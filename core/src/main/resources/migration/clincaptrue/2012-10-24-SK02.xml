@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="skirpichenok" id="2012-10-24-SK02-1">
+        <dropSequence sequenceName="OID_ID_SEQ" />
+        <createSequence sequenceName="crf_oid_id_seq" />
+        <createSequence sequenceName="crf_version_oid_id_seq" />
+        <createSequence sequenceName="generic_oid_id_seq" />
+        <createSequence sequenceName="item_group_oid_id_seq" />
+        <createSequence sequenceName="item_oid_id_seq" />
+        <createSequence sequenceName="measurement_unit_oid_id_seq" />
+        <createSequence sequenceName="study_event_definition_oid_id_seq" />
+        <createSequence sequenceName="study_oid_id_seq" />
+        <createSequence sequenceName="study_subject_oid_id_seq" />
+    </changeSet>
+</databaseChangeLog>

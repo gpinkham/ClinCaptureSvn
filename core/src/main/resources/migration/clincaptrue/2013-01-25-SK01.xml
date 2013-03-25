@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="skirpichenok" id="2013-01-25-SK01-01">
+        <comment>Add current_session field to user_account table</comment>
+        <addColumn tableName="user_account" >
+            <column name="pentaho_user_session" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2013-01-25-SK01-02">
+        <comment>Add session_last_activity field to user_account table</comment>
+        <addColumn tableName="user_account" >
+            <column name="pentaho_token_date" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

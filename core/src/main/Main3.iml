@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Spring" name="Spring">
+      <configuration>
+        <fileset id="fileset1" name="Xml Application Context" removed="false">
+          <file>file://$MODULE_DIR$/resources/org/akaza/openclinica/applicationContext-core-db.xml</file>
+          <file>file://$MODULE_DIR$/resources/org/akaza/openclinica/applicationContext-core-email.xml</file>
+          <file>file://$MODULE_DIR$/resources/org/akaza/openclinica/applicationContext-core-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/resources/org/akaza/openclinica/applicationContext-core-scheduler.xml</file>
+          <file>file://$MODULE_DIR$/resources/org/akaza/openclinica/applicationContext-core-service.xml</file>
+          <file>file://$MODULE_DIR$/resources/org/akaza/openclinica/applicationContext-core-spring.xml</file>
+          <file>file://$MODULE_DIR$/resources/org/akaza/openclinica/applicationContext-core-timer.xml</file>
+          <file>file://$MODULE_DIR$/resources/org/akaza/openclinica/applicationContext-security.xml</file>
+          <file>file://$MODULE_DIR$/resources/org/akaza/openclinica/ws/client/client-config.xml</file>
+        </fileset>
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/resources" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="libraries" level="project" />
+  </component>
+</module>
+

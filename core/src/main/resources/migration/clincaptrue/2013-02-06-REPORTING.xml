@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="amiklushou" id="2013-02-06-REPORTING-01">
+        <comment>DN count by status view</comment>
+        <createView viewName="v_dn_count">
+            select s.name, s.study_id, (select count(dn.resolution_status_id) from discrepancy_note dn where dn.study_id = s.study_id and dn.parent_dn_id IS NULL and (dn.discrepancy_note_type_id IN (3,5,4,1)) AND dn.resolution_status_id = 1) as new,
+            (select count(dn.resolution_status_id) from discrepancy_note dn where dn.study_id = s.study_id and dn.parent_dn_id IS NULL and (dn.discrepancy_note_type_id IN (3,5,4,1)) AND dn.resolution_status_id = 2) as updated,
+            (select count(dn.resolution_status_id) from discrepancy_note dn where dn.study_id = s.study_id and dn.parent_dn_id IS NULL and (dn.discrepancy_note_type_id IN (3,5,4,1)) AND dn.resolution_status_id = 3) as resolution,
+            (select count(dn.resolution_status_id) from discrepancy_note dn where dn.study_id = s.study_id and dn.parent_dn_id IS NULL and (dn.discrepancy_note_type_id IN (3,5,4,1)) AND dn.resolution_status_id = 4) as closed
+            from study s;
+        </createView>
+    </changeSet>
+    <changeSet author="amiklushou" id="2013-02-06-REPORTING-02">
+        <comment>Enrollemnt per month view</comment>
+        <createView viewName="v_enrollment_per_month_2013">
+            SELECT ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-01-01'::date AND '2013-01-31'::date) AS jan, ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-02-01'::date AND '2013-02-28'::date) AS feb, ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-03-01'::date AND '2013-03-31'::date) AS mar, ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-04-01'::date AND '2013-04-30'::date) AS apr, ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-05-01'::date AND '2013-05-31'::date) AS may, ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-06-01'::date AND '2013-06-30'::date) AS jun, ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-07-01'::date AND '2013-07-31'::date) AS jul, ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-08-01'::date AND '2013-08-31'::date) AS aug, ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-09-01'::date AND '2013-09-30'::date) AS sep, ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-10-01'::date AND '2013-10-31'::date) AS oct, ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-11-01'::date AND '2013-11-30'::date) AS nov, ( SELECT count(ss.study_subject_id) AS count
+            FROM study_subject ss
+            WHERE ss.enrollment_date between '2013-12-01'::date AND '2013-12-31'::date) AS "dec";
+        </createView>
+    </changeSet>
+
+    <changeSet author="amiklushou" id="2013-02-06-REPORTING-03">
+        <comment>Enrollment view</comment>
+        <createView viewName="v_enrolled_per_site">
+            select s.name, s.study_id, (select count(dn.resolution_status_id) from discrepancy_note dn where dn.study_id = s.study_id and dn.parent_dn_id IS NULL and (dn.discrepancy_note_type_id IN (3,5,4,1)) AND dn.resolution_status_id = 1) as new,
+            (select count(dn.resolution_status_id) from discrepancy_note dn where dn.study_id = s.study_id and dn.parent_dn_id IS NULL and (dn.discrepancy_note_type_id IN (3,5,4,1)) AND dn.resolution_status_id = 2) as updated,
+            (select count(dn.resolution_status_id) from discrepancy_note dn where dn.study_id = s.study_id and dn.parent_dn_id IS NULL and (dn.discrepancy_note_type_id IN (3,5,4,1)) AND dn.resolution_status_id = 3) as resolution,
+            (select count(dn.resolution_status_id) from discrepancy_note dn where dn.study_id = s.study_id and dn.parent_dn_id IS NULL and (dn.discrepancy_note_type_id IN (3,5,4,1)) AND dn.resolution_status_id = 4) as closed
+            from study s;
+        </createView>
+
+    </changeSet>
+</databaseChangeLog>

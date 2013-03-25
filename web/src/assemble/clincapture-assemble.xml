@@ -1,0 +1,36 @@
+<assembly>
+  <id></id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <includes>
+        <include>README*</include>
+        <include>LICENSE*</include>
+        <include>NOTICE*</include>
+      </includes>
+    </fileSet>
+	<fileSet>
+      <directory>src/main/config/install-docs</directory>
+      <outputDirectory>install-docs</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/config</directory>
+      <outputDirectory>config</outputDirectory>
+      <includes>
+        <include>database/PostgreSQL/1.0.2/*/*</include>
+        <include>database/Oracle/1.0.2/*/*</include>
+        <include>languages/*</include>
+		<include>languages/*/*</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  <files>
+  	<file>
+  		<source>target/ClinCapture-1.0.2.war</source>
+  		<outputDirectory>distribution</outputDirectory>
+  		<destName>ClinCapture-1.0.2.war</destName>
+  	</file>
+  </files>
+</assembly>

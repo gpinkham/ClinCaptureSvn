@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="skirpichenok" id="2013-01-02-SK01-01">
+        <validCheckSum>8c55281f82b89c869fb5dc843b58a86b</validCheckSum>
+        <validCheckSum>81a0bd68c2c8bbf479297dc09c06cb9</validCheckSum>
+        <update tableName="study_parameter">
+            <column name="overridable" value="TRUE"/>
+            <where>handle='markImportedCRFAsCompletezd'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

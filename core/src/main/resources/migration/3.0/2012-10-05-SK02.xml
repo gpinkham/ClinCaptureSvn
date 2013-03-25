@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="skirpichenok" id="2012-10-05-SK02-01">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from study_parameter where name = 'secondaryLabelRequired'</sqlCheck>
+        </preConditions>
+        <delete tableName="study_parameter_value">
+            <where>parameter='secondaryLabelRequired'</where>
+        </delete>
+        <update tableName="study_parameter">
+            <column name="name" value="secondaryIdRequired"/>
+            <column name="handle" value="secondaryIdRequired"/>
+            <where>name='secondaryLabelRequired'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

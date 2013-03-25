@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="plukashenka" id="2012-10-08-PL01-01">
+        <comment>Change real messages with keys</comment>
+
+        <update tableName="audit_log_event_type">
+            <column name="name" value="item_data_value_updated"/>
+            <where>audit_log_event_type_id=1</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_subject_created"/>
+            <where>audit_log_event_type_id=2</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_subject_status_changed"/>
+            <where>audit_log_event_type_id=3</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_subject_value_changed"/>
+            <where>audit_log_event_type_id=4</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="subject_created"/>
+            <where>audit_log_event_type_id=5</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="subject_status_changed"/>
+            <where>audit_log_event_type_id=6</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="subject_global_value_changed"/>
+            <where>audit_log_event_type_id=7</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="event_crf_marked_complete"/>
+            <where>audit_log_event_type_id=8</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="event_crf_properties_changed"/>
+            <where>audit_log_event_type_id=9</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="event_crf_initial_data_entry_complete"/>
+            <where>audit_log_event_type_id=10</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="event_crf_double_data_entry_complete"/>
+            <where>audit_log_event_type_id=11</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="item_data_status_changed"/>
+            <where>audit_log_event_type_id=12</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="item_data_deleted"/>
+            <where>audit_log_event_type_id=13</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="event_crf_complete_with_password"/>
+            <where>audit_log_event_type_id=14</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="event_crf_initial_data_entry_complete_with_password"/>
+            <where>audit_log_event_type_id=15</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="event_crf_double_data_entry_complete_with_password"/>
+            <where>audit_log_event_type_id=16</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_scheduled"/>
+            <where>audit_log_event_type_id=17</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_data_entry_started"/>
+            <where>audit_log_event_type_id=18</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_completed"/>
+            <where>audit_log_event_type_id=19</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_stopped"/>
+            <where>audit_log_event_type_id=20</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_skipped"/>
+            <where>audit_log_event_type_id=21</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_locked"/>
+            <where>audit_log_event_type_id=22</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_removed"/>
+            <where>audit_log_event_type_id=23</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_start_date_changed"/>
+            <where>audit_log_event_type_id=24</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_end_date_changed"/>
+            <where>audit_log_event_type_id=25</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_location_changed"/>
+            <where>audit_log_event_type_id=26</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="subject_site_assignment"/>
+            <where>audit_log_event_type_id=27</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="subject_group_assignment"/>
+            <where>audit_log_event_type_id=28</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="subject_group_changed"/>
+            <where>audit_log_event_type_id=29</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="item_data_inserted_for_repeating_row"/>
+            <where>audit_log_event_type_id=30</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_signed"/>
+            <where>audit_log_event_type_id=31</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="eventcrf_sdv_status"/>
+            <where>audit_log_event_type_id=32</where>
+        </update>
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_restored"/>
+            <where>audit_log_event_type_id=35</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

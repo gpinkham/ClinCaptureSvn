@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <dn_event_crf_map
+            event_crf_id = "1"
+            discrepancy_note_id =  "4"
+            column_name = "interviewer_name" />
+
+    <dn_item_data_map
+            item_data_id = "1"
+            discrepancy_note_id = "1"
+            column_name = "value"
+            study_subject_id="1" />
+
+    <dn_study_event_map
+            study_event_id = "1"
+            discrepancy_note_id = "5"
+            column_name = "start_date" />
+
+    <dn_study_subject_map
+            study_subject_id = "1"
+            discrepancy_note_id = "3"
+            column_name="" />
+
+    <dn_subject_map
+            subject_id = "1"
+            discrepancy_note_id = "2"
+            column_name="" />
+</dataset>

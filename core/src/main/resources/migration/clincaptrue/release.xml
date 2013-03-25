@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <include file="migration/clincaptrue/2012-10-22-SK01.xml"/>
+    <include file="migration/clincaptrue/2012-10-24-SK02.xml"/>
+    <include file="migration/clincaptrue/2012-11-12-TH01.xml"/>
+    <include file="migration/clincaptrue/2012-11-23-TICKET105.xml"/>
+    <include file="migration/clincaptrue/2012-11-23-TICKET111.xml"/>
+    <include file="migration/clincaptrue/2013-01-02-SK01.xml"/>
+    <include file="migration/clincaptrue/2013-01-03-TICKET120.xml"/>
+    <include file="migration/clincaptrue/2013-01-05-TICKET142.xml"/>
+    <include file="migration/clincaptrue/2013-01-25-SK01.xml"/>
+    <include file="migration/clincaptrue/2013-02-05-SK01.xml"/>
+    <include file="migration/clincaptrue/2013-02-06-REPORTING.xml" />
+    <include file="migration/clincaptrue/2013-03-04-TICKET221.xml" />
+</databaseChangeLog>

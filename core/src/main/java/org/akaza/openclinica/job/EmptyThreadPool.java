@@ -1,0 +1,49 @@
+/*******************************************************************************
+ * Copyright (C) 2009-2013 Clinovo Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
+ * 
+ * You should have received a copy of the Lesser GNU General Public License along with this program.  
+ * If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
+package org.akaza.openclinica.job;
+
+import org.quartz.simpl.ZeroSizeThreadPool;
+
+/**
+ * 
+ * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
+ * 
+ */
+public class EmptyThreadPool extends ZeroSizeThreadPool {
+
+	private final Object lock = new Object();
+
+	@Override
+	public boolean runInThread(Runnable runnable) {
+		sleep();
+		return false;
+	}
+
+	@Override
+	public int blockForAvailableThreads() {
+		sleep();
+		return 0;
+	}
+
+	private void sleep() {
+		synchronized (lock) {
+			try {
+				lock.wait(10000);
+			} catch (InterruptedException e) {
+				// Do nothing
+			}
+		}
+	}
+
+}

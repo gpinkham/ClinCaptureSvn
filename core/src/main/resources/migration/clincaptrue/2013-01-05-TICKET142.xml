@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="skirpichenok" id="2013-01-05-TICKET142-1">
+        <sql splitStatements="false">
+            update event_crf ec set not_started = false where (select count(id.item_data_id) from item_data id where id.event_crf_id = ec.event_crf_id) > 0
+        </sql>
+    </changeSet>
+</databaseChangeLog>

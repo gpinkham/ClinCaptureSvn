@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="hendra" id="2010-12-10-HT01-1">
+        <comment>Create a table named password</comment>
+        <createTable tableName="password">
+            <column autoIncrement="true" name="passwd_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="user_name" type="VARCHAR(255)"/>
+            <column name="user_id" type="INT"/>
+            <column name="passwd" type="VARCHAR(255)"/>
+            <column name="date_first_used" type="java.sql.Types.TIMESTAMP"/>
+            <column name="date_last_used" type="java.sql.Types.TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

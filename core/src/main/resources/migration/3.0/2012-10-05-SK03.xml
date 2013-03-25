@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="skirpichenok" id="2012-10-05-SK03-01">
+        <comment>Insert a new record in the studyParameter table</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="18"/>
+            <column name="handle" value="dateOfEnrollmentForStudyRequired"/>
+            <column name="name" value="dateOfEnrollmentForStudyRequired"/>
+            <column name="description" value="Date of Enrollment for Study Required"/>
+            <column name="default_value" value="yes"/>
+            <!-- can be no, yes, not_used -->
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2012-10-05-SK03-02">
+        <comment>Insert a new record in the studyParameter table</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="19"/>
+            <column name="handle" value="studySubjectIdLabel"/>
+            <column name="name" value="studySubjectIdLabel"/>
+            <column name="description" value="Study Subject ID Label"/>
+            <column name="default_value" value="Study Subject ID"/>
+            <!-- can be no, yes, not_used -->
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2012-10-05-SK03-03">
+        <comment>Insert a new record in the studyParameter table</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="20"/>
+            <column name="handle" value="secondaryIdLabel"/>
+            <column name="name" value="secondaryIdLabel"/>
+            <column name="description" value="Secondary ID Label"/>
+            <column name="default_value" value="Secondary ID"/>
+            <!-- can be no, yes, not_used -->
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2012-10-05-SK03-04">
+        <comment>Insert a new record in the studyParameter table</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="21"/>
+            <column name="handle" value="dateOfEnrollmentForStudyLabel"/>
+            <column name="name" value="dateOfEnrollmentForStudyLabel"/>
+            <column name="description" value="Date of Enrollment for Study Label"/>
+            <column name="default_value" value="Date of Enrollment for Study"/>
+            <!-- can be no, yes, not_used -->
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2012-10-05-SK03-05">
+        <comment>Insert a new record in the studyParameter table</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="22"/>
+            <column name="handle" value="genderLabel"/>
+            <column name="name" value="genderLabel"/>
+            <column name="description" value="Gender Label"/>
+            <column name="default_value" value="Sex"/>
+            <!-- can be no, yes, not_used -->
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2012-10-05-SK03-06">
+        <comment>Insert a new record in the studyParameter table</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="23"/>
+            <column name="handle" value="startDateTimeRequired"/>
+            <column name="name" value="startDateTimeRequired"/>
+            <column name="description" value="Start Date Time Required"/>
+            <column name="default_value" value="yes"/>
+            <!-- can be no, yes, not_used -->
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2012-10-05-SK03-07">
+        <comment>Insert a new record in the studyParameter table</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="24"/>
+            <column name="handle" value="startDateTimeLabel"/>
+            <column name="name" value="startDateTimeLabel"/>
+            <column name="description" value="Start Date Time Label"/>
+            <column name="default_value" value="Start Date/Time"/>
+            <!-- can be no, yes, not_used -->
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2012-10-05-SK03-08">
+        <comment>Insert a new record in the studyParameter table</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="25"/>
+            <column name="handle" value="endDateTimeRequired"/>
+            <column name="name" value="endDateTimeRequired"/>
+            <column name="description" value="End Date Time Required"/>
+            <column name="default_value" value="no"/>
+            <!-- can be no, yes, not_used -->
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2012-10-05-SK03-09">
+        <comment>Insert a new record in the studyParameter table</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="26"/>
+            <column name="handle" value="endDateTimeLabel"/>
+            <column name="name" value="endDateTimeLabel"/>
+            <column name="description" value="End Date Time Label"/>
+            <column name="default_value" value="End Date/Time"/>
+            <!-- can be no, yes, not_used -->
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
