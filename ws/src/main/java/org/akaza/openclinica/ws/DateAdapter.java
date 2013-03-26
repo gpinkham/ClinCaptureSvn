@@ -13,12 +13,12 @@
 
 package org.akaza.openclinica.ws;
 
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 
 public class DateAdapter extends XmlAdapter<String, Date> {
 

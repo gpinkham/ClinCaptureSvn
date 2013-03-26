@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
  * 
  * @author ssachs
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class DiscrepancyValidator extends Validator {
 	private final FormDiscrepancyNotes notes;
 

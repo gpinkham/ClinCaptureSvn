@@ -25,11 +25,7 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * @author jxu
- * 
- * 
- */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class FormDiscrepancyNotes {
 	private HashMap fieldNotes;
 	private HashMap numExistingFieldNotes;
@@ -50,7 +46,6 @@ public class FormDiscrepancyNotes {
 		}
 
 		notes.add(note);
-		// System.out.println("after adding note:" + notes.size());
 		fieldNotes.put(field, notes);
 	}
 

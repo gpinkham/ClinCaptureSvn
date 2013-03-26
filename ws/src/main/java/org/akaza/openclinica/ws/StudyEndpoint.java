@@ -57,6 +57,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
 @Endpoint
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class StudyEndpoint {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -92,7 +93,6 @@ public class StudyEndpoint {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		Element studyRefElement = (Element) studyNodeList.item(0);
 
-		// StudyMetadataRequestBean studyMetadataRequestBean = unMarshallRequest(studyRefElement);
 		BaseStudyDefinitionBean studyMetadataRequestBean = unMarshallRequest(studyRefElement);
 		DataBinder dataBinder = new DataBinder((studyMetadataRequestBean));
 		Errors errors = dataBinder.getBindingResult();
@@ -120,7 +120,7 @@ public class StudyEndpoint {
 
 		Element odmElement = document.createElementNS(NAMESPACE_URI_V1, "odm");
 		String reportText = getReport(study);
-		odmElement.setTextContent(reportText);// meta.getXmlOutput().toString());
+		odmElement.setTextContent(reportText);
 		responseElement.appendChild(odmElement);
 
 		return responseElement;
@@ -128,8 +128,6 @@ public class StudyEndpoint {
 	}
 
 	private String getReport(StudyBean currentStudy) {
-		// ServletContext servletContext =
-		// (ServletContext) context.getMessageContext().get(MessageContext.SERVLET_CONTEXT);
 		MetaDataCollector mdc = new MetaDataCollector(dataSource, currentStudy, ruleSetRuleDao);
 		AdminDataCollector adc = new AdminDataCollector(dataSource, currentStudy);
 		MetaDataCollector.setTextLength(200);
@@ -138,7 +136,6 @@ public class StudyEndpoint {
 		odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
 		ArrayList<String> xmlnsList = new ArrayList<String>();
 		xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
-		// xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
 		xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
 		xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
 		odmb.setXmlnsList(xmlnsList);
@@ -179,7 +176,6 @@ public class StudyEndpoint {
 
 	}
 
-	// private StudyMetadataRequestBean unMarshallRequest(Element studyEventDefinitionListAll) {
 	private BaseStudyDefinitionBean unMarshallRequest(Element studyEventDefinitionListAll) {
 
 		Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyEventDefinitionListAll, "identifier");

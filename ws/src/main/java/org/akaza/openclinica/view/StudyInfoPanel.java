@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
  * @author thickerson
  * 
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class StudyInfoPanel {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -197,22 +198,13 @@ public class StudyInfoPanel {
 		Locale locale = request.getLocale();
 		resword = ResourceBundleProvider.getWordsBundle();
 		local_sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string"));
-		// logger.info("found date format string: " +
-		// ResourceBundleProvider.getFormatBundle
-		// ().getString("date_format_string"));
-		// logger.info("found date format string with locale: " +
-		// ResourceBundleProvider
-		// .getFormatBundle(locale).getString("date_format_string"));
 
 		try {
 			// defaults, can be reset by mistake by running through one page,
-			// tbh
 			this.setStudyInfoShown(true);
 			this.setOrderedData(false);
-			// try to avoid errors, tbh
 			if (page.equals(Page.CREATE_DATASET_1)) {
 				this.reset();
-				// this.setData("Number of Steps", "5");
 			} else if (page.equals(Page.CREATE_DATASET_2) || page.equals(Page.CREATE_DATASET_EVENT_ATTR)
 					|| page.equals(Page.CREATE_DATASET_SUB_ATTR) || page.equals(Page.CREATE_DATASET_CRF_ATTR)
 					|| page.equals(Page.CREATE_DATASET_GROUP_ATTR) || page.equals(Page.CREATE_DATASET_VIEW_SELECTED)) {
@@ -314,28 +306,7 @@ public class StudyInfoPanel {
 			} else if (page.equals(Page.ADMIN_SYSTEM)) {
 				// blank here , info set in servlet itself
 			} else if (page.equals(Page.VIEW_STUDY_SUBJECT) || page.equals(Page.LIST_EVENTS_FOR_SUBJECT)) {
-				// special case, unlocks study name, subject name, and
-				// visits
-				// TODO set all this up, tbh
-				/*
-				 * set up the side info panel to create the following upon entry from the ViewStudyServlet Study X
-				 * Subject Y StudyEventDef Z1 StudyEventDef Z2 <status-tag> CRF A1 <status-tag> CRF A2 Z1 should be
-				 * collapsible/expandible, etc.
-				 * 
-				 * We can pull things from the session and the request:
-				 */
-				/*
-				 * StudyBean study = (StudyBean) request.getAttribute("study"); StudySubjectBean studySubject =
-				 * (StudySubjectBean) request.getAttribute("studySub"); EntityBeanTable table = (EntityBeanTable)
-				 * request.getAttribute("table"); EventCRFBean ecb = (EventCRFBean)request.getAttribute("eventCRF");
-				 * this.reset(); ArrayList rows = table.getRows(); ArrayList beans =
-				 * DisplayStudyEventBean.generateBeansFromRows(rows);
-				 * 
-				 * 
-				 * addStudyEventTree(study, studySubject, beans, ecb);
-				 */
-				// this.setIconInfoShown(false);
-				// this.setManageSubject(true);
+	
 				this.reset();
 				this.setStudyInfoShown(true);
 				this.setOrderedData(true);
@@ -389,8 +360,6 @@ public class StudyInfoPanel {
 			} else if (page.equals(Page.EDIT_DATASET)) {
 				this.reset();
 
-				// HashMap eventlist = (HashMap)
-				// request.getAttribute("eventlist");
 				HashMap eventlist = (LinkedHashMap) session.getAttribute("eventsForCreateDataset");
 				ArrayList displayData = generateEventTree(eventlist);
 
@@ -577,10 +546,6 @@ public class StudyInfoPanel {
 		this.setOrderedData(false);
 
 		ArrayList displayData = new ArrayList();
-		// displayData.add(new StudyInfoPanelLine("Study", study.getName(),
-		// true, false));
-		// displayData.add(new StudyInfoPanelLine("<span class='alert'>Subject",
-		// studySubject.getLabel() + "</span>", true, false));
 		if (withLink) {
 			displayData = generateTreeFromBeans(displayStudyEventBeans, displayData, studySubject, ecb);
 		} else {
@@ -630,8 +595,6 @@ public class StudyInfoPanel {
 					// last event CRF for this event
 					// it's the current crf
 					if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {// was
-						// getName(),
-						// tbh
 
 						displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()),
 								"<span class='alert'>" + dec.getEventCRF().getCrf().getName() + " "
@@ -663,8 +626,6 @@ public class StudyInfoPanel {
 				if (count == uncompleted.size() - 1) {
 					if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()
 							&& ecb.getCrf().getId() == dedc.getEventCRF().getCrf().getId()) {
-						// logger.info("ecb id*******" + ecb.getId() +
-						// dedc.getEventCRF().getId());
 						displayData.add(new StudyInfoPanelLine(
 								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
 										+ dedc.getEdc().getCrf().getName() + "</span>", false, true, true));
@@ -680,8 +641,6 @@ public class StudyInfoPanel {
 					}
 				} else {
 					if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()) {
-						// logger.info("ecb id*******" + ecb.getId() +
-						// dedc.getEventCRF().getId());
 						displayData.add(new StudyInfoPanelLine(
 								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
 										+ dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
@@ -772,8 +731,6 @@ public class StudyInfoPanel {
 				if (count == uncompleted.size() - 1) {
 					if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()
 							&& ecb.getCrf().getId() == dedc.getEventCRF().getCrf().getId()) {
-						// logger.info("ecb id*******" + ecb.getId() +
-						// dedc.getEventCRF().getId());
 						displayData.add(new StudyInfoPanelLine(
 								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
 										+ dedc.getEdc().getCrf().getName() + "</span>", false, true, true));
@@ -785,8 +742,6 @@ public class StudyInfoPanel {
 					}
 				} else {
 					if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()) {
-						// logger.info("ecb id*******" + ecb.getId() +
-						// dedc.getEventCRF().getId());
 						displayData.add(new StudyInfoPanelLine(
 								"<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
 										+ dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
@@ -833,7 +788,6 @@ public class StudyInfoPanel {
 							+ ExtractBean.getSEDCRFCode(i + 1, j + 1) + "</b>", false, true));
 				}
 
-				// third, iterate through crf versions
 			}
 		}
 		return displayData;
@@ -841,10 +795,7 @@ public class StudyInfoPanel {
 
 	private ArrayList generateEventTree(HashMap eventlist) {
 		ArrayList displayData = new ArrayList();
-		// Iterator keyIt = eventlist.keySet().iterator();
-		// logger.info("how many events =" + eventlist.size());
 
-		int count = 0;
 		for (Iterator keyIt = eventlist.keySet().iterator(); keyIt.hasNext();) {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) keyIt.next();
 			displayData.add(new StudyInfoPanelLine("Definition", sed.getName(), true, false));
@@ -861,9 +812,7 @@ public class StudyInfoPanel {
 				}
 				ordinal_crf++;
 			}
-			count++;
 		}
-		// logger.info("how many definitions =" + count);
 		return displayData;
 
 	}

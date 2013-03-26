@@ -22,6 +22,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.springframework.validation.Errors;
 
+@SuppressWarnings({"rawtypes"})
 public class BaseVSValidatorImplementation implements BaseWSValidatorInterface {
 
 	public StudyBean verifyStudy(StudyDAO dao, String study_id, Status[] included_status, Errors errors) {
@@ -102,16 +103,10 @@ public class BaseVSValidatorImplementation implements BaseWSValidatorInterface {
 	}
 
 	public StudyBean verifyStudySubject(String study_id, String subjectId, int max_length, Errors errors) {
-		// verify that subjectId is not null
-
-		// verify that subjectid<max_length if max_length>0
-
-		// verify that subject id belongs to study
 		return null;
 	}
 
 	public boolean verifyRole(UserAccountBean user, int study_id, int site_id, Role excluded_role, Errors errors) {
-		// TODO Auto-generated method stub
 		// check for site role & user permission if ok -> return yes,
 		// if no-> check for study permissions & role
 		StudyUserRoleBean role = null;
@@ -137,7 +132,6 @@ public class BaseVSValidatorImplementation implements BaseWSValidatorInterface {
 	}
 
 	public boolean verifyRole(UserAccountBean user, int study_id, int site_id, Errors errors) {
-		// TODO Auto-generated method stub
 		// check for site role & user permission if ok -> return yes,
 		// if no-> check for study permissions & role
 		StudyUserRoleBean role = null;
@@ -162,7 +156,6 @@ public class BaseVSValidatorImplementation implements BaseWSValidatorInterface {
 
 	public boolean verifyUser(UserAccountBean user, UserAccountDAO userAccountDao, int study_id, int site_id,
 			Errors errors) {
-		// TODO Auto-generated method stub
 		// check for site role & user permission if ok -> return yes,
 		// if no-> check for study permissions & role
 		StudyUserRoleBean siteSur;

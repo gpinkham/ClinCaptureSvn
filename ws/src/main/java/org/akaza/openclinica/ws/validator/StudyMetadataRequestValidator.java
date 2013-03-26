@@ -13,7 +13,8 @@
 
 package org.akaza.openclinica.ws.validator;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -23,8 +24,7 @@ import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import javax.sql.DataSource;
-
+@SuppressWarnings({"rawtypes"})
 public class StudyMetadataRequestValidator implements Validator {
 
 	DataSource dataSource;
@@ -39,7 +39,6 @@ public class StudyMetadataRequestValidator implements Validator {
 		helper = new BaseVSValidatorImplementation();
 	}
 
-	@SuppressWarnings("rawtypes")
 	public boolean supports(Class clazz) {
 		return BaseStudyDefinitionBean.class.equals(clazz);
 	}
@@ -64,49 +63,9 @@ public class StudyMetadataRequestValidator implements Validator {
 				site_id = site.getId();
 			}
 		}
+		
 		helper.verifyUser(studyMetadataRequest.getUser(), getUserAccountDAO(), study.getId(), site_id, e);
 
-		//
-		// StudyUserRoleBean studySur =
-		// getUserAccountDAO().findRoleByUserNameAndStudyId(studyMetadataRequest.getUser().getName(), study.getId());
-		// if (studySur.getStatus() != Status.AVAILABLE) {
-		// e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
-		// "You do not have sufficient privileges to proceed with this operation.");
-		// return;
-		// }
-
-		// if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() == null) {
-		// StudyBean study = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getStudyUniqueId());
-		// if (study == null) {
-		// e.reject("subjectTransferValidator.study_does_not_exist", new Object[] {
-		// studyMetadataRequest.getStudyUniqueId() }, "Study identifier you specified "
-		// + studyMetadataRequest.getStudyUniqueId() + " does not correspond to a valid study.");
-		// return;
-		// }
-		//
-		// StudyUserRoleBean studySur =
-		// getUserAccountDAO().findRoleByUserNameAndStudyId(studyMetadataRequest.getUser().getName(), study.getId());
-		// if (studySur.getStatus() != Status.AVAILABLE) {
-		// e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
-		// "You do not have sufficient privileges to proceed with this operation.");
-		// return;
-		// }
-		// }
-		// if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() != null) {
-		// StudyBean study = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getStudyUniqueId());
-		// StudyBean site = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getSiteUniqueId());
-		// if (study == null || site == null || site.getParentStudyId() != study.getId()) {
-		// e.reject("studyEventDefinitionRequestValidator.invalid_study_identifier_site_identifier");
-		// return;
-		// }
-		// StudyUserRoleBean siteSur =
-		// getUserAccountDAO().findRoleByUserNameAndStudyId(studyMetadataRequest.getUser().getName(), site.getId());
-		// if (siteSur.getStatus() != Status.AVAILABLE) {
-		// e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
-		// "You do not have sufficient privileges to proceed with this operation.");
-		// return;
-		// }
-		// }
 	}
 
 	public StudyDAO getStudyDAO() {

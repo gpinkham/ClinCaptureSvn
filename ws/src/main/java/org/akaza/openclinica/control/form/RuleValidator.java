@@ -40,12 +40,10 @@ import javax.servlet.http.HttpServletRequest;
  * 
  * @author ssachs
  */
+@SuppressWarnings({"rawtypes"})
 public class RuleValidator extends Validator {
-	private FormDiscrepancyNotes notes;
-
 	public RuleValidator(HttpServletRequest request, FormDiscrepancyNotes notes) {
 		super(request);
-		this.notes = notes;
 	}
 
 	public RuleValidator(HttpServletRequest request) {
@@ -54,10 +52,6 @@ public class RuleValidator extends Validator {
 
 	@Override
 	protected HashMap validate(String fieldName, Validation v) {
-		/*
-		 * if (!v.isAlwaysExecuted()) { if (notes.hasNote(fieldName) || notes.getNumExistingFieldNotes(fieldName) > 0) {
-		 * return errors; } }
-		 */
 
 		return super.validate(fieldName, v);
 	}

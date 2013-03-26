@@ -91,24 +91,17 @@ public class DataEndpoint {
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
-		// logger.debug("rootElement=" + odmElement);
 		logger.debug("rootElement=" + odmElement);
 
-		String xml = null;
 		UserAccountBean userBean = null;
 
 		try {
 			if (odmElement == null) {
 				return new DOMSource(mapFailConfirmation(null, "Your XML is not well-formed."));
 			}
-			// xml = node2String(odmElement);
-			// xml = xml.replaceAll("<ODM>", this.ODM_HEADER_NAMESPACE);
 			ODMContainer odmContainer = unmarshallToODMContainer(odmElement);
-			// Element clinicalDataNode = (Element) odmElement.getElementsByTagName("ClinicalData").item(0);
-			// String studyUniqueID = clinicalDataNode.getAttribute("StudyOID");
 			String studyUniqueID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
 			userBean = getUserAccount();
-			// CRFDataImportBean crfDataImportBean = new CRFDataImportBean(studyUniqueID, userBean);
 			BaseStudyDefinitionBean crfDataImportBean = new BaseStudyDefinitionBean(studyUniqueID, userBean);
 
 			DataBinder dataBinder = new DataBinder(crfDataImportBean);
@@ -137,7 +130,6 @@ public class DataEndpoint {
 		} catch (Exception npe) {
 			return new DOMSource(mapFailConfirmation(null, "Your XML is not well-formed. " + npe.getMessage()));
 		}
-		// return new DOMSource(mapConfirmation(xml, studyBean, userBean));
 	}
 
 	private ODMContainer unmarshallToODMContainer(Element odmElement) throws Exception {
@@ -151,10 +143,6 @@ public class DataEndpoint {
 
 		Mapping myMap = new Mapping();
 
-		// InputStream xsdFile = coreResources.getInputStream("ODM1-3-0.xsd");//new File(propertiesPath + File.separator
-		// + "ODM1-3-0.xsd");
-		// InputStream xsdFile2 = coreResources.getInputStream("ODM1-2-1.xsd");//new File(propertiesPath +
-		// File.separator + "ODM1-2-1.xsd");
 		InputStream mapInputStream = coreResources.getInputStream("cd_odm_mapping.xml");
 
 		myMap.loadMapping(new InputSource(mapInputStream));
@@ -177,20 +165,6 @@ public class DataEndpoint {
 			// fail against one, try another
 			me1.printStackTrace();
 			logger.debug("failed in unmarshaling, trying another version = " + me1.getMessage());
-			// htaycher: use only one schema according to Tom
-			// try {
-			// // schemaValidator.validateAgainstSchema(xml, xsdFile2);
-			// // for backwards compatibility, we also try to validate vs
-			// // 1.2.1 ODM 06/2008
-			// odmContainer = (ODMContainer) um1.unmarshal(new StringReader(xml));
-			// } catch (Exception me2) {
-			// // not sure if we want to report me2
-			// me2.printStackTrace();
-			// // break here with an exception
-			// logger.debug("found an error with XML: " + me2.getMessage());
-			// throw new Exception();
-			//
-			// }
 			throw new Exception();
 		}
 

@@ -13,14 +13,6 @@
 
 package org.akaza.openclinica.web.filter;
 
-import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.object.MappingSqlQuery;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -30,6 +22,15 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.object.MappingSqlQuery;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
+
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 public class OpenClinicaJdbcService extends JdbcDaoImpl {
 
 	private MappingSqlQuery ocUsersByUsernameMapping;
@@ -38,7 +39,6 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
 	 * Executes the <tt>usersByUsernameQuery</tt> and returns a list of UserDetails objects (there should normally only
 	 * be one matching user).
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	protected List loadUsersByUsername(String username) {
 		this.ocUsersByUsernameMapping = new OcUsersByUsernameMapping(getDataSource());

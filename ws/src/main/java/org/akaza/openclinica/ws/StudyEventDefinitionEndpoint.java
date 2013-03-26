@@ -54,6 +54,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
 @Endpoint
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class StudyEventDefinitionEndpoint {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -104,7 +105,6 @@ public class StudyEventDefinitionEndpoint {
 		}
 	}
 
-	// StudyBean getStudy(StudyEventDefinitionRequestBean studyEventDefinitionRequestBean) {
 	StudyBean getStudy(BaseStudyDefinitionBean studyEventDefinitionRequestBean) {
 		StudyBean study = null;
 		if (studyEventDefinitionRequestBean.getStudyUniqueId() != null
@@ -135,7 +135,6 @@ public class StudyEventDefinitionEndpoint {
 		return (UserAccountBean) getUserAccountDao().findByUserName(username);
 	}
 
-	// private StudyEventDefinitionRequestBean unMarshallRequest(Element studyEventDefinitionListAll) {
 	private BaseStudyDefinitionBean unMarshallRequest(Element studyEventDefinitionListAll) {
 		Element studyRefElement = DomUtils.getChildElementByTagName(studyEventDefinitionListAll, "studyRef");
 		Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
@@ -147,9 +146,6 @@ public class StudyEventDefinitionEndpoint {
 				.trim();
 		String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement)
 				.trim();
-
-		// StudyEventDefinitionRequestBean studyEventDefinitionRequestBean =
-		// new StudyEventDefinitionRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
 
 		BaseStudyDefinitionBean studyEventDefinitionRequestBean = new BaseStudyDefinitionBean(studyIdentifier,
 				siteIdentifier, getUserAccount());

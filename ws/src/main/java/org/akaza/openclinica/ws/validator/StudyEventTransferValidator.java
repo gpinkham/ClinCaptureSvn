@@ -13,11 +13,10 @@
 
 package org.akaza.openclinica.ws.validator;
 
-import java.util.Date;
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -28,8 +27,7 @@ import org.akaza.openclinica.ws.bean.StudyEventTransferBean;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import javax.sql.DataSource;
-
+@SuppressWarnings({"rawtypes"})
 public class StudyEventTransferValidator implements Validator {
 
 	DataSource dataSource;
@@ -43,7 +41,6 @@ public class StudyEventTransferValidator implements Validator {
 		helper = new BaseVSValidatorImplementation();
 	}
 
-	@SuppressWarnings("rawtypes")
 	public boolean supports(Class clazz) {
 		return StudyEventTransferBean.class.equals(clazz);
 	}
@@ -81,56 +78,6 @@ public class StudyEventTransferValidator implements Validator {
 				Role.MONITOR, e);
 		if (!isRoleVerified)
 			return;
-		//
-		// StudyBean study = getStudyDAO().findByUniqueIdentifier(studyEventTransferBean.getStudyUniqueId());
-		// if (study == null) {
-		// e.reject("studyEventTransferValidator.study_does_not_exist", new Object[] {
-		// studyEventTransferBean.getStudyUniqueId() },
-		// "Study identifier you specified " + studyEventTransferBean.getStudyUniqueId() +
-		// " does not correspond to a valid study.");
-		// return;}
-		// //validate study status
-		// if (study != null && !( study.getStatus().isAvailable() || study.getStatus().isPending()) ){
-		// e.reject("subjectTransferValidator.study_status_wrong", new Object[] {
-		// studyEventTransferBean.getStudyUniqueId() }, "Study "
-		// + studyEventTransferBean.getStudyUniqueId() +" has wrong status.");
-		// return;
-		// }
-		// else
-		// {
-		// studyEventTransferBean.setStudy(study);
-		// }
-
-		// if (studyEventTransferBean.getSiteUniqueId() != null) {
-		// study = getStudyDAO().findSiteByUniqueIdentifier(studyEventTransferBean.getStudyUniqueId(),
-		// studyEventTransferBean.getSiteUniqueId());
-		// // verification
-		// // go from here : study should be available or in design - verify
-		// if ( study == null){
-		// e.reject("subjectTransferValidator.site_does_not_exist", new Object[] {
-		// studyEventTransferBean.getSiteUniqueId() },
-		// "Site identifier you specified does not correspond to a valid site.");
-		// return;
-		// }
-		// //validate site status
-		// if (study != null && !study.getStatus().isAvailable()) {
-		//
-		// e.reject("subjectTransferValidator.site_status_wrong", new Object[] {
-		// studyEventTransferBean.getSiteUniqueId() }, "Site "
-		// + study.getName() +" has wrong status. Subject can be added to an 'AVAILABLE' site only.");
-		// return;
-		// }
-		// studyEventTransferBean.setStudy(study);
-		// }
-		//
-		// by study or site
-		// StudyUserRoleBean role =
-		// studyEventTransferBean.getUser().getRoleByStudy(studyEventTransferBean.getStudy().getId());
-		// if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
-		// e.reject("studyEventTransferValidator.insufficient_permissions",
-		// "You do not have sufficient privileges to proceed with this operation.");
-		// return;
-		// }
 
 		// Non Business Validation
 		if (studyEventTransferBean.getSubjectLabel() == null) {

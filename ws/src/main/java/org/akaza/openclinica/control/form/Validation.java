@@ -22,6 +22,7 @@ package org.akaza.openclinica.control.form;
 
 import java.util.ArrayList;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class Validation {
 	private int type;
 

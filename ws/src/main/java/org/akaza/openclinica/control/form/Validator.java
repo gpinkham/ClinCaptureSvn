@@ -334,31 +334,17 @@ import javax.servlet.http.HttpServletRequest;
  * @author ssachs
  * 
  */
-
-// TODO: add ability to halt at a given validation
-// TODO: work on making this class extensible. this is probably best achieved by
-// subclassing the Validation class
-// and making it more beefy (ie adding a checkIfValidated() type method to that
-// class,
-// so that the work is done there and not in this class)
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class Validator {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	Locale locale;
 	ResourceBundle restext, resexception, resword;
 
-	// public static final ValidatorRegularExpression DATE = new
-	// ValidatorRegularExpression(
-	// "MM/DD/YYYY", "[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}");
 	public static ValidatorRegularExpression getDateRegEx() {
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 		return new ValidatorRegularExpression(resformat.getString("date_format"), resformat.getString("date_regexp"));
 	}
-
-	// public static final ValidatorRegularExpression DATE_TIME = new
-	// ValidatorRegularExpression(
-	// "MM/DD/YYYY HH:MM a", "[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}
-	// [0-9]{1,2}:[0-9]{1,2} [aApP][mM]");
 
 	public static ValidatorRegularExpression getDateTimeRegEx() {
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
@@ -368,10 +354,6 @@ public class Validator {
 
 	public static final ValidatorRegularExpression EMAIL = new ValidatorRegularExpression(
 			"username@institution.domain", ".+@.+\\..*");
-
-	// public static final ValidatorRegularExpression PHONE_NUMBER = new
-	// ValidatorRegularExpression(
-	// "123-456-7890", "[0-9]{3}[\\-\\.][0-9]{3}[\\-\\.][0-9]{4}");
 
 	public static ValidatorRegularExpression getPhoneRegEx() {
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
@@ -404,9 +386,7 @@ public class Validator {
 	public static final int IS_A_USERNAME = 16;
 	public static final int IS_VALID_TERM = 17;
 	public static final int COMPARES_TO_STATIC_VALUE = 18; // for comparisons
-	// like
-	// "NumQuestions >=
-	// 1"
+	
 	public static final int ENTITY_EXISTS_IN_STUDY = 19;
 	public static final int IS_A_PHONE_NUMBER = 20;
 	public static final int NO_BLANKS_SET = 22;
@@ -417,21 +397,19 @@ public class Validator {
 	public static final int IS_REQUIRED = 26;
 	public static final int MATCHES_REGULAR_EXPRESSION = 27;
 	public static final int DATE_IN_PAST = 28;
-	// YW 06-26-2007 << throw error message:"You have to choose different value"
+	// Throw error message:"You have to choose different value"
 	// if one field
 	// has the same value as another field.
 	// e.g. new expired password should be different from the old password;
 	// otherwise, throw error
 	public static final int CHECK_DIFFERENT = 29;
-	// YW >>
 	public static final int DIFFERENT_NUMBER_OF_GROUPS_IN_DDE = 30;
 
 	public static final int IS_A_DATE_WITHOUT_REQUIRED_CHECK = 31;
-	// YW, 2-5-2008 << For scoring. If this type has been set, add error message
+	// For scoring. If this type has been set, add error message
 	// which will be set out of this class
 	public static final int CALCULATION_FAILED = 32;
 	public static final int IS_PARTIAL_DATE = 34;
-	// YW >>
 	public static final int IS_AN_RULE = 33;
 	public static final int BARCODE_EAN_13 = 36;
 	public static final int IS_VALID_WIDTH_DECIMAL = 35;
@@ -483,23 +461,11 @@ public class Validator {
 		validations.put(fieldName, fieldValidations);
 	}
 
-	// protected int getLastValidationInd(String fieldName) {
-	// ArrayList fieldValidations = getFieldValidations(fieldName);
-	// return fieldValidations.size() - 1;
-	// }
-
-	/*
-	 * use for: NO_BLANKS, IS_A_NUMBER, IS_A_DATE, IS_A_EMAIL, IS_AN_INTEGER, IS_A_PASSWORD, IS_A_USERNAME,
-	 * IS_A_PHONE_NUMBER, IS_DATE_TIME, NO_BLANKS_SET DATE_IN_PAST
-	 */
 	public void addValidation(String fieldName, int type) {
 		Validation v = new Validation(type);
 		addValidation(fieldName, v);
 	}
 
-	/*
-	 * use for: IS_IN_RANGE
-	 */
 	public void addValidation(String fieldName, int type, int start, int end) {
 		// TODO: assert type == is in range
 		// For finding out if a number is in a range
@@ -625,7 +591,6 @@ public class Validator {
 		v.addArgument(new String(idb.getValue()));
 		v.addArgument(isMultiple);
 		lastField = fieldName;
-		// added tbh, 112007
 		addValidation(fieldName, v);
 	}
 
@@ -676,7 +641,6 @@ public class Validator {
 
 	protected void addError(String fieldName, Validation v) {
 
-		// locale = request.getLocale(); htaycher : set in constructor
 		resexception = ResourceBundleProvider.getExceptionsBundle(locale);
 		resword = ResourceBundleProvider.getWordsBundle(locale);
 
@@ -729,15 +693,10 @@ public class Validator {
 			case IS_AN_INTEGER:
 				errorMessage = resexception.getString("input_not_integer");
 				break;
-			// case IS_A_FILE:
-			// break;
-			// case IS_OF_FILE_TYPE:
-			// break;
 			case IS_IN_SET:
 				errorMessage = resexception.getString("input_not_acceptable_option");
 				break;
 			case IS_A_PASSWORD:
-				// clinovo - tiket #120
 				errorMessage = resexception.getString("password_must_be_at_least") + getPwdMinLen(request) + " "
 						+ resword.getString("characters_long") + ".";
 				break;
@@ -788,8 +747,6 @@ public class Validator {
 				break;
 			case MATCHES_INITIAL_DATA_ENTRY_VALUE:
 				String value = v.getString(0);
-				// errorMessage = v.getErrorMessage();//should be set at the DDE
-				// stage, tbh 112007
 				errorMessage = resexception.getString("value_not_match") + " : " + value;
 				break;
 			case IS_REQUIRED:
@@ -821,7 +778,6 @@ public class Validator {
 				errorMessage = v.getErrorMessage();
 			}
 		}
-		// logger.info("<<<error added: "+errorMessage+" to "+fieldName);
 		addError(fieldName, errorMessage);
 	}
 
@@ -938,10 +894,6 @@ public class Validator {
 				addError(fieldName, v);
 			}
 			break;
-		// case IS_A_FILE:
-		// break;
-		// case IS_OF_FILE_TYPE:
-		// break;
 		case IS_IN_SET:
 			ArrayList set = (ArrayList) v.getArg(0);
 
@@ -950,7 +902,6 @@ public class Validator {
 			}
 			break;
 		case IS_A_PASSWORD:
-			// clinovo - tiket #120
 			int pwdMinLen = getPwdMinLen(request);
 			if (pwdMinLen > 0
 					&& !lengthComparesToStaticValue(fieldName, NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO,
@@ -1077,11 +1028,6 @@ public class Validator {
 			boolean isPDate = Boolean.FALSE;
 			String fieldValue = getFieldValue(fieldName);
 			if (fieldValue != null) {
-				// if (StringUtil.isFormatYearMonth(fieldValue,
-				// resformat.getString("date_format_year_month")) ||
-				// StringUtil.isFormatYear(fieldValue)
-				// || StringUtil.isFormatDate(fieldValue,
-				// resformat.getString("date_format_string"))) {
 				if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"))
 						|| StringUtil.isPartialYear(fieldValue, "yyyy")
 						|| StringUtil.isPartialYearMonth(fieldValue, resformat.getString("date_format_year_month"))) {
@@ -1147,7 +1093,7 @@ public class Validator {
 		}
 
 		try {
-			float f = Float.parseFloat(fieldValue);
+			Float.parseFloat(fieldValue);
 		} catch (Exception e) {
 			return false;
 		}
@@ -1194,7 +1140,7 @@ public class Validator {
 		sdf.setLenient(false);
 		try {
 			java.util.Date date = sdf.parse(fieldValue);
-			String s = date.toString();
+			date.toString();
 			return isYearNotFourDigits(date);
 		} catch (ParseException fe) {
 			return false;
@@ -1230,23 +1176,6 @@ public class Validator {
 	 *         <code>false</code> otherwise.
 	 */
 	protected boolean isDateInPast(String fieldName) {
-		Date d = null;
-		if (fieldName != null) {
-			// d = FormProcessor.getDateFromString(getFieldValue(fieldName));
-		}
-		if (d != null) {
-			Date today = new Date();
-			Calendar cal = Calendar.getInstance();
-			/*
-			 * Adding one day with the current server date to allow validation for date entered form a client in forward
-			 * timezone
-			 */
-			cal.add(Calendar.HOUR, 24);
-			today = cal.getTime();
-			if (today.compareTo(d) >= 0) {
-				return true;
-			}
-		}
 		return false;
 	}
 
@@ -1260,22 +1189,7 @@ public class Validator {
 	protected boolean isYearNotFourDigits(Date d) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(d);
-		if (c.get(Calendar.YEAR) < 1000 || c.get(Calendar.YEAR) > 9999) { // did
-			// the
-			// user
-			// enter
-			// a
-			// year
-			// with
-			// less
-			// than
-			// 4
-			// digits
-			// or
-			// more
-			// than
-			// 4
-			// digits?
+		if (c.get(Calendar.YEAR) < 1000 || c.get(Calendar.YEAR) > 9999) { 
 			return false;
 		}
 		return true;
@@ -1298,23 +1212,17 @@ public class Validator {
 			return false;
 		}
 
-		// YW 08-17-2007 << If no input for any of these 3 fields, it means that
-		// time is not specified.
-		// In this case, 12:00 am has been set as default according to original
-		// setting
 		if ("-1".equals(hour) && "-1".equals(minute) && "".equals(half)) {
 			hour = "12";
 			minute = "00";
 			half = "am";
 		}
-		// tbh >> added the extra 0 to minutes, 112007
 		if (hour.length() == 1) {
 			hour = "0" + hour;
 		}
 		if (minute.length() == 1) {
 			minute = "0" + minute;
 		}
-		// YW >>
 		String fieldValue = date + " " + hour + ":" + minute + ":00 " + half;
 		SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_time_format_string"));
 		sdf.setLenient(false);
@@ -1372,8 +1280,6 @@ public class Validator {
 		}
 	}
 
-	// TODO: entity exists method
-
 	protected boolean isInteger(String fieldName) {
 		String fieldValue = getFieldValue(fieldName);
 
@@ -1381,15 +1287,13 @@ public class Validator {
 			return false;
 		}
 		try {
-			int i = Integer.parseInt(fieldValue);
+			Integer.parseInt(fieldValue);
 		} catch (Exception e) {
 			return false;
 		}
 
 		return true;
 	}
-
-	// TODO: is_a_file, IS_OF_FILE_TYPE methods
 
 	protected boolean isInSet(String fieldName, ArrayList set) {
 		String fieldValue = getFieldValue(fieldName);
@@ -1588,15 +1492,9 @@ public class Validator {
 		if (laterDateValue == null || earlierDateValue == null) {
 			return false;
 		}
+		
+		return false;
 
-		Date laterDate = null;// FormProcessor.getDateFromString(laterDateValue);
-		Date earlierDate = null;// FormProcessor.getDateFromString(earlierDateValue);
-
-		if (laterDate.compareTo(earlierDate) >= 0) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	protected boolean isSetBlank(String fieldName) {
@@ -1610,7 +1508,6 @@ public class Validator {
 	}
 
 	protected boolean isInResponseSet(String fieldName, ResponseSetBean set, boolean multValues) {
-		// prep work - makes checking for a value in the set very fast
 		HashMap values = new HashMap();
 
 		ArrayList options = set.getOptions();
@@ -1724,7 +1621,6 @@ public class Validator {
 				logger.info("line 1444: validator: found NPE with " + fieldName);
 				return false;
 			}
-			// had to re-add: tbh 09222007
 		}
 
 		if (fieldValue == null) {
@@ -1747,18 +1643,15 @@ public class Validator {
 	 *            The error message to display.
 	 */
 	public void setErrorMessage(String message) {
-		// logger.info("got this far...");
 		if (lastField == null) {
 			return;
 		}
 
-		// logger.info("got this far...");
 		ArrayList fieldValidations = (ArrayList) validations.get(lastField);
 		if (fieldValidations == null) {
 			return;
 		}
 
-		// logger.info("got this far...");
 		int lastInd = fieldValidations.size() - 1;
 		Validation v = (Validation) fieldValidations.get(lastInd);
 		if (v == null) {
@@ -1766,7 +1659,6 @@ public class Validator {
 		}
 
 		v.setErrorMessage(message);
-		// logger.info("set error message successfully: "+message);
 		fieldValidations.set(lastInd, v);
 		validations.put(lastField, fieldValidations);
 	}
@@ -1809,25 +1701,13 @@ public class Validator {
 		compareOpByFunction.put("lte", NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO);
 		compareOpByFunction.put("ne", NumericComparisonOperator.NOT_EQUALS);
 		compareOpByFunction.put("eq", NumericComparisonOperator.EQUALS);
-		// if(!inputFunction.equals("func:barcode(EAN-13)")){
-		// this is a regular expression for the pattern:
-		// func: fname(arg1 [, arg2] ... [, argn])
-		// if it matches then:
-		// fname is group 1
-		// arg1 is group 2
-		// "," + arg2 is group 3
-		// ...
-		// "," + argn is group n + 1
 		Pattern funcPattern = Pattern.compile("func:\\s*([A-Za-z]+)\\(([^,]*)?(,[^,]*)*\\)");
 		Matcher funcMatcher = funcPattern.matcher(inputFunction);
 
 		if (!funcMatcher.matches()) {
 			throw new Exception(resexception.getString("syntax_incorrect"));
-			// error: the syntax is incorrect, should be func:
-			// fname(arg1,...,argn)
 		}
 
-		int numGroups = funcMatcher.groupCount();
 		// note that numGroups must be > 1
 		fname = funcMatcher.group(1);
 		args = new ArrayList();
@@ -1864,7 +1744,7 @@ public class Validator {
 		for (int i = 0; i < args.size(); i++) {
 			int ord = i + 1;
 			try {
-				float f = Float.parseFloat((String) args.get(i));
+				Float.parseFloat((String) args.get(i));
 			} catch (Exception e) {
 				throw new Exception(resexception.getString("validation_column_invalid_function") + ": "
 						+ resexception.getString("argument") + ord + " " + resexception.getString("is_not_a_number"));
@@ -1886,9 +1766,6 @@ public class Validator {
 			v.addArgument(f);
 
 		}
-		// }else{
-		// v = new Validation(BARCODE_EAN_13);
-		// }
 		return v;
 	}
 
@@ -1898,12 +1775,8 @@ public class Validator {
 
 		Validation v = new Validation(Validator.MATCHES_REGULAR_EXPRESSION);
 
-		// YW 10-23-2007, <<
-		// inputRegex should be looking like "regexp:/expression/" if it goes
-		// this far
 		String finalRegexp = inputRegex.substring(7).trim();
 		finalRegexp = finalRegexp.substring(1, finalRegexp.length() - 1);
-		// YW >>
 
 		if (StringUtil.isBlank(finalRegexp)) {
 			throw new Exception(resexception.getString("regular_expression_is_blank"));
@@ -1926,7 +1799,6 @@ public class Validator {
 	 * @param dataType
 	 * @return
 	 * 
-	 * @author ywang (02-2009)
 	 */
 	public static StringBuffer validateWidthDecimalSetting(String widthDecimal, String dataType,
 			boolean isCalculationItem, Locale locale) {
@@ -2065,7 +1937,6 @@ public class Validator {
 		return message;
 	}
 
-	// clinovo - ticket #120
 	private int getPwdMinLen(HttpServletRequest request) {
 		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(
 				request.getSession().getServletContext()).getBean(ConfigurationDao.class);

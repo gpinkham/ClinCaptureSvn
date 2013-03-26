@@ -31,12 +31,8 @@ import javax.servlet.http.HttpServletRequest;
  * 
  */
 public class ScoreItemValidator extends DiscrepancyValidator {
-	private FormDiscrepancyNotes notes;
-
 	public ScoreItemValidator(HttpServletRequest request, FormDiscrepancyNotes notes) {
-		// super(request);
 		super(request, notes);
-		this.notes = notes;
 	}
 
 	@Override

@@ -20,6 +20,25 @@
  */
 package org.akaza.openclinica.ws;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -33,7 +52,6 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -65,30 +83,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
-
-import javax.sql.DataSource;
-import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-
-/**
- * @author Krikor Krumlian
- * 
- */
 @Endpoint
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class StudySubjectEndpoint {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -134,18 +130,14 @@ public class StudySubjectEndpoint {
 
 			DataBinder dataBinder = new DataBinder((subjectTransferBean));
 			errors = dataBinder.getBindingResult();
-			// System.out.println("got here before validation");
 			subjectTransferBean.setOwner(getUserAccount());
 			SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
 			subjectTransferValidator.validate((subjectTransferBean), errors);
 			if (!errors.hasErrors()) {
-				// System.out.println("got here before creation");
 				String label = create(subjectTransferBean);
-				// System.out.println("got here after creation" + label);
 				return new DOMSource(mapConfirmation(
 						messages.getMessage("studySubjectEndpoint.success", null, "Success", locale), label, errors));
 			} else {
-				// System.out.println("got here by throwing an error");
 				return new DOMSource(mapConfirmation(
 						messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
 			}
@@ -206,12 +198,10 @@ public class StudySubjectEndpoint {
 	public Source isStudySubject(@XPathParam("//studySubject:studySubject") NodeList subject) throws Exception {
 		ResourceBundleProvider.updateLocale(locale);
 		Element subjectElement = (Element) subject.item(0);
-		// Element studyElement = (Element) study.item(0);
 		SubjectStudyDefinitionBean subjectStudyBean = unMarshallToSubjectStudy(subjectElement);// ,studyElement);
 
 		DataBinder dataBinder = new DataBinder((subjectStudyBean));
 		Errors errors = dataBinder.getBindingResult();
-		// System.out.println("got here before validation");
 		SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
 		subjectTransferValidator.validateIsSubjectExists((subjectStudyBean), errors);
 
@@ -276,7 +266,6 @@ public class StudySubjectEndpoint {
 		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
 		EventsType eventsType = new EventsType();
 		List<StudyEventBean> events = eventDao.findAllByStudySubject(studySubject);
-		StudyEventDefinitionBean eb = null;
 		for (StudyEventBean studyEventBean : events) {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(studyEventBean
 					.getStudyEventDefinitionId());
@@ -436,29 +425,8 @@ public class StudySubjectEndpoint {
 	 * @return String
 	 */
 	private String create(SubjectTransferBean subjectTransferBean) {
-		// boolean isSubjectInMain = doesSubjectExist(subjectTransferBean);
-
-		// if (isSubjectInMain) {
-		// // TODO : either return something or throw exception or don't do anything
-		// logger.debug("SubjectInMain");
-		// throw new OpenClinicaSystemException("Duplicate label");
-		// } else {
 		logger.debug("creating subject transfer");
 		return createSubject(subjectTransferBean);
-		// }
-	}
-
-	/**
-	 * @param subjectTransferBean
-	 * @return
-	 */
-	private boolean doesSubjectExist(SubjectTransferBean subjectTransferBean) {
-		// TODO: Implement this
-		StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
-		StudyDAO studyDao = new StudyDAO(dataSource);
-		StudyBean studyBean = studyDao.findByUniqueIdentifier(subjectTransferBean.getStudy().getIdentifier());
-		StudySubjectBean ssbean = ssdao.findByLabelAndStudy(subjectTransferBean.getStudySubjectId(), studyBean);
-		return ssbean.getId() > 0 ? true : false;
 	}
 
 	private String createSubject(SubjectTransferBean subjectTransfer) {
@@ -466,15 +434,11 @@ public class StudySubjectEndpoint {
 		subject.setUniqueIdentifier(subjectTransfer.getPersonId());
 		subject.setLabel(subjectTransfer.getStudySubjectId());
 		subject.setDateOfBirth(subjectTransfer.getDateOfBirth());
-		// System.out.println("testing new code here...");
-		// below added tbh 04/2011
 		if (subject.getDateOfBirth() != null) {
 			subject.setDobCollected(true);
 		} else {
 			subject.setDobCollected(false);
 		}
-		// >> above added tbh 04/2011, mantis issue having to
-		// deal with not being able to change DOB after a submit
 		subject.setGender(subjectTransfer.getGender());
 		if (subjectTransfer.getOwner() != null) {
 			subject.setOwner(subjectTransfer.getOwner());
