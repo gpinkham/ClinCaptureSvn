@@ -593,14 +593,6 @@
 						</systemProperties>
 					</configuration>
 				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-eclipse-plugin</artifactId>
-					<version>2.6</version>
-					<configuration>
-						<addVersionToProjectName>true</addVersionToProjectName>
-					</configuration>
-				</plugin>
 			</plugins>
 		</pluginManagement>
 
