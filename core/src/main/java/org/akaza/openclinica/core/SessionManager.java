@@ -20,25 +20,23 @@
  */
 package org.akaza.openclinica.core;
 
-import oracle.jdbc.pool.OracleDataSource;
-
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Level;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+
+import oracle.jdbc.pool.OracleDataSource;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Utility which handles connection and login, as prompted by OpenClinica control servlets. Updated August 2004 to
@@ -50,15 +48,9 @@ import javax.sql.DataSource;
  * @author Jun Xu
  */
 public class SessionManager {
-	private Connection con;
-
 	private UserAccountBean ub;
 
-	private String logFileName;
-
 	private OracleDataSource ods;
-
-	private Level logLevel;
 
 	private DataSource ds;
 
@@ -104,9 +96,6 @@ public class SessionManager {
 
 	public void setupUser(UserAccountBean userFromSession, String userName) {
 		if (userFromSession == null || StringUtil.isBlank(userFromSession.getName())) {
-			// create a new user account bean form database
-			SQLFactory factory = SQLFactory.getInstance();
-
 			uDAO = new UserAccountDAO(ds);
 			if (userName == null) {
 				userName = "";
@@ -120,11 +109,6 @@ public class SessionManager {
 	}
 
 	public void setupDataSource() {
-		// begin remove later
-		// logger.info("***** BEGIN LISTING PROPERTIES *****");
-		// System.getProperties().list(System.out);
-		// logger.info("***** END LISTING PROPERTIES *****");
-		// end remove later
 		try {
 			Context ctx = new InitialContext();
 			Context env = (Context) ctx.lookup("java:comp/env");
@@ -133,7 +117,6 @@ public class SessionManager {
 				logger.debug("looking up oracle...");
 				ds = (DataSource) env.lookup("SQLOracle");
 			} else if ("postgres".equals(dbName)) {
-				// logger.info("looking up postgres...");
 				ds = (DataSource) env.lookup("SQLPostgres");
 			}
 
@@ -156,7 +139,6 @@ public class SessionManager {
 	}
 
 	public void setConnection(Connection con) {
-		this.con = con;
 	}
 
 	public void setUserBean(UserAccountBean user) {
@@ -167,7 +149,6 @@ public class SessionManager {
 		return ds;
 	}
 
-	/** added 08-04-2004 by tbh, supporting Oracle 10g */
 	public OracleDataSource getOracleDataSource() {
 		return ods;
 	}

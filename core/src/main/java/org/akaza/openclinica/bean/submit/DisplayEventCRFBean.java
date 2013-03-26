@@ -39,6 +39,7 @@ import java.util.Date;
  * @author ssachs
  */
 
+@SuppressWarnings("rawtypes")
 public class DisplayEventCRFBean implements Comparable {
 
 	protected final static Logger logger = LoggerFactory.getLogger(DisplayEventCRFBean.class.getName());

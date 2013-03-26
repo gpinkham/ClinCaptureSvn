@@ -24,12 +24,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 
 import java.util.HashMap;
 
-/**
- * @author jxu
- * 
- *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
- *         Code Templates
- */
+@SuppressWarnings("rawtypes")
 public class DisplayItemDetailBean {
 	private ItemBean item;
 	private HashMap metaForVersion = new HashMap();

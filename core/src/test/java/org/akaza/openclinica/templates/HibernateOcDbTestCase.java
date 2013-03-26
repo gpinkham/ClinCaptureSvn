@@ -13,6 +13,12 @@
 
 package org.akaza.openclinica.templates;
 
+import java.io.File;
+import java.util.Locale;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -23,21 +29,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-
-import java.io.File;
-import java.util.Locale;
-import java.util.Properties;
-
-import javax.sql.DataSource;
 
 public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	// public static PlatformTransactionManager transactionManager;
 	protected static ApplicationContext context;
 
 	protected static Properties properties = new Properties();
@@ -80,34 +77,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 	@Override
 	protected void setUp() throws Exception {
 
-		/*
-		 * loadProperties(); dbName = properties.getProperty("dbName"); dbUrl = properties.getProperty("url");
-		 * dbUserName = properties.getProperty("username"); dbPassword = properties.getProperty("password");
-		 * dbDriverClassName = properties.getProperty("driver"); locale = properties.getProperty("locale");
-		 * initializeLocale(); initializeQueriesInXml();
-		 */
-		// setUpContext();
-		// TODO Auto-generated method stub
 		super.setUp();
-
-	}
-
-	private void setUpContext() {
-		// Loading the applicationContext under test/resources first allows
-		// test.properties to be loaded first.Hence we can
-		// use different settings.
-		/*
-		 * context = new ClassPathXmlApplicationContext( new String[] { "classpath*:applicationContext-core-s*.xml",
-		 * "classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
-		 * "classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
-		 * "classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
-		 * "classpath*:org/akaza/openclinica/applicationContext-core-scheduler.xml",
-		 * "classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
-		 * " classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
-		 * "classpath*:org/akaza/openclinica/applicationContext-security.xml" }); transactionManager =
-		 * (PlatformTransactionManager) context.getBean("transactionManager"); transactionManager.getTransaction(new
-		 * DefaultTransactionDefinition());
-		 */
 
 	}
 
@@ -152,18 +122,9 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 			throw new IllegalStateException(
 					"The system properties basedir were not made available to the application. Therefore we cannot locate the test properties file.");
 		}
-		// @pgawade 05-Nov-2010 Updated the path of directory storing xml files
-		// containing sql queries
-		// SQLFactory.JUNIT_XML_DIR =
-		// baseDir + File.separator + "src" + File.separator + "main" +
-		// File.separator + "webapp" + File.separator + "properties" +
-		// File.separator;
 		SQLFactory.JUNIT_XML_DIR = baseDir + File.separator + "src" + File.separator + "main" + File.separator
 				+ "resources" + File.separator + "properties" + File.separator;
 
-		// @pgawade 10272010 - Added the ResourceLoader instance as a parameter
-		// to run method of SQLFactory
-		// SQLFactory.getnstance().run(dbName);
 		SQLFactory.getInstance().run(dbName, context);
 	}
 
@@ -198,10 +159,8 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 
 			transactionManager.commit(transactionManager.getTransaction(new DefaultTransactionDefinition()));
 			super.tearDown();
-			// transactionManager = null;
 			if (ds != null)
 				ds.getConnection().close();
-			// getDataSource().getConnection().close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

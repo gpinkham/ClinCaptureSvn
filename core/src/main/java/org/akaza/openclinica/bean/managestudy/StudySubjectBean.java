@@ -21,10 +21,7 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Date;
 
-/**
- * @author jxu
- * 
- */
+@SuppressWarnings({"rawtypes", "serial"})
 public class StudySubjectBean extends AuditableEntityBean {
 	
 	private String label = "";
@@ -33,9 +30,6 @@ public class StudySubjectBean extends AuditableEntityBean {
 
 	private int studyId;
 
-	/**
-	 * @vbc 08/06/2008 NEW EXTRACT DATA IMPLEMENTATION - add dob_collected
-	 */
 	private boolean isDobCollected;
 
 	private Date enrollmentDate;

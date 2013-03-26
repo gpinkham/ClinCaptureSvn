@@ -26,9 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// Internationalized name and description in Term.getName and
-// Term.getDescription()
-
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class StudyType extends Term {
 
 	public static final StudyType INVALID = new StudyType(0, "");

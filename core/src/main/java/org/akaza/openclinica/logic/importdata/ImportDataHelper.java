@@ -49,6 +49,7 @@ import java.util.HashMap;
  * @author Tom Hickerson, 04/2008
  * @category logic classes
  */
+@SuppressWarnings({"rawtypes"})
 public class ImportDataHelper {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -96,8 +97,7 @@ public class ImportDataHelper {
 		SubjectDAO subjectDao = new SubjectDAO(sm.getDataSource());
 
 		StudyBean studyBean = (StudyBean) studyDao.findByName(studyName);
-		// .findByPK(studyId);
-
+		
 		// generate the subject bean first, so that we can have the subject id
 		// below...
 		SubjectBean subjectBean = subjectDao// .findByUniqueIdentifierAndStudy(subjectName,
@@ -105,7 +105,6 @@ public class ImportDataHelper {
 				.findByUniqueIdentifier(subjectName);
 
 		StudySubjectBean studySubjectBean = studySubjectDao.findBySubjectIdAndStudy(subjectBean.getId(), studyBean);
-		// .findByLabelAndStudy(subjectName, studyBean);
 		logger.info("::: found study subject id here: " + studySubjectBean.getId() + " with the following: subject ID "
 				+ subjectBean.getId() + " study bean name " + studyBean.getName());
 
@@ -129,17 +128,13 @@ public class ImportDataHelper {
 		// trying it again up here since down there doesn't seem to work, tbh
 		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinistionDao
 				.findByName(eventDefinitionCRFName);
-		// .findByEventDefinitionCRFId(eventDefinitionCRFId);
-		// replaced by findbyname
 
 		if (studySubjectBean.getId() <= 0 && studyEventBean.getId() <= 0 && crfVersion.getId() <= 0
 				&& studyBean.getId() <= 0 && studyEventDefinitionBean.getId() <= 0) {
 			logger.info("Throw an Exception, One of the provided ids is not valid");
 		}
 
-		// >> tbh repeating items:
 		ArrayList eventCrfBeans = eventCrfDao.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersion);
-		// TODO repeating items here? not yet
 		if (eventCrfBeans.size() > 1) {
 			logger.info("found more than one");
 		}
@@ -167,10 +162,8 @@ public class ImportDataHelper {
 			}
 
 			eventCrfBean = new EventCRFBean();
-			// eventCrfBean.setCrf((CRFBean)crf);
-			// eventCrfBean.setCrfVersion(crfVersion);
-			if (eventCRFId == 0) {// no event CRF created yet
-				// ???
+			if (eventCRFId == 0) {
+				// no event CRF created yet
 				if (studyBean.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
 					eventCrfBean.setInterviewerName("");
 				} else {
@@ -181,10 +174,7 @@ public class ImportDataHelper {
 				if (!studyBean.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
 					if (studyEventBean.getDateStarted() != null) {
 						eventCrfBean.setDateInterviewed(studyEventBean.getDateStarted());// default
-						// date
 					} else {
-						// logger.info("evnet start date is null, so date
-						// interviewed is null");
 						eventCrfBean.setDateInterviewed(null);
 					}
 				} else {
@@ -194,9 +184,7 @@ public class ImportDataHelper {
 				eventCrfBean.setAnnotations("");
 				eventCrfBean.setCreatedDate(new Date());
 				eventCrfBean.setCRFVersionId(crfVersion.getId());
-				// eventCrfBean.setCrfVersion((CRFVersionBean)crfVersion);
 				eventCrfBean.setOwner(ub);
-				// eventCrfBean.setCrf((CRFBean)crf);
 				eventCrfBean.setStatus(Status.AVAILABLE);
 				eventCrfBean.setCompletionStatusId(1);
 				// problem with the line below
@@ -207,19 +195,11 @@ public class ImportDataHelper {
 
 				try {
 					eventCrfBean = (EventCRFBean) eventCrfDao.create(eventCrfBean);
-					// TODO review
-					// eventCrfBean.setCrfVersion((CRFVersionBean)crfVersion);
-					// eventCrfBean.setCrf((CRFBean)crf);
 				} catch (Exception ee) {
 					logger.info(ee.getMessage());
 					logger.info("throws with crf version id " + crfVersion.getId() + " and study event id "
 							+ studyEventId + " study subject id " + studySubjectBean.getId());
 				}
-				// note that you need to catch an exception if the numbers are
-				// bogus, ie you can throw an error here
-				// however, putting the try catch allows you to pass which is
-				// also bad
-				// logger.info("CREATED EVENT CRF");
 			} else {
 				// there is an event CRF already, only need to update
 				// is the status not started???
@@ -235,15 +215,11 @@ public class ImportDataHelper {
 				eventCrfBean.setUpdater(ub);
 				eventCrfBean = (EventCRFBean) eventCrfDao.update(eventCrfBean);
 
-				// eventCrfBean.setCrfVersion((CRFVersionBean)crfVersion);
-				// eventCrfBean.setCrf((CRFBean)crf);
 			}
 
 			if (eventCrfBean.getId() <= 0) {
 				logger.info("error");
 			} else {
-				// TODO change status here, tbh
-				// 2/08 this part seems to work, tbh
 				studyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
 				studyEventBean.setUpdater(ub);
 				studyEventBean.setUpdatedDate(new Date());
@@ -255,7 +231,6 @@ public class ImportDataHelper {
 		eventCrfBean.setCrfVersion(crfVersion);
 		eventCrfBean.setCrf((CRFBean) crf);
 
-		// repeating?
 		return eventCrfBean;
 	}
 }

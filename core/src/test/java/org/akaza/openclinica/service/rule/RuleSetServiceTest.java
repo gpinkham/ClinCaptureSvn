@@ -24,6 +24,7 @@ import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 
 import java.util.List;
 
+@SuppressWarnings("rawtypes")
 public class RuleSetServiceTest extends HibernateOcDbTestCase {
 
 	public RuleSetServiceTest() {
@@ -43,9 +44,6 @@ public class RuleSetServiceTest extends HibernateOcDbTestCase {
 		RuleSetServiceInterface instance = (RuleSetServiceInterface) getContext().getBean("ruleSetService");
 		ruleSets = instance.filterByStatusEqualsAvailable(ruleSets);
 		assertEquals("RuleSet size should be 3", 3, ruleSets.size());
-		// testing out a regression
-		// assertEquals("There should not be any RuleSetRules in this RuleSet", 0,
-		// ruleSets.get(2).getRuleSetRules().size());
 	}
 
 	private List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition() {
@@ -64,16 +62,6 @@ public class RuleSetServiceTest extends HibernateOcDbTestCase {
 		RuleSetServiceInterface instance = (RuleSetServiceInterface) getContext().getBean("ruleSetService");
 		List<RuleSetBean> ruleSets = instance.getRuleSetsByCrfStudyAndStudyEventDefinition(study, studyEventDefinition,
 				crfVersion);
-		return ruleSets;
-
-	}
-
-	private List<RuleSetBean> getRuleSets() {
-		List<RuleSetBean> ruleSets = null;
-		ruleSets = getRuleSetsByCrfStudyAndStudyEventDefinition();
-
-		RuleSetServiceInterface instance = (RuleSetServiceInterface) getContext().getBean("ruleSetService");
-		ruleSets = instance.filterByStatusEqualsAvailable(ruleSets);
 		return ruleSets;
 
 	}

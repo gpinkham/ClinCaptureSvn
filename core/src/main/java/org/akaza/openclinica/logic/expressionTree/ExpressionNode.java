@@ -26,14 +26,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
-/**
- * @author Krikor Krumlian
- * 
- */
 public abstract class ExpressionNode {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	private HashMap<String, String> testValues;
 	private OpenClinicaExpressionParser expressionParser;
 
 	String value() throws OpenClinicaSystemException {

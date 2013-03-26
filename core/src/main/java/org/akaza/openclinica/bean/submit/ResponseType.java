@@ -45,9 +45,7 @@ import java.util.List;
  *         File � for upload of files
  * @deprecated
  */
-
-// Internationalized description in Term.getDescription()
-@Deprecated
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class ResponseType extends Term {
 	public static final ResponseType TEXT = new ResponseType(1, "text", null);
 
@@ -67,8 +65,6 @@ public class ResponseType extends Term {
 			RADIOBUTTON, FILE };
 
 	public static final List list = Arrays.asList(members);
-
-	private List privileges;
 
 	private ResponseType(int id, String name, Privilege[] myPrivs) {
 		super(id, name);

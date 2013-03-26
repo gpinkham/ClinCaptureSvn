@@ -33,9 +33,7 @@ import java.util.HashMap;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-/**
- * @author Jun Xu
- */
+@SuppressWarnings({ "rawtypes", "serial" })
 public class AuditEventBean extends AuditableEntityBean {
 	// AUDIT_ID AUDIT_DATE AUDIT_TABLE USER_ID
 	// ENTITY_ID REASON_FOR_CHANGE ACTION_MESSAGE
@@ -49,7 +47,6 @@ public class AuditEventBean extends AuditableEntityBean {
 	private String columnName = "";
 	private String oldValue = "";
 	private String newValue = "";
-	private int updateCount = 0;
 	private HashMap changes = new HashMap();
 	private HashMap otherInfo = new HashMap();
 	private String studyName = "NULL";
@@ -208,7 +205,6 @@ public class AuditEventBean extends AuditableEntityBean {
 	 *            The updateCount to set.
 	 */
 	public void setUpdateCount(int updateCount) {
-		this.updateCount = updateCount;
 	}
 
 	/**

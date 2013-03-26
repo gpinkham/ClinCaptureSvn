@@ -26,6 +26,7 @@ import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 
 import java.util.ArrayList;
 
+@SuppressWarnings({"rawtypes"})
 public class RulesPostImportContainerServiceTest extends HibernateOcDbTestCase {
 
 	public RulesPostImportContainerServiceTest() {
@@ -47,11 +48,6 @@ public class RulesPostImportContainerServiceTest extends HibernateOcDbTestCase {
 		assertEquals(0, container.getInValidRuleDefs().size());
 		assertEquals(1, container.getValidRuleDefs().size());
 
-		// FIXME the following fail now - why?
-		// container = postImportContainerService.validateRuleSetDefs(container);
-		// assertEquals(1, container.getDuplicateRuleSetDefs().size());
-		// assertEquals(0, container.getInValidRuleSetDefs().size());
-		// assertEquals(0, container.getValidRuleSetDefs().size());
 	}
 
 	private RulesPostImportContainer prepareContainer() {

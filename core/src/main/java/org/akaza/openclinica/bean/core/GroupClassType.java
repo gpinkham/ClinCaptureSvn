@@ -29,9 +29,7 @@ import java.util.List;
  * 
  * @author Jun Xu
  */
-
-// Internationalized name and description in Term.getName and
-// Term.getDescription()
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class GroupClassType extends Term {
 	public static final GroupClassType INVALID = new GroupClassType(0, "invalid");
 	public static final GroupClassType ARM = new GroupClassType(1, "Arm");

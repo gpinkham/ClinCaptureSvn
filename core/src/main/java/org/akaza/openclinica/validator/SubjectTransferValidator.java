@@ -31,6 +31,7 @@ import java.util.Date;
 
 import javax.sql.DataSource;
 
+@SuppressWarnings({"rawtypes"})
 public class SubjectTransferValidator implements Validator {
 
 	DataSource dataSource;

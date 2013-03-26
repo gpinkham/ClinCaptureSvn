@@ -19,6 +19,7 @@ package org.akaza.openclinica.bean.service;
  * @author thickerson
  * 
  */
+@SuppressWarnings("serial")
 public class SasProcessingFunction extends ProcessingFunction {
 
 	public SasProcessingFunction() {

@@ -21,12 +21,6 @@
 
 package org.akaza.openclinica.bean.odmbeans;
 
-/**
- * 
- * @author ywang (Aug., 2010)
- * 
- */
-
 public class StudyDescriptionAndStatusBean {
 	// attributes
 	private String officialTitle;
@@ -44,13 +38,7 @@ public class StudyDescriptionAndStatusBean {
 	private String protocolType;
 	private String protocolVerificationDate;
 	private String purpose;
-	private String duration;
 	private String selection;
-	private String timing;
-	private String allocation;
-	private String masking;
-	private String control;
-	private String interventionModel;
 	private String studyClassification;
 
 	public String getOfficialTitle() {

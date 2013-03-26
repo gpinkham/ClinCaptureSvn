@@ -13,10 +13,7 @@
 
 package org.akaza.openclinica.exception;
 
-/**
- * @author sshamim
- * 
- */
+@SuppressWarnings("serial")
 public class CRFReadingException extends Exception {
 	public String message;
 

@@ -41,6 +41,7 @@ import javax.sql.DataSource;
  * 
  * @author ywang
  */
+@SuppressWarnings("unchecked")
 public class SimpleConditionalDisplayService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

@@ -27,10 +27,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author jxu
  * @deprecated
  */
-@Deprecated
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class GroupRole extends Term {
 	public static final GroupRole INVALID = new GroupRole(0, "invalid");
 	public static final GroupRole PROBAND = new GroupRole(1, "proband");
@@ -38,8 +37,6 @@ public class GroupRole extends Term {
 	private static final GroupRole[] members = { PROBAND };
 
 	public static final List list = Arrays.asList(members);
-
-	private List privileges;
 
 	private GroupRole(int id, String name) {
 		super(id, name);

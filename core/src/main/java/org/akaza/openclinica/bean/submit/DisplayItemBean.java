@@ -28,9 +28,7 @@ import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
 import java.io.File;
 import java.util.ArrayList;
 
-/**
- * @author ssachs
- */
+@SuppressWarnings({"rawtypes"})
 public class DisplayItemBean implements Comparable {
 	private ItemDataBean data;
 	private ItemBean item;
@@ -117,11 +115,6 @@ public class DisplayItemBean implements Comparable {
 		setProperties();
 	}
 
-	// public DisplayItemBean(EventDefinitionCRFBean eventDefinitionCRF) {
-	// this.eventDefinitionCRF = eventDefinitionCRF;
-	// setProperties();
-	// }
-
 	/**
 	 * @return Returns the data.
 	 */
@@ -167,10 +160,6 @@ public class DisplayItemBean implements Comparable {
 		this.metadata = metadata;
 
 		ResponseSetBean rsb = metadata.getResponseSet();
-		// BWP 09/18/07 >> rsb cannot be null here because I added this line to
-		// ItemFormMetadataBean's
-		// constructor: responseSet=new ResponseSetBean();
-		// logger.info("rsb = " + rsb);
 
 		org.akaza.openclinica.bean.core.ResponseType rt = rsb.getResponseType();
 
@@ -263,7 +252,6 @@ public class DisplayItemBean implements Comparable {
 		String valueForDB = "";
 		String glue = "";
 
-		// clinovo - ticket #44
 		rsb.removeSelection();
 		for (int i = 0; i < values.size(); i++) {
 			String value = (String) values.get(i);
@@ -295,24 +283,19 @@ public class DisplayItemBean implements Comparable {
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.INSTANT_CALCULATION)) {
 			rsb.setValue(value);
 		} else {
-			// clinovo - ticket #44
 			rsb.removeSelection();
 			if (value != null && !value.trim().isEmpty()) {
 				rsb.setSelected(value.trim(), true);
 			}
 		}
-		// logger.info("loadFormValue, line 241, DisplayItemBean
-		// "+rsb.getResponseType().getName());
 		metadata.setResponseSet(rsb);
-		// System.out.println("data value:" + data.getId() + " " + value);
-		data.setValue(value);// comment set by tbh, 112007
+		data.setValue(value);
 	}
 
 	public void loadDBValue() {
 		ResponseSetBean rsb = metadata.getResponseSet();
 		org.akaza.openclinica.bean.core.ResponseType rt = rsb.getResponseType();
 		String dbValue = data.getValue();
-		// System.out.println("setting dbValue: " + dbValue);
 		if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX)
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
 			String dbValues[] = dbValue.split(",");

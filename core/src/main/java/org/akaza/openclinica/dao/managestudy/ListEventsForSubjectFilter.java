@@ -123,16 +123,7 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 							+ studyEventDefinitionId
 							+ " and se.subject_event_status_id = 7";
 				}
-				/*
-				 * else if (!value.equals("1")) { // crf data entry stages other than // DataEntryStage.UNCOMPLETED int
-				 * stage = getStatusForStage(Integer.parseInt(value.toString())); criteria += "AND " + stage + " = (" +
-				 * "SELECT event_crf.status_id FROM event_crf event_crf, crf_version crf_version WHERE study_event_id in (SELECT se.study_event_id FROM study_event se, study_event_definition sed"
-				 * + " WHERE se.study_subject_id=SS.SUBJECT_ID" + " and se.study_event_definition_id = " +
-				 * studyEventDefinitionId + " and se.study_event_definition_id= sed.study_event_definition_id)" +
-				 * " and crf_version.crf_id = " + crfId + " and event_crf.crf_version_id = crf_version.crf_version_id";
-				 * 
-				 * criteria += " order by event_crf_id asc" + ")"; }
-				 */
+	
 				else {// DataEntryStage.UNCOMPLETED
 					criteria += " AND ( ( SELECT count(*) FROM event_crf event_crf, crf_version crf_version WHERE study_event_id in  "
 							+ " (SELECT se.study_event_id FROM study_event study_event, study_event_definition sed "
@@ -146,13 +137,6 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 							+ "ec.crf_version_id = cv.crf_version_id and crf_id= "
 							+ crfId
 							+ " ) and se.study_event_definition_id = " + studyEventDefinitionId + ")";
-					/*
-					 * criteria += " AND (se.study_subject_id is null or (se.study_event_definition_id != " +
-					 * studyEventDefinitionId; criteria +=
-					 * " AND (select count(*) from  study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id"
-					 * ; criteria += " where  study_event.study_event_definition_id =" + studyEventDefinitionId +
-					 * " and ss.study_subject_id = ss1.study_subject_id) =0))";
-					 */
 				}
 
 			} else if (property.equals("studySubject.createdDate")) {
@@ -164,40 +148,6 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 			}
 		}
 		return criteria;
-	}
-
-	/*
-	 * Method to convert DataEntryStage id value into status value to be match it with event_crf table rows.
-	 */
-	private int getStatusForStage(int stage) {
-		int status = 0;
-
-		if (stage == 2) // DataEntryStage.INITIAL_DATA_ENTRY
-		{
-			status = 1;
-		}
-
-		if (stage == 3 || stage == 4) // DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE
-		// / DataEntryStage.DOUBLE_DATA_ENTRY
-		{
-			status = 4;
-		}
-
-		if (stage == 5) // DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
-		{
-			status = 2;
-		}
-
-		if (stage == 6) // DataEntryStage.ADMINISTRATIVE_EDITING
-		{
-			status = 6;
-		}
-
-		if (stage == 7) // DataEntryStage.LOCKED
-		{
-			status = 7;
-		}
-		return status;
 	}
 
 	private static class Filter {

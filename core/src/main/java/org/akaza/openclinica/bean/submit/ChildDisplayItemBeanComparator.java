@@ -22,9 +22,7 @@ package org.akaza.openclinica.bean.submit;
 
 import java.util.Comparator;
 
-/**
- * @author ssachs
- */
+@SuppressWarnings({"rawtypes"})
 public class ChildDisplayItemBeanComparator implements Comparator {
 	private static ChildDisplayItemBeanComparator instance = null;
 

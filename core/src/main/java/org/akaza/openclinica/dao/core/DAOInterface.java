@@ -35,6 +35,7 @@ import java.util.HashMap;
  * 
  * 
  */
+@SuppressWarnings({"rawtypes"})
 public interface DAOInterface {
 	// problem here is to prevent beans which recursively access themselves;
 	// if we don't have a special boolean, the user account bean will recurse

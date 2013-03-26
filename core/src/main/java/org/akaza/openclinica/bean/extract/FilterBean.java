@@ -31,7 +31,7 @@ import java.util.ArrayList;
  * 
  * 
  */
-
+@SuppressWarnings({"rawtypes", "serial"})
 public class FilterBean extends AuditableEntityBean {
 	private String description;
 	private String SQLStatement;

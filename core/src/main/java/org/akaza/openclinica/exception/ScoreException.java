@@ -27,6 +27,7 @@ package org.akaza.openclinica.exception;
  * @author ywang (Mar. 2008)
  * 
  */
+@SuppressWarnings("serial")
 public class ScoreException extends OpenClinicaException {
 	public ScoreException(String message, String errorId) {
 		super(message, errorId);

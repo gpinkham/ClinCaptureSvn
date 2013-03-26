@@ -25,12 +25,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author Jun Xu
- * 
- */
-// Internationalized name and description in Term.getName and
-// Term.getDescription()
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class DiscrepancyNoteType extends Term {
 
 	public static final DiscrepancyNoteType INVALID = new DiscrepancyNoteType(0, "Invalid", null);

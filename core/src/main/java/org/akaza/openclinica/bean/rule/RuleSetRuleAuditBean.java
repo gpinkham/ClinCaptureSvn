@@ -26,6 +26,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 
 import java.util.Date;
 
+@SuppressWarnings("serial")
 public class RuleSetRuleAuditBean extends EntityBean {
 
 	RuleSetRuleBean ruleSetRuleBean;

@@ -10,20 +10,20 @@
 
 package com.clinovo.clincapture.bean.core;
 
-import static org.junit.Assert.*;
-
-import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-/**
- * User: Pavel Date: 24.10.12
- */
+import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.junit.Before;
+import org.junit.Test;
+
 public class ResolutionStatusTest {
 
 	public static final String INVALID_KEY = "invalid";

@@ -24,9 +24,7 @@ package org.akaza.openclinica.bean.extract;
 
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 
-/**
- * @author ssachs
- */
+@SuppressWarnings("serial")
 public class ExtractStudyEventDefinitionBean extends StudyEventDefinitionBean {
 
 }

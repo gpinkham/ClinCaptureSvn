@@ -67,6 +67,7 @@ public class EmailActionProcessorTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testExecute() throws MessagingException {
 		context.checking(new Expectations() {
 			{

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@SuppressWarnings("serial")
 public class RuleSetRuleBean extends AuditableEntityBean {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

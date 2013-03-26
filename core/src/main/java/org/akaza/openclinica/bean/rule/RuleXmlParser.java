@@ -30,12 +30,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-/*
+/**
  * A simple xml parser based on SAX. This parser will parse
  * rule xml data.
  *
  * @author Krikor Krumlian
  */
+@SuppressWarnings("rawtypes")
 public class RuleXmlParser extends DefaultHandler {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

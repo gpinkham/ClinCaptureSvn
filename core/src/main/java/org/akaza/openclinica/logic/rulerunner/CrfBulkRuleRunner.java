@@ -271,7 +271,6 @@ public class CrfBulkRuleRunner extends RuleRunner {
 			HashMap<Key, List<RuleActionBean>> hms = new HashMap<Key, List<RuleActionBean>>();
 			for (RuleActionContainer ruleActionContainer : entry.getValue()) {
 
-				// ruleSet.setTarget(ruleAction.getRuleSetExpression());
 				ruleActionContainer.getRuleAction().setCuratedMessage(
 						curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction()
 								.getRuleSetRule()));
@@ -279,7 +278,6 @@ public class CrfBulkRuleRunner extends RuleRunner {
 						.getActionType(), ds, getMailSender(), dynamicsMetadataService, ruleActionContainer
 						.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction()
 						.getRuleSetRule());
-				RuleActionBean rab = null;
 				ap.execute(
 						RuleRunnerMode.RULSET_BULK,
 						executionMode,
@@ -290,18 +288,6 @@ public class CrfBulkRuleRunner extends RuleRunner {
 						ub,
 						prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction()
 								.getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
-				if (rab != null) {
-					Key k = new Key(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction()
-							.getExpressionEvaluatesTo().toString(), ruleActionContainer.getRuleAction()
-							.getRuleSetRule().getRuleBean());
-					if (hms.containsKey(k)) {
-						hms.get(k).add(ruleActionContainer.getRuleAction());
-					} else {
-						List<RuleActionBean> theActionBeansToShow = new ArrayList<RuleActionBean>();
-						theActionBeansToShow.add(ruleActionContainer.getRuleAction());
-						hms.put(k, theActionBeansToShow);
-					}
-				}
 			}
 			for (Map.Entry<Key, List<RuleActionBean>> theEntry : hms.entrySet()) {
 				Key key = theEntry.getKey();
@@ -310,7 +296,6 @@ public class CrfBulkRuleRunner extends RuleRunner {
 						key.getRuleSet(), key.getRule(), key.getResult(), currentStudy, value);
 			}
 		}
-		// logCrfViewSpecificOrderedObjects(crfViewSpecificOrderedObjects);
 		return crfViewSpecificOrderedObjects;
 	}
 

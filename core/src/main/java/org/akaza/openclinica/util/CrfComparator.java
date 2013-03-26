@@ -18,19 +18,9 @@ import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 
 import java.util.Comparator;
 
-// clinovo - ticket #41
+@SuppressWarnings({"rawtypes"})
 public class CrfComparator implements Comparator {
 
-	/*
-	 * // by name public int compare(Object o1, Object o2) { String crfName1 = getCrfName(o1); String crfName2 =
-	 * getCrfName(o2); return crfName1.compareTo(crfName2); }
-	 * 
-	 * private String getCrfName(Object o) { String crfName = ""; if (o instanceof DisplayEventCRFBean) { crfName =
-	 * ((DisplayEventCRFBean)o).getEventCRF().getCrf().getName(); } else if (o instanceof DisplayEventDefinitionCRFBean)
-	 * { crfName = ((DisplayEventDefinitionCRFBean)o).getEdc().getCrf().getName(); } return crfName; }
-	 */
-
-	// by real order
 	public int compare(Object o1, Object o2) {
 		Integer ordinal1 = getOrdinal(o1);
 		Integer ordinal2 = getOrdinal(o2);

@@ -22,16 +22,11 @@ package org.akaza.openclinica.logic.expressionTree;
 
 import java.util.HashMap;
 
-/**
- * @author Krikor Krumlian
- * 
- */
 public enum Operator {
 	EQUAL(1, "eq"), NOT_EQUAL(2, "ne"), OR(3, "or"), AND(4, "and"), GREATER_THAN(5, "gt"), GREATER_THAN_EQUAL(6, "gte"), LESS_THAN(
 			7, "lt"), LESS_THAN_EQUAL(8, "lte"), PLUS(9, "+"), MINUS(10, "-"), MULTIPLY(11, "*"), POWER(12, "^"), DIVIDE(
 			13, "/"), CONTAINS(14, "ct");
 
-	private int code;
 	private String description;
 
 	Operator(int code) {
@@ -39,7 +34,6 @@ public enum Operator {
 	}
 
 	Operator(int code, String description) {
-		this.code = code;
 		this.description = description;
 	}
 

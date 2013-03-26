@@ -30,6 +30,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
  * 
  * 
  */
+@SuppressWarnings("serial")
 public class ItemDataBean extends AuditableEntityBean {
 	@Override
 	public int hashCode() {

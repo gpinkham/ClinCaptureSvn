@@ -22,10 +22,7 @@ package org.akaza.openclinica.bean.extract;
 
 import java.util.ArrayList;
 
-/**
- * @author jxu
- * 
- */
+@SuppressWarnings({"rawtypes"})
 public class TextReportBean extends ReportBean {
 	protected String end;
 	protected String sep;

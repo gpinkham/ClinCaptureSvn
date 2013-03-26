@@ -13,6 +13,14 @@
 
 package org.akaza.openclinica.logic.rulerunner;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -40,16 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
+@SuppressWarnings({"rawtypes"})
 public class ImportDataRuleRunnerContainer {
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	/**
@@ -189,16 +188,6 @@ public class ImportDataRuleRunnerContainer {
 			}
 		}
 		return ruleSets;
-	}
-
-	private Set<String> collectTargetItemOids(List<RuleSetBean> ruleSets) {
-		Set<String> itemOids = new HashSet<String>();
-		if (ruleSets != null) {
-			for (RuleSetBean ruleSetBean : ruleSets) {
-				itemOids.add(ruleSetBean.getItem().getOid());
-			}
-		}
-		return itemOids;
 	}
 
 	private boolean isRepeatIGForSure(DataSource ds, Integer crfVersionId, String itemGroupOid, Integer igOrdinal,

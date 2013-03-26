@@ -46,8 +46,7 @@ import java.util.List;
  * 
  * @author ssachs
  */
-
-// Internationalized description in Term.getDescription()
+@SuppressWarnings({ "rawtypes", "serial" })
 public class ItemDataType extends Term {
 	public static final ItemDataType INVALID = new ItemDataType(0, "invalid", "Invalid_Type");
 	public static final ItemDataType BL = new ItemDataType(1, "bl", "Boolean");

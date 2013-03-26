@@ -16,9 +16,7 @@ package org.akaza.openclinica.bean.submit;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA. User: bruceperry Date: May 7, 2007
- */
+@SuppressWarnings("rawtypes")
 public class DisplayItemGroupBean implements Comparable {
 	@Override
 	public int hashCode() {

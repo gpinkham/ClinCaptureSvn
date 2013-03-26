@@ -28,9 +28,7 @@ import java.util.Set;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 
-/**
- * @author ssachs
- */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class DisplaySectionBean {
 	private CRFBean crf;
 	private CRFVersionBean crfVersion;

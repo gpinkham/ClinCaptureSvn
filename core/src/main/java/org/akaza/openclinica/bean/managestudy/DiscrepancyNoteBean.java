@@ -28,17 +28,8 @@ import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 
-/**
- * @author jxu
- * 
- */
+@SuppressWarnings({"rawtypes", "serial"})
 public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparable {
-	// discrepancy_note_id serial NOT NULL,
-	// description varchar(255),
-	// discrepancy_note_type_id numeric,
-	// resolution_status_id numeric,
-	// detailed_notes varchar(1000),
-	// parent_dn_id numeric,
 	public static final String ITEM_DATA = "itemData";
 	private String description = "";
 	private int discrepancyNoteTypeId;
@@ -56,7 +47,6 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 	private String fieldForDN = "";
 	private ArrayList children = new ArrayList();// not in DB
 	private int studyId = 0;
-	// added by BWP; 5/09/08;
 	private int eventCRFId = 0;
 
 	private UserAccountBean lastUpdator;
@@ -79,7 +69,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
 	// indicates whether a note is in the db or
 	// not
-	// YW << if entity is ItemData, stageId = 5 means the crf of this ItemData
+	// if entity is ItemData, stageId = 5 means the crf of this ItemData
 	// has been marked complete
 	private int stageId = 0;
 	private int itemId = 0;
@@ -143,8 +133,6 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 	public void setItemId(int itemid) {
 		this.itemId = itemid;
 	}
-
-	// YW >>
 
 	public DiscrepancyNoteBean() {
 		disType = DiscrepancyNoteType.QUERY;

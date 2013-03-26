@@ -59,8 +59,7 @@ import java.util.List;
  *         (NI) as the default of all defaults.
  * 
  */
-
-// Internationalized description in Term.getDescription()
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class NullValue extends Term {
 	public static final NullValue INVALID = new NullValue(0, "invalid", "invalid");
 	public static final NullValue NI = new NullValue(1, "NI", "no_information");

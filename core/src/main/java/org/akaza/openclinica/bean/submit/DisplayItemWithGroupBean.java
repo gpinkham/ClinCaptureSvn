@@ -23,6 +23,7 @@ package org.akaza.openclinica.bean.submit;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("rawtypes")
 public class DisplayItemWithGroupBean implements Comparable {
 	private DisplayItemBean singleItem;
 

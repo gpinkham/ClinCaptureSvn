@@ -10,18 +10,17 @@
 
 package org.pentaho.platform.web.http.security;
 
-import org.apache.commons.codec.binary.Hex;
-import org.slf4j.Logger;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import java.security.MessageDigest;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.MessageDigest;
+
+import org.apache.commons.codec.binary.Hex;
+
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 public class CryptUtil {
-
-	private static final Logger LOGGER = null;
 
 	private static final String secKey = "7A1B3"; // TODO maybe we need to share and save these parameters in another
 													// way

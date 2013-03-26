@@ -21,10 +21,6 @@
 package org.akaza.openclinica.bean.rule;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.rule.action.RuleActionBean;
-
-import java.util.List;
 
 /**
  * <p>
@@ -33,12 +29,7 @@ import java.util.List;
  * 
  * @author Krikor Krumlian
  */
+@SuppressWarnings("serial")
 public class RuleExecutionAudit extends AuditableEntityBean {
-
-	private RuleSetRuleBean ruleSetRule;
-	private StudyEventBean studyEvent;
-	private String executionStatus;
-	private String result;
-	private List<RuleActionBean> actions;
 
 }

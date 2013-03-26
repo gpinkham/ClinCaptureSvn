@@ -27,10 +27,12 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import java.util.ArrayList;
 
 /**
+ * A class for display study list properly, group studies by parent and child relationship
+ * 
  * @author Jun Xu
  * 
- *         A class for display study list properly, group studies by parent and child relationship
  */
+@SuppressWarnings({"rawtypes", "serial"})
 public class DisplayStudyBean extends AuditableEntityBean {
 	private StudyBean parent;
 	private ArrayList children;

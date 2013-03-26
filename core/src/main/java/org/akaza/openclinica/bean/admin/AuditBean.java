@@ -17,13 +17,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 
 import java.util.Date;
 
-/*
- *
- * @author Krikor Krumlian 2/10/2007
- * @author jsampson
- *
- */
-
+@SuppressWarnings("serial")
 public class AuditBean extends EntityBean {
 
 	private Date auditDate;

@@ -22,6 +22,7 @@ package org.akaza.openclinica.bean.service;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
+@SuppressWarnings("serial")
 public class StudyParameterValueBean extends AuditableEntityBean {
 	private int studyId;
 	private String parameter;

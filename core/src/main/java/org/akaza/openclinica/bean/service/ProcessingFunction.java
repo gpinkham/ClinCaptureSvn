@@ -24,6 +24,7 @@ import java.io.Serializable;
  * @author thickerson
  * 
  */
+@SuppressWarnings("serial")
 public abstract class ProcessingFunction implements ProcessingInterface, Serializable {
 	private String ODMXMLFileName;
 	private String xslFileName;

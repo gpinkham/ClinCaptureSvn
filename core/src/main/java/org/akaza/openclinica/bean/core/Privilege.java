@@ -30,9 +30,7 @@ import java.util.List;
  *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
  *         Code Templates
  */
-
-// Internationalized name and description in Term.getName and
-// Term.getDescription()
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class Privilege extends Term {
 	public static final Privilege ADMIN = new Privilege(1, "admin");
 	public static final Privilege STUDYDIRECTOR = new Privilege(2, "director");

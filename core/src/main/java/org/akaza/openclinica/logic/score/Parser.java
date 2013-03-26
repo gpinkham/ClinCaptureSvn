@@ -25,21 +25,16 @@ package org.akaza.openclinica.logic.score;
  * The <code>Parser</code> is used to parse expression String into ScoreToken
  * ArrayList and parse item variables in expression.
  * 
- * @author ywang
- * @version 1.0, 01-16-2008
- * 
  */
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import org.akaza.openclinica.bean.submit.ItemBean;
+
+@SuppressWarnings("rawtypes")
 public class Parser {
-	private Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private HashMap<String, ItemBean> map;
 	private HashMap<String, String> itemdata;
 	private StringBuffer errors;
@@ -80,7 +75,6 @@ public class Parser {
 		char contents[] = exp.toCharArray();
 		String token = "";
 		int pos = 0;
-		int listpos = 0;
 		ScoreToken scoretoken = new ScoreToken();
 		while (pos < contents.length) {
 			char c = contents[pos];
@@ -91,48 +85,39 @@ public class Parser {
 				if (token.length() > 0) {
 					scoretoken = new ScoreToken(ScoreSymbol.TERM_SYMBOL, token);
 					list.add(scoretoken);
-					++listpos;
 					token = "";
 				}
 				scoretoken = new ScoreToken(ScoreSymbol.ARITHMETIC_OPERATOR_SYMBOL, c + "");
 				list.add(scoretoken);
-				++listpos;
 			} else if (c == '(') {
 				String funcname = ScoreUtil.getFunctionName(token);
 				if (funcname != null) {
 					scoretoken = new ScoreToken(ScoreSymbol.FUNCTION_SYMBOL, token);
 					list.add(scoretoken);
-					++listpos;
 					token = "";
 				} else if (token.length() > 0) {
 					scoretoken = new ScoreToken(ScoreSymbol.TERM_SYMBOL, token);
 					list.add(scoretoken);
-					++listpos;
 					token = "";
 				}
 				scoretoken = new ScoreToken(ScoreSymbol.OPEN_PARENTH_SYMBOL, c + "");
 				list.add(scoretoken);
-				++listpos;
 			} else if (c == ')') {
 				if (token.length() > 0) {
 					scoretoken = new ScoreToken(ScoreSymbol.TERM_SYMBOL, token);
 					list.add(scoretoken);
-					++listpos;
 					token = "";
 				}
 				scoretoken = new ScoreToken(ScoreSymbol.CLOSE_PARENTH_SYMBOL, c + "");
 				list.add(scoretoken);
-				++listpos;
 			} else if (c == ',') {
 				if (token.length() > 0) {
 					scoretoken = new ScoreToken(ScoreSymbol.TERM_SYMBOL, token);
 					list.add(scoretoken);
-					++listpos;
 					token = "";
 				}
 				scoretoken = new ScoreToken(ScoreSymbol.COMMA_SYMBOL, c + "");
 				list.add(scoretoken);
-				++listpos;
 			} else {
 				token += c;
 			}
@@ -163,8 +148,6 @@ public class Parser {
 			if (t.getSymbol() == ScoreSymbol.TERM_SYMBOL) {
 				char next = i < expression.size() - 1 ? expression.get(i + 1).getSymbol() : ' ';
 				if (map.containsKey(t.getName().trim()) && next != '(') {
-					// String key = ((ItemBean)map.get(var.trim())).getId() +
-					// "_" + ordinal;
 					String key = map.get(t.getName().trim()).getId() + "_" + ordinal;
 					if (itemdata.containsKey(key)) {
 						String idvalue = itemdata.get(key);
@@ -279,7 +262,6 @@ public class Parser {
 	 *            a function name.
 	 * @return the function class name.
 	 * 
-	 * @author Hailong Wang, 08/25/2006
 	 */
 	public static String convertToClassName(String packageName, String functionName) {
 		if (functionName == null || functionName.length() == 0) {

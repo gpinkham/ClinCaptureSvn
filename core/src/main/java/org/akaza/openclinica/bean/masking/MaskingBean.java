@@ -22,11 +22,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
 import java.util.HashMap;
 
-/**
- * @author thickerson
- * 
- * 
- */
+@SuppressWarnings({ "rawtypes", "serial" })
 public class MaskingBean extends AuditableEntityBean {
 	public HashMap ruleMap;// String property_name -> Boolean value
 	public String entityName;

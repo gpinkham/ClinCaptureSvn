@@ -23,9 +23,7 @@ package org.akaza.openclinica.bean.submit;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.core.form.StringUtil;
 
-/**
- * @author ssachs
- */
+@SuppressWarnings({"rawtypes", "serial"})
 public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	//
 	private int itemId;
@@ -210,12 +208,10 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	private String regexpErrorMsg;
 	private int ordinal;
 	private boolean required;
-	// YW 08-01-2007, default_value has been added
 	private String defaultValue;
 	private String widthDecimal;
 
 	private boolean showItem;
-	// tbh 02/2010, for dynamics
 
 	// New properties added in response to group-related
 	// template
@@ -225,10 +221,10 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	private String crfVersionName;// not in the DB,only for display purpose
 	private String crfName;// not in the DB
 
-	private String sectionName;// not in the DB only for display, tbh 082007
-	private int repeatMax;// not in the DB, tbh 082007
+	private String sectionName;// not in the DB only for display
+	private int repeatMax;// not in the DB, 
 
-	private boolean isHighlighted;// not in the db, tbh 052010
+	private boolean isHighlighted;// not in the db
 
 	/**
 	 * Not in the database. Not guaranteed to correspond to responseSetId, although ItemFormDAO should take care of that
@@ -303,10 +299,6 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	public String getGroupLabel() {
 		return groupLabel;
 	}
-
-	/*
-	 * public void setGroupLabel(String gl) { this.groupLabel = gl; }
-	 */
 
 	public int getRepeatMax() {
 		return repeatMax;

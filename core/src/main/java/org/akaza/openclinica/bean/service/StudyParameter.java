@@ -22,6 +22,7 @@ package org.akaza.openclinica.bean.service;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
+@SuppressWarnings("serial")
 public class StudyParameter extends AuditableEntityBean {
 	/*
 	 * study_parameter_id serial NOT NULL, handle varchar(50), name varchar(50), description varchar(255), default_value

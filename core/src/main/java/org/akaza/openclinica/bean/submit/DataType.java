@@ -49,7 +49,7 @@ import java.util.List;
  * @author Jun Xu
  * @deprecated
  */
-@Deprecated
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class DataType extends Term {
 	public static final DataType INVALID = new DataType(0, "INVALID", null);
 	public static final DataType BN = new DataType(1, "BN", null);
@@ -63,8 +63,6 @@ public class DataType extends Term {
 	private static final DataType[] members = { BN, ED, TEL, ST, INT, REAL, SET };
 
 	public static final List list = Arrays.asList(members);
-
-	private List privileges;
 
 	private DataType(int id, String name, Privilege[] myPrivs) {
 		super(id, name);

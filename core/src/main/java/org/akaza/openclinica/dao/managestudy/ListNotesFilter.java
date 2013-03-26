@@ -13,16 +13,15 @@
 
 package org.akaza.openclinica.dao.managestudy;
 
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 public class ListNotesFilter implements CriteriaCommand {
 

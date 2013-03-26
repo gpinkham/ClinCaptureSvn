@@ -61,6 +61,7 @@ public class ClinicalDataCollector extends OdmDataCollector {
 		this.collectOdmClinicalDataMap();
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void collectOdmClinicalDataMap() {
 		Iterator<OdmStudyBase> it = this.getStudyBaseMap().values().iterator();
 		while (it.hasNext()) {

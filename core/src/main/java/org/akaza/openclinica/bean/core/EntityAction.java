@@ -23,9 +23,7 @@ package org.akaza.openclinica.bean.core;
 import java.util.Arrays;
 import java.util.List;
 
-// Internationalized name and description in Term.getName and
-// Term.getDescription()
-
+@SuppressWarnings({ "rawtypes", "serial" })
 public class EntityAction extends Term {
 
 	public static final EntityAction VIEW = new EntityAction(1, "view");

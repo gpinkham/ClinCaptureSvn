@@ -24,9 +24,7 @@ package org.akaza.openclinica.bean.extract;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 
-/**
- * @author ssachs
- */
+@SuppressWarnings("serial")
 public class ExtractStudyEventDefinitionBeanOld extends EntityBean {
 	private boolean repeating = false;
 	private OrderedEntityBeansSet crfVersions = new OrderedEntityBeansSet(new ExtractCRFVersionBean());

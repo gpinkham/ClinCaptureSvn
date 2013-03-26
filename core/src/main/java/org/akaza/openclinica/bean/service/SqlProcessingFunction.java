@@ -13,18 +13,15 @@
 
 package org.akaza.openclinica.bean.service;
 
-import java.io.File;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
-
-import javax.xml.transform.TransformerConfigurationException;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.core.util.ScriptRunner;
@@ -35,6 +32,7 @@ import org.akaza.openclinica.core.util.ScriptRunner;
  * @author thickerson
  * 
  */
+@SuppressWarnings("serial")
 public class SqlProcessingFunction extends ProcessingFunction implements Serializable {
 
 	private ExtractPropertyBean extractPropertyBean;
@@ -65,28 +63,14 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
 			Properties props = new Properties();
 			props.setProperty("user", databaseUsername);
 			props.setProperty("password", databasePassword);
-			// props.setProperty("ssl","true");
 			conn = DriverManager.getConnection(databaseUrl, props);
 
 			conn.setAutoCommit(true);
 			File sqlFile = new File(getTransformFileName());
-			// String[] statements = getFileContents(sqlFile);
 
 			ScriptRunner runner = new ScriptRunner(conn, true, false);
 			runner.runScript(new BufferedReader(new FileReader(sqlFile)));
 
-			/*
-			 * stmt = conn.createStatement(); for (String statement : statements) {
-			 * 
-			 * // and then execute the statement here // convert the translated file to a string and then tries an
-			 * execute
-			 * 
-			 * // System.out.println("-- > about to run " + statement);
-			 * 
-			 * System.out.println("Stament prepared"+statement); stmt.executeUpdate(statement); //stmt.close();
-			 * 
-			 * } // stmt.executeBatch();
-			 */
 			if (conn != null) {
 				conn.commit();
 				conn.setAutoCommit(true);
@@ -94,7 +78,6 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			// System.out.println(" -- > found an exception : " + e.getMessage());
 			resultError = ProcessingResultType.FAIL;
 			resultError.setUrl(""); // no url required
 			resultError.setArchiveMessage("Failure thrown: " + e.getMessage());
@@ -167,33 +150,5 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
 
 	public void setDatabaseType(String databaseType) {
 		this.databaseType = databaseType;
-	}
-
-	/*
-	 * getFileContents(sqlFile): pulls out all the contents and assembles a string with all the SQL statements to be
-	 * executed on the datamart.
-	 */
-	private String[] getFileContents(File sqlFile) throws Exception {
-		String value = "";
-		StringBuffer sb = new StringBuffer();
-		int bufSize = 1024;
-		BufferedReader br = new BufferedReader(new FileReader(sqlFile));
-		char[] buffer = new char[bufSize];
-		int amt = 0;
-		while ((amt = br.read(buffer)) >= 0) {
-			// value = value.concat(buffer);
-			sb.append(buffer, 0, amt);
-		}
-		br.close();
-		// sending sql statement by sql statement for error checking, tbh
-		// since we have plpsql functions we need to ignore semis that are
-		// included
-		// in quotes
-
-		// return sb.toString().split(";[^as \'.*\']");
-		// JN: Changing this to use tokenizer
-		// String[] ret = new String[1];
-		String[] ret = sb.toString().split(";");
-		return ret;
 	}
 }

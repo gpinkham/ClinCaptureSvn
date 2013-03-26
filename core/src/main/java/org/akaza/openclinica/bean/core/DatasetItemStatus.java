@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings("serial")
 public class DatasetItemStatus extends Term {
 	public static final DatasetItemStatus COMPLETED = new DatasetItemStatus(1, "completed", "completed_items");
 	public static final DatasetItemStatus NONCOMPLETED = new DatasetItemStatus(2, "non_completed",

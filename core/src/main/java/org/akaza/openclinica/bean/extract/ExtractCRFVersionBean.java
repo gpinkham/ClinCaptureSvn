@@ -27,9 +27,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author ssachs
- */
+@SuppressWarnings("serial")
 public class ExtractCRFVersionBean extends EntityBean {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -47,10 +45,6 @@ public class ExtractCRFVersionBean extends EntityBean {
 		ItemBean ib = new ItemBean();
 		ib.setId(itemId.intValue());
 		ib.setName(itemName);
-		if (!items.contains(ib)) {
-			// logger.info("adding item: " + itemId.intValue() + "-" +
-			// itemName);
-		}
 		return (ItemBean) items.add(ib);
 	}
 

@@ -30,14 +30,8 @@ import java.util.HashMap;
 
 import javax.sql.DataSource;
 
-/**
- * @author thickerson
- * 
- *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
- *         Code Templates
- */
+@SuppressWarnings({"rawtypes"})
 public class QueryDAO extends AuditableEntityDAO {
-	// private DataSource ds;
 
 	public QueryDAO(DataSource ds) {
 		super(ds);
@@ -45,7 +39,7 @@ public class QueryDAO extends AuditableEntityDAO {
 
 	@Override
 	protected void setDigesterName() {
-		// digesterName = SQLFactory.getInstance().DAO_QUERY;
+		// Nothing to implement
 	}
 
 	@Override

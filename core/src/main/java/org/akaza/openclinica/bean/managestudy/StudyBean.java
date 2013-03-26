@@ -25,11 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-/**
- * @author thickerson
- * 
- * 
- */
+@SuppressWarnings({"rawtypes", "serial"})
 public class StudyBean extends AuditableEntityBean {
 	private int parentStudyId = 0;
 	// The original reason to add this is being able to list on
@@ -58,8 +54,6 @@ public class StudyBean extends AuditableEntityBean {
 	// these both vars are transient
 	private boolean showLockEventsButton;
 	private boolean showUnlockEventsButton;
-
-	// private int statusId = 0;//?
 
 	private String principalInvestigator = "";
 	private String facilityName = "";

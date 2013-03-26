@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
  * 
  * @author jxu
  */
+@SuppressWarnings({"rawtypes"})
 public class StringUtil {
 	/*
 	 * A utility method for escaping apostrophes in Strings. "My'String" becomes "My\'String". This could be used for
@@ -105,23 +106,10 @@ public class StringUtil {
 		return answer;
 	}
 
-	/**
-	 * @param s
-	 * @param dateFormat
-	 * @return
-	 * 
-	 * @author ywang (Nov., 2008)
-	 */
 	public static boolean isFormatDate(String s, String dateFormat) {
 		return isFormatDate(s, dateFormat, Locale.getDefault());
 	}
 
-	/**
-	 * @param s
-	 * @param dateFormat
-	 * @param locale
-	 * @return
-	 */
 	public static boolean isFormatDate(String s, String dateFormat, Locale locale) {
 		String dateformat = parseDateFormat(dateFormat);
 		return isSameDate(dateformat, dateformat, s, locale);
@@ -129,13 +117,6 @@ public class StringUtil {
 
 	/**
 	 * Allow only 4 digits, no more, no less
-	 * 
-	 * @param s
-	 * @param yearFormat
-	 * @return
-	 * 
-	 * @author ywang (Nov., 2008)
-	 * @author clinovo (dec 2012) - updated from OpenClinica 3.1.3
 	 */
 	public static boolean isPartialYear(String s, String yearFormat) {
 		return partialYear(s, yearFormat, null);
@@ -176,13 +157,6 @@ public class StringUtil {
 
 	/**
 	 * The year can only between 1000 and 9999.
-	 * 
-	 * @param s
-	 * @param yearMonthFormat
-	 * @return
-	 * 
-	 * @author ywang (Nov., 2008)
-	 * @author clinovo Dec 2012
 	 */
 	public static boolean isPartialYearMonth(String s, String yearMonthFormat) {
 		String yearmonthformat = parseDateFormat(yearMonthFormat) + "-dd";
@@ -198,9 +172,6 @@ public class StringUtil {
 
 	/**
 	 * return dateFormat with lowercase "y" and "d"
-	 * 
-	 * @param dateFormat
-	 * @return
 	 */
 	public static String parseDateFormat(String dateFormat) {
 		String s = dateFormat;
@@ -263,18 +234,4 @@ public class StringUtil {
 	public static boolean isSameDate(String dateFormat1, String dateFormat2, String dateStr) {
 		return isSameDate(dateFormat1, dateFormat2, dateStr, Locale.getDefault());
 	}
-
-	// /**
-	// * @param s A string of words, which are substrings separated
-	// * by non-word characters (reg ex "\W").
-	// * @param numWords The number of words to cut-off at.
-	// * @return A string composed of the first <code>numWords</code> words of
-	// <code>s</code>.
-	// */
-	// public static String firstWords(String s, int numWords) {
-	// Pattern p = Pattern.compile("\\W");
-	// String[] pieces = p.split(s, numWords);
-	// ArrayList a = new ArrayList(Arrays.asList(pieces));
-	// return join(" ", a);
-	// }
 }

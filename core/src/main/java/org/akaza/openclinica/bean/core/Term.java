@@ -27,10 +27,12 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
+ * Superclass for controlled vocabulary terms like status, role, etc.
+ * 
  * @author ssachs
  * 
- *         Superclass for controlled vocabulary terms like status, role, etc.
  */
+@SuppressWarnings({"serial", "rawtypes"})
 public class Term extends EntityBean {
 
 	Locale locale;
@@ -118,16 +120,8 @@ public class Term extends EntityBean {
 		}
 	}
 
-	// clinovo - start (ticket #50)
 	public String getCode() {
 		return this.name;
 	}
-	// clinovo - end
-
-	// TODO
-	/*
-	 * public String getLocalizedName() { locale = LocaleProvider.getLocale(); resterm=
-	 * ResourceBundle.getBundle("org.akaza.openclinica.i18n.terms",locale); return resterm.getString(this.name); }
-	 */
 
 }

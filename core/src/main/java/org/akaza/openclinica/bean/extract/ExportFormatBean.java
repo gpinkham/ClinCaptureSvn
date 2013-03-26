@@ -22,11 +22,7 @@ package org.akaza.openclinica.bean.extract;
 
 import org.akaza.openclinica.bean.core.Term;
 
-/**
- * @author thickerson
- * 
- */
-
+@SuppressWarnings("serial")
 public class ExportFormatBean extends Term {
 
 	public static final ExportFormatBean TXTFILE = new ExportFormatBean(1, "text/plain");

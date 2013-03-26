@@ -23,10 +23,7 @@ package org.akaza.openclinica.bean.managestudy;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 
-/**
- * @author jxu
- * 
- */
+@SuppressWarnings("serial")
 public class DisplayEventDefinitionCRFBean extends AuditableEntityBean {
 	private EventDefinitionCRFBean edc;
 	private EventCRFBean eventCRF;

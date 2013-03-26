@@ -22,11 +22,7 @@
 
 package org.akaza.openclinica.bean.odmbeans;
 
-/**
- * 
- * @author ywang (May, 2008)
- * 
- */
+@SuppressWarnings("rawtypes")
 public class ElementOIDBean implements Comparable {
 	private String oid;
 

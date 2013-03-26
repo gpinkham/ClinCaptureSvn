@@ -22,21 +22,8 @@ package org.akaza.openclinica.bean.submit;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
-/**
- * @author jxu
- * 
- */
+@SuppressWarnings("serial")
 public class SubjectGroupMapBean extends AuditableEntityBean {
-	// subject_group_map_id serial NOT NULL,
-	// study_group_class_id numeric,
-	// study_subject_id numeric,
-	// study_group_id numeric,
-	// status_id numeric,
-	// owner_id numeric,
-	// date_created date,
-	// date_updated date,
-	// update_id numeric,
-	// notes varchar(255),
 	private int studyGroupClassId;
 	private int studyGroupId;
 

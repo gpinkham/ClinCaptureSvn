@@ -42,6 +42,7 @@ import java.util.Date;
  * 
  * 
  */
+@SuppressWarnings("serial")
 public class AuditableEntityBean extends EntityBean {
 
 	protected Date createdDate;

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 
 import javax.sql.DataSource;
 
+@SuppressWarnings({"rawtypes"})
 public class StudyConfigService {
 
 	private DataSource ds;
@@ -110,7 +111,6 @@ public class StudyConfigService {
 		for (int i = 0; i < parameters.size(); i++) {
 			StudyParameter sp = (StudyParameter) parameters.get(i);
 			String handle = sp.getHandle();
-			// logger.info("handle:" + handle);
 			StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), handle);
 			// TO DO: will change to use java reflection later
 			if (spv.getId() > 0) {
@@ -122,8 +122,6 @@ public class StudyConfigService {
 					spc.setDiscrepancyManagement(spv.getValue());
 				} else if (handle.equalsIgnoreCase("subjectPersonIdRequired")) {
 					spc.setSubjectPersonIdRequired(spv.getValue());
-					// logger.info("subjectPersonIdRequired" +
-					// spc.getSubjectPersonIdRequired());
 				} else if (handle.equalsIgnoreCase("interviewerNameRequired")) {
 					spc.setInterviewerNameRequired(spv.getValue());
 				} else if (handle.equalsIgnoreCase("interviewerNameDefault")) {
@@ -150,7 +148,6 @@ public class StudyConfigService {
 				} else if (handle.equalsIgnoreCase("eventLocationRequired")) {
 					spc.setEventLocationRequired(spv.getValue());
 				}
-				// clinovo - start (ticket #11)
 				else if (handle.equalsIgnoreCase("secondaryIdRequired")) {
 					spc.setSecondaryIdRequired(spv.getValue());
 				} else if (handle.equalsIgnoreCase("dateOfEnrollmentForStudyRequired")) {
@@ -164,8 +161,6 @@ public class StudyConfigService {
 				} else if (handle.equalsIgnoreCase("genderLabel")) {
 					spc.setGenderLabel(spv.getValue());
 				}
-				// clinovo - end
-				// clinovo - start (ticket #12)
 				else if (handle.equalsIgnoreCase("startDateTimeRequired")) {
 					spc.setStartDateTimeRequired(spv.getValue());
 				} else if (handle.equalsIgnoreCase("useStartTime")) {
@@ -179,12 +174,9 @@ public class StudyConfigService {
 				} else if (handle.equalsIgnoreCase("endDateTimeLabel")) {
 					spc.setEndDateTimeLabel(spv.getValue());
 				}
-				// clinovo - end
-				// clinovo - start (ticket #47)
 				else if (handle.equalsIgnoreCase("markImportedCRFAsCompleted")) {
 					spc.setMarkImportedCRFAsCompleted(spv.getValue());
 				}
-				// clinovo - end
 			}
 		}
 		study.setStudyParameterConfig(spc);
@@ -244,7 +236,6 @@ public class StudyConfigService {
 				study.getStudyParameterConfig().setAdminForcedReasonForChange(spvb.getValue());
 			}
 
-			// clinovo - start (ticket #11)
 			else if (parameter.equalsIgnoreCase("secondaryIdRequired")) {
 				study.getStudyParameterConfig().setSecondaryIdRequired(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("secondaryLabelViewable")) {
@@ -260,8 +251,6 @@ public class StudyConfigService {
 			} else if (parameter.equalsIgnoreCase("genderLabel")) {
 				study.getStudyParameterConfig().setGenderLabel(spvb.getValue());
 			}
-			// clinovo - end
-			// clinovo - start (ticket #12)
 			else if (parameter.equalsIgnoreCase("startDateTimeRequired")) {
 				study.getStudyParameterConfig().setStartDateTimeRequired(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("useStartTime")) {
@@ -275,13 +264,9 @@ public class StudyConfigService {
 			} else if (parameter.equalsIgnoreCase("endDateTimeLabel")) {
 				study.getStudyParameterConfig().setEndDateTimeLabel(spvb.getValue());
 			}
-			// clinovo - end
-			// clinovo - start (ticket #47)
 			else if (parameter.equalsIgnoreCase("markImportedCRFAsCompleted")) {
 				study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(spvb.getValue());
 			}
-			// clinovo - end
-
 		}
 		return study;
 
@@ -340,11 +325,8 @@ public class StudyConfigService {
 				site.getStudyParameterConfig().setAdminForcedReasonForChange(spvb.getValue());
 			}
 
-			// clinovo - start (ticket #11)
 			else if (parameter.equalsIgnoreCase("secondaryIdRequired")) {
 				site.getStudyParameterConfig().setSecondaryIdRequired(spvb.getValue());
-				// } else if (parameter.equalsIgnoreCase("secondaryLabelViewable")) {
-				// site.getStudyParameterConfig().setSecondaryLabelViewable(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("dateOfEnrollmentForStudyRequired")) {
 				site.getStudyParameterConfig().setDateOfEnrollmentForStudyRequired(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("studySubjectIdLabel")) {
@@ -356,8 +338,6 @@ public class StudyConfigService {
 			} else if (parameter.equalsIgnoreCase("genderLabel")) {
 				site.getStudyParameterConfig().setGenderLabel(spvb.getValue());
 			}
-			// clinovo - end
-			// clinovo - start (ticket #12)
 			else if (parameter.equalsIgnoreCase("startDateTimeRequired")) {
 				site.getStudyParameterConfig().setStartDateTimeRequired(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("useStartTime")) {
@@ -371,17 +351,10 @@ public class StudyConfigService {
 			} else if (parameter.equalsIgnoreCase("endDateTimeLabel")) {
 				site.getStudyParameterConfig().setEndDateTimeLabel(spvb.getValue());
 			}
-			// clinovo - end
-			// clinovo - start (ticket #47)
 			else if (parameter.equalsIgnoreCase("markImportedCRFAsCompleted")) {
 				site.getStudyParameterConfig().setMarkImportedCRFAsCompleted(spvb.getValue());
 			}
-			// clinovo - end
-
-			// will add interview name/date features later
 		}
 		return site;
-
 	}
-
 }

@@ -26,6 +26,7 @@ import java.util.Date;
  * @author thickerson
  * 
  */
+@SuppressWarnings("serial")
 public class CRFVersionBean extends AuditableEntityBean {
 
 	private String description = "";

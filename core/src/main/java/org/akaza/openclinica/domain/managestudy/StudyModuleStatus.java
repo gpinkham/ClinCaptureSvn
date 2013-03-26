@@ -13,18 +13,16 @@
 
 package org.akaza.openclinica.domain.managestudy;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
-
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import java.util.Date;
+
+import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 /**
- * @author: Shamim Date: Feb 17, 2009 Time: 8:17:02 PM There will be a single instance of this class which will maintain
- *          completion status of different entities of study module.
+ * There will be a single instance of this class which will maintain completion status of different entities of study module.
  */
 @Entity
 @Table(name = "study_module_status")

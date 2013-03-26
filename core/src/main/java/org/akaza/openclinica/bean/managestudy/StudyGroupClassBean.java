@@ -25,10 +25,12 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import java.util.ArrayList;
 
 /**
+ * Object for study group class
+ * 
  * @author jxu
  * 
- *         Object for study group class
  */
+@SuppressWarnings({"rawtypes", "serial"})
 public class StudyGroupClassBean extends AuditableEntityBean {
 	// STUDY_GROUP_ID NAME STUDY_ID OWNER_ID
 	// DATE_CREATED GROUP_CLASS_TYPE_ID STATUS_ID DATE_UPDATED

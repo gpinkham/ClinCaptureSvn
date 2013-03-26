@@ -79,12 +79,6 @@ public class InsertActionProcessor implements ActionProcessor {
 		return null;
 	}
 
-	private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData,
-			StudyBean currentStudy, UserAccountBean ub) {
-		//
-		return ruleAction;
-	}
-
 	private RuleActionBean dryRun(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData,
 			StudyBean currentStudy, UserAccountBean ub) {
 		return ruleAction;

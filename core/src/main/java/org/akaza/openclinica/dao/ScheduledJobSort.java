@@ -19,15 +19,7 @@ import java.util.List;
 
 import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 
-/**
- * 
- * @author jnyayapathi
- * 
- */
 public class ScheduledJobSort implements CriteriaCommand {
-	private String fireTime;
-	private String datasetId;
-	private String scheduledFireTime;
 	HashMap<String, String> columnMapping = new HashMap<String, String>();
 	List<Sort> sorts = new ArrayList<Sort>();
 
@@ -40,9 +32,6 @@ public class ScheduledJobSort implements CriteriaCommand {
 	}
 
 	public ScheduledJobSort() {
-		fireTime = "";
-		datasetId = "";
-		scheduledFireTime = "";
 	}
 
 	public String execute(String criteria) {

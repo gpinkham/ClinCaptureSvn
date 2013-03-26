@@ -13,31 +13,28 @@
 
 package org.akaza.openclinica.bean.service;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
-import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.FormattingResults;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.fop.apps.PageSequenceResults;
-
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.Result;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.sax.SAXResult;
 
 /**
  * PdfProcessingFunction, a post-processing function for Extract Data By Tom Hickerson, 09/2010
@@ -45,13 +42,14 @@ import javax.xml.transform.sax.SAXResult;
  * @author thickerson
  * 
  */
+@SuppressWarnings({ "rawtypes", "serial" })
 public class PdfProcessingFunction extends ProcessingFunction {
 
 	public PdfProcessingFunction() {
 		fileType = "pdf";
 	}
 
-	/*
+	/**
 	 * The run() method. Note that we will assume that all variables (i.e. file paths) are set here.
 	 * 
 	 * Running this will open a file stream, perform a transform with the *.fo file (note, does not necessarily have to
@@ -72,8 +70,6 @@ public class PdfProcessingFunction extends ProcessingFunction {
 			// where fo is the transformed file
 
 			File procExportDirectory;
-			File oldFiles[] = null;
-
 			if (this.getExportFileName() != null && this.getLocation() != null) {
 
 				procExportDirectory = new File(this.getLocation());
@@ -178,7 +174,6 @@ public class PdfProcessingFunction extends ProcessingFunction {
 	}
 
 	private void deleteOldFiles(File[] oldFiles, File outputFile, String zipFile) {
-		// File[] files = complete.listFiles();
 		File zip = new File(zipFile);
 		for (int i = 0; i < oldFiles.length; i++) {
 			if (!outputFile.getName().equals(oldFiles[i].getName()) && !zip.getName().equals(oldFiles[i].getName()))

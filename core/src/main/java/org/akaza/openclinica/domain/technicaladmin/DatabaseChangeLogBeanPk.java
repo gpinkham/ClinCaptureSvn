@@ -19,6 +19,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
+@SuppressWarnings("serial")
 public class DatabaseChangeLogBeanPk implements Serializable {
 
 	private String id;

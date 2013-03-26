@@ -34,6 +34,7 @@ import java.util.Date;
  * 
  * @author thickerson
  */
+@SuppressWarnings("serial")
 public class EventCRFBean extends AuditableEntityBean {
 	private int studyEventId = 0;
 	private int CRFVersionId = 0;

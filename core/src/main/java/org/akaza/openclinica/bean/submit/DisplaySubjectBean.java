@@ -24,12 +24,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 
 import java.util.ArrayList;
 
-/**
- * @author jxu
- * 
- *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
- *         Code Templates
- */
+@SuppressWarnings({"rawtypes", "serial"})
 public class DisplaySubjectBean extends EntityBean {
 	private SubjectBean subject;
 	private ArrayList studySubjects;

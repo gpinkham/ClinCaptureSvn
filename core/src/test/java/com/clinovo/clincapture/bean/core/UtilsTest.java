@@ -10,19 +10,21 @@
 
 package com.clinovo.clincapture.bean.core;
 
-import static org.junit.Assert.*;
-
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * User: Pavel Date: 14.10.12

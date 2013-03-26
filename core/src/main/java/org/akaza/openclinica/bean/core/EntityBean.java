@@ -20,11 +20,7 @@
  */
 package org.akaza.openclinica.bean.core;
 
-/**
- * @author thickerson
- * 
- * 
- */
+@SuppressWarnings("serial")
 public class EntityBean implements java.io.Serializable {
 
 	// ss - changed visibility of these fields so Term could see them

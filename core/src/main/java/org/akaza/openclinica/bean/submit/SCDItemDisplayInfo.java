@@ -27,6 +27,7 @@ import java.util.List;
  * 
  * @author ywang
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class SCDItemDisplayInfo {
 	private int rowDisplayStatus = SCDRowDisplayStatus.SHOW_UNCHANGABLE.getCode(); // 0;
 	/**
@@ -39,16 +40,8 @@ public class SCDItemDisplayInfo {
 
 	private int scdShowStatus = SCDShowStatus.SHOW_UNCHANGABLE.getCode(); // 0;
 
-	// private SCDShowStatus scdShowStatus = SCDShowStatus.SHOW_UNCHANGABLE;
-
 	public static DisplaySectionBean generateSCDDisplayInfo(DisplaySectionBean section, Boolean noValueComparison) {
-		/*
-		 * rowStatus - SHOW_UNCHANGABLE: 0; row always display; SHOW_CHANGABLE 1: current display but changable;
-		 * HIDE_CHANGABLE 2: current no display but changable;
-		 */
-		/*
-		 * scdShowStatus - 0: always display; 1: display but changable; 2: no display but changable;
-		 */
+		
 		List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
 		int rowStartIndex = 0, rowStatus = -1, rowIndex = 1;
 		String ids = "";
@@ -61,16 +54,11 @@ public class SCDItemDisplayInfo {
 			if (SCDItemDisplayInfo.isSCDItem(dib)) {
 				int scdShowStatus0 = -1;
 				if (noValueComparison) {
-					// scdShowStatus0 = dib.getNumDiscrepancyNotes() > 0 ? 0 :
-					// dib.getData().getValue().length()>0 || dib.getIsSCDtoBeShown() ? 1 : 2;
 					scdShowStatus0 = dib.getNumDiscrepancyNotes() > 0 ? SCDShowStatus.SHOW_UNCHANGABLE.getCode() : dib
 							.getData().getValue().length() > 0
 							|| dib.getIsSCDtoBeShown() ? SCDShowStatus.SHOW_CHANGABLE.getCode()
 							: SCDShowStatus.HIDE_CHANGABLE.getCode();
 				} else {
-					// scdShowStatus0 = dib.getNumDiscrepancyNotes() > 0 || dib.getScdData().getDbValue().length() > 0 ?
-					// 0 :
-					// dib.getData().getValue().length()>0 || dib.getIsSCDtoBeShown() ? 1 : 2;
 					scdShowStatus0 = dib.getNumDiscrepancyNotes() > 0 || dib.getScdData().getDbValue().length() > 0 ? SCDShowStatus.SHOW_UNCHANGABLE
 							.getCode()
 							: dib.getData().getValue().length() > 0 || dib.getIsSCDtoBeShown() ? SCDShowStatus.SHOW_CHANGABLE
@@ -78,7 +66,6 @@ public class SCDItemDisplayInfo {
 				}
 				SCDItemDisplayInfo dinfo0 = dib.getScdData().getScdDisplayInfo();
 				dinfo0.setScdShowStatus(scdShowStatus0);
-				// dinfo0.setScdShowStatus(SCDShowStatus.getByCode(scdShowStatus0));
 				dinfo0.setRowNum(rowIndex);
 				ids += scdShowStatus0 <= 1 ? dinfo0.getRowSCDShowIDStr() + "-" + dib.getMetadata().getItemId() : dinfo0
 						.getRowSCDShowIDStr();
@@ -90,13 +77,10 @@ public class SCDItemDisplayInfo {
 			for (int j = 0; j < childItems0.size(); ++j) {
 				DisplayItemBean child = childItems0.get(j);
 				if (SCDItemDisplayInfo.isSCDItem(child)) {
-					// int scdShowStatus = child.getNumDiscrepancyNotes() > 0 ? 0 :
-					// child.getData().getValue().length()>0 || child.getIsSCDtoBeShown() ? 1 : 2;
 					int scdShowStatus = child.getNumDiscrepancyNotes() > 0 ? SCDShowStatus.SHOW_UNCHANGABLE.getCode()
 							: child.getData().getValue().length() > 0 || child.getIsSCDtoBeShown() ? SCDShowStatus.SHOW_CHANGABLE
 									.getCode() : SCDShowStatus.HIDE_CHANGABLE.getCode();
 					child.getScdData().getScdDisplayInfo().setScdShowStatus(scdShowStatus);
-					// child.getScdData().getScdDisplayInfo().setScdShowStatus(SCDShowStatus.getByCode(scdShowStatus));
 				}
 			}
 		}
@@ -109,7 +93,6 @@ public class SCDItemDisplayInfo {
 				if (col <= 1) {
 					DisplayItemBean prevDib = allItems.get(rowStartIndex).getSingleItem();
 					SCDItemDisplayInfo dinfo = prevDib.getScdData().getScdDisplayInfo();
-					// dinfo.setRowDisplayStatus(SCDRowDisplayStatus.getByCode(rowStatus));
 					dinfo.setRowDisplayStatus(rowStatus);
 					dinfo.setRowSCDShowIDStr(ids);
 					rowStartIndex = i;
@@ -119,15 +102,10 @@ public class SCDItemDisplayInfo {
 				if (SCDItemDisplayInfo.isSCDItem(dib)) {
 					int scdShowStatus = -1;
 					if (noValueComparison) {
-						// scdShowStatus = dib.getNumDiscrepancyNotes() > 0 ? 0 :
-						// dib.getData().getValue().length()>0 || dib.getIsSCDtoBeShown() ? 1 : 2;
 						scdShowStatus = dib.getNumDiscrepancyNotes() > 0 ? SCDShowStatus.SHOW_UNCHANGABLE.getCode()
 								: dib.getData().getValue().length() > 0 || dib.getIsSCDtoBeShown() ? SCDShowStatus.SHOW_CHANGABLE
 										.getCode() : SCDShowStatus.HIDE_CHANGABLE.getCode();
 					} else {
-						// scdShowStatus = dib.getNumDiscrepancyNotes() > 0 || dib.getScdData().getDbValue().length() >
-						// 0 ? 0 :
-						// dib.getData().getValue().length()>0 || dib.getIsSCDtoBeShown() ? 1 : 2;
 						scdShowStatus = dib.getNumDiscrepancyNotes() > 0 || dib.getScdData().getDbValue().length() > 0 ? SCDShowStatus.SHOW_UNCHANGABLE
 								.getCode()
 								: dib.getData().getValue().length() > 0 || dib.getIsSCDtoBeShown() ? SCDShowStatus.SHOW_CHANGABLE
@@ -135,7 +113,6 @@ public class SCDItemDisplayInfo {
 					}
 					SCDItemDisplayInfo dinfo = dib.getScdData().getScdDisplayInfo();
 					dinfo.setScdShowStatus(scdShowStatus);
-					// dinfo.setScdShowStatus(SCDShowStatus.getByCode(scdShowStatus));
 					dinfo.setRowNum(rowIndex);
 					dinfo.setRowFirstColIndex(rowStartIndex);
 					ids += scdShowStatus <= 1 ? dinfo.getRowSCDShowIDStr() + "-" + ifmb.getItemId() : dinfo
@@ -149,14 +126,11 @@ public class SCDItemDisplayInfo {
 				for (int j = 0; j < childItems.size(); ++j) {
 					DisplayItemBean child = (DisplayItemBean) childItems.get(j);
 					if (SCDItemDisplayInfo.isSCDItem(child)) {
-						// int scdShowStatus = child.getNumDiscrepancyNotes() > 0 ? 0 :
-						// child.getData().getValue().length()>0 || child.getIsSCDtoBeShown() ? 1 : 2;
 						int scdShowStatus = child.getNumDiscrepancyNotes() > 0 ? SCDShowStatus.SHOW_UNCHANGABLE
 								.getCode()
 								: child.getData().getValue().length() > 0 || child.getIsSCDtoBeShown() ? SCDShowStatus.SHOW_CHANGABLE
 										.getCode() : SCDShowStatus.HIDE_CHANGABLE.getCode();
 						child.getScdData().getScdDisplayInfo().setScdShowStatus(scdShowStatus);
-						// child.getScdData().getScdDisplayInfo().setScdShowStatus(SCDShowStatus.getByCode(scdShowStatus));
 					}
 				}
 			}
@@ -165,7 +139,6 @@ public class SCDItemDisplayInfo {
 			DisplayItemBean prevDib = allItems.get(rowStartIndex).getSingleItem();
 			SCDItemDisplayInfo dinfo = prevDib.getScdData().getScdDisplayInfo();
 			dinfo.setRowDisplayStatus(rowStatus);
-			// dinfo.setRowDisplayStatus(SCDRowDisplayStatus.getByCode(rowStatus));
 			dinfo.setRowSCDShowIDStr(ids + "-");
 			dinfo.setRowFirstColIndex(rowStartIndex);
 		}

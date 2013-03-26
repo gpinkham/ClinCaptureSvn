@@ -13,15 +13,13 @@
 
 package org.akaza.openclinica.dao.managestudy;
 
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.apache.commons.lang.StringEscapeUtils;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.apache.commons.lang.StringEscapeUtils;
 
 public class FindSubjectsFilter implements CriteriaCommand {
 
@@ -51,6 +49,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
 		return theCriteria;
 	}
 
+	@SuppressWarnings("deprecation")
 	private boolean dateIsOk(String dateStr) {
 		boolean result = false;
 		try {

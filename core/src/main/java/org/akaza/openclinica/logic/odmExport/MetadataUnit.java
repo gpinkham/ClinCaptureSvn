@@ -22,6 +22,15 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -39,21 +48,12 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 /**
  * A class for ODM metadata of one study.
  * 
  * @author ywang (May, 2009)
  */
-
+@SuppressWarnings({"rawtypes"})
 public class MetadataUnit extends OdmUnit {
 	private OdmStudyBean odmStudy;
 	private StudyBean parentStudy;
@@ -190,11 +190,6 @@ public class MetadataUnit extends OdmUnit {
 				}
 			}
 
-			// populate protocol
-			// Set<Integer> nullCodeSet = oedao.getMetadata(parentStudyId,
-			// studyId,
-			// metadata, this.getODMBean().getODMVersion());
-			// studyBase.setNullClSet(nullCodeSet);
 			oedao.getMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion());
 			metadata.setRuleSetRules(getRuleSetRuleDao().findByRuleSetStudyIdAndStatusAvail(parentStudyId));
 		}
@@ -217,7 +212,6 @@ public class MetadataUnit extends OdmUnit {
 	}
 
 	public static String getOdmItemDataType(int responseTypeId, int OCDataTypeId) {
-		// 3: checkbox; 7: multi-select
 		if (responseTypeId == 3 || responseTypeId == 7) {
 			return "text";
 		} else {
@@ -273,9 +267,6 @@ public class MetadataUnit extends OdmUnit {
 				switch (OCDataTypeId) {
 				case 1:
 					return "boolean";
-					// not be supported in openclinica-3.0.4.1
-					// case 10:
-					// return "partialDate";
 				default:
 					return getOdmItemDataType(OCDataTypeId);
 				}
@@ -370,8 +361,6 @@ public class MetadataUnit extends OdmUnit {
 		unitRefs.add(unit);
 
 		List<RangeCheckBean> rcs = new ArrayList<RangeCheckBean>();
-		// final String[] odmComparator = { "LT", "LE", "GT", "GE", "EQ", "NE",
-		// "IN", "NOTIN" };
 		String[] s = func.split("\\(");
 		RangeCheckBean rc = new RangeCheckBean();
 		if (s[0].equalsIgnoreCase("range")) {

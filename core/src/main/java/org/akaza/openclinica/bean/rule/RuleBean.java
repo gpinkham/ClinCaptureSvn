@@ -36,6 +36,7 @@ import java.util.List;
  * 
  * @author Krikor Krumlian
  */
+@SuppressWarnings("serial")
 public class RuleBean extends AuditableEntityBean {
 
 	private String oid;

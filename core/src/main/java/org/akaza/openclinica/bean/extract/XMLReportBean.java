@@ -22,9 +22,7 @@ package org.akaza.openclinica.bean.extract;
 
 import java.util.ArrayList;
 
-/**
- * @author ywang
- */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class XMLReportBean extends ReportBean {
 	private ArrayList dataLines;
 

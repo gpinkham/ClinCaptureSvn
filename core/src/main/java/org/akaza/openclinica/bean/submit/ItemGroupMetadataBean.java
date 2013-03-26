@@ -15,9 +15,7 @@ package org.akaza.openclinica.bean.submit;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 
-/**
- * Created by IntelliJ IDEA. User: bruceperry Date: May 10, 2007
- */
+@SuppressWarnings({"rawtypes", "serial"})
 public class ItemGroupMetadataBean extends EntityBean implements Comparable {
 	private Integer itemGroupId;
 	private String header;
@@ -34,9 +32,6 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
 	private boolean showGroup;
 	private boolean isHighlighted;
 	private boolean repeatingGroup;
-
-	// << tbh 02/2010 for dynamics
-	// << tbh isHighlighted only for admin editing 05/2010
 
 	public ItemGroupMetadataBean() {
 		super();

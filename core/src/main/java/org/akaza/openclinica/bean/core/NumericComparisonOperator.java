@@ -23,11 +23,8 @@ package org.akaza.openclinica.bean.core;
 import java.util.Arrays;
 import java.util.List;
 
-// implicit controlled vocab, not stored in db
 
-// Internationalized name and description in Term.getName and
-// Term.getDescription()
-
+@SuppressWarnings("serial")
 public class NumericComparisonOperator extends Term {
 	public static final NumericComparisonOperator EQUALS = new NumericComparisonOperator(1, "equal_to", "equal_to");
 	public static final NumericComparisonOperator NOT_EQUALS = new NumericComparisonOperator(2, "not_equal_to",
@@ -42,7 +39,7 @@ public class NumericComparisonOperator extends Term {
 
 	private static final NumericComparisonOperator[] members = { EQUALS, NOT_EQUALS, LESS_THAN, LESS_THAN_OR_EQUAL_TO,
 			GREATER_THAN, GREATER_THAN_OR_EQUAL_TO };
-	public static final List list = Arrays.asList(members);
+	public static final List<NumericComparisonOperator> list = Arrays.asList(members);
 
 	private NumericComparisonOperator(int id, String name) {
 		super(id, name);

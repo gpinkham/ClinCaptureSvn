@@ -20,14 +20,12 @@
  */
 package org.akaza.openclinica.service.managestudy;
 
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
 
 /**
  * I am not really the author but I wanted to commit this code for an example with Jenkins.
@@ -70,12 +68,10 @@ public class DiscrepancyNoteService implements IDiscrepancyNoteService {
 		dnb.setResolutionStatusId(1);
 		dnb.setColumn("value");
 		dnb.setOwner(ub);
-		// clinovo - start (ticket #116)
 		if (assignToUser) {
 			dnb.setAssignedUser(ub);
 			dnb.setAssignedUserId(ub.getId());
 		}
-		// clinovo - end
 		if (parentId != null) {
 			dnb.setParentDnId(parentId);
 		}

@@ -63,6 +63,7 @@ public class EmptySpaceHandler extends GeneralizedFieldHandler {
 	 * @return the class type of of the field
 	 */
 	@Override
+	@SuppressWarnings("rawtypes")
 	public Class getFieldType() {
 		return String.class;
 	}

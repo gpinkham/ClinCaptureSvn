@@ -22,10 +22,6 @@ package org.akaza.openclinica.logic.expressionTree;
 
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 
-/**
- * @author Krikor Krumlian
- * 
- */
 public class RelationalOpNode extends ExpressionNode {
 	Operator op; // The operator.
 	ExpressionNode left; // The expression for its left operand.
@@ -106,30 +102,14 @@ public class RelationalOpNode extends ExpressionNode {
 
 	void validate(String l, String r) throws OpenClinicaSystemException {
 		if (!(ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) && !isDouble(l, r)) {
-			// throw new OpenClinicaSystemException(l + " and " + r + " cannot be used with the " + op.toString() +
-			// " operator");
 			throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { l, r, op.toString() });
 		}
 	}
 
 	void validate(String l, String r, String ltext, String rtext) throws OpenClinicaSystemException {
 		if (!(ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) && !isDouble(l, r)) {
-			// throw new OpenClinicaSystemException(l + " and " + r + " cannot be used with the " + op.toString() +
-			// " operator");
 			throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { ltext, rtext, op.toString() });
 		}
-	}
-
-	/*
-	 * Precondition: both l and r are not empty. Return true only if one is dd-MMM-yyyy format, another is
-	 * ExpressionTreeHelper.isDateyyyyMMdd
-	 */
-	private boolean preValidateOnddMMMyyyyDashes(String l, String r) {
-		if (ExpressionTreeHelper.isDateddMMMyyyyDashes(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)
-				|| ExpressionTreeHelper.isDateddMMMyyyyDashes(r) && ExpressionTreeHelper.isDateyyyyMMdd(l)) {
-			return true;
-		}
-		return false;
 	}
 
 	private boolean blankAgainstDateyyyyMMdd(String l, String r) {

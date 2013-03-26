@@ -20,12 +20,7 @@
  */
 package org.akaza.openclinica.exception;
 
-/**
- * @author thickerson
- * 
- *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
- *         Code Templates
- */
+@SuppressWarnings("serial")
 public class PreparedStatementFactoryException extends Exception {
 	public String message;
 

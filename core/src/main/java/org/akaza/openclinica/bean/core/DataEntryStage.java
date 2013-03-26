@@ -24,11 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author ssachs
- */
-// Internationalized name and description in Term.getName and
-// Term.getDescription()
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class DataEntryStage extends Term {
 	public static final DataEntryStage INVALID = new DataEntryStage(0, "invalid");
 	public static final DataEntryStage UNCOMPLETED = new DataEntryStage(1, "not_started", "not_started");
@@ -79,8 +75,6 @@ public class DataEntryStage extends Term {
 	}
 
 	public static final List list = Arrays.asList(members);
-
-	private List privileges;
 
 	private DataEntryStage(int id, String name) {
 		super(id, name);

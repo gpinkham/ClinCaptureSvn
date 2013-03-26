@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// Internationalized name and description in Term.getName and
-// Term.getDescription()
-
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class UserType extends Term {
 
 	public static final UserType INVALID = new UserType(0, "invalid");

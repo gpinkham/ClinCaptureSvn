@@ -23,11 +23,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-/**
- * @author thickerson
- * 
- * 
- */
+@SuppressWarnings({"rawtypes"})
 public abstract class BusinessEvaluator implements Runnable {
 	protected ArrayList ruleSet;
 	protected boolean hasBeenUpdated;

@@ -20,18 +20,16 @@
  */
 package org.akaza.openclinica.bean.extract;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DatasetItemStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-/**
- * @author thickerson
- */
+@SuppressWarnings({"rawtypes", "serial"})
 public class DatasetBean extends AuditableEntityBean {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -44,16 +42,6 @@ public class DatasetBean extends AuditableEntityBean {
 	private java.util.Date dateStart;
 	private java.util.Date dateEnd;
 	private int approverId = 0;
-	// private int maxItemDataBeanOrdinal = 0;
-	// above somewhat of a hack,
-	// we need to deliver the maximum ordinal size
-	// for repeating items to the extract data bean
-	// so that they can generate the full report, tbh 08/2007
-	/*
-	 * private ArrayList versionIds = new ArrayList(); private ArrayList versionNames = new ArrayList();
-	 * 
-	 * private ArrayList eventNames = new ArrayList();
-	 */
 	private ArrayList eventIds = new ArrayList();
 	private ArrayList itemIds = new ArrayList();
 	private ArrayList subjectGroupIds = new ArrayList();
@@ -86,12 +74,7 @@ public class DatasetBean extends AuditableEntityBean {
 	private boolean showCRFcompletionDate = false;
 	// again, how is it different from Start/End?
 	private boolean showSubjectGroupInformation = false;
-	// private boolean showGroupInformation = false;
-	// private boolean showDiscrepancyInformation = false;
-	// removed above after meeting 07/16/2007, tbh
-	//
-	//
-
+	
 	private ArrayList itemDefCrf = new ArrayList();
 	// map items with definition and CRF
 
@@ -263,7 +246,6 @@ public class DatasetBean extends AuditableEntityBean {
 
 		String pattern = "yyyy-MM-dd";
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-		// guard clauses to defend vs NPE, tbh 10-2009
 		String beginDate = "1900-01-01";
 		if (dateStart != null) {
 			beginDate = sdf.format(this.dateStart);
@@ -272,14 +254,10 @@ public class DatasetBean extends AuditableEntityBean {
 		if (dateEnd != null) {
 			stopDate = sdf.format(this.dateEnd);
 		}
-		// << tbh 10/2009
 		sb.append("(date(date_created) >= date('" + beginDate + "')) and (date(date_created) <= date('" + stopDate
 				+ "'))");
-		// perform regexp here that pulls out [] square brackets
 
 		String returnMe = sb.toString().replaceAll("\\[|\\]", "");
-		// returnMe = returnMe.replaceAll("[^0-9])",")");
-		// return sb.toString();
 		returnMe = returnMe + " order by date_start asc";
 		return returnMe;
 	}
@@ -314,8 +292,6 @@ public class DatasetBean extends AuditableEntityBean {
 		logger.info(sb.toString());
 		logger.info("-----------------------------");
 		String returnMe = sb.toString().replaceAll("\\[|\\]", "");
-		// returnMe = returnMe.replaceAll("[^0-9])",")");
-		// return sb.toString();
 		returnMe = returnMe + " order by date_start";
 		return returnMe;
 	}
@@ -495,13 +471,6 @@ public class DatasetBean extends AuditableEntityBean {
 		this.showCRFversion = showCRFversion;
 	}
 
-	/*
-	 * public boolean isShowDiscrepancyInformation() { return showDiscrepancyInformation; }
-	 * 
-	 * public void setShowDiscrepancyInformation(boolean showDiscrepancyInformation) { this.showDiscrepancyInformation =
-	 * showDiscrepancyInformation; }
-	 */
-
 	public boolean isShowEventEndTime() {
 		return showEventEndTime;
 	}
@@ -525,12 +494,6 @@ public class DatasetBean extends AuditableEntityBean {
 	public void setShowEventStatus(boolean showEventStatus) {
 		this.showEventStatus = showEventStatus;
 	}
-
-	/*
-	 * public boolean isShowGroupInformation() { return showGroupInformation; } FIXME now change all the places where
-	 * this is located... public void setShowGroupInformation(boolean showGroupInformation) { this.showGroupInformation
-	 * = showGroupInformation; }
-	 */
 
 	public boolean isShowSubjectAgeAtEvent() {
 		return showSubjectAgeAtEvent;
@@ -627,10 +590,4 @@ public class DatasetBean extends AuditableEntityBean {
 		return sql;
 	}
 
-	/*
-	 * public int getMaxItemDataBeanOrdinal() { return maxItemDataBeanOrdinal; }
-	 * 
-	 * public void setMaxItemDataBeanOrdinal(int maxItemDataBeanOrdinal) { this.maxItemDataBeanOrdinal =
-	 * maxItemDataBeanOrdinal; }
-	 */
 }

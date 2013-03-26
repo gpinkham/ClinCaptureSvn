@@ -53,6 +53,7 @@ public class DiscrepancyNoteActionProcessorTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testExecute() {
 
 		context.checking(new Expectations() {

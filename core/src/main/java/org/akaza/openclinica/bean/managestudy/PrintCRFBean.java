@@ -20,9 +20,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 
 import java.util.List;
 
-/**
- * @author: Shamim Date: Nov 23, 2009 Time: 8:41:41 AM
- */
+@SuppressWarnings("rawtypes")
 public class PrintCRFBean {
 	private StudyEventBean studyEventBean;
 	private CRFBean crfBean;

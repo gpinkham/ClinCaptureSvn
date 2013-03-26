@@ -32,6 +32,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
  * 
  * 
  */
+@SuppressWarnings({"rawtypes", "serial"})
 public class SectionBean extends AuditableEntityBean {
 	private int CRFVersionId;
 

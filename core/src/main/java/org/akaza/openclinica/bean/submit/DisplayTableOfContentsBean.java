@@ -29,9 +29,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 
 import java.util.ArrayList;
 
-/**
- * @author ssachs
- */
+@SuppressWarnings({"rawtypes"})
 public class DisplayTableOfContentsBean {
 	private boolean active; // AND's together all the active bits of all the
 	// beans that were explicitly set, except for

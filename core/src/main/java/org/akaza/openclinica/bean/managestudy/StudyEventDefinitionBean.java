@@ -21,11 +21,7 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Map;
 
-/**
- * @author thickerson
- * 
- * 
- */
+@SuppressWarnings({"rawtypes", "serial"})
 public class StudyEventDefinitionBean extends AuditableEntityBean implements Comparable {
 	private String description = "";
 

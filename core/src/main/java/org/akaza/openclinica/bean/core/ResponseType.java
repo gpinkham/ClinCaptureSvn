@@ -23,9 +23,8 @@ package org.akaza.openclinica.bean.core;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author ssachs
- */
+
+@SuppressWarnings("serial")
 public class ResponseType extends Term {
 	public static final ResponseType INVALID = new ResponseType(0, "invalid");
 	public static final ResponseType TEXT = new ResponseType(1, "text");
@@ -48,13 +47,10 @@ public class ResponseType extends Term {
 
 	public static final ResponseType INSTANT_CALCULATION = new ResponseType(10, "instant-calculation");
 
-	// public static final ResponseType CODING = new ResponseType(10, "text(non-editable)");// added 03/2009, tbh
-	// changed 03/09, from 'coding' to 'text(non-editable)' to accept spreadsheet changes
-
 	private static final ResponseType[] members = { TEXT, TEXTAREA, CHECKBOX, FILE, RADIO, SELECT, SELECTMULTI,
 			CALCULATION, GROUP_CALCULATION, INSTANT_CALCULATION };// , CODING };
 
-	public static final List list = Arrays.asList(members);
+	public static final List<ResponseType> list = Arrays.asList(members);
 
 	private ResponseType(int id, String name) {
 		super(id, name);

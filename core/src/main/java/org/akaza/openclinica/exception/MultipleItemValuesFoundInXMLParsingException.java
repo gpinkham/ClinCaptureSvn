@@ -21,6 +21,7 @@ package org.akaza.openclinica.exception;
  * @author ywang
  */
 
+@SuppressWarnings("serial")
 public class MultipleItemValuesFoundInXMLParsingException extends Exception {
 	public MultipleItemValuesFoundInXMLParsingException() {
 		super();

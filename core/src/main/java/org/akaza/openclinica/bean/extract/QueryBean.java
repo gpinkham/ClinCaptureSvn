@@ -22,12 +22,7 @@ package org.akaza.openclinica.bean.extract;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 
-/**
- * @author thickerson
- * 
- *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
- *         Code Templates
- */
+@SuppressWarnings("serial")
 public class QueryBean extends EntityBean {
 	public QueryBean() {
 

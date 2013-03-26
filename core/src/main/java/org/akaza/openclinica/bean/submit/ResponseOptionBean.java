@@ -22,9 +22,7 @@ package org.akaza.openclinica.bean.submit;
 
 import java.io.Serializable;
 
-/**
- * @author ssachs
- */
+@SuppressWarnings("serial")
 public class ResponseOptionBean implements Serializable {
 	/**
 	 * This will be displayed to the user.

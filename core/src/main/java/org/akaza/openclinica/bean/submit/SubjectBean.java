@@ -24,9 +24,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
 import java.util.Date;
 
-/**
- * @author jxu
- */
+@SuppressWarnings("serial")
 public class SubjectBean extends AuditableEntityBean {
 	/*
 	 * since we extend entity bean, we already have the following: subject_id, date_created, date_updated, update_id

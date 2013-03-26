@@ -10,20 +10,20 @@
 
 package com.clinovo.clincapture.bean.core;
 
-import static org.junit.Assert.*;
-
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-/**
- * User: Pavel Date: 24.10.12
- */
+import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.junit.Before;
+import org.junit.Test;
+
 public class NumericComparisonOperatorTest {
 
 	public static final String EQUALS_KEY = "equal_to";
@@ -32,8 +32,6 @@ public class NumericComparisonOperatorTest {
 	public static final String LESS_THAN_OR_EQUAL_TO_KEY = "less_than_or_equal_to";
 	public static final String GREATER_THAN_KEY = "greater_than";
 	public static final String GREATER_THAN_OR_EQUAL_TO_KEY = "greater_than_or_equal_to";
-
-	private static final String WRONG_KEY = "Monitor";
 
 	private NumericComparisonOperator comparisonOperator;
 	private ResourceBundle resterm;

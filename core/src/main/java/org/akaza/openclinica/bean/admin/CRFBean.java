@@ -29,6 +29,7 @@ import java.util.ArrayList;
  * 
  * 
  */
+@SuppressWarnings({"rawtypes", "serial"})
 public class CRFBean extends AuditableEntityBean {
 	private int statusId = 1;
 	private String description = "";

@@ -20,25 +20,22 @@
  */
 package org.akaza.openclinica.service.rule;
 
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.oid.GenericOidGenerator;
-import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.rule.RuleBean;
 import org.akaza.openclinica.bean.rule.RuleSetBean;
 import org.akaza.openclinica.dao.rule.RuleDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
-
 public class RuleService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	DataSource ds;
 	private RuleDAO ruleDao;
-	private OidGenerator oidGenerator;
-
 	public RuleService(DataSource ds) {
-		oidGenerator = new GenericOidGenerator();
+		new GenericOidGenerator();
 		this.ds = ds;
 	}
 

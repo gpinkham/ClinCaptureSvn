@@ -30,13 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-/**
- * @author Jun Xu
- * 
- */
-
-// Internationalized name and description in Term.getName and
-// Term.getDescription()
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class SubjectEventStatus extends Term implements Comparable {
 	// waiting for the db to come in sync with our set of terms...
 	public static final SubjectEventStatus INVALID = new SubjectEventStatus(0, "invalid");
@@ -63,9 +57,7 @@ public class SubjectEventStatus extends Term implements Comparable {
 
     public static final SubjectEventStatus UNLOCK = new SubjectEventStatus(11, "unlock");
 
-	private static final SubjectEventStatus[] members = { SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED, COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED, SOURCE_DATA_VERIFIED, DELETED };
-
-    private static List list = Arrays.asList(new SubjectEventStatus[]{ SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED, COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED, SOURCE_DATA_VERIFIED, DELETED, UNLOCK});
+	private static List list = Arrays.asList(new SubjectEventStatus[]{ SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED, COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED, SOURCE_DATA_VERIFIED, DELETED, UNLOCK});
 
 	// Solve the problem with the get() method...
 	private static final Map<Integer, String> membersMap = new HashMap<Integer, String>();

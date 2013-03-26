@@ -30,7 +30,7 @@ public class ItemGroupCrvVersionUtil {
 	private String itemDataType;
 	private String versions;
 	private String errorMesages;
-	private List arrErrorMesages;
+	private List<String> arrErrorMesages;
 
 	private int id;
 
@@ -223,11 +223,11 @@ public class ItemGroupCrvVersionUtil {
 		this.id = i_id;
 	}
 
-	public List getArrErrorMesages() {
+	public List<String> getArrErrorMesages() {
 		return arrErrorMesages;
 	}
 
-	public void setArrErrorMesages(List arrErrorMesages) {
+	public void setArrErrorMesages(List<String> arrErrorMesages) {
 		this.arrErrorMesages = arrErrorMesages;
 	}
 }

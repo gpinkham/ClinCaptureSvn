@@ -25,10 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 
-/**
- * 
- * @author thickerson
- */
+@SuppressWarnings("serial")
 public class OpenClinicaException extends Exception {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

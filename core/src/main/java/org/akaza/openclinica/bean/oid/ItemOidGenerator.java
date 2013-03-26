@@ -13,18 +13,13 @@
 
 package org.akaza.openclinica.bean.oid;
 
-import org.akaza.openclinica.exception.OpenClinicaException;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * @author Krikor Krumlian
- * 
- */
+import javax.sql.DataSource;
+
 public class ItemOidGenerator extends OidGenerator {
 
 	private final int argumentLength = 2;

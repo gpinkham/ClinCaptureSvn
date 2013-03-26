@@ -36,6 +36,7 @@ import java.util.HashMap;
 
 import javax.sql.DataSource;
 
+@SuppressWarnings({"rawtypes"})
 public class EventService implements EventServiceInterface {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

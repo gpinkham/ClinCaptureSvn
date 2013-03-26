@@ -53,6 +53,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+@SuppressWarnings("rawtypes")
 public class RuleRunner {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

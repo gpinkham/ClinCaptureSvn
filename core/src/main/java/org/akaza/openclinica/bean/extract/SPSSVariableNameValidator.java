@@ -22,7 +22,6 @@
 
 package org.akaza.openclinica.bean.extract;
 
-import java.util.TreeSet;
 
 /**
  * Validate if a SPSS variable name is valid.
@@ -146,7 +145,6 @@ public class SPSSVariableNameValidator extends NameValidator {
 	@Override
 	public String getNextSequentialString(int maxValue) {
 		if (this.sequential >= maxValue) {
-			// System.out.println("Cannot generate sequential string because sequential="+sequential+" >= maxValue="+maxValue+".");
 			System.exit(1);
 		}
 		String s = "" + this.sequential;

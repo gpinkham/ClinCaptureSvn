@@ -24,10 +24,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Krikor Krumlian
- * 
- */
+@SuppressWarnings("serial")
 public class ExpressionBean extends AuditableEntityBean {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

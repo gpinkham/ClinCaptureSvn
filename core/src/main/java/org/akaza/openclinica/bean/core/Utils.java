@@ -27,6 +27,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -171,14 +172,18 @@ public class Utils {
 	 * @param content
 	 * 
 	 * @author ywang (07-2008)
+	 * @throws IOException 
 	 */
-	public static boolean createZipFile(String fileName, String filePath, StringBuffer content) {
+	public static boolean createZipFile(String fileName, String filePath, StringBuffer content) throws IOException {
+		
+		ZipOutputStream z = null;
+		
 		try {
 			File dir = new File(filePath);
 			if (!dir.isDirectory()) {
 				dir.mkdirs();
 			}
-			ZipOutputStream z = new ZipOutputStream(new FileOutputStream(new File(dir, fileName + ".zip")));
+			z = new ZipOutputStream(new FileOutputStream(new File(dir, fileName + ".zip")));
 			z.putNextEntry(new ZipEntry(fileName));
 			byte[] bytes = content.toString().getBytes();
 			z.write(bytes, 0, bytes.length);
@@ -188,6 +193,8 @@ public class Utils {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		} finally {
+			z.close();
 		}
 	}
 

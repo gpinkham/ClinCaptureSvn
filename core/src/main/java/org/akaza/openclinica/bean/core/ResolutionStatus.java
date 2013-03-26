@@ -36,9 +36,7 @@ import java.util.Locale;
  * @author Jun Xu
  * 
  */
-
-// Internationalized name and description in Term.getName and
-// Term.getDescription()
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class ResolutionStatus extends Term {
 
 	protected static final Logger logger = LoggerFactory.getLogger(ResolutionStatus.class.getName());
@@ -58,7 +56,6 @@ public class ResolutionStatus extends Term {
 	public static final ResolutionStatus NOT_APPLICABLE = new ResolutionStatus(5, "Not_Applicable", null,
 			"images/icon_flagWhite.gif");
 
-	// ClinCapture #42 short status list
 	public static final List<ResolutionStatus> simpleList = Arrays.asList(OPEN, UPDATED, CLOSED);
 
 	private String iconFilePath;
@@ -152,8 +149,6 @@ public class ResolutionStatus extends Term {
 		ResourceBundleProvider.updateLocale(new Locale("en"));
 
 		ResolutionStatus test = new ResolutionStatus(1, "New", null, null);
-		// System.out.println("Test id : " + test.getId());
-		// System.out.println(test.getName());
 		logger.info("Test id : " + test.getId());
 		logger.info(test.getName());
 	}

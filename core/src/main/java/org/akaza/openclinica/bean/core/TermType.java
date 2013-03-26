@@ -23,9 +23,7 @@ package org.akaza.openclinica.bean.core;
 import java.util.Arrays;
 import java.util.List;
 
-// note: if you're going to add another member to this class, please update
-// Validator accordingly
-
+@SuppressWarnings({"serial", "rawtypes"})
 public class TermType extends Term {
 	public static final TermType ENTITY_ACTION = new TermType(1, "entity_action");
 	public static final TermType ROLE = new TermType(2, "role");

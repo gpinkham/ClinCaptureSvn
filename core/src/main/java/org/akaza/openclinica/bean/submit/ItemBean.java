@@ -36,6 +36,7 @@ import java.util.ArrayList;
  * 
  *         added itemdataelements - clinovo #121 12/2012
  */
+@SuppressWarnings({"rawtypes", "serial"})
 public class ItemBean extends AuditableEntityBean implements Comparable {
 	private String description = "";
 

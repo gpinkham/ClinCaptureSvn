@@ -10,17 +10,18 @@
 
 package com.clinovo.clincapture.bean.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import org.akaza.openclinica.bean.core.EntityAction;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 /**
  * User: Pavel Date: 14.10.12

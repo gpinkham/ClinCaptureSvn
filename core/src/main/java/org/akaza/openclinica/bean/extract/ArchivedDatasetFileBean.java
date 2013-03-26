@@ -41,6 +41,7 @@ import java.util.Date;
  * 
  *         TODO sync up fields with the table, eventually
  */
+@SuppressWarnings("serial")
 public class ArchivedDatasetFileBean extends EntityBean {
 
 	private int id;

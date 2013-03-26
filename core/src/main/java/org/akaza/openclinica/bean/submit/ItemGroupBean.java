@@ -20,9 +20,7 @@ import org.akaza.openclinica.bean.oid.OidGenerator;
 import javax.sql.DataSource;
 import java.util.ArrayList;
 
-/**
- * Created by IntelliJ IDEA. User: bruceperry Date: May 7, 2007
- */
+@SuppressWarnings({"rawtypes", "serial"})
 public class ItemGroupBean extends AuditableEntityBean {
 
 	private Integer crfId = 0;

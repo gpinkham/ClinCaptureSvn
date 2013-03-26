@@ -28,10 +28,7 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import java.util.ArrayList;
 import java.util.Date;
 
-/**
- * @author jxu
- * 
- */
+@SuppressWarnings({"rawtypes", "serial"})
 public class StudyEventBean extends AuditableEntityBean {
 	// STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID
 	// LOCATION SAMPLE_ORDINAL DATE_START DATE_END
@@ -72,15 +69,13 @@ public class StudyEventBean extends AuditableEntityBean {
 
 	private ArrayList<StudyEventBean> repeatEvents = new ArrayList<StudyEventBean>();
 
-	// A. Hamid.
 	// will the edit icon be appeared
 	private boolean editable = true;
 
-	// YW 08-17-2007
 	private boolean startTimeFlag = false;
 	private boolean endTimeFlag = false;
 
-	// BWP: for display discrepancy notes in a matrix-type study/event grid; 5/2/2008
+	// For display discrepancy notes in a matrix-type study/event grid; 5/2/2008
 	private ArrayList<DiscrepancyNoteBean> discBeanList = new ArrayList<DiscrepancyNoteBean>();
 
 	public ArrayList<DiscrepancyNoteBean> getDiscBeanList() {
@@ -314,11 +309,6 @@ public class StudyEventBean extends AuditableEntityBean {
 		return stage;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.akaza.openclinica.bean.core.AuditableEntityBean#getStatus()
-	 */
 	@Override
 	public void setStatus(Status s) {
 		this.status = s;

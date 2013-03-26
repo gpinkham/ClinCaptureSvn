@@ -19,6 +19,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 
 import java.util.Date;
 
+@SuppressWarnings("serial")
 public class TriggerBean extends EntityBean {
 
 	private Date previousDate;
