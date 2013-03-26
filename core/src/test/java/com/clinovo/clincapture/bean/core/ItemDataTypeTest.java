@@ -23,9 +23,6 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * User: Pavel Date: 24.10.12
- */
 public class ItemDataTypeTest {
 
 	public static final String INVALID_KEY = "invalid";
