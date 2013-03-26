@@ -2,10 +2,10 @@
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.clinovo.clincapture</groupId>
-    <artifactId>clincapture-enterprise</artifactId>
+    <artifactId>clincapture</artifactId>
     <packaging>pom</packaging>
     <version>1.0.2.1-SNAPSHOT</version>
-    <name>ClinCapture Enterprise</name>
+    <name>ClinCapture</name>
     <description>Electronic Data Capture Application for Clinical Trials</description>
 
     <repositories>
@@ -54,7 +54,7 @@
         <dependencies>
             <dependency>
                 <groupId>com.clinovo.clincapture</groupId>
-                <artifactId>core-enterprise</artifactId>
+                <artifactId>core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

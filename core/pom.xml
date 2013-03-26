@@ -2,14 +2,14 @@
 
 	<parent>
 		<groupId>com.clinovo.clincapture</groupId>
-    	<artifactId>clincapture-enterprise</artifactId>
+    	<artifactId>clincapture</artifactId>
 		<version>1.0.2.1-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>core-enterprise</artifactId>
+	<artifactId>core</artifactId>
 	<packaging>jar</packaging>
-	<name>ClinCapture Core Enterprise</name>
+	<name>ClinCapture Core</name>
 
 	<properties>
 		<catalina.home>C:\Program Files\Apache Software Foundation\Tomcat 6.0</catalina.home>
