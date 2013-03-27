@@ -12,6 +12,7 @@
 	<name>ClinCapture Web Application</name>
 
 	<properties>
+		<catalina.home>C:\Program Files\Apache Software Foundation\Tomcat 6.0</catalina.home>
 		<published.version>${project.version} ${build.revision}</published.version>
 	</properties>
 
@@ -288,21 +289,6 @@
 					</webResources>
                 </configuration>
             </plugin>
-			<plugin>
-				<groupId>org.codehaus.cargo</groupId>
-				<artifactId>cargo-maven2-plugin</artifactId>
-				<version>0.3.1</version>
-				<configuration>
-					<container>
-						<containerId>tomcat5x</containerId>
-						<home>${catalina.home}</home>
-					</container>
-					<configuration>
-						<home>${catalina.home}</home>
-						<type>existing</type>
-					</configuration>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -319,6 +305,35 @@
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
 							<skipTests>true</skipTests>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>tomcat-deploy</id>
+			<activation>
+				<property>
+					<name>tomcat-deploy</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<finalName>clincapture</finalName>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.cargo</groupId>
+						<artifactId>cargo-maven2-plugin</artifactId>
+						<version>1.2.0</version>
+						<configuration>
+							<container>
+								<containerId>tomcat6x</containerId>
+								<home>${catalina.home}</home>
+							</container>
+							<configuration>
+								<home>${catalina.home}</home>
+								<type>existing</type>
+							</configuration>
 						</configuration>
 					</plugin>
 				</plugins>
