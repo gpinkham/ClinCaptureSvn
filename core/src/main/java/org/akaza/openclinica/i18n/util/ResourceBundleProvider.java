@@ -17,31 +17,30 @@ public class ResourceBundleProvider {
 	 */
 	static HashMap<Locale, HashMap<String, ResourceBundle>> resBundleSetMap = new HashMap<Locale, HashMap<String, ResourceBundle>>();
 
-	public static void updateLocale(Locale l) {
-		// logger.info("* found locale " + l.getDisplayCountry() + " " + l.getDisplayLanguage());
-		localeMap.put(Thread.currentThread(), l);
-		if (!resBundleSetMap.containsKey(l)) {
+	public static void updateLocale(Locale locale) {
+		localeMap.put(Thread.currentThread(), locale);
+		if (!resBundleSetMap.containsKey(locale)) {
 			HashMap<String, ResourceBundle> resBundleSet = new HashMap<String, ResourceBundle>();
 			resBundleSet.put("org.akaza.openclinica.i18n.admin",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.admin", l));
+					ResourceBundle.getBundle("org.akaza.openclinica.i18n.admin", locale));
 			resBundleSet.put("org.akaza.openclinica.i18n.audit_events",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.audit_events", l));
+					ResourceBundle.getBundle("org.akaza.openclinica.i18n.audit_events", locale));
 			resBundleSet.put("org.akaza.openclinica.i18n.exceptions",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions", l));
+					ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions", locale));
 			resBundleSet.put("org.akaza.openclinica.i18n.format",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.format", l));
+					ResourceBundle.getBundle("org.akaza.openclinica.i18n.format", locale));
 			resBundleSet.put("org.akaza.openclinica.i18n.page_messages",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages", l));
+					ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages", locale));
 			resBundleSet.put("org.akaza.openclinica.i18n.notes",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes", l));
+					ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes", locale));
 			resBundleSet.put("org.akaza.openclinica.i18n.terms",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.terms", l));
+					ResourceBundle.getBundle("org.akaza.openclinica.i18n.terms", locale));
 			resBundleSet.put("org.akaza.openclinica.i18n.words",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", l));
+					ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", locale));
 			resBundleSet.put("org.akaza.openclinica.i18n.workflow",
-					ResourceBundle.getBundle("org.akaza.openclinica.i18n.workflow", l));
+					ResourceBundle.getBundle("org.akaza.openclinica.i18n.workflow", locale));
 
-			resBundleSetMap.put(l, resBundleSet);
+			resBundleSetMap.put(locale, resBundleSet);
 		}
 	}
 
