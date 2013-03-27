@@ -281,9 +281,9 @@
 						<nonFilteredFileExtension>png</nonFilteredFileExtension>
 					</nonFilteredFileExtensions>
 					<webResources>
-					<resource>
-						<directory>src/main/webapp</directory>
-						<filtering>true</filtering>
+						<resource>
+							<directory>src/main/webapp</directory>
+							<filtering>true</filtering>
 						</resource>
 					</webResources>
                 </configuration>
