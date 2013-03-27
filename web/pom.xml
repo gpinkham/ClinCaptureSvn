@@ -248,6 +248,41 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.3</version>
+					<configuration>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<archive>
+							<manifestEntries>
+								<Specification-Title>${project.name}</Specification-Title>
+								<Specification-Version>${project.version}</Specification-Version>
+								<Build-Id>${BUILD_ID}</Build-Id>
+								<Implementation-Version>${BUILD_TAG}</Implementation-Version>
+								<Published-Version>${published.version}</Published-Version>
+							</manifestEntries>
+						</archive>
+						<nonFilteredFileExtensions>
+							<nonFilteredFileExtension>gif</nonFilteredFileExtension>
+							<nonFilteredFileExtension>ico</nonFilteredFileExtension>
+							<nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+							<nonFilteredFileExtension>png</nonFilteredFileExtension>
+						</nonFilteredFileExtensions>
+						<webResources>
+							<resource>
+								<directory>src/main/webapp</directory>
+								<filtering>true</filtering>
+							</resource>
+						</webResources>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<inherited>true</inherited>
@@ -259,36 +294,9 @@
 				<artifactId>maven-jar-plugin</artifactId>
 			</plugin>
 			<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.1.1</version>
-                <configuration>
-                    <manifest>
-                        <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                    </manifest>
-                    <archive>
-                        <manifestEntries>
-                            <Specification-Title>${project.name}</Specification-Title>
-                            <Specification-Version>${project.version}</Specification-Version>
-                            <Build-Id>${BUILD_ID}</Build-Id>
-                            <Implementation-Version>${BUILD_TAG}</Implementation-Version>
-                            <Published-Version>${published.version}</Published-Version>
-                        </manifestEntries>
-                    </archive>
-                    <nonFilteredFileExtensions>
-						<nonFilteredFileExtension>gif</nonFilteredFileExtension>
-						<nonFilteredFileExtension>ico</nonFilteredFileExtension>
-						<nonFilteredFileExtension>jpg</nonFilteredFileExtension>
-						<nonFilteredFileExtension>png</nonFilteredFileExtension>
-					</nonFilteredFileExtensions>
-					<webResources>
-						<resource>
-							<directory>src/main/webapp</directory>
-							<filtering>true</filtering>
-						</resource>
-					</webResources>
-                </configuration>
-            </plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -335,6 +343,10 @@
 								<type>existing</type>
 							</configuration>
 						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
