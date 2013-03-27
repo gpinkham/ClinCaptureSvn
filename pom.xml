@@ -21,6 +21,7 @@
 	<properties>
         <config.id>default</config.id>
 		<spring.version>3.2.1.RELEASE</spring.version>
+        <build.revision>Rev: ${SVN_REVISION}</build.revision>
 		<spring.security.version>3.1.3.RELEASE</spring.security.version>
         <config.file>src/main/resources/datainfo.properties</config.file>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
