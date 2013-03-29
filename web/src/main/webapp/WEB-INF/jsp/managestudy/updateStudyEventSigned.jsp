@@ -346,7 +346,7 @@
 
                     <td class="table_cell">&nbsp;</td>
 
-                <td class="table_cell">
+                <td class="table_cell" width='100px'>
                  <c:choose>
                     <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
                     <%--<c:when test="${dedc.status.name=='locked'}">--%>
@@ -431,7 +431,7 @@
                 </td>
                 <td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
                 <td class="table_cell"><c:out value="${dec.eventCRF.updater.name}" />&nbsp;</td>
-                <td class="table_cell">
+                <td class="table_cell" width='100px'>
                     <c:set var="actionQuery" value="" />
 
                     <c:if test="${dec.continueInitialDataEntryPermitted}">
