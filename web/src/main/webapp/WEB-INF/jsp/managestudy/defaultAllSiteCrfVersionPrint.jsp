@@ -139,4 +139,5 @@ for ( var i = 0; i < els.length ; i ++ ) {
 </c:forEach>
  </div>
 </body>
+<jsp:include page="../include/changeTheme.jsp"/>
 </html>

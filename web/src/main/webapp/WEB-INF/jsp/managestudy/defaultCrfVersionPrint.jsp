@@ -28,7 +28,35 @@
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="session" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
 <jsp:useBean scope="request" id="printCrfBeans" class="java.util.ArrayList" />
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/JavaScript">
+$(document).ready(function() {
+	$('.tableDiv').find('span').each(function() {
+    	var $this = $(this);
+		var t = $this.text();
+   		$this.html(t.replace('&lt;','<').replace('&gt;', '>'));
+	});
+	
+	$('.toplevel').find('.aka_headerBackground.aka_padding_large.aka_cellBorders.aka_font_general').each(function() {
+    	var $this = $(this);
+		var t = $this.text();
+    	$this.html(t.replace('&lt;','<').replace('&gt;', '>'));
+	});
 
+	$('.tableDiv').find('.aka_text_block_shared').css('height','100%').css('float','left').css('display','table');
+	$(".aka_form_table").attr('class', 'tableDiv');
+ 
+	var elsarea = document.getElementsByTagName ('textarea');
+	for ( var i = 0; i < elsarea.length ; i ++ ) {
+		elsarea[i].setAttribute('disabled', 'true'); 
+	}
+	
+	var els = document.getElementsByTagName ('input');
+	for ( var i = 0; i < els.length ; i ++ ) {
+ 		if ( els[i].type == 'text' || els[i].type == 'radio' || els[i].type == 'checkbox' || els[i].type == 'button') els[i].setAttribute('disabled', 'true'); 
+	}
+});
+</script>
 <body>
 
 <fmt:message key="study_subject_ID" bundle="${resword}" var="studySubjectIdLabel"/>
@@ -101,4 +129,5 @@
  </table>
  </div>
 </body>
+<jsp:include page="../include/changeTheme.jsp"/>
 </html>

@@ -11,6 +11,7 @@
 <html>
 <head>
 <title><fmt:message key="print_discrepancy_notes" bundle="${resword}"/></title>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <link rel="stylesheet" href="includes/styles.css" type="text/css">
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
@@ -102,5 +103,5 @@
 </body>
 
 <input type="button" name="BTN_Close" id="CloseWindow" value="<fmt:message key="close_window" bundle="${resword}"/>" class="button_medium" onClick="javascript:window.close();"/>
-
+<jsp:include page="../include/changeTheme.jsp"/>
 </html>

@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="includes/styles.css" type="text/css">
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+    <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 </head>
 <body onload="javascript:alert('<fmt:message key="alert_to_print" bundle="${restext}"/>')">
 
@@ -133,5 +134,6 @@
 <br><br>
 </c:forEach>
 </body>
+<jsp:include page="../include/changeTheme.jsp"/>
 </html>
 

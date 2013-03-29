@@ -33,12 +33,18 @@
 		jjq('a').removeAttr('onmousedown');
 		jjq('a').removeAttr('onmouseup');
 		jjq('H3').css('color', '#AA62C6');
+		jjq('H1').css('color', '#AA62C6');
 		
 		jjq(".nav_bt").find('a:link').css('color','#FFFFFF');
 		jjq('.oc_nav').find('.nav_bt').css("background-color", "#AA62C6");
 		jjq('#bt_Home td, #bt_Home li').css("background-color", "#AA62C6");
 		jjq('input.navSearch:text').css('background-color', "#dbc4e4");
-
+		jjq('.table_cell_noborder').css('color', "#AA62C6");
+		jjq('.table_cell_top').css('color', "#AA62C6");
+		jjq('.table_header_column_top').css('color', "#AA62C6");
+		jjq('.table_title_manage').css('color', "#AA62C6");
+		jjq('.title_manage').css('color', '#AA62C6');
+		
 		jjq("img[src*='bt_']").each(function() {
 			var newSrc = jjq(this).attr('src');
 			var violetCheck = "/violet/";
@@ -159,11 +165,17 @@
 		jjq('a').removeAttr('onmousedown');
 		jjq('a').removeAttr('onmouseup');
 		jjq('H3').css('color', '#75b894');
+		jjq('H1').css('color', '#75b894');
 		
 		jjq(".nav_bt").find('a:link').css('color','#FFFFFF');
 		jjq('.oc_nav').find('.nav_bt').css("background-color", "#75b894");
 		jjq('#bt_Home td, #bt_Home li').css("background-color", "#75b894");
 		jjq('input.navSearch:text').css('background-color', "#c9e3d5");
+		jjq('.table_cell_noborder').css('color', "#75b894");
+		jjq('.table_cell_top').css('color', "#75b894");
+		jjq('.table_header_column_top').css('color', "#75b894");
+		jjq('.table_title_manage').css('color', "#75b894");
+		jjq('.title_manage').css('color', '#75b894');
 		
 		jjq("img[src*='bt_']").each(function() {
 			var newSrc = jjq(this).attr('src');

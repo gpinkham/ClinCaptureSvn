@@ -256,4 +256,5 @@ $(document).ready(function() {
 		</c:forEach>
 	</div>
 </body>
+<jsp:include page="../include/changeTheme.jsp"/>
 </html>

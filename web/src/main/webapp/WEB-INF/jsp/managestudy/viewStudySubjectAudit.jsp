@@ -12,6 +12,7 @@
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
+    <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
 </head>
 
@@ -395,6 +396,6 @@
 <input id="CloaseViewStudySubjectAuditWindow" class="button_medium" type="submit" onclick="javascript:window.close()" value="<fmt:message key="close_window" bundle="${resword}"/>" name="BTN_Close_Window"/>
 <br>
 </c:forEach>
-
+<jsp:include page="../include/changeTheme.jsp"/>
 <hr>
 </body>

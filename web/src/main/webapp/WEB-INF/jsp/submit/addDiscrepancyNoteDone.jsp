@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="includes/styles.css" type="text/css">
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 
 <script language="JavaScript" src="includes/CalendarPopup.js"></script>
@@ -72,5 +73,6 @@
      <tr>     
       <td><input type="submit" name="B1" value="<fmt:message key="close" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.close();"></td> 
     </tr>
-    </table>  
+    </table> 
+   	<jsp:include page="../include/changeTheme.jsp"/> 
 </html>

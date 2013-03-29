@@ -365,6 +365,6 @@
 
 <input type="button" name="BTN_Close" id="CloseWindow" value="<fmt:message key="close_window" bundle="${resword}"/>" class="button_medium" onClick="javascript:window.close();"/>
 
-
+<jsp:include page="../include/changeTheme.jsp"/>
 </html>
 

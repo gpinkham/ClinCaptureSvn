@@ -106,4 +106,5 @@ for ( var i = 0; i < els.length ; i ++ ) {
   <aka_frm:print_tabletag><c:out value="${dataIsInvolved}"/></aka_frm:print_tabletag>
 
 </body>
+<jsp:include page="../include/changeTheme.jsp"/>
 </html>

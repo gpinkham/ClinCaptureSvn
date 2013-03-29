@@ -155,4 +155,5 @@ for ( var i = 0; i < els.length ; i ++ ) {
 </c:choose>
 
 </body>
+<jsp:include page="../include/changeTheme.jsp"/>
 </html>
