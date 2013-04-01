@@ -277,6 +277,9 @@
 							<resource>
 								<directory>src/main/webapp</directory>
 								<filtering>true</filtering>
+								<excludes>
+									<exclude>**/*.jsp</exclude>
+								</excludes>
 							</resource>
 						</webResources>
 					</configuration>
