@@ -88,11 +88,6 @@ public class EqualityOpNode extends ExpressionNode {
 
 	}
 
-	private boolean blankAgainstDateyyyyMMdd(String l, String r) {
-		return l.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(r)
-				|| r.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(l);
-	}
-
 	private String calc(String x, String y) throws OpenClinicaSystemException {
 		switch (op) {
 		case EQUAL:
