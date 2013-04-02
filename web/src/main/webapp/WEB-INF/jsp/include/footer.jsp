@@ -17,7 +17,7 @@
 
 <!-- Footer -->
 
-            <table id="footerInnerTable1"  border="0" cellpadding="0" cellspacing="0" width="">
+            <table id="footerInnerTable1"  border="0" cellpadding="0" cellspacing="0" width="" style="white-space: nowrap;">
             <tr>
                 <td class="footer">
                 <!--
