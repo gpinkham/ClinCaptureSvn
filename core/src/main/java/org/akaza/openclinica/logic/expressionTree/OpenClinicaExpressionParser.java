@@ -20,8 +20,10 @@
  */
 package org.akaza.openclinica.logic.expressionTree;
 
+import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
@@ -34,28 +36,30 @@ import java.util.*;
  * @author Krikor Krumlian
  * 
  */
-public class OpenClinicaExpressionParser  {
+public class OpenClinicaExpressionParser {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	protected final Logger logger = LoggerFactory.getLogger(getClass()
+			.getName());
 
-    TextIO textIO;
-    ExpressionObjectWrapper expressionWrapper;
-    private final String ERROR_MESSAGE_KEY = "OCRERR_0005";
+	TextIO textIO;
+	ExpressionObjectWrapper expressionWrapper;
+	private final String ERROR_MESSAGE_KEY = "OCRERR_0005";
 
-    public static final String ONE = "1";
-    public static final String NOT_USED = "not_used";
-    public static final String STUDY_SUBJECT = "studySubject";
+	public static final String ONE = "1";
+	public static final String NOT_USED = "not_used";
+	public static final String STUDY_SUBJECT = "studySubject";
+	public static final String SUBJECT = "subject";
 
-    private HashMap<String, String> testValues;
-    private HashMap<String, String> responseTestValues;
+	private HashMap<String, String> testValues;
+	private HashMap<String, String> responseTestValues;
 
-    private Date subjectDob;
-    private Date subjectEnrollment;
-    private boolean importRulesMode = true;
+	private Date subjectDob;
+	private Date subjectEnrollment;
+	private boolean importRulesMode = true;
 
-    public OpenClinicaExpressionParser() {
-        textIO = new TextIO();
-    }
+	public OpenClinicaExpressionParser() {
+		textIO = new TextIO();
+	}
 
 	public HashMap<String, String> getTestValues() {
 		return testValues;
@@ -78,31 +82,39 @@ public class OpenClinicaExpressionParser  {
 
 	public OpenClinicaExpressionParser(ExpressionObjectWrapper expressionWrapper) {
 		textIO = new TextIO();
-        this.expressionWrapper = expressionWrapper;
-    }
+		this.expressionWrapper = expressionWrapper;
+	}
 
-    public OpenClinicaExpressionParser(StudyBean currentStudy, HttpServletRequest request, ExpressionObjectWrapper expressionWrapper) {
-        this(expressionWrapper);
-        importRulesMode = false;
-        StudySubjectBean ssb = (StudySubjectBean)request.getAttribute(STUDY_SUBJECT);
-        if (currentStudy.getStudyParameterConfig().getCollectDob().equalsIgnoreCase(ONE)) {
-            setSubjectDob(ssb.getDateOfBirth());
-        }
-        if (!currentStudy.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired().equalsIgnoreCase(NOT_USED)) {
-            setSubjectEnrollment(ssb.getEnrollmentDate());
-        }
-    }
+	public OpenClinicaExpressionParser(StudyBean currentStudy,
+			HttpServletRequest request,
+			ExpressionObjectWrapper expressionWrapper) {
+		this(expressionWrapper);
+		importRulesMode = false;
+		if (currentStudy.getStudyParameterConfig().getCollectDob()
+				.equalsIgnoreCase(ONE)) {
+			setSubjectDob(((SubjectBean) request.getAttribute(SUBJECT))
+					.getDateOfBirth());
+		}
+		if (!currentStudy.getStudyParameterConfig()
+				.getDateOfEnrollmentForStudyRequired()
+				.equalsIgnoreCase(NOT_USED)) {
+			setSubjectEnrollment(((StudySubjectBean) request
+					.getAttribute(STUDY_SUBJECT)).getEnrollmentDate());
+		}
+	}
 
-    public void parseExpression(String expression) throws OpenClinicaSystemException {
-        getTextIO().fillBuffer(expression);
-        getTextIO().skipBlanks();
+	public void parseExpression(String expression)
+			throws OpenClinicaSystemException {
+		getTextIO().fillBuffer(expression);
+		getTextIO().skipBlanks();
 		ExpressionNode exp = expressionTree();
 		if (getTextIO().peek() != '\n')
 			throw new OpenClinicaSystemException(ERROR_MESSAGE_KEY);
 		exp.printStackCommands();
 	}
 
-	public String parseAndEvaluateExpression(String expression) throws OpenClinicaSystemException {
+	public String parseAndEvaluateExpression(String expression)
+			throws OpenClinicaSystemException {
 		getTextIO().fillBuffer(expression);
 		getTextIO().skipBlanks();
 		ExpressionNode exp = expressionTree();
@@ -111,7 +123,8 @@ public class OpenClinicaExpressionParser  {
 		return exp.value();
 	}
 
-	public String parseAndTestEvaluateExpression(String expression) throws OpenClinicaSystemException {
+	public String parseAndTestEvaluateExpression(String expression)
+			throws OpenClinicaSystemException {
 		getTextIO().fillBuffer(expression);
 		getTextIO().skipBlanks();
 		ExpressionNode exp = expressionTree();
@@ -121,7 +134,8 @@ public class OpenClinicaExpressionParser  {
 
 	}
 
-	public HashMap<String, String> parseAndTestEvaluateExpression(String expression, HashMap<String, String> h)
+	public HashMap<String, String> parseAndTestEvaluateExpression(
+			String expression, HashMap<String, String> h)
 			throws OpenClinicaSystemException {
 		getTextIO().fillBuffer(expression);
 		getTextIO().skipBlanks();
@@ -138,16 +152,18 @@ public class OpenClinicaExpressionParser  {
 	}
 
 	/**
-	 * Reads an expression from the current line of input and builds an expression tree that represents the expression.
+	 * Reads an expression from the current line of input and builds an
+	 * expression tree that represents the expression.
 	 * 
-	 * @return an ExpNode which is a pointer to the root node of the expression tree
-     * @throws OpenClinicaSystemException
-     *             if a syntax error is found in the input
-     */
-    protected ExpressionNode expressionTree() throws OpenClinicaSystemException {
-        try {
-            textIO.skipBlanks();
-            boolean negative; // True if there is a leading minus sign.
+	 * @return an ExpNode which is a pointer to the root node of the expression
+	 *         tree
+	 * @throws OpenClinicaSystemException
+	 *             if a syntax error is found in the input
+	 */
+	protected ExpressionNode expressionTree() throws OpenClinicaSystemException {
+		try {
+			textIO.skipBlanks();
+			boolean negative; // True if there is a leading minus sign.
 			negative = false;
 			if (textIO.peek() == '-') {
 				textIO.getAnyChar();
@@ -159,21 +175,23 @@ public class OpenClinicaExpressionParser  {
 				exp = new UnaryMinusNode(exp);
 			textIO.skipBlanks();
 
-			while (textIO.peek() == 'o' && textIO.peek(3).matches("or ") || textIO.peek() == 'a'
-					&& textIO.peek(4).matches("and ")) {
+			while (textIO.peek() == 'o' && textIO.peek(3).matches("or ")
+					|| textIO.peek() == 'a' && textIO.peek(4).matches("and ")) {
 				// Read the next term and combine it with the
 				// previous terms into a bigger expression tree.
 				// char op = textIO.getAnyChar();
-				String op = textIO.peek() == 'o' ? textIO.getAnyString(3) : textIO.getAnyString(4);
+				String op = textIO.peek() == 'o' ? textIO.getAnyString(3)
+						: textIO.getAnyString(4);
 				logger.info("Operator" + op);
 				ExpressionNode nextTerm = termTree3();
-                exp = ExpressionNodeFactory.getExpNode(Operator.getByDescription(op), exp, nextTerm);
-                textIO.skipBlanks();
-            }
-            exp.setExpressionParser(this);
-            return exp;
-        } catch (NullPointerException e) {
-            throw new OpenClinicaSystemException(ERROR_MESSAGE_KEY);
+				exp = ExpressionNodeFactory.getExpNode(
+						Operator.getByDescription(op), exp, nextTerm);
+				textIO.skipBlanks();
+			}
+			exp.setExpressionParser(this);
+			return exp;
+		} catch (NullPointerException e) {
+			throw new OpenClinicaSystemException(ERROR_MESSAGE_KEY);
 		} catch (OpenClinicaSystemException e) {
 			throw e;
 		}
@@ -185,23 +203,28 @@ public class OpenClinicaExpressionParser  {
 		term = termTree2();
 		textIO.skipBlanks();
 
-		while (textIO.peek() == 'e' && textIO.peek(3).matches("eq ") || textIO.peek() == 'n'
-				&& textIO.peek(3).matches("ne ") || textIO.peek() == 'c' && textIO.peek(3).matches("ct ")
-				|| textIO.peek() == 'g' && textIO.peek(3).matches("gt ") || textIO.peek() == 'g'
-				&& textIO.peek(4).matches("gte ") || textIO.peek() == 'l' && textIO.peek(3).matches("lt ")
+		while (textIO.peek() == 'e' && textIO.peek(3).matches("eq ")
+				|| textIO.peek() == 'n' && textIO.peek(3).matches("ne ")
+				|| textIO.peek() == 'c' && textIO.peek(3).matches("ct ")
+				|| textIO.peek() == 'g' && textIO.peek(3).matches("gt ")
+				|| textIO.peek() == 'g' && textIO.peek(4).matches("gte ")
+				|| textIO.peek() == 'l' && textIO.peek(3).matches("lt ")
 				|| textIO.peek() == 'l' && textIO.peek(4).matches("lte ")) {
 			// Read the next term and combine it with the
 			// previous terms into a bigger expression tree.
 			// char op = textIO.getAnyChar();
-			String op = textIO.peek(4).matches("gte ") || textIO.peek(4).matches("lte ") ? textIO.getAnyString(4)
+			String op = textIO.peek(4).matches("gte ")
+					|| textIO.peek(4).matches("lte ") ? textIO.getAnyString(4)
 					: textIO.getAnyString(3);
 			ExpressionNode nextTerm = termTree2();
-			term = ExpressionNodeFactory.getExpNode(Operator.getByDescription(String.valueOf(op)), term, nextTerm);
+			term = ExpressionNodeFactory.getExpNode(
+					Operator.getByDescription(String.valueOf(op)), term,
+					nextTerm);
 			// term = new BooleanOpNode(Operator.getByDescription(op), term,
 			// nextTerm);
 			textIO.skipBlanks();
 		}
-
+		term.setExpressionParser(this);
 		return term;
 	} // end termValue()
 
@@ -216,19 +239,24 @@ public class OpenClinicaExpressionParser  {
 			// previous terms into a bigger expression tree.
 			char op = textIO.getAnyChar();
 			ExpressionNode nextTerm = termTree();
-			term = ExpressionNodeFactory.getExpNode(Operator.getByDescription(String.valueOf(op)), term, nextTerm);
+			term = ExpressionNodeFactory.getExpNode(
+					Operator.getByDescription(String.valueOf(op)), term,
+					nextTerm);
 			// term = new
 			// BinOpNode(Operator.getByDescription(String.valueOf(op)), term,
 			// nextTerm);
 			textIO.skipBlanks();
 		}
+		term.setExpressionParser(this);
 		return term;
 	} // end termValue()
 
 	/**
-	 * Reads a term from the current line of input and builds an expression tree that represents the expression.
+	 * Reads a term from the current line of input and builds an expression tree
+	 * that represents the expression.
 	 * 
-	 * @return an ExpNode which is a pointer to the root node of the expression tree
+	 * @return an ExpNode which is a pointer to the root node of the expression
+	 *         tree
 	 * @throws OpenClinicaSystemException
 	 *             if a syntax error is found in the input
 	 */
@@ -243,61 +271,70 @@ public class OpenClinicaExpressionParser  {
 			// previous factors into a bigger expression tree.
 			char op = textIO.getAnyChar();
 			ExpressionNode nextFactor = factorTree();
-			term = ExpressionNodeFactory.getExpNode(Operator.getByDescription(String.valueOf(op)), term, nextFactor);
+			term = ExpressionNodeFactory.getExpNode(
+					Operator.getByDescription(String.valueOf(op)), term,
+					nextFactor);
 			// term = new
 			// BinOpNode(Operator.getByDescription(String.valueOf(op)), term,
 			// nextFactor);
 			textIO.skipBlanks();
 		}
+		term.setExpressionParser(this);
 		return term;
 	} // end termValue()
 
-    /**
-     * Reads a factor from the current line of input and builds an expression tree that represents the expression.
-     *
-     * @return an ExpNode which is a pointer to the root node of the expression tree
-     * @throws OpenClinicaSystemException
-     *             if a syntax error is found in the input
-     */
-    private ExpressionNode factorTree() throws OpenClinicaSystemException {
-        textIO.skipBlanks();
-        char ch = textIO.peek();
-        logger.info("TheChar is : " + ch);
-        if (Character.isDigit(ch)) {
-            String dateOrNum = textIO.getDate();
-            if (dateOrNum == null) {
-                dateOrNum = String.valueOf(textIO.getDouble());
+	/**
+	 * Reads a factor from the current line of input and builds an expression
+	 * tree that represents the expression.
+	 * 
+	 * @return an ExpNode which is a pointer to the root node of the expression
+	 *         tree
+	 * @throws OpenClinicaSystemException
+	 *             if a syntax error is found in the input
+	 */
+	private ExpressionNode factorTree() throws OpenClinicaSystemException {
+		ExpressionNode resultNode = null;
+		textIO.skipBlanks();
+		char ch = textIO.peek();
+		logger.info("TheChar is : " + ch);
+		if (Character.isDigit(ch)) {
+			String dateOrNum = textIO.getDate();
+			if (dateOrNum == null) {
+				dateOrNum = String.valueOf(textIO.getDouble());
 
-            }
-            logger.info("TheNum is : " + dateOrNum);
-            return new ConstantNode(dateOrNum);
-        } else if (ch == '(') {
-            // The factor is an expression in parentheses.
-            // Return a tree representing that expression.
-            textIO.getAnyChar(); // Read the "("
-            ExpressionNode exp = expressionTree();
-            textIO.skipBlanks();
-            if (textIO.peek() != ')')
-                throw new OpenClinicaSystemException("OCRERR_0006");
-            textIO.getAnyChar(); // Read the ")"
-            return exp;
-        } else if (String.valueOf(ch).matches("\\w+")) {
-            String k = textIO.getWord();
-            logger.info("TheWord 1 is : " + k);
-            return new OpenClinicaVariableNode(k, expressionWrapper, this);
-        } else if (String.valueOf(ch).matches("\"")) {
-            String k = textIO.getDoubleQuoteWord();
-            logger.info("TheWord 2 is : " + k);
-            return new ConstantNode(k);
-        } else if (ch == '\n')
-            throw new OpenClinicaSystemException("OCRERR_0007");
-        else if (ch == ')')
-            throw new OpenClinicaSystemException("OCRERR_0008");
-        else if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
-            throw new OpenClinicaSystemException("OCRERR_0009");
-        else
-            throw new OpenClinicaSystemException("OCRERR_0010", new Object[] { ch });
-    } // end factorTree()
+			}
+			logger.info("TheNum is : " + dateOrNum);
+			resultNode = new ConstantNode(dateOrNum);
+		} else if (ch == '(') {
+			// The factor is an expression in parentheses.
+			// Return a tree representing that expression.
+			textIO.getAnyChar(); // Read the "("
+			ExpressionNode exp = expressionTree();
+			textIO.skipBlanks();
+			if (textIO.peek() != ')')
+				throw new OpenClinicaSystemException("OCRERR_0006");
+			textIO.getAnyChar(); // Read the ")"
+			return exp;
+		} else if (String.valueOf(ch).matches("\\w+")) {
+			String k = textIO.getWord();
+			logger.info("TheWord 1 is : " + k);
+			resultNode = new OpenClinicaVariableNode(k, expressionWrapper);
+		} else if (String.valueOf(ch).matches("\"")) {
+			String k = textIO.getDoubleQuoteWord();
+			logger.info("TheWord 2 is : " + k);
+			resultNode = new ConstantNode(k);
+		} else if (ch == '\n')
+			throw new OpenClinicaSystemException("OCRERR_0007");
+		else if (ch == ')')
+			throw new OpenClinicaSystemException("OCRERR_0008");
+		else if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
+			throw new OpenClinicaSystemException("OCRERR_0009");
+		else
+			throw new OpenClinicaSystemException("OCRERR_0010",
+					new Object[] { ch });
+		resultNode.setExpressionParser(this);
+		return resultNode;
+	} // end factorTree()
 
 	/**
 	 * @return the textIO
@@ -314,38 +351,52 @@ public class OpenClinicaExpressionParser  {
 		this.textIO = textIO;
 	}
 
-    public Date getSubjectDob() {
-        return subjectDob;
-    }
+	public Date getSubjectDob() {
+		return subjectDob;
+	}
 
-    public void setSubjectDob(Date subjectDob) {
-        this.subjectDob = subjectDob;
-    }
+	public void setSubjectDob(Date subjectDob) {
+		this.subjectDob = subjectDob;
+	}
 
-    public Date getSubjectEnrollment() {
-        return subjectEnrollment;
-    }
+	public Date getSubjectEnrollment() {
+		return subjectEnrollment;
+	}
 
-    public void setSubjectEnrollment(Date subjectEnrollment) {
-        this.subjectEnrollment = subjectEnrollment;
-    }
+	public void setSubjectEnrollment(Date subjectEnrollment) {
+		this.subjectEnrollment = subjectEnrollment;
+	}
 
-    public boolean isImportRulesMode() {
-        return importRulesMode;
-    }
+	public boolean isImportRulesMode() {
+		return importRulesMode;
+	}
 
-    public void setImportRulesMode(boolean importRulesMode) {
-        this.importRulesMode = importRulesMode;
-    }
+	public void setImportRulesMode(boolean importRulesMode) {
+		this.importRulesMode = importRulesMode;
+	}
 
+	public boolean isDateItem() {
+		boolean result = false;
+		try {
+			result = expressionWrapper.getRuleSet().getItem()
+					.getItemDataTypeId() == ItemDataType.DATE.getId();
+		} catch (Exception ex) {
+			//
+		}
+		return result;
+	}
 	/*
-	 * public static void main(String[] args) { SimpleParser4 smp4 = new SimpleParser4(); // textIO.putln("\n\nEnter an
-	 * expression, or press return to end."); // textIO.put("\n? "); smp4.getTextIO().fillBuffer(" ((2 +2 * 4+2 *2 gte
-	 * 15) or false or false or 3+4 * 2 lt 10) and yellow eq \"yellow\" "); //
-	 * smp4.getTextIO().fillBuffer(" \"yellow\" eq yellow "); smp4.getTextIO().skipBlanks(); try { ExpNode exp =
-	 * smp4.expressionTree(); logger.info("\nValue 1 is " + exp.value());
-	 * logger.info("\nOrder of postfix evaluation is:\n"); exp.printStackCommands(); } catch (OpenClinicaSystemException
-	 * e) { logger.info("\n*** Error in input: " + e.getMessage()); logger.info("*** Discarding input: " +
-	 * smp4.getTextIO().getln()); } } // end main()
+	 * public static void main(String[] args) { SimpleParser4 smp4 = new
+	 * SimpleParser4(); // textIO.putln("\n\nEnter an expression, or press
+	 * return to end."); // textIO.put("\n? "); smp4.getTextIO().fillBuffer("
+	 * ((2 +2 * 4+2 *2 gte 15) or false or false or 3+4 * 2 lt 10) and yellow eq
+	 * \"yellow\" "); // smp4.getTextIO().fillBuffer(" \"yellow\" eq yellow ");
+	 * smp4.getTextIO().skipBlanks(); try { ExpNode exp = smp4.expressionTree();
+	 * logger.info("\nValue 1 is " + exp.value());
+	 * logger.info("\nOrder of postfix evaluation is:\n");
+	 * exp.printStackCommands(); } catch (OpenClinicaSystemException e) {
+	 * logger.info("\n*** Error in input: " + e.getMessage());
+	 * logger.info("*** Discarding input: " + smp4.getTextIO().getln()); } } //
+	 * end main()
 	 */
 }

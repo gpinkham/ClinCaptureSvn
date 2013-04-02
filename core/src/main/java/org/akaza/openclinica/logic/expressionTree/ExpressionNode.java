@@ -28,16 +28,19 @@ import java.util.HashMap;
 
 public abstract class ExpressionNode {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	protected final Logger logger = LoggerFactory.getLogger(getClass()
+			.getName());
 	private OpenClinicaExpressionParser expressionParser;
+	boolean dateParameter;
 
 	String value() throws OpenClinicaSystemException {
 		return calculate();
 	}
 
 	/*
-	 * Use this method to test the expression mainly Data types plugging test data wherever necessary. This will not
-	 * only validate the syntax but also test the validity of the expression itself.
+	 * Use this method to test the expression mainly Data types plugging test
+	 * data wherever necessary. This will not only validate the syntax but also
+	 * test the validity of the expression itself.
 	 */
 	String testValue() throws OpenClinicaSystemException {
 		return testCalculate();
@@ -50,22 +53,39 @@ public abstract class ExpressionNode {
 	abstract void printStackCommands();
 
 	String getNumber() {
-        return null;
-    }
-
-    public OpenClinicaExpressionParser getExpressionParser() {
-        return expressionParser;
-    }
-
-    public void setExpressionParser(OpenClinicaExpressionParser expressionParser) {
-        this.expressionParser = expressionParser;
-    }
+		return null;
+	}
 
 	public HashMap<String, String> getTestValues() {
 		return expressionParser.getTestValues();
 	}
 
-    public HashMap<String, String> getResponseTestValues() {
-        return expressionParser.getResponseTestValues();
-    }
+	public HashMap<String, String> getResponseTestValues() {
+		return expressionParser.getResponseTestValues();
+	}
+
+	protected OpenClinicaExpressionParser getExpressionParser() {
+		return expressionParser;
+	}
+
+	protected void setExpressionParser(
+			OpenClinicaExpressionParser expressionParser) {
+		this.expressionParser = expressionParser;
+	}
+
+	protected boolean isDateParameter() {
+		return dateParameter;
+	}
+
+	protected void setDateParameter(boolean dateParameter) {
+		this.dateParameter = dateParameter;
+	}
+
+	protected boolean dateShouldBeEntered(ExpressionNode left,
+			ExpressionNode right) {
+		return !expressionParser.isImportRulesMode()
+				&& expressionParser.isDateItem()
+				&& (left.isDateParameter() ? (right.isDateParameter() ? false
+						: right.value().isEmpty()) : left.value().isEmpty());
+	}
 }

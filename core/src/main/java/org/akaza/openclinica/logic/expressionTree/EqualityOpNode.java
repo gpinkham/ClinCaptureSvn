@@ -33,7 +33,8 @@ public class EqualityOpNode extends ExpressionNode {
 
 	EqualityOpNode(Operator op, ExpressionNode left, ExpressionNode right) {
 		// Construct a BinOpNode containing the specified data.
-		assert op == Operator.EQUAL || op == Operator.NOT_EQUAL || op == Operator.CONTAINS;
+		assert op == Operator.EQUAL || op == Operator.NOT_EQUAL
+				|| op == Operator.CONTAINS;
 		assert left != null && right != null;
 		this.op = op;
 		this.left = left;
@@ -67,6 +68,10 @@ public class EqualityOpNode extends ExpressionNode {
 		String y = null;
 		String l = left.value();
 		String r = right.value();
+		if (dateShouldBeEntered(left, right)) {
+			throw new OpenClinicaSystemException(
+					"OCRERR_DATE_SHOULD_BE_ENTERED", new Object[] {});
+		}
 		try {
 			Float fx = Float.valueOf(l);
 			Float fy = Float.valueOf(r);
@@ -83,6 +88,11 @@ public class EqualityOpNode extends ExpressionNode {
 
 	}
 
+	private boolean blankAgainstDateyyyyMMdd(String l, String r) {
+		return l.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(r)
+				|| r.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(l);
+	}
+
 	private String calc(String x, String y) throws OpenClinicaSystemException {
 		switch (op) {
 		case EQUAL:
@@ -92,8 +102,8 @@ public class EqualityOpNode extends ExpressionNode {
 		case CONTAINS:
 			return String.valueOf(x.contains(y));
 		default:
-			throw new OpenClinicaSystemException("OCRERR_0002", new Object[] { left.value(), right.value(),
-					op.toString() });
+			throw new OpenClinicaSystemException("OCRERR_0002", new Object[] {
+					left.value(), right.value(), op.toString() });
 		}
 	}
 

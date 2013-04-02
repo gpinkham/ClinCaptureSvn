@@ -29,8 +29,8 @@ public class RelationalOpNode extends ExpressionNode {
 
 	RelationalOpNode(Operator op, ExpressionNode left, ExpressionNode right) {
 		// Construct a BinOpNode containing the specified data.
-		assert op == Operator.GREATER_THAN || op == Operator.GREATER_THAN_EQUAL || op == Operator.LESS_THAN
-				|| op == Operator.LESS_THAN_EQUAL;
+		assert op == Operator.GREATER_THAN || op == Operator.GREATER_THAN_EQUAL
+				|| op == Operator.LESS_THAN || op == Operator.LESS_THAN_EQUAL;
 		assert left != null && right != null;
 		this.op = op;
 		this.left = left;
@@ -46,7 +46,8 @@ public class RelationalOpNode extends ExpressionNode {
 			return "blankAgainstDateyyyyMMdd";
 		}
 		validate(l, r, left.getNumber(), right.getNumber());
-		if (ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) {
+		if (ExpressionTreeHelper.isDateyyyyMMdd(l)
+				&& ExpressionTreeHelper.isDateyyyyMMdd(r)) {
 			x = ExpressionTreeHelper.getDate(l).getTime();
 			y = ExpressionTreeHelper.getDate(r).getTime();
 		} else {
@@ -61,11 +62,13 @@ public class RelationalOpNode extends ExpressionNode {
 		double x, y;
 		String l = String.valueOf(left.value());
 		String r = String.valueOf(right.value());
-		if (blankAgainstDateyyyyMMdd(l, r)) {
-			return "blankAgainstDateyyyyMMdd";
+		if (dateShouldBeEntered(left, right)) {
+			throw new OpenClinicaSystemException(
+					"OCRERR_DATE_SHOULD_BE_ENTERED", new Object[] {});
 		}
 		validate(l, r);
-		if (ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) {
+		if (ExpressionTreeHelper.isDateyyyyMMdd(l)
+				&& ExpressionTreeHelper.isDateyyyyMMdd(r)) {
 			x = ExpressionTreeHelper.getDate(l).getTime();
 			y = ExpressionTreeHelper.getDate(r).getTime();
 		} else {
@@ -101,20 +104,25 @@ public class RelationalOpNode extends ExpressionNode {
 	}
 
 	void validate(String l, String r) throws OpenClinicaSystemException {
-		if (!(ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) && !isDouble(l, r)) {
-			throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { l, r, op.toString() });
+		if (!(ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper
+				.isDateyyyyMMdd(r)) && !isDouble(l, r)) {
+			throw new OpenClinicaSystemException("OCRERR_0001", new Object[] {
+					l, r, op.toString() });
 		}
 	}
 
-	void validate(String l, String r, String ltext, String rtext) throws OpenClinicaSystemException {
-		if (!(ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) && !isDouble(l, r)) {
-			throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { ltext, rtext, op.toString() });
+	void validate(String l, String r, String ltext, String rtext)
+			throws OpenClinicaSystemException {
+		if (!(ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper
+				.isDateyyyyMMdd(r)) && !isDouble(l, r)) {
+			throw new OpenClinicaSystemException("OCRERR_0001", new Object[] {
+					ltext, rtext, op.toString() });
 		}
 	}
 
 	private boolean blankAgainstDateyyyyMMdd(String l, String r) {
-		return l.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(r) || r.isEmpty()
-				&& ExpressionTreeHelper.isDateyyyyMMdd(l);
+		return l.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(r)
+				|| r.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(l);
 	}
 
 	@Override
