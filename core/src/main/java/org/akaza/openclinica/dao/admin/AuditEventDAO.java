@@ -214,6 +214,7 @@ public class AuditEventDAO extends AuditableEntityDAO {
 		auditEvent.setOldValue("");
 		auditEvent.setNewValue("");
 		auditEvent.setReasonForChange("");
+		create(auditEvent);
 	}
 
 	public void createRowForUserAccount(UserAccountBean uab, String reasonForChange, String actionMessage) {
@@ -226,7 +227,7 @@ public class AuditEventDAO extends AuditableEntityDAO {
 		aeb.setAuditTable("__user_account");
 		aeb.setReasonForChange(reasonForChange);
 		aeb.setActionMessage(actionMessage);
-
+		create(aeb);
 	}
 
 	public void createRowForFailedLogin(UserAccountBean uab) {
@@ -249,6 +250,7 @@ public class AuditEventDAO extends AuditableEntityDAO {
 		//
 		auditEventBean.setReasonForChange(reasonForChange);
 		auditEventBean.setActionMessage(actionMessage);
+		createWithDate(auditEventBean);
 	}
 
 	public void createRowForExtractDataJobSuccess(TriggerBean triggerBean) {
