@@ -250,7 +250,7 @@ public class AuditEventDAO extends AuditableEntityDAO {
 		//
 		auditEventBean.setReasonForChange(reasonForChange);
 		auditEventBean.setActionMessage(actionMessage);
-		createWithDate(auditEventBean);
+		create(auditEventBean);
 	}
 
 	public void createRowForExtractDataJobSuccess(TriggerBean triggerBean) {
