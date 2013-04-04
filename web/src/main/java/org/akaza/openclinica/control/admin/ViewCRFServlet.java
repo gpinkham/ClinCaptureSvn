@@ -24,17 +24,22 @@ import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
@@ -54,7 +59,8 @@ public class ViewCRFServlet extends SecureController {
 
 	private static String CRF = "crf";
 	private static String CRF_ID = "crfId";
-	
+	private RuleSetServiceInterface ruleSetService;
+
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
 		if (ub.isSysAdmin()) {
@@ -118,7 +124,52 @@ public class ViewCRFServlet extends SecureController {
 			request.setAttribute(CRF, crf);
 			forwardPage(Page.VIEW_CRF);
 
+			populate(crf, versions);
 		}
+	}
+
+	private Collection<TableColumnHolder> populate(CRFBean crf, ArrayList<CRFVersionBean> versions) {
+		HashMap<CRFVersionBean, ArrayList<TableColumnHolder>> hm = new HashMap<CRFVersionBean, ArrayList<TableColumnHolder>>();
+		List<TableColumnHolder> tableColumnHolders = new ArrayList<TableColumnHolder>();
+		for (CRFVersionBean versionBean : versions) {
+			hm.put(versionBean, new ArrayList<TableColumnHolder>());
+		}
+		List<RuleSetBean> ruleSets = getRuleSetService().getRuleSetsByCrfAndStudy(crf, currentStudy);
+		ruleSets = getRuleSetService().filterByStatusEqualsAvailable(ruleSets);
+		for (RuleSetBean ruleSetBean : ruleSets) {
+			if (ruleSetBean.getCrfVersion() == null) {
+				for (CRFVersionBean key : hm.keySet()) {
+					hm.get(key).addAll(createFromRuleSet(ruleSetBean, key));
+				}
+			}
+			if (ruleSetBean.getCrfVersion() != null) {
+				try {
+					hm.get(ruleSetBean.getCrfVersion()).addAll(
+							createFromRuleSet(ruleSetBean, ruleSetBean.getCrfVersion()));
+				} catch (NullPointerException e) {
+					// i18n support, need to catch a NPE every once in a while
+					System.out.println("found NPE");
+					// no logger?
+				}
+			}
+		}
+		for (ArrayList<TableColumnHolder> list : hm.values()) {
+			tableColumnHolders.addAll(list);
+		}
+		return tableColumnHolders;
+	}
+
+	private List<TableColumnHolder> createFromRuleSet(RuleSetBean ruleSet, CRFVersionBean crfVersion) {
+		List<TableColumnHolder> tchs = new ArrayList<TableColumnHolder>();
+		for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
+			String ruleExpression = ruleSetRule.getRuleBean().getExpression().getValue();
+			String ruleName = ruleSetRule.getRuleBean().getName();
+			TableColumnHolder tch = new TableColumnHolder(crfVersion.getName(), crfVersion.getId(), ruleName,
+					ruleExpression, ruleSetRule.getActions(), ruleSetRule.getId());
+			tchs.add(tch);
+
+		}
+		return tchs;
 	}
 
 	private String renderStudiesTable(List<StudyBean> studyBeans) {
@@ -200,6 +251,12 @@ public class ViewCRFServlet extends SecureController {
 		} else {
 			return "";
 		}
+	}
+
+	private RuleSetServiceInterface getRuleSetService() {
+		ruleSetService = this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
+				.getApplicationContext(context).getBean("ruleSetService");
+		return ruleSetService;
 	}
 
 }
