@@ -1929,6 +1929,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 	 * @param request
 	 *            TODO
 	 */
+	@SuppressWarnings("unused")
 	protected void getInputBeans(HttpServletRequest request) throws InsufficientPermissionException {
 
 		HttpSession session = request.getSession();
@@ -2003,7 +2004,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 			sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 
-			for (int i = 0; i < sections.size();) {
+			for (int i = 0; i < sections.size(); i++) {
 				SectionBean sb = (SectionBean) sections.get(i);
 				sectionId = sb.getId();// find the first section of this CRF
 				break;
@@ -2032,13 +2033,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	protected boolean checkGroups(FormProcessor fp, EventCRFBean ecb) {
 		int sectionId = fp.getInt(INPUT_SECTION_ID, true);
 		SectionDAO sdao = new SectionDAO(getDataSource());
 		if (sectionId <= 0) {
 			ArrayList sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 
-			for (int i = 0; i < sections.size();) {
+			for (int i = 0; i < sections.size(); i++) {
 				SectionBean sb = (SectionBean) sections.get(i);
 				sectionId = sb.getId();// find the first section of this CRF
 				break;

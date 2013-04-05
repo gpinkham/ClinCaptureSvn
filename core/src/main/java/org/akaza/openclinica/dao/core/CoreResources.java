@@ -526,7 +526,7 @@ public class CoreResources implements ResourceLoaderAware {
 			epbean.setHelpText(getExtractField("extract." + i + ".helpText"));
 			// help text, currently in the alt-text of the link
 			epbean.setLinkText(getExtractField("extract." + i + ".linkText"));
-			
+
 			epbean.setFileLocation(getExtractField("extract." + i + ".location"));
 
 			epbean.setOdmType(getExtractField("extract." + i + ".odmType"));
@@ -635,17 +635,24 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	/**
-	 * @throws IOException 
+	 * @throws IOException
 	 * @deprecated Use {@link #getFile(String,String)} instead
 	 */
 	public File getFile(String fileName) throws IOException {
 		return getFile(fileName, "filePath");
 	}
 
-	public File getFile(String fileName, String relDirectory) throws IOException {
-		File f = new File(getField("filePath") + relDirectory + fileName);
+	public File getFile(String fileName, String relDirectory) {
+		try {
 
-		return f;
+			getInputStream(fileName);
+
+			File f = new File(getField("filePath") + relDirectory + fileName);
+			return f;
+
+		} catch (IOException e) {
+			throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
+		}
 	}
 
 	public void setPROPERTIES_DIR() {

@@ -452,15 +452,13 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			UserAccountBean ub, StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study) {
 		ArrayList answer = new ArrayList();
 
-		int i;
-
 		StudyEventDAO sedao = new StudyEventDAO(ds);
 		CRFDAO cdao = new CRFDAO(ds);
 		CRFVersionDAO cvdao = new CRFVersionDAO(ds);
 		ItemDataDAO iddao = new ItemDataDAO(ds);
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
 
-		for (i = 0; i < eventCRFs.size(); i++) {
+		for (int i = 0; i < eventCRFs.size(); i++) {
 			EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
 
 			// populate the event CRF with its crf bean

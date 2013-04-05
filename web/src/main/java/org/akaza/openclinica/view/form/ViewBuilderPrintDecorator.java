@@ -30,7 +30,7 @@ import java.util.SortedMap;
  * This is a Decorator design pattern for the ViewBuilderUtil Class. It adds printing related functionality to that
  * class.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class ViewBuilderPrintDecorator {
 	private final ViewBuilderUtil viewBuilderUtil;
 
@@ -250,6 +250,10 @@ public class ViewBuilderPrintDecorator {
 	public List<DisplayItemGroupBean> splitUpGroupBeanIntoSingleColumns(DisplayItemGroupBean existingBean) {
 
 		List<DisplayItemGroupBean> newDisplayBeans = new ArrayList<DisplayItemGroupBean>();
+		if (existingBean == null) {
+			return newDisplayBeans;
+		}
+
 		int ordinal = existingBean.getOrdinal();
 		DisplayItemGroupBean cloneDisplayBean = cloneDisplayItemGroupBean(existingBean, existingBean.getItems().get(0),
 				ordinal);

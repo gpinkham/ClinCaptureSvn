@@ -950,7 +950,6 @@ public class ExtractBean {
 		StudyEventDAO sedao = new StudyEventDAO(ds);
 		StudyEventBean se = (StudyEventBean) sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectId,
 				studyEventDefinitionId, sampleOrdinal);
-		se.setStatus(Status.INVALID);
 		
 		StudyEventBean event = new StudyEventBean();
 		EventCRFBean eventCRF = new EventCRFBean();

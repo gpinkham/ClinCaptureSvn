@@ -104,7 +104,6 @@ public class ScheduledJobTableFactory extends AbstractTableFactory {
 			Integer.parseInt(context.getParameter("studyId"));
 			context.getContextPath();
 		}
-
 	}
 
 	protected ScheduledJobSort getScheduledJobSort(Limit limit) {

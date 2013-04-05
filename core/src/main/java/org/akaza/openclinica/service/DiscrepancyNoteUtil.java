@@ -572,9 +572,6 @@ public class DiscrepancyNoteUtil {
 		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 		// what is the purpose of this data member?
 		discrepancyNoteDAO.setFetchMapping(true);
-		int parentStudyId = currentStudy.getParentStudyId();
-		if (parentStudyId > 0) {
-		}
 		allDiscNotes = discrepancyNoteDAO.findAllDiscrepancyNotesDataByStudy(currentStudy);
 
 		if (filterDiscNotes) {

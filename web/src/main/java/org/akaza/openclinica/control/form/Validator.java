@@ -1162,14 +1162,14 @@ public class Validator {
 			return false;
 		}
 
+		if (fieldValue.equals("")) {
+			return true;
+		}
+		
 		try {
 			Float.parseFloat(fieldValue);
 		} catch (Exception e) {
 			return false;
-		}
-
-		if (fieldValue.equals("")) {
-			return true;
 		}
 
 		return true;
@@ -1383,14 +1383,14 @@ public class Validator {
 			return false;
 		}
 		
+		if (fieldValue.equals("")) {
+			return true;
+		}
+		
 		try {
 			Float.parseFloat(fieldValue);
 		} catch (Exception e) {
 			return false;
-		}
-		
-		if (fieldValue.equals("")) {
-			return true;
 		}
 
 		return true;
@@ -1859,6 +1859,16 @@ public class Validator {
 					+ resexception.getString("number_of_arguments_incorrect"));
 		}
 
+		for (int i = 0; i < args.size(); i++) {
+			int ord = i + 1;
+			try {
+				Float.parseFloat((String) args.get(i));
+			} catch (Exception e) {
+				throw new Exception(resexception.getString("validation_column_invalid_function") + ": "
+						+ resexception.getString("argument") + ord + " " + resexception.getString("is_not_a_number"));
+			}
+		}
+		
 		// success - all tests have been passed
 		// now we compose the validation object created by this function
 		Integer valType = (Integer) valTypeByFunction.get(fname);
@@ -1910,7 +1920,6 @@ public class Validator {
 	 * @param dataType
 	 * @return
 	 * 
-	 * @author ywang (02-2009)
 	 */
 	public static StringBuffer validateWidthDecimalSetting(String widthDecimal, String dataType,
 			boolean isCalculationItem, Locale locale) {

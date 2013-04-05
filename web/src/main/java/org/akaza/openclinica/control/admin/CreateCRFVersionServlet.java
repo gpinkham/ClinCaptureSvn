@@ -674,6 +674,7 @@ public class CreateCRFVersionServlet extends SecureController {
 	 * @param newRes
 	 * @return The original option
 	 */
+	@SuppressWarnings("unused")
 	public ResponseOptionBean hasDifferentOption(ResponseSetBean oldRes, ResponseSetBean newRes) {
 		ArrayList oldOptions = oldRes.getOptions();
 		ArrayList newOptions = newRes.getOptions();
@@ -686,7 +687,7 @@ public class CreateCRFVersionServlet extends SecureController {
 				ResponseOptionBean rob = (ResponseOptionBean) oldOptions.get(i);
 				String text = rob.getText();
 				String value = rob.getValue();
-				for (int j = i; j < newOptions.size();) {// from
+				for (int j = i; j < newOptions.size(); j++) {// from
 					// spreadsheet
 					ResponseOptionBean rob1 = (ResponseOptionBean) newOptions.get(j);
 					
