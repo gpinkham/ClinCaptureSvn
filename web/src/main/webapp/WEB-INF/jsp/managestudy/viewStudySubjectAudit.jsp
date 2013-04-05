@@ -14,6 +14,12 @@
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+	<c:set var="color" scope="session" value="${newThemeColor}" />
+	<c:if test="${(color == 'violet') || (color == 'green')}">
+		<script>
+			document.write('<style class="hideStuff" ' + 'type="text/css">body {display:none;}<\/style>');
+		</script>
+	</c:if>
 </head>
 
 <jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
