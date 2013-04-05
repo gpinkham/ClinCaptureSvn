@@ -480,8 +480,8 @@ public class CoreResources implements ResourceLoaderAware {
 
 		if (!dest.exists()) {
 			if (!dest.mkdirs()) {
-				logger.error("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
-				throw new OpenClinicaSystemException("Copying files, Could not create direcotry: "
+				logger.error("Copying files, Could not create directory: " + dest.getAbsolutePath() + ".");
+				throw new OpenClinicaSystemException("Copying files, Could not create directory: "
 						+ dest.getAbsolutePath() + ".");
 			}
 		}
