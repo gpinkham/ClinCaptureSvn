@@ -1,15 +1,15 @@
 package org.akaza.openclinica.control.login;
 
 import java.io.PrintWriter;
-import java.util.Stack;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.dao.core.CoreResources;
 
-@SuppressWarnings({ "unchecked", "serial" })
+@SuppressWarnings({ "serial" })
 public class HelpThemeServlet extends HttpServlet {
 
 	@Override
