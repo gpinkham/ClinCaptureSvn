@@ -692,9 +692,9 @@
     </reporting>
 
     <scm>
-		<connection>scm:svn:https://svn.clinovo.com/edc_project/ClinCapture/trunk</connection>
-		<developerConnection>scm:svn:https://svn.clinovo.com/edc_project/ClinCapture/trunk</developerConnection>
-		<url>https://trac.clinovo.com/ClinCapture-2.0-Release/browser/ClinCapture/trunk</url>
+		<connection>scm:svn:https://svn.clinovo.com/clincapture/trunk</connection>
+		<developerConnection>scm:svn:https://svn.clinovo.com/clincapture/trunk</developerConnection>
+		<url>https://trac.clinovo.com/clincapture/browser/trunk</url>
 	</scm>
 
     <distributionManagement>
