@@ -253,6 +253,12 @@
  	    <servlet-name>HelpNavigationServlet</servlet-name> 
  	    <description>HelpNavigationServlet</description> 
  	    <servlet-class>org.akaza.openclinica.navigation.HelpNavigationServlet</servlet-class> 
+ 	</servlet>
+ 	
+ 	<servlet> 
+ 	    <servlet-name>HelpThemeServlet</servlet-name> 
+ 	    <description>HelpThemeServlet</description> 
+ 	    <servlet-class>org.akaza.openclinica.control.login.HelpThemeServlet</servlet-class> 
  	</servlet> 
 
     <servlet>
@@ -1955,6 +1961,10 @@
 	<servlet-mapping> 
         <servlet-name>HelpNavigationServlet</servlet-name> 
         <url-pattern>/HelpNavigation</url-pattern> 
+    </servlet-mapping>
+    	<servlet-mapping> 
+        <servlet-name>HelpThemeServlet</servlet-name> 
+        <url-pattern>/HelpThemeServlet</url-pattern> 
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ChangeDefinitionOrdinalServlet</servlet-name>

@@ -47,6 +47,37 @@
     "includes/repetition-model/repetition-model.js"></script>--%>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
+<script type="text/javascript">
+	var jq = jQuery;
+	jq(document).ready(function() {
+		jq.ajax({
+        	url:'HelpThemeServlet',
+        	type: 'GET',
+        	dataType:'text',
+        	success:function(response2){
+			var themeColor = response2;
+		
+			if (themeColor == 'violet') {
+				jq('a').css('color','#AA62C6');
+				jq('H1').css('color', '#AA62C6');
+				jq("input").each(function() {
+					var newSrc = jq(this).css('background-image');
+					newSrc = newSrc.replace('images/','images/violet/');
+					jq(this).css('background-image', newSrc);
+				});
+			}
+			if (themeColor == 'green') {
+				jq('a').css('color','#75b894');
+				jq('H1').css('color', '#75b894');
+				jq("input").each(function() {
+					var newSrc = jq(this).css('background-image');
+					newSrc = newSrc.replace('images/','images/green/');
+					jq(this).css('background-image', newSrc);
+				});
+        	}}
+     	});
+	})
+</script>
 <%--<script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>--%></head>
 

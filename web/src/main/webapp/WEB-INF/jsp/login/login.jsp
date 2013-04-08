@@ -18,8 +18,37 @@
     <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-1.3.2.min.js'/>"></script>
     <script type="text/javascript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.blockUI.js'/>"></script>
     <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript2.js'/>"></script>
-    <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js'/>"></script>
+	<script type="text/JavaScript" language="JavaScript"
+		src="<c:url value='/includes/global_functions_javascript.js'/>"></script>
+	<script type="text/javascript">
+		jQuery.ajax({
+		url : '../../HelpThemeServlet',
+		type : 'GET',
+		dataType : 'text',
+		success : function(response2) {
+			var themeColor = response2;
+			if (themeColor == 'violet') {
+				jQuery('a').css('color', '#AA62C6');
+				jQuery('H1').css('color', '#AA62C6');
+				jQuery("input").each(function() {
+					var newSrc = jQuery(this).css('background-image');
+					newSrc = newSrc.replace('images/', 'images/violet/');
+					jQuery(this).css('background-image', newSrc);
+				});
+			}
+			if (themeColor == 'green') {
+				jQuery('a').css('color', '#75b894');
+				jQuery('H1').css('color', '#75b894');
+				jQuery("input").each(function() {
+					var newSrc = jQuery(this).css('background-image');
+					newSrc = newSrc.replace('images/', 'images/green/');
+					jQuery(this).css('background-image', newSrc);
+				});
+			}
+		}
 
+	});
+</script>
 </head>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>

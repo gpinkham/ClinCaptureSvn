@@ -14,6 +14,7 @@
 
 
 	<security:http pattern="/pages/login/login" security="none" />
+	<security:http pattern="/HelpThemeServlet" security="none" />
 	<security:http pattern="/SystemStatus" security="none" />
 	<security:http pattern="/RssReader" security="none" />
 	<security:http pattern="/RequestPassword" security="none" />
