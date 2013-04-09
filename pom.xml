@@ -4,7 +4,7 @@
     <groupId>com.clinovo.clincapture</groupId>
     <artifactId>clincapture</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2.1-SNAPSHOT</version>
+    <version>1.0.2.1</version>
     <name>ClinCapture</name>
     <description>Electronic Data Capture Application for Clinical Trials</description>
 
@@ -692,9 +692,9 @@
     </reporting>
 
     <scm>
-		<connection>scm:svn:https://svn.clinovo.com/clincapture/trunk</connection>
-		<developerConnection>scm:svn:https://svn.clinovo.com/clincapture/trunk</developerConnection>
-		<url>https://trac.clinovo.com/clincapture/browser/trunk</url>
+		<connection>scm:svn:https://svn.clinovo.com/clincapture/tags/clincapture-1.0.2.1</connection>
+		<developerConnection>scm:svn:https://svn.clinovo.com/clincapture/tags/clincapture-1.0.2.1</developerConnection>
+		<url>https://trac.clinovo.com/clincapture/browser/tags/clincapture-1.0.2.1</url>
 	</scm>
 
     <distributionManagement>
