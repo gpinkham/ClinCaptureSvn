@@ -1,40 +1,31 @@
 --------------------------------------------------------------
 CLINCAPTURE RELEASE NOTES
-ClinCapture Version 1.0.2
+ClinCapture Version 1.0.2.1
 Document Version 1.0
 --------------------------------------------------------------
-Created 26-Jan-2013 by Tom Hickerson tom.hickerson@clinovo.com
+Created 9-Apr-2013 by Mark Gerard mark.gerard@clinovo.com
 --------------------------------------------------------------
 
-Welcome to the first public release of ClinCapture.  This version 1.0.2 is based
-on the OpenClinica code base of 3.1.2, and contains many of the features in 
-OpenClinica 3.1.3.  It also contains many bug fixes and enhancements contributed from
-Clinovo.
+Welcome to the first commnmuity release of ClinCapture.  This version is based on the 1.0.2 code base that has vast improvements contributed by the ClinCapture community.
 
 The most notable enhancements unique to ClinCapture include:
-- One-click access to data entry screens, scheduling, SDV and signing from Subject Matrix
-- LiveReports: Integration with the Pentaho Business Intelligence Server
--Wider browsers support 
--Direct access to ClinCapture’s community and forums
--Security enhancements:
-- Account administrative lockout after a configurable period of inactivity
--Configurable password re-use policy
-- Streamlining and simplification of the Discrepancy Notes interface and reporting logic
-- Simplification of user roles between Sites and Studies
-- An updated, intuitive Graphical User Interface (GUI)
-- Expansion of dynamic CRFs, including Javascript calculations in CRFs
-- Expanded Study Properties, allowing for further customization of CRF and Subject display
-- Inclusion of many of the OpenClinica 3.1.3 features, such as: 
-	- CRF Version Migration 
-	- Rules running during Import Data
-	- Options to require strong passwords
-	- Referencing a CRF through an ODM-based URL
-- Numerous bug fixes to the code base, including:
-	- Reconciling Discrepancy Notes and Repeating Rows in CRF Data Entry
-	- Bug fixes for i18n issues
-	- Bug fixes for showing event status incorrectly
-	- Bug fixes for scheduling Import Jobs and running Rules in Data Entry
-- Expansion of an automated testing framework using Selenium and unit tests
+
+Bug fixes:
+
+- Fixing problems with transitions of event states (Ticket #78)
+- Remove the filtering of the filePath parameter in JSP files (Ticket #94)
+
+Enhancements
+- Enhancements to subject management matrix (Ticket #28)
+
+Improvements to theming (Ticket #19)
+- Correcting the transition of different themes on the UI (Ticket #79)
+- Enhancing the audit log to follow the theme color (Ticket #88)
+- Login screen and initial password reset screen to follow the selected color scheme (Ticket #97)
+- Fix pop up screen to match the selected theme color (Ticket #98)
+- Align action icons (Ticket #17)
+
+Consult the 1.0.2.1 milestone here: http://tinyurl.com/ck3nhln
 	
 The core, web and web services modules are contained in separate modules, but this document serves as the main 'readme' for each one.
  
@@ -56,6 +47,7 @@ Server Operating Systems:
 
 Redhat Enterprise Linux 4.0+
 Windows Server 2003
+Mac OS 10.X
 
 Databases:
 Postgres 8.4
@@ -100,20 +92,17 @@ Some key features of ClinCapture include:
 * A robust and scalable technology infrastructure developed using the Java J2EE framework interoperable with relational databases including PostgreSQL (open source) and Oracle 10G, to support the needs of the clinical research enterprise. 
 
 3. KNOWN ISSUES: 
-Known issues that are currently being fixed can be viewed in the Trac issue manager, available through http://www.clinovo.com/clincapture/community.
+Known issues that are currently being fixed can be viewed in the Trac issue manager, available through https://trac.clinovo.com/clincapture/report/1
 
 Currently known issues include the following:
 
-- Tomcat memory leaks do persist when the ClinCapture application is re-deployed (Trac #171)
-- If a CRF required extra HTML in generation for Submit Data, this extra HTML is shown when printing the CRF (Trac #134)
-- Certain encoding problems searching on Rules in a CRF with non-Latin characters in the CRF Name (Trac #149)
-- CRF Version Migration does not show existing data being transferred back into the CRF, if it was there originally (Trac #198)
+- Sometimes the odm_mapping folder is not created in WEB-INF/classes (Ticket #30)
 
 4. INSTALLING CLINCAPTURE:
 Installation procedures are documented in the ClinCapture Administrator’s Guide.
 Please visit http://www.clinovo.com/clincapture/community to download it.
 
-5. UPGRADING FROM OPENCLINICA 3.1.X TO CLINCAPTURE 1.0.2:
+5. UPGRADING FROM OPENCLINICA 3.1.X TO CLINCAPTURE 1.0.2.1:
 Installation procedures are documented in the ClinCapture Administrator’s Guide.
 Please visit http://www.clinovo.com/clincapture/community to download it.
 
