@@ -242,7 +242,11 @@
 <table>
 	<tr>
 		<td>
-		<input type="button" name="btnSubmit" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>','ViewImportJob');" />
+		<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>" 
+					class="button_medium" 
+					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+		
 		</td>
 		<td>
 		  <input type="submit" name="btnSubmit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"/>

@@ -138,7 +138,10 @@
 
 <td>
  <%-- <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');"/> --%>
-  <input type="button" name="BTN_Back" id="GoToManageEventDef" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>','ListEventDefinition');"/>
+	<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>" 
+					class="button_medium" 
+					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 </td>
 <td>
   <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">

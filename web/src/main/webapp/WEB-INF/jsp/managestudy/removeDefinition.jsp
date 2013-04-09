@@ -177,10 +177,13 @@
 </div></div></div></div></div></div></div></div>
 </div> 
 <br>
-<form action='RemoveEventDefinition?action=submit&id=<c:out value="${definitionToRemove.id}"/>' method="POST">
-<input id="GoBackToSubjectList" title="<fmt:message key="go_back_to_subject_matrix" bundle="${resword}"/>" class="button_medium" type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" onclick="window.location.href=('ListEventDefinition');"/>
+	<form action='RemoveEventDefinition?action=submit&id=<c:out value="${definitionToRemove.id}"/>' method="POST">
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
-<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" title="<fmt:message key="remove_event_definition" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="if_you_remove_this_definition" bundle="${resword}"/>");'>
+	<input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" title="<fmt:message key="remove_event_definition" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="if_you_remove_this_definition" bundle="${resword}"/>");'>
 <%-- <input type="button" onclick="confirmCancel('ListEventDefinition');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/> --%>   
 </form>
 

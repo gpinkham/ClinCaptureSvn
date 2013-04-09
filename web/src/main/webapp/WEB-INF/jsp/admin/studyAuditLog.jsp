@@ -73,6 +73,9 @@
     </form>
 </div>
 <br>
-<input type="button" onclick="history.back();" name="<fmt:message key="back" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" class="button_long"/>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
 <jsp:include page="../include/footer.jsp"/>

@@ -72,7 +72,10 @@
 
 
 <%-- <div class="homebox_bullets"><a href="pages/studymodule"><fmt:message key="go_back_build_study_page" bundle="${resword}"/></a></div>--%>
-<input id="GoBackToBuildStudy" title="<fmt:message key="go_back_build_study_page" bundle="${resword}"/>" class="button_medium" type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" onclick="window.location.href=('pages/studymodule');"/>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
  <c:choose>
    <c:when test="${study.parentStudyId>0}">

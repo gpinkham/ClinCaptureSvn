@@ -61,22 +61,7 @@
 	</c:if>	
 </c:forEach>
 <script type="text/JavaScript" language="JavaScript">
-  <!--
- function myCancel() {
- 
-    cancelButton=document.getElementById('cancel');
-    if ( cancelButton != null) {
-      if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-        window.location.href="ListSite";
-       return true;
-      } else {
-        return false;
-       }
-     }
-     return true;    
-   
-  }
-   //-->
+  
 function updateVersionSelection(vsIds, index, count) {
 	var s = "vs"+count;
 	var mvs = document.getElementById(s);
@@ -678,9 +663,14 @@ function updateThis(multiSelEle, count) {
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
- <input type="submit" name="Submit" value="<fmt:message key="confirm_site" bundle="${resword}"/>" class="button_long">
+  <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}')" />
 </td>
-<td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="javascript:myCancel();"/></td></td>
+<td>
+  <input type="submit" name="Submit" value="<fmt:message key="confirm_site" bundle="${resword}"/>" class="button_long">
+</td>
 </tr>
 </table>
 

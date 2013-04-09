@@ -58,7 +58,10 @@
 <input type="hidden" name="studyId" value="<c:out value="${newStudy.id}"/>">
 <p><fmt:message key="you_choose_to_reassign_subject2" bundle="${restext}"/> <b><c:out value="${subject.uniqueIdentifier}"/></b> <fmt:message key="to_study" bundle="${restext}"/>  <b><c:out value="${newStudy.name}"/></b>.</p>
 <br>
-<input type="button" value="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onclick="history.back();"/>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></td></tr>
 <%--input type="button" value="<fmt:message key="cancel" bundle="${resword}"/>" title="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onclick="history.back();"/--%>
 

@@ -154,12 +154,12 @@ $.noConflict();
 <td  class="table_cell"  style="text-align:center;" ><c:if test="${version.id == crfversionId}">X</c:if>&nbsp;</td>
 <td  class="table_cell"  > &nbsp;
 <a onmouseup="javascript:setImage('bt_View1','../../images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');" 
-href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes','','','')">
+href="#" onclick="window.location.href='../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes'">
 <img hspace="6" border="0" align="left" title="View" alt="View" src="../../images/bt_View.gif" name="bt_View1">
 </a>
 &nbsp;
 <a onmouseup="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" onmousedown="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" 
-href="#" onclick="window.openNewWindow('../../ViewCRFVersion?id=<c:out value="${version.id}"/>','','','')">
+href="#" onclick="window.location.href='../../ViewCRFVersion?id=<c:out value="${version.id}"/>'">
 <img hspace="6" border="0" align="left" title="Metadata" alt="Metadata" src="../../images/bt_Metadata.gif" name="bt_Metadata">
 </a>
 
@@ -174,13 +174,23 @@ href="#" onclick="window.openNewWindow('../../ViewCRFVersion?id=<c:out value="${
 </table>
 
 <table border="0" cellpadding="0" cellspacing="0">
-<tr><td VALIGN="top">
+<tr>
+ <td VALIGN="top">
+  <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
-<input type="submit" name="confirmCRFVersionSubmit" class="button_long" 
-value="<fmt:message key="continue" bundle="${resword}"/>" >
+   
+ </td >
 
+ <td VALIGN="top">
+
+   <input type="submit" name="confirmCRFVersionSubmit" class="button_long" 
+     value="<fmt:message key="continue" bundle="${resword}"/>" >
+ </td >
 </form>
-</td ><td VALIGN="top">
+<td VALIGN="top">
 <form id="fr_cancel_button" method="get">
 <input type="hidden" name="id" value="<c:out value="${studySubjectId}"/>" />
 <input type="button" name="Cancel" id="cancel" 

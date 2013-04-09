@@ -286,18 +286,18 @@
 <br><br>
 </c:forEach>
 
-<%-- <input type="button" name="BTN_Back" id="BackToBuildStudy" title="<fmt:message key="go_back_build_study_page" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>"  class="button_medium" size="50" onclick="window.location.href=('pages/studymodule');"/> --%>
-<input type="button" name="BTN_Exit" id="GoToListCRF" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="window.location.href=('ListCRF?module=admin');" />
+<input type="button" name="BTN_Smart_Exit" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
 <c:choose>
   <c:when test="${userBean.sysAdmin && module=='admin'}">
-  <%-- <input type="button" value="<fmt:message key="back" bundle="${resword}"/>"  class="button_long" size="50" onclick="history.back();"/> --%>
-  <c:import url="../include/workflow.jsp">
+    <c:import url="../include/workflow.jsp">
    <c:param name="module" value="admin"/>
   </c:import>
  </c:when>
   <c:otherwise>
-  <%-- <input type="button" value="<fmt:message key="back" bundle="${resword}"/>"  class="button_medium" size="50" onclick="history.back();"/>--%>
    <c:import url="../include/workflow.jsp">
    <c:param name="module" value="manage"/>
   </c:import>

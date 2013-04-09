@@ -52,9 +52,12 @@
 </c:import>
 <br>
 <table>
-<%--td>
- <input id="GoBackToHome" class="button_medium" type="button" name="BTN_Back" title="<fmt:message key="go_back_home" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" onclick="window.location.href=('MainMenu');"/>
-</td--%>
+<td>
+ <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+</td>
 <td>
  <input id="CreateUser" class="button_medium" type="button" name="BTN_Create" value="<fmt:message key="create_user" bundle="${resword}"/>" onclick="window.location.href=('CreateUserAccount');"/>
 </td>

@@ -68,8 +68,16 @@
 <br><br>
 
 
-<%-- <p><input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');"/> --%>
-<P>
-<input type="button" name="<fmt:message key="create_event" bundle="${resword}"/>" value="<fmt:message key="create_event" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.location.href='DefineStudyEvent'"/>
-</p>
+
+<table>
+	<td>
+		<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>" 
+					class="button_medium" 
+					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+	</td>
+	<td>
+		<input type="button" name="<fmt:message key="create_event" bundle="${resword}"/>" value="<fmt:message key="create_event" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.location.href='DefineStudyEvent'"/>
+	</td>
+</table>
 <jsp:include page="../include/footer.jsp"/>

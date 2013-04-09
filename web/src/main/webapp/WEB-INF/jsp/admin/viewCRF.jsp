@@ -175,7 +175,10 @@
 <div class="homebox_bullets"><a href="ViewRuleAssignment?ruleAssignments_f_crfName=<c:out value="${crfName}"/>"><fmt:message key="rule_crf_view_rules_for_this_crf" bundle="${resword}"/></a></div><br/>
 <br/>
 <input type="button" onclick="confirmExit('ListCRF?module=<c:out value="${module}"/>');"  name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/> -->
-<input type="button" onclick="history.back();" name="<fmt:message key="back" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" class="button_long"/>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="<fmt:message key="view_crf_rules" bundle="${resword}"/>" value="<fmt:message key="view_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='ViewRuleAssignment?ruleAssignments_f_crfName=<c:out value="${crfName}"/>'"/>
 <input type="button" name="<fmt:message key="run_crf_rules" bundle="${resword}"/>" value="<fmt:message key="run_crf_rules" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRule?crfId=<c:out value="${crf.id}"/>&action=dryRun'"/>
 

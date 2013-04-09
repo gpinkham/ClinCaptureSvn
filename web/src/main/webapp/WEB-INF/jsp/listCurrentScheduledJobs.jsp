@@ -92,7 +92,11 @@
     <script type="text/javascript">hideCols('s_sdv',[2,3,4])</script>
 
 </div>
-<br><input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onclick="javascript:history.go(-1);">
+	<br>
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <jsp:include page="include/footer.jsp"/>
 </body>
 <script language="JavaScript">

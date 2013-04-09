@@ -95,8 +95,7 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
- <input id="GoBackToSubjectList" class="button_medium" type="button" name="BTN_Back" title="<fmt:message key="back" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" onclick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>','CreateSubjectGroupClass?action=back');"/>
-</td>
+ <input id="GoBackToSubjectList" class="button_medium" type="button" name="BTN_Back" title="<fmt:message key="back" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" onclick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>','CreateSubjectGroupClass?action=back');"/></td>
 <td>
 <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
 </td>

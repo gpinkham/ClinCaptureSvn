@@ -580,7 +580,11 @@
    </div>
    </div></div></div></div></div></div></div></div>
     <br>
-    <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', 'ListStudySubjects');"/>
+    <input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>" 
+					class="button_medium" 
+					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+
     <input type="submit" name="BTN_Sign" value="<fmt:message key="sign" bundle="${resword}"/>" class="button_medium">
     <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">
     <%-- <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>"

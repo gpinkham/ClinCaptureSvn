@@ -154,8 +154,11 @@
 	</tr>
 </table>
 <br>
-<input class="button_medium" type="button" value="<fmt:message key="back" bundle="${resword}"/>" onclick="window.location.href=('ListSubject');"/>
- <c:import url="../include/workflow.jsp">
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+  <c:import url="../include/workflow.jsp">
   <c:param name="module" value="admin"/>
  </c:import>
 <jsp:include page="../include/footer.jsp"/>

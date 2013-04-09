@@ -89,10 +89,7 @@
 <br>
 <table>
 <td>
- <input type="button" name="BTN_Back_Smart" id="GoToPreviousPage" value="Smart_<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
-</td>
-<td>
- <input id="GoBackToUserList" class="button_medium" title='<fmt:message key="back" bundle="${resword}"/>' type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" onclick="history.go(-1);"/>
+ <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="Smart_<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
 </td>
 </table> 
 <br>

@@ -173,10 +173,16 @@ for each study user is in, show:
    <td>
        <c:choose>
            <c:when test="${showExitInsteadOfBack}">
-               <input id="GoBackToUserList" class="button_medium" type="button" name="EX_Back" title="<fmt:message key="exit" bundle="${resword}"/>" value="<fmt:message key="exit" bundle="${resword}"/>" onclick="window.location.href = 'ListUserAccounts';"/>
+               <input type="button" name="BTN_Smart_Exit" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="exit" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
            </c:when>
            <c:otherwise>
-               <input id="GoBackToSubjectList" class="button_medium" type="button" name="BTN_Back" title="<fmt:message key="back" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" onclick="history.go(-1);"/>
+               <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
            </c:otherwise>
        </c:choose>
    </td>

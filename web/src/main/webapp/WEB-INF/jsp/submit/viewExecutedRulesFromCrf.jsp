@@ -150,13 +150,21 @@
 <p><fmt:message key="rule_execute_rule_bottom_message1" bundle="${resword}"/></p>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
-<td>
-<input type="button" name="Back" id="back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_long" onClick="history.back();"/></td>
-</td>
-<td>
-<input type="button" name="Submit" id="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRule?${submitLinkParams}';"/></td>
+	<td>
+		<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+	</td>
 
-<td><input type="button"   name="cancel" value="   <fmt:message key="exit" bundle="${resword}"/>   " class="button_medium" onclick=window.location.href='ListCRF'></td></tr>
+	<td>
+		<input type="button" name="Submit" id="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRule?${submitLinkParams}';"/>
+	</td>
+
+	<td>
+		<input type="button"   name="cancel" value="   <fmt:message key="exit" bundle="${resword}"/>   " class="button_medium" onclick=window.location.href='ListCRF'>
+	</td>
+</tr>
 </table>
 <c:choose>
   <c:when test="${userBean.sysAdmin && module=='admin'}">

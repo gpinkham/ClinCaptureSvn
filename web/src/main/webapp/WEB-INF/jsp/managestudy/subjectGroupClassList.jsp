@@ -61,7 +61,10 @@
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showSubjectGroupClassRow.jsp" /></c:import>
 <br>
 
-<%--       <input type="button" onclick="window.location.href=('ListStudySubjects');" title="<fmt:message key="go_back_to_subject_matrix" bundle="${resword}"/>" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/> --%>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
       <!-- <div class="homebox_bullets"><a href="pages/studymodule"><fmt:message key="go_back_build_study_page" bundle="${resword}"/></a></div> -->
    
       <input type="button" onclick="window.location.href=('CreateSubjectGroupClass');" name="BTN_Group" value="<fmt:message key="create_group" bundle="${resword}"/>" class="button_medium"/>

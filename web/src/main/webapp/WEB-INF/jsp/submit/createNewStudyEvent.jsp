@@ -978,10 +978,16 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
- <input type="button" name="BTN_Cancel" id="GoToSubjectMatrix" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onclick="window.location.href=('ListStudySubjects');"/>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
 <td>
  <input type="submit" name="BTN_Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" />
+</td>
+<td>
+ <input type="button" name="BTN_Cancel" id="GoToSubjectMatrix" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onclick="window.location.href=('ListStudySubjects');"/>
 </td>
 <td>
  <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">

@@ -88,6 +88,12 @@
 
 <table border="0">
 <tr>
+	<td>
+		<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+	</td>
     <c:choose>
         <c:when test="${!(userRole.monitor || userRole.investigator)}">
              <td>

@@ -9,7 +9,7 @@
 <jsp:include page="include/managestudy_top_pages.jsp"/>
 <!-- should be extract study? -->
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
-<!-- *JSP* ${pageContext.page['class'].simpleName} -->
+
 <jsp:include page="include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open">
@@ -54,8 +54,11 @@
 <table>
 	<tr>
 		<td colspan="2" align="left">
-		 <input type="button" name="back" value="<fmt:message key="back" bundle="${resword}"/>" onclick="history.back();" class="button_medium"  />
-		  <td>
+			<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+		 <td>
 		 <input type="button" onclick="javascript:window.location.href='../ViewDatasets'"  name="cancel" value="   <fmt:message key="view_all_datasets" bundle="${resword}"/>   " class="button_medium"/></td>
 	</tr>
 </table>

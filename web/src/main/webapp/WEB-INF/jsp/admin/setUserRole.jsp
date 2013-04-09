@@ -143,7 +143,10 @@
 </div></div></div></div></div></div></div></div>
 
 </div>
-<input type="button" onClick="checkGoToEntryStatusMod1('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>','ListUserAccounts');"  name="cancel" value="   <fmt:message key="back" bundle="${resword}"/>   " class="button_medium"/>
+<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>" 
+					class="button_medium" 
+					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
 <input type="hidden" id="pageIsChanged" name="pageIsChanged" value="${pageIsChanged}">
 <img src="images/icon_UnchangedData.gif" style="visibility:hidden" alt="Data Status" name="DataStatus_bottom">

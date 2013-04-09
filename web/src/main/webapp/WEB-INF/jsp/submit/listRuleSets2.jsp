@@ -88,7 +88,10 @@
 
 <script>$j("img[title*='PDF']").attr('title', '<fmt:message key="view_rules_download_xml" bundle="${resword}"/>' );</script>
 <br>
-<!-- <input type="button" style="position:relative; left="200px";" name="Back" id="Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="history.back();"/> -->
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="ImportRule" value="<fmt:message key="import_rules" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='ImportRule';"/>
 <input type="button" name="TestRule" value="<fmt:message key="test_rules_title" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='TestRule';"/>
 

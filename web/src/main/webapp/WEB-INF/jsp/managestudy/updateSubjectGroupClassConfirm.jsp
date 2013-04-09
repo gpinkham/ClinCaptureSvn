@@ -99,7 +99,10 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
- <input id="GoBackToSubjectList" class="button_medium" type="button" name="BTN_Back" title="<fmt:message key="go_back_to_subject_matrix" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" onclick="javascript:history.go(-1);"/>
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
 <td>
 <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">

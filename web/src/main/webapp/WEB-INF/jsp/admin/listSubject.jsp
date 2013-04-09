@@ -66,7 +66,10 @@
         ${listSubjectsHtml}
     </form>
 	
-	<!-- <input type="button" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="javascript:window.location.href='ListStudySubjects'"/> -->
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
 
 <jsp:include page="../include/footer.jsp"/>

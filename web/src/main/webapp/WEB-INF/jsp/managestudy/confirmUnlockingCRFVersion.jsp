@@ -122,7 +122,11 @@
 <br>
 <table border="0" cellpadding="0" cellspacing="0" width="300">
 <tr>
-<td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript:window.location.href='ListCRF?module=<c:out value='${module}'/>'" />
+<td>
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
 <td>
 <form action='UnlockCRFVersion?action=confirm&module=admin&id=<c:out value="${crfVersionToUnlock.id}"/>' method="POST">

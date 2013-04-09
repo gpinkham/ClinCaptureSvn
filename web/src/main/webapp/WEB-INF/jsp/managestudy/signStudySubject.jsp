@@ -176,10 +176,9 @@
             </table>
         </div>
         </div></div></div></div></div></div></div></div>
-	<input type="button" name="BTN_Back_Smart" id="GoToPreviousPage" value="Smart_<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="Smart_<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
 		
-	<input id="back" class="button_medium" type="button" title="<fmt:message key="back" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" onClick="checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>','ListStudySubjects');"/>
-    <input type="submit" name="Submit" value="<fmt:message key="sign_casebook" bundle="${resword}"/>" class="button_medium">
+	<input type="submit" name="Submit" value="<fmt:message key="sign_casebook" bundle="${resword}"/>" class="button_medium">
 	<input type="button" onClick="checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>','<%=request.getContextPath()%>/ViewStudySubject?id=${studySub.id}');"  value="<fmt:message key="view_subject_record2" bundle="${resword}"/>"  class="button_xlong"/>
     <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">
 

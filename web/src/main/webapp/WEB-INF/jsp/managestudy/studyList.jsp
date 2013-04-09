@@ -48,9 +48,13 @@
 
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showStudyRow.jsp" /></c:import>
 <br>
-<%-- <a id="haCreateStudy" href="CreateStudy" style="display: none;"><fmt:message key="create_a_new_study" bundle="${resword}"/></a> --%>
-<%-- <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onclick="javascript:history.go(-1);"> --%>
-<input type="button" onclick="location.href = '<%=request.getContextPath()%>/CreateStudy'"  name="create_study" value="<fmt:message key="create_study" bundle="${resword}"/>" class="button_medium"/>
+	<%-- <a id="haCreateStudy" href="CreateStudy" style="display: none;"><fmt:message key="create_a_new_study" bundle="${resword}"/></a> --%>
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+
+	<input type="button" onclick="location.href = '${contextPath}/CreateStudy'"  name="create_study" value="<fmt:message key="create_study" bundle="${resword}"/>" class="button_medium"/>
 
 <br><br>
 

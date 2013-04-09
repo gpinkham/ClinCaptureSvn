@@ -80,10 +80,12 @@
 "${version.crfId}"/>&tabId=1
 <form action="javascript:void(0)"><a href="SectionPreview?tabId=1"  target="_blank"><input type="submit" name="submit" value=
    "Preview CRF" class="button_medium"></a></form>--%>
-<%-- <td><b><form action="ListCRF" method="post">
- <input type="submit" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"></form></b> </td>--%>
+
 <td>
- <input id="GoBackToSubjectList" class="button_medium" type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" onclick="window.location.href = 'InitCreateCRFVersion?module=&crfId=${version.crfId}&name=${version.name}';"/>
+<input type="button" name="BTN_Back" id="GoToPreviousPage"
+					value="<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: history.go(-1);" />
 </td>  
   <td><b><form action="CreateCRFVersion?action=confirmsql&crfId=<c:out value=
 "${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post">
@@ -98,10 +100,11 @@
 
  <table border="0">
 <tr>
-<%-- <td><b><form action="ListCRF" method="post">
- <input type="submit" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"></form></b> </td>--%>
 <td>
- <input id="GoBackToSubjectList" class="button_medium" type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" onclick="window.location.href = 'InitCreateCRFVersion?module=&crfId=${version.crfId}&name=${version.name}';"/>
+ <input type="button" name="BTN_Back" id="GoToPreviousPage"
+					value="<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: history.go(-1);" />
 </td>  
 <td><b><form action="CreateCRFVersion?action=confirmsql&crfId=<c:out value=
 "${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post">
@@ -124,7 +127,10 @@
 <%-- <fmt:message key="click" bundle="${resword}"/> --%>
 <fmt:message key="go_back_to_upload_your_corrected_spreadsheet" bundle="${restext}"/>
 </br>
-<input type="submit" name="submit" value="<fmt:message key="back" bundle="${resword}"/>" class="button" onclick="javascript:window.location.href='CreateCRFVersion?module=&crfId=<c:out value="${version.crfId}"/>'">
+<input type="button" name="BTN_Back" id="GoToPreviousPage"
+					value="<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: history.go(-1);" />
 <br></br>
 <%=htmlTable%>
 

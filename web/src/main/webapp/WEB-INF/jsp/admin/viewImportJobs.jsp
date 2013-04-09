@@ -53,7 +53,10 @@
 </c:import>
 <br><br>
 
-<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='ViewAllJobs'"/>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="<fmt:message key="create_import_job" bundle="${resword}"/>" value="<fmt:message key="create_import_job" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='CreateJobImport'"/>
 
 <br><br>

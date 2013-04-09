@@ -66,7 +66,10 @@
 
 </div>
 <br>
-<input id="GoBackToSubjectList" class="button_medium" type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>" onclick="window.location.href=('ListStudyUser');"/>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
     &nbsp;
 <input type="submit" name="BTN_Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
 <%-- <input type="button" onclick="confirmCancel('ListStudyUser');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>--%>

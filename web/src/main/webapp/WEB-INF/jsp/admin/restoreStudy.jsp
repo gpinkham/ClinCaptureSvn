@@ -172,7 +172,10 @@
 </div>
 <br>
 <form action='RestoreStudy?action=submit&id=<c:out value="${studyToRestore.id}"/>' method="POST">
- <input type="button" value="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>" class="button_long" size="50" onclick="history.back();"/>
+ <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
  <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_restore_this_study" bundle="${restext}"/>");'>
 </form>
 

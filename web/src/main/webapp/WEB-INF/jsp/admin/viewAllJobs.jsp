@@ -51,7 +51,10 @@
 <jsp:useBean id="now" class="java.util.Date" />
 <P><I><fmt:message key="note_that_job_is_set" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="${dtetmeFormat}"/>.</I></P>
 
-<%-- <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='MainMenu'"/> --%>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="<fmt:message key="export_jobs" bundle="${resword}"/>" value="<fmt:message key="export_jobs" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='ViewJob'"/>
 <input type="button" name="<fmt:message key="import_jobs" bundle="${resword}"/>" value="<fmt:message key="import_jobs" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='ViewImportJob'"/>
 <input type="button" name="<fmt:message key="running_jobs" bundle="${resword}"/>" value="<fmt:message key="running_jobs" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='pages/listCurrentScheduledJobs'"/>

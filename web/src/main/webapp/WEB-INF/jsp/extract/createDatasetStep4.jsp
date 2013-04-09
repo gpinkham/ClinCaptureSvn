@@ -314,8 +314,6 @@
 <table>
 	<tr>
 		<td colspan="3" align="left">
-		  <input type="submit" name="btnSubmit" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/></td>
-		<td>
 		  <input type="submit" name="btnSubmit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium"/></td>
 		<td>
 		 <input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>

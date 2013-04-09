@@ -149,11 +149,12 @@ function submitform(){
 <br clear="all">
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
-<!-- <td> -->
-<%--   <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');"/> --%>
-<%-- <input type="button" onclick="confirmExit('ListCRF?module=<c:out value="${module}"/>')" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/> --%>
-<!-- </td> -->
-
+<td>
+  <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+</td>
 <td>
   <input type="submit" onclick="return submitform();" value="<fmt:message key="preview_CRF" bundle="${resword}"/>" class="button_medium">
 </td>

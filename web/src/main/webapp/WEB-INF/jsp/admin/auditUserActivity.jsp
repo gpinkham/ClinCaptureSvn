@@ -75,6 +75,9 @@
 
 <br>
 <%-- <input type="button" onclick="confirmExit('ListUserAccounts');"  name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>--%>
-<input type="button" name="BTN_Back" id="GoToPreviousPage" title="<fmt:message key="go_back_to_user_list" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onclick="window.location.href=('ListUserAccounts');"/>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
 <jsp:include page="../include/footer.jsp"/>

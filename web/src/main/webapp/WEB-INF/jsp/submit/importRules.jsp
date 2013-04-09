@@ -106,7 +106,10 @@
 <div class="homebox_bullets"><a href="ImportRule?action=downloadtemplate"><fmt:message key="rule_import_all_actions_without_notes" bundle="${resterm}"/></a></div><br/>
 
 <br clear="all">
-<input type="button" name="BTN_Back" id="GoToManageRules" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onclick="window.location.href=('ViewRuleAssignment?read=true');"/>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
 <%-- <p><a href="pages/studymodule"><fmt:message key="import_rules_back_to_study_build" bundle="${resword}"/></a></p> --%>
 </form>

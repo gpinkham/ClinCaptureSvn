@@ -55,7 +55,10 @@
 <table>
   <tr>
     <td>
-       <input type="button" name="BTN_Back" id="GoBackBTN" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onclick="window.location.href = 'CreateCRFVersion?module=<c:out value="${module}"/>&crfId=<c:out value="${version.crfId}"/>';"/>
+       <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
        <input type="button" name="BTN_Submit" value="<fmt:message key="delete_version" bundle="${resword}"/>" class="button_medium" onClick="window.location.href = 'CreateCRFVersion?module=<c:out value="${module}"/>&action=delete&id=<c:out value="${version.id}"/>&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>';"/>
     </td>
    </tr>

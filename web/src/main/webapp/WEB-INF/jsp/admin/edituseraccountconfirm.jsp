@@ -210,7 +210,9 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
-<input type="button" value="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="history.go(-1);"/>
+<td>
+  <input type="button" value="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="history.go(-1);"/>
+</td>
 </td>
 <td>
 <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">

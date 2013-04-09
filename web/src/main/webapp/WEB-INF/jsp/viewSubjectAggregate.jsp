@@ -110,10 +110,13 @@
 
         ${sdvTableAttribute}
         <br />
-        <c:if test="${showBackButton}">
+        
             <input type="hidden" name="sbb" value="true"/>
-            <input type="button" value="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="location.href = '<%=request.getContextPath()%>/ListStudySubjects'"/>
-        </c:if>
+            <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+        
         <input type="submit" name="sdvAllFormSubmit" class="button_medium" value="<fmt:message key="sdv_all_checked" bundle="${resword}"/>" onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/sdvStudySubjects';this.form.submit();"/>
         <%--<input type="submit" name="sdvAllFormCancel" class="button_medium" value="Cancel" onclick="this.form.action='${pageContext.request.contextPath}/pages/viewSubjectAggregate';this.form.submit();"/>
     </form>--%>

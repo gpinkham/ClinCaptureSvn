@@ -391,7 +391,10 @@ int selectedValue;
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
-  <input type="button" name="BTN_Back" id="GoToPreviousPage" title="<fmt:message key="go_back_to_subject_matrix" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoToEntryStatusMod1('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>','ListUserAccounts');"/>
+  <input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>" 
+					class="button_medium" 
+					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
   <input type="hidden" id="pageIsChanged" name="pageIsChanged" value="${pageIsChanged}">
 </td>
 <td>

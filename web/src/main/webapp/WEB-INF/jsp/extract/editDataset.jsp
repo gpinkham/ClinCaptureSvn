@@ -93,8 +93,12 @@
   <tr>
    <td><input type="submit" name="save" value="<fmt:message key="add_or_remove_items" bundle="${resword}"/>" class="button_xlong"/></td>
    <td><input type="submit" name="saveContinue" value="<fmt:message key="continue_to_define_scope" bundle="${resword}"/>" class="button_xlong"/></td>
-   <td><input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
-  </tr>
+   <td><input type="button" name="BTN_Smart_Cancel" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="cancel" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
+	</td>  
+	</tr>
 </table>
 <br>
 
@@ -104,7 +108,11 @@
   <tr>
    <td><input type="submit" name="save" value="<fmt:message key="add_or_remove_items" bundle="${resword}"/>" class="button_xlong"/></td>
    <td><input type="submit" name="saveContinue" value="<fmt:message key="continue_to_define_scope" bundle="${resword}"/>" class="button_xlong"/></td>
-   <td><input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
+   <td><input type="button" name="BTN_Smart_Cancel" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="cancel" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
+	</td>
   </tr>
 </table>
 </form>

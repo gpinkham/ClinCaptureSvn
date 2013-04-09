@@ -101,7 +101,12 @@
 
 </div>
 <!-- <p><a href="#" onClick="history.go(-1)"><fmt:message key="back_to_group_class_list" bundle="${resword}"/></a></p> -->
-<p><input type="button" name="back" onClick="history.go(-1)" class="button_medium" value=<fmt:message key="back_to_group_class_list" bundle="${resword}"/></a></p>
+<p>
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+</p>
 
  <c:import url="../include/workflow.jsp">
    <c:param name="module" value="manage"/> 

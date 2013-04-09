@@ -58,13 +58,13 @@ function goBackSmart(servletURL, defaultURL) {
     jQuery.ajax({
         url:servletURL,
         type: 'GET',
-        dataType:'text',
-        success:function(responseURL){
-            if (responseURL.search("DOCTYPE") === -1 ) {
-                window.location.href = responseURL;
-            } else {
-                //window.history.go(-1);
-                window.location.href = defaultURL;
+        dataType: 'text',
+        success: function(responseURL){
+			if (responseURL.search("DOCTYPE") === -1 ) {
+				window.location.href = responseURL;
+			} else {
+				//window.history.go(-1);
+				window.location.href = defaultURL;
             }
         }
     });

@@ -170,13 +170,9 @@
 <table>
   <tr>
 		<td>
-			<!--<input type="submit" name="submit" value="Continue to Apply Filter" class="button_xlong"/>&nbsp;&nbsp;-->
-			<!--<input type="submit" name="submit" value="Skip Apply Filter and Save" class="button_xlong"/>		-->
 			<input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="history.go(-1);"/>
 			<input type="submit" name="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium"/>
             <input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
-			
-
         </td>
 	</tr>
 </table>

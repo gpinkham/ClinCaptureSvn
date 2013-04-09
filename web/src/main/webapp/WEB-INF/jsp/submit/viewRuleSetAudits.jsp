@@ -152,7 +152,10 @@
 
 </div>
 
-<input type="button" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.location.href='ViewRuleSet?ruleSetId=${ruleSet.id}'"/>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
 <c:choose>
   <c:when test="${userBean.sysAdmin && module=='admin'}">

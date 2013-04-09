@@ -199,7 +199,13 @@
 
 </div>
 </c:if>
-<p><span class="spanBack" onClick="history.go(-1);"><fmt:message key="go_back" bundle="${resword}"/></span></p>
+<p>
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+	
+</p>
  
  <c:import url="../include/workflow.jsp">
    <c:param name="module" value="manage"/> 

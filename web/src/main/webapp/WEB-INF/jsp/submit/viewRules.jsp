@@ -238,9 +238,10 @@ function confirmRemove(){
 
 </div>
 
-<input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" 
-title="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="history.back();"/>
-<!-- <p><a href="ViewRuleAssignment"/><fmt:message key="rule_go_back_to_Assignment_list" bundle="${resword}"/></a></p> -->
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" value="<fmt:message key="view_rules_run_all" bundle="${resword}"/>" 
 title="<fmt:message key="view_rules_run_all_tip" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.location.href='RunRuleSet?ruleSetId=<c:out value="${ruleSet.id}"/>'"/>
 <input type="button" value="<fmt:message key="view_rules_remove_all" bundle="${resword}"/>" 

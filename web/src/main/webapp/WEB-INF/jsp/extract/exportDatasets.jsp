@@ -184,7 +184,10 @@
 <table>
 	<tr>
 		<td colspan="3" align="left">
-		 <input type="button" name="exit" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.location.href='ViewDatasets'">
+		  <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 		  <td>
 		 <input type="button" onclick="javascript:window.location.href='ViewDatasets'"  name="cancel" value="   <fmt:message key="view_all_datasets" bundle="${resword}"/>   " class="button_medium"/></td>
 	</tr>

@@ -284,7 +284,7 @@
              ok = true;
          }
          if (ok) {
-             history.go(-1);
+        	 goBackSmart('${navigationURL}', '${defaultURL}');
          }
      }
     </SCRIPT>
@@ -326,7 +326,7 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
-<input type="button" value="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="back_checkEditUserFormState();"/>
+<input type="button" value="Smart_<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="back_checkEditUserFormState();"/>
 <input type="submit" name="continue" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" /><br/>
 </td>
 <%--td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="javascript:myCancel();"/>

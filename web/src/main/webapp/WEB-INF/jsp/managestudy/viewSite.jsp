@@ -631,7 +631,10 @@
     <c:choose>
         <c:when test="${userBean.sysAdmin}">
             <%-- <input type="button" onclick="confirmExit('ListSite');"  name="cancel" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/> --%> 
-            <input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="javascript:history.go(-1);"/>
+            <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
         </c:when>
         <c:otherwise>
             <%-- <input type="button" onclick="goBack();" name="cancel" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/> --%>

@@ -166,13 +166,19 @@
    <c:choose>
     <c:when test="${!empty events}">
      <form action='RestoreStudySubject?action=submit&id=<c:out value="${studySub.id}"/>&subjectId=<c:out value="${studySub.subjectId}"/>&studyId=<c:out value="${studySub.studyId}"/>' method="POST">
-       <input type="button" onclick="history.back();"  name="back" value="   <fmt:message key="back" bundle="${resword}"/>   " class="button_medium"/>
+       <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
        <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="this_subject_has_data_from_events_restore" bundle="${resword}"/>");'>
      </form>   
     </c:when>
     <c:otherwise>
      <form action='RestoreStudySubject?action=submit&id=<c:out value="${studySub.id}"/>&subjectId=<c:out value="${studySub.subjectId}"/>&studyId=<c:out value="${studySub.studyId}"/>' method="POST">
-       <input type="button" onclick="history.back();"  name="back" value="   <fmt:message key="back" bundle="${resword}"/>   " class="button_medium"/>
+       <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
        <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_restore_it" bundle="${resword}"/>");'>
      </form> 
      

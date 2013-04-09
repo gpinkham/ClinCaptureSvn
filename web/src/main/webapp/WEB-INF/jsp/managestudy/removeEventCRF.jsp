@@ -134,13 +134,19 @@
    <c:choose>
     <c:when test="${!empty items && count>0}">
      <form action='RemoveEventCRF?action=submit&id=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
-      <input type="button" onclick="history.go(-1);"  name="BTN_Back" value="   <fmt:message key="back" bundle="${resword}"/>   " class="button_medium"/>
+      <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
       <input type="submit" name="BTN_Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="this_crf_has_data" bundle="${resword}"/>");'>
      </form>
     </c:when>
     <c:otherwise>
       <form action='RemoveEventCRF?action=submit&id=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
-      <input type="button" onclick="history.go(-1);"  name="BTN_Back" value="   <fmt:message key="back" bundle="${resword}"/>   " class="button_medium"/>
+      <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
       <input type="submit" name="BTN_Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_remove_it" bundle="${resword}"/>");'>
      </form>
     </c:otherwise>

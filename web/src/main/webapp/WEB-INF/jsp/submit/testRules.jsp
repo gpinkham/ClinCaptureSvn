@@ -524,7 +524,10 @@
 <table border="0" cellpadding="0" cellspacing="0">
     <tr>
     <td>
-    	<input type="button" onClick="history.back();"  name="back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/>
+    	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
     </td>  
 	
 	<td><input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" title="<fmt:message key="test_rule2" bundle="${resword}"/>" class="button_medium" size="50""/>

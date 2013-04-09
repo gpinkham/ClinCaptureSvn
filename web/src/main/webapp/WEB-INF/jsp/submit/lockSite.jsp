@@ -364,7 +364,10 @@
     <input type="hidden" name="action" value="${action}">
     <input type="hidden" name="id" value="<c:out value="${studyBean.id}"/>">
 
-    <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="window.location.href = '${refererUrl}';"/>
+    <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
     <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
 
 </form>
