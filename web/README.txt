@@ -41,32 +41,39 @@ Contents:
 8. GNU LGPL License
 
 1. SYSTEM REQUIREMENTS:
+
 ClinCapture is currently tested and developed on the following platforms:
 
-Server Operating Systems:
+Supported Server Operating Systems:
 
-Redhat Enterprise Linux 4.0+
-Windows Server 2003
-Mac OS 10.X
+- Redhat Enterprise Linux 4.0+
+- Windows Server 2003
+- Mac OS 10.X
 
-Databases:
-Postgres 8.4
-Oracle 10g
+Supported Databases:
 
-Client Browsers:
-Internet Explorer 8 or 9
-Mozilla Firefox 
-Chrome
+-Postgres 8.4
+- Oracle 10g
+
+Supported Client Browsers:
+
+- Internet Explorer 8 or 9
+- Mozilla Firefox 
+- Chrome
 
 Web Server:
-Apache Jakarta Tomcat 6.0.x
-Java: Java 2 SDK 1.6.x or 1.7.x
+
+- Apache Jakarta Tomcat 6.0.x
+- Java: Java 2 SDK 1.6.x or 1.7.x
 
 Hardware Requirements:
-Memory: 256 MB minimum (2 GB Recommended)
-Disk Space: 500 MB minimum (2 GB Recommended)
 
-NOTE that ClinCapture can run on top of Postgres 9.x, but you will need to switch out the JDBC driver library in the ClinCapture/WEB-INF/lib folder under Tomcat.
+- Memory: 256 MB minimum (2 GB Recommended)
+- Disk Space: 500 MB minimum (2 GB Recommended)
+
+NOTE:
+
+ClinCapture can run on top of Postgres 9.x, but you will need to switch out the JDBC driver library in the ClinCapture/WEB-INF/lib folder under Tomcat.
 Ideally, you will want to download the JDBC4 jar file from the site http://jdbc.postgresql.org/download.html.  This database version is not included in the current test plan, but will be in the near future.
 
 We have been testing ClinCapture with Tomcat 7, but have encountered technical issues with its implementation, and hope to fix this in a future release.
@@ -74,6 +81,7 @@ We have been testing ClinCapture with Tomcat 7, but have encountered technical i
 The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit http://www.clinovo.com/clincapture/community.
 
 2. OVERALL FEATURES SET:
+
 The main functionality includes:
 * Submit Data: Allows subject enrollment, data submission and validation for use by clinicians and research associates as well as Query Management and Bulk Data Import.
 * Monitor and Manage Data: Enables ongoing data management and monitoring
@@ -81,7 +89,7 @@ The main functionality includes:
 * Study Build: Facilitates creation and management of studies (protocols), sites, CRFs, users and study event definitions by principal investigators and coordinators.
 * Administration: Allows overall system oversight, auditing, configuration, and reporting by administrators.
 
-Some key features of ClinCapture include: 
+Some key features of ClinCapture features include: 
 
 * Organization of clinical research by study protocol and site, each with its own set of authorized users, subjects, study event definitions, and CRFs. Support for sharing resources across studies in a secure and transparent manner. 
 * Dynamic generation of web-based CRFs for electronic data capture via user-defined clinical parameters and validation logic specified in portable Excel templates.
@@ -92,21 +100,25 @@ Some key features of ClinCapture include:
 * A robust and scalable technology infrastructure developed using the Java J2EE framework interoperable with relational databases including PostgreSQL (open source) and Oracle 10G, to support the needs of the clinical research enterprise. 
 
 3. KNOWN ISSUES: 
-Known issues that are currently being fixed can be viewed in the Trac issue manager, available through https://trac.clinovo.com/clincapture/report/1
+
+Known issues that are currently being fixed can be viewed in the Trac issue manager, available at https://trac.clinovo.com/clincapture/report/1
 
 Currently known issues include the following:
 
 - Sometimes the odm_mapping folder is not created in WEB-INF/classes (Ticket #30)
 
 4. INSTALLING CLINCAPTURE:
+
 Installation procedures are documented in the ClinCapture Administrator’s Guide.
-Please visit http://www.clinovo.com/clincapture/community to download it.
+http://www.clinovo.com/clincapture/community/downloads to download it.
 
 5. UPGRADING FROM OPENCLINICA 3.1.X TO CLINCAPTURE 1.0.2.1:
+
 Installation procedures are documented in the ClinCapture Administrator’s Guide.
-Please visit http://www.clinovo.com/clincapture/community to download it.
+http://www.clinovo.com/clincapture/community/downloads to download it.
 
 6. TECHNICAL ISSUES AND TROUBLESHOOTING:
+
 If you don't see an issue that is addressed below, we certainly recommend posting a question to the forums through http://www.clinovo.com/clincapture/forum.
 
 - Starting up the application
