@@ -309,7 +309,7 @@
 
 	<profiles>
 		<profile>
-			<id>noTest</id>
+			<id>run-selenium-tests</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
