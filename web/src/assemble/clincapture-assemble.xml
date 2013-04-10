@@ -1,5 +1,5 @@
 <assembly>
-	<id></id>
+	<id>distribution</id>
 	<formats>
 		<format>zip</format>
 	</formats>
@@ -28,9 +28,9 @@
 	</fileSets>
 	<files>
 		<file>
-			<source>target/ClinCapture-{project.version}.war</source>
+			<source>target/ClinCapture-1.0.2.2-SNAPSHOT.war</source>
 			<outputDirectory>distribution</outputDirectory>
-			<destName>ClinCapture-{project.version}.war</destName>
+			<destName>ClinCapture-1.0.2.2-SNAPSHOT.war</destName>
 		</file>
 	</files>
 </assembly>
