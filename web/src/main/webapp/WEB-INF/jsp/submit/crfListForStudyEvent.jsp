@@ -97,9 +97,6 @@
         <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id eq 2}">
             <a href="ReassignStudySubject?id=${studySubject.id}"><img src="images/bt_Reassign.gif" border="0" align="left" alt="<fmt:message key="reassign" bundle="${resword}"/>" title="<fmt:message key="reassign" bundle="${resword}"/>" hspace="4"/></a>
         </c:if>
-        <%--c:if test="${currentRole.id eq 2 and !allLocked}">
-            <a href="LockStudySubject?id=${studySubject.id}"><img src="images/bt__Lock.png" border="0" align="left" alt="<fmt:message key="lockStudySubject" bundle="${resword}"/>" title="<fmt:message key="lockStudySubject" bundle="${resword}"/>" hspace="4"/></a>
-        </c:if--%>
     </td>
 </tr>
 
@@ -186,16 +183,12 @@
 
 <c:choose>
 <c:when test="${dedc.status.name=='locked'}">
-    <%--<c:when test="${studyEvent.subjectEventStatus.name=='locked'}">--%>
-    <%-- nothing for right now --%>&nbsp;
+&nbsp;
 </c:when>
 <c:otherwise>
 <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
 <tr valign="top">
 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" /> <c:if test="${dedc.edc.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
-    <%--
-                 <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
-                 --%>
 <td class="table_cell">
     <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
         <c:choose>
@@ -208,8 +201,6 @@
         <input type="hidden" name="crfVersionId" value="<c:out value="${dedc.edc.defaultVersionId}"/>">
         </c:otherwise>
         </c:choose>
-
-            <%--<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.edc.defaultVersionId}"/>">--%>
             <c:set var="versionCount" value="0"/>
         <c:forEach var="version" items="${dedc.edc.versions}">
             <c:set var="versionCount" value="${versionCount+1}"/>
@@ -224,8 +215,6 @@
         </c:forEach>
 
         </c:when>
-
-            <%--<c:otherwise>--%>
         <c:when test="${dedc.eventCRF.id == 0}">
 
         <select name="versionId<c:out value="${dedc.edc.crf.id}"/>" onchange="javascript:changeQuery<c:out value="${dedc.edc.crf.id}"/>();">
@@ -258,8 +247,6 @@
 
             }
         </SCRIPT>
-
-            <%--</c:otherwise>--%>
         </c:when>
 
         <c:otherwise>
@@ -285,7 +272,6 @@
 <c:choose>
 
         <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
-            <%--<c:when test="${dedc.status.name=='locked'}">--%>
             <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
                 <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
             </td>
@@ -296,11 +282,6 @@
                 <c:when test="${dedc.eventCRF.id>0 and !dedc.eventCRF.notStarted}">
                     <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;"><img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>"></td>
                 </c:when>
-                <%--c:when test="${studySubject.status.deleted or studyEvent.subjectEventStatus.id eq 10}">
-                    <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
-                        <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
-                    </td>
-                </c:when--%>
                 <c:otherwise>
                     <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
                         <img src="images/icon_NotStarted.gif" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
@@ -450,13 +431,6 @@
         </c:if>
     </c:if>
 
-        <%--
-                            <c:if test="${dec.locked}">
-                                locked
-                            </c:if>
-
-        --%>
-
     <c:choose>
         <c:when test='${actionQuery == "" && dec.stage.name =="invalid" }'>
             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
@@ -479,7 +453,7 @@
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
               ><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="4"></a>
-            <%-- added above 112007, tbh --%>
+
         </c:when>
         <c:otherwise>
             <c:set var="enterDataWasInserted" value="false"/>
@@ -521,9 +495,6 @@
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="4">
                     </a>
                 </c:if>
-                <%--c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}">
-                    &nbsp;
-                </c:if--%>
             </c:if>
 
             <c:if test="${enterDataWasInserted eq 'false'}">
@@ -589,8 +560,4 @@
 <input type="hidden" class="hideCrfBlankCell"  value="${hideCrfBlankCell}"/>
 <jsp:include page="../include/changeTheme.jsp"/>
 
-<%--c:if test="${!study.status.available}">
-    <div class="wrongStudyStatus">
-        <fmt:message key="studyShoudBeInAvailableMode" bundle="${resword}"/>
-    </div>
-</c:if--%>
+

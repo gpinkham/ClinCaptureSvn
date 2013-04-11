@@ -254,6 +254,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 							eventCrfBean.setStatus(Status.UNAVAILABLE);
 							eventCrfBean.setStage(edcb.isDoubleEntry() ? DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
 									: DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE);
+							eventCrfBean.setSdvStatus(false);
 							itemDataDao.updateStatusByEventCRF(eventCrfBean, Status.UNAVAILABLE);
 						}
 
@@ -266,13 +267,16 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 					ArrayList allCRFs = eventCrfDao.findAllByStudyEventAndStatus(seb, Status.UNAVAILABLE);
 					ArrayList allEDCs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(currentStudy,
 							seb.getStudyEventDefinitionId());
+					logger.debug("count for event crf: " + allCRFs.size() + " count for edcs: " + allEDCs.size());
 					if (allCRFs.size() == allEDCs.size()) {
 						seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
 					} else if (seb.getSubjectEventStatus() == SubjectEventStatus.NOT_SCHEDULED
-							|| seb.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED) {
+							|| seb.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED 
+							|| seb.getSubjectEventStatus() == SubjectEventStatus.SOURCE_DATA_VERIFIED
+							|| seb.getSubjectEventStatus() == SubjectEventStatus.COMPLETED) {
 						seb.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
 					}
-
+					
 					sedao.update(seb);
 				}
 
