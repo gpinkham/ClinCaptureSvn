@@ -111,7 +111,7 @@
 </div>
 <br>
 <br>
-<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="Smart_<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
 
 <br>
 <jsp:include page="../include/footer.jsp"/>

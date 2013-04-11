@@ -270,7 +270,7 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
- <input type="button" name="BTN_Smart_Exit" id="GoToPreviousPage" value="Smart_<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+ <input type="button" name="BTN_Smart_Exit" id="GoToPreviousPage" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 </td>
 <td>
  <input type="submit" name="BTN_CaptureData" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" title="<fmt:message key="update_study_event" bundle="${resword}"/>"/>

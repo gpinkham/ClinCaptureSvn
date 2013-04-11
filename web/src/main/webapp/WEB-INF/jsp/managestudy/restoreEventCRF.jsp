@@ -132,7 +132,7 @@
     <c:when test="${!empty items}">
      <form action='RestoreEventCRF?action=submit&id=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
       <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
       <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="this_crf_has_data_restore" bundle="${resword}"/>");'>
@@ -142,7 +142,7 @@
     <c:otherwise>
     	<form action='RestoreEventCRF?action=submit&id=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
 		<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
      	<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_restore_it" bundle="${resword}"/>");'>

@@ -56,7 +56,7 @@
 <form action="CreateDataset" method="post">
 <input type="hidden" name="action" value="begin"/>
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="submit" name="BTN_Continue" id="ContinueCreating" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" size="50" />

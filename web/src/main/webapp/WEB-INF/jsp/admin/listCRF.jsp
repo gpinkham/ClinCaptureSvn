@@ -72,7 +72,7 @@
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showCRFRow.jsp" /></c:import>
 <br>
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" style="position:relative;" name="<fmt:message key="create_CRF" bundle="${resword}"/>" value="<fmt:message key="create_CRF" bundle="${resword}"/>" class="button_long" onClick="window.location.href='CreateCRFVersion?module=<c:out value="${module}"/>'" />

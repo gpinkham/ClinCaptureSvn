@@ -103,7 +103,7 @@
  <tr>
   <td>
    <input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
-					value="Smart_<fmt:message key="back" bundle="${resword}"/>" 
+					value="<fmt:message key="back" bundle="${resword}"/>" 
 					class="button_medium" 
 					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
   </td>

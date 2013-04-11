@@ -174,13 +174,13 @@ for each study user is in, show:
        <c:choose>
            <c:when test="${showExitInsteadOfBack}">
                <input type="button" name="BTN_Smart_Exit" id="GoToPreviousPage"
-					value="Smart_<fmt:message key="exit" bundle="${resword}"/>"
+					value="<fmt:message key="exit" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
            </c:when>
            <c:otherwise>
                <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
            </c:otherwise>

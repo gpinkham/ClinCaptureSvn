@@ -606,7 +606,7 @@ END --%>
   <br>
   <br>
   <div>
-      <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="Smart_<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
+      <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
       
       <input type="submit" name="submitEvent" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
       <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">

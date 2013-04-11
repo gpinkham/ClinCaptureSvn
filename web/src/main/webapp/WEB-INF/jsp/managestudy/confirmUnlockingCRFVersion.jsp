@@ -124,7 +124,7 @@
 <tr>
 <td>
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>

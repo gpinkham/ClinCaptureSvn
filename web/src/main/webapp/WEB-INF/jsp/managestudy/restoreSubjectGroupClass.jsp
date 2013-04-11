@@ -106,7 +106,7 @@
  <form action='RestoreSubjectGroupClass?action=submit&id=<c:out value="${group.id}"/>' method="POST">
     <!-- <input type="submit" name="submit" value="<fmt:message key="restore_subject_group_class" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="if_you_restore_this_subject_group_class" bundle="${resword}"/>");'> -->
     <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 	<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" title="<fmt:message key="restore_subject_group_class" bundle="${resword}"/>" onClick='return confirm("<fmt:message key="if_you_restore_this_subject_group_class" bundle="${resword}"/>");'>

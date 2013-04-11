@@ -106,7 +106,7 @@
 
  <form action='RemoveSubjectGroupClass?action=submit&id=<c:out value="${group.id}"/>' method="POST">
     <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="Smart_<fmt:message key="back" bundle="${resword}"/>"
+					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
     <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="if_you_remove_this_subject_group_class" bundle="${resword}"/>");'>
