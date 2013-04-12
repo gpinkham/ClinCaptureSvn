@@ -64,9 +64,9 @@
 <form  action="${pageContext.request.contextPath}/ListSubject">
         <input type="hidden" name="module" value="submit">
         ${listSubjectsHtml}
-    </form>
+</form>
 	
-	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />

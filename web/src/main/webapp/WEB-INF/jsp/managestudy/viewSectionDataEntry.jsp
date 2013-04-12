@@ -266,10 +266,6 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
 					class="button" />
 			</c:when>
 			<c:otherwise>
-				<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 				<input type="button"
 					onclick="window.location.href='${viewSectionDataEntryReferer}';"
 					value="<fmt:message key="exit" bundle="${resword}"/>"

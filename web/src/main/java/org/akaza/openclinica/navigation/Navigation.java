@@ -20,7 +20,8 @@ public class Navigation {
 			"/InitUpdateEventDefinition", "/UpdateEventDefinition", "/RemoveEventDefinition", "/RemoveSubject", 
 			"/RemoveStudy", "/ViewUserAccount", "/EditUserAccount", "/SetUserRole", "/ViewUserAccount", 
 			"/Configure", "/CreateUserAccount", "/UpdateJobImport", "/CreateJobExport", "/CreateJobImport",
-			"/UpdateProfile", "/RemoveDataset", "/LockStudySubject", "/pages/extract"));
+			"/UpdateProfile", "/RemoveDataset", "/LockStudySubject", "/pages/extract",
+			"/CreateNewStudyEvent", "/UpdateSubject"));
 	//ignored-set of pages, pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
