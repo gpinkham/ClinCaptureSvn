@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.service.rule;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -269,7 +270,12 @@ public class RuleSetService implements RuleSetServiceInterface {
 		return ruleRunner.runRules(ub, ruleSets, variableAndValue);
 	}
 
-	public HashMap<String, ArrayList<String>> runRulesInImportData(List<ImportDataRuleRunnerContainer> containers,
+    public HashMap<String, ArrayList<String>> runRulesInImportData(List<ImportDataRuleRunnerContainer> containers,
+                                                                   StudyBean study, UserAccountBean ub, ExecutionMode executionMode) {
+        return runRulesInImportData(null, containers, study, ub, executionMode);
+    }
+
+	public HashMap<String, ArrayList<String>> runRulesInImportData(Connection connection, List<ImportDataRuleRunnerContainer> containers,
 			StudyBean study, UserAccountBean ub, ExecutionMode executionMode) {
 		ImportDataRuleRunner ruleRunner = new ImportDataRuleRunner(dataSource, requestURLMinusServletPath, contextPath,
 				mailSender);
@@ -277,7 +283,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 		ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
 		ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
 
-		return ruleRunner.runRules(containers, study, ub, executionMode);
+		return ruleRunner.runRules(connection, containers, study, ub, executionMode);
 	}
 
 	public List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study,

@@ -22,17 +22,26 @@ import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 
 public class ShowActionProcessor implements ActionProcessor {
 
 	DataSource ds;
 	DynamicsMetadataService itemMetadataService;
 	RuleSetBean ruleSet;
+	Connection con;
 
 	public ShowActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService, RuleSetBean ruleSet) {
 		this.itemMetadataService = itemMetadataService;
 		this.ruleSet = ruleSet;
 		this.ds = ds;
+	}
+	
+	public ShowActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService, RuleSetBean ruleSet, Connection con) {
+		this.itemMetadataService = itemMetadataService;
+		this.ruleSet = ruleSet;
+		this.ds = ds;
+		this.con = con;
 	}
 
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode,
@@ -49,9 +58,9 @@ public class ShowActionProcessor implements ActionProcessor {
 		}
 		case SAVE: {
 			if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
-				return saveAndReturnMessage(ruleAction, itemDataBean, itemData, currentStudy, ub);
+				return saveAndReturnMessage(ruleAction, itemDataBean, itemData, currentStudy, ub, con);
 			} else {
-				return save(ruleAction, itemDataBean, itemData, currentStudy, ub);
+				return save(ruleAction, itemDataBean, itemData, currentStudy, ub, con);
 			}
 		}
 		default:
@@ -60,16 +69,16 @@ public class ShowActionProcessor implements ActionProcessor {
 	}
 
 	private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData,
-			StudyBean currentStudy, UserAccountBean ub) {
+			StudyBean currentStudy, UserAccountBean ub, Connection con) {
 		getItemMetadataService().showNew(itemDataBean.getId(), ((ShowActionBean) ruleAction).getProperties(), ub,
-				ruleSet);
+				ruleSet, con);
 		return ruleAction;
 	}
 
 	private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData,
-			StudyBean currentStudy, UserAccountBean ub) {
+			StudyBean currentStudy, UserAccountBean ub, Connection con) {
 		getItemMetadataService().showNew(itemDataBean.getId(), ((ShowActionBean) ruleAction).getProperties(), ub,
-				ruleSet);
+				ruleSet, con);
 		return ruleAction;
 	}
 

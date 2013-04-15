@@ -21,23 +21,32 @@ import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 
 public class ActionProcessorFacade {
 
-	public static ActionProcessor getActionProcessor(ActionType actionType, DataSource ds,
+    public static ActionProcessor getActionProcessor(ActionType actionType, DataSource ds,
+                                                     JavaMailSenderImpl mailSender, DynamicsMetadataService itemMetadataService, RuleSetBean ruleSet,
+                                                     RuleActionRunLogDao ruleActionRunLogDao, RuleSetRuleBean ruleSetRule) throws OpenClinicaSystemException {
+        return getActionProcessor(actionType, null, ds,
+                mailSender, itemMetadataService, ruleSet,
+                ruleActionRunLogDao, ruleSetRule);
+    }
+
+	public static ActionProcessor getActionProcessor(ActionType actionType, Connection connection, DataSource ds,
 			JavaMailSenderImpl mailSender, DynamicsMetadataService itemMetadataService, RuleSetBean ruleSet,
 			RuleActionRunLogDao ruleActionRunLogDao, RuleSetRuleBean ruleSetRule) throws OpenClinicaSystemException {
 		switch (actionType) {
 		case FILE_DISCREPANCY_NOTE:
-			return new DiscrepancyNoteActionProcessor(ds, ruleActionRunLogDao, ruleSetRule);
+			return new DiscrepancyNoteActionProcessor(connection, ds, ruleActionRunLogDao, ruleSetRule);
 		case EMAIL:
-			return new EmailActionProcessor(ds, mailSender, ruleActionRunLogDao, ruleSetRule);
+			return new EmailActionProcessor(ds, mailSender, ruleActionRunLogDao, ruleSetRule, connection);
 		case SHOW:
-			return new ShowActionProcessor(ds, itemMetadataService, ruleSet);
+			return new ShowActionProcessor(ds, itemMetadataService, ruleSet, connection);
 		case HIDE:
-			return new HideActionProcessor(ds, itemMetadataService, ruleSet);
+			return new HideActionProcessor(ds, itemMetadataService, ruleSet, connection);
 		case INSERT:
-			return new InsertActionProcessor(ds, itemMetadataService, ruleActionRunLogDao, ruleSet, ruleSetRule);
+			return new InsertActionProcessor(ds, itemMetadataService, ruleActionRunLogDao, ruleSet, ruleSetRule, connection);
 		default:
 			throw new OpenClinicaSystemException("actionType", "Unrecognized action type!");
 		}

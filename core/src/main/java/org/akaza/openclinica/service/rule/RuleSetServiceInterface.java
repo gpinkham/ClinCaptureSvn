@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.service.rule;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -102,6 +103,10 @@ public interface RuleSetServiceInterface {
 	public abstract HashMap<String, ArrayList<String>> runRulesInImportData(
 			List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub,
 			ExecutionMode executionMode);
+
+    public abstract HashMap<String, ArrayList<String>> runRulesInImportData(Connection connection,
+            List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub,
+            ExecutionMode executionMode);
 
 	public abstract List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study,
 			StudyEventDefinitionBean sed, CRFVersionBean crfVersion);

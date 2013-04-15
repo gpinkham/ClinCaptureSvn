@@ -75,6 +75,11 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		super(ds);
 		setQueryNames();
 	}
+	
+	public EventCRFDAO(DataSource ds, Connection con) {
+		super(ds,con);
+		setQueryNames();
+	}
 
 	public EventCRFDAO(DataSource ds, DAODigester digester) {
 		super(ds);
@@ -124,8 +129,13 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		this.setTypeExpected(24, TypeNames.BOOL); // not_started
 
 	}
-
+	
 	public EntityBean update(EntityBean eb) {
+		Connection con = null;
+		return update(eb, con);
+	}
+
+	public EntityBean update(EntityBean eb, Connection con) {
 		EventCRFBean ecb = (EventCRFBean) eb;
 
 		ecb.setActive(false);
@@ -148,7 +158,8 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 			nullVars.put(new Integer(8), new Integer(Types.TIMESTAMP));
 			variables.put(new Integer(8), null);
 		} else {
-			variables.put(new Integer(8), new java.sql.Timestamp(ecb.getDateCompleted().getTime()));
+			variables.put(new Integer(8), new java.sql.Timestamp(ecb
+					.getDateCompleted().getTime()));
 		}
 
 		variables.put(new Integer(9), new Integer(ecb.getValidatorId()));
@@ -164,34 +175,39 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 			nullVars.put(new Integer(11), new Integer(Types.TIMESTAMP));
 			variables.put(new Integer(11), null);
 		} else {
-			variables.put(new Integer(11), new Timestamp(ecb.getDateValidateCompleted().getTime()));
+			variables.put(new Integer(11), new Timestamp(ecb
+					.getDateValidateCompleted().getTime()));
 		}
 		variables.put(new Integer(12), ecb.getValidatorAnnotations());
 		variables.put(new Integer(13), ecb.getValidateString());
 		variables.put(new Integer(14), new Integer(ecb.getStudySubjectId()));
 		variables.put(new Integer(15), new Integer(ecb.getUpdaterId()));
-		variables.put(new Integer(16), new Boolean(ecb.isElectronicSignatureStatus()));
+		variables.put(new Integer(16),
+				new Boolean(ecb.isElectronicSignatureStatus()));
 
 		variables.put(new Integer(17), new Boolean(ecb.isSdvStatus()));
 		if (ecb.getOldStatus() != null && ecb.getOldStatus().getId() > 0) {
-			variables.put(new Integer(18), new Integer(ecb.getOldStatus().getId()));
+			variables.put(new Integer(18), new Integer(ecb.getOldStatus()
+					.getId()));
 		} else {
 			variables.put(new Integer(18), new Integer(0));
 		}
 		variables.put(new Integer(19), ecb.getSdvUpdateId());
 		variables.put(new Integer(20), new Boolean(ecb.isNotStarted()));
 		variables.put(new Integer(21), new Integer(ecb.getId()));
-
-		this.execute(digester.getQuery("update"), variables, nullVars);
-
+		this.execute(digester.getQuery("update"), variables, nullVars, con);
 		if (isQuerySuccessful()) {
 			ecb.setActive(true);
 		}
 
 		return ecb;
 	}
-
+	
 	public void markComplete(EventCRFBean ecb, boolean ide) {
+		markComplete (ecb, ide, null);
+	}
+
+	public void markComplete(EventCRFBean ecb, boolean ide, Connection con) {
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(ecb.getId()));
 

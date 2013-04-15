@@ -72,7 +72,8 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 @SuppressWarnings({"rawtypes","unchecked"})
 public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface {
 	protected DataSource ds;
-
+	
+	protected Connection con;
 	protected String digesterName;
 
 	protected DAODigester digester;
@@ -124,6 +125,15 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		initializeI18nStrings();
 		setCache(SQLFactory.getInstance().getEhCacheWrapper());
 	}
+	
+	public EntityDAO(DataSource ds, Connection con) {
+		this.ds = ds;
+		this.con = con;
+		setDigesterName();
+		digester = SQLFactory.getInstance().getDigester(digesterName);
+		initializeI18nStrings();
+		setCache(SQLFactory.getInstance().getEhCacheWrapper());
+	}
 
 	/**
 	 * This is the method added to cache the queries
@@ -169,7 +179,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 		ArrayList results = new ArrayList();
 		ResultSet rs = null;
-		Connection con = null;
+		con = null;
 		Statement ps = null;
 		logger.trace("query???" + query);
 		try {
@@ -212,7 +222,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		ArrayList results = new ArrayList();
 
 		ResultSet rs = null;
-		Connection con = null;
+		con = null;
 		PreparedStatementFactory psf = new PreparedStatementFactory(variables);
 		PreparedStatement ps = null;
 
@@ -268,7 +278,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		ArrayList results = new ArrayList();
 
 		ResultSet rs = null;
-		Connection con = null;
+		con = null;
 		PreparedStatementFactory psf = new PreparedStatementFactory(variables);
 		PreparedStatement ps = null;
 
@@ -353,7 +363,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		ArrayList results = new ArrayList();
 		K key;
 		ResultSet rs = null;
-		Connection con = null;
+		con = null;
 		PreparedStatementFactory psf = new PreparedStatementFactory(variables);
 		PreparedStatement ps = null;
 
@@ -405,7 +415,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 *            updated by clinovo 12/19/2012 for #121 and other issues
 	 */
 	public void execute(String query) {
-		Connection con = null;
+		con = null;
 		execute(query, con);
 	}
 
@@ -455,7 +465,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	}
 
 	public void execute(String query, HashMap variables) {
-		Connection con = null;
+		con = null;
 		execute(query, variables, con);
 	}
 
@@ -506,7 +516,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	}
 
 	public void execute(String query, HashMap variables, HashMap nullVars) {
-		Connection con = null;
+		con = null;
 		execute(query, variables, nullVars, con);
 	}
 
@@ -564,56 +574,71 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * 
 	 * @author ywang 11-26-2007
 	 */
-	public void executeWithPK(String query, HashMap variables, HashMap nullVars) {
-		clearSignals();
+    public void executeWithPK(String query, HashMap variables, HashMap nullVars) {
+        con = null;
+        executeWithPK(query, variables, nullVars, con);
+    }
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		PreparedStatementFactory psf = new PreparedStatementFactory(variables, nullVars);
-		try {
-			con = ds.getConnection();
-			if (con.isClosed()) {
-				if (logger.isWarnEnabled())
-					logger.warn("Connection is closed: EntityDAO.execute!");
-				throw new SQLException();
-			}
-			ps = con.prepareStatement(query);
-			ps = psf.generate(ps);// enter variables here!
-			if (ps.executeUpdate() != 1) {
-				logger.warn("Problem with executing dynamic query, EntityDAO: " + query);
-				throw new SQLException();
+    public void executeWithPK(String query, HashMap variables, HashMap nullVars, Connection con) {
+        clearSignals();
 
-			} else {
-				logger.trace("Executing dynamic query, EntityDAO: " + query);
+        boolean isTrasactional = false;
+        if (con != null) {
+            isTrasactional = true;
+        }
 
-				if (getCurrentPKName == null) {
-					this.latestPK = 0;
-				}
+        PreparedStatement ps = null;
+        PreparedStatementFactory psf = new PreparedStatementFactory(variables, nullVars);
+        try {
+            if (!isTrasactional) {
+                con = ds.getConnection();
+            }
+            if (con.isClosed()) {
+                if (logger.isWarnEnabled())
+                    logger.warn("Connection is closed: EntityDAO.execute!");
+                throw new SQLException();
+            }
+            ps = con.prepareStatement(query);
+            ps = psf.generate(ps);// enter variables here!
+            if (ps.executeUpdate() != 1) {
+                logger.warn("Problem with executing dynamic query, EntityDAO: " + query);
+                throw new SQLException();
 
-				this.unsetTypeExpected();
-				this.setTypeExpected(1, TypeNames.INT);
+            } else {
+                logger.trace("Executing dynamic query, EntityDAO: " + query);
 
-				ArrayList al = select(digester.getQuery(getCurrentPKName), con);
+                if (getCurrentPKName == null) {
+                    this.latestPK = 0;
+                }
 
-				if (al.size() > 0) {
-					HashMap h = (HashMap) al.get(0);
-					this.latestPK = ((Integer) h.get("key")).intValue();
-				}
+                this.unsetTypeExpected();
+                this.setTypeExpected(1, TypeNames.INT);
 
-			}
+                ArrayList al = select(digester.getQuery(getCurrentPKName), con);
 
-		} catch (SQLException sqle) {
-			signalFailure(sqle);
-			if (logger.isWarnEnabled()) {
-				logger.warn("Exception while executing dynamic statement, EntityDAO.execute: " + query + ": "
-						+ sqle.getMessage());
-				sqle.printStackTrace();
-			}
-		} finally {
-			this.closeIfNecessary(con, ps);
-		}
-	}
+                if (al.size() > 0) {
+                    HashMap h = (HashMap) al.get(0);
+                    this.latestPK = ((Integer) h.get("key")).intValue();
+                }
 
+            }
+
+        } catch (SQLException sqle) {
+            signalFailure(sqle);
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception while executing dynamic statement, EntityDAO.execute: " + query + ": "
+                        + sqle.getMessage());
+                sqle.printStackTrace();
+            }
+        } finally {
+            if (!isTrasactional) {
+                this.closeIfNecessary(con, ps);
+            } else {
+                closePreparedStatement(ps);
+            }
+        }
+    }
+	
 	/*
 	 * Currently, latestPK is set only in executeWithPK() after inserting has been executed successfully. So, this
 	 * method should be called only immediately after executeWithPK()
@@ -1081,7 +1106,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		logger.error("sqlSubjectStudySubjectDataset=" + query);
 		ArrayList results = new ArrayList();
 		ResultSet rs = null;
-		Connection con = null;
+		con = null;
 		Statement ps = null;
 		try {
 			con = ds.getConnection();
@@ -1370,7 +1395,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		logger.error("sqlDatasetBase_itemGroupside=" + query);
 		boolean bret = false;
 		ResultSet rs = null;
-		Connection con = null;
+		con = null;
 		Statement ps = null;
 		try {
 			con = ds.getConnection();
@@ -1433,7 +1458,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		logger.error("sqlDatasetBase_eventside=" + query);
 		boolean bret = false;
 		ResultSet rs = null;
-		Connection con = null;
+		con = null;
 		Statement ps = null;
 		try {
 			con = ds.getConnection();
@@ -2768,7 +2793,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 		HashMap results = new HashMap();
 		ResultSet rs = null;
-		Connection con = null;
+		con = null;
 		Statement ps = null;
 		try {
 			con = ds.getConnection();
@@ -2889,7 +2914,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 		ArrayList results = new ArrayList();
 		ResultSet rs = null;
-		Connection con = null;
+		con = null;
 		Statement ps = null;
 		try {
 			con = ds.getConnection();
@@ -3067,7 +3092,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 		ArrayList results = new ArrayList();
 		ResultSet rs = null;
-		Connection con = null;
+		con = null;
 		Statement ps = null;
 		try {
 			con = ds.getConnection();

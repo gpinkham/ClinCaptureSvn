@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.web.job;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -45,10 +46,17 @@ import org.slf4j.LoggerFactory;
 public class CrfBusinessLogicHelper {
 
 	DataSource ds;
+	Connection con;
+	
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	public CrfBusinessLogicHelper(DataSource ds) {
 		this.ds = ds;
+	}
+	
+	public CrfBusinessLogicHelper(DataSource ds, Connection con) {
+		this.ds = ds;
+		this.con = con;
 
 	}
 
@@ -175,9 +183,13 @@ public class CrfBusinessLogicHelper {
 	 * 
 	 * @return
 	 */
-	public boolean markCRFComplete(EventCRFBean ecb, UserAccountBean ub) throws Exception {
-		EventCRFDAO eventCrfDao = new EventCRFDAO(ds);
-		ItemDataDAO itemDataDao = new ItemDataDAO(ds);
+	public void markCRFComplete(EventCRFBean ecb, UserAccountBean ub) throws Exception {
+		markCRFComplete (ecb, ub, null);
+	}
+	
+	public boolean markCRFComplete(EventCRFBean ecb, UserAccountBean ub, Connection con) throws Exception {
+		EventCRFDAO eventCrfDao = new EventCRFDAO(ds, con);
+		ItemDataDAO itemDataDao = new ItemDataDAO(ds, con);
 		StudyDAO sdao = new StudyDAO(ds);
 		StudyBean study = sdao.findByStudySubjectId(ecb.getStudySubjectId());
 		EventDefinitionCRFBean edcb = getEventDefinitionCrfByStudyEventAndCrfVersion(ecb, study);
@@ -204,10 +216,10 @@ public class CrfBusinessLogicHelper {
 
 		ecb.setStatus(newStatus);
 		ecb.setStage(newStage);
-		ecb = (EventCRFBean) eventCrfDao.update(ecb);
+		ecb = (EventCRFBean) eventCrfDao.update(ecb, con);
 		logger.debug("just updated event crf id: " + ecb.getId());
 		// note the below statement only updates the DATES, not the STATUS
-		eventCrfDao.markComplete(ecb, ide);
+		eventCrfDao.markComplete(ecb, ide, con);
 
 		// update all the items' status to complete
 		itemDataDao.updateStatusByEventCRF(ecb, newStatus);

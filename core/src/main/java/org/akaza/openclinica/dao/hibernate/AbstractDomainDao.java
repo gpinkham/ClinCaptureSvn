@@ -13,6 +13,8 @@
 
 package org.akaza.openclinica.dao.hibernate;
 
+import java.sql.Connection;
+
 import org.akaza.openclinica.domain.DomainObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -37,6 +39,13 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
 		return (T) q.uniqueResult();
 	}
 
+	@Transactional
+	public T saveOrUpdate(T domainObject, Connection con) {
+		getSessionFactory().getStatistics().logSummary();
+		getSessionForTransaction(con).saveOrUpdate(domainObject);
+		return domainObject;
+	}
+	
 	@Transactional
 	public T saveOrUpdate(T domainObject) {
 		getSessionFactory().getStatistics().logSummary();
@@ -69,6 +78,16 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
 	 */
 	protected Session getCurrentSession() {
 		return sessionFactory.getCurrentSession();
+	}
+	
+	protected Session getSessionForTransaction(Connection con) {
+		if (con != null) {
+			System.out.println("Im using my own connection");
+			return sessionFactory.openSession(con);
+		} else {
+			return sessionFactory.getCurrentSession();
+		}
+		
 	}
 
 }

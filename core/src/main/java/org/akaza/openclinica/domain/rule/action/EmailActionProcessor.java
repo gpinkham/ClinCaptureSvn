@@ -28,6 +28,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,6 +48,7 @@ public class EmailActionProcessor implements ActionProcessor {
 	JavaMailSenderImpl mailSender;
 	RuleActionRunLogDao ruleActionRunLogDao;
 	RuleSetRuleBean ruleSetRule;
+	Connection con;
 
 	public EmailActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionRunLogDao ruleActionRunLogDao,
 			RuleSetRuleBean ruleSetRule) {
@@ -54,6 +56,15 @@ public class EmailActionProcessor implements ActionProcessor {
 		this.mailSender = mailSender;
 		this.ruleSetRule = ruleSetRule;
 		this.ruleActionRunLogDao = ruleActionRunLogDao;
+	}
+	
+	public EmailActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionRunLogDao ruleActionRunLogDao,
+			RuleSetRuleBean ruleSetRule, Connection con) {
+		this.ds = ds;
+		this.mailSender = mailSender;
+		this.ruleSetRule = ruleSetRule;
+		this.ruleActionRunLogDao = ruleActionRunLogDao;
+		this.con = con;
 	}
 
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode,
@@ -69,7 +80,7 @@ public class EmailActionProcessor implements ActionProcessor {
 			sendEmail(ruleAction, ub, arg0.get("body"), arg0.get("subject"));
 			RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean,
 					itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
-			ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
+			ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog, con);
 			return null;
 		}
 		default:

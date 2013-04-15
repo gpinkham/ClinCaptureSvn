@@ -13,6 +13,8 @@
 
 package org.akaza.openclinica.domain.rule.action;
 
+import java.sql.Connection;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -28,11 +30,20 @@ public class HideActionProcessor implements ActionProcessor {
 	DataSource ds;
 	DynamicsMetadataService dynamicsMetadataService;
 	RuleSetBean ruleSet;
+	Connection con;
+	
 
 	public HideActionProcessor(DataSource ds, DynamicsMetadataService dynamicsMetadataService, RuleSetBean ruleSet) {
 		this.dynamicsMetadataService = dynamicsMetadataService;
 		this.ds = ds;
 		this.ruleSet = ruleSet;
+	}
+	
+	public HideActionProcessor(DataSource ds, DynamicsMetadataService dynamicsMetadataService, RuleSetBean ruleSet, Connection con) {
+		this.dynamicsMetadataService = dynamicsMetadataService;
+		this.ds = ds;
+		this.ruleSet = ruleSet;
+		this.con = con;
 	}
 
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode,
@@ -49,9 +60,9 @@ public class HideActionProcessor implements ActionProcessor {
 		}
 		case SAVE: {
 			if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
-				return saveAndReturnMessage(ruleAction, itemDataBean, itemData, currentStudy, ub);
+				return saveAndReturnMessage(ruleAction, itemDataBean, itemData, currentStudy, ub, con);
 			} else {
-				return save(ruleAction, itemDataBean, itemData, currentStudy, ub);
+				return save(ruleAction, itemDataBean, itemData, currentStudy, ub, con);
 			}
 		}
 		default:
@@ -60,16 +71,16 @@ public class HideActionProcessor implements ActionProcessor {
 	}
 
 	private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData,
-			StudyBean currentStudy, UserAccountBean ub) {
+			StudyBean currentStudy, UserAccountBean ub, Connection con) {
 		getDynamicsMetadataService().hideNew(itemDataBean.getId(), ((HideActionBean) ruleAction).getProperties(), ub,
-				ruleSet);
+				ruleSet, con);
 		return ruleAction;
 	}
 
 	private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData,
-			StudyBean currentStudy, UserAccountBean ub) {
+			StudyBean currentStudy, UserAccountBean ub, Connection con) {
 		getDynamicsMetadataService().hideNew(itemDataBean.getId(), ((HideActionBean) ruleAction).getProperties(), ub,
-				ruleSet);
+				ruleSet, con);
 		return ruleAction;
 	}
 

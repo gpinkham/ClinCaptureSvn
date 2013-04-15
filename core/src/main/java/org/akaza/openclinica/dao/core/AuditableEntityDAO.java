@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,7 +56,7 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 	 * </code>
 	 */
 	protected String findAllByStudyName;
-
+	
 	/**
 	 * status =1
 	 */
@@ -76,6 +77,13 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 
 	public AuditableEntityDAO(DataSource ds) {
 		super(ds);
+		setDigesterName();
+		digester = SQLFactory.getInstance().getDigester(digesterName);
+	}
+	
+	
+	public AuditableEntityDAO(DataSource ds, Connection transactionCon) {
+		super(ds, transactionCon);
 		setDigesterName();
 		digester = SQLFactory.getInstance().getDigester(digesterName);
 	}

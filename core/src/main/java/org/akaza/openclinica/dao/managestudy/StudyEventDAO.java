@@ -66,6 +66,11 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		super(ds);
 		setQueryNames();
 	}
+	
+	public StudyEventDAO(DataSource ds, Connection con) {
+		super(ds,con);
+		setQueryNames();
+	}
 
 	public StudyEventDAO(DataSource ds, DAODigester digester) {
 		super(ds);
@@ -553,36 +558,43 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		sb.setActive(false);
 
-		variables.put(Integer.valueOf(1), Integer.valueOf(sb.getStudyEventDefinitionId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(sb.getStudySubjectId()));
+		variables.put(Integer.valueOf(1),
+				Integer.valueOf(sb.getStudyEventDefinitionId()));
+		variables.put(Integer.valueOf(2),
+				Integer.valueOf(sb.getStudySubjectId()));
 		variables.put(Integer.valueOf(3), sb.getLocation());
-		variables.put(Integer.valueOf(4), Integer.valueOf(sb.getSampleOrdinal()));
-		variables.put(Integer.valueOf(5), new Timestamp(sb.getDateStarted().getTime()));
+		variables.put(Integer.valueOf(4),
+				Integer.valueOf(sb.getSampleOrdinal()));
+		variables.put(Integer.valueOf(5), new Timestamp(sb.getDateStarted()
+				.getTime()));
 		if (sb.getDateEnded() == null) {
-			nullVars.put(Integer.valueOf(6), Integer.valueOf(TypeNames.TIMESTAMP));
+			nullVars.put(Integer.valueOf(6),
+					Integer.valueOf(TypeNames.TIMESTAMP));
 			variables.put(Integer.valueOf(6), null);
 		} else {
-			variables.put(Integer.valueOf(6), new Timestamp(sb.getDateEnded().getTime()));
+			variables.put(Integer.valueOf(6), new Timestamp(sb.getDateEnded()
+					.getTime()));
 		}
-		variables.put(Integer.valueOf(7), Integer.valueOf(sb.getStatus().getId()));
+		variables.put(Integer.valueOf(7),
+				Integer.valueOf(sb.getStatus().getId()));
 		variables.put(Integer.valueOf(8), new java.util.Date());// DATE_Updated
-		variables.put(Integer.valueOf(9), Integer.valueOf(sb.getUpdater().getId()));
-		variables.put(Integer.valueOf(10), Integer.valueOf(sb.getSubjectEventStatus().getId()));
+		variables.put(Integer.valueOf(9),
+				Integer.valueOf(sb.getUpdater().getId()));
+		variables.put(Integer.valueOf(10),
+				Integer.valueOf(sb.getSubjectEventStatus().getId()));
 		variables.put(Integer.valueOf(11), sb.getStartTimeFlag()); // YW
 		// start_time_flag
 		variables.put(Integer.valueOf(12), sb.getEndTimeFlag()); // YW
 		// end_time_flag
 		variables.put(Integer.valueOf(13), sb.isWasLockedBy());
-		variables.put(Integer.valueOf(14), Integer.valueOf(sb.getPrevSubjectEventStatus().getId()));
+		variables.put(Integer.valueOf(14),
+				Integer.valueOf(sb.getPrevSubjectEventStatus().getId()));
 
 		variables.put(Integer.valueOf(15), Integer.valueOf(sb.getId()));
 
 		String sql = digester.getQuery("update");
-		if (con == null) {
-			this.execute(sql, variables, nullVars);
-		} else {
-			this.execute(sql, variables, nullVars, con);
-		}
+
+		this.execute(sql, variables, nullVars, con);
 
 		if (isQuerySuccessful()) {
 			sb.setActive(true);

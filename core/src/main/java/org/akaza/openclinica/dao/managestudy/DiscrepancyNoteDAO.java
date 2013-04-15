@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Connection;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,6 +61,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	// only applies to functions which return a single bean
 	private boolean fetchMapping = false;
 
+    private Connection connection;
+
 	/**
 	 * @return Returns the fetchMapping.
 	 */
@@ -90,6 +93,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.digester = digester;
 		setQueryNames();
 	}
+
+    public DiscrepancyNoteDAO(DataSource ds, Connection connection) {
+        super(ds);
+        this.connection = connection;
+    }
 
 	@Override
 	protected void setDigesterName() {
@@ -1520,7 +1528,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Creates a new discrepancy note
 	 */
-	public EntityBean create(EntityBean eb) {
+    public EntityBean create(EntityBean eb) {
+        return create(eb, null);
+    }
+
+	public EntityBean create(EntityBean eb, Connection connection) {
 		DiscrepancyNoteBean sb = (DiscrepancyNoteBean) eb;
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
@@ -1545,7 +1557,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			variables.put(Integer.valueOf(9), Integer.valueOf(sb.getAssignedUserId()));
 		}
 
-		this.executeWithPK(digester.getQuery("create"), variables, nullVars);
+        this.executeWithPK(digester.getQuery("create"), variables, nullVars, connection);
 		if (isQuerySuccessful()) {
 			sb.setId(getLatestPK());
 		}
@@ -1556,7 +1568,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Creates a new discrepancy note map
 	 */
-	public void createMapping(DiscrepancyNoteBean eb) {
+    public void createMapping(DiscrepancyNoteBean eb) {
+        createMapping(eb, null);
+    }
+
+	public void createMapping(DiscrepancyNoteBean eb, Connection connection) {
 		HashMap variables = new HashMap();
 		variables.put(Integer.valueOf(1), Integer.valueOf(eb.getEntityId()));
 		variables.put(Integer.valueOf(2), Integer.valueOf(eb.getId()));
@@ -1564,15 +1580,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		String entityType = eb.getEntityType();
 
 		if ("subject".equalsIgnoreCase(entityType)) {
-			this.execute(digester.getQuery("createSubjectMap"), variables);
+			this.execute(digester.getQuery("createSubjectMap"), variables, connection);
 		} else if ("studySub".equalsIgnoreCase(entityType)) {
-			this.execute(digester.getQuery("createStudySubjectMap"), variables);
+			this.execute(digester.getQuery("createStudySubjectMap"), variables, connection);
 		} else if ("eventCrf".equalsIgnoreCase(entityType)) {
-			this.execute(digester.getQuery("createEventCRFMap"), variables);
+			this.execute(digester.getQuery("createEventCRFMap"), variables, connection);
 		} else if ("studyEvent".equalsIgnoreCase(entityType)) {
-			this.execute(digester.getQuery("createStudyEventMap"), variables);
+			this.execute(digester.getQuery("createStudyEventMap"), variables, connection);
 		} else if ("itemData".equalsIgnoreCase(entityType)) {
-			this.execute(digester.getQuery("createItemDataMap"), variables);
+			this.execute(digester.getQuery("createItemDataMap"), variables, connection);
 		}
 
 	}

@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.logic.rulerunner;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,7 +59,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 	 * @return Returned RuleActionBean summary with key as groupOrdinalPLusItemOid.
 	 */
 	@Transactional
-	public HashMap<String, ArrayList<String>> runRules(List<ImportDataRuleRunnerContainer> containers, StudyBean study,
+	public HashMap<String, ArrayList<String>> runRules(Connection connection, List<ImportDataRuleRunnerContainer> containers, StudyBean study,
 			UserAccountBean ub, ExecutionMode executionMode) {
 		HashMap<String, ArrayList<String>> messageMap = new HashMap<String, ArrayList<String>>();
 
@@ -69,7 +70,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 			}
 		} else if (executionMode == ExecutionMode.SAVE) {
 			for (ImportDataRuleRunnerContainer container : containers) {
-				MessageContainer messageContainer = this.runRules(study, ub,
+				MessageContainer messageContainer = this.runRules(connection, study, ub,
 						(HashMap<String, String>) container.getVariableAndValue(),
 						container.getRuleActionContainerMap());
 				messageMap.putAll(messageContainer.getByMessageType(MessageType.ERROR));
@@ -170,7 +171,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 	}
 
 	@Transactional
-	private MessageContainer runRules(StudyBean currentStudy, UserAccountBean ub,
+	private MessageContainer runRules(Connection connection, StudyBean currentStudy, UserAccountBean ub,
 			HashMap<String, String> variableAndValue, HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted) {
 		// Copied from DataEntryRuleRunner runRules
 		MessageContainer messageContainer = new MessageContainer();
@@ -188,23 +189,24 @@ public class ImportDataRuleRunner extends RuleRunner {
 						curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction()
 								.getRuleSetRule()));
 				ActionProcessor ap = ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction()
-						.getActionType(), ds, getMailSender(), dynamicsMetadataService, ruleActionContainer
+						.getActionType(), connection, ds, getMailSender(), dynamicsMetadataService, ruleActionContainer
 						.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction()
 						.getRuleSetRule());
 
 				ItemDataBean itemData = getExpressionService().getItemDataBeanFromDb(
 						ruleActionContainer.getRuleSetBean().getTarget().getValue());
 
-				RuleActionBean rab = ap.execute(
-						RuleRunnerMode.IMPORT_DATA,
-						ExecutionMode.SAVE,
-						ruleActionContainer.getRuleAction(),
-						itemData,
-						DiscrepancyNoteBean.ITEM_DATA,
-						currentStudy,
-						ub,
-						prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction()
-								.getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
+                RuleActionBean rab = ap.execute(
+                        RuleRunnerMode.IMPORT_DATA,
+                        ExecutionMode.SAVE,
+                        ruleActionContainer.getRuleAction(),
+                        itemData,
+                        DiscrepancyNoteBean.ITEM_DATA,
+                        currentStudy,
+                        ub,
+                        prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction()
+                                .getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
+
 				if (rab != null) {
 					if (rab instanceof ShowActionBean) {
 						messageContainer.add(

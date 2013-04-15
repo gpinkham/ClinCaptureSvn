@@ -13,6 +13,8 @@
 
 package org.akaza.openclinica.domain.rule.action;
 
+import java.sql.Connection;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -32,6 +34,7 @@ public class InsertActionProcessor implements ActionProcessor {
 	RuleActionRunLogDao ruleActionRunLogDao;
 	RuleSetBean ruleSet;
 	RuleSetRuleBean ruleSetRule;
+	Connection con;
 
 	public InsertActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService,
 			RuleActionRunLogDao ruleActionRunLogDao, RuleSetBean ruleSet, RuleSetRuleBean ruleSetRule) {
@@ -40,6 +43,16 @@ public class InsertActionProcessor implements ActionProcessor {
 		this.ruleSetRule = ruleSetRule;
 		this.ruleActionRunLogDao = ruleActionRunLogDao;
 		this.ds = ds;
+	}
+	
+	public InsertActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService,
+			RuleActionRunLogDao ruleActionRunLogDao, RuleSetBean ruleSet, RuleSetRuleBean ruleSetRule, Connection con) {
+		this.itemMetadataService = itemMetadataService;
+		this.ruleSet = ruleSet;
+		this.ruleSetRule = ruleSetRule;
+		this.ruleActionRunLogDao = ruleActionRunLogDao;
+		this.ds = ds;
+		this.con = con;
 	}
 
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode,
@@ -56,9 +69,9 @@ public class InsertActionProcessor implements ActionProcessor {
 		}
 		case SAVE: {
 			if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
-				save(ruleAction, itemDataBean, itemData, currentStudy, ub);
+				save(ruleAction, itemDataBean, itemData, currentStudy, ub, con);
 			} else {
-				save(ruleAction, itemDataBean, itemData, currentStudy, ub);
+				save(ruleAction, itemDataBean, itemData, currentStudy, ub, con);
 			}
 		}
 		default:
@@ -67,14 +80,14 @@ public class InsertActionProcessor implements ActionProcessor {
 	}
 
 	private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData,
-			StudyBean currentStudy, UserAccountBean ub) {
+			StudyBean currentStudy, UserAccountBean ub, Connection con) {
 		getItemMetadataService().insert(itemDataBean.getId(), ((InsertActionBean) ruleAction).getProperties(), ub,
-				ruleSet);
+				ruleSet, con);
 		RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean,
 				itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
 		if (ruleActionRunLogDao.findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
 		} else {
-			ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
+			ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog, con);
 		}
 		return null;
 	}

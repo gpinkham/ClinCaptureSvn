@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.service.crfdata;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -486,7 +487,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 	}
 
-	public void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet) {
+	public void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet, Connection con) {
 		ItemDataBean itemDataBeanA = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
 		EventCRFBean eventCrfBeanA = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBeanA.getEventCRFId());
 		StudyEventBean studyEventBeanA = (StudyEventBean) getStudyEventDAO().findByPK(eventCrfBeanA.getStudyEventId());
@@ -546,7 +547,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 				ItemDataBean oidBasedItemData = oneToOne(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA,
 						itemBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub, 1);
 				oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
-				getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+				getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
 			}
 			// If A is not repeating group & B is a repeating group with no index selected
 			if (!isGroupARepeating && isGroupBRepeating && itemGroupBOrdinal.equals("")) {
@@ -554,7 +555,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 						itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub);
 				for (ItemDataBean oidBasedItemData : oidBasedItemDatas) {
 					oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
-					getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+					getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
 				}
 			}
 			// If A is not repeating group & B is a repeating group with index selected
@@ -563,14 +564,14 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 						itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub,
 						Integer.valueOf(itemGroupBOrdinal));
 				oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
-				getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+				getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
 			}
 			// If A is repeating/ non repeating group & B is a repeating group with index selected as END
 			if (isGroupBRepeating && itemGroupBOrdinal.equals("END")) {
 				ItemDataBean oidBasedItemData = oneToEndMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA,
 						itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub);
 				oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
-				getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+				getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
 			}
 			// If A is repeating group with index & B is a repeating group with index selected
 			if (isGroupARepeating && isGroupBRepeating && !itemGroupBOrdinal.equals("")
@@ -579,7 +580,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 						itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub,
 						Integer.valueOf(itemGroupBOrdinal));
 				oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
-				getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+				getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
 			}
 			// If A is repeating group with index & B is a repeating group with no index selected
 			if (isGroupARepeating && isGroupBRepeating && itemGroupBOrdinal.equals("")) {
@@ -587,7 +588,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 						itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub,
 						Integer.valueOf(itemGroupAOrdinal));
 				oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
-				getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+				getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd", con);
 			}
 
 		}
@@ -598,7 +599,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 	}
 
-	public void hideNew(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet) {
+	public void hideNew(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet, Connection con) {
 		ItemDataBean itemDataBeanA = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
 		EventCRFBean eventCrfBeanA = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBeanA.getEventCRFId());
 		ItemGroupMetadataBean itemGroupMetadataBeanA = (ItemGroupMetadataBean) getItemGroupMetadataDAO()
@@ -669,7 +670,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 							&& oidBasedItemData.getValue().equals("")) {
 						// tbh #5287: add an additional check here to see if it should be hidden
 						dynamicsMetadataBean.setShowItem(false);
-						getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
+						getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean, con);
 					}
 				}
 			}
@@ -695,11 +696,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 								hideGroup(itemGroupMetadataBean, eventCrfBeanA);
 							} else if (dynamicsGroupBean != null && !dynamicsGroupBean.isShowGroup()) {
 								dynamicsGroupBean.setShowGroup(false);
-								getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean);
+								getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean, con);
 								// TODO is below required in hide?
 							} else if (eventCrfBeanA.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
 								dynamicsGroupBean.setPassedDde(1);// setVersion(1); // version 1 = passed DDE
-								getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean);
+								getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean, con);
 							}
 						}
 					}
@@ -708,7 +709,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		}
 	}
 
-	public void showNew(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet) {
+	public void showNew(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet, Connection con) {
 		ItemDataBean itemDataBeanA = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
 		EventCRFBean eventCrfBeanA = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBeanA.getEventCRFId());
 		ItemGroupMetadataBean itemGroupMetadataBeanA = (ItemGroupMetadataBean) getItemGroupMetadataDAO()
@@ -778,14 +779,14 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 						// itemsAlreadyShown.add(new Integer(oidBasedItemData.getId()));
 					} else if (dynamicsMetadataBean != null && !dynamicsMetadataBean.isShowItem()) {
 						dynamicsMetadataBean.setShowItem(true);
-						getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
+						getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean, con);
 						// itemsAlreadyShown.add(new Integer(oidBasedItemData.getId()));
 					} else if (eventCrfBeanA.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
 						logger.debug("hit DDE here: idb " + oidBasedItemData.getId());
 						// need a guard clause to guarantee DDE
 						// if we get there, it means that we've hit DDE and the bean exists
 						dynamicsMetadataBean.setPassedDde(1);// setVersion(1);// version 1 = passed DDE
-						getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
+						getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean, con);
 					}
 				}
 
@@ -810,10 +811,10 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 								showGroup(itemGroupMetadataBean, eventCrfBeanA);
 							} else if (dynamicsGroupBean != null && !dynamicsGroupBean.isShowGroup()) {
 								dynamicsGroupBean.setShowGroup(true);
-								getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean);
+								getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean, con);
 							} else if (eventCrfBeanA.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
 								dynamicsGroupBean.setPassedDde(1);// setVersion(1); // version 1 = passed DDE
-								getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean);
+								getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean, con);
 							}
 						}
 					}

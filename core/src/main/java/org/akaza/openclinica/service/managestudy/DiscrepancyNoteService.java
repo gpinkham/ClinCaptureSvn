@@ -27,6 +27,8 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 
+import java.sql.Connection;
+
 /**
  * I am not really the author but I wanted to commit this code for an example with Jenkins.
  * 
@@ -42,22 +44,31 @@ public class DiscrepancyNoteService implements IDiscrepancyNoteService {
 		this.ds = ds;
 	}
 
-	public void saveFieldNotes(String description, int entityId, String entityType, StudyBean sb, UserAccountBean ub,
+    public void saveFieldNotes(String description, int entityId, String entityType, StudyBean sb, UserAccountBean ub,
+                               boolean assignToUser) {
+        saveFieldNotes(description, entityId, entityType, null, sb, ub, assignToUser);
+    }
+
+	public void saveFieldNotes(String description, int entityId, String entityType, Connection connection, StudyBean sb, UserAccountBean ub,
 			boolean assignToUser) {
 		// Create a new thread each time
-		DiscrepancyNoteBean parent = createDiscrepancyNoteBean(description, entityId, entityType, sb, ub, null,
+		DiscrepancyNoteBean parent = createDiscrepancyNoteBean(description, entityId, entityType, connection, sb, ub, null,
 				assignToUser);
-		createDiscrepancyNoteBean(description, entityId, entityType, sb, ub, parent.getId(), assignToUser);
+		createDiscrepancyNoteBean(description, entityId, entityType, connection, sb, ub, parent.getId(), assignToUser);
 	}
 
-	public void saveFieldNotes(String description, int entityId, String entityType, StudyBean sb, UserAccountBean ub) {
+    public void saveFieldNotes(String description, int entityId, String entityType, StudyBean sb, UserAccountBean ub) {
+        saveFieldNotes(description, entityId, entityType, null, sb, ub);
+    }
+
+    public void saveFieldNotes(String description, int entityId, String entityType, Connection connection, StudyBean sb, UserAccountBean ub) {
 		// Create a new thread each time
-		DiscrepancyNoteBean parent = createDiscrepancyNoteBean(description, entityId, entityType, sb, ub, null, false);
-		createDiscrepancyNoteBean(description, entityId, entityType, sb, ub, parent.getId(), false);
+		DiscrepancyNoteBean parent = createDiscrepancyNoteBean(description, entityId, entityType, connection, sb, ub, null, false);
+		createDiscrepancyNoteBean(description, entityId, entityType, connection, sb, ub, parent.getId(), false);
 	}
 
 	private DiscrepancyNoteBean createDiscrepancyNoteBean(String description, int entityId, String entityType,
-			StudyBean sb, UserAccountBean ub, Integer parentId, boolean assignToUser) {
+			Connection connection, StudyBean sb, UserAccountBean ub, Integer parentId, boolean assignToUser) {
 
 		DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
 		dnb.setEntityId(entityId);
@@ -75,8 +86,8 @@ public class DiscrepancyNoteService implements IDiscrepancyNoteService {
 		if (parentId != null) {
 			dnb.setParentDnId(parentId);
 		}
-		dnb = (DiscrepancyNoteBean) getDiscrepancyNoteDao().create(dnb);
-		getDiscrepancyNoteDao().createMapping(dnb);
+		dnb = (DiscrepancyNoteBean) getDiscrepancyNoteDao().create(dnb, connection);
+		getDiscrepancyNoteDao().createMapping(dnb, connection);
 		return dnb;
 	}
 

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.sql.Connection;
 import java.text.SimpleDateFormat;
 
 import javax.sql.DataSource;
@@ -75,6 +76,11 @@ public class ItemDataDAO extends AuditableEntityDAO {
 			this.locale = ResourceBundleProvider.getLocale(); // locale still might be null.
 		}
 	}
+	
+	public ItemDataDAO(DataSource ds, Connection con) {
+		super(ds, con);
+		setQueryNames();
+	}
 
 	public ItemDataDAO(DataSource ds, Locale locale) {
 		super(ds);
@@ -123,15 +129,21 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(10, TypeNames.INT);// ordinal
 		this.setTypeExpected(11, TypeNames.INT);// ordinal
 	}
-
+	
 	public EntityBean update(EntityBean eb) {
+		Connection con = null;
+		return update(eb, con);
+	}
+	
+	public EntityBean update(EntityBean eb, Connection con) {
 		ItemDataBean idb = (ItemDataBean) eb;
 
 		// Convert to oc_date_format_string pattern before
 		// inserting into database
 		ItemDataType dataType = getDataType(idb.getItemId());
 		if (dataType.equals(ItemDataType.DATE)) {
-			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+			idb.setValue(Utils.convertedItemDateValue(idb.getValue(),
+					local_df_string, oc_df_string));
 		} else if (dataType.equals(ItemDataType.PDATE)) {
 			idb.setValue(formatPDate(idb.getValue()));
 		}
@@ -147,14 +159,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		variables.put(new Integer(6), new Integer(idb.getOrdinal()));
 		variables.put(new Integer(7), new Integer(idb.getOldStatus().getId()));
 		variables.put(new Integer(8), new Integer(idb.getId()));
-		this.execute(digester.getQuery("update"), variables);
-
+		this.execute(digester.getQuery("update"), variables, con);
 		if (isQuerySuccessful()) {
 			idb.setActive(true);
 		}
 
 		return idb;
 	}
+	
 
 	/**
 	 * This will update item data value
@@ -243,6 +255,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	 * @return
 	 */
 	public EntityBean updateValue(EntityBean eb, String current_df_string) {
+		return updateValue(eb, current_df_string, null);
+	}
+	
+	public EntityBean updateValue(EntityBean eb, String current_df_string, Connection con) {
 		ItemDataBean idb = (ItemDataBean) eb;
 
 		// Convert to oc_date_format_string pattern before
@@ -256,7 +272,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		variables.put(new Integer(2), idb.getValue());
 		variables.put(new Integer(3), new Integer(idb.getUpdaterId()));
 		variables.put(new Integer(4), new Integer(idb.getId()));
-		this.execute(digester.getQuery("updateValue"), variables);
+		this.execute(digester.getQuery("updateValue"), variables, con);
 
 		if (isQuerySuccessful()) {
 			idb.setActive(true);
@@ -281,14 +297,20 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 		return idb;
 	}
-
+	
 	public EntityBean create(EntityBean eb) {
+		Connection con = null;
+		return create(eb, con);
+	}
+
+	public EntityBean create(EntityBean eb, Connection con) {
 		ItemDataBean idb = (ItemDataBean) eb;
 		// Convert to oc_date_format_string pattern before
 		// inserting into database
 		ItemDataType dataType = getDataType(idb.getItemId());
 		if (dataType.equals(ItemDataType.DATE)) {
-			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+			idb.setValue(Utils.convertedItemDateValue(idb.getValue(),
+					local_df_string, oc_df_string));
 		} else if (dataType.equals(ItemDataType.PDATE)) {
 			idb.setValue(formatPDate(idb.getValue()));
 		}
@@ -303,15 +325,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		variables.put(new Integer(6), new Integer(idb.getOwnerId()));
 		variables.put(new Integer(7), new Integer(idb.getOrdinal()));
 		variables.put(new Integer(8), new Integer(idb.getStatus().getId()));
-		this.execute(digester.getQuery("create"), variables);
-
+		this.execute(digester.getQuery("create"), variables, con);
 		if (isQuerySuccessful()) {
 			idb.setId(id);
 		}
 
 		return idb;
 	}
-
+	
 	public EntityBean upsert(EntityBean eb) {
 		ItemDataBean idb = (ItemDataBean) eb;
 		// Convert to oc_date_format_string pattern before
@@ -583,15 +604,21 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		ArrayList<ItemDataBean> itemDataBeans = this.executeFindAllQuery("findAllByEventCRFIdAndItemName", variables);
 		return !itemDataBeans.isEmpty() && itemDataBeans.size() == 1 ? itemDataBeans.get(0) : null;
 	}
-
+	
 	public void updateStatusByEventCRF(EventCRFBean eventCRF, Status s) {
+		Connection con = null;
+		updateStatusByEventCRF(eventCRF, s, con);
+	}
+
+	public void updateStatusByEventCRF(EventCRFBean eventCRF, Status s,
+			Connection con) {
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 		variables.put(new Integer(1), new Integer(s.getId()));
 		variables.put(new Integer(2), new Integer(eventCRF.getId()));
 
 		String sql = digester.getQuery("updateStatusByEventCRF");
-		execute(sql, variables);
 
+		execute(sql, variables, con);
 		return;
 	}
 
