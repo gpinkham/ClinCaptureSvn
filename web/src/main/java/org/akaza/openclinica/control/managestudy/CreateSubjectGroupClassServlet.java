@@ -81,6 +81,7 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 			}
 			StudyGroupClassBean group = new StudyGroupClassBean();
 			request.setAttribute("groupTypes", GroupClassType.toArrayList());
+			
 			session.setAttribute("group", group);
 			session.setAttribute("studyGroups", studyGroups);
 			forwardPage(Page.CREATE_SUBJECT_GROUP_CLASS);

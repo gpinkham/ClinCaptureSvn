@@ -4,7 +4,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<c:set var="dteFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.ArchivedDatasetFileRow" />
@@ -12,7 +12,7 @@
 	<td class="table_cell_left"><c:out value="${currRow.bean.name}" /></td>
 	<td class="table_cell"><c:out value="${currRow.bean.runTime}" /></td>
 	<td class="table_cell"><c:out value="${currRow.bean.fileSize}" /></td>
-	<td class="table_cell"><fmt:formatDate value="${currRow.bean.dateCreated}"/></td>
+	<td class="table_cell"><fmt:formatDate value="${currRow.bean.dateCreated}" pattern="${dtetmeFormat}"/></td>
 	<td class="table_cell"><c:out value="${currRow.bean.owner.name}" /></td>
     <td class="table_cell">
         <a target="_new" href="AccessFile?fileId=<c:out value="${currRow.bean.id}"/>">

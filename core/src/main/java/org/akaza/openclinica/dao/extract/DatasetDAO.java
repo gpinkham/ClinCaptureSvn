@@ -98,8 +98,8 @@ public class DatasetDAO extends AuditableEntityDAO {
 		// 08-21-2007, datatype
 		// changed to Timestamp
 		this.setTypeExpected(9, TypeNames.TIMESTAMP);// date end
-		this.setTypeExpected(10, TypeNames.DATE);// created
-		this.setTypeExpected(11, TypeNames.DATE);// updated
+		this.setTypeExpected(10, TypeNames.TIMESTAMP);// created
+		this.setTypeExpected(11, TypeNames.TIMESTAMP);// updated
 		this.setTypeExpected(12, TypeNames.DATE);// last run
 		this.setTypeExpected(13, TypeNames.INT);// owner id
 		this.setTypeExpected(14, TypeNames.INT);// approver id

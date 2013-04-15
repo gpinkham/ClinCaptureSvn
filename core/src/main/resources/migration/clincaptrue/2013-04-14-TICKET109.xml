@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="skirpichenok" id="2013-04-14-TICKET109-01">
+        <comment>the update for ticket #109</comment>
+        <update tableName="group_class_types">
+            <column name="group_class_type_id" value="5"/>
+            <where>name='Other'</where>
+        </update>
+        <insert tableName="group_class_types">
+            <column name="group_class_type_id" value="4"/>
+            <column name="name" value="Dynamic Visits"/>
+        </insert>
+        <createTable tableName="dynamic_event">
+            <column autoIncrement="true" name="dynamic_event_id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="study_group_class_id" type="INT"/>
+            <column name="study_event_definition_id" type="INT"/>
+            <column name="study_id" type="INT"/>
+            <column name="ordinal" type="INT"/>
+            <column name="owner_id" type="INT"/>
+            <column name="update_id" type="INT"/>
+            <column name="date_created" type="java.sql.Types.DATE"/>
+            <column name="date_updated" type="java.sql.Types.DATE"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(2048)"/>
+            <column name="is_default" type="BOOLEAN" defaultValue="0"/>
+        </createTable>
+        <addColumn tableName="study_event" >
+            <column name="dynamic_event_id" type="INT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2013-04-14-TICKET109-02" dbms="oracle">
+        <comment>the update for ticket #109</comment>
+        <createSequence sequenceName="DYNAMIC_EVENT_ID_SEQ"/>
+        <sql splitStatements="false">
+            create or replace trigger dynamic_event_bef_trg
+                before insert on dynamic_event
+                    for each row begin
+                        if :new.id is null
+                          then select DYNAMIC_EVENT_ID_SEQ.nextval into :new.id from dual;
+                        end if;
+                    end;
+        </sql>
+        <rollback>
+            drop trigger dynamic_event_bef_trg;
+            drop sequence DYNAMIC_EVENT_ID_SEQ;
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

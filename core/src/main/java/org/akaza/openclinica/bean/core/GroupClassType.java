@@ -32,15 +32,18 @@ import java.util.List;
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class GroupClassType extends Term {
 	public static final GroupClassType INVALID = new GroupClassType(0, "invalid");
+	
 	public static final GroupClassType ARM = new GroupClassType(1, "Arm");
 
 	public static final GroupClassType FAMILY = new GroupClassType(2, "Family/Pedigree");
 
 	public static final GroupClassType DEMOGRAPHIC = new GroupClassType(3, "Demographic");
+	
+	public static final GroupClassType DYNAMIC = new GroupClassType(4, "Dynamic_Visit");
 
-	public static final GroupClassType OTHER = new GroupClassType(4, "Other");
+	public static final GroupClassType OTHER = new GroupClassType(5, "Other");
 
-	private static final GroupClassType[] members = { ARM, FAMILY, DEMOGRAPHIC, OTHER };
+	private static final GroupClassType[] members = { ARM, FAMILY, DEMOGRAPHIC, DYNAMIC, OTHER };
 
 	public static final List list = Arrays.asList(members);
 

@@ -77,7 +77,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
 		this.setTypeExpected(5, TypeNames.STRING);// file_reference
 		this.setTypeExpected(6, TypeNames.INT);// run_time
 		this.setTypeExpected(7, TypeNames.INT);// file_size
-		this.setTypeExpected(8, TypeNames.DATE);// date_created
+		this.setTypeExpected(8, TypeNames.TIMESTAMP);// date_created
 		this.setTypeExpected(9, TypeNames.INT);// owner id
 	}
 

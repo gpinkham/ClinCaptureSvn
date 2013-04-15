@@ -36,6 +36,7 @@ public class GroupClassTypeTest {
 	private static final String FAMILY_KEY = "Family/Pedigree";
 	private static final String DEMOGRAPHIC_KEY = "Demographic";
 	private static final String OTHER_KEY = "Other";
+	private static final String DYNAMIC_KEY = "Dynamic_Visit";
 	private static final String WRONG_KEY = "Monitor";
 
 	@Before
@@ -81,10 +82,10 @@ public class GroupClassTypeTest {
 
 	@Test
 	public void testOther() {
-		groupClassType = GroupClassType.get(4);
-		assertEquals(4, groupClassType.getId());
+		groupClassType = GroupClassType.get(5);
+		assertEquals(5, groupClassType.getId());
 		assertEquals(groupClassType, GroupClassType.OTHER);
-		assertEquals(resterm.getString(OTHER_KEY), groupClassType.getName());
+		assertEquals(OTHER_KEY, groupClassType.getName());
 	}
 
 	@Test
@@ -105,12 +106,12 @@ public class GroupClassTypeTest {
 
 	@Test
 	public void testGetInactive() {
-		groupClassType = GroupClassType.get(4);
+		groupClassType = GroupClassType.get(5);
 		assertEquals(groupClassType, GroupClassType.OTHER);
 		assertTrue(groupClassType.isActive());
 
 		groupClassType.setActive(false);
-		groupClassType = GroupClassType.get(4);
+		groupClassType = GroupClassType.get(5);
 		assertEquals(groupClassType, GroupClassType.INVALID);
 		groupClassType.setActive(true);
 	}
