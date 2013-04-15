@@ -121,6 +121,11 @@
           
           
           </td>
+          <c:if test="${userBean.name != version.owner.name && userRole.manageStudy && userBean.sysAdmin && module !='admin' && version.status.name != 'removed' && version.status.name != 'auto-removed'}">
+          	<td>
+          		<img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6">
+          	</td>
+		  </c:if>
           <c:if test="${version.status.available && userBean.sysAdmin && module=='admin'}">
               <td><a href="LockCRFVersion?module=<c:out value="${module}"/>&id=<c:out value="${version.id}"/>"
                 onMouseDown="javascript:setImage('bt_Lock1','images/bt_Lock_d.gif');"
