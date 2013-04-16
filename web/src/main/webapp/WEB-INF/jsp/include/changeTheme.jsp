@@ -182,7 +182,7 @@
 			var newSrc = jjq(this).attr('src');
 			var greenCheck = "/green/";
 			var transparent = "Transparent";
-				if(newSrc.indexOf(violetCheck) == -1 && newSrc.indexOf(transparent) == -1){
+				if(newSrc.indexOf(greenCheck) == -1 && newSrc.indexOf(transparent) == -1){
 				newSrc = newSrc.replace('images/','images/green/');
 				jjq(this).attr('src', newSrc);
 			} 
