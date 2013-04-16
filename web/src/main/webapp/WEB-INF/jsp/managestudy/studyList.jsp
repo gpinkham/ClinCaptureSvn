@@ -54,7 +54,7 @@
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
-	<input type="button" onclick="location.href = '${contextPath}/CreateStudy'"  name="create_study" value="<fmt:message key="create_study" bundle="${resword}"/>" class="button_medium"/>
+		<input type="button" onclick="location.href = '${pageContext.request.contextPath}/CreateStudy'"  name="create_study" value="<fmt:message key="create_study" bundle="${resword}"/>" class="button_medium"/>
 
 <br><br>
 
