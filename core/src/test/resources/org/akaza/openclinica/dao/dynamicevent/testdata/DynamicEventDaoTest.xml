@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <dynamic_event
+            dynamic_event_id="1"
+            study_group_class_id="1"
+            study_event_definition_id="1"
+            study_id="1"
+            ordinal="1"
+            owner_id="1"
+            update_id="1"
+            date_created="2008-07-02"
+            date_updated="2008-07-02"
+            name="dynamic event 1"
+            description="test dynamic event 1"
+            is_default="true"/>
+</dataset>

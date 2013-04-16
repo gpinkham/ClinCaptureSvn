@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<queries>
+    <query>
+        <name>findByPK</name>
+        <sql>SELECT * FROM DYNAMIC_EVENT WHERE
+            DYNAMIC_EVENT_ID = ?</sql>
+    </query>
+    <query>
+        <name>findAll</name>
+        <sql>SELECT * FROM DYNAMIC_EVENT</sql>
+    </query>
+    <query>
+        <name>create</name>
+        <sql>INSERT INTO DYNAMIC_EVENT (STUDY_GROUP_CLASS_ID, STUDY_EVENT_DEFINITION_ID,
+            STUDY_ID, ORDINAL, OWNER_ID, DATE_CREATED,
+            NAME, DESCRIPTION, IS_DEFAULT)
+            VALUES (?,?,?,?,?,sysdate,?,?,?)</sql>
+    </query>
+    <query>
+        <name>update</name>
+        <sql>UPDATE DYNAMIC_EVENT SET STUDY_GROUP_CLASS_ID=?, STUDY_EVENT_DEFINITION_ID=?,
+            STUDY_ID=?, ORDINAL=?, UPDATE_ID=?, DATE_UPDATED=sysdate,
+            NAME=?, DESCRIPTION=?, IS_DEFAULT=?
+            WHERE DYNAMIC_EVENT_ID=?</sql>
+    </query>
+</queries>

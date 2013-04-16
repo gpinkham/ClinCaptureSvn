@@ -20,15 +20,15 @@
  */
 package org.akaza.openclinica.bean.managestudy;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 
-import java.util.ArrayList;
-import java.util.Date;
-
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings({ "rawtypes", "serial" })
 public class StudyEventBean extends AuditableEntityBean {
 	// STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID
 	// LOCATION SAMPLE_ORDINAL DATE_START DATE_END
@@ -74,6 +74,20 @@ public class StudyEventBean extends AuditableEntityBean {
 
 	private boolean startTimeFlag = false;
 	private boolean endTimeFlag = false;
+
+	private int dynamicEventId;
+
+	public int getDynamicEventId() {
+		return dynamicEventId;
+	}
+
+	public void setDynamicEventId(int dynamicEventId) {
+		this.dynamicEventId = dynamicEventId;
+	}
+
+	public boolean isDynamic() {
+		return dynamicEventId > 0;
+	}
 
 	// For display discrepancy notes in a matrix-type study/event grid; 5/2/2008
 	private ArrayList<DiscrepancyNoteBean> discBeanList = new ArrayList<DiscrepancyNoteBean>();

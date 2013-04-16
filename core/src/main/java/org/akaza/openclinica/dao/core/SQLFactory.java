@@ -60,6 +60,7 @@ public class SQLFactory {
 	public final String DAO_AUDITEVENT = "audit_event";
 	public final String DAO_AUDIT = "audit";
 	public final String DAO_DATAVIEW = "dataview_dao";
+	public final String DAO_DYNAMIC_EVENT = "dynamic_event";
 	public final String DAO_ITEM = "item";
 	public final String DAO_ITEMDATA = "item_data";
 	public final String DAO_ITEMFORMMETADATA = "item_form_metadata";
@@ -166,6 +167,7 @@ public class SQLFactory {
 			fileList.put(this.DAO_EVENTDEFINITIONCRF, "oracle_event_definition_crf_dao.xml");
 			fileList.put(this.DAO_AUDITEVENT, "oracle_audit_event_dao.xml");
 			fileList.put(this.DAO_AUDIT, "oracle_audit_dao.xml");
+            fileList.put(this.DAO_DYNAMIC_EVENT, "oracle_dynamic_event_dao.xml");
 			fileList.put(this.DAO_ITEM, "oracle_item_dao.xml");
 			fileList.put(this.DAO_ITEMDATA, "oracle_itemdata_dao.xml");
 			fileList.put(this.DAO_CRF, "oracle_crf_dao.xml");
@@ -202,6 +204,7 @@ public class SQLFactory {
 			fileList.put(this.DAO_EVENTDEFINITIONCRF, "event_definition_crf_dao.xml");
 			fileList.put(this.DAO_AUDITEVENT, "audit_event_dao.xml");
 			fileList.put(this.DAO_AUDIT, "audit_dao.xml");
+            fileList.put(this.DAO_DYNAMIC_EVENT, "dynamic_event_dao.xml");
 			fileList.put(this.DAO_ITEM, "item_dao.xml");
 			fileList.put(this.DAO_ITEMDATA, "itemdata_dao.xml");
 			fileList.put(this.DAO_CRF, "crf_dao.xml");
