@@ -11,7 +11,7 @@ public class Navigation {
 	
 	//"skip!"-set of pages, non pop-ups
 	private static Set<String> exclusionURLs = new HashSet<String>(Arrays.asList("/PageToCreateNewStudyEvent",
-			"/CRFListForStudyEvent", "/InitialDataEntry", "/PrintSubjectCaseBook", 
+			"/CRFListForStudyEvent", "/InitialDataEntry", 
 			"/AdministrativeEditing", "/UpdateStudySubject", "/RemoveStudySubject", "/ResolveDiscrepancy", 
 			"/RestoreStudySubject", "/UpdateStudyEvent", "/RemoveStudyEvent", "/RestoreStudyEvent", 
 			"/DeleteEventCRF", "/RemoveEventCRF", "/RestoreEventCRF", "/CreateOneDiscrepancyNote",
@@ -29,7 +29,8 @@ public class Navigation {
 			"/ViewRulesAssignment", "/DownloadRuleSetXml", "/UpdateRuleSetRule", "/pages/handleSDVGet",
 			"/DownloadVersionSpreadSheet", "/PrintAllSiteEventCRF", "/DeleteUser", "/UnLockUser",
 			"/DeleteStudyUserRole", "/PauseJob", "/SelectItems", "/CreateDiscrepancyNote", 
-			"/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile", "/help"));
+			"/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile", "/help",
+			"/PrintSubjectCaseBook"));
 	private static String defaultShortURL = "/MainMenu";		
 	
 	/*
