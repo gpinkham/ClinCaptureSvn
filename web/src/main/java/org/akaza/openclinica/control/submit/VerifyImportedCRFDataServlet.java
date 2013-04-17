@@ -64,7 +64,6 @@ import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
-import org.akaza.openclinica.web.job.ImportSpringJob;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.

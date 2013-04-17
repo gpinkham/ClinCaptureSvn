@@ -19,8 +19,6 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 
-import java.sql.Connection;
-
 public interface ActionProcessor {
 
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode,

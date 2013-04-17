@@ -61,9 +61,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	// only applies to functions which return a single bean
 	private boolean fetchMapping = false;
 
-    private Connection connection;
-
-	/**
+    /**
 	 * @return Returns the fetchMapping.
 	 */
 	public boolean isFetchMapping() {
@@ -96,7 +94,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
     public DiscrepancyNoteDAO(DataSource ds, Connection connection) {
         super(ds);
-        this.connection = connection;
     }
 
 	@Override
