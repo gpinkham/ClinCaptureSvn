@@ -468,31 +468,42 @@
 			</div>
 			</div>
 			<br />
+			
+			
+<form action="VerifyImportedCRFData?action=save" method="POST">
 
-			<form action="VerifyImportedCRFData?action=save" method="POST">
-
-			<input type="hidden" name="crfId"
-				value="<c:out value="${version.crfId}"/>"> <c:set
-				var="overwriteCount" value="${0}" /> <c:forEach
-				var="displayItemBeanWrapper" items="${importedData}">
-				<c:if test="${displayItemBeanWrapper.overwrite}">
-					<c:set var="overwriteCount" value="${overwriteCount + 1}" />
-				</c:if>
-			</c:forEach> <c:if test="${overwriteCount == 0}">
-				<input type="submit"
-					value="<fmt:message key="continue" bundle="${resword}"/>"
-					class="button_long">
-			</c:if> <c:if test="${overwriteCount > 0 }">
+	<input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>"> 
+	<c:set var="overwriteCount" value="${0}" /> 
+	<c:forEach
+		var="displayItemBeanWrapper" items="${importedData}">
+		<c:if test="${displayItemBeanWrapper.overwrite}">
+			<c:set var="overwriteCount" value="${overwriteCount + 1}" />
+		</c:if>
+	</c:forEach> 			
+			 
+	<table>
+		<td>
+			<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+					value="<fmt:message key="back" bundle="${resword}"/>"
+					class="button_medium"
+					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />		
+		</td>
+		<td>
+			<c:if test="${overwriteCount == 0}">
+				<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
+			</c:if> 
+			<c:if test="${overwriteCount > 0 }">
 				<input type="submit"
 					value="<fmt:message key="continue" bundle="${resword}"/>"
 					class="button_long" onClick="return checkOverwriteStatus();">
-			</c:if></form>
-
+			</c:if>	
+		</td>
 			<%-- added an alert above --%>
-
-			<form action="ListStudySubjects"><input type="submit"
-				value="<fmt:message key="cancel" bundle="${resword}"/>"
-				class="button_long"></form>
+		<td>
+			<input id="Cancel" class="button_long" type="button" name="BTN_Cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="window.location.href=('ListStudySubjects');"/>
+		</td>	
+	</table>
+</form>				
 			<%-- end of the other loop --%>
 	</c:otherwise>
 </c:choose>

@@ -11,7 +11,7 @@ public class Navigation {
 	
 	//"skip!"-set of pages, non pop-ups
 	private static Set<String> exclusionURLs = new HashSet<String>(Arrays.asList("/PageToCreateNewStudyEvent",
-			"/CRFListForStudyEvent", "/InitialDataEntry", 
+			"/CRFListForStudyEvent", "/InitialDataEntry", "/VerifyImportedCRFData",
 			"/AdministrativeEditing", "/UpdateStudySubject", "/RemoveStudySubject", "/ResolveDiscrepancy", 
 			"/RestoreStudySubject", "/UpdateStudyEvent", "/RemoveStudyEvent", "/RestoreStudyEvent", 
 			"/DeleteEventCRF", "/RemoveEventCRF", "/RestoreEventCRF", "/CreateOneDiscrepancyNote",
@@ -22,7 +22,7 @@ public class Navigation {
 			"/Configure", "/CreateUserAccount", "/UpdateJobImport", "/CreateJobExport", "/CreateJobImport",
 			"/UpdateProfile", "/RemoveDataset", "/LockStudySubject", "/pages/extract",
 			"/CreateNewStudyEvent", "/UpdateSubject"));
-	//ignored-set of pages, pop-ups
+	//ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
 			"/ViewItemDetail", "/PrintCRF", "/ChangeDefinitionOrdinal", "/PrintEventCRF",
