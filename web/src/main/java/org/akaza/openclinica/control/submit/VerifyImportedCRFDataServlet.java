@@ -183,9 +183,12 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 
 				// setup ruleSets to run if applicable
 				RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) SpringServletAccess
-						.getApplicationContext(context).getBean("ruleSetService");
+						.getApplicationContext(context).getBean(
+								"ruleSetService");
 				logger.debug("=== about to generate rule containers ===");
-				List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(con, sm.getDataSource(), currentStudy, ub, ruleSetService);
+				List<ImportDataRuleRunnerContainer> containers = this
+						.ruleRunSetup(con, sm.getDataSource(), currentStudy,
+								ub, ruleSetService);
 
 				List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) session
 						.getAttribute("importedData");
@@ -264,37 +267,59 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 									+ "_"
 									+ displayItemBean.getData().getOrdinal()
 									+ "_" + wrapper.getStudySubjectOid();
-							if (wrapper.getValidationErrors().containsKey(itemOid)) {
+							if (wrapper.getValidationErrors().containsKey(
+									itemOid)) {
 								ArrayList messageList = (ArrayList) wrapper
 										.getValidationErrors().get(itemOid);
 								// could be more then one will have to iterate
 								for (int iter = 0; iter < messageList.size(); iter++) {
 									String message = (String) messageList
 											.get(iter);
-									DiscrepancyNoteBean parentDn = createDiscrepancyNote(ibean,message, eventCrfBean,displayItemBean, null, ub, sm.getDataSource(),currentStudy, con);
-									createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, parentDn.getId(), ub, sm.getDataSource(), currentStudy, con);
+									DiscrepancyNoteBean parentDn = createDiscrepancyNote(
+											ibean, message, eventCrfBean,
+											displayItemBean, null, ub,
+											sm.getDataSource(), currentStudy,
+											con);
+									createDiscrepancyNote(ibean, message,
+											eventCrfBean, displayItemBean,
+											parentDn.getId(), ub,
+											sm.getDataSource(), currentStudy,
+											con);
 								}
 							}
-							if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
-								if (currentStudy.getStudyParameterConfig().getMarkImportedCRFAsCompleted().equalsIgnoreCase("yes")) {
-									crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub, con);
+							if (!eventCrfInts.contains(new Integer(eventCrfBean
+									.getId()))) {
+								if (currentStudy.getStudyParameterConfig()
+										.getMarkImportedCRFAsCompleted()
+										.equalsIgnoreCase("yes")) {
+									crfBusinessLogicHelper.markCRFComplete(
+											eventCrfBean, ub, con);
 								}
-								eventCrfInts.add(new Integer(eventCrfBean.getId()));
+								eventCrfInts.add(new Integer(eventCrfBean
+										.getId()));
 							}
 
-							EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId(currentStudy, eventCrfBean.getStudyEventId(), eventCrfBean.getCRFVersionId());
+							EventDefinitionCRFBean edcb = edcdao
+									.findByStudyEventIdAndCRFVersionId(
+											currentStudy,
+											eventCrfBean.getStudyEventId(),
+											eventCrfBean.getCRFVersionId());
 
 							eventCrfBean.setNotStarted(false);
 							eventCrfBean.setStatus(Status.AVAILABLE);
 
-							if (currentStudy.getStudyParameterConfig().getMarkImportedCRFAsCompleted().equalsIgnoreCase("yes")) {
+							if (currentStudy.getStudyParameterConfig()
+									.getMarkImportedCRFAsCompleted()
+									.equalsIgnoreCase("yes")) {
 								eventCrfBean.setUpdaterId(ub.getId());
 								eventCrfBean.setUpdater(ub);
 								eventCrfBean.setUpdatedDate(new Date());
 								eventCrfBean.setDateCompleted(new Date());
-								eventCrfBean.setDateValidateCompleted(new Date());
+								eventCrfBean
+										.setDateValidateCompleted(new Date());
 								eventCrfBean.setStatus(Status.UNAVAILABLE);
-								eventCrfBean.setStage(edcb.isDoubleEntry() ? DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
+								eventCrfBean
+										.setStage(edcb.isDoubleEntry() ? DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
 												: DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE);
 								itemDataDao.updateStatusByEventCRF(
 										eventCrfBean, Status.UNAVAILABLE, con);
@@ -303,21 +328,26 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 							eventCrfDao.update(eventCrfBean, con);
 						}
 
-						StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource(), con);
+						StudyEventDAO sedao = new StudyEventDAO(
+								sm.getDataSource(), con);
 						StudyEventBean seb = (StudyEventBean) sedao
 								.findByPK(eventCrfBean.getStudyEventId());
 
-						ArrayList allCRFs = eventCrfDao.findAllByStudyEventAndStatus(seb, Status.UNAVAILABLE);
-						ArrayList allEDCs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(currentStudy,
+						ArrayList allCRFs = eventCrfDao
+								.findAllByStudyEventAndStatus(seb,
+										Status.UNAVAILABLE);
+						ArrayList allEDCs = (ArrayList) edcdao
+								.findAllActiveByEventDefinitionId(currentStudy,
 										seb.getStudyEventDefinitionId());
-						logger.debug("count for event crf: " + allCRFs.size() + " count for edcs: " + allEDCs.size());
+						logger.debug("count for event crf: " + allCRFs.size()
+								+ " count for edcs: " + allEDCs.size());
 						if (allCRFs.size() == allEDCs.size()) {
 							seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
 						} else if (seb.getSubjectEventStatus() == SubjectEventStatus.NOT_SCHEDULED
-							|| seb.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED 
-							|| seb.getSubjectEventStatus() == SubjectEventStatus.SOURCE_DATA_VERIFIED
-							|| seb.getSubjectEventStatus() == SubjectEventStatus.COMPLETED) {
-						seb.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+								|| seb.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED
+								|| seb.getSubjectEventStatus() == SubjectEventStatus.SOURCE_DATA_VERIFIED
+								|| seb.getSubjectEventStatus() == SubjectEventStatus.COMPLETED) {
+							seb.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
 						}
 						sedao.update(seb, con);
 					}
@@ -326,17 +356,24 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 
 				addPageMessage(respage
 						.getString("data_has_been_successfully_import"));
-
-				logger.debug("=== about to run rules ===");
-				addPageMessage(this.ruleActionWarnings(this.runRules(
-                        con, currentStudy, ub, containers, ruleSetService,
-						ExecutionMode.SAVE)));
-
+				System.out.println("Data is committed");
+				con.commit();
+				con.close();
+				try {
+					con = sm.getDataSource().getConnection();
+					con.setAutoCommit(false);
+					logger.debug("=== about to run rules ===");
+					addPageMessage(this.ruleActionWarnings(this.runRules(con,
+							currentStudy, ub, containers, ruleSetService,
+							ExecutionMode.SAVE)));
+					con.commit();
+				} catch (SQLException sqle) {
+					con.rollback();
+					con.close();
+				}
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
 			}
-			System.out.println("Data is committed");
-			con.commit();
-			con.close();
+
 		} catch (SQLException sqle) {
 			con.rollback();
 			con.close();
