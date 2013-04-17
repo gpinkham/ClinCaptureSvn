@@ -2,6 +2,7 @@ package org.akaza.openclinica.bean.dynamicevent;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
+@SuppressWarnings({ "rawtypes", "serial" })
 public class DynamicEventBean extends AuditableEntityBean implements Comparable {
 
 	private int studyGroupClassId;

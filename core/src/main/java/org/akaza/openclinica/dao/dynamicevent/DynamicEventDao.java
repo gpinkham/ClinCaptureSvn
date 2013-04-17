@@ -12,6 +12,7 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO {
 
 	public DynamicEventDao(DataSource ds) {
@@ -50,6 +51,7 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		this.setTypeExpected(12, TypeNames.BOOL);// is_default
 	}
 
+	@SuppressWarnings("deprecation")
 	public Object getEntityFromHashMap(HashMap hm) {
 		DynamicEventBean deb = new DynamicEventBean();
 		deb.setId(((Integer) hm.get("dynamic_event_id")).intValue());

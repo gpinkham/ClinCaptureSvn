@@ -12,6 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings({"rawtypes", "deprecation"})
 public class DynamicEventDaoTest extends HibernateOcDbTestCase {
 
 	private DataSource dataSource;
@@ -57,7 +58,7 @@ public class DynamicEventDaoTest extends HibernateOcDbTestCase {
 		dynamicEventDao.update(dynamicEventBean);
 		assertEquals(description, ((DynamicEventBean) dynamicEventDao.findByPK(1)).getDescription());
 	}
-
+	
 	@Test
 	public void testCreate() throws OpenClinicaException {
 		DynamicEventBean dynamicEventBean = new DynamicEventBean();
