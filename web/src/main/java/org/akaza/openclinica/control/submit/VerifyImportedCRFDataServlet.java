@@ -367,6 +367,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 							currentStudy, ub, containers, ruleSetService,
 							ExecutionMode.SAVE)));
 					con.commit();
+					con.close();
 				} catch (SQLException sqle) {
 					con.rollback();
 					con.close();

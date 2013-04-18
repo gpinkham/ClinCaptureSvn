@@ -222,7 +222,7 @@ public class CrfBusinessLogicHelper {
 		eventCrfDao.markComplete(ecb, ide, con);
 
 		// update all the items' status to complete
-		itemDataDao.updateStatusByEventCRF(ecb, newStatus);
+		itemDataDao.updateStatusByEventCRF(ecb, newStatus, con);
 
 		// change status for study event
 		StudyEventDAO sedao = new StudyEventDAO(ds);
@@ -262,7 +262,7 @@ public class CrfBusinessLogicHelper {
 		}
 		logger.debug("just set subj event status, final status is " + seb.getSubjectEventStatus().getName());
 		logger.debug("final overall status is " + seb.getStatus().getName());
-		seb = (StudyEventBean) sedao.update(seb);
+		seb = (StudyEventBean) sedao.update(seb, con);
 
 		return true;
 	}

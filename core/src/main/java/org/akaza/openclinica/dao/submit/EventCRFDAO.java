@@ -212,9 +212,9 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		variables.put(new Integer(1), new Integer(ecb.getId()));
 
 		if (ide) {
-			execute(digester.getQuery("markCompleteIDE"), variables);
+			execute(digester.getQuery("markCompleteIDE"), variables, con);
 		} else {
-			execute(digester.getQuery("markCompleteDDE"), variables);
+			execute(digester.getQuery("markCompleteDDE"), variables, con);
 		}
 	}
 
