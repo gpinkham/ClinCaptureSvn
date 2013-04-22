@@ -59,14 +59,14 @@ public class ImportDataRuleRunner extends RuleRunner {
 	 * @return Returned RuleActionBean summary with key as groupOrdinalPLusItemOid.
 	 */
 	@Transactional
-	public HashMap<String, ArrayList<String>> runRules(Connection connection, List<ImportDataRuleRunnerContainer> containers, StudyBean study,
+	public HashMap<String, ArrayList<String>> runRules(Boolean optimiseRuleValidator, Connection connection, List<ImportDataRuleRunnerContainer> containers, StudyBean study,
 			UserAccountBean ub, ExecutionMode executionMode) {
 		HashMap<String, ArrayList<String>> messageMap = new HashMap<String, ArrayList<String>>();
 
 		if (executionMode == ExecutionMode.DRY_RUN) {
 			for (ImportDataRuleRunnerContainer container : containers) {
 				if (container.getShouldRunRules())
-					container.setRuleActionContainerMap(this.populateToBeExpected(container, study, ub));
+					container.setRuleActionContainerMap(this.populateToBeExpected(optimiseRuleValidator, container, study, ub));
 			}
 		} else if (executionMode == ExecutionMode.SAVE) {
 			for (ImportDataRuleRunnerContainer container : containers) {
@@ -81,7 +81,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 
 	@Transactional
 	private HashMap<String, ArrayList<RuleActionContainer>> populateToBeExpected(
-			ImportDataRuleRunnerContainer container, StudyBean study, UserAccountBean ub) {
+			Boolean optimiseRuleValidator, ImportDataRuleRunnerContainer container, StudyBean study, UserAccountBean ub) {
 		// copied code for toBeExpected from DataEntryServlet runRules
 		HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
 		HashMap<String, String> variableAndValue = (HashMap<String, String>) container.getVariableAndValue();
@@ -115,7 +115,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 							variableAndValue);
 					try {
 						OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
-						result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
+						result = oep.parseAndEvaluateExpression(rule.getExpression().getValue(), optimiseRuleValidator);
 						itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
 
 						// Actions

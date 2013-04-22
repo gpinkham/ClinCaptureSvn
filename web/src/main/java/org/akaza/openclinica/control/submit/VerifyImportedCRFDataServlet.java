@@ -74,6 +74,7 @@ import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 public class VerifyImportedCRFDataServlet extends SecureController {
 	
 	private Connection con;
+	private Boolean runRulesOptimisation = true;
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -137,6 +138,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 	@SuppressWarnings(value = { "unchecked", "deprecation" })
 	public void processRequest() throws Exception {
 		try {
+			session.setMaxInactiveInterval(10800);
 			con = sm.getDataSource().getConnection();
 			con.setAutoCommit(false);
 			System.out.println("JDBC open connection for transaction");
@@ -187,7 +189,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 								"ruleSetService");
 				logger.debug("=== about to generate rule containers ===");
 				List<ImportDataRuleRunnerContainer> containers = this
-						.ruleRunSetup(con, sm.getDataSource(), currentStudy,
+						.ruleRunSetup(runRulesOptimisation, con, sm.getDataSource(), currentStudy,
 								ub, ruleSetService);
 
 				List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) session
@@ -363,7 +365,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 					con = sm.getDataSource().getConnection();
 					con.setAutoCommit(false);
 					logger.debug("=== about to run rules ===");
-					addPageMessage(this.ruleActionWarnings(this.runRules(con,
+					addPageMessage(this.ruleActionWarnings(this.runRules(runRulesOptimisation, con,
 							currentStudy, ub, containers, ruleSetService,
 							ExecutionMode.SAVE)));
 					con.commit();
@@ -372,6 +374,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 					con.rollback();
 					con.close();
 				}
+				session.setMaxInactiveInterval(3600);
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
 			}
 
@@ -381,7 +384,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 		}
 	}
 
-	private List<ImportDataRuleRunnerContainer> ruleRunSetup(Connection connection, DataSource dataSource, StudyBean studyBean,
+	private List<ImportDataRuleRunnerContainer> ruleRunSetup(Boolean runRulesOptimisation, Connection connection, DataSource dataSource, StudyBean studyBean,
 			UserAccountBean userBean, RuleSetServiceInterface ruleSetService) {
 		List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
 		ODMContainer odmContainer = (ODMContainer) session.getAttribute("odmContainer");
@@ -402,20 +405,20 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 				}
 				if (containers != null && !containers.isEmpty()) {
 					logger.debug("=== running rules dry run ===");
-					ruleSetService.runRulesInImportData(connection, containers, studyBean, userBean, ExecutionMode.DRY_RUN);
+					ruleSetService.runRulesInImportData(runRulesOptimisation, connection, containers, studyBean, userBean, ExecutionMode.DRY_RUN);
 				}
 			}
 		}
 		return containers;
 	}
 
-	private List<String> runRules(Connection connection, StudyBean studyBean, UserAccountBean userBean,
+	private List<String> runRules(Boolean runRulesOptimisation, Connection connection, StudyBean studyBean, UserAccountBean userBean,
 			List<ImportDataRuleRunnerContainer> containers, RuleSetServiceInterface ruleSetService,
 			ExecutionMode executionMode) {
 
 		List<String> messages = new ArrayList<String>();
 		if (containers != null && !containers.isEmpty()) {
-			HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(connection, containers, studyBean,
+			HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(runRulesOptimisation, connection, containers, studyBean,
 					userBean, executionMode);
 			logger.debug("=== found summary " + summary.toString());
 			messages = extractRuleActionWarnings(summary);

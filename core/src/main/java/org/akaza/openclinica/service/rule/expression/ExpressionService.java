@@ -459,7 +459,7 @@ public class ExpressionService {
 		return result;
 	}
 
-	public boolean ruleExpressionChecker(String expression) {
+	public boolean ruleExpressionChecker(String expression, Boolean optimiseRuleValidator) {
 		boolean result = false;
 		boolean isRuleExpressionValid = false;
 		if (expressionWrapper.getRuleSet() != null) {
@@ -476,7 +476,7 @@ public class ExpressionService {
 			}
 
 			if (isRuleExpressionValid) {
-				isExpressionValid(fullExpression);
+				isExpressionValidWithOptimiseRuleValidator(fullExpression, optimiseRuleValidator);
 				result = true;
 			}
 
@@ -915,7 +915,10 @@ public class ExpressionService {
 	 * @param expression
 	 */
 	public void isExpressionValid(String expression) {
-
+		isExpressionValidWithOptimiseRuleValidator(expression, false);
+	}
+	
+	public void isExpressionValidWithOptimiseRuleValidator(String expression, Boolean optimiseRuleValidator) {
 		int length = expression.split(ESCAPED_SEPERATOR).length;
 		ItemBean item = null;
 		ItemGroupBean itemGroup = null;
@@ -926,31 +929,32 @@ public class ExpressionService {
 			if (item == null)
 				throw new OpenClinicaSystemException("OCRERR_0023");
 		}
+		if (!optimiseRuleValidator) {
+			if (length > 1) {
+				String itemGroupOid = getItemGroupOidFromExpression(expression);
+				itemGroup = getItemGroupDao().findByOid(itemGroupOid);
+				if (itemGroup == null)
+					throw new OpenClinicaSystemException("OCRERR_0022");
+			}
 
-		if (length > 1) {
-			String itemGroupOid = getItemGroupOidFromExpression(expression);
-			itemGroup = getItemGroupDao().findByOid(itemGroupOid);
-			if (itemGroup == null)
-				throw new OpenClinicaSystemException("OCRERR_0022");
-		}
+			if (length > 2) {
+				crf = getCRFFromExpression(expression);
+				if (crf == null || crf.getId() != itemGroup.getCrfId())
+					throw new OpenClinicaSystemException("OCRERR_0033");
+			}
 
-		if (length > 2) {
-			crf = getCRFFromExpression(expression);
-			if (crf == null || crf.getId() != itemGroup.getCrfId())
-				throw new OpenClinicaSystemException("OCRERR_0033");
-		}
+			if (length > 3) {
+				StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionFromExpression(expression);
+				crf = getCRFFromExpression(expression);
+				if (studyEventDefinition == null || crf == null)
+					throw new OpenClinicaSystemException("OCRERR_0034");
 
-		if (length > 3) {
-			StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionFromExpression(expression);
-			crf = getCRFFromExpression(expression);
-			if (studyEventDefinition == null || crf == null)
-				throw new OpenClinicaSystemException("OCRERR_0034");
-
-			EventDefinitionCRFBean eventDefinitionCrf = getEventDefinitionCRFDao()
-					.findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(),
+				EventDefinitionCRFBean eventDefinitionCrf = getEventDefinitionCRFDao()
+						.findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(),
 							studyEventDefinition.getId(), crf.getId());
-			if (eventDefinitionCrf == null || eventDefinitionCrf.getId() == 0)
-				throw new OpenClinicaSystemException("OCRERR_0034");
+				if (eventDefinitionCrf == null || eventDefinitionCrf.getId() == 0)
+					throw new OpenClinicaSystemException("OCRERR_0034");
+			}
 		}
 	}
 

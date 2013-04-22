@@ -39,9 +39,17 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 	String number;
 	ExpressionService expressionService;
 	ExpressionObjectWrapper expressionWrapper;
-
+	Boolean optimiseRuleValidator; 
+	
 	OpenClinicaVariableNode(String val) {
 		number = val;
+		// validate();
+	}
+	
+	OpenClinicaVariableNode(String val, ExpressionObjectWrapper expressionWrapper, Boolean optimiseRuleValidator) {
+		number = val;
+		this.expressionWrapper = expressionWrapper;
+		this.optimiseRuleValidator = optimiseRuleValidator;
 		// validate();
 	}
 
@@ -162,7 +170,7 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 
 		}
 		// logger.info("e" + expressionWrapper.getRuleSet());
-		else if (!getExpressionService().ruleExpressionChecker(number)) {
+		else if (!getExpressionService().ruleExpressionChecker(number, optimiseRuleValidator)) {
 			logger.info("Go down");
 			throw new OpenClinicaSystemException("OCRERR_0013",
 					new Object[] { number });

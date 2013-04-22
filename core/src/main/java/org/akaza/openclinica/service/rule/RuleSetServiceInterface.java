@@ -104,7 +104,7 @@ public interface RuleSetServiceInterface {
 			List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub,
 			ExecutionMode executionMode);
 
-    public abstract HashMap<String, ArrayList<String>> runRulesInImportData(Connection connection,
+    public abstract HashMap<String, ArrayList<String>> runRulesInImportData(Boolean optimiseRuleValidator, Connection connection,
             List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub,
             ExecutionMode executionMode);
 
