@@ -124,13 +124,13 @@ public class UtilsTest {
 
 	@Test
 	public void testGetAge() {
-		assertEquals(10, Utils.getAge(subjectDate, eventDate));
-		assertEquals(10, Utils.getAge(olderSubjectDate, eventDate));
+		assertEquals(10, Utils.getAge(subjectDate, eventDate).intValue());
+		assertEquals(10, Utils.getAge(olderSubjectDate, eventDate).intValue());
 	}
 
 	@Test
 	public void testGetPast() {
-		assertEquals(-1, Utils.getAge(olderSubjectDate, subjectDate));
+		assertEquals(-1, Utils.getAge(olderSubjectDate, subjectDate).intValue());
 	}
 
 	@Test

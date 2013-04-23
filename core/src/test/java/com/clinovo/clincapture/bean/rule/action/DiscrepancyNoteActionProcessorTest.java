@@ -53,12 +53,11 @@ public class DiscrepancyNoteActionProcessorTest {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
 	public void testExecute() {
 
 		context.checking(new Expectations() {
 			{
-				one(noteService).saveFieldNotes(DESCRIPTION, ITEM_DATA_BEAN_ID, ITEM_DATA, studyBean, accountBean);
+				oneOf(noteService).saveFieldNotes(DESCRIPTION, ITEM_DATA_BEAN_ID, ITEM_DATA, studyBean, accountBean);
 			}
 		});
 

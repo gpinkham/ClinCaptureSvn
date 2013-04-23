@@ -67,11 +67,10 @@ public class EmailActionProcessorTest {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
 	public void testExecute() throws MessagingException {
 		context.checking(new Expectations() {
 			{
-				one(emailEngine).process(TO, EmailEngine.getAdminEmail(), SUBJECT, BODY);
+				oneOf(emailEngine).process(TO, EmailEngine.getAdminEmail(), SUBJECT, BODY);
 			}
 		});
 
