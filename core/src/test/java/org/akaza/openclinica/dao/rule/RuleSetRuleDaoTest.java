@@ -47,15 +47,15 @@ public class RuleSetRuleDaoTest extends HibernateOcDbTestCase {
 	public void testFindByIdEmptyResultSet() {
 
 		RuleSetRuleBean ruleSetRuleBean = null;
-		ruleSetRuleBean = ruleSetRuleDao.findById(6);
+		ruleSetRuleBean = ruleSetRuleDao.findById(1);
 
 		// Test Rule
 		assertNull("RuleSet is null", ruleSetRuleBean);
 	}
 
 	public void testFindByRuleSetBeanAndRuleBean() {
-		RuleBean persistentRuleBean = ruleDao.findById(-1);
-		RuleSetBean persistentRuleSetBean = ruleSetDao.findById(-1);
+		RuleBean persistentRuleBean = ruleDao.findById(1);
+		RuleSetBean persistentRuleSetBean = ruleSetDao.findById(1);
 		List<RuleSetRuleBean> ruleSetRules = ruleSetRuleDao.findByRuleSetBeanAndRuleBean(persistentRuleSetBean,
 				persistentRuleBean);
 

@@ -5,10 +5,6 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.dbunit.operation.DatabaseOperation;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,32 +17,8 @@ public class DynamicEventDaoTest extends HibernateOcDbTestCase {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		try {
-			DatabaseOperation.DELETE_ALL.execute(getConnection(), getMappingDataSet());
-			DatabaseOperation.INSERT.execute(getConnection(), getMappingDataSet());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		dataSource = getDataSource();
 		dynamicEventDao = new DynamicEventDao(dataSource);
-	}
-
-	@After
-	public void tearDown() {
-		try {
-			DatabaseOperation.DELETE_ALL.execute(getConnection(), getMappingDataSet());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		super.tearDown();
-	}
-
-	private IDataSet getMappingDataSet() throws Exception {
-		StringBuffer path = new StringBuffer("/");
-		path.append(getClass().getPackage().getName().replace(".", "/"));
-		path.append("/testdata/");
-		path.append("DynamicEventDaoTest.xml");
-		return new FlatXmlDataSet(HibernateOcDbTestCase.class.getResourceAsStream(path.toString()));
 	}
 
 	@Test

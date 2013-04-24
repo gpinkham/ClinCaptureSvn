@@ -48,6 +48,7 @@ public class EmailActionProcessorTest {
 
 	@Before
 	public void setUp() throws Exception {
+		
 		emailEngine = context.mock(IEmailEngine.class);
 
 		actionBean = new EmailActionBean();

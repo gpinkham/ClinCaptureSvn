@@ -41,16 +41,16 @@ public class RuleDaoTest extends HibernateOcDbTestCase {
 		RuleBean persistentRuleBean = ruleDao.findByOid(oid, 1);
 
 		assertNotNull("RuleSet is null", persistentRuleBean);
-		assertEquals("The id of the retrieved RuleSet should be 1", new Integer(-1), persistentRuleBean.getId());
+		assertEquals("The id of the retrieved RuleSet should be 1", new Integer(1), persistentRuleBean.getId());
 	}
 
 	public void testFindById() {
 		RuleBean ruleBean = null;
-		ruleBean = ruleDao.findById(-1);
+		ruleBean = ruleDao.findById(1);
 
 		// Test Rule
 		assertNotNull("RuleSet is null", ruleBean);
-		assertEquals("The id of the retrieved RuleSet should be 1", new Integer(-1), ruleBean.getId());
+		assertEquals("The id of the retrieved RuleSet should be 1", new Integer(1), ruleBean.getId());
 
 	}
 
@@ -71,7 +71,7 @@ public class RuleDaoTest extends HibernateOcDbTestCase {
 		RuleBean persistentRuleBean = ruleDao.findByOid(ruleBean);
 
 		assertNotNull("RuleSet is null", persistentRuleBean);
-		assertEquals("The id of the retrieved RuleSet should be 1", new Integer(-1), persistentRuleBean.getId());
+		assertEquals("The id of the retrieved RuleSet should be 1", new Integer(1), persistentRuleBean.getId());
 	}
 
 	public void testSaveOrUpdate() {

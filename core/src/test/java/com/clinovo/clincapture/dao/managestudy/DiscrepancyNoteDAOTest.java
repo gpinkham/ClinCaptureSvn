@@ -10,6 +10,13 @@
 
 package com.clinovo.clincapture.dao.managestudy;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteStatisticBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -17,18 +24,8 @@ import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesSort;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.dbunit.operation.DatabaseOperation;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.sql.DataSource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * User: Pavel Date: 09.11.12
@@ -45,12 +42,6 @@ public class DiscrepancyNoteDAOTest extends HibernateOcDbTestCase {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		try {
-			DatabaseOperation.DELETE_ALL.execute(getConnection(), getMappingDataSet());
-			DatabaseOperation.INSERT.execute(getConnection(), getMappingDataSet());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		DataSource dataSource = getDataSource();
 
 		discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
@@ -285,37 +276,12 @@ public class DiscrepancyNoteDAOTest extends HibernateOcDbTestCase {
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 2)));
 	}
 
-	@Test
-	public void testPlaceholder() {
-		assertEquals(1, 1);
-	}
-
-	@After
-	public void tearDown() {
-		try {
-			DatabaseOperation.DELETE_ALL.execute(getConnection(), getMappingDataSet());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		super.tearDown();
-	}
-
 	private void assertDNBeansInList(List<DiscrepancyNoteBean> dns, List<Integer> ids) {
 		for (Integer id : ids) {
 			DiscrepancyNoteBean noteBean = noteBeanMap.get(id);
 			assertNotNull(noteBean);
 			assertTrue(dns.contains(noteBean));
 		}
-	}
-
-	private IDataSet getMappingDataSet() throws Exception {
-
-		StringBuffer path = new StringBuffer("/");
-		path.append(getClass().getPackage().getName().replace(".", "/"));
-		path.append("/testdata/");
-		path.append("DiscrepancyNoteMapping.xml");
-
-		return new FlatXmlDataSet(HibernateOcDbTestCase.class.getResourceAsStream(path.toString()));
 	}
 
 }

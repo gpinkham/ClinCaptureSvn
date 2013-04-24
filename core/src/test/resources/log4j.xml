@@ -35,7 +35,7 @@
 		<level value="error" />
 	</logger>
 	<logger name="org.hibernate.SQL">
-		<level value="debug" />
+		<level value="info" />
 	</logger>
 	<logger name="org.hibernate.type">
 		<level value="trace" />
@@ -61,9 +61,13 @@
 	<logger name="com.clinovo">
 		<level value="info" />
 	</logger>
+	
+	<logger name="net.sf.ehcache">
+		<level value="error"/>
+	</logger>
 
 	<root>
-		<priority value="debug" />
+		<priority value="info" />
 		<appender-ref ref="stdout" />
 		<appender-ref ref="file" />
 	</root>

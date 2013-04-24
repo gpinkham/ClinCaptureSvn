@@ -44,11 +44,11 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
 
 	public void testFindById() {
 		RuleSetBean ruleSet = null;
-		ruleSet = ruleSetDao.findById(-1);
+		ruleSet = ruleSetDao.findById(1);
 
 		// Test RuleSet
 		assertNotNull("RuleSet is null", ruleSet);
-		assertEquals("The id of the retrieved RuleSet should be 1", new Integer(-1), ruleSet.getId());
+		assertEquals("The id of the retrieved RuleSet should be 1", new Integer(1), ruleSet.getId());
 		assertNotNull("The Expression is null", ruleSet.getTarget());
 		assertNotNull("The Context is null", ruleSet.getTarget().getContext());
 		assertEquals("The context should be 1", new Integer(1), ruleSet.getTarget().getContext().getCode());
@@ -91,7 +91,7 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
 		RuleSetBean ruleSet = createStubRuleSetBean();
 		RuleSetBean persistentRuleSet = ruleSetDao.findByExpression(ruleSet);
 		assertNotNull("The returned ruleSet was null", persistentRuleSet);
-		assertEquals("The id of returned object should be -1 ", persistentRuleSet.getId(), new Integer(-1));
+		assertEquals("The id of returned object should be 3 ", persistentRuleSet.getId(), new Integer(3));
 
 	}
 

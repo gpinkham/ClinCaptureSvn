@@ -31,7 +31,7 @@ public class RuleSetAuditDaoTest extends HibernateOcDbTestCase {
 
 	public void testFindAllByRuleSet() {
 
-		RuleSetBean ruleSet = ruleSetDao.findById(-1);
+		RuleSetBean ruleSet = ruleSetDao.findById(1);
 		List<RuleSetAuditBean> ruleSetAudits = ruleSetAuditDao.findAllByRuleSet(ruleSet);
 
 		assertNotNull("ruleSetAudits is null", ruleSetAudits);
@@ -41,16 +41,16 @@ public class RuleSetAuditDaoTest extends HibernateOcDbTestCase {
 
 	public void testFindById() {
 
-		RuleSetAuditBean ruleSetAuditBean = ruleSetAuditDao.findById(-1);
+		RuleSetAuditBean ruleSetAuditBean = ruleSetAuditDao.findById(1);
 
 		assertNotNull("ruleSetRuleAuditBean is null", ruleSetAuditBean);
-		assertEquals("The ruleSetRuleAuditBean.getRuleSetRule.getId should be 3", new Integer(-1),
+		assertEquals("The ruleSetRuleAuditBean.getRuleSetRule.getId should be 3", new Integer(1),
 				Integer.valueOf(ruleSetAuditBean.getRuleSetBean().getId()));
 
 	}
 
 	public void testSaveOrUpdate() {
-		RuleSetBean ruleSetBean = ruleSetDao.findById(-1);
+		RuleSetBean ruleSetBean = ruleSetDao.findById(1);
 
 		RuleSetAuditBean ruleSetAuditBean = new RuleSetAuditBean();
 		ruleSetAuditBean.setRuleSetBean(ruleSetBean);

@@ -13,13 +13,12 @@
 
 package org.akaza.openclinica.templates;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
@@ -58,7 +57,8 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 		locale = properties.getProperty("locale");
 		initializeLocale();
 
-		context = new ClassPathXmlApplicationContext(new String[] { "classpath*:applicationContext-core-s*.xml",
+		context = new ClassPathXmlApplicationContext(new String[] { 
+				"classpath*:applicationContext-core-spring.xml",
 				"classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
 				"classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
 				"classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
@@ -68,7 +68,6 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 
 		transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
 		transactionManager.getTransaction(new DefaultTransactionDefinition());
-		initializeQueriesInXml();
 	}
 
 	public HibernateOcDbTestCase() {
@@ -83,7 +82,10 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 
 	@Override
 	protected IDataSet getDataSet() throws Exception {
-		return new FlatXmlDataSet(HibernateOcDbTestCase.class.getResourceAsStream(getTestDataFilePath()));
+		
+		InputStream resource = HibernateOcDbTestCase.class.getResourceAsStream(getTestDataFilePath());
+		FlatXmlDataSet flatXmlDataSet = new FlatXmlDataSet(resource);
+		return flatXmlDataSet;
 	}
 
 	@Override
@@ -113,21 +115,6 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 		ResourceBundleProvider.updateLocale(new Locale(locale));
 	}
 
-	/**
-	 * Instantiates SQLFactory and all the xml files that contain the queries that are used in our dao class
-	 */
-	protected static void initializeQueriesInXml() {
-		String baseDir = System.getProperty("user.dir");
-		if (baseDir == null || "".equalsIgnoreCase(baseDir)) {
-			throw new IllegalStateException(
-					"The system properties basedir were not made available to the application. Therefore we cannot locate the test properties file.");
-		}
-		SQLFactory.JUNIT_XML_DIR = baseDir + File.separator + "src" + File.separator + "main" + File.separator
-				+ "resources" + File.separator + "properties" + File.separator;
-
-		SQLFactory.getInstance().run(dbName, context);
-	}
-
 	private static String getPropertiesFilePath() {
 		return "/test.properties";
 	}
@@ -141,11 +128,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 	 * @return path to data file
 	 */
 	private String getTestDataFilePath() {
-		StringBuffer path = new StringBuffer("/");
-		path.append(getClass().getPackage().getName().replace(".", "/"));
-		path.append("/testdata/");
-		path.append(getClass().getSimpleName() + ".xml");
-		return path.toString();
+		return "/com/clinovo/dataset.xml";
 	}
 
 	public String getDbName() {
@@ -165,6 +148,5 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 }
