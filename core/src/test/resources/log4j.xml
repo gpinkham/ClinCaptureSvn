@@ -65,6 +65,10 @@
 	<logger name="net.sf.ehcache">
 		<level value="error"/>
 	</logger>
+	
+	<logger name="org.akaza.openclinica">
+		<level value="error"/>
+	</logger>
 
 	<root>
 		<priority value="info" />

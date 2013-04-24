@@ -10,19 +10,15 @@
 
 package org.akaza.openclinica.dao;
 
-import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
+import org.junit.Test;
 
-import com.clinovo.AbstractContextSentiveTest;
+public class ConfigurationDaoTest extends DefaultAppContextTest {
 
-public class ConfigurationDaoTest extends AbstractContextSentiveTest {
-
-	public ConfigurationDaoTest() {
-		super();
-	}
-
+	@Test
 	public void testSaveOrUpdate() {
-		ConfigurationDao configurationDao = (ConfigurationDao) getContext().getBean("configurationDao");
+		
 		ConfigurationBean configurationBean = new ConfigurationBean();
 		configurationBean.setKey("user.test");
 		configurationBean.setValue("test");
@@ -32,16 +28,18 @@ public class ConfigurationDaoTest extends AbstractContextSentiveTest {
 
 		assertNotNull("Persistant id is null", configurationBean.getId());
 	}
-
+	
+	@Test
 	public void testfindById() {
-		ConfigurationDao configurationDao = (ConfigurationDao) getContext().getBean("configurationDao");
+		
 		ConfigurationBean configurationBean = configurationDao.findById(-1);
 
 		assertEquals("Key should be test.test", "test.test", configurationBean.getKey());
 	}
 
+	@Test
 	public void testfindByKey() {
-		ConfigurationDao configurationDao = (ConfigurationDao) getContext().getBean("configurationDao");
+		
 		ConfigurationBean configurationBean = configurationDao.findByKey("test.test");
 
 		assertEquals("Key should be test.test", "test.test", configurationBean.getKey());

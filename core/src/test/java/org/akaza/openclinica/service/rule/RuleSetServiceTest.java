@@ -13,6 +13,9 @@
 
 package org.akaza.openclinica.service.rule;
 
+import java.util.List;
+
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -20,48 +23,41 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
-
-import com.clinovo.AbstractContextSentiveTest;
-
-import java.util.List;
+import org.junit.Test;
 
 @SuppressWarnings("rawtypes")
-public class RuleSetServiceTest extends AbstractContextSentiveTest {
+public class RuleSetServiceTest extends DefaultAppContextTest {
 
-	public RuleSetServiceTest() {
-		super();
-	}
-
+	@Test
 	public void testGetRuleSetsByCrfStudyAndStudyEventDefinition() {
+		
 		List<RuleSetBean> ruleSets = getRuleSetsByCrfStudyAndStudyEventDefinition();
 		assertEquals("RuleSet size should be 4", 4, ruleSets.size());
 		assertNotNull(ruleSets.get(0).getRuleSetRules());
 	}
 
+	@Test
 	public void testFilterByStatusEqualsAvailable() {
+		
 		List<RuleSetBean> ruleSets = getRuleSetsByCrfStudyAndStudyEventDefinition();
 		assertEquals("RuleSet size should be 4", 4, ruleSets.size());
 
-		RuleSetServiceInterface instance = (RuleSetServiceInterface) getContext().getBean("ruleSetService");
-		ruleSets = instance.filterByStatusEqualsAvailable(ruleSets);
+		ruleSets = ruleSetService.filterByStatusEqualsAvailable(ruleSets);
 		assertEquals("RuleSet size should be 3", 3, ruleSets.size());
 	}
 
 	private List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition() {
+		
 		StudyDAO studyDao = new StudyDAO(getDataSource());
 		StudyBean study = (StudyBean) studyDao.findByPK(1);
-		assertNotNull(study);
 
 		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(getDataSource());
 		StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(2);
-		assertNotNull(studyEventDefinition);
 
-		CRFVersionDAO crfVersionDao = new CRFVersionDAO(getDataSource());
+		CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
 		CRFVersionBean crfVersion = (CRFVersionBean) crfVersionDao.findByPK(2);
-		assertNotNull(crfVersion);
 
-		RuleSetServiceInterface instance = (RuleSetServiceInterface) getContext().getBean("ruleSetService");
-		List<RuleSetBean> ruleSets = instance.getRuleSetsByCrfStudyAndStudyEventDefinition(study, studyEventDefinition,
+		List<RuleSetBean> ruleSets = ruleSetService.getRuleSetsByCrfStudyAndStudyEventDefinition(study, studyEventDefinition,
 				crfVersion);
 		return ruleSets;
 

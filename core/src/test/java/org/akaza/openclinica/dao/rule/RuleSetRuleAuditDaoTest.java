@@ -12,29 +12,14 @@ package org.akaza.openclinica.dao.rule;
 
 import java.util.List;
 
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean;
-import org.hibernate.CacheMode;
-import org.hibernate.HibernateException;
+import org.junit.Test;
 
-import com.clinovo.AbstractContextSentiveTest;
+public class RuleSetRuleAuditDaoTest extends DefaultAppContextTest {
 
-public class RuleSetRuleAuditDaoTest extends AbstractContextSentiveTest {
-	private static RuleSetDao ruleSetDao;
-	private static RuleSetRuleAuditDao ruleSetRuleAuditDao;
-	private static RuleSetRuleDao ruleSetRuleDao;
-
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
-		ruleSetRuleAuditDao = (RuleSetRuleAuditDao) getContext().getBean("ruleSetRuleAuditDao");
-		ruleSetRuleDao = (RuleSetRuleDao) getContext().getBean("ruleSetRuleDao");
-	}
-
+	@Test
 	public void testFindAllByRuleSet() {
 
 		RuleSetBean ruleSet = ruleSetDao.findById(1);
@@ -46,6 +31,7 @@ public class RuleSetRuleAuditDaoTest extends AbstractContextSentiveTest {
 
 	}
 
+	@Test
 	public void testFindById() {
 
 		RuleSetRuleAuditBean ruleSetRuleAuditBean = ruleSetRuleAuditDao.findById(1);
@@ -56,16 +42,4 @@ public class RuleSetRuleAuditDaoTest extends AbstractContextSentiveTest {
 
 	}
 
-	public void tearDown() {
-		try {
-			ruleSetRuleDao.getSessionFactory().getCurrentSession().close();
-			ruleSetRuleAuditDao.getSessionFactory().getCurrentSession().close();
-			ruleSetDao.getSessionFactory().getCurrentSession().close();
-			ruleSetRuleDao.getSessionFactory().getCurrentSession().setCacheMode(CacheMode.REFRESH);
-		} catch (HibernateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		super.tearDown();
-	}
 }

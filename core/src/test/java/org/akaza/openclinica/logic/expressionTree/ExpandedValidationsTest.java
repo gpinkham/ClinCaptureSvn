@@ -7,11 +7,6 @@ import java.util.Date;
 
 public class ExpandedValidationsTest extends TestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
     public void testAll() throws OpenClinicaSystemException {
         assertEquals("The result should be true", "true", testExpression("2008-12-05 gt 2007-12-04"));
         assertEquals("The result should be true", "true", testExpression("2008-12-03 lt 2009-12-04"));

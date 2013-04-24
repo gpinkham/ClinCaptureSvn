@@ -10,24 +10,20 @@
 
 package org.akaza.openclinica.dao;
 
-import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
-import org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean;
-
-import com.clinovo.AbstractContextSentiveTest;
-
 import java.util.ArrayList;
 
-public class DatabaseChangeLogDaoTest extends AbstractContextSentiveTest {
+import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean;
+import org.junit.Test;
+
+public class DatabaseChangeLogDaoTest extends DefaultAppContextTest {
 
 	private final Integer POSTGRES_COUNT = 833;
 	private final Integer ORACLE_COUNT = 833;
 
-	public DatabaseChangeLogDaoTest() {
-		super();
-	}
-
+	@Test
 	public void testCount() {
-		DatabaseChangeLogDao databaseChangeLogDao = (DatabaseChangeLogDao) getContext().getBean("databaseChangeLogDao");
+		
 		Long count = databaseChangeLogDao.count();
 
 		if (getDbName().equals("postgres")) {
@@ -39,8 +35,9 @@ public class DatabaseChangeLogDaoTest extends AbstractContextSentiveTest {
 
 	}
 
+	@Test
 	public void testfindAll() {
-		DatabaseChangeLogDao databaseChangeLogDao = (DatabaseChangeLogDao) getContext().getBean("databaseChangeLogDao");
+		
 		DatabaseChangeLogBean databaseChangeLogBean = null;
 		ArrayList<DatabaseChangeLogBean> databaseChangeLogBeans = databaseChangeLogDao.findAll();
 		databaseChangeLogBean = databaseChangeLogBeans.get(0);
@@ -57,8 +54,9 @@ public class DatabaseChangeLogDaoTest extends AbstractContextSentiveTest {
 
 	}
 
+	@Test
 	public void testfindById() {
-		DatabaseChangeLogDao databaseChangeLogDao = (DatabaseChangeLogDao) getContext().getBean("databaseChangeLogDao");
+		
 		DatabaseChangeLogBean databaseChangeLogBean = null;
 		databaseChangeLogBean = databaseChangeLogDao.findById("1235684743487-1", "pgawade (generated)",
 				"migration/2.5/changeLogCreateTables.xml");

@@ -12,10 +12,9 @@ package org.akaza.openclinica.dao.rule;
 
 import java.util.List;
 
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.hibernate.RuleDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -23,27 +22,13 @@ import org.akaza.openclinica.domain.rule.action.ActionType;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.hibernate.HibernateException;
+import org.junit.Test;
 
-import com.clinovo.AbstractContextSentiveTest;
+public class RuleSetDaoTest extends DefaultAppContextTest {
 
-public class RuleSetDaoTest extends AbstractContextSentiveTest {
-	private static RuleSetDao ruleSetDao;
-	private static RuleDao ruleDao;
-
-	public RuleSetDaoTest() {
-		super();
-
-	}
-
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
-		ruleDao = (RuleDao) getContext().getBean("ruleDao");
-	}
-
+	@Test
 	public void testFindById() {
+		
 		RuleSetBean ruleSet = null;
 		ruleSet = ruleSetDao.findById(1);
 
@@ -68,14 +53,18 @@ public class RuleSetDaoTest extends AbstractContextSentiveTest {
 				Integer.valueOf(ruleSet.getRuleSetRules().get(0).getActions().size()));
 	}
 
+	@Test
 	public void testSaveOrUpdate() {
+		
 		RuleBean persistantRuleBean = ruleDao.findById(1);
 		RuleSetBean ruleSetBean = createStubRuleSetBean(persistantRuleBean);
 		ruleSetBean = ruleSetDao.saveOrUpdate(ruleSetBean);
 		assertNotNull("Persistant id is null", ruleSetBean.getId());
 	}
 
+	@Test
 	public void testFindByCrfEmptyResultSet() {
+		
 		CRFBean crfBean = new CRFBean();
 		crfBean.setId(4);
 		StudyBean studyBean = new StudyBean();
@@ -88,7 +77,9 @@ public class RuleSetDaoTest extends AbstractContextSentiveTest {
 
 	}
 
+	@Test
 	public void testFindByExpression() {
+		
 		RuleSetBean ruleSet = createStubRuleSetBean();
 		RuleSetBean persistentRuleSet = ruleSetDao.findByExpression(ruleSet);
 		assertNotNull("The returned ruleSet was null", persistentRuleSet);
@@ -97,6 +88,7 @@ public class RuleSetDaoTest extends AbstractContextSentiveTest {
 	}
 
 	private RuleSetBean createStubRuleSetBean(RuleBean ruleBean) {
+		
 		RuleSetBean ruleSet = new RuleSetBean();
 		ruleSet.setTarget(createExpression(Context.OC_RULES_V1,
 				"SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_N"));
@@ -106,6 +98,7 @@ public class RuleSetDaoTest extends AbstractContextSentiveTest {
 	}
 
 	private RuleSetBean createStubRuleSetBean() {
+		
 		RuleSetBean ruleSet = new RuleSetBean();
 		ruleSet.setTarget(createExpression(Context.OC_RULES_V1,
 				"SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_NAME"));
@@ -115,6 +108,7 @@ public class RuleSetDaoTest extends AbstractContextSentiveTest {
 	}
 
 	private RuleSetRuleBean createRuleSetRule(RuleSetBean ruleSet, RuleBean ruleBean) {
+		
 		RuleSetRuleBean ruleSetRule = new RuleSetRuleBean();
 		DiscrepancyNoteActionBean ruleAction = new DiscrepancyNoteActionBean();
 		ruleAction.setMessage("HELLO WORLD");
@@ -127,21 +121,10 @@ public class RuleSetDaoTest extends AbstractContextSentiveTest {
 	}
 
 	private ExpressionBean createExpression(Context context, String value) {
+		
 		ExpressionBean expression = new ExpressionBean();
 		expression.setContext(context);
 		expression.setValue(value);
 		return expression;
 	}
-
-	public void tearDown() {
-		try {
-			ruleSetDao.getSessionFactory().getCurrentSession().close();
-			ruleDao.getSessionFactory().getCurrentSession().close();
-		} catch (HibernateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		super.tearDown();
-	}
-
 }

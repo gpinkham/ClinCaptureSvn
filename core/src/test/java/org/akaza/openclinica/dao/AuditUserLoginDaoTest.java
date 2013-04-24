@@ -10,22 +10,17 @@
 
 package org.akaza.openclinica.dao;
 
-import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
-import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
-import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
-
-import com.clinovo.AbstractContextSentiveTest;
-
 import java.util.Date;
 
-public class AuditUserLoginDaoTest extends AbstractContextSentiveTest {
+import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
+import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
+import org.junit.Test;
 
-	public AuditUserLoginDaoTest() {
-		super();
-	}
+public class AuditUserLoginDaoTest extends DefaultAppContextTest {
 
+	@Test
 	public void testSaveOrUpdate() {
-		AuditUserLoginDao auditUserLoginDao = (AuditUserLoginDao) getContext().getBean("auditUserLoginDao");
 		AuditUserLoginBean auditUserLoginBean = new AuditUserLoginBean();
 		auditUserLoginBean.setUserName("testUser");
 		auditUserLoginBean.setLoginAttemptDate(new Date());
@@ -36,8 +31,9 @@ public class AuditUserLoginDaoTest extends AbstractContextSentiveTest {
 		assertNotNull("Persistant id is null", auditUserLoginBean.getId());
 	}
 
+	@Test
 	public void testfindById() {
-		AuditUserLoginDao auditUserLoginDao = (AuditUserLoginDao) getContext().getBean("auditUserLoginDao");
+		
 		AuditUserLoginBean auditUserLoginBean = auditUserLoginDao.findById(-1);
 
 		assertEquals("UserName should be testUser", "testUser", auditUserLoginBean.getUserName());

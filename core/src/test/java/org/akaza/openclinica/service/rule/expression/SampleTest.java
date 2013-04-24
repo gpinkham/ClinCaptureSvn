@@ -13,20 +13,16 @@
 
 package org.akaza.openclinica.service.rule.expression;
 
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.junit.Test;
+@SuppressWarnings("rawtypes")
+public class SampleTest extends DefaultAppContextTest {
 
-import com.clinovo.AbstractContextSentiveTest;
-
-public class SampleTest extends AbstractContextSentiveTest {
-
-	public SampleTest() {
-		super();
-	}
-
-	@SuppressWarnings("rawtypes")
+	@Test
 	public void testStatement() {
-		StudyDAO studyDao = new StudyDAO(getDataSource());
+		StudyDAO studyDao = new StudyDAO(dataSource);
 		StudyBean study = (StudyBean) studyDao.findByPK(1);
 		assertNotNull(study);
 	}

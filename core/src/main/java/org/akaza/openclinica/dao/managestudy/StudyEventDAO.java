@@ -22,7 +22,14 @@ package org.akaza.openclinica.dao.managestudy;
 
 import java.sql.Connection;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -41,12 +48,6 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 
-/**
- * @author jxu
- * 
- *         Modified by ywang.
- * 
- */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class StudyEventDAO extends AuditableEntityDAO {
 
@@ -54,7 +55,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		findByPKAndStudyName = "findByPKAndStudy";
 		getCurrentPKName = "getCurrentPrimaryKey";
 	}
-
+	
 	public StudyEventDAO(DataSource ds) {
 		super(ds);
 		setQueryNames();

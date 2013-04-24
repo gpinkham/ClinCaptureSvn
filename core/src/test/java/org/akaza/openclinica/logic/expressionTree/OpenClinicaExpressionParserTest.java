@@ -22,12 +22,6 @@ import junit.framework.TestCase;
 
 public class OpenClinicaExpressionParserTest extends TestCase {
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
-	}
-
 	public void testGenericParseAndTestEvaluateExpression() throws OpenClinicaSystemException {
 
 		String expressionA = "4 gt 3 and (3 gt 4 or 3 gt 0)";

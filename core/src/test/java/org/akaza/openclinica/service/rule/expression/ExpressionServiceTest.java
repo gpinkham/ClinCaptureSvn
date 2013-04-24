@@ -17,12 +17,6 @@ import junit.framework.TestCase;
 
 public class ExpressionServiceTest extends TestCase {
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
-	}
-
 	public void testStatement() {
 
 		org.apache.commons.dbcp.BasicDataSource ds = new org.apache.commons.dbcp.BasicDataSource();

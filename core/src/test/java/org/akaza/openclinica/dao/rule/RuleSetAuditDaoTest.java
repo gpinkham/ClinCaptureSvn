@@ -12,24 +12,14 @@ package org.akaza.openclinica.dao.rule;
 
 import java.util.List;
 
-import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.domain.rule.RuleSetAuditBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.hibernate.HibernateException;
+import org.junit.Test;
 
-import com.clinovo.AbstractContextSentiveTest;
+public class RuleSetAuditDaoTest extends DefaultAppContextTest {
 
-public class RuleSetAuditDaoTest extends AbstractContextSentiveTest {
-	private static RuleSetAuditDao ruleSetAuditDao;
-	private static RuleSetDao ruleSetDao;
-
-	public RuleSetAuditDaoTest() {
-		super();
-		ruleSetAuditDao = (RuleSetAuditDao) getContext().getBean("ruleSetAuditDao");
-		ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
-	}
-
+	@Test
 	public void testFindAllByRuleSet() {
 
 		RuleSetBean ruleSet = ruleSetDao.findById(1);
@@ -40,6 +30,7 @@ public class RuleSetAuditDaoTest extends AbstractContextSentiveTest {
 
 	}
 
+	@Test
 	public void testFindById() {
 
 		RuleSetAuditBean ruleSetAuditBean = ruleSetAuditDao.findById(1);
@@ -50,7 +41,9 @@ public class RuleSetAuditDaoTest extends AbstractContextSentiveTest {
 
 	}
 
+	@Test
 	public void testSaveOrUpdate() {
+		
 		RuleSetBean ruleSetBean = ruleSetDao.findById(1);
 
 		RuleSetAuditBean ruleSetAuditBean = new RuleSetAuditBean();
@@ -58,16 +51,5 @@ public class RuleSetAuditDaoTest extends AbstractContextSentiveTest {
 		ruleSetAuditBean = ruleSetAuditDao.saveOrUpdate(ruleSetAuditBean);
 
 		assertNotNull("Persistant id is null", ruleSetAuditBean.getId());
-	}
-
-	public void tearDown() {
-		try {
-			ruleSetAuditDao.getSessionFactory().getCurrentSession().close();
-			ruleSetAuditDao.getSessionFactory().getCurrentSession().close();
-		} catch (HibernateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		super.tearDown();
 	}
 }

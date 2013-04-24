@@ -13,31 +13,18 @@
 
 package org.akaza.openclinica.dao.rule;
 
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.hibernate.HibernateException;
+import org.junit.Test;
 
-import com.clinovo.AbstractContextSentiveTest;
+public class RuleDaoTest extends DefaultAppContextTest {
 
-public class RuleDaoTest extends AbstractContextSentiveTest {
-	private static RuleDao ruleDao;
-
-	public RuleDaoTest() {
-		super();
-
-	}
-
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		ruleDao = (RuleDao) getContext().getBean("ruleDao");
-
-	}
-
+	@Test
 	public void testFindByOidString() {
+
 		String oid = "RULE_1";
 		RuleBean persistentRuleBean = ruleDao.findByOid(oid, 1);
 
@@ -45,7 +32,9 @@ public class RuleDaoTest extends AbstractContextSentiveTest {
 		assertEquals("The id of the retrieved RuleSet should be 1", new Integer(1), persistentRuleBean.getId());
 	}
 
+	@Test
 	public void testFindById() {
+
 		RuleBean ruleBean = null;
 		ruleBean = ruleDao.findById(1);
 
@@ -55,7 +44,9 @@ public class RuleDaoTest extends AbstractContextSentiveTest {
 
 	}
 
+	@Test
 	public void testFindByIdEmptyResultSet() {
+
 		RuleBean ruleBean2 = null;
 		ruleBean2 = ruleDao.findById(-3);
 
@@ -63,7 +54,9 @@ public class RuleDaoTest extends AbstractContextSentiveTest {
 		assertNull("RuleSet is null", ruleBean2);
 	}
 
+	@Test
 	public void testFindByOid() {
+
 		RuleBean ruleBean = new RuleBean();
 		ruleBean.setOid("RULE_1");
 		StudyBean studyBean = new StudyBean();
@@ -75,7 +68,9 @@ public class RuleDaoTest extends AbstractContextSentiveTest {
 		assertEquals("The id of the retrieved RuleSet should be 1", new Integer(1), persistentRuleBean.getId());
 	}
 
+	@Test
 	public void testSaveOrUpdate() {
+
 		RuleBean ruleBean = createRuleBeanStub();
 		RuleBean persistentRuleBean = ruleDao.saveOrUpdate(ruleBean);
 
@@ -87,6 +82,7 @@ public class RuleDaoTest extends AbstractContextSentiveTest {
 	}
 
 	private RuleBean createRuleBeanStub() {
+
 		RuleBean ruleBean = new RuleBean();
 		ruleBean.setName("TEST");
 		ruleBean.setOid("BOY");
@@ -97,20 +93,10 @@ public class RuleDaoTest extends AbstractContextSentiveTest {
 	}
 
 	private ExpressionBean createExpression(Context context, String value) {
+
 		ExpressionBean expression = new ExpressionBean();
 		expression.setContext(context);
 		expression.setValue(value);
 		return expression;
-	}
-
-	public void tearDown() {
-		try {
-			ruleDao.getSessionFactory().getCurrentSession().close();
-
-		} catch (HibernateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		super.tearDown();
 	}
 }

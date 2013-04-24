@@ -11,7 +11,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package com.clinovo;
+package org.akaza.openclinica;
 
 import java.io.InputStream;
 import java.util.Locale;
@@ -24,17 +24,30 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+@Transactional
+@RunWith(SpringJUnit4ClassRunner.class)
+@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
+@ContextConfiguration(locations = { 
+		"classpath*:applicationContext-core-spring.xml",
+		"classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
+		"classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
+		"classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
+		"classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
+		" classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
+		"classpath*:org/akaza/openclinica/applicationContext-security.xml" })
 public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCase {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	protected static ApplicationContext context;
+	protected static final Logger logger = LoggerFactory.getLogger(AbstractContextSentiveTest.class);
 
 	protected static Properties properties = new Properties();
 	public static String dbName;
@@ -57,27 +70,6 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 		locale = properties.getProperty("locale");
 		initializeLocale();
 
-		context = new ClassPathXmlApplicationContext(new String[] { 
-				"classpath*:applicationContext-core-spring.xml",
-				"classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
-				"classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
-				"classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
-				"classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
-				" classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
-				"classpath*:org/akaza/openclinica/applicationContext-security.xml" });
-
-		transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
-		transactionManager.getTransaction(new DefaultTransactionDefinition());
-	}
-
-	public AbstractContextSentiveTest() {
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-
-		super.setUp();
-
 	}
 
 	@Override
@@ -99,15 +91,11 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 		return ds;
 	}
 
-	public ApplicationContext getContext() {
-		return context;
-	}
-
 	public static void loadProperties() {
 		try {
 			properties.load(AbstractContextSentiveTest.class.getResourceAsStream(getPropertiesFilePath()));
-		} catch (Exception ioExc) {
-			ioExc.printStackTrace();
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
 		}
 	}
 
@@ -145,8 +133,7 @@ public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCa
 			if (ds != null)
 				ds.getConnection().close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 	}
 }

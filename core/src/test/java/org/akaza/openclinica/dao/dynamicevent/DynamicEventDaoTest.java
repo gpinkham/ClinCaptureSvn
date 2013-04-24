@@ -1,26 +1,12 @@
 package org.akaza.openclinica.dao.dynamicevent;
 
-import javax.sql.DataSource;
-
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
-import org.junit.Before;
 import org.junit.Test;
 
-import com.clinovo.AbstractContextSentiveTest;
-
-@SuppressWarnings({"rawtypes", "deprecation"})
-public class DynamicEventDaoTest extends AbstractContextSentiveTest {
-
-	private DataSource dataSource;
-	private DynamicEventDao dynamicEventDao;
-
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-		dataSource = getDataSource();
-		dynamicEventDao = new DynamicEventDao(dataSource);
-	}
+@SuppressWarnings({"deprecation"})
+public class DynamicEventDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testUpdate() throws OpenClinicaException {

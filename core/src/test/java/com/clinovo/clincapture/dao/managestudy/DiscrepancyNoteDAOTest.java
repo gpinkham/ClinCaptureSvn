@@ -15,25 +15,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteStatisticBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesSort;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.clinovo.AbstractContextSentiveTest;
+public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 
-/**
- * User: Pavel Date: 09.11.12
- */
-public class DiscrepancyNoteDAOTest extends AbstractContextSentiveTest {
-
-	DiscrepancyNoteDAO discrepancyNoteDAO;
 	StudyBean study;
 	ListNotesFilter notesFilter;
 	ListNotesSort notesSort;
@@ -42,10 +34,6 @@ public class DiscrepancyNoteDAOTest extends AbstractContextSentiveTest {
 
 	@Before
 	public void setUp() throws Exception {
-		super.setUp();
-		DataSource dataSource = getDataSource();
-
-		discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 
 		study = new StudyBean();
 		study.setId(1);

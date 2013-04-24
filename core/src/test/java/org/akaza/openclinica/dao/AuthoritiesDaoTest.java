@@ -10,22 +10,15 @@
 
 package org.akaza.openclinica.dao;
 
-import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
-import org.hibernate.HibernateException;
+import org.junit.Test;
 
-import com.clinovo.AbstractContextSentiveTest;
-
-public class AuthoritiesDaoTest extends AbstractContextSentiveTest {
-	private static AuthoritiesDao authoritiesDao;
-
-	public void setUp() throws Exception {
-		super.setUp();
-		authoritiesDao = (AuthoritiesDao) getContext().getBean("authoritiesDao");
-
-	}
-
+public class AuthoritiesDaoTest extends DefaultAppContextTest {
+	
+	@Test
 	public void testSaveOrUpdate() {
+		
 		AuthoritiesBean authorities = new AuthoritiesBean();
 		authorities.setUsername("root");
 		authorities.setAuthority("ROLE_USER");
@@ -35,6 +28,7 @@ public class AuthoritiesDaoTest extends AbstractContextSentiveTest {
 		assertNotNull("Persistant id is null", authorities.getId());
 	}
 
+	@Test
 	public void testFindById() {
 
 		AuthoritiesBean authorities = null;
@@ -45,6 +39,7 @@ public class AuthoritiesDaoTest extends AbstractContextSentiveTest {
 		assertEquals("The id of the retrieved Domain Object should be -1", new Integer(-1), authorities.getId());
 	}
 
+	@Test
 	public void testFindByUsername() {
 
 		AuthoritiesBean authorities = null;
@@ -53,17 +48,6 @@ public class AuthoritiesDaoTest extends AbstractContextSentiveTest {
 		// Test Authorities
 		assertNotNull("RuleSet is null", authorities);
 		assertEquals("The id of the retrieved Domain Object should be -1", new Integer(-1), authorities.getId());
-	}
-
-	public void tearDown() {
-		try {
-
-			authoritiesDao.getSessionFactory().getCurrentSession().close();
-		} catch (HibernateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		super.tearDown();
 	}
 
 }

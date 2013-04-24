@@ -12,29 +12,15 @@ package org.akaza.openclinica.dao.rule;
 
 import java.util.List;
 
-import org.akaza.openclinica.dao.hibernate.RuleDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.hibernate.HibernateException;
+import org.junit.Test;
 
-import com.clinovo.AbstractContextSentiveTest;
+public class RuleSetRuleDaoTest extends DefaultAppContextTest {
 
-public class RuleSetRuleDaoTest extends AbstractContextSentiveTest {
-	private static RuleSetRuleDao ruleSetRuleDao;
-	private static RuleDao ruleDao;
-	private static RuleSetDao ruleSetDao;
-
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		ruleSetRuleDao = (RuleSetRuleDao) getContext().getBean("ruleSetRuleDao");
-		ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
-		ruleDao = (RuleDao) getContext().getBean("ruleDao");
-	}
-
+	@Test
 	public void testFindById() {
 		RuleSetRuleBean ruleSetRuleBean = null;
 		ruleSetRuleBean = ruleSetRuleDao.findById(3);
@@ -45,6 +31,7 @@ public class RuleSetRuleDaoTest extends AbstractContextSentiveTest {
 
 	}
 
+	@Test
 	public void testFindByIdEmptyResultSet() {
 
 		RuleSetRuleBean ruleSetRuleBean = null;
@@ -54,6 +41,7 @@ public class RuleSetRuleDaoTest extends AbstractContextSentiveTest {
 		assertNull("RuleSet is null", ruleSetRuleBean);
 	}
 
+	@Test
 	public void testFindByRuleSetBeanAndRuleBean() {
 		RuleBean persistentRuleBean = ruleDao.findById(1);
 		RuleSetBean persistentRuleSetBean = ruleSetDao.findById(1);
@@ -62,17 +50,5 @@ public class RuleSetRuleDaoTest extends AbstractContextSentiveTest {
 
 		assertNotNull("RuleSetRules is null", ruleSetRules);
 		assertEquals("The size of RuleSetRules should be 1", new Integer(1), new Integer(ruleSetRules.size()));
-	}
-
-	public void tearDown() {
-		try {
-			ruleSetDao.getSessionFactory().getCurrentSession().close();
-			ruleDao.getSessionFactory().getCurrentSession().close();
-			ruleSetRuleDao.getSessionFactory().getCurrentSession().close();
-		} catch (HibernateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		super.tearDown();
 	}
 }

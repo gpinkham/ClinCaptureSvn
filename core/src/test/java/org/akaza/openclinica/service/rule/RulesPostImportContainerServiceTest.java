@@ -13,6 +13,9 @@
 
 package org.akaza.openclinica.service.rule;
 
+import java.util.ArrayList;
+
+import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.rule.RuleBean;
@@ -22,23 +25,16 @@ import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.junit.Test;
 
-import com.clinovo.AbstractContextSentiveTest;
+@SuppressWarnings({ "rawtypes" })
+public class RulesPostImportContainerServiceTest extends DefaultAppContextTest {
 
-import java.util.ArrayList;
+	@Test
+	public void testThatGetDuplicationRuleSetDefsReturnsZeroOnNoDuplicates() {
 
-@SuppressWarnings({"rawtypes"})
-public class RulesPostImportContainerServiceTest extends AbstractContextSentiveTest {
-
-	public RulesPostImportContainerServiceTest() {
-		super();
-	}
-
-	public void testDuplicationRuleSetDefs() {
-		StudyDAO studyDao = new StudyDAO(getDataSource());
+		StudyDAO studyDao = new StudyDAO(dataSource);
 		StudyBean study = (StudyBean) studyDao.findByPK(1);
-		RulesPostImportContainerService postImportContainerService = (RulesPostImportContainerService) getContext()
-				.getBean("rulesPostImportContainerService");
 		postImportContainerService.setCurrentStudy(study);
 
 		RulesPostImportContainer container = prepareContainer();
@@ -46,12 +42,40 @@ public class RulesPostImportContainerServiceTest extends AbstractContextSentiveT
 		container = postImportContainerService.validateRuleDefs(container);
 
 		assertEquals(0, container.getDuplicateRuleDefs().size());
+
+	}
+	
+	@Test
+	public void testThatGetDuplicationRuleSetDefsReturnsZeroOnNoInvalidRuleDefs() {
+
+		StudyDAO studyDao = new StudyDAO(dataSource);
+		StudyBean study = (StudyBean) studyDao.findByPK(1);
+		postImportContainerService.setCurrentStudy(study);
+
+		RulesPostImportContainer container = prepareContainer();
+
+		container = postImportContainerService.validateRuleDefs(container);
+
 		assertEquals(0, container.getInValidRuleDefs().size());
+
+	}
+
+	public void testThatGetDuplicationRuleSetDefsReturnsCorrectDuplicateSize() {
+
+		StudyDAO studyDao = new StudyDAO(dataSource);
+		StudyBean study = (StudyBean) studyDao.findByPK(1);
+		postImportContainerService.setCurrentStudy(study);
+
+		RulesPostImportContainer container = prepareContainer();
+
+		container = postImportContainerService.validateRuleDefs(container);
+
 		assertEquals(1, container.getValidRuleDefs().size());
 
 	}
 
 	private RulesPostImportContainer prepareContainer() {
+
 		RulesPostImportContainer container = new RulesPostImportContainer();
 		ArrayList<RuleSetBean> ruleSets = new ArrayList<RuleSetBean>();
 		ArrayList<RuleBean> ruleDefs = new ArrayList<RuleBean>();
@@ -67,6 +91,7 @@ public class RulesPostImportContainerServiceTest extends AbstractContextSentiveT
 	}
 
 	private RuleSetBean getRuleSet(String ruleOid) {
+
 		RuleSetBean ruleSet = new RuleSetBean();
 		ruleSet.setTarget(createExpression(Context.OC_RULES_V1,
 				"SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_NAME"));
@@ -77,6 +102,7 @@ public class RulesPostImportContainerServiceTest extends AbstractContextSentiveT
 	}
 
 	private RuleSetRuleBean createRuleSetRule(RuleSetBean ruleSet, String ruleOid) {
+
 		RuleSetRuleBean ruleSetRule = new RuleSetRuleBean();
 		DiscrepancyNoteActionBean ruleAction = new DiscrepancyNoteActionBean();
 		ruleAction.setMessage("HELLO WORLD");
@@ -89,6 +115,7 @@ public class RulesPostImportContainerServiceTest extends AbstractContextSentiveT
 	}
 
 	private RuleBean createRuleBean() {
+
 		RuleBean ruleBean = new RuleBean();
 		ruleBean.setName("TEST");
 		ruleBean.setOid("BOY");
@@ -99,6 +126,7 @@ public class RulesPostImportContainerServiceTest extends AbstractContextSentiveT
 	}
 
 	private ExpressionBean createExpression(Context context, String value) {
+
 		ExpressionBean expression = new ExpressionBean();
 		expression.setContext(context);
 		expression.setValue(value);
