@@ -23,14 +23,15 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesSort;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.clinovo.AbstractContextSentiveTest;
 
 /**
  * User: Pavel Date: 09.11.12
  */
-public class DiscrepancyNoteDAOTest extends HibernateOcDbTestCase {
+public class DiscrepancyNoteDAOTest extends AbstractContextSentiveTest {
 
 	DiscrepancyNoteDAO discrepancyNoteDAO;
 	StudyBean study;

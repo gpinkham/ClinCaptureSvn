@@ -20,12 +20,13 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
+
+import com.clinovo.AbstractContextSentiveTest;
 
 import java.util.List;
 
 @SuppressWarnings("rawtypes")
-public class RuleSetServiceTest extends HibernateOcDbTestCase {
+public class RuleSetServiceTest extends AbstractContextSentiveTest {
 
 	public RuleSetServiceTest() {
 		super();

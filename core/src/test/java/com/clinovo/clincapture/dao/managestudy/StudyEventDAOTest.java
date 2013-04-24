@@ -6,11 +6,12 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.junit.Before;
 import org.junit.Test;
 
-public class StudyEventDAOTest extends HibernateOcDbTestCase {
+import com.clinovo.AbstractContextSentiveTest;
+
+public class StudyEventDAOTest extends AbstractContextSentiveTest {
 
 	private DataSource dataSource;
 	private StudyEventDAO studyEventDao;

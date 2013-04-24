@@ -12,11 +12,12 @@ package org.akaza.openclinica.dao;
 
 import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
 import org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
+
+import com.clinovo.AbstractContextSentiveTest;
 
 import java.util.ArrayList;
 
-public class DatabaseChangeLogDaoTest extends HibernateOcDbTestCase {
+public class DatabaseChangeLogDaoTest extends AbstractContextSentiveTest {
 
 	private final Integer POSTGRES_COUNT = 833;
 	private final Integer ORACLE_COUNT = 833;

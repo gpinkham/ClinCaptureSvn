@@ -4,12 +4,13 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.clinovo.AbstractContextSentiveTest;
+
 @SuppressWarnings({"rawtypes", "deprecation"})
-public class DynamicEventDaoTest extends HibernateOcDbTestCase {
+public class DynamicEventDaoTest extends AbstractContextSentiveTest {
 
 	private DataSource dataSource;
 	private DynamicEventDao dynamicEventDao;

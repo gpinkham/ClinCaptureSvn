@@ -11,7 +11,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.akaza.openclinica.templates;
+package com.clinovo;
 
 import java.io.InputStream;
 import java.util.Locale;
@@ -31,7 +31,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
+public abstract class AbstractContextSentiveTest extends DataSourceBasedDBTestCase {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	protected static ApplicationContext context;
@@ -70,7 +70,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 		transactionManager.getTransaction(new DefaultTransactionDefinition());
 	}
 
-	public HibernateOcDbTestCase() {
+	public AbstractContextSentiveTest() {
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 	@Override
 	protected IDataSet getDataSet() throws Exception {
 		
-		InputStream resource = HibernateOcDbTestCase.class.getResourceAsStream(getTestDataFilePath());
+		InputStream resource = AbstractContextSentiveTest.class.getResourceAsStream(getTestDataFilePath());
 		FlatXmlDataSet flatXmlDataSet = new FlatXmlDataSet(resource);
 		return flatXmlDataSet;
 	}
@@ -105,7 +105,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 
 	public static void loadProperties() {
 		try {
-			properties.load(HibernateOcDbTestCase.class.getResourceAsStream(getPropertiesFilePath()));
+			properties.load(AbstractContextSentiveTest.class.getResourceAsStream(getPropertiesFilePath()));
 		} catch (Exception ioExc) {
 			ioExc.printStackTrace();
 		}

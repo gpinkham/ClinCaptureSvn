@@ -12,10 +12,11 @@ package org.akaza.openclinica.dao;
 
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
 
-public class AuthoritiesDaoTest extends HibernateOcDbTestCase {
+import com.clinovo.AbstractContextSentiveTest;
+
+public class AuthoritiesDaoTest extends AbstractContextSentiveTest {
 	private static AuthoritiesDao authoritiesDao;
 
 	public void setUp() throws Exception {

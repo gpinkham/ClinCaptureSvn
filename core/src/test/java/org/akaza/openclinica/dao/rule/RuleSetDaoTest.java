@@ -23,10 +23,11 @@ import org.akaza.openclinica.domain.rule.action.ActionType;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
 
-public class RuleSetDaoTest extends HibernateOcDbTestCase {
+import com.clinovo.AbstractContextSentiveTest;
+
+public class RuleSetDaoTest extends AbstractContextSentiveTest {
 	private static RuleSetDao ruleSetDao;
 	private static RuleDao ruleDao;
 

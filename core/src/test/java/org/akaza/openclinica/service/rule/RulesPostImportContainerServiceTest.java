@@ -22,12 +22,13 @@ import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
+
+import com.clinovo.AbstractContextSentiveTest;
 
 import java.util.ArrayList;
 
 @SuppressWarnings({"rawtypes"})
-public class RulesPostImportContainerServiceTest extends HibernateOcDbTestCase {
+public class RulesPostImportContainerServiceTest extends AbstractContextSentiveTest {
 
 	public RulesPostImportContainerServiceTest() {
 		super();

@@ -18,10 +18,11 @@ import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
 
-public class RuleSetRuleDaoTest extends HibernateOcDbTestCase {
+import com.clinovo.AbstractContextSentiveTest;
+
+public class RuleSetRuleDaoTest extends AbstractContextSentiveTest {
 	private static RuleSetRuleDao ruleSetRuleDao;
 	private static RuleDao ruleDao;
 	private static RuleSetDao ruleSetDao;

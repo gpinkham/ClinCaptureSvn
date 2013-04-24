@@ -13,11 +13,12 @@ package org.akaza.openclinica.dao;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
+
+import com.clinovo.AbstractContextSentiveTest;
 
 import java.util.Date;
 
-public class AuditUserLoginDaoTest extends HibernateOcDbTestCase {
+public class AuditUserLoginDaoTest extends AbstractContextSentiveTest {
 
 	public AuditUserLoginDaoTest() {
 		super();

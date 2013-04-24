@@ -12,9 +12,10 @@ package org.akaza.openclinica.dao;
 
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 
-public class ConfigurationDaoTest extends HibernateOcDbTestCase {
+import com.clinovo.AbstractContextSentiveTest;
+
+public class ConfigurationDaoTest extends AbstractContextSentiveTest {
 
 	public ConfigurationDaoTest() {
 		super();

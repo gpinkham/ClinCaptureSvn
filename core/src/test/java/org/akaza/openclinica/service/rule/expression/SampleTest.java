@@ -15,9 +15,10 @@ package org.akaza.openclinica.service.rule.expression;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 
-public class SampleTest extends HibernateOcDbTestCase {
+import com.clinovo.AbstractContextSentiveTest;
+
+public class SampleTest extends AbstractContextSentiveTest {
 
 	public SampleTest() {
 		super();
