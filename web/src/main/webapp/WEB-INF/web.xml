@@ -1218,12 +1218,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>ExecuteCrossEditCheckServlet</servlet-name>
-        <display-name>ExecuteCrossEditCheck</display-name>
-        <servlet-class>org.akaza.openclinica.control.rule.ExecuteCrossEditCheckServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>SignStudySubjectServlet</servlet-name>
         <display-name>SignStudySubject</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.SignStudySubjectServlet</servlet-class>
@@ -1359,11 +1353,6 @@
         <url-pattern>/UpdateJobImport</url-pattern>
     </servlet-mapping>
     
-    <servlet-mapping>
-        <servlet-name>ExecuteCrossEditCheckServlet</servlet-name>
-        <url-pattern>/ExecuteCrossEditCheck</url-pattern>
-    </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>VerifyImportedRuleServlet</servlet-name>
         <url-pattern>/VerifyImportedRule</url-pattern>

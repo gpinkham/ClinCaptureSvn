@@ -13,7 +13,7 @@
 
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.bean.rule.expression.Context;
+import org.akaza.openclinica.domain.rule.expression.Context;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.usertype.EnhancedUserType;

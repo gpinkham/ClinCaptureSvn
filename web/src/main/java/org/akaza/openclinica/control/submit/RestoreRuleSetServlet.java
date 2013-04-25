@@ -23,7 +23,7 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.dao.rule.RuleSetDAO;
+
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
@@ -33,7 +33,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 public class RestoreRuleSetServlet extends SecureController {
 
 	private static final long serialVersionUID = 1L;
-	RuleSetDAO ruleSetDao;
+
 	RuleSetServiceInterface ruleSetService;
 
 	private static String RULESET_ID = "ruleSetId";

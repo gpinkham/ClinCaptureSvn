@@ -23,8 +23,6 @@ package org.akaza.openclinica.dao.ws;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
-import org.akaza.openclinica.bean.rule.RuleSetAuditBean;
-import org.akaza.openclinica.bean.rule.RuleSetBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.SQLFactory;
@@ -123,7 +121,7 @@ public class SubjectTransferDAO extends EntityDAO {
 	}
 
 	public EntityBean findByPK(int id) throws OpenClinicaException {
-		RuleSetAuditBean ruleSetAudit = null;
+		SubjectTransferBean transfer = null;
 
 		this.setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
@@ -135,27 +133,9 @@ public class SubjectTransferDAO extends EntityDAO {
 		Iterator<?> it = alist.iterator();
 
 		if (it.hasNext()) {
-			ruleSetAudit = (RuleSetAuditBean) this.getEntityFromHashMap((HashMap<?, ?>) it.next());
+			transfer = (SubjectTransferBean) this.getEntityFromHashMap((HashMap<?, ?>) it.next());
 		}
-		return ruleSetAudit;
-	}
-
-	public ArrayList<RuleSetAuditBean> findAllByRuleSet(RuleSetBean ruleSet) {
-		ArrayList<RuleSetAuditBean> ruleSetAuditBeans = new ArrayList<RuleSetAuditBean>();
-
-		this.setTypesExpected();
-		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), ruleSet.getId());
-
-		String sql = digester.getQuery("findAllByRuleSet");
-		ArrayList<?> alist = this.select(sql, variables);
-		Iterator<?> it = alist.iterator();
-
-		while (it.hasNext()) {
-			RuleSetAuditBean ruleSetAudit = (RuleSetAuditBean) this.getEntityFromHashMap((HashMap<?, ?>) it.next());
-			ruleSetAuditBeans.add(ruleSetAudit);
-		}
-		return ruleSetAuditBeans;
+		return transfer;
 	}
 
 	public EntityBean create(EntityBean eb, UserAccountBean ub) {
@@ -204,11 +184,11 @@ public class SubjectTransferDAO extends EntityDAO {
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) throws OpenClinicaException {
-		return new ArrayList<RuleSetAuditBean>();
+		return new ArrayList<SubjectTransferBean>();
 	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) throws OpenClinicaException {
-		return new ArrayList<RuleSetAuditBean>();
+		return new ArrayList<SubjectTransferBean>();
 	}
 
 }

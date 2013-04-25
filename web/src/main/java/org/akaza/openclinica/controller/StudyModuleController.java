@@ -34,7 +34,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.rule.RuleDAO;
+
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
@@ -117,7 +117,6 @@ public class StudyModuleController {
 		studyGroupClassDao = new StudyGroupClassDAO(dataSource);
 		studyDao = new StudyDAO(dataSource);
 		userDao = new UserAccountDAO(dataSource);
-		new RuleDAO(dataSource);
 
 		StudyModuleStatus sms = studyModuleStatusDao.findByStudyId(currentStudy.getId());
 		if (sms == null) {

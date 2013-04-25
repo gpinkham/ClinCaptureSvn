@@ -532,9 +532,7 @@
                   ><img name="bt_Remove<c:out value="${rowCount}"/>" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="4"></a>
             </c:if>
 
-            <c:if test="${doRuleSetsExist[status.index]}" >
-                <a href="ExecuteCrossEditCheck?eventCrfId=<c:out value='${dec.eventCRF.id}'/>">execute Rule</a>
-            </c:if>
+            
         </c:otherwise>
     </c:choose>
 </td>

@@ -39,7 +39,7 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 	String number;
 	ExpressionService expressionService;
 	ExpressionObjectWrapper expressionWrapper;
-	Boolean optimiseRuleValidator; 
+	Boolean optimiseRuleValidator = new Boolean(false); 
 	
 	OpenClinicaVariableNode(String val) {
 		number = val;
@@ -164,12 +164,10 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 	}
 
 	void validate() throws OpenClinicaSystemException {
-		// logger.info(number + " : " +
-		// getExpressionService().checkSyntax(number));
+		
 		if (calculateVariable() != null) {
-
+		
 		}
-		// logger.info("e" + expressionWrapper.getRuleSet());
 		else if (!getExpressionService().ruleExpressionChecker(number, optimiseRuleValidator)) {
 			logger.info("Go down");
 			throw new OpenClinicaSystemException("OCRERR_0013",

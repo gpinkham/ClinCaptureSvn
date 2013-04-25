@@ -188,7 +188,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
 		// prepare to figure out what the display should look like
 		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 		ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(seb);
-		ArrayList<Boolean> doRuleSetsExist = new ArrayList<Boolean>();
 
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 		ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
@@ -234,7 +233,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
 		// >>
 
 		request.setAttribute(BEAN_STUDY_EVENT, seb);
-		request.setAttribute("doRuleSetsExist", doRuleSetsExist);
 		request.setAttribute(BEAN_STUDY_SUBJECT, studySubjectBean);
 		request.setAttribute(BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS, uncompletedEventDefinitionCRFs);
 		request.setAttribute(BEAN_DISPLAY_EVENT_CRFS, displayEventCRFs);

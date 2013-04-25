@@ -51,20 +51,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 public interface RuleSetServiceInterface {
 
-	/**
-	 * Now I know why ORM are pretty cool. Takes care of saving the whole object graph.
-	 * 
-	 * @param ruleSetBean
-	 * @return
-	 * 
-	 *         public RuleSetBean saveRuleSet(RuleSetBean ruleSetBean) { RuleSetBean persistentRuleSetBean =
-	 *         (RuleSetBean) getRuleSetDao().saveOrUpdate(ruleSetBean); // Save RuleSetRules for (RuleSetRuleBean
-	 *         ruleSetRule : persistentRuleSetBean.getRuleSetRules()) {
-	 *         ruleSetRule.setRuleSetBean(persistentRuleSetBean); getRuleSetRuleDao().saveOrUpdate(ruleSetRule); // Save
-	 *         Actions for (RuleActionBean action : ruleSetRule.getActions()) { action.setRuleSetRule(ruleSetRule);
-	 *         getRuleActionDao().saveOrUpdate(action); } } return persistentRuleSetBean; }
-	 */
-
 	public abstract RuleSetBean saveRuleSet(RuleSetBean ruleSetBean);
 
 	public abstract void saveImportFromDesigner(RulesPostImportContainer rulesContainer);

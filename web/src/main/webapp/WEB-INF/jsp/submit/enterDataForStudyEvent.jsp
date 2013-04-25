@@ -645,9 +645,6 @@
    			
    			</c:if>
 
-            <c:if test="${doRuleSetsExist[status.index]}" >
-                <a href="ExecuteCrossEditCheck?eventCrfId=<c:out value='${dec.eventCRF.id}'/>">execute Rule</a>
-            </c:if>
         </c:otherwise>
     </c:choose>
 </td>
