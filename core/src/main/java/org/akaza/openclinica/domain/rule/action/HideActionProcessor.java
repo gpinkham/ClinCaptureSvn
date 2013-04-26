@@ -92,5 +92,10 @@ public class HideActionProcessor implements ActionProcessor {
 	private DynamicsMetadataService getDynamicsMetadataService() {
 		return dynamicsMetadataService;
 	}
+	
+	public Object execute(RuleActionBean ruleAction) {
+		// Do nothing
+		return null;
+	}
 
 }

@@ -21,6 +21,8 @@ import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 
 public interface ActionProcessor {
 
+	public Object execute(RuleActionBean ruleAction) throws Exception;
+	
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode,
 			RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy,
 			UserAccountBean ub, Object... arguments);

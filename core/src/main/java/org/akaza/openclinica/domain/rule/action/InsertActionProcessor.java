@@ -100,5 +100,10 @@ public class InsertActionProcessor implements ActionProcessor {
 	private DynamicsMetadataService getItemMetadataService() {
 		return itemMetadataService;
 	}
+	
+	public Object execute(RuleActionBean ruleAction) {
+		// Do nothing
+		return null;
+	}
 
 }

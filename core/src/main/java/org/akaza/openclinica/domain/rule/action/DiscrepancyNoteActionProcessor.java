@@ -83,4 +83,10 @@ public class DiscrepancyNoteActionProcessor implements ActionProcessor {
 		return discrepancyNoteService;
 	}
 
+	public Object execute(RuleActionBean ruleAction) {
+		
+		// Do nothing
+		return null;
+	}
+
 }

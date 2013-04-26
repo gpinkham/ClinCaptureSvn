@@ -128,4 +128,9 @@ public class EmailActionProcessor implements ActionProcessor {
 
 	}
 
+	public Object execute(RuleActionBean ruleAction) {
+		// Do nothing
+		return null;
+	}
+
 }

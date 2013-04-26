@@ -18,16 +18,10 @@ import org.akaza.openclinica.domain.enumsupport.CodedEnum;
 
 import java.util.HashMap;
 
-/*
- * Use this enum as operator holder
- * @author Krikor Krumlian
- *
- */
-
 public enum ActionType implements CodedEnum {
 
 	FILE_DISCREPANCY_NOTE(1, "DiscrepancyNoteAction"), EMAIL(2, "EmailAction"), SHOW(3, "ShowAction"), INSERT(4,
-			"InsertAction"), HIDE(5, "HideAction");
+			"InsertAction"), HIDE(5, "HideAction"), WEB_SERVICE(6, "WebServiceAction");
 
 	private int code;
 	private String description;
