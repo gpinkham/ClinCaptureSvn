@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="igor" id="2013-04-26-TICKET114-01">
+        <comment>Change name "Dynamic Visits" to "Dynamic Group"</comment>
+		<update tableName="group_class_types">
+			<column name="name" value="Dynamic Group"/>
+            <where>group_class_type_id='4'</where>
+		</update>
+    </changeSet>
+</databaseChangeLog>

@@ -35,7 +35,7 @@ public class GroupClassTypeTest {
     private static final String ARM_KEY = "Arm";
     private static final String FAMILY_KEY = "Family/Pedigree";
     private static final String DEMOGRAPHIC_KEY = "Demographic";
-    private static final String DYNAMIC_KEY = "Dynamic_Visit";
+    private static final String DYNAMIC_KEY = "Dynamic_Group";
     private static final String OTHER_KEY = "Other";
     private static final String WRONG_KEY = "Monitor";
 

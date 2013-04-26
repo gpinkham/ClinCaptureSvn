@@ -39,7 +39,7 @@ public class GroupClassType extends Term {
 
 	public static final GroupClassType DEMOGRAPHIC = new GroupClassType(3, "Demographic");
 	
-	public static final GroupClassType DYNAMIC = new GroupClassType(4, "Dynamic_Visit");
+	public static final GroupClassType DYNAMIC = new GroupClassType(4, "Dynamic_Group");
 
 	public static final GroupClassType OTHER = new GroupClassType(5, "Other");
 
