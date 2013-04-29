@@ -902,6 +902,33 @@
 	<authorities id="-1" username="root" authority="ROLE_USER"
 		version="0" />
 
+	<discrepancy_note discrepancy_note_id="1"
+		description="10:00pm bedtime" discrepancy_note_type_id="1"
+		resolution_status_id="4" detailed_notes="[The input you provided is not an integer.]"
+		date_created="2012-01-09" owner_id="1" entity_type="itemData"
+		study_id="1" assigned_user_id="1" />
+	<discrepancy_note discrepancy_note_id="2"
+		description="First office visit " discrepancy_note_type_id="2"
+		resolution_status_id="1" detailed_notes="Subject is unaware of CPAP pressure"
+		date_created="2012-01-10" owner_id="1" parent_dn_id="0" entity_type="subject"
+		study_id="1" />
+	<discrepancy_note discrepancy_note_id="3"
+		description="unknown pressure" discrepancy_note_type_id="3"
+		resolution_status_id="2" detailed_notes="Unknown pressure"
+		date_created="2012-01-10" owner_id="1" parent_dn_id="0" entity_type="studySub"
+		study_id="1" assigned_user_id="1" />
+	<discrepancy_note discrepancy_note_id="4"
+		description="data entry error" discrepancy_note_type_id="1"
+		resolution_status_id="1" detailed_notes="per sponsor changed screen fail."
+		date_created="2012-01-10" owner_id="1" parent_dn_id="0" entity_type="eventCRF"
+		study_id="1" assigned_user_id="1" />
+	<discrepancy_note discrepancy_note_id="5"
+		description="data entry error" discrepancy_note_type_id="3"
+		resolution_status_id="1"
+		detailed_notes="You have changed data after this CRF was marked complete. You must provide a Reason For Change discrepancy note for this item before you can save this updated information."
+		date_created="2012-01-10" owner_id="1" parent_dn_id="0" entity_type="studyEvent"
+		study_id="1" />
+
 	<dn_event_crf_map event_crf_id="1"
 		discrepancy_note_id="4" column_name="interviewer_name" />
 
