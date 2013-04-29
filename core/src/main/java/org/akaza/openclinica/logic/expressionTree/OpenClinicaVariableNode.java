@@ -36,6 +36,7 @@ import java.util.Date;
  * 
  */
 public class OpenClinicaVariableNode extends ExpressionNode {
+	
 	String number;
 	ExpressionService expressionService;
 	ExpressionObjectWrapper expressionWrapper;
@@ -43,21 +44,18 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 	
 	OpenClinicaVariableNode(String val) {
 		number = val;
-		// validate();
 	}
 	
 	OpenClinicaVariableNode(String val, ExpressionObjectWrapper expressionWrapper, Boolean optimiseRuleValidator) {
 		number = val;
 		this.expressionWrapper = expressionWrapper;
 		this.optimiseRuleValidator = optimiseRuleValidator;
-		// validate();
 	}
 
 	OpenClinicaVariableNode(String val,
 			ExpressionObjectWrapper expressionWrapper) {
 		this.expressionWrapper = expressionWrapper;
 		number = val;
-		// validate();
 	}
 
 	@Override
