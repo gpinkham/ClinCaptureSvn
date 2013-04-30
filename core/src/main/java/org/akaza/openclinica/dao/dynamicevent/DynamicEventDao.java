@@ -48,7 +48,6 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		this.setTypeExpected(9, TypeNames.DATE);// updated
 		this.setTypeExpected(10, TypeNames.STRING);// name
 		this.setTypeExpected(11, TypeNames.STRING);// description
-		this.setTypeExpected(12, TypeNames.BOOL);// is_default
 	}
 
 	@SuppressWarnings("deprecation")
@@ -65,7 +64,6 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		deb.setUpdatedDate((Date) hm.get("date_updated"));
 		deb.setName((String) hm.get("name"));
 		deb.setDescription((String) hm.get("description"));
-		deb.setDefault((Boolean) hm.get("is_default"));
 		return deb;
 	}
 
@@ -109,7 +107,6 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		variables.put(new Integer(5), new Integer(deb.getOwnerId()));
 		variables.put(new Integer(6), deb.getName());
 		variables.put(new Integer(7), deb.getDescription());
-		variables.put(new Integer(8), deb.isDefault());
 		this.execute(digester.getQuery("create"), variables);
 		return eb;
 	}
@@ -124,12 +121,37 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		variables.put(new Integer(5), new Integer(deb.getUpdaterId()));
 		variables.put(new Integer(6), deb.getName());
 		variables.put(new Integer(7), deb.getDescription());
-		variables.put(new Integer(8), deb.isDefault());
-		variables.put(new Integer(9), new Integer(deb.getId()));
+		variables.put(new Integer(8), new Integer(deb.getId()));
 		this.execute(digester.getQuery("update"), variables);
 		return eb;
 	}
+	
+	public void deleteByPK(int key) throws OpenClinicaException {
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(key));
+		this.execute(digester.getQuery("deleteByPK"), variables);
+	}
 
+	public void deleteAllFromStudyGroupClass(int studyGroupClassId) throws OpenClinicaException {
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyGroupClassId));
+		this.execute(digester.getQuery("deleteAllFromStudyGroupClass"), variables);
+	}
+	
+	public Collection findAllByStudyGroupClassId(int studyGroupClassId) throws OpenClinicaException {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyGroupClassId)); 
+		ArrayList alist = this.select(digester.getQuery("findAllByStudyGroupClassId"), variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			DynamicEventBean deb = (DynamicEventBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(deb);
+		}
+		return al;
+	}
+	
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase)
 			throws OpenClinicaException {
 		ArrayList al = new ArrayList();

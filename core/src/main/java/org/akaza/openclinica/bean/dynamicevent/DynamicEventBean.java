@@ -16,15 +16,7 @@ public class DynamicEventBean extends AuditableEntityBean implements Comparable 
 	private String name;
 
 	private String description;
-
-	public boolean isDefault() {
-		return isDefault;
-	}
-
-	public void setDefault(boolean aDefault) {
-		isDefault = aDefault;
-	}
-
+	
 	public int getStudyGroupClassId() {
 		return studyGroupClassId;
 	}
@@ -72,8 +64,6 @@ public class DynamicEventBean extends AuditableEntityBean implements Comparable 
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	private boolean isDefault;
 
 	@Override
 	public int hashCode() {

@@ -77,6 +77,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		// date_updated date,
 		// update_id numeric,
 		// subject_assignment varchar(30),
+		// is_default boolean
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.STRING);
@@ -89,6 +90,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		this.setTypeExpected(8, TypeNames.DATE);
 		this.setTypeExpected(9, TypeNames.INT);
 		this.setTypeExpected(10, TypeNames.STRING);
+		this.setTypeExpected(11, TypeNames.BOOL);
 
 	}
 
@@ -108,6 +110,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		String classTypeName = GroupClassType.get(((Integer) hm.get("group_class_type_id")).intValue()).getName();
 		eb.setGroupClassTypeName(classTypeName);
 		eb.setSubjectAssignment((String) hm.get("subject_assignment"));
+		eb.setDefault((Boolean) hm.get("is_default"));
 		return eb;
 	}
 
@@ -239,6 +242,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		// Date_created is now()
 		variables.put(new Integer(6), new Integer(sb.getStatus().getId()));
 		variables.put(new Integer(7), sb.getSubjectAssignment());
+		variables.put(new Integer(8), sb.isDefault());
 		this.execute(digester.getQuery("create"), variables);
 		if (isQuerySuccessful()) {
 			sb.setId(id);
@@ -257,7 +261,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		// UPDATE study_group_class SET NAME=?,STUDY_ID=?,
 		// GROUP_class_TYPE_ID=?,
 		// STATUS_ID=?, DATE_UPDATED=?,UPDATE_ID=?,
-		// subject_assignment=? WHERE STUDY_GROUP_class_ID=?
+		// subject_assignment=?, is_default=? WHERE STUDY_GROUP_class_ID=?
 		variables.put(new Integer(1), sb.getName());
 		variables.put(new Integer(2), new Integer(sb.getStudyId()));
 		variables.put(new Integer(3), new Integer(sb.getGroupClassTypeId()));
@@ -266,7 +270,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		variables.put(new Integer(5), new java.util.Date());
 		variables.put(new Integer(6), new Integer(sb.getUpdater().getId()));
 		variables.put(new Integer(7), sb.getSubjectAssignment());
-		variables.put(new Integer(8), new Integer(sb.getId()));
+		variables.put(new Integer(8), sb.isDefault());
+		variables.put(new Integer(9), new Integer(sb.getId()));
 
 		String sql = digester.getQuery("update");
 		this.execute(sql, variables);

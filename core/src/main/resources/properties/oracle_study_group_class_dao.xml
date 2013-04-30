@@ -37,15 +37,15 @@
 		<sql>
 		   INSERT INTO study_group_class 
 		   (STUDY_GROUP_CLASS_ID,NAME,STUDY_ID,OWNER_ID,DATE_CREATED, GROUP_CLASS_TYPE_ID,
-		    STATUS_ID,subject_assignment) 
-		   VALUES (?,?,?,?,sysdate,?,?,?)
+		    STATUS_ID,subject_assignment,is_default=?) 
+		   VALUES (?,?,?,?,sysdate,?,?,?,?)
 		</sql>
 	</query>
 	<query>
 		<name>update</name>
 		<sql>
 		  UPDATE study_group_class SET NAME=?,STUDY_ID=?, GROUP_CLASS_TYPE_ID=?,
-		  STATUS_ID=?, DATE_UPDATED=?,UPDATE_ID=?,subject_assignment=?
+		  STATUS_ID=?, DATE_UPDATED=?,UPDATE_ID=?,subject_assignment=?,is_default=?
 		  WHERE STUDY_GROUP_CLASS_ID=?
 	    </sql>
 	</query>

@@ -47,6 +47,15 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	private String groupNotes = "";// not in DB
 	private String studyGroupName = "";// not in DB
 	private boolean selected = false; // not in DB, tbh
+	private boolean isDefault; //in DB, for Dyn Events
+
+	public boolean isDefault() {
+		return isDefault;
+	}
+
+	public void setDefault(boolean aDefault) {
+		isDefault = aDefault;
+	}
 
 	public boolean isSelected() {
 		return selected;

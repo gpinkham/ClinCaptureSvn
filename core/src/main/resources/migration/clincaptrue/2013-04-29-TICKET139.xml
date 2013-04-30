@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="igor" id="2013-04-29-TICKET139-01">
+        <comment>Move isDefault from Dynamic Events to Group Classes</comment>
+		<addColumn tableName="study_group_class" >
+            <column name="is_default" type="BOOLEAN" defaultValue="0"/>
+        </addColumn>
+		<dropColumn columnName="is_default" tableName="dynamic_event"/>
+    </changeSet>
+</databaseChangeLog>

@@ -13,14 +13,22 @@
         <name>create</name>
         <sql>INSERT INTO DYNAMIC_EVENT (STUDY_GROUP_CLASS_ID, STUDY_EVENT_DEFINITION_ID,
             STUDY_ID, ORDINAL, OWNER_ID, DATE_CREATED,
-            NAME, DESCRIPTION, IS_DEFAULT)
-            VALUES (?,?,?,?,?,sysdate,?,?,?)</sql>
+            NAME, DESCRIPTION)
+            VALUES (?,?,?,?,?,sysdate,?,?)</sql>
     </query>
     <query>
         <name>update</name>
         <sql>UPDATE DYNAMIC_EVENT SET STUDY_GROUP_CLASS_ID=?, STUDY_EVENT_DEFINITION_ID=?,
             STUDY_ID=?, ORDINAL=?, UPDATE_ID=?, DATE_UPDATED=sysdate,
-            NAME=?, DESCRIPTION=?, IS_DEFAULT=?
+            NAME=?, DESCRIPTION=?
             WHERE DYNAMIC_EVENT_ID=?</sql>
     </query>
+	<query>
+		<name>deleteByPK</name>
+		<sql>DELETE FROM DYNAMIC_EVENT WHERE DYNAMIC_EVENT_ID=?</sql>
+	</query>
+	<query>
+		<name>deleteAllFromStudyGroupClass</name>
+		<sql>DELETE FROM DYNAMIC_EVENT WHERE STUDY_GROUP_CLASS_ID=?</sql>
+	</query>
 </queries>

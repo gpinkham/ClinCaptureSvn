@@ -947,5 +947,15 @@
 	<dynamic_event dynamic_event_id="1" study_group_class_id="1"
 		study_event_definition_id="1" study_id="1" ordinal="1" owner_id="1"
 		update_id="1" date_created="2008-07-02" date_updated="2008-07-02"
-		name="dynamic event 1" description="test dynamic event 1" is_default="true" />
+		name="dynamic event 1" description="test dynamic event 1" />
+		
+	<dynamic_event dynamic_event_id="2" study_group_class_id="1"
+		study_event_definition_id="2" study_id="1" ordinal="2" owner_id="1"
+		update_id="1" date_created="2008-07-02" date_updated="2008-07-03"
+		name="dynamic event 2" description="test dynamic event 2" />	
+		
+	<study_group_class study_group_class_id="1"
+		name="study group 1" study_id="1" owner_id="1" date_created="2008-07-02" 
+		group_class_type_id="4" status_id="1" subject_assignment="" update_id="1" 
+		date_updated="2008-07-03" is_default="true"/>	
 </dataset>

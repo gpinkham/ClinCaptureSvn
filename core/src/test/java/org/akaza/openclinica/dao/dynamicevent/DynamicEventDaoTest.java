@@ -28,7 +28,17 @@ public class DynamicEventDaoTest extends DefaultAppContextTest {
 		dynamicEventBean.setOwnerId(2);
 		dynamicEventBean.setName("dynamic event 2");
 		dynamicEventBean.setDescription("test dynamic event 2");
-		dynamicEventBean.setDefault(true);
 		dynamicEventDao.create(dynamicEventBean);
+	}
+	
+	@Test
+	public void testDeleteByPK() throws OpenClinicaException {
+		dynamicEventDao.deleteByPK(1);
+		assertNull(dynamicEventDao.findByPK(1).getName());
+	}
+	@Test
+	public void deleteAllFromStudyGroupClass() throws OpenClinicaException {
+		dynamicEventDao.deleteAllFromStudyGroupClass(1);
+		assertNull(dynamicEventDao.findByPK(2).getName());
 	}
 }
