@@ -131,8 +131,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();
-		this.setTypeExpected(11, TypeNames.STRING);
 		this.setTypeExpected(12, TypeNames.STRING);
+		this.setTypeExpected(13, TypeNames.STRING);
 
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(study.getId()));
@@ -158,8 +158,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();
-		this.setTypeExpected(11, TypeNames.STRING);
 		this.setTypeExpected(12, TypeNames.STRING);
+		this.setTypeExpected(13, TypeNames.STRING);
 
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(study.getId()));
@@ -233,7 +233,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		// INSERT INTO study_group_class
 		// (NAME,STUDY_ID,OWNER_ID,DATE_CREATED, GROUP_CLASS_TYPE_ID,
 		// STATUS_ID,subject_assignment)
-		// VALUES (?,?,?,NOW(),?,?,?)
+		// VALUES (?,?,?,NOW(),?,?,?,?)
 		variables.put(new Integer(1), new Integer(id));
 		variables.put(new Integer(2), sb.getName());
 		variables.put(new Integer(3), new Integer(sb.getStudyId()));
