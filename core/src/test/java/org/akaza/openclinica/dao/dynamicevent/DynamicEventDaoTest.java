@@ -16,7 +16,7 @@ public class DynamicEventDaoTest extends DefaultAppContextTest {
 		dynamicEventBean.setDescription(description);
 		dynamicEventDao.update(dynamicEventBean);
 		assertEquals(description, ((DynamicEventBean) dynamicEventDao.findByPK(1)).getDescription());
-	}
+	} 
 	
 	@Test
 	public void testCreate() throws OpenClinicaException {
@@ -34,11 +34,11 @@ public class DynamicEventDaoTest extends DefaultAppContextTest {
 	@Test
 	public void testDeleteByPK() throws OpenClinicaException {
 		dynamicEventDao.deleteByPK(1);
-		assertNull(dynamicEventDao.findByPK(1).getName());
+		assertNull(((DynamicEventBean)dynamicEventDao.findByPK(1)).getCreatedDate());
 	}
 	@Test
 	public void deleteAllFromStudyGroupClass() throws OpenClinicaException {
 		dynamicEventDao.deleteAllFromStudyGroupClass(1);
-		assertNull(dynamicEventDao.findByPK(2).getName());
+		assertNull(((DynamicEventBean)dynamicEventDao.findByPK(2)).getCreatedDate());
 	}
 }
