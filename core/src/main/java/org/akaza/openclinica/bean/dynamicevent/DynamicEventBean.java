@@ -17,6 +17,11 @@ public class DynamicEventBean extends AuditableEntityBean implements Comparable 
 
 	private String description;
 	
+	public DynamicEventBean() {
+		this.name = "";
+		this.description = "";
+	}
+	
 	public int getStudyGroupClassId() {
 		return studyGroupClassId;
 	}
