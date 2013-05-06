@@ -21,15 +21,22 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
@@ -71,28 +78,56 @@ public class ViewSubjectGroupClassServlet extends SecureController {
 		} else {
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 			StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
-			SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
 			StudyDAO studyDao = new StudyDAO(sm.getDataSource());
 
-			StudyGroupClassBean sgcb = (StudyGroupClassBean) sgcdao.findByPK(classId);
-			StudyBean study = (StudyBean) studyDao.findByPK(sgcb.getStudyId());
+			StudyGroupClassBean group = (StudyGroupClassBean) sgcdao.findByPK(classId);
+			StudyBean study = (StudyBean) studyDao.findByPK(group.getStudyId());
+			
+			checkRoleByUserAndStudy(ub, group.getStudyId(), study.getParentStudyId());
 
-			checkRoleByUserAndStudy(ub, sgcb.getStudyId(), study.getParentStudyId());
+			group.setGroupClassTypeName(GroupClassType.get(group.getGroupClassTypeId()).getName());
+			
+			if ("Dynamic Group".equals(group.getGroupClassTypeName())) {
+				//create treemap<order,StudyEventDefinitionId>
+				DynamicEventDao dynevdao = new DynamicEventDao(sm.getDataSource());
+				ArrayList dynEvents = (ArrayList)dynevdao.findAllByStudyGroupClassId(group.getId());
+				TreeMap<Integer,Integer> ordinalToStudyEventDefinitionId = new TreeMap<Integer,Integer>();
+				for (int i = 0; i < dynEvents.size(); i++) {
+					DynamicEventBean dynEventBean = (DynamicEventBean) dynEvents.get(i);
+					ordinalToStudyEventDefinitionId.put(dynEventBean.getOrdinal(), dynEventBean.getStudyEventDefinitionId());
+				}
+				//create hashmap<StudyEventDefinitionId,StudyEventDefinition with number of crfs>
+				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+				ArrayList allDefsFromStudy = seddao.findAllByStudy(currentStudy);
+				HashMap<Integer, StudyEventDefinitionBean> idToStudyEventDefinition = new HashMap<Integer, StudyEventDefinitionBean>();
+				for (int i = 0; i < allDefsFromStudy.size(); i++) {
+					StudyEventDefinitionBean def = (StudyEventDefinitionBean) allDefsFromStudy.get(i);
+					if (ordinalToStudyEventDefinitionId.values().contains(def.getId())){
+						EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+						ArrayList crfs = (ArrayList) edcdao.findAllActiveParentsByEventDefinitionId(def.getId());
+						def.setCrfNum(crfs.size());
+						idToStudyEventDefinition.put(def.getId(), def);
+					}
+				}
 
-			sgcb.setGroupClassTypeName(GroupClassType.get(sgcb.getGroupClassTypeId()).getName());
+				session.setAttribute("ordinalToStudyEventDefinitionId", ordinalToStudyEventDefinitionId);
+				session.setAttribute("idToStudyEventDefinition", idToStudyEventDefinition);
+				 
+			} else {
+				SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
+				ArrayList groups = sgdao.findAllByGroupClass(group);
+				ArrayList studyGroups = new ArrayList();
 
-			ArrayList groups = sgdao.findAllByGroupClass(sgcb);
-			ArrayList studyGroups = new ArrayList();
+				for (int i = 0; i < groups.size(); i++) {
+					StudyGroupBean sg = (StudyGroupBean) groups.get(i);
+					ArrayList subjectMaps = sgmdao.findAllByStudyGroupClassAndGroup(group.getId(), sg.getId());
+					sg.setSubjectMaps(subjectMaps);
+					studyGroups.add(sg);
+				}
 
-			for (int i = 0; i < groups.size(); i++) {
-				StudyGroupBean sg = (StudyGroupBean) groups.get(i);
-				ArrayList subjectMaps = sgmdao.findAllByStudyGroupClassAndGroup(sgcb.getId(), sg.getId());
-				sg.setSubjectMaps(subjectMaps);
-				studyGroups.add(sg);
+				request.setAttribute("studyGroups", studyGroups);
 			}
-
-			request.setAttribute("group", sgcb);
-			request.setAttribute("studyGroups", studyGroups);
+			request.setAttribute("group", group);
 			forwardPage(Page.VIEW_SUBJECT_GROUP_CLASS);
 		}
 	}
