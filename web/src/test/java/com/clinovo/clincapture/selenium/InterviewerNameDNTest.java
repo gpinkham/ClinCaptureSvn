@@ -32,10 +32,10 @@ public class InterviewerNameDNTest extends BaseTest {
 		groupRowSelector = "//table[@class='aka_form_table'][1]/tbody/tr"; // for first we have to specify the group
 																			// selector
 
-		hoverStudySubjectEvent(TEST_SUBJECT_1, "First Office Visit/Screening"); // view/enter data for: SSID ->
+		hoverStudySubjectEvent(TEST_SUBJECT_1, "First Office Visit"); // view/enter data for: SSID ->
 																				// 'TEST_SUBJECT_1' & event -> 'First
 																				// Office Visit/Screening'
-		administrativeEditing("Monthly Office Visit Follow-up Form"); // administrative Editing of 'Monthly Office Visit
+		administrativeEditing("Review of Eligibility/Study Participation Form"); // administrative Editing of 'Monthly Office Visit
 																		// Follow-up Form' CRF
 
 		selenium.click("//tr[@id='CRF_infobox_closed']/td/div/div[2]/div[2]/a/b");

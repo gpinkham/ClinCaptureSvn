@@ -21,6 +21,7 @@ public class NewVersionNumberTest extends BaseTest {
 
 	@Test
 	public void startTest() throws Exception {
+		testName = "New Version Number Test";
 		login(ROOT, ROOT_PASSWORD);
 		testVersionNumberPresent();
 	}

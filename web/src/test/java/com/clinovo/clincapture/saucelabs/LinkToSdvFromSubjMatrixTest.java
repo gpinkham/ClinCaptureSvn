@@ -21,6 +21,7 @@ public class LinkToSdvFromSubjMatrixTest extends BaseTest {
 
 	@Test
 	public void startTest() throws Exception {
+		testName = "Link to SDV from Matrix";
 		login(ROOT, ROOT_PASSWORD);
 		testLinkage();
 	}
@@ -28,9 +29,6 @@ public class LinkToSdvFromSubjMatrixTest extends BaseTest {
 	private void testLinkage() throws Exception {
 		selenium.open(SUBJECT_MATRIX_URL, PAGE_TIME_OUT);
 		selenium.click("//a[contains(text(),'Source Data Verification')]");
-
-		// selenium.click("//img[@src='images/icon_DEcomplete.gif']");
-		// selenium.click("//a[@class='sdvLink']");
 
 		wait("selenium.isTextPresent(\"1.0.2\")");
 		assertTrue(selenium.isTextPresent("1.0.2"));

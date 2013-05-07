@@ -13,6 +13,11 @@
 
 package com.clinovo.clincapture.saucelabs.base;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.junit.After;
 import org.junit.Before;
 
@@ -29,9 +34,9 @@ public class BaseTest extends SeleneseTestBase {
 
 	protected int exceptionCounter = 0;
 
-	public static final String ROOT = "root";
+	public static final String ROOT = "selenium_admin";
 
-	public static final String ROOT_PASSWORD = "password";
+	public static final String ROOT_PASSWORD = "KharkovStyle101";
 
 	public static final String CRC = "a_crc1";
 
@@ -41,11 +46,11 @@ public class BaseTest extends SeleneseTestBase {
 
 	public static final String INVESTIGATOR_PASSWORD = "password";
 
-	public static final String TEST_SUBJECT_1 = "1-001";
+	public static final String TEST_SUBJECT_1 = "TEST008";
 
 	public static final int MAX_EVENT_DEFINITIONS = 20;
 
-	public static final String CC_CONTEXT = "ClinCapture-1.0.2";
+	public static final String CC_CONTEXT = "clincapture";
 
 	public static final String LOGIN_URL = CC_CONTEXT;
 
@@ -60,6 +65,8 @@ public class BaseTest extends SeleneseTestBase {
 	protected String mainWinId;
 
 	protected String groupRowSelector;
+	
+	protected String testName = "";
 
 	protected String ignoreMarkCRFCompleteMSG = null;
 
@@ -86,15 +93,37 @@ public class BaseTest extends SeleneseTestBase {
 	}
 
 	protected DefaultSelenium selenium;
+	
+	protected String sauceName = "";
+	
+	protected String sauceAccessKey = "";
+	
+	public void setTestProperties() {
+
+		String resource = "test.properties";
+		Properties prop = new Properties();
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();           
+		InputStream stream = loader.getResourceAsStream(resource);
+		try {
+			prop.load(stream);
+			sauceName = prop.getProperty("saucelabs.name");
+			sauceAccessKey = prop.getProperty("saucelabs.access.key");
+		} catch (IOException e) {
+			throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
+		}
+	}
 
 	@Before
 	public void setUp() throws Exception {
-
-		selenium = new DefaultSelenium("ondemand.saucelabs.com", 80, "{\"username\": \"USERNAME\","
-				+ "\"access-key\": \"USERKEY\"," + "\"os\": \"Windows 2008\"," + "\"browser\": \"iehta\","
-				+ "\"browser-version\": \"9\"," + "\"max-duration\": \"360\","
-				+ "\"name\": \"Testing ClinCapture 1.0.2 " + this.getClass().getName() + " with IE 9:\"}",
-				"http://YOUR_CLINCAPTURE_URL/");
+		
+		// pull the following from test.properties: saucelabs.name and saucelabs.access.key
+		this.setTestProperties();
+		
+		selenium = new DefaultSelenium("ondemand.saucelabs.com", 80, "{\"username\": \"" + sauceName + "\","
+				+ "\"access-key\": \"" + sauceAccessKey + "\"," + "\"os\": \"Windows 8\"," + "\"browser\": \"internet explorer\","
+				+ "\"browser-version\": \"10\"," + "\"max-duration\": \"360\","
+				+ "\"name\": \"ClinCapture 1.0.2.3 " + this.getClass().getSimpleName() + ":\"}",
+				"http://jenkins.clinovo.com/");
 
 		selenium.start();
 	}
