@@ -113,9 +113,8 @@ public class OpenClinicaExpressionParser {
 		exp.printStackCommands();
 	}
 	
-	public String parseAndEvaluateExpression(String expression)
-	{
-		return parseAndEvaluateExpression (expression, false);
+	public String parseAndEvaluateExpression(String expression) {
+		return parseAndEvaluateExpression(expression, false);
 	}
 	
 	public String parseAndEvaluateExpression(String expression, Boolean optimiseRuleValidator)
