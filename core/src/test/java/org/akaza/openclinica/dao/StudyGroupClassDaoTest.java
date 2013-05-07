@@ -7,8 +7,6 @@ import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
 
-@SuppressWarnings({"deprecation"})
-
 public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 
 	@Test

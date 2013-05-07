@@ -28,6 +28,8 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+import com.clinovo.context.SubmissionContext;
+
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -128,7 +130,8 @@ public class EmailActionProcessor implements ActionProcessor {
 
 	}
 
-	public Object execute(RuleActionBean ruleAction) {
+	public Object execute(SubmissionContext context) {
+		
 		// Do nothing
 		return null;
 	}

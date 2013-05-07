@@ -69,19 +69,19 @@ public class WebServiceActionTest extends BaseTest {
 	@Test
 	public void testThatCreateWebServiceActionReturnsValidActionWithStudyUsername() {
 
-		assertEquals("Should have valid username", "test", wsAction.getUsername());
+		assertEquals("Should have valid username", "demosite1", wsAction.getUsername());
 	}
 
 	@Test
 	public void testThatCreateWebServiceActionReturnsValidActionWithPassword() {
 
-		assertEquals("Should have valid password", "test", wsAction.getPassword());
+		assertEquals("Should have valid password", "demo1", wsAction.getPassword());
 	}
 
 	@Test
 	public void testThatCreateWebServiceActionReturnsValidActionWithUrl() {
 
-		assertEquals("Should have valid url", "http://clinovo.com/ws/randomize", wsAction.getUrl());
+		assertEquals("Should have valid url", "https://www.randomize.net/api/RandomizeAPIService/Authenticate", wsAction.getAuthenticationUrl());
 	}
 
 	@Test
@@ -124,6 +124,12 @@ public class WebServiceActionTest extends BaseTest {
 	public void testThatWebServiceActionDoesNotRunOnImportDataEntry() {
 		
 		assertFalse("This rule should not run on Import data entry", wsAction.getRuleActionRun().getImportDataEntry());
+	}
+	
+	@Test
+	public void testThatWebServiceActionHasRandomizationUrl() {
+		
+		assertEquals("Should have a randomization url", "https://www.randomize.net/api//RandomizeAPIService/RandomizePatientDelegated", wsAction.getRandomizationUrl());
 	}
 	
 	private RuleSetRuleBean createRuleSetRuleBean() {

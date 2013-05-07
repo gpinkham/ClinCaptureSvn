@@ -11,12 +11,13 @@ import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
 @DiscriminatorValue("2")
 public class WebServiceAction extends RuleActionBean {
 
-	private String url;
 	private String username;
 	private String rolename;
 	private String password;
 	private String studyOID;
 	private String studySubjectOID;
+	private String randomizationUrl;
+	private String authenticationUrl;
 
 	// Run flags
 	private boolean runOnBatchMode = true;
@@ -35,12 +36,12 @@ public class WebServiceAction extends RuleActionBean {
 				runOnDoubleDataEntry, runOnImportDataEntry, runOnBatchMode));
 	}
 
-	public String getUrl() {
-		return url;
+	public String getAuthenticationUrl() {
+		return authenticationUrl;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
+	public void setAuthenticationUrl(String url) {
+		this.authenticationUrl = url;
 	}
 
 	public String getUsername() {
@@ -81,6 +82,14 @@ public class WebServiceAction extends RuleActionBean {
 
 	public void setStudySubjectOID(String studySubjectOID) {
 		this.studySubjectOID = studySubjectOID;
+	}
+
+	public String getRandomizationUrl() {
+		return randomizationUrl;
+	}
+
+	public void setRandomizationUrl(String randomizationUrl) {
+		this.randomizationUrl = randomizationUrl;
 	}
 
 }

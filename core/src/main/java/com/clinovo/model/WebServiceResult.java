@@ -1,42 +1,44 @@
 package com.clinovo.model;
 
+
 public class WebServiceResult {
 
-	private String group;
-	private String message;
-	private String treatment;
-	private boolean displayTreatment;
 
-	public String getGroup() {
-		return group;
+	private String siteId;
+	private String trialId;
+	private String initials;
+	private String patientId;
+
+	public String getTrialId() {
+		return trialId;
 	}
 
-	public void setGroup(String group) {
-		this.group = group;
+	public void setTrialId(String trialId) {
+		this.trialId = trialId;
 	}
 
-	public String getMessage() {
-		return message;
+	public String getPatientId() {
+		return patientId;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
 	}
 
-	public String getTreatment() {
-		return treatment;
+	public String getSiteId() {
+		return siteId;
 	}
 
-	public void setTreatment(String treatment) {
-		this.treatment = treatment;
+	public void setSiteId(String siteId) {
+		this.siteId = siteId;
 	}
 
-	public boolean isDisplayTreatment() {
-		return displayTreatment;
+	public String getInitials() {
+		return initials;
 	}
 
-	public void setDisplayTreatment(boolean displayTreatment) {
-		this.displayTreatment = displayTreatment;
+	public void setInitials(String initials) {
+		this.initials = initials;
 	}
 
 }

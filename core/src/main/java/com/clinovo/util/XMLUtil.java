@@ -23,20 +23,20 @@ public class XMLUtil {
 
 		Document document = createDocument(response);
 
-		Node groupNode = extractNodeFromDocument("group", document);
-		Node messageNode = extractNodeFromDocument("message", document);
-		Node treatmentNode = extractNodeFromDocument("treatment", document);
-		Node displayTreamentNode = extractNodeFromDocument("displayTreatment", document);
+		Node siteNode = extractNodeFromDocument("siteid", document);
+		Node trialNode = extractNodeFromDocument("trialid", document);
+		Node patientNode = extractNodeFromDocument("patientid", document);
+		Node initialsNode = extractNodeFromDocument("initials", document);
 
-		String group = groupNode != null ? groupNode.getTextContent() : "";
-		String message = messageNode != null ? messageNode.getTextContent() : "";
-		String treatment = treatmentNode != null ? treatmentNode.getTextContent() : "";
-		String displayTreatment = displayTreamentNode != null ? displayTreamentNode.getTextContent() : "false";
+		String siteId = siteNode != null ? siteNode.getTextContent() : "";
+		String trialId = trialNode != null ? trialNode.getTextContent() : "";
+		String patientId = patientNode != null ? patientNode.getTextContent() : "";
+		String initials = initialsNode != null ? initialsNode.getTextContent() : "";
 		
-		result.setGroup(group);
-		result.setMessage(message);
-		result.setTreatment(treatment);
-		result.setDisplayTreatment(Boolean.valueOf(displayTreatment));
+		result.setSiteId(siteId);
+		result.setTrialId(trialId);
+		result.setPatientId(patientId);
+		result.setInitials(initials);
 
 		return result;
 	}

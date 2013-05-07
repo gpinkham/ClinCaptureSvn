@@ -25,6 +25,8 @@ import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 
+import com.clinovo.context.SubmissionContext;
+
 import javax.sql.DataSource;
 
 public class InsertActionProcessor implements ActionProcessor {
@@ -101,7 +103,8 @@ public class InsertActionProcessor implements ActionProcessor {
 		return itemMetadataService;
 	}
 	
-	public Object execute(RuleActionBean ruleAction) {
+	public Object execute(SubmissionContext context) {
+		
 		// Do nothing
 		return null;
 	}

@@ -22,6 +22,8 @@ import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 
+import com.clinovo.context.SubmissionContext;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 
@@ -83,7 +85,7 @@ public class DiscrepancyNoteActionProcessor implements ActionProcessor {
 		return discrepancyNoteService;
 	}
 
-	public Object execute(RuleActionBean ruleAction) {
+	public Object execute(SubmissionContext context) {
 		
 		// Do nothing
 		return null;

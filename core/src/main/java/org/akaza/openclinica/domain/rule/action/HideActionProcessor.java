@@ -23,6 +23,8 @@ import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 
+import com.clinovo.context.SubmissionContext;
+
 import javax.sql.DataSource;
 
 public class HideActionProcessor implements ActionProcessor {
@@ -93,7 +95,8 @@ public class HideActionProcessor implements ActionProcessor {
 		return dynamicsMetadataService;
 	}
 	
-	public Object execute(RuleActionBean ruleAction) {
+	public Object execute(SubmissionContext context) {
+		
 		// Do nothing
 		return null;
 	}

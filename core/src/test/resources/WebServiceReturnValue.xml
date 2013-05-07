@@ -1,6 +1,7 @@
 <Result>
-	<group>Test-001</group>
-	<treatment>Treatment-001</treatment>
-	<displayTreatment>true</displayTreatment>
-	<message>Owe me like you owe your tax</message>
+	<trialid>some-trial-id</trialid>
+	<siteid>some-site-id</siteid>
+	<patientid>some-patient-id</patientid>
+	<initials>NAS</initials>
+	<dateofbirth>May 7, 2013</dateofbirth>
 </Result>

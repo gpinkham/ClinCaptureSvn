@@ -16,6 +16,7 @@ import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.clinovo.context.SubmissionContext;
 import com.clinovo.model.WebServiceResult;
 import com.clinovo.rule.ext.HttpTransportProtocol;
 
@@ -24,7 +25,7 @@ public class WebServiceActionProcessor implements ActionProcessor {
 	private HttpTransportProtocol protocol;
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-	public Object execute(RuleActionBean ruleAction) throws Exception {
+	public Object execute(SubmissionContext context) throws Exception {
 
 		// Allow for testing
 		if (protocol == null) {
@@ -32,14 +33,14 @@ public class WebServiceActionProcessor implements ActionProcessor {
 			protocol = new HttpTransportProtocol();
 		}
 
-		protocol.setWebServiceAction(ruleAction);
+		protocol.setSubmissionContext(context);
 
 		ExecutorService executor = Executors.newFixedThreadPool(5);
 		FutureTask<WebServiceResult> webServiceCall = new FutureTask<WebServiceResult>(protocol);
 
 		try {
 			
-			log.info("Processing web service rule action with id: {}", ruleAction.getId());
+			log.info("Processing web service rule action with id: {}", context.getAction().getId());
 			
 			executor.execute(webServiceCall);
 			

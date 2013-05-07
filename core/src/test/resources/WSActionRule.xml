@@ -6,13 +6,13 @@
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true"
 					DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
 
-				<username>test</username>
-				<password>test</password>
+				<username>demosite1</username>
+				<password>demo1</password>
 				<rolename>admin</rolename>
 				<studyoid>SE_TEST</studyoid>
-				<url>http://clinovo.com/ws/randomize</url>
 				<studysubjectoid>SE_TEST_SS_NUM</studysubjectoid>
-
+				<authenticationurl>https://www.randomize.net/api/RandomizeAPIService/Authenticate</authenticationurl>
+				<randomizationurl>https://www.randomize.net/api//RandomizeAPIService/RandomizePatientDelegated</randomizationurl>
 			</WebServiceAction>
 		</RuleRef>
 	</RuleAssignment>

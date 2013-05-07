@@ -1,26 +1,26 @@
 package com.clinovo.rule.ext;
 
-import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import javax.xml.ws.WebServiceException;
 
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.clinovo.context.SubmissionContext;
 import com.clinovo.model.WebServiceResult;
-import com.clinovo.rule.WebServiceAction;
-import com.clinovo.util.XMLUtil;
 
 public class HttpTransportProtocol implements Callable<WebServiceResult> {
 
-	private GetMethod method = null;
-	private WebServiceAction webServiceAction;
+	private PostMethod method = null;
+	private SubmissionContext context;
+	private HttpClient client = new HttpClient();
+	private Header randomizationHeader = new Header();
 
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -28,33 +28,48 @@ public class HttpTransportProtocol implements Callable<WebServiceResult> {
 
 		log.info("Initiating call to web service");
 
-		if (webServiceAction == null)
+		if (context == null)
 			throw new WebServiceException("The web service action cannot be null or empty");
 
 		WebServiceResult result = new WebServiceResult();
 
-		HttpClient client = new HttpClient();
-
 		// Allow testing
 		if (method == null) {
-			method = new GetMethod(webServiceAction.getUrl());
+			method = new PostMethod(context.getAction().getRandomizationUrl());
 		}
 
 		try {
 
 			// set parameters
-			HttpMethodParams parameters = new HttpMethodParams();
+			JSONObject postData = new JSONObject();
 
-			parameters.setParameter("username", webServiceAction.getUsername());
-			parameters.setParameter("rolename", webServiceAction.getRolename());
-			parameters.setParameter("studyOID", webServiceAction.getStudyOID());
-			parameters.setParameter("studySubjectOID", webServiceAction.getStudySubjectOID());
+			// Required post data
+			postData.append("TrialID", "");
+			postData.append("SiteID", "");
+			postData.append("PatientID", "");
+			postData.append("BirthDate", "");
+			postData.append("Initials", "");
 
-			method.setParams(parameters);
+			// Required Headers
+			Header contentTypeHeader = new Header();
+			contentTypeHeader.setName("Content-Type");
+			contentTypeHeader.setValue("application/json");
+
+			Header acceptHeader = new Header();
+			acceptHeader.setName("Accept");
+			acceptHeader.setValue("application/json");
+
+			method.addRequestHeader(acceptHeader);
+			method.addRequestHeader(contentTypeHeader);
+			method.addRequestHeader(randomizationHeader);
+
+			String body = postData.toString().replaceAll("]|\\[", "");
+
+			method.setRequestEntity(new StringRequestEntity(body, "application/json", "utf-8"));
 
 			client.executeMethod(method);
 
-			result = processResponse();
+			result = context.processResponse(method.getResponseBodyAsString(), method.getStatusCode());
 
 		} catch (Exception ex) {
 
@@ -68,44 +83,19 @@ public class HttpTransportProtocol implements Callable<WebServiceResult> {
 		return result;
 	}
 
-	private WebServiceResult processResponse() throws IOException, Exception {
-
-		WebServiceResult result = new WebServiceResult();
-
-		// Everything is chimmy
-		if (method.getStatusCode() == HttpStatus.SC_OK) {
-
-			String response = method.getResponseBodyAsString();
-
-			result = XMLUtil.createWebServiceResult(response);
-
-		// You forgot to pay tax
-		} else if (method.getStatusCode() == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-
-			result = XMLUtil.createWebServiceResult(method.getResponseBodyAsString());
-			throw new WebServiceException(result.getMessage());
-
-		// Gates are closed 
-		} else if (method.getStatusCode() == HttpStatus.SC_FORBIDDEN
-				|| method.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-
-			result = XMLUtil.createWebServiceResult(method.getResponseBodyAsString());
-			throw new WebServiceException(result.getMessage());
-			
-		} else {
-
-			result = XMLUtil.createWebServiceResult(method.getResponseBodyAsString());
-			log.warn("Web service call failed with message: {} : {}", method.getStatusCode(), result.getMessage());
-
-		}
-		return result;
-	}
-
-	public void setGetMethod(GetMethod method) {
+	public void setHttpMethod(PostMethod method) {
 		this.method = method;
 	}
 
-	public void setWebServiceAction(RuleActionBean ruleAction) {
-		this.webServiceAction = (WebServiceAction) ruleAction;
+	public void setSubmissionContext(SubmissionContext context) {
+		this.context = context;
+	}
+
+	public void setRandomizationHeader(String token) {
+
+		// Randomization Header
+		randomizationHeader.setName("X-RANDOMIZE-TOKEN");
+		randomizationHeader.setValue(token);
+		
 	}
 }

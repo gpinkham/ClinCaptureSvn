@@ -2,7 +2,6 @@ package com.clinovo.rule.processor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import javax.xml.ws.WebServiceException;
 
@@ -10,13 +9,15 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.auth.AuthState;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.clinovo.BaseTest;
+import com.clinovo.context.SubmissionContext;
+import com.clinovo.context.impl.XMLSubmissionContext;
 import com.clinovo.model.WebServiceResult;
 import com.clinovo.rule.WebServiceAction;
 import com.clinovo.rule.ext.HttpTransportProtocol;
@@ -24,15 +25,15 @@ import com.clinovo.util.XMLUtil;
 
 public class WebServiceActionProcessTest extends BaseTest {
 
-	private WebServiceAction action;
 	private WebServiceActionProcessor processor;
+	SubmissionContext context = new XMLSubmissionContext();
 
 	@Before
 	public void setUp() throws Exception {
 
-		action = createWebServiceAction();
+		WebServiceAction action = createWebServiceAction();
 
-		GetMethod method = Mockito.mock(GetMethod.class);
+		PostMethod method = Mockito.mock(PostMethod.class);
 
 		// Expectations
 		Mockito.when(method.getStatusCode()).thenReturn(HttpStatus.SC_OK);
@@ -45,8 +46,17 @@ public class WebServiceActionProcessTest extends BaseTest {
 
 		HttpTransportProtocol protocol = new HttpTransportProtocol();
 
-		protocol.setGetMethod(method);
-		protocol.setWebServiceAction(action);
+		protocol.setHttpMethod(method);
+		protocol.setSubmissionContext(context);
+
+		protocol.setHttpMethod(method);
+
+		context.setAction(action);
+
+		protocol.setSubmissionContext(context);
+
+		processor = new WebServiceActionProcessor();
+		processor.setTransportProtocol(protocol);
 
 		processor = new WebServiceActionProcessor();
 		processor.setTransportProtocol(protocol);
@@ -54,70 +64,82 @@ public class WebServiceActionProcessTest extends BaseTest {
 
 	@Test(expected = WebServiceException.class)
 	public void testThatExecuteThrowsExceptionOnInvalidInput() throws Exception {
-		
+
 		processor.execute(null);
 	}
 
 	@Test
 	public void testThatExecuteDoesNotReturnNull() throws Exception {
 
-		assertNotNull("Should not return null", processor.execute(action));
+		assertNotNull("Should not return null", processor.execute(context));
 	}
 
 	@Test
-	public void testThatExecuteReturnsValidResultWithGroup() throws Exception {
+	public void testThatExecuteReturnsValidResultWithTrialId() throws Exception {
 
-		WebServiceResult result = (WebServiceResult) processor.execute(action);
-		assertNotNull("The processor should return a valid result with group", result.getGroup());
-
-	}
-
-	@Test
-	public void testThatExecuteReturnsValidResultWithCorrectGroup() throws Exception {
-
-		WebServiceResult result = (WebServiceResult) processor.execute(action);
-		assertEquals("The processor should return a valid result with the correct group", "Test-001", result.getGroup());
+		WebServiceResult result = (WebServiceResult) processor.execute(context);
+		assertNotNull("The processor should return a valid result with trial Id", result.getTrialId());
 
 	}
 
 	@Test
-	public void testThatExecuteReturnsValidResultWithTreatment() throws Exception {
+	public void testThatExecuteReturnsValidResultWithCorrectTrialId() throws Exception {
 
-		WebServiceResult result = (WebServiceResult) processor.execute(action);
-		assertNotNull("The processor should return a valid result with treatment", result.getTreatment());
-
-	}
-
-	@Test
-	public void testThatExecuteReturnsValidResultWithCorrectTreatment() throws Exception {
-
-		WebServiceResult result = (WebServiceResult) processor.execute(action);
-		assertEquals("The processor should return a valid result with the correct treatment", "Treatment-001",
-				result.getTreatment());
+		WebServiceResult result = (WebServiceResult) processor.execute(context);
+		assertEquals("The processor should return a valid result with the correct trial Id", "some-trial-id",
+				result.getTrialId());
 
 	}
 
 	@Test
-	public void testThatExecuteReturnsValidResultWithMessage() throws Exception {
+	public void testThatExecuteReturnsValidResultWithPatientId() throws Exception {
 
-		WebServiceResult result = (WebServiceResult) processor.execute(action);
-		assertNotNull("The processor should return a valid result with treatment", result.getMessage());
-
-	}
-
-	@Test
-	public void testThatExecuteReturnsValidResultWithCorrectMessage() throws Exception {
-
-		WebServiceResult result = (WebServiceResult) processor.execute(action);
-		assertEquals("The processor should return a valid result with the correct message",
-				"Owe me like you owe your tax", result.getMessage());
+		WebServiceResult result = (WebServiceResult) processor.execute(context);
+		assertNotNull("The processor should return a valid result with patientId", result.getPatientId());
 
 	}
 
 	@Test
-	public void testThatExecuteReturnsValidResultWithDisplayTreatmentFlag() throws Exception {
+	public void testThatExecuteReturnsValidResultWithCorrectPatientId() throws Exception {
 
-		WebServiceResult result = (WebServiceResult) processor.execute(action);
-		assertTrue("The processor should return a valid result with the correct message", result.isDisplayTreatment());
+		WebServiceResult result = (WebServiceResult) processor.execute(context);
+		assertEquals("The processor should return a valid result with the correct treatment", "some-patient-id",
+				result.getPatientId());
+
 	}
+
+	@Test
+	public void testThatExecuteReturnsValidResultWithSiteId() throws Exception {
+
+		WebServiceResult result = (WebServiceResult) processor.execute(context);
+		assertNotNull("The processor should return a valid result with siteId", result.getSiteId());
+
+	}
+
+	@Test
+	public void testThatExecuteReturnsValidResultWithCorrectSiteId() throws Exception {
+
+		WebServiceResult result = (WebServiceResult) processor.execute(context);
+		assertEquals("The processor should return a valid result with the correct site id", "some-site-id",
+				result.getSiteId());
+
+	}
+
+	@Test
+	public void testThatExecuteReturnsValidResultWithInitials() throws Exception {
+
+		WebServiceResult result = (WebServiceResult) processor.execute(context);
+		assertNotNull("The processor should return a valid result with initials", result.getInitials());
+
+	}
+
+	@Test
+	public void testThatExecuteReturnsValidResultWithCorrectInitials() throws Exception {
+
+		WebServiceResult result = (WebServiceResult) processor.execute(context);
+		assertEquals("The processor should return a valid result with the correct initials", "NAS",
+				result.getInitials());
+
+	}
+
 }

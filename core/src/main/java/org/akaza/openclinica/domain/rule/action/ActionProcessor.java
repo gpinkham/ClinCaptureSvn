@@ -19,9 +19,11 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 
+import com.clinovo.context.SubmissionContext;
+
 public interface ActionProcessor {
 
-	public Object execute(RuleActionBean ruleAction) throws Exception;
+	public Object execute(SubmissionContext context) throws Exception;
 	
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode,
 			RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy,
