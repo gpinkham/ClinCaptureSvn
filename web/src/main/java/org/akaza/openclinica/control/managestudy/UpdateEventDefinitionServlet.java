@@ -21,6 +21,8 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.core.*;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -32,6 +34,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -70,6 +73,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
 	@Override
 	public void processRequest() throws Exception {
+		checkReferenceVisit();
 		String action = request.getParameter("action");
 		if (StringUtil.isBlank(action)) {
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
@@ -97,7 +101,6 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		FormProcessor fp = new FormProcessor(request);
 
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
 				2000);
@@ -105,10 +108,45 @@ public class UpdateEventDefinitionServlet extends SecureController {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
 		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-
+		//Clinovo start
+		String calendaredVisitType = fp.getString("type");
+		if ("calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
+			v.addValidation("maxDay", Validator.IS_REQUIRED);
+			v.addValidation("maxDay", Validator.IS_A_NUMBER,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("minDay", Validator.IS_REQUIRED);
+			v.addValidation("minDay", Validator.IS_A_NUMBER,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("schDay", Validator.IS_REQUIRED);
+			v.addValidation("schDay", Validator.IS_A_NUMBER,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("emailUser", Validator.NO_BLANKS);
+			//v.addValidation("emailUser", Validator.IS_A_EMAIL);
+			v.addValidation("emailDay", Validator.IS_REQUIRED);
+			v.addValidation("emailDay", Validator.IS_A_NUMBER,
+					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+		}
+		
+		String emailUser = fp.getString("emailUser");
+		if(!checkUserName(emailUser) && "calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
+			Validator.addError(errors, "emailUser", resexception.getString("this_user_name_does_not_exist"));
+			request.setAttribute("formMessages", errors);
+			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
+		} else {
+		//end
 		errors = v.validate();
 
 		if (!errors.isEmpty()) {
+			String showCalendarBox = fp.getString("type");
+			if ("calendared_visit".equalsIgnoreCase(showCalendarBox)) {
+				session.setAttribute("showCalendaredVisitBox", true);
+			}
+			String changedReference = fp.getString("isReference");
+			if ("true".equalsIgnoreCase(changedReference)) {
+				session.setAttribute("changedReference", true);
+			} else {
+				session.setAttribute("changedReference", false);
+			}
 			logger.info("has errors");
 			request.setAttribute("formMessages", errors);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
@@ -121,7 +159,26 @@ public class UpdateEventDefinitionServlet extends SecureController {
 			sed.setCategory(fp.getString("category"));
 			sed.setDescription(fp.getString("description"));
 			sed.setType(fp.getString("type"));
-
+			//Clinovo start
+			sed.setMaxDay(fp.getInt("maxDay"));
+			sed.setMinDay(fp.getInt("minDay"));
+			sed.setScheduleDay(fp.getInt("schDay"));
+			String userEmail = getEmailByUserName(fp.getString("emailUser"));
+			if("".equals(userEmail)) {
+				sed.setEmailAdress("");
+			} else {
+				sed.setEmailAdress(userEmail);
+			}
+			sed.setEmailDay(fp.getInt("emailDay"));
+			String referenceVisitValue = fp.getString("isReference");
+			if ("true".equalsIgnoreCase(referenceVisitValue)) {
+				sed.setReferenceVisit(true);
+			} else {
+				sed.setReferenceVisit(false);
+			}
+		}
+			// end
+			
 			session.setAttribute("definition", sed);
 			ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
 			CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
@@ -247,7 +304,9 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		session.removeAttribute("tmpCRFIdMap");
 		session.removeAttribute("crfsWithVersion");
 		session.removeAttribute("eventDefinitionCRFs");
-
+		session.removeAttribute("showCalendaredVisitBox");
+		session.removeAttribute("changedReference");
+		
 		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"));
 		forwardPage(Page.LIST_DEFINITION_SERVLET);
 	}
@@ -347,5 +406,45 @@ public class UpdateEventDefinitionServlet extends SecureController {
 			}
 		}
 
+	}
+	
+	private void checkReferenceVisit() {
+		boolean referenceVisitAlredyExist = false;
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(
+				sm.getDataSource());
+		ArrayList<StudyEventDefinitionBean> definitions = seddao.findReferenceVisitBeans();
+		for (StudyEventDefinitionBean studyEventDefinition : definitions) {
+			if (studyEventDefinition.getReferenceVisit()) {
+				logger.trace("Reference visit already exist");
+				referenceVisitAlredyExist = true;
+				break;
+			}
+		}
+		if (referenceVisitAlredyExist) {
+			session.setAttribute("referenceVisitAlredyExist",
+					referenceVisitAlredyExist);
+		}
+	}
+	
+	private boolean checkUserName(String emailUser) {
+		boolean isValid = false;
+		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		ArrayList<StudyUserRoleBean> userBean = uadao.findAllByStudyId(currentStudy.getId());
+		for (StudyUserRoleBean userAccountBean : userBean) {
+			if (emailUser.equals(userAccountBean.getUserName())) {
+				isValid = true;
+				break;
+			} else {
+				isValid = false;
+			}
+		}
+		return isValid;
+	}
+
+	private String getEmailByUserName(String userName) {
+		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		UserAccountBean userBean = (UserAccountBean) uadao
+				.findByUserName(userName);
+		return userBean.getEmail();
 	}
 }

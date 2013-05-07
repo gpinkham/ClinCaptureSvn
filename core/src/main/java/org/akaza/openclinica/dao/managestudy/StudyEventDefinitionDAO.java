@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Date;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -88,6 +90,13 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		this.setTypeExpected(12, TypeNames.INT);
 		this.setTypeExpected(13, TypeNames.INT);
 		this.setTypeExpected(14, TypeNames.STRING);
+		//Clinovo Ticket #65
+		this.setTypeExpected(15, TypeNames.INT);
+		this.setTypeExpected(16, TypeNames.INT);
+		this.setTypeExpected(17, TypeNames.INT);
+		this.setTypeExpected(18, TypeNames.INT);
+		this.setTypeExpected(19, TypeNames.STRING);
+		this.setTypeExpected(20, TypeNames.BOOL);
 	}
 
 	/**
@@ -151,8 +160,17 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		variables.put(new Integer(9), new Integer(sedb.getStatus().getId()));
 		variables.put(new Integer(10), new Integer(sedb.getOrdinal()));
 		variables.put(new Integer(11), getValidOid(sedb));
+		//
+		variables.put(new Integer(12), new Integer (sedb.getMinDay()));
+		variables.put(new Integer(13), new Integer (sedb.getMaxDay()));
+		variables.put(new Integer(14), new Integer (sedb.getEmailDay()));
+		variables.put(new Integer(15), new Integer (sedb.getScheduleDay()));
+		variables.put(new Integer(16), sedb.getEmailAdress());
+		variables.put(new Integer(17), new Boolean(sedb.getReferenceVisit()));
 		this.execute(digester.getQuery("create"), variables);
 
+
+		
 		return sedb;
 	}
 
@@ -168,7 +186,13 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		variables.put(new Integer(7), new Integer(sedb.getStatus().getId()));
 		variables.put(new Integer(8), new Integer(sedb.getUpdaterId()));
 		variables.put(new Integer(9), new Integer(sedb.getOrdinal()));
-		variables.put(new Integer(10), new Integer(sedb.getId()));
+		variables.put(new Integer(10), new Integer (sedb.getMinDay()));
+		variables.put(new Integer(11), new Integer (sedb.getMaxDay()));
+		variables.put(new Integer(12), new Integer (sedb.getEmailDay()));
+		variables.put(new Integer(13), new Integer (sedb.getScheduleDay()));
+		variables.put(new Integer(14), sedb.getEmailAdress());
+		variables.put(new Integer(15), new Boolean(sedb.getReferenceVisit()));
+		variables.put(new Integer(16), new Integer(sedb.getId()));
 		this.execute(digester.getQuery("update"), variables);
 		return eb;
 	}
@@ -196,6 +220,19 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		eb.setType((String) hm.get("type"));
 		eb.setCategory((String) hm.get("category"));
 		eb.setOid((String) hm.get("oc_oid"));
+		//Clinovo #65 start
+		Integer dayMin = (Integer) hm.get("day_min");
+		eb.setMinDay((dayMin.intValue()));
+		Integer dayMax = (Integer) hm.get("day_max");
+		eb.setMaxDay((dayMax.intValue()));
+		Integer dayEmail = (Integer) hm.get("day_email");
+		eb.setEmailDay((dayEmail.intValue()));
+		Integer scheduleDay = (Integer) hm.get("schedule_day");
+		eb.setScheduleDay((scheduleDay.intValue()));
+		eb.setEmailAdress((String) hm.get("email_adress"));
+		Boolean referenceVisit = (Boolean) hm.get("reference_visit");
+		eb.setReferenceVisit(referenceVisit.booleanValue());
+		//end
 		return eb;
 	}
 
@@ -418,6 +455,18 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(parentStudyId));
 		ArrayList alist = this.select(digester.getQuery("findAllActiveByParentStudyId"), variables);
+		ArrayList<StudyEventDefinitionBean> al = new ArrayList<StudyEventDefinitionBean>();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
+		}
+		return al;
+	}
+	
+	public ArrayList<StudyEventDefinitionBean> findReferenceVisitBeans() {
+		this.setTypesExpected();
+		ArrayList alist = this.select(digester.getQuery("findReferenceVisitBeans"));
 		ArrayList<StudyEventDefinitionBean> al = new ArrayList<StudyEventDefinitionBean>();
 		Iterator it = alist.iterator();
 		while (it.hasNext()) {

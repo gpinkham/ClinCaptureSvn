@@ -41,6 +41,7 @@
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='definition' class='org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean'/>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript">
   <!--
  function myCancel() {
@@ -57,6 +58,38 @@
      return true;       
   }
    //-->
+</script>
+<script type="text/JavaScript" language="JavaScript">
+$(document).ready(function() {
+	$(".showHide").css('display', 'none');
+	$('select[name="type"]').change(function() {
+		if($(this).find(":selected").val() == 'calendared_visit') {
+			$(".showHide").fadeIn('medium');
+		} else {
+			$(".showHide").fadeOut('medium');
+			$('input[name*="Day"]').attr('value','').attr('readonly','');
+			$('.showHide input[type="checkbox"]').attr('checked', false);
+			$('input[name="emailUser"]').attr('value','').attr('readonly','');
+		}
+	});
+	$('input[name="isReference"]').click(function() {
+		if ($(this).is(':checked')) {
+			$('input[name*="Day"]').attr('value','0').attr('readonly','true');;
+		} else {
+			$('input[name*="Day"]').attr('value','').attr('readonly','');
+		}
+	});
+	$('select[name="type"]').each(function() {
+		if($(this).find(":selected").val() == 'calendared_visit') {
+			$(".showHide").css('display', '');
+		} 
+	});
+	$('input[name="isReference"]').each(function() {
+		if ($(this).is(':checked')) {
+			$('input[name*="Day"]').attr('value','0').attr('readonly','true');
+		}
+	});
+});
 </script>
 <h1><span class="title_manage">
 <fmt:message key="create_SED_for"  bundle="${resword}"/> <c:out value="${study.name}"/>
@@ -76,10 +109,9 @@
 
 <div class="textbox_center">
 <table border="0" cellpadding="0" cellspacing="0">
-  <tr valign="top"><td class="formlabel"><fmt:message key="name" bundle="${resword}"/>:</td><td>  
-  <div class="formfieldXL_BG"><input type="text" name="name" onchange="javascript:changeIcon();" value="<c:out value="${definition.name}"/>" class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include>
-  </td><td class="formlabel">*</td></tr>
+   <tr valign="top"><td class="formlabel"><fmt:message key="name" bundle="${resword}"/>:</td><td><table><tr><td>
+ <div class="formfieldXL_BG"><input type="text" name="name" onchange="javascript:changeIcon();" value="<c:out value="${definition.name}"/>" class="formfieldXL"></div>
+  </td><td class="formlabel">*</td><td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td></tr></table></td></tr>
   <tr valign="top"><td class="formlabel"><fmt:message key="description" bundle="${resword}"/>:</td><td>  
   <div class="formtextareaXL4_BG">
   <textarea class="formtextareaXL4" name="description" onchange="javascript:changeIcon();" onchange="javascript:changeIcon();" rows="4" cols="50"><c:out value="${definition.description}"/></textarea>
@@ -107,16 +139,25 @@
          <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
          <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
          <option value="common" selected><fmt:message key="common" bundle="${resword}"/>
+         <option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
         </c:when>        
         <c:when test="${definition.type == 'unscheduled'}">       
          <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
          <option value="unscheduled" selected><fmt:message key="unscheduled" bundle="${resword}"/>
          <option value="common"><fmt:message key="common" bundle="${resword}"/>
+         <option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
+        </c:when>
+        <c:when test="${definition.type == 'calendared_visit'}">       
+         <option value="scheduled"><fmt:message key="scheduled" bundle="${resword}"/>
+         <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
+         <option value="common"><fmt:message key="common" bundle="${resword}"/>
+         <option value="calendared_visit" selected><fmt:message key="calendared_visit" bundle="${resword}"/>
         </c:when>
         <c:otherwise>        
          <option value="scheduled" selected><fmt:message key="scheduled" bundle="${resword}"/>
          <option value="unscheduled"><fmt:message key="unscheduled" bundle="${resword}"/>
          <option value="common"><fmt:message key="common" bundle="${resword}"/>
+         <option value="calendared_visit"><fmt:message key="calendared_visit" bundle="${resword}"/>
         </c:otherwise>
        </c:choose>       
     </select></div>
@@ -126,6 +167,48 @@
    <div class="formfieldXL_BG"><input type="text" name="category" onchange="javascript:changeIcon();" value="<c:out value="${definition.category}"/>" class="formfieldXL"></div>
    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="category"/></jsp:include>
   </td></tr>
+<!-- Clinovo ticket #134 start -->
+  <tr valign="top" class='showHide'>
+  		<td style="white-space: nowrap;"><fmt:message key="reference_event" bundle="${resword}"/>:</td><td>
+  		<c:choose>
+  		<c:when test="${isReference == 'true'}">
+  		<input type="checkbox" value="true" checked name="isReference"/>
+  		</c:when>
+  		<c:otherwise>
+  		<input type="checkbox" value="true" name="isReference"/>
+  		</c:otherwise>
+  		</c:choose>
+  		<c:choose>
+  		<c:when test="${referenceVisitAlredyExist == 'true'}">
+  		<span class="alert"><fmt:message key="reference_visit_already_exist" bundle="${resword}"/></span>
+  		</c:when>
+  		</c:choose></td>
+  </tr>
+  <tr valign="top" class='showHide'>
+  		<td class="formlabel" style="padding-top:10px"><fmt:message key="day_schedule" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG"><input class="formfieldL" value="<c:out value="${schDay}"/>" type="text" size="3" name="schDay"/></div>
+		</td><td style="padding-bottom:20px">*</td><td width="250px"><fmt:message key="after_the_reference_visit" bundle="${resword}"/></td><td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="schDay"/></jsp:include></td></tr></table></td>
+  </tr>
+   <tr valign="top" class='showHide'>
+  		<td class="formlabel" style="padding-top:15px"><fmt:message key="day_max" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG"><input class="formfieldL" value="<c:out value="${maxDay}"/>" type="text" size="3" name="maxDay"/></div>
+		</td><td style="padding-bottom:20px">*</td><td width="250px"><fmt:message key="the_maximum_day_that_an_event" bundle="${resword}"/></td><td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="maxDay"/></jsp:include></td></tr></table></td>
+    </tr>
+      <tr valign="top" class='showHide'>
+  		<td class="formlabel" style="padding-top:15px"><fmt:message key="day_min" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG"><input class="formfieldL" value="<c:out value="${minDay}"/>" type="text" size="3" name="minDay"/></div>
+		</td><td style="padding-bottom:20px">*</td><td width="250px"><fmt:message key="the_minimum_day_that_an_event" bundle="${resword}"/></td><td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="minDay"/></jsp:include></td></tr></table></td>
+    </tr>
+	<tr valign="top" class='showHide'>
+  		<td class="formlabel" style="padding-top:15px"><fmt:message key="day_email" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG"><input class="formfieldL" value="<c:out value="${emailDay}"/>" type="text" size="3" name="emailDay"/></div>
+		</td><td style="padding-bottom:20px">*</td><td width="250px"><fmt:message key="the_day_a_reminder_email_is" bundle="${resword}"/></td><td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="emailDay"/></jsp:include></td></tr></table></td>
+    </tr>
+
+   <tr valign="top" class='showHide'>
+  		<td class="formlabel"><fmt:message key="user_name" bundle="${resword}"/>:</td><td><table><tr><td><div class="formfieldXL_BG" ><input class="formfieldXL" value="<c:out value="${emailUser}"/>" type="text" size="3" name="emailUser"/></div><td style="padding-bottom:20px">*</td></td></tr></table></td></tr>
+		<tr class='showHide'><td>&nbsp</td><td><fmt:message key="use_only_a_valid_user_name" bundle="${resword}"/></tr>
+		<tr class='showHide'><td>&nbsp</td><td width="250px"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="emailUser"/></jsp:include></td></tr>
+
+ <!--  Clinovo end -->
+  
+  <!-- end -->
  
 
 </table>

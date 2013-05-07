@@ -18,6 +18,8 @@ import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudyEventDefinitionOidGenerator;
 
 import javax.sql.DataSource;
+
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -51,7 +53,14 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 
 	private String oid;
 	private OidGenerator oidGenerator;
-
+	//Clinovo #62 start
+	private int minDay = 0;
+	private int maxDay = 0;
+	private int emailDay = 0;
+	private int scheduleDay = 0;
+	private String emailAdress = "";
+	private boolean referenceVisit = false;
+	//end
 	public StudyEventDefinitionBean() {
 		this.oidGenerator = new StudyEventDefinitionOidGenerator();
 	}
@@ -255,4 +264,55 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 	public int hashCode() {
 		return id;
 	}
+	
+	//Clinovo ticket #65
+	
+	public int getMinDay() {
+		return minDay;
+	}
+	
+	public void setMinDay(int min_day) {
+		this.minDay = min_day;
+	}
+	
+	public int getMaxDay() {
+		return maxDay;
+	}
+	
+	public void setMaxDay(int max_day) {
+		this.maxDay = max_day;
+	}
+
+	public int getEmailDay() {
+		return emailDay;
+	}
+	
+	public void setEmailDay(int email_day) {
+		this.emailDay = email_day;
+	}
+	
+	public int getScheduleDay() {
+		return scheduleDay;
+	}
+	
+	public void setScheduleDay(int schedule_day) {
+		this.scheduleDay = schedule_day;
+	}
+	
+	public String getEmailAdress() {
+		return emailAdress;
+	}
+	
+	public void setEmailAdress(String email_adress) {
+		this.emailAdress = email_adress;
+	}
+	
+	public boolean getReferenceVisit() {
+		return referenceVisit;
+	}
+	
+	public void setReferenceVisit(boolean isRevernseVisit) {
+		referenceVisit = isRevernseVisit;
+	}
+
 }
