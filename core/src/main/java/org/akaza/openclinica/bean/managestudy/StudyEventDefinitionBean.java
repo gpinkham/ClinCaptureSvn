@@ -19,7 +19,6 @@ import org.akaza.openclinica.bean.oid.StudyEventDefinitionOidGenerator;
 
 import javax.sql.DataSource;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Map;
 

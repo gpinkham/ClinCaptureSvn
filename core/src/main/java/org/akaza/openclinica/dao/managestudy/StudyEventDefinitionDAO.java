@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
-import java.sql.Date;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
