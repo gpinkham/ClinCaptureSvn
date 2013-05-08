@@ -408,6 +408,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void checkReferenceVisit() {
 		boolean referenceVisitAlredyExist = false;
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(
@@ -426,6 +427,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean checkUserName(String emailUser) {
 		boolean isValid = false;
 		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
