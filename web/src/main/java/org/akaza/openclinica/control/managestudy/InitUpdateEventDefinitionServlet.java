@@ -30,6 +30,7 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -37,6 +38,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -103,7 +105,7 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 
 	@Override
 	public void processRequest() throws Exception {
-
+		setUserNameInsteadEmail();
 		StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(sm.getDataSource());
 		String idString = request.getParameter("id");
 		logger.info("definition id: " + idString);
@@ -189,5 +191,17 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 		}
 
 		return flags;
+	}
+	
+	private void setUserNameInsteadEmail() {
+		String sedId = request.getParameter("id");
+		int eventId = Integer.valueOf(sedId).intValue();
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(eventId);
+		String userEmail = sedBean.getEmailAdress();
+		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		UserAccountBean userBean = (UserAccountBean) uadao.findByUserEmail(userEmail);
+		request.setAttribute("userNameInsteadEmail", userBean.getName());
+
 	}
 }

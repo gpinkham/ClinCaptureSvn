@@ -1187,7 +1187,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-bottom: 6px;
 }
 
-.formfieldL { font-family: Tahoma Arial, Helvetica, sans-serif;
+.formfieldL_cf { font-family: Tahoma Arial, Helvetica, sans-serif;
 	font-size: 11px;
     color: #4D4D4D;
     background-color: white;
@@ -1199,7 +1199,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-bottom: 7px;
 }
 
-.formfieldL_BG { background-image: url(../images/formfieldM_BG_L.gif);
+.formfieldL_BG_cf { background-image: url(../images/formfieldM_BG_L.gif);
 	
     background-repeat: no-repeat;
     width: 40px !important;

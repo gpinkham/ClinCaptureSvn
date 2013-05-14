@@ -306,6 +306,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		session.removeAttribute("eventDefinitionCRFs");
 		session.removeAttribute("showCalendaredVisitBox");
 		session.removeAttribute("changedReference");
+		session.removeAttribute("userNameInsteadEmail");
 		
 		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"));
 		forwardPage(Page.LIST_DEFINITION_SERVLET);
@@ -449,4 +450,5 @@ public class UpdateEventDefinitionServlet extends SecureController {
 				.findByUserName(userName);
 		return userBean.getEmail();
 	}
+	
 }

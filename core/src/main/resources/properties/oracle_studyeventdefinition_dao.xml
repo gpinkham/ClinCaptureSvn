@@ -80,13 +80,15 @@
                 <sql>INSERT INTO STUDY_EVENT_DEFINITION
                     (study_event_definition_id,STUDY_ID, NAME,DESCRIPTION,
                     REPEATING, "TYPE", CATEGORY, OWNER_ID,STATUS_ID,DATE_CREATED,
-                    ordinal,oc_oid) VALUES (?,?,?,?,?,?,?,?,?,sysdate,?,?)</sql>
+                    ordinal,oc_oid, day_min,day_max,day_email,schedule_day,email_adress,reference_visit) 
+                    VALUES (?,?,?,?,?,?,?,?,?,sysdate,?,?,?,?,?,?,?,?)</sql>
         </query>
         <query>
                 <name>update</name>
                 <sql>UPDATE STUDY_EVENT_DEFINITION SET STUDY_ID=?,NAME=?,
                 DESCRIPTION=?,REPEATING=?,TYPE=?,CATEGORY=?,STATUS_ID=?,
-                DATE_UPDATED=sysdate,UPDATE_ID=?, ordinal=? WHERE STUDY_EVENT_DEFINITION_ID=?</sql>
+                DATE_UPDATED=sysdate,UPDATE_ID=?, ordinal=?, day_min=?,day_max=?,day_email=?,schedule_day=?,email_adress=?,reference_visit=?
+                WHERE STUDY_EVENT_DEFINITION_ID=?</sql>
         </query>
         <query>
                 <name>findAllWithStudyEvent</name>
@@ -130,6 +132,14 @@
 				AND (st.study_id=?)
 				AND sed.status_id=1
 				order by sed.ordinal asc
+		</sql>
+	</query>
+	<query>
+		<name>findReferenceVisitBeans</name>
+		<sql>
+			SELECT sed.*
+			FROM STUDY_EVENT_DEFINITION sed
+			WHERE sed.reference_visit = 'true'
 		</sql>
 	</query>
 </queries>

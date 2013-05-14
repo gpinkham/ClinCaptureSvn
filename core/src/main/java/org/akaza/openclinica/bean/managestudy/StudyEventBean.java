@@ -195,6 +195,20 @@ public class StudyEventBean extends AuditableEntityBean {
 		stage = DataEntryStage.UNCOMPLETED;
 		subjectEventStatus = SubjectEventStatus.SCHEDULED;
 	}
+	
+	public StudyEventBean (StudyEventBean obj) {
+		this.stage = obj.getStage();
+		this.subjectEventStatus = obj.getPrevSubjectEventStatus();
+		this.dateEnded = obj.getDateEnded();
+		this.dateStarted = obj.getDateStarted();
+		this.studyEventDefinitionId = obj.getStudyEventDefinitionId();
+		this.studySubjectId = obj.getStudySubjectId();
+		this.studySubject = obj.getStudySubject();
+		this.location = obj.getLocation();
+		this.sampleOrdinal = obj.getSampleOrdinal();
+		this.studySubjectLabel = obj.getStudySubjectLabel();
+		this.updatedDate = obj.getUpdatedDate();
+	}
 
 	/**
 	 * @return Returns the dateEnded.

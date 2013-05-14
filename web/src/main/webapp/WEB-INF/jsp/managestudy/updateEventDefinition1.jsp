@@ -206,24 +206,24 @@ $(document).ready(function() {
   		</c:choose></td>
   </tr>
   <tr valign="top" class='showHide'>
-  		<td class="formlabel" style="padding-top:10px"><fmt:message key="day_schedule" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG"><input class="formfieldL" value="<c:out value="${definition.scheduleDay}"/>" type="text" size="3" name="schDay"/></div>
+  		<td class="formlabel" style="padding-top:10px"><fmt:message key="day_schedule" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG_cf"><input class="formfieldL_cf" value="<c:out value="${definition.scheduleDay}"/>" type="text" size="3" name="schDay"/></div>
 		</td><td style="padding-bottom:20px">*</td><td width="250px"><fmt:message key="after_the_reference_visit" bundle="${resword}"/></td><td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="schDay"/></jsp:include></td></tr></table></td>
   </tr>
    <tr valign="top" class='showHide'>
-  		<td class="formlabel" style="padding-top:15px"><fmt:message key="day_max" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG"><input class="formfieldL" value="<c:out value="${definition.maxDay}"/>" type="text" size="3" name="maxDay"/></div>
+  		<td class="formlabel" style="padding-top:15px"><fmt:message key="day_max" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG_cf"><input class="formfieldL_cf" value="<c:out value="${definition.maxDay}"/>" type="text" size="3" name="maxDay"/></div>
 		</td><td style="padding-bottom:20px">*</td><td width="250px"><fmt:message key="the_maximum_day_that_an_event" bundle="${resword}"/></td><td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="maxDay"/></jsp:include></td></tr></table></td>
     </tr>
       <tr valign="top" class='showHide'>
-  		<td class="formlabel" style="padding-top:15px"><fmt:message key="day_min" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG"><input class="formfieldL" value="<c:out value="${definition.minDay}"/>" type="text" size="3" name="minDay"/></div>
+  		<td class="formlabel" style="padding-top:15px"><fmt:message key="day_min" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG_cf"><input class="formfieldL_cf" value="<c:out value="${definition.minDay}"/>" type="text" size="3" name="minDay"/></div>
 		</td><td style="padding-bottom:20px">*</td><td width="250px"><fmt:message key="the_minimum_day_that_an_event" bundle="${resword}"/></td><td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="minDay"/></jsp:include></td></tr></table></td>
     </tr>
 	<tr valign="top" class='showHide'>
-  		<td class="formlabel" style="padding-top:15px"><fmt:message key="day_email" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG"><input class="formfieldL" value="<c:out value="${definition.emailDay}"/>" type="text" size="3" name="emailDay"/></div>
+  		<td class="formlabel" style="padding-top:15px"><fmt:message key="day_email" bundle="${resword}"/>:</td><td><table width=480px><tr><td><div class="formfieldL_BG_cf"><input class="formfieldL_cf" value="<c:out value="${definition.emailDay}"/>" type="text" size="3" name="emailDay"/></div>
 		</td><td style="padding-bottom:20px">*</td><td width="250px"><fmt:message key="the_day_a_reminder_email_is" bundle="${resword}"/></td><td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="emailDay"/></jsp:include></td></tr></table></td>
     </tr>
 
    <tr valign="top" class='showHide'>
-  		<td class="formlabel"><fmt:message key="user_name" bundle="${resword}"/>:</td><td><table><tr><td><div class="formfieldXL_BG" ><input class="formfieldXL" value="<c:out value="${definition.emailAdress}"/>" type="text" size="3" name="emailUser"/></div><td style="padding-bottom:20px">*</td></td></tr></table></td></tr>
+  		<td class="formlabel"><fmt:message key="user_name" bundle="${resword}"/>:</td><td><table><tr><td><div class="formfieldXL_BG" ><input class="formfieldXL" value="<c:out value="${userNameInsteadEmail}"/>" type="text" size="3" name="emailUser"/></div><td style="padding-bottom:20px">*</td></td></tr></table></td></tr>
 		<tr class='showHide'><td>&nbsp</td><td><fmt:message key="use_only_a_valid_user_name" bundle="${resword}"/></tr>
 		<tr class='showHide'><td>&nbsp</td><td width="250px"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="emailUser"/></jsp:include></td></tr>
 

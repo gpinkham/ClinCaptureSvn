@@ -245,5 +245,8 @@
                 user_name = ? and study_id = ?
             </sql>
         </query>
-
+        <query>
+                <name>findByUserEmail</name>
+                <sql>select * from user_account where email=?</sql>
+        </query>
 </queries>

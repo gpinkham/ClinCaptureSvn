@@ -244,4 +244,8 @@
         <name>getPasswdHistory</name>
         <sql>select * from password where user_name=? and passwd = ?</sql>
     </query>
+    <query>
+                <name>findByUserEmail</name>
+                <sql>select * from user_account where email=?</sql>
+    </query>
 </queries>

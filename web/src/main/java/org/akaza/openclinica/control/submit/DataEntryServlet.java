@@ -118,6 +118,7 @@ import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.akaza.openclinica.logic.score.ScoreCalculator;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.calendar.CalendarLogic;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.crfdata.InstantOnChangeService;
 import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
@@ -3727,7 +3728,15 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		SubjectEventStatusUtil.determineSubjectEventState(seb, study, new DAOWrapper(sdao, sedao, ssdao, ecdao, edcdao,
 				discDao));
 		seb = (StudyEventBean) sedao.update(seb);
-
+		//Clinovo calendar func
+		if (seb.getSubjectEventStatus() == SubjectEventStatus.COMPLETED) {
+			CalendarLogic calLogic = new CalendarLogic(getDataSource());
+			String message = calLogic.maxMinDaysValidator(seb);
+			if (!"empty".equalsIgnoreCase(message)) {
+				addPageMessage(message, request);
+			}
+		}
+		//end
 		request.setAttribute(INPUT_EVENT_CRF, ecb);
 		request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);
 		return true;

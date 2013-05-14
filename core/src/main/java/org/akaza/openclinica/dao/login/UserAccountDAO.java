@@ -984,5 +984,20 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		}
 		return pwb.getDateLastUsed();
 	}
+	
+	public EntityBean findByUserEmail(String email) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+
+		variables.put(new Integer(1), email);
+
+		ArrayList alist = this.select(digester.getQuery("findByUserEmail"), variables);
+		UserAccountBean eb = new UserAccountBean();
+		Iterator it = alist.iterator();
+		if (it.hasNext()) {
+			eb = (UserAccountBean) this.getEntityFromHashMap((HashMap) it.next(), true);
+		}
+		return eb;
+	}
 
 }
