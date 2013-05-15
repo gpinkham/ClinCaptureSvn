@@ -46,7 +46,6 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.SingleThreadModel;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -153,8 +152,8 @@ import org.springframework.security.core.userdetails.UserDetails;
  * </ol>
  * 
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "deprecation", "serial" })
-public abstract class SecureController extends HttpServlet implements SingleThreadModel {
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+public abstract class SecureController extends HttpServlet {
 
 	public static final String BR = "<br/>";
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
