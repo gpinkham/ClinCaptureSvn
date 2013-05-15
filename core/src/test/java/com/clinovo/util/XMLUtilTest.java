@@ -65,7 +65,7 @@ public class XMLUtilTest extends BaseTest {
 
 		Document document = XMLUtil.createDocument(createInputStream());
 
-		assertNotNull("Should never return null", XMLUtil.extractNodeFromDocument("initials", document));
+		assertNotNull("Should never return null", XMLUtil.extractNodeFromDocument("patient", document));
 	}
 
 	@Test
@@ -73,17 +73,17 @@ public class XMLUtilTest extends BaseTest {
 
 		Document document = XMLUtil.createDocument(createInputStream());
 
-		Node node = XMLUtil.extractNodeFromDocument("initials", document);
-		assertEquals("Should extract the correct Node", "initials", node.getNodeName());
+		Node node = XMLUtil.extractNodeFromDocument("treatment", document);
+		assertEquals("Should extract the correct Node", "treatment", node.getNodeName());
 	}
 
 	@Test
 	public void testThatExtractNodeReturnsNodeWithValue() throws Exception {
 
 		Document document = XMLUtil.createDocument(createInputStream());
-		Node node = XMLUtil.extractNodeFromDocument("initials", document);
+		Node node = XMLUtil.extractNodeFromDocument("treatment", document);
 
-		assertEquals("Should extract the correct Node content", "NAS", node.getTextContent());
+		assertEquals("Should extract the correct Node content", "2", node.getTextContent());
 	}
 
 	@Test
@@ -95,20 +95,37 @@ public class XMLUtilTest extends BaseTest {
 	}
 
 	@Test
-	public void testThatCreateWebServiceResultReturnsValidResultWithValidTrialId() throws Exception {
+	public void testThatCreateWebServiceResultReturnsValidResultWithValidTreatment() throws Exception {
 
 		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
 
-		assertThat("Trial Id should not be null", result.getTrialId(), IsNot.not(""));
+		assertThat("Treatment should not be null", result.getTreatment(), IsNot.not(""));
 
 	}
 
 	@Test
-	public void testThatCreateWebServiceResultReturnsValidResultWithCorrectTrialId() throws Exception {
+	public void testThatCreateWebServiceResultReturnsValidResultWithCorrectTreatment() throws Exception {
 
 		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
 
-		assertThat("Trial Id should set correctly", result.getTrialId(), is("some-trial-id"));
+		assertThat("Treatment should set correctly", result.getTreatment(), is("2"));
+	}
+	
+	@Test
+	public void testThatCreateWebServiceResultReturnsValidResultWithValidRandomizationResult() throws Exception {
+
+		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
+
+		assertThat("Randomization result should not be null", result.getRandomizationResult(), IsNot.not(""));
+
+	}
+
+	@Test
+	public void testThatCreateWebServiceResultReturnsValidResultWithCorrectRandomResult() throws Exception {
+
+		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
+
+		assertThat("Randomization result should set correctly", result.getRandomizationResult(), is("radiotherapy"));
 	}
 	
 	@Test
@@ -125,24 +142,7 @@ public class XMLUtilTest extends BaseTest {
 
 		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
 
-		assertThat("Patient Id should not be null", result.getPatientId(), is("some-patient-id"));
-	}
-
-	@Test
-	public void testThatCreateWebServiceResultReturnsValidResultWithCorrectInitials() throws Exception {
-
-		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
-
-		assertThat("Intials should not be null or empty", result.getInitials(), is("NAS"));
-	}
-	
-	@Test
-	public void testThatCreateWebServiceResultReturnsValidResultWithValidInitials() throws Exception {
-
-		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
-
-		assertThat("Initials should be set correctly", result.getInitials(), IsNot.not(""));
-
+		assertThat("Patient Id should not be null", result.getPatientId(), is("subject2"));
 	}
 	
 	private Document parseDocument() throws Exception {

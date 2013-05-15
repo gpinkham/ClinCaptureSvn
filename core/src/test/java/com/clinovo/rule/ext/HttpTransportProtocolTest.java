@@ -30,14 +30,14 @@ public class HttpTransportProtocolTest extends BaseTest {
 		context = new XMLSubmissionContext();
 
 		WebServiceAction action = createWebServiceAction();
-		
+
 		context.setAction(action);
-		
+
 		method = createPostMethodMock(action.getRandomizationUrl(), XMLUtil.docToString(webServiceReturnValue));
 
 		protocol = new HttpTransportProtocol();
 		protocol.setHttpMethod(method);
-		
+
 		context.setAction(action);
 		protocol.setSubmissionContext(context);
 
@@ -80,19 +80,19 @@ public class HttpTransportProtocolTest extends BaseTest {
 	}
 
 	@Test
-	public void testThatCallReturnsValidWebServiceResultWithTrialId() throws Exception {
+	public void testThatCallReturnsValidWebServiceResultWithTreatment() throws Exception {
 
 		WebServiceResult result = protocol.call();
 
-		assertNotNull("Should have a valid TrialId specified", result.getTrialId());
+		assertNotNull("Should have a valid Treatment specified", result.getTreatment());
 	}
 
 	@Test
-	public void testThatCallReturnsValidWebServiceResultWithACorrectTrialId() throws Exception {
+	public void testThatCallReturnsValidWebServiceResultWithACorrectTreatment() throws Exception {
 
 		WebServiceResult result = protocol.call();
 
-		assertEquals("Should have a correct TrialId specified", "some-trial-id", result.getTrialId());
+		assertEquals("Should have a correct Treatment specified", "2", result.getTreatment());
 	}
 
 	@Test
@@ -108,15 +108,15 @@ public class HttpTransportProtocolTest extends BaseTest {
 
 		WebServiceResult result = protocol.call();
 
-		assertEquals("Should have a correct patientId specified", "some-patient-id", result.getPatientId());
+		assertEquals("Should have a correct patientId specified", "subject2", result.getPatientId());
 	}
-	
+
 	@Test
 	public void testThatCallReturnsValidWebServiceResultWithSiteId() throws Exception {
 
 		WebServiceResult result = protocol.call();
 
-		assertNotNull("Should have a valid site Id specified", result.getSiteId());
+		assertNotNull("Should have a valid Randomization result specified", result.getRandomizationResult());
 	}
 
 	@Test
@@ -124,23 +124,7 @@ public class HttpTransportProtocolTest extends BaseTest {
 
 		WebServiceResult result = protocol.call();
 
-		assertEquals("Should have a correct site Id specified", "some-site-id", result.getSiteId());
+		assertEquals("Should have a correct Randomization result specified", "radiotherapy",
+				result.getRandomizationResult());
 	}
-	
-	@Test
-	public void testThatCallReturnsValidWebServiceResultWithInitials() throws Exception {
-
-		WebServiceResult result = protocol.call();
-
-		assertNotNull("Should have a valid initials", result.getInitials());
-	}
-
-	@Test
-	public void testThatCallReturnsValidWebServiceResultWithACorrectInitials() throws Exception {
-
-		WebServiceResult result = protocol.call();
-
-		assertEquals("Should have a correct initials", "NAS", result.getInitials());
-	}
-	
 }

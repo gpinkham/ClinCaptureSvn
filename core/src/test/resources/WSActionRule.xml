@@ -6,11 +6,11 @@
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true"
 					DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
 
-				<username>demosite1</username>
-				<password>demo1</password>
-				<rolename>admin</rolename>
-				<studyoid>SE_TEST</studyoid>
-				<studysubjectoid>SE_TEST_SS_NUM</studysubjectoid>
+				<username>clinovo</username>
+				<password>clinovo</password>
+				<siteid>clinovotest</siteid>
+				<trialid>SE_TEST</trialid>
+				<patientid>SE_TEST_SS_NUM</patientid>
 				<authenticationurl>https://www.randomize.net/api/RandomizeAPIService/Authenticate</authenticationurl>
 				<randomizationurl>https://www.randomize.net/api//RandomizeAPIService/RandomizePatientDelegated</randomizationurl>
 			</WebServiceAction>

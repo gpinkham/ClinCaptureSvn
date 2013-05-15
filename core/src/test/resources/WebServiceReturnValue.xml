@@ -1,7 +1,5 @@
 <Result>
-	<trialid>some-trial-id</trialid>
-	<siteid>some-site-id</siteid>
-	<patientid>some-patient-id</patientid>
-	<initials>NAS</initials>
-	<dateofbirth>May 7, 2013</dateofbirth>
+	<treatment>2</treatment>
+	<patient>subject2</patient>
+	<randomizationresult>radiotherapy</randomizationresult>
 </Result>

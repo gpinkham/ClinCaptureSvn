@@ -6,9 +6,11 @@ import javax.xml.ws.WebServiceException;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpsURL;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.json.JSONObject;
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import org.apache.commons.httpclient.protocol.SSLProtocolSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +22,6 @@ public class HttpTransportProtocol implements Callable<WebServiceResult> {
 	private PostMethod method = null;
 	private SubmissionContext context;
 	private HttpClient client = new HttpClient();
-	private Header randomizationHeader = new Header();
 
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -35,37 +36,22 @@ public class HttpTransportProtocol implements Callable<WebServiceResult> {
 
 		// Allow testing
 		if (method == null) {
-			method = new PostMethod(context.getAction().getRandomizationUrl());
+			method = new PostMethod();
 		}
 
 		try {
 
-			// set parameters
-			JSONObject postData = new JSONObject();
+			for (Header header : context.getHttpHeaders()) {
 
-			// Required post data
-			postData.append("TrialID", "");
-			postData.append("SiteID", "");
-			postData.append("PatientID", "");
-			postData.append("BirthDate", "");
-			postData.append("Initials", "");
+				method.addRequestHeader(header);
+			}
 
-			// Required Headers
-			Header contentTypeHeader = new Header();
-			contentTypeHeader.setName("Content-Type");
-			contentTypeHeader.setValue("application/json");
+			ProtocolSocketFactory sslFactory = new SSLProtocolSocketFactory();
+			Protocol.registerProtocol("https", new Protocol("https", sslFactory, 443));
 
-			Header acceptHeader = new Header();
-			acceptHeader.setName("Accept");
-			acceptHeader.setValue("application/json");
-
-			method.addRequestHeader(acceptHeader);
-			method.addRequestHeader(contentTypeHeader);
-			method.addRequestHeader(randomizationHeader);
-
-			String body = postData.toString().replaceAll("]|\\[", "");
-
-			method.setRequestEntity(new StringRequestEntity(body, "application/json", "utf-8"));
+			HttpsURL url = new HttpsURL(context.getAction().getRandomizationUrl());
+			method.setURI(url);
+			method.setRequestEntity(context.getRequestEntity());
 
 			client.executeMethod(method);
 
@@ -91,11 +77,4 @@ public class HttpTransportProtocol implements Callable<WebServiceResult> {
 		this.context = context;
 	}
 
-	public void setRandomizationHeader(String token) {
-
-		// Randomization Header
-		randomizationHeader.setName("X-RANDOMIZE-TOKEN");
-		randomizationHeader.setValue(token);
-		
-	}
 }

@@ -35,16 +35,16 @@ public class SubmissionContextTest extends BaseTest {
 	@Test
 	public void testThatAuthenticateDoesNotReturnNull() throws Exception {
 
-		assertNotNull("Should never return null", context.authenticate(context.getAction()));
+		assertNotNull("Should never return null", context.authenticate());
 	}
 
 	@Test
 	public void testThatAuthenticateReturnsValidAuthToken() throws Exception {
 
-		JSONObject token = new JSONObject(context.authenticate(context.getAction()));
+		JSONObject token = new JSONObject(context.authenticate());
 
-		assertEquals("The auth token should be equal the expected type", "36055d77-5f0c-4121-bd87-bb8fb6132605",
-				token.get("Token"));
+		assertEquals("The auth token should be equal the expected type", "\"36055d77-5f0c-4121-bd87-bb8fb6132605\"",
+				token.getString("Token").replaceAll("]|\\[", ""));
 
 	}
 }

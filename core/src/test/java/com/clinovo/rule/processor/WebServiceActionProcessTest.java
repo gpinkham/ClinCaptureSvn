@@ -75,19 +75,19 @@ public class WebServiceActionProcessTest extends BaseTest {
 	}
 
 	@Test
-	public void testThatExecuteReturnsValidResultWithTrialId() throws Exception {
+	public void testThatExecuteReturnsValidResultWithTreatment() throws Exception {
 
 		WebServiceResult result = (WebServiceResult) processor.execute(context);
-		assertNotNull("The processor should return a valid result with trial Id", result.getTrialId());
+		assertNotNull("The processor should return a valid result with treatment", result.getTreatment());
 
 	}
 
 	@Test
-	public void testThatExecuteReturnsValidResultWithCorrectTrialId() throws Exception {
+	public void testThatExecuteReturnsValidResultWithCorrectTreatment() throws Exception {
 
 		WebServiceResult result = (WebServiceResult) processor.execute(context);
-		assertEquals("The processor should return a valid result with the correct trial Id", "some-trial-id",
-				result.getTrialId());
+		assertEquals("The processor should return a valid result with the correct treatment", "2",
+				result.getTreatment());
 
 	}
 
@@ -103,42 +103,25 @@ public class WebServiceActionProcessTest extends BaseTest {
 	public void testThatExecuteReturnsValidResultWithCorrectPatientId() throws Exception {
 
 		WebServiceResult result = (WebServiceResult) processor.execute(context);
-		assertEquals("The processor should return a valid result with the correct treatment", "some-patient-id",
+		assertEquals("The processor should return a valid result with the correct treatment", "subject2",
 				result.getPatientId());
 
 	}
 
 	@Test
-	public void testThatExecuteReturnsValidResultWithSiteId() throws Exception {
+	public void testThatExecuteReturnsValidResultWithRandomizationResult() throws Exception {
 
 		WebServiceResult result = (WebServiceResult) processor.execute(context);
-		assertNotNull("The processor should return a valid result with siteId", result.getSiteId());
+		assertNotNull("The processor should return a valid result with Randomization result", result.getRandomizationResult());
 
 	}
 
 	@Test
-	public void testThatExecuteReturnsValidResultWithCorrectSiteId() throws Exception {
+	public void testThatExecuteReturnsValidResultWithCorrectRandomizationResult() throws Exception {
 
 		WebServiceResult result = (WebServiceResult) processor.execute(context);
-		assertEquals("The processor should return a valid result with the correct site id", "some-site-id",
-				result.getSiteId());
-
-	}
-
-	@Test
-	public void testThatExecuteReturnsValidResultWithInitials() throws Exception {
-
-		WebServiceResult result = (WebServiceResult) processor.execute(context);
-		assertNotNull("The processor should return a valid result with initials", result.getInitials());
-
-	}
-
-	@Test
-	public void testThatExecuteReturnsValidResultWithCorrectInitials() throws Exception {
-
-		WebServiceResult result = (WebServiceResult) processor.execute(context);
-		assertEquals("The processor should return a valid result with the correct initials", "NAS",
-				result.getInitials());
+		assertEquals("The processor should return a valid result with the correct Randomization result", "radiotherapy",
+				result.getRandomizationResult());
 
 	}
 

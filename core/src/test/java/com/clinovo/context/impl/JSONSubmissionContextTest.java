@@ -63,29 +63,29 @@ public class JSONSubmissionContextTest extends BaseTest {
 	}
 
 	@Test
-	public void testThatProcessResponseReturnsResultWithTrialId() throws Exception {
+	public void testThatProcessResponseReturnsResultWithTreatment() throws Exception {
 
 		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
 
-		assertNotNull("Should return valid Trial Id", result.getTrialId());
+		assertNotNull("Should return valid Treatment", result.getTreatment());
 	}
 
 	@Test
-	public void testThatProcessResponseReturnsresultWithCorrectTrialId() throws Exception {
+	public void testThatProcessResponseReturnsresultWithCorrectTreatment() throws Exception {
 
 		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
 
-		assertEquals("Should return correct Trial Id", "1185", result.getTrialId());
+		assertEquals("Should return correct Treatment", "3", result.getTreatment());
 	}
-	
+
 	@Test
 	public void testThatProcessResponseReturnsResultWithPatientId() throws Exception {
-		
+
 		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
-		
+
 		assertNotNull("Should return valid Patient Id", result.getPatientId());
 	}
-	
+
 	@Test
 	public void testThatProcessResponseReturnsresultWithCorrectPatientId() throws Exception {
 
@@ -93,37 +93,25 @@ public class JSONSubmissionContextTest extends BaseTest {
 
 		assertEquals("Should return correct Patient Id", "abc123", result.getPatientId());
 	}
-	
+
 	@Test
-	public void testThatProcessResponseReturnsResultWithSiteId() throws Exception {
-		
-		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
-		
-		assertNotNull("Should return valid site Id", result.getSiteId());
-	}
-	
-	@Test
-	public void testThatProcessResponseReturnsresultWithCorrectSiteId() throws Exception {
+	public void testThatProcessResponseReturnsResultWithRandomizationResult() throws Exception {
 
 		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
 
-		assertEquals("Should return correct Site Id", "clinovotest", result.getSiteId());
+		assertNotNull("Should return valid randomization result", result.getRandomizationResult());
 	}
-	
+
 	@Test
-	public void testThatProcessResponseReturnsResultWithInitials() throws Exception {
-		
-		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
-		
-		assertNotNull("Should return valid initials", result.getInitials());
-	}
-	
-	@Test
-	public void testThatProcessResponseReturnsresultWithCorrectInitials() throws Exception {
+	public void testThatProcessResponseReturnsresultWithCorrectRandomizationResult() throws Exception {
 
 		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
 
-		assertEquals("Should return correct Initials", "MDG", result.getInitials());
+		assertEquals("Should return correct randomization result", "radiotherapy", result.getRandomizationResult());
 	}
-	
+
+	@Test
+	public void testThatFailedRandomizationCallThrowsException() {
+
+	}
 }

@@ -11,7 +11,6 @@ import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.auth.AuthState;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.mockito.Mockito;
@@ -58,33 +57,21 @@ public class BaseTest {
 	public static void createJSONReturnData() throws Exception {
 
 		jsonReturnedData = new JSONObject();
-		jsonReturnedData.append("Initials", "MDG");
-		jsonReturnedData.append("TrialID", "1185");
-		jsonReturnedData.append("PatientID", "abc123");
-		jsonReturnedData.append("BirthDate", "May 7, 2013");
-		jsonReturnedData.append("SiteID", "clinovotest");
+		jsonReturnedData.put("PatientID", "abc123");
+		jsonReturnedData.put("RandomizationResult", "radiotherapy");
+		jsonReturnedData.put("TreatmentID", "3");
 		
-		// optional for now?
-		JSONArray patientOtherAnswers = new JSONArray();
-		patientOtherAnswers.put(new JSONObject("{\"ID\" : 1, \"OtherAnswer\"  : \"User1\"}"));
-		patientOtherAnswers.put(new JSONObject("{\"ID\" : 2, \"OtherAnswer\" : \"RoleA\"}"));
-		patientOtherAnswers.put(new JSONObject("{\"ID\" : 3, \"OtherAnswer\" : \"3234234923481\"}"));
-		
-		jsonReturnedData.append("PatientOtherAnswers", patientOtherAnswers);
-		
-		// Strata answers
-		jsonReturnedData.append("StrataAnswers", new JSONObject("{\"StratificationID\" : 1, \"Level\" : 2}"));
-
 	}
 
 	protected WebServiceAction createWebServiceAction() {
 
 		WebServiceAction action = new WebServiceAction();
+		
 		action.setUsername(webServiceActionDefinition.getElementsByTagName("username").item(0).getTextContent());
 		action.setPassword(webServiceActionDefinition.getElementsByTagName("password").item(0).getTextContent());
-		action.setRolename(webServiceActionDefinition.getElementsByTagName("rolename").item(0).getTextContent());
-		action.setStudyOID(webServiceActionDefinition.getElementsByTagName("studyoid").item(0).getTextContent());
-		action.setStudySubjectOID(webServiceActionDefinition.getElementsByTagName("studysubjectoid").item(0)
+		action.setTrialId(webServiceActionDefinition.getElementsByTagName("trialid").item(0).getTextContent());
+		action.setSiteId(webServiceActionDefinition.getElementsByTagName("siteid").item(0).getTextContent());
+		action.setPatientId(webServiceActionDefinition.getElementsByTagName("patientid").item(0)
 				.getTextContent());
 		action.setRandomizationUrl(webServiceActionDefinition.getElementsByTagName("randomizationurl").item(0)
 				.getTextContent());

@@ -5,7 +5,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,16 +14,14 @@ import com.clinovo.rule.WebServiceAction;
 public abstract class DefaultSubmissionContext implements SubmissionContext {
 
 	protected WebServiceAction action;
-	protected PostMethod method = new PostMethod();
+	protected PostMethod method = null;
 	protected HttpClient client = new HttpClient();
 
 	protected final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-	public String authenticate(WebServiceAction action) throws Exception {
-
-		JSONObject postData = new JSONObject();
-		postData.append("SiteID", action.getUsername());
-		postData.append("Password", action.getPassword());
+	abstract String getBody() throws Exception;
+	
+	public String authenticate() throws Exception {
 
 		// Allow for testing
 		if (method == null)
@@ -41,15 +38,13 @@ public abstract class DefaultSubmissionContext implements SubmissionContext {
 		method.addRequestHeader(acceptHeader);
 		method.addRequestHeader(contentTypeHeader);
 
-		// Remove brackets
-		String body = postData.toString().replaceAll("]|\\[", "");
-		method.setRequestEntity(new StringRequestEntity(body, "application/json", "utf-8"));
+		method.setRequestEntity(new StringRequestEntity(getBody(), "application/json", "utf-8"));
 
-		log.info("Making randomization post request with: {} ", body);
+		log.info("Making randomization post request with: {} ", getBody());
 		client.executeMethod(method);
 
-		String response = method.getResponseBodyAsString().replaceAll("]|\\[", "");
-
+		String response = method.getResponseBodyAsString();
+		
 		return response;
 	}
 

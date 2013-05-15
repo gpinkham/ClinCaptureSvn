@@ -11,11 +11,17 @@ import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
 @DiscriminatorValue("2")
 public class WebServiceAction extends RuleActionBean {
 
+	// Post data
+	private String siteId;
+	private String trialId;
+	private String initials;
+	private String patientId;
+	
+	// Auth details
 	private String username;
-	private String rolename;
 	private String password;
-	private String studyOID;
-	private String studySubjectOID;
+	
+	// urls
 	private String randomizationUrl;
 	private String authenticationUrl;
 
@@ -52,14 +58,6 @@ public class WebServiceAction extends RuleActionBean {
 		this.username = username;
 	}
 
-	public String getRolename() {
-		return rolename;
-	}
-
-	public void setRolename(String rolename) {
-		this.rolename = rolename;
-	}
-
 	public String getPassword() {
 		return password;
 	}
@@ -68,20 +66,20 @@ public class WebServiceAction extends RuleActionBean {
 		this.password = password;
 	}
 
-	public String getStudyOID() {
-		return studyOID;
+	public String getSiteId() {
+		return siteId;
 	}
 
-	public void setStudyOID(String studyOID) {
-		this.studyOID = studyOID;
+	public void setSiteId(String siteId) {
+		this.siteId = siteId;
 	}
 
-	public String getStudySubjectOID() {
-		return studySubjectOID;
+	public String getPatientId() {
+		return patientId;
 	}
 
-	public void setStudySubjectOID(String studySubjectOID) {
-		this.studySubjectOID = studySubjectOID;
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
 	}
 
 	public String getRandomizationUrl() {
@@ -90,6 +88,22 @@ public class WebServiceAction extends RuleActionBean {
 
 	public void setRandomizationUrl(String randomizationUrl) {
 		this.randomizationUrl = randomizationUrl;
+	}
+
+	public String getInitials() {
+		return initials;
+	}
+
+	public void setInitials(String initials) {
+		this.initials = initials;
+	}
+
+	public String getTrialId() {
+		return trialId;
+	}
+
+	public void setTrialId(String trialId) {
+		this.trialId = trialId;
 	}
 
 }

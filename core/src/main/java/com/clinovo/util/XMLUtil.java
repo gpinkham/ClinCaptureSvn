@@ -23,20 +23,17 @@ public class XMLUtil {
 
 		Document document = createDocument(response);
 
-		Node siteNode = extractNodeFromDocument("siteid", document);
-		Node trialNode = extractNodeFromDocument("trialid", document);
-		Node patientNode = extractNodeFromDocument("patientid", document);
-		Node initialsNode = extractNodeFromDocument("initials", document);
+		Node treatmentNode = extractNodeFromDocument("treatment", document);
+		Node patientNode = extractNodeFromDocument("patient", document);
+		Node randomizationResultNode = extractNodeFromDocument("randomizationresult", document);
 
-		String siteId = siteNode != null ? siteNode.getTextContent() : "";
-		String trialId = trialNode != null ? trialNode.getTextContent() : "";
 		String patientId = patientNode != null ? patientNode.getTextContent() : "";
-		String initials = initialsNode != null ? initialsNode.getTextContent() : "";
-		
-		result.setSiteId(siteId);
-		result.setTrialId(trialId);
+		String treatment = treatmentNode != null ? treatmentNode.getTextContent() : "";
+		String randomizationResult = randomizationResultNode != null ? randomizationResultNode.getTextContent() : "";
+
+		result.setTreatment(treatment);
 		result.setPatientId(patientId);
-		result.setInitials(initials);
+		result.setRandomizationResult(randomizationResult);
 
 		return result;
 	}

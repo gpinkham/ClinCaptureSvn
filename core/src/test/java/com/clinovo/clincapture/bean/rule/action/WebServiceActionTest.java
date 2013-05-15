@@ -61,39 +61,45 @@ public class WebServiceActionTest extends BaseTest {
 	}
 
 	@Test
-	public void testThatCreateWebServiceActionReturnsValidActionWithStudyOID() {
+	public void testThatCreateWebServiceActionReturnsValidActionWithSiteId() {
 
-		assertEquals("Should have valid studyOID", "SE_TEST", wsAction.getStudyOID());
+		assertEquals("Should have valid site id", "clinovotest", wsAction.getSiteId());
 	}
 
 	@Test
 	public void testThatCreateWebServiceActionReturnsValidActionWithStudyUsername() {
 
-		assertEquals("Should have valid username", "demosite1", wsAction.getUsername());
+		assertEquals("Should have valid username", "clinovo", wsAction.getUsername());
 	}
 
 	@Test
 	public void testThatCreateWebServiceActionReturnsValidActionWithPassword() {
 
-		assertEquals("Should have valid password", "demo1", wsAction.getPassword());
+		assertEquals("Should have valid password", "clinovo", wsAction.getPassword());
 	}
 
 	@Test
-	public void testThatCreateWebServiceActionReturnsValidActionWithUrl() {
+	public void testThatCreateWebServiceActionReturnsValidActionWithAuthenticationUrl() {
 
 		assertEquals("Should have valid url", "https://www.randomize.net/api/RandomizeAPIService/Authenticate", wsAction.getAuthenticationUrl());
 	}
-
+	
 	@Test
-	public void testThatCreateWebServiceActionReturnsValidActionWithStudySubjectOID() {
-
-		assertEquals("Should have valid study subject oid", "SE_TEST_SS_NUM", wsAction.getStudySubjectOID());
+	public void testThatWebServiceActionHasRandomizationUrl() {
+		
+		assertEquals("Should have a randomization url", "https://www.randomize.net/api//RandomizeAPIService/RandomizePatientDelegated", wsAction.getRandomizationUrl());
 	}
 
 	@Test
-	public void testThatCreateWebServiceActionReturnsValidActionWithRoleName() {
+	public void testThatCreateWebServiceActionReturnsValidActionWithPatientId() {
 
-		assertEquals("Should have valid rolename", "admin", wsAction.getRolename());
+		assertEquals("Should have valid patient id", "SE_TEST_SS_NUM", wsAction.getPatientId());
+	}
+
+	@Test
+	public void testThatCreateWebServiceActionReturnsValidActionWithTrialId() {
+
+		assertEquals("Should have valid Trial Id", "SE_TEST", wsAction.getTrialId());
 	}
 	
 	@Test
@@ -124,12 +130,6 @@ public class WebServiceActionTest extends BaseTest {
 	public void testThatWebServiceActionDoesNotRunOnImportDataEntry() {
 		
 		assertFalse("This rule should not run on Import data entry", wsAction.getRuleActionRun().getImportDataEntry());
-	}
-	
-	@Test
-	public void testThatWebServiceActionHasRandomizationUrl() {
-		
-		assertEquals("Should have a randomization url", "https://www.randomize.net/api//RandomizeAPIService/RandomizePatientDelegated", wsAction.getRandomizationUrl());
 	}
 	
 	private RuleSetRuleBean createRuleSetRuleBean() {

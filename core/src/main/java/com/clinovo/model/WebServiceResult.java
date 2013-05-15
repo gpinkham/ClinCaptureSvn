@@ -4,17 +4,16 @@ package com.clinovo.model;
 public class WebServiceResult {
 
 
-	private String siteId;
-	private String trialId;
-	private String initials;
 	private String patientId;
+	private String treatmentID;
+	private String randomizationResult;
 
-	public String getTrialId() {
-		return trialId;
+	public String getTreatment() {
+		return treatmentID;
 	}
 
-	public void setTrialId(String trialId) {
-		this.trialId = trialId;
+	public void setTreatment(String treatment) {
+		this.treatmentID = treatment;
 	}
 
 	public String getPatientId() {
@@ -25,20 +24,12 @@ public class WebServiceResult {
 		this.patientId = patientId;
 	}
 
-	public String getSiteId() {
-		return siteId;
+	public String getRandomizationResult() {
+		return randomizationResult;
 	}
 
-	public void setSiteId(String siteId) {
-		this.siteId = siteId;
-	}
-
-	public String getInitials() {
-		return initials;
-	}
-
-	public void setInitials(String initials) {
-		this.initials = initials;
+	public void setRandomizationResult(String result) {
+		this.randomizationResult = result;
 	}
 
 }
