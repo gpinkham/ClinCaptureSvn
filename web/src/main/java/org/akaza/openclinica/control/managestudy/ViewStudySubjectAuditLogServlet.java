@@ -99,7 +99,8 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 		String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
 
 		int studySubId = fp.getInt("id", true);// studySubjectId
-
+		request.setAttribute("id", studySubId);
+		
 		if (studySubId == 0) {
 			addPageMessage(respage.getString("please_choose_a_subject_to_view"));
 			forwardPage(Page.LIST_STUDY_SUBJECTS);
