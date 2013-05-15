@@ -68,9 +68,7 @@ public class SQLFactory {
 	public final String DAO_CRFVERSION = "crfversion";
 	public final String DAO_DATASET = "dataset";
 	public final String DAO_SECTION = "section";
-	public final String DAO_MASKING = "masking";
-	public final String DAO_FILTER = "filter";
-
+	
 	public final String DAO_EVENTCRF = "eventcrf";
 	public final String DAO_ARCHIVED_DATASET_FILE = "archived_dataset_file";
 	public final String DAO_DISCREPANCY_NOTE = "discrepancy_note";
@@ -174,8 +172,7 @@ public class SQLFactory {
 			fileList.put(this.DAO_CRFVERSION, "oracle_crfversion_dao.xml");
 			fileList.put(this.DAO_DATASET, "oracle_dataset_dao.xml");
 			fileList.put(this.DAO_SECTION, "oracle_section_dao.xml");
-			fileList.put(this.DAO_FILTER, "oracle_filter_dao.xml");
-			fileList.put(this.DAO_MASKING, "oracle_masking_dao.xml");
+			
 			fileList.put(this.DAO_EVENTCRF, "oracle_eventcrf_dao.xml");
 			fileList.put(this.DAO_ITEMFORMMETADATA, "oracle_item_form_metadata_dao.xml");
 			fileList.put(this.DAO_DISCREPANCY_NOTE, "oracle_discrepancy_note_dao.xml");
@@ -211,8 +208,7 @@ public class SQLFactory {
 			fileList.put(this.DAO_CRFVERSION, "crfversion_dao.xml");
 			fileList.put(this.DAO_DATASET, "dataset_dao.xml");
 			fileList.put(this.DAO_SECTION, "section_dao.xml");
-			fileList.put(this.DAO_FILTER, "filter_dao.xml");
-			fileList.put(this.DAO_MASKING, "masking_dao.xml");
+			
 			fileList.put(this.DAO_EVENTCRF, "eventcrf_dao.xml");
 			fileList.put(this.DAO_ITEMFORMMETADATA, "item_form_metadata_dao.xml");
 			fileList.put(this.DAO_DISCREPANCY_NOTE, "discrepancy_note_dao.xml");

@@ -808,26 +808,7 @@
         <display-name>RestoreEventCRF</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreEventCRFServlet</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>ApplyFilterServlet</servlet-name>
-        <display-name>ApplyFilter</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.ApplyFilterServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>CreateFiltersOneServlet</servlet-name>
-        <display-name>CreateFiltersOne</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.CreateFiltersOneServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>CreateFiltersTwoServlet</servlet-name>
-        <display-name>CreateFiltersTwo</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.CreateFiltersTwoServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>CreateFiltersThreeServlet</servlet-name>
-        <display-name>CreateFiltersThree</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.CreateFiltersThreeServlet</servlet-class>
-    </servlet>
+    
     <servlet>
         <servlet-name>ViewCRFVersionServlet</servlet-name>
         <display-name>ViewCRFVersion</display-name>
@@ -843,16 +824,7 @@
         <display-name>ReassignStudySubject</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ReassignStudySubjectServlet</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>EditFilterServlet</servlet-name>
-        <display-name>EditFilter</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.EditFilterServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>RemoveFilterServlet</servlet-name>
-        <display-name>RemoveFilter</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.RemoveFilterServlet</servlet-class>
-    </servlet>
+    
     <servlet>
         <servlet-name>RemoveDatasetServlet</servlet-name>
         <display-name>RemoveDataset</display-name>
@@ -1458,22 +1430,12 @@
         <servlet-name>MainMenuServlet</servlet-name>
         <url-pattern>/MainMenu</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ApplyFilterServlet</servlet-name>
-        <url-pattern>/ApplyFilter</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>EditFilterServlet</servlet-name>
-        <url-pattern>/EditFilter</url-pattern>
-    </servlet-mapping>
+    
     <servlet-mapping>
         <servlet-name>EditDatasetServlet</servlet-name>
         <url-pattern>/EditDataset</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RemoveFilterServlet</servlet-name>
-        <url-pattern>/RemoveFilter</url-pattern>
-    </servlet-mapping>
+    
     <servlet-mapping>
         <servlet-name>RemoveDatasetServlet</servlet-name>
         <url-pattern>/RemoveDataset</url-pattern>
@@ -1482,14 +1444,7 @@
         <servlet-name>RestoreDatasetServlet</servlet-name>
         <url-pattern>/RestoreDataset</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateFiltersOneServlet</servlet-name>
-        <url-pattern>/CreateFiltersOne</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateFiltersTwoServlet</servlet-name>
-        <url-pattern>/CreateFiltersTwo</url-pattern>
-    </servlet-mapping>
+    
     <servlet-mapping>
         <servlet-name>AccessFileServlet</servlet-name>
         <url-pattern>/AccessFile</url-pattern>
@@ -1511,10 +1466,7 @@
         <servlet-name>AuditLogStudyServlet</servlet-name>
         <url-pattern>/AuditLogStudy</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateFiltersThreeServlet</servlet-name>
-        <url-pattern>/CreateFiltersThree</url-pattern>
-    </servlet-mapping>
+    
     <servlet-mapping>
         <servlet-name>ManageStudyServlet</servlet-name>
         <url-pattern>/ManageStudy</url-pattern>

@@ -557,37 +557,9 @@ public class Page {
 	public final static Page RESTORE_DATASET = new Page("/WEB-INF/jsp/extract/restoreDataset.jsp", "Restore Dataset");
 
 	public final static Page ITEM_DETAIL = new Page("/WEB-INF/jsp/extract/itemDetail.jsp", "Remove Dataset");
-	/**
-	 * Pages for create and show all filters, tbh
-	 * 
-	 */
-	public final static Page APPLY_FILTER = new Page("/WEB-INF/jsp/extract/applyFilter.jsp", "Apply Filter");
-	public final static Page CREATE_FILTER_SCREEN_1 = new Page("/WEB-INF/jsp/extract/createFilterScreen1.jsp",
-			"Create Filter Screen One");
-	public final static Page CREATE_FILTER_SCREEN_2 = new Page("/WEB-INF/jsp/extract/createFilterScreen2.jsp",
-			"Create Filter Screen Two");
-	public final static Page CREATE_FILTER_SCREEN_3 = new Page("/WEB-INF/jsp/extract/createFilterScreen3.jsp",
-			"Create Filter Screen Three");
-	public final static Page CREATE_FILTER_SCREEN_3_1 = new Page("/WEB-INF/jsp/extract/createFilterScreen3_1.jsp",
-			"Create Filter Screen Three Point One");
-	public final static Page CREATE_FILTER_SCREEN_3_2 = new Page("/WEB-INF/jsp/extract/createFilterScreen3_2.jsp",
-			"Create Filter Screen Three Point Two");
-	public final static Page CREATE_FILTER_SCREEN_4 = new Page("/WEB-INF/jsp/extract/createFilterScreen4.jsp",
-			"Create Filter Screen Four");
-	public final static Page CREATE_FILTER_SCREEN_5 = new Page("/WEB-INF/jsp/extract/createFilterScreen5.jsp",
-			"Create Filter Screen Five");
-	public final static Page CREATE_FILTER_CONFIRM = new Page("/WEB-INF/jsp/extract/createFilterConfirm.jsp",
-			"Create Filter Confirm");
-	public final static Page VIEW_FILTER_DETAILS = new Page("/WEB-INF/jsp/extract/viewFilterDetails.jsp",
-			"View Filter Details");
-	public final static Page EDIT_FILTER = new Page("/WEB-INF/jsp/extract/editFilter.jsp", "Edit Filter");
+	
 	public final static Page EDIT_DATASET = new Page("/WEB-INF/jsp/extract/editDataset.jsp", "Edit Dataset");
-	public final static Page VALIDATE_EDIT_FILTER = new Page("/WEB-INF/jsp/extract/validateEditFilter.jsp",
-			"Validate Edited Filter");
-	public final static Page REMOVE_FILTER = new Page("/WEB-INF/jsp/extract/removeFilter.jsp", "Remove Filter");
-	/**
-	 * Page to show errors
-	 */
+	
 	public final static Page ERROR = new Page("/WEB-INF/jsp/error.jsp", "Error Page of OpenClinica");
 
 	private final static String path = "/WEB-INF/jsp/";

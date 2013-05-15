@@ -20,6 +20,18 @@
  */
 package org.akaza.openclinica.view;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.TreeMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -32,26 +44,11 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.TreeMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 /**
  * To create a flexible panel of information that will change while the user manages his or her session.
@@ -259,11 +256,7 @@ public class StudyInfoPanel {
 				if (fb != null) {
 					this.setData("Added Filter", fb.getName());
 				}
-			} else if (page.equals(Page.APPLY_FILTER)) {
-				DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
-				this.setData(resword.getString("beginning_date"), local_sdf.format(dsb.getDateStart()));
-				this.setData(resword.getString("ending_date"), local_sdf.format(dsb.getDateEnd()));
-
+			
 			} else if (page.equals(Page.CONFIRM_DATASET)) {
 				this.reset();
 				this.setStudyInfoShown(false);
@@ -291,18 +284,7 @@ public class StudyInfoPanel {
 				if (fb != null) {
 					this.setData(resword.getString("added_filter"), fb.getName());
 				}
-			} else if (page.equals(Page.CREATE_FILTER_SCREEN_3_1)) {
-				CRFVersionBean cvBean = (CRFVersionBean) session.getAttribute("cvBean");
-				this.setData(resword.getString("CRF_version_selected"), cvBean.getName());
-			} else if (page.equals(Page.CREATE_FILTER_SCREEN_3_2)) {
-				SectionBean secBean = (SectionBean) session.getAttribute("secBean");
-				this.setData(resword.getString("section_selected"), secBean.getName());
-				Collection metadatas = (Collection) request.getAttribute("metadatas");
-				this.setData(resword.getString("number_of_questions"), new Integer(metadatas.size()).toString());
-			} else if (page.equals(Page.CREATE_FILTER_SCREEN_4)) {
-
-			} else if (page.equals(Page.CREATE_FILTER_SCREEN_5)) {
-				// blank here to prevent data reset, tbh
+			
 			} else if (page.equals(Page.ADMIN_SYSTEM)) {
 				// blank here , info set in servlet itself
 			} else if (page.equals(Page.VIEW_STUDY_SUBJECT) || page.equals(Page.LIST_EVENTS_FOR_SUBJECT)) {

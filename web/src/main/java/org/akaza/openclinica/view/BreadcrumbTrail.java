@@ -130,7 +130,7 @@ public class BreadcrumbTrail {
 					trail.add(3, bcb2);
 					closeRestOfTrail(3);
 				}
-			} else if (jspPage.equals(Page.CREATE_DATASET_APPLY_FILTER) || jspPage.equals(Page.APPLY_FILTER)) {
+			} else if (jspPage.equals(Page.CREATE_DATASET_APPLY_FILTER)) {
 				openBreadcrumbs(4);
 				BreadcrumbBean bcb2 = (BreadcrumbBean) trail.remove(4);
 				bcb2.setStatus(Status.PENDING);
@@ -164,36 +164,7 @@ public class BreadcrumbTrail {
 						Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("download_data"), "ExportDataset"
 						+ this.generateURLString(request), Status.PENDING));
-			} else if (jspPage.equals(Page.CREATE_FILTER_SCREEN_2)) {
-				trail = new ArrayList();
-				trail.add(new BreadcrumbBean(resworkflow.getString("extract_datasets"), "ExtractDatasetsMain",
-						Status.AVAILABLE));
-				trail.add(new BreadcrumbBean(resworkflow.getString("instructions"), "CreateFiltersOne"
-						+ this.generateURLString(request), Status.PENDING));
-				trail.add(new BreadcrumbBean(resworkflow.getString("select_CRF"), "#", Status.UNAVAILABLE));
-				trail.add(new BreadcrumbBean(resworkflow.getString("select_section"), "#", Status.UNAVAILABLE));
-				trail.add(new BreadcrumbBean(resworkflow.getString("select_parameters"), "#", Status.UNAVAILABLE));
-				trail.add(new BreadcrumbBean(resworkflow.getString("specify_criteria"), "#", Status.UNAVAILABLE));
-				trail.add(new BreadcrumbBean(resworkflow.getString("export"), "ExportDataset", Status.UNAVAILABLE));
-			} else if (jspPage.equals(Page.CREATE_FILTER_SCREEN_3)) {
-				trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("select_CRF"), "CreateFiltersTwo"
-						+ this.generateURLString(request), Status.PENDING), 2);
-				closeRestOfTrail(2);
-			} else if (jspPage.equals(Page.CREATE_FILTER_SCREEN_3_1)) {
-				trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("select_section"),
-						"CreateFiltersTwo" + this.generateURLString(request), Status.PENDING), 3);
-				closeRestOfTrail(3);
-			} else if (jspPage.equals(Page.CREATE_FILTER_SCREEN_3_2)) {
-				trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("select_parameters"),
-						"CreateFiltersTwo" + this.generateURLString(request), Status.PENDING), 4);
-				closeRestOfTrail(4);
-			} else if (jspPage.equals(Page.CREATE_FILTER_SCREEN_4)) {
-				trail = advanceTrail(trail, new BreadcrumbBean(resworkflow.getString("specify_criteria"),
-						"CreateFiltersTwo" + this.generateURLString(request), Status.PENDING), 5);
-				closeRestOfTrail(5);
-			}
-			
-			else if (jspPage.equals(Page.SUBMIT_DATA)) {
+			} else if (jspPage.equals(Page.SUBMIT_DATA)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("submit_data"), "ListStudySubjectsSubmit",
 						Status.PENDING));
@@ -778,11 +749,7 @@ public class BreadcrumbTrail {
 						Status.UNAVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("generate_dataset"), "CreateDataset",
 						Status.UNAVAILABLE));
-			} else if (jspPage.equals(Page.EDIT_FILTER)) {
-				trail = new ArrayList();
-				trail.add(new BreadcrumbBean(resworkflow.getString("extract_datasets"), "ExtractDatasetsMain",
-						Status.AVAILABLE));
-				trail.add(new BreadcrumbBean(resworkflow.getString("edit_filter"), "#", Status.PENDING));
+			
 			} else if (jspPage.equals(Page.VIEW_DATASET_DETAILS)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("extract_datasets"), "ExtractDatasetsMain",
@@ -798,11 +765,7 @@ public class BreadcrumbTrail {
 				trail.add(new BreadcrumbBean(resworkflow.getString("extract_datasets"), "ExtractDatasetsMain",
 						Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("view_dataset"), "#", Status.PENDING));
-			} else if (jspPage.equals(Page.CREATE_FILTER_SCREEN_1)) {
-				trail = new ArrayList();
-				trail.add(new BreadcrumbBean(resworkflow.getString("extract_datasets"), "ExtractDatasetsMain",
-						Status.AVAILABLE));
-				trail.add(new BreadcrumbBean(resworkflow.getString("view_filters"), "#", Status.PENDING));
+			
 			} else if (jspPage.equals(Page.VIEW_RULES)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));

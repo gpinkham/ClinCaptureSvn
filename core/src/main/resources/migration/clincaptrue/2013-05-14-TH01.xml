@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="thickerson" id="2013-05-14-TH01-1">
+        <comment>CLEANUP: dropping tables that are not used at all in the system</comment>
+        <dropTable cascadeConstraints="true" tableName="dc_computed_event"/>
+        <dropTable cascadeConstraints="true" tableName="dc_event"/>
+        <dropTable cascadeConstraints="true" tableName="dc_primitive"/>
+        <dropTable cascadeConstraints="true" tableName="dc_section_event"/>
+        <dropTable cascadeConstraints="true" tableName="dc_send_email_event"/>
+        <dropTable cascadeConstraints="true" tableName="dc_substitution_event"/>
+        <dropTable cascadeConstraints="true" tableName="dc_summary_item_map"/>
+        <dropTable cascadeConstraints="true" tableName="decision_condition"/>
+        <dropTable cascadeConstraints="true" tableName="dataset_filter_map"/>
+        <dropTable cascadeConstraints="true" tableName="filter_crf_version_map"/>
+        <dropTable cascadeConstraints="true" tableName="filter"/>
+        <dropTable cascadeConstraints="true" tableName="role_privilege_map"/>
+        <dropTable cascadeConstraints="true" tableName="privilege"/>
+    </changeSet>
+</databaseChangeLog>

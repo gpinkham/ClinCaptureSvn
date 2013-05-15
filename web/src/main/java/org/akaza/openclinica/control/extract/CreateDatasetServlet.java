@@ -22,7 +22,6 @@ package org.akaza.openclinica.control.extract;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,7 +48,6 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
-import org.akaza.openclinica.dao.extract.FilterDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -58,8 +56,8 @@ import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.akaza.openclinica.web.bean.FilterRow;
+
+
 
 /**
  * Creates a dataset by building a query based on study events, CRFs and items
@@ -314,15 +312,8 @@ public class CreateDatasetServlet extends SecureController {
 					session.setAttribute("newDataset", dsb);
 
 					if (fp.getString("submit").equals(resword.getString("continue_to_apply_filter"))) {
-						// FilterDAO fdao = new FilterDAO(sm.getDataSource());
-						// Collection filters = fdao.findAll();
-						// TODO make findAllByProject
-						// request.setAttribute("filters",filters);
-						EntityBeanTable table = getFilterTable();
-						session.setAttribute("partOfCreateDataset", new Integer(1));
-						// to be used in createFiltersThree servlet, tbh
-						request.setAttribute("table", table);
-						forwardPage(Page.APPLY_FILTER);
+						// you got here by mistake.
+						forwardPage(Page.MENU);
 					} else {
 						request.setAttribute("statuses", Status.toActiveArrayList());
 						// YW, 2-20-2008 <<these attributes will show on the
@@ -739,25 +730,6 @@ public class CreateDatasetServlet extends SecureController {
 		return answer;
 	}
 
-	private EntityBeanTable getFilterTable() {
-		FormProcessor fp = new FormProcessor(request);
-		FilterDAO fdao = new FilterDAO(sm.getDataSource());
-		EntityBeanTable table = fp.getEntityBeanTable();
-
-		ArrayList filters = (ArrayList) fdao.findAll();
-
-		ArrayList filterRows = FilterRow.generateRowsFromBeans(filters);
-
-		String[] columns = { resword.getString("filter_name"), resword.getString("description"),
-				resword.getString("created_by"), resword.getString("created_date"), resword.getString("status"),
-				resword.getString("actions") };
-		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(5);
-		table.setQuery("ApplyFilter", new HashMap());
-		table.setRows(filterRows);
-		table.computeDisplay();
-		return table;
-	}
 
 	private String genAttMsg(DatasetBean db) {
 		String summary = "";
@@ -848,8 +820,6 @@ public class CreateDatasetServlet extends SecureController {
 		return summary;
 	}
 
-	// TODO set up additional settings here, tbh
-	//
 	private void getSubAttr(FormProcessor fp, DatasetBean db) {
 		String dob = fp.getString(DOB);
 		if (!StringUtil.isBlank(dob) && "yes".equalsIgnoreCase(dob.trim())) {
