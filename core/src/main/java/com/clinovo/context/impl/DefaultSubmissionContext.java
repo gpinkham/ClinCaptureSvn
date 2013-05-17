@@ -15,13 +15,20 @@ public abstract class DefaultSubmissionContext implements SubmissionContext {
 
 	protected WebServiceAction action;
 	protected PostMethod method = null;
+	protected String currentAuthToken = null;
 	protected HttpClient client = new HttpClient();
+	public static final int DUPLICATION_RANDOMIZATION = 510;
 
 	protected final Logger log = LoggerFactory.getLogger(getClass().getName());
 
 	abstract String getBody() throws Exception;
-	
+
 	public String authenticate() throws Exception {
+
+		// Re-use token if existing
+		if (currentAuthToken != null) {
+			return currentAuthToken;
+		}
 
 		// Allow for testing
 		if (method == null)
@@ -44,7 +51,7 @@ public abstract class DefaultSubmissionContext implements SubmissionContext {
 		client.executeMethod(method);
 
 		String response = method.getResponseBodyAsString();
-		
+
 		return response;
 	}
 

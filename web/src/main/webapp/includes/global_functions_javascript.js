@@ -2189,3 +2189,94 @@ try {
         });
     }
 } catch (e) {}
+
+function randomizeSubject() {
+    
+    var currentUrl = window.location.href
+
+    var subjectIdPattern = new RegExp("(?:&subjectId=)(\\d+)(?=&)")
+
+    if(subjectIdPattern.test(currentUrl)) {
+
+        var pace = ""
+        var crfId = ""
+        var studyId = ""
+
+        var inputs = jQuery(":input")
+        for(var index = 0; index < inputs.length; index++) {
+            if(jQuery(inputs[index]).attr("name") === "crfId") {
+                crfId = jQuery(inputs[index]).val()
+                break
+            }
+        }
+
+        for(var index = 0; index < inputs.length; index++) {
+            if(jQuery(inputs[index]).attr("name") === "studyId") {
+                studyId = jQuery(inputs[index]).val()
+                break
+            }
+        }
+        
+        var subjectId = subjectIdPattern.exec(currentUrl)[1];
+        var checkboxes = jQuery("#IT_PatientSurgicalCandidate_opg").find(":input")
+        
+        if(jQuery(checkboxes[0]).is(":checked") || jQuery(checkboxes[1]).is(":checked")) {
+
+            for(var index =0; index < checkboxes.length; index++) {
+
+                var box = checkboxes[index]
+                if(jQuery(box).is(":checked")) {
+
+                    pace = jQuery(box).attr("value")
+                    break
+                }
+            }
+        } else {
+            alert("Please specify if the subject is a surgical candidate or not")
+            return
+        }
+
+        //subjectId = subjectId + generateId()
+        var url = "randomize?subject="+subjectId + "&crf=" + crfId + "&pace=" + pace + "&study=" + studyId
+
+        makeHttpCall(url, function(result) {
+
+            console.log("Received randomization: " + result)
+
+            if(result.match(/UnknownHostException/)){
+
+                var urlPattern = new RegExp("Exception:(.*)")
+                alert("The randomization service '" + urlPattern.exec(result)[1] + "' is not available. Consult your system administrator")
+
+            } else if(result.match(/Exception/)) {
+
+                var exceptionPattern = new RegExp("^.*:(.*)")
+                alert(exceptionPattern.exec(result)[1])
+
+            } else {
+
+                var input = jQuery("#LB_TXT_RANDOMIZATION").find(":input")
+                jQuery(input).val(result)
+
+            }
+        });
+    }
+}
+
+var request = new XMLHttpRequest();
+
+function makeHttpCall(url, callback) {
+
+    request.open("GET", url);
+    request.onreadystatechange = function() {
+
+        if (request.readyState == 4 && request.status == 200) {
+
+            console.log("Received http call result: " + request.responseText)
+            
+            callback(request.responseText)
+        }
+    }
+
+    request.send(null)
+}

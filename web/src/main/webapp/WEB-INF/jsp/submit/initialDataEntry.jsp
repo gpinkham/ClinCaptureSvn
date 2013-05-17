@@ -107,6 +107,7 @@
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
 <input type="hidden" name="tab" value="<c:out value="${tabId}"/>" />
+<input type="hidden" name="crfId" value="<c:out value="${section.crf.id}"/>" />
 
 
 <c:import url="interviewer.jsp"/>

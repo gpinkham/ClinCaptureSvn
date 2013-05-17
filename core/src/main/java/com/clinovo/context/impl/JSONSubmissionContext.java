@@ -10,6 +10,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.clinovo.model.WebServiceResult;
@@ -21,7 +22,7 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 		WebServiceResult result = new WebServiceResult();
 
 		if (httpStatus == HttpStatus.SC_OK) {
-			
+
 			log.info("Successfully Randomized Request.");
 
 			JSONObject returnData = new JSONObject(response);
@@ -40,7 +41,7 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 			result.setRandomizationResult(randomizationResult);
 
 		} else if (httpStatus == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-			
+
 			log.warn(response);
 			throw new WebServiceException(response);
 
@@ -48,18 +49,23 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 
 			log.warn(response);
 			throw new WebServiceException(response);
-			
-		} else if(httpStatus == HttpStatus.SC_BAD_REQUEST) {
-			
+
+		} else if (httpStatus == HttpStatus.SC_BAD_REQUEST) {
+
 			log.error(response);
 			throw new WebServiceException(response);
+
+		} else if (httpStatus == DefaultSubmissionContext.DUPLICATION_RANDOMIZATION) {
+
+			log.info("Duplicate randomization attempt");
+			throw new WebServiceException("This subject has already been randomized");
 		}
 
 		return result;
 	}
 
 	public RequestEntity getRequestEntity() throws Exception {
-		
+
 		JSONObject postData = new JSONObject();
 
 		postData.put("SiteID", action.getSiteId());
@@ -72,26 +78,34 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 		JSONObject strataObject = new JSONObject();
 		strataObject.put("StratificationID", 1);
 		strataObject.put("Level", 2);
-		
+
 		array.put(strataObject);
 
 		postData.put("StrataAnswers", array);
-		
+
 		log.info("Randomizing with: {}", postData.toString());
-		
+
 		StringRequestEntity entity = new StringRequestEntity(postData.toString(), "application/json", "utf-8");
-		
+
 		return entity;
 	}
 
 	public List<Header> getHttpHeaders() throws Exception {
 
 		String authToken = authenticate();
-		
-		JSONObject token = new JSONObject(authToken);
-		
-		List<Header> headers = new ArrayList<Header>(); 
-				
+
+		try {
+			
+			JSONObject token = new JSONObject(authToken);
+			currentAuthToken = token.getString("Token");
+			
+		} catch (JSONException ex) {
+			log.error("Randomization Authentication failed");
+			throw ex;
+		}
+
+		List<Header> headers = new ArrayList<Header>();
+
 		// Required Headers
 		Header contentTypeHeader = new Header();
 		contentTypeHeader.setName("Content-Type");
@@ -100,27 +114,27 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 		Header acceptHeader = new Header();
 		acceptHeader.setName("Accept");
 		acceptHeader.setValue("application/json");
-		
+
 		// Randomization Header
 		Header randomizationHeader = new Header();
 		randomizationHeader.setName("X-RANDOMIZE-TOKEN");
-		randomizationHeader.setValue(token.getString("Token"));
-		
+
+		randomizationHeader.setValue(currentAuthToken);
+
 		headers.add(acceptHeader);
 		headers.add(contentTypeHeader);
 		headers.add(randomizationHeader);
-		
+
 		return headers;
 	}
 
-	
 	@Override
 	String getBody() throws Exception {
-		
+
 		JSONObject postData = new JSONObject();
 		postData.put("SiteID", action.getUsername());
 		postData.put("Password", action.getPassword());
-		
+
 		return postData.toString();
 	}
 }

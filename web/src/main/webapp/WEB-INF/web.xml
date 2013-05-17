@@ -2126,5 +2126,15 @@
         <servlet-name>urlRewriterServlet</servlet-name>
         <url-pattern>/ClinicalData/*</url-pattern>
     </servlet-mapping>
+    
+	<servlet>
+		<servlet-name>randomizeServlet</servlet-name>
+        <servlet-class>com.clinovo.servlet.RandomizeServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>randomizeServlet</servlet-name>
+        <url-pattern>/randomize</url-pattern>
+    </servlet-mapping>
 
 </web-app>
