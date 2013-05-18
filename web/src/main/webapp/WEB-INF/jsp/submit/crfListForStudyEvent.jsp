@@ -105,16 +105,16 @@
             <fmt:message key="event" bundle="${resword}"/>: <b>${studyEvent.studyEventDefinition.name}</b>
         </td>
         <td class="table_header_row" align="center" style="vertical-align: middle;">
-    	<c:set var="removedTitle" value="Removed"/>
-    	<c:choose>
-    		<c:when test="${studyEvent.subjectEventStatus.name eq 'deleted'}">
-    			<img src="${sesIconUrl}" alt="${studyEvent.subjectEventStatus.name}" title="<c:out value="${removedTitle}"/>" /></td>
-    		</c:when>
-    		<c:otherwise>
-    			<img src="${sesIconUrl}" alt="${studyEvent.subjectEventStatus.name}" title="${studyEvent.subjectEventStatus.name}"/></td>
-    		</c:otherwise>
+        <c:set var="removedTitle" value="Removed"/>
+        <c:choose>
+            <c:when test="${studyEvent.subjectEventStatus.name eq 'deleted'}">
+                <img src="${sesIconUrl}" alt="${studyEvent.subjectEventStatus.name}" title="<c:out value="${removedTitle}"/>" /></td>
+            </c:when>
+            <c:otherwise>
+                <img src="${sesIconUrl}" alt="${studyEvent.subjectEventStatus.name}" title="${studyEvent.subjectEventStatus.name}"/></td>
+            </c:otherwise>
         </c:choose>
-    	<td class="table_header_row" style="white-space: nowrap;">
+        <td class="table_header_row" style="white-space: nowrap;">
 
             <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id ne 6}">
                 <a href="UpdateStudyEvent?event_id=${studyEvent.id}&ss_id=${studySubject.id}"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_event" bundle="${resword}"/>" title="<fmt:message key="edit_study_event" bundle="${resword}"/>" hspace="4"/></a>
@@ -312,7 +312,7 @@
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         </c:otherwise>
                                     </c:choose>
-                                        <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&crfVersionId=<c:out value="${dedc.edc.defaultVersionId}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+                                    <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&crfVersionId=<c:out value="${dedc.edc.defaultVersionId}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                                            onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                                            onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                                            name="bt_View1" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="4"></a>
@@ -552,5 +552,3 @@
 
 <input type="hidden" class="hideCrfBlankCell"  value="${hideCrfBlankCell}"/>
 <jsp:include page="../include/changeTheme.jsp"/>
-
-

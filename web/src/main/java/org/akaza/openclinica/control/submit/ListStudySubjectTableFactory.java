@@ -1087,7 +1087,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 		eventDiv.tr(0).id("Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style("display: none;")
 				.close();
-		eventDiv.td(0).styleClass("table_cell_left").colspan(String.valueOf(studyEventsSize)).close().append("<i>").append("</i>").tdEnd();
+		eventDiv.td(0).styleClass("table_cell_left").colspan(String.valueOf(studyEventsSize)).close().append("<i>")
+				.append("</i>").tdEnd();
 		eventDiv.trEnd(0);
 
 		eventDiv.tableEnd(0);
