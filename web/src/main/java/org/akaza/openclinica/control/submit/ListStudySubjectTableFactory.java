@@ -774,7 +774,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
 		actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view"))
 				.title(resword.getString("view")).append("hspace=\"4\"").end().aEnd();
-		
+
 		return actionLink.toString();
 
 	}
@@ -819,7 +819,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						+ studySubject.getLabel()).close();
 		actionLink.img().src("images/icon_DoubleCheck_Action.gif").border("0").alt(resword.getString("perform_sdv"))
 				.title(resword.getString("perform_sdv")).append("hspace=\"4\"").end().aEnd();
-		
+
 		return actionLink.toString();
 
 	}
@@ -910,7 +910,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		return eventDiv.toString();
 	}
 
-
 	private String eventDivBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents,
 			StudyEventDefinitionBean sed, StudySubjectBean studySubject) {
 
@@ -981,7 +980,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		eventDiv.append(
 				eventText + ": <a id=\"" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount
 						+ "\" href=\"#\" style=\"color: #666;\">" + sed.getName() + "</a>").br();
-		
+
 		if (userRole == Role.COORDINATOR || userRole == Role.MONITOR) {
 			eventDiv.append("<a class=\"sdvLink\" href=\""
 					+ "pages/viewAllSubjectSDVtmp?sbb=true&studyId="
@@ -990,7 +989,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					+ studySubjectLabel + "&sdv_f_eventName=" + sed.getName() + "\" style=\"color: #666;\">" + sdvText
 					+ "</a><br class=\"sdvBR\"/>");
 		}
-		
+
 		eventDiv.divEnd();
 
 		eventDiv.div().style("width: 49%; float: right; text-align: right;").close();
@@ -1013,15 +1012,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		eventDiv.spanEnd();
 		eventDiv.divEnd().tdEnd().append("<td class=\"table_header_row_left\">&nbsp;</td>").trEnd(0);
 		eventDiv.tr(0).close();
-		
+
 		eventDiv.td(0).id("Scroll_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back")
 				.styleClass("statusbox_scroll_L_dis").width("20").close();
 		eventDiv.img().src("images/arrow_status_back_dis.gif").border("0").close();
 		eventDiv.tdEnd();
-		
+
 		eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back")
 				.styleClass("statusbox_scroll_L").width("20").style("display: none;").close();
-		
+
 		eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back")
 				.style("display: none;").close();
 		eventDiv.a()
@@ -1030,7 +1029,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		eventDiv.img().src("images/arrow_status_back.gif").border("0").close();
 		eventDiv.aEnd();
 		eventDiv.divEnd();
-		
+
 		eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back_dis")
 				.close();
 		eventDiv.img().src("images/arrow_status_back_dis.gif").border("0").close();
@@ -1068,7 +1067,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				.styleClass("statusbox_scroll_R_dis").width("20").close();
 		eventDiv.img().src("images/arrow_status_next_dis.gif").border("0").close();
 		eventDiv.tdEnd();
-		
+
 		eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next")
 				.styleClass("statusbox_scroll_R").width("20").style("display: none;").close();
 		eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next")
@@ -1079,7 +1078,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		eventDiv.img().src("images/arrow_status_next.gif").border("0").close();
 		eventDiv.aEnd();
 		eventDiv.divEnd();
-		
+
 		eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next_dis")
 				.style("display: none;").close();
 		eventDiv.img().src("images/arrow_status_next_dis.gif").border("0").close();
@@ -1211,7 +1210,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			eventDiv.bold().append(occurrence_x_of).append("#1 of 1").br();
 			if (studyEvents.size() > 0) {
 				eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
-				
+
 			} else {
 				eventDiv.append(status + " : " + SubjectEventStatus.NOT_SCHEDULED.getName());
 			}
@@ -1256,7 +1255,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				eventDiv.td(0).styleClass("table_cell_left").close();
 				eventDiv.div().id("crfListWrapper_" + studyEventId).style(WIDTH_600PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
-				
+
 			}
 
 			else if (eventStatus == SubjectEventStatus.LOCKED) {
@@ -1351,10 +1350,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	private void repeatingIconLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount,
 			List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed, String studyEventId) {
-		
+
 		String params = "'" + studyEventId + "', '" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "',"
 				+ studyEvents.size() + ", event";
-		
+
 		builder.a().style("cursor: pointer;");// .href(href1 + href2);
 		builder.onmouseover("if (canShowPopup('" + studyEventId + "')) { showPopup(" + params + "); } ");
 		builder.onmouseout("clearInterval(popupInterval);");
@@ -1365,10 +1364,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	private void iconLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount,
 			List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed, String studyEventId) {
-		
+
 		String params = "'" + studyEventId + "', '" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount
 				+ "', undefined, event";
-		
+
 		builder.a().style("cursor: pointer;");
 		builder.onmouseover("if (canShowPopup('" + studyEventId + "')) { showPopup(" + params + "); } ");
 		builder.onmouseout("clearInterval(popupInterval);");
