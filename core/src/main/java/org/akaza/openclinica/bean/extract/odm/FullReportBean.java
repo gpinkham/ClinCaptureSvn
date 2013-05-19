@@ -8,7 +8,7 @@
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
  * 
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
- * If not, see <http://www.gnu.org/licenses/>.
+ \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
 /* OpenClinica is distributed under the GNU Lesser General Public License (GNU
