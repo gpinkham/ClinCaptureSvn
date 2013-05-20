@@ -12,14 +12,37 @@
 <tr valign="top">   
       <td class="table_cell_left"><c:out value="${currRow.bean.name}"/></td>
       <td class="table_cell"><c:out value="${currRow.bean.groupClassTypeName}"/></td>  
-      <td class="table_cell"><c:out value="${currRow.bean.subjectAssignment}"/></td>     
+      <td class="table_cell"><c:out value="${currRow.bean.subjectAssignment}"/></td> 
+	  <c:choose>
+			<c:when test="${currRow.bean.default}">
+				<td class="table_cell aka_green_highlight"><c:out value="${currRow.bean.default}"/></td>	
+			</c:when>
+			<c:when test="${currRow.bean.groupClassTypeId == 4}">
+				<td class="table_cell"><c:out value="${currRow.bean.default}"/></td>	
+			</c:when>
+			<c:otherwise>
+				<td class="table_cell"></td>	
+			</c:otherwise>
+	  </c:choose>
       <td class="table_cell"><c:out value="${currRow.bean.studyName}"/></td>
        <td class="table_cell">
         <c:forEach var="studyGroup" items="${currRow.bean.studyGroups}">
           <c:out value="${studyGroup.name}"/><br>
         </c:forEach>  
        </td>
-      <td class="table_cell"><c:out value="${currRow.bean.status.name}"/></td>
+       <td class="table_cell">
+        <c:forEach var="eventDefinition" items="${currRow.bean.eventDefinitions}">
+          <c:out value="${eventDefinition.name}"/><br>
+        </c:forEach>  
+       </td>
+		<c:choose>
+			<c:when test="${currRow.bean.status.available}">
+				<td class="table_cell"><c:out value="${currRow.bean.status.name}"/></td>	
+			</c:when>
+			<c:otherwise>
+				<td class="table_cell aka_red_highlight"><c:out value="${currRow.bean.status.name}"/></td>	
+			</c:otherwise>
+		</c:choose>
       <td class="table_cell">    
        <table border="0" cellpadding="0" cellspacing="0">
          <tr>
@@ -66,4 +89,3 @@
 	  </table>
       </td>
    </tr>
-   

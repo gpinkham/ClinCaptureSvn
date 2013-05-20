@@ -33,6 +33,12 @@
 		</sql>
 	</query>
 	<query>
+		<name>findAllDefault</name>
+		<sql>
+			SELECT * FROM study_group_class WHERE is_default='true'
+		</sql>
+	</query>
+	<query>
 		<name>create</name>
 		<sql>
 		   INSERT INTO study_group_class 

@@ -36,19 +36,6 @@
 
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <script type="text/JavaScript" language="JavaScript">
- function myCancel() {
- 
-    cancelButton=document.getElementById('cancel');
-    if ( cancelButton != null) {
-      if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-        window.location.href="ListSubjectGroupClass";
-       return true;
-      } else {
-        return false;
-       }
-     }
-     return true;    
-  }
   
   function showGroupSection() {
   
@@ -105,7 +92,7 @@
 		</td>
 		<td>
 			<div class="formfieldXL_BG">
-				<input type="text" name="name" onChange="setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" value="<c:out value="${fields['groupClassName']}"/>" class="formfieldXL">
+				<input type="text" name="name" onChange="setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key='changed_not_saved' bundle="${restext}"/>');" value="<c:out value="${fields['groupClassName']}"/>" class="formfieldXL">
 			</div>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include>
 		</td>
@@ -163,15 +150,21 @@
 			<fmt:message key="default" bundle="${resword}"/>
 		</td>
 		<td>
-			<c:choose>
-			<c:when test="${fields['isDefault'] =='yes'}">
-				<input type="checkbox" checked id="isDefault" name="isDefault" value="yes">
+		<c:choose>
+			<c:when test="${defaultGroupAlreadyExists}">
+				<input type="checkbox" disabled id="isDefault" name="isDefault" value="true" title="<fmt:message key="default_group_already_exists" bundle="${resword}"/>"/>
 			</c:when>
 			<c:otherwise>
-				<input type="checkbox" id="isDefault" name="isDefault" value="yes">
+				<c:choose>
+					<c:when test="${fields['isDefault'] == 'true'}">
+						<input type="checkbox" checked id="isDefault" name="isDefault" value="true"/>
+					</c:when>
+					<c:otherwise>
+						<input type="checkbox" id="isDefault" name="isDefault" value="true"/>
+					</c:otherwise>
+				</c:choose>
 			</c:otherwise>
 		</c:choose>
-			
 		</td>
 		<td></td>
 	</tr>
@@ -287,7 +280,7 @@
  
  <%-- Dynamic Group Section --%>
  <div id="definitions" style="display: none">
- 
+
  <div style="width: 600px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -302,7 +295,7 @@
 			<td class="table_header_row"><fmt:message key="OID" bundle="${resword}"/></td>
 			<td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
 			<td class="table_header_row"><fmt:message key="of_CRFs" bundle="${resword}"/></td>
-		</tr>
+		</tr> 
 		<c:forEach var="definition" items="${definitionsToView}" varStatus="status">
 		<tr>
 			<td class="table_cell_left">
@@ -347,11 +340,8 @@
 <td>
 <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
 </td>
-<%-- <td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="javascript:myCancel();"/></td>--%>
 </tr>
 </table>  
 </form>
-<%--<c:import url="../include/workflow.jsp">--%>
-  <%--<c:param name="module" value="manage"/>--%>
- <%--</c:import>--%>
+
 <jsp:include page="../include/footer.jsp"/>

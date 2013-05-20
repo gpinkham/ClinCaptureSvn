@@ -42,6 +42,7 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	private String subjectAssignment = "";
 
 	private ArrayList studyGroups = new ArrayList();// not in DB
+	private ArrayList eventDefinitions = new ArrayList();// not in DB, show events which is in Dynamic Group
 	private int studyGroupId = 0;// not in DB, indicates which group a
 	// subject is in
 	private String groupNotes = "";// not in DB
@@ -140,6 +141,21 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 		this.studyId = studyId;
 	}
 
+	/**
+	 * @return Returns the eventDefinitions for Dynamic Group.
+	 */
+	public ArrayList getEventDefinitions() {
+		return eventDefinitions;
+	}
+
+	/**
+	 * @param eventDefinitions 
+	 *            The eventDefinitions to set for Dynamic Group.
+	 */
+	public void setEventDefinitions(ArrayList eventDefinitions) {
+		this.eventDefinitions = eventDefinitions;
+	}
+	
 	/**
 	 * @return Returns the studyGroups.
 	 */

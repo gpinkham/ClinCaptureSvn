@@ -21,11 +21,16 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.view.Page;
@@ -36,7 +41,9 @@ import org.akaza.openclinica.web.bean.StudyGroupClassRow;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.TreeMap;
 
 /**
  * Lists all the subject group classes in a study
@@ -88,9 +95,37 @@ public class ListSubjectGroupClassServlet extends SecureController {
 		StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
 		for (int i = 0; i < groups.size(); i++) {
 			StudyGroupClassBean group = (StudyGroupClassBean) groups.get(i);
-			ArrayList studyGroups = sgdao.findAllByGroupClass(group);
-			group.setStudyGroups(studyGroups);
-
+			if (group.getGroupClassTypeId() == 4){
+				//create treemap<order,StudyEventDefinitionId>
+				DynamicEventDao dynevdao = new DynamicEventDao(sm.getDataSource());
+				ArrayList dynEvents = (ArrayList)dynevdao.findAllByStudyGroupClassId(group.getId());
+				TreeMap<Integer,Integer> ordinalToStudyEventDefinitionId = new TreeMap<Integer,Integer>();
+				for (int j = 0; j < dynEvents.size(); j++) {
+					DynamicEventBean dynEventBean = (DynamicEventBean) dynEvents.get(j);
+					ordinalToStudyEventDefinitionId.put(dynEventBean.getOrdinal(), dynEventBean.getStudyEventDefinitionId());
+				}
+				//create hashmap<StudyEventDefinitionId,StudyEventDefinition 
+				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+				ArrayList allDefsFromStudy = seddao.findAllByStudy(currentStudy);
+				HashMap<Integer, StudyEventDefinitionBean> idToStudyEventDefinition = new HashMap<Integer, StudyEventDefinitionBean>();
+				for (int j = 0; j < allDefsFromStudy.size(); j++) {
+					StudyEventDefinitionBean def = (StudyEventDefinitionBean) allDefsFromStudy.get(j);
+					if (ordinalToStudyEventDefinitionId.containsValue(def.getId())){
+						idToStudyEventDefinition.put(def.getId(), def);
+					}
+				}
+				//create sorted arraylist<StudyEventDefinitionBean> 
+				ArrayList<StudyEventDefinitionBean> orderedEventDefs = new ArrayList<StudyEventDefinitionBean>();
+				for (Iterator keyIt = ordinalToStudyEventDefinitionId.keySet().iterator(); keyIt.hasNext();) {
+					int id = ordinalToStudyEventDefinitionId.get((Integer)keyIt.next());
+					orderedEventDefs.add(idToStudyEventDefinition.get(id));	
+					//System.out.println(idToStudyEventDefinition.get(id).getName());
+				}
+				group.setEventDefinitions(orderedEventDefs); 
+			} else {
+				ArrayList studyGroups = sgdao.findAllByGroupClass(group);
+				group.setStudyGroups(studyGroups);
+			}
 		}
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allGroupRows = StudyGroupClassRow.generateRowsFromBeans(groups);
@@ -98,11 +133,15 @@ public class ListSubjectGroupClassServlet extends SecureController {
 		request.setAttribute("isParentStudy", isParentStudy);
 
 		String[] columns = { resword.getString("subject_group_class"), resword.getString("type"),
-				resword.getString("subject_assignment"), resword.getString("study_name"),
-				resword.getString("subject_groups"), resword.getString("status"), resword.getString("actions") };
+				resword.getString("subject_assignment"), resword.getString("default"),
+				resword.getString("study_name"), resword.getString("subject_groups"), 
+				resword.getString("study_events"), resword.getString("status"), 
+				resword.getString("actions") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(4);
+		table.hideColumnLink(3);
+		table.hideColumnLink(5);
 		table.hideColumnLink(6);
+		table.hideColumnLink(8);
 		table.setQuery("ListSubjectGroupClass", new HashMap());
 		table.setRows(allGroupRows);
 		table.computeDisplay();

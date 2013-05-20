@@ -22,11 +22,18 @@ package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
@@ -34,6 +41,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * Removes a subject group class from a study
@@ -56,12 +65,11 @@ public class RemoveSubjectGroupClassServlet extends SecureController {
 		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
 			return;
 		}
-
+		
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 				+ respage.getString("change_study_contact_sysadmin"));
 		throw new InsufficientPermissionException(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET,
 				resexception.getString("not_study_director"), "1");
-
 	}
 
 	@Override
@@ -71,38 +79,72 @@ public class RemoveSubjectGroupClassServlet extends SecureController {
 		int classId = fp.getInt("id");
 
 		if (classId == 0) {
-
 			addPageMessage(respage.getString("please_choose_a_subject_group_class_to_remove"));
 			forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET);
 		} else {
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 			StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
+			StudyDAO studyDao = new StudyDAO(sm.getDataSource());
 			SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
 
 			if (action.equalsIgnoreCase("confirm")) {
-				StudyGroupClassBean sgcb = (StudyGroupClassBean) sgcdao.findByPK(classId);
-				if (sgcb.getStatus().equals(Status.DELETED)) {
+				clearSession();
+	
+				StudyGroupClassBean group = (StudyGroupClassBean) sgcdao.findByPK(classId);
+				StudyBean study = (StudyBean) studyDao.findByPK(group.getStudyId());
+				
+				checkRoleByUserAndStudy(ub, group.getStudyId(), study.getParentStudyId());
+				
+				if (group.getStatus().equals(Status.DELETED)) {
 					addPageMessage(respage.getString("this_subject_group_class_has_been_deleted_already"));
 					forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET);
 					return;
 				}
-				ArrayList groups = sgdao.findAllByGroupClass(sgcb);
+				
+				if (group.getGroupClassTypeId() == 4) {
+					//create treemap<order,StudyEventDefinitionId>
+					DynamicEventDao dynevdao = new DynamicEventDao(sm.getDataSource());
+					ArrayList dynEvents = (ArrayList)dynevdao.findAllByStudyGroupClassId(group.getId());
+					TreeMap<Integer,Integer> ordinalToStudyEventDefinitionId = new TreeMap<Integer,Integer>();
+					for (int i = 0; i < dynEvents.size(); i++) {
+						DynamicEventBean dynEventBean = (DynamicEventBean) dynEvents.get(i);
+						ordinalToStudyEventDefinitionId.put(dynEventBean.getOrdinal(), dynEventBean.getStudyEventDefinitionId());
+					}
+					//create hashmap<StudyEventDefinitionId,StudyEventDefinition with number of crfs>
+					StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+					ArrayList allDefsFromStudy = seddao.findAllByStudy(currentStudy);
+					HashMap<Integer, StudyEventDefinitionBean> idToStudyEventDefinition = new HashMap<Integer, StudyEventDefinitionBean>();
+					for (int i = 0; i < allDefsFromStudy.size(); i++) {
+						StudyEventDefinitionBean def = (StudyEventDefinitionBean) allDefsFromStudy.get(i);
+						if (ordinalToStudyEventDefinitionId.values().contains(def.getId())){
+							EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+							ArrayList crfs = (ArrayList) edcdao.findAllActiveParentsByEventDefinitionId(def.getId());
+							def.setCrfNum(crfs.size());
+							idToStudyEventDefinition.put(def.getId(), def);
+						}
+					}
+					request.setAttribute("ordinalToStudyEventDefinitionId", ordinalToStudyEventDefinitionId);
+					request.setAttribute("idToStudyEventDefinition", idToStudyEventDefinition);
+					
+				} else {
+					ArrayList studyGroups = sgdao.findAllByGroupClass(group);
 
-				for (int i = 0; i < groups.size(); i++) {
-					StudyGroupBean sg = (StudyGroupBean) groups.get(i);
-					ArrayList subjectMaps = sgmdao.findAllByStudyGroupClassAndGroup(sgcb.getId(), sg.getId());
-					sg.setSubjectMaps(subjectMaps);
-
+					for (int i = 0; i < studyGroups.size(); i++) {
+						StudyGroupBean sg = (StudyGroupBean) studyGroups.get(i);
+						ArrayList subjectMaps = sgmdao.findAllByStudyGroupClassAndGroup(group.getId(), sg.getId());
+						sg.setSubjectMaps(subjectMaps);
+					}
+					request.setAttribute("studyGroups", studyGroups);
 				}
-
-				session.setAttribute("group", sgcb);
-				session.setAttribute("studyGroups", groups);
+				session.setAttribute("group", group);
+				
 				forwardPage(Page.REMOVE_SUBJECT_GROUP_CLASS);
-
+				
 			} else if (action.equalsIgnoreCase("submit")) {
 				StudyGroupClassBean group = (StudyGroupClassBean) session.getAttribute("group");
 				group.setStatus(Status.DELETED);
 				group.setUpdater(ub);
+				group.setDefault(false);
 				sgcdao.update(group);
 
 				ArrayList subjectMaps = sgmdao.findAllByStudyGroupClassId(group.getId());
@@ -121,5 +163,9 @@ public class RemoveSubjectGroupClassServlet extends SecureController {
 				forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET);
 			}
 		}
+	}
+
+	private void clearSession() {
+		session.removeAttribute("group");
 	}
 }

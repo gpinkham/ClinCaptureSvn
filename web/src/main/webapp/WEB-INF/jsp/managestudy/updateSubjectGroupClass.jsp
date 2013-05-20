@@ -1,9 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+ 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 
 <jsp:include page="../include/managestudy-header.jsp"/>
@@ -40,124 +41,325 @@
 
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <script type="text/JavaScript" language="JavaScript">
-  <!--
- function myCancel() {
- 
-    cancelButton=document.getElementById('cancel');
-    if ( cancelButton != null) {
-      if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-        window.location.href="ListSubjectGroupClass";
-       return true;
-      } else {
-        return false;
-       }
-     }
-     return true;    
-   
+  function showGroupSection() {
+  
+    var index = $(":select [name='groupClassTypeId'] :selected").val();
+	switch (index) {
+		case '4':
+			$("div#groups").hide();
+			$("div#definitions").show();
+			$("tr#isDefaultRow").show();   
+			$("tr#subjAssignmentRow").hide(); 
+			break
+		case '':
+			$("div#definitions").hide();
+			$("div#groups").hide();
+			//$("input#isDefault").attr("checked", "");
+			$("tr#isDefaultRow").hide();   
+			$("tr#subjAssignmentRow").hide(); 
+			break
+		default: 
+			$("div#definitions").hide();
+			$("div#groups").show();
+			$("input#isDefault").attr("checked", "");
+			$("tr#isDefaultRow").hide();   
+			$("tr#subjAssignmentRow").show(); 
+	}
+	return true;
   }
-   //-->
+  
+  $(document).ready(function() { 
+		showGroupSection();
+	});
+
+  function showMoreFields(index) {
+  
+	for (var j=index+1; (j<51)&&(j<(index+4)); j++){
+		$("tr#row"+j).show();
+	}
+  }	
+	
 </script>
-<h1><span class="title_manage"><fmt:message key="update_a_subject_group_class" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="update_a_subject_group_class" bundle="${resword}"/> <a href="javascript:openDocWindow('help/4_7_subjectGroups_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 
 <form action="UpdateSubjectGroupClass" method="post">
 * <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
-<input type="hidden" name="action" value="confirm">
-<input type="hidden" name="id" value="<c:out value="${group.id}"/>">
-<jsp:include page="../include/showSubmitted.jsp" />
+<input type="hidden" name="action" value="confirm"> 
+<input type="hidden" name="id" value="<c:out value="${oldGroup.id}"/>">
 <!-- These DIVs define shaded box borders -->
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
 <div class="textbox_center">
-<table border="0" cellpadding="0" cellspacing="0">
-   
-  <tr valign="top"><td class="formlabel"><fmt:message key="name" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
-  <input type="text" name="name" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved.');" value="<c:out value="${group.name}"/>" class="formfieldXL"></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td>*</td></tr>
+<table border="0" cellpadding="0" cellspacing="0" width="75%"> 
+	<tr valign="top">
+		<td width="140" class="formlabel">
+			<fmt:message key="name" bundle="${resword}"/>:
+		</td>
+		<td>
+			<div class="formfieldXL_BG">
+				<input type="text" name="name" onChange="setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" value="<c:out value="${fields['groupClassName']}"/>" class="formfieldXL">
+			</div>
+			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include>
+		</td>
+		<td>*</td>
+	</tr>
     
-  <tr valign="top"><td class="formlabel"><fmt:message key="type" bundle="${resword}"/>:</td><td><div class="formfieldL_BG">
-   <c:set var="groupClassTypeId1" value="${group.groupClassTypeId}"/>   
-   <select name="groupClassTypeId" class="formfieldL" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved.');">
-      <option value="">--</option>
-      <c:forEach var="type" items="${groupTypes}">    
-       <c:choose>
-        <c:when test="${groupClassTypeId1 == type.id}">   
-         <option value="<c:out value="${type.id}"/>" selected><c:out value="${type.name}"/>
-        </c:when>
-        <c:otherwise>
-         <option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>      
-        </c:otherwise>
-       </c:choose> 
-    </c:forEach>
-   </select></div>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="groupClassTypeId"/></jsp:include></td><td>*</td></tr>      
-   
-   
-   <tr valign="top"><td class="formlabel"><fmt:message key="subject_assignment" bundle="${resword}"/>:</td><td>
+	<tr valign="top">
+		<td class="formlabel">
+			<fmt:message key="type" bundle="${resword}"/>:
+		</td>
+		<td>
+			<div class="formfieldL_BG">
+			<c:set var="groupClassTypeId1" value="${fields['groupClassTypeId']}"/>   
+			<select name="groupClassTypeId" onChange="showGroupSection(); setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" class="formfieldL">
+				<option value="">--</option>
+				<c:forEach var="type" items="${groupTypes}">    
+				<c:choose>
+					<c:when test="${groupClassTypeId1 == 4}">   
+						<c:if test="${groupClassTypeId1 == type.id}">
+							<option value="<c:out value="${type.id}"/>" selected><c:out value="${type.name}"/>
+						</c:if>
+					</c:when>
+					<c:otherwise>
+						<c:choose>
+							<c:when test="${groupClassTypeId1 == type.id}">   
+								<option value="<c:out value="${type.id}"/>" selected><c:out value="${type.name}"/>
+							</c:when>
+							<c:otherwise>
+								<c:if test="${type.id != 4}">
+									<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>      
+								</c:if>
+								
+							</c:otherwise>
+						</c:choose> 
+					</c:otherwise>
+				</c:choose> 
+				
+				 
+				</c:forEach>
+			</select>
+			</div>
+			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="groupClassTypeId"/></jsp:include>
+		</td>
+		<td>*</td>
+	</tr>      
   
-   <c:choose>
-   <c:when test="${group.subjectAssignment =='Required'}">
-    <input type="radio" checked name="subjectAssignment" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved.');" value="Required"><fmt:message key="required" bundle="${resword}"/>
-    <input type="radio" name="subjectAssignment" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved.');" value="Optional"><fmt:message key="optional" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-    <input type="radio" name="subjectAssignment" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved.');" value="Required"><fmt:message key="required" bundle="${resword}"/>
-    <input type="radio" checked name="subjectAssignment" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved.');" value="Optional"><fmt:message key="optional" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="subjectAssignment"/></jsp:include></td><td>*</td></tr>      
-        
-  
-  <tr valign="top"><td class="formlabel"><fmt:message key="study_groups" bundle="${resword}"/>:</td>
-  
-  <td>
-  <c:set var="count" value="0"/>
-  <table border="0" cellpadding="0" cellspacing="0">
-   <tr>      
-       <td>&nbsp;</td>
-       <td>&nbsp;<fmt:message key="name" bundle="${resword}"/></td>
-       <td>&nbsp;<fmt:message key="description" bundle="${resword}"/></td>
-    </tr>
-   <c:forEach var="studyGroup" items="${studyGroups}">
-   <input type="hidden" name="studyGroupId<c:out value="${count}"/>" value="<c:out value="${studyGroup.id}"/>">
-   <tr> 
-   <td valign="top"><c:out value="${count+1}"/>&nbsp;</td>  
-    <td>
-     <div class="formfieldL_BG"><input type="text" name="studyGroup<c:out value="${count}"/>" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved.');" value="<c:out value="${studyGroup.name}"/>" class="formfieldL"></div>
-    </td>  
-     
-    <td> 
-     <div class="formfieldXL_BG"><input type="text" name="studyGroupDescription<c:out value="${count}"/>" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved.');" value="<c:out value="${studyGroup.description}"/>" class="formfieldL"></div>
-    </td>
-   </tr> 
-   <c:set var="count" value="${count+1}"/>
-   </c:forEach>
-   <c:if test="${count < 49}">
-    <c:forEach begin="${count}" end="49">
-     <input type="hidden" name="studyGroupId<c:out value="${count}"/>" value="0">
-      <tr>     
-       <td valign="top"><c:out value="${count+1}"/>&nbsp;</td>  
-       <td>
-        <div class="formfieldL_BG"><input type="text" name="studyGroup<c:out value="${count}"/>" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved.');" value="" class="formfieldL"></div>
-       </td>       
-       <td> 
-       <div class="formfieldXL_BG"><input type="text" name="studyGroupDescription<c:out value="${count}"/>" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved.');" value="<c:out value="${studyGroup.description}"/>" class="formfieldL"></div>
-       </td>
-      </tr>
-       <c:set var="count" value="${count+1}"/>
-    </c:forEach>
-   </c:if> 
-   <br>    
-   </table> 
-   <span class="alert"><c:out value="${studyGroupError}"/></span>
-  </td></tr>  
-   
-  
- 
+	<tr valign="top" id="subjAssignmentRow">
+		<td class="formlabel" width="140">
+			<fmt:message key="subject_assignment" bundle="${resword}"/>:
+		</td>
+		<td>
+		<c:choose>
+			<c:when test="${fields['subjectAssignment'] =='Required'}">
+				<input type="radio" checked name="subjectAssignment" onChange="setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" value="Required"><fmt:message key="required" bundle="${resword}"/>
+				<input type="radio" name="subjectAssignment" onChange="setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" value="Optional"><fmt:message key="optional" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<input type="radio" name="subjectAssignment" onChange="setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" value="Required"><fmt:message key="required" bundle="${resword}"/>
+				<input type="radio" checked name="subjectAssignment" onChange="setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" value="Optional"><fmt:message key="optional" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+		</td>
+		
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="subjectAssignment"/></jsp:include>
+		<td>*</td>
+	</tr>
+	<tr valign="top" id="isDefaultRow">
+		<td class="formlabel" width="140">
+			<fmt:message key="default" bundle="${resword}"/>
+		</td>
+		<td>
+		<c:choose>
+			<c:when test="${oldGroup.default}">
+				<c:choose>
+					<c:when test="${fields['isDefault'] == 'true'}">
+						<input type="checkbox" checked id="isDefault" name="isDefault" value="true"/>
+					</c:when>
+					<c:otherwise>
+						<input type="checkbox" id="isDefault" name="isDefault" value="true"/>
+					</c:otherwise>
+				</c:choose>
+			</c:when>
+			<c:otherwise>
+				<c:choose>
+					<c:when test="${defaultGroupAlreadyExists}">
+						<input type="checkbox" disabled id="isDefault" name="isDefault" value="true" title="<fmt:message key="default_group_already_exists" bundle="${resword}"/>"/>
+					</c:when>
+					<c:otherwise>
+						<c:choose>
+							<c:when test="${fields['isDefault'] == 'true'}">
+								<input type="checkbox" checked id="isDefault" name="isDefault" value="true"/>
+							</c:when>
+							<c:otherwise>
+								<input type="checkbox" id="isDefault" name="isDefault" value="true"/>
+							</c:otherwise>
+						</c:choose>
+					</c:otherwise>
+				</c:choose>
+			</c:otherwise>
+		</c:choose>
+		</td>
+		<td></td>
+	</tr>
 </table>
 </div>
 </div></div></div></div></div></div></div></div>
 
+</div>
+
+<%-- Ordinary Study Group Section --%>
+<div id="groups" style="display: none">
+
+ <div style="width: 600px">
+ <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+ <div class="tablebox_center">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tr valign="top">
+			<td class="formlabel">
+				<br>
+				<fmt:message key="study_groups" bundle="${resword}"/>:
+			</td>
+			<td style="padding-top:4px;">
+				
+				<c:set var="count" value="0"/>
+				<table border="0" cellpadding="0" cellspacing="0">  
+					<br>
+					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyGroupError"/></jsp:include>
+					<tr>      
+						<td>&nbsp;</td>
+						<td>&nbsp;<strong><fmt:message key="name" bundle="${resword}"/></strong></td>
+						<td>&nbsp;<strong><fmt:message key="description" bundle="${resword}"/></strong></td>
+					</tr>   
+					<c:forEach var="studyGroup" items="${studyGroups}">
+					<input type="hidden" name="studyGroupId<c:out value="${count}"/>" value="<c:out value="${studyGroup.id}"/>">
+					<tr>  
+						<td valign="top">
+							<c:out value="${count+1}"/>
+							&nbsp;
+						</td>  
+						<td>
+							<div class="formfieldS_BG">
+								<input type="text" name="studyGroup<c:out value="${count}"/>" onChange="showMoreFields(${count}); setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" value="<c:out value="${studyGroup.name}"/>" class="formfieldS">
+							</div>
+						</td>  
+						<td> 
+							<div class="formfieldL_BG">
+								<input type="text" name="studyGroupDescription<c:out value="${count}"/>" onChange="showMoreFields(${count}); setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" value="<c:out value="${studyGroup.description}"/>" class="formfieldL">
+							</div>
+						</td>
+					</tr> 
+					<c:set var="count" value="${count+1}"/>
+					</c:forEach>
+					
+					<c:choose>
+						<c:when test="${count < 5}">
+							<c:set var="delta" value="${6-count}"/>
+						</c:when>
+						<c:when test="${count > 46}">
+							<c:set var="delta" value="${49-count}"/>
+						</c:when>
+						<c:otherwise>
+							<c:set var="delta" value="2"/>
+						</c:otherwise>
+					</c:choose>
+
+					<c:forEach begin="${count}" end="${count+delta}">
+					<tr>  
+						<td valign="top">
+							<c:out value="${count+1}"/>
+							&nbsp;
+						</td>  
+						<td>
+							<div class="formfieldS_BG">
+								<input type="text" name="studyGroup<c:out value="${count}"/>" onChange="showMoreFields(${count}); setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" value="" class="formfieldS">
+							</div>
+						</td>  
+						<td> 
+							<div class="formfieldL_BG">
+								<input type="text" name="studyGroupDescription<c:out value="${count}"/>" onChange="showMoreFields(${count}); setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" value="" class="formfieldL">
+							</div>
+						</td>
+					</tr> 
+					<c:set var="count" value="${count+1}"/>
+					</c:forEach>
+					
+					<c:if test="${count <= 49}">
+						<c:forEach begin="${count}" end="49">
+						<tr style="display: none" id="row${count}">  
+							<td valign="top"><c:out value="${count+1}"/>&nbsp;</td>    
+							<td>
+								<div class="formfieldS_BG">
+									<input type="text" name="studyGroup<c:out value="${count}"/>" value="" class="formfieldS" onChange="showMoreFields(${count}); setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
+								</div>
+							</td>       
+							<td> 
+								<div class="formfieldL_BG">
+									<input type="text" name="studyGroupDescription<c:out value="${count}"/>" onChange="showMoreFields(${count}); setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" value="<c:out value="${studyGroup.description}"/>" class="formfieldL">
+								</div>
+							</td>
+						</tr>
+						<c:set var="count" value="${count+1}"/>
+						</c:forEach>   
+					</c:if> 
+					<br>    
+				</table> 
+				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyGroupError"/></jsp:include>
+			</td>
+		</tr> 		
+	</table>
+	<br>
+</div>
+</div></div></div></div></div></div></div></div></div>
+</div>
+ 
+ <%-- Dynamic Group Section --%>
+ <div id="definitions" style="display: none">
+ 
+ <div style="width: 600px">
+ <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+
+<div class="tablebox_center">
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<fmt:message key="study_events" bundle="${resword}"/>:
+<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dynamicEvents"/></jsp:include>
+<br></br>
+	<table border="1" cellpadding="0" cellspacing="0" width="100%">
+		<tr valign="top">
+			<td class="table_header_row">&nbsp;</td>
+			<td class="table_header_row"><fmt:message key="name" bundle="${resword}"/></td>
+			<td class="table_header_row"><fmt:message key="OID" bundle="${resword}"/></td>
+			<td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
+			<td class="table_header_row"><fmt:message key="of_CRFs" bundle="${resword}"/></td>
+		</tr>
+		<c:forEach var="definition" items="${definitionsToView}" varStatus="status">
+		<tr>
+			<td class="table_cell_left">
+			<c:choose>
+				<c:when test="${definition.value}">
+					<input type="checkbox" checked onchange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" 
+						value="yes" name="selected<c:out value="${definition.key.id}"/>"/>&nbsp;
+				</c:when>
+				<c:otherwise>
+					<input type="checkbox" onchange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" 
+						value="yes" name="selected<c:out value="${definition.key.id}"/>"/>&nbsp;
+				</c:otherwise>
+			</c:choose>
+			</td>
+			<td class="table_cell">
+				<c:out value="${definition.key.name}"/>
+			</td>
+			<td class="table_cell"><c:out value="${definition.key.oid}"/></td>
+			<td class="table_cell">
+				<c:out value="${definition.key.description}"/>&nbsp;
+			</td>
+			<td class="table_cell">
+				<c:out value="${definition.key.crfNum}"/>&nbsp;
+			</td>
+		</tr>
+		</c:forEach>
+	</table>
+</div>
+</div></div></div></div></div></div></div></div>
+</div>
 </div>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
@@ -172,7 +374,6 @@
 <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
 </td>
 <td>
-<%-- <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="javascript:myCancel();"/>--%>
 </td>
 </tr>
 </table>
@@ -222,10 +423,7 @@
 	
 							<span class="title_manage">
 				
-					
-						
 							<fmt:message key="manage_study" bundle="${resword}"/>
-					
 				
 							</span>
 
@@ -255,27 +453,17 @@
 						</td>
 						<td><img src="images/arrow.gif"></td>
 						<td>
-
 				<!-- These DIVs define shaded box borders -->
 						<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
 							<div class="textbox_center" align="center">
-
-							<span class="title_manage">
-				
-					
-							 <b><fmt:message key="update_a_subject_group_class" bundle="${resword}"/></b> 
-					
-				
-							</span>
-
+								<span class="title_manage">
+									<b><fmt:message key="update_a_subject_group_class" bundle="${resword}"/></b> 
+								</span>
 							</div>
 						</div></div></div></div></div></div></div></div>
-
 						</td>
 					</tr>
 				</table>
-
 
 		<!-- end Workflow items -->
 

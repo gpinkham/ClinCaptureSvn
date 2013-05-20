@@ -87,25 +87,29 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 
 		if (StringUtil.isBlank(action)) {
 			ArrayList studyGroups = new ArrayList();
+			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
+			ArrayList defaultStudyGroupClasses = sgcdao.findAllDefault();
 			clearSession();
 			
 			session.setAttribute("groupTypes", GroupClassType.toArrayList());
 			session.setAttribute("studyGroups", studyGroups);
+			session.setAttribute("defaultGroupAlreadyExists", !defaultStudyGroupClasses.isEmpty());
 			
 			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-			ArrayList definitionsList = seddao.findAllByStudy(currentStudy);
+			ArrayList allDefsFromStudy = seddao.findAllByStudy(currentStudy);
 			HashMap<StudyEventDefinitionBean, Boolean> definitions = new HashMap<StudyEventDefinitionBean, Boolean>();
 
-			for (int i = 0; i < definitionsList.size(); i++) {
-				StudyEventDefinitionBean def = (StudyEventDefinitionBean) definitionsList.get(i);
+			for (int i = 0; i < allDefsFromStudy.size(); i++) {
+				StudyEventDefinitionBean def = (StudyEventDefinitionBean) allDefsFromStudy.get(i);
 				ArrayList crfs = (ArrayList) edcdao.findAllActiveParentsByEventDefinitionId(def.getId());
 				def.setCrfNum(crfs.size());
-				definitions.put(def, false);
+				if (def.getStatus().isAvailable()) {
+					definitions.put(def, false);
+				}
 			}
 
 			session.setAttribute("definitionsToView", definitions);
-			session.setAttribute("defNum", definitions.size() + "");
 			forwardPage(Page.CREATE_SUBJECT_GROUP_CLASS);
 
 		} else {
@@ -157,22 +161,22 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 		
 		ArrayList studyGroups = new ArrayList();
 		if ("4".equals(request.getParameter("groupClassTypeId"))){ //dynamic group
-			if ("yes".equals(request.getParameter("isDefault"))) {
+			if ("true".equals(request.getParameter("isDefault"))) {
 				isDefault = true;
 			}
-			ArrayList<StudyEventDefinitionBean> listOfDefenitions = new ArrayList<StudyEventDefinitionBean>();
+			ArrayList<StudyEventDefinitionBean> listOfDefinitions = new ArrayList<StudyEventDefinitionBean>();
 			HashMap<StudyEventDefinitionBean, Boolean> definitions = (HashMap)session.getAttribute("definitionsToView");
 			for (Iterator keyIt = definitions.keySet().iterator(); keyIt.hasNext();) {
 				StudyEventDefinitionBean def =(StudyEventDefinitionBean) keyIt.next();
 				if ("yes".equals(request.getParameter("selected"+def.getId()))){
 					definitions.put(def, true);
 					atLeastOneEventDefSelected = true;
-					listOfDefenitions.add(def);
+					listOfDefinitions.add(def);
 				} else {
 					definitions.put(def, false);
 				}
 			}
-			session.setAttribute("listOfDefenitions", listOfDefenitions);
+			session.setAttribute("listOfDefinitions", listOfDefinitions);
 			session.setAttribute("definitionsToView", definitions);
 		} else {  //not dynamic group
 			atLeastOneEventDefSelected = true;
@@ -253,23 +257,24 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 			addPageMessage(respage.getString("the_subject_group_class_not_created_database"));
 		} else {
 			if (group.getGroupClassTypeId() == 4){
-				ArrayList<StudyEventDefinitionBean> listOfDefenitions = (ArrayList)session.getAttribute("listOfDefenitions");
-				ArrayList<StudyEventDefinitionBean> listOfOrderedDefenitions = new ArrayList(listOfDefenitions);
+				ArrayList<StudyEventDefinitionBean> listOfDefinitions = (ArrayList)session.getAttribute("listOfDefinitions");
+				ArrayList<StudyEventDefinitionBean> listOfOrderedDefinitions = new ArrayList(listOfDefinitions);
 				
 				//read order from submit-page and create ordered list
-				for ( StudyEventDefinitionBean def: listOfDefenitions) {
+				for ( StudyEventDefinitionBean def: listOfDefinitions) {
 					int index = Integer.valueOf(request.getParameter("event" + def.getId()));
-					listOfOrderedDefenitions.set(index-1, def);
+					listOfOrderedDefinitions.set(index-1, def);
 				}	
 				//create DynamicEventBeans and write to DB
 				DynamicEventDao dedao = new DynamicEventDao(sm.getDataSource());
-				for ( int i=0; i<listOfOrderedDefenitions.size(); i++) {
-					StudyEventDefinitionBean def = listOfOrderedDefenitions.get(i);
+				for ( int i=0; i<listOfOrderedDefinitions.size(); i++) {
+					StudyEventDefinitionBean def = listOfOrderedDefinitions.get(i);
 					DynamicEventBean de = new DynamicEventBean();
 					de.setStudyGroupClassId(group.getId());
 					de.setStudyEventDefinitionId(def.getId());
 					de.setStudyId(currentStudy.getId());
 					de.setOrdinal(i);
+					de.setOwner(ub);
 					dedao.create(de);
 				}
 			} else {
@@ -294,12 +299,12 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 	}
 	
 	private void clearSession() {
-		session.removeAttribute("listOfDefenitions");
+		session.removeAttribute("listOfDefinitions");
 		session.removeAttribute("definitionsToView");
 		session.removeAttribute("fields");
-		session.removeAttribute("defNum");
 		session.removeAttribute("group");
 		session.removeAttribute("studyGroups");
 		session.removeAttribute("groupTypes");
+		session.removeAttribute("defaultGroupAlreadyExists");
 	}
 }

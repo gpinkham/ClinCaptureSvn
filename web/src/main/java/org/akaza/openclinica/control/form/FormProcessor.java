@@ -475,7 +475,7 @@ public class FormProcessor {
 		answer.setKeywordFilter(getString(EBL_FILTER_KEYWORD));
 
 		// this code says that for each of the boolean properties of the table,
-		// if no value was speified on the form or in the GET query, then
+		// if no value was specified on the form or in the GET query, then
 		// keep the default value for that bit
 		// otherwise, the bits will just be forced to false
 		String blnFields[] = { EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED };
@@ -510,7 +510,7 @@ public class FormProcessor {
 		answer.setKeywordFilter(getString(EBL_FILTER_KEYWORD));
 
 		// this code says that for each of the boolean properties of the table,
-		// if no value was speified on the form or in the GET query, then
+		// if no value was specified on the form or in the GET query, then
 		// keep the default value for that bit
 		// otherwise, the bits will just be forced to false
 		String blnFields[] = { EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED };
@@ -533,7 +533,7 @@ public class FormProcessor {
 	}
 
 	/**
-	 * Return a String which cancatenates inputed "Date", "Hour", "Minute" and "am/pm" if applicable. Empty string will
+	 * Return a String which concatenates inputed "Date", "Hour", "Minute" and "am/pm" if applicable. Empty string will
 	 * be returned if none of them has been entered.
 	 * 
 	 * @param prefix

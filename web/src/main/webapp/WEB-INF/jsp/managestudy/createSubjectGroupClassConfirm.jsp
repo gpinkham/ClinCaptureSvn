@@ -4,7 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="../include/managestudy-header.jsp"/>
-
+ 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
@@ -74,13 +74,13 @@
 <h1><span class="title_manage"><fmt:message key="confirm_a_subject_group_class" bundle="${resword}"/>:</span></h1>
 
 <form action="CreateSubjectGroupClass" method="post">
-* <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
+<br>
 <input type="hidden" name="action" value="submit">
 <!-- These DIVs define shaded box borders -->
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-<div class="textbox_center">
+<div class="tablebox_center">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    
 	<tr valign="top">
@@ -151,13 +151,13 @@
 							<fmt:message key="order" bundle="${resword}"/>
 						</td>
 					</tr>
-					<c:forEach var="item" items="${listOfDefenitions}" varStatus="status">
+					<c:forEach var="item" items="${listOfDefinitions}" varStatus="status">
 					<tr valign="top">  
 						<td class="table_cell_left" id="order${status.count}">
 						<c:choose>
 							<c:when test="${status.first}">
 								<c:choose>
-									<c:when test="${fn:length(listOfDefenitions) > 1}">
+									<c:when test="${fn:length(listOfDefinitions) > 1}">
 										&nbsp;<img src="images/bt_sort_descending.gif" border="0" onClick="javascript: moveDown(${status.count});" alt="<fmt:message key="move_down" bundle="${resword}"/>" title="<fmt:message key="move_down" bundle="${resword}"/>" />
 									</c:when>
 									<c:otherwise>
@@ -188,7 +188,7 @@
 							<fmt:message key="OID" bundle="${resword}"/>
 						</td>
 					</tr>
-					<c:forEach var="item" items="${listOfDefenitions}" varStatus="status">
+					<c:forEach var="item" items="${listOfDefinitions}" varStatus="status">
 					<tr id="content${status.count}">			
 						<td class="table_cell">
 							<c:out value="${item.name}"/>
@@ -219,8 +219,4 @@
 </tr>
 </table>
 </form>
-
-<%--<c:import url="../include/workflow.jsp">--%>
-  <%--<c:param name="module" value="manage"/>--%>
- <%--</c:import>--%>
 <jsp:include page="../include/footer.jsp"/>

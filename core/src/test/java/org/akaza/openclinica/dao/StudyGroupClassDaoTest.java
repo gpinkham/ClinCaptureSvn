@@ -1,5 +1,7 @@
 package org.akaza.openclinica.dao;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -36,6 +38,11 @@ public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 		studyGroupClassBean.setSubjectAssignment("Arm");
 		studyGroupClassBean.setDefault(false);
 		studyGroupClassDAO.create(studyGroupClassBean);
+	}
+	
+	@Test
+	public void testFindAllDefault() throws OpenClinicaException {
+		assertEquals(1,studyGroupClassDAO.findAllDefault().size());
 	}
 }
 

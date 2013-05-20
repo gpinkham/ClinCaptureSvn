@@ -42,7 +42,7 @@
 <!-- These DIVs define shaded box borders -->
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-<div class="textbox_center">
+<div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 	<tr valign="top">
 		<td class="table_header_column">
@@ -90,13 +90,12 @@
 
 <c:choose>
 	<c:when test="${group.groupClassTypeId == 4}">
+		<div class="table_title_manage"><fmt:message key="study_events" bundle="${resword}"/>:</div>
 		<div id="definitions">
 		<div style="width: 600px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 		<div class="tablebox_center">
-			<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<fmt:message key="study_events" bundle="${resword}"/>:
-			<br></br>
 			<table border="1" cellpadding="0" cellspacing="0" width="100%">
 				<tr valign="top">
 					<td class="table_header_row">&nbsp;</td>
@@ -122,15 +121,16 @@
 					<td class="table_cell">
 						<c:out value="${definition.crfNum}"/>
 					</td>
-					<td class="table_cell">
 					<c:choose>
 						<c:when test="${definition.status.available}">
-							<fmt:message key="available" bundle="${resword}"/>&nbsp;
+							<td class="table_cell"><c:out value="${definition.status.name}"/></td>	
 						</c:when>
 						<c:otherwise>
-							<fmt:message key="unavailable" bundle="${resword}"/>&nbsp;
+							<td class="table_cell aka_red_highlight"><c:out value="${definition.status.name}"/></td>	
 						</c:otherwise>
 					</c:choose>
+					<td class="table_cell">
+						
 					</td>
 				</tr>
 				</c:forEach>
@@ -144,13 +144,13 @@
 		<div class="table_title_manage"><fmt:message key="study_group_and_associated_subjects" bundle="${resword}"/>:</div>
 		<div style="width: 600px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-		<div class="textbox_center">
+		<div class="tablebox_center">
 
 		<table border="0" cellpadding="0" cellspacing="0" width="100%">   
 			<tr valign="top">
-				<td class="table_header_column_top"><fmt:message key="name" bundle="${resword}"/></td>
-				<td class="table_header_column_top"><fmt:message key="description" bundle="${resword}"/></td>
-				<td class="table_header_column_top"><fmt:message key="subjects" bundle="${resword}"/></td> 
+				<td class="table_header_row"><fmt:message key="name" bundle="${resword}"/></td>
+				<td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
+				<td class="table_header_row"><fmt:message key="subjects" bundle="${resword}"/></td> 
 			</tr>    
 			<c:forEach var="studyGroup" items="${studyGroups}">   
 			<tr valign="top">
