@@ -758,13 +758,23 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					if (getCurrentRole().getRole() == Role.COORDINATOR) {
 						url.append(studySubjectLockLinkBuilder(studySubjectBean));
 					}
+
+					if (discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel())) {
+						
+						if (getStudyBean().getStatus() == Status.AVAILABLE
+								&& getCurrentRole().getRole() != Role.MONITOR) {
+							
+							// Make sure this is the last icon
+							url.append(createNotesAndDiscrepanciesIcon(studySubjectBean));
+						}
+					}
 				}
+
 				value = "</div>" + url.toString();
 			}
 
 			return value;
 		}
-
 	}
 
 	private String viewStudySubjectLinkBuilder(StudySubjectBean studySubject) {
@@ -792,6 +802,22 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	}
 
+	private String createNotesAndDiscrepanciesIcon(StudySubjectBean studySubject) {
+
+		HtmlBuilder actionLink = new HtmlBuilder();
+		actionLink
+				.a()
+				.href("ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label="
+						+ studySubject.getLabel() + "&&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed");
+		actionLink.append("onMouseDown=\"javascript:setImage('ndIcon','images/icon_Note.gif');\"");
+		actionLink.append("onMouseUp=\"javascript:setImage('ndIcon','images/icon_Note.gif');\"").close();
+		actionLink.img().name("ndIcon").src("images/icon_Note.gif").border("0")
+				.alt(resword.getString("view_discrepancy_notes")).title(resword.getString("view_discrepancy_notes"))
+				.end().aEnd();
+
+		return actionLink.toString();
+	}
+
 	private String signStudySubjectLinkBuilder(StudySubjectBean studySubject, boolean isSignable) {
 		String result = "";
 		boolean showHidden = !isSignable ? getStudyEventDAO().findAllByStudySubject(studySubject).size() == 0 : false;
@@ -803,7 +829,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			actionLink.append("onMouseUp=\"javascript:setImage('icon_signed_blue','images/icon_SignedBlue.gif');\"")
 					.close();
 			actionLink.img().name("bt_Sign1").src("images/icon_SignedBlue.gif").border("0")
-					.alt(resword.getString("sign")).title(resword.getString("sign")).append("hspace=\"4\"").end().aEnd();
+					.alt(resword.getString("sign")).title(resword.getString("sign")).append("hspace=\"4\"").end()
+					.aEnd();
 			result = actionLink.toString();
 		}
 		return result;

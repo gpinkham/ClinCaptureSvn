@@ -66,17 +66,6 @@
             </c:if>
             <a href="ViewStudySubject?id=${studySubject.id}"><img src="images/bt_View.gif" border="0" align="left" alt="<fmt:message key="view_subject_record" bundle="${resword}"/>" title="<fmt:message key="view_subject_record" bundle="${resword}"/>" hspace="4"/></a>
 
-            <c:choose>
-                <c:when test="${subjectHasNDs eq true}">
-                    <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed">
-                        <img src="images/icon_NDs_Alert.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
-                </c:when>
-                <c:otherwise>
-                    <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed">
-                        <img src="images/icon_NDs.gif" border="0" align="left" alt="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
-                </c:otherwise>
-            </c:choose>
-
             <c:if test="${currentRole.id ne 4 and currentRole.id ne 5 and currentRole.id ne 6}">
                 <c:set var="insertBlankCell" value="true"/>
                 <c:choose>
@@ -96,6 +85,10 @@
             </c:if>
             <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id eq 2}">
                 <a href="ReassignStudySubject?id=${studySubject.id}"><img src="images/bt_Reassign.gif" border="0" align="left" alt="<fmt:message key="reassign" bundle="${resword}"/>" title="<fmt:message key="reassign" bundle="${resword}"/>" hspace="4"/></a>
+            </c:if>
+            <c:if test="${subjectHasNDs eq true}">
+                    <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed">
+                        <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
             </c:if>
         </td>
     </tr>
@@ -121,18 +114,6 @@
             </c:if>
             <a href="EnterDataForStudyEvent?eventId=${studyEvent.id}"><img src="images/bt_View.gif" border="0" align="left" alt="<fmt:message key="view_study_event" bundle="${resword}"/>" title="<fmt:message key="view_study_event" bundle="${resword}"/>" hspace="4"/></a>
 
-            <!-- View DNs icons -->
-            <c:choose>
-                <c:when test="${eventHasNDs eq true}">
-                    <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_eventName=${studyEventName}">
-                        <img src="images/icon_NDs_Alert.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
-                </c:when>
-                <c:otherwise>
-                    <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_eventName=${studyEventName}">
-                        <img src="images/icon_NDs.gif" border="0" align="left" alt="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
-                </c:otherwise>
-            </c:choose>
-
             <c:choose>
                 <c:when test="${not studySubject.status.deleted and currentRole.id ne 4 and currentRole.id ne 5 and currentRole.id ne 6}">
                     <c:choose>
@@ -156,6 +137,11 @@
             </c:if>
             <c:if test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4}">
                 <a href="UpdateStudyEvent?action=submit&event_id=${studyEvent.id}&ss_id=${studySubject.id}&changeDate=&startDate=20-Jan-2012&startHour=-1&startMinute=-1&startHalf=&endDate=&endHour=-1&endMinute=-1&endHalf=&statusId=8&Submit=Submit+Changes"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign" bundle="${resword}"/>" title="<fmt:message key="sign" bundle="${resword}"/>" hspace="4"/></a>
+            </c:if>
+            <!-- View DNs icons -->
+            <c:if test="${eventHasNDs eq true}">
+                    <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_eventName=${studyEventName}">
+                        <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
             </c:if>
         </td>
     </tr>
@@ -317,18 +303,12 @@
                                            onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                                            name="bt_View1" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="4"></a>
 
-                                    <c:choose>
-                                        <c:when test="${crfNDsMap[dedc.edc.crf.id] eq true}">
-                                            <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_crfName=${dedc.edc.crf.name}">
-                                                <img src="images/icon_NDs_Alert.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&&listNotes_f_crfName=${dedc.edc.crf.name}">
-                                                <img src="images/icon_NDs.gif" border="0" align="left" alt="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
-                                        </c:otherwise>
-                                    </c:choose>
 
                                     </form>
+                                    <c:if test="${crfNDsMap[dedc.edc.crf.id] eq true}">
+                                            <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_crfName=${dedc.edc.crf.name}">
+                                                <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
+                                    </c:if>
                                 </td>
                             </tr>
 
@@ -504,18 +484,6 @@
                                            onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                           ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="4"></a>
 
-
-                                        <c:choose>
-                                            <c:when test="${crfNDsMap[dec.eventCRF.crf.id] eq true}">
-                                                <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_crfName=${dec.eventCRF.crf.name}&listNotes_f_eventName=${dec.eventCRF.name}">
-                                                    <img src="images/icon_NDs_Alert.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_crfName=${dec.eventCRF.crf.name}&listNotes_f_eventName=${dec.eventCRF.name}">
-                                                    <img src="images/icon_NDs.gif" border="0" align="left" alt="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
-                                            </c:otherwise>
-                                        </c:choose>
-
                                         <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
                                             <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                                                onMouseDown="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
@@ -531,6 +499,10 @@
                                         </c:if>
                                     </c:otherwise>
                                 </c:choose>
+                                <c:if test="${crfNDsMap[dec.eventCRF.crf.id] eq true}">
+                                        <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_crfName=${dec.eventCRF.crf.name}&listNotes_f_eventName=${dec.eventCRF.name}">
+                                            <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
+                                </c:if>
                             </td>
                         </tr>
                         <c:set var="rowCount" value="${rowCount + 1}" />
