@@ -54,6 +54,7 @@ public class UpdateStudyServletNew extends SecureController {
 	public static final String INPUT_VER_DATE = "protocolDateVerification";
 	public static StudyBean study;
 	public ArrayList<DnDescription> newRfcDescriptions;
+	public ArrayList<DnDescription> updateRfcDescriptions;
 
 	/**
      *
@@ -162,7 +163,7 @@ public class UpdateStudyServletNew extends SecureController {
 				forwardPage(Page.UPDATE_STUDY_NEW);
 			} else {
 				study.setProtocolType(protocolType);
-				submitStudy(study, newRfcDescriptions);
+				submitStudy(study, newRfcDescriptions, updateRfcDescriptions);
 				study.setStudyParameters(new StudyParameterValueDAO(sm.getDataSource()).findParamConfigByStudy(study));
 				addPageMessage(respage.getString("the_study_has_been_updated_succesfully"));
 				ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
@@ -438,6 +439,32 @@ public class UpdateStudyServletNew extends SecureController {
 			rfcTerm3.setStudyId(study.getId());
 			newRfcDescriptions.add(rfcTerm3);
 		}
+		// review all other forms with dn descriptions
+		ArrayList<DnDescription> oldRfcDescriptions = new ArrayList<DnDescription>();
+		updateRfcDescriptions = new ArrayList<DnDescription>();
+		DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(sm.getDataSource());
+		try {
+			oldRfcDescriptions = (ArrayList<DnDescription>) dnDescriptionDao.findAllByStudyId(study.getId());
+		} catch (OpenClinicaException e) {
+			logger.error(e.getMessage());
+		}
+		
+		for (DnDescription oldRfc : oldRfcDescriptions) {
+			String nameField = "dnRfcDescription" + oldRfc.getId();
+			String siteField = "dnRfcIsSiteVisible" + oldRfc.getId();
+
+			// set to be updated
+			oldRfc.setName(fp.getString(nameField));
+
+			if (!"0".equals(fp.getString(siteField))) {
+				oldRfc.setSiteVisible(true);
+			} else {
+				oldRfc.setSiteVisible(false);
+			}
+			updateRfcDescriptions.add(oldRfc);
+
+		}
+
 		if (!errors.isEmpty()) {
 			request.setAttribute("formMessages", errors);
 			// set other terms here
@@ -608,7 +635,7 @@ public class UpdateStudyServletNew extends SecureController {
 
 	}
 
-	private void submitStudy(StudyBean newStudy, ArrayList<DnDescription> newRfcDescriptions) {
+	private void submitStudy(StudyBean newStudy, ArrayList<DnDescription> newRfcDescriptions, ArrayList<DnDescription> updateRfcDescriptions) {
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
 		DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(sm.getDataSource());
@@ -627,7 +654,17 @@ public class UpdateStudyServletNew extends SecureController {
 					logger.debug("successfully created one");
 				} catch (OpenClinicaException e) {
 					logger.debug(e.getMessage());
-					e.printStackTrace();
+				}
+			}
+		}
+		
+		if (!updateRfcDescriptions.isEmpty()) {
+			for (DnDescription updateDescript : updateRfcDescriptions) {
+				try {
+					logger.debug("about to update one");
+					dnDescriptionDao.update(updateDescript);
+				} catch (OpenClinicaException e) {
+					logger.error(e.getMessage());
 				}
 			}
 		}

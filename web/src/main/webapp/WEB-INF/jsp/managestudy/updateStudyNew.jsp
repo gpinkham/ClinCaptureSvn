@@ -812,12 +812,12 @@
         Site Visible?
         <c:choose>
           <c:when test="${term.siteVisible }">
-          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramName}"/>" checked value="1">Yes
-          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramName}"/>" value="0">No
+          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramSvName}"/>" checked value="1">Yes
+          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramSvName}"/>" value="0">No
           </c:when>
           <c:otherwise>
-          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramName}"/>" value="1">Yes
-          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramName}"/>" checked value="0">No
+          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramSvName}"/>" value="1">Yes
+          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramSvName}"/>" checked value="0">No
           </c:otherwise>
         </c:choose>
           <br/>
