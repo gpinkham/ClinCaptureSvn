@@ -2166,9 +2166,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return noteBeans.size() > 0;
 	}
 
-	public boolean doesEventHasUnclosedNDsInStudy(StudyBean study, String eventLabel) {
+	public boolean doesEventHasUnclosedNDsInStudy(StudyBean study, String eventLabel, String subjectLabel) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("eventName", eventLabel);
+		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "321");
 		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
 				new ListNotesSort(), 0, 100);

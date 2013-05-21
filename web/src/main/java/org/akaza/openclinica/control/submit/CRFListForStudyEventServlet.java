@@ -217,7 +217,7 @@ public class CRFListForStudyEventServlet extends SecureController {
 				discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(currentStudy, studySubjectBean.getLabel()));
 
 		String eventName = seb.getStudyEventDefinition().getName();
-		request.setAttribute(EVENT_HAS_NDs, discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(currentStudy, eventName));
+		request.setAttribute(EVENT_HAS_NDs, discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(currentStudy, eventName, studySubjectBean.getLabel()));
 
 		List<Object> fullCrfList = new ArrayList<Object>();
 		fullCrfList.addAll(uncompletedEventDefinitionCRFs);
