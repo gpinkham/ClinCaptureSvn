@@ -793,6 +793,63 @@
 </div>
 </div>
 <br>
+<a href="javascript:leftnavExpand('sectionee');">
+ 	<img id="excl_sectione" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
+           <fmt:message key="discrepancy_descriptions" bundle="${resword}"/></span></a>
+<div id="sectionee" style="display:none">
+<!-- filler here -->
+<div style="width: 600px">
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<div class="textbox_center">
+<table border="0" cellpadding="0">
+
+    <tr valign="top"><td class="formlabel">Reason For Change Descriptions</td>
+  	<td>
+  	<c:forEach var="term" items="${dnDescriptions}">
+  		<c:set var="paramName" value="dnRfcDescription${term.id}"/>
+  		<c:set var="paramSvName" value="dnRfcIsSiteVisible${term.id}"/>
+  		<div class="formfieldXL_BG"><input type="text" name="<c:out value="${paramName}"/>" onchange="javascript:changeIcon()" value="${term.name}" class="formFieldXL"></div>
+        Site Visible?
+        <c:choose>
+          <c:when test="${term.siteVisible }">
+          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramName}"/>" checked value="1">Yes
+          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramName}"/>" value="0">No
+          </c:when>
+          <c:otherwise>
+          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramName}"/>" value="1">Yes
+          	<input type="radio" onchange="javascript:changeIcon()" name="<c:out value="${paramName}"/>" checked value="0">No
+          </c:otherwise>
+        </c:choose>
+          <br/>
+  	</c:forEach>
+	  		<div class="formfieldXL_BG"><input type="text" name="dnRfcDescriptionNew1" onchange="javascript:changeIcon()" value="" class="formFieldXL"></div>
+          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRfcDescriptionNew1"/></jsp:include>
+          Site Visible?  
+          <input type="radio" onchange="javascript:changeIcon()" name="dnRfcNewSiteVisible1" value="1">Yes
+          <input type="radio" onchange="javascript:changeIcon()" name="dnRfcNewSiteVisible1" value="0">No
+          <br>
+	  		<div class="formfieldXL_BG"><input type="text" name="dnRfcDescriptionNew2" onchange="javascript:changeIcon()" value="" class="formFieldXL"></div>
+          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRfcDescriptionNew2"/></jsp:include>
+          Site Visible?
+          <input type="radio" onchange="javascript:changeIcon()" name="dnRfcNewSiteVisible2" value="1">Yes
+          <input type="radio" onchange="javascript:changeIcon()" name="dnRfcNewSiteVisible2" value="0">No
+          <br>
+          	<div class="formfieldXL_BG"><input type="text" name="dnRfcDescriptionNew3" onchange="javascript:changeIcon()" value="" class="formFieldXL"></div>
+          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dnRfcDescriptionNew3"/></jsp:include>
+          Site Visible?
+          <input type="radio" onchange="javascript:changeIcon()" name="dnRfcNewSiteVisible3" value="1">Yes
+          <input type="radio" onchange="javascript:changeIcon()" name="dnRfcNewSiteVisible3" value="0">No
+          <br>
+          
+          
+  	</td>
+  </tr>
+</table>
+</div></div></div></div></div></div></div></div></div>
+</div>
+</div>
+<!-- end of section ee -->
+<br>
 <a href="javascript:leftnavExpand('sectionf');">
 	<img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
     <fmt:message key="study_parameter_configuration" bundle="${resword}"/></span></a>

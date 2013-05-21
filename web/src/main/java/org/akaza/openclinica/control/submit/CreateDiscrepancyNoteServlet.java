@@ -21,6 +21,7 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.DnDescription;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
@@ -38,6 +39,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -151,7 +153,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 		boolean writeToDB = fp.getBoolean(WRITE_TO_DB, true); // this should be set based on a new property of
 																// DisplayItemBean
 		boolean isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
-		// ClinCapture #42 save isReasonForChange on form
 		request.setAttribute(IS_REASON_FOR_CHANGE, isReasonForChange ? "1" : "0");
 		int entityId = fp.getInt(ENTITY_ID);
 		// subjectId has to be added to the database when disc notes area saved
@@ -392,7 +393,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
 		if (!fp.isSubmitted()) {
 			DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-
+			ArrayList<DnDescription> dnDescriptions = new ArrayList<DnDescription>();
+			
 			if (subjectId > 0) {
 				// This doesn't seem correct, because the SubjectId should
 				// be the id for
@@ -437,6 +439,24 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 						dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
 					}
 					if (isReasonForChange) {
+						ArrayList<DnDescription> siteVisibleDescs = new ArrayList<DnDescription>();
+						ArrayList<DnDescription> studyVisibleDescs = new ArrayList<DnDescription>();
+						DnDescriptionDao descriptionDao = new DnDescriptionDao(sm.getDataSource());
+						int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+						ArrayList<DnDescription> rfcDescriptions = (ArrayList<DnDescription>) descriptionDao.findAllByStudyId(parentStudyId);
+						for (DnDescription rfcTerm : rfcDescriptions) {
+							if (rfcTerm.isSiteVisible()) {
+								siteVisibleDescs.add(rfcTerm);
+							} else {
+								studyVisibleDescs.add(rfcTerm);
+							}
+						}
+						
+						if (currentStudy.getParentStudyId() > 0) {
+							dnDescriptions = siteVisibleDescs;
+						} else {
+							dnDescriptions = studyVisibleDescs;
+						}
 
 						dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId()); // ClinCapture #42
 
@@ -503,6 +523,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 			request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");// this should go from UI & here
 			ArrayList userAccounts = this.generateUserAccounts(ub.getActiveStudyId(), subjectId);
 			request.setAttribute(USER_ACCOUNTS, userAccounts);
+			request.setAttribute("dnDescriptions", dnDescriptions);
 
 			// ideally should be only two cases
 			if (currentRole.getRole().equals(Role.RESEARCHASSISTANT)

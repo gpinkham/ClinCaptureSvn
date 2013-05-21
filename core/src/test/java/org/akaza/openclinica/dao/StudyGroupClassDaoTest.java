@@ -1,7 +1,5 @@
 package org.akaza.openclinica.dao;
 
-import java.util.ArrayList;
-
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;

@@ -27,6 +27,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -98,9 +99,10 @@ public class ViewStudyServlet extends SecureController {
 				// find all subjects in the study, include ones in sites
 				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-
+				DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(sm.getDataSource());
 				// find all events in the study, include ones in sites
 				ArrayList definitions = seddao.findAllByStudy(study);
+				ArrayList dnDescriptions = (ArrayList) dnDescriptionDao.findAllByStudyId(studyId);
 
 				for (int i = 0; i < definitions.size(); i++) {
 					StudyEventDefinitionBean def = (StudyEventDefinitionBean) definitions.get(i);
@@ -111,6 +113,7 @@ public class ViewStudyServlet extends SecureController {
 
 				request.setAttribute("sitesToView", sites);
 				request.setAttribute("siteNum", sites.size() + "");
+				request.setAttribute("dnDescriptions", dnDescriptions);
 
 				request.setAttribute("userRolesToView", userRoles);
 				request.setAttribute("userNum", userRoles.size() + "");

@@ -15,6 +15,7 @@ import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.junit.Before;
@@ -33,6 +34,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected StudyEventDAO studyEventDao;
 	protected DynamicEventDao dynamicEventDao;
 	protected DiscrepancyNoteDAO discrepancyNoteDAO;
+	protected DnDescriptionDao dnDescriptionDao;
 	protected StudyGroupClassDAO studyGroupClassDAO;
 	// DAOS
 	@Autowired protected RuleDao ruleDao;
@@ -61,5 +63,6 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		dynamicEventDao = new DynamicEventDao(dataSource);
 		discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 		studyGroupClassDAO = new StudyGroupClassDAO(dataSource);
+		dnDescriptionDao = new DnDescriptionDao(dataSource);
 	}
 }

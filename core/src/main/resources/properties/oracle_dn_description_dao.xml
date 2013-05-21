@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<queries>
+    <query>
+        <name>findByPK</name>
+        <sql>SELECT * FROM DN_RFC_DESCRIPTION WHERE
+            DN_RFC_DESCRIPTION_ID = ?</sql>
+    </query>
+    <query>
+        <name>findAll</name>
+        <sql>SELECT * FROM DN_RFC_DESCRIPTION</sql>
+    </query>
+    <query>
+        <name>create</name>
+        <sql>INSERT INTO DN_RFC_DESCRIPTION (NAME, DESCRIPTION) VALUES (?, ?)</sql>
+    </query>
+    <query>
+        <name>update</name>
+        <sql>UPDATE DN_RFC_DESCRIPTION SET NAME = ?, DESCRIPTION = ? WHERE DN_RFC_DESCRIPTION = ?</sql>
+    </query>
+	<query>
+		<name>deleteByPK</name>
+		<sql>DELETE FROM DN_RFC_DESCRIPTION WHERE DN_RFC_DESCRIPTION_ID=?</sql>
+	</query>
+	<query>
+		<name>findAllByStudyId</name>
+		<sql>SELECT * FROM DN_RFC_DESCRIPTION WHERE STUDY_ID=? ORDER BY DN_RFC_DESCRIPTION_ID</sql>
+	</query>
+</queries>

@@ -7,6 +7,7 @@
 <jsp:useBean scope='request' id='writeToDB' class='java.lang.String' />
 <jsp:useBean scope='request' id='unlock' class='java.lang.String' />
 <jsp:useBean scope='request' id='autoView' class='java.lang.String' />
+<jsp:useBean scope='request' id='dnDescriptions' class='java.util.ArrayList' />
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -227,10 +228,24 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 
 	<div class="dnBoxCol1 dnBoxText"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
 	<div class="dnBoxCol2 dnBoxText">
+	<c:choose>
+		<c:when test="${isRfc == 1}">
+			<div class="formfieldL_BG">
+			<select name="description" id="description" class="formFieldL">
+				<c:forEach var="rfcTerm" items="${dnDescriptions}">
+					<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
+				</c:forEach>
+				<option value="Other">Other
+			</select>
+			</div>
+		</c:when>
+		<c:otherwise>
 		<span id="description">
 			<div class="formfieldXL_BG"><input type="text" name="description" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
 		</span>
+		</c:otherwise>
+	</c:choose>
 	</div>
 	
 	<div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>

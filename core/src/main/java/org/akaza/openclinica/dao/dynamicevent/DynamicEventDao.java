@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
+ * 
+ * You should have received a copy of the Lesser GNU General Public License along with this program.  
+ * If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
 package org.akaza.openclinica.dao.dynamicevent;
 
 import java.util.*;
@@ -100,13 +113,13 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 	public EntityBean create(EntityBean eb) throws OpenClinicaException {
 		DynamicEventBean deb = (DynamicEventBean) eb;
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(deb.getStudyGroupClassId()));
-		variables.put(new Integer(2), new Integer(deb.getStudyEventDefinitionId()));
-		variables.put(new Integer(3), new Integer(deb.getStudyId()));
-		variables.put(new Integer(4), new Integer(deb.getOrdinal()));
-		variables.put(new Integer(5), new Integer(deb.getOwnerId()));
-		variables.put(new Integer(6), deb.getName());
-		variables.put(new Integer(7), deb.getDescription());
+		variables.put(Integer.valueOf(1), new Integer(deb.getStudyGroupClassId()));
+		variables.put(Integer.valueOf(2), new Integer(deb.getStudyEventDefinitionId()));
+		variables.put(Integer.valueOf(3), new Integer(deb.getStudyId()));
+		variables.put(Integer.valueOf(4), new Integer(deb.getOrdinal()));
+		variables.put(Integer.valueOf(5), new Integer(deb.getOwnerId()));
+		variables.put(Integer.valueOf(6), deb.getName());
+		variables.put(Integer.valueOf(7), deb.getDescription());
 		this.execute(digester.getQuery("create"), variables);
 		return eb;
 	}

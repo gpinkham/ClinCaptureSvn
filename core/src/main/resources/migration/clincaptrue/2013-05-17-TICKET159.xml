@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="thickerson" id="2013-05-17-TICKET159-01">
+        <comment>creating a new table to contain discrepancy descriptions for reasons for change</comment>
+        <createTable tableName="dn_rfc_description">
+            <column autoIncrement="true" name="dn_rfc_description_id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(2048)"/>
+            <column name="is_site_visible" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="study_id" type="INT"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

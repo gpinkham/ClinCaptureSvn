@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
+import org.akaza.openclinica.bean.core.DnDescription;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -38,9 +39,11 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -50,6 +53,7 @@ public class UpdateStudyServletNew extends SecureController {
 	public static final String INPUT_END_DATE = "endDate";
 	public static final String INPUT_VER_DATE = "protocolDateVerification";
 	public static StudyBean study;
+	public ArrayList<DnDescription> newRfcDescriptions;
 
 	/**
      *
@@ -78,6 +82,7 @@ public class UpdateStudyServletNew extends SecureController {
 		studyId = studyId == 0 ? fp.getInt("studyId") : studyId;
 		String action = fp.getString("action");
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(sm.getDataSource());
 		boolean isInterventional = false;
 
 		study = (StudyBean) sdao.findByPK(studyId);
@@ -90,8 +95,9 @@ public class UpdateStudyServletNew extends SecureController {
 		study.setId(studyId);
 		StudyConfigService scs = new StudyConfigService(sm.getDataSource());
 		study = scs.setParametersForStudy(study);
+		ArrayList dnDescriptions = (ArrayList) dnDescriptionDao.findAllByStudyId(studyId);
 		request.setAttribute("studyToView", study);
-
+		request.setAttribute("dnDescriptions", dnDescriptions);
 		request.setAttribute("studyId", studyId + "");
 		request.setAttribute("studyPhaseMap", CreateStudyServlet.studyPhaseMap);
 		ArrayList statuses = Status.toStudyUpdateMembersList();
@@ -145,17 +151,18 @@ public class UpdateStudyServletNew extends SecureController {
 			validateStudy4(fp, v);
 			validateStudy5(fp, v);
 			validateStudy6(fp, v);
+			validateStudy7(fp, v);
 			confirmWholeStudy(fp, v);
 
 			request.setAttribute("studyToView", study);
 			if (!errors.isEmpty()) {
-				System.out.println("found errors : " + errors.toString());
+				logger.debug("found errors : " + errors.toString());
 				request.setAttribute("formMessages", errors);
 
 				forwardPage(Page.UPDATE_STUDY_NEW);
 			} else {
 				study.setProtocolType(protocolType);
-				submitStudy(study);
+				submitStudy(study, newRfcDescriptions);
 				study.setStudyParameters(new StudyParameterValueDAO(sm.getDataSource()).findParamConfigByStudy(study));
 				addPageMessage(respage.getString("the_study_has_been_updated_succesfully"));
 				ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
@@ -385,6 +392,57 @@ public class UpdateStudyServletNew extends SecureController {
 			request.setAttribute("formMessages", errors);
 		}
 	}
+	
+	private void validateStudy7(FormProcessor fp, Validator v) {
+		v.addValidation("dnRfcDescriptionNew1", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("dnRfcDescriptionNew2", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		v.addValidation("dnRfcDescriptionNew3", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		
+		errors = v.validate();
+		newRfcDescriptions = new ArrayList<DnDescription>();
+		
+		// set list of dn descriptions for rfc here
+		DnDescription rfcTerm1 = new DnDescription();
+		DnDescription rfcTerm2 = new DnDescription();
+		DnDescription rfcTerm3 = new DnDescription();
+		
+		if (!"".equals(fp.getString("dnRfcDescriptionNew1"))) {
+			rfcTerm1.setName(fp.getString("dnRfcDescriptionNew1"));
+			if (!"0".equals(fp.getString("dnRfcNewSiteVisible1"))) {
+				rfcTerm1.setSiteVisible(true);
+			} else {
+				rfcTerm1.setSiteVisible(false);
+			}
+			rfcTerm1.setStudyId(study.getId());
+			newRfcDescriptions.add(rfcTerm1);
+		}
+		
+		if (!"".equals(fp.getString("dnRfcDescriptionNew2"))) {
+			rfcTerm2.setName(fp.getString("dnRfcDescriptionNew2"));
+			if (!"0".equals(fp.getString("dnRfcNewSiteVisible2"))) {
+				rfcTerm2.setSiteVisible(true);
+			} else {
+				rfcTerm2.setSiteVisible(false);
+			}
+			rfcTerm2.setStudyId(study.getId());
+			newRfcDescriptions.add(rfcTerm2);
+		}
+		
+		if (!"".equals(fp.getString("dnRfcDescriptionNew3"))) {
+			rfcTerm3.setName(fp.getString("dnRfcDescriptionNew3"));
+			if (!"0".equals(fp.getString("dnRfcNewSiteVisible3"))) {
+				rfcTerm3.setSiteVisible(true);
+			} else {
+				rfcTerm3.setSiteVisible(false);
+			}
+			rfcTerm3.setStudyId(study.getId());
+			newRfcDescriptions.add(rfcTerm3);
+		}
+		if (!errors.isEmpty()) {
+			request.setAttribute("formMessages", errors);
+			// set other terms here
+		}
+	}
 
 	private void confirmWholeStudy(FormProcessor fp, Validator v) {
 		errors = v.validate();
@@ -550,15 +608,29 @@ public class UpdateStudyServletNew extends SecureController {
 
 	}
 
-	private void submitStudy(StudyBean newStudy) {
+	private void submitStudy(StudyBean newStudy, ArrayList<DnDescription> newRfcDescriptions) {
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-
+		DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(sm.getDataSource());
+		
 		StudyBean study1 = newStudy;
 		logger.info("study bean to be updated:" + study1.getName());
 		study1.setUpdatedDate(new Date());
 		study1.setUpdater((UserAccountBean) session.getAttribute("userBean"));
 		sdao.update(study1);
+		logger.debug("about to create dn descripts");
+		if (!newRfcDescriptions.isEmpty()) {
+			for (DnDescription descript : newRfcDescriptions) {
+				logger.debug("found one");
+				try {
+					dnDescriptionDao.create(descript);
+					logger.debug("successfully created one");
+				} catch (OpenClinicaException e) {
+					logger.debug(e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
 
 		ArrayList siteList = (ArrayList) sdao.findAllByParent(newStudy.getId());
 		if (siteList.size() > 0) {

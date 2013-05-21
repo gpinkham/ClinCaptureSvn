@@ -51,6 +51,7 @@
 <jsp:useBean scope='request' id='userRolesToView' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectsToView' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='definitionsToView' class='java.util.ArrayList'/>
+<jsp:useBean scope='request' id='dnDefinitions' class='java.util.ArrayList'/>
 
 
 
@@ -462,8 +463,30 @@
 </div>
 </div>
 <br>
+
+<a href="javascript:leftnavExpand('sectionee');">
+	<img id="excl_sectionee" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="discrepancy_descriptions" bundle="${resword}"/>]</span></a>
+	<div id="sectionee" style="display:none">
+		<div style="width: 600px">
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<div class="tablebox_center">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tr valign="top"><td class="table_header_column">Reason For Change Descriptions</td>
+  	<td class="table_cell">
+  	<c:forEach var="term" items="${dnDescriptions}">
+  		<c:out value="${term.name }"/><br>
+  	</c:forEach>
+  	
+  	</td>
+  </tr>
+  </table>
+  </div></div></div></div></div></div></div></div></div></div>
+	</div>
+	<br>
+	
 <a href="javascript:leftnavExpand('sectionf');">
-    <img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="study_parameter_configuration" bundle="${resword}"/>]</span></a>
+    <img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> G: <fmt:message key="study_parameter_configuration" bundle="${resword}"/>]</span></a>
 <div id="sectionf" style="display:none ">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">

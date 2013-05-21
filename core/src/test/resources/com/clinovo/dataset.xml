@@ -958,4 +958,7 @@
 		name="study group 1" study_id="1" owner_id="1" date_created="2008-07-02" 
 		group_class_type_id="4" status_id="1" subject_assignment="" update_id="1" 
 		date_updated="2008-07-03" is_default="true"/>	
+		
+	<DN_RFC_DESCRIPTION DN_RFC_DESCRIPTION_ID="1" NAME="Site Removed" DESCRIPTION="Site Removed this from the protocol" is_site_visible="true" study_id="1"/>
+	<DN_RFC_DESCRIPTION DN_RFC_DESCRIPTION_ID="2" NAME="Protocol Deviation" DESCRIPTION="Standard Protocol Deviation" is_site_visible="false" study_id="1"/>
 </dataset>

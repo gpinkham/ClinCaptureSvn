@@ -61,6 +61,7 @@ public class SQLFactory {
 	public final String DAO_AUDIT = "audit";
 	public final String DAO_DATAVIEW = "dataview_dao";
 	public final String DAO_DYNAMIC_EVENT = "dynamic_event";
+	public final String DAO_DN_DESCRIPTION = "dn_description";
 	public final String DAO_ITEM = "item";
 	public final String DAO_ITEMDATA = "item_data";
 	public final String DAO_ITEMFORMMETADATA = "item_form_metadata";
@@ -172,7 +173,7 @@ public class SQLFactory {
 			fileList.put(this.DAO_CRFVERSION, "oracle_crfversion_dao.xml");
 			fileList.put(this.DAO_DATASET, "oracle_dataset_dao.xml");
 			fileList.put(this.DAO_SECTION, "oracle_section_dao.xml");
-			
+			fileList.put(this.DAO_DN_DESCRIPTION, "oracle_dn_description_dao.xml");
 			fileList.put(this.DAO_EVENTCRF, "oracle_eventcrf_dao.xml");
 			fileList.put(this.DAO_ITEMFORMMETADATA, "oracle_item_form_metadata_dao.xml");
 			fileList.put(this.DAO_DISCREPANCY_NOTE, "oracle_discrepancy_note_dao.xml");
@@ -208,7 +209,7 @@ public class SQLFactory {
 			fileList.put(this.DAO_CRFVERSION, "crfversion_dao.xml");
 			fileList.put(this.DAO_DATASET, "dataset_dao.xml");
 			fileList.put(this.DAO_SECTION, "section_dao.xml");
-			
+			fileList.put(this.DAO_DN_DESCRIPTION, "dn_description_dao.xml");
 			fileList.put(this.DAO_EVENTCRF, "eventcrf_dao.xml");
 			fileList.put(this.DAO_ITEMFORMMETADATA, "item_form_metadata_dao.xml");
 			fileList.put(this.DAO_DISCREPANCY_NOTE, "discrepancy_note_dao.xml");
