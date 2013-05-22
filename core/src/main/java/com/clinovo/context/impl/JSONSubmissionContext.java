@@ -2,6 +2,8 @@ package com.clinovo.context.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.ws.WebServiceException;
 
@@ -91,8 +93,18 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 	}
 
 	public List<Header> getHttpHeaders() throws Exception {
-
+		
+		Pattern incorrectCredentialsPattern = Pattern.compile("\\{\"Code\":400,\"Error\":\"Credentials not valid.\"");
+		
 		String authToken = authenticate();
+		
+		Matcher matcher = incorrectCredentialsPattern.matcher(authToken);
+		
+		// Incorrect creds
+		if(matcher.find()) {
+			
+			throw new WebServiceException("Incorrect username or password specified. Check the datainfo.properties");
+		}
 
 		try {
 			
