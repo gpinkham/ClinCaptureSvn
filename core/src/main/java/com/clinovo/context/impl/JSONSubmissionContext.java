@@ -112,8 +112,8 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 			currentAuthToken = token.getString("Token");
 			
 		} catch (JSONException ex) {
-			log.error("Randomization Authentication failed");
-			throw ex;
+			log.error("An error occurred during the authentication with the randomization service", ex.getMessage());
+			throw new WebServiceException(ex);
 		}
 
 		List<Header> headers = new ArrayList<Header>();
