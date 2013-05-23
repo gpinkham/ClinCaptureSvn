@@ -103,7 +103,7 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 		// Incorrect creds
 		if(matcher.find()) {
 			
-			throw new WebServiceException("Incorrect username or password specified. Check the datainfo.properties");
+			throw new WebServiceException("Authentication error, please contact your Study Administrator");
 		}
 
 		try {
