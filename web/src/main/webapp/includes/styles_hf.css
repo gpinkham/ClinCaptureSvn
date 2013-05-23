@@ -53,6 +53,15 @@ body {
 	min-height: 460px;
 	}
 
+#about-content {
+	background-image: url(../images/dots.gif);
+	background-repeat: repeat-y;
+	background-position: left;
+	padding: 1px 55px 30px 20px;
+	margin-left: 10px;
+	min-height: 460px;
+	}
+
 #content td{
 	font-size: 11px;
 	}
