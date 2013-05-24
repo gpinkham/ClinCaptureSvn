@@ -109,9 +109,4 @@ public class JSONSubmissionContextTest extends BaseTest {
 
 		assertEquals("Should return correct randomization result", "radiotherapy", result.getRandomizationResult());
 	}
-
-	@Test
-	public void testThatFailedRandomizationCallThrowsException() {
-
-	}
 }
