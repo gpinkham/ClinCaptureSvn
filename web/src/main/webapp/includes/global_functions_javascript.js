@@ -2239,44 +2239,39 @@ function randomizeSubject() {
         //subjectId = subjectId + generateId()
         var url = "randomize?subject="+subjectId + "&crf=" + crfId + "&pace=" + pace + "&study=" + studyId
 
-        makeHttpCall(url, function(result) {
+        jQuery.ajax({
 
-            console.log("Received randomization: " + result)
+            type:"POST",
+            url: "randomize",
+            dataType: "text",
+            data: {
 
-            if(result.match(/UnknownHostException/)){
+                crf: crfId,
+                pace: pace,
+                study: studyId,
+                subject: subjectId
+            },
 
-                var urlPattern = new RegExp("Exception:(.*)")
-                alert("The randomization service '" + urlPattern.exec(result)[1] + "' is not available. Consult your system administrator")
+            success: function(data) {
 
-            } else if(result.match(/Exception/)) {
+                console.log("Received randomization: " + data)
 
-                var exceptionPattern = new RegExp("^.*:(.*)")
-                alert(exceptionPattern.exec(result)[1])
+                if(data.match(/UnknownHostException/)) {
 
-            } else {
+                    var urlPattern = new RegExp("Exception:(.*)")
+                    alert("The randomization service '" + urlPattern.exec(data)[1] + "' is not available. Consult your system administrator")
 
-                var input = jQuery("#LB_TXT_RANDOMIZATION").find(":input")
-                jQuery(input).val(result)
+                } else if(data.match(/Exception/)) {
 
-            }
-        });
+                    var exceptionPattern = new RegExp("^.*:(.*)")
+                    alert(exceptionPattern.exec(data)[1])
+
+                } else {
+
+                    var input = jQuery("#LB_TXT_RANDOMIZATION").find(":input")
+                    jQuery(input).val(data)
+
+                }
+        }})
     }
-}
-
-var request = new XMLHttpRequest();
-
-function makeHttpCall(url, callback) {
-
-    request.open("GET", url);
-    request.onreadystatechange = function() {
-
-        if (request.readyState == 4 && request.status == 200) {
-
-            console.log("Received http call result: " + request.responseText)
-            
-            callback(request.responseText)
-        }
-    }
-
-    request.send(null)
 }
