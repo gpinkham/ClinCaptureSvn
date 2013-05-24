@@ -66,7 +66,7 @@ public class RandomizeServlet extends SecureController {
 
 				getSiteId(studyId);
 				String trialId = "";
-				String siteId = "test2"; //getSiteId(studyId);
+				String siteId = getSiteId(studyId);
 
 				// Determine the trial to use
 				if (pace.toString().equals("1"))
