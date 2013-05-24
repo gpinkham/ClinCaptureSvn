@@ -307,12 +307,18 @@ END --%>
                     <c:when test="${studyModuleStatus.eventDefinition == 2}">
                         <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="javascript:openDocWindow('../ShowCalendarFunc?id=<c:out value="${currentStudy.id}"/>')">
+                    	<img src="../images/bt_Calendar.gif" border="0" alt="<fmt:message key="view_calendared_events" bundle="${resword}"/>" title="<fmt:message key="view_calendared_events" bundle="${resword}"/>" ></a>
+                        
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
                         <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="javascript:openDocWindow('../ShowCalendarFunc?id=<c:out value="${currentStudy.id}"/>')">
+                    	<img src="../images/bt_Calendar.gif" border="0" alt="<fmt:message key="view_calendared_events" bundle="${resword}"/>" title="<fmt:message key="view_calendared_events" bundle="${resword}"/>" ></a>
+                        
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:otherwise>

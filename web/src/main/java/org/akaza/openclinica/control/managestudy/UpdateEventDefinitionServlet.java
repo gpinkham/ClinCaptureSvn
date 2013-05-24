@@ -86,6 +86,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
 			} else {
 				addPageMessage(respage.getString("updating_ED_is_cancelled"));
+				session.removeAttribute("definition");
 				forwardPage(Page.LIST_DEFINITION_SERVLET);
 			}
 		}
@@ -99,7 +100,8 @@ public class UpdateEventDefinitionServlet extends SecureController {
 	private void confirmDefinition() throws Exception {
 		Validator v = new Validator(request);
 		FormProcessor fp = new FormProcessor(request);
-
+		errors = v.validate();
+		
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
@@ -121,22 +123,9 @@ public class UpdateEventDefinitionServlet extends SecureController {
 			v.addValidation("schDay", Validator.IS_A_NUMBER,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
 			v.addValidation("emailUser", Validator.NO_BLANKS);
-			//v.addValidation("emailUser", Validator.IS_A_EMAIL);
 			v.addValidation("emailDay", Validator.IS_REQUIRED);
 			v.addValidation("emailDay", Validator.IS_A_NUMBER,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
-		}
-		
-		String emailUser = fp.getString("emailUser");
-		if(!checkUserName(emailUser) && "calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
-			Validator.addError(errors, "emailUser", resexception.getString("this_user_name_does_not_exist"));
-			request.setAttribute("formMessages", errors);
-			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
-		} else {
-		//end
-		errors = v.validate();
-
-		if (!errors.isEmpty()) {
 			String showCalendarBox = fp.getString("type");
 			if ("calendared_visit".equalsIgnoreCase(showCalendarBox)) {
 				session.setAttribute("showCalendaredVisitBox", true);
@@ -147,13 +136,58 @@ public class UpdateEventDefinitionServlet extends SecureController {
 			} else {
 				session.setAttribute("changedReference", false);
 			}
+		}
+		//
+		int minDay = fp.getInt("minDay");
+		int maxDay = fp.getInt("maxDay");
+		int schDay = fp.getInt("schDay");
+		int emailDay = fp.getInt("emailDay");
+		String emailUser = fp.getString("emailUser");
+		
+		if (!(maxDay >= schDay)) {
+			Validator.addError(errors, "maxDay",resexception.getString("daymax_greate_or_equal_dayschedule"));
+		} 
+		if (!(minDay <= schDay)) {
+			Validator.addError(errors, "minDay",resexception.getString("daymin_less_or_equal_dayschedule"));
+		} 
+		if (!(minDay <= maxDay)) {
+			Validator.addError(errors, "minDay",resexception.getString("daymin_less_or_equal_daymax"));
+		} 
+		if (!(emailDay <= schDay)) {
+			Validator.addError(errors, "emailDay",resexception.getString("dayemail_less_or_equal_dayschedule"));
+		} 
+		if (!checkUserName(emailUser)&& "calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
+			Validator.addError(errors, "emailUser",resexception.getString("this_user_name_does_not_exist"));
+		}
+		if (!checkUserName(emailUser)&& "calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
+			Validator.addError(errors, "emailUser",resexception.getString("this_user_name_does_not_exist"));
+		}
+
+		if (!errors.isEmpty()) {
+			StudyEventDefinitionBean sedForErrors = new StudyEventDefinitionBean();
+			sedForErrors.setName(fp.getString("name"));
+			sedForErrors.setDescription(fp.getString("description"));
+			sedForErrors.setCategory(fp.getString("category"));
+			sedForErrors.setType(fp.getString("type"));
+			sedForErrors.setRepeating(fp.getBoolean("repeating"));
+			sedForErrors.setMaxDay(fp.getInt("maxDay"));
+			sedForErrors.setMinDay(fp.getInt("minDay"));
+			sedForErrors.setScheduleDay(fp.getInt("schDay"));
+			String referenceVisitValue = fp.getString("isReference");
+			if ("true".equalsIgnoreCase(referenceVisitValue)) {
+				sedForErrors.setReferenceVisit(true);
+			} else {
+				sedForErrors.setReferenceVisit(false);
+			}
+			request.setAttribute("userNameInsteadEmail", fp.getString("emailUser"));
+			request.setAttribute("definition", sedForErrors);
 			logger.info("has errors");
 			request.setAttribute("formMessages", errors);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
 
 		} else {
 			logger.info("no errors");
-
+			//request will show values for error messages instead of session for sed
 			sed.setName(fp.getString("name"));
 			sed.setRepeating(fp.getBoolean("repeating"));
 			sed.setCategory(fp.getString("category"));
@@ -252,7 +286,6 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
 			session.setAttribute("eventDefinitionCRFs", edcs);
 			forwardPage(Page.UPDATE_EVENT_DEFINITION_CONFIRM);
-		}
 
 	}
 
@@ -300,7 +333,6 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		}
 		session.removeAttribute("definition");
 		session.removeAttribute("eventDefinitionCRFs");
-
 		session.removeAttribute("tmpCRFIdMap");
 		session.removeAttribute("crfsWithVersion");
 		session.removeAttribute("eventDefinitionCRFs");
@@ -437,8 +469,6 @@ public class UpdateEventDefinitionServlet extends SecureController {
 			if (emailUser.equals(userAccountBean.getUserName())) {
 				isValid = true;
 				break;
-			} else {
-				isValid = false;
 			}
 		}
 		return isValid;

@@ -1839,7 +1839,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 									request.setAttribute(INPUT_SECTION_ID, new Integer(nextSec.getId()).toString());
 									session.removeAttribute("mayProcessUploading");
 								} else if (section.isLastSection()) { 
-									
 									// already the last section, should go back to
 									// view event page
 									session.removeAttribute(GROUP_HAS_DATA);
@@ -1859,6 +1858,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
 													response);
 										}
 									}
+									//Clinovo Ticket #173 start
+									CalendarLogic calLogic = new CalendarLogic(getDataSource());
+									String message = calLogic.MaxMinDaysValidator(seb);
+									if (!"empty".equalsIgnoreCase(message)) {
+														addPageMessage(message, request);
+									}
+									//end
 									forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET, request, response);
 									return;
 
@@ -3728,15 +3734,19 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		SubjectEventStatusUtil.determineSubjectEventState(seb, study, new DAOWrapper(sdao, sedao, ssdao, ecdao, edcdao,
 				discDao));
 		seb = (StudyEventBean) sedao.update(seb);
+
 		//Clinovo calendar func
 		if (seb.getSubjectEventStatus() == SubjectEventStatus.COMPLETED) {
+			System.out.println("AutoSchedule");
 			CalendarLogic calLogic = new CalendarLogic(getDataSource());
-			String message = calLogic.maxMinDaysValidator(seb);
+			calLogic.ScheduleSubjectEvents(seb);
+			String message = calLogic.MaxMinDaysValidator(seb);
 			if (!"empty".equalsIgnoreCase(message)) {
-				addPageMessage(message, request);
+								addPageMessage(message, request);
 			}
 		}
 		//end
+
 		request.setAttribute(INPUT_EVENT_CRF, ecb);
 		request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);
 		return true;

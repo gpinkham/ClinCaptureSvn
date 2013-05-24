@@ -941,6 +941,11 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.PrintSubjectCaseBookServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ShowCalendarFuncServlet</servlet-name>
+        <display-name>ShowCalendarFunc</display-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.ShowCalendarFuncServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>PrintCRFServlet</servlet-name>
         <display-name>PrintCRF</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.PrintCRFServlet</servlet-class>
@@ -1902,6 +1907,10 @@
     <servlet-mapping>
         <servlet-name>PrintSubjectCaseBookServlet</servlet-name>
         <url-pattern>/PrintSubjectCaseBook</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ShowCalendarFuncServlet</servlet-name>
+        <url-pattern>/ShowCalendarFunc</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>PrintCRFServlet</servlet-name>

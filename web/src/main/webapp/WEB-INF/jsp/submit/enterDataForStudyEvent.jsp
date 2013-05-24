@@ -139,6 +139,12 @@
                                      </a>
                                      </span>
                                     </c:when>
+                                    <c:when test="${hasLocationNote eq 'no'}">
+                                     <span style="float:right"><a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg','spanAlert-location'); return false;">
+                                     <img id="flag_location" name="flag_location" src="images/icon_flagGreen.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" hspace="4" >
+                                     </a>
+                                     </span>
+                                    </c:when>
                                     <c:otherwise>
                                        <c:if test="${!study.status.locked}">
                                         <span style="float:right">
@@ -171,6 +177,12 @@
                                      </a>
                                      </span>
                                     </c:when>
+                                    <c:when test="${hasStartDateNote eq 'no'}">
+                                     <span style="float:right"><a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg','spanAlert-start_date'); return false;">
+                                     <img id="flag_start_date" name="flag_start_date" src="images/icon_flagGreen.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" hspace="4" >
+                                     </a>
+                                     </span>
+                                    </c:when>
                                     <c:otherwise>
                                        <c:if test="${!study.status.locked}">
                                         <span style="float:right">
@@ -195,6 +207,12 @@
                                     <c:when test="${hasEndDateNote eq 'yes'}">
                                      <span style="float:right"><a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg','spanAlert-end_date'); return false;">
                                      <img id="flag_end_date" name="flag_end_date" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" hspace="4" >
+                                     </a>
+                                     </span>
+                                    </c:when>
+                                    <c:when test="${hasEndDateNote eq 'no'}">
+                                     <span style="float:right"><a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg','spanAlert-end_date'); return false;">
+                                     <img id="flag_end_date" name="flag_end_date" src="images/icon_flagGreen.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" hspace="4" >
                                      </a>
                                      </span>
                                     </c:when>

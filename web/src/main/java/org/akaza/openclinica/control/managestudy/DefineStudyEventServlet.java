@@ -238,29 +238,39 @@ public class DefineStudyEventServlet extends SecureController {
 			session.setAttribute("isReference", fp.getString("isReference"));
 
 		}
-		String emailUser = fp.getString("emailUser");
-		if(!checkUserName(emailUser) && "calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
-			Validator.addError(errors, "emailUser", resexception.getString("this_user_name_does_not_exist"));
-			request.setAttribute("formMessages", errors);
-			session.setAttribute("definition", createStudyEventDefinition());
-			setOrGetDefinition();
-			forwardPage(Page.DEFINE_STUDY_EVENT1);
-		} else {
-		//end
 		errors = v.validate();
-		session.setAttribute("definition", createStudyEventDefinition());
-			if (errors.isEmpty()) {
-				logger.info("no errors in the first section");
-				prepareServletForStepTwo(fp, true);
-			} else {
-				logger.trace("has validation errors in the first section");
-				request.setAttribute("formMessages", errors);
-				setOrGetDefinition();
-				forwardPage(Page.DEFINE_STUDY_EVENT1);
-			}
+		int minDay = fp.getInt("minDay");
+		int maxDay = fp.getInt("maxDay");
+		int schDay = fp.getInt("schDay");
+		int emailDay = fp.getInt("emailDay");
+		String emailUser = fp.getString("emailUser");
+		if (!(maxDay >= schDay)) {
+			Validator.addError(errors, "maxDay",resexception.getString("daymax_greate_or_equal_dayschedule"));
 		}
+		if(!(minDay<=schDay)) {
+			Validator.addError(errors, "minDay",resexception.getString("daymin_less_or_equal_dayschedule"));
+		}
+		if (!(minDay<=maxDay)) {
+			Validator.addError(errors, "minDay",resexception.getString("daymin_less_or_equal_daymax"));
+		}
+		if(!(emailDay <= schDay)) {
+			Validator.addError(errors, "emailDay",resexception.getString("dayemail_less_or_equal_dayschedule"));
+		}
+		if (!checkUserName(emailUser)&& "calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
+			Validator.addError(errors, "emailUser", resexception.getString("this_user_name_does_not_exist"));
+		}
+		session.setAttribute("definition", createStudyEventDefinition());
+				if (errors.isEmpty()) {
+					logger.info("no errors in the first section");
+					prepareServletForStepTwo(fp, true);
+				} else {
+					logger.trace("has validation errors in the first section");
+					request.setAttribute("formMessages", errors);
+					setOrGetDefinition();
+					forwardPage(Page.DEFINE_STUDY_EVENT1);
+				}	
+		
 	}
-
 	private void prepareServletForStepTwo(FormProcessor fp, boolean checkForm) {
 		/*
 		 * The tmpCRFIdMap will hold all the selected CRFs in the session when the user is navigating through the list.

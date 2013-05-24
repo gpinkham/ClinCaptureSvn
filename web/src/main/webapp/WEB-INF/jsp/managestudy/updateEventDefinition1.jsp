@@ -68,16 +68,18 @@ $(document).ready(function() {
 	$('select[name="type"]').change(function() {
 		if($(this).find(":selected").val() == 'calendared_visit') {
 			$(".showHide").fadeIn('medium');
+			$('tr[name="repeating"]').hide();
 		} else {
 			$(".showHide").fadeOut('medium');
 			$('input[name*="Day"]').attr('value','').attr('readonly','');
 			$('.showHide input[type="checkbox"]').attr('checked', false);
 			$('input[name="emailUser"]').attr('value','').attr('readonly','');
+			$('tr[name="repeating"]').fadeIn('medium');
 		}
 	});
 	$('input[name="isReference"]').click(function() {
 		if ($(this).is(':checked')) {
-			$('input[name*="Day"]').attr('value','0').attr('readonly','true');;
+			$('input[name*="Day"]').attr('value','0').attr('readonly','true');
 		} else {
 			$('input[name*="Day"]').attr('value','').attr('readonly','');
 		}
@@ -85,6 +87,7 @@ $(document).ready(function() {
 	$('select[name="type"]').each(function() {
 		if($(this).find(":selected").val() == 'calendared_visit') {
 			$(".showHide").css('display', '');
+			$('tr[name="repeating"]').hide();
 		} 
 	});
 	$('input[name="isReference"]').each(function() {
@@ -100,6 +103,7 @@ $(document).ready(function() {
 			$(document).ready(function() {
 				$(".showHide").css('display', '');
 				$('select[name="type"]').val('calendared_visit');
+				$('tr[name="repeating"]').hide();
 			});
 		</script>
 	</c:when>
@@ -109,7 +113,8 @@ $(document).ready(function() {
 	<script>
 			$(document).ready(function() {
 				$('input[name="isReference"]').attr('checked', false);
-				$('input[name*="Day"]').attr('value','').attr('readonly','');
+				$('input[name*="Day"]').attr('readonly','');
+				$('tr[name="repeating"]').hide();
 			});
 		</script>
 	</c:when>
@@ -140,7 +145,7 @@ $(document).ready(function() {
                     <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
                 </td></tr>
 
-                <tr valign="top"><td class="formlabel"><fmt:message key="repeating" bundle="${resword}"/>:</td><td>
+                <tr valign="top" name="repeating"><td class="formlabel"><fmt:message key="repeating" bundle="${resword}"/>:</td><td>
                     <c:choose>
                         <c:when test="${definition.repeating == true}">
                             <input type="radio" onchange="javascript:changeIcon();" checked name="repeating" value="1"><fmt:message key="yes" bundle="${resword}"/>

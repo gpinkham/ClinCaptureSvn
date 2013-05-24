@@ -201,7 +201,10 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 		String userEmail = sedBean.getEmailAdress();
 		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
 		UserAccountBean userBean = (UserAccountBean) uadao.findByUserEmail(userEmail);
-		request.setAttribute("userNameInsteadEmail", userBean.getName());
-
+		if(userBean.getName() != null) {
+			session.setAttribute("userNameInsteadEmail", userBean.getName());	
+		} else {
+			session.setAttribute("userNameInsteadEmail", "Not found in the db");	
+		}
 	}
 }

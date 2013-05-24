@@ -68,6 +68,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.calendar.CalendarLogic;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -462,6 +463,14 @@ public class UpdateStudyEventServlet extends SecureController {
 				studyEvent.setUpdater(ub);
 				studyEvent.setUpdatedDate(new Date());
 				sedao.update(studyEvent);
+				if(studyEvent.getSubjectEventStatus().isCompleted()) {
+					CalendarLogic calLogic = new CalendarLogic(sm.getDataSource());
+					calLogic.ScheduleSubjectEvents(studyEvent);
+					String message = calLogic.MaxMinDaysValidator(studyEvent);
+					if (!"empty".equalsIgnoreCase(message)) {
+							addPageMessage(message);
+					}
+				}
 
 				// save discrepancy notes into DB
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session

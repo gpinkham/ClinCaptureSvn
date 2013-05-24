@@ -30,7 +30,7 @@ public class Navigation {
 			"/DownloadVersionSpreadSheet", "/PrintAllSiteEventCRF", "/DeleteUser", "/UnLockUser",
 			"/DeleteStudyUserRole", "/PauseJob", "/SelectItems", "/CreateDiscrepancyNote", 
 			"/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile", "/help",
-			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog"));
+			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc"));
 	private static String defaultShortURL = "/MainMenu";		
 	
 	/*

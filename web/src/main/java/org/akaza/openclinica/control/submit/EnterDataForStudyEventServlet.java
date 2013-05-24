@@ -520,15 +520,28 @@ public class EnterDataForStudyEventServlet extends SecureController {
 	 */
 	private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans) {
 		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
-			if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-				request.setAttribute(HAS_LOCATION_NOTE, "yes");
-			} else if ("start_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-				request.setAttribute(HAS_START_DATE_NOTE, "yes");
+			if (!discrepancyNoteBean.getDescription().isEmpty()) {
+				if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+					if (discrepancyNoteBean.getResolutionStatusId() == 4) {
+						request.setAttribute(HAS_LOCATION_NOTE, "no");
+					} else {
+						request.setAttribute(HAS_LOCATION_NOTE, "yes");
+					}
+				} else if ("start_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+					if (discrepancyNoteBean.getResolutionStatusId() == 4) {
+						request.setAttribute(HAS_START_DATE_NOTE, "no");
+					} else {
+						request.setAttribute(HAS_START_DATE_NOTE, "yes");
+					}
 
-			} else if ("end_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-				request.setAttribute(HAS_END_DATE_NOTE, "yes");
+				} else if ("end_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+					if (discrepancyNoteBean.getResolutionStatusId() == 4) {
+						request.setAttribute(HAS_END_DATE_NOTE, "no");
+					} else {
+						request.setAttribute(HAS_END_DATE_NOTE, "yes");
+					}
+				}
 			}
-
 		}
 	}
 }

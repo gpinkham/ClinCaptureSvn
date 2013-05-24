@@ -65,7 +65,9 @@ $(document).ready(function() {
 	$('select[name="type"]').change(function() {
 		if($(this).find(":selected").val() == 'calendared_visit') {
 			$(".showHide").fadeIn('medium');
+			$('tr[name="repeating"]').fadeOut('medium');
 		} else {
+			$('tr[name="repeating"]').fadeIn('medium');
 			$(".showHide").fadeOut('medium');
 			$('input[name*="Day"]').attr('value','').attr('readonly','');
 			$('.showHide input[type="checkbox"]').attr('checked', false);
@@ -74,18 +76,20 @@ $(document).ready(function() {
 	});
 	$('input[name="isReference"]').click(function() {
 		if ($(this).is(':checked')) {
-			$('input[name*="Day"]').attr('value','0').attr('readonly','true');;
+			$('input[name*="Day"]').attr('value','0').attr('readonly','true');
 		} else {
 			$('input[name*="Day"]').attr('value','').attr('readonly','');
 		}
 	});
 	$('select[name="type"]').each(function() {
 		if($(this).find(":selected").val() == 'calendared_visit') {
+			$('tr[name="repeating"]').hide();
 			$(".showHide").css('display', '');
 		} 
 	});
 	$('input[name="isReference"]').each(function() {
 		if ($(this).is(':checked')) {
+			$('tr[name="repeating"]').hide();
 			$('input[name*="Day"]').attr('value','0').attr('readonly','true');
 		}
 	});
@@ -119,7 +123,7 @@ $(document).ready(function() {
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
   </td></tr>
  
- <tr valign="top"><td class="formlabel"><fmt:message key="repeating" bundle="${resword}"/>:</td><td>
+ <tr valign="top" name="repeating"><td class="formlabel"><fmt:message key="repeating" bundle="${resword}"/>:</td><td>
   <c:choose>
    <c:when test="${definition.repeating == true}">
     <input type="radio" checked name="repeating" onchange="javascript:changeIcon();" value="1"><fmt:message key="yes" bundle="${resword}"/>
