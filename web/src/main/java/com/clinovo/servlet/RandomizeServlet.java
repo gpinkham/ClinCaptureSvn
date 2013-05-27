@@ -58,22 +58,14 @@ public class RandomizeServlet extends SecureController {
 
 		try {
 
-			String pace = request.getParameter("pace");
 			String crfId = request.getParameter("crf");
 			String studyId = request.getParameter("study");
+			String trialId = request.getParameter("trial");
+			String riskGroup = request.getParameter("riskGroup");
 
 			if (isCrfComplete(crfId)) {
 
-				getSiteId(studyId);
-				String trialId = "";
-				String siteId = getSiteId(studyId);
-
-				// Determine the trial to use
-				if (pace.toString().equals("1"))
-					trialId = "1199";
-				if (pace.toString().equals("2"))
-					trialId = "1198";
-
+				String siteId = "PACE001"; getSiteId(studyId);
 				String patientId = request.getParameter("subject");
 
 				WebServiceAction action = new WebServiceAction();
@@ -86,6 +78,7 @@ public class RandomizeServlet extends SecureController {
 				action.setSiteId(siteId);
 				action.setTrialId(trialId);
 				action.setPatientId(patientId);
+				action.setRiskGroup(riskGroup);
 
 				// Https details
 				action.setRandomizationUrl(CoreResources.getField("randomizationUrl"));
@@ -136,7 +129,7 @@ public class RandomizeServlet extends SecureController {
 		String siteId = "";
 		if(currentStudy.isSite(Integer.parseInt(studyId))) {
 			
-			siteId = currentStudy.getIdentifier();
+			siteId = currentStudy.getName();
 			
 		} else {
 			

@@ -78,8 +78,8 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 		// Strata
 		JSONArray array = new JSONArray();
 		JSONObject strataObject = new JSONObject();
-		strataObject.put("StratificationID", 1);
-		strataObject.put("Level", 2);
+		strataObject.put("StratificationID", "1");
+		strataObject.put("Level", action.getRiskGroup());
 
 		array.put(strataObject);
 

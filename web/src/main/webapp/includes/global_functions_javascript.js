@@ -2198,46 +2198,42 @@ function randomizeSubject() {
 
     if(subjectIdPattern.test(currentUrl)) {
 
-        var pace = ""
-        var crfId = ""
-        var studyId = ""
-
-        var inputs = jQuery(":input")
-        for(var index = 0; index < inputs.length; index++) {
-            if(jQuery(inputs[index]).attr("name") === "crfId") {
-                crfId = jQuery(inputs[index]).val()
-                break
-            }
-        }
-
-        for(var index = 0; index < inputs.length; index++) {
-            if(jQuery(inputs[index]).attr("name") === "studyId") {
-                studyId = jQuery(inputs[index]).val()
-                break
-            }
-        }
+        var crf = jQuery("input:hidden[name='crfId']").val()
+        var studyId = jQuery("input:hidden[name='studyId']").val()
         
+        var trial = "";
+        var riskGroup = "";
         var subjectId = subjectIdPattern.exec(currentUrl)[1];
-        var checkboxes = jQuery("#IT_PatientSurgicalCandidate_opg").find(":input")
         
-        if(jQuery(checkboxes[0]).is(":checked") || jQuery(checkboxes[1]).is(":checked")) {
+        var riskGroupInputs = jQuery("#IT_RiskGroup_opg").find(":input")
+        if(jQuery(riskGroupInputs[0]).is(":checked") 
+            || jQuery(riskGroupInputs[1]).is(":checked")) {
 
-            for(var index =0; index < checkboxes.length; index++) {
+            if(jQuery(riskGroupInputs[0]).is(":checked")) {
+                riskGroup = jQuery("input:hidden[eleId='riskGroup']").attr("alternateValue")
+            } else {
+                riskGroup = jQuery("input:hidden[eleId='riskGroup']").attr("value")
+            } 
+        } else {
+            alert("Please specify the Risk Group for the subject")
+            return
+        }
 
-                var box = checkboxes[index]
-                if(jQuery(box).is(":checked")) {
+        var surgeryInputs = jQuery("#IT_PatientSurgicalCandidate_opg").find(":input")
+        if(jQuery(surgeryInputs[0]).is(":checked") 
+            || jQuery(surgeryInputs[1]).is(":checked")) {
 
-                    pace = jQuery(box).attr("value")
-                    break
-                }
+            if(jQuery(surgeryInputs[0]).is(":checked")) {
+                trial = jQuery("input:hidden[eleId='surgery']").attr("alternateValue")
+            } else {
+                trial = jQuery("input:hidden[eleId='surgery']").attr("value")
             }
         } else {
             alert("Please specify if the subject is a surgical candidate or not")
             return
         }
 
-        //subjectId = subjectId + generateId()
-        var url = "randomize?subject="+subjectId + "&crf=" + crfId + "&pace=" + pace + "&study=" + studyId
+        var url = "randomize?subject="+subjectId + "&crf="+crf +"&trial="+trial + "&riskGroup="+riskGroup + "&study="+studyId
 
         jQuery.ajax({
 
@@ -2245,11 +2241,13 @@ function randomizeSubject() {
             url: "randomize",
             data: {
 
-                crf: crfId,
-                pace: pace,
+                crf: crf,
+                trial: trial,
                 study: studyId,
-                subject: subjectId
+                subject: subjectId,
+                riskGroup: riskGroup
             },
+
 
             success: function(data) {
 
@@ -2263,12 +2261,30 @@ function randomizeSubject() {
                     var exceptionPattern = new RegExp("^.*:(.*)")
                     alert(exceptionPattern.exec(data)[1])
 
-                } else {
+                } else if(data.match(/\w+/)) {
 
-                    var input = jQuery("#LB_TXT_RANDOMIZATION").find(":input")
-                    jQuery(input).val(data)
+                    jQuery("#LB_TXT_RANDOMIZATION").find(":input").val(data)
 
+                    if(data.match(/^Cyber/)) {
+
+                        var inputs = jQuery("#IT_RandomizationSite_1").find(":input")
+
+                        jQuery(inputs[1]).attr("checked", true)
+                        
+                        var inputs2 = jQuery("#IT_RandomizationSite_2").find(":input");
+                        jQuery(inputs2[1]).attr("checked", true)
+
+                    } else {
+
+                        var inputs = jQuery("#IT_RandomizationSite_1").find(":input")
+
+                        jQuery(inputs[0]).attr("checked", true)
+                        
+                        var inputs2 = jQuery("#IT_RandomizationSite_2").find(":input");
+                        jQuery(inputs2[0]).attr("checked", true)
+                    }
                 }
-        }})
+            }
+        })
     }
 }

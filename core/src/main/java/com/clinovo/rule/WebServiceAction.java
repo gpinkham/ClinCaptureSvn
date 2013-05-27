@@ -31,6 +31,7 @@ public class WebServiceAction extends RuleActionBean {
 	private boolean runOnDoubleDataEntry = true;
 	private boolean runOnImportDataEntry = false;
 	private boolean runOnAdministrativeDataEntry = true;
+	private String riskGroup;
 
 	public WebServiceAction() {
 
@@ -104,6 +105,14 @@ public class WebServiceAction extends RuleActionBean {
 
 	public void setTrialId(String trialId) {
 		this.trialId = trialId;
+	}
+
+	public void setRiskGroup(String riskGroup) {
+		this.riskGroup = riskGroup;
+	}
+
+	public String getRiskGroup() {
+		return this.riskGroup;
 	}
 
 }
