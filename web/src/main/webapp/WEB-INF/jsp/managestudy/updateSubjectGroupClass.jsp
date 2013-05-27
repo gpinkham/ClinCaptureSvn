@@ -110,10 +110,13 @@
 		</td>
 		<td>
 			<div class="formfieldL_BG">
-			<c:set var="groupClassTypeId1" value="${fields['groupClassTypeId']}"/>   
+			<c:set var="groupClassTypeId1" value="${fields['groupClassTypeId']}"/>
+			<c:if test="${groupClassTypeId1 == ''}">
+				<c:set var="groupClassTypeId1" value="${oldGroup.groupClassTypeId}"/>  
+			</c:if>
 			<select name="groupClassTypeId" onChange="showGroupSection(); setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" class="formfieldL">
 				<option value="">--</option>
-				<c:forEach var="type" items="${groupTypes}">    
+				<c:forEach var="type" items="${groupTypes}"> 
 				<c:choose>
 					<c:when test="${groupClassTypeId1 == 4}">   
 						<c:if test="${groupClassTypeId1 == type.id}">
@@ -129,13 +132,10 @@
 								<c:if test="${type.id != 4}">
 									<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>      
 								</c:if>
-								
 							</c:otherwise>
 						</c:choose> 
 					</c:otherwise>
 				</c:choose> 
-				
-				 
 				</c:forEach>
 			</select>
 			</div>
