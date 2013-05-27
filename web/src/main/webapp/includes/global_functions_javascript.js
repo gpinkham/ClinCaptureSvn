@@ -2243,7 +2243,6 @@ function randomizeSubject() {
 
             type:"POST",
             url: "randomize",
-            dataType: "text",
             data: {
 
                 crf: crfId,
@@ -2253,8 +2252,6 @@ function randomizeSubject() {
             },
 
             success: function(data) {
-
-                console.log("Received randomization: " + data)
 
                 if(data.match(/UnknownHostException/)) {
 
