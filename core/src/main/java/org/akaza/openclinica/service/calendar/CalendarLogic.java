@@ -17,7 +17,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -26,18 +25,25 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.Interval;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
+import org.quartz.impl.StdScheduler;
+import org.springframework.scheduling.quartz.JobDetailBean;
 
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class CalendarLogic {
-
+	
+	StdScheduler scheduler;
 	DataSource ds;
 	private ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
 	private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
 	
-	public CalendarLogic(DataSource ds) {
+	public CalendarLogic(DataSource ds, StdScheduler scheduler) {
 		this.ds = ds;
+		this.scheduler = scheduler;
 
 	}
 
@@ -60,38 +66,29 @@ public class CalendarLogic {
 				for (StudyEventBean studyEventBeanReferenceVisit : seb) {
 					if (studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
 						if (studyEventBeanRef.getUpdatedDate() == null) {
-							System.out.println("Date is empty");
 							studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
-							System.out.println("Date is empty so I take the first " +studyEventBeanRef.getUpdatedDate());
 						} else {
-							System.out.println("Date not empty");
 							if (studyEventBeanRef.getUpdatedDate().before(studyEventBeanReferenceVisit.getUpdatedDate())) {
 								studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
-								System.out.println("I have found the latest " +studyEventBeanRef.getUpdatedDate());
 							}
 						}
 					}
 				}
 			}
-			System.out.println("Early reference visit date for this subject " + studyEventBeanRef.getUpdatedDate());
+			System.out.println("Latest reference visit date for this subject " + studyEventBeanRef.getUpdatedDate());
 			//schedule all other events using this date and their sch_day fields
 			List<StudyEventDefinitionBean> sedForSch = seddao.findAllByStudy(studyBean);
 			for (StudyEventDefinitionBean sedTmp : sedForSch) {
 				if (!sedTmp.getReferenceVisit() && "calendared_visit".equalsIgnoreCase(sedTmp.getType())) {
 					ArrayList<StudyEventBean> eventsForValidation = sed.findAllByStudySubjectAndDefinition(ssb, sedTmp);
-					System.out.println("size eventsForValidation "+ eventsForValidation.size());
 					if (eventsForValidation.size() == 0) {
-						System.out.println("This events is not created - i will create it now and set status scheduled");
 						StudyEventBean studyEvent = new StudyEventBean();
 						studyEvent.setStudyEventDefinitionId(sedTmp.getId());
 						studyEvent.setStudySubjectId(subjectId);
 						studyEvent.setStartTimeFlag(false);
 						int schDay = sedTmp.getScheduleDay();
-						System.out.println("Found not RV events");
 						DateTime dateTimeCompleted = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
-						System.out.println("This date will be set without sch days "+ dateTimeCompleted);
 						dateTimeCompleted = dateTimeCompleted.plusDays(schDay);
-						System.out.println("Start date will be set (plus sch days) "+ dateTimeCompleted);
 						studyEvent.setDateStarted(dateTimeCompleted.toDate());
 						studyEvent.setOwner(getUserByEmail(sedb.getEmailAdress()));
 						studyEvent.setStatus(Status.AVAILABLE);
@@ -99,6 +96,17 @@ public class CalendarLogic {
 						studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 						studyEvent.setSampleOrdinal(sed.getMaxSampleOrdinal(sedTmp, ssb) + 1);
 						studyEvent = (StudyEventBean) sed.create(studyEvent);
+						UserAccountDAO useracdao = new UserAccountDAO(ds);
+						UserAccountBean useracBean = (UserAccountBean) useracdao.findByUserEmail(sedTmp.getEmailAdress());
+						try {
+							System.out.println("Start quartz scheduler for this event");
+							DateTime dateTimeEmail = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
+							dateTimeEmail = dateTimeEmail.plusDays(sedTmp.getEmailDay());
+							int daysBetween = Days.daysBetween(dateTimeEmail.toDateMidnight(), dateTimeCompleted.toDateMidnight()).getDays();
+							ScheduleEmailQuartz(sedTmp, ssb, dateTimeEmail.toDate(), daysBetween, sedTmp.getEmailAdress(), useracBean);
+						} catch (SchedulerException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -126,15 +134,10 @@ public class CalendarLogic {
 			for (StudyEventBean studyEventBeanReferenceVisit : sebBeanArr) {
 				if (studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
 					if (studyEventBeanRef.getUpdatedDate() == null) {
-						System.out.println("Date is empty");
 						studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
-						System.out.println("Date is empty so I take the first " +studyEventBeanRef.getUpdatedDate());
 					} else {
-						System.out.println("Date not empty");
 						if (studyEventBeanRef.getUpdatedDate().before(studyEventBeanReferenceVisit.getDateStarted())) {
-							System.out.println("Before " +studyEventBeanRef.getUpdatedDate());
 							studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
-							System.out.println("The latest " +studyEventBeanRef.getUpdatedDate());
 						}
 					}
 				}
@@ -142,17 +145,15 @@ public class CalendarLogic {
 		}
 		boolean refEventsIsEmpty = false;
 		if(studyEventBeanRef.getUpdatedDate() == null) {
-			Date currentDate = new Date();
-			studyEventBeanRef.setUpdatedDate(currentDate);
-			System.out.println("RV not started so get currentDate and skip DN");
+			studyEventBeanRef.setUpdatedDate(new Date());
+			System.out.println("RV not founds so get currentDate and skip DN");
 			refEventsIsEmpty = true;
 		}
 		
 		StudyEventDefinitionBean infoBean = (StudyEventDefinitionBean) seddao.findByPK(studyEventBeanRef.getStudyEventDefinitionId());
 		System.out.println("Reference visit name " + infoBean.getName());
 		System.out.println("Latest referense visit date complete " + studyEventBeanRef.getUpdatedDate());
-		System.out.println("Information about filled event. RefVis? " +seBean.getReferenceVisit());
-		System.out.println("nformation about filled event. OID? " +seBean.getOid());
+		System.out.println("Information about filled event. OID? " +seBean.getOid());
 		
 			DateTime dateTimeCurrent = new DateTime();
 			DateTime ReferenceEventStartDate = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
@@ -223,6 +224,22 @@ public class CalendarLogic {
 		note = (DiscrepancyNoteBean) dndao.create(note);
 		dndao.createMapping(note);
 		return note;
+	}
+	
+	private void ScheduleEmailQuartz(StudyEventDefinitionBean sedTmp,
+			StudySubjectBean ssb, Date sendEmailDay, int daysBetween, String contactEmail,
+			UserAccountBean uaBean) throws SchedulerException {
+		EmailTriggerService emailTriggerService = new EmailTriggerService();
+		SimpleTrigger trigger = emailTriggerService.generateEmailSenderTrigger(sedTmp, ssb, sendEmailDay, daysBetween, contactEmail, uaBean);
+		trigger.setDescription("email day for " + ssb.getLabel() + " in "+ sedTmp.getName());
+		JobDetailBean jobDetailBean = new JobDetailBean();
+		jobDetailBean.setGroup(trigger.getGroup());
+		jobDetailBean.setName(trigger.getName());
+		jobDetailBean.setJobClass(org.akaza.openclinica.service.calendar.EmailStatefulJob.class);
+		jobDetailBean.setJobDataMap(trigger.getJobDataMap());
+		jobDetailBean.setDurability(true);
+		jobDetailBean.setVolatility(false);
+		scheduler.scheduleJob(jobDetailBean, trigger);
 	}
 	
 	

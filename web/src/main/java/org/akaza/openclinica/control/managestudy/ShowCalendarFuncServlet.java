@@ -29,7 +29,7 @@ public class ShowCalendarFuncServlet extends SecureController {
 
 	}
 	
-	@SuppressWarnings({ "unchecked"})
+	@SuppressWarnings({ "rawtypes"})
 	@Override
 	public void processRequest() throws Exception {
 		request.setAttribute("studyName", currentStudy.getName());

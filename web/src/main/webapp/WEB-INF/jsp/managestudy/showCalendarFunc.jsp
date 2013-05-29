@@ -35,7 +35,22 @@
 	<c:forEach var="event" items="${requestScope['events']}">
       <tr>
             <td class="table_header_column"> <c:out value="${event.name}"/></td>
-			<td class="table_header_column"><c:out value="${event.type}"/></td>
+			<td class="table_header_column">
+			 <c:choose>
+			 <c:when test="${event.type == 'calendared_visit'}">
+			 	<fmt:message key="calendared_visit" bundle="${resword}"/>
+			 </c:when>
+			 <c:when test="${event.type == 'unscheduled'}">
+			 	<fmt:message key="unscheduled" bundle="${resword}"/>
+			 </c:when>
+			 <c:when test="${event.type == 'common'}">
+			 	<fmt:message key="common" bundle="${resword}"/>
+			 </c:when>
+			 <c:otherwise>
+			 	<fmt:message key="scheduled" bundle="${resword}"/>
+			 </c:otherwise>
+			 </c:choose>
+			</td>
 			<td class="table_header_column"><c:out value="${event.minDay}"/></td>
 			<td class="table_header_column"><c:out value="${event.maxDay}"/></td>
 			<td class="table_header_column"><c:out value="${event.scheduleDay}"/></td>

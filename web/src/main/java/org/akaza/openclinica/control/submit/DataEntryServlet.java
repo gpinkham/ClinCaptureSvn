@@ -131,6 +131,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.quartz.impl.StdScheduler;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 /**
@@ -1858,13 +1859,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
 													response);
 										}
 									}
-									//Clinovo Ticket #173 start
-									CalendarLogic calLogic = new CalendarLogic(getDataSource());
+									// Clinovo Ticket #173 start
+									StdScheduler scheduler = getScheduler(request);
+									CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
 									String message = calLogic.MaxMinDaysValidator(seb);
 									if (!"empty".equalsIgnoreCase(message)) {
-														addPageMessage(message, request);
+										addPageMessage(message, request);
 									}
-									//end
+									// end
 									forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET, request, response);
 									return;
 
@@ -3738,11 +3740,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		//Clinovo calendar func
 		if (seb.getSubjectEventStatus() == SubjectEventStatus.COMPLETED) {
 			System.out.println("AutoSchedule");
-			CalendarLogic calLogic = new CalendarLogic(getDataSource());
+			StdScheduler scheduler = getScheduler(request);
+			CalendarLogic calLogic = new CalendarLogic(getDataSource(),scheduler);
 			calLogic.ScheduleSubjectEvents(seb);
 			String message = calLogic.MaxMinDaysValidator(seb);
 			if (!"empty".equalsIgnoreCase(message)) {
-								addPageMessage(message, request);
+				addPageMessage(message, request);
 			}
 		}
 		//end
@@ -5047,5 +5050,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		if (nonRepOri != null && nonRepOri.size() > 0) {
 			ins.itemsInstantUpdate(section.getDisplayItemGroups(), nonRepOri);
 		}
+	}
+
+	private StdScheduler getScheduler(HttpServletRequest request) {
+		StdScheduler scheduler = (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession()
+				.getServletContext()).getBean("schedulerFactoryBean");
+		return scheduler;
 	}
 }

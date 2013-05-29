@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
@@ -72,6 +74,7 @@ import org.akaza.openclinica.service.calendar.CalendarLogic;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.quartz.impl.StdScheduler;
 
 /**
  * @author jxu
@@ -463,12 +466,13 @@ public class UpdateStudyEventServlet extends SecureController {
 				studyEvent.setUpdater(ub);
 				studyEvent.setUpdatedDate(new Date());
 				sedao.update(studyEvent);
-				if(studyEvent.getSubjectEventStatus().isCompleted()) {
-					CalendarLogic calLogic = new CalendarLogic(sm.getDataSource());
+				if (studyEvent.getSubjectEventStatus().isCompleted()) {
+					StdScheduler scheduler = getScheduler(request);
+					CalendarLogic calLogic = new CalendarLogic(sm.getDataSource(), scheduler);
 					calLogic.ScheduleSubjectEvents(studyEvent);
 					String message = calLogic.MaxMinDaysValidator(studyEvent);
 					if (!"empty".equalsIgnoreCase(message)) {
-							addPageMessage(message);
+						addPageMessage(message);
 					}
 				}
 
@@ -785,4 +789,10 @@ public class UpdateStudyEventServlet extends SecureController {
 			}
 		}
 	}
+	
+		private StdScheduler getScheduler(HttpServletRequest request) {
+		StdScheduler scheduler = (StdScheduler) SpringServletAccess.getApplicationContext(
+					request.getSession().getServletContext()).getBean("schedulerFactoryBean");
+			return scheduler;
+		}
 }

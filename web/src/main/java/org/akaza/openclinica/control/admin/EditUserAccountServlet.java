@@ -23,6 +23,8 @@ package org.akaza.openclinica.control.admin;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -30,6 +32,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -188,6 +191,7 @@ public class EditUserAccountServlet extends SecureController {
 			} else if (button.equals(resword.getString("submit"))) {
 				user.setFirstName(fp.getString(INPUT_FIRST_NAME));
 				user.setLastName(fp.getString(INPUT_LAST_NAME));
+				changeCalendarEventsUserEmail(user.getEmail(), fp.getString(INPUT_EMAIL));
 				user.setEmail(fp.getString(INPUT_EMAIL));
 				user.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
 				user.setUpdater(ub);
@@ -335,5 +339,21 @@ public class EditUserAccountServlet extends SecureController {
 	@Override
 	protected String getAdminServlet() {
 		return SecureController.ADMIN_SERVLET_CODE;
+	}
+	
+	@SuppressWarnings({"unchecked"})
+	private void changeCalendarEventsUserEmail(String userEmail,String emailForUpdate) {
+		StudyEventDefinitionDAO sedao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		ArrayList<StudyBean> studies = (ArrayList) sdao.findAllByUser(ub.getName());
+		for (StudyBean study : studies) {
+			ArrayList<StudyEventDefinitionBean> sedBeans = sedao.findAllActiveByStudy(study);
+			for (StudyEventDefinitionBean sedBean : sedBeans) {
+				if (userEmail.equals(sedBean.getEmailAdress())) {
+					sedBean.setEmailAdress(emailForUpdate);
+					sedao.update(sedBean);
+				}
+			}
+		}
 	}
 }

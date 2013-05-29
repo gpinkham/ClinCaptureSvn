@@ -1,0 +1,98 @@
+package org.akaza.openclinica.service.calendar;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.admin.TriggerBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.core.OpenClinicaMailSender;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.SimpleTrigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.quartz.QuartzJobBean;
+
+public class EmailJob extends QuartzJobBean {
+
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	
+	private ResourceBundle reswords;
+	private DataSource dataSource;
+	private OpenClinicaMailSender mailSender;
+	
+	public static final String EMAIL = "contactEmail";
+	public static final String USER_ID = "user_id";
+	public static final String EVENT_NAME = "event_name";
+	public static final String SUBJECT_NAME = "subject_name";
+	public static final String DAYS_BETWEEN = "daysBetween";
+	
+	@Override
+	protected void executeInternal(JobExecutionContext context)
+			throws JobExecutionException {
+		Locale locale = new Locale("en-US");
+		ResourceBundleProvider.updateLocale(locale);
+		reswords = ResourceBundleProvider.getWordsBundle();
+		JobDataMap dataMap = context.getMergedJobDataMap();
+		SimpleTrigger trigger = (SimpleTrigger) context.getTrigger();
+		
+		TriggerBean triggerBean = new TriggerBean();
+		triggerBean.setFullName(trigger.getName());
+		String contactEmail = dataMap.getString(EMAIL);
+		String eventName = dataMap.getString(EVENT_NAME);
+		String subjectlabel = dataMap.getString(SUBJECT_NAME);
+		String daysBetween = dataMap.getString(DAYS_BETWEEN);
+		if ("0".equals(daysBetween)) {
+			daysBetween = "today";
+		} else {
+			daysBetween = "in "+daysBetween +" days";
+		}
+				
+		logger.error(contactEmail + eventName + subjectlabel);
+		try {
+			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
+			dataSource = (DataSource) appContext.getBean("dataSource");
+			mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
+			int userId = dataMap.getInt(USER_ID);
+			UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+			UserAccountBean ub = (UserAccountBean) userAccountDAO.findByPK(userId);
+			triggerBean.setUserAccount(ub);
+			try {
+				if (contactEmail != null && !"".equals(contactEmail)) {
+					mailSender.sendEmail(contactEmail, EmailHeader(eventName, subjectlabel), EmailTextMessage(ub, eventName, subjectlabel, daysBetween), true);
+
+				}
+			} catch (OpenClinicaSystemException e) {
+				logger.error("=== throw an ocse === " + e.getMessage());
+				e.printStackTrace();
+			}
+
+		} catch (Exception e) {
+			logger.error("=== throw an ocse === " + e.getMessage());
+			e.printStackTrace();
+		}
+
+	}
+	
+	private String EmailTextMessage(UserAccountBean ub, String eventName, String subjectLabel, String daysBetween) {
+		String emailTestMessage = reswords.getString("day_email_message_htm");
+		emailTestMessage = emailTestMessage.replace("{0}", ub.getFirstName() +" "+ ub.getLastName()).replace("{1}", eventName)
+				.replace("{2}", subjectLabel).replace("{3}", daysBetween);
+		return emailTestMessage;
+		
+		
+	}
+	
+	private String EmailHeader(String eventName, String subjectLabel) {
+		String emailHeader = reswords.getString("reminder_for_event_and_subject");
+		emailHeader = emailHeader.replace("{0}", eventName).replace("{1}", subjectLabel);
+		return emailHeader;
+	}
+}

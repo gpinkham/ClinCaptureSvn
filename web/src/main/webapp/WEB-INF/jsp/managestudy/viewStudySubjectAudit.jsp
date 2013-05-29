@@ -411,7 +411,7 @@
     </td>
     </tr>
     <!-- Return to Root -->
-    <tr><td colspan="2" class="table_header_column_top" style="color: #789EC5"><a href="#root">Return to Top</a>&nbsp;</td></tr>
+    <tr><td colspan="2" class="table_header_column_top" style="color: #789EC5"><a href="#root"><fmt:message key="return_to_top" bundle="${resword}"/></a>&nbsp;</td></tr>
 </c:forEach>
 </table>
 <input id="CloaseViewStudySubjectAuditWindow" class="button_medium" type="submit" onclick="javascript:window.close()" value="<fmt:message key="close_window" bundle="${resword}"/>" name="BTN_Close_Window"/>
