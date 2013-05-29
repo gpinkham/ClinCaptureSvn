@@ -149,6 +149,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <!-- For randomization -->
 <input type="hidden" name="studyId" value="<c:out value="${study.id}"/>" />
 <input type="hidden" name="crfId" value="<c:out value="${section.crf.id}"/>" />
+<input type="hidden" name="subjectLabel" value="<c:out value="${studySubject.label}"/>" />
 
 <%--FF: ${requestScope['formFirstField']}<br />--%>
 
