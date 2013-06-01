@@ -53,7 +53,7 @@ public class EqualityOpNode extends ExpressionNode {
 			x = fx.toString();
 			y = fy.toString();
 		} catch (NumberFormatException nfe) {
-			// Don't do anything cause we were just testing above.
+			logger.error(nfe.getMessage());
 		}
 		if (x == null && y == null) {
 			x = String.valueOf(l);
@@ -68,17 +68,14 @@ public class EqualityOpNode extends ExpressionNode {
 		String y = null;
 		String l = left.value();
 		String r = right.value();
-		if (dateShouldBeEntered(left, right)) {
-			throw new OpenClinicaSystemException(
-					"OCRERR_DATE_SHOULD_BE_ENTERED", new Object[] {});
-		}
+		
 		try {
 			Float fx = Float.valueOf(l);
 			Float fy = Float.valueOf(r);
 			x = fx.toString();
 			y = fy.toString();
 		} catch (NumberFormatException nfe) {
-			// Don't do anything cause we were just testing above.
+			logger.error(nfe.getMessage());
 		}
 		if (x == null && y == null) {
 			x = String.valueOf(l);

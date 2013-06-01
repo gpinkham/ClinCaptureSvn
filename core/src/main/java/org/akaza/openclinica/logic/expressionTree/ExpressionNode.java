@@ -83,9 +83,10 @@ public abstract class ExpressionNode {
 
 	protected boolean dateShouldBeEntered(ExpressionNode left,
 			ExpressionNode right) {
-		return !expressionParser.isImportRulesMode()
-				&& expressionParser.isDateItem()
-				&& (left.isDateParameter() ? (right.isDateParameter() ? false
-						: right.value().isEmpty()) : left.value().isEmpty());
+		boolean isNotImportRules = !expressionParser.isImportRulesMode();
+		boolean isDateItem = expressionParser.isDateItem();
+		boolean isNextToDate = (left.isDateParameter() ? (right.isDateParameter() ? false
+				: right.value().isEmpty()) : left.value().isEmpty());
+		return isNotImportRules && isDateItem && isNextToDate;
 	}
 }

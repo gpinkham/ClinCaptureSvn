@@ -209,10 +209,10 @@ public class ExpressionService {
 			return value;
 		} catch (NullPointerException npe) {
 			logger.error("NullPointerException was thrown ");
-			return null;
+			return "";
 		} catch (IndexOutOfBoundsException ioobe) {
 			logger.error("IndexOutOfBoundsException was thrown ");
-			return null;
+			return "";
 		}
 
 	}

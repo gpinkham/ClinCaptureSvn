@@ -62,11 +62,9 @@ public class RelationalOpNode extends ExpressionNode {
 		double x, y;
 		String l = String.valueOf(left.value());
 		String r = String.valueOf(right.value());
-		if (dateShouldBeEntered(left, right)) {
-			throw new OpenClinicaSystemException(
-					"OCRERR_DATE_SHOULD_BE_ENTERED", new Object[] {});
-		}
+
 		validate(l, r);
+		
 		if (ExpressionTreeHelper.isDateyyyyMMdd(l)
 				&& ExpressionTreeHelper.isDateyyyyMMdd(r)) {
 			x = ExpressionTreeHelper.getDate(l).getTime();

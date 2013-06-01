@@ -156,6 +156,9 @@ public class DataEntryRuleRunner extends RuleRunner {
 										variableAndValue,
 										respagemsgs.getString(code));
 							}
+						} catch (NullPointerException npe) {
+							logger.info("found NPE while running rules, possible empty execution Mode");
+							logger.info("rule set target value " + ruleSet.getTarget().getValue() + " rule name " + rule.getName());
 						}
 					}
 				}
