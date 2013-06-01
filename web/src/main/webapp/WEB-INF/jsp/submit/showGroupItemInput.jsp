@@ -242,6 +242,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="inputType" value="${displayItem.metadata.responseSet.responseType.name}" />
 <c:set var="functionType" value="${displayItem.metadata.responseSet.options[0].value}"/>
 <c:set var="itemId" value="${displayItem.item.id}" />
+<c:set var="respLayout" value="${displayItem.metadata.responseLayout}" />
 <c:set var="numOfDate" value="${param.key}" />
 <c:set var="isLast" value="${param.isLast}" />
 <c:set var="isFirst" value="${param.isFirst}" />
@@ -387,11 +388,11 @@ function switchStr(itemId, id,attribute,str1,str2) {
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
       <input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-             onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
+             onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
     </c:when>
     <c:otherwise>
       <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-             onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
+             onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
