@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -92,35 +93,12 @@ public class ListSubjectGroupClassServlet extends SecureController {
 			groups = sgcdao.findAllByStudy(currentStudy);
 		}
 		StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 		for (int i = 0; i < groups.size(); i++) {
 			StudyGroupClassBean group = (StudyGroupClassBean) groups.get(i);
-			if (group.getGroupClassTypeId() == 4){
-				//create treemap<order,StudyEventDefinitionId>
-				DynamicEventDao dynevdao = new DynamicEventDao(sm.getDataSource());
-				ArrayList dynEvents = (ArrayList)dynevdao.findAllByStudyGroupClassId(group.getId());
-				TreeMap<Integer,Integer> ordinalToStudyEventDefinitionId = new TreeMap<Integer,Integer>();
-				for (int j = 0; j < dynEvents.size(); j++) {
-					DynamicEventBean dynEventBean = (DynamicEventBean) dynEvents.get(j);
-					ordinalToStudyEventDefinitionId.put(dynEventBean.getOrdinal(), dynEventBean.getStudyEventDefinitionId());
-				}
-				//create hashmap<StudyEventDefinitionId,StudyEventDefinition 
-				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-				ArrayList allDefsFromStudy = seddao.findAllByStudy(currentStudy);
-				HashMap<Integer, StudyEventDefinitionBean> idToStudyEventDefinition = new HashMap<Integer, StudyEventDefinitionBean>();
-				for (int j = 0; j < allDefsFromStudy.size(); j++) {
-					StudyEventDefinitionBean def = (StudyEventDefinitionBean) allDefsFromStudy.get(j);
-					if (ordinalToStudyEventDefinitionId.containsValue(def.getId())){
-						idToStudyEventDefinition.put(def.getId(), def);
-					}
-				}
-				//create sorted arraylist<StudyEventDefinitionBean> 
-				ArrayList<StudyEventDefinitionBean> orderedEventDefs = new ArrayList<StudyEventDefinitionBean>();
-				for (Iterator keyIt = ordinalToStudyEventDefinitionId.keySet().iterator(); keyIt.hasNext();) {
-					int id = ordinalToStudyEventDefinitionId.get((Integer)keyIt.next());
-					orderedEventDefs.add(idToStudyEventDefinition.get(id));	
-					//System.out.println(idToStudyEventDefinition.get(id).getName());
-				}
-				group.setEventDefinitions(orderedEventDefs); 
+			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()){
+				ArrayList orderedDefinitions = seddao.findAllOrderedByStudyGroupClassId(group.getId());
+				group.setEventDefinitions(orderedDefinitions); 
 			} else {
 				ArrayList studyGroups = sgdao.findAllByGroupClass(group);
 				group.setStudyGroups(studyGroups);

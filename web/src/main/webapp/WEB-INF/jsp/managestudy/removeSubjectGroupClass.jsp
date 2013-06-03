@@ -109,8 +109,7 @@
 					<td class="table_header_row"><fmt:message key="of_CRFs" bundle="${resword}"/></td>
 					<td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
 				</tr>
-				<c:forEach var="orderOfDef" items="${ordinalToStudyEventDefinitionId}" varStatus="status">
-				<c:set var="definition" value="${idToStudyEventDefinition[orderOfDef.value]}"/> 
+				<c:forEach var="definition" items="${orderedDefinitions}" varStatus="status">
 				<tr>
 					<td class="table_cell_left">
 						<c:out value="${status.count}"/>

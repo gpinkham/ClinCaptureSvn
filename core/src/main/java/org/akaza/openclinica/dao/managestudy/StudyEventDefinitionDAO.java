@@ -339,6 +339,24 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 
 		return answer;
 	}
+	
+	public ArrayList findAllOrderedByStudyGroupClassId(int id) {
+		ArrayList answer = new ArrayList();
+
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(id));
+
+		ArrayList alist = this.select(digester.getQuery("findAllOrderedByStudyGroupClassId"), variables);
+
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+			answer.add(seb);
+		}
+
+		return answer;
+	}
 
 	public Collection findAll() {
 		this.setTypesExpected();
@@ -447,8 +465,12 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		return al;
 
 	}
-
+	
 	public ArrayList<StudyEventDefinitionBean> findAllActiveByParentStudyId(int parentStudyId) {
+		return findAllActiveByParentStudyId(parentStudyId, false);
+	}
+
+	public ArrayList<StudyEventDefinitionBean> findAllActiveByParentStudyId(int parentStudyId, boolean filterOnCalendar) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(parentStudyId));
@@ -457,7 +479,31 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		Iterator it = alist.iterator();
 		while (it.hasNext()) {
 			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
-			al.add(eb);
+			if (filterOnCalendar && eb.getType().equalsIgnoreCase("calendared_visit")) {
+				// al.add(eb);
+				logger.trace("found calendared visit");
+			} else {
+				al.add(eb);
+			}
+		}
+		return al;
+	}
+	
+	public ArrayList<StudyEventDefinitionBean> findAllActiveByParentStudyId(int parentStudyId, ArrayList<Integer> idsToHide) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(parentStudyId));
+		ArrayList alist = this.select(digester.getQuery("findAllActiveByParentStudyId"), variables);
+		ArrayList<StudyEventDefinitionBean> al = new ArrayList<StudyEventDefinitionBean>();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+			if (idsToHide.contains(Integer.valueOf(eb.getId()))) {
+				// al.add(eb);
+				logger.trace("found visit contained in dynamic group, not adding");
+			} else {
+				al.add(eb);
+			}
 		}
 		return al;
 	}

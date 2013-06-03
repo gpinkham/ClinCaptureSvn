@@ -135,6 +135,16 @@
 		</sql>
 	</query>
 	<query>
+		<name>findAllOrderedByStudyGroupClassId</name>
+		<sql>
+			SELECT *
+			FROM study_event_definition
+			INNER JOIN dynamic_event ON dynamic_event.study_event_definition_id = study_event_definition.study_event_definition_id
+			WHERE dynamic_event.study_group_class_id = ?
+			ORDER BY dynamic_event.ordinal
+		</sql>
+	</query>
+	<query>
 		<name>findReferenceVisitBeans</name>
 		<sql>
 			SELECT sed.*

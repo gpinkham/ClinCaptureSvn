@@ -160,7 +160,7 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 		errors = v.validate();
 		
 		ArrayList studyGroups = new ArrayList();
-		if ("4".equals(request.getParameter("groupClassTypeId"))){ //dynamic group
+		if (String.valueOf(GroupClassType.DYNAMIC.getId()).equals(request.getParameter("groupClassTypeId"))){ //dynamic group
 			if ("true".equals(request.getParameter("isDefault"))) {
 				isDefault = true;
 			}
@@ -223,7 +223,7 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 			group.setName(fp.getString("name"));
 			group.setGroupClassTypeId(fp.getInt("groupClassTypeId"));
 			group.setDefault(isDefault);
-			if (!"4".equals(request.getParameter("groupClassTypeId"))){ //dynamic group
+			if (!String.valueOf(GroupClassType.DYNAMIC.getId()).equals(request.getParameter("groupClassTypeId"))){ //dynamic group
 				group.setSubjectAssignment(fp.getString("subjectAssignment"));
 			}
 			group.setGroupClassTypeName(GroupClassType.get(group.getGroupClassTypeId()).getName());
@@ -256,7 +256,7 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 		if (!group.isActive()) {
 			addPageMessage(respage.getString("the_subject_group_class_not_created_database"));
 		} else {
-			if (group.getGroupClassTypeId() == 4){
+			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()){
 				ArrayList<StudyEventDefinitionBean> listOfDefinitions = (ArrayList)session.getAttribute("listOfDefinitions");
 				ArrayList<StudyEventDefinitionBean> listOfOrderedDefinitions = new ArrayList(listOfDefinitions);
 				
