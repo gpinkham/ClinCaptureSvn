@@ -182,7 +182,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
 		}
 
 		if (!allNotesforSubjectAndEvent.isEmpty()) {
-			setRequestAttributesForNotes(allNotesforSubjectAndEvent);
+			setRequestAttributesForNotes(allNotesforSubjectAndEvent, seb);
 		}
 
 		// prepare to figure out what the display should look like
@@ -518,9 +518,12 @@ public class EnterDataForStudyEventServlet extends SecureController {
 	 * @param discBeans
 	 *            A List of DiscrepancyNoteBeans.
 	 */
-	private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans) {
+	private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans, StudyEventBean seb) {
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
 		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
-			if (!discrepancyNoteBean.getDescription().isEmpty()) {
+			//method discrepancyNoteBean.getEvent.getId() return 0 for all DNs
+			if (discrepancyNoteBean.getEventName().equalsIgnoreCase(sedBean.getName())) {
 				if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
 					if (discrepancyNoteBean.getResolutionStatusId() == 4) {
 						request.setAttribute(HAS_LOCATION_NOTE, "no");
