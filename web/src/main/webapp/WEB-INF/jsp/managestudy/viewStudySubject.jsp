@@ -762,13 +762,11 @@
   <input id="NotesDiscrepancies" class="button_long" type="button" name="BTN_NotesDiscrepancies" value="<fmt:message key="subjects_discrepancies" bundle="${resword}"/>" onclick="window.location.href=('ViewNotes?module=<c:out value="${module}"/>&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=<c:out value="${studySub.label}"/>');"/>
  
  </td>
- <td> 
-
- </td>
- <td> 
-
- <input id="ViewAuditLog" class="button_medium" type="submit" name="BTN_View" value="<fmt:message key="subjects_audit_log" bundle="${resword}"/>" onclick="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>');"/>
- </td>
+  <c:if test="${userRole.role.id != 4 && userRole.role.id != 5}">
+		<td> 
+		  <input id="ViewAuditLog" class="button_medium" type="submit" name="BTN_View" value="<fmt:message key="subjects_audit_log" bundle="${resword}"/>" onclick="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>');"/>
+		</td>
+  </c:if>
 <td>
  <input class="button_medium" type="submit" name="CaseBook" value="<fmt:message key="subjects_case_book" bundle="${resword}"/>" onclick="javascript:openDocWindow('PrintSubjectCaseBook?subjectId=<c:out value="${studySub.id}"/>');"/>
 </td>
