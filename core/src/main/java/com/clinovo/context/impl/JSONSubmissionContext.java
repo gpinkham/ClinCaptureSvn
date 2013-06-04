@@ -76,14 +76,17 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 		postData.put("TrialID", Integer.parseInt(action.getTrialId()));
 
 		// Strata
-		JSONArray array = new JSONArray();
-		JSONObject strataObject = new JSONObject();
-		strataObject.put("StratificationID", "1");
-		strataObject.put("Level", action.getRiskGroup());
+		if (action.getStratificationId() != null || action.getStratificationId() != "") {
 
-		array.put(strataObject);
+			JSONArray array = new JSONArray();
+			JSONObject strataObject = new JSONObject();
+			strataObject.put("StratificationID", "1");
+			strataObject.put("Level", action.getStratificationId());
 
-		postData.put("StrataAnswers", array);
+			array.put(strataObject);
+
+			postData.put("StrataAnswers", array);
+		}
 
 		log.info("Randomizing with: {}", postData.toString());
 
@@ -93,24 +96,24 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 	}
 
 	public List<Header> getHttpHeaders() throws Exception {
-		
+
 		Pattern incorrectCredentialsPattern = Pattern.compile("\\{\"Code\":400,\"Error\":\"Credentials not valid.\"");
-		
+
 		String authToken = authenticate();
-		
+
 		Matcher matcher = incorrectCredentialsPattern.matcher(authToken);
-		
+
 		// Incorrect creds
-		if(matcher.find()) {
-			
+		if (matcher.find()) {
+
 			throw new WebServiceException("Authentication error, please contact your Study Administrator");
 		}
 
 		try {
-			
+
 			JSONObject token = new JSONObject(authToken);
 			currentAuthToken = token.getString("Token");
-			
+
 		} catch (JSONException ex) {
 			log.error("An error occurred during the authentication with the randomization service", ex.getMessage());
 			throw new WebServiceException(ex);

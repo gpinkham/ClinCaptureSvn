@@ -4,6 +4,8 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -28,8 +30,9 @@ import com.clinovo.rule.ext.HttpTransportProtocol;
 @SuppressWarnings("serial")
 public class RandomizeServlet extends SecureController {
 
-	private final Logger log = LoggerFactory.getLogger(getClass().getName());
+	private WebServiceResult result = null;
 	private RuleSetServiceInterface ruleSetService;
+	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
 	@Override
 	protected void mayProceed() throws InsufficientPermissionException {
@@ -59,56 +62,79 @@ public class RandomizeServlet extends SecureController {
 		try {
 
 			String crfId = request.getParameter("crf");
-			String studyId = request.getParameter("study");
-			String trialId = request.getParameter("trial");
-			String riskGroup = request.getParameter("riskGroup");
+
+			String opt2 = request.getParameter("optionalParameter2");
 
 			if (isCrfComplete(crfId)) {
 
-				String siteId = "PACE001"; getSiteId(studyId);
-				String patientId = request.getParameter("subject");
+				if (opt2 != null) {
 
-				WebServiceAction action = new WebServiceAction();
+					// YES
+					if ("1".equals(opt2)) {
 
-				// username and password
-				action.setUsername(CoreResources.getField("randomizationusername"));
-				action.setPassword(CoreResources.getField("randomizationpassword"));
+						result = initiateRandomizationCall(request);
 
-				// Rando details
-				action.setSiteId(siteId);
-				action.setTrialId(trialId);
-				action.setPatientId(patientId);
-				action.setRiskGroup(riskGroup);
+					} else if ("0".equals(opt2)) {
 
-				// Https details
-				action.setRandomizationUrl(CoreResources.getField("randomizationUrl"));
-				action.setAuthenticationUrl(CoreResources.getField("randomizationAuthenticationUrl"));
-
-				SubmissionContext context = new JSONSubmissionContext();
-				context.setAction(action);
-
-				HttpTransportProtocol protocol = new HttpTransportProtocol();
-				protocol.setSubmissionContext(context);
-
-				WebServiceResult result = protocol.call();
+						throw new RandomizationException("IE criteria not fulfilled. The subject has not completed the IE criteria. Complete IE criteria to randomize");
+					}
+				} else {
+					
+					result = initiateRandomizationCall(request);
+				}
 
 				writer.write(result.getRandomizationResult());
 				writer.flush();
 
 			} else {
 
-				// CRF not complete
-				writer.write("The crf is not complete. Please make sure you have executed all rules before randomizing");
-				writer.flush();
+				throw new RandomizationException("The crf is not complete. Please make sure you have executed all rules before attempting to randomize the subject");
 			}
 
 		} catch (Exception ex) {
 
 			log.error("Randomization Error: {0}", ex.getMessage());
-			writer.write(ex.getMessage());
+			writer.write("Exception: " + ex.getMessage());
 			writer.flush();
-
 		}
+	}
+
+	private WebServiceResult initiateRandomizationCall(HttpServletRequest request) throws Exception {
+
+		String studyId = request.getParameter("study");
+
+		// optional parameters
+		String opt1 = request.getParameter("optionalParameter1");
+		String opt3 = request.getParameter("optionalParameter3");
+
+		String siteId = "PACE001"; getSiteId(studyId);
+		String patientId = request.getParameter("subject");
+
+		WebServiceAction action = new WebServiceAction();
+
+		// username and password
+		action.setUsername(CoreResources.getField("randomizationusername"));
+		action.setPassword(CoreResources.getField("randomizationpassword"));
+
+		// Rando details
+		action.setSiteId(siteId);
+		action.setTrialId(opt3);
+		action.setPatientId(patientId);
+		action.setStratificationId(opt1);
+
+		// Https details
+		action.setRandomizationUrl(CoreResources.getField("randomizationUrl"));
+		action.setAuthenticationUrl(CoreResources.getField("randomizationAuthenticationUrl"));
+
+		SubmissionContext context = new JSONSubmissionContext();
+		context.setAction(action);
+
+		HttpTransportProtocol protocol = new HttpTransportProtocol();
+		protocol.setSubmissionContext(context);
+
+		WebServiceResult result = protocol.call();
+		
+		return result;
 	}
 
 	private boolean isCrfComplete(String crfId) {
@@ -123,19 +149,19 @@ public class RandomizeServlet extends SecureController {
 			return false;
 		}
 	}
-	
+
 	protected String getSiteId(String studyId) throws RandomizationException {
-		
+
 		String siteId = "";
-		if(currentStudy.isSite(Integer.parseInt(studyId))) {
-			
+		if (currentStudy.isSite(Integer.parseInt(studyId))) {
+
 			siteId = currentStudy.getName();
-			
+
 		} else {
-			
+
 			throw new RandomizationException("Randomization can only be performed on a site.");
 		}
-		
+
 		return siteId;
 	}
 

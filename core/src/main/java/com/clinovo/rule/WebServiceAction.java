@@ -107,11 +107,11 @@ public class WebServiceAction extends RuleActionBean {
 		this.trialId = trialId;
 	}
 
-	public void setRiskGroup(String riskGroup) {
+	public void setStratificationId(String riskGroup) {
 		this.riskGroup = riskGroup;
 	}
 
-	public String getRiskGroup() {
+	public String getStratificationId() {
 		return this.riskGroup;
 	}
 

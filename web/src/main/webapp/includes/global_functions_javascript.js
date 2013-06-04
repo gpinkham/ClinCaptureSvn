@@ -2192,44 +2192,65 @@ try {
 
 function randomizeSubject() {
     
-    var currentUrl = window.location.href
-
-    var crf = jQuery("input:hidden[name='crfId']").val()
-    var studyId = jQuery("input:hidden[name='studyId']").val()
+    var crf = jQuery("input:hidden[name='crfId']").val();
+    var studyId = jQuery("input:hidden[name='studyId']").val();
     
-    var trial = "";
-    var riskGroup = "";
-    var subject = jQuery("input:hidden[name='subjectLabel']").val()
-    
-    var riskGroupInputs = jQuery("#IT_RiskGroup_opg").find(":input")
-    if(jQuery(riskGroupInputs[0]).is(":checked") 
-        || jQuery(riskGroupInputs[1]).is(":checked")) {
+    var rand_optionalParameter1 = null;
 
-        if(jQuery(riskGroupInputs[0]).is(":checked")) {
-            riskGroup = jQuery("input:hidden[eleId='riskGroup']").attr("alternateValue")
+    // Check if the optional item is defined
+    if(jQuery("#Rand_OptionalParam_1 :select").size() > 0) {
+
+        // Check if selection has been done
+        if(jQuery("#Rand_OptionalParam_1 :select").find(":selected") !== undefined) {
+            
+            var opt1 = jQuery("#Rand_OptionalParam_1 :select").find(":selected").text();
+
+            rand_optionalParameter1 = jQuery("input:hidden[eleid='optionalParam_1']").attr(opt1)
+
         } else {
-            riskGroup = jQuery("input:hidden[eleId='riskGroup']").attr("value")
-        } 
-    } else {
-        alert("Please specify the Risk Group for the subject")
-        return
-    }
 
-    var surgeryInputs = jQuery("#IT_PatientSurgicalCandidate_opg").find(":input")
-    if(jQuery(surgeryInputs[0]).is(":checked") 
-        || jQuery(surgeryInputs[1]).is(":checked")) {
-
-        if(jQuery(surgeryInputs[0]).is(":checked")) {
-            trial = jQuery("input:hidden[eleId='surgery']").attr("alternateValue")
-        } else {
-            trial = jQuery("input:hidden[eleId='surgery']").attr("value")
+            alert(jQuery("input:hidden[name='optional_param_1_missing']").val());
+            return false;
         }
-    } else {
-        alert("Please specify if the subject is a surgical candidate or not")
-        return
     }
 
-    var url = "randomize?subject="+subject + "&crf="+crf +"&trial="+trial + "&riskGroup="+riskGroup + "&study="+studyId
+    var rand_optionalParameter2 = null
+
+    // Check if optional item is defined
+    if(jQuery("input[type='radio']", "#Rand_OptionalParam_2") !== undefined) {
+
+        if(jQuery("input[type='radio']:checked", "#Rand_OptionalParam_2").val() !== undefined) {
+
+            rand_optionalParameter2 = jQuery("input[type='radio']:checked", "#Rand_OptionalParam_2").val();
+
+        } else {
+
+            alert(jQuery("input:hidden[name='optional_param_2_missing']").val());
+            return false;
+        }
+    }
+
+    var rand_optionalParameter3 = null
+
+    // Check if the optional item is defined
+    if(jQuery("#Rand_OptionalParam_3 :select").size() > 0) {
+
+        // Check if selection has been done
+        if(jQuery("#Rand_OptionalParam_3 :select").find(":selected") !== undefined) {
+           
+            var opt3 = jQuery("#Rand_OptionalParam_3 :select").find(":selected").text();
+
+            rand_optionalParameter3 = jQuery("input:hidden[eleid='optionalParam_3']").attr(opt3)
+
+        } else {
+            
+            alert(jQuery("input:hidden[name='optional_param_3_missing']").val());
+
+            return false;
+        }
+    }
+    
+    var subject = jQuery("input:hidden[name='subjectLabel']").val()
 
     jQuery.ajax({
 
@@ -2238,10 +2259,11 @@ function randomizeSubject() {
         data: {
 
             crf: crf,
-            trial: trial,
             study: studyId,
             subject: subject,
-            riskGroup: riskGroup
+            optionalParameter1: rand_optionalParameter1,
+            optionalParameter2: rand_optionalParameter2,
+            optionalParameter3: rand_optionalParameter3
         },
 
 
@@ -2259,26 +2281,8 @@ function randomizeSubject() {
 
             } else if(data.match(/\w+/)) {
 
-                jQuery("#LB_TXT_RANDOMIZATION").find(":input").val(data)
-
-                if(data.match(/^Cyber/)) {
-
-                    var inputs = jQuery("#IT_RandomizationSite_1").find(":input")
-
-                    jQuery(inputs[1]).attr("checked", true)
-                    
-                    var inputs2 = jQuery("#IT_RandomizationSite_2").find(":input");
-                    jQuery(inputs2[1]).attr("checked", true)
-
-                } else {
-
-                    var inputs = jQuery("#IT_RandomizationSite_1").find(":input")
-
-                    jQuery(inputs[0]).attr("checked", true)
-                    
-                    var inputs2 = jQuery("#IT_RandomizationSite_2").find(":input");
-                    jQuery(inputs2[0]).attr("checked", true)
-                }
+                jQuery("#Rand_Result_Txt").find(":input").val(data)
+                jQuery("#Rand_Randomization_Date").find(":input").val(new Date())
             }
         }
     })
