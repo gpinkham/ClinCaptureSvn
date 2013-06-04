@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service.calendar;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -144,7 +145,7 @@ public class CalendarLogic {
 			}
 		}
 		boolean refEventsIsEmpty = false;
-		if(studyEventBeanRef.getUpdatedDate() == null) {
+		if(getYearFromDate(studyEventBeanRef.getUpdatedDate()) == 1970) {
 			studyEventBeanRef.setUpdatedDate(new Date());
 			System.out.println("RV not founds so get currentDate and skip DN");
 			refEventsIsEmpty = true;
@@ -240,6 +241,17 @@ public class CalendarLogic {
 		jobDetailBean.setDurability(true);
 		jobDetailBean.setVolatility(false);
 		scheduler.scheduleJob(jobDetailBean, trigger);
+	}
+	
+	//joda getYear is deprecation method.
+	private static int getYearFromDate(Date date) {
+	    int result = -1;
+	    if (date != null) {
+	        Calendar cal = Calendar.getInstance();
+	        cal.setTime(date);
+	        result = cal.get(Calendar.YEAR);
+	    }
+	    return result;
 	}
 	
 	

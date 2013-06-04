@@ -16,6 +16,9 @@
 			document.write('<style class="hideStuff" ' + 'type="text/css">body {display:none;}<\/style>');
 		</script>
 	</c:if>
+	<title>
+	<fmt:message key="calendared_events_parametrs" bundle="${resword}"/> : <c:out value="${studyName}"/>
+	</title>
 </head>
 
 <h1><span class="title_manage">
@@ -25,12 +28,12 @@
 <table border="0" cellpadding="0" cellspacing="0" width="650" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
 
      <tr>
-        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="event_name" bundle="${resword}"/></b></td>
-		<td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="event_type" bundle="${resword}"/></b></td>
-        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="day_min" bundle="${resword}"/></b></td>
-        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="day_max" bundle="${resword}"/></b></td>
-        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="day_schedule" bundle="${resword}"/></b></td>
-        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="day_email" bundle="${resword}"/></b></td>
+        <td class="table_header_column_top" style="color: #789EC5" align="center" width="150px"><b><fmt:message key="event_name" bundle="${resword}"/></b></td>
+		<td class="table_header_column_top" style="color: #789EC5" align="center" width="100px"><b><fmt:message key="event_type" bundle="${resword}"/></b></td>
+        <td class="table_header_column_top" style="color: #789EC5" align="center" width="100px"><b><fmt:message key="day_min" bundle="${resword}"/></b></td>
+        <td class="table_header_column_top" style="color: #789EC5" align="center" width="100px"><b><fmt:message key="day_max" bundle="${resword}"/></b></td>
+        <td class="table_header_column_top" style="color: #789EC5" align="center" width="100px"><b><fmt:message key="day_schedule" bundle="${resword}"/></b></td>
+        <td class="table_header_column_top" style="color: #789EC5" align="center" width="100px"><b><fmt:message key="day_email" bundle="${resword}"/></b></td>
     </tr>
 	<c:forEach var="event" items="${requestScope['events']}">
       <tr>
@@ -51,10 +54,10 @@
 			 </c:otherwise>
 			 </c:choose>
 			</td>
-			<td class="table_header_column"><c:out value="${event.minDay}"/></td>
-			<td class="table_header_column"><c:out value="${event.maxDay}"/></td>
-			<td class="table_header_column"><c:out value="${event.scheduleDay}"/></td>
-			<td class="table_header_column"><c:out value="${event.emailDay}"/></td>
+			<td class="table_header_column" align="center"><c:out value="${event.minDay}"/></td>
+			<td class="table_header_column" align="center"><c:out value="${event.maxDay}"/></td>
+			<td class="table_header_column" align="center"><c:out value="${event.scheduleDay}"/></td>
+			<td class="table_header_column" align="center"><c:out value="${event.emailDay}"/></td>
             </td>
       </tr>
     </c:forEach>

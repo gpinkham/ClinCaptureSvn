@@ -203,7 +203,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					new StudyEventDefinitionMapCellEditor(), new SubjectEventStatusDroplistFilterEditor(), true, false);
 		}
 		String actionsHeader = resword.getString("rule_actions")
-				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
+				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" + 
+				"&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" +
+				"&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
 		configureColumn(row.getColumn(columnNames[columnNames.length - 1]), actionsHeader, new ActionsCellEditor(),
 				new DefaultActionsEditor(locale), true, false);
 
@@ -759,6 +761,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						url.append(studySubjectLockLinkBuilder(studySubjectBean));
 					}
 
+					url.append(calendaredEventsBuilder(studySubjectBean));
+					
 					if (discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel())) {
 						
 						if (getStudyBean().getStatus() == Status.AVAILABLE
@@ -769,7 +773,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						}
 					}
 				}
-
+				
 				value = "</div>" + url.toString();
 			}
 
@@ -1427,6 +1431,17 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		String format = resformat.getString("date_format_string");
 		SimpleDateFormat sdf = new SimpleDateFormat(format);
 		return sdf.format(date);
+	}
+	
+	private String calendaredEventsBuilder(StudySubjectBean studySubject) {
+		HtmlBuilder actionLink = new HtmlBuilder();
+		actionLink.a().href("javascript:openDocWindow('ViewCalendaredEventsForSubject?id=" + studySubject.getId()+"')");
+		actionLink.append("onMouseDown=\"javascript:setImage('bt_Calendar','images/bt_Calendar_d.gif');\"");
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_Calendar','images/bt_Calendar.gif');\"").close();
+		actionLink.img().name("bt_Calendar").src("images/bt_Calendar.gif").border("0")
+				.alt(resword.getString("view_calendared_parameters")).title(resword.getString("view_calendared_parameters")).append("hspace=\"4\"").end()
+				.aEnd();
+		return actionLink.toString();
 	}
 
 }

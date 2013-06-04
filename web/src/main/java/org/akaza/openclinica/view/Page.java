@@ -816,6 +816,8 @@ public class Page {
 			"View subject's case book print");
 	public final static Page SHOW_CALENDAR_FUNC = new Page("/WEB-INF/jsp/managestudy/showCalendarFunc.jsp",
 			"View caledar events properties");
+	public final static Page SHOW_CALENDAR_FUNC_PER_SUBJ = new Page("/WEB-INF/jsp/managestudy/viewCalendaredEventsForSubject.jsp",
+			"View caledar events properties");
 
 	public final static Page LOCK_SITE = new Page("/WEB-INF/jsp/submit/lockSite.jsp", "Lock / Unlock Site");
 	public final static Page LOCK_STUDY_SUBJECT = new Page("/WEB-INF/jsp/submit/lockStudySubject.jsp",
