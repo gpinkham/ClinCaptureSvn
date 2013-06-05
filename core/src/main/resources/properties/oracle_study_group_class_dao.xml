@@ -33,6 +33,14 @@
 		</sql>
 	</query>
 	<query>
+		<name>findDynamicByStudySubjectId</name>
+		<sql>
+			SELECT *
+			FROM study_group_class
+			WHERE study_group_class_id=ANY(SELECT dynamic_group_class_id FROM study_subject WHERE study_subject_id=?)
+		</sql>
+	</query>
+	<query>
 		<name>findAllDefault</name>
 		<sql>
 			SELECT * FROM study_group_class WHERE is_default='true'

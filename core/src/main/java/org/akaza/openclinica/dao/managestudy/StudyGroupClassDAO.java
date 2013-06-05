@@ -152,9 +152,17 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 
 		return answer;
 	}
-
+	
 	@Override
 	public ArrayList findAllActiveByStudy(StudyBean study) {
+		return this.findAllActiveByStudy(study, false);
+	}
+	
+	public ArrayList findAllActiveByStudy(StudyBean study, boolean filterOnDynamic) {
+		return findAllActiveByStudyId(study.getId(), filterOnDynamic);
+	}
+
+	public ArrayList findAllActiveByStudyId(int studyId, boolean filterOnDynamic) {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();
@@ -162,8 +170,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		this.setTypeExpected(13, TypeNames.STRING);
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(study.getId()));
-		variables.put(new Integer(2), new Integer(study.getId()));
+		variables.put(new Integer(1), new Integer(studyId));
+		variables.put(new Integer(2), new Integer(studyId));
 
 		ArrayList alist = this.select(digester.getQuery("findAllActiveByStudy"), variables);
 
@@ -172,15 +180,54 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 			HashMap hm = (HashMap) it.next();
 			StudyGroupClassBean group = (StudyGroupClassBean) this.getEntityFromHashMap(hm);
 			group.setStudyName((String) hm.get("study_name"));
-			// logger.info("study Name " + group.getStudyName());
+			
 			group.setGroupClassTypeName((String) hm.get("type_name"));
 			group.setSelected(false);
-			answer.add(group);
+			if (filterOnDynamic && group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId())
+			{
+				logger.trace("found dynamic event, filtering " + group.getId() + " " + group.getName());
+			} else {
+				answer.add(group);
+			}
 		}
 
 		return answer;
 	}
+	
+	public ArrayList findAllActiveDynamicGroupsByStudyId(int studyId) {
+		ArrayList dynAnswer = new ArrayList();
+		ArrayList oldAnswer = this.findAllActiveByStudyId(studyId, false);
+		Iterator it = oldAnswer.iterator();
+		while (it.hasNext()) {
+			StudyGroupClassBean possibleBean = (StudyGroupClassBean) it.next();
+			if (possibleBean.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()) {
+				logger.trace("found dynamic event: " + possibleBean.getId() + " " + possibleBean.getName());
+				dynAnswer.add(possibleBean);
+			}
+		}
+		
+		return dynAnswer;
+	}
 
+	public EntityBean findByStudySubjectId(int id) {
+		StudyGroupClassBean eb = new StudyGroupClassBean();
+		this.setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(id));
+
+		String sql = digester.getQuery("findByStudySubjectId");
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
+
+		if (it.hasNext()) {
+			eb = (StudyGroupClassBean) this.getEntityFromHashMap((HashMap) it.next());
+		}
+
+		return eb;
+	}
+
+ 
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
 		ArrayList al = new ArrayList();
 

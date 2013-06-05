@@ -28,6 +28,7 @@ import org.akaza.openclinica.control.admin.StudyStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
+import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -73,6 +74,7 @@ public class MainMenuServlet extends SecureController {
 	private EventDefinitionCRFDAO eventDefintionCRFDAO;
 	private StudyGroupDAO studyGroupDAO;
 	private DiscrepancyNoteDAO discrepancyNoteDAO;
+	private DynamicEventDao dynamicEventDao;
 
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
@@ -280,6 +282,7 @@ public class MainMenuServlet extends SecureController {
 		factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setStudyGroupDAO(getStudyGroupDAO());
+		factory.setDynamicEventDao(getDynamicEventDao());
 		String findSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("findSubjectsHtml", findSubjectsHtml);
 	}
@@ -290,6 +293,11 @@ public class MainMenuServlet extends SecureController {
 		return studyEventDefinitionDAO;
 	}
 
+	public DynamicEventDao getDynamicEventDao() {
+		dynamicEventDao = this.dynamicEventDao == null ? new DynamicEventDao(sm.getDataSource()) : dynamicEventDao;
+		return dynamicEventDao;
+	}
+	
 	public SubjectDAO getSubjectDAO() {
 		subjectDAO = this.subjectDAO == null ? new SubjectDAO(sm.getDataSource()) : subjectDAO;
 		return subjectDAO;

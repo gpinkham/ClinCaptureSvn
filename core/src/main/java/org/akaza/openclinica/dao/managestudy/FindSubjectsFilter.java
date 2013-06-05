@@ -75,13 +75,13 @@ public class FindSubjectsFilter implements CriteriaCommand {
 				value = SubjectEventStatus.getSubjectEventStatusIdByName(value.toString()) + "";
 				if (!value.equals("2")) {
 					criteria += " and ";
-					criteria += " ( se.study_event_definition_id = " + property.substring(4);
+					criteria += " ( se.study_event_definition_id = " + property.split("_")[1];
 					criteria += " and se.subject_event_status_id = " + value + " )";
 				} else {
 					criteria += " AND (se.study_subject_id is null or (se.study_event_definition_id != "
-							+ property.substring(4);
+							+ property.split("_")[1];
 					criteria += " AND (select count(*) from  study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id";
-					criteria += " where  study_event.study_event_definition_id =" + property.substring(4)
+					criteria += " where  study_event.study_event_definition_id =" + property.split("_")[1]
 							+ " and ss.study_subject_id = ss1.study_subject_id) =0))";
 
 				}

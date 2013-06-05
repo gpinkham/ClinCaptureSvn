@@ -357,6 +357,17 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 
 		return answer;
 	}
+	
+	public ArrayList findAllActiveOrderedByStudyGroupClassId(int id) {
+		ArrayList<StudyEventDefinitionBean> temp = findAllOrderedByStudyGroupClassId(id);
+		ArrayList<StudyEventDefinitionBean> answer = new ArrayList();
+		for ( StudyEventDefinitionBean def: temp) {
+			if (def.isActive()){
+				answer.add(def);
+			}
+		}
+		return answer;
+	}
 
 	public Collection findAll() {
 		this.setTypesExpected();

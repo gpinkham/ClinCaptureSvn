@@ -49,6 +49,8 @@ public class StudySubjectBean extends AuditableEntityBean {
 	 * An array of the groups this subject belongs to. Each element is a StudyGroupMapBean object. Not in the database.
 	 */
 	private ArrayList studyGroupMaps;
+	
+	private int dynamicGroupClassId;
 
 	private Date eventStartDate;// not in DB, for adding subject from subject matrix
 
@@ -81,6 +83,10 @@ public class StudySubjectBean extends AuditableEntityBean {
 	public void setOidGenerator(OidGenerator oidGenerator) {
 		this.oidGenerator = oidGenerator;
 	}
+	
+	public void setDynamicGroupClassId(int dynamicGroupClassId) {
+		this.dynamicGroupClassId = dynamicGroupClassId;
+	}
 
 	/**
 	 * @return Returns the uniqueIndentifier.
@@ -104,6 +110,10 @@ public class StudySubjectBean extends AuditableEntityBean {
 		return studyName;
 	}
 
+	public int getDynamicGroupClassId() {
+		return dynamicGroupClassId;
+	}
+	
 	/**
 	 * @param studyName
 	 *            The studyName to set.

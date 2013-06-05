@@ -1,4 +1,4 @@
-/*******************************************************************************
+/******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
@@ -11,11 +11,14 @@
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
+
 package org.akaza.openclinica.control.submit;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +44,7 @@ import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
+import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
@@ -56,6 +60,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.SDVUtil;
@@ -93,16 +98,19 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private ItemDataDAO itemDataDAO;
 	private EventDefinitionCRFDAO eventDefintionCRFDAO;
 	private DiscrepancyNoteDAO discrepancyNoteDAO;
+	private DynamicEventDao dynamicEventDao;
 	private StudyBean studyBean;
 	private String[] columnNames = new String[] {};
 	private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
 	private ArrayList<StudyGroupClassBean> studyGroupClasses;
+	private ArrayList<StudyGroupClassBean> dynamicGroupClasses;
 	private StudyUserRoleBean currentRole;
 	private UserAccountBean currentUser;
 	private boolean showMoreLink;
 	private ResourceBundle resword;
 	private ResourceBundle resformat;
 	private ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
+	private int hideColumnsNumber;
 
 	public static final int WIDTH_600 = 600;
 	public static final String WIDTH_600PX = "width: " + WIDTH_600 + "px";
@@ -151,7 +159,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	public void configureTableFacadeCustomView(TableFacade tableFacade, HttpServletRequest request) {
-		tableFacade.setView(new ListStudyView(getLocale(), request));
+		tableFacade.setView(new ListStudyView(getLocale(), request, studyGroupClasses, dynamicGroupClasses, studyEventDefinitions, hideColumnsNumber));
 	}
 
 	@Override
@@ -186,19 +194,30 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			configureColumn(row.getColumn(columnNames[index]), currentStudy == null ? resword.getString("secondary_ID")
 					: currentStudy.getStudyParameterConfig().getSecondaryIdLabel(), null, null);
 			++index;
-
 		}
-
+		this.hideColumnsNumber = index - 1;
+		
 		// group class columns
 		for (int i = index; i < index + studyGroupClasses.size(); i++) {
 			StudyGroupClassBean studyGroupClass = studyGroupClasses.get(i - index);
 			configureColumn(row.getColumn(columnNames[i]), studyGroupClass.getName(), new StudyGroupClassCellEditor(
 					studyGroupClass), new SubjectGroupClassDroplistFilterEditor(studyGroupClass), true, false);
 		}
-		// study event definition columns
-		for (int i = index + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
+		index = index + studyGroupClasses.size();
+		
+		// dynamic event columns, but you need to add one col per event here
+		for (StudyGroupClassBean dynamicGroupClass : dynamicGroupClasses) {
+			for (int i = index; i < index + dynamicGroupClass.getEventDefinitions().size(); i++) {
+				StudyEventDefinitionBean studyEventDefinitionBean = dynamicGroupClass.getEventDefinitions().get(i-index);
+				configureColumn(row.getColumn(columnNames[i]), studyEventDefinitionBean.getName(),
+						new StudyEventDefinitionMapCellEditor(), new SubjectEventStatusDroplistFilterEditor(), true, false);
+			}
+			index = index + dynamicGroupClass.getEventDefinitions().size();
+		}
+		
+		for (int i = index; i < columnNames.length - 1; i++) {
 			StudyEventDefinitionBean studyEventDefinition = studyEventDefinitions.get(i
-					- (index + studyGroupClasses.size()));
+					- index);
 			configureColumn(row.getColumn(columnNames[i]), studyEventDefinition.getName(),
 					new StudyEventDefinitionMapCellEditor(), new SubjectEventStatusDroplistFilterEditor(), true, false);
 		}
@@ -233,6 +252,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
 		Role r = currentRole.getRole();
 		boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
+		
+		// add other tool bar here?
+		
+		// filter study group classes by dynamic groups #todo
 
 		tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(),
 				addSubjectLinkShow, showMoreLink));
@@ -296,7 +319,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					allStudyEventsForStudySubjectBySedId.get(studyEventBean.getStudyEventDefinitionId()).add(
 							studyEventBean);
 				}
-
 			}
 			SubjectGroupMapBean subjectGroupMapBean;
 			for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
@@ -307,7 +329,37 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					theItem.put("grpName_sgc_" + studyGroupClass.getId(), subjectGroupMapBean.getStudyGroupName());
 				}
 			}
-
+			
+			for (int i = 0; i < getDynamicGroupClasses().size(); i++) {
+				StudyGroupClassBean dynamicGroupClass = getDynamicGroupClasses().get(i);
+				boolean permission_for_dynamic = false;
+				if ((studySubjectBean.getDynamicGroupClassId() == 0 && dynamicGroupClass.isDefault()) || (studySubjectBean.getDynamicGroupClassId() == dynamicGroupClass.getId())){
+					permission_for_dynamic = true;
+				}
+				for (StudyEventDefinitionBean studyEventDefinition : dynamicGroupClass.getEventDefinitions()) {
+					SubjectEventStatus subjectEventStatus = null;
+					List<StudyEventBean> studyEvents = allStudyEventsForStudySubjectBySedId.get(studyEventDefinition.getId());
+					studyEvents = studyEvents == null ? new ArrayList<StudyEventBean>() : studyEvents;
+					if (studyEvents.size() < 1) {
+						subjectEventStatus = SubjectEventStatus.NOT_SCHEDULED;
+					} else {
+						for (StudyEventBean studyEventBean : studyEvents) {
+							if (studyEventBean.getSampleOrdinal() == 1) {
+								subjectEventStatus = studyEventBean.getSubjectEventStatus();
+								break;
+							}
+						}
+					}
+					//logger.trace("adding sed id from dynamics to item " + event.getStudyEventDefinitionId());
+					logger.trace("set study events " + studyEvents.toString());
+					theItem.put("sed_" + studyEventDefinition.getId() + "_" + dynamicGroupClass.getId(), subjectEventStatus.getId());
+					theItem.put("sed_" + studyEventDefinition.getId() + "_" + dynamicGroupClass.getId() + "_studyEvents", studyEvents);
+					theItem.put("sed_" + studyEventDefinition.getId() + "_" + dynamicGroupClass.getId()+ "_object", studyEventDefinition);
+					theItem.put("sed_" + studyEventDefinition.getId() + "_" + dynamicGroupClass.getId() + "_permission_for_dynamic", permission_for_dynamic);
+					theItem.put("sed_" + studyEventDefinition.getId() + "_" + dynamicGroupClass.getId() + "_number_of_column", i);
+				}
+			}
+			
 			for (StudyEventDefinitionBean studyEventDefinition : getStudyEventDefinitions()) {
 				List<StudyEventBean> studyEvents = allStudyEventsForStudySubjectBySedId.get(studyEventDefinition
 						.getId());
@@ -322,13 +374,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 							break;
 						}
 					}
-
 				}
 
 				theItem.put("sed_" + studyEventDefinition.getId(), subjectEventStatus.getId());
 				theItem.put("sed_" + studyEventDefinition.getId() + "_studyEvents", studyEvents);
 				theItem.put("sed_" + studyEventDefinition.getId() + "_object", studyEventDefinition);
-
+				theItem.put("sed_" + studyEventDefinition.getId() + "_permission_for_dynamic", true);
 			}
 
 			theItems.add(theItem);
@@ -340,7 +391,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private int getColumnNamesMap(TableFacade tableFacade) {
-		int stratFrom = 4;
+		int startFrom = 4;
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
 
 		ArrayList<String> columnNamesList = new ArrayList<String>();
@@ -350,23 +401,30 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		columnNamesList.add("enrolledAt");
 		columnNamesList.add("studySubject.oid");
 		if (currentStudy == null || currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
-			stratFrom++;
+			startFrom++;
 			columnNamesList.add("subject.charGender");
 		}
 		if (currentStudy == null
 				|| !currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used")) {
-			stratFrom++;
+			startFrom++;
 			columnNamesList.add("studySubject.secondaryLabel");
 		}
 		for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
 			columnNamesList.add("sgc_" + studyGroupClass.getId());
 		}
+		
+		for (StudyGroupClassBean dynamicGroupClass : getDynamicGroupClasses()) {
+			for (StudyEventDefinitionBean studyEventDefinition : dynamicGroupClass.getEventDefinitions()) {
+				columnNamesList.add("sed_" + studyEventDefinition.getId() + "_" + dynamicGroupClass.getId());
+			}
+		}
+		
 		for (StudyEventDefinitionBean studyEventDefinition : getStudyEventDefinitions()) {
 			columnNamesList.add("sed_" + studyEventDefinition.getId());
 		}
 		columnNamesList.add("actions");
 		columnNames = columnNamesList.toArray(columnNames);
-		return stratFrom;
+		return startFrom;
 	}
 
 	protected FindSubjectsFilter getSubjectFilter(Limit limit) {
@@ -410,27 +468,60 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private ArrayList<StudyEventDefinitionBean> getStudyEventDefinitions() {
+		// need to filter by events that are not in dynamic groups #done
+		// and yet, at the same time, add them to the beginning of the list
 		if (this.studyEventDefinitions == null) {
 			if (studyBean.getParentStudyId() > 0) {
 				studyEventDefinitions = getStudyEventDefinitionDao().findAllActiveByParentStudyId(
-						studyBean.getParentStudyId());
+						studyBean.getParentStudyId(), getDynamicEventDao().findAllDefIdsInActiveDynGroupsByStudyId(studyBean.getParentStudyId()));
+				// filter on calendared events as well?
 			} else {
-				studyEventDefinitions = getStudyEventDefinitionDao().findAllActiveByParentStudyId(studyBean.getId());
+				studyEventDefinitions = getStudyEventDefinitionDao().findAllActiveByParentStudyId(
+						studyBean.getId(),	getDynamicEventDao().findAllDefIdsInActiveDynGroupsByStudyId(studyBean.getId()));
 			}
 		}
 		return this.studyEventDefinitions;
 	}
 
 	private ArrayList<StudyGroupClassBean> getStudyGroupClasses() {
+		// need to filter here by dyanamic groups #done
 		if (this.studyGroupClasses == null) {
 			if (studyBean.getParentStudyId() > 0) {
 				StudyBean parentStudy = (StudyBean) getStudyDAO().findByPK(studyBean.getParentStudyId());
-				studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(parentStudy);
+				studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(parentStudy, true);
 			} else {
-				studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(studyBean);
+				studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(studyBean, true);
 			}
 		}
 		return studyGroupClasses;
+	}
+	
+	private ArrayList<StudyGroupClassBean> getDynamicGroupClasses() {
+		// need to filter by events that are not in dynamic groups #done
+		// and yet, at the same time, add them to the beginning of the list
+		if (dynamicGroupClasses == null) {
+			if (studyBean.getParentStudyId() > 0) {
+				dynamicGroupClasses = getStudyGroupClassDAO().findAllActiveDynamicGroupsByStudyId(studyBean.getParentStudyId());
+			} else {
+				dynamicGroupClasses = getStudyGroupClassDAO().findAllActiveDynamicGroupsByStudyId(studyBean.getId());
+			}
+			
+			for (StudyGroupClassBean dynGroup : dynamicGroupClasses) {
+				dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllActiveOrderedByStudyGroupClassId(dynGroup.getId()));
+			}
+			Collections.sort(dynamicGroupClasses, new Comparator<StudyGroupClassBean>(){
+				public int compare(StudyGroupClassBean bean1, StudyGroupClassBean bean2) {
+					if (bean2.isDefault()){
+						return 1;
+					}
+					if (bean1.isDefault()){
+						return -1;
+					}
+					return 0;
+				}
+			});
+		}
+		return dynamicGroupClasses;
 	}
 
 	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
@@ -455,6 +546,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	public void setStudySubjectDAO(StudySubjectDAO studySubjectDAO) {
 		this.studySubjectDAO = studySubjectDAO;
+	}
+
+	public DynamicEventDao getDynamicEventDao() {
+		return dynamicEventDao;
+	}
+
+	public void setDynamicEventDao(DynamicEventDao dynamicEventDao) {
+		this.dynamicEventDao = dynamicEventDao;
 	}
 
 	public SubjectDAO getSubjectDAO() {
@@ -565,14 +664,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		public boolean evaluate(Object itemValue, String filterValue) {
 			String item = StringUtils.lowerCase(String.valueOf(itemValue));
 			String filter = StringUtils.lowerCase(String.valueOf(filterValue));
+			
 			if (StringUtils.contains(item, filter)) {
 				return true;
 			}
-
+			
 			return false;
 		}
 	}
-
+	
 	public class StatusFilterMatcher implements FilterMatcher {
 		public boolean evaluate(Object itemValue, String filterValue) {
 
@@ -702,12 +802,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			subjectEventStatus = SubjectEventStatus.get((Integer) ((HashMap<Object, Object>) item).get(property));
 			subject = (SubjectBean) ((HashMap<Object, Object>) item).get("subject");
 			studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
+			boolean permission_for_dynamic = (Boolean) ((HashMap<Object, Object>) item).get(property + "_permission_for_dynamic");
 
 			StringBuilder url = new StringBuilder();
 			url.append(eventDivBuilder(subject, rowcount, studyEvents, studyEventDefinition, studySubjectBean));
 
 			SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, imageIconPaths, studySubjectBean,
-					studyEvents, subjectEventStatus, resword);
+					studyEvents, subjectEventStatus, resword, permission_for_dynamic);
 
 			url.append(getCount());
 			url.append("</a></td></tr></table>");
@@ -1424,9 +1525,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		builder.a().href(href1 + href2);
 		builder.onclick("closePopup(); " + onClick1 + onClick2 + onClick3 + onClick4);
 		builder.close().append("X").aEnd();
-
+		
 	}
-
+	
 	private String formatDate(Date date) {
 		String format = resformat.getString("date_format_string");
 		SimpleDateFormat sdf = new SimpleDateFormat(format);
@@ -1443,5 +1544,4 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				.aEnd();
 		return actionLink.toString();
 	}
-
 }

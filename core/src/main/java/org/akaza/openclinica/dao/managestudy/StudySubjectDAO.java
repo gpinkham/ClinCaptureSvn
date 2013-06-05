@@ -84,6 +84,7 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		// date_updated | date |
 		// owner_id | numeric |
 		// update_id | numeric |
+		// dynamic_group_class_id | numeric |
 
 		this.unsetTypeExpected();
 		int ind = 1;
@@ -112,10 +113,13 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		ind++; // update_id
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // oc oid
+		this.setTypeExpected(ind, TypeNames.INT);
+		ind++; //dynamic_group_class_id
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; //
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; //
+		
 	}
 
 	public void setTypesExpectedFilter() {
@@ -147,6 +151,8 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		ind++; // update_id
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // oc oid
+		this.setTypeExpected(ind, TypeNames.INT);
+		ind++; // dynamic_group_class_id
 		this.setTypeExpected(ind, TypeNames.DATE);
 		ind++;
 		this.setTypeExpected(ind, TypeNames.STRING);
@@ -155,7 +161,7 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		ind++;
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++;
-
+		
 	}
 
 	public void setDNTypesExpected() {
@@ -187,13 +193,15 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		ind++; // update_id
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // oc oid
+		this.setTypeExpected(ind, TypeNames.INT);
+		ind++; //dynamic_group_class_id
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; //
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; //
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; //
-
+		
 	}
 
 	/**
@@ -205,7 +213,7 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		super.setEntityAuditInformation(eb, hm);
 		// STUDY_SUBJECT_ID, LABEL, SUBJECT_ID, STUDY_ID
 		// STATUS_ID, DATE_CREATED, OWNER_ID, STUDY_GROUP_ID
-		// DATE_UPDATED, UPDATE_ID
+		// DATE_UPDATED, UPDATE_ID, DYNAMIC_GROUP_CLASS_ID
 		Integer ssid = (Integer) hm.get("study_subject_id");
 		eb.setId(ssid.intValue());
 
@@ -217,6 +225,7 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		eb.setSecondaryLabel((String) hm.get("secondary_label"));
 		eb.setOid((String) hm.get("oc_oid"));
 		eb.setStudyName((String) hm.get("unique_identifier"));
+		eb.setDynamicGroupClassId(((Integer) hm.get("dynamic_group_class_id")).intValue());
 		return eb;
 	}
 
@@ -524,8 +533,8 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 
 		// INSERT INTO study_subject
 		// (LABEL, SUBJECT_ID, STUDY_ID, STATUS_ID,
-		// DATE_CREATED, OWNER_ID, ENROLLMENT_DATE,SECONDARY_LABEL)
-		// VALUES (?,?,?,?,NOW(),?,?,?)
+		// DATE_CREATED, OWNER_ID, ENROLLMENT_DATE,SECONDARY_LABEL, DYNAMIC_GROUP_CLASS_ID)
+		// VALUES (?,?,?,?,NOW(),?,?,?,?)
 
 		int ind = 1;
 		variables.put(new Integer(ind), sb.getLabel());
@@ -548,7 +557,8 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		}
 		variables.put(new Integer(ind), sb.getSecondaryLabel());
 		ind++;
-
+		variables.put(new Integer(ind), sb.getDynamicGroupClassId());
+		ind++;
 		this.execute(digester.getQuery("create"), variables, nullVars);
 
 		if (isQuerySuccessful()) {
@@ -598,6 +608,9 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		ind++;
 
 		variables.put(new Integer(ind), getValidOid(sb));
+		ind++;
+		
+		variables.put(new Integer(ind), sb.getDynamicGroupClassId());
 		ind++;
 
 		this.executeWithPK(digester.getQuery("create"), variables, nullVars);
@@ -1040,7 +1053,7 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 
 		// UPDATE study_subject SET LABEL=?, SUBJECT_ID=?, STUDY_ID=?,
 		// STATUS_ID=?, ENROLLMENT_DATE=?, DATE_UPDATED=?,
-		// UPDATE_ID=?, SECONDARY_LABEL=? WHERE STUDY_SUBJECT_ID=?
+		// UPDATE_ID=?, SECONDARY_LABEL=?, DYNAMIC_GROUP_CLASS_ID=? WHERE STUDY_SUBJECT_ID=?
 		int ind = 1;
 		variables.put(new Integer(ind), sb.getLabel());
 		ind++;
@@ -1065,6 +1078,8 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		variables.put(new Integer(ind), new Integer(sb.getUpdater().getId()));
 		ind++;
 		variables.put(new Integer(ind), sb.getSecondaryLabel());
+		ind++;
+		variables.put(new Integer(ind), sb.getDynamicGroupClassId());
 		ind++;
 		variables.put(new Integer(ind), new Integer(sb.getId()));
 		ind++;
@@ -1153,6 +1168,8 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		ind++; // secondary_label
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // studyName
+		this.setTypeExpected(ind, TypeNames.INT);
+		ind++; // dynamic_group_class_id
 
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(studyId));

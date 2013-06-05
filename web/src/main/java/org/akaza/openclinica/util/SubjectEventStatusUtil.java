@@ -62,7 +62,7 @@ public final class SubjectEventStatusUtil {
 
 	public static void determineSubjectEventIconOnTheSubjectMatrix(StringBuilder url,
 			HashMap<Integer, String> imageIconPaths, StudySubjectBean studySubjectBean,
-			List<StudyEventBean> studyEvents, SubjectEventStatus subjectEventStatus, ResourceBundle resword) {
+			List<StudyEventBean> studyEvents, SubjectEventStatus subjectEventStatus, ResourceBundle resword, boolean permission_for_dynamic) {
 		if (studyEvents.size() <= 1) {
 			if (studySubjectBean.getStatus().isLocked() && subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
 				String txt = resword.getString("locked");
@@ -84,8 +84,10 @@ public final class SubjectEventStatusUtil {
 						+ txt
 						+ "' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative; left: 7px;'>");
 			} else {
+				if (!subjectEventStatus.isNotScheduled() || permission_for_dynamic) {
 				url.append("<img src='" + imageIconPaths.get(subjectEventStatus.getId())
 						+ "' border='0' style='position: relative; left: 7px;'>");
+				}
 			}
 		} else {
 			boolean des = false;

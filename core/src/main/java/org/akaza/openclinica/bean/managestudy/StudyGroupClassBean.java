@@ -30,7 +30,7 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings({"serial"})
 public class StudyGroupClassBean extends AuditableEntityBean {
 	// STUDY_GROUP_ID NAME STUDY_ID OWNER_ID
 	// DATE_CREATED GROUP_CLASS_TYPE_ID STATUS_ID DATE_UPDATED
@@ -41,8 +41,8 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	private String groupClassTypeName = ""; // not in db
 	private String subjectAssignment = "";
 
-	private ArrayList studyGroups = new ArrayList();// not in DB
-	private ArrayList eventDefinitions = new ArrayList();// not in DB, show events which is in Dynamic Group
+	private ArrayList<StudyGroupBean> studyGroups = new ArrayList<StudyGroupBean>();// not in DB
+	private ArrayList<StudyEventDefinitionBean> eventDefinitions = new ArrayList<StudyEventDefinitionBean>();// not in DB, show events which is in Dynamic Group, for Dynamic Group only
 	private int studyGroupId = 0;// not in DB, indicates which group a
 	// subject is in
 	private String groupNotes = "";// not in DB
@@ -144,7 +144,7 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	/**
 	 * @return Returns the eventDefinitions for Dynamic Group.
 	 */
-	public ArrayList getEventDefinitions() {
+	public ArrayList<StudyEventDefinitionBean> getEventDefinitions() {
 		return eventDefinitions;
 	}
 
@@ -152,14 +152,14 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	 * @param eventDefinitions 
 	 *            The eventDefinitions to set for Dynamic Group.
 	 */
-	public void setEventDefinitions(ArrayList eventDefinitions) {
+	public void setEventDefinitions(ArrayList<StudyEventDefinitionBean> eventDefinitions) {
 		this.eventDefinitions = eventDefinitions;
 	}
 	
 	/**
 	 * @return Returns the studyGroups.
 	 */
-	public ArrayList getStudyGroups() {
+	public ArrayList<StudyGroupBean> getStudyGroups() {
 		return studyGroups;
 	}
 
@@ -167,7 +167,7 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	 * @param studyGroups
 	 *            The studyGroups to set.
 	 */
-	public void setStudyGroups(ArrayList studyGroups) {
+	public void setStudyGroups(ArrayList<StudyGroupBean> studyGroups) {
 		this.studyGroups = studyGroups;
 	}
 

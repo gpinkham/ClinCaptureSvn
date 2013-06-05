@@ -26,6 +26,7 @@ import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.dynamicevent.*;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -58,6 +59,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	private EventDefinitionCRFDAO eventDefintionCRFDAO;
 	private DiscrepancyNoteDAO discrepancyNoteDAO;
 	private StudyGroupDAO studyGroupDAO;
+	private DynamicEventDao dynamicEventDao;
 	private boolean showMoreLink;
 	Locale locale;
 
@@ -144,10 +146,12 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setStudyGroupDAO(getStudyGroupDAO());
+		factory.setDynamicEventDao(getDynamicEventDao());
 		String findSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("findSubjectsHtml", findSubjectsHtml);
 		request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
 		request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
+		
 		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
 		session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
@@ -217,6 +221,11 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	public StudyGroupDAO getStudyGroupDAO() {
 		studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
 		return studyGroupDAO;
+	}
+	
+	public DynamicEventDao getDynamicEventDao() {
+		dynamicEventDao = this.dynamicEventDao == null ? new DynamicEventDao(sm.getDataSource()) : dynamicEventDao;
+		return dynamicEventDao;
 	}
 
 	@Override

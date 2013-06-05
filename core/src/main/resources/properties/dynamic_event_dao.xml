@@ -2,8 +2,9 @@
 <queries>
     <query>
         <name>findByPK</name>
-        <sql>SELECT * FROM DYNAMIC_EVENT WHERE
-            DYNAMIC_EVENT_ID = ?</sql>
+        <sql>
+			SELECT * FROM DYNAMIC_EVENT WHERE DYNAMIC_EVENT_ID = ?
+		</sql>
     </query>
     <query>
         <name>findAll</name>
@@ -13,6 +14,20 @@
         <name>findAllByStudyGroupClassId</name>
         <sql>SELECT * FROM DYNAMIC_EVENT WHERE STUDY_GROUP_CLASS_ID = ?</sql>
     </query>
+	<query>
+		<name>findAllByStudyId</name>
+		<sql>
+			SELECT * FROM dynamic_event	WHERE study_id=?
+		</sql>
+	</query>
+	<query>
+		<name>findAllByGroupClassStatusIdAndStudyId</name>
+		<sql>
+			SELECT * 
+			FROM dynamic_event	
+			WHERE study_group_class_id=ANY(SELECT study_group_class_id FROM study_group_class WHERE status_id=? AND study_id=?)
+		</sql>
+	</query>
     <query>
         <name>create</name>
         <sql>INSERT INTO DYNAMIC_EVENT (STUDY_GROUP_CLASS_ID, STUDY_EVENT_DEFINITION_ID,

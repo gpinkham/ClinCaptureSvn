@@ -13,11 +13,14 @@
 
 package org.akaza.openclinica.control;
 
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.HtmlSnippets;
@@ -26,12 +29,19 @@ public class ListStudyView extends DefaultView {
 
 	private final ResourceBundle resword;
 	private boolean showTitle = false;
+	private ArrayList<StudyGroupClassBean> studyGroupClasses;
+	private ArrayList<StudyGroupClassBean> dynamicGroupClasses;
+	private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
+	private int hideColumnsNumber;
 
-	public ListStudyView(Locale locale, HttpServletRequest request) {
+	public ListStudyView(Locale locale, HttpServletRequest request, ArrayList<StudyGroupClassBean> studyGroupClasses, ArrayList<StudyGroupClassBean> dynamicGroupClasses, ArrayList<StudyEventDefinitionBean> studyEventDefinitions, int hideColumnsNumber) {
+		this.studyGroupClasses = studyGroupClasses;
+		this.dynamicGroupClasses = dynamicGroupClasses;
+		this.studyEventDefinitions = studyEventDefinitions;
+		this.hideColumnsNumber = hideColumnsNumber;
 		resword = ResourceBundleProvider.getWordsBundle(locale);
 		if (request.getRequestURI().contains("MainMenu"))
 			showTitle = true;
-
 	}
 
 	public Object render() {
@@ -45,6 +55,9 @@ public class ListStudyView extends DefaultView {
 
 		html.append(customHeader());
 		html.append(snippets.toolbar());
+		if (!dynamicGroupClasses.isEmpty()) {
+			html.append(customGroupHeader());
+		}
 		html.append(snippets.header());
 		html.append(snippets.filter());
 		html.append(snippets.theadEnd());
@@ -60,13 +73,31 @@ public class ListStudyView extends DefaultView {
 		return html.toString();
 	}
 
+	private String customGroupHeader() {
+		HtmlBuilder html = new HtmlBuilder();
+		html.tr(1).styleClass("header").width("100%").close();
+		int index = 0;
+		for (; index < studyGroupClasses.size()+hideColumnsNumber+1; index++){
+			html.td(index).style("border-bottom: 1px solid white;background-color:white;color:black;").align("center").close().tdEnd();
+		}
+		for (StudyGroupClassBean dynGroup: dynamicGroupClasses){
+			html.td(index).colspan(String.valueOf(dynGroup.getEventDefinitions().size())).style("border-bottom: 1px solid white;background-color:white;color:black;").align("center").close()
+					.append(dynGroup.getName()).tdEnd();
+			index++;
+		}
+		html.td(index).colspan(String.valueOf(studyEventDefinitions.size()+1)).style("border-bottom: 1px solid white;background-color:white;color:black;").align("center").close().tdEnd();
+		html.trEnd(1);
+
+		return html.toString();
+	}
+
 	/**
 	 * Setting the group cell editor.
 	 */
+	
 	private void setCustomCellEditors() {
 		getTable().setCaption("Subject Enrollment");
-
-	}
+    }
 
 	private String customHeader() {
 

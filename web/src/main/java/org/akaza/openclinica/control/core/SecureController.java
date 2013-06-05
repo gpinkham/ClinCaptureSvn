@@ -31,6 +31,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -903,6 +905,33 @@ public abstract class SecureController extends HttpServlet {
 
 	}
 
+	public  ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(int studyId) {
+		StudyGroupClassDAO studyGroupClassDAO = new StudyGroupClassDAO(sm.getDataSource());	
+		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(sm.getDataSource());
+		ArrayList<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO.findAllActiveDynamicGroupsByStudyId(studyId);
+		for (StudyGroupClassBean dynGroup : dynamicGroupClasses) {
+			dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllActiveOrderedByStudyGroupClassId(dynGroup.getId()));
+		}
+		Collections.sort(dynamicGroupClasses, new Comparator<StudyGroupClassBean>(){
+			public int compare(StudyGroupClassBean bean1, StudyGroupClassBean bean2) {
+				if (bean2.isDefault()){
+					return 1;
+				}
+				if (bean1.isDefault()){
+					return -1;
+				}
+				return 0;
+			}
+		});
+		
+		return dynamicGroupClasses;
+	}
+
+	public  ArrayList<StudyGroupClassBean> getDynamicGroupClassesByCurrentStudy() {
+		return getDynamicGroupClassesByStudyId(currentStudy.getId());
+	}
+
+	
 	protected UserDetails getUserDetails() {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (principal instanceof UserDetails) {

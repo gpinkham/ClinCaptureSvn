@@ -2072,7 +2072,7 @@ function createNewEvent(event) {
                         for (var k = 0; k < result.events.length; k++) {
                             var event = result.events[k];
                             var eventDiv = jQuery("div[id^='" + event.eventDivId + "']");
-                            if (eventDiv.length == 1) {
+                            if (eventDiv.length > 0) {
                                 var aElement = eventDiv.next();
 
                                 var newMOFuncBody = jQuery.trim(aElement.attr("onmouseover").toString().match(/{((?:.|\n)+)}/)[1]).toString();
