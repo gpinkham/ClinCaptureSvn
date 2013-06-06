@@ -208,6 +208,7 @@ public class DefineStudyEventServlet extends SecureController {
 		Validator v = new Validator(request);
 		FormProcessor fp = new FormProcessor(request);
 		v.addValidation("name", Validator.NO_BLANKS);
+		v.addValidation("type", Validator.NO_BLANKS);
 		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
 				2000);
 		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON,
