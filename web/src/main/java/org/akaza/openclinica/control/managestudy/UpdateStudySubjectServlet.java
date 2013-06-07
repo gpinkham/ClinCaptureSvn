@@ -88,6 +88,8 @@ public class UpdateStudySubjectServlet extends SecureController {
 		FormDiscrepancyNotes discNotes = null;
 		StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
 		FormProcessor fp = new FormProcessor(request);
+		int defaultDynGroupClassId = 0;
+		String defaultDynGroupClassName = "";
 
 		String referer = request.getHeader(REFERER);
 		if (referer != null && !referer.contains(UPDATE_STUDY_SUBJECT)) {
@@ -116,6 +118,8 @@ public class UpdateStudySubjectServlet extends SecureController {
 			}
 
 			StudySubjectBean sub = (StudySubjectBean) subdao.findByPK(studySubId);
+			
+			
 
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 			StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
@@ -131,13 +135,16 @@ public class UpdateStudySubjectServlet extends SecureController {
 
 			StudyDAO stdao = new StudyDAO(sm.getDataSource());
 			ArrayList classes = new ArrayList();
+			ArrayList dynamicClasses = new ArrayList();
 			if (!"submit".equalsIgnoreCase(action)) {
 				int parentStudyId = currentStudy.getParentStudyId();
 				if (parentStudyId > 0) {
 					StudyBean parentStudy = (StudyBean) stdao.findByPK(parentStudyId);
-					classes = sgcdao.findAllActiveByStudy(parentStudy);
+					classes = sgcdao.findAllActiveByStudy(parentStudy, true);
+					dynamicClasses = getDynamicGroupClassesByStudyId(parentStudyId);
 				} else {
-					classes = sgcdao.findAllActiveByStudy(currentStudy);
+					classes = sgcdao.findAllActiveByStudy(currentStudy, true);
+					dynamicClasses = getDynamicGroupClassesByStudyId(currentStudy.getId());
 				}
 				for (int i = 0; i < classes.size(); i++) {
 					StudyGroupClassBean group = (StudyGroupClassBean) classes.get(i);
@@ -149,12 +156,24 @@ public class UpdateStudySubjectServlet extends SecureController {
 						group.setGroupNotes(gMap.getNotes());
 					}
 				}
-
-				session.setAttribute("groups", classes);
+				request.setAttribute("groups", classes);
+				request.setAttribute("dynamicGroups", dynamicClasses);
+				
+				if (dynamicClasses.size() > 0) {
+					if (((StudyGroupClassBean) dynamicClasses.get(0)).isDefault()){
+						defaultDynGroupClassId = ((StudyGroupClassBean) dynamicClasses.get(0)).getId();
+						defaultDynGroupClassName = ((StudyGroupClassBean) dynamicClasses.get(0)).getName();
+					}
+				}
+				request.setAttribute("defaultDynGroupClassId", defaultDynGroupClassId);
+				request.setAttribute("defaultDynGroupClassName", defaultDynGroupClassName);
+				if (!fp.getString("dynamicGroupClassId").equals("")) {
+					session.setAttribute("selectedDynGroupClassId", fp.getInt("dynamicGroupClassId"));
+				}
 			}
-
+			
 			if ("show".equalsIgnoreCase(action)) {
-
+				session.setAttribute("selectedDynGroupClassId", sub.getDynamicGroupClassId());
 				session.setAttribute("studySub", sub);
 				String enrollDateStr = local_df.format(sub.getEnrollmentDate());
 				session.setAttribute("enrollDateStr", enrollDateStr);
@@ -168,6 +187,12 @@ public class UpdateStudySubjectServlet extends SecureController {
 			} else if ("submit".equalsIgnoreCase(action)) {// submit to DB
 				StudySubjectBean subject = (StudySubjectBean) session.getAttribute("studySub");
 				subject.setUpdater(ub);
+				int selectedDynGroupClassId = 0;
+				if (!"".equals(session.getAttribute("selectedDynGroupClassId"))){
+					selectedDynGroupClassId = (Integer) session.getAttribute("selectedDynGroupClassId");
+				}
+				subject.setDynamicGroupClassId(selectedDynGroupClassId);
+
 				subdao.update(subject);
 
 				// save discrepancy notes into DB
@@ -216,6 +241,7 @@ public class UpdateStudySubjectServlet extends SecureController {
 				session.removeAttribute("studySub");
 				session.removeAttribute("groups");
 				session.removeAttribute("enrollDateStr");
+				session.removeAttribute("selectedDynGroupClassId");
 				session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 				request.setAttribute("id", new Integer(studySubId).toString());
 
@@ -236,12 +262,13 @@ public class UpdateStudySubjectServlet extends SecureController {
 	 * @throws Exception
 	 */
 	private void confirm(StudyGroupDAO sgdao) throws Exception {
-		ArrayList classes = (ArrayList) session.getAttribute("groups");
+		FormProcessor fp = new FormProcessor(request);
+		ArrayList classes = (ArrayList) request.getAttribute("groups");
+		
 		StudySubjectBean sub = (StudySubjectBean) session.getAttribute("studySub");
 		FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session
 				.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 		DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
-		FormProcessor fp = new FormProcessor(request);
 		java.util.Date enrollDate = sub.getEnrollmentDate();
 
 		if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator()

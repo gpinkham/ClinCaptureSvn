@@ -105,40 +105,68 @@
 </div></div></div></div></div></div></div></div>
 
 </div>
-<c:if test="${(!empty groups)}">
+<c:if test="${(!empty groups)&&(!empty dynamicGroups)}">
 <br>
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
-<table border="0" cellpadding="0">
-
-  <tr valign="top">
-	<td class="table_header_column"><fmt:message key="subject_group_class" bundle="${resword}"/>:
-	<td class="table_cell">
-
 	<table border="0" cellpadding="0">
-	  <c:forEach var="group" items="${groups}">
-	  <tr valign="top">
-	   <td><b><c:out value="${group.name}"/></b></td>
-	   <td><c:out value="${group.studyGroupName}"/></td></tr>
-	    <tr valign="top">
-	      <td><fmt:message key="notes" bundle="${resword}"/>:</td>
-	      <td><c:out value="${group.groupNotes}"/></td>
-	    </tr>
-	  </c:forEach>
-	  </table>
-	</td>
-  </tr>
-
-
-
-</table>
+	<c:if test="${(!empty dynamicGroups)}">
+		<tr valign="top">
+			<td class="table_header_column"><fmt:message key="dynamic_group_class" bundle="${resword}"/>:</td>
+			<td class="table_cell">
+				<table border="0" cellpadding="0">
+					<c:if test="${selectedDynGroupClassId == 0}">
+					<tr valign="top">
+						<c:set var="selectedDynGroupClassId" value="${defaultDynGroupClassId}"/>
+						<c:set var="defaultGroupSelected" value="${true}"/>
+					</tr>
+					</c:if>
+					<tr valign="top">
+					<c:forEach var="dynGroup" items="${dynamicGroups}">
+						<c:if test="${dynGroup.id == selectedDynGroupClassId}">
+						<c:choose>
+							<c:when test="${defaultGroupSelected}"> 
+								<td><b><fmt:message key="default_group" bundle="${resword}"/>&nbsp;&nbsp;(<c:out value="${dynGroup.name}"/>)</b></td>							
+							</c:when>
+							<c:otherwise>
+								<td><b><c:out value="${dynGroup.name}"/></b></td>
+							</c:otherwise>
+						</c:choose> 
+						</c:if>
+					</c:forEach>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</c:if>
+	<c:if test="${(!empty groups)}">
+		<tr valign="top">
+			<td class="table_header_column"><fmt:message key="subject_group_class" bundle="${resword}"/>:</td>
+			<td class="table_cell">
+				<table border="0" cellpadding="0">
+					<c:forEach var="group" items="${groups}">
+					<tr valign="top">
+						<td><b><c:out value="${group.name}"/></b></td>
+						<td><c:out value="${group.studyGroupName}"/></td>
+					</tr>
+					<tr valign="top">
+						<td><fmt:message key="notes" bundle="${resword}"/>:</td>
+						<td><c:out value="${group.groupNotes}"/></td>
+					</tr>
+					</c:forEach>
+				</table>
+			</td>
+		</tr>
+	</c:if>
+	</table>
 </div>
 
 </div></div></div></div></div></div></div></div>
 
 </div>
+
 </c:if>
 <br>
   <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"

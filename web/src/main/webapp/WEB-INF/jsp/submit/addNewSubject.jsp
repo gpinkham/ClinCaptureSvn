@@ -89,8 +89,16 @@
 	<c:if test='${presetValue.key == "father"}'>
 		<c:set var="fatherId" value="${presetValue.value}" />
 	</c:if>
+	<c:if test='${presetValue.key == "selectedDynGroupClassId"}'>
+		<c:set var="selectedDynGroupClassId" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "defaultDynGroupClassId"}'>
+		<c:set var="defaultDynGroupClassId" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "defaultDynGroupClassName"}'>
+		<c:set var="defaultDynGroupClassName" value="${presetValue.value}" />
+	</c:if>
 </c:forEach>
-
 
 <h1><span class="title_manage">
 <c:out value="${study.name}" />:
@@ -107,6 +115,31 @@
 <br/><fmt:message key="field_required" bundle="${resword}"/></P>
 <form action="AddNewSubject" method="post">
 <jsp:include page="../include/showSubmitted.jsp" />
+
+<script type="text/JavaScript" language="JavaScript">
+  function showDynamicEventsSection(defaultDynGroupClassId) {
+  
+    var index = $(":select [name='dynamicGroupClassId'] :selected").val();
+	switch (index) {
+		case '0':
+			$("tr[id^='dynamicGroupId']").hide();   
+			if (defaultDynGroupClassId != 0){
+				$("tr#defaultDynGroupName").show();
+				$("tr[id='dynamicGroupId"+defaultDynGroupClassId+"']").show();
+			}
+			break
+		default: 
+			$("tr#defaultDynGroupName").hide();
+			$("tr[id^='dynamicGroupId']").hide();   
+			$("tr[id='dynamicGroupId"+index+"']").show();
+	}
+	return true;
+  }
+  
+  $(document).ready(function() { 
+		showDynamicEventsSection(${defaultDynGroupClassId});
+	});
+</script>
 
 <div style="width: 550px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -470,57 +503,105 @@
 
 </div>
 
-<c:if test="${(!empty groups)}">
+<c:if test="${(!empty groups)||(!empty dynamicGroups)}">
 <br>
 <div style="width: 550px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
 <table border="0" cellpadding="0">
-
+  <c:if test="${!empty dynamicGroups}">
   <tr valign="top">
-	<td class="formlabel"><fmt:message key="subject_group_class" bundle="${resword}"/>:
+	<td class="formlabel"><fmt:message key="dynamic_group_class" bundle="${resword}"/>:</td>
 	<td class="table_cell">
-	<c:set var="count" value="0"/>
 	<table border="0" cellpadding="0">
-	  <c:forEach var="group" items="${groups}">
-	  <tr valign="top">
-	   <td><b><c:out value="${group.name}"/></b></td>
-	   <td><div class="formfieldM_BG">
-	       <select name="studyGroupId<c:out value="${count}"/>" class="formfieldM">
-	    	 <option value="0">--</option>
-
-	    	<c:forEach var="sg" items="${group.studyGroups}">
-	    	  <c:choose>
-				<c:when test="${group.studyGroupId == sg.id}">
-					<option value="<c:out value="${sg.id}" />" selected><c:out value="${sg.name}"/></option>
-				</c:when>
-				<c:otherwise>
-				    <option value="<c:out value="${sg.id}"/>"><c:out value="${sg.name}"/></option>
-				</c:otherwise>
-			 </c:choose>
-	    	</c:forEach>
-	    	</select></div>
-	    	<c:import url="../showMessage.jsp"><c:param name="key" value="studyGroupId${count}" /></c:import>
-
-	    	</td>
+		<tr><td>&nbsp;</td></tr>
+		<tr valign="top">
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+			<td>
+			<div class="formfieldM_BG">
+				<select name="dynamicGroupClassId" class="formfieldM" onChange="showDynamicEventsSection(${defaultDynGroupClassId});">
+					<option value="0"><fmt:message key="default_group" bundle="${resword}"/></option>
+					<c:forEach var="dynGroup" items="${dynamicGroups}">
+					<c:choose>
+						<c:when test="${dynGroup.id == selectedDynGroupClassId}">
+							<option value="<c:out value="${dynGroup.id}" />" selected><c:out value="${dynGroup.name}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="<c:out value="${dynGroup.id}"/>"><c:out value="${dynGroup.name}"/></option>
+						</c:otherwise>
+					</c:choose>
+					</c:forEach>
+				</select>
+			</div>
+			</td>
+		</tr>
+		<tr style="display: none" id="defaultDynGroupName">
+			<td>&nbsp;<fmt:message key="name" bundle="${resword}"/>:&nbsp;</td>
+			<td>&nbsp;&nbsp;<c:out value="${defaultDynGroupClassName}"/></td>
+		</tr>
+		<c:forEach var="dynGroup" items="${dynamicGroups}">
+		<tr style="display: none" id="dynamicGroupId${dynGroup.id}">
+			<td>&nbsp;<fmt:message key="definitions" bundle="${resword}"/>:&nbsp;</td>
+			<td>
+				<table width="75%" cellspacing="0" cellpadding="0" border="1">
+				<c:forEach var="studyEvDef" items="${dynGroup.eventDefinitions}">
+					<tr>
+						<td class="table_cell">&nbsp;&nbsp;<c:out value="${studyEvDef.name}"/></td>
+					</tr>
+				</c:forEach>
+				</table>
+			</td>
+		</tr>	
+		</c:forEach>
+		<tr><td>&nbsp;</td></tr>
+	</table>
+	</td>
+  </tr>
+  </c:if>
+  <c:if test="${!empty groups}">
+  <tr valign="top">
+	<td class="formlabel"><fmt:message key="subject_group_class" bundle="${resword}"/>: </td>
+	<td class="table_cell">
+		<c:set var="count" value="0"/>
+		<table border="0" cellpadding="0">
+			<tr><td>&nbsp;</td></tr>
+			<c:forEach var="group" items="${groups}">
+			<tr valign="top">
+				<td><b>&nbsp;<c:out value="${group.name}"/>&nbsp;</b></td>
+				<td><div class="formfieldM_BG">
+					<select name="studyGroupId<c:out value="${count}"/>" class="formfieldM">
+						<option value="0">--</option>
+						<c:forEach var="sg" items="${group.studyGroups}">
+							<c:choose>
+								<c:when test="${group.studyGroupId == sg.id}">
+									<option value="<c:out value="${sg.id}" />" selected><c:out value="${sg.name}"/></option>
+								</c:when>
+								<c:otherwise>
+									<option value="<c:out value="${sg.id}"/>"><c:out value="${sg.name}"/></option>
+								</c:otherwise>
+							</c:choose>
+						</c:forEach>
+					</select></div>
+					<c:import url="../showMessage.jsp"><c:param name="key" value="studyGroupId${count}" /></c:import>
+				</td>
 	    	<c:if test="${group.subjectAssignment=='Required'}">
-	    	  <td align="left">*</td>
+				<td align="left">*</td>
 	    	</c:if>
 	    	</tr>
 	    	<tr valign="top">
-	    	<td><fmt:message key="notes" bundle="${resword}"/>:</td>
-	    	<td>
-	    	<div class="formfieldXL_BG"><input onfocus="this.select()" type="text" class="formfieldXL" name="notes<c:out value="${count}"/>"  value="<c:out value="${group.groupNotes}"/>"></div>
-	        <c:import url="../showMessage.jsp"><c:param name="key" value="notes${count}" /></c:import>
-	        </td></tr>
-	       <c:set var="count" value="${count+1}"/>
-	  </c:forEach>
-	  </table>
+				<td>&nbsp;<fmt:message key="notes" bundle="${resword}"/>:&nbsp;</td>
+				<td>
+					<div class="formfieldXL_BG"><input onfocus="this.select()" type="text" class="formfieldXL" name="notes<c:out value="${count}"/>"  value="<c:out value="${group.groupNotes}"/>"></div>
+					<c:import url="../showMessage.jsp"><c:param name="key" value="notes${count}" /></c:import>
+				</td>
+			</tr>
+			<c:set var="count" value="${count+1}"/>
+			</c:forEach>
+		</table>
 	</td>
   </tr>
-
-
+  </c:if>
 
 </table>
 </div>
@@ -531,14 +612,14 @@
 </c:if>
 <br>
 <table border="0" cellpadding="0" cellspacing="0">
-<tr>
-<td>
-<input type="submit" name="submitEvent" value="<fmt:message key="save_and_assign_study_event" bundle="${restext}"/>" class="button_long">
-</td>
-<td><input type="submit" name="submitEnroll" value="<fmt:message key="save_and_add_next_subject" bundle="${restext}"/>" class="button_long"></td>
-<td><input type="submit" name="submitDone" value="<fmt:message key="save_and_finish" bundle="${restext}"/>" class="button_long"></td>
-<td><input type="button" onclick="confirmCancel('ListStudySubjects');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
-</tr>
+	<tr>
+		<td>
+			<input type="submit" name="submitEvent" value="<fmt:message key="save_and_assign_study_event" bundle="${restext}"/>" class="button_long">
+		</td>
+		<td><input type="submit" name="submitEnroll" value="<fmt:message key="save_and_add_next_subject" bundle="${restext}"/>" class="button_long"></td>
+		<td><input type="submit" name="submitDone" value="<fmt:message key="save_and_finish" bundle="${restext}"/>" class="button_long"></td>
+		<td><input type="button" onclick="confirmCancel('ListStudySubjects');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
+	</tr>
 </table>
 </form>
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;z-index:10;background-color:white;layer-background-color:white;"></DIV>

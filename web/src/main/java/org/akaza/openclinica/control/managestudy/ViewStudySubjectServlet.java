@@ -46,6 +46,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
@@ -66,6 +67,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -185,6 +187,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 		analyzeUrl();
 		SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
 		StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
+		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 		FormProcessor fp = new FormProcessor(request);
 		int studySubId = fp.getInt("id", true);// studySubjectId
 		studySubId = studySubId == 0 ? fp.getInt("ssId") : studySubId;
@@ -207,7 +210,28 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 			StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 			StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
-
+			
+			StudyGroupClassBean subjDynGroup = new StudyGroupClassBean();
+			String studyEventDefinitionsString = "";
+			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+			if (studySub.getDynamicGroupClassId() == 0) {
+				request.setAttribute("subjDynGroupIsDefault", true);
+				StudyGroupClassBean defaultGroup = (StudyGroupClassBean) sgcdao.findDefault();
+				if (defaultGroup.getId() > 0){
+					subjDynGroup = defaultGroup;
+				} else {
+					request.setAttribute("defaultGroupNotExist", true);
+				}
+			} else {
+				subjDynGroup = (StudyGroupClassBean) sgcdao.findByPK(studySub.getDynamicGroupClassId());
+			}
+			ArrayList<StudyEventDefinitionBean> listSEDBeans = seddao.findAllActiveOrderedByStudyGroupClassId(subjDynGroup.getId());
+			for (StudyEventDefinitionBean sedBean: listSEDBeans){
+				studyEventDefinitionsString = studyEventDefinitionsString + ", " + sedBean.getName() ;
+			}
+			request.setAttribute("subjDynGroup", subjDynGroup);
+			request.setAttribute("studyEventDefinitionsString", studyEventDefinitionsString.replaceFirst(", ", ""));
+			
 			List<StudyEventBean> studyEventBeanList = sedao.findAllByStudySubject(studySub);
 			if (studyEventBeanList.size() > 0) {
 				boolean allLocked = true;
@@ -284,7 +308,6 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 					allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(
 							currentStudy, study, studySubId));
 				}
-
 			}
 
 			if (!allNotesforSubject.isEmpty()) {
@@ -338,8 +361,6 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 			// find study events
 
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-
 			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,
 					sm.getDataSource(), ub, currentRole);
 			
@@ -357,9 +378,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 				for (DisplayStudyEventBean displayStudyEventBean : displayEvents) {
 
 					hideCRFManager.removeHiddenEventCRF(displayStudyEventBean);
-
 				}
-
 			}
 			
 			EntityBeanTable table = fp.getEntityBeanTable();

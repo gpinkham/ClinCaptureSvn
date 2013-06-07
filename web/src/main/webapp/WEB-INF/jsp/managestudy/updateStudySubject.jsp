@@ -20,6 +20,30 @@
 </c:choose>
 <%-- <jsp:include page="../include/managestudy-header.jsp"/> --%>
 
+<script type="text/JavaScript" language="JavaScript">
+  function showDynamicEventsSection(defaultDynGroupClassId) {
+  
+    var index = $(":select [name='dynamicGroupClassId'] :selected").val();
+	switch (index) {
+		case '0':
+			$("tr[id^='dynamicGroupId']").hide();   
+			if (defaultDynGroupClassId != 0){
+				$("tr#defaultDynGroupName").show();
+				$("tr[id='dynamicGroupId"+defaultDynGroupClassId+"']").show();
+			}
+			break
+		default: 
+			$("tr#defaultDynGroupName").hide();
+			$("tr[id^='dynamicGroupId']").hide();   
+			$("tr[id='dynamicGroupId"+index+"']").show();
+	}
+	return true;
+  }
+  
+  $(document).ready(function() { 
+		showDynamicEventsSection(${defaultDynGroupClassId});
+	});
+</script>
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -93,7 +117,7 @@
     || (study.parentStudyId > 0 && userRole.researchAssistant)}">
 	 <div style="width: 550px">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
+	<br>
 	<div class="tablebox_center">
 	<table border="0" cellpadding="0" cellspacing="0">
 	  <tr valign="top">
@@ -183,14 +207,63 @@
 </c:choose>
 
 <br>
-<c:if test="${(!empty groups)}">
+<c:if test="${(!empty groups)||(!empty dynamicGroups)}">
 <br>
 <div style="width: 550px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
 <table border="0" cellpadding="0">
-
+<c:if test="${!empty dynamicGroups}">
+  <tr valign="top">
+	<td class="formlabel"><fmt:message key="dynamic_group_class" bundle="${resword}"/>:</td>
+	<td class="table_cell">
+	<table border="0" cellpadding="0">
+		<tr><td>&nbsp;</td></tr>
+		<tr valign="top">
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+			<td>
+			<div class="formfieldM_BG">
+				<select name="dynamicGroupClassId" class="formfieldM" onChange="showDynamicEventsSection(${defaultDynGroupClassId});">
+					<option value="0"><fmt:message key="default_group" bundle="${resword}"/></option>
+					<c:forEach var="dynGroup" items="${dynamicGroups}">
+					<c:choose>
+						<c:when test="${dynGroup.id == selectedDynGroupClassId}">
+							<option value="<c:out value="${dynGroup.id}" />" selected><c:out value="${dynGroup.name}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="<c:out value="${dynGroup.id}"/>"><c:out value="${dynGroup.name}"/></option>
+						</c:otherwise>
+					</c:choose>
+					</c:forEach>
+				</select>
+			</div>
+			</td>
+		</tr>
+		<tr style="display: none" id="defaultDynGroupName">
+			<td>&nbsp;<fmt:message key="name" bundle="${resword}"/>:&nbsp;</td>
+			<td>&nbsp;&nbsp;<c:out value="${defaultDynGroupClassName}"/></td>
+		</tr>
+		<c:forEach var="dynGroup" items="${dynamicGroups}">
+		<tr style="display: none" id="dynamicGroupId${dynGroup.id}">
+			<td>&nbsp;<fmt:message key="definitions" bundle="${resword}"/>:&nbsp;</td>
+			<td>
+				<table width="75%" cellspacing="0" cellpadding="0" border="1">
+				<c:forEach var="studyEvDef" items="${dynGroup.eventDefinitions}">
+					<tr>
+						<td class="table_cell">&nbsp;&nbsp;<c:out value="${studyEvDef.name}"/></td>
+					</tr>
+				</c:forEach>
+				</table>
+			</td>
+		</tr>	
+		</c:forEach>
+		<tr><td>&nbsp;</td></tr>
+	</table>
+	</td>
+  </tr>
+  </c:if>
+  <c:if test="${!empty groups}">
   <tr valign="top">
 	<td class="formlabel"><fmt:message key="subject_group_class" bundle="${resword}"/>:
 	<td class="table_cell">
@@ -231,9 +304,7 @@
 	  </table>
 	</td>
   </tr>
-
-
-
+  </c:if>
 </table>
 </div>
 

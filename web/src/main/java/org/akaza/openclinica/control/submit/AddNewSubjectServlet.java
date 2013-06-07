@@ -102,6 +102,8 @@ public class AddNewSubjectServlet extends SecureController {
 	public static final String INPUT_MOTHER = "mother";
 
 	public static final String BEAN_GROUPS = "groups";
+	
+	public static final String BEAN_DYNAMIC_GROUPS = "dynamicGroups";
 
 	public static final String BEAN_FATHERS = "fathers";
 
@@ -121,6 +123,9 @@ public class AddNewSubjectServlet extends SecureController {
 
 	public static final String STUDY_EVENT_DEFINITION = "studyEventDefinition";
 	public static final String LOCATION = "location";
+	public static final String SELECTED_DYN_GROUP_CLASS_ID = "selectedDynGroupClassId";
+	public static final String DEFAULT_DYN_GROUP_CLASS_ID = "defaultDynGroupClassId";
+	public static final String DEFAULT_DYN_GROUP_CLASS_NAME = "defaultDynGroupClassName";
 
 	String DOB = "";
 	String YOB = "";
@@ -142,6 +147,9 @@ public class AddNewSubjectServlet extends SecureController {
 		StudyDAO stdao = new StudyDAO(sm.getDataSource());
 		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 		ArrayList classes = new ArrayList();
+		ArrayList dynamicClasses = new ArrayList();
+		int defaultDynGroupClassId = 0;
+		String defaultDynGroupClassName = "";
 		panel.setStudyInfoShown(false);
 		FormProcessor fp = new FormProcessor(request);
 		FormDiscrepancyNotes discNotes;
@@ -157,11 +165,23 @@ public class AddNewSubjectServlet extends SecureController {
 		int parentStudyId = currentStudy.getParentStudyId();
 		if (parentStudyId <= 0) {
 			parentStudyId = currentStudy.getId();
-			classes = sgcdao.findAllActiveByStudy(currentStudy);
+			classes = sgcdao.findAllActiveByStudy(currentStudy, true);
+			dynamicClasses = getDynamicGroupClassesByStudyId(currentStudy.getId());
 		} else {
 			StudyBean parentStudy = (StudyBean) stdao.findByPK(parentStudyId);
-			classes = sgcdao.findAllActiveByStudy(parentStudy);
+			classes = sgcdao.findAllActiveByStudy(parentStudy, true);
+			dynamicClasses = getDynamicGroupClassesByStudyId(parentStudyId);
 		}
+		
+		if (dynamicClasses.size() > 0) {
+			if (((StudyGroupClassBean) dynamicClasses.get(0)).isDefault()){
+				defaultDynGroupClassId = ((StudyGroupClassBean) dynamicClasses.get(0)).getId();
+				defaultDynGroupClassName = ((StudyGroupClassBean) dynamicClasses.get(0)).getName();
+			}
+		}
+		fp.addPresetValue(DEFAULT_DYN_GROUP_CLASS_ID, defaultDynGroupClassId);
+		fp.addPresetValue(DEFAULT_DYN_GROUP_CLASS_NAME, defaultDynGroupClassName);
+		
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
 		StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "collectDob");
 		currentStudy.getStudyParameterConfig().setCollectDob(parentSPV.getValue());
@@ -178,6 +198,8 @@ public class AddNewSubjectServlet extends SecureController {
 			} else {
 
 				setUpBeans(classes);
+				request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
+				
 				Date today = new Date(System.currentTimeMillis());
 				String todayFormatted = local_df.format(today);
 				fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
@@ -215,7 +237,7 @@ public class AddNewSubjectServlet extends SecureController {
 				YOB = fp.getString(INPUT_YOB);
 				GENDER = fp.getString(INPUT_GENDER);
 			}
-
+			
 			discNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 			if (discNotes == null) {
 				discNotes = new FormDiscrepancyNotes();
@@ -304,7 +326,6 @@ public class AddNewSubjectServlet extends SecureController {
 			String uniqueIdentifier = fp.getString(INPUT_UNIQUE_IDENTIFIER);// global
 			// Id
 			SubjectBean subjectWithSameId = new SubjectBean();
-			new SubjectBean();
 			boolean showExistingRecord = false;
 			if (!uniqueIdentifier.equals("")) {
 				boolean subjectWithSameIdInCurrentStudyTree = false;
@@ -458,7 +479,8 @@ public class AddNewSubjectServlet extends SecureController {
 				fp.addPresetValue(INPUT_EVENT_START_DATE, fp.getString(INPUT_EVENT_START_DATE));
 				fp.addPresetValue(STUDY_EVENT_DEFINITION, fp.getInt(STUDY_EVENT_DEFINITION));
 				fp.addPresetValue(LOCATION, fp.getString(LOCATION));
-
+				fp.addPresetValue(SELECTED_DYN_GROUP_CLASS_ID, fp.getString("dynamicGroupClassId"));
+				
 				if (currentStudy.isGenetic()) {
 					String intFields[] = { INPUT_GROUP, INPUT_FATHER, INPUT_MOTHER };
 					fp.setCurrentIntValuesAsPreset(intFields);
@@ -467,6 +489,7 @@ public class AddNewSubjectServlet extends SecureController {
 				setPresetValues(fp.getPresetValues());
 
 				setUpBeans(classes);
+				request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 				boolean existingSubShown = fp.getBoolean(EXISTING_SUB_SHOWN);
 
 				if (!existingSubShown) {
@@ -542,6 +565,7 @@ public class AddNewSubjectServlet extends SecureController {
 
 					setPresetValues(fp.getPresetValues());
 					setUpBeans(classes);
+					request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 
 					// YW <<
 					int warningCount = 0;
@@ -659,7 +683,7 @@ public class AddNewSubjectServlet extends SecureController {
 				// for the subject
 				// in <subject> table, the subject only needs to be inserted
 				// into <studysubject> table.
-				// In other words, if(!showExistingRecord), the subject needs to
+				// In other words, if(!showExistingRecord), the subject needs 
 				// to be inserted into both <subject> and <studysubject> tables
 				if (!showExistingRecord) {
 					// YW >>
@@ -754,6 +778,8 @@ public class AddNewSubjectServlet extends SecureController {
 				}
 
 				studySubject.setOwner(ub);
+				
+				studySubject.setDynamicGroupClassId(Integer.valueOf(fp.getString("dynamicGroupClassId")));
 
 				// Shaoyu Su: prevent same label ("Study Subject ID")
 				if (fp.getString(INPUT_LABEL).equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
@@ -784,10 +810,9 @@ public class AddNewSubjectServlet extends SecureController {
 						if (map.getStudyGroupId() > 0) {
 							sgmdao.create(map);
 						}
-
 					}
 				}
-
+				
 				if (!studySubject.isActive()) {
 					throw new OpenClinicaException(resexception.getString("could_not_create_study_subject"), "4");
 				}
@@ -836,6 +861,7 @@ public class AddNewSubjectServlet extends SecureController {
 				} else if (!StringUtil.isBlank(submitEnroll)) {
 					// NEW MANTIS ISSUE 4770
 					setUpBeans(classes);
+					request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 					Date today = new Date(System.currentTimeMillis());
 					String todayFormatted = local_df.format(today);
 					fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
@@ -946,12 +972,6 @@ public class AddNewSubjectServlet extends SecureController {
 
 	protected void setUpBeans(ArrayList classes) throws Exception {
 		StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
-		// addEntityList(BEAN_GROUPS, sgdao.findAllByStudy(currentStudy),
-		// "A group must be available in order to add new subjects to this
-		// study;
-		// however, there are no groups in this Study. Please contact your Study
-		// Director.",
-		// Page.SUBMIT_DATA);
 
 		SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
 		ArrayList fathers = sdao.findAllByGender('m');
