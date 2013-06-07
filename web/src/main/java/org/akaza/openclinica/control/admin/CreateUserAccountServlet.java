@@ -325,15 +325,16 @@ public class CreateUserAccountServlet extends SecureController {
 
 	private void sendNewAccountEmail(UserAccountBean createdUserAccountBean, String password) throws Exception {
 		logger.info("Sending account creation notification to " + createdUserAccountBean.getName());
-
-		String body = resword.getString("dear") + " " + createdUserAccountBean.getFirstName() + " "
-				+ createdUserAccountBean.getLastName() + ",\n";
-		body += restext.getString("a_new_user_account_has_been_created_for_you") + "\n\n";
-		body += resword.getString("user_name") + ": " + createdUserAccountBean.getName() + "\n";
-		body += resword.getString("password") + ": " + password + "\n\n";
-		body += restext.getString("please_test_your_login_information_and_let") + "\n";
+		String body = "<html><body>"; 
+		body += resword.getString("dear") + " " + createdUserAccountBean.getFirstName() + " "
+				+ createdUserAccountBean.getLastName() + ",<br><br>";
+		body += restext.getString("a_new_user_account_has_been_created_for_you") + "<br>";
+		body += resword.getString("user_name") + ": " + createdUserAccountBean.getName() + "<br>";
+		body += resword.getString("password") + ": " + password + "<br><br>";
+		body += restext.getString("please_test_your_login_information_and_let") + "<br>";
 		body += SQLInitServlet.getSystemURL();
 		body += " . ";
+		body += "</body></html>";
 		sendEmail(createdUserAccountBean.getEmail().trim(), restext.getString("your_new_openclinica_account"), body,
 				false);
 	}
