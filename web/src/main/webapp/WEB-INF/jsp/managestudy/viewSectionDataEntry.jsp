@@ -106,8 +106,9 @@
 		jQuery(document).ready(function() {
 			jQuery("table > tbody  input").attr("disabled", "disabled");   	
 			jQuery("table > tbody a").removeAttr("onmouseover"); 
-			jQuery("table > tbody .tablebox_center a").removeAttr("onclick"); 
-			jQuery("table > tbody .tablebox_center a").removeAttr("href");
+			//next code disable Disc Note flags 
+			//jQuery("table > tbody .tablebox_center a").removeAttr("onclick"); 
+			//jQuery("table > tbody .tablebox_center a").removeAttr("href");
 			jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
 			jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
 			jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
