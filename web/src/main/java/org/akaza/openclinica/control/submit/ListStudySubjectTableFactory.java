@@ -44,6 +44,7 @@ import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
+import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFactory;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -889,7 +890,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
 		actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view"))
 				.title(resword.getString("view")).append("hspace=\"4\"").end().aEnd();
-
 		return actionLink.toString();
 
 	}
@@ -985,7 +985,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					.href("LockStudySubject?id=" + studySubject.getId() + "&action=unlock")
 					.style(allLocked && hasLockedBy ? "" : "display: none;").close();
 			actionLink1.img().src("images/bt__Unlock.png").border("0").alt(resword.getString("unlockStudySubject"))
-					.title(resword.getString("unlockStudySubject")).append("hspace=\"8\"").end().aEnd();
+					.title(resword.getString("unlockStudySubject")).append("hspace=\"4\"").end().aEnd();
 
 			HtmlBuilder actionLink2 = new HtmlBuilder();
 			actionLink2.a().id("button_lockStudySubject_" + studySubject.getId())
@@ -994,7 +994,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			actionLink2.img().src("images/bt__Lock.png").border("0").alt(resword.getString("lockStudySubject"))
 					.title(resword.getString("lockStudySubject")).append("hspace=\"4\"").end().aEnd();
 
-			link = actionLink1.toString() + " " + actionLink2.toString();
+			link = actionLink1.toString() + actionLink2.toString();
 		}
 		return link;
 	}
@@ -1008,7 +1008,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"").close();
 		actionLink.img().name("bt_Restore1").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore"))
 				.title(resword.getString("restore")).append("hspace=\"4\"").end().aEnd();
-		return actionLink.toString();
+		HtmlBuilder transparentButton = new HtmlBuilder();
+		if(currentRole.getRole().getId() != 4 && currentRole.getRole().getId() != 5) {
+		transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0").append("hspace=\"4\"").end();
+		}
+		return actionLink.toString() + transparentButton.toString();
 
 	}
 
@@ -1535,6 +1539,29 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 	
 	private String calendaredEventsBuilder(StudySubjectBean studySubject) {
+		HtmlBuilder transparentIcon = new HtmlBuilder();
+		if (currentRole.getRole().getId() == 2) {
+			transparentIcon = new HtmlBuilder();
+			List<StudyEventBean> studyEventBeanList = getStudyEventDAO().findAllByStudySubject(studySubject);
+			if (studyEventBeanList.size() == 0) {
+				transparentIcon.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0").append("hspace=\"4\"").end();
+			}
+		}
+		if(currentRole.getRole().getId() == 5) {
+			transparentIcon = new HtmlBuilder();
+			List<StudyEventBean> studyEventBeanList = getStudyEventDAO().findAllByStudySubject(studySubject);
+			if (studyEventBeanList.size() == 0) {
+				transparentIcon.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0").append("hspace=\"4\"").end();
+			} else {
+				for (StudyEventBean eventBean : studyEventBeanList) {
+					if(eventBean.getSubjectEventStatus() != SubjectEventStatus.DELETED) {
+						transparentIcon.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0").append("hspace=\"4\"").end();
+						break;
+					}
+				}
+			}
+		}
+		
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href("javascript:openDocWindow('ViewCalendaredEventsForSubject?id=" + studySubject.getId()+"')");
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Calendar','images/bt_Calendar_d.gif');\"");
@@ -1542,6 +1569,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		actionLink.img().name("bt_Calendar").src("images/bt_Calendar.gif").border("0")
 				.alt(resword.getString("view_calendared_parameters")).title(resword.getString("view_calendared_parameters")).append("hspace=\"4\"").end()
 				.aEnd();
-		return actionLink.toString();
+		return transparentIcon.toString() + actionLink.toString();
 	}
 }
