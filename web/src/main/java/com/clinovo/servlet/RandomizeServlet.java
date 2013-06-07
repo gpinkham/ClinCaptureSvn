@@ -63,20 +63,20 @@ public class RandomizeServlet extends SecureController {
 
 			String crfId = request.getParameter("crf");
 
-			String opt2 = request.getParameter("optionalParameter2");
+			String opt3 = request.getParameter("optionalParameter3");
 
 			if (isCrfComplete(crfId)) {
 
-				if (opt2 != null) {
+				if (opt3 != null) {
 
 					// YES
-					if ("1".equals(opt2)) {
+					if ("0".equals(opt3)) {
 
 						result = initiateRandomizationCall(request);
 
-					} else if ("0".equals(opt2)) {
+					} else if ("1".equals(opt3)) {
 
-						throw new RandomizationException("IE criteria not fulfilled. The subject has not completed the IE criteria. Complete IE criteria to randomize");
+						throw new RandomizationException("The subject has not completed the IE criteria. Complete IE criteria before randomizing the subject");
 					}
 				} else {
 					
@@ -105,7 +105,7 @@ public class RandomizeServlet extends SecureController {
 
 		// optional parameters
 		String opt1 = request.getParameter("optionalParameter1");
-		String opt3 = request.getParameter("optionalParameter3");
+		String opt2 = request.getParameter("optionalParameter2");
 
 		String siteId = "PACE001"; getSiteId(studyId);
 		String patientId = request.getParameter("subject");
@@ -118,7 +118,7 @@ public class RandomizeServlet extends SecureController {
 
 		// Rando details
 		action.setSiteId(siteId);
-		action.setTrialId(opt3);
+		action.setTrialId(opt2);
 		action.setPatientId(patientId);
 		action.setStratificationId(opt1);
 

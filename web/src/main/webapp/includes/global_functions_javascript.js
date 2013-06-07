@@ -2216,16 +2216,20 @@ function randomizeSubject() {
 
     var rand_optionalParameter2 = null
 
-    // Check if optional item is defined
-    if(jQuery("input[type='radio']", "#Rand_OptionalParam_2") !== undefined) {
+    // Check if the optional item is defined
+    if(jQuery("#Rand_OptionalParam_2 :select").size() > 0) {
 
-        if(jQuery("input[type='radio']:checked", "#Rand_OptionalParam_2").val() !== undefined) {
+        // Check if selection has been done
+        if(jQuery("#Rand_OptionalParam_2 :select").find(":selected") !== undefined) {
+           
+            var opt2 = jQuery("#Rand_OptionalParam_2 :select").find(":selected").text();
 
-            rand_optionalParameter2 = jQuery("input[type='radio']:checked", "#Rand_OptionalParam_2").val();
+            rand_optionalParameter2 = jQuery("input:hidden[eleid='optionalParam_2']").attr(opt2)
 
         } else {
-
+            
             alert(jQuery("input:hidden[name='optional_param_2_missing']").val());
+
             return false;
         }
     }
@@ -2238,9 +2242,7 @@ function randomizeSubject() {
         // Check if selection has been done
         if(jQuery("#Rand_OptionalParam_3 :select").find(":selected") !== undefined) {
            
-            var opt3 = jQuery("#Rand_OptionalParam_3 :select").find(":selected").text();
-
-            rand_optionalParameter3 = jQuery("input:hidden[eleid='optionalParam_3']").attr(opt3)
+           rand_optionalParameter3 = jQuery("#Rand_OptionalParam_3 :select").find(":selected").val()
 
         } else {
             
@@ -2287,9 +2289,11 @@ function randomizeSubject() {
 
             } 
             else if(data.match(/\w+/)) {
+            	
+            	var date = new Date()
 
                 jQuery("#Rand_Result_Txt").find(":input").val(data)
-                jQuery("#Rand_Randomization_Date").find(":input").val(new Date())
+                jQuery("#Rand_Randomization_Date").find(":input").val(date.getDate() + "-" + date.getMonth() + "-" + date.getFullYear())
             }
         }
     })
