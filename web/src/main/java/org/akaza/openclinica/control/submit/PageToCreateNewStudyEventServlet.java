@@ -43,6 +43,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -127,9 +128,13 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 		}
 		
 		// find all active definitions with CRFs
-		ArrayList eventDefinitions = seddao.findAllActiveByStudy(studyWithEventDefinitions);
-		
-		Collections.sort(eventDefinitions);
+		ArrayList eventDefinitions = seddao.findAllActiveBySubjectAndStudyId(ssb,studyWithEventDefinitions.getId());
+
+		Collections.sort(eventDefinitions, new Comparator<StudyEventDefinitionBean>(){
+			public int compare(StudyEventDefinitionBean bean1, StudyEventDefinitionBean bean2) {
+				return bean1.getName().compareTo(bean2.getName());
+			}
+		});
 		ArrayList eventDefinitionsScheduled = eventDefinitions;
 
 		if (!fp.isSubmitted()) {
@@ -193,6 +198,7 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 
 			request.setAttribute("eventDefinitionsScheduled", eventDefinitionsScheduled);
 			setInputMessages(new HashMap());
+
 			forwardPage(Page.PAGE_TO_CREATE_NEW_STUDY_EVENT);
 		} else {
 

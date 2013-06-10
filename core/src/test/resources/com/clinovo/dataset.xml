@@ -30,7 +30,14 @@
 		study_event_definition_id="2" study_id="1" name="ED-2-Repeating"
 		description="" repeating="true" type="scheduled" category="" owner_id="1"
 		status_id="1" date_created="2008-07-02" ordinal="2" oc_oid="SE_ED2REPEA" />
-
+	<study_event_definition
+		study_event_definition_id="3" study_id="1" name="ED-3-NotRepeating"
+		description="" repeating="false" type="scheduled" category="" owner_id="1"
+		status_id="1" date_created="2008-07-03" ordinal="3" oc_oid="SE_ED3NOTRE" />
+	<study_event_definition
+		study_event_definition_id="4" study_id="1" name="ED-4-NotRepeating"
+		description="" repeating="false" type="scheduled" category="" owner_id="1"
+		status_id="1" date_created="2008-07-03" ordinal="4" oc_oid="SE_ED4NOTRE" />
 	<event_definition_crf event_definition_crf_id="1"
 		study_event_definition_id="1" study_id="1" crf_id="1" required_crf="true"
 		double_entry="false" require_all_text_filled="false"
@@ -952,12 +959,22 @@
 	<dynamic_event dynamic_event_id="2" study_group_class_id="1"
 		study_event_definition_id="2" study_id="1" ordinal="2" owner_id="1"
 		update_id="1" date_created="2008-07-02" date_updated="2008-07-03"
-		name="dynamic event 2" description="test dynamic event 2" />	
+		name="dynamic event 2" description="test dynamic event 2" />
+		
+	<dynamic_event dynamic_event_id="3" study_group_class_id="2"
+		study_event_definition_id="3" study_id="1" ordinal="2" owner_id="1"
+		update_id="1" date_created="2008-07-02" date_updated="2008-07-03"
+		name="dynamic event 3" description="test dynamic event 3" />	
 		
 	<study_group_class study_group_class_id="1"
 		name="study group 1" study_id="1" owner_id="1" date_created="2008-07-02" 
 		group_class_type_id="4" status_id="1" subject_assignment="" update_id="1" 
 		date_updated="2008-07-03" is_default="true"/>	
+		
+	<study_group_class study_group_class_id="2"
+		name="study group 2" study_id="1" owner_id="1" date_created="2008-07-02" 
+		group_class_type_id="4" status_id="1" subject_assignment="" update_id="1" 
+		date_updated="2008-07-03" is_default="false"/>		
 		
 	<DN_RFC_DESCRIPTION DN_RFC_DESCRIPTION_ID="1" NAME="Site Removed" DESCRIPTION="Site Removed this from the protocol" is_site_visible="true" study_id="1"/>
 	<DN_RFC_DESCRIPTION DN_RFC_DESCRIPTION_ID="2" NAME="Protocol Deviation" DESCRIPTION="Standard Protocol Deviation" is_site_visible="false" study_id="1"/>

@@ -127,6 +127,10 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 	}
 
 	public ArrayList findAllActiveByStudy(StudyBean study) {
+		return findAllActiveByStudyId(study.getId());
+	}
+
+	public ArrayList findAllActiveByStudyId(int id) {
 		ArrayList answer = new ArrayList();
 
 		if (findAllActiveByStudyName == null) {
@@ -138,10 +142,10 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 		HashMap variables = new HashMap();
 
 		// study.study_id=?
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
+		variables.put(Integer.valueOf(1), Integer.valueOf(id));
 
 		// or study.parent_study_id=?
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+		variables.put(Integer.valueOf(2), Integer.valueOf(id));
 
 		String sql = digester.getQuery(findAllActiveByStudyName);
 
@@ -155,7 +159,7 @@ public abstract class AuditableEntityDAO<K, V> extends EntityDAO {
 
 		return answer;
 	}
-
+	
 	/**
 	 * Note: The subclass must define findByPKAndStudyName before calling this method. Otherwise an inactive
 	 * AuditableEntityBean will be returned.

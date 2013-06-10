@@ -32,6 +32,8 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
@@ -358,7 +360,42 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		return answer;
 	}
 	
-	public ArrayList findAllActiveOrderedByStudyGroupClassId(int id) {
+	public ArrayList findAllActiveBySubjectAndStudyId(StudySubjectBean ssb, int studyId) {
+		ArrayList<StudyEventDefinitionBean> defsFromGroup = new ArrayList(); 
+		if (ssb.getDynamicGroupClassId() == 0){
+			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(this.getDs());
+			StudyGroupClassBean sgc = (StudyGroupClassBean) sgcdao.findDefault();
+			if (sgc.getId() > 0){
+				defsFromGroup = findAllActiveOrderedByStudyGroupClassId(sgc.getId());
+			}
+		} else {
+			defsFromGroup = findAllActiveOrderedByStudyGroupClassId(ssb.getDynamicGroupClassId());
+		}
+		ArrayList<StudyEventDefinitionBean> nonGroupDefs = findAllActiveNotClassGroupedByStudyId(studyId);
+		defsFromGroup.addAll(nonGroupDefs);
+		
+		return defsFromGroup;
+	}
+	
+	public ArrayList<StudyEventDefinitionBean> findAllActiveNotClassGroupedByStudyId(int id) {
+		ArrayList answer = new ArrayList();
+
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(id));
+
+		ArrayList alist = this.select(digester.getQuery("findAllActiveNotClassGroupedByStudyId"), variables);
+
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+			answer.add(seb);
+		}
+
+		return answer;
+	}
+	
+	public ArrayList<StudyEventDefinitionBean> findAllActiveOrderedByStudyGroupClassId(int id) {
 		ArrayList<StudyEventDefinitionBean> temp = findAllOrderedByStudyGroupClassId(id);
 		ArrayList<StudyEventDefinitionBean> answer = new ArrayList();
 		for ( StudyEventDefinitionBean def: temp) {
