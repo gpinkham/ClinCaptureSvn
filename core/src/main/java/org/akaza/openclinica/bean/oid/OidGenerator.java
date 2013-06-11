@@ -13,12 +13,17 @@
 
 package org.akaza.openclinica.bean.oid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * OID Generator solves the problems described below. We have Domain Objects that need to be assigned a specific OID. -
@@ -82,7 +87,8 @@ public abstract class OidGenerator {
 			input = input + "_";
 		int intOid = getNextValue();
 		if (intOid > MAX_OID_SUFFIX) {
-			throw new RuntimeException("*** The current value in the [...]_OID_ID_SEQ more than 9999!");
+			throw new RuntimeException("*** The current value in the [...]_OID_ID_SEQ more than " + MAX_OID_SUFFIX
+					+ "!");
 		}
 		String endOid = "" + intOid;
 		int forTo = OID_SUFFIX_LENGTH - endOid.length();
@@ -93,7 +99,41 @@ public abstract class OidGenerator {
 		return input;
 	}
 
-	public abstract int getNextValue();
+	public int getNextValue() {
+		int result = 0;
+		ResultSet rs = null;
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			con = getDataSource().getConnection();
+			if (con.isClosed()) {
+				if (logger.isWarnEnabled())
+					logger.warn("Connection is closed.");
+				throw new SQLException();
+			}
+			ps = con.prepareStatement("SELECT nextval('" + getSequenceName() + "')");
+			rs = ps.executeQuery();
+			result = rs.next() ? rs.getInt(1) : 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (con != null)
+					con.close();
+				if (ps != null)
+					ps.close();
+				if (rs != null)
+					rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+
+	public abstract String getSequenceName();
+
+	public abstract DataSource getDataSource();
 
 	public abstract void setDataSource(DataSource dataSource);
 

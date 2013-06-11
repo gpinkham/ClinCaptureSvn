@@ -14,19 +14,22 @@
 package org.akaza.openclinica.bean.oid;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Maximum length of measurement_unit_oid is 40.
  */
 public class MeasurementUnitOidGenerator extends OidGenerator {
 
+	public static final String SEQ_NAME = "measurement_unit_oid_id_seq";
+
 	private final int argumentLength = 1;
 
 	private DataSource dataSource;
+
+	@Override
+	public String getSequenceName() {
+		return SEQ_NAME;
+	}
 
 	@Override
 	public void setDataSource(DataSource dataSource) {
@@ -34,36 +37,8 @@ public class MeasurementUnitOidGenerator extends OidGenerator {
 	}
 
 	@Override
-	public int getNextValue() {
-		int result = 0;
-		ResultSet rs = null;
-		Connection con = null;
-		PreparedStatement ps = null;
-		try {
-			con = dataSource.getConnection();
-			if (con.isClosed()) {
-				if (logger.isWarnEnabled())
-					logger.warn("Connection is closed: GenericDAO.select!");
-				throw new SQLException();
-			}
-			ps = con.prepareStatement("SELECT nextval('measurement_unit_oid_id_seq')");
-			rs = ps.executeQuery();
-			result = rs.next() ? rs.getInt(1) : 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (con != null)
-					con.close();
-				if (ps != null)
-					ps.close();
-				if (rs != null)
-					rs.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return result;
+	public DataSource getDataSource() {
+		return dataSource;
 	}
 
 	@Override
