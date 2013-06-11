@@ -80,8 +80,12 @@ $(document).ready(function() {
 	$('input[name="isReference"]').click(function() {
 		if ($(this).is(':checked')) {
 			$('input[name*="Day"]').attr('value','0').attr('readonly','true');
+			$('input[name="emailUser"]').attr('value','').attr('readonly','true');
+			$("tr[id^='email']").fadeOut('medium');
 		} else {
 			$('input[name*="Day"]').attr('value','').attr('readonly','');
+			$('input[name="emailUser"]').attr('readonly','');
+			$("tr[id^='email']").fadeIn('medium');
 		}
 	});
 	$('select[name="type"]').each(function() {
@@ -93,6 +97,8 @@ $(document).ready(function() {
 	$('input[name="isReference"]').each(function() {
 		if ($(this).is(':checked')) {
 			$('input[name*="Day"]').attr('value','0').attr('readonly','true');
+			$('input[name="emailUser"]').attr('value','').attr('readonly','true');
+			$("tr[id^='email']").hide();
 		}
 	});
 });
@@ -227,10 +233,10 @@ $(document).ready(function() {
 		</td><td style="padding-bottom:20px">*</td><td width="250px"><fmt:message key="the_day_a_reminder_email_is" bundle="${resword}"/></td><td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="emailDay"/></jsp:include></td></tr></table></td>
     </tr>
 
-   <tr valign="top" class='showHide'>
+   <tr valign="top" class='showHide' id='email'>
   		<td class="formlabel"><fmt:message key="user_name" bundle="${resword}"/>:</td><td><table><tr><td><div class="formfieldXL_BG" ><input class="formfieldXL" value="<c:out value="${userNameInsteadEmail}"/>" type="text" size="3" name="emailUser"/></div><td style="padding-bottom:20px">*</td></td></tr></table></td></tr>
-		<tr class='showHide'><td>&nbsp</td><td><fmt:message key="use_only_a_valid_user_name" bundle="${resword}"/></tr>
-		<tr class='showHide'><td>&nbsp</td><td width="250px"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="emailUser"/></jsp:include></td></tr>
+		<tr class='showHide' id='email'><td>&nbsp</td><td><fmt:message key="use_only_a_valid_user_name" bundle="${resword}"/></tr>
+		<tr class='showHide' id='email'><td>&nbsp</td><td width="250px"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="emailUser"/></jsp:include></td></tr>
 
  <!--  Clinovo end -->
             

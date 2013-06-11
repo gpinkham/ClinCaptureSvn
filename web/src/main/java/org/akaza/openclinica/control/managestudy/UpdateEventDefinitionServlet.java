@@ -122,7 +122,9 @@ public class UpdateEventDefinitionServlet extends SecureController {
 			v.addValidation("schDay", Validator.IS_REQUIRED);
 			v.addValidation("schDay", Validator.IS_A_NUMBER,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
-			v.addValidation("emailUser", Validator.NO_BLANKS);
+			if("".equalsIgnoreCase(fp.getString("isReference"))) {
+					v.addValidation("emailUser", Validator.NO_BLANKS);
+			}
 			v.addValidation("emailDay", Validator.IS_REQUIRED);
 			v.addValidation("emailDay", Validator.IS_A_NUMBER,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
@@ -156,10 +158,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		if (!(emailDay <= schDay)) {
 			Validator.addError(errors, "emailDay",resexception.getString("dayemail_less_or_equal_dayschedule"));
 		} 
-		if (!checkUserName(emailUser)&& "calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
-			Validator.addError(errors, "emailUser",resexception.getString("this_user_name_does_not_exist"));
-		}
-		if (!checkUserName(emailUser)&& "calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
+		if (!checkUserName(emailUser) && "calendared_visit".equalsIgnoreCase(calendaredVisitType) && "".equalsIgnoreCase(fp.getString("isReference"))) {
 			Validator.addError(errors, "emailUser",resexception.getString("this_user_name_does_not_exist"));
 		}
 
