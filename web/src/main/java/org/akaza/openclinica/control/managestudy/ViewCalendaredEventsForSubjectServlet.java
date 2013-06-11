@@ -134,8 +134,9 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 	
 	private String getFlagColor(Date dayMin, Date dayMax, StudyEventBean seBean) {
 		String flagColor;
-		Date dayMaxPlusInclusiveDay = new DateTime(dayMax.getTime()).plusDays(1).toDate();
-		Interval timeRangeForStudyEvent = new Interval(dayMin.getTime(),dayMaxPlusInclusiveDay.getTime());
+		//Date dayMaxPlusInclusiveDay = new DateTime(dayMax.getTime()).plusDays(1).toDate();
+		Date dayMaxTime = new DateTime(dayMax.getTime()).toDate();
+		Interval timeRangeForStudyEvent = new Interval(dayMin.getTime(),dayMaxTime.getTime());
 		if (seBean.getUpdatedDate() != null && seBean.getSubjectEventStatus().isCompleted()) {
 			logger.info("===================");
 			logger.info("seBean.getUpdatedDate() = "+seBean.getUpdatedDate());
@@ -148,8 +149,7 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 				flagColor = "red";
 				return flagColor;
 			} else if (!timeRangeForStudyEvent.getStart().isAfter(seBean.getUpdatedDate().getTime())
-					&& !timeRangeForStudyEvent.getEnd().isBefore(seBean.getUpdatedDate().getTime())
-					) {
+					&& !timeRangeForStudyEvent.getEnd().isBefore(seBean.getUpdatedDate().getTime())) {
 				logger.info("in max min range");
 				return flagColor = "green";
 			}
