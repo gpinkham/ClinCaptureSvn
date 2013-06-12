@@ -74,14 +74,15 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 		postData.put("Initials", action.getInitials());
 		postData.put("PatientID", action.getPatientId());
 		postData.put("TrialID", Integer.parseInt(action.getTrialId()));
-
+		
 		// Strata
-		if (action.getStratificationId() != null || action.getStratificationId() != "") {
+		if (!action.getStratificationLevel().equals(null) 
+				&& action.getStratificationLevel().length() > 1) {
 
 			JSONArray array = new JSONArray();
 			JSONObject strataObject = new JSONObject();
 			strataObject.put("StratificationID", "1");
-			strataObject.put("Level", action.getStratificationId());
+			strataObject.put("Level", action.getStratificationLevel());
 
 			array.put(strataObject);
 

@@ -104,8 +104,8 @@ public class RandomizeServlet extends SecureController {
 		String studyId = request.getParameter("study");
 
 		// optional parameters
-		String opt1 = request.getParameter("optionalParameter1");
-		String opt2 = request.getParameter("optionalParameter2");
+		String trialId = request.getParameter("optionalParameter2");
+		String strataId = !request.getParameter("optionalParameter1").equals("null") ? request.getParameter("optionalParameter1") : "";
 
 		String siteId = "PACE001"; getSiteId(studyId);
 		String patientId = request.getParameter("subject");
@@ -118,9 +118,9 @@ public class RandomizeServlet extends SecureController {
 
 		// Rando details
 		action.setSiteId(siteId);
-		action.setTrialId(opt2);
+		action.setTrialId(trialId);
 		action.setPatientId(patientId);
-		action.setStratificationId(opt1);
+		action.setStratificationLevel(strataId);
 
 		// Https details
 		action.setRandomizationUrl(CoreResources.getField("randomizationUrl"));
