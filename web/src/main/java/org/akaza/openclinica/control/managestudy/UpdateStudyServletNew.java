@@ -736,6 +736,7 @@ public class UpdateStudyServletNew extends SecureController {
 		spv.setParameter("personIdShownOnCRF");
 		spv.setValue(study1.getStudyParameterConfig().getPersonIdShownOnCRF());
 		updateParameter(spvdao, spv);
+		
 		spv.setParameter("secondaryLabelViewable");
 		spv.setValue(study1.getStudyParameterConfig().getSecondaryLabelViewable());
 		updateParameter(spvdao, spv);
@@ -816,12 +817,103 @@ public class UpdateStudyServletNew extends SecureController {
 			sdao.update(child);
 			StudyParameterValueBean childspv = new StudyParameterValueBean();
 			childspv.setStudyId(child.getId());
+			
 			childspv.setParameter("collectDob");
 			childspv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
 			updateParameter(spvdao, childspv);
+			
 			childspv.setParameter("genderRequired");
 			childspv.setValue(study1.getStudyParameterConfig().getGenderRequired());
 			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("discrepancyManagement");
+			childspv.setValue(study1.getStudyParameterConfig().getDiscrepancyManagement());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("genderRequired");
+			childspv.setValue(study1.getStudyParameterConfig().getGenderRequired());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("subjectPersonIdRequired");
+			childspv.setValue(study1.getStudyParameterConfig().getSubjectPersonIdRequired());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("subjectIdGeneration");
+			childspv.setValue(study1.getStudyParameterConfig().getSubjectIdGeneration());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("subjectIdPrefixSuffix");
+			childspv.setValue(study1.getStudyParameterConfig().getSubjectIdPrefixSuffix());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("personIdShownOnCRF");
+			childspv.setValue(study1.getStudyParameterConfig().getPersonIdShownOnCRF());
+			updateParameter(spvdao, childspv);
+			
+			childspv.setParameter("secondaryLabelViewable");
+			childspv.setValue(study1.getStudyParameterConfig().getSecondaryLabelViewable());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("adminForcedReasonForChange");
+			childspv.setValue(study1.getStudyParameterConfig().getAdminForcedReasonForChange());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("eventLocationRequired");
+			childspv.setValue(study1.getStudyParameterConfig().getEventLocationRequired());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("secondaryIdRequired");
+			childspv.setValue(study1.getStudyParameterConfig().getSecondaryIdRequired());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("dateOfEnrollmentForStudyRequired");
+			childspv.setValue(study1.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("studySubjectIdLabel");
+			childspv.setValue(study1.getStudyParameterConfig().getStudySubjectIdLabel());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("secondaryIdLabel");
+			childspv.setValue(study1.getStudyParameterConfig().getSecondaryIdLabel());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("dateOfEnrollmentForStudyLabel");
+			childspv.setValue(study1.getStudyParameterConfig().getDateOfEnrollmentForStudyLabel());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("genderLabel");
+			childspv.setValue(study1.getStudyParameterConfig().getGenderLabel());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("startDateTimeRequired");
+			childspv.setValue(study1.getStudyParameterConfig().getStartDateTimeRequired());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("useStartTime");
+			childspv.setValue(newStudy.getStudyParameterConfig().getUseStartTime());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("endDateTimeRequired");
+			childspv.setValue(study1.getStudyParameterConfig().getEndDateTimeRequired());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("useEndTime");
+			childspv.setValue(newStudy.getStudyParameterConfig().getUseEndTime());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("startDateTimeLabel");
+			childspv.setValue(study1.getStudyParameterConfig().getStartDateTimeLabel());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("endDateTimeLabel");
+			childspv.setValue(study1.getStudyParameterConfig().getEndDateTimeLabel());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("markImportedCRFAsCompleted");
+			childspv.setValue(newStudy.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
+			updateParameter(spvdao, childspv);
+
 		}
 	}
 
@@ -833,8 +925,10 @@ public class UpdateStudyServletNew extends SecureController {
 	private void updateParameter(StudyParameterValueDAO spvdao, StudyParameterValueBean spv) {
 		StudyParameterValueBean spv1 = spvdao.findByHandleAndStudy(spv.getStudyId(), spv.getParameter());
 		if (spv1.getId() > 0) {
+			logger.debug("Updating " + spv.getParameter() + " for study " + spv.getStudyId());
 			spvdao.update(spv);
 		} else {
+			logger.debug("Creating " + spv.getParameter() + " for study " + spv.getStudyId());
 			spvdao.create(spv);
 		}
 	}
