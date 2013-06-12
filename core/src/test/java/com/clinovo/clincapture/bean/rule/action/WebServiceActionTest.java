@@ -1,9 +1,7 @@
 package com.clinovo.clincapture.bean.rule.action;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +9,6 @@ import java.util.List;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.action.ActionType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -40,18 +37,6 @@ public class WebServiceActionTest extends BaseTest {
 		ArrayList<RuleSetRuleBean> ruleSetBeanList = ruleSetRuleDAO.findByRuleSetStudyIdAndStatusAvail(0);
 		wsAction = (WebServiceAction) ruleSetBeanList.get(0).getActions().get(0);
 
-	}
-
-	@Test
-	public void testThatWebServiceActionHasCorrectType() {
-
-		assertEquals("Should have web service action", "WEB_SERVICE", wsAction.getActionType().toString());
-	}
-
-	@Test
-	public void testThatWebServiceActionHasCorrectTypeFromActionType() {
-
-		assertEquals("Should have web service action", ActionType.WEB_SERVICE, wsAction.getActionType());
 	}
 
 	@Test
@@ -100,36 +85,6 @@ public class WebServiceActionTest extends BaseTest {
 	public void testThatCreateWebServiceActionReturnsValidActionWithTrialId() {
 
 		assertEquals("Should have valid Trial Id", "SE_TEST", wsAction.getTrialId());
-	}
-	
-	@Test
-	public void testThatWebServiceActionRunsOnAdministrativeDataEntry() {
-		
-		assertTrue("This rule should run on Administrative data entry", wsAction.getRuleActionRun().getAdministrativeDataEntry());
-	}
-
-	@Test
-	public void testThatWebServiceActionRunsOnInitialDataEntry() {
-		
-		assertTrue("This rule should run on Initial data entry", wsAction.getRuleActionRun().getInitialDataEntry());
-	}
-	
-	@Test
-	public void testThatWebServiceActionRunsOnDoubleDataEntry() {
-		
-		assertTrue("This rule should run on Double data entry", wsAction.getRuleActionRun().getDoubleDataEntry());
-	}
-	
-	@Test
-	public void testThatWebServiceActionRunsOnBatchDataEntry() {
-		
-		assertTrue("This rule should run on Batch data entry", wsAction.getRuleActionRun().getBatch());
-	}
-	
-	@Test
-	public void testThatWebServiceActionDoesNotRunOnImportDataEntry() {
-		
-		assertFalse("This rule should not run on Import data entry", wsAction.getRuleActionRun().getImportDataEntry());
 	}
 	
 	private RuleSetRuleBean createRuleSetRuleBean() {
