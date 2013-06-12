@@ -25,11 +25,12 @@
 <fmt:message key="calendared_events_parametrs" bundle="${resword}"/> : <c:out value="${studyName}"/>
 <body>
 </span></h1>
-<table border="0" cellpadding="0" cellspacing="0" width="650" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
+<table border="0" cellpadding="0" cellspacing="0" width="700" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
 
      <tr>
         <td class="table_header_column_top" style="color: #789EC5" align="center" width="150px"><b><fmt:message key="event_name" bundle="${resword}"/></b></td>
 		<td class="table_header_column_top" style="color: #789EC5" align="center" width="100px"><b><fmt:message key="event_type" bundle="${resword}"/></b></td>
+		<td class="table_header_column_top" style="color: #789EC5" align="center" width="50px"><b><fmt:message key="reference" bundle="${resword}"/></b></td>
         <td class="table_header_column_top" style="color: #789EC5" align="center" width="100px"><b><fmt:message key="day_min" bundle="${resword}"/></b></td>
         <td class="table_header_column_top" style="color: #789EC5" align="center" width="100px"><b><fmt:message key="day_max" bundle="${resword}"/></b></td>
         <td class="table_header_column_top" style="color: #789EC5" align="center" width="100px"><b><fmt:message key="day_schedule" bundle="${resword}"/></b></td>
@@ -54,11 +55,59 @@
 			 </c:otherwise>
 			 </c:choose>
 			</td>
-			<td class="table_header_column" align="center"><c:out value="${event.minDay}"/></td>
-			<td class="table_header_column" align="center"><c:out value="${event.maxDay}"/></td>
-			<td class="table_header_column" align="center"><c:out value="${event.scheduleDay}"/></td>
-			<td class="table_header_column" align="center"><c:out value="${event.emailDay}"/></td>
-            </td>
+			<td class="table_header_column" align="center"> 
+			 <c:choose>
+				<c:when test="${event.referenceVisit == 'true'}">
+					<fmt:message key="yes" bundle="${resword}"/>
+				</c:when>
+				<c:when test="${event.referenceVisit == 'false' && event.type == 'calendared_visit'}">
+					<fmt:message key="no" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					&nbsp;
+				</c:otherwise>
+			 </c:choose>
+			</td>
+			<td class="table_header_column" align="center">
+			  <c:choose>
+				<c:when test="${event.referenceVisit == 'false' && event.type == 'calendared_visit'}">
+					<c:out value="${event.minDay}"/>
+				</c:when>
+				<c:otherwise>
+					&nbsp;
+				</c:otherwise>
+			  </c:choose>
+			</td>
+			<td class="table_header_column" align="center">
+			  <c:choose>
+				<c:when test="${event.referenceVisit == 'false' && event.type == 'calendared_visit'}">
+					<c:out value="${event.maxDay}"/>
+				</c:when>
+				<c:otherwise>
+					&nbsp;
+				</c:otherwise>
+			  </c:choose>
+			</td>
+			<td class="table_header_column" align="center">
+			  <c:choose>
+				<c:when test="${event.referenceVisit == 'false' && event.type == 'calendared_visit'}">
+					<c:out value="${event.scheduleDay}"/>
+				</c:when>
+				<c:otherwise>
+					&nbsp;
+				</c:otherwise>
+			  </c:choose>
+			</td>
+			<td class="table_header_column" align="center">
+			  <c:choose>
+				<c:when test="${event.referenceVisit == 'false' && event.type == 'calendared_visit'}">
+					<c:out value="${event.emailDay}"/>
+				</c:when>
+				<c:otherwise>
+					&nbsp;
+				</c:otherwise>
+			  </c:choose>
+			</td>
       </tr>
     </c:forEach>
 </table>
