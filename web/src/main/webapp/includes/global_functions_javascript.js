@@ -2190,8 +2190,15 @@ try {
     }
 } catch (e) {}
 
+jQuery(function() {
+
+    jQuery("#Rand_Result_Txt").find(":input").attr('readonly', 'true');
+    jQuery("#Rand_Randomization_Date").find(":input").attr('readonly', 'true');
+
+})
+
 function randomizeSubject() {
-    
+
     var crf = jQuery("input:hidden[name='crfId']").val();
     var studyId = jQuery("input:hidden[name='studyId']").val();
     
@@ -2280,6 +2287,8 @@ function randomizeSubject() {
                 alert("The Site Id configured is invalid. Please contact your system administrator")
             } else if(data.match(/Invalid Trial/)) {
                 alert("The Trial Id configured is invalid. Please contact your system administrator")
+            } else if(data.match(/Invalid Strata/)) {
+                alert("The Stratification level missing. Please contact your system administrator")
             } else if(data.match(/^\</)) {
                 alert("An error occurred during the randomization call. Please contact your system administrator")
             } else if(data.match(/Exception/)) {
@@ -2287,12 +2296,15 @@ function randomizeSubject() {
                 var exceptionPattern = new RegExp("^.*:(.*)")
                 alert(exceptionPattern.exec(data)[1])
 
-            } else if(data.match(/\w+/)) {
+            } else {
             	
-            	var date = new Date()
-
-                jQuery("#Rand_Result_Txt").find(":input").val(data)
-                jQuery("#Rand_Randomization_Date").find(":input").val(date.getDate() + "-" + date.getMonth() + "-" + date.getFullYear())
+            	var result = JSON.parse(data)
+            	jQuery("#Rand_Result_Txt").attr('readonly','');
+            	jQuery("#Rand_Randomization_Date").attr('readonly','');
+                jQuery("#Rand_Result_Txt").find(":input").val(result.result).change();
+                jQuery("#Rand_Randomization_Date").find(":input").val(result.date).change();
+                jQuery("#Rand_Result_Txt").attr('readonly','true');
+            	jQuery("#Rand_Randomization_Date").attr('readonly','true');
             }
         }
     })

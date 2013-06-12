@@ -1,6 +1,9 @@
 package com.clinovo.servlet;
 
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -16,6 +19,7 @@ import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -73,6 +77,17 @@ public class RandomizeServlet extends SecureController {
 					if ("0".equals(opt3)) {
 
 						result = initiateRandomizationCall(request);
+						
+						JSONObject randomizationResult = new JSONObject();
+						
+						DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+						Date date = new Date();
+						
+						randomizationResult.put("date", dateFormat.format(date));
+						randomizationResult.put("result", result.getRandomizationResult());
+						
+						writer.write(randomizationResult.toString());
+						writer.flush();
 
 					} else if ("1".equals(opt3)) {
 
@@ -81,10 +96,18 @@ public class RandomizeServlet extends SecureController {
 				} else {
 					
 					result = initiateRandomizationCall(request);
+					
+					JSONObject randomizationResult = new JSONObject();
+					
+					DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+					Date date = new Date();
+					
+					randomizationResult.put("date", dateFormat.format(date));
+					randomizationResult.put("result", result.getRandomizationResult());
+					
+					writer.write(randomizationResult.toString());
+					writer.flush();
 				}
-
-				writer.write(result.getRandomizationResult());
-				writer.flush();
 
 			} else {
 

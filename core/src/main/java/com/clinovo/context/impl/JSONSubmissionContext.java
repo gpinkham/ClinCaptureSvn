@@ -77,7 +77,7 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 		
 		// Strata
 		if (!action.getStratificationLevel().equals(null) 
-				&& action.getStratificationLevel().length() > 1) {
+				&& action.getStratificationLevel().length() > 0) {
 
 			JSONArray array = new JSONArray();
 			JSONObject strataObject = new JSONObject();
