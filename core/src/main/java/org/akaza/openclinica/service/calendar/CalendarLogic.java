@@ -17,12 +17,14 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.joda.time.DateTime;
@@ -82,7 +84,23 @@ public class CalendarLogic {
 			}
 			logger.info("Latest reference visit date for this subject " + studyEventBeanRef.getUpdatedDate());
 			//schedule all other events using this date and their sch_day fields
-			List<StudyEventDefinitionBean> sedForSch = seddao.findAllByStudy(studyBean);
+			int subjectDynGroupId = ssb.getDynamicGroupClassId();
+			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(ds);
+			StudyGroupClassBean sgcb = new StudyGroupClassBean();
+			if(subjectDynGroupId == 0) {
+				sgcb = (StudyGroupClassBean) sgcdao.findDefault();
+			} else {
+				sgcb.setId(subjectDynGroupId);
+			}
+			List<StudyEventDefinitionBean> sedForSch;
+			if(sgcb.getId() == 0) {
+				logger.info("dyn groups not used");
+				sedForSch = seddao.findAllByStudy(studyBean);
+			} else {
+				logger.info("dyn groups is used");
+				sedForSch = seddao.findAllActiveOrderedByStudyGroupClassId(subjectDynGroupId);
+			}
+			
 			for (StudyEventDefinitionBean sedTmp : sedForSch) {
 				if (!sedTmp.getReferenceVisit() && "calendared_visit".equalsIgnoreCase(sedTmp.getType())) {
 					ArrayList<StudyEventBean> eventsForValidation = sed.findAllByStudySubjectAndDefinition(ssb, sedTmp);
