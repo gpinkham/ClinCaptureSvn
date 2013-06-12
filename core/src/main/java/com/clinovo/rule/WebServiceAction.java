@@ -3,9 +3,7 @@ package com.clinovo.rule;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import org.akaza.openclinica.domain.rule.action.ActionType;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
 
 @Entity
 @DiscriminatorValue("2")
@@ -25,22 +23,11 @@ public class WebServiceAction extends RuleActionBean {
 	private String randomizationUrl;
 	private String authenticationUrl;
 
-	// Run flags
-	private boolean runOnBatchMode = true;
-	private boolean runOnInitiaDataEntry = true;
-	private boolean runOnDoubleDataEntry = true;
-	private boolean runOnImportDataEntry = false;
-	private boolean runOnAdministrativeDataEntry = true;
-	private String riskGroup;
+	private String level;
 
 	public WebServiceAction() {
 
-		// Set type
-		setActionType(ActionType.WEB_SERVICE);
 
-		// Set run actions
-		setRuleActionRun(new RuleActionRunBean(runOnAdministrativeDataEntry, runOnInitiaDataEntry,
-				runOnDoubleDataEntry, runOnImportDataEntry, runOnBatchMode));
 	}
 
 	public String getAuthenticationUrl() {
