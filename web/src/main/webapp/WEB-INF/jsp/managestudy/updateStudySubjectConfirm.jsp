@@ -128,7 +128,7 @@
 						<c:if test="${dynGroup.id == selectedDynGroupClassId}">
 						<c:choose>
 							<c:when test="${defaultGroupSelected}"> 
-								<td><b><fmt:message key="default_group" bundle="${resword}"/>&nbsp;&nbsp;(<c:out value="${dynGroup.name}"/>)</b></td>							
+								<td><b><fmt:message key="default_group" bundle="${resword}"/>&nbsp;&nbsp;</b>(<c:out value="${dynGroup.name}"/>)</td>							
 							</c:when>
 							<c:otherwise>
 								<td><b><c:out value="${dynGroup.name}"/></b></td>
@@ -136,6 +136,9 @@
 						</c:choose> 
 						</c:if>
 					</c:forEach>
+						<c:if test="${selectedDynGroupClassId == 0}">
+							<td><b><fmt:message key="default_group" bundle="${resword}"/>&nbsp;&nbsp;</b>(<fmt:message key="none" bundle="${resword}"/>)</td>
+						</c:if>
 					</tr>
 				</table>
 			</td>
@@ -172,7 +175,7 @@
   <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+					onClick="javascript: window.location.href=('UpdateStudySubject?id=<c:out value="${studySub.id}"/>&amp;action=back');"/>
  
   <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
 

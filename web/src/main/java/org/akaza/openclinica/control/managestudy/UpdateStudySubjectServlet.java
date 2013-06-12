@@ -91,11 +91,6 @@ public class UpdateStudySubjectServlet extends SecureController {
 		int defaultDynGroupClassId = 0;
 		String defaultDynGroupClassName = "";
 
-		String referer = request.getHeader(REFERER);
-		if (referer != null && !referer.contains(UPDATE_STUDY_SUBJECT)) {
-			request.getSession().setAttribute(UPDATE_STUDY_SUBJECT_REFERER, referer);
-		}
-
 		String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
 		if (StringUtil.isBlank(fromResolvingNotes)) {
 			session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
@@ -119,8 +114,6 @@ public class UpdateStudySubjectServlet extends SecureController {
 
 			StudySubjectBean sub = (StudySubjectBean) subdao.findByPK(studySubId);
 			
-			
-
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 			StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
 			SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
@@ -171,8 +164,13 @@ public class UpdateStudySubjectServlet extends SecureController {
 					session.setAttribute("selectedDynGroupClassId", fp.getInt("dynamicGroupClassId"));
 				}
 			}
-			
+			if ("back".equalsIgnoreCase(action)) {
+				
+				request.setAttribute("groups", session.getAttribute("groups"));
+				forwardPage(Page.UPDATE_STUDY_SUBJECT);
+			}
 			if ("show".equalsIgnoreCase(action)) {
+				clearSession();
 				session.setAttribute("selectedDynGroupClassId", sub.getDynamicGroupClassId());
 				session.setAttribute("studySub", sub);
 				String enrollDateStr = local_df.format(sub.getEnrollmentDate());
@@ -238,11 +236,8 @@ public class UpdateStudySubjectServlet extends SecureController {
 				}
 
 				addPageMessage(respage.getString("study_subject_updated_succesfully"));
-				session.removeAttribute("studySub");
-				session.removeAttribute("groups");
-				session.removeAttribute("enrollDateStr");
-				session.removeAttribute("selectedDynGroupClassId");
-				session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+				clearSession();
+				
 				request.setAttribute("id", new Integer(studySubId).toString());
 
 				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
@@ -253,6 +248,15 @@ public class UpdateStudySubjectServlet extends SecureController {
 			}
 
 		}
+	}
+
+	private void clearSession() {
+		// TODO Auto-generated method stub
+		session.removeAttribute("studySub");
+		session.removeAttribute("groups");
+		session.removeAttribute("enrollDateStr");
+		session.removeAttribute("selectedDynGroupClassId");
+		session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 	}
 
 	/**

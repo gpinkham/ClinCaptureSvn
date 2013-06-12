@@ -448,7 +448,7 @@
                             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tr>
                                     <td class="table_header_row_left"><fmt:message key="dynamic_group_class" bundle="${resword}"/></td>
-                                    <td class="table_header_row"><fmt:message key="definitions" bundle="${resword}"/></td>
+                                    <td class="table_header_row"><fmt:message key="events" bundle="${resword}"/></td>
 									<td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
 								</tr>                                
 								<tr> 
@@ -476,7 +476,7 @@
 											<td class="table_cell aka_red_highlight"><c:out value="${subjDynGroup.status.name}"/></td>                                                                                
 										</c:when>
 										<c:otherwise>
-											<td class="table_cell_left"><c:out value="${subjDynGroup.status.name}"/></td>                                        
+											<td class="table_cell"><c:out value="${subjDynGroup.status.name}"/></td>                                        
 										</c:otherwise>
 									</c:choose>									
 								</tr>

@@ -479,7 +479,7 @@ public class AddNewSubjectServlet extends SecureController {
 				fp.addPresetValue(INPUT_EVENT_START_DATE, fp.getString(INPUT_EVENT_START_DATE));
 				fp.addPresetValue(STUDY_EVENT_DEFINITION, fp.getInt(STUDY_EVENT_DEFINITION));
 				fp.addPresetValue(LOCATION, fp.getString(LOCATION));
-				fp.addPresetValue(SELECTED_DYN_GROUP_CLASS_ID, fp.getString("dynamicGroupClassId"));
+				fp.addPresetValue(SELECTED_DYN_GROUP_CLASS_ID, request.getParameter("dynamicGroupClassId"));
 				
 				if (currentStudy.isGenetic()) {
 					String intFields[] = { INPUT_GROUP, INPUT_FATHER, INPUT_MOTHER };
@@ -779,7 +779,11 @@ public class AddNewSubjectServlet extends SecureController {
 
 				studySubject.setOwner(ub);
 				
-				studySubject.setDynamicGroupClassId(Integer.valueOf(fp.getString("dynamicGroupClassId")));
+				if (!"".equals(fp.getString("dynamicGroupClassId"))) {
+					studySubject.setDynamicGroupClassId(Integer.valueOf(fp.getString("dynamicGroupClassId")));
+				} else {
+					studySubject.setDynamicGroupClassId(0);
+				}
 
 				// Shaoyu Su: prevent same label ("Study Subject ID")
 				if (fp.getString(INPUT_LABEL).equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {

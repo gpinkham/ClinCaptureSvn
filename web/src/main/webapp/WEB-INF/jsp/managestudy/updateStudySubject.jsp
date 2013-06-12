@@ -30,6 +30,8 @@
 			if (defaultDynGroupClassId != 0){
 				$("tr#defaultDynGroupName").show();
 				$("tr[id='dynamicGroupId"+defaultDynGroupClassId+"']").show();
+			} else {
+				$("tr#defaultDynGroupName").show();
 			}
 			break
 		default: 
@@ -242,11 +244,18 @@
 		</tr>
 		<tr style="display: none" id="defaultDynGroupName">
 			<td>&nbsp;<fmt:message key="name" bundle="${resword}"/>:&nbsp;</td>
-			<td>&nbsp;&nbsp;<c:out value="${defaultDynGroupClassName}"/></td>
+			<c:choose>
+				<c:when test="${defaultDynGroupClassName != ''}">
+					<td>&nbsp;&nbsp;<c:out value="${defaultDynGroupClassName}"/></td>
+				</c:when>
+				<c:otherwise>
+					<td>&nbsp;<fmt:message key="none" bundle="${resword}"/>&nbsp;</td>
+				</c:otherwise>
+			</c:choose>
 		</tr>
 		<c:forEach var="dynGroup" items="${dynamicGroups}">
 		<tr style="display: none" id="dynamicGroupId${dynGroup.id}">
-			<td>&nbsp;<fmt:message key="definitions" bundle="${resword}"/>:&nbsp;</td>
+			<td>&nbsp;<fmt:message key="events" bundle="${resword}"/>:&nbsp;</td>
 			<td>
 				<table width="75%" cellspacing="0" cellpadding="0" border="1">
 				<c:forEach var="studyEvDef" items="${dynGroup.eventDefinitions}">
