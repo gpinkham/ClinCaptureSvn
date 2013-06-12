@@ -87,7 +87,9 @@ public final class SubjectEventStatusUtil {
 				if (!subjectEventStatus.isNotScheduled() || permission_for_dynamic) {
 				url.append("<img src='" + imageIconPaths.get(subjectEventStatus.getId())
 						+ "' border='0' style='position: relative; left: 7px;'>");
-				}
+				} else {
+					url.append("<img src='' border='0' style='position: relative; left: 7px;'>");
+				}	
 			}
 		} else {
 			boolean des = false;
