@@ -13,7 +13,7 @@ public class CalendarFuncBean {
 	private String eventsReferenseVisit;
 	private String flagColor;
 	
-	public void CalendarFuncBean() {
+	public CalendarFuncBean() {
 		dateMax = new Date();
 		dateMin = new Date();
 		dateEmail = new Date();

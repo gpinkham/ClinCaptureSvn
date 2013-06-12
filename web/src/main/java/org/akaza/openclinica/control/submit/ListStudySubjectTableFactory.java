@@ -60,7 +60,6 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.SDVUtil;
