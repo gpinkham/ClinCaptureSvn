@@ -2273,8 +2273,8 @@ function randomizeSubject() {
             
             if(data.match(/UnknownHostException/)) {
 
-                var urlPattern = new RegExp("Exception:(.*)")
-                alert("The randomization service '" + urlPattern.exec(data)[1] + "' is not available. Consult your system administrator")
+                var urlPattern = new RegExp("^Exception:(.*)")
+                alert("The randomization service is not available. Consult your system administrator")
 
             } else if(data.match(/Invalid Site/)) {
                 alert("The Site Id configured is invalid. Please contact your system administrator")
@@ -2287,8 +2287,7 @@ function randomizeSubject() {
                 var exceptionPattern = new RegExp("^.*:(.*)")
                 alert(exceptionPattern.exec(data)[1])
 
-            } 
-            else if(data.match(/\w+/)) {
+            } else if(data.match(/\w+/)) {
             	
             	var date = new Date()
 
