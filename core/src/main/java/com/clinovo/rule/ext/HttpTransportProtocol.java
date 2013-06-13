@@ -1,5 +1,6 @@
 package com.clinovo.rule.ext;
 
+import java.io.ByteArrayOutputStream;
 import java.util.concurrent.Callable;
 
 import javax.xml.ws.WebServiceException;
@@ -19,9 +20,9 @@ import com.clinovo.model.WebServiceResult;
 
 public class HttpTransportProtocol implements Callable<WebServiceResult> {
 
-	private PostMethod method = null;
+	private HttpClient client = null;
 	private SubmissionContext context;
-	private HttpClient client = new HttpClient();
+	private PostMethod method = new PostMethod();
 
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -32,12 +33,10 @@ public class HttpTransportProtocol implements Callable<WebServiceResult> {
 		if (context == null)
 			throw new WebServiceException("The web service action cannot be null or empty");
 
-		WebServiceResult result = new WebServiceResult();
+		if (client == null)
+			client = new HttpClient();
 
-		// Allow testing
-		if (method == null) {
-			method = new PostMethod();
-		}
+		WebServiceResult result = new WebServiceResult();
 
 		try {
 
@@ -53,9 +52,15 @@ public class HttpTransportProtocol implements Callable<WebServiceResult> {
 			method.setURI(url);
 			method.setRequestEntity(context.getRequestEntity());
 
-			client.executeMethod(method);
+			int status = client.executeMethod(method);
 
-			result = context.processResponse(method.getResponseBodyAsString(), method.getStatusCode());
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			byte[] byteArray = new byte[1024];
+			int count = 0;
+			while ((count = method.getResponseBodyAsStream().read(byteArray, 0, byteArray.length)) > 0) {
+				outputStream.write(byteArray, 0, count);
+			}
+			result = context.processResponse(new String(outputStream.toByteArray(), "UTF-8"), status);
 
 		} catch (Exception ex) {
 
@@ -69,8 +74,8 @@ public class HttpTransportProtocol implements Callable<WebServiceResult> {
 		return result;
 	}
 
-	public void setHttpMethod(PostMethod method) {
-		this.method = method;
+	public void setHttpClient(HttpClient client) {
+		this.client = client;
 	}
 
 	public void setSubmissionContext(SubmissionContext context) {

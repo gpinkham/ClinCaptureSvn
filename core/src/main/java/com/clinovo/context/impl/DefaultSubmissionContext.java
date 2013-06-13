@@ -2,7 +2,6 @@ package com.clinovo.context.impl;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.slf4j.Logger;
@@ -29,10 +28,12 @@ public abstract class DefaultSubmissionContext implements SubmissionContext {
 		if (currentAuthToken != null) {
 			return currentAuthToken;
 		}
-
+		
+		method = new PostMethod(action.getAuthenticationUrl());
+		
 		// Allow for testing
-		if (method == null)
-			method = new PostMethod(action.getAuthenticationUrl());
+		if (client == null)
+			client = new HttpClient();
 
 		Header contentTypeHeader = new Header();
 		contentTypeHeader.setName("Content-Type");
@@ -63,8 +64,8 @@ public abstract class DefaultSubmissionContext implements SubmissionContext {
 		return this.action;
 	}
 
-	public void setHttpMethod(HttpMethod method) {
+	public void setHttpClient(HttpClient client) {
 
-		this.method = (PostMethod) method;
+		this.client = client;
 	}
 }

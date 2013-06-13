@@ -5,11 +5,10 @@ import static org.junit.Assert.assertNotNull;
 
 import javax.xml.ws.WebServiceException;
 
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import com.clinovo.BaseTest;
 import com.clinovo.context.SubmissionContext;
@@ -20,9 +19,9 @@ import com.clinovo.util.XMLUtil;
 
 public class HttpTransportProtocolTest extends BaseTest {
 
-	private PostMethod method;
+	private HttpClient client;
 	private SubmissionContext context;
-	private HttpTransportProtocol protocol;
+	private HttpTransportProtocol protocol = null;
 
 	@Before
 	public void setUp() throws Exception {
@@ -33,14 +32,14 @@ public class HttpTransportProtocolTest extends BaseTest {
 
 		context.setAction(action);
 
-		method = createPostMethodMock(action.getRandomizationUrl(), XMLUtil.docToString(webServiceReturnValue));
+		client = createMockHttpClient(XMLUtil.docToString(webServiceReturnValue), HttpStatus.SC_OK);
 
 		protocol = new HttpTransportProtocol();
-		protocol.setHttpMethod(method);
+		protocol.setHttpClient(client);
 
 		context.setAction(action);
 		protocol.setSubmissionContext(context);
-
+		
 	}
 
 	@Test(expected = WebServiceException.class)
@@ -54,20 +53,20 @@ public class HttpTransportProtocolTest extends BaseTest {
 	public void testThatFailedHttpCallRaisesWebServiceException() throws Exception {
 
 		String failureMessage = "<result><message>Respect other people's security you tard</message></result>";
-
-		Mockito.when(method.getStatusCode()).thenReturn(HttpStatus.SC_FORBIDDEN);
-		Mockito.when(method.getResponseBodyAsString()).thenReturn(failureMessage);
-
+		HttpClient client = createMockHttpClient(failureMessage, HttpStatus.SC_FORBIDDEN);
+		
+		protocol.setHttpClient(client);
+		
 		protocol.call();
 	}
 
 	@Test(expected = WebServiceException.class)
 	public void testThatUnVailableHttpReturnCodeHttpCallRaisesWebServiceException() throws Exception {
-
+		
 		String failureMessage = "<result><message>The randomization service is down</message></result>";
-
-		Mockito.when(method.getResponseBodyAsString()).thenReturn(failureMessage);
-		Mockito.when(method.getStatusCode()).thenReturn(HttpStatus.SC_SERVICE_UNAVAILABLE);
+		
+		HttpClient client = createMockHttpClient(failureMessage, HttpStatus.SC_SERVICE_UNAVAILABLE);
+		protocol.setHttpClient(client);
 
 		protocol.call();
 	}

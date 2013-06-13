@@ -18,15 +18,10 @@ import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.auth.AuthState;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpClientMock;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
-import org.mockito.Mockito;
 import org.w3c.dom.Document;
 
 import com.clinovo.rule.WebServiceAction;
@@ -94,19 +89,10 @@ public class BaseTest {
 		return action;
 	}
 	
-	protected PostMethod createPostMethodMock(String url, String response) throws Exception {
+	protected HttpClient createMockHttpClient(String response, int status) throws Exception {
 
-		PostMethod method = Mockito.mock(PostMethod.class);
+		HttpClient client = new HttpClientMock(status, response);
 
-		// Expectations
-		Mockito.when(method.getURI()).thenReturn(new URI(url, false));
-		Mockito.when(method.getStatusCode()).thenReturn(HttpStatus.SC_OK);
-		Mockito.when(method.getResponseBodyAsString()).thenReturn(response);
-		Mockito.when(method.getParams()).thenReturn(new HttpMethodParams());
-		Mockito.when(method.getHostAuthState()).thenReturn(new AuthState());
-		Mockito.when(method.getProxyAuthState()).thenReturn(new AuthState());
-		Mockito.when(method.getRequestHeaders(Mockito.anyString())).thenReturn(new Header[0]);
-
-		return method;
+		return client;
 	}
 }

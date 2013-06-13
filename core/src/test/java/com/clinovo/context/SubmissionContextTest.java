@@ -3,7 +3,8 @@ package com.clinovo.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import com.clinovo.rule.WebServiceAction;
 
 public class SubmissionContextTest extends BaseTest {
 
-	private PostMethod method;
+	private HttpClient client;
 	private SubmissionContext context;
 
 	@Before
@@ -26,9 +27,9 @@ public class SubmissionContextTest extends BaseTest {
 		
 		context.setAction(action);
 		
-		method = createPostMethodMock(context.getAction().getAuthenticationUrl(), authenticationToken.toString());
+		client = createMockHttpClient(authenticationToken.toString(), HttpStatus.SC_OK);
 		
-		context.setHttpMethod(method);
+		context.setHttpClient(client);
 
 	}
 	

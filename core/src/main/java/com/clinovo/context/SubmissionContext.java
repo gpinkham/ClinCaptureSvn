@@ -3,7 +3,7 @@ package com.clinovo.context;
 import java.util.List;
 
 import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.RequestEntity;
 
 import com.clinovo.model.WebServiceResult;
@@ -13,7 +13,7 @@ public interface SubmissionContext {
 
 	WebServiceAction getAction();
 
-	void setHttpMethod(HttpMethod method);
+	void setHttpClient(HttpClient client);
 
 	String authenticate() throws Exception;
 

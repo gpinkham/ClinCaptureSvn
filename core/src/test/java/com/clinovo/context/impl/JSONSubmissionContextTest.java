@@ -5,8 +5,8 @@ import static org.junit.Assert.assertNotNull;
 
 import javax.xml.ws.WebServiceException;
 
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,8 +18,9 @@ import com.clinovo.rule.ext.HttpTransportProtocol;
 
 public class JSONSubmissionContextTest extends BaseTest {
 
-	private PostMethod method;
+	private HttpClient client;
 	private SubmissionContext context;
+	private HttpTransportProtocol protocol = null;
 
 	@Before
 	public void setUp() throws Exception {
@@ -30,10 +31,10 @@ public class JSONSubmissionContextTest extends BaseTest {
 
 		context.setAction(action);
 
-		method = createPostMethodMock(action.getRandomizationUrl(), jsonReturnedData.toString());
+		client = createMockHttpClient(jsonReturnedData.toString(), HttpStatus.SC_OK);
 
-		HttpTransportProtocol protocol = new HttpTransportProtocol();
-		protocol.setHttpMethod(method);
+		protocol = new HttpTransportProtocol();
+		protocol.setHttpClient(client);
 
 		context.setAction(action);
 		protocol.setSubmissionContext(context);
