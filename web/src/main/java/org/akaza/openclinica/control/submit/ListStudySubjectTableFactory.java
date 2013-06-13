@@ -332,7 +332,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			for (int i = 0; i < getDynamicGroupClasses().size(); i++) {
 				StudyGroupClassBean dynamicGroupClass = getDynamicGroupClasses().get(i);
 				boolean permission_for_dynamic = false;
-				if ((studySubjectBean.getDynamicGroupClassId() == 0 && dynamicGroupClass.isDefault()) || (studySubjectBean.getDynamicGroupClassId() == dynamicGroupClass.getId())){
+				if ((dynamicGroupClass.isDefault()) || (studySubjectBean.getDynamicGroupClassId() == dynamicGroupClass.getId())){
 					permission_for_dynamic = true;
 				}
 				for (StudyEventDefinitionBean studyEventDefinition : dynamicGroupClass.getEventDefinitions()) {
