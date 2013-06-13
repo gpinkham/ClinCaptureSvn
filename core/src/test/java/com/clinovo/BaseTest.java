@@ -24,26 +24,26 @@ import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.w3c.dom.Document;
 
-import com.clinovo.rule.WebServiceAction;
+import com.clinovo.model.Randomization;
 
 public class BaseTest {
 
 	// Web service JSON return data
-	protected static JSONObject jsonReturnedData;
+	protected static JSONObject randomizationResult;
 	protected static JSONObject authenticationToken;
 	
 	// XML return data
-	protected static Document webServiceReturnValue;
-	protected static Document webServiceActionDefinition;
+	protected static Document xmlRandomiationResult;
+	protected static Document randomizationDef;
 
 	@BeforeClass
 	public static void initialize() throws Exception {
 
-		webServiceActionDefinition = readTestXMLFile("src/test/resources/WSActionRule.xml");
-		webServiceReturnValue = readTestXMLFile("src/test/resources/WebServiceReturnValue.xml");
+		randomizationDef = readFile("src/test/resources/RandomizationRule.xml");
+		xmlRandomiationResult = readFile("src/test/resources/XMLRandomizationResult.xml");
 	}
 
-	private static Document readTestXMLFile(String fileName) throws Exception {
+	private static Document readFile(String fileName) throws Exception {
 
 		File fXmlFile = new File(fileName);
 
@@ -62,31 +62,31 @@ public class BaseTest {
 	}
 	
 	@BeforeClass
-	public static void createJSONReturnData() throws Exception {
+	public static void createJSONRandomizationResult() throws Exception {
 
-		jsonReturnedData = new JSONObject();
-		jsonReturnedData.put("PatientID", "abc123");
-		jsonReturnedData.put("RandomizationResult", "radiotherapy");
-		jsonReturnedData.put("TreatmentID", "3");
+		randomizationResult = new JSONObject();
+		randomizationResult.put("PatientID", "abc123");
+		randomizationResult.put("RandomizationResult", "radiotherapy");
+		randomizationResult.put("TreatmentID", "3");
 		
 	}
 
-	protected WebServiceAction createWebServiceAction() {
+	protected Randomization createRandomization() {
 
-		WebServiceAction action = new WebServiceAction();
+		Randomization randomization = new Randomization();
 		
-		action.setUsername(webServiceActionDefinition.getElementsByTagName("username").item(0).getTextContent());
-		action.setPassword(webServiceActionDefinition.getElementsByTagName("password").item(0).getTextContent());
-		action.setTrialId(webServiceActionDefinition.getElementsByTagName("trialid").item(0).getTextContent());
-		action.setSiteId(webServiceActionDefinition.getElementsByTagName("siteid").item(0).getTextContent());
-		action.setPatientId(webServiceActionDefinition.getElementsByTagName("patientid").item(0)
+		randomization.setUsername(randomizationDef.getElementsByTagName("username").item(0).getTextContent());
+		randomization.setPassword(randomizationDef.getElementsByTagName("password").item(0).getTextContent());
+		randomization.setTrialId(randomizationDef.getElementsByTagName("trialid").item(0).getTextContent());
+		randomization.setSiteId(randomizationDef.getElementsByTagName("siteid").item(0).getTextContent());
+		randomization.setPatientId(randomizationDef.getElementsByTagName("patientid").item(0)
 				.getTextContent());
-		action.setRandomizationUrl(webServiceActionDefinition.getElementsByTagName("randomizationurl").item(0)
+		randomization.setRandomizationUrl(randomizationDef.getElementsByTagName("randomizationurl").item(0)
 				.getTextContent());
-		action.setAuthenticationUrl(webServiceActionDefinition.getElementsByTagName("authenticationurl").item(0)
+		randomization.setAuthenticationUrl(randomizationDef.getElementsByTagName("authenticationurl").item(0)
 				.getTextContent());
 
-		return action;
+		return randomization;
 	}
 	
 	protected HttpClient createMockHttpClient(String response, int status) throws Exception {

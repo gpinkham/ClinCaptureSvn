@@ -10,14 +10,14 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 
-import com.clinovo.model.WebServiceResult;
+import com.clinovo.model.RandomizationResult;
 import com.clinovo.util.XMLUtil;
 
 public class XMLSubmissionContext extends DefaultSubmissionContext {
 
-	public WebServiceResult processResponse(String response, int httpStatus) throws Exception {
+	public RandomizationResult processResponse(String response, int httpStatus) throws Exception {
 
-		WebServiceResult result = new WebServiceResult();
+		RandomizationResult result = new RandomizationResult();
 
 		if (httpStatus == HttpStatus.SC_OK) {
 
@@ -69,22 +69,22 @@ public class XMLSubmissionContext extends DefaultSubmissionContext {
 
 		// Trial Id
 		postData.append("<TrialID>");
-		postData.append(action.getTrialId());
+		postData.append(randomiation.getTrialId());
 		postData.append("</TrialID>");
 
 		// Site Id
 		postData.append("<SiteID>");
-		postData.append(action.getSiteId());
+		postData.append(randomiation.getSiteId());
 		postData.append("</SiteID>");
 
 		// Initials
 		postData.append("<Initials>");
-		postData.append(action.getInitials());
+		postData.append(randomiation.getInitials());
 		postData.append("</Initials>");
 
 		// Patient Id
 		postData.append("<PatientID>");
-		postData.append(action.getPatientId());
+		postData.append(randomiation.getPatientId());
 		postData.append("</PatientID>");
 
 		// Strata data
@@ -107,10 +107,10 @@ public class XMLSubmissionContext extends DefaultSubmissionContext {
 		StringBuilder body = new StringBuilder("<Authentication>");
 
 		body.append("<SiteID>");
-		body.append(action.getUsername());
+		body.append(randomiation.getUsername());
 		body.append("</SiteID>");
 		body.append("<Password>");
-		body.append(action.getPassword());
+		body.append(randomiation.getPassword());
 		body.append("</Password>");
 		body.append("</Authentication>");
 

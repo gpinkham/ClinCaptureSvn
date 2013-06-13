@@ -12,8 +12,8 @@ import org.junit.Test;
 
 import com.clinovo.BaseTest;
 import com.clinovo.context.SubmissionContext;
-import com.clinovo.model.WebServiceResult;
-import com.clinovo.rule.WebServiceAction;
+import com.clinovo.model.Randomization;
+import com.clinovo.model.RandomizationResult;
 import com.clinovo.rule.ext.HttpTransportProtocol;
 
 public class JSONSubmissionContextTest extends BaseTest {
@@ -27,16 +27,16 @@ public class JSONSubmissionContextTest extends BaseTest {
 
 		context = new JSONSubmissionContext();
 
-		WebServiceAction action = createWebServiceAction();
+		Randomization randomization = createRandomization();
 
-		context.setAction(action);
+		context.setRandomization(randomization);
 
-		client = createMockHttpClient(jsonReturnedData.toString(), HttpStatus.SC_OK);
+		client = createMockHttpClient(randomizationResult.toString(), HttpStatus.SC_OK);
 
 		protocol = new HttpTransportProtocol();
 		protocol.setHttpClient(client);
 
-		context.setAction(action);
+		context.setRandomization(randomization);
 		protocol.setSubmissionContext(context);
 
 	}
@@ -44,7 +44,7 @@ public class JSONSubmissionContextTest extends BaseTest {
 	@Test
 	public void testThatProcessResponseDoesNotReturnNull() throws Exception {
 
-		assertNotNull("Should not return null", context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK));
+		assertNotNull("Should not return null", context.processResponse(randomizationResult.toString(), HttpStatus.SC_OK));
 	}
 
 	@Test(expected = WebServiceException.class)
@@ -66,7 +66,7 @@ public class JSONSubmissionContextTest extends BaseTest {
 	@Test
 	public void testThatProcessResponseReturnsResultWithTreatment() throws Exception {
 
-		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
+		RandomizationResult result = context.processResponse(randomizationResult.toString(), HttpStatus.SC_OK);
 
 		assertNotNull("Should return valid Treatment", result.getTreatment());
 	}
@@ -74,7 +74,7 @@ public class JSONSubmissionContextTest extends BaseTest {
 	@Test
 	public void testThatProcessResponseReturnsresultWithCorrectTreatment() throws Exception {
 
-		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
+		RandomizationResult result = context.processResponse(randomizationResult.toString(), HttpStatus.SC_OK);
 
 		assertEquals("Should return correct Treatment", "3", result.getTreatment());
 	}
@@ -82,7 +82,7 @@ public class JSONSubmissionContextTest extends BaseTest {
 	@Test
 	public void testThatProcessResponseReturnsResultWithPatientId() throws Exception {
 
-		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
+		RandomizationResult result = context.processResponse(randomizationResult.toString(), HttpStatus.SC_OK);
 
 		assertNotNull("Should return valid Patient Id", result.getPatientId());
 	}
@@ -90,7 +90,7 @@ public class JSONSubmissionContextTest extends BaseTest {
 	@Test
 	public void testThatProcessResponseReturnsresultWithCorrectPatientId() throws Exception {
 
-		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
+		RandomizationResult result = context.processResponse(randomizationResult.toString(), HttpStatus.SC_OK);
 
 		assertEquals("Should return correct Patient Id", "abc123", result.getPatientId());
 	}
@@ -98,7 +98,7 @@ public class JSONSubmissionContextTest extends BaseTest {
 	@Test
 	public void testThatProcessResponseReturnsResultWithRandomizationResult() throws Exception {
 
-		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
+		RandomizationResult result = context.processResponse(randomizationResult.toString(), HttpStatus.SC_OK);
 
 		assertNotNull("Should return valid randomization result", result.getRandomizationResult());
 	}
@@ -106,7 +106,7 @@ public class JSONSubmissionContextTest extends BaseTest {
 	@Test
 	public void testThatProcessResponseReturnsresultWithCorrectRandomizationResult() throws Exception {
 
-		WebServiceResult result = context.processResponse(jsonReturnedData.toString(), HttpStatus.SC_OK);
+		RandomizationResult result = context.processResponse(randomizationResult.toString(), HttpStatus.SC_OK);
 
 		assertEquals("Should return correct randomization result", "radiotherapy", result.getRandomizationResult());
 	}

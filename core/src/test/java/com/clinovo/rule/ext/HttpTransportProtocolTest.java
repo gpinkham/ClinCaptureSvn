@@ -13,8 +13,8 @@ import org.junit.Test;
 import com.clinovo.BaseTest;
 import com.clinovo.context.SubmissionContext;
 import com.clinovo.context.impl.XMLSubmissionContext;
-import com.clinovo.model.WebServiceResult;
-import com.clinovo.rule.WebServiceAction;
+import com.clinovo.model.Randomization;
+import com.clinovo.model.RandomizationResult;
 import com.clinovo.util.XMLUtil;
 
 public class HttpTransportProtocolTest extends BaseTest {
@@ -28,16 +28,16 @@ public class HttpTransportProtocolTest extends BaseTest {
 
 		context = new XMLSubmissionContext();
 
-		WebServiceAction action = createWebServiceAction();
+		Randomization randomization = createRandomization();
 
-		context.setAction(action);
+		context.setRandomization(randomization);
 
-		client = createMockHttpClient(XMLUtil.docToString(webServiceReturnValue), HttpStatus.SC_OK);
+		client = createMockHttpClient(XMLUtil.docToString(xmlRandomiationResult), HttpStatus.SC_OK);
 
 		protocol = new HttpTransportProtocol();
 		protocol.setHttpClient(client);
 
-		context.setAction(action);
+		context.setRandomization(randomization);
 		protocol.setSubmissionContext(context);
 		
 	}
@@ -74,14 +74,14 @@ public class HttpTransportProtocolTest extends BaseTest {
 	@Test
 	public void testThatCallDoesNotReturnNull() throws Exception {
 
-		WebServiceResult result = protocol.call();
+		RandomizationResult result = protocol.call();
 		assertNotNull("Should never return null", result);
 	}
 
 	@Test
 	public void testThatCallReturnsValidWebServiceResultWithTreatment() throws Exception {
 
-		WebServiceResult result = protocol.call();
+		RandomizationResult result = protocol.call();
 
 		assertNotNull("Should have a valid Treatment specified", result.getTreatment());
 	}
@@ -89,7 +89,7 @@ public class HttpTransportProtocolTest extends BaseTest {
 	@Test
 	public void testThatCallReturnsValidWebServiceResultWithACorrectTreatment() throws Exception {
 
-		WebServiceResult result = protocol.call();
+		RandomizationResult result = protocol.call();
 
 		assertEquals("Should have a correct Treatment specified", "2", result.getTreatment());
 	}
@@ -97,7 +97,7 @@ public class HttpTransportProtocolTest extends BaseTest {
 	@Test
 	public void testThatCallReturnsValidWebServiceResultWithPatientId() throws Exception {
 
-		WebServiceResult result = protocol.call();
+		RandomizationResult result = protocol.call();
 
 		assertNotNull("Should have a valid patient Id specified", result.getPatientId());
 	}
@@ -105,7 +105,7 @@ public class HttpTransportProtocolTest extends BaseTest {
 	@Test
 	public void testThatCallReturnsValidWebServiceResultWithACorrectPatientId() throws Exception {
 
-		WebServiceResult result = protocol.call();
+		RandomizationResult result = protocol.call();
 
 		assertEquals("Should have a correct patientId specified", "subject2", result.getPatientId());
 	}
@@ -113,7 +113,7 @@ public class HttpTransportProtocolTest extends BaseTest {
 	@Test
 	public void testThatCallReturnsValidWebServiceResultWithSiteId() throws Exception {
 
-		WebServiceResult result = protocol.call();
+		RandomizationResult result = protocol.call();
 
 		assertNotNull("Should have a valid Randomization result specified", result.getRandomizationResult());
 	}
@@ -121,7 +121,7 @@ public class HttpTransportProtocolTest extends BaseTest {
 	@Test
 	public void testThatCallReturnsValidWebServiceResultWithACorrectSiteId() throws Exception {
 
-		WebServiceResult result = protocol.call();
+		RandomizationResult result = protocol.call();
 
 		assertEquals("Should have a correct Randomization result specified", "radiotherapy",
 				result.getRandomizationResult());

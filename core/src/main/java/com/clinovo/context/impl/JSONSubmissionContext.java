@@ -15,13 +15,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.clinovo.model.WebServiceResult;
+import com.clinovo.model.RandomizationResult;
 
 public class JSONSubmissionContext extends DefaultSubmissionContext {
 
-	public WebServiceResult processResponse(String response, int httpStatus) throws Exception {
+	public RandomizationResult processResponse(String response, int httpStatus) throws Exception {
 
-		WebServiceResult result = new WebServiceResult();
+		RandomizationResult result = new RandomizationResult();
 
 		if (httpStatus == HttpStatus.SC_OK) {
 
@@ -70,19 +70,19 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 
 		JSONObject postData = new JSONObject();
 
-		postData.put("SiteID", action.getSiteId());
-		postData.put("Initials", action.getInitials());
-		postData.put("PatientID", action.getPatientId());
-		postData.put("TrialID", Integer.parseInt(action.getTrialId()));
+		postData.put("SiteID", randomiation.getSiteId());
+		postData.put("Initials", randomiation.getInitials());
+		postData.put("PatientID", randomiation.getPatientId());
+		postData.put("TrialID", Integer.parseInt(randomiation.getTrialId()));
 		
 		// Strata
-		if (!action.getStratificationLevel().equals(null) 
-				&& action.getStratificationLevel().length() > 0) {
+		if (!randomiation.getStratificationLevel().equals(null) 
+				&& randomiation.getStratificationLevel().length() > 0) {
 
 			JSONArray array = new JSONArray();
 			JSONObject strataObject = new JSONObject();
 			strataObject.put("StratificationID", "1");
-			strataObject.put("Level", action.getStratificationLevel());
+			strataObject.put("Level", randomiation.getStratificationLevel());
 
 			array.put(strataObject);
 
@@ -148,8 +148,8 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 	String getBody() throws Exception {
 
 		JSONObject postData = new JSONObject();
-		postData.put("SiteID", action.getUsername());
-		postData.put("Password", action.getPassword());
+		postData.put("SiteID", randomiation.getUsername());
+		postData.put("Password", randomiation.getPassword());
 
 		return postData.toString();
 	}

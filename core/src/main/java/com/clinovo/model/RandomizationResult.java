@@ -1,8 +1,10 @@
 package com.clinovo.model;
 
-
-public class WebServiceResult {
-
+/**
+ * Encapsulates the Randomization result returned from randomize.net
+ *
+ */
+public class RandomizationResult {
 
 	private String patientId;
 	private String treatmentID;

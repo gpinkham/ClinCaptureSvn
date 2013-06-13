@@ -27,14 +27,14 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import com.clinovo.context.SubmissionContext;
 import com.clinovo.context.impl.JSONSubmissionContext;
 import com.clinovo.exception.RandomizationException;
-import com.clinovo.model.WebServiceResult;
-import com.clinovo.rule.WebServiceAction;
+import com.clinovo.model.Randomization;
+import com.clinovo.model.RandomizationResult;
 import com.clinovo.rule.ext.HttpTransportProtocol;
 
 @SuppressWarnings("serial")
 public class RandomizeServlet extends SecureController {
 
-	private WebServiceResult result = null;
+	private RandomizationResult result = null;
 	private RuleSetServiceInterface ruleSetService;
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -122,7 +122,7 @@ public class RandomizeServlet extends SecureController {
 		}
 	}
 
-	private WebServiceResult initiateRandomizationCall(HttpServletRequest request) throws Exception {
+	private RandomizationResult initiateRandomizationCall(HttpServletRequest request) throws Exception {
 
 		String studyId = request.getParameter("study");
 
@@ -133,29 +133,29 @@ public class RandomizeServlet extends SecureController {
 		String siteId = "PACE001"; getSiteId(studyId);
 		String patientId = request.getParameter("subject");
 
-		WebServiceAction action = new WebServiceAction();
+		Randomization randomization = new Randomization();
 
 		// username and password
-		action.setUsername(CoreResources.getField("randomizationusername"));
-		action.setPassword(CoreResources.getField("randomizationpassword"));
+		randomization.setUsername(CoreResources.getField("randomizationusername"));
+		randomization.setPassword(CoreResources.getField("randomizationpassword"));
 
 		// Rando details
-		action.setSiteId(siteId);
-		action.setTrialId(trialId);
-		action.setPatientId(patientId);
-		action.setStratificationLevel(strataId);
+		randomization.setSiteId(siteId);
+		randomization.setTrialId(trialId);
+		randomization.setPatientId(patientId);
+		randomization.setStratificationLevel(strataId);
 
 		// Https details
-		action.setRandomizationUrl(CoreResources.getField("randomizationUrl"));
-		action.setAuthenticationUrl(CoreResources.getField("randomizationAuthenticationUrl"));
+		randomization.setRandomizationUrl(CoreResources.getField("randomizationUrl"));
+		randomization.setAuthenticationUrl(CoreResources.getField("randomizationAuthenticationUrl"));
 
 		SubmissionContext context = new JSONSubmissionContext();
-		context.setAction(action);
+		context.setRandomization(randomization);
 
 		HttpTransportProtocol protocol = new HttpTransportProtocol();
 		protocol.setSubmissionContext(context);
 
-		WebServiceResult result = protocol.call();
+		RandomizationResult result = protocol.call();
 		
 		return result;
 	}

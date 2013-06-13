@@ -16,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.clinovo.context.SubmissionContext;
-import com.clinovo.model.WebServiceResult;
+import com.clinovo.model.RandomizationResult;
 
-public class HttpTransportProtocol implements Callable<WebServiceResult> {
+public class HttpTransportProtocol implements Callable<RandomizationResult> {
 
 	private HttpClient client = null;
 	private SubmissionContext context;
@@ -26,17 +26,17 @@ public class HttpTransportProtocol implements Callable<WebServiceResult> {
 
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-	public WebServiceResult call() throws Exception {
+	public RandomizationResult call() throws Exception {
 
 		log.info("Initiating call to web service");
 
 		if (context == null)
-			throw new WebServiceException("The web service action cannot be null or empty");
+			throw new WebServiceException("Randomization cannot be null or empty");
 
 		if (client == null)
 			client = new HttpClient();
 
-		WebServiceResult result = new WebServiceResult();
+		RandomizationResult result = new RandomizationResult();
 
 		try {
 
@@ -48,7 +48,7 @@ public class HttpTransportProtocol implements Callable<WebServiceResult> {
 			ProtocolSocketFactory sslFactory = new SSLProtocolSocketFactory();
 			Protocol.registerProtocol("https", new Protocol("https", sslFactory, 443));
 
-			HttpsURL url = new HttpsURL(context.getAction().getRandomizationUrl());
+			HttpsURL url = new HttpsURL(context.getRandomization().getRandomizationUrl());
 			method.setURI(url);
 			method.setRequestEntity(context.getRequestEntity());
 

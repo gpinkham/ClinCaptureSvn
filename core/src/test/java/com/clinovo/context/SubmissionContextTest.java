@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import com.clinovo.BaseTest;
 import com.clinovo.context.impl.JSONSubmissionContext;
-import com.clinovo.rule.WebServiceAction;
+import com.clinovo.model.Randomization;
 
 public class SubmissionContextTest extends BaseTest {
 
@@ -23,9 +23,9 @@ public class SubmissionContextTest extends BaseTest {
 
 		context = new JSONSubmissionContext();
 
-		WebServiceAction action = createWebServiceAction();
+		Randomization randomization = createRandomization();
 		
-		context.setAction(action);
+		context.setRandomization(randomization);
 		
 		client = createMockHttpClient(authenticationToken.toString(), HttpStatus.SC_OK);
 		

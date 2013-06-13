@@ -1,13 +1,13 @@
-package com.clinovo.rule;
+package com.clinovo.model;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-
-@Entity
-@DiscriminatorValue("2")
-public class WebServiceAction extends RuleActionBean {
+/**
+ * Encapsulates the content and data that will be used to validate a given subject.
+ * 
+ * <p>
+ * The content in here form part of the contex that is sent over to randomize.net
+ *
+ */
+public class Randomization {
 
 	// Post data
 	private String siteId;
@@ -24,11 +24,6 @@ public class WebServiceAction extends RuleActionBean {
 	private String authenticationUrl;
 
 	private String level;
-
-	public WebServiceAction() {
-
-
-	}
 
 	public String getAuthenticationUrl() {
 		return authenticationUrl;

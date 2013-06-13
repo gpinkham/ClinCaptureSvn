@@ -18,14 +18,14 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 import com.clinovo.BaseTest;
-import com.clinovo.model.WebServiceResult;
+import com.clinovo.model.RandomizationResult;
 
 public class XMLUtilTest extends BaseTest {
 
 	@Test
 	public void testThatXMLToStringDoesNotReturnNullOnValidInput() throws Exception {
 
-		assertNotNull("Should never return null", XMLUtil.docToString(webServiceReturnValue));
+		assertNotNull("Should never return null", XMLUtil.docToString(xmlRandomiationResult));
 	}
 
 	@Test
@@ -89,7 +89,7 @@ public class XMLUtilTest extends BaseTest {
 	@Test
 	public void testThatCreateWebServiceResultDoesNotReturn() throws Exception {
 
-		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
+		RandomizationResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(xmlRandomiationResult));
 
 		assertNotNull("Should never return null", result);
 	}
@@ -97,7 +97,7 @@ public class XMLUtilTest extends BaseTest {
 	@Test
 	public void testThatCreateWebServiceResultReturnsValidResultWithValidTreatment() throws Exception {
 
-		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
+		RandomizationResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(xmlRandomiationResult));
 
 		assertThat("Treatment should not be null", result.getTreatment(), IsNot.not(""));
 
@@ -106,7 +106,7 @@ public class XMLUtilTest extends BaseTest {
 	@Test
 	public void testThatCreateWebServiceResultReturnsValidResultWithCorrectTreatment() throws Exception {
 
-		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
+		RandomizationResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(xmlRandomiationResult));
 
 		assertThat("Treatment should set correctly", result.getTreatment(), is("2"));
 	}
@@ -114,7 +114,7 @@ public class XMLUtilTest extends BaseTest {
 	@Test
 	public void testThatCreateWebServiceResultReturnsValidResultWithValidRandomizationResult() throws Exception {
 
-		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
+		RandomizationResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(xmlRandomiationResult));
 
 		assertThat("Randomization result should not be null", result.getRandomizationResult(), IsNot.not(""));
 
@@ -123,7 +123,7 @@ public class XMLUtilTest extends BaseTest {
 	@Test
 	public void testThatCreateWebServiceResultReturnsValidResultWithCorrectRandomResult() throws Exception {
 
-		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
+		RandomizationResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(xmlRandomiationResult));
 
 		assertThat("Randomization result should set correctly", result.getRandomizationResult(), is("radiotherapy"));
 	}
@@ -131,7 +131,7 @@ public class XMLUtilTest extends BaseTest {
 	@Test
 	public void testThatCreateWebServiceResultReturnsValidResultWithValidPatientId() throws Exception {
 
-		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
+		RandomizationResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(xmlRandomiationResult));
 
 		assertThat("Patient Id should be set correctly", result.getPatientId(), IsNot.not(""));
 
@@ -140,14 +140,14 @@ public class XMLUtilTest extends BaseTest {
 	@Test
 	public void testThatCreateWebServiceResultReturnsValidResultWithCorrectPatientId() throws Exception {
 
-		WebServiceResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(webServiceReturnValue));
+		RandomizationResult result = XMLUtil.createWebServiceResult(XMLUtil.docToString(xmlRandomiationResult));
 
 		assertThat("Patient Id should not be null", result.getPatientId(), is("subject2"));
 	}
 	
 	private Document parseDocument() throws Exception {
 
-		String xmlToString = XMLUtil.docToString(webServiceReturnValue);
+		String xmlToString = XMLUtil.docToString(xmlRandomiationResult);
 
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -158,7 +158,7 @@ public class XMLUtilTest extends BaseTest {
 
 	private InputStream createInputStream() throws Exception {
 
-		String xmlToString = XMLUtil.docToString(webServiceReturnValue);
+		String xmlToString = XMLUtil.docToString(xmlRandomiationResult);
 		InputSource source = new InputSource(new ByteArrayInputStream(xmlToString.getBytes("utf-8")));
 		return source.getByteStream();
 	}

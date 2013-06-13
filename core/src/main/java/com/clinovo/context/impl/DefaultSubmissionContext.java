@@ -8,11 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.clinovo.context.SubmissionContext;
-import com.clinovo.rule.WebServiceAction;
+import com.clinovo.model.Randomization;
 
 public abstract class DefaultSubmissionContext implements SubmissionContext {
 
-	protected WebServiceAction action;
+	protected Randomization randomiation;
 	protected PostMethod method = null;
 	protected String currentAuthToken = null;
 	protected HttpClient client = new HttpClient();
@@ -29,7 +29,7 @@ public abstract class DefaultSubmissionContext implements SubmissionContext {
 			return currentAuthToken;
 		}
 		
-		method = new PostMethod(action.getAuthenticationUrl());
+		method = new PostMethod(randomiation.getAuthenticationUrl());
 		
 		// Allow for testing
 		if (client == null)
@@ -56,12 +56,12 @@ public abstract class DefaultSubmissionContext implements SubmissionContext {
 		return response;
 	}
 
-	public void setAction(WebServiceAction action) {
-		this.action = action;
+	public void setRandomization(Randomization randomization) {
+		this.randomiation = randomization;
 	}
 
-	public WebServiceAction getAction() {
-		return this.action;
+	public Randomization getRandomization() {
+		return this.randomiation;
 	}
 
 	public void setHttpClient(HttpClient client) {

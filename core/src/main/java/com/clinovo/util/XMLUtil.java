@@ -11,15 +11,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.clinovo.model.WebServiceResult;
+import com.clinovo.model.RandomizationResult;
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 public class XMLUtil {
 
-	public static WebServiceResult createWebServiceResult(String response) throws Exception {
+	public static RandomizationResult createWebServiceResult(String response) throws Exception {
 
-		WebServiceResult result = new WebServiceResult();
+		RandomizationResult result = new RandomizationResult();
 
 		Document document = createDocument(response);
 
