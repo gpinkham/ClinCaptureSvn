@@ -88,7 +88,7 @@ public final class SubjectEventStatusUtil {
 				url.append("<img src='" + imageIconPaths.get(subjectEventStatus.getId())
 						+ "' border='0' style='position: relative; left: 7px;'>");
 				} else {
-					url.append("<img src='' border='0' style='position: relative; left: 7px;'>");
+					url.append("<img src='' border='0' style='position: relative; left: 7px; display: none;'>");
 				}	
 			}
 		} else {
