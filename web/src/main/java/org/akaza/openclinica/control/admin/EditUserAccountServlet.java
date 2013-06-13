@@ -325,12 +325,12 @@ public class EditUserAccountServlet extends SecureController {
 	private void sendResetPasswordEmail(UserAccountBean user, String password) throws Exception {
 		logger.info("Sending password reset notification to " + user.getName());
 
-		String body = resword.getString("dear") + " " + user.getFirstName() + " " + user.getLastName() + ",<br/>\n";
+		String body = resword.getString("dear") + " " + user.getFirstName() + " " + user.getLastName() + ",<br/><br/>\n\n";
 		body += restext.getString("your_password_has_been_reset_on_openclinica") + ":<br/><br/>\n\n";
 		body += resword.getString("user_name") + ": " + user.getName() + "<br/>\n";
 		body += resword.getString("password") + ": " + password + "<br/><br/>\n\n";
 		body += restext.getString("please_test_your_login_information_and_let") + "<br/>\n";
-		body += "<a href='" + SQLInitServlet.getSystemURL() + "'>" + SQLInitServlet.getField("sysURL") + "</a><br/>\n";
+		body += "<a href='" + SQLInitServlet.getSystemURL() + "'>" + SQLInitServlet.getField("sysURL") + "</a><br/><br/>\n\n";
 		body += restext.getString("openclinica_system_administrator");
 
 		sendEmail(user.getEmail().trim(), restext.getString("your_openclinica_account_password_reset"), body, false);
