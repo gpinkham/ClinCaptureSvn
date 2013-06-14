@@ -14,27 +14,20 @@
 package org.akaza.openclinica.web.job;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
+import org.akaza.openclinica.bean.submit.crfdata.*;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.quartz.JobDataMap;
-import org.quartz.SimpleTrigger;
+import org.quartz.TriggerKey;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
-@SuppressWarnings({"rawtypes"})
+@SuppressWarnings({ "rawtypes" })
 public class TriggerService {
 
 	public TriggerService() {
@@ -58,7 +51,8 @@ public class TriggerService {
 
 	private static String IMPORT_TRIGGER = "importTrigger";
 
-	public SimpleTrigger generateTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study, String locale) {
+	public SimpleTriggerImpl generateTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study,
+			String locale) {
 		Date startDateTime = fp.getDateTime(DATE_START_JOB);
 		// check the above?
 		int datasetId = fp.getInt(DATASET_ID);
@@ -90,8 +84,11 @@ public class TriggerService {
 		}
 		// set up and commit job here
 
-		SimpleTrigger trigger = new SimpleTrigger(jobName, "DEFAULT", 64000, interval.longValue());
-
+		SimpleTriggerImpl trigger = new SimpleTriggerImpl();
+		trigger.setJobName(jobName);
+		trigger.setJobGroup("DEFAULT");
+		trigger.setRepeatCount(64000);
+		trigger.setRepeatInterval(interval.longValue());
 		// set the job detail name,
 		// based on our choice of format above
 		// what if there is more than one detail?
@@ -103,7 +100,7 @@ public class TriggerService {
 		trigger.setStartTime(startDateTime);
 		trigger.setName(jobName);// + datasetId);
 		trigger.setGroup("DEFAULT");// + datasetId);
-		trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
+		trigger.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
 		// set job data map
 		JobDataMap jobDataMap = new JobDataMap();
 		jobDataMap.put(DATASET_ID, datasetId);
@@ -131,17 +128,17 @@ public class TriggerService {
 		trigger.setJobDataMap(jobDataMap);
 		// trigger.setRepeatInterval(interval.longValue());
 		// System.out.println("default for volatile: " + trigger.isVolatile());
-		trigger.setVolatility(false);
+		// trigger.setVolatility(false);
 		return trigger;
 	}
 
-	public SimpleTrigger generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study,
+	public SimpleTriggerImpl generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study,
 			String locale, Date startTime) {
 		Date startDateTime = startTime != null ? startTime : new Date(System.currentTimeMillis());
 		return generateImportTrigger(fp, userAccount, study, startDateTime, locale);
 	}
 
-	public SimpleTrigger generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study,
+	public SimpleTriggerImpl generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study,
 			Date startDateTime, String locale) {
 
 		String jobName = fp.getString(JOB_NAME);
@@ -162,13 +159,17 @@ public class TriggerService {
 			long minutesInt = minutes * 60000;
 			interval = interval + minutesInt;
 		}
-		SimpleTrigger trigger = new SimpleTrigger(jobName, IMPORT_TRIGGER, 64000, interval);
+		SimpleTriggerImpl trigger = new SimpleTriggerImpl();
+		trigger.setJobName(jobName);
+		trigger.setJobGroup(IMPORT_TRIGGER);
+		trigger.setRepeatCount(64000);
+		trigger.setRepeatInterval(interval);
 		trigger.setDescription(jobDesc);
 		// set just the start date
 		trigger.setStartTime(startDateTime);
 		trigger.setName(jobName);// + datasetId);
 		trigger.setGroup(IMPORT_TRIGGER);// + datasetId);
-		trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
+		trigger.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
 		// set job data map
 		JobDataMap jobDataMap = new JobDataMap();
 
@@ -183,11 +184,12 @@ public class TriggerService {
 		jobDataMap.put("minutes", minutes);
 
 		trigger.setJobDataMap(jobDataMap);
-		trigger.setVolatility(false);
+		// trigger.setVolatility(false);
 		return trigger;
 	}
 
-	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, String[] triggerNames, String properName) {
+	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
+			String properName) {
 		Validator v = new Validator(request);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
 		// need to be unique too
@@ -195,7 +197,8 @@ public class TriggerService {
 		v.addValidation(EMAIL, Validator.IS_A_EMAIL);
 		v.addValidation(PERIOD, Validator.NO_BLANKS);
 		v.addValidation(DATE_START_JOB + "Date", Validator.IS_A_DATE);
-		// v.addValidation(DATE_START_JOB + "Date", new Date(), Validator.DATE_IS_AFTER_OR_EQUAL);
+		// v.addValidation(DATE_START_JOB + "Date", new Date(),
+		// Validator.DATE_IS_AFTER_OR_EQUAL);
 		// TODO job names will have to be unique, tbh
 
 		String tab = fp.getString(TAB);
@@ -211,8 +214,8 @@ public class TriggerService {
 			// errors.put(TAB, "Error Message - Pick one of the below");
 			Validator.addError(errors, TAB, "Please pick at least one of the below.");
 		}
-		for (String triggerName : triggerNames) {
-			if (triggerName.equals(fp.getString(JOB_NAME)) && (!triggerName.equals(properName))) {
+		for (TriggerKey triggerKey : triggerKeys) {
+			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
 				Validator.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
 			}
 		}
@@ -334,7 +337,7 @@ public class TriggerService {
 		return generateHardValidationErrorMessage(subjectData, totalValidationErrors, true);
 	}
 
-	public HashMap validateImportJobForm(FormProcessor fp, HttpServletRequest request, String[] triggerNames,
+	public HashMap validateImportJobForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
 			String properName) {
 		Validator v = new Validator(request);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
@@ -364,20 +367,20 @@ public class TriggerService {
 			// errors.put(TAB, "Error Message - Pick one of the below");
 			Validator.addError(errors, "hours", "At least one of the following should be greater than zero.");
 		}
-		for (String triggerName : triggerNames) {
-			if (triggerName.equals(fp.getString(JOB_NAME)) && (!triggerName.equals(properName))) {
+		for (TriggerKey triggerKey : triggerKeys) {
+			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
 				Validator.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
 			}
 		}
 		return errors;
 	}
 
-	public HashMap validateImportJobForm(FormProcessor fp, HttpServletRequest request, String[] triggerNames) {
-		return validateImportJobForm(fp, request, triggerNames, "");
+	public HashMap validateImportJobForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys) {
+		return validateImportJobForm(fp, request, triggerKeys, "");
 	}
 
-	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, String[] triggerNames) {
-		return validateForm(fp, request, triggerNames, "");
+	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys) {
+		return validateForm(fp, request, triggerKeys, "");
 	}
 
 	public HashMap validateImportForm(HttpServletRequest request) {

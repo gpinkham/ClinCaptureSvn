@@ -13,17 +13,17 @@
 
 package org.akaza.openclinica.service.extract;
 
+import java.math.BigInteger;
+import java.util.Date;
+
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.quartz.JobDataMap;
-import org.quartz.SimpleTrigger;
-
-import java.util.Date;
-import java.math.BigInteger;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 public class XsltTriggerService {
-	public XsltTriggerService() {
 
+	public XsltTriggerService() {
 	}
 
 	public static final String DATASET_ID = "dsId";
@@ -42,7 +42,7 @@ public class XsltTriggerService {
 	public static final String FAILURE_MESSAGE = "FAILURE_MESSAGE";
 	public static final String XSLT_PATH = "XSLT_PATH";
 	public static final String EP_BEAN = "epBean";
-	public static String TRIGGER_GROUP_NAME = "XsltTriggersExportJobs";
+	public static final String TRIGGER_GROUP_NAME = "XsltTriggersExportJobs";
 	public static final String PERIOD = "periodToRun";
 	public static final String EXPORT_FORMAT = "exportFormat";
 	public static final String EXPORT_FORMAT_ID = "exportFormatId";
@@ -55,20 +55,22 @@ public class XsltTriggerService {
 	public static final String POST_PROC_EXPORT_NAME = "postProcExportName";
 	public static final String COUNT = "count";
 
-	public SimpleTrigger generateXsltTrigger(String xslFile, String xmlFile, String endFilePath, String endFile,
+	public SimpleTriggerImpl generateXsltTrigger(String xslFile, String xmlFile, String endFilePath, String endFile,
 			int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale, int cnt,
 			String xsltPath, String triggerGroupName) {
 		Date startDateTime = new Date(System.currentTimeMillis());
 		String jobName = datasetId + "_" + epBean.getExportFileName()[0];
-		if (triggerGroupName != null)
-			TRIGGER_GROUP_NAME = triggerGroupName;
 
-		SimpleTrigger trigger = new SimpleTrigger(jobName, triggerGroupName, 0, 1);
+		SimpleTriggerImpl trigger = new SimpleTriggerImpl();
 
 		trigger.setStartTime(startDateTime);
 		trigger.setName(jobName);// + datasetId);
 		trigger.setGroup(triggerGroupName);// + datasetId);
-		trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+		trigger.setJobName(jobName);
+		trigger.setJobGroup(triggerGroupName);
+		trigger.setRepeatCount(0);
+		trigger.setRepeatInterval(1);
+		trigger.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_FIRE_NOW);
 		// set job data map
 		JobDataMap jobDataMap = new JobDataMap();
 
@@ -99,7 +101,7 @@ public class XsltTriggerService {
 		jobDataMap.put(EP_BEAN, epBean);
 
 		trigger.setJobDataMap(jobDataMap);
-		trigger.setVolatility(false);
+		// trigger.setVolatility(false);
 
 		return trigger;
 	}
@@ -123,9 +125,4 @@ public class XsltTriggerService {
 		}
 		return interval.longValue();
 	}
-
-	public String getTriggerGroupNameForExportJobs() {
-		return "XsltTriggersExportJobs";
-	}
-
 }

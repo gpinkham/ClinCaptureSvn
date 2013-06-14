@@ -261,13 +261,12 @@
 		<td>
 		  <input type="submit" name="btnSubmit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"/>
 		</td>
-		</form>
 		<td>
 		 <img src="images/icon_UnchangedData.gif" style="visibility:hidden" alt="Data Status" name="DataStatus_bottom">
 		</td>
 	</tr>
 </table>
 
-
+</form>
 
 <jsp:include page="../include/footer.jsp"/>

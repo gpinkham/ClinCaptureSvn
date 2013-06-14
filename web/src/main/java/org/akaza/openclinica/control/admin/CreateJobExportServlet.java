@@ -15,11 +15,7 @@ package org.akaza.openclinica.control.admin;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,18 +35,20 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
+import org.quartz.TriggerKey;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
-import org.springframework.scheduling.quartz.JobDetailBean;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 /**
  * 
  * @author thickerson
  * 
  */
-@SuppressWarnings({"rawtypes","unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class CreateJobExportServlet extends SecureController {
-	
+
 	public static final String PERIOD = "periodToRun";
 	public static final String FORMAT_ID = "formatId";
 	public static final String DATASET_ID = "dsId";
@@ -111,7 +109,7 @@ public class CreateJobExportServlet extends SecureController {
 		presetValues.put(DATE_START_JOB + "Date", local_df.format(jobDate));
 		fp2.setPresetValues(presetValues);
 		setPresetValues(fp2.getPresetValues());
-		request.setAttribute(DATE_START_JOB, fp2.getDateTime(DATE_START_JOB + "Date"));
+		request.setAttribute(DATE_START_JOB, fp2.getDateTime(DATE_START_JOB));
 		// EMAIL, TAB, CDISC, SPSS, PERIOD, DATE_START_JOB
 		// TODO pick out the datasets and the date
 	}
@@ -132,7 +130,8 @@ public class CreateJobExportServlet extends SecureController {
 			forwardPage(Page.CREATE_JOB_EXPORT);
 		} else if ("confirmall".equalsIgnoreCase(action)) {
 			// collect form information
-			HashMap errors = validateForm(fp, request, scheduler.getTriggerNames("DEFAULT"), "");
+			HashMap errors = validateForm(fp, request,
+					scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")), "");
 
 			if (!errors.isEmpty()) {
 				// set errors to request
@@ -172,7 +171,8 @@ public class CreateJobExportServlet extends SecureController {
 				SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
 				int i = 0;
 				String[] temp = new String[exportFiles.length];
-				// JN: The following logic is for comma separated variables, to avoid the second file be treated as a
+				// JN: The following logic is for comma separated variables, to
+				// avoid the second file be treated as a
 				// old file and deleted.
 				String datasetFilePath = SQLInitServlet.getField("filePath") + "datasets";
 
@@ -192,14 +192,16 @@ public class CreateJobExportServlet extends SecureController {
 				exportFileName = epBean.getExportFileName()[cnt];
 
 				// need to set the dataset path here, tbh
-				// next, can already run jobs, translations, and then add a message to be notified later
+				// next, can already run jobs, translations, and then add a
+				// message to be notified later
 				// JN all the properties need to have the variables...
 				String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + files[cnt];
 				String endFilePath = epBean.getFileLocation();
 				endFilePath = extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
 				// exportFileName = resolveVars(exportFileName,dsBean,sdfDir);
 				if (epBean.getPostProcExportName() != null) {
-					// String preProcExportPathName = getEndFilePath(epBean.getPostProcExportName(),dsBean,sdfDir);
+					// String preProcExportPathName =
+					// getEndFilePath(epBean.getPostProcExportName(),dsBean,sdfDir);
 					String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(), dsBean,
 							sdfDir, datasetFilePath);
 					epBean.setPostProcExportName(preProcExportPathName);
@@ -210,14 +212,16 @@ public class CreateJobExportServlet extends SecureController {
 					epBean.setPostProcLocation(prePocLoc);
 				}
 				extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
-				SimpleTrigger trigger = null;
+				SimpleTriggerImpl trigger = null;
 
 				trigger = xsltService.generateXsltTrigger(xsltPath,
 						generalFileDir, // xml_file_path
 						endFilePath + File.separator, exportFileName, dsBean.getId(), epBean, userBean, request
 								.getLocale().getLanguage(), cnt, SQLInitServlet.getField("filePath") + "xslt",
-						xsltService.getTriggerGroupNameForExportJobs());
+						XsltTriggerService.TRIGGER_GROUP_NAME);
 
+                trigger.setName(jobName);
+                trigger.setJobName(jobName);
 				// Updating the original trigger with user given inputs
 				trigger.setRepeatCount(64000);
 				trigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
@@ -225,8 +229,7 @@ public class CreateJobExportServlet extends SecureController {
 				// set just the start date
 
 				trigger.setStartTime(startDateTime);
-				trigger.setName(jobName);// + datasetId);
-				trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
+				trigger.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
 				trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
 				trigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
 				trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
@@ -234,13 +237,13 @@ public class CreateJobExportServlet extends SecureController {
 				trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
 				trigger.getJobDataMap().put("job_type", "exportJob");
 
-				JobDetailBean jobDetailBean = new JobDetailBean();
-				jobDetailBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
+				JobDetailImpl jobDetailBean = new JobDetailImpl();
+				jobDetailBean.setGroup(XsltTriggerService.TRIGGER_GROUP_NAME);
 				jobDetailBean.setName(trigger.getName());
 				jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
 				jobDetailBean.setJobDataMap(trigger.getJobDataMap());
 				jobDetailBean.setDurability(true); // need durability?
-				jobDetailBean.setVolatility(false);
+				// jobDetailBean.setVolatility(false);
 
 				// set to the scheduler
 				try {
@@ -266,7 +269,8 @@ public class CreateJobExportServlet extends SecureController {
 		}
 	}
 
-	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, String[] triggerNames, String properName) {
+	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
+			String properName) {
 		Validator v = new Validator(request);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
 		// need to be unique too
@@ -283,8 +287,8 @@ public class CreateJobExportServlet extends SecureController {
 			// errors.put(TAB, "Error Message - Pick one of the below");
 			Validator.addError(errors, FORMAT_ID, "Please pick at least one.");
 		}
-		for (String triggerName : triggerNames) {
-			if (triggerName.equals(fp.getString(JOB_NAME)) && (!triggerName.equals(properName))) {
+		for (TriggerKey triggerKey : triggerKeys) {
+			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
 				Validator.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
 			}
 		}

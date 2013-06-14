@@ -17,16 +17,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -71,8 +62,10 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -228,12 +221,13 @@ public abstract class CoreSecureController extends HttpServlet {
 		try {
 			if (jobName != null && groupName != null) {
 				logger.info("trying to retrieve status on " + jobName + " " + groupName);
-				int state = getScheduler(request).getTriggerState(jobName, groupName);
+				Trigger.TriggerState state = getScheduler(request).getTriggerState(
+						TriggerKey.triggerKey(jobName, groupName));
 				logger.info("found state: " + state);
-				org.quartz.JobDetail details = getScheduler(request).getJobDetail(jobName, groupName);
+				org.quartz.JobDetail details = getScheduler(request).getJobDetail(JobKey.jobKey(jobName, groupName));
 				org.quartz.JobDataMap dataMap = details.getJobDataMap();
 				String failMessage = dataMap.getString("failMessage");
-				if (state == Trigger.STATE_NONE) {
+				if (state == Trigger.TriggerState.NONE) {
 					// add the message here that your export is done
 					logger.info("adding a message!");
 					// TODO make absolute paths in the message, for example a
@@ -372,8 +366,12 @@ public abstract class CoreSecureController extends HttpServlet {
 				} else {
 					currentStudy = new StudyBean();
 				}
-				session.setAttribute(STUDY, currentStudy);// The above line is moved here since currentstudy's value is
-															// set in else block and could change
+				session.setAttribute(STUDY, currentStudy);// The above line is
+															// moved here since
+															// currentstudy's
+															// value is
+															// set in else block
+															// and could change
 			} else if (currentStudy.getId() > 0) {
 				// Set site's parentstudy name when site is restored
 				if (currentStudy.getParentStudyId() > 0) {
@@ -530,8 +528,8 @@ public abstract class CoreSecureController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			java.io.IOException {
 		try {
-            Navigation.addToNavigationStack(request);
-            logger.debug("Request");
+			Navigation.addToNavigationStack(request);
+			logger.debug("Request");
 			process(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -551,9 +549,9 @@ public abstract class CoreSecureController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			java.io.IOException {
-        try {
-        	Navigation.addToNavigationStack(request); 
-            logger.debug("Post");
+		try {
+			Navigation.addToNavigationStack(request);
+			logger.debug("Post");
 			process(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -918,8 +916,10 @@ public abstract class CoreSecureController extends HttpServlet {
 
 	}
 
-	// JN:Synchornized in the securecontroller to avoid concurrent modification exception
-	// JN: this could still throw concurrentModification, coz of remove TODO: try to do better.
+	// JN:Synchornized in the securecontroller to avoid concurrent modification
+	// exception
+	// JN: this could still throw concurrentModification, coz of remove TODO:
+	// try to do better.
 	public static synchronized void removeLockedCRF(int userId) {
 		try {
 			for (Iterator iter = getUnavailableCRFList().entrySet().iterator(); iter.hasNext();) {
@@ -931,7 +931,8 @@ public abstract class CoreSecureController extends HttpServlet {
 				}
 			}
 		} catch (ConcurrentModificationException cme) {
-			cme.printStackTrace();// swallowing the exception, not the ideal thing to do but safer as of now.
+			cme.printStackTrace();// swallowing the exception, not the ideal
+									// thing to do but safer as of now.
 		}
 	}
 

@@ -20,6 +20,7 @@ import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 
 /**
@@ -72,22 +73,23 @@ public class PauseJobServlet extends SecureController {
 		}
 		String deleteMe = fp.getString("del");
 		scheduler = getScheduler();
+		Trigger trigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName, finalGroupName));
 		try {
 			if (("y".equals(deleteMe)) && (ub.isSysAdmin())) {
-				scheduler.deleteJob(triggerName, finalGroupName);
+				scheduler.deleteJob(trigger.getJobKey());
 				// set return message here
 				System.out.println("deleted job: " + triggerName);
 				addPageMessage("The following job " + triggerName
 						+ " and its corresponding Trigger have been deleted from the system.");
 			} else {
 
-				if (scheduler.getTriggerState(triggerName, finalGroupName) == Trigger.STATE_PAUSED) {
-					scheduler.resumeTrigger(triggerName, finalGroupName);
+				if (scheduler.getTriggerState(trigger.getKey()) == Trigger.TriggerState.PAUSED) {
+					scheduler.resumeTrigger(trigger.getKey());
 					System.out.println("-- resuming trigger! " + triggerName + " " + finalGroupName);
 					addPageMessage("This trigger " + triggerName
 							+ " has been resumed and will continue to run until paused or deleted.");
 				} else {
-					scheduler.pauseTrigger(triggerName, finalGroupName);
+					scheduler.pauseTrigger(trigger.getKey());
 					System.out.println("-- pausing trigger! " + triggerName + " " + finalGroupName);
 					addPageMessage("This trigger " + triggerName
 							+ " has been paused, and will not run again until it is restored.");

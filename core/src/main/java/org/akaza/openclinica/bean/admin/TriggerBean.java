@@ -24,6 +24,7 @@ public class TriggerBean extends EntityBean {
 
 	private Date previousDate;
 	private Date nextDate;
+	private Date firedDate;
 	private String fullName;
 	private String groupName;
 	private String description = "";
@@ -157,5 +158,13 @@ public class TriggerBean extends EntityBean {
 
 	public void setExportFormat(String exportFormat) {
 		this.exportFormat = exportFormat;
+	}
+
+	public Date getFiredDate() {
+		return firedDate;
+	}
+
+	public void setFiredDate(Date firedDate) {
+		this.firedDate = firedDate;
 	}
 }

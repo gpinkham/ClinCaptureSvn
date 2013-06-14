@@ -13,21 +13,10 @@
 
 package org.akaza.openclinica.web.job;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.sql.DataSource;
 
@@ -41,11 +30,7 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.*;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
@@ -74,7 +59,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -91,7 +76,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @author thickerson, 04/2009
  * 
  */
-@SuppressWarnings({"rawtypes"})
+@SuppressWarnings({ "rawtypes" })
 public class ImportSpringJob extends QuartzJobBean {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -160,9 +145,10 @@ public class ImportSpringJob extends QuartzJobBean {
 		triggerService = new TriggerService();
 
 		JobDataMap dataMap = context.getMergedJobDataMap();
-		SimpleTrigger trigger = (SimpleTrigger) context.getTrigger();
+		SimpleTriggerImpl trigger = (SimpleTriggerImpl) context.getTrigger();
 		TriggerBean triggerBean = new TriggerBean();
 		triggerBean.setFullName(trigger.getName());
+		triggerBean.setFiredDate(trigger.getStartTime());
 		String contactEmail = dataMap.getString(EMAIL);
 		logger.debug("=== starting to run trigger " + trigger.getName() + " ===");
 		try {

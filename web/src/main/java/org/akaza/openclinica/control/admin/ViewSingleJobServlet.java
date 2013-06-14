@@ -35,6 +35,7 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.job.ExampleSpringJob;
 import org.quartz.JobDataMap;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
@@ -71,16 +72,16 @@ public class ViewSingleJobServlet extends SecureController {
 		String groupName = "";
 		if (gName.equals("") || gName.equals("0")) {
 			groupName = XsltTriggerService.TRIGGER_GROUP_NAME;
-		} else { 
+		} else {
 			groupName = TRIGGER_IMPORT_GROUP;
 		}
 		scheduler = getScheduler();
-		Trigger trigger = scheduler.getTrigger(triggerName, groupName);
+		Trigger trigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName, groupName));
 
 		if (trigger == null) {
 			System.out.println("*** reset trigger group name");
 			groupName = XsltTriggerService.TRIGGER_GROUP_NAME;
-			trigger = scheduler.getTrigger(triggerName.trim(), groupName);
+			trigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName.trim(), groupName));
 		}
 		logger.debug("found trigger name: " + triggerName);
 		logger.debug("found group name: " + groupName);
@@ -89,15 +90,15 @@ public class ViewSingleJobServlet extends SecureController {
 		AuditEventDAO auditEventDAO = new AuditEventDAO(sm.getDataSource());
 
 		try {
-			triggerBean.setFullName(trigger.getName());
+			triggerBean.setFullName(trigger.getKey().getName());
 			triggerBean.setPreviousDate(trigger.getPreviousFireTime());
 			triggerBean.setNextDate(trigger.getNextFireTime());
-			if (scheduler.getTriggerState(triggerName, groupName) == Trigger.STATE_PAUSED) {
+			if (scheduler.getTriggerState(trigger.getKey()) == Trigger.TriggerState.PAUSED) {
 				triggerBean.setActive(false);
-				logger.debug("setting active to false for trigger: " + trigger.getName());
+				logger.debug("setting active to false for trigger: " + trigger.getKey().getName());
 			} else {
 				triggerBean.setActive(true);
-				logger.debug("setting active to TRUE for trigger: " + trigger.getName());
+				logger.debug("setting active to TRUE for trigger: " + trigger.getKey().getName());
 			}
 			// <<
 			if (trigger.getDescription() != null) {
@@ -128,7 +129,7 @@ public class ViewSingleJobServlet extends SecureController {
 
 				triggerBean.setUserAccount(userAccount);
 
-				ArrayList<AuditEventBean> triggerLogs = auditEventDAO.findAllByAuditTable(trigger.getName());
+				ArrayList<AuditEventBean> triggerLogs = auditEventDAO.findAllByAuditTable(trigger.getKey().getName());
 
 				// set the table for the audit event beans here
 
@@ -136,8 +137,8 @@ public class ViewSingleJobServlet extends SecureController {
 
 				EntityBeanTable table = fp.getEntityBeanTable();
 				String[] columns = { resword.getString("date_and_time"), resword.getString("action_message"),
-						resword.getString("entity_operation"),
-						resword.getString("changes_and_additions"), resword.getString("actions") };
+						resword.getString("entity_operation"), resword.getString("changes_and_additions"),
+						resword.getString("actions") };
 
 				table.setColumns(new ArrayList(Arrays.asList(columns)));
 				table.setAscendingSort(false);

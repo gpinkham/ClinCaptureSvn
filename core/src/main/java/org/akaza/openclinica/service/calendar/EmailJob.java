@@ -23,28 +23,27 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 public class EmailJob extends QuartzJobBean {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	
+
 	private ResourceBundle reswords;
 	private DataSource dataSource;
 	private OpenClinicaMailSender mailSender;
-	
+
 	public static final String EMAIL = "contactEmail";
 	public static final String USER_ID = "user_id";
 	public static final String EVENT_NAME = "event_name";
 	public static final String SUBJECT_NAME = "subject_name";
 	public static final String DAYS_BETWEEN = "daysBetween";
-	
+
 	@Override
-	protected void executeInternal(JobExecutionContext context)
-			throws JobExecutionException {
+	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		Locale locale = new Locale("en-US");
 		ResourceBundleProvider.updateLocale(locale);
 		reswords = ResourceBundleProvider.getWordsBundle();
 		JobDataMap dataMap = context.getMergedJobDataMap();
 		SimpleTrigger trigger = (SimpleTrigger) context.getTrigger();
-		
+
 		TriggerBean triggerBean = new TriggerBean();
-		triggerBean.setFullName(trigger.getName());
+		triggerBean.setFullName(trigger.getKey().getName());
 		String contactEmail = dataMap.getString(EMAIL);
 		String eventName = dataMap.getString(EVENT_NAME);
 		String subjectlabel = dataMap.getString(SUBJECT_NAME);
@@ -52,12 +51,13 @@ public class EmailJob extends QuartzJobBean {
 		if ("0".equals(daysBetween)) {
 			daysBetween = "today";
 		} else {
-			daysBetween = "in "+daysBetween +" days";
+			daysBetween = "in " + daysBetween + " days";
 		}
-				
+
 		logger.error(contactEmail + eventName + subjectlabel);
 		try {
-			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
+			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
+					.get("applicationContext");
 			dataSource = (DataSource) appContext.getBean("dataSource");
 			mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
 			int userId = dataMap.getInt(USER_ID);
@@ -66,7 +66,8 @@ public class EmailJob extends QuartzJobBean {
 			triggerBean.setUserAccount(ub);
 			try {
 				if (contactEmail != null && !"".equals(contactEmail)) {
-					mailSender.sendEmail(contactEmail, EmailHeader(eventName, subjectlabel), EmailTextMessage(ub, eventName, subjectlabel, daysBetween), true);
+					mailSender.sendEmail(contactEmail, EmailHeader(eventName, subjectlabel),
+							EmailTextMessage(ub, eventName, subjectlabel, daysBetween), true);
 
 				}
 			} catch (OpenClinicaSystemException e) {
@@ -80,16 +81,15 @@ public class EmailJob extends QuartzJobBean {
 		}
 
 	}
-	
+
 	private String EmailTextMessage(UserAccountBean ub, String eventName, String subjectLabel, String daysBetween) {
 		String emailTestMessage = reswords.getString("day_email_message_htm");
-		emailTestMessage = emailTestMessage.replace("{0}", ub.getFirstName() +" "+ ub.getLastName()).replace("{1}", eventName)
-				.replace("{2}", subjectLabel).replace("{3}", daysBetween);
+		emailTestMessage = emailTestMessage.replace("{0}", ub.getFirstName() + " " + ub.getLastName())
+				.replace("{1}", eventName).replace("{2}", subjectLabel).replace("{3}", daysBetween);
 		return emailTestMessage;
-		
-		
+
 	}
-	
+
 	private String EmailHeader(String eventName, String subjectLabel) {
 		String emailHeader = reswords.getString("reminder_for_event_and_subject");
 		emailHeader = emailHeader.replace("{0}", eventName).replace("{1}", subjectLabel);

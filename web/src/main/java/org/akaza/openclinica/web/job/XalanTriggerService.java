@@ -13,10 +13,10 @@
 
 package org.akaza.openclinica.web.job;
 
-import org.quartz.JobDataMap;
-import org.quartz.SimpleTrigger;
-
 import java.util.Date;
+
+import org.quartz.JobDataMap;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 public class XalanTriggerService {
 	public XalanTriggerService() {
@@ -30,17 +30,20 @@ public class XalanTriggerService {
 	public static final String XML_FILE_PATH = "xmlFilePath";
 	public static final String SQL_FILE_PATH = "sqlFilePath";
 
-	public static String TRIGGER_GROUP_NAME = "XalanTriggers";
+	public static final String TRIGGER_GROUP_NAME = "XalanTriggers";
 
-	public SimpleTrigger generateXalanTrigger(String xslFile, String xmlFile, String sqlFile, int datasetId) {
+	public SimpleTriggerImpl generateXalanTrigger(String xslFile, String xmlFile, String sqlFile, int datasetId) {
 		Date startDateTime = new Date(System.currentTimeMillis());
 		String jobName = xmlFile + datasetId;
-		SimpleTrigger trigger = new SimpleTrigger(jobName, TRIGGER_GROUP_NAME, 1, 1);
-
+		SimpleTriggerImpl trigger = new SimpleTriggerImpl();
+		trigger.setJobName(jobName);
+		trigger.setJobGroup(TRIGGER_GROUP_NAME);
+		trigger.setRepeatCount(1);
+		trigger.setRepeatInterval(1);
 		trigger.setStartTime(startDateTime);
 		trigger.setName(jobName);// + datasetId);
 		trigger.setGroup(TRIGGER_GROUP_NAME);// + datasetId);
-		trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
+		trigger.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
 		// set job data map
 		JobDataMap jobDataMap = new JobDataMap();
 
@@ -53,7 +56,7 @@ public class XalanTriggerService {
 		// jobDataMap.put(ExampleSpringJob.LOCALE, locale);
 
 		trigger.setJobDataMap(jobDataMap);
-		trigger.setVolatility(false);
+		// trigger.setVolatility(false);
 
 		return trigger;
 	}

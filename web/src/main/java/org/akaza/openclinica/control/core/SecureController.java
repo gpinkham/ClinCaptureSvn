@@ -21,39 +21,6 @@
 
 package org.akaza.openclinica.control.core;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.Role;
@@ -61,12 +28,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -82,12 +44,7 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -104,8 +61,10 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +73,21 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * This class enhances the Controller in several ways.
@@ -293,12 +267,13 @@ public abstract class SecureController extends HttpServlet {
 		try {
 			if (jobName != null && groupName != null) {
 				logger.info("trying to retrieve status on " + jobName + " " + groupName);
-				int state = getScheduler(request).getTriggerState(jobName, groupName);
+				Trigger.TriggerState state = getScheduler(request).getTriggerState(
+						TriggerKey.triggerKey(jobName, groupName));
 				logger.info("found state: " + state);
-				org.quartz.JobDetail details = getScheduler(request).getJobDetail(jobName, groupName);
+				org.quartz.JobDetail details = getScheduler(request).getJobDetail(JobKey.jobKey(jobName, groupName));
 				org.quartz.JobDataMap dataMap = details.getJobDataMap();
 				String failMessage = dataMap.getString("failMessage");
-				if (state == Trigger.STATE_NONE || state == Trigger.STATE_COMPLETE) {
+				if (state == Trigger.TriggerState.NONE || state == Trigger.TriggerState.COMPLETE) {
 					// add the message here that your export is done
 					logger.info("adding a message!");
 					// TODO make absolute paths in the message, for example a link from /pages/* would break
@@ -905,33 +880,34 @@ public abstract class SecureController extends HttpServlet {
 
 	}
 
-	public  ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(int studyId) {
-		StudyGroupClassDAO studyGroupClassDAO = new StudyGroupClassDAO(sm.getDataSource());	
+	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(int studyId) {
+		StudyGroupClassDAO studyGroupClassDAO = new StudyGroupClassDAO(sm.getDataSource());
 		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(sm.getDataSource());
-		ArrayList<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO.findAllActiveDynamicGroupsByStudyId(studyId);
+		ArrayList<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO
+				.findAllActiveDynamicGroupsByStudyId(studyId);
 		for (StudyGroupClassBean dynGroup : dynamicGroupClasses) {
-			dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllActiveOrderedByStudyGroupClassId(dynGroup.getId()));
+			dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllActiveOrderedByStudyGroupClassId(dynGroup
+					.getId()));
 		}
-		Collections.sort(dynamicGroupClasses, new Comparator<StudyGroupClassBean>(){
+		Collections.sort(dynamicGroupClasses, new Comparator<StudyGroupClassBean>() {
 			public int compare(StudyGroupClassBean bean1, StudyGroupClassBean bean2) {
-				if (bean2.isDefault()){
+				if (bean2.isDefault()) {
 					return 1;
 				}
-				if (bean1.isDefault()){
+				if (bean1.isDefault()) {
 					return -1;
 				}
 				return 0;
 			}
 		});
-		
+
 		return dynamicGroupClasses;
 	}
 
-	public  ArrayList<StudyGroupClassBean> getDynamicGroupClassesByCurrentStudy() {
+	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByCurrentStudy() {
 		return getDynamicGroupClassesByStudyId(currentStudy.getId());
 	}
 
-	
 	protected UserDetails getUserDetails() {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (principal instanceof UserDetails) {

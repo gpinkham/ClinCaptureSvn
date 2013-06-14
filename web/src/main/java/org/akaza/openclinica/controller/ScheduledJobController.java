@@ -14,11 +14,7 @@
 package org.akaza.openclinica.controller;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,15 +30,15 @@ import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobs;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.jmesa.facade.TableFacade;
-import org.quartz.JobExecutionContext;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
+import org.quartz.*;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.quartz.JobDetailBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -95,8 +91,6 @@ public class ScheduledJobController {
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		ModelMap gridMap = new ModelMap();
 		StdScheduler scheduler = getScheduler(request);
-		String[] triggersInGroup;
-
 		boolean showMoreLink = false;
 		if (request.getParameter("showMoreLink") != null) {
 			showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
@@ -120,16 +114,19 @@ public class ScheduledJobController {
 		List<String> currentJobList = new ArrayList<String>();
 		while (itCurrentJobs.hasNext()) {
 			JobExecutionContext temp = itCurrentJobs.next();
-			currentJobList.add(temp.getTrigger().getJobName() + temp.getTrigger().getGroup());
+			currentJobList.add(temp.getTrigger().getKey().getName() + temp.getTrigger().getKey().getGroup());
 		}
 
-		Iterator<SimpleTrigger> it = scheduler.getPausedTriggerGroups().iterator();
+		Iterator<String> it = scheduler.getPausedTriggerGroups().iterator();
 		while (it.hasNext()) {
-			logMe("Paused Job Group" + it.next().getJobGroup());
-			logMe("Paused Job Name:" + it.next().getJobName());
-			logMe("Paused Trigger Name:" + it.next().getName());
-			logMe("Paused Trigger Next Fire Time:" + it.next().getNextFireTime());
-
+			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(it.next()));
+			for (TriggerKey triggerKey : legacyTriggers) {
+				Trigger trigger = scheduler.getTrigger(triggerKey);
+				logMe("Paused Job Group" + trigger.getJobKey().getGroup());
+				logMe("Paused Job Name:" + trigger.getJobKey().getName());
+				logMe("Paused Trigger Name:" + trigger.getKey().getName());
+				logMe("Paused Trigger Next Fire Time:" + trigger.getNextFireTime());
+			}
 		}
 
 		// enumerate each job group
@@ -146,37 +143,34 @@ public class ScheduledJobController {
 		 * 
 		 * } }
 		 */
-		String[] triggerGroups = scheduler.getTriggerGroupNames();
-		List<SimpleTrigger> simpleTriggers = new ArrayList<SimpleTrigger>();
-		int index1 = 0;
-		for (int i = 0; i < triggerGroups.length; i++) {
-			System.out.println("Group: " + triggerGroups[i] + " contains the following triggers");
-			triggersInGroup = scheduler.getTriggerNames(triggerGroups[i]);
-
-			for (int j = 0; j < triggersInGroup.length; j++) {
-				logMe("- " + triggersInGroup[j]);
-				simpleTriggers.add(index1, (SimpleTrigger) scheduler.getTrigger(triggersInGroup[j], triggerGroups[i]));
-				index1++;
-
+		List<String> triggerGroups = scheduler.getTriggerGroupNames();
+		List<SimpleTriggerImpl> simpleTriggers = new ArrayList<SimpleTriggerImpl>();
+		for (String triggerGroup : triggerGroups) {
+			System.out.println("Group: " + triggerGroup + " contains the following triggers");
+			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
+			for (TriggerKey triggerKey : legacyTriggers) {
+				logMe("- " + triggerKey.getName());
+				Trigger trigger = scheduler.getTrigger(triggerKey);
+				if (trigger instanceof SimpleTriggerImpl) {
+					simpleTriggers.add((SimpleTriggerImpl) trigger);
+				}
 			}
 		}
 
 		List<ScheduledJobs> jobsScheduled = new ArrayList<ScheduledJobs>();
-		int index = 0;
 		/*
 		 * for(JobExecutionContext jec:listCurrentJobs) { ScheduledJobs jobs = new ScheduledJobs(); StringBuilder
 		 * schedulerStatus = new StringBuilder("");
 		 * 
-		 * schedulerStatus.append("<center><input style='margin-right: 5px' type='checkbox' ").append("class='sdvCheck'")
-		 * .append(" name='").append("sdvCheck_")
-		 * .append((Integer)jec.getTrigger().getJobDataMap().get("dsId")).append("' /></center>");
+		 * schedulerStatus.append( "<center><input style='margin-right: 5px' type='checkbox' "
+		 * ).append("class='sdvCheck'") .append(" name='").append("sdvCheck_") .append
+		 * ((Integer)jec.getTrigger().getJobDataMap().get("dsId")).append( "' /></center>");
 		 * 
-		 * jobs.setCheckbox(schedulerStatus.toString());
-		 * jobs.setDatasetId((Integer)jec.getTrigger().getJobDataMap().get("dsId")+"");
-		 * jobs.setFireTime(jec.getFireTime()+""); jobs.setScheduledFireTime(jec.getScheduledFireTime()+"");
-		 * jobsScheduled.add(index, jobs); index++; }
+		 * jobs.setCheckbox(schedulerStatus.toString()); jobs.setDatasetId((Integer
+		 * )jec.getTrigger().getJobDataMap().get("dsId")+""); jobs.setFireTime(jec.getFireTime()+"");
+		 * jobs.setScheduledFireTime(jec.getScheduledFireTime()+""); jobsScheduled.add(index, jobs); index++; }
 		 */
-		for (SimpleTrigger st : simpleTriggers) {
+		for (SimpleTriggerImpl st : simpleTriggers) {
 
 			ScheduledJobs jobs = new ScheduledJobs();
 
@@ -213,14 +207,12 @@ public class ScheduledJobController {
 				jobs.setJobStatus(currentJobList.contains(st.getJobName() + st.getGroup()) ? "Currently Executing"
 						: "Scheduled");
 
-				jobsScheduled.add(index, jobs);
-
-				index++;
+				jobsScheduled.add(jobs);
 			}
 		}
-		logMe("totalRows" + index);
+		logMe("totalRows" + jobsScheduled.size());
 
-		request.setAttribute("totalJobs", index);
+		request.setAttribute("totalJobs", jobsScheduled.size());
 
 		request.setAttribute("jobs", jobsScheduled);
 
@@ -252,54 +244,63 @@ public class ScheduledJobController {
 
 		StdScheduler scheduler = getScheduler(request);
 
-		scheduler.getJobDetail(theJobName, theJobGroupName);
-		logMe("About to pause the job-->" + theJobName + "Job Group Name -->" + theJobGroupName);
+		Trigger trigger = scheduler.getTrigger(TriggerKey.triggerKey(theJobName, theJobGroupName));
+		SimpleTriggerImpl oldTrigger = trigger instanceof SimpleTriggerImpl ? (SimpleTriggerImpl) trigger : null;
+		logMe("About to pause the job-->" + oldTrigger.getJobKey().getName() + "Job Group Name -->"
+				+ oldTrigger.getJobKey().getGroup());
 
-		SimpleTrigger oldTrigger = (SimpleTrigger) scheduler.getTrigger(triggerName, triggerGroupName);
 		if (oldTrigger != null) {
 			Date startTime = new Date(oldTrigger.getStartTime().getTime() + oldTrigger.getRepeatInterval());
 			if (triggerGroupName.equals(ExtractController.TRIGGER_GROUP_NAME)) {
-				scheduler.interrupt(theJobName, theJobGroupName);
+				scheduler.interrupt(JobKey.jobKey(theJobName, theJobGroupName));
 			}
 
-			scheduler.pauseJob(theJobName, theJobGroupName);
+			scheduler.pauseJob(JobKey.jobKey(theJobName, theJobGroupName));
 
-			SimpleTrigger newTrigger = new SimpleTrigger(triggerName, triggerGroupName);
+			SimpleTriggerImpl newTrigger = new SimpleTriggerImpl();
+			newTrigger.setName(triggerName);
+			newTrigger.setGroup(triggerGroupName);
 			newTrigger.setJobName(theJobName);
 			newTrigger.setJobGroup(theJobGroupName);
 			// newTrigger.setNextFireTime(nextFireTime );
 			newTrigger.setMisfireInstruction(oldTrigger.getMisfireInstruction());
 			newTrigger.setJobDataMap(oldTrigger.getJobDataMap());
-			newTrigger.setVolatility(false);
+			// newTrigger.setVolatility(false);
 			newTrigger.setRepeatCount(oldTrigger.getRepeatCount());
 			newTrigger.setRepeatInterval(oldTrigger.getRepeatInterval());
-			newTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT);
+			newTrigger
+					.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT);
 			newTrigger.setStartTime(startTime);
 			newTrigger.setRepeatInterval(oldTrigger.getRepeatInterval());
 
-			scheduler.unscheduleJob(triggerName, triggerGroupName);// these are the jobs which are from extract data and
-																	// are not not required to be rescheduled.
+			scheduler.unscheduleJob(TriggerKey.triggerKey(triggerName, triggerGroupName));// these are the jobs which
+																							// are from
+																							// extract data and
+																							// are not not required to
+																							// be
+																							// rescheduled.
 
 			ArrayList<String> pageMessages = new ArrayList<String>();
 
 			if (triggerGroupName.equals(ExtractController.TRIGGER_GROUP_NAME)) {
-				scheduler.rescheduleJob(triggerName, triggerGroupName, newTrigger);
+				scheduler.rescheduleJob(TriggerKey.triggerKey(triggerName, triggerGroupName), newTrigger);
 
 				messageFormat.applyPattern(resPageMessages.getString("job_has_been_cancelled"));
 				Object[] arguments = { theJobName };
 				pageMessages.add(messageFormat.format(arguments));
 			} else if (triggerGroupName.equals(XsltTriggerService.TRIGGER_GROUP_NAME)) {
 
-				JobDetailBean jobDetailBean = new JobDetailBean();
+				JobDetailImpl jobDetailBean = new JobDetailImpl();
 				jobDetailBean.setGroup(XsltTriggerService.TRIGGER_GROUP_NAME);
 				jobDetailBean.setName(newTrigger.getName());
 				jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
 				jobDetailBean.setJobDataMap(newTrigger.getJobDataMap());
 				jobDetailBean.setDurability(true); // need durability?
-				jobDetailBean.setVolatility(false);
+				// jobDetailBean.setVolatility(false);
 
-				scheduler.deleteJob(theJobName, theJobGroupName);
-				// scheduler.rescheduleJob(triggerName, triggerGroupName, newTrigger); // These are the jobs which come
+				scheduler.deleteJob(jobDetailBean.getKey());
+				// scheduler.rescheduleJob(triggerName, triggerGroupName,
+				// newTrigger); // These are the jobs which come
 				// from export job and need to be rescheduled.
 				scheduler.scheduleJob(jobDetailBean, newTrigger);
 
@@ -311,7 +312,7 @@ public class ScheduledJobController {
 
 			request.setAttribute("pageMessages", pageMessages);
 
-			logMe("jobDetails>" + scheduler.getJobDetail(theJobName, theJobGroupName));
+			logMe("jobDetails>" + scheduler.getJobDetail(JobKey.jobKey(theJobName, theJobGroupName)));
 		}
 		sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
 		return null;

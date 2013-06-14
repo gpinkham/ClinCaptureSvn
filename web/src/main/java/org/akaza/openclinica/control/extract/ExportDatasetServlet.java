@@ -20,14 +20,17 @@
  */
 package org.akaza.openclinica.control.extract;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
-import org.akaza.openclinica.bean.extract.CommaReportBean;
-import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.bean.extract.ExportFormatBean;
-import org.akaza.openclinica.bean.extract.ExtractBean;
-import org.akaza.openclinica.bean.extract.SPSSReportBean;
-import org.akaza.openclinica.bean.extract.TabReportBean;
+import org.akaza.openclinica.bean.extract.*;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -46,22 +49,9 @@ import org.akaza.openclinica.web.bean.ArchivedDatasetFileRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.job.XalanTriggerService;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
-import org.springframework.scheduling.quartz.JobDetailBean;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 /**
  * Take a dataset and show it in different formats,<BR/>
@@ -75,7 +65,7 @@ import java.util.zip.ZipFile;
  * 
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class ExportDatasetServlet extends SecureController {
 
 	public static String getLink(int dsId) {
@@ -134,7 +124,7 @@ public class ExportDatasetServlet extends SecureController {
 			forwardPage(Page.MENU_SERVLET);
 			return;
 		}
-		
+
 		int currentstudyid = currentStudy.getId();
 		int parentstudy = currentstudyid;
 
@@ -207,27 +197,31 @@ public class ExportDatasetServlet extends SecureController {
 				request.setAttribute("generate", generalFileDir + ODMXMLFileName);
 				System.out.println("+++ set the following: " + generalFileDir + ODMXMLFileName);
 				// Working group
-				// put an extra flag here, where we generate the XML, and then find the XSL, run a job and
-				// send a link with the SQL file? put the generated SQL file with the dataset?
+				// put an extra flag here, where we generate the XML, and then
+				// find the XSL, run a job and
+				// send a link with the SQL file? put the generated SQL file
+				// with the dataset?
 				if (fp.getString("xalan") != null) {
 					XalanTriggerService xts = new XalanTriggerService();
 
 					String propertiesPath = SQLInitServlet.getField("filePath");
 
-					// the trick there, we need to open up the zipped file and get at the XML
+					// the trick there, we need to open up the zipped file and
+					// get at the XML
 					openZipFile(generalFileDir + ODMXMLFileName + ".zip");
-					// need to find out how to copy this xml file from /bin to the generalFileDir
-					SimpleTrigger simpleTrigger = xts.generateXalanTrigger(propertiesPath + File.separator
+					// need to find out how to copy this xml file from /bin to
+					// the generalFileDir
+					SimpleTriggerImpl simpleTrigger = xts.generateXalanTrigger(propertiesPath + File.separator
 							+ "ODMReportStylesheet.xsl", ODMXMLFileName, generalFileDir + "output.sql", db.getId());
 					scheduler = getScheduler();
 
-					JobDetailBean jobDetailBean = new JobDetailBean();
+					JobDetailImpl jobDetailBean = new JobDetailImpl();
 					jobDetailBean.setGroup(XalanTriggerService.TRIGGER_GROUP_NAME);
 					jobDetailBean.setName(simpleTrigger.getName());
 					jobDetailBean.setJobClass(org.akaza.openclinica.web.job.XalanStatefulJob.class);
 					jobDetailBean.setJobDataMap(simpleTrigger.getJobDataMap());
 					jobDetailBean.setDurability(true); // need durability?
-					jobDetailBean.setVolatility(false);
+					// jobDetailBean.setVolatility(false);
 
 					try {
 						Date dateStart = scheduler.scheduleJob(jobDetailBean, simpleTrigger);
@@ -274,7 +268,7 @@ public class ExportDatasetServlet extends SecureController {
 				eb.getMetadata();
 
 				eb.computeReport(answer);
-				
+
 				String DDLFileName = "";
 				HashMap answerMap = generateFileService.createSPSSFile(db, eb, currentStudy, parentStudy, sysTimeBegin,
 						generalFileDir, answer, "");
@@ -309,7 +303,7 @@ public class ExportDatasetServlet extends SecureController {
 				request.setAttribute("generate", generalFileDir + excelFileName);
 				logger.info("set 'generate' to :" + generalFileDir + excelFileName);
 			}
-			
+
 			if (!finalTarget.equals(Page.GENERATE_EXCEL_DATASET) && !finalTarget.equals(Page.GENERATE_DATASET_HTML)) {
 
 				finalTarget.setFileName("" + "/WEB-INF/jsp/extract/generateMetadataCore.jsp");
@@ -393,7 +387,8 @@ public class ExportDatasetServlet extends SecureController {
 				ZipEntry entry = (ZipEntry) entries.nextElement();
 
 				if (entry.isDirectory()) {
-					// Assume directories are stored parents first then children.
+					// Assume directories are stored parents first then
+					// children.
 					System.out.println("Extracting directory: " + entry.getName());
 					// This is not robust, just for demonstration purposes.
 					(new File(entry.getName())).mkdir();
@@ -424,10 +419,10 @@ public class ExportDatasetServlet extends SecureController {
 		fileList = new ArrayList();
 		Iterator fileIterator = fileListRaw.iterator();
 		while (fileIterator.hasNext()) {
-			
+
 			ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) fileIterator.next();
 			asdfBean.setWebPath(asdfBean.getFileReference());
-			
+
 			if (new File(asdfBean.getFileReference()).isFile()) {
 				fileList.add(asdfBean);
 			} else {
@@ -468,7 +463,8 @@ public class ExportDatasetServlet extends SecureController {
 		setToPanel(resword.getString("created_date"), local_df.format(db.getCreatedDate()));
 		setToPanel(resword.getString("dataset_owner"), db.getOwner().getName());
 		try {
-			// do we not set this or is it null b/c we come to the page with no session?
+			// do we not set this or is it null b/c we come to the page with no
+			// session?
 			setToPanel(resword.getString("date_last_run"), local_df.format(db.getDateLastRun()));
 		} catch (NullPointerException npe) {
 			System.out.println("exception: " + npe.getMessage());

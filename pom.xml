@@ -478,13 +478,13 @@
 		    <dependency>
 				<groupId>org.quartz-scheduler</groupId>
 				<artifactId>quartz</artifactId>
-				<version>1.8.0</version>
+				<version>2.1.7</version>
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
 		        <groupId>org.quartz-scheduler</groupId>
 		        <artifactId>quartz-oracle</artifactId>
-		        <version>1.8.0</version>
+		        <version>2.1.7</version>
 		        <scope>compile</scope>
 		    </dependency>
 		    <!-- LIQUIBASE -->

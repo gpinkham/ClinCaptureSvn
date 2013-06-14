@@ -15,11 +15,7 @@ package org.akaza.openclinica.control.admin;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -41,12 +37,14 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.job.ExampleSpringJob;
 import org.quartz.JobDataMap;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
-import org.springframework.scheduling.quartz.JobDetailBean;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class UpdateJobExportServlet extends SecureController {
 
 	private static String SCHEDULER = "schedulerFactoryBean";
@@ -62,7 +60,6 @@ public class UpdateJobExportServlet extends SecureController {
 	public static final String JOB_DESC = "jobDesc";
 	public static final String USER_ID = "user_id";
 	public static final String STUDY_NAME = "study_name";
-	public static final String TRIGGER_GROUP_JOB = "XsltTriggersExportJobs";
 
 	@Override
 	protected void mayProceed() throws InsufficientPermissionException {
@@ -92,7 +89,7 @@ public class UpdateJobExportServlet extends SecureController {
 		Collection dsList = dsdao.findAllOrderByStudyIdAndName();
 		// TODO will have to dress this up to allow for sites then datasets
 		request.setAttribute("datasets", dsList);
-		request.setAttribute(CreateJobExportServlet.JOB_NAME, trigger.getName());
+		request.setAttribute(CreateJobExportServlet.JOB_NAME, trigger.getKey().getName());
 		request.setAttribute(CreateJobExportServlet.JOB_DESC, trigger.getDescription());
 
 		dataMap = trigger.getJobDataMap();
@@ -110,6 +107,7 @@ public class UpdateJobExportServlet extends SecureController {
 		request.setAttribute("extractProperties", CoreResources.getExtractProperties());
 
 		Date jobDate = trigger.getNextFireTime();
+		jobDate = jobDate == null ? trigger.getStartTime() : jobDate;
 		HashMap presetValues = new HashMap();
 		Calendar calendar = new GregorianCalendar();
 		calendar.setTime(jobDate);
@@ -129,7 +127,8 @@ public class UpdateJobExportServlet extends SecureController {
 		scheduler = getScheduler();
 		System.out.println("found trigger name " + triggerName);
 		ExtractUtils extractUtils = new ExtractUtils();
-		Trigger updatingTrigger = scheduler.getTrigger(triggerName.trim(), XsltTriggerService.TRIGGER_GROUP_NAME);
+		Trigger updatingTrigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName.trim(),
+				XsltTriggerService.TRIGGER_GROUP_NAME));
 		if (StringUtil.isBlank(action)) {
 			setUpServlet(updatingTrigger);
 			forwardPage(Page.UPDATE_JOB_EXPORT);
@@ -138,7 +137,8 @@ public class UpdateJobExportServlet extends SecureController {
 			// validate first
 			// then update or send back
 			HashMap errors = validateForm(fp, request,
-					scheduler.getTriggerNames(XsltTriggerService.TRIGGER_GROUP_NAME), updatingTrigger.getName());
+					scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(XsltTriggerService.TRIGGER_GROUP_NAME)),
+					updatingTrigger.getKey().getName());
 			if (!errors.isEmpty()) {
 				// send back
 				addPageMessage("Your modifications caused an error, please see the messages for more information.");
@@ -198,43 +198,46 @@ public class UpdateJobExportServlet extends SecureController {
 					epBean.setPostProcLocation(prePocLoc);
 				}
 				extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
-				SimpleTrigger trigger = null;
+				SimpleTriggerImpl newTrigger = null;
 
-				trigger = xsltService.generateXsltTrigger(xsltPath,
+                newTrigger = xsltService.generateXsltTrigger(xsltPath,
 						generalFileDir, // xml_file_path
 						endFilePath + File.separator, exportFileName, dsBean.getId(), epBean, userBean, request
 								.getLocale().getLanguage(), cnt, SQLInitServlet.getField("filePath") + "xslt",
-						TRIGGER_GROUP_JOB);
+						XsltTriggerService.TRIGGER_GROUP_NAME);
 
+                newTrigger.setName(jobName);
+                newTrigger.setJobName(jobName);
 				// Updating the original trigger with user given inputs
-				trigger.setRepeatCount(64000);
-				trigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
-				trigger.setDescription(jobDesc);
+                newTrigger.setRepeatCount(64000);
+                newTrigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
+                newTrigger.setDescription(jobDesc);
 				// set just the start date
-				trigger.setStartTime(startDateTime);
-				trigger.setName(jobName);// + datasetId);
-				trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
-				trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
-				trigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
-				trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
-				trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
-				trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
+                newTrigger.setStartTime(startDateTime);
+                newTrigger.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
+                newTrigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
+                newTrigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
+                newTrigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
+                newTrigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
+                newTrigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
 
-				JobDetailBean jobDetailBean = new JobDetailBean();
+				JobDetailImpl jobDetailBean = new JobDetailImpl();
 				jobDetailBean.setGroup(XsltTriggerService.TRIGGER_GROUP_NAME);
-				jobDetailBean.setName(trigger.getName());
+				jobDetailBean.setName(newTrigger.getName());
 				jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
-				jobDetailBean.setJobDataMap(trigger.getJobDataMap());
+				jobDetailBean.setJobDataMap(newTrigger.getJobDataMap());
 				jobDetailBean.setDurability(true); // need durability?
-				jobDetailBean.setVolatility(false);
+				// jobDetailBean.setVolatility(false);
 				try {
-					scheduler.deleteJob(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME);
+					scheduler.deleteJob(updatingTrigger.getJobKey());
+					Date dataStart = scheduler.scheduleJob(jobDetailBean, newTrigger);
+					logger.info("Job started with a start date of " + dataStart.toString());
 					addPageMessage("Your job has been successfully modified.");
 					forwardPage(Page.VIEW_JOB_SERVLET);
 				} catch (SchedulerException se) {
 					se.printStackTrace();
 					// set a message here with the exception message
-					setUpServlet(trigger);
+					setUpServlet(newTrigger);
 					addPageMessage("There was an unspecified error with your creation, please contact an administrator.");
 					forwardPage(Page.UPDATE_JOB_EXPORT);
 				}
@@ -242,7 +245,8 @@ public class UpdateJobExportServlet extends SecureController {
 		}
 	}
 
-	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, String[] triggerNames, String properName) {
+	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
+			String properName) {
 		Validator v = new Validator(request);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
 		// need to be unique too
@@ -258,8 +262,8 @@ public class UpdateJobExportServlet extends SecureController {
 		if (formatId == 0) {
 			Validator.addError(errors, FORMAT_ID, "Please pick at least one.");
 		}
-		for (String triggerName : triggerNames) {
-			if (triggerName.equals(fp.getString(JOB_NAME)) && (!triggerName.equals(properName))) {
+		for (TriggerKey triggerKey : triggerKeys) {
+			if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && (!triggerKey.getName().equals(properName))) {
 				Validator.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
 			}
 		}

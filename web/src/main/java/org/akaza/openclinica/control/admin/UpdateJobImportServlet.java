@@ -13,12 +13,6 @@
 
 package org.akaza.openclinica.control.admin;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -33,8 +27,17 @@ import org.akaza.openclinica.web.job.TriggerService;
 import org.quartz.JobDataMap;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
-import org.springframework.scheduling.quartz.JobDetailBean;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class UpdateJobImportServlet extends SecureController {
@@ -74,8 +77,8 @@ public class UpdateJobImportServlet extends SecureController {
 		request.setAttribute(ImportSpringJob.FIRST_FILE_PATH, IMPORT_DIR);
 
 		if (trigger != null) {
-			request.setAttribute(ImportSpringJob.TNAME, trigger.getName());
-			request.setAttribute(ImportSpringJob.JOB_NAME, trigger.getName());
+			request.setAttribute(ImportSpringJob.TNAME, trigger.getKey().getName());
+			request.setAttribute(ImportSpringJob.JOB_NAME, trigger.getJobKey().getName());
 			request.setAttribute(ImportSpringJob.JOB_DESC, trigger.getDescription());
 
 			dataMap = trigger.getJobDataMap();
@@ -140,13 +143,13 @@ public class UpdateJobImportServlet extends SecureController {
 		String triggerName = fp.getString("tname");
 		scheduler = getScheduler();
 		System.out.println("found trigger name " + triggerName);
-		Trigger trigger = scheduler.getTrigger(triggerName, TRIGGER_IMPORT_GROUP);
+		Trigger updatingTrigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName, TRIGGER_IMPORT_GROUP));
 		if (StringUtil.isBlank(action)) {
-			setUpServlet(trigger);
+			setUpServlet(updatingTrigger);
 			forwardPage(Page.UPDATE_JOB_IMPORT);
 		} else if ("confirmall".equalsIgnoreCase(action)) {
-			HashMap errors = triggerService.validateImportJobForm(fp, request, scheduler.getTriggerNames("DEFAULT"),
-					trigger.getName());
+			HashMap errors = triggerService.validateImportJobForm(fp, request,
+					scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")), updatingTrigger.getKey().getName());
 
 			Date startTime = getJobStartTime(errors, fp);
 
@@ -160,24 +163,26 @@ public class UpdateJobImportServlet extends SecureController {
 				StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
 				int studyId = fp.getInt(ImportSpringJob.STUDY_ID);
 				StudyBean study = (StudyBean) studyDAO.findByPK(studyId);
-				trigger = triggerService.generateImportTrigger(fp, sm.getUserBean(), study, startTime, request
+                SimpleTriggerImpl newTrigger = triggerService.generateImportTrigger(fp, sm.getUserBean(), study, startTime, request
 						.getLocale().getLanguage());
-				JobDetailBean jobDetailBean = new JobDetailBean();
+				JobDetailImpl jobDetailBean = new JobDetailImpl();
 				jobDetailBean.setGroup(TRIGGER_IMPORT_GROUP);
-				jobDetailBean.setName(trigger.getName());
+				jobDetailBean.setName(newTrigger.getKey().getName());
 				jobDetailBean.setJobClass(org.akaza.openclinica.web.job.ImportStatefulJob.class);
-				jobDetailBean.setJobDataMap(trigger.getJobDataMap());
+				jobDetailBean.setJobDataMap(newTrigger.getJobDataMap());
 				jobDetailBean.setDurability(true); // need durability?
-				jobDetailBean.setVolatility(false);
+				// jobDetailBean.setVolatility(false);
 
 				try {
-					scheduler.deleteJob(triggerName, TRIGGER_IMPORT_GROUP);
+					scheduler.deleteJob(updatingTrigger.getJobKey());
+					Date dateStart = scheduler.scheduleJob(jobDetailBean, newTrigger);
+					logger.info("Job scheduled with a start date of " + dateStart.toString());
 					addPageMessage("Your job has been successfully modified.");
 					forwardPage(Page.VIEW_IMPORT_JOB_SERVLET);
 				} catch (SchedulerException se) {
 					se.printStackTrace();
 					// set a message here with the exception message
-					setUpServlet(trigger);
+					setUpServlet(newTrigger);
 					addPageMessage("There was an unspecified error with your creation, please contact an administrator.");
 					forwardPage(Page.UPDATE_JOB_IMPORT);
 				}

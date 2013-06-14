@@ -13,41 +13,8 @@
 
 package org.akaza.openclinica.job;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.sql.DataSource;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
 import org.akaza.openclinica.bean.admin.TriggerBean;
-import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
-import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.bean.extract.ExportFormatBean;
-import org.akaza.openclinica.bean.extract.ExtractBean;
-import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import org.akaza.openclinica.bean.extract.*;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.ProcessingFunction;
@@ -67,15 +34,25 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
+import javax.sql.DataSource;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Xalan Transform Job, an XSLT transform job using the Xalan classes
@@ -83,7 +60,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
  * @author thickerson
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class XsltTransformJob extends QuartzJobBean {
 
 	public static final String DATASET_ID = "dsId";
@@ -166,7 +143,8 @@ public class XsltTransformJob extends QuartzJobBean {
 			int dsId = dataMap.getInt(DATASET_ID);
 
 			// JN: Change from earlier versions, cannot get static reference as
-			// static references don't work. Reason being for example there could be
+			// static references don't work. Reason being for example there
+			// could be
 			// datasetId as a variable which is different for each dataset and
 			// that needs to be loaded dynamically
 			ExtractPropertyBean epBean = (ExtractPropertyBean) dataMap.get(EP_BEAN);
@@ -215,7 +193,8 @@ public class XsltTransformJob extends QuartzJobBean {
 				Object value = entry.getValue();
 				ODMXMLFileName = (String) key;// JN: Since there is a logic to
 												// delete all the intermittent
-												// files, this file could be a zip
+												// files, this file could be a
+												// zip
 												// file.
 				Integer fileID = (Integer) value;
 				fId = fileID.intValue();
@@ -249,7 +228,8 @@ public class XsltTransformJob extends QuartzJobBean {
 
 				Transformer transformer = tFactory.newTransformer(new StreamSource(in));
 
-				// String endFile = outputPath + File.separator + dataMap.getString(POST_FILE_NAME);
+				// String endFile = outputPath + File.separator +
+				// dataMap.getString(POST_FILE_NAME);
 				endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
 
 				endFileStream = new FileOutputStream(endFile);
@@ -388,7 +368,8 @@ public class XsltTransformJob extends QuartzJobBean {
 				// delete old files now
 				List<File> intermediateFiles = generateFileService.getOldFiles();
 				String[] dontDelFiles = epBean.getDoNotDelFiles();
-				// JN: The following is the code for zipping up the files, in case of more than one xsl being provided.
+				// JN: The following is the code for zipping up the files, in
+				// case of more than one xsl being provided.
 				if (dontDelFiles.length > 1 && zipped) {
 					// unzip(dontDelFiles);
 					logMe("count =====" + cnt + "dontDelFiles length==---" + dontDelFiles.length);
@@ -469,6 +450,7 @@ public class XsltTransformJob extends QuartzJobBean {
 					triggerBean.setDataset(datasetBean);
 					triggerBean.setUserAccount(userBean);
 					triggerBean.setFullName(extractName);
+					triggerBean.setFiredDate(context.getFireTime());
 					String actionMsg = "You may access the " + (String) dataMap.get(XsltTriggerService.EXPORT_FORMAT)
 							+ " file by changing your study/site to " + currentStudy.getName()
 							+ " and selecting the Export Data icon for " + datasetBean.getName()
@@ -523,6 +505,7 @@ public class XsltTransformJob extends QuartzJobBean {
 				TriggerBean triggerBean = new TriggerBean();
 				triggerBean.setUserAccount(userBean);
 				triggerBean.setFullName((String) dataMap.get(XsltTriggerService.JOB_NAME));
+				triggerBean.setFiredDate(context.getFireTime());
 				auditEventDAO.createRowForExtractDataJobFailure(triggerBean);
 			}
 
@@ -773,7 +756,7 @@ public class XsltTransformJob extends QuartzJobBean {
 			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
 					.get("applicationContext");
 			StdScheduler scheduler = (StdScheduler) appContext.getBean(SCHEDULER);
-			JobDetail jobDetail = context.getJobDetail();
+			JobDetailImpl jobDetail = (JobDetailImpl) context.getJobDetail();
 			JobDataMap dataMap = jobDetail.getJobDataMap();
 			dataMap.put("successMsg", message);
 			jobDetail.setJobDataMap(dataMap);
@@ -791,7 +774,7 @@ public class XsltTransformJob extends QuartzJobBean {
 			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
 					.get("applicationContext");
 			StdScheduler scheduler = (StdScheduler) appContext.getBean(SCHEDULER);
-			JobDetail jobDetail = context.getJobDetail();
+			JobDetailImpl jobDetail = (JobDetailImpl) context.getJobDetail();
 			JobDataMap dataMap = jobDetail.getJobDataMap();
 			dataMap.put("failMessage", message);
 			jobDetail.setJobDataMap(dataMap);
@@ -853,10 +836,14 @@ public class XsltTransformJob extends QuartzJobBean {
 	private double setFormat(double number) {
 		if (number < 1)
 			number = 1.0;
-		DecimalFormat df = new DecimalFormat("#.#");
-		logger.trace("Number is" + Double.parseDouble(df.format(number)));
-		logger.trace("Number is" + (float) Double.parseDouble(df.format(number)));
-		return Double.valueOf(df.format(number));
+		BigDecimal num = new BigDecimal(number);
+		logger.trace("Number is" + num.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue());
+		return num.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+		/*
+		 * DecimalFormat df = new DecimalFormat("#.#"); logger.trace("Number is" +
+		 * Double.parseDouble(df.format(number))); logger.trace("Number is" + (float)
+		 * Double.parseDouble(df.format(number))); return Double.valueOf(df.format(number));
+		 */
 	}
 
 }

@@ -20,6 +20,10 @@
  */
 package org.akaza.openclinica.dao.admin;
 
+import java.util.*;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -34,16 +38,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
-@SuppressWarnings({"rawtypes","unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class AuditEventDAO extends AuditableEntityDAO {
 
 	public AuditEventDAO(DataSource ds) {

@@ -43,13 +43,13 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.SimpleTrigger;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-@SuppressWarnings({"rawtypes"})
+@SuppressWarnings({ "rawtypes" })
 public class ExampleSpringJob extends QuartzJobBean {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -86,12 +86,11 @@ public class ExampleSpringJob extends QuartzJobBean {
 		ResourceBundleProvider.updateLocale(locale);
 		ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
 		JobDataMap dataMap = context.getMergedJobDataMap();
-		SimpleTrigger trigger = (SimpleTrigger) context.getTrigger();
+		SimpleTriggerImpl trigger = (SimpleTriggerImpl) context.getTrigger();
 		try {
 			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
 					.get("applicationContext");
-			String studySubjectNumber = CoreResources
-					.getField("extract.number");
+			String studySubjectNumber = CoreResources.getField("extract.number");
 			coreResources = (CoreResources) appContext.getBean("coreResources");
 			ruleSetRuleDao = (RuleSetRuleDao) appContext.getBean("ruleSetRuleDao");
 			dataSource = (DataSource) appContext.getBean("dataSource");
@@ -159,7 +158,8 @@ public class ExampleSpringJob extends QuartzJobBean {
 
 				// logger.debug("-- gen tab file 00");
 
-				// tbh #5796 - covers a bug when the user changes studies, 10/2010
+				// tbh #5796 - covers a bug when the user changes studies,
+				// 10/2010
 				StudyBean activeStudy = (StudyBean) studyDao.findByPK(studyId);
 				StudyBean parentStudy = new StudyBean();
 				logger.debug("active study: " + studyId + " parent study: " + activeStudy.getParentStudyId());
@@ -283,11 +283,13 @@ public class ExampleSpringJob extends QuartzJobBean {
 				triggerBean.setDataset(datasetBean);
 				triggerBean.setUserAccount(userBean);
 				triggerBean.setFullName(trigger.getName());
+				triggerBean.setFiredDate(trigger.getStartTime());
 				auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, auditMessage.toString());
 			} else {
 				TriggerBean triggerBean = new TriggerBean();
 				triggerBean.setUserAccount(userBean);
 				triggerBean.setFullName(trigger.getName());
+				triggerBean.setFiredDate(trigger.getStartTime());
 				auditEventDAO.createRowForExtractDataJobFailure(triggerBean);
 			}
 

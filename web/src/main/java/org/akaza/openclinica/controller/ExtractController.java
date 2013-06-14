@@ -32,17 +32,18 @@ import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.quartz.JobDetailBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
 // import org.akaza.openclinica.control.extract.StdScheduler;
 
 @Controller("extractController")
@@ -62,7 +63,7 @@ public class ExtractController {
 
 	private String SCHEDULER = "schedulerFactoryBean";
 
-	public static String TRIGGER_GROUP_NAME = "XsltTriggers";
+	public static final String TRIGGER_GROUP_NAME = "XsltTriggers";
 
 	public ExtractController() {
 
@@ -103,8 +104,8 @@ public class ExtractController {
 		String[] files = epBean.getFileName();
 		String exportFileName;
 		int cnt = 0;
-		JobDetailBean jobDetailBean = new JobDetailBean();
-		SimpleTrigger simpleTrigger = null;
+		JobDetailImpl jobDetailBean;
+		SimpleTriggerImpl simpleTrigger;
 		// TODO: if files and export names size is not same... throw an error
 		dsBean.setName(dsBean.getName().replaceAll(" ", "_"));
 		String[] exportFiles = epBean.getExportFileName();
@@ -113,7 +114,8 @@ public class ExtractController {
 		SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
 		int i = 0;
 		String[] temp = new String[exportFiles.length];
-		// JN: The following logic is for comma separated variables, to avoid the second file be treated as a old file
+		// JN: The following logic is for comma separated variables, to avoid
+		// the second file be treated as a old file
 		// and deleted.
 		while (i < exportFiles.length) {
 			temp[i] = resolveVars(exportFiles[i], dsBean, sdfDir, SQLInitServlet.getField("filePath"), extractUtils);
@@ -137,14 +139,16 @@ public class ExtractController {
 
 			// need to set the dataset path here, tbh
 			System.out.println("found odm xml file path " + generalFileDir);
-			// next, can already run jobs, translations, and then add a message to be notified later
+			// next, can already run jobs, translations, and then add a message
+			// to be notified later
 			// JN all the properties need to have the variables...
 			String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + files[cnt];
 			String endFilePath = epBean.getFileLocation();
 			endFilePath = getEndFilePath(endFilePath, dsBean, sdfDir, SQLInitServlet.getField("filePath"), extractUtils);
 			// exportFileName = resolveVars(exportFileName,dsBean,sdfDir);
 			if (epBean.getPostProcExportName() != null) {
-				// String preProcExportPathName = getEndFilePath(epBean.getPostProcExportName(),dsBean,sdfDir);
+				// String preProcExportPathName =
+				// getEndFilePath(epBean.getPostProcExportName(),dsBean,sdfDir);
 				String preProcExportPathName = resolveVars(epBean.getPostProcExportName(), dsBean, sdfDir,
 						SQLInitServlet.getField("filePath"), extractUtils);
 				epBean.setPostProcExportName(preProcExportPathName);
@@ -156,24 +160,33 @@ public class ExtractController {
 			}
 			setAllProps(epBean, dsBean, sdfDir, extractUtils);
 			// also need to add the status fields discussed w/ cc:
-			// result code, user message, optional URL, archive message, log file message
+			// result code, user message, optional URL, archive message, log
+			// file message
 			// asdf table: sort most recent at top
 			System.out.println("found xslt file name " + xsltPath);
 
 			// String xmlFilePath = generalFileDir + ODMXMLFileName;
-			simpleTrigger = xsltService.generateXsltTrigger(xsltPath, generalFileDir, // xml_file_path
+			simpleTrigger = xsltService.generateXsltTrigger(xsltPath,
+					generalFileDir, // xml_file_path
 					endFilePath + File.separator, exportFileName, dsBean.getId(), epBean, userBean, request.getLocale()
-							.getLanguage(), cnt, SQLInitServlet.getField("filePath") + "xslt", ExtractController.TRIGGER_GROUP_NAME);
-			// System.out.println("just set locale: " + request.getLocale().getLanguage());
+							.getLanguage(), cnt, SQLInitServlet.getField("filePath") + "xslt",
+					ExtractController.TRIGGER_GROUP_NAME);
+			// System.out.println("just set locale: " +
+			// request.getLocale().getLanguage());
 
 			cnt++;
-			jobDetailBean = new JobDetailBean();
+
+			String jobName = simpleTrigger.getName() + System.currentTimeMillis();
+			simpleTrigger.setJobName(jobName);
+
+			jobDetailBean = new JobDetailImpl();
 			jobDetailBean.setGroup(ExtractController.TRIGGER_GROUP_NAME);
-			jobDetailBean.setName(simpleTrigger.getName() + System.currentTimeMillis());
+			jobDetailBean.setName(jobName);
 			jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
 			jobDetailBean.setJobDataMap(simpleTrigger.getJobDataMap());
-			jobDetailBean.setDurability(true); // need durability? YES - we will want to see if it's finished
-			jobDetailBean.setVolatility(false);
+			jobDetailBean.setDurability(true); // need durability? YES - we will
+												// want to see if it's finished
+			// jobDetailBean.setVolatility(false);
 
 			try {
 				Date dateStart = scheduler.scheduleJob(jobDetailBean, simpleTrigger);
@@ -185,7 +198,8 @@ public class ExtractController {
 
 		}
 		request.setAttribute("datasetId", datasetId);
-		// set the job name here in the user's session, so that we can ping the scheduler to pull it out later
+		// set the job name here in the user's session, so that we can ping the
+		// scheduler to pull it out later
 		if (jobDetailBean != null)
 			request.getSession().setAttribute("jobName", jobDetailBean.getName());
 		if (simpleTrigger != null)

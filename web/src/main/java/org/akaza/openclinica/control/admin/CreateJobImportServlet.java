@@ -30,9 +30,10 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.job.ImportSpringJob;
 import org.akaza.openclinica.web.job.TriggerService;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
-import org.springframework.scheduling.quartz.JobDetailBean;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 /**
  * Create Job Import Servlet, by Tom Hickerson, 2009
@@ -119,7 +120,7 @@ public class CreateJobImportServlet extends SecureController {
 		} else if ("confirmall".equalsIgnoreCase(action)) {
 			// collect form information
 			HashMap errors = triggerService.validateImportJobForm(fp, request,
-					scheduler.getTriggerNames(IMPORT_TRIGGER));
+					scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(IMPORT_TRIGGER)));
 
 			Date startTime = getJobStartTime(errors, fp);
 
@@ -136,16 +137,16 @@ public class CreateJobImportServlet extends SecureController {
 				int studyId = fp.getInt(ImportSpringJob.STUDY_ID);
 				StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
 				StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
-				SimpleTrigger trigger = triggerService.generateImportTrigger(fp, sm.getUserBean(), studyBean, request
-						.getLocale().getLanguage(), startTime);
+				SimpleTriggerImpl trigger = triggerService.generateImportTrigger(fp, sm.getUserBean(), studyBean,
+						request.getLocale().getLanguage(), startTime);
 
-				JobDetailBean jobDetailBean = new JobDetailBean();
+				JobDetailImpl jobDetailBean = new JobDetailImpl();
 				jobDetailBean.setGroup(IMPORT_TRIGGER);
 				jobDetailBean.setName(trigger.getName());
 				jobDetailBean.setJobClass(org.akaza.openclinica.web.job.ImportStatefulJob.class);
 				jobDetailBean.setJobDataMap(trigger.getJobDataMap());
 				jobDetailBean.setDurability(true); // need durability?
-				jobDetailBean.setVolatility(false);
+				// jobDetailBean.setVolatility(false);
 
 				// set to the scheduler
 				try {
