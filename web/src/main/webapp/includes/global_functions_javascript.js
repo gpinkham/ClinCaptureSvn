@@ -2078,8 +2078,15 @@ try {
 
 jQuery(function() {
 
-    jQuery("#Rand_Result_Txt").find(":input").attr('readonly', 'true');
-    jQuery("#Rand_Randomization_Date").find(":input").attr('readonly', 'true');
+    jQuery("#Rand_Date").find(":input").attr('disabled', "disabled");
+    jQuery("#Rand_Result").find(":input").attr('disabled', "disabled");
+
+})
+
+jQuery(function() {
+
+    jQuery("#Rand_Date").find(":input").attr('disabled', "disabled");
+    jQuery("#Rand_Result").find(":input").attr('disabled', "disabled");
 
 })
 
@@ -2088,58 +2095,54 @@ function randomizeSubject() {
     var crf = jQuery("input:hidden[name='crfId']").val();
     var studyId = jQuery("input:hidden[name='studyId']").val();
     
-    var rand_optionalParameter1 = null;
+    var eligibility = null;
 
-    // Check if the optional item is defined
-    if(jQuery("#Rand_OptionalParam_1 :select").size() > 0) {
+    // Check if the subject eligibility is defined
+    if(jQuery("#Rand_Eligibility :radio").size() > 0) {
 
         // Check if selection has been done
-        if(jQuery("#Rand_OptionalParam_1 :select").find(":selected") !== undefined) {
+        if(jQuery("input[type=radio]:checked", "#Rand_Eligibility").length > 0) {
             
-            var opt1 = jQuery("#Rand_OptionalParam_1 :select").find(":selected").text();
+            eligibility = jQuery("input[type=radio]:checked", "#Rand_Eligibility").val();
 
-            rand_optionalParameter1 = jQuery("input:hidden[eleid='optionalParam_1']").attr(opt1)
-
-        } else {
-
-            alert(jQuery("input:hidden[name='optional_param_1_missing']").val());
-            return false;
-        }
+        } 
     }
 
-    var rand_optionalParameter2 = null
+    var strataLevel = null
 
-    // Check if the optional item is defined
-    if(jQuery("#Rand_OptionalParam_2 :select").size() > 0) {
+    // Check if the strate level item defined
+    if(jQuery("#Rand_StrataData :select").size() > 0) {
 
         // Check if selection has been done
-        if(jQuery("#Rand_OptionalParam_2 :select").find(":selected") !== undefined) {
+        if(jQuery("#Rand_StrataData :select").find(":selected") !== undefined) {
            
-            var opt2 = jQuery("#Rand_OptionalParam_2 :select").find(":selected").text();
+            var opt2 = jQuery("#Rand_StrataData :select").find(":selected").text();
 
-            rand_optionalParameter2 = jQuery("input:hidden[eleid='optionalParam_2']").attr(opt2)
+            strataLevel = jQuery("input:hidden[eleid='requiredParam2']").attr(opt2)} 
 
-        } else {
+            else {
             
-            alert(jQuery("input:hidden[name='optional_param_2_missing']").val());
+            alert(jQuery("input:hidden[name='requiredParam2Missing']").val());
 
             return false;
         }
     }
 
-    var rand_optionalParameter3 = null
+    var trialId = null
 
-    // Check if the optional item is defined
-    if(jQuery("#Rand_OptionalParam_3 :select").size() > 0) {
+    // Check if the trial Id is defined
+    if(jQuery("#Rand_TrialIDs :select").size() > 0) {
 
         // Check if selection has been done
-        if(jQuery("#Rand_OptionalParam_3 :select").find(":selected") !== undefined) {
+        if(jQuery("#Rand_TrialIDs :select").find(":selected") !== undefined) {
+
+            var opt3 = jQuery("#Rand_TrialIDs :select").find(":selected").text();
            
-           rand_optionalParameter3 = jQuery("#Rand_OptionalParam_3 :select").find(":selected").val()
+           trialId = jQuery("input:hidden[eleid='requiredParam3']").attr(opt3)
 
         } else {
             
-            alert(jQuery("input:hidden[name='optional_param_3_missing']").val());
+            alert(jQuery("input:hidden[name='requiredParam3Missing']").val());
 
             return false;
         }
@@ -2156,9 +2159,9 @@ function randomizeSubject() {
             crf: crf,
             study: studyId,
             subject: subject,
-            optionalParameter1: rand_optionalParameter1,
-            optionalParameter2: rand_optionalParameter2,
-            optionalParameter3: rand_optionalParameter3
+            trialId: trialId,
+            eligibility: eligibility,
+            strataLevel: strataLevel
         },
 
 
@@ -2183,14 +2186,14 @@ function randomizeSubject() {
                 alert(exceptionPattern.exec(data)[1])
 
             } else {
-            	
-            	var result = JSON.parse(data)
-            	jQuery("#Rand_Result_Txt").attr('readonly','');
-            	jQuery("#Rand_Randomization_Date").attr('readonly','');
-                jQuery("#Rand_Result_Txt").find(":input").val(result.result).change();
-                jQuery("#Rand_Randomization_Date").find(":input").val(result.date).change();
-                jQuery("#Rand_Result_Txt").attr('readonly','true');
-            	jQuery("#Rand_Randomization_Date").attr('readonly','true');
+                
+                var result = JSON.parse(data)
+                
+                jQuery("#Rand_Date").find(":input").attr('disabled', "disabled");
+                jQuery("#Rand_Result").find(":input").attr('disabled', "disabled");
+
+                jQuery("#Rand_Date").find(":input").val(result.date).change();
+                jQuery("#Rand_Result").find(":input").val(result.result).change();
             }
         }
     })
