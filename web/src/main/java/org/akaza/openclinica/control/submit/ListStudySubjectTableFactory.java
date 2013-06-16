@@ -223,7 +223,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		String actionsHeader = resword.getString("rule_actions")
 				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" + 
 				"&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" +
-				"&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
+				"&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
 		configureColumn(row.getColumn(columnNames[columnNames.length - 1]), actionsHeader, new ActionsCellEditor(),
 				new DefaultActionsEditor(locale), true, false);
 
@@ -843,14 +843,21 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 									getStudySubjectDAO(), getEventCRFDAO(), getEventDefintionCRFDAO(),
 									getStudyEventDefinitionDao(), getDiscrepancyNoteDAO()))) {
 						url.append(sdvStudySubjectLinkBuilder(studySubjectBean));
+					} else if(currentRole.getRole().getId() != 5 && currentRole.getRole().getId() != 4) {
+						HtmlBuilder transparentButton = new HtmlBuilder();
+						url.append(transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0").append("hspace=\"4\"").end());
 					}
 					if (getStudyBean().getStatus() == Status.AVAILABLE
 							&& getCurrentRole().getRole() != Role.RESEARCHASSISTANT
 							&& getCurrentRole().getRole() != Role.INVESTIGATOR
 							&& studySubjectBean.getStatus() == Status.AVAILABLE) {
 						url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
+					} else if(getStudyBean().getStatus() == Status.AVAILABLE
+							&& (studySubjectBean.getStatus() != Status.DELETED || studySubjectBean.getStatus() != Status.AUTO_DELETED) && currentRole.getRole().getId() != 5
+							&& currentRole.getRole().getId() != 4) {
+						HtmlBuilder transparentButton = new HtmlBuilder();
+						url.append(transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0").append("hspace=\"4\"").end());
 					}
-
 					if (getCurrentRole().getRole() == Role.INVESTIGATOR
 							&& getStudyBean().getStatus() == Status.AVAILABLE
 							&& studySubjectBean.getStatus() != Status.DELETED) {
@@ -941,9 +948,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	private String sdvStudySubjectLinkBuilder(StudySubjectBean studySubject) {
 		HtmlBuilder actionLink = new HtmlBuilder();
-		actionLink
-				.a()
-				.href("pages/viewSubjectAggregate?sbb=true&studyId="
+		actionLink.a().href("pages/viewSubjectAggregate?sbb=true&studyId="
 						+ studyBean.getId()
 						+ "&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId="
 						+ studySubject.getLabel()).close();
@@ -1007,7 +1012,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		actionLink.img().name("bt_Restore1").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore"))
 				.title(resword.getString("restore")).append("hspace=\"4\"").end().aEnd();
 		HtmlBuilder transparentButton = new HtmlBuilder();
-		if(currentRole.getRole().getId() != 4 && currentRole.getRole().getId() != 5) {
+		if(currentRole.getRole().getId() != 4 && currentRole.getRole().getId() != 5 && currentRole.getRole().getId() != 2) {
 		transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0").append("hspace=\"4\"").end();
 		}
 		return actionLink.toString() + transparentButton.toString();

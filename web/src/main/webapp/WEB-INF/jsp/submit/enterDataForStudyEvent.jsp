@@ -526,7 +526,7 @@
     </c:choose>
 
 </td>
-<td class="table_cell" style="width:200px;text-align:center;">
+<td class="table_cell" style="width:215px;text-align:center;">
     <c:set var="actionQuery" value="" />
     <c:if test="${study.status.available}">
         <c:if test="${dec.continueInitialDataEntryPermitted}">
