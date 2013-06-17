@@ -62,6 +62,7 @@ public class CalendarLogic {
 		int subjectId = studyEventBean.getStudySubjectId();
 		StudyDAO sdao = new StudyDAO(ds);
 		StudyBean studyBean = sdao.findByStudySubjectId(subjectId);
+		studyBean = studyBean.getParentStudyId() > 0 ? (StudyBean)sdao.findByPK(studyBean.getParentStudyId()) : studyBean;
 		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPKAndStudy(subjectId, studyBean);
 		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean
 				.getStudyEventDefinitionId());
@@ -95,18 +96,22 @@ public class CalendarLogic {
 				sgcb.setId(subjectDynGroupId);
 			}
 			List<StudyEventDefinitionBean> sedForSch;
+			logger.debug("study bean id " + studyBean.getId());
+			logger.debug("subject dyn group id " + subjectDynGroupId);
 			if(sgcb.getId() == 0) {
-				logger.info("dyn groups not used");
 				sedForSch = seddao.findAllByStudy(studyBean);
 			} else {
-				logger.info("dyn groups is used");
-				sedForSch = seddao.findAllActiveOrderedByStudyGroupClassId(subjectDynGroupId);
+				sedForSch = seddao.findAllActiveOrderedByStudyGroupClassId(sgcb.getId());
 			}
-			
+			//find all non-grouped events
+			List <StudyEventDefinitionBean> nonGroupedEvents = seddao.findAllActiveNotClassGroupedByStudyId(studyBean.getId());
+			sedForSch.addAll(nonGroupedEvents);	
+			logger.debug("found list " + sedForSch.size());
 			for (StudyEventDefinitionBean sedTmp : sedForSch) {
+				logger.debug("found name " + sedTmp.getName());
 				if (!sedTmp.getReferenceVisit() && "calendared_visit".equalsIgnoreCase(sedTmp.getType())) {
 					ArrayList<StudyEventBean> eventsForValidation = sed.findAllByStudySubjectAndDefinition(ssb, sedTmp);
-					if (eventsForValidation.size() == 0) {
+						if (eventsForValidation.size() == 0) {
 						StudyEventBean studyEvent = new StudyEventBean();
 						studyEvent.setStudyEventDefinitionId(sedTmp.getId());
 						studyEvent.setStudySubjectId(subjectId);
@@ -115,7 +120,7 @@ public class CalendarLogic {
 						DateTime dateTimeCompleted = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
 						dateTimeCompleted = dateTimeCompleted.plusDays(schDay);
 						studyEvent.setDateStarted(dateTimeCompleted.toDate());
-						studyEvent.setOwner(getUserByEmail(sedb.getEmailAdress()));
+						studyEvent.setOwner(getUserByEmail(sedTmp.getEmailAdress()));
 						studyEvent.setStatus(Status.AVAILABLE);
 						studyEvent.setLocation("");
 						studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
