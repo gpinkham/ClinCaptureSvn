@@ -15,6 +15,7 @@ package org.akaza.openclinica.job;
 
 import org.quartz.StatefulJob;
 
+@SuppressWarnings("deprecation")
 public class XsltStatefulJob extends XsltTransformJob implements StatefulJob {
 
 	public XsltStatefulJob() {
