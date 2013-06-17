@@ -2083,13 +2083,6 @@ jQuery(function() {
 
 })
 
-jQuery(function() {
-
-    jQuery("#Rand_Date").find(":input").attr('disabled', "disabled");
-    jQuery("#Rand_Result").find(":input").attr('disabled', "disabled");
-
-})
-
 function randomizeSubject() {
 
     var crf = jQuery("input:hidden[name='crfId']").val();
