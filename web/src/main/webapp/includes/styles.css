@@ -367,7 +367,7 @@ li { font-family: Tahoma, Arial, Helvetica, Sans-Serif;
 
 td { font-family: Tahoma, Arial, Helvetica, Sans-Serif;
     font-size: 11px;
-    line-height: 15px;
+    line-height: 15px !important;
     color: #4D4D4D;
 }
 
