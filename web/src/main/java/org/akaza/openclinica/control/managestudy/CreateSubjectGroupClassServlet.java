@@ -97,7 +97,7 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 			
 			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-			ArrayList allDefsFromStudy = seddao.findAllByStudy(currentStudy);
+			ArrayList allDefsFromStudy = seddao.findAllActiveNotClassGroupedByStudyId(currentStudy.getId());
 			HashMap<StudyEventDefinitionBean, Boolean> definitions = new HashMap<StudyEventDefinitionBean, Boolean>();
 
 			for (int i = 0; i < allDefsFromStudy.size(); i++) {

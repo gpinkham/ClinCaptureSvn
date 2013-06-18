@@ -97,7 +97,11 @@ public class UpdateSubjectGroupClassServlet extends SecureController {
 				
 					StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 					EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-					ArrayList allDefsFromStudy = seddao.findAllByStudy(currentStudy);
+					//if you want to see all event definitions from study use next line:
+					//ArrayList allDefsFromStudy = seddao.findAllByStudy(currentStudy);
+					ArrayList allDefsFromStudy = seddao.findAllActiveOrderedByStudyGroupClassId(classId);
+					allDefsFromStudy.addAll(seddao.findAllActiveNotClassGroupedByStudyId(currentStudy.getId()));
+					
 					HashMap<StudyEventDefinitionBean, Boolean> definitions = new HashMap<StudyEventDefinitionBean, Boolean>();
 				
 					//create treemap<order,StudyEventDefinitionId> and hashmap<StudyEventDefinitionId,order>
