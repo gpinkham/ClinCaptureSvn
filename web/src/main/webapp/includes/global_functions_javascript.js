@@ -75,7 +75,7 @@ function checkGoBackSmartEntryStatus(strImageName, Message, servletURL, defaultU
     objImage = MM_findObj(strImageName);
     //alert(objImage.src);
     if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-        return confirmBack(Message, servletURL, defaultURL);
+        return confirmBackSmart(Message, servletURL, defaultURL);
     } else {
         goBackSmart(servletURL, defaultURL);
     }
@@ -1982,6 +1982,7 @@ function createNewEvent(event) {
                                 confEvent(aElement, newCLFuncBody);
 
                                 aElement.find("img").attr("src", "images/icon_Scheduled.gif");
+								aElement.find("img").attr("style", "position: relative;");
 								aElement.find("img").attr("style", "position: relative; left: 7px;");
                                 eventDiv.css("visibility", "hidden");
                                 eventDiv.html("");
