@@ -73,14 +73,7 @@
 	</c:when>
 	<c:otherwise>
 		 <td class="table_header_column" align="center" width="180px"><b><fmt:formatDate value="${event.dateMin}" dateStyle="medium"/> – <fmt:formatDate value="${event.dateMax}" dateStyle="medium"/></b>
-		 		<c:choose>
-		 		<c:when test="${event.flagColor == 'red'}">
-		 			<img src="images/icon_Note.gif">
-		 		</c:when>
-				<c:when test="${event.flagColor == 'green'}">
-		 			<img src="images/icon_flagGreen.gif">
-		 		</c:when>
-		 		</c:choose>
+		 		
 		 </td>
 		 <td class="table_header_column" align="center"><b><fmt:formatDate value="${event.dateSchedule}" dateStyle="medium"/></br></b></td>
 		 <td class="table_header_column" align="center"><b><fmt:formatDate value="${event.dateEmail}" dateStyle="medium"/></br></b></td>

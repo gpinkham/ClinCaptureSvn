@@ -80,6 +80,7 @@ import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+import org.joda.time.DateTime;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
@@ -1565,13 +1566,101 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			}
 		}
 		
+		boolean completedReferenceEvent = false; 
+		List <StudyEventBean> studyEventBeanList = getStudyEventDAO().findAllByStudySubject(studySubject);
+		for (StudyEventBean studyEventBean : studyEventBeanList) {
+			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(studyEventBean.getStudyEventDefinitionId());
+			if(sedBean.getReferenceVisit() && studyEventBean.getSubjectEventStatus().isCompleted()) {
+				completedReferenceEvent = true;
+				break;
+			}
+		}
 		HtmlBuilder actionLink = new HtmlBuilder();
-		actionLink.a().href("javascript:openDocWindow('ViewCalendaredEventsForSubject?id=" + studySubject.getId()+"')");
-		actionLink.append("onMouseDown=\"javascript:setImage('bt_Calendar','images/bt_Calendar_d.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_Calendar','images/bt_Calendar.gif');\"").close();
-		actionLink.img().name("bt_Calendar").src("images/bt_Calendar.gif").border("0")
-				.alt(resword.getString("view_calendared_parameters")).title(resword.getString("view_calendared_parameters")).append("hspace=\"4\"").end()
-				.aEnd();
+		
+		if (completedReferenceEvent) {
+			String iconColor = "bt_Calendar";
+			List <StudyEventBean> studyEventList = getStudyEventDAO().findAllByStudySubject(studySubject);
+			if(!getCalendarIconColor(studyEventList, studySubject)) {
+				iconColor = "bt_Calendar_red";
+			}
+			actionLink.a().href("javascript:openDocWindow('ViewCalendaredEventsForSubject?id="+ studySubject.getId() + "')");
+			actionLink.append("onMouseDown=\"javascript:setImage('bt_Calendar','images/"+iconColor+"_d.gif');\"");
+			actionLink.append("onMouseUp=\"javascript:setImage('bt_Calendar','images/"+iconColor+".gif');\"").close();
+			actionLink.img().name("bt_Calendar").src("images/"+iconColor+".gif").border("0");
+			actionLink.alt(resword.getString("view_calendared_parameters")).title(resword.getString("view_calendared_parameters")).append("hspace=\"4\"").end().aEnd();	
+		} 
 		return transparentIcon.toString() + actionLink.toString();
 	}
+	
+	private boolean getCalendarIconColor(List<StudyEventBean> studyEventBeanList,StudySubjectBean subjectBean) {
+		boolean defaultColor = true;
+		StudyEventBean refEventResult;
+		for (StudyEventBean studyEventBean : studyEventBeanList) {
+			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(studyEventBean.getStudyEventDefinitionId());
+			Date refVisitDateCompleted = new DateTime(studyEventBean.getDateStarted().getTime()).minusDays(sedBean.getScheduleDay()).toDate();
+			if (studyEventBean.getSubjectEventStatus().isCompleted() && !sedBean.getReferenceVisit()) {
+				refEventResult = getSubjectReferenceEventByDateCompleted(refVisitDateCompleted, subjectBean);
+				Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMinDay()).toDate();
+				if (studyEventBean.getUpdatedDate() != null) {
+					Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay()).toDate();
+					if ((minDate.after(studyEventBean.getUpdatedDate())) && discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(studyBean,sedBean.getName(), subjectBean.getLabel())) {
+						defaultColor = false;
+						break;
+					} else if (maxDate.before(studyEventBean.getUpdatedDate()) && discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(studyBean,sedBean.getName(), subjectBean.getLabel())) {
+						defaultColor = false;
+						break;
+					}
+				}
+			} else if (studyEventBean.getSubjectEventStatus().isScheduled() ) {
+				refEventResult = getLastReferenceEvent(subjectBean);
+				Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay()+1).toDate();
+					if (maxDate.before(new Date())) {
+						defaultColor = false;
+						break;
+					}
+			}
+
+		}
+		return defaultColor;
+	}
+	
+	private StudyEventBean getSubjectReferenceEventByDateCompleted(Date dateCompleted, StudySubjectBean ssBean) {
+			StudyEventBean refEventResult = new StudyEventBean();
+			ArrayList<StudyEventDefinitionBean> refEventDefs = getStudyEventDefinitionDao().findReferenceVisitBeans();
+			for (StudyEventDefinitionBean refEventDef : refEventDefs) {
+				ArrayList<StudyEventBean> refEventBeans = getStudyEventDAO().findAllByStudySubjectAndDefinition(ssBean, refEventDef);
+				if (refEventBeans.size() > 0) {
+					for (StudyEventBean refEventBean : refEventBeans) {
+						if (refEventBean.getSubjectEventStatus().isCompleted() && refEventBean.getUpdatedDate().equals(dateCompleted)) {
+							refEventResult = refEventBean;
+							refEventResult.setStudyEventDefinition(refEventBean.getStudyEventDefinition());
+							break;
+						}
+					}
+				}
+			}
+			return refEventResult;
+	}
+	
+	private StudyEventBean getLastReferenceEvent(StudySubjectBean ssBean) {
+		StudyEventBean studyEventBeanRef = new StudyEventBean();
+		List<StudyEventDefinitionBean> studyEventDefinitions = getStudyEventDefinitionDao().findReferenceVisitBeans();
+		for (StudyEventDefinitionBean studyEventDefinitionBean : studyEventDefinitions) {
+			List<StudyEventBean> sebBeanArr = getStudyEventDAO().findAllByDefinitionAndSubject(studyEventDefinitionBean,ssBean);
+			for (StudyEventBean studyEventBeanReferenceVisit : sebBeanArr) {
+				if (studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
+					if (studyEventBeanRef.getUpdatedDate() == null) {
+						studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
+					} else {
+						if (studyEventBeanRef.getUpdatedDate().before(studyEventBeanReferenceVisit.getDateStarted())) {
+							studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
+						}
+					}
+				}
+			}
+		}
+		return studyEventBeanRef;
+	}
+	
+	
 }

@@ -56,11 +56,9 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 				Date schDate = seBean.getDateStarted();
 				Date refVisitDateCompleted = new DateTime(schDate.getTime()).minusDays(sedBean.getScheduleDay()).toDate();
 				StudyEventBean refEventResult;
-				boolean completeEvent = false;
 				if (seBean.getSubjectEventStatus().isCompleted()) {
 					refEventResult = getSubjectReferenceEventByDateCompleted(refVisitDateCompleted, ssBean);
 					logger.info("found completed event");
-					completeEvent = true;
 				} else {
 					refEventResult = getLastReferenceEvent(ssBean);
 					logger.info("found non completed event");
@@ -72,15 +70,10 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 					Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMinDay()).toDate();
 					Date emailDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getEmailDay()).toDate();
 					//set bean with values
-					calendFuncBean.setFlagColor(getFlagColor(minDate, maxDate, seBean));
 					calendFuncBean.setDateMax(maxDate);
 					calendFuncBean.setDateMin(minDate);
 					calendFuncBean.setDateSchedule(schDate);
-					if(completeEvent) {
 					calendFuncBean.setDateEmail(emailDate);
-					} else {
-						calendFuncBean.setDateEmail(emailDate);
-					}
 					calendFuncBean.setEventName(sedBean.getName());
 					calendFuncBean.setReferenceVisit(sedBean.getReferenceVisit());
 					calendFuncBean.setEventsReferenceVisit(seddao.findByPK(refEventResult.getStudyEventDefinitionId()).getName());	
@@ -130,31 +123,6 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 	        result = cal.get(Calendar.YEAR);
 	    }
 	    return result;
-	}
-	
-	private String getFlagColor(Date dayMin, Date dayMax, StudyEventBean seBean) {
-		String flagColor;
-		//Date dayMaxPlusInclusiveDay = new DateTime(dayMax.getTime()).plusDays(1).toDate();
-		Date dayMaxTime = new DateTime(dayMax.getTime()).toDate();
-		Interval timeRangeForStudyEvent = new Interval(dayMin.getTime(),dayMaxTime.getTime());
-		if (seBean.getUpdatedDate() != null && seBean.getSubjectEventStatus().isCompleted()) {
-			logger.info("===================");
-			logger.info("seBean.getUpdatedDate() = "+seBean.getUpdatedDate());
-			logger.info("timeRangeForStudyEvent.getStart() = "+timeRangeForStudyEvent.getStart().toDate());
-			logger.info("timeRangeForStudyEvent.getEnd() = "+timeRangeForStudyEvent.getEnd().toDate());
-			logger.info("===================");
-			if ((timeRangeForStudyEvent.getStart().isAfter(seBean.getUpdatedDate().getTime()) || timeRangeForStudyEvent
-					.getEnd().isBefore(seBean.getUpdatedDate().getTime()))) {
-				logger.info("out of range");
-				flagColor = "red";
-				return flagColor;
-			} else if (!timeRangeForStudyEvent.getStart().isAfter(seBean.getUpdatedDate().getTime())
-					&& !timeRangeForStudyEvent.getEnd().isBefore(seBean.getUpdatedDate().getTime())) {
-				logger.info("in max min range");
-				return flagColor = "green";
-			}
-		}
-		return null;
 	}
 	
 	@SuppressWarnings("unchecked")
