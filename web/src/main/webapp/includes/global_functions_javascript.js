@@ -2077,6 +2077,10 @@ try {
     }
 } catch (e) {}
 
+/* =======================================================================
+* Disable the Randomization result field and the randomization date field
+* They should be read-only
+========================================================================= */
 jQuery(function() {
 
     jQuery("#Rand_Date").find(":input").attr('disabled', "disabled");
@@ -2084,6 +2088,18 @@ jQuery(function() {
 
 })
 
+/* =======================================================================================
+* Randomize the current subject for whom data entry is being executed on.
+*
+* This function takes no parameters but assumes the following (for a valid randomization): 
+*
+* - The current study is a site
+* - A stratification level is provided
+* - Corresponding details are configured in randomize.net
+* - A valid Trial Id is either configured in the CRF or datainfo.properties (but not both)
+*
+* This function returns undefined.
+========================================================================================== */
 function randomizeSubject() {
 
     var crf = jQuery("input:hidden[name='crfId']").val();
@@ -2140,6 +2156,9 @@ function randomizeSubject() {
 
             return false;
         }
+    } else {
+        
+        trialId = jQuery("input[eleid='randomize']").attr("trialId")
     }
     
     var subject = jQuery("input:hidden[name='subjectLabel']").val()

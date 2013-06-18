@@ -30,6 +30,7 @@ import com.clinovo.exception.RandomizationException;
 import com.clinovo.model.Randomization;
 import com.clinovo.model.RandomizationResult;
 import com.clinovo.rule.ext.HttpTransportProtocol;
+import com.clinovo.util.RandomizationUtil;
 
 @SuppressWarnings("serial")
 public class RandomizeServlet extends SecureController {
@@ -125,13 +126,42 @@ public class RandomizeServlet extends SecureController {
 
 	private RandomizationResult initiateRandomizationCall(HttpServletRequest request) throws Exception {
 
+		String trialId = "";
 		String studyId = request.getParameter("study");
 
-		// optional parameters
-		String trialId = request.getParameter("trialId");
+		// Get Trial Id configured in the CRF
+		String crfConfiguredTrialId = request.getParameter("trialId");
+
+		// Get TrialId configured in datainfo.properties
+		String configuredTrialId = CoreResources.getField("randomizationTrialId");
+
+		// Check if the datainfo.properties trial config is "empty or zero"
+		if (RandomizationUtil.isConfiguredTrialIdValid(configuredTrialId)) {
+
+			// Trial Id should be configured in one place
+			if (RandomizationUtil.isTrialIdDoubleConfigured(configuredTrialId, crfConfiguredTrialId)) {
+
+				throw new RandomizationException("Trial ID must be specified either on the server or the CRF but not both.");
+
+			} else {
+
+				trialId = configuredTrialId;
+			}
+
+		} else if (RandomizationUtil.isCRFSpecifiedTrialIdValid(crfConfiguredTrialId)) {
+
+			trialId = crfConfiguredTrialId;
+			
+		} else {
+			
+			// Valid Trial Id must be specified at least in one place (CRF or datainfo.properties)
+			throw new RandomizationException("Specify a valid Trial Id to proceed.");
+		}
+
 		String strataLevel = request.getParameter("strataLevel").equals("null") ? "" : request.getParameter("strataLevel");
 
-		String siteId = "PACE001"; getSiteId(studyId);
+		// This line should be removed
+		String siteId = "PACE001"; //getSiteId(studyId);
 		String patientId = request.getParameter("subject");
 
 		Randomization randomization = new Randomization();
@@ -157,16 +187,18 @@ public class RandomizeServlet extends SecureController {
 		protocol.setSubmissionContext(context);
 
 		RandomizationResult result = protocol.call();
-		
+
 		return result;
 	}
 
 	private boolean isCrfComplete(String crfId) {
 
 		log.info("Asserting the status of crf with id: {0} ", crfId);
-
+		
+		// Run rules on the CRF
 		HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> result = getRuleSetService()
 				.runRulesInBulk(crfId, ExecutionMode.DRY_RUN, currentStudy, ub);
+		
 		if (result.isEmpty()) {
 			return true;
 		} else {
@@ -199,5 +231,4 @@ public class RandomizeServlet extends SecureController {
 		ruleSetService.setRequestURLMinusServletPath(getRequestURLMinusServletPath());
 		return ruleSetService;
 	}
-
 }
