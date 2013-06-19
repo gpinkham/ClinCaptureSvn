@@ -21,4 +21,5 @@
 	<include file="migration/clincaptrue/2013-05-17-TICKET159.xml" />
 	<include file="migration/clincaptrue/2013-05-28-TICKET109.xml" />
     <include file="migration/clincaptrue/2013-06-07-quartz-2.1.7.xml" />
+	<include file="migration/clincaptrue/2013-06-12-TICKET238.xml" />
 </databaseChangeLog>
