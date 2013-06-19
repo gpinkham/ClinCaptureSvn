@@ -58,10 +58,10 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 				StudyEventBean refEventResult;
 				if (seBean.getSubjectEventStatus().isCompleted()) {
 					refEventResult = getSubjectReferenceEventByDateCompleted(refVisitDateCompleted, ssBean);
-					logger.info("found completed event");
+					logger.info("found for completed event");
 				} else {
 					refEventResult = getLastReferenceEvent(ssBean);
-					logger.info("found non completed event");
+					logger.info("found for non completed event");
 				}
 				CalendarFuncBean calendFuncBean = new CalendarFuncBean();
 				if (!(getYearFromDate(refEventResult.getUpdatedDate()) == 1970) && refEventResult != null) {
@@ -100,7 +100,9 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 		for (StudyEventDefinitionBean studyEventDefinitionBean : studyEventDefinitions) {
 			List<StudyEventBean> sebBeanArr = sedao.findAllByDefinitionAndSubject(studyEventDefinitionBean,ssBean);
 			for (StudyEventBean studyEventBeanReferenceVisit : sebBeanArr) {
-				if (studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
+				if (studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED) 
+						|| studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED) 
+						|| studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
 					if (studyEventBeanRef.getUpdatedDate() == null) {
 						studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
 					} else {
@@ -133,8 +135,11 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 				ArrayList<StudyEventBean> refEventBeans = sedao.findAllByStudySubjectAndDefinition(ssBean, refEventDef);
 				if (refEventBeans.size() > 0) {
 					for (StudyEventBean refEventBean : refEventBeans) {
-						if (refEventBean.getSubjectEventStatus().isCompleted() && refEventBean.getUpdatedDate().equals(dateCompleted)) {
-							logger.info("nashel referense event for completed event using his dateUpdate");
+						if (refEventBean.getSubjectEventStatus().isCompleted() 
+								|| refEventBean.getSubjectEventStatus().isSourceDataVerified() 
+								|| refEventBean.getSubjectEventStatus().isSigned()
+								&& refEventBean.getUpdatedDate().equals(dateCompleted)) {
+							logger.info("Have found referense event for completed event using his dateUpdate");
 							refEventResult = refEventBean;
 							refEventResult.setStudyEventDefinition(refEventBean.getStudyEventDefinition());
 							break;
