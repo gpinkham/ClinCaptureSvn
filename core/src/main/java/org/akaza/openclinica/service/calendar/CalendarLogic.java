@@ -136,7 +136,7 @@ public class CalendarLogic {
 							int daysBetween = Days.daysBetween(dateTimeEmail.toDateMidnight(),
 									dateTimeCompleted.toDateMidnight()).getDays();
 							ScheduleEmailQuartz(sedTmp, ssb, dateTimeEmail.toDate(), daysBetween,
-									sedTmp.getEmailAdress(), useracBean);
+									sedTmp.getEmailAdress(), useracBean, studyBean.getName());
 						} catch (SchedulerException e) {
 							e.printStackTrace();
 						}
@@ -268,10 +268,10 @@ public class CalendarLogic {
 	}
 
 	private void ScheduleEmailQuartz(StudyEventDefinitionBean sedTmp, StudySubjectBean ssb, Date sendEmailDay,
-			int daysBetween, String contactEmail, UserAccountBean uaBean) throws SchedulerException {
+			int daysBetween, String contactEmail, UserAccountBean uaBean, String studyName) throws SchedulerException {
 		EmailTriggerService emailTriggerService = new EmailTriggerService();
 		SimpleTriggerImpl trigger = emailTriggerService.generateEmailSenderTrigger(sedTmp, ssb, sendEmailDay,
-				daysBetween, contactEmail, uaBean);
+				daysBetween, contactEmail, uaBean, studyName);
 		trigger.setDescription("email day for " + ssb.getLabel() + " in " + sedTmp.getName());
 		JobDetailImpl jobDetailBean = new JobDetailImpl();
 		jobDetailBean.setGroup(trigger.getGroup());

@@ -21,9 +21,10 @@ public class EmailTriggerService {
 	public static final String SCHEDULED_DAY = "scheduled_day";
 	public static final String SUBJECT_NAME = "subject_name";
 	public static final String DAYS_BETWEEN = "daysBetween";
+	public static final String STUDY_NAME = "study_name";
 
 	public SimpleTriggerImpl generateEmailSenderTrigger(StudyEventDefinitionBean sedTmp, StudySubjectBean ssb,
-			Date sendEmailDay, int daysBetween, String contactEmail, UserAccountBean uaBean) {
+			Date sendEmailDay, int daysBetween, String contactEmail, UserAccountBean uaBean, String studyName) {
 		JobDataMap emailJobDataMap = new JobDataMap();
 		emailJobDataMap.put(EMAIL, sedTmp.getEmailAdress());
 		emailJobDataMap.put(USER_ID, uaBean.getId());
@@ -31,6 +32,7 @@ public class EmailTriggerService {
 		emailJobDataMap.put(SUBJECT_NAME, ssb.getLabel());
 		emailJobDataMap.put(SCHEDULED_DAY, sedTmp.getScheduleDay());
 		emailJobDataMap.put(DAYS_BETWEEN, Integer.toString(daysBetween));
+		emailJobDataMap.put(STUDY_NAME, studyName);
 		String triggerGroup = "CALENDAR";
 		SimpleTriggerImpl sTrigger = new SimpleTriggerImpl();
 		sTrigger.setName("event_" + sedTmp.getName() + " subject_" + ssb.getLabel() + " email_time_" + sendEmailDay);

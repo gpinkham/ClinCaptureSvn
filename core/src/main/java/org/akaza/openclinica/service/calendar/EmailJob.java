@@ -33,6 +33,7 @@ public class EmailJob extends QuartzJobBean {
 	public static final String EVENT_NAME = "event_name";
 	public static final String SUBJECT_NAME = "subject_name";
 	public static final String DAYS_BETWEEN = "daysBetween";
+	public static final String STUDY_NAME = "study_name";
 
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
@@ -48,11 +49,8 @@ public class EmailJob extends QuartzJobBean {
 		String eventName = dataMap.getString(EVENT_NAME);
 		String subjectlabel = dataMap.getString(SUBJECT_NAME);
 		String daysBetween = dataMap.getString(DAYS_BETWEEN);
-		if ("0".equals(daysBetween)) {
-			daysBetween = "today";
-		} else {
-			daysBetween = "in " + daysBetween + " days";
-		}
+		String studyName = dataMap.getString(STUDY_NAME);
+		daysBetween = "in " + daysBetween + " days";
 
 		logger.error(contactEmail + eventName + subjectlabel);
 		try {
@@ -67,7 +65,7 @@ public class EmailJob extends QuartzJobBean {
 			try {
 				if (contactEmail != null && !"".equals(contactEmail)) {
 					mailSender.sendEmail(contactEmail, EmailHeader(eventName, subjectlabel),
-							EmailTextMessage(ub, eventName, subjectlabel, daysBetween), true);
+							EmailTextMessage(ub, eventName, subjectlabel, daysBetween, studyName), true);
 
 				}
 			} catch (OpenClinicaSystemException e) {
@@ -82,10 +80,11 @@ public class EmailJob extends QuartzJobBean {
 
 	}
 
-	private String EmailTextMessage(UserAccountBean ub, String eventName, String subjectLabel, String daysBetween) {
+	private String EmailTextMessage(UserAccountBean ub, String eventName, String subjectLabel, String daysBetween, String studyName) {
 		String emailTestMessage = reswords.getString("day_email_message_htm");
 		emailTestMessage = emailTestMessage.replace("{0}", ub.getFirstName() + " " + ub.getLastName())
-				.replace("{1}", eventName).replace("{2}", subjectLabel).replace("{3}", daysBetween);
+				.replace("{1}", eventName).replace("{2}", subjectLabel).replace("{3}", studyName).replace("{4}", daysBetween);
+		System.out.println(emailTestMessage);
 		return emailTestMessage;
 
 	}
