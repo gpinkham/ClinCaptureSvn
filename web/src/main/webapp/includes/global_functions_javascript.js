@@ -850,11 +850,11 @@ function displayMessageFromCheckbox(checkboxObject, dde){
 
 	
 	var color = jq('*').find('a').css('color');
-	if (color == 'rgb(170, 98, 198)' || color == '#AA62C6') {
+	if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
 		jq('input.button_medium').css('background-image', 'url(images/violet/button_medium_BG.gif)');
 		jq('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
 	}
-	if (color == 'rgb(117, 184, 148)' || color == '#75b894') {
+	if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
 		jq('input.button_medium').css('background-image', 'url(images/green/button_medium_BG.gif)');
 		jq('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
 	}
@@ -1983,7 +1983,6 @@ function createNewEvent(event) {
 
                                 aElement.find("img").attr("src", "images/icon_Scheduled.gif");
 								aElement.find("img").attr("style", "position: relative;");
-								aElement.find("img").attr("style", "position: relative; left: 7px;");
                                 eventDiv.css("visibility", "hidden");
                                 eventDiv.html("");
                                 eventDiv.get(0).innerHTML = "";
