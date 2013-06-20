@@ -208,7 +208,25 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		
 		return dynAnswer;
 	}
+	
+	public StudyGroupClassBean findByNameAndStudyId(String studyGroupName, int studyId) {
+		
+		StudyGroupClassBean eb = new StudyGroupClassBean();
+		this.setTypesExpected();
 
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), studyGroupName);
+		variables.put(new Integer(2), new Integer(studyId));
+
+		ArrayList alist = this.select(digester.getQuery("findByNameAndStudyId"), variables);
+
+		Iterator it = alist.iterator();
+		if (it.hasNext()) {
+			eb = (StudyGroupClassBean) this.getEntityFromHashMap((HashMap) it.next());
+		}
+		return eb;
+	}
+	
 	public EntityBean findByStudySubjectId(int id) {
 		StudyGroupClassBean eb = new StudyGroupClassBean();
 		this.setTypesExpected();

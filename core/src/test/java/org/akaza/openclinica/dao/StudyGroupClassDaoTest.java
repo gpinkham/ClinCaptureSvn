@@ -1,6 +1,7 @@
 package org.akaza.openclinica.dao;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
@@ -10,23 +11,103 @@ import org.junit.Test;
 public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 
 	@Test
-	public void testUpdate() throws OpenClinicaException {
-		boolean aDefault = false;
+	public void testThatCreateDoesNotReturnNull() throws OpenClinicaException {
+		
+		assertNotNull(createStudyGroupClass());
+	}
+	
+	@Test
+	public void testUpdateSetsTheCorrectPropertiesName() throws OpenClinicaException {
+		
 		String name = "Study Group Class 2";
 		StudyGroupClassBean studyGroupClassBean = (StudyGroupClassBean) studyGroupClassDAO.findByPK(1);
-		assertNotNull(studyGroupClassBean);
+		
 		studyGroupClassBean.setName(name);
-		studyGroupClassBean.setDefault(aDefault);
+		studyGroupClassBean.setUpdater(new UserAccountBean());
+		
+		studyGroupClassDAO.update(studyGroupClassBean);
+		
+		assertEquals(name, ((StudyGroupClassBean) studyGroupClassDAO.findByPK(1)).getName());
+	}
+	
+	@Test
+	public void testUpdateSetsTheCorrectNameWhenUpdated() throws OpenClinicaException {
+		
+		String name = "Study Group Class 2";
+		StudyGroupClassBean studyGroupClassBean = (StudyGroupClassBean) studyGroupClassDAO.findByPK(1);
+		
+		studyGroupClassBean.setName(name);
+		studyGroupClassBean.setUpdater(new UserAccountBean());
+		
+		studyGroupClassDAO.update(studyGroupClassBean);
+		
+		assertEquals(name, ((StudyGroupClassBean) studyGroupClassDAO.findByPK(1)).getName());
+	}
+	
+	@Test
+	public void testUpdateSetsTheCorrectDefaultPropertyWhenUpdated() throws OpenClinicaException {
+		
+		StudyGroupClassBean studyGroupClassBean = (StudyGroupClassBean) studyGroupClassDAO.findByPK(1);
+		
+		studyGroupClassBean.setDefault(false);		
+		studyGroupClassBean.setUpdater(new UserAccountBean());
+		
+		studyGroupClassDAO.update(studyGroupClassBean);
+		
+		assertEquals(false, ((StudyGroupClassBean) studyGroupClassDAO.findByPK(1)).isDefault());
+	}
+	
+	@Test
+	public void testUpdateSetsTheCorrectStatusWhenUpdated() throws OpenClinicaException {
+		
+		StudyGroupClassBean studyGroupClassBean = (StudyGroupClassBean) studyGroupClassDAO.findByPK(1);
+		
 		studyGroupClassBean.setStatus(Status.DELETED);
 		studyGroupClassBean.setUpdater(new UserAccountBean());
+
 		studyGroupClassDAO.update(studyGroupClassBean);
-		assertEquals(name, ((StudyGroupClassBean) studyGroupClassDAO.findByPK(1)).getName());
-		assertEquals(aDefault, ((StudyGroupClassBean) studyGroupClassDAO.findByPK(1)).isDefault());
+		
 		assertEquals(Status.DELETED, ((StudyGroupClassBean) studyGroupClassDAO.findByPK(1)).getStatus());
 	}
 	
 	@Test
-	public void testCreate() throws OpenClinicaException {
+	public void testThatFindByPKDoesNotReturnNull() {
+		
+		StudyGroupClassBean studyGroupClassBean = (StudyGroupClassBean) studyGroupClassDAO.findByPK(1);
+		
+		assertNotNull(studyGroupClassBean);
+	}
+	
+	@Test
+	public void testThatFindByPKReturnsCorrectStudyGroup() {
+		
+		StudyGroupClassBean studyGroupClassBean = (StudyGroupClassBean) studyGroupClassDAO.findByPK(1);
+		
+		assertEquals("Should return Study Group with correct name", "study group 1", studyGroupClassBean.getName());
+	}
+	
+	@Test
+	public void testFindAllDefault() throws OpenClinicaException {
+		
+		assertEquals(1, studyGroupClassDAO.findAllDefault().size());
+	}
+	
+	@Test
+	public void testThatFindByNameAndStudyIdDoesNotReturnNull() {
+		
+		assertNotNull(studyGroupClassDAO.findByNameAndStudyId("Study Group Class 3", 2));
+	}
+	
+	@Test
+	public void testThatFindByNameAndStudyIdReturnsCorrectStudyGroupClass() {
+		
+		StudyGroupClassBean studyGroup = studyGroupClassDAO.findByNameAndStudyId("study group 1", 1);
+		
+		assertEquals("Should return correct study group class with correct name", "study group 1", studyGroup.getName());
+	}
+	
+	private EntityBean createStudyGroupClass() {
+		
 		StudyGroupClassBean studyGroupClassBean = new StudyGroupClassBean();
 		studyGroupClassBean.setName("Study Group Class 3");
 		studyGroupClassBean.setStudyId(2);
@@ -35,12 +116,9 @@ public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 		studyGroupClassBean.setStatus(Status.AVAILABLE);
 		studyGroupClassBean.setSubjectAssignment("Arm");
 		studyGroupClassBean.setDefault(false);
-		studyGroupClassDAO.create(studyGroupClassBean);
-	}
-	
-	@Test
-	public void testFindAllDefault() throws OpenClinicaException {
-		assertEquals(1,studyGroupClassDAO.findAllDefault().size());
+		
+		return studyGroupClassDAO.create(studyGroupClassBean);
+		
 	}
 }
 

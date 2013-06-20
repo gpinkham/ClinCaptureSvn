@@ -6,6 +6,11 @@
 		study_group_class_id = ?</sql>
 	</query>
 	<query>
+		<name>findByNameAndStudyId</name>
+		<sql>SELECT * FROM study_group_class WHERE 
+		name = ? AND study_id = ?</sql>
+	</query>
+	<query>
 		<name>findAll</name>
 		<sql>SELECT * FROM study_group_class</sql>
 	</query>
