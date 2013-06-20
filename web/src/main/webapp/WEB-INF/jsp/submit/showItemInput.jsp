@@ -78,11 +78,10 @@ form element in red --%>
   </c:if>
 </c:forEach>
 
- <c:if test="${isInError}">
-      <c:set var="errorFlag" value="1"/><!--  use in discrepancy note-->
-  </c:if>
+<c:if test="${isInError}">
+    <c:set var="errorFlag" value="1"/><!--  use in discrepancy note-->
+</c:if>
 
-<script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
 
 <script lang="Javascript">

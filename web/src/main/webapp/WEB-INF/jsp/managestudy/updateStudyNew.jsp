@@ -8,10 +8,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.admin" var="resadmin"/>
 
-
-<script type="text/JavaScript" language="JavaScript" src="../includes/global_functions_javascript.js"></script>  
-
-
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <c:choose>

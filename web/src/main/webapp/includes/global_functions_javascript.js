@@ -267,7 +267,6 @@ function giveFirstElementFocus(){
 
 }
 
-function $(x){return document.getElementById(x);}
 /**
  * Display a sequence of three tabs (implemented as TD elements) in a JSP view;
  * by selecting only the tabs or TD elements that have a certain class name.
@@ -291,7 +290,7 @@ function selectTabs(tabNumber,totalNumberOfTabs,tabClassName) {
     //the last three tabs should be selected
     var lastTabSelected = (tabNumber == (totalNumberOfTabs - 1));
     //fetches all TD elements with a class name of tabClassName
-    var allTabs = $$(param);
+    var allTabs = prt$$(param);
     var tdCount = allTabs.length;
     //If there are not more than two tabs, just one or two, then all we have to do is
     //select one or two TD elements, and not worry about deselecting others
@@ -768,7 +767,7 @@ var getCookie = function(c_name) {
 }
 
 var markCRFCompleteOk = function(checkboxObjectName) {
-    $jq("#confirmation").dialog("close");
+    $("#confirmation").dialog("close");
     var checkboxObjects = document.getElementsByName(checkboxObjectName);
     if(checkboxObjects[0]){
         checkboxObjects[0].checked=true;
@@ -779,7 +778,7 @@ var markCRFCompleteOk = function(checkboxObjectName) {
 }
 
 var markCRFCompleteCancel = function(checkboxObjectName) {
-    $jq("#confirmation").dialog("close");
+    $("#confirmation").dialog("close");
     var checkboxObjects = document.getElementsByName(checkboxObjectName);
     if(checkboxObjects[0]){
         checkboxObjects[0].checked=false;
@@ -802,11 +801,10 @@ var shouldShowDialog = function() {
  when the user clicked it; then uncheck the checkbox if the user chooses "cancel"
  in the confirm dialogue. */
 function displayMessageFromCheckbox(checkboxObject, dde){
-    var jq = $jq != undefined ? $jq : jQuery;
     if(checkboxObject != null && checkboxObject.checked){
 
-        if (jq("#confirmation").length == 0) {
-            jq("body").append(
+        if ($("#confirmation").length == 0) {
+            $("body").append(
                 "<div id=\"confirmation\" style=\"display: none;\" title=\"Mark CRF Complete\">" +
                     (dde == undefined ? "<div style=\"clear: both; text-align: justify;\">Marking this CRF complete will finalize data entry. You will be allowed to edit the data later but this data entry stage is completed. If Double Data Entry is required, you or another user may need to complete this CRF again before it is verified as complete. Are you sure you want to mark this CRF complete?</div>"
                                       : "<div style=\"clear: both; text-align: justify;\">Marking this CRF complete will prepare it for Double Data Entry, where another user will enter data and then be able to finally complete this CRF.</div>") +
@@ -817,22 +815,22 @@ function displayMessageFromCheckbox(checkboxObject, dde){
                     "</div>" +
                 "</div>");
 
-            jq("#confirmation").dialog({
+            $("#confirmation").dialog({
                 autoOpen : false,
                 modal : true,
                 height: (dde == undefined ? 180 : 150),
                 width: 450}
             );
 
-            jq("#confirmation #ignoreMarkCRFCompleteMSG").unbind("change").bind("change", function() {
-                setCookie("ignoreMarkCRFCompleteMSG", jq(this).attr("checked") ? "yes" : "no", 1000);
+            $("#confirmation #ignoreMarkCRFCompleteMSG").unbind("change").bind("change", function() {
+                setCookie("ignoreMarkCRFCompleteMSG", $(this).attr("checked") ? "yes" : "no", 1000);
             });
         }
 
         if (shouldShowDialog()) {
-            jq("input[name=" + checkboxObject.name + "]").attr('checked', false);
-            jq("#confirmation #ignoreMarkCRFCompleteMSG").attr('checked', false);
-            jq("#confirmation").dialog("open");
+            $("input[name=" + checkboxObject.name + "]").attr('checked', false);
+            $("#confirmation #ignoreMarkCRFCompleteMSG").attr('checked', false);
+            $("#confirmation").dialog("open");
         } else {
             markCRFCompleteOk(checkboxObject.name);
         }
@@ -849,14 +847,14 @@ function displayMessageFromCheckbox(checkboxObject, dde){
     }
 
 	
-	var color = jq('*').find('a').css('color');
+	var color = $('*').find('a').css('color');
 	if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
-		jq('input.button_medium').css('background-image', 'url(images/violet/button_medium_BG.gif)');
-		jq('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
+		$('input.button_medium').css('background-image', 'url(images/violet/button_medium_BG.gif)');
+		$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
 	}
 	if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
-		jq('input.button_medium').css('background-image', 'url(images/green/button_medium_BG.gif)');
-		jq('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
+		$('input.button_medium').css('background-image', 'url(images/green/button_medium_BG.gif)');
+		$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
 	}
 }
 
@@ -1666,7 +1664,7 @@ function requestSignatureFromCheckbox(password, checkbox){
 
 function numberGroupRows(){
 	alert("test");
-	var allGroupDivs = $$("div.tableDiv");
+	var allGroupDivs = prt$$("div.tableDiv");
 	var allTrTags;
 	var rowCounter;
 
@@ -2056,10 +2054,10 @@ var bindRadioButtons = function() {
             var elementList = mainForm.getElementsByTagName('input');
             for (i = 0; i < elementList.length; i++) {
                 if (elementList[i].type == 'radio') {
-                    $jq(elementList[i]).bind("mouseup", function(event) {
+                    $(elementList[i]).bind("mouseup", function(event) {
                         radioButtonOnMouseUp(event);
                     });
-                    $jq(elementList[i]).bind("click", function(event) {
+                    $(elementList[i]).bind("click", function(event) {
                         radioButtonOnClick(event);
                     });
                 }
@@ -2068,18 +2066,10 @@ var bindRadioButtons = function() {
     }
 }
 
-try {
-    if ($jq != undefined) {
-        $jq(function() {
-            bindRadioButtons();
-        });
-    }
-} catch (e) {}
-
 /* =======================================================================
-* Disable the Randomization result field and the randomization date field
-* They should be read-only
-========================================================================= */
+ * Disable the Randomization result field and the randomization date field
+ * They should be read-only
+ ========================================================================= */
 jQuery(function() {
 
     jQuery("#Rand_Date").find(":input").attr('disabled', "disabled");
@@ -2210,3 +2200,18 @@ function randomizeSubject() {
         }
     })
 }
+
+function urlParam(name){
+    var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    return results != undefined ? results[1] : undefined;
+}
+
+// when document is loaded
+$(function() {
+    // enable the ability to uncheck the radio buttons in the CRF's
+    bindRadioButtons();
+
+    // disable smartBackButton
+    //var smartButton = document.getElementById("GoToPreviousPage");
+    //if (smartButton != undefined && urlParam("hsb") != undefined) smartButton.style.display = "none";
+});

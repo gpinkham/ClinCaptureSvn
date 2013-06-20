@@ -7,8 +7,6 @@
 
 <c:import url="../include/admin-header.jsp"/>
 
-<script type="text/JavaScript" language="JavaScript" src="../includes/global_functions_javascript.js"></script>  
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->

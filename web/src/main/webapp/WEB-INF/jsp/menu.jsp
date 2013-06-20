@@ -23,6 +23,7 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
 <%-- <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa-original.js"></script> --%>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
 <style type="text/css">
 
         .graph {

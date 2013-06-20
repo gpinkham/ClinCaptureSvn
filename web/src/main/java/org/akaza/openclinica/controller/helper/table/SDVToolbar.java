@@ -90,7 +90,7 @@ public class SDVToolbar extends DefaultToolbar {
 				html.script()
 						.type("text/javascript")
 						.close()
-						.append("$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('sdv',["
+						.append("$(document).ready(function(){ " + "hideCols('sdv',["
 								+ getIndexes() + "],false);});").scriptEnd();
 
 			} else {
@@ -103,7 +103,7 @@ public class SDVToolbar extends DefaultToolbar {
 				html.script()
 						.type("text/javascript")
 						.close()
-						.append("$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('sdv',["
+						.append("$(document).ready(function(){ " + "hideCols('sdv',["
 								+ getIndexes() + "],true);});").scriptEnd();
 			}
 

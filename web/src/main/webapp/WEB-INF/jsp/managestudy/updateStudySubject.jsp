@@ -8,8 +8,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 
-<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>  
-
 <c:choose>
 <c:when test="${userBean.sysAdmin || userBean.techAdmin || userRole.manageStudy}">
 	<jsp:include page="../include/managestudy-header.jsp"/>

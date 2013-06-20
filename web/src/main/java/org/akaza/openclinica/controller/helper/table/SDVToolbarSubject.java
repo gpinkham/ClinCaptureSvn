@@ -71,7 +71,7 @@ public class SDVToolbarSubject extends DefaultToolbar {
 				html.script()
 						.type("text/javascript")
 						.close()
-						.append("$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('s_sdv',["
+						.append("$(document).ready(function(){ " + "hideCols('s_sdv',["
 								+ getIndexes() + "],false);});").scriptEnd();
 			} else {
 				html.a().id("hide").href("javascript:hideCols('s_sdv',[" + getIndexes() + "],false);").close();
@@ -83,7 +83,7 @@ public class SDVToolbarSubject extends DefaultToolbar {
 				html.script()
 						.type("text/javascript")
 						.close()
-						.append("$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('s_sdv',["
+						.append("$(document).ready(function(){ " + "hideCols('s_sdv',["
 								+ getIndexes() + "],true);});").scriptEnd();
 
 			}

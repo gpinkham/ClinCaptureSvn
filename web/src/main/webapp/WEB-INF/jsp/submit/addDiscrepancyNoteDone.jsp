@@ -14,7 +14,7 @@
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-<script language="JavaScript" src="includes/global_functions_javascript.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
 
 <script language="JavaScript" src="includes/CalendarPopup.js"></script>
 <style type="text/css">

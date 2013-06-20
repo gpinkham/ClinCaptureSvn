@@ -94,7 +94,7 @@ removeButtonClick = function(btn, block) {
         if (deletedRowIndex != undefined && rowPrefix != undefined && block != undefined) {
             addOverlay();
             var timestamp = new Date().getTime();
-            $jq.get("ShuffleDiscrepancyNotes?rp=" + rowPrefix + "&t=" + timestamp, function(data) {
+            $.get("ShuffleDiscrepancyNotes?rp=" + rowPrefix + "&t=" + timestamp, function(data) {
                     for (var i = 0; i < block.parentNode.children.length; i++) {
                         var tr = block.parentNode.children[i];
                         if (tr.nodeName.toUpperCase() == "TR") {

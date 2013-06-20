@@ -4688,7 +4688,7 @@ Ajax.PeriodicalUpdater = Class.create(Ajax.Base,
 	};
 
 })();
-window.$$ = function() {
+window.prt$$ = function() {
 	var expression = $A(arguments).join(', ');
 	return Prototype.Selector.select(expression, document);
 };

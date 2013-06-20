@@ -100,7 +100,7 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
 				html.script()
 						.type("text/javascript")
 						.close()
-						.append("$j = jQuery.noConflict(); $j(document).ready(function(){ "
+						.append("$(document).ready(function(){ "
 								+ "hideCols('findSubjects',[" + getIndexes() + "],false);});").scriptEnd();
 			} else {
 				html.a().id("hide").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);").close();

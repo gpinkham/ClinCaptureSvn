@@ -11,7 +11,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
-    
+    <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/JavaScript" language="JavaScript" src=
       "includes/global_functions_javascript.js"></script>
     <script type="text/javascript"  language="JavaScript" src=
@@ -30,7 +30,6 @@
 <jsp:useBean scope="session" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
 <jsp:useBean scope="request" id="sedCrfBeans" class="java.util.LinkedHashMap" />
 <!-- Clinovo ticket #134 start -->
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
 <script type="text/JavaScript">

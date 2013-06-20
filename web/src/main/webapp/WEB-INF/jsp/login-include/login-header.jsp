@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css">
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
 <%-- <link rel="stylesheet" href="includes/NewNavStyles.css" type="text/css" />--%>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
 <%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
 <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
@@ -45,12 +46,10 @@
     
 <%--<script type="text/javascript"  language="JavaScript" src=
     "includes/repetition-model/repetition-model.js"></script>--%>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
 <script type="text/javascript">
-	var jq = jQuery;
-	jq(document).ready(function() {
-		jq.ajax({
+	$(document).ready(function() {
+		$.ajax({
         	url:'HelpThemeServlet',
         	type: 'GET',
         	dataType:'text',
@@ -58,21 +57,21 @@
 			var themeColor = response2;
 		
 			if (themeColor == 'violet') {
-				jq('a').css('color','#AA62C6');
-				jq('H1').css('color', '#AA62C6');
-				jq("input").each(function() {
-					var newSrc = jq(this).css('background-image');
+				$('a').css('color','#AA62C6');
+				$('H1').css('color', '#AA62C6');
+				$("input").each(function() {
+					var newSrc = $(this).css('background-image');
 					newSrc = newSrc.replace('images/','images/violet/');
-					jq(this).css('background-image', newSrc);
+					$(this).css('background-image', newSrc);
 				});
 			}
 			if (themeColor == 'green') {
-				jq('a').css('color','#75b894');
-				jq('H1').css('color', '#75b894');
-				jq("input").each(function() {
-					var newSrc = jq(this).css('background-image');
+				$('a').css('color','#75b894');
+				$('H1').css('color', '#75b894');
+				$("input").each(function() {
+					var newSrc = $(this).css('background-image');
 					newSrc = newSrc.replace('images/','images/green/');
-					jq(this).css('background-image', newSrc);
+					$(this).css('background-image', newSrc);
 				});
         	}}
      	});

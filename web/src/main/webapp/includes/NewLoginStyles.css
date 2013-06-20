@@ -2,7 +2,7 @@
 
 /* general style propertyies */
 
-body.login_BG { background: url(../images/login_BG2.gif) repeat-x top left #FFFFFF; }
+body.login_BG { }
 
 div.login_BG { background: url(../images/login_BG.gif) no-repeat top center; height: 100%; padding-top: 117px; }
 

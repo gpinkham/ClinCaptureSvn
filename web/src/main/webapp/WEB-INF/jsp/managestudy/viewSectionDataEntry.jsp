@@ -60,6 +60,8 @@
 	<link rel="stylesheet"
 		href="<c:out value="${contextPath}" />/includes/print.css"
 		type="text/css" media="print">
+        <script type="text/JavaScript" language="JavaScript"
+            src="<c:out value="${contextPath}" />/includes/jmesa/jquery-1.3.2.min.js"></script>
 		<script type="text/JavaScript" language="JavaScript"
 			src="<c:out value="${contextPath}" />/includes/global_functions_javascript.js"></script>
 		<script type="text/JavaScript" language="JavaScript"
@@ -67,8 +69,6 @@
 		<!-- <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script> -->
 		<script type="text/javascript" language="JavaScript"
 			src="<c:out value="${contextPath}" />/includes/repetition-model/repetition-model.js"></script>
-		<script type="text/JavaScript" language="JavaScript"
-			src="<c:out value="${contextPath}" />/includes/jmesa/jquery-1.3.2.min.js"></script>
 		<script type="text/JavaScript" language="JavaScript"
 			src="<c:out value="${contextPath}" />/includes/prototype.js"></script>
 		<script type="text/JavaScript" language="JavaScript"
@@ -437,9 +437,7 @@ function checkDataStatus() {
         var OptionIndex = document.crfForm.sectionSelect.selectedIndex;
         window.location = document.crfForm.sectionSelect.options[OptionIndex].value;
     }
-
- function $(x){return document.getElementById(x);}
-    </script>
+</script>
 					<%--
 <td align="right" id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
 <td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="<c:out value="${contextPath}" />/images/arrow_next.gif" border="0" style=

@@ -8,8 +8,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
-
 <c:choose>
  <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
    <c:import url="../include/admin-header.jsp"/>

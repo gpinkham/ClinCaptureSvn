@@ -42,7 +42,6 @@
 
 <script type="text/javascript" language="javascript">
 
-    var jq = $jq != undefined ? $jq : jQuery;
     window.expandCrfInfo = '${empty expandCrfInfo ? false : expandCrfInfo}';
 
     //If someone closes the browser on data entry stage, the following request should be
@@ -55,20 +54,20 @@
             });
         }
     }
-    jq(document).ready(function(){
-       jq("a").click(function(event){
+    $(document).ready(function(){
+       $("a").click(function(event){
            closing = false;
        });
-       jq("input").click(function(event){
+       $("input").click(function(event){
            closing = false;
        });
-       jq("select").click(function(event){
+       $("select").click(function(event){
            closing = false;
         });
-       //jq('.CRF_infobox_closed').show();
+       //$('.CRF_infobox_closed').show();
       
-     //  jq('#nameNote1').mouseover(function(event){
-       //  jq.getJSON("InitialDataEntry",{ name:0 },function(discrepancyNote){
+     //  $('#nameNote1').mouseover(function(event){
+       //  $.getJSON("InitialDataEntry",{ name:0 },function(discrepancyNote){
     	//		alert('w'+discrepancyNote);
         //});
        // });

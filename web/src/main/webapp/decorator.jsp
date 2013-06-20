@@ -11,6 +11,7 @@
     <meta name="gwt:property" content="locale=${pageContext.request.locale}">
     <title><decorator:title default="ClinCapture" /></title>
     <script type="text/javascript" language="javascript" src="../gwt/GwtMenu/org.akaza.openclinica.gwt.GwtMenu.nocache.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.3.2.min.js"></script>
     <script type="text/javascript" language="javascript" src="../includes/prototype.js"></script>
     <script type="text/javascript" language="javascript" src="../includes/global_functions_javascript.js"></script>
     <script type="text/javascript" language="javascript" src="../includes/Tabs.js"></script>

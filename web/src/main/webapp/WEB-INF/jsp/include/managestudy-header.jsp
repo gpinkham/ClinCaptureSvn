@@ -29,6 +29,7 @@
 <link rel="stylesheet" href="includes/styles.css" type="text/css"> 
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
 <%-- <link rel="stylesheet" href="includes/NewNavStyles.css" type="text/css" />--%>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
 <%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
 <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
@@ -43,7 +44,6 @@
     
 <%--<script type="text/javascript"  language="JavaScript" src=
     "includes/repetition-model/repetition-model.js"></script>--%>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
 <%--<script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>--%>

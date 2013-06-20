@@ -12,8 +12,6 @@
 <jsp:useBean scope='session' id='boxDNMap'  class="java.util.HashMap"/>
 <jsp:useBean scope='session' id='boxToShow'  class="java.lang.String"/>
 
-
-<script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 <script language="JavaScript">
 <!--
 function showOnly(strLeftNavRowElementName){

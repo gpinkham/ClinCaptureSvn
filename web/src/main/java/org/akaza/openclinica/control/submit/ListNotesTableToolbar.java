@@ -114,7 +114,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 				html.script()
 						.type("text/javascript")
 						.close()
-						.append("$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listNotes',["
+						.append("$(document).ready(function(){ " + "hideCols('listNotes',["
 								+ getIndexes() + "],false);});").scriptEnd();
 			} else {
 				html.a().id("showMore").style("display:none;")
@@ -126,7 +126,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 				html.script()
 						.type("text/javascript")
 						.close()
-						.append("$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listNotes',["
+						.append("$(document).ready(function(){ " + "hideCols('listNotes',["
 								+ getIndexes() + "],true);});").scriptEnd();
 			}
 

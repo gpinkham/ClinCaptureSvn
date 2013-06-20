@@ -100,7 +100,7 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
 				html.script()
 						.type("text/javascript")
 						.close()
-						.append("$j = jQuery.noConflict(); $j(document).ready(function(){ "
+						.append("$(document).ready(function(){ "
 								+ "hideCols('listEventsForSubject',[" + getIndexes() + "],false);});").scriptEnd();
 			} else {
 				html.a().id("showMore").style("display: none;")

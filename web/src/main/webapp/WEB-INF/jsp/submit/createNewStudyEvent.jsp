@@ -6,10 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
-<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
-
 <jsp:include page="../include/submit-header.jsp"/>
-
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
