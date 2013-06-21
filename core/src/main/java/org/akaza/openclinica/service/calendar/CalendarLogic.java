@@ -64,8 +64,7 @@ public class CalendarLogic {
 		StudyBean studyBean = sdao.findByStudySubjectId(subjectId);
 		studyBean = studyBean.getParentStudyId() > 0 ? (StudyBean)sdao.findByPK(studyBean.getParentStudyId()) : studyBean;
 		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPKAndStudy(subjectId, studyBean);
-		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean
-				.getStudyEventDefinitionId());
+		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean.getStudyEventDefinitionId());
 		//
 		StudyEventBean studyEventBeanRef = new StudyEventBean();
 		if (sedb.getReferenceVisit()) {
@@ -77,15 +76,15 @@ public class CalendarLogic {
 						if (studyEventBeanRef.getUpdatedDate() == null) {
 							studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
 						} else {
-							if (studyEventBeanRef.getUpdatedDate()
-									.before(studyEventBeanReferenceVisit.getUpdatedDate())) {
+							if (studyEventBeanRef.getUpdatedDate().before(studyEventBeanReferenceVisit.getUpdatedDate())) {
 								studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
 							}
 						}
 					}
 				}
 			}
-			logger.info("Latest reference visit date for this subject " + studyEventBeanRef.getUpdatedDate());
+			StudyEventDefinitionBean studyEventDefBeanRef = (StudyEventDefinitionBean) seddao.findByPK(studyEventBeanRef.getStudyEventDefinitionId());
+			logger.info("Latest reference visit date for this subject updated" + studyEventBeanRef.getUpdatedDate() + " and called "+studyEventDefBeanRef.getName());
 			//schedule all other events using this date and their sch_day fields
 			int subjectDynGroupId = ssb.getDynamicGroupClassId();
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(ds);
@@ -125,10 +124,10 @@ public class CalendarLogic {
 						studyEvent.setLocation("");
 						studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 						studyEvent.setSampleOrdinal(sed.getMaxSampleOrdinal(sedTmp, ssb) + 1);
+						studyEvent.setReferenceVisitName(studyEventDefBeanRef.getName());
 						studyEvent = (StudyEventBean) sed.create(studyEvent);
 						UserAccountDAO useracdao = new UserAccountDAO(ds);
-						UserAccountBean useracBean = (UserAccountBean) useracdao.findByUserEmail(sedTmp
-								.getEmailAdress());
+						UserAccountBean useracBean = (UserAccountBean) useracdao.findByUserEmail(sedTmp.getEmailAdress());
 						try {
 							logger.info("Start quartz scheduler for this event");
 							DateTime dateTimeEmail = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
@@ -199,6 +198,11 @@ public class CalendarLogic {
 					+ ReferenceEventStartDate.toDateMidnight().plusDays(dayMax + 1));
 			Interval timeRangeForStudyEvent = new Interval(ReferenceEventStartDate.plusDays(dayMin).toDateMidnight(),
 					ReferenceEventStartDate.toDateMidnight().plusDays(dayMax + 1));
+			
+			if(!refEventsIsEmpty) {
+				studyEventBean.setReferenceVisitName(infoBean.getName());
+				sedao.update(studyEventBean);
+			}
 			if (timeRangeForStudyEvent.getStart().isAfter(dateTimeCurrent) && !refEventsIsEmpty) {
 				logger.info("Early start");
 				messageReturn = resexception.getString("data_has_enteret_too_early_in_the_calendar");

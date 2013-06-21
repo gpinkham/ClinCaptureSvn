@@ -1,7 +1,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +18,6 @@ import org.akaza.openclinica.service.calendar.CalendarFuncBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 
 @SuppressWarnings("serial")
@@ -39,41 +37,41 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 		FormProcessor fp = new FormProcessor(request);
 		sedao = new StudyEventDAO(sm.getDataSource());
 		seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		
 		ssdao = new StudySubjectDAO(sm.getDataSource());
 		ArrayList events = new ArrayList();
 		int subjectId = fp.getInt("id", true);
 		StudySubjectBean ssBean = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
-		logger.info("subjectId" +subjectId);
 		ArrayList <StudyEventBean> seBeans = sedao.findAllBySubjectId(subjectId);
-		logger.info("found a list of " + seBeans.size() + " study event beans");
 		for (StudyEventBean seBean : seBeans) {
 			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seBean.getStudyEventDefinitionId());
 			logger.info("looking up type: " + sedBean.getType());
 			if("calendared_visit".equalsIgnoreCase(sedBean.getType()) && !seBean.getSubjectEventStatus().isNotScheduled()) {
-				logger.info("passed if loop");
 				//try to found reference event for this event
-				Date schDate = seBean.getDateStarted();
-				Date refVisitDateCompleted = new DateTime(schDate.getTime()).minusDays(sedBean.getScheduleDay()).toDate();
-				StudyEventBean refEventResult;
+				StudyEventBean refEventResult = null;
 				if (seBean.getSubjectEventStatus().isCompleted()) {
-					refEventResult = getSubjectReferenceEventByDateCompleted(refVisitDateCompleted, ssBean);
+					StudyEventDefinitionBean sedBeanTmp = (StudyEventDefinitionBean) seddao.findByName(seBean.getReferenceVisitName());
+					ArrayList <StudyEventBean> seBeanTmp = sedao.findAllByStudySubjectAndDefinition(ssBean, sedBeanTmp);
+					if (seBeanTmp.size() > 0) {
+						refEventResult = seBeanTmp.get(0);
+					}
 					logger.info("found for completed event");
 				} else {
 					refEventResult = getLastReferenceEvent(ssBean);
 					logger.info("found for non completed event");
 				}
 				CalendarFuncBean calendFuncBean = new CalendarFuncBean();
-				if (!(getYearFromDate(refEventResult.getUpdatedDate()) == 1970) && refEventResult != null) {
+				Date schDate = seBean.getDateStarted();
+				if (refEventResult != null) {
 					
 					Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay()).toDate();
 					Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMinDay()).toDate();
-					Date emailDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getEmailDay()).toDate();
+					int daysBetween = sedBean.getScheduleDay() - sedBean.getEmailDay();
+					Date emailDay = new DateTime(seBean.getDateStarted()).minusDays(daysBetween).toDate();
 					//set bean with values
 					calendFuncBean.setDateMax(maxDate);
 					calendFuncBean.setDateMin(minDate);
 					calendFuncBean.setDateSchedule(schDate);
-					calendFuncBean.setDateEmail(emailDate);
+					calendFuncBean.setDateEmail(emailDay);
 					calendFuncBean.setEventName(sedBean.getName());
 					calendFuncBean.setReferenceVisit(sedBean.getReferenceVisit());
 					calendFuncBean.setEventsReferenceVisit(seddao.findByPK(refEventResult.getStudyEventDefinitionId()).getName());	
@@ -84,7 +82,8 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 						calendFuncBean.setEventName(sedBean.getName());
 						calendFuncBean.setReferenceVisit(sedBean.getReferenceVisit());
 						events.add(calendFuncBean);
-				} 
+				}
+				
 			} 
 		}
 		request.setAttribute("subjectLabel", ssBean.getLabel());
@@ -114,40 +113,6 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 			}
 		}
 		return studyEventBeanRef;
-	}
-	
-	//joda getYear is deprecation method.
-	private static int getYearFromDate(Date date) {
-	    int result = -1;
-	    if (date != null) {
-	        Calendar cal = Calendar.getInstance();
-	        cal.setTime(date);
-	        result = cal.get(Calendar.YEAR);
-	    }
-	    return result;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private StudyEventBean getSubjectReferenceEventByDateCompleted(Date dateCompleted, StudySubjectBean ssBean) {
-			StudyEventBean refEventResult = new StudyEventBean();
-			ArrayList<StudyEventDefinitionBean> refEventDefs = seddao.findReferenceVisitBeans();
-			for (StudyEventDefinitionBean refEventDef : refEventDefs) {
-				ArrayList<StudyEventBean> refEventBeans = sedao.findAllByStudySubjectAndDefinition(ssBean, refEventDef);
-				if (refEventBeans.size() > 0) {
-					for (StudyEventBean refEventBean : refEventBeans) {
-						if (refEventBean.getSubjectEventStatus().isCompleted() 
-								|| refEventBean.getSubjectEventStatus().isSourceDataVerified() 
-								|| refEventBean.getSubjectEventStatus().isSigned()
-								&& refEventBean.getUpdatedDate().equals(dateCompleted)) {
-							logger.info("Have found referense event for completed event using his dateUpdate");
-							refEventResult = refEventBean;
-							refEventResult.setStudyEventDefinition(refEventBean.getStudyEventDefinition());
-							break;
-						}
-					}
-				}
-			}
-			return refEventResult;
 	}
 }
 

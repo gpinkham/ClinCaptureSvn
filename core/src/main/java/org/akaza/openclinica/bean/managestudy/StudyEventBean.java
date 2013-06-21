@@ -76,6 +76,16 @@ public class StudyEventBean extends AuditableEntityBean {
 	private boolean endTimeFlag = false;
 
 	private int dynamicEventId;
+	
+	private String referenceVisitName = "";
+	
+	public String getReferenceVisitName() {
+		return referenceVisitName;
+	}
+	
+	public void setReferenceVisitName(String referenceVisitName) {
+		this.referenceVisitName = referenceVisitName;
+	}
 
 	public int getDynamicEventId() {
 		return dynamicEventId;

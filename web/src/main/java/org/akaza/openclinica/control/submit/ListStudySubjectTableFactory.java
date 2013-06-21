@@ -1600,12 +1600,17 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	
 	private boolean getCalendarIconColor(List<StudyEventBean> studyEventBeanList,StudySubjectBean subjectBean) {
 		boolean defaultColor = true;
-		StudyEventBean refEventResult;
+		StudyEventBean refEventResult = null;
 		for (StudyEventBean studyEventBean : studyEventBeanList) {
 			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(studyEventBean.getStudyEventDefinitionId());
-			Date refVisitDateCompleted = new DateTime(studyEventBean.getDateStarted().getTime()).minusDays(sedBean.getScheduleDay()).toDate();
+			//Date refVisitDateCompleted = new DateTime(studyEventBean.getDateStarted().getTime()).minusDays(sedBean.getScheduleDay()).toDate();
 			if (studyEventBean.getSubjectEventStatus().isCompleted() && !sedBean.getReferenceVisit() && "calendared_visit".equalsIgnoreCase(sedBean.getType())) {
-				refEventResult = getSubjectReferenceEventByDateCompleted(refVisitDateCompleted, subjectBean);
+				StudyEventDefinitionBean sedBeanTmp = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByName(studyEventBean.getReferenceVisitName());
+				ArrayList <StudyEventBean> seBeanTmp = getStudyEventDAO().findAllByStudySubjectAndDefinition(subjectBean, sedBeanTmp);
+				if (seBeanTmp.size() > 0) {
+					refEventResult = seBeanTmp.get(0);
+				}
+				logger.info("found for completed event");
 				Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMinDay()).toDate();
 				if (studyEventBean.getUpdatedDate() != null) {
 					Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay()).toDate();
@@ -1630,26 +1635,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		return defaultColor;
 	}
 	
-	private StudyEventBean getSubjectReferenceEventByDateCompleted(Date dateCompleted, StudySubjectBean ssBean) {
-			StudyEventBean refEventResult = new StudyEventBean();
-			ArrayList<StudyEventDefinitionBean> refEventDefs = getStudyEventDefinitionDao().findReferenceVisitBeans();
-			for (StudyEventDefinitionBean refEventDef : refEventDefs) {
-				ArrayList<StudyEventBean> refEventBeans = getStudyEventDAO().findAllByStudySubjectAndDefinition(ssBean, refEventDef);
-				if (refEventBeans.size() > 0) {
-					for (StudyEventBean refEventBean : refEventBeans) {
-						if (refEventBean.getSubjectEventStatus().isCompleted() 
-								|| refEventBean.getSubjectEventStatus().isSourceDataVerified() 
-								|| refEventBean.getSubjectEventStatus().isSigned()
-								&& refEventBean.getUpdatedDate().equals(dateCompleted)) {
-							refEventResult = refEventBean;
-							refEventResult.setStudyEventDefinition(refEventBean.getStudyEventDefinition());
-							break;
-						}
-					}
-				}
-			}
-			return refEventResult;
-	}
 	
 	private StudyEventBean getLastReferenceEvent(StudySubjectBean ssBean) {
 		StudyEventBean studyEventBeanRef = new StudyEventBean();
