@@ -133,7 +133,7 @@ function submitform(){
 
 <tr>
 <td class="formlabel"><fmt:message key="ms_excel_file_to_upload" bundle="${resword}"/>:</td>
-<td><div class="formfieldFile_BG"><input type="file" name="excel_file" id="excel_file_path"onchange="javascript:changeIcon()"></div>
+<td><input type="file" name="excel_file" id="excel_file_path"onchange="javascript:changeIcon()">
 <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="excel_file"/></jsp:include></td>
 </tr>
 <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
