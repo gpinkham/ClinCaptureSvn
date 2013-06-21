@@ -161,7 +161,7 @@ public class RandomizeServlet extends SecureController {
 		String strataLevel = request.getParameter("strataLevel").equals("null") ? "" : request.getParameter("strataLevel");
 
 		// This line should be removed
-		String siteId = "PACE001"; //getSiteId(studyId);
+		String siteId = getSiteId(studyId);
 		String patientId = request.getParameter("subject");
 
 		Randomization randomization = new Randomization();
