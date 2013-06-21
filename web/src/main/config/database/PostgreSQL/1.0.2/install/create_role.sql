@@ -2,5 +2,5 @@
 -- If the role already exists you will get : ERROR: role "clincapture" already exists SQL state: 42710
 --
 CREATE ROLE clincapture LOGIN
-  ENCRYPTED PASSWORD 'clinica'
+  ENCRYPTED PASSWORD 'clincapture'
   SUPERUSER NOINHERIT NOCREATEDB NOCREATEROLE;
