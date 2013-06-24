@@ -14,7 +14,7 @@ div.login_BG { background: url(../images/login_BG.gif) no-repeat top center; hei
 
 .loginBoxes td { width: 310px; vertical-align: top; }
 
-.loginBox_T { background: url(../images/login_box_T.png) no-repeat top center; height: 10px; line-height: 10px; font-size: 1px; }
+.loginBox_T { background: url(../images/login_box_T.png) no-repeat top center; height: 10px; line-height: 10px !important; font-size: 1px; }
 
 .loginBox { background: url(../images/login_box_BG.png) no-repeat bottom center; }
 
