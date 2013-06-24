@@ -148,10 +148,12 @@
 
 <br> 
 <form action='RemoveSite?action=submit&id=<c:out value="${siteToRemove.id}"/>' method="POST">
- <input type="submit" name="submit" value="<fmt:message key="remove_site" bundle="${resword}"/>" class="button_long" onClick='return confirm("<fmt:message key="if_you_remove_this_site" bundle="${resword}"/>");'>
-    &nbsp;
- <input type="button" onclick="confirmCancel('ListSite');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
-    
+    <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+           value="<fmt:message key="back" bundle="${resword}"/>"
+           class="button_medium"
+           onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+    <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="if_you_remove_this_site" bundle="${resword}"/>");'>
+    <%--input type="button" onclick="confirmCancel('ListSite');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/--%>
 </form>
 
 <br><br>

@@ -697,10 +697,13 @@ function updateThis(multiSelEle, count) {
 </c:forEach>
 
 <br><br>
-  <table border="0" cellpadding="0" cellspacing="0">
-  <input type="submit" name="Submit" value="<fmt:message key="submit_site" bundle="${resword}"/>" class="button_long">
-    &nbsp;
-  <input type="button" onclick="confirmCancel('ListSite');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
+  <table border="0" cellpadding="0" cellspacing="0" style="width: 100%">
+      <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+             value="<fmt:message key="back" bundle="${resword}"/>"
+             class="button_medium"
+             onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+      <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+      <%--input type="button" onclick="confirmCancel('ListSite');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/--%>
 	</table>
 </form>
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>

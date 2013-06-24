@@ -77,10 +77,13 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
- <input type="submit" name="Submit" value="<fmt:message key="add" bundle="${resword}"/>" class="button_medium">
+    <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+           value="<fmt:message key="back" bundle="${resword}"/>"
+           class="button_medium"
+           onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
 <td>
-<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="javascript:myCancel();"/></td>
+    <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
 </tr></table>
 </form>
 <br><br>
