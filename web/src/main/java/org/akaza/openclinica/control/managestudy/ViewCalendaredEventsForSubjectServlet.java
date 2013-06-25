@@ -2,9 +2,6 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -48,34 +45,29 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 			if("calendared_visit".equalsIgnoreCase(sedBean.getType()) && !seBean.getSubjectEventStatus().isNotScheduled()) {
 				//try to found reference event for this event
 				StudyEventBean refEventResult = null;
-				if (seBean.getSubjectEventStatus().isCompleted()) {
-					StudyEventDefinitionBean sedBeanTmp = (StudyEventDefinitionBean) seddao.findByName(seBean.getReferenceVisitName());
-					ArrayList <StudyEventBean> seBeanTmp = sedao.findAllByStudySubjectAndDefinition(ssBean, sedBeanTmp);
-					if (seBeanTmp.size() > 0) {
-						refEventResult = seBeanTmp.get(0);
-					}
-					logger.info("found for completed event");
-				} else {
-					refEventResult = getLastReferenceEvent(ssBean);
-					logger.info("found for non completed event");
+				StudyEventDefinitionBean sedBeanTmp = (StudyEventDefinitionBean) seddao.findByName(seBean.getReferenceVisitName());
+				ArrayList <StudyEventBean> seBeanTmp = sedao.findAllByStudySubjectAndDefinition(ssBean, sedBeanTmp);
+				if (seBeanTmp.size() > 0) {
+					refEventResult = seBeanTmp.get(0);
 				}
-				CalendarFuncBean calendFuncBean = new CalendarFuncBean();
 				Date schDate = seBean.getDateStarted();
-				if (refEventResult != null) {
-					
-					Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay()).toDate();
-					Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMinDay()).toDate();
-					int daysBetween = sedBean.getScheduleDay() - sedBean.getEmailDay();
-					Date emailDay = new DateTime(seBean.getDateStarted()).minusDays(daysBetween).toDate();
-					//set bean with values
-					calendFuncBean.setDateMax(maxDate);
-					calendFuncBean.setDateMin(minDate);
-					calendFuncBean.setDateSchedule(schDate);
-					calendFuncBean.setDateEmail(emailDay);
-					calendFuncBean.setEventName(sedBean.getName());
-					calendFuncBean.setReferenceVisit(sedBean.getReferenceVisit());
-					calendFuncBean.setEventsReferenceVisit(seddao.findByPK(refEventResult.getStudyEventDefinitionId()).getName());	
-					events.add(calendFuncBean);
+				CalendarFuncBean calendFuncBean = new CalendarFuncBean();
+				if (!(refEventResult == null)) {
+					if(refEventResult.getSubjectEventStatus().isCompleted() || refEventResult.getSubjectEventStatus().isSourceDataVerified() || refEventResult.getSubjectEventStatus().isSigned()) {
+						Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay()).toDate();
+						Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMinDay()).toDate();
+						int daysBetween = sedBean.getScheduleDay() - sedBean.getEmailDay();
+						Date emailDay = new DateTime(seBean.getDateStarted()).minusDays(daysBetween).toDate();
+						//set bean with values
+						calendFuncBean.setDateMax(maxDate);
+						calendFuncBean.setDateMin(minDate);
+						calendFuncBean.setDateSchedule(schDate);
+						calendFuncBean.setDateEmail(emailDay);
+						calendFuncBean.setEventName(sedBean.getName());
+						calendFuncBean.setReferenceVisit(sedBean.getReferenceVisit());
+						calendFuncBean.setEventsReferenceVisit(seddao.findByPK(refEventResult.getStudyEventDefinitionId()).getName());	
+						events.add(calendFuncBean);
+					}
 				} else {
 						logger.info("This event is RV or Event without RV");
 						calendFuncBean.setDateSchedule(schDate);
@@ -92,27 +84,5 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 		forwardPage(Page.SHOW_CALENDAR_FUNC_PER_SUBJ);
 	}
 	
-	@SuppressWarnings("unchecked")
-	private StudyEventBean getLastReferenceEvent(StudySubjectBean ssBean) {
-		StudyEventBean studyEventBeanRef = new StudyEventBean();
-		List<StudyEventDefinitionBean> studyEventDefinitions = seddao.findReferenceVisitBeans();
-		for (StudyEventDefinitionBean studyEventDefinitionBean : studyEventDefinitions) {
-			List<StudyEventBean> sebBeanArr = sedao.findAllByDefinitionAndSubject(studyEventDefinitionBean,ssBean);
-			for (StudyEventBean studyEventBeanReferenceVisit : sebBeanArr) {
-				if (studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED) 
-						|| studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED) 
-						|| studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
-					if (studyEventBeanRef.getUpdatedDate() == null) {
-						studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
-					} else {
-						if (studyEventBeanRef.getUpdatedDate().before(studyEventBeanReferenceVisit.getDateStarted())) {
-							studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
-						}
-					}
-				}
-			}
-		}
-		return studyEventBeanRef;
-	}
 }
 

@@ -25,19 +25,19 @@
 <fmt:message key="calendared_events_parametrs" bundle="${resword}"/> : <c:out value="${subjectLabel}"/>
 </span></h1>
 <table style="border:none">
-<tr><td class="table_header_column_top" align="right">Current Date:</td>
+<tr><td class="table_header_column_top" align="right"><fmt:message key="current_date" bundle="${resword}"/>:</td>
 	<td class="table_header_column_top" align="left"><fmt:formatDate value="${currentDate}" dateStyle="medium"/></td>
 </tr>
 </table>
 <br>
 <table border="0" cellpadding="0" cellspacing="0" width="800" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
 	<tr>
-        <td class="table_header_column_top" align="center"><b>Calendared Event Name</b></td>
-		<td class="table_header_column_top" align="center"><b>Min-Max Date Range</b></td>
-        <td class="table_header_column_top" align="center"><b>Schedule Date</b></td>
-        <td class="table_header_column_top" align="center"><b>User Email Date</b></td>
-        <td class="table_header_column_top" align="center"><b>is Reference Event</b></td>
-        <td class="table_header_column_top" align="center"><b>Reference Visit for Event</b></td>
+        <td class="table_header_column_top" align="center"><b><fmt:message key="calendared_event_name" bundle="${resword}"/></b></td>
+		<td class="table_header_column_top" align="center"><b><fmt:message key="min_max_date_range" bundle="${resword}"/></b></td>
+        <td class="table_header_column_top" align="center"><b><fmt:message key="schedule_date" bundle="${resword}"/></b></td>
+        <td class="table_header_column_top" align="center"><b><fmt:message key="user_email_date" bundle="${resword}"/></b></td>
+        <td class="table_header_column_top" align="center"><b><fmt:message key="is_reference_event" bundle="${resword}"/></b></td>
+        <td class="table_header_column_top" align="center"><b><fmt:message key="reference_visit_for_event" bundle="${resword}"/></b></td>
     </tr>
 		<c:forEach var="event" items="${requestScope['events']}">
 	<tr>

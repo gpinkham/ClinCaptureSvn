@@ -1604,59 +1604,45 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		for (StudyEventBean studyEventBean : studyEventBeanList) {
 			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(studyEventBean.getStudyEventDefinitionId());
 			//Date refVisitDateCompleted = new DateTime(studyEventBean.getDateStarted().getTime()).minusDays(sedBean.getScheduleDay()).toDate();
-			if (studyEventBean.getSubjectEventStatus().isCompleted() && !sedBean.getReferenceVisit() && "calendared_visit".equalsIgnoreCase(sedBean.getType())) {
+			if (!sedBean.getReferenceVisit() && "calendared_visit".equalsIgnoreCase(sedBean.getType())) {
 				StudyEventDefinitionBean sedBeanTmp = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByName(studyEventBean.getReferenceVisitName());
-				ArrayList <StudyEventBean> seBeanTmp = getStudyEventDAO().findAllByStudySubjectAndDefinition(subjectBean, sedBeanTmp);
+				ArrayList<StudyEventBean> seBeanTmp = getStudyEventDAO().findAllByStudySubjectAndDefinition(subjectBean,sedBeanTmp);
 				if (seBeanTmp.size() > 0) {
 					refEventResult = seBeanTmp.get(0);
 				}
 				logger.info("found for completed event");
-				Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMinDay()).toDate();
-				if (studyEventBean.getUpdatedDate() != null) {
-					Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay()).toDate();
-					if ((minDate.after(studyEventBean.getUpdatedDate())) && discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(studyBean,sedBean.getName(), subjectBean.getLabel())) {
-						defaultColor = false;
-						break;
-					} else if (maxDate.before(studyEventBean.getUpdatedDate()) && discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(studyBean,sedBean.getName(), subjectBean.getLabel())) {
-						defaultColor = false;
-						break;
+				//if null RV for event not found.
+				if (studyEventBean.getUpdatedDate() != null && refEventResult != null) {
+					//for completed events
+					if(refEventResult.getSubjectEventStatus().isCompleted() || refEventResult.getSubjectEventStatus().isSigned() || refEventResult.getSubjectEventStatus().isSourceDataVerified()) {
+					//Reference event should be completed, signed or SDVed
+						if(studyEventBean.getSubjectEventStatus().isCompleted()) {
+							Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMinDay()).toDate();
+							Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay()).toDate();
+								if ((minDate.after(studyEventBean.getUpdatedDate())) && discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(studyBean, sedBean.getName(), subjectBean.getLabel())) {
+									defaultColor = false;
+									break;
+								} else if (maxDate.before(studyEventBean.getUpdatedDate()) && discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(studyBean,sedBean.getName(), subjectBean.getLabel())) {
+									defaultColor = false;
+									break;
+								}
+					}
+					//for sheduled events
+						if (studyEventBean.getSubjectEventStatus().isScheduled()) {
+							Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay() + 1).toDate();
+								if (maxDate.before(new Date())) {
+									defaultColor = false;
+									break;
+								}
+						}
 					}
 				}
-			} else if (studyEventBean.getSubjectEventStatus().isScheduled() && !sedBean.getReferenceVisit() && "calendared_visit".equalsIgnoreCase(sedBean.getType())) {
-				refEventResult = getLastReferenceEvent(subjectBean);
-				Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay()+1).toDate();
-					if (maxDate.before(new Date())) {
-						defaultColor = false;
-						break;
-					}
-			}
+			} 
 
 		}
 		return defaultColor;
 	}
 	
-	
-	private StudyEventBean getLastReferenceEvent(StudySubjectBean ssBean) {
-		StudyEventBean studyEventBeanRef = new StudyEventBean();
-		List<StudyEventDefinitionBean> studyEventDefinitions = getStudyEventDefinitionDao().findReferenceVisitBeans();
-		for (StudyEventDefinitionBean studyEventDefinitionBean : studyEventDefinitions) {
-			List<StudyEventBean> sebBeanArr = getStudyEventDAO().findAllByDefinitionAndSubject(studyEventDefinitionBean,ssBean);
-			for (StudyEventBean studyEventBeanReferenceVisit : sebBeanArr) {
-				if (studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED) 
-						|| studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED) 
-						|| studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
-					if (studyEventBeanRef.getUpdatedDate() == null) {
-						studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
-					} else {
-						if (studyEventBeanRef.getUpdatedDate().before(studyEventBeanReferenceVisit.getDateStarted())) {
-							studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
-						}
-					}
-				}
-			}
-		}
-		return studyEventBeanRef;
-	}
 	
 	
 }

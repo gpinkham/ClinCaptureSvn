@@ -161,23 +161,16 @@ public class CalendarLogic {
 			StudyBean studyBean = sdao.findByStudySubjectId(subjectId);
 			StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPKAndStudy(subjectId, studyBean);
 			StudyEventBean studyEventBeanRef = new StudyEventBean();
-
-			List<StudyEventDefinitionBean> studyEventDefinitions = seddao.findReferenceVisitBeans();
-			for (StudyEventDefinitionBean studyEventDefinitionBean : studyEventDefinitions) {
-				List<StudyEventBean> sebBeanArr = sedao.findAllByDefinitionAndSubject(studyEventDefinitionBean, ssb);
-				for (StudyEventBean studyEventBeanReferenceVisit : sebBeanArr) {
-					if (studyEventBeanReferenceVisit.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
-						if (studyEventBeanRef.getUpdatedDate() == null) {
-							studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
-						} else {
-							if (studyEventBeanRef.getUpdatedDate()
-									.before(studyEventBeanReferenceVisit.getDateStarted())) {
-								studyEventBeanRef = new StudyEventBean(studyEventBeanReferenceVisit);
-							}
-						}
-					}
+			StudyEventDefinitionBean sedBeanTmp = (StudyEventDefinitionBean) seddao.findByName(studyEventBean.getReferenceVisitName());
+			ArrayList <StudyEventBean> seBeanTmp = sedao.findAllByDefinitionAndSubject(sedBeanTmp, ssb);
+			if (seBeanTmp.size() > 0) {
+				studyEventBeanRef = seBeanTmp.get(0);
+				if(!studyEventBeanRef.getSubjectEventStatus().isSourceDataVerified() && !studyEventBeanRef.getSubjectEventStatus().isCompleted() && !studyEventBeanRef.getSubjectEventStatus().isSigned()) {
+					logger.info("RV for this events is not Completed/SDV/Signed");
+					studyEventBeanRef = new StudyEventBean();
 				}
 			}
+
 			boolean refEventsIsEmpty = false;
 			if (getYearFromDate(studyEventBeanRef.getUpdatedDate()) == 1970) {
 				studyEventBeanRef.setUpdatedDate(new Date());
@@ -185,8 +178,7 @@ public class CalendarLogic {
 				refEventsIsEmpty = true;
 			}
 
-			StudyEventDefinitionBean infoBean = (StudyEventDefinitionBean) seddao.findByPK(studyEventBeanRef
-					.getStudyEventDefinitionId());
+			StudyEventDefinitionBean infoBean = (StudyEventDefinitionBean) seddao.findByPK(studyEventBeanRef.getStudyEventDefinitionId());
 			logger.info("Reference visit name " + infoBean.getName());
 			logger.info("Latest referense visit date complete " + studyEventBeanRef.getUpdatedDate());
 			logger.info("Information about filled event. OID? " + seBean.getOid());
@@ -199,10 +191,6 @@ public class CalendarLogic {
 			Interval timeRangeForStudyEvent = new Interval(ReferenceEventStartDate.plusDays(dayMin).toDateMidnight(),
 					ReferenceEventStartDate.toDateMidnight().plusDays(dayMax + 1));
 			
-			if(!refEventsIsEmpty) {
-				studyEventBean.setReferenceVisitName(infoBean.getName());
-				sedao.update(studyEventBean);
-			}
 			if (timeRangeForStudyEvent.getStart().isAfter(dateTimeCurrent) && !refEventsIsEmpty) {
 				logger.info("Early start");
 				messageReturn = resexception.getString("data_has_enteret_too_early_in_the_calendar");
