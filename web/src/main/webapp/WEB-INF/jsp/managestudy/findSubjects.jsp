@@ -61,6 +61,12 @@
             return false;
         });
     });
+	
+	//alignment of headers and icons
+    jQuery(document).ready(function() {	
+		jQuery("div[id^='Event_']").parent().parent().parent().parent().parent().attr("align", "center");
+		jQuery("tr.header").attr("align", "center");
+	});
 </script>
 
 <!-- then instructions-->
@@ -120,9 +126,5 @@
     <c:if test="${showOverlay}">
         jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
     </c:if>
-
-    jQuery(function() {
-        //TODO
-    });
 
 </script>

@@ -221,10 +221,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			configureColumn(row.getColumn(columnNames[i]), studyEventDefinition.getName(),
 					new StudyEventDefinitionMapCellEditor(), new SubjectEventStatusDroplistFilterEditor(), true, false);
 		}
-		String actionsHeader = resword.getString("rule_actions")
-				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" + 
-				"&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" +
-				"&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
+		String actionsHeader = "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" 
+				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" + resword.getString("rule_actions") 
+				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
+				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
 		configureColumn(row.getColumn(columnNames[columnNames.length - 1]), actionsHeader, new ActionsCellEditor(),
 				new DefaultActionsEditor(locale), true, false);
 

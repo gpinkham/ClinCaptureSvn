@@ -150,11 +150,11 @@
 }
 
 .jmesa .odd td {
-    border: 1px solid #ffffff;
+    border: 1px none #ffffff;
 }
 
 .jmesa .even td {
-    border: 1px solid #e3e3e3;
+    border: 1px none #e3e3e3;
 }
 
 .jmesa .odd {
@@ -170,7 +170,7 @@
     font-size: 11px;
     vertical-align: top;
     line-height: 15px;
-    padding: 3px 4px 3px 4px;
+    padding: 2px 3px 2px 3px;
     background-color: #fdecae;
 }
 

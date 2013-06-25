@@ -72,7 +72,7 @@ public final class SubjectEventStatusUtil {
 						+ txt
 						+ "' alt='"
 						+ txt
-						+ "' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative; left: 7px;'>");
+						+ "' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative;'>");
 			} else if (studySubjectBean.getStatus().isDeleted()
 					&& subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
 				String txt = resword.getString("removed");
@@ -82,13 +82,13 @@ public final class SubjectEventStatusUtil {
 						+ txt
 						+ "' alt='"
 						+ txt
-						+ "' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative; left: 7px;'>");
+						+ "' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative;'>");
 			} else {
 				if (!subjectEventStatus.isNotScheduled() || permission_for_dynamic) {
 				url.append("<img src='" + imageIconPaths.get(subjectEventStatus.getId())
-						+ "' border='0' style='position: relative; left: 7px;'>");
+						+ "' border='0' style='position: relative;'>");
 				} else {
-					url.append("<img src='' border='0' style='position: relative; left: 7px; display: none;'>");
+					url.append("<img src='' border='0' style='position: relative; display: none;'>");
 				}	
 			}
 		} else {
@@ -127,7 +127,7 @@ public final class SubjectEventStatusUtil {
 				status = minNotDESStatus;
 			}
 			url.append("<img src='" + imageIconPaths.get(status.getId())
-					+ "' border='0' style='position: relative; left: 7px;'>");
+					+ "' border='0' style='position: relative;'>");
 		}
 	}
 
