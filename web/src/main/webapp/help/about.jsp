@@ -16,7 +16,8 @@
 <title>ClinCapture About</title>
 
 <link rel="stylesheet" href="../includes/styles_hf.css" type="text/css" media="screen" />
-
+<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="colorTheme.js"></script>
 </head>
 
 <body>
@@ -33,7 +34,7 @@
 <!--content container, on the right side-->
 <div id="about-content">
 		<!-- clinovo icon should be here -->
-		<img src="../images/CLIlogo.jpg" alt="Clinovo Inc."/>
+		<img src="../images/CLIlogo.png" alt="Clinovo Inc."/>
 		<P>ClinCapture&#0153; <fmt:message key="Version_release" bundle="${resword}"/>&nbsp;&nbsp;<fmt:message key="buildNumber" bundle="${resbuildnumber}"/></P>
 		<P>Licensed under LGPLv2.1.  The program is free software; you can redistribute it and modify it under the terms of the GNU Lesser General Public License version 2.1 as published by the Free Software Foundation.</P>
 		<p> &copy; 2004-2012 OpenClinica, LLC and collaborators. The OpenClinica
