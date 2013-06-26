@@ -20,15 +20,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -38,14 +30,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.RememberLastPage;
@@ -60,12 +45,7 @@ import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -81,7 +61,7 @@ import org.quartz.impl.StdScheduler;
  * 
  *         Performs updating study event action
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class UpdateStudyEventServlet extends SecureController {
 
 	private static final long serialVersionUID = -6029524999558420563L;
@@ -158,6 +138,7 @@ public class UpdateStudyEventServlet extends SecureController {
 			return;
 		}
 
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
 		StudySubjectBean ssub = null;
 		if (studySubjectId > 0) {
@@ -168,7 +149,7 @@ public class UpdateStudyEventServlet extends SecureController {
 			// link back to view
 			// study subject
 		}
-		
+
 		Status s = ssub.getStatus();
 		if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
 			addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be")
@@ -188,9 +169,9 @@ public class UpdateStudyEventServlet extends SecureController {
 		ArrayList statuses = SubjectEventStatus.toArrayList();
 
 		SubjectEventStatusUtil.preparePossibleSubjectEventStates(studyEvent.getEventCRFs(), statuses);
-        if (!studyEvent.isWasLockedBy()) {
-            statuses.remove(SubjectEventStatus.UNLOCK);
-        }
+		if (!studyEvent.isWasLockedBy()) {
+			statuses.remove(SubjectEventStatus.UNLOCK);
+		}
 		StudyDAO sdao = new StudyDAO(this.sm.getDataSource());
 		StudyBean studyBean = (StudyBean) sdao.findByPK(ssub.getStudyId());
 		checkRoleByUserAndStudy(ub, studyBean.getParentStudyId(), studyBean.getId());
@@ -217,7 +198,7 @@ public class UpdateStudyEventServlet extends SecureController {
 		if (removeSign == true || !currentRole.isInvestigator()) {
 			statuses.remove(SubjectEventStatus.SIGNED);
 		}
-		
+
 		if (!studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.NOT_SCHEDULED)) {
 			statuses.remove(SubjectEventStatus.NOT_SCHEDULED);
 		}
@@ -233,7 +214,7 @@ public class UpdateStudyEventServlet extends SecureController {
 		}
 
 		ArrayList getECRFs = studyEvent.getEventCRFs();
-		
+
 		EventDefinitionCRFDAO edefcrfdao = new EventDefinitionCRFDAO(sm.getDataSource());
 		ArrayList getAllECRFs = (ArrayList) edefcrfdao.findAllByDefinition(studyBean,
 				studyEvent.getStudyEventDefinitionId());
@@ -268,7 +249,7 @@ public class UpdateStudyEventServlet extends SecureController {
 				}
 			}
 		}
-		
+
 		if (!ub.isSysAdmin() && !currentRole.getRole().equals(Role.STUDYDIRECTOR)
 				&& !currentRole.getRole().equals(Role.COORDINATOR)) {
 			statuses.remove(SubjectEventStatus.LOCKED);
@@ -284,26 +265,28 @@ public class UpdateStudyEventServlet extends SecureController {
 		request.setAttribute("statuses", statuses);
 
 		String action = fp.getString("action");
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEvent
 				.getStudyEventDefinitionId());
 		request.setAttribute(EVENT_DEFINITION_BEAN, sed);
 		if (action.equalsIgnoreCase("submit")) {
-            discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-            DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
-            SubjectEventStatus ses = SubjectEventStatus.get(fp.getInt(SUBJECT_EVENT_STATUS_ID));
-            if (ses == SubjectEventStatus.LOCKED) {
-                if (studyEvent.getSubjectEventStatus() != SubjectEventStatus.LOCKED) {
-                    studyEvent.setWasLockedBy(true);
-                    studyEvent.setPrevSubjectEventStatus(studyEvent.getSubjectEventStatus());
-                }
-            } else {
-                studyEvent.setWasLockedBy(false);
-            }
-            studyEvent.setSubjectEventStatus(ses == SubjectEventStatus.UNLOCK ? studyEvent.getPrevSubjectEventStatus() : ses);
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-            ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
-            if (ses.equals(SubjectEventStatus.SKIPPED) || ses.equals(SubjectEventStatus.STOPPED)) {
+			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+			DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
+			SubjectEventStatus ses = SubjectEventStatus.get(fp.getInt(SUBJECT_EVENT_STATUS_ID));
+
+			if (ses == SubjectEventStatus.LOCKED) {
+				if (studyEvent.getSubjectEventStatus() != SubjectEventStatus.LOCKED) {
+					studyEvent.setWasLockedBy(true);
+					studyEvent.setPrevSubjectEventStatus(studyEvent.getSubjectEventStatus());
+					studyEvent.setSubjectEventStatus(SubjectEventStatus.LOCKED);
+				}
+			} else {
+				studyEvent.setWasLockedBy(false);
+				studyEvent.setSubjectEventStatus(studyEvent.getPrevSubjectEventStatus());
+			}
+
+			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+			ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
+			if (ses.equals(SubjectEventStatus.SKIPPED) || ses.equals(SubjectEventStatus.STOPPED)) {
 				studyEvent.setStatus(Status.UNAVAILABLE);
 				for (int i = 0; i < eventCRFs.size(); i++) {
 					EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
@@ -321,7 +304,7 @@ public class UpdateStudyEventServlet extends SecureController {
 					ecdao.update(ecb);
 				}
 			}
-			
+
 			String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
 			Date start = fp.getDateTime(INPUT_STARTDATE_PREFIX);
 			Date end = null;
@@ -374,7 +357,7 @@ public class UpdateStudyEventServlet extends SecureController {
 				forwardPage(Page.UPDATE_STUDY_EVENT);
 
 			} else if (studyEvent.getSubjectEventStatus().isSigned()) {
-				
+
 				request.setAttribute(STUDY_SUBJECT_ID, new Integer(studySubjectId).toString());
 				if (fp.getString(INPUT_STARTDATE_PREFIX + "Hour").equals("-1")
 						&& fp.getString(INPUT_STARTDATE_PREFIX + "Minute").equals("-1")
@@ -398,7 +381,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
 				studyEvent.setLocation(fp.getString(INPUT_LOCATION));
 				studyEvent.setStudyEventDefinition(sed);
-				
+
 				ssdao = new StudySubjectDAO(sm.getDataSource());
 				StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 
@@ -459,13 +442,32 @@ public class UpdateStudyEventServlet extends SecureController {
 						studyEvent.setEndTimeFlag(true);
 					}
 				}
-				
+
 				studyEvent.setLocation(fp.getString(INPUT_LOCATION));
 
 				logger.info("update study event...");
 				studyEvent.setUpdater(ub);
 				studyEvent.setUpdatedDate(new Date());
 				sedao.update(studyEvent);
+
+				if (ses == SubjectEventStatus.UNLOCK) {
+					ssub.setStatus(Status.AVAILABLE);
+					ssdao.update(ssub);
+				} else if (ses == SubjectEventStatus.LOCKED) {
+					int count = 0;
+					List<StudyEventBean> studyEventList = sedao.findAllByStudySubject(ssub);
+					for (StudyEventBean studyEventBean : studyEventList) {
+						if (studyEventBean.getId() != studyEvent.getId()
+								&& studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
+							count++;
+						}
+					}
+					if (count == studyEventList.size() - 1) {
+						ssub.setStatus(Status.LOCKED);
+						ssdao.update(ssub);
+					}
+				}
+
 				if (studyEvent.getSubjectEventStatus().isCompleted()) {
 					StdScheduler scheduler = getScheduler(request);
 					CalendarLogic calLogic = new CalendarLogic(sm.getDataSource(), scheduler);
@@ -491,7 +493,7 @@ public class UpdateStudyEventServlet extends SecureController {
 				addPageMessage(respage.getString("study_event_updated"));
 				request.setAttribute("id", new Integer(studySubjectId).toString());
 				session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-				
+
 				redirectToStudySubjectView(studySubjectId);
 			}
 		} else if (action.equalsIgnoreCase("confirm")) {// confirming the signed
@@ -789,10 +791,10 @@ public class UpdateStudyEventServlet extends SecureController {
 			}
 		}
 	}
-	
-		private StdScheduler getScheduler(HttpServletRequest request) {
+
+	private StdScheduler getScheduler(HttpServletRequest request) {
 		StdScheduler scheduler = (StdScheduler) SpringServletAccess.getApplicationContext(
-					request.getSession().getServletContext()).getBean("schedulerFactoryBean");
-			return scheduler;
-		}
+				request.getSession().getServletContext()).getBean("schedulerFactoryBean");
+		return scheduler;
+	}
 }

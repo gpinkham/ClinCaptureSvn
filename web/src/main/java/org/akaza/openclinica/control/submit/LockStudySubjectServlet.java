@@ -1,12 +1,8 @@
 package org.akaza.openclinica.control.submit;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -26,7 +22,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class LockStudySubjectServlet extends SecureController {
 
 	public static final String REFERER_URL = "refererUrl";
@@ -161,6 +157,8 @@ public class LockStudySubjectServlet extends SecureController {
 						sedao.update(studyEventBean);
 					}
 				}
+				studySubjectBean.setStatus(Status.LOCKED);
+				ssdao.update(studySubjectBean);
 			} else if (action.equalsIgnoreCase("unlock")) {
 				message = resword.getString("unlockStudySubjectResultMsg");
 				for (StudyEventBean studyEventBean : studyEventBeanList) {
@@ -178,6 +176,8 @@ public class LockStudySubjectServlet extends SecureController {
 						sedao.update(studyEventBean);
 					}
 				}
+				studySubjectBean.setStatus(Status.AVAILABLE);
+				ssdao.update(studySubjectBean);
 			}
 			showResultMessage(studySubjectBean, message);
 			response.sendRedirect((String) request.getSession().getAttribute(REFERER_URL));
