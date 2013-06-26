@@ -12,7 +12,7 @@ import com.clinovo.model.Randomization;
 
 public abstract class DefaultSubmissionContext implements SubmissionContext {
 
-	protected Randomization randomiation;
+	protected Randomization randomization;
 	protected PostMethod method = null;
 	protected String currentAuthToken = null;
 	protected HttpClient client = new HttpClient();
@@ -29,7 +29,7 @@ public abstract class DefaultSubmissionContext implements SubmissionContext {
 			return currentAuthToken;
 		}
 		
-		method = new PostMethod(randomiation.getAuthenticationUrl());
+		method = new PostMethod(randomization.getAuthenticationUrl());
 		
 		// Allow for testing
 		if (client == null)
@@ -57,11 +57,11 @@ public abstract class DefaultSubmissionContext implements SubmissionContext {
 	}
 
 	public void setRandomization(Randomization randomization) {
-		this.randomiation = randomization;
+		this.randomization = randomization;
 	}
 
 	public Randomization getRandomization() {
-		return this.randomiation;
+		return this.randomization;
 	}
 
 	public void setHttpClient(HttpClient client) {

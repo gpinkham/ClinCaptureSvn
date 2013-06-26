@@ -2070,7 +2070,7 @@ var bindRadioButtons = function() {
  * Disable the Randomization result field and the randomization date field
  * They should be read-only
  ========================================================================= */
-jQuery(function() {
+$(function() {
 
     jQuery("#Rand_Date").find(":input").attr('disabled', "disabled");
     jQuery("#Rand_Result").find(":input").attr('disabled', "disabled");

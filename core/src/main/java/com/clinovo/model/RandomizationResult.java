@@ -5,7 +5,8 @@ package com.clinovo.model;
  *
  */
 public class RandomizationResult {
-
+	
+	private String studyId;
 	private String patientId;
 	private String treatmentID;
 	private String randomizationResult;
@@ -34,4 +35,13 @@ public class RandomizationResult {
 		this.randomizationResult = result;
 	}
 
+	public void setStudyId(String studyId) {
+		
+		this.studyId = studyId;
+	}
+
+	public String getStudyId() {
+		
+		return this.studyId;
+	}
 }

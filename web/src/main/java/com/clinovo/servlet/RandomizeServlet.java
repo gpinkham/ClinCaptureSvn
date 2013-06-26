@@ -10,9 +10,11 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
@@ -78,42 +80,22 @@ public class RandomizeServlet extends SecureController {
 					// YES
 					if ("0".equals(eligibility)) {
 
-						result = initiateRandomizationCall(request);
-						
-						JSONObject randomizationResult = new JSONObject();
-						
-						DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
-						Date date = new Date();
-						
-						randomizationResult.put("date", dateFormat.format(date));
-						randomizationResult.put("result", result.getRandomizationResult());
-						
-						writer.write(randomizationResult.toString());
-						writer.flush();
+						randomize(writer);
 
 					} else if ("1".equals(eligibility)) {
 
-						throw new RandomizationException("The subject has not completed the IE criteria. Complete IE criteria before randomizing the subject");
+						throw new RandomizationException(
+								"The subject has not completed the IE criteria. Complete IE criteria before randomizing the subject");
 					}
 				} else {
-					
-					result = initiateRandomizationCall(request);
-					
-					JSONObject randomizationResult = new JSONObject();
-					
-					DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
-					Date date = new Date();
-					
-					randomizationResult.put("date", dateFormat.format(date));
-					randomizationResult.put("result", result.getRandomizationResult());
-					
-					writer.write(randomizationResult.toString());
-					writer.flush();
+
+					randomize(writer);
 				}
 
 			} else {
 
-				throw new RandomizationException("The crf is not complete. Please make sure you have executed all rules before attempting to randomize the subject");
+				throw new RandomizationException(
+						"The crf is not complete. Please make sure you have executed all rules before attempting to randomize the subject");
 			}
 
 		} catch (Exception ex) {
@@ -122,6 +104,30 @@ public class RandomizeServlet extends SecureController {
 			writer.write("Exception: " + ex.getMessage());
 			writer.flush();
 		}
+	}
+
+	private void randomize(PrintWriter writer) throws Exception {
+
+		result = initiateRandomizationCall(request);		
+		result.setStudyId(String.valueOf(getStudyId()));
+		
+		// Set expected context
+		RandomizationUtil.setSessionManager(sm);
+		RandomizationUtil.setCurrentStudy(currentStudy);
+
+		// Assign subject to group
+		RandomizationUtil.assignSubjectToGroup(result);
+
+		JSONObject randomizationResult = new JSONObject();
+
+		DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+		Date date = new Date();
+
+		randomizationResult.put("date", dateFormat.format(date));
+		randomizationResult.put("result", result.getRandomizationResult());
+
+		writer.write(randomizationResult.toString());
+		writer.flush();
 	}
 
 	private RandomizationResult initiateRandomizationCall(HttpServletRequest request) throws Exception {
@@ -141,7 +147,8 @@ public class RandomizeServlet extends SecureController {
 			// Trial Id should be configured in one place
 			if (RandomizationUtil.isTrialIdDoubleConfigured(configuredTrialId, crfConfiguredTrialId)) {
 
-				throw new RandomizationException("Trial ID must be specified either on the server or the CRF but not both.");
+				throw new RandomizationException(
+						"Trial ID must be specified either on the server or the CRF but not both.");
 
 			} else {
 
@@ -151,16 +158,16 @@ public class RandomizeServlet extends SecureController {
 		} else if (RandomizationUtil.isCRFSpecifiedTrialIdValid(crfConfiguredTrialId)) {
 
 			trialId = crfConfiguredTrialId;
-			
+
 		} else {
-			
+
 			// Valid Trial Id must be specified at least in one place (CRF or datainfo.properties)
 			throw new RandomizationException("Specify a valid Trial Id to proceed.");
 		}
 
-		String strataLevel = request.getParameter("strataLevel").equals("null") ? "" : request.getParameter("strataLevel");
+		String strataLevel = request.getParameter("strataLevel").equals("null") ? "" : request
+				.getParameter("strataLevel");
 
-		// This line should be removed
 		String siteId = getSiteId(studyId);
 		String patientId = request.getParameter("subject");
 
@@ -194,11 +201,11 @@ public class RandomizeServlet extends SecureController {
 	private boolean isCrfComplete(String crfId) {
 
 		log.info("Asserting the status of crf with id: {0} ", crfId);
-		
+
 		// Run rules on the CRF
 		HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> result = getRuleSetService()
 				.runRulesInBulk(crfId, ExecutionMode.DRY_RUN, currentStudy, ub);
-		
+
 		if (result.isEmpty()) {
 			return true;
 		} else {
@@ -219,6 +226,23 @@ public class RandomizeServlet extends SecureController {
 		}
 
 		return siteId;
+	}
+
+	@SuppressWarnings("rawtypes")
+	protected int getStudyId() {
+		
+		StudyBean study = null;
+		StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+
+		if (currentStudy.getParentStudyId() > 0) {
+			
+			study = (StudyBean) studyDAO.findByPK(currentStudy.getParentStudyId());
+		} else {
+			
+			study = currentStudy;
+		}
+		
+		return study.getId();
 	}
 
 	private RuleSetServiceInterface getRuleSetService() {

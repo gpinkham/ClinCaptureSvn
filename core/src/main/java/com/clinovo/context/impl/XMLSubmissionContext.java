@@ -69,22 +69,22 @@ public class XMLSubmissionContext extends DefaultSubmissionContext {
 
 		// Trial Id
 		postData.append("<TrialID>");
-		postData.append(randomiation.getTrialId());
+		postData.append(randomization.getTrialId());
 		postData.append("</TrialID>");
 
 		// Site Id
 		postData.append("<SiteID>");
-		postData.append(randomiation.getSiteId());
+		postData.append(randomization.getSiteId());
 		postData.append("</SiteID>");
 
 		// Initials
 		postData.append("<Initials>");
-		postData.append(randomiation.getInitials());
+		postData.append(randomization.getInitials());
 		postData.append("</Initials>");
 
 		// Patient Id
 		postData.append("<PatientID>");
-		postData.append(randomiation.getPatientId());
+		postData.append(randomization.getPatientId());
 		postData.append("</PatientID>");
 
 		// Strata data
@@ -107,10 +107,10 @@ public class XMLSubmissionContext extends DefaultSubmissionContext {
 		StringBuilder body = new StringBuilder("<Authentication>");
 
 		body.append("<SiteID>");
-		body.append(randomiation.getUsername());
+		body.append(randomization.getUsername());
 		body.append("</SiteID>");
 		body.append("<Password>");
-		body.append(randomiation.getPassword());
+		body.append(randomization.getPassword());
 		body.append("</Password>");
 		body.append("</Authentication>");
 

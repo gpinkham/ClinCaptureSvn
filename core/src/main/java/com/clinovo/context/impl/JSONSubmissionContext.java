@@ -70,19 +70,19 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 
 		JSONObject postData = new JSONObject();
 
-		postData.put("SiteID", randomiation.getSiteId());
-		postData.put("Initials", randomiation.getInitials());
-		postData.put("PatientID", randomiation.getPatientId());
-		postData.put("TrialID", Integer.parseInt(randomiation.getTrialId()));
+		postData.put("SiteID", randomization.getSiteId());
+		postData.put("Initials", randomization.getInitials());
+		postData.put("PatientID", randomization.getPatientId());
+		postData.put("TrialID", Integer.parseInt(randomization.getTrialId()));
 		
 		// Strata
-		if (!randomiation.getStratificationLevel().equals(null) 
-				&& randomiation.getStratificationLevel().length() > 0) {
+		if (randomization.getStratificationLevel() != null 
+				&& randomization.getStratificationLevel().length() > 0) {
 
 			JSONArray array = new JSONArray();
 			JSONObject strataObject = new JSONObject();
 			strataObject.put("StratificationID", "1");
-			strataObject.put("Level", randomiation.getStratificationLevel());
+			strataObject.put("Level", randomization.getStratificationLevel());
 
 			array.put(strataObject);
 
@@ -148,8 +148,8 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 	String getBody() throws Exception {
 
 		JSONObject postData = new JSONObject();
-		postData.put("SiteID", randomiation.getUsername());
-		postData.put("Password", randomiation.getPassword());
+		postData.put("SiteID", randomization.getUsername());
+		postData.put("Password", randomization.getPassword());
 
 		return postData.toString();
 	}
