@@ -306,7 +306,7 @@ function EnableScrollArrows2(StatusBoxID, StatusBoxNum) {
     for (var i = 1; i <= StatusBoxNum; i++) {
         if (i == 1 ) {
             document.getElementById('Event_' + StatusBoxID + '_' + i).style.display = "";
-            loadCRFList(StatusBoxID,i);
+            //loadCRFList(StatusBoxID,i);
         } else {
             document.getElementById('Event_' + StatusBoxID + '_' + i).style.display = "none";
         }
@@ -379,9 +379,15 @@ function loadCRFList(StatusBoxID,StatusBoxNum) {
     jQuery('.crfListTable').remove();
     jQuery('#crfListWrapper_' + studyEventId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
     jQuery('#crfListWrapper_' + studyEventId).css("height", "18px");
-    jQuery.get("CRFListForStudyEvent?eventId=" + studyEventId, function(data) {
-        jQuery('#crfListWrapper_' + studyEventId).css("height", "auto");
-        jQuery('#crfListWrapper_' + studyEventId).html(data);
-        adjustCrfListTable2(studyEventId);
+    jQuery.ajax({
+        url: "CRFListForStudyEvent",
+        type: "GET",
+        data: {eventId: studyEventId},
+        cache: false,
+        success: function (data) {
+            jQuery('#crfListWrapper_' + studyEventId).css("height", "auto");
+            jQuery('#crfListWrapper_' + studyEventId).html(data);
+            adjustCrfListTable2(studyEventId);
+        }
     });
 }
