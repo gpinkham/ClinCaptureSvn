@@ -227,6 +227,7 @@
 				<select name="dynamicGroupClassId" class="formfieldM" onChange="showDynamicEventsSection(${defaultDynGroupClassId});">
 					<option value="0"><fmt:message key="default_group" bundle="${resword}"/></option>
 					<c:forEach var="dynGroup" items="${dynamicGroups}">
+					<c:if test="${dynGroup.id != defaultDynGroupClassId}">
 					<c:choose>
 						<c:when test="${dynGroup.id == selectedDynGroupClassId}">
 							<option value="<c:out value="${dynGroup.id}" />" selected><c:out value="${dynGroup.name}"/></option>
@@ -235,6 +236,7 @@
 							<option value="<c:out value="${dynGroup.id}"/>"><c:out value="${dynGroup.name}"/></option>
 						</c:otherwise>
 					</c:choose>
+					</c:if>
 					</c:forEach>
 				</select>
 			</div>
