@@ -2090,10 +2090,12 @@ var bindRadioButtons = function() {
  * They should be read-only
  ========================================================================= */
 $(function() {
+	
+	var dateInput = $("#Rand_Date").find(":input")
+	var resultInput = $("#Rand_Result").find(":input")
 
-    jQuery("#Rand_Date").find(":input").attr('disabled', "disabled");
-    jQuery("#Rand_Result").find(":input").attr('disabled', "disabled");
-
+	$(dateInput).attr("readonly", "readonly");
+	$(resultInput).attr("readonly", "readonly");
 })
 
 /* =======================================================================================
@@ -2110,18 +2112,18 @@ $(function() {
 ========================================================================================== */
 function randomizeSubject() {
 
-    var crf = jQuery("input:hidden[name='crfId']").val();
-    var studyId = jQuery("input:hidden[name='studyId']").val();
+    var crf = $("input:hidden[name='crfId']").val();
+    var studyId = $("input:hidden[name='studyId']").val();
     
     var eligibility = null;
 
     // Check if the subject eligibility is defined
-    if(jQuery("#Rand_Eligibility :radio").size() > 0) {
+    if($("#Rand_Eligibility :radio").size() > 0) {
 
         // Check if selection has been done
-        if(jQuery("input[type=radio]:checked", "#Rand_Eligibility").length > 0) {
+        if($("input[type=radio]:checked", "#Rand_Eligibility").length > 0) {
             
-            eligibility = jQuery("input[type=radio]:checked", "#Rand_Eligibility").val();
+            eligibility = $("input[type=radio]:checked", "#Rand_Eligibility").val();
 
         } 
     }
@@ -2129,18 +2131,18 @@ function randomizeSubject() {
     var strataLevel = null
 
     // Check if the strate level item defined
-    if(jQuery("#Rand_StrataData :select").size() > 0) {
+    if($("#Rand_StrataData :select").size() > 0) {
 
         // Check if selection has been done
-        if(jQuery("#Rand_StrataData :select").find(":selected") !== undefined) {
+        if($("#Rand_StrataData :select").find(":selected") !== undefined) {
            
-            var opt2 = jQuery("#Rand_StrataData :select").find(":selected").text();
+            var opt2 = $("#Rand_StrataData :select").find(":selected").text();
 
-            strataLevel = jQuery("input:hidden[eleid='requiredParam2']").attr(opt2)} 
+            strataLevel = $("input:hidden[eleid='requiredParam2']").attr(opt2)} 
 
             else {
             
-            alert(jQuery("input:hidden[name='requiredParam2Missing']").val());
+            alert($("input:hidden[name='requiredParam2Missing']").val());
 
             return false;
         }
@@ -2149,29 +2151,29 @@ function randomizeSubject() {
     var trialId = null
 
     // Check if the trial Id is defined
-    if(jQuery("#Rand_TrialIDs :select").size() > 0) {
+    if($("#Rand_TrialIDs :select").size() > 0) {
 
         // Check if selection has been done
-        if(jQuery("#Rand_TrialIDs :select").find(":selected") !== undefined) {
+        if($("#Rand_TrialIDs :select").find(":selected") !== undefined) {
 
-            var opt3 = jQuery("#Rand_TrialIDs :select").find(":selected").text();
+            var opt3 = $("#Rand_TrialIDs :select").find(":selected").text();
            
-           trialId = jQuery("input:hidden[eleid='requiredParam3']").attr(opt3)
+           trialId = $("input:hidden[eleid='requiredParam3']").attr(opt3)
 
         } else {
             
-            alert(jQuery("input:hidden[name='requiredParam3Missing']").val());
+            alert($("input:hidden[name='requiredParam3Missing']").val());
 
             return false;
         }
     } else {
         
-        trialId = jQuery("input[eleid='randomize']").attr("trialId")
+        trialId = $("input[eleid='randomize']").attr("trialId")
     }
     
-    var subject = jQuery("input:hidden[name='subjectLabel']").val()
+    var subject = $("input:hidden[name='subjectLabel']").val()
 
-    jQuery.ajax({
+    $.ajax({
 
         type:"POST",
         url: "randomize",
@@ -2210,11 +2212,17 @@ function randomizeSubject() {
                 
                 var result = JSON.parse(data)
                 
-                jQuery("#Rand_Date").find(":input").attr('disabled', "disabled");
-                jQuery("#Rand_Result").find(":input").attr('disabled', "disabled");
+                var dateInput = $("#Rand_Date").find(":input")
+                var resultInput = $("#Rand_Result").find(":input")
 
-                jQuery("#Rand_Date").find(":input").val(result.date).change();
-                jQuery("#Rand_Result").find(":input").val(result.result).change();
+                $(dateInput).attr("readonly", "");
+                $(resultInput).attr("readonly", "");
+
+                $(dateInput).val(result.date).change();
+                $(resultInput).val(result.result).change();
+
+                $(dateInput).attr("readonly", "readonly");
+                $(resultInput).attr("readonly", "readonly");
             }
         }
     })
