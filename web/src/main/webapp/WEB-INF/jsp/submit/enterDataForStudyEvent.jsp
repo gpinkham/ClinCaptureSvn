@@ -58,9 +58,7 @@
     <td class="sidebar_tab">
 
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
         <b><fmt:message key="instructions" bundle="${resword}"/></b>
-
     </td>
 </tr>
 <jsp:include page="../include/eventOverviewSideInfo.jsp"/>
@@ -245,8 +243,6 @@
             </td>
         </tr>
     </table>
-
-
 </div>
 
 </div></div></div></div></div></div></div></div>
@@ -272,12 +268,12 @@
 
 <c:otherwise>
 <tr>
-    <td class="table_header_row_left"><fmt:message key="CRF_name" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="version" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
-    <td class="table_header_row ddeColumnHeader"><fmt:message key="validation" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
+    <td align="center" class="table_header_row_left"><fmt:message key="CRF_name" bundle="${resword}"/></td>
+    <td align="center" class="table_header_row"><fmt:message key="version" bundle="${resword}"/></td>
+    <td align="center" class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
+    <td align="center" class="table_header_row"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
+    <td align="center" class="table_header_row ddeColumnHeader"><fmt:message key="validation" bundle="${resword}"/></td>
+    <td align="center" class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
 </tr>
 <c:set var="rowCount" value="${0}" />
 
@@ -287,17 +283,20 @@
 
 <c:choose>
 <c:when test="${dedc.status.name=='locked'}">
-    <%--<c:when test="${studyEvent.subjectEventStatus.name=='locked'}">--%>
-    <%-- nothing for right now --%>&nbsp;
 </c:when>
 <c:otherwise>
 <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
 <tr valign="top">
-<td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" /> <c:if test="${dedc.edc.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
-    <%--
-                 <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
-                 --%>
-<td class="table_cell">
+	<td class="table_cell_left">
+		<c:out value="${dedc.edc.crf.name}" /> 
+		<c:if test="${dedc.edc.requiredCRF}">
+			<span style="color: orange">*</span>
+		</c:if> 
+		<c:if test="${dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2}">
+			<img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/>
+		</c:if>
+	</td>
+	<td class="table_cell">
     <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
         <c:choose>
         <c:when test="${dedc.eventCRF.id > 0}">
@@ -360,19 +359,15 @@
             }
         </SCRIPT>
 
-            <%--</c:otherwise>--%>
         </c:when>
 
         <c:otherwise>
             <c:out value="${dedc.eventCRF.crfVersion.name}"/>
         </c:otherwise>
-
         </c:choose>
-
 </td>
 
 <c:choose>
-
     <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
         <%--<c:when test="${dedc.status.name=='locked'}">--%>
         <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
@@ -446,7 +441,6 @@
    			onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><img
       		name="Reassign" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="4"></a>
             </c:if>
-
     </form>
 </td>
 
@@ -545,14 +539,6 @@
             <c:set var="actionQuery" value="AdministrativeEditing?eventCRFId=${dec.eventCRF.id}" />
         </c:if>
     </c:if>
-
-        <%--
-                            <c:if test="${dec.locked}">
-                                locked
-                            </c:if>
-
-        --%>
-
     <c:choose>
         <c:when test='${actionQuery == "" && dec.stage.name =="invalid" }'>
 			<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
@@ -682,15 +668,11 @@
 </div></div></div></div></div></div></div></div>
 </div>
 <br>
-<%-- --%><form method="POST" action="ViewStudySubject">
+<form method="POST" action="ViewStudySubject">
     <input type="hidden" name="id" value="<c:out value="${studySubject.id}"/>" />
     <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
-    
     <input type="button" name="BTN_BackToSV" id="GoToSV" value="<fmt:message key="view_subject_record2" bundle="${resword}"/>" class="button_long" onClick="window.location.href = 'ViewStudySubject?id=${studySubject.id}';"/>
     <input type="button" name="BTN_Schedule" id="ScheduleEvent" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_long" onClick="javascript: window.location.href=('CreateNewStudyEvent?studySubjectId=<c:out value="${studySubject.id}"/>&studyEventDefinition=<c:out value="${studyEvent.studyEventDefinition.id}"/>');">
-    
-    <%-- <input type="button" name="BTN_Exit" id="ExitToSubjectMatrix" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="javascript: window.location.href=('ListStudySubjects');">--%>
-    
 </form>
 <br>
 
