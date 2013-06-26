@@ -89,10 +89,10 @@
 <table border="0">
 <tr>
 	<td>
-		<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+		<input type="button" name="BTN_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+					onClick="javascript: window.location.href='ViewDatasets'" />
 	</td>
     <c:choose>
         <c:when test="${!(userRole.monitor || userRole.investigator)}">

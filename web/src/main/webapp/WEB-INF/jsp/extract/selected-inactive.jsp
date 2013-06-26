@@ -309,7 +309,7 @@
    </c:choose>
    </td>
    <td class="table_cell">
-       <a href="javascript: window.location.href='ViewItemDetail?itemId=<c:out value='${item.id}'/>&itemName=<c:out value='${item.name}'/>'">
+       <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value='${item.id}'/>&itemName=<c:out value='${item.name}'/>');">
            <c:out value="${item.name}"/></a>
    </td>
    <td class="table_cell"><c:out value="${item.description}"/>&nbsp;</td>
