@@ -35,6 +35,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -78,6 +79,7 @@ public class ChangeStudyServlet extends SecureController {
 	private EventCRFDAO eventCRFDAO;
 	private EventDefinitionCRFDAO eventDefintionCRFDAO;
 	private StudyGroupDAO studyGroupDAO;
+	private DynamicEventDao dynamicEventDao;
 	private DiscrepancyNoteDAO discrepancyNoteDAO;
 
 	@Override
@@ -379,8 +381,14 @@ public class ChangeStudyServlet extends SecureController {
 		factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setStudyGroupDAO(getStudyGroupDAO());
+		factory.setDynamicEventDao(getDynamicEventDao());
 		String findSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("findSubjectsHtml", findSubjectsHtml);
+	}
+	
+	public DynamicEventDao getDynamicEventDao() {
+		dynamicEventDao = this.dynamicEventDao == null ? new DynamicEventDao(sm.getDataSource()) : dynamicEventDao;
+		return dynamicEventDao;
 	}
 
 	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
