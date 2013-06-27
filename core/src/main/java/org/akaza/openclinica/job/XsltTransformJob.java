@@ -440,7 +440,7 @@ public class XsltTransformJob extends QuartzJobBean {
 			}
 			// email the message to the user
 			// String email = dataMap.getString(EMAIL);
-			emailBuffer.append("<p>" + pageMessages.getString("html_email_body_5") + "</p>");
+			emailBuffer.append("<p>" + pageMessages.getString("html_email_body_5").replace("{0}", currentStudy.getName()) + "</p>");
 			try {
 
 				if ((null != dataMap.get("job_type"))
@@ -816,7 +816,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
 	private void sendErrorEmail(String message, JobExecutionContext context, String target) {
 		String subject = "Warning: " + message;
-		String emailBody = "An exception was thrown while running an extract job on your server, please see the logs for more details.";
+		String emailBody = "An exception was thrown while running an extract job on your server, please see the logs for more details."; 
 		try {
 			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
 					.get("applicationContext");

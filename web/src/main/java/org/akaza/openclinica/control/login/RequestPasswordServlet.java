@@ -24,6 +24,7 @@ import java.util.Date;
 
 import org.akaza.openclinica.bean.login.PwdChallengeQuestion;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -33,6 +34,7 @@ import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -157,19 +159,24 @@ public class RequestPasswordServlet extends SecureController {
 	 * @param request
 	 * @param response
 	 */
+	@SuppressWarnings("rawtypes")
 	private void sendPassword(String passwd, UserAccountBean ubDB) throws Exception {
-
+		
+		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyBean sBean = (StudyBean) sdao.findByPK(ubDB.getActiveStudyId());
 		logger.info("Sending email...");
-
-		StringBuffer email = new StringBuffer("Hi " + ubDB.getFirstName() + ", <br>");
+		
+		StringBuffer email = new StringBuffer("Dear " + ubDB.getFirstName() + " " + ubDB.getLastName() + ", <br><br>");
 		email.append(restext.getString("this_email_is_from_openclinica_admin") + "<br>")
-				.append(restext.getString("your_password_has_been_reset_as") + ":" + passwd)
-				.append("<br>" + restext.getString("you_will_be_required_to_change"))
+				.append(restext.getString("your_password_has_been_reset_as") + ": " + passwd)
+				.append("<br><br>" + restext.getString("you_will_be_required_to_change"))
 				.append(restext.getString("time_you_login_to_the_system"))
 				.append(restext.getString("use_the_following_link_to_log") + ":<br>")
-				.append(SQLInitServlet.getSystemURL());
+				.append(SQLInitServlet.getSystemURL() + "<br><br>")
+				.append(respage.getString("best_system_administrator"));
 
 		String emailBody = email.toString();
+		emailBody = emailBody.replace("{0}", sBean.getName());
 		sendEmail(ubDB.getEmail().trim(), EmailEngine.getAdminEmail(), restext.getString("your_openclinica_password"),
 				emailBody, true, respage.getString("your_password_reset_new_password_emailed"),
 				respage.getString("your_password_not_send_due_mail_server_problem"), true);

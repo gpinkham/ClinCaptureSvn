@@ -22,11 +22,13 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -122,18 +124,20 @@ public class DeleteUserServlet extends SecureController {
 		forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void sendRestoreEmail(UserAccountBean u, String password) throws Exception {
 		logger.info("Sending restore and password reset notification to " + u.getName());
 
-		String body = resword.getString("dear") + " " + u.getFirstName() + " " + u.getLastName() + ",\n";
-		body += restext.getString("your_account_has_been_restored_and_password_reset") + ":\n\n";
-		body += resword.getString("user_name") + " " + u.getName() + "\n";
-		body += resword.getString("password") + " " + password + "\n\n";
-		body += restext.getString("please_test_your_login_information_and_let") + "\n";
+		String body = resword.getString("dear") + " " + u.getFirstName() + " " + u.getLastName() + ",<br><br>";
+		body += restext.getString("your_account_has_been_restored_and_password_reset") + ":<br><br>\n\n";
+		body += resword.getString("user_name") + ": " + u.getName() + "<br>\n";
+		body += resword.getString("password") + ": " + password + "<br><br>\n\n";
+		body += restext.getString("please_test_your_login_information_and_let") + "<br>\n";
 		body += SQLInitServlet.getSystemURL();
-		body += " . ";
-		body += restext.getString("openclinica_system_administrator");
-
+		body += " .<br><br>";
+		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyBean sBean = (StudyBean) sdao.findByPK(u.getActiveStudyId());
+		body += respage.getString("best_system_administrator").replace("{0}", sBean.getName());
 		logger.info("Sending email...begin");
 		sendEmail(u.getEmail().trim(), restext.getString("your_new_openclinica_account_has_been_restored"), body, false);
 		logger.info("Sending email...done");

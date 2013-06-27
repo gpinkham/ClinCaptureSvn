@@ -83,8 +83,7 @@ public class EmailJob extends QuartzJobBean {
 	private String EmailTextMessage(UserAccountBean ub, String eventName, String subjectLabel, String daysBetween, String studyName) {
 		String emailTestMessage = reswords.getString("day_email_message_htm");
 		emailTestMessage = emailTestMessage.replace("{0}", ub.getFirstName() + " " + ub.getLastName())
-				.replace("{1}", eventName).replace("{2}", subjectLabel).replace("{3}", studyName).replace("{4}", daysBetween);
-		System.out.println(emailTestMessage);
+				.replace("{1}", eventName).replace("{2}", subjectLabel).replace("{3}", studyName).replace("{4}", daysBetween).replace("{5}", studyName);
 		return emailTestMessage;
 
 	}

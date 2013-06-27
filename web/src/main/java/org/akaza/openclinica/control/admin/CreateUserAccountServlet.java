@@ -260,7 +260,8 @@ public class CreateUserAccountServlet extends SecureController {
 							+ "\"" + respage.getString("was_created_succesfully"));
 					if ("no".equalsIgnoreCase(displayPwd)) {
 						try {
-							sendNewAccountEmail(createdUserAccountBean, password);
+							StudyBean study = (StudyBean) sdao.findByPK(activeStudy);
+							sendNewAccountEmail(createdUserAccountBean, password, study.getName());
 						} catch (Exception e) {
 							addPageMessage(respage.getString("there_was_an_error_sending_account_creating_mail"));
 						}
@@ -323,17 +324,18 @@ public class CreateUserAccountServlet extends SecureController {
 		return createdUserAccountBean;
 	}
 
-	private void sendNewAccountEmail(UserAccountBean createdUserAccountBean, String password) throws Exception {
+	private void sendNewAccountEmail(UserAccountBean createdUserAccountBean, String password, String studyName) throws Exception {
 		logger.info("Sending account creation notification to " + createdUserAccountBean.getName());
 		String body = "<html><body>"; 
 		body += resword.getString("dear") + " " + createdUserAccountBean.getFirstName() + " "
 				+ createdUserAccountBean.getLastName() + ",<br><br>";
-		body += restext.getString("a_new_user_account_has_been_created_for_you") + "<br>";
+		body += restext.getString("a_new_user_account_has_been_created_for_you") + "<br><br>";
 		body += resword.getString("user_name") + ": " + createdUserAccountBean.getName() + "<br>";
 		body += resword.getString("password") + ": " + password + "<br><br>";
 		body += restext.getString("please_test_your_login_information_and_let") + "<br>";
 		body += SQLInitServlet.getSystemURL();
-		body += " . ";
+		body += " . <br><br> ";
+		body += respage.getString("best_system_administrator").replace("{0}", studyName);
 		body += "</body></html>";
 		sendEmail(createdUserAccountBean.getEmail().trim(), restext.getString("your_new_openclinica_account"), body,
 				false);

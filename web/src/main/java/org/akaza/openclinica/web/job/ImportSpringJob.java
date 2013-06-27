@@ -232,7 +232,7 @@ public class ImportSpringJob extends QuartzJobBean {
 					if (contactEmail != null && !"".equals(contactEmail)) {
 						mailSender.sendEmail(contactEmail,
 								respage.getString("job_ran_for") + " " + triggerBean.getFullName(),
-								generateMsg(auditMessages.get(0), contactEmail), true);
+								generateMsg(auditMessages.get(0), contactEmail, studyName), true);
 						logger.debug("email body: " + auditMessages.get(1));
 					}
 				} catch (OpenClinicaSystemException e) {
@@ -268,10 +268,11 @@ public class ImportSpringJob extends QuartzJobBean {
 		return dataService;
 	}
 
-	private String generateMsg(String msg, String contactEmail) {
-		String returnMe = respage.getString("html_email_header_1") + contactEmail
+	private String generateMsg(String msg, String contactEmail, String studyName) {
+		String returnMe = respage.getString("html_email_header_1") + " " + contactEmail + ",<br>"
 				+ respage.getString("your_job_ran_success_html") + "  "
-				+ respage.getString("please_review_the_data_html") + msg;
+				+ respage.getString("please_review_the_data_html") + msg
+				+ "<br/>" + respage.getString("best_system_administrator").replace("{0}", studyName);
 		return returnMe;
 	}
 

@@ -151,23 +151,23 @@ public class RequestAccountServlet extends SecureController {
 		UserAccountBean ubForm = (UserAccountBean) session.getAttribute("newUserBean");
 		logger.info("Sending email...");
 		// YW << <<
-		StringBuffer email = new StringBuffer("From: " + ubForm.getEmail() + "\n");
-		email.append("Sent: " + new Date() + "\n");
-		email.append("To: " + SQLInitServlet.getField("adminEmail") + "\n");
-		email.append("Subject: Request Account\n\n\n");
-		email.append("Dear Admin, \n\n");
+		StringBuffer email = new StringBuffer("From: " + ubForm.getEmail() + "<br>");
+		email.append("Sent: " + new Date() + "<br>");
+		email.append("To: " + SQLInitServlet.getField("adminEmail") + "<br>");
+		email.append("Subject: Request Account<br><br><br>");
+		email.append("Dear Admin, <br><br>");
 		email.append(ubForm.getFirstName() + " is requesting an account on the ClinCapture system running at "
-				+ SQLInitServlet.getField("sysURL") + ". \n\n");
-		email.append("His/her information is shown as follows: \n\n");
+				+ SQLInitServlet.getField("sysURL") + ". <br><br>");
+		email.append("His/her information is shown as follows: <br><br>");
 		email.append(resword.getString("name") + ": " + ubForm.getFirstName() + " " + ubForm.getLastName());
-		email.append("\n" + resword.getString("user_name") + ": " + ubForm.getName());
-		email.append("\n" + resword.getString("email") + ": " + ubForm.getEmail());
-		email.append("\n" + resword.getString("institutional_affiliation") + ": "
+		email.append("<br>" + resword.getString("user_name") + ": " + ubForm.getName());
+		email.append("<br>" + resword.getString("email") + ": " + ubForm.getEmail());
+		email.append("<br>" + resword.getString("institutional_affiliation") + ": "
 				+ ubForm.getInstitutionalAffiliation());
-		email.append("\n" + resword.getString("default_active_study") + ":" + studyName + ", id:"
+		email.append("<br>" + resword.getString("default_active_study") + ":" + studyName + ", id:"
 				+ ubForm.getActiveStudyId());
-		email.append("\n" + resword.getString("other_study") + otherStudy);
-		email.append("\n" + resword.getString("user_role_requested") + ubForm.getActiveStudyRoleName());
+		email.append("<br>" + resword.getString("other_study") + otherStudy);
+		email.append("<br>" + resword.getString("user_role_requested") + ubForm.getActiveStudyRoleName());
 		String emailBody = email.toString();
 		// YW >>
 		logger.info("Sending email...begin" + emailBody);
