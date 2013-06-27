@@ -20,8 +20,13 @@
     <%--script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript2.js'/>"></script--%>
 	<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js'/>"></script>
 	<script type="text/javascript">
+		var colorUrl = '../../HelpThemeServlet'
+		var pathArray = window.location.pathname.split( '/' );
+		if(pathArray.indexOf("login") < 0) {
+			colorUrl = 'HelpThemeServlet'
+		}
 		jQuery.ajax({
-		url : '../../HelpThemeServlet',
+		url : colorUrl,
 		type : 'GET',
 		dataType : 'text',
 		success : function(response2) {
