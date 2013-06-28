@@ -77,8 +77,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
 	private int hideColumnsNumber;
 
-	public static final int WIDTH_600 = 600;
-	public static final String WIDTH_600PX = "width: " + WIDTH_600 + "px";
+    public static final int POPUP_BASE_WIDTH = 600;
+    public static final String POPUP_BASE_WIDTH_PX = "width: " + POPUP_BASE_WIDTH + "px";
 
 	private Role userRole;
 
@@ -1047,7 +1047,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 		String studySubjectLabel = SubjectLabelNormalizer.normalizeSubjectLabel(studySubject.getLabel());
 
-		String divWidth = studyEvents.size() > 1 ? ("" + (WIDTH_600 + 50 + 8)) : ("" + (WIDTH_600 + 8));
+		String divWidth = studyEvents.size() > 1 ? ("" + (POPUP_BASE_WIDTH + 50 + 8)) : ("" + (POPUP_BASE_WIDTH + 8));
 
 		HtmlBuilder eventDiv = new HtmlBuilder();
 
@@ -1250,13 +1250,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			if (eventStatus.isCompleted()) {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell").close();
-				eventDiv.div().id("crfListWrapper_" + studyEventId).style(WIDTH_600PX).close().divEnd();
+				eventDiv.div().id("crfListWrapper_" + studyEventId).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 
 			} else if (eventStatus == SubjectEventStatus.LOCKED) {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell").close();
-				eventDiv.div().id("crfListWrapper_" + studyEventId).style(WIDTH_600PX).close().divEnd();
+				eventDiv.div().id("crfListWrapper_" + studyEventId).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 				if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin())
 						&& studyBean.getStatus() == Status.AVAILABLE) {
@@ -1268,7 +1268,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			} else {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
-				eventDiv.div().id("crfListWrapper_" + studyEventId).style(WIDTH_600PX).close().divEnd();
+				eventDiv.div().id("crfListWrapper_" + studyEventId).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			}
 		}
@@ -1276,7 +1276,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		if (eventSysStatus == Status.DELETED || eventSysStatus == Status.AUTO_DELETED) {
 			eventDiv.tr(0).valign("top").close();
 			eventDiv.td(0).styleClass("table_cell").close();
-			eventDiv.div().id("crfListWrapper_" + studyEventId).style(WIDTH_600PX).close().divEnd();
+			eventDiv.div().id("crfListWrapper_" + studyEventId).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 			eventDiv.tdEnd().trEnd(0);
 		}
 
@@ -1378,14 +1378,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				String href1 = "PageToCreateNewStudyEvent?studySubjectId=" + studySubject.getId()
 						+ "&studyEventDefinition=" + sed.getId();
 				eventDiv.div().id("eventScheduleWrapper_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
-						.rel(href1).style(WIDTH_600PX).close().divEnd();
+						.rel(href1).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			}
 
 			else if (eventStatus.isCompleted()) {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
-				eventDiv.div().id("crfListWrapper_" + studyEventId).style(WIDTH_600PX).close().divEnd();
+				eventDiv.div().id("crfListWrapper_" + studyEventId).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 
 			}
@@ -1394,7 +1394,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				eventDiv.tdEnd().trEnd(0);
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
-				eventDiv.div().id("crfListWrapper_" + studyEventId).style(WIDTH_600PX).close().divEnd();
+				eventDiv.div().id("crfListWrapper_" + studyEventId).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 				if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin())
 						&& studyBean.getStatus() == Status.AVAILABLE) {
@@ -1406,7 +1406,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			} else {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
-				eventDiv.div().id("crfListWrapper_" + studyEventId).style(WIDTH_600PX).close().divEnd();
+				eventDiv.div().id("crfListWrapper_" + studyEventId).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			}
 		}
@@ -1414,7 +1414,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		if (eventSysStatus == Status.DELETED || eventSysStatus == Status.AUTO_DELETED) {
 			eventDiv.tr(0).valign("top").close();
 			eventDiv.td(0).styleClass("table_cell_left").close();
-			eventDiv.div().id("crfListWrapper_" + studyEventId).style(WIDTH_600PX).close().divEnd();
+			eventDiv.div().id("crfListWrapper_" + studyEventId).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 			eventDiv.tdEnd().trEnd(0);
 		}
 		eventDiv.tableEnd(0).tdEnd().trEnd(0);

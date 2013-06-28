@@ -1801,20 +1801,9 @@ function adjustCrfListTable(studyEventId) {
             crfsCellCount = currVal > crfsCellCount ? currVal : crfsCellCount;
         }
     });
-    var arr = new Array();
-    arr[0] = 65;
-    arr[1] = 100;
-    arr[2] = 130;
-    arr[3] = 160;
-    var dec = 2;
-    if (jQuery('#crfListWrapper_' + studyEventId + ' .hideCrfBlankCell').val() == 'true') {
-        jQuery(".crfBlankCellImg").css("display", "none");
-        if (crfsCellCount > headerCellCount) {
-            dec++;
-        }
-    }
-    var cellCount = headerCellCount > crfsCellCount ? headerCellCount : crfsCellCount;
-    jQuery('#crfListWrapper_' + studyEventId + ' .crfListTableActions').attr("style", "width: " + arr[cellCount - dec] + "px;");
+    crfActionIconWidth = 18;
+    crfActionsMaxIconsCount = 9;
+    jQuery('#crfListWrapper_' + studyEventId + ' .crfListTableActions').attr("style", "width: " + (crfActionIconWidth * crfActionsMaxIconsCount) + "px;");
 }
 
 function getCRFList(studyEventId) {
@@ -1864,6 +1853,29 @@ function justShowPopup(studyEventId, statusBoxId, statusBoxNum, event) {
     }, 200);
 }
 
+function getScheduledEventContent(studyEventId, statusBoxId, statusBoxNum, top, left, localDivId, localDivRel) {
+    jQuery('#eventScheduleWrapper_' + statusBoxId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
+    jQuery('#eventScheduleWrapper_' + statusBoxId).css("height", "18px");
+    jQuery.ajax({
+        url: "CreateNewStudyEvent",
+        type: "GET",
+        data: {returnScheduledEvenContent: localDivId, popupQueryStudySubjectId: localDivRel},
+        cache: false,
+        success: function (data) {
+            var localDiv = jQuery("#" + localDivId);
+            localDiv.html(data);
+            //IE8 bug
+            if (localDiv.html() == "") {
+                localDiv.get(0).innerHTML = data;
+            }
+            if (localDiv[0].repeatingEvent && parseInt(localDiv[0].totalEvents) > 1) {
+                localDiv.attr("style", localDiv.attr("style").replace("width: 608px;", "width: 658px;"));
+            }
+            hideAllTooltips(studyEventId, statusBoxId, statusBoxNum, top, left);
+        }
+    });
+}
+
 function hideAllTooltips(studyEventId, statusBoxId, statusBoxNum, top, left) {
     try {
         jQuery(".calendar").remove();
@@ -1883,12 +1895,25 @@ function hideAllTooltips(studyEventId, statusBoxId, statusBoxNum, top, left) {
 
         if (statusBoxId != undefined) {
             currentPopupUid = statusBoxId;
+
+            var eventDiv = jQuery("#Event_" + statusBoxId);
+            if (eventDiv.length > 0) {
+                if (eventDiv[0].repeatingEvent && parseInt(eventDiv[0].totalEvents) > 1) {
+                    statusBoxNum = eventDiv[0].totalEvents;
+                }
+                if (eventDiv[0].getScheduledContent) {
+                    eventDiv[0].getScheduledContent = undefined;
+                    getScheduledEventContent(studyEventId, statusBoxId, statusBoxNum, top, left, eventDiv.attr("id"), eventDiv.attr("rel"));
+                    return;
+                }
+            }
+
             if (statusBoxNum != undefined) {
                 EnableScrollArrows2(statusBoxId, statusBoxNum);
                 jQuery("*").unbind("mousedown", hideCurrentPopup).bind("mousedown", hideCurrentPopup);
             } else {
-                document.getElementById('Menu_on_' + statusBoxId).style.display = "";
-                document.getElementById('Menu_off_' + statusBoxId).style.display = "none";
+                if (document.getElementById('Menu_on_' + statusBoxId) != undefined) document.getElementById('Menu_on_' + statusBoxId).style.display = "";
+                if (document.getElementById('Menu_off_' + statusBoxId) != undefined) document.getElementById('Menu_off_' + statusBoxId).style.display = "none";
                 if (studyEventId != '') {
                     getCRFList(studyEventId);
                 } else {
@@ -1969,59 +1994,51 @@ function createNewEvent(event) {
                         jQuery("#button_unlockStudySubject_" + params['popupQueryStudySubjectId']).remove();
                         jQuery("#button_lockStudySubject_" + params['popupQueryStudySubjectId']).removeAttr("style");
                         jQuery("#button_signStudySubject_" + params['popupQueryStudySubjectId']).removeAttr("style");
-                        for (var k = 0; k < result.events.length; k++) {
-                            var event = result.events[k];
-                            var eventDiv = jQuery("div[id^='" + event.eventDivId + "']");
-                            if (eventDiv.length > 0) {
-                                var aElement = eventDiv.next();
+                        for (var h = 0; h < result.eventDefs.length; h++) {
+                            var eventDef = result.eventDefs[h];
+                            if (eventDef != undefined && eventDef.eventDivId != undefined) {
+                                var eventDiv = jQuery("div[id^='" + eventDef.eventDivId + "']");
+                                if (eventDiv.length > 0 && eventDef.eventIds.length > 0) {
+                                    var aElement = eventDiv.next();
+                                    var eventId = eventDef.eventIds[0];
 
-                                var newMOFuncBody = jQuery.trim(aElement.attr("onmouseover").toString().match(/{((?:.|\n)+)}/)[1]).toString();
-                                newMOFuncBody = newMOFuncBody.replace(/canShowPopup\(''\)/g, "canShowPopup('" + event.eventId + "')").replace(/canShowPopup\(\"\"\)/g, "canShowPopup(\"" + event.eventId + "\")");
-                                newMOFuncBody = newMOFuncBody.replace(/showPopup\('',/g, "showPopup('" + event.eventId + "',").replace(/showPopup\(\"\",/g, "showPopup(\"" + event.eventId + "\",");
-                                aElement.attr("onmouseover", "");
-                                var confEvent = function(element, funcBody) {
-                                    element.unbind("mouseover").bind("mouseover", function(event){
-                                        eval(funcBody);
-                                    });
-                                }
-                                confEvent(aElement, newMOFuncBody);
+                                    eventDiv[0].totalEvents = eventDef.totalEvents;
+                                    eventDiv[0].repeatingEvent = eventDef.repeatingEvent;
+                                    eventDiv[0].getScheduledContent = true;
 
-                                var newCLFuncBody = jQuery.trim(aElement.attr("onclick").toString().match(/{((?:.|\n)+)}/)[1]).toString();
-                                newCLFuncBody = newCLFuncBody.replace(/justShowPopup\('',/g, "justShowPopup('" + event.eventId + "',").replace(/justShowPopup\(\"\",/g, "justShowPopup(\"" + event.eventId + "\",");
-                                aElement.attr("onclick", "");
-                                var confEvent = function(element, funcBody) {
-                                    element.unbind("click").bind("click", function(event){
-                                        eval(funcBody);
-                                    });
-                                }
-                                confEvent(aElement, newCLFuncBody);
+                                    var newMOFuncBody = jQuery.trim(aElement.attr("onmouseover").toString().match(/{((?:.|\n)+)}/)[1]).toString();
+                                    newMOFuncBody = newMOFuncBody.replace(/canShowPopup\(''\)/g, "canShowPopup('" + eventId + "')").replace(/canShowPopup\(\"\"\)/g, "canShowPopup(\"" + eventId + "\")");
+                                    newMOFuncBody = newMOFuncBody.replace(/showPopup\('',/g, "showPopup('" + eventId + "',").replace(/showPopup\(\"\",/g, "showPopup(\"" + eventId + "\",");
+                                    aElement.attr("onmouseover", "");
+                                    var confEvent = function(element, funcBody) {
+                                        element.unbind("mouseover").bind("mouseover", function(event){
+                                            eval(funcBody);
+                                        });
+                                    }
+                                    confEvent(aElement, newMOFuncBody);
 
-                                aElement.find("img").attr("src", "images/icon_Scheduled.gif");
-								aElement.find("img").attr("style", "position: relative;");
-                                eventDiv.css("visibility", "hidden");
-                                eventDiv.html("");
-                                eventDiv.get(0).innerHTML = "";
-                                var getContent = function(localDiv, last) {
-                                    jQuery.ajax({
-                                        url: "CreateNewStudyEvent",
-                                        type: "GET",
-                                        data: {returnScheduledEvenContent: localDiv.attr("id"), popupQueryStudySubjectId: localDiv.attr("rel")},
-                                        cache: false,
-                                        success: function (data) {
-                                            localDiv.html(data);
-                                            //IE8 bug
-                                            if (localDiv.html() == "") {
-                                                localDiv.get(0).innerHTML = data;
-                                            }
-                                            if (last) {
-                                                gfRemoveOverlay();
-                                            }
-                                        }
-                                    });
+                                    var newCLFuncBody = jQuery.trim(aElement.attr("onclick").toString().match(/{((?:.|\n)+)}/)[1]).toString();
+                                    newCLFuncBody = newCLFuncBody.replace(/justShowPopup\('',/g, "justShowPopup('" + eventId + "',").replace(/justShowPopup\(\"\",/g, "justShowPopup(\"" + eventId + "\",");
+                                    aElement.attr("onclick", "");
+                                    var confEvent = function(element, funcBody) {
+                                        element.unbind("click").bind("click", function(event){
+                                            eval(funcBody);
+                                        });
+                                    }
+                                    confEvent(aElement, newCLFuncBody);
+
+                                    if (aElement.find("img").attr("src").indexOf("icon_NotStarted.gif") > 0) {
+                                        aElement.find("img").attr("src", "images/icon_Scheduled.gif");
+                                        aElement.find("img").attr("style", "position: relative;");
+                                    }
+                                    eventDiv.css("visibility", "hidden");
+                                    if (eventDef.repeatingEvent && parseInt(eventDef.totalEvents) > 1) {
+                                        aElement.html(aElement.find("img")[0].outerHTML + "&nbsp;&nbsp;&nbsp;x" + eventDef.totalEvents);
+                                    }
                                 }
-                                getContent(eventDiv, parseInt(k) == result.events.length - 1);
                             }
                         }
+                        gfRemoveOverlay();
                         if (result.pageMessages.length > 0) {
                             jQuery("#sidebar_Alerts_open").css("sidebar_Alerts_closed", "none");
                             jQuery("#sidebar_Alerts_open").css("display", "all");
@@ -2237,8 +2254,4 @@ function urlParam(name){
 $(function() {
     // enable the ability to uncheck the radio buttons in the CRF's
     bindRadioButtons();
-
-    // disable smartBackButton
-    //var smartButton = document.getElementById("GoToPreviousPage");
-    //if (smartButton != undefined && urlParam("hsb") != undefined) smartButton.style.display = "none";
 });

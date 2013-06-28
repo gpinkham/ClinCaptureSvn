@@ -97,6 +97,33 @@ public class CreateNewStudyEventServlet extends SecureController {
 	private EventDefinitionCRFDAO eventDefintionCRFDAO;
 	private StudyGroupDAO studyGroupDAO;
 
+	private void processEvents(JSONArray eventDefs, String eventDivId, int studyEventId,
+			StudyEventDefinitionBean definition, StudySubjectBean studySubject, StudyEventDAO sed) throws Exception {
+		JSONObject jsonObject = null;
+		JSONArray eventIds = null;
+		for (int i = 0; i < eventDefs.length(); i++) {
+			if (eventDefs.getJSONObject(i).get("eventDivId").toString().equalsIgnoreCase(eventDivId)) {
+				jsonObject = eventDefs.getJSONObject(i);
+				eventIds = jsonObject.getJSONArray("eventIds");
+				break;
+			}
+		}
+		if (jsonObject == null) {
+			eventIds = new JSONArray();
+			eventIds.put(studyEventId);
+			jsonObject = new JSONObject();
+			jsonObject.put("eventDivId", eventDivId);
+			jsonObject.put("eventIds", eventIds);
+			Collection<StudyEventBean> studyEvents = sed.findAllByDefinitionAndSubject(definition, studySubject);
+			jsonObject.put("totalEvents", studyEvents.size());
+			jsonObject.put("repeatingEvent", definition.isRepeating());
+			eventDefs.put(jsonObject);
+		} else {
+			eventIds.put(studyEventId);
+			jsonObject.put("totalEvents", jsonObject.getInt("totalEvents") + 1);
+		}
+	}
+
 	@Override
 	protected void processRequest() throws Exception {
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
@@ -108,7 +135,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 		int studyEventDefinitionId = fp.getInt(INPUT_STUDY_EVENT_DEFINITION);
 
 		String popupSubjectLabel = "";
-		JSONArray events = new JSONArray();
+		JSONArray eventDefs = new JSONArray();
 		JSONArray pageMessages = new JSONArray();
 		String popupQueryStr = request.getParameter("popupQuery");
 		boolean popupQuery = popupQueryStr != null;
@@ -132,6 +159,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 			String eventDiv = getEventDivForScheduledEvent(studySubjectId, sedId, rowCount);
 			response.setContentType("text/html");
 			response.getWriter().write(eventDiv);
+            context.getRequestDispatcher("/WEB-INF/jsp/include/changeTheme.jsp").include(request, response);
 			return;
 		}
 
@@ -162,7 +190,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 		}
 		// find all active definitions with CRFs
 		ArrayList eventDefinitions = seddao.findAllActiveByStudy(studyWithEventDefinitions);
-		
+
 		Collections.sort(eventDefinitions);
 
 		ArrayList eventDefinitionsScheduled = eventDefinitions;
@@ -271,7 +299,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 
 			v.addValidation(INPUT_STUDY_EVENT_DEFINITION, Validator.ENTITY_EXISTS_IN_STUDY, seddao,
 					studyWithEventDefinitions);
-			
+
 			v.addValidation(INPUT_STUDY_SUBJECT_LABEL, Validator.NO_BLANKS);
 			v.addValidation(INPUT_LOCATION, Validator.LENGTH_NUMERIC_COMPARISON,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
@@ -284,7 +312,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 			boolean hasScheduledEvent = false;
 			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 				if (!StringUtil.isBlank(fp.getString(CreateNewStudyEventServlet.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]))) {
-					
+
 					v.addValidation(CreateNewStudyEventServlet.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i], Validator.ENTITY_EXISTS_IN_STUDY,
 							seddao, studyWithEventDefinitions);
 					if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
@@ -436,7 +464,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 					}
 				}
 			}
-			
+
 			if (!errors.isEmpty()) {
 				logger.info("we have errors; number of this; " + errors.size());
 				System.out.println("found request study subject: " + fp.getString(INPUT_REQUEST_STUDY_SUBJECT));
@@ -539,13 +567,11 @@ public class CreateNewStudyEventServlet extends SecureController {
 							currentStudy);
 				}
 
-				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("eventDivId", "Event_" + SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel)
-						+ "_" + definition.getId() + "_");
-				jsonObject.put("eventId", studyEvent.getId());
-				events.put(jsonObject);
+				String eventDivId = "Event_" + SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel) + "_"
+						+ definition.getId() + "_";
+                processEvents(eventDefs, eventDivId, studyEvent.getId(), definition, studySubject, sed);
 
-				if (hasScheduledEvent) {
+                if (hasScheduledEvent) {
 					for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 
 						// should only do the following process if user inputs a
@@ -582,7 +608,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 								studyEventScheduled.setOwner(ub);
 								studyEventScheduled.setStatus(Status.AVAILABLE);
 								studyEventScheduled.setLocation(fp.getString(INPUT_SCHEDULED_LOCATION[i]));
-								studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+                                studyEventScheduled.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 
 								studyEventScheduled.setSampleOrdinal(sed.getMaxSampleOrdinal(
 										definitionScheduleds.get(i), studySubject) + 1);
@@ -598,14 +624,12 @@ public class CreateNewStudyEventServlet extends SecureController {
 										studyEventScheduled.getId(), "studyEvent", currentStudy);
 								AddNewSubjectServlet.saveFieldNotes(INPUT_ENDDATE_PREFIX_SCHEDULED[i], fdn, dndao,
 										studyEventScheduled.getId(), "studyEvent", currentStudy);
-								
+
 								if (popupQuery) {
-									jsonObject = new JSONObject();
-									jsonObject.put("eventDivId",
-											"Event_" + SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel)
-													+ "_" + scheduledDefinitionIds[i] + "_");
-									jsonObject.put("eventId", studyEventScheduled.getId());
-									events.put(jsonObject);
+									eventDivId = "Event_"
+											+ SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel) + "_"
+											+ scheduledDefinitionIds[i] + "_";
+									processEvents(eventDefs, eventDivId, studyEventScheduled.getId(), (StudyEventDefinitionBean)seddao.findByPK(scheduledDefinitionIds[i]), studySubject, sed);
 								}
 							} else {
 								String pageMessage = restext.getString("scheduled_event_definition")
@@ -629,8 +653,8 @@ public class CreateNewStudyEventServlet extends SecureController {
 
 				if (popupQuery) {
 					response.setContentType("application/json");
-					jsonObject = new JSONObject();
-					jsonObject.put("events", events);
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("eventDefs", eventDefs);
 					jsonObject.put("pageMessages", pageMessages);
 					System.out.println("jsonObject: " + jsonObject.toString());
 					response.getWriter().write(jsonObject.toString());
@@ -665,6 +689,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(
 				studyEventDefinitionId);
 		List<StudyEventBean> studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubject, sed);
+		Collections.reverse(studyEvents);
 
 		String eventDiv = factory.eventDivBuilder(subject, rowCount, studyEvents, sed, studySubject,
 				request.getLocale());

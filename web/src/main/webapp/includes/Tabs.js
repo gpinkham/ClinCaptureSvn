@@ -306,7 +306,6 @@ function EnableScrollArrows2(StatusBoxID, StatusBoxNum) {
     for (var i = 1; i <= StatusBoxNum; i++) {
         if (i == 1 ) {
             document.getElementById('Event_' + StatusBoxID + '_' + i).style.display = "";
-            //loadCRFList(StatusBoxID,i);
         } else {
             document.getElementById('Event_' + StatusBoxID + '_' + i).style.display = "none";
         }
@@ -356,20 +355,9 @@ function adjustCrfListTable2(studyEventId) {
             crfsCellCount = currVal > crfsCellCount ? currVal : crfsCellCount;
         }
     });
-    var arr = new Array();
-    arr[0] = 65;
-    arr[1] = 100;
-    arr[2] = 130;
-    arr[3] = 160;
-    var dec = 2;
-    if (jQuery('#crfListWrapper_' + studyEventId + ' .hideCrfBlankCell').val() == 'true') {
-        jQuery(".crfBlankCellImg").css("display", "none");
-        if (crfsCellCount > headerCellCount) {
-            dec++;
-        }
-    }
-    var cellCount = headerCellCount > crfsCellCount ? headerCellCount : crfsCellCount;
-    jQuery('#crfListWrapper_' + studyEventId + ' .crfListTableActions').attr("style", "width: " + arr[cellCount - dec] + "px;");
+    crfActionIconWidth = 18;
+    crfActionsMaxIconsCount = 9;
+    jQuery('#crfListWrapper_' + studyEventId + ' .crfListTableActions').attr("style", "width: " + (crfActionIconWidth * crfActionsMaxIconsCount) + "px;");
 }
 
 function loadCRFList(StatusBoxID,StatusBoxNum) {

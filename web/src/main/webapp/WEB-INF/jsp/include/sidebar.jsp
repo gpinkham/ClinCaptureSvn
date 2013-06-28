@@ -10,7 +10,7 @@
 
 <%--<jsp:useBean scope="session" id="panel" class="org.akaza.openclinica.view.StudyInfoPanel" />--%>
 
-<table border="0" cellpadding=0" cellspacing="0">
+<table border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td class="sidebar" valign="top">
 
