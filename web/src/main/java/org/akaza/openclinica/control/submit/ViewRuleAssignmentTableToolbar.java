@@ -76,7 +76,7 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
 						.type("text/javascript")
 						.close()
 						.append("$(document).ready(function(){ "
-								+ "hideCols('ruleAssignments',[" + getIndexes() + "],false);" + " if($j.browser.msie){"
+								+ "hideCols('ruleAssignments',[" + getIndexes() + "],false);" + " if($.browser.msie){"
 								+ " $('tr.header td div:last').each(function(){" + " $(this).click();"
 								+ "var ah = $(this).height();" + "$('tr.header td div').each(function(){"
 								+ "$(this).css('height',ah);" + "});" + "});" + "}" + "});").scriptEnd();

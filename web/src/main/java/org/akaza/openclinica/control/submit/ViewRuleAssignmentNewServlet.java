@@ -137,12 +137,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 		request.setAttribute("ruleAssignmentsHtml", ruleAssignmentsHtml);
 		createStudyEventForInfoPanel();
 		if (ruleAssignmentsHtml != null) {
-			if (isDesigner) {
-				forwardPage(Page.VIEW_RULE_SETS_DESIGNER);
-			} else {
-				forwardPage(Page.VIEW_RULE_SETS2);
-			}
-
+			forwardPage(Page.VIEW_RULE_SETS2);	
 		}
 
 	}
