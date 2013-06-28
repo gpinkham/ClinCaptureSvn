@@ -141,9 +141,9 @@ public class UpdateJobExportServlet extends SecureController {
 					updatingTrigger.getKey().getName());
 			if (!errors.isEmpty()) {
 				// send back
-				addPageMessage("Your modifications caused an error, please see the messages for more information.");
+				request.setAttribute("formMessages", errors);
+				logger.info("errors found: " + errors.toString());
 				setUpServlet(updatingTrigger);
-				System.out.println("errors : " + errors.toString());
 				forwardPage(Page.UPDATE_JOB_EXPORT);
 			} else {
 				DatasetDAO datasetDao = new DatasetDAO(sm.getDataSource());
@@ -200,26 +200,28 @@ public class UpdateJobExportServlet extends SecureController {
 				extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
 				SimpleTriggerImpl newTrigger = null;
 
-                newTrigger = xsltService.generateXsltTrigger(xsltPath,
+				newTrigger = xsltService.generateXsltTrigger(xsltPath,
 						generalFileDir, // xml_file_path
 						endFilePath + File.separator, exportFileName, dsBean.getId(), epBean, userBean, request
 								.getLocale().getLanguage(), cnt, SQLInitServlet.getField("filePath") + "xslt",
 						XsltTriggerService.TRIGGER_GROUP_NAME);
 
-                newTrigger.setName(jobName);
-                newTrigger.setJobName(jobName);
+				newTrigger.setName(jobName);
+				newTrigger.setJobName(jobName);
 				// Updating the original trigger with user given inputs
-                newTrigger.setRepeatCount(64000);
-                newTrigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
-                newTrigger.setDescription(jobDesc);
+				newTrigger.setRepeatCount(64000);
+				newTrigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
+				newTrigger.setDescription(jobDesc);
 				// set just the start date
-                newTrigger.setStartTime(startDateTime);
-                newTrigger.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
-                newTrigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
-                newTrigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
-                newTrigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
-                newTrigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
-                newTrigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
+				newTrigger.setStartTime(startDateTime);
+				newTrigger
+						.setMisfireInstruction(SimpleTriggerImpl.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
+				newTrigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
+				newTrigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
+				newTrigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
+				newTrigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
+				newTrigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
+				newTrigger.getJobDataMap().put("job_type", "exportJob");
 
 				JobDetailImpl jobDetailBean = new JobDetailImpl();
 				jobDetailBean.setGroup(XsltTriggerService.TRIGGER_GROUP_NAME);
@@ -248,6 +250,7 @@ public class UpdateJobExportServlet extends SecureController {
 	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
 			String properName) {
 		Validator v = new Validator(request);
+		v.addValidation(DATASET_ID, Validator.NO_BLANKS_SET);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
 		// need to be unique too
 		v.addValidation(JOB_DESC, Validator.NO_BLANKS);

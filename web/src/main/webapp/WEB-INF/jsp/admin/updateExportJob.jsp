@@ -80,7 +80,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="text"><b><fmt:message key="please_pick_a_dataset_to_export" bundle="${resword}"/>:</b></td>
+		<td class="text"><b><fmt:message key="please_pick_a_dataset_to_export" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dsId"/></jsp:include></td>
 		<td class="text"><select name="dsId" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
 			<c:forEach var="dataset" items="${datasets}">
 				<option value="<c:out value="${dataset.id}"/>"

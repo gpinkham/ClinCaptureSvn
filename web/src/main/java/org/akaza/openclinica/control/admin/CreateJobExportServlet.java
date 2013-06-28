@@ -58,6 +58,8 @@ public class CreateJobExportServlet extends SecureController {
 	public static final String JOB_DESC = "jobDesc";
 	public static final String USER_ID = "user_id";
 	public static final String STUDY_NAME = "study_name";
+	public static final String REFERER = "referer";
+	public static final String DATASETS = "datasets";
 
 	private static String SCHEDULER = "schedulerFactoryBean";
 	// faking out DRY - should we create a super class, Job Servlet, which
@@ -92,7 +94,7 @@ public class CreateJobExportServlet extends SecureController {
 		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
 		Collection dsList = dsdao.findAllOrderByStudyIdAndName();
 		// TODO will have to dress this up to allow for sites then datasets
-		request.setAttribute("datasets", dsList);
+		request.setAttribute(DATASETS, dsList);
 		request.setAttribute(JOB_NAME, fp2.getString(JOB_NAME));
 		request.setAttribute(JOB_DESC, fp2.getString(JOB_DESC));
 		request.setAttribute("extractProperties", CoreResources.getExtractProperties());
@@ -126,7 +128,6 @@ public class CreateJobExportServlet extends SecureController {
 			// set up list of data sets
 			// select by ... active study
 			setUpServlet();
-
 			forwardPage(Page.CREATE_JOB_EXPORT);
 		} else if ("confirmall".equalsIgnoreCase(action)) {
 			// collect form information
@@ -136,10 +137,8 @@ public class CreateJobExportServlet extends SecureController {
 			if (!errors.isEmpty()) {
 				// set errors to request
 				request.setAttribute("formMessages", errors);
-				logger.info("has validation errors in the first section");
 				logger.info("errors found: " + errors.toString());
 				setUpServlet();
-
 				forwardPage(Page.CREATE_JOB_EXPORT);
 			} else {
 				logger.info("found no validation errors, continuing");
@@ -149,12 +148,16 @@ public class CreateJobExportServlet extends SecureController {
 				UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 				CoreResources cr = new CoreResources();
 				int datasetId = fp.getInt(DATASET_ID);
+				if (datasetId == 0) {
+					addPageMessage(resexception.getString("please_choose_a_dataset"));
+					forwardPage(Page.CREATE_JOB_EXPORT);
+					return;
+				}
 				String period = fp.getString(PERIOD);
 				String email = fp.getString(EMAIL);
 				String jobName = fp.getString(JOB_NAME);
 				String jobDesc = fp.getString(JOB_DESC);
 				Date startDateTime = fp.getDateTime(DATE_START_JOB);
-
 				Integer exportFormatId = fp.getInt(FORMAT_ID);
 
 				ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
@@ -174,7 +177,7 @@ public class CreateJobExportServlet extends SecureController {
 				// JN: The following logic is for comma separated variables, to
 				// avoid the second file be treated as a
 				// old file and deleted.
-				String datasetFilePath = SQLInitServlet.getField("filePath") + "datasets";
+				String datasetFilePath = SQLInitServlet.getField("filePath") + DATASETS;
 
 				while (i < exportFiles.length) {
 					temp[i] = extractUtils.resolveVars(exportFiles[i], dsBean, sdfDir, datasetFilePath);
@@ -186,7 +189,7 @@ public class CreateJobExportServlet extends SecureController {
 				XsltTriggerService xsltService = new XsltTriggerService();
 				String generalFileDir = SQLInitServlet.getField("filePath");
 
-				generalFileDir = generalFileDir + "datasets" + File.separator + dsBean.getId() + File.separator
+				generalFileDir = generalFileDir + DATASETS + File.separator + dsBean.getId() + File.separator
 						+ sdfDir.format(new java.util.Date());
 
 				exportFileName = epBean.getExportFileName()[cnt];
@@ -220,8 +223,8 @@ public class CreateJobExportServlet extends SecureController {
 								.getLocale().getLanguage(), cnt, SQLInitServlet.getField("filePath") + "xslt",
 						XsltTriggerService.TRIGGER_GROUP_NAME);
 
-                trigger.setName(jobName);
-                trigger.setJobName(jobName);
+				trigger.setName(jobName);
+				trigger.setJobName(jobName);
 				// Updating the original trigger with user given inputs
 				trigger.setRepeatCount(64000);
 				trigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
@@ -272,6 +275,7 @@ public class CreateJobExportServlet extends SecureController {
 	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
 			String properName) {
 		Validator v = new Validator(request);
+        v.addValidation(DATASET_ID, Validator.NO_BLANKS_SET);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
 		// need to be unique too
 		v.addValidation(JOB_DESC, Validator.NO_BLANKS);
