@@ -145,7 +145,6 @@ public class LockStudySubjectServlet extends SecureController {
 					if (studyEventBean.getSubjectEventStatus() != SubjectEventStatus.LOCKED) {
 						studyEventBean.setPrevSubjectEventStatus(studyEventBean.getSubjectEventStatus());
 						studyEventBean.setSubjectEventStatus(SubjectEventStatus.LOCKED);
-						studyEventBean.setWasLockedBy(true);
 						studyEventBean.setUpdater(ub);
 						studyEventBean.setUpdatedDate(new Date());
 						ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEventBean);
@@ -162,9 +161,8 @@ public class LockStudySubjectServlet extends SecureController {
 			} else if (action.equalsIgnoreCase("unlock")) {
 				message = resword.getString("unlockStudySubjectResultMsg");
 				for (StudyEventBean studyEventBean : studyEventBeanList) {
-					if (studyEventBean.isWasLockedBy()) {
+					if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
 						studyEventBean.setSubjectEventStatus(studyEventBean.getPrevSubjectEventStatus());
-						studyEventBean.setWasLockedBy(false);
 						studyEventBean.setUpdater(ub);
 						studyEventBean.setUpdatedDate(new Date());
 						ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEventBean);

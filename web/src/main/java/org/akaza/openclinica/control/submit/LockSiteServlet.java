@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -89,7 +90,6 @@ public class LockSiteServlet extends SecureController {
 						if (studyEventBean.getSubjectEventStatus() != SubjectEventStatus.LOCKED) {
 							studyEventBean.setPrevSubjectEventStatus(studyEventBean.getSubjectEventStatus());
 							studyEventBean.setSubjectEventStatus(SubjectEventStatus.LOCKED);
-							studyEventBean.setWasLockedBy(true);
 							studyEventBean.setUpdater(ub);
 							studyEventBean.setUpdatedDate(new Date());
 							ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEventBean);
@@ -101,15 +101,16 @@ public class LockSiteServlet extends SecureController {
 							sedao.update(studyEventBean);
 						}
 					}
+					studySubjectBean.setStatus(Status.LOCKED);
+					ssdao.update(studySubjectBean);
 				}
 			} else if (action.equalsIgnoreCase("unlock")) {
 				message = resword.getString("unlockSiteStudySubjectsResultMsg");
 				for (StudySubjectBean studySubjectBean : studySubjectBeanList) {
 					List<StudyEventBean> studyEventBeanList = sedao.findAllByStudySubject(studySubjectBean);
 					for (StudyEventBean studyEventBean : studyEventBeanList) {
-						if (studyEventBean.isWasLockedBy()) {
+						if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
 							studyEventBean.setSubjectEventStatus(studyEventBean.getPrevSubjectEventStatus());
-							studyEventBean.setWasLockedBy(false);
 							studyEventBean.setUpdater(ub);
 							studyEventBean.setUpdatedDate(new Date());
 							ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEventBean);
@@ -121,6 +122,8 @@ public class LockSiteServlet extends SecureController {
 							sedao.update(studyEventBean);
 						}
 					}
+					studySubjectBean.setStatus(Status.AVAILABLE);
+					ssdao.update(studySubjectBean);
 				}
 			}
 			showResultMessage(studyBean, message);

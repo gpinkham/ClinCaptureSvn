@@ -44,8 +44,6 @@ public class StudyEventBean extends AuditableEntityBean {
 
 	private int sampleOrdinal;
 
-	private boolean wasLockedBy;
-
 	private SubjectEventStatus prevSubjectEventStatus = SubjectEventStatus.INVALID;
 
 	private Date dateStarted;
@@ -401,14 +399,6 @@ public class StudyEventBean extends AuditableEntityBean {
 
 	public void setStudySubject(StudySubjectBean studySubject) {
 		this.studySubject = studySubject;
-	}
-
-	public boolean isWasLockedBy() {
-		return wasLockedBy;
-	}
-
-	public void setWasLockedBy(boolean wasLockedBy) {
-		this.wasLockedBy = wasLockedBy;
 	}
 
 	public SubjectEventStatus getPrevSubjectEventStatus() {

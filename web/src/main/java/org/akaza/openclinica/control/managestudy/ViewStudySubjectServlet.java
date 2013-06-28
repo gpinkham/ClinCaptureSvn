@@ -237,7 +237,8 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 				boolean allLocked = true;
 				boolean hasLockedBy = false;
 				for (StudyEventBean studyEventBean : studyEventBeanList) {
-					hasLockedBy = !hasLockedBy ? studyEventBean.isWasLockedBy() : hasLockedBy;
+					hasLockedBy = !hasLockedBy ? studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED
+							: hasLockedBy;
 					if (studyEventBean.getSubjectEventStatus() != SubjectEventStatus.LOCKED) {
 						allLocked = false;
 					}

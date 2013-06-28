@@ -57,7 +57,7 @@ public class SubjectEventStatus extends Term implements Comparable {
 
     public static final SubjectEventStatus UNLOCK = new SubjectEventStatus(11, "unlock");
 
-	private static List list = Arrays.asList(new SubjectEventStatus[]{ SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED, COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED, SOURCE_DATA_VERIFIED, DELETED, UNLOCK});
+	private static List list = Arrays.asList(new SubjectEventStatus[]{ SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED, COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED, SOURCE_DATA_VERIFIED, DELETED});
 
 	// Solve the problem with the get() method...
 	private static final Map<Integer, String> membersMap = new HashMap<Integer, String>();

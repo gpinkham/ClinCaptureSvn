@@ -169,8 +169,8 @@ public class UpdateStudyEventServlet extends SecureController {
 		ArrayList statuses = SubjectEventStatus.toArrayList();
 
 		SubjectEventStatusUtil.preparePossibleSubjectEventStates(studyEvent.getEventCRFs(), statuses);
-		if (!studyEvent.isWasLockedBy()) {
-			statuses.remove(SubjectEventStatus.UNLOCK);
+		if (studyEvent.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
+			statuses.add(SubjectEventStatus.UNLOCK);
 		}
 		StudyDAO sdao = new StudyDAO(this.sm.getDataSource());
 		StudyBean studyBean = (StudyBean) sdao.findByPK(ssub.getStudyId());
@@ -273,15 +273,13 @@ public class UpdateStudyEventServlet extends SecureController {
 			DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
 			SubjectEventStatus ses = SubjectEventStatus.get(fp.getInt(SUBJECT_EVENT_STATUS_ID));
 
-			if (ses == SubjectEventStatus.LOCKED) {
-				if (studyEvent.getSubjectEventStatus() != SubjectEventStatus.LOCKED) {
-					studyEvent.setWasLockedBy(true);
-					studyEvent.setPrevSubjectEventStatus(studyEvent.getSubjectEventStatus());
-					studyEvent.setSubjectEventStatus(SubjectEventStatus.LOCKED);
-				}
-			} else {
-				studyEvent.setWasLockedBy(false);
+			if (ses == SubjectEventStatus.LOCKED && studyEvent.getSubjectEventStatus() != SubjectEventStatus.LOCKED) {
+				studyEvent.setPrevSubjectEventStatus(studyEvent.getSubjectEventStatus());
+				studyEvent.setSubjectEventStatus(SubjectEventStatus.LOCKED);
+			} else if (ses == SubjectEventStatus.UNLOCK) {
 				studyEvent.setSubjectEventStatus(studyEvent.getPrevSubjectEventStatus());
+			} else {
+				studyEvent.setSubjectEventStatus(ses);
 			}
 
 			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());

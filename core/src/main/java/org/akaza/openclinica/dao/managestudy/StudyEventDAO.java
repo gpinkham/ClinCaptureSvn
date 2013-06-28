@@ -30,9 +30,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
 import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -55,7 +53,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		findByPKAndStudyName = "findByPKAndStudy";
 		getCurrentPKName = "getCurrentPrimaryKey";
 	}
-	
+
 	public StudyEventDAO(DataSource ds) {
 		super(ds);
 		setQueryNames();
@@ -110,10 +108,9 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(13, TypeNames.INT);
 		this.setTypeExpected(14, TypeNames.BOOL); // start_time_flag
 		this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
-		this.setTypeExpected(16, TypeNames.BOOL); // wasLockedBy
-		this.setTypeExpected(17, TypeNames.INT); // prev_status
-		this.setTypeExpected(18, TypeNames.INT); // dynamic_event_id
-		this.setTypeExpected(19, TypeNames.STRING); //reference_visit_name
+		this.setTypeExpected(16, TypeNames.INT); // prev_status
+		this.setTypeExpected(17, TypeNames.INT); // dynamic_event_id
+		this.setTypeExpected(18, TypeNames.STRING); // reference_visit_name
 	}
 
 	public void setTypesExpected(boolean withSubject) {
@@ -141,12 +138,11 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(14, TypeNames.BOOL); // start_time_flag
 		this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
 
-		this.setTypeExpected(16, TypeNames.BOOL); // wasLockedBy
-		this.setTypeExpected(17, TypeNames.INT); // prev_status
-		this.setTypeExpected(18, TypeNames.INT); // dynamic_event_id
-		this.setTypeExpected(19, TypeNames.STRING); //reference_visit_name
+		this.setTypeExpected(16, TypeNames.INT); // prev_status
+		this.setTypeExpected(17, TypeNames.INT); // dynamic_event_id
+		this.setTypeExpected(18, TypeNames.STRING); // reference_visit_name
 		if (withSubject) {
-			this.setTypeExpected(20, TypeNames.STRING);
+			this.setTypeExpected(19, TypeNames.STRING);
 		}
 	}
 
@@ -190,14 +186,12 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		eb.setStartTimeFlag((Boolean) hm.get("start_time_flag"));
 		eb.setEndTimeFlag((Boolean) hm.get("end_time_flag"));
 
-		eb.setWasLockedBy((Boolean) hm.get("was_locked_by"));
-
 		Integer prevSubjectEventStatus = (Integer) hm.get("prev_subject_event_status");
 		eb.setPrevSubjectEventStatus(SubjectEventStatus.getByCode(prevSubjectEventStatus));
 
 		Integer dynamicEventId = (Integer) hm.get("dynamic_event_id");
 		eb.setDynamicEventId(dynamicEventId);
-		
+
 		String referenceVisitName = (String) hm.get("reference_visit_name");
 		eb.setReferenceVisitName(referenceVisitName);
 
@@ -228,16 +222,14 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		eb.setStartTimeFlag((Boolean) hm.get("start_time_flag"));
 		eb.setEndTimeFlag((Boolean) hm.get("end_time_flag"));
 
-		eb.setWasLockedBy((Boolean) hm.get("was_locked_by"));
-
 		Integer prevSubjectEventStatus = (Integer) hm.get("prev_subject_event_status");
 		eb.setPrevSubjectEventStatus(SubjectEventStatus.getByCode(prevSubjectEventStatus));
 
 		Integer dynamicEventId = (Integer) hm.get("dynamic_event_id");
 		eb.setDynamicEventId(dynamicEventId);
-		
+
 		eb.setReferenceVisitName((String) hm.get("reference_visit_name"));
-		
+
 		if (withSubject) {
 			eb.setStudySubjectLabel((String) hm.get("label"));
 		}
@@ -535,7 +527,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		variables.put(Integer.valueOf(10), sb.getStartTimeFlag());
 		variables.put(Integer.valueOf(11), sb.getEndTimeFlag());
 		variables.put(Integer.valueOf(12), sb.getReferenceVisitName());
-		
+
 		this.executeWithPK(digester.getQuery("create"), variables, nullVars);
 		if (isQuerySuccessful()) {
 			sb.setId(getLatestPK());
@@ -586,11 +578,10 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		// start_time_flag
 		variables.put(Integer.valueOf(12), sb.getEndTimeFlag()); // YW
 		// end_time_flag
-		variables.put(Integer.valueOf(13), sb.isWasLockedBy());
-		variables.put(Integer.valueOf(14), Integer.valueOf(sb.getPrevSubjectEventStatus().getId()));
-		variables.put(Integer.valueOf(15), Integer.valueOf(sb.getDynamicEventId()));
-		variables.put(Integer.valueOf(16), sb.getReferenceVisitName());
-		variables.put(Integer.valueOf(17), Integer.valueOf(sb.getId()));
+		variables.put(Integer.valueOf(13), Integer.valueOf(sb.getPrevSubjectEventStatus().getId()));
+		variables.put(Integer.valueOf(14), Integer.valueOf(sb.getDynamicEventId()));
+		variables.put(Integer.valueOf(15), sb.getReferenceVisitName());
+		variables.put(Integer.valueOf(16), Integer.valueOf(sb.getId()));
 
 		String sql = digester.getQuery("update");
 
