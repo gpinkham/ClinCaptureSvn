@@ -769,7 +769,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		SubjectBean subject;
 
 		private String getCount() {
-			return studyEvents.size() < 2 ? "" : "&nbsp;&nbsp;&nbsp;x" + String.valueOf(studyEvents.size() + "");
+            return studyEvents.size() < 2 ? "" : "<span class=\"re_indicator\">x" + String.valueOf(studyEvents.size() + "</span>");
 		}
 
 		public Object getValue(Object item, String property, int rowcount) {

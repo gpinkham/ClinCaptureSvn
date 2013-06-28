@@ -2033,7 +2033,7 @@ function createNewEvent(event) {
                                     }
                                     eventDiv.css("visibility", "hidden");
                                     if (eventDef.repeatingEvent && parseInt(eventDef.totalEvents) > 1) {
-                                        aElement.html(aElement.find("img")[0].outerHTML + "&nbsp;&nbsp;&nbsp;x" + eventDef.totalEvents);
+                                        aElement.html(aElement.find("img")[0].outerHTML + "<span class=\"re_indicator\">x" + eventDef.totalEvents + "</span>");
                                     }
                                 }
                             }

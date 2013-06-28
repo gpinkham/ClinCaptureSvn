@@ -2042,8 +2042,15 @@ span.spanBack {
     color: #789EC5;
     text-decoration: none;
 }
+
 span.spanBack:hover {
     cursor: pointer;
     color: #789EC5;
     text-decoration: underline;
+}
+
+span.re_indicator {
+    margin-left: 4px;
+    margin-right: -20px;
+    white-space: nowrap;
 }
