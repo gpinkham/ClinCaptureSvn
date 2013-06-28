@@ -3,7 +3,7 @@
 # tomcat        
 #
 # chkconfig: 2345 90 15 
-# description:  Tomcat start script for OpenClinica.
+# description:  Tomcat start script for ClinCapture.
 #
 #
 #
