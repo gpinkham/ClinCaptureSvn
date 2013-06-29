@@ -2130,7 +2130,6 @@ $(function() {
 function randomizeSubject() {
 
     var crf = $("input:hidden[name='crfId']").val();
-    var studyId = $("input:hidden[name='studyId']").val();
     
     var eligibility = null;
 
@@ -2197,7 +2196,6 @@ function randomizeSubject() {
         data: {
 
             crf: crf,
-            study: studyId,
             subject: subject,
             trialId: trialId,
             eligibility: eligibility,

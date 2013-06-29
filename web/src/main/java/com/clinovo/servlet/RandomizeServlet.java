@@ -133,7 +133,6 @@ public class RandomizeServlet extends SecureController {
 	private RandomizationResult initiateRandomizationCall(HttpServletRequest request) throws Exception {
 
 		String trialId = "";
-		String studyId = request.getParameter("study");
 
 		// Get Trial Id configured in the CRF
 		String crfConfiguredTrialId = request.getParameter("trialId");
@@ -168,7 +167,7 @@ public class RandomizeServlet extends SecureController {
 		String strataLevel = request.getParameter("strataLevel").equals("null") ? "" : request
 				.getParameter("strataLevel");
 
-		String siteId = getSiteId(studyId);
+		String siteId = getSite();
 		String patientId = request.getParameter("subject");
 
 		Randomization randomization = new Randomization();
@@ -213,19 +212,16 @@ public class RandomizeServlet extends SecureController {
 		}
 	}
 
-	protected String getSiteId(String studyId) throws RandomizationException {
+	protected String getSite() throws RandomizationException {
 
-		String siteId = "";
-		if (currentStudy.isSite(Integer.parseInt(studyId))) {
+		if (currentStudy.isSite(currentStudy.getId())) {
 
-			siteId = currentStudy.getName();
+			return currentStudy.getIdentifier();
 
 		} else {
 
 			throw new RandomizationException("Randomization can only be performed on a site.");
 		}
-
-		return siteId;
 	}
 
 	@SuppressWarnings("rawtypes")
