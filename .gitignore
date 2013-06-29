@@ -13,13 +13,6 @@ ws/.classpath
 ws/.project
 ws/.settings/
 
-*.xls
-
-C:/
-C:\\\\ClinCapture/
-c:\\ClinCapture\\tomcat\\ClinovoEDC.data\\crf/
-c:\\ClinCapture\\tomcat\\ClinovoEDC.data\\rules/
-c:\\ClinCapture\\tomcat\\ClinovoEDC.data\\xslt/
 core/openclinica-test.log
 
 .DS_Store
