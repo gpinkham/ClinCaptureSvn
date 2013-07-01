@@ -137,6 +137,7 @@ public class ImportSpringJob extends QuartzJobBean {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	protected void executeInternalInTransaction(JobExecutionContext context) {
 		locale = new Locale("en-US");
 
@@ -230,9 +231,15 @@ public class ImportSpringJob extends QuartzJobBean {
 				auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, auditMessages.get(1));
 				try {
 					if (contactEmail != null && !"".equals(contactEmail)) {
+						StudyBean emailParentStudy = new StudyBean();
+						if (studyBean.getParentStudyId() > 0) {
+							emailParentStudy = (StudyBean) studyDAO.findByPK(studyBean.getParentStudyId());
+						} else {
+							emailParentStudy = studyBean;
+						}
 						mailSender.sendEmail(contactEmail,
 								respage.getString("job_ran_for") + " " + triggerBean.getFullName(),
-								generateMsg(auditMessages.get(0), contactEmail, studyName), true);
+								generateMsg(auditMessages.get(0), contactEmail, emailParentStudy.getName()), true);
 						logger.debug("email body: " + auditMessages.get(1));
 					}
 				} catch (OpenClinicaSystemException e) {

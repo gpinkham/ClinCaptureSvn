@@ -260,8 +260,13 @@ public class CreateUserAccountServlet extends SecureController {
 							+ "\"" + respage.getString("was_created_succesfully"));
 					if ("no".equalsIgnoreCase(displayPwd)) {
 						try {
-							StudyBean study = (StudyBean) sdao.findByPK(activeStudy);
-							sendNewAccountEmail(createdUserAccountBean, password, study.getName());
+							StudyBean emailParentStudy = new StudyBean();
+							if (currentStudy.getParentStudyId() > 0) {
+								emailParentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
+							} else {
+								emailParentStudy = currentStudy;
+							}
+							sendNewAccountEmail(createdUserAccountBean, password, emailParentStudy.getName());
 						} catch (Exception e) {
 							addPageMessage(respage.getString("there_was_an_error_sending_account_creating_mail"));
 						}

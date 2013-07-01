@@ -440,7 +440,13 @@ public class XsltTransformJob extends QuartzJobBean {
 			}
 			// email the message to the user
 			// String email = dataMap.getString(EMAIL);
-			emailBuffer.append("<p>" + pageMessages.getString("html_email_body_5").replace("{0}", currentStudy.getName()) + "</p>");
+			StudyBean emailParentStudy = new StudyBean();
+			if (currentStudy.getParentStudyId() > 0) {
+				emailParentStudy = (StudyBean) studyDao.findByPK(currentStudy.getParentStudyId());
+			} else {
+				emailParentStudy = currentStudy;
+			}
+			emailBuffer.append("<p>" + pageMessages.getString("html_email_body_5").replace("{0}", emailParentStudy.getName()) + "</p>");
 			try {
 
 				if ((null != dataMap.get("job_type"))

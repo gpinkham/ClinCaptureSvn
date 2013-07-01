@@ -136,8 +136,13 @@ public class DeleteUserServlet extends SecureController {
 		body += SQLInitServlet.getSystemURL();
 		body += " .<br><br>";
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		StudyBean sBean = (StudyBean) sdao.findByPK(u.getActiveStudyId());
-		body += respage.getString("best_system_administrator").replace("{0}", sBean.getName());
+		StudyBean emailParentStudy = new StudyBean();
+		if (currentStudy.getParentStudyId() > 0) {
+			emailParentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
+		} else {
+			emailParentStudy = currentStudy;
+		}
+		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
 		logger.info("Sending email...begin");
 		sendEmail(u.getEmail().trim(), restext.getString("your_new_openclinica_account_has_been_restored"), body, false);
 		logger.info("Sending email...done");

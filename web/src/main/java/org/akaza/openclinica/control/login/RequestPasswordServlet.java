@@ -174,9 +174,14 @@ public class RequestPasswordServlet extends SecureController {
 				.append(restext.getString("use_the_following_link_to_log") + ":<br>")
 				.append(SQLInitServlet.getSystemURL() + "<br><br>")
 				.append(respage.getString("best_system_administrator"));
-
+		StudyBean emailParentStudy = new StudyBean();
+		if (sBean.getParentStudyId() > 0) {
+			emailParentStudy = (StudyBean) sdao.findByPK(sBean.getParentStudyId());
+		} else {
+			emailParentStudy = sBean;
+		}
 		String emailBody = email.toString();
-		emailBody = emailBody.replace("{0}", sBean.getName());
+		emailBody = emailBody.replace("{0}", emailParentStudy.getName());
 		sendEmail(ubDB.getEmail().trim(), EmailEngine.getAdminEmail(), restext.getString("your_openclinica_password"),
 				emailBody, true, respage.getString("your_password_reset_new_password_emailed"),
 				respage.getString("your_password_not_send_due_mail_server_problem"), true);

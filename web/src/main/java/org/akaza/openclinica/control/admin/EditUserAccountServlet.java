@@ -332,8 +332,13 @@ public class EditUserAccountServlet extends SecureController {
 		body += restext.getString("please_test_your_login_information_and_let") + "<br/>\n";
 		body += "<a href='" + SQLInitServlet.getSystemURL() + "'>" + SQLInitServlet.getField("sysURL") + "</a><br/><br/>\n\n";
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		StudyBean sBean = (StudyBean) sdao.findByPK(user.getActiveStudyId());
-		body += respage.getString("best_system_administrator").replace("{0}", sBean.getName());
+		StudyBean emailParentStudy = new StudyBean();
+		if (currentStudy.getParentStudyId() > 0) {
+			emailParentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
+		} else {
+			emailParentStudy = currentStudy;
+		}
+		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
 		sendEmail(user.getEmail().trim(), restext.getString("your_openclinica_account_password_reset"), body, false);
 	}
 
