@@ -306,4 +306,6 @@
 	color: #789EC5; 
 	}
 
-
+.jmesa .table .header td div {
+	display: inline-table;
+}
