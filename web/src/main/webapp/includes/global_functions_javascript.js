@@ -1801,7 +1801,7 @@ function adjustCrfListTable(studyEventId) {
             crfsCellCount = currVal > crfsCellCount ? currVal : crfsCellCount;
         }
     });
-    crfActionIconWidth = 18;
+    crfActionIconWidth = 28;
     crfActionsMaxIconsCount = 9;
     jQuery('#crfListWrapper_' + studyEventId + ' .crfListTableActions').attr("style", "width: " + (crfActionIconWidth * crfActionsMaxIconsCount) + "px;");
 }

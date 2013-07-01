@@ -61,34 +61,67 @@
 
         <!-- Subject Controls section -->
         <td class="table_header_row" style="white-space: nowrap;">
-            <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id ne 6}">
-                <a href="UpdateStudySubject?id=${studySubject.id}&action=show"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_subject" bundle="${resword}"/>" title="<fmt:message key="edit_study_subject" bundle="${resword}"/>" hspace="4"/></a>
-            </c:if>
+
+            <c:choose>
+                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id ne 6}">
+                    <a href="UpdateStudySubject?id=${studySubject.id}&action=show"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_subject" bundle="${resword}"/>" title="<fmt:message key="edit_study_subject" bundle="${resword}"/>" hspace="4"/></a>
+                </c:when>
+                <c:otherwise>
+                    <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
+                </c:otherwise>
+            </c:choose>
+
             <a href="ViewStudySubject?id=${studySubject.id}"><img src="images/bt_View.gif" border="0" align="left" alt="<fmt:message key="view_subject_record" bundle="${resword}"/>" title="<fmt:message key="view_subject_record" bundle="${resword}"/>" hspace="4"/></a>
 
-            <c:if test="${currentRole.id ne 4 and currentRole.id ne 5 and currentRole.id ne 6}">
-                <c:set var="insertBlankCell" value="true"/>
-                <c:choose>
-                    <c:when test="${not studySubject.status.deleted}">
-                        <a href="RemoveStudySubject?action=confirm&id=${studySubject.id}&subjectId=${studySubject.id}&studyId=${studyId}"><img src="images/bt_Remove.gif" border="0" align="left" alt="<fmt:message key="remove_study_subject" bundle="${resword}"/>" title="<fmt:message key="remove_study_subject" bundle="${resword}"/>" hspace="4"/></a>
-                    </c:when>
-                    <c:otherwise>
-                        <a href="RestoreStudySubject?action=confirm&id=${studySubject.id}&subjectId=${studySubject.id}&studyId=${studyId}"><img src="images/bt_Restore.gif" border="0" align="left" alt="<fmt:message key="restore_study_subject" bundle="${resword}"/>" title="<fmt:message key="restore_study_subject" bundle="${resword}"/>" hspace="4"/></a>
-                    </c:otherwise>
-                </c:choose>
-            </c:if>
-            <c:if test="${showSubjectSDVButton and not studySubject.status.deleted and (currentRole.id eq 6 or currentRole.id eq 2)}">
-                <a class="sdvLink" href="pages/viewSubjectAggregate?sbb=true&studyId=${studyId}&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId=${studySubject.label}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
-            </c:if>
-            <c:if test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4}">
-                <a href="SignStudySubject?id=${studySubject.id}"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign_subject " bundle="${resword}"/>" title="<fmt:message key="sign_subject " bundle="${resword}"/>" hspace="4"/></a>
-            </c:if>
-            <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id eq 2}">
-                <a href="ReassignStudySubject?id=${studySubject.id}"><img src="images/bt_Reassign.gif" border="0" align="left" alt="<fmt:message key="reassign" bundle="${resword}"/>" title="<fmt:message key="reassign" bundle="${resword}"/>" hspace="4"/></a>
-            </c:if>
+            <c:choose>
+                <c:when test="${currentRole.id ne 4 and currentRole.id ne 5 and currentRole.id ne 6}">
+                    <c:set var="insertBlankCell" value="true"/>
+                    <c:choose>
+                        <c:when test="${not studySubject.status.deleted}">
+                            <a href="RemoveStudySubject?action=confirm&id=${studySubject.id}&subjectId=${studySubject.id}&studyId=${studyId}"><img src="images/bt_Remove.gif" border="0" align="left" alt="<fmt:message key="remove_study_subject" bundle="${resword}"/>" title="<fmt:message key="remove_study_subject" bundle="${resword}"/>" hspace="4"/></a>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="RestoreStudySubject?action=confirm&id=${studySubject.id}&subjectId=${studySubject.id}&studyId=${studyId}"><img src="images/bt_Restore.gif" border="0" align="left" alt="<fmt:message key="restore_study_subject" bundle="${resword}"/>" title="<fmt:message key="restore_study_subject" bundle="${resword}"/>" hspace="4"/></a>
+                        </c:otherwise>
+                    </c:choose>
+                </c:when>
+                <c:otherwise>
+                    <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
+                </c:otherwise>
+            </c:choose>
+
+            <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
+
+            <c:choose>
+                <c:when test="${showSubjectSDVButton and not studySubject.status.deleted and (currentRole.id eq 6 or currentRole.id eq 2)}">
+                    <a class="sdvLink" href="pages/viewSubjectAggregate?sbb=true&studyId=${studyId}&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId=${studySubject.label}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
+                </c:when>
+                <c:otherwise>
+                    <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
+                </c:otherwise>
+            </c:choose>
+
+            <c:choose>
+                <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4}">
+                    <a href="SignStudySubject?id=${studySubject.id}"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign_subject " bundle="${resword}"/>" title="<fmt:message key="sign_subject " bundle="${resword}"/>" hspace="4"/></a>
+                </c:when>
+                <c:otherwise>
+                    <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
+                </c:otherwise>
+            </c:choose>
+
+            <c:choose>
+                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id eq 2}">
+                    <a href="ReassignStudySubject?id=${studySubject.id}"><img src="images/bt_Reassign.gif" border="0" align="left" alt="<fmt:message key="reassign" bundle="${resword}"/>" title="<fmt:message key="reassign" bundle="${resword}"/>" hspace="4"/></a>
+                </c:when>
+                <c:otherwise>
+                    <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
+                </c:otherwise>
+            </c:choose>
+
             <c:if test="${subjectHasNDs eq true}">
-                    <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed">
-                        <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
+                <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed">
+                    <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
             </c:if>
         </td>
     </tr>
@@ -109,9 +142,15 @@
         </c:choose>
         <td class="table_header_row" style="white-space: nowrap;">
 
-            <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id ne 6}">
-                <a href="UpdateStudyEvent?event_id=${studyEvent.id}&ss_id=${studySubject.id}"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_event" bundle="${resword}"/>" title="<fmt:message key="edit_study_event" bundle="${resword}"/>" hspace="4"/></a>
-            </c:if>
+            <c:choose>
+                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id ne 6}">
+                    <a href="UpdateStudyEvent?event_id=${studyEvent.id}&ss_id=${studySubject.id}"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_event" bundle="${resword}"/>" title="<fmt:message key="edit_study_event" bundle="${resword}"/>" hspace="4"/></a>
+                </c:when>
+                <c:otherwise>
+                    <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
+                </c:otherwise>
+            </c:choose>
+
             <a href="EnterDataForStudyEvent?eventId=${studyEvent.id}"><img src="images/bt_View.gif" border="0" align="left" alt="<fmt:message key="view_study_event" bundle="${resword}"/>" title="<fmt:message key="view_study_event" bundle="${resword}"/>" hspace="4"/></a>
 
             <c:choose>
@@ -126,18 +165,32 @@
                     </c:choose>
                 </c:when>
                 <c:otherwise>
-                    <c:if test="${insertBlankCell eq 'true'}">
-                        <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
-                    </c:if>
+                    <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
                 </c:otherwise>
             </c:choose>
 
-            <c:if test="${showSDVButton and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (currentRole.id eq 6 or currentRole.id eq 2)}">
-                <a class="sdvLink" href="pages/viewAllSubjectSDVtmp?sbb=true&studyId=${studyId}&imagePathPrefix=..%2F&crfId=0&redirection=viewAllSubjectSDVtmp&maxRows=15&showMoreLink=true&sdv_tr_=true&sdv_p_=1&sdv_mr_=15&sdv_f_studySubjectId=${studySubject.label}&sdv_f_eventName=${studyEvent.studyEventDefinition.name}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
-            </c:if>
-            <c:if test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4}">
-                <a href="UpdateStudyEvent?action=submit&event_id=${studyEvent.id}&ss_id=${studySubject.id}&changeDate=&startDate=20-Jan-2012&startHour=-1&startMinute=-1&startHalf=&endDate=&endHour=-1&endMinute=-1&endHalf=&statusId=8&Submit=Submit+Changes"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign" bundle="${resword}"/>" title="<fmt:message key="sign" bundle="${resword}"/>" hspace="4"/></a>
-            </c:if>
+            <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
+
+            <c:choose>
+                <c:when test="${showSDVButton and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (currentRole.id eq 6 or currentRole.id eq 2)}">
+                    <a class="sdvLink" href="pages/viewAllSubjectSDVtmp?sbb=true&studyId=${studyId}&imagePathPrefix=..%2F&crfId=0&redirection=viewAllSubjectSDVtmp&maxRows=15&showMoreLink=true&sdv_tr_=true&sdv_p_=1&sdv_mr_=15&sdv_f_studySubjectId=${studySubject.label}&sdv_f_eventName=${studyEvent.studyEventDefinition.name}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
+                </c:when>
+                <c:otherwise>
+                    <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
+                </c:otherwise>
+            </c:choose>
+
+            <c:choose>
+                <c:when test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4}">
+                    <a href="UpdateStudyEvent?action=submit&event_id=${studyEvent.id}&ss_id=${studySubject.id}&changeDate=&startDate=20-Jan-2012&startHour=-1&startMinute=-1&startHalf=&endDate=&endHour=-1&endMinute=-1&endHalf=&statusId=8&Submit=Submit+Changes"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign" bundle="${resword}"/>" title="<fmt:message key="sign" bundle="${resword}"/>" hspace="4"/></a>
+                </c:when>
+                <c:otherwise>
+                    <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
+                </c:otherwise>
+            </c:choose>
+
+            <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
+
             <!-- View DNs icons -->
             <c:if test="${eventHasNDs eq true}">
                     <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_eventName=${studyEventName}&listNotes_f_studySubject.label=${studySubject.label}">
@@ -285,7 +338,7 @@
                                     <c:choose>
                                         <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
                                             <%--<c:when test="${dedc.status.name=='locked'}">--%>
-                                            &nbsp;
+                                            <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         </c:when>
                                         <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && !userRole.monitor}">
                                                 <c:set var="hideCrfBlankCell" value="false"/>
@@ -306,6 +359,10 @@
 
                                     </form>
                                     <c:if test="${crfNDsMap[dedc.edc.crf.id] eq true}">
+                                            <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
+                                            <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
+                                            <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
+                                            <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                             <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_crfName=${dedc.edc.crf.name}">
                                                 <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
                                     </c:if>
@@ -409,8 +466,10 @@
                                     </c:if>
                                 </c:if>
 
+                                <c:set var="crfSpacersCount" value="0"/>
                                 <c:choose>
                                     <c:when test='${actionQuery == "" && dec.stage.name =="invalid" }'>
+                                        <c:set var="crfSpacersCount" value="5"/>
                                         <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                                            onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
@@ -418,6 +477,7 @@
                                           ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="4"></a>
 
                                         <c:if test="${currentRole.id ne 4 and currentRole.id ne 5 and (studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed') && (study.status.available)}">
+                                            <c:set var="crfSpacersCount" value="4"/>
                                             <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                                                onMouseDown="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
                                                onMouseUp="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
@@ -426,6 +486,7 @@
                                     </c:when>
 
                                     <c:when test='${actionQuery == ""}'>
+                                        <c:set var="crfSpacersCount" value="5"/>
                                         <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                                            onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
@@ -479,12 +540,14 @@
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         </c:if>
 
+                                        <c:set var="crfSpacersCount" value="5"/>
                                         <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                                            onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                            onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                           ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="4"></a>
 
                                         <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
+                                            <c:set var="crfSpacersCount" value="4"/>
                                             <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                                                onMouseDown="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
                                                onMouseUp="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
@@ -492,6 +555,7 @@
                                         </c:if>
 
                                         <c:if test="${userBean.sysAdmin && (study.status.available)}">
+                                            <c:set var="crfSpacersCount" value="3"/>
                                             <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
                                                onMouseDown="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                                                onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
@@ -500,6 +564,9 @@
                                     </c:otherwise>
                                 </c:choose>
                                 <c:if test="${crfNDsMap[dec.eventCRF.crf.id] eq true}">
+                                        <c:forEach begin="1" end="${crfSpacersCount}">
+                                            <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
+                                        </c:forEach>
                                         <a href="ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label=${studySubject.label}&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed&listNotes_f_crfName=${dec.eventCRF.crf.name}&listNotes_f_eventName=${dec.eventCRF.name}">
                                             <img src="images/icon_Note.gif" border="0" align="left" alt="<fmt:message key="view_all_discrepancy_notes_in" bundle="${resword}"/>" title="<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>" hspace="4"/></a>
                                 </c:if>
