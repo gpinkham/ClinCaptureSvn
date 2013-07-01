@@ -137,7 +137,6 @@ public class ImportSpringJob extends QuartzJobBean {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	protected void executeInternalInTransaction(JobExecutionContext context) {
 		locale = new Locale("en-US");
 
