@@ -126,7 +126,7 @@ public class SQLInitServlet extends HttpServlet {
 	 * gets the actual system URL by doing a DNS name lookup
 	 */
 	public static String getSystemURL() {
-		String url = params.getProperty("sysURL");
+		String url = params.getProperty("sysURL.base");
 		if (url != null) {
 			url = url.trim();
 		} else {

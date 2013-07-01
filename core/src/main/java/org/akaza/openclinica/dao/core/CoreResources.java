@@ -13,11 +13,7 @@
 
 package org.akaza.openclinica.dao.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -196,7 +192,7 @@ public class CoreResources implements ResourceLoaderAware {
 
 		DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
 		// sysURL.base
-		String sysURLBase = DATAINFO.getProperty("sysURL").replace("MainMenu", "");
+		String sysURLBase = DATAINFO.getProperty("sysURL").replace("/MainMenu", "");
 		DATAINFO.setProperty("sysURL.base", sysURLBase);
 
 		if (DATAINFO.getProperty("org.quartz.jobStore.misfireThreshold") == null)
