@@ -348,14 +348,14 @@ public class EditUserAccountServlet extends SecureController {
 	}
 	
 	@SuppressWarnings({"unchecked"})
-	private void changeCalendarEventsUserEmail(String userEmail,String emailForUpdate) {
+	private void changeCalendarEventsUserEmail(String userEmail, String emailForUpdate) {
 		StudyEventDefinitionDAO sedao = new StudyEventDefinitionDAO(sm.getDataSource());
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
 		ArrayList<StudyBean> studies = (ArrayList) sdao.findAllByUser(ub.getName());
 		for (StudyBean study : studies) {
 			ArrayList<StudyEventDefinitionBean> sedBeans = sedao.findAllActiveByStudy(study);
 			for (StudyEventDefinitionBean sedBean : sedBeans) {
-				if (userEmail.equals(sedBean.getEmailAdress())) {
+				if (userEmail.equals(sedBean.getEmailAdress()) && !sedBean.getReferenceVisit()) {
 					sedBean.setEmailAdress(emailForUpdate);
 					sedao.update(sedBean);
 				}

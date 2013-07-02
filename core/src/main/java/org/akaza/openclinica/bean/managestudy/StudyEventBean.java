@@ -75,14 +75,14 @@ public class StudyEventBean extends AuditableEntityBean {
 
 	private int dynamicEventId;
 	
-	private String referenceVisitName = "";
+	private int referenceVisitId;
 	
-	public String getReferenceVisitName() {
-		return referenceVisitName;
+	public int getReferenceVisitId() {
+		return referenceVisitId;
 	}
 	
-	public void setReferenceVisitName(String referenceVisitName) {
-		this.referenceVisitName = referenceVisitName;
+	public void setReferenceVisitId(int referenceVisitId) {
+		this.referenceVisitId = referenceVisitId;
 	}
 
 	public int getDynamicEventId() {
@@ -205,6 +205,7 @@ public class StudyEventBean extends AuditableEntityBean {
 	}
 	
 	public StudyEventBean (StudyEventBean obj) {
+		this.id = obj.getId();
 		this.stage = obj.getStage();
 		this.subjectEventStatus = obj.getPrevSubjectEventStatus();
 		this.dateEnded = obj.getDateEnded();

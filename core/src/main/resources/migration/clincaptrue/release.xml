@@ -25,5 +25,6 @@
 	<include file="migration/clincaptrue/2013-06-20-TICKET324.xml" />
     <include file="migration/clincaptrue/2013-06-28-TICKET347.xml" />
     <include file="migration/clincaptrue/2013-06-28-TICKET255.xml" />
+    <include file="migration/clincaptrue/2013-06-27-TICKET345.xml" />
     <include file="migration/clincaptrue/2013-06-28-TICKET256.xml" />
 </databaseChangeLog>

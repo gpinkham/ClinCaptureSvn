@@ -1596,18 +1596,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		boolean defaultColor = true;
 		StudyEventBean refEventResult = null;
 		for (StudyEventBean studyEventBean : studyEventBeanList) {
-			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(
-					studyEventBean.getStudyEventDefinitionId());
-			// Date refVisitDateCompleted = new
-			// DateTime(studyEventBean.getDateStarted().getTime()).minusDays(sedBean.getScheduleDay()).toDate();
-			if (!sedBean.getReferenceVisit() && "calendared_visit".equalsIgnoreCase(sedBean.getType())) {
-				StudyEventDefinitionBean sedBeanTmp = (StudyEventDefinitionBean) getStudyEventDefinitionDao()
-						.findByName(studyEventBean.getReferenceVisitName());
-				ArrayList<StudyEventBean> seBeanTmp = getStudyEventDAO().findAllByStudySubjectAndDefinition(
-						subjectBean, sedBeanTmp);
-				if (seBeanTmp.size() > 0) {
-					refEventResult = seBeanTmp.get(0);
-				}
+			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(studyEventBean.getStudyEventDefinitionId());
+			if (!sedBean.getReferenceVisit() && "calendared_visit".equalsIgnoreCase(sedBean.getType()) && studyEventBean.getReferenceVisitId() != 0) {
+				refEventResult = (StudyEventBean) getStudyEventDAO().findByPK(studyEventBean.getReferenceVisitId());
 				logger.info("found for completed event");
 				// if null RV for event not found.
 				if (studyEventBean.getUpdatedDate() != null && refEventResult != null) {

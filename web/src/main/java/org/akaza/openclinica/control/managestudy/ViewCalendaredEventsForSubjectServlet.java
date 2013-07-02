@@ -44,15 +44,10 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 			logger.info("looking up type: " + sedBean.getType());
 			if("calendared_visit".equalsIgnoreCase(sedBean.getType()) && !seBean.getSubjectEventStatus().isNotScheduled()) {
 				//try to found reference event for this event
-				StudyEventBean refEventResult = null;
-				StudyEventDefinitionBean sedBeanTmp = (StudyEventDefinitionBean) seddao.findByName(seBean.getReferenceVisitName());
-				ArrayList <StudyEventBean> seBeanTmp = sedao.findAllByStudySubjectAndDefinition(ssBean, sedBeanTmp);
-				if (seBeanTmp.size() > 0) {
-					refEventResult = seBeanTmp.get(0);
-				}
+				StudyEventBean refEventResult = (StudyEventBean) sedao.findByPK(seBean.getReferenceVisitId());
 				Date schDate = seBean.getDateStarted();
 				CalendarFuncBean calendFuncBean = new CalendarFuncBean();
-				if (!(refEventResult == null)) {
+				if (!(refEventResult == null) && seBean.getReferenceVisitId() != 0) {
 					if(refEventResult.getSubjectEventStatus().isCompleted() || refEventResult.getSubjectEventStatus().isSourceDataVerified() || refEventResult.getSubjectEventStatus().isSigned()) {
 						Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay()).toDate();
 						Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMinDay()).toDate();

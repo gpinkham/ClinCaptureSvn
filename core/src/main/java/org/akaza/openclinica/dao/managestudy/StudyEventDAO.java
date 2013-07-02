@@ -110,7 +110,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
 		this.setTypeExpected(16, TypeNames.INT); // prev_status
 		this.setTypeExpected(17, TypeNames.INT); // dynamic_event_id
-		this.setTypeExpected(18, TypeNames.STRING); // reference_visit_name
+		this.setTypeExpected(18, TypeNames.INT); //reference_visit_id
 	}
 
 	public void setTypesExpected(boolean withSubject) {
@@ -140,7 +140,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		this.setTypeExpected(16, TypeNames.INT); // prev_status
 		this.setTypeExpected(17, TypeNames.INT); // dynamic_event_id
-		this.setTypeExpected(18, TypeNames.STRING); // reference_visit_name
+		this.setTypeExpected(18, TypeNames.INT); //reference_visit_id
 		if (withSubject) {
 			this.setTypeExpected(19, TypeNames.STRING);
 		}
@@ -191,9 +191,9 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		Integer dynamicEventId = (Integer) hm.get("dynamic_event_id");
 		eb.setDynamicEventId(dynamicEventId);
-
-		String referenceVisitName = (String) hm.get("reference_visit_name");
-		eb.setReferenceVisitName(referenceVisitName);
+		
+		Integer referenceVisitId = (Integer) hm.get("reference_visit_id");
+		eb.setReferenceVisitId(referenceVisitId);
 
 		return eb;
 	}
@@ -227,9 +227,9 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		Integer dynamicEventId = (Integer) hm.get("dynamic_event_id");
 		eb.setDynamicEventId(dynamicEventId);
-
-		eb.setReferenceVisitName((String) hm.get("reference_visit_name"));
-
+		
+		eb.setReferenceVisitId((Integer) hm.get("reference_visit_id"));
+		
 		if (withSubject) {
 			eb.setStudySubjectLabel((String) hm.get("label"));
 		}
@@ -526,8 +526,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		variables.put(Integer.valueOf(9), Integer.valueOf(sb.getSubjectEventStatus().getId()));
 		variables.put(Integer.valueOf(10), sb.getStartTimeFlag());
 		variables.put(Integer.valueOf(11), sb.getEndTimeFlag());
-		variables.put(Integer.valueOf(12), sb.getReferenceVisitName());
-
+		variables.put(Integer.valueOf(12), sb.getReferenceVisitId());
+		
 		this.executeWithPK(digester.getQuery("create"), variables, nullVars);
 		if (isQuerySuccessful()) {
 			sb.setId(getLatestPK());
@@ -580,7 +580,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		// end_time_flag
 		variables.put(Integer.valueOf(13), Integer.valueOf(sb.getPrevSubjectEventStatus().getId()));
 		variables.put(Integer.valueOf(14), Integer.valueOf(sb.getDynamicEventId()));
-		variables.put(Integer.valueOf(15), sb.getReferenceVisitName());
+		variables.put(Integer.valueOf(15), sb.getReferenceVisitId());
 		variables.put(Integer.valueOf(16), Integer.valueOf(sb.getId()));
 
 		String sql = digester.getQuery("update");

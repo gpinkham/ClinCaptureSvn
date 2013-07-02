@@ -83,6 +83,7 @@ public class CalendarLogic {
 					}
 				}
 			}
+			System.out.println("RefEvent ID = " +studyEventBeanRef.getId());
 			StudyEventDefinitionBean studyEventDefBeanRef = (StudyEventDefinitionBean) seddao.findByPK(studyEventBeanRef.getStudyEventDefinitionId());
 			logger.info("Latest reference visit date for this subject updated" + studyEventBeanRef.getUpdatedDate() + " and called "+studyEventDefBeanRef.getName());
 			//schedule all other events using this date and their sch_day fields
@@ -124,7 +125,7 @@ public class CalendarLogic {
 						studyEvent.setLocation("");
 						studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 						studyEvent.setSampleOrdinal(sed.getMaxSampleOrdinal(sedTmp, ssb) + 1);
-						studyEvent.setReferenceVisitName(studyEventDefBeanRef.getName());
+						studyEvent.setReferenceVisitId(studyEventBeanRef.getId());
 						studyEvent = (StudyEventBean) sed.create(studyEvent);
 						UserAccountDAO useracdao = new UserAccountDAO(ds);
 						UserAccountBean useracBean = (UserAccountBean) useracdao.findByUserEmail(sedTmp.getEmailAdress());
@@ -160,15 +161,11 @@ public class CalendarLogic {
 			StudyDAO sdao = new StudyDAO(ds);
 			StudyBean studyBean = sdao.findByStudySubjectId(subjectId);
 			StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPKAndStudy(subjectId, studyBean);
-			StudyEventBean studyEventBeanRef = new StudyEventBean();
-			StudyEventDefinitionBean sedBeanTmp = (StudyEventDefinitionBean) seddao.findByName(studyEventBean.getReferenceVisitName());
-			ArrayList <StudyEventBean> seBeanTmp = sedao.findAllByDefinitionAndSubject(sedBeanTmp, ssb);
-			if (seBeanTmp.size() > 0) {
-				studyEventBeanRef = seBeanTmp.get(0);
-				if(!studyEventBeanRef.getSubjectEventStatus().isSourceDataVerified() && !studyEventBeanRef.getSubjectEventStatus().isCompleted() && !studyEventBeanRef.getSubjectEventStatus().isSigned()) {
-					logger.info("RV for this events is not Completed/SDV/Signed");
-					studyEventBeanRef = new StudyEventBean();
-				}
+			StudyEventBean studyEventBeanRef = (StudyEventBean) sedao.findByPK(studyEventBean.getReferenceVisitId());
+			//Ref Event can be null
+			if(!studyEventBeanRef.getSubjectEventStatus().isSourceDataVerified() && !studyEventBeanRef.getSubjectEventStatus().isCompleted() && !studyEventBeanRef.getSubjectEventStatus().isSigned()) {
+				logger.info("RV for this events is not Completed/SDV/Signed");
+				studyEventBeanRef = new StudyEventBean();
 			}
 
 			boolean refEventsIsEmpty = false;

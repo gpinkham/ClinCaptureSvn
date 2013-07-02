@@ -205,7 +205,7 @@ public class UpdateProfileServlet extends SecureController {
 		for (StudyBean study : studies) {
 			ArrayList<StudyEventDefinitionBean> sedBeans = sedao.findAllActiveByStudy(study);
 			for (StudyEventDefinitionBean sedBean : sedBeans) {
-				if (userEmail.equalsIgnoreCase(sedBean.getEmailAdress())) {
+				if (userEmail.equalsIgnoreCase(sedBean.getEmailAdress()) && !sedBean.getReferenceVisit()) {
 					sedBean.setEmailAdress(emailForUpdate);
 					sedao.update(sedBean);
 				}
