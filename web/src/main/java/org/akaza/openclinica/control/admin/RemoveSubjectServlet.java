@@ -112,7 +112,7 @@ public class RemoveSubjectServlet extends SecureController {
 					StudyEventBean event = (StudyEventBean) events.get(j);
 					if (!event.getStatus().equals(Status.DELETED)) {
 						event.setStatus(Status.AUTO_DELETED);
-						event.setSubjectEventStatus(SubjectEventStatus.DELETED);
+						event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
 						event.setUpdater(ub);
 						event.setUpdatedDate(new Date());
 						sedao.update(event);

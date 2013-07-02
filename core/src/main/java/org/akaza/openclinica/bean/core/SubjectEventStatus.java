@@ -53,11 +53,11 @@ public class SubjectEventStatus extends Term implements Comparable {
 
 	public static final SubjectEventStatus SOURCE_DATA_VERIFIED = new SubjectEventStatus(9, "source_data_verified");
 
-	public static final SubjectEventStatus DELETED = new SubjectEventStatus(10, "deleted");
+	public static final SubjectEventStatus REMOVED = new SubjectEventStatus(10, "removed");
 
     public static final SubjectEventStatus UNLOCK = new SubjectEventStatus(11, "unlock");
 
-	private static List list = Arrays.asList(new SubjectEventStatus[]{ SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED, COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED, SOURCE_DATA_VERIFIED, DELETED});
+	private static List list = Arrays.asList(new SubjectEventStatus[]{ SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED, COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED, SOURCE_DATA_VERIFIED, REMOVED});
 
 	// Solve the problem with the get() method...
 	private static final Map<Integer, String> membersMap = new HashMap<Integer, String>();
@@ -72,7 +72,7 @@ public class SubjectEventStatus extends Term implements Comparable {
 		membersMap.put(7, "locked");
 		membersMap.put(8, "signed");
 		membersMap.put(9, "source_data_verified");
-		membersMap.put(10, "deleted");
+		membersMap.put(10, "removed");
 	}
 
 	public boolean isSourceDataVerified() {

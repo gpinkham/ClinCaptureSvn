@@ -1550,7 +1550,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						.append("hspace=\"4\"").end();
 			} else {
 				for (StudyEventBean eventBean : studyEventBeanList) {
-					if (eventBean.getSubjectEventStatus() != SubjectEventStatus.DELETED) {
+					if (eventBean.getSubjectEventStatus() != SubjectEventStatus.REMOVED) {
 						transparentIcon.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0")
 								.append("hspace=\"4\"").end();
 						break;

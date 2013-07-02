@@ -140,7 +140,7 @@ public class RemoveStudySubjectServlet extends SecureController {
 					if (!event.getStatus().equals(Status.DELETED)) {
 						event.setStatus(Status.AUTO_DELETED);
 						// clinovo - ticket #111
-						event.setSubjectEventStatus(SubjectEventStatus.DELETED);
+						event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
 						event.setUpdater(ub);
 						event.setUpdatedDate(new Date());
 						sedao.update(event);

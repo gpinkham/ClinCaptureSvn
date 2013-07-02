@@ -77,7 +77,7 @@ public final class SubjectEventStatusUtil {
 					&& subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
 				String txt = resword.getString("removed");
 				url.append("<img src='"
-						+ imageIconPaths.get(SubjectEventStatus.DELETED.getId())
+						+ imageIconPaths.get(SubjectEventStatus.REMOVED.getId())
 						+ "' title='"
 						+ txt
 						+ "' alt='"
@@ -95,7 +95,7 @@ public final class SubjectEventStatusUtil {
 			boolean des = false;
 			int countOfSDVd = 0;
 			int countOfLocked = 0;
-			int countOfDeleted = 0;
+			int countOfRemoved = 0;
 			SubjectEventStatus minNotDESStatus = null;
 			SubjectEventStatus status = subjectEventStatus;
 			for (StudyEventBean studyEventBean : studyEvents) {
@@ -109,8 +109,8 @@ public final class SubjectEventStatusUtil {
 					des = true;
 				} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
 					countOfLocked++;
-				} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DELETED) {
-					countOfDeleted++;
+				} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.REMOVED) {
+					countOfRemoved++;
 				} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SOURCE_DATA_VERIFIED) {
 					countOfSDVd++;
 				}
@@ -119,8 +119,8 @@ public final class SubjectEventStatusUtil {
 				status = SubjectEventStatus.DATA_ENTRY_STARTED;
 			} else if (countOfLocked == studyEvents.size()) {
 				status = SubjectEventStatus.LOCKED;
-			} else if (countOfDeleted == studyEvents.size()) {
-				status = SubjectEventStatus.DELETED;
+			} else if (countOfRemoved == studyEvents.size()) {
+				status = SubjectEventStatus.REMOVED;
 			} else if (countOfSDVd == studyEvents.size()) {
 				status = SubjectEventStatus.SOURCE_DATA_VERIFIED;
 			} else if (!des && minNotDESStatus != null) {
@@ -152,7 +152,7 @@ public final class SubjectEventStatusUtil {
 			statuses.remove(SubjectEventStatus.SOURCE_DATA_VERIFIED);
 		}
 		if (countOfStarted == 0 || countOfDeleted < countOfStarted) {
-			statuses.remove(SubjectEventStatus.DELETED);
+			statuses.remove(SubjectEventStatus.REMOVED);
 		}
 	}
 
@@ -173,7 +173,7 @@ public final class SubjectEventStatusUtil {
 			}
 			if (countOfDeletedEventCRFs == countOfStartedEventCRFs) {
 				studyEventBean.setStatus(Status.DELETED);
-				studyEventBean.setSubjectEventStatus(SubjectEventStatus.DELETED);
+				studyEventBean.setSubjectEventStatus(SubjectEventStatus.REMOVED);
 				studyEventBean.setUpdater(ub);
 				studyEventBean.setUpdatedDate(new Date());
 
