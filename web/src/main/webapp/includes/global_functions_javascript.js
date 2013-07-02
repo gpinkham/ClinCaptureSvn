@@ -2211,13 +2211,25 @@ function randomizeSubject() {
                 alert("The randomization service is not available. Consult your system administrator")
 
             } else if(data.match(/Invalid Site/)) {
+
                 alert("The Site Id configured is invalid. Please contact your system administrator")
+
             } else if(data.match(/Invalid Trial/)) {
+
                 alert("The Trial Id configured is invalid. Please contact your system administrator")
+
             } else if(data.match(/Invalid Strata/)) {
+
                 alert("The Stratification level missing. Please contact your system administrator")
+
             } else if(data.match(/^\</)) {
+
                 alert("An error occurred during the randomization call. Please contact your system administrator")
+
+            } else if(data.match(/Site is not auth/)) {
+
+                alert("The Site configured is not authorized to randomize subjects . Please contact your system administrator")
+
             } else if(data.match(/Exception/)) {
 
                 var exceptionPattern = new RegExp("^.*:(.*)")
