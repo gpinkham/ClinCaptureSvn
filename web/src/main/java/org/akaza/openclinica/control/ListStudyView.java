@@ -78,14 +78,14 @@ public class ListStudyView extends DefaultView {
 		html.tr(1).styleClass("header").width("100%").close();
 		int index = 0;
 		for (; index < studyGroupClasses.size()+hideColumnsNumber+1; index++){
-			html.td(index).style("border-bottom: 1px solid white;background-color:white;color:black;").align("center").close().tdEnd();
+			html.td(index).style("border-bottom: 1px solid white;background-color:#729FCF;color:white;").align("center").close().tdEnd();
 		}
 		for (StudyGroupClassBean dynGroup: dynamicGroupClasses){
-			html.td(index).colspan(String.valueOf(dynGroup.getEventDefinitions().size())).style("border-bottom: 1px solid white;background-color:white;color:black;").align("center").close()
+			html.td(index).colspan(String.valueOf(dynGroup.getEventDefinitions().size())).style("border-bottom: 1px solid white;background-color:#729FCF;color:white;").align("center").close()
 					.append(dynGroup.getName()).tdEnd();
 			index++;
 		}
-		html.td(index).colspan(String.valueOf(studyEventDefinitions.size()+1)).style("border-bottom: 1px solid white;background-color:white;color:black;").align("center").close().tdEnd();
+		html.td(index).colspan(String.valueOf(studyEventDefinitions.size()+1)).style("border-bottom: 1px solid white;background-color:#729FCF;color:white;").align("center").close().tdEnd();
 		html.trEnd(1);
 
 		return html.toString();
