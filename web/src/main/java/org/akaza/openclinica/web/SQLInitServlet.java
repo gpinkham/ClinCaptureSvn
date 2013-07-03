@@ -71,27 +71,35 @@ public class SQLInitServlet extends HttpServlet {
 		Role.RESEARCHASSISTANT.setDescription(getField("ra"));
 		Role.MONITOR.setDescription(getField("monitor"));
 
-		// The crf/original/CRF Template will be created if not exist.
-		String theDir = getField("filePath");
-		String dir1 = "crf" + File.separator;
-		String dir2 = "original" + File.separator;
-		String dirRules = "rules";
+		String ruleDirectory = "rules";
+		String rootDirectory = getField("filePath");
+		String crfDirectory = "crf" + File.separator;
+		String crfOriginalDirectory = "original" + File.separator;
 
-		// Creating rules directory if not exist mantis issue 6584.
-		if (!(new File(theDir)).isDirectory() || !(new File(dirRules)).isDirectory()) {
-			(new File(theDir + dirRules)).mkdirs();
+		// Creating rules directory if not exist 
+		if (!(new File(rootDirectory)).isDirectory() || !(new File(ruleDirectory)).isDirectory()) {
+			(new File(rootDirectory + ruleDirectory)).mkdirs();
 		}
 
-		if (!(new File(theDir)).isDirectory() || !(new File(dir1)).isDirectory() || !(new File(dir2)).isDirectory()) {
-			(new File(theDir + dir1 + dir2)).mkdirs();
-			copyTemplate(theDir + dir1 + dir2 + DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+		if (!(new File(rootDirectory)).isDirectory() || !(new File(crfDirectory)).isDirectory() || !(new File(crfOriginalDirectory)).isDirectory()) {
+			
+			(new File(rootDirectory + crfDirectory + crfOriginalDirectory)).mkdirs();
+			copyTemplate(rootDirectory + crfDirectory + crfOriginalDirectory, DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+			copyTemplate(rootDirectory + crfDirectory + crfOriginalDirectory, DownloadVersionSpreadSheetServlet.RANDOMIZATION_CRF_TEMPLATE);
 		}
-		theDir = theDir + dir1 + dir2;
-		File excelFile = new File(theDir + DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
-		if (!excelFile.isFile()) {
-			copyTemplate(theDir);
+		
+		rootDirectory = rootDirectory + crfDirectory + crfOriginalDirectory;
+		
+		File crfTemplate = new File(rootDirectory + DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+		File randomizationFormTemplate = new File(rootDirectory + DownloadVersionSpreadSheetServlet.RANDOMIZATION_CRF_TEMPLATE);
+		
+		if (!crfTemplate.isFile()
+				|| !randomizationFormTemplate.isFile()) {
+			
+			copyTemplate(rootDirectory, DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+			copyTemplate(rootDirectory, DownloadVersionSpreadSheetServlet.RANDOMIZATION_CRF_TEMPLATE);
 		}
-
+		
 		// 'passwd_expiration_time' and 'change_passwd_required' are now defined in the database
 		// Here the values in the datainfo.properites file (if any) are overridden.
 		overridePropertyFromDatabase(configurationDao, "pwd.expiration.days", params, "passwd_expiration_time");
@@ -164,13 +172,14 @@ public class SQLInitServlet extends HttpServlet {
 		return name == null ? "" : name;
 	}
 
-	public void copyTemplate(String theDir) {
+	public void copyTemplate(String theDir, String fileName) {
+		
 		OutputStream out = null;
 		InputStream is = null;
 		CoreResources cr = (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
 		try {
-			is = cr.getInputStream(DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
-			File excelOutFile = new File(theDir);
+			is = cr.getInputStream(fileName);
+			File excelOutFile = new File(theDir + fileName);
 			out = new FileOutputStream(excelOutFile);
 			byte[] buf = new byte[1024];
 			int len;

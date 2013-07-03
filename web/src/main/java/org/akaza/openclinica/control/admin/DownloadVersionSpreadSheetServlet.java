@@ -45,6 +45,7 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 	public static String CRF_VERSION_ID = "crfVersionId";
 
 	public static String CRF_VERSION_TEMPLATE = "CRF_Design_Template_v3.1.xls";
+	public static String RANDOMIZATION_CRF_TEMPLATE = "Randomization_Form_v1.0.xls";
 
 	/**
      *
@@ -72,9 +73,8 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 
 	@Override
 	public void processRequest() throws Exception {
+		
 		String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;
-		// YW 09-10-2007 << Now CRF_Design_Template_v2.xls is located at
-		// $CATALINA_HOME/webapps/OpenClinica-instanceName/properties
 		FormProcessor fp = new FormProcessor(request);
 
 		String crfIdString = fp.getString(CRF_ID);
@@ -88,19 +88,30 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 
 		String excelFileName = crfIdString + version.getOid() + ".xls";
 
-		// aha, what if it's the old style? next line is for backwards compat,
-		// tbh 07/2008
 		File excelFile = null;
 		String oldExcelFileName = crfIdString + version.getName() + ".xls";
 		if (isTemplate) {
-			// excelFile = new File(dir + CRF_VERSION_TEMPLATE);
-			excelFile = getCoreResources().getFile(CRF_VERSION_TEMPLATE,
-					"crf" + File.separator + "original" + File.separator);
-			excelFileName = CRF_VERSION_TEMPLATE;
-			// FileOutputStream fos = new FileOutputStream(excelFile);
-			// IOUtils.copy(getCoreResources().getInputStream(CRF_VERSION_TEMPLATE), fos);
-			// IOUtils.closeQuietly(fos);
+			
+			String templateId = request.getParameter("template");
+			
+			// Blank CRF template
+			if ("1".equals(templateId)) {
+				
+				excelFileName = CRF_VERSION_TEMPLATE;
+				excelFile = getCoreResources().getFile(CRF_VERSION_TEMPLATE,
+						"crf" + File.separator + "original" + File.separator);
+				
+			} else if("2".equals(templateId)) {
+				
+				// Randomization CRF template
+				excelFileName = RANDOMIZATION_CRF_TEMPLATE;
+				excelFile = getCoreResources().getFile(RANDOMIZATION_CRF_TEMPLATE,
+						"crf" + File.separator + "original" + File.separator);
+				
+			}
+			
 		} else {
+			
 			excelFile = new File(dir + excelFileName);
 			// backwards compat
 			File oldExcelFile = new File(dir + oldExcelFileName);
@@ -113,6 +124,7 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 			}
 
 		}
+		
 		logger.info("looking for : " + excelFile.getName());
 		if (!excelFile.exists() || excelFile.length() <= 0) {
 			addPageMessage(respage.getString("the_excel_is_not_available_on_server_contact"));

@@ -146,6 +146,7 @@ public class ListCRFServlet extends RememberLastPage {
 		table.hideColumnLink(8);
 		table.setQuery("ListCRF", new HashMap());
 		table.addLink(resword.getString("blank_CRF_template"), "DownloadVersionSpreadSheet?template=1");
+		table.addLink(resword.getString("randomization_crf_template"), "DownloadVersionSpreadSheet?template=2");
 		table.setRows(allRows);
 		table.computeDisplay();
 

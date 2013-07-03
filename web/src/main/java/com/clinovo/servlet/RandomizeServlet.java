@@ -50,6 +50,7 @@ public class RandomizeServlet extends SecureController {
 		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
 				|| currentRole.getRole().equals(Role.INVESTIGATOR)
 				|| currentRole.getRole().equals(Role.RESEARCHASSISTANT)) {
+			
 			return;
 		}
 
