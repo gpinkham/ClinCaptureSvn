@@ -250,6 +250,7 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 		group.setStudyId(currentStudy.getId());
 		group.setOwner(ub);
 		group.setStatus(Status.AVAILABLE);
+		group.setDynamicOrdinal(sgcdao.getMaxDynamicOrdinalByStudyId(currentStudy.getId())+1);
 		
 		group = (StudyGroupClassBean) sgcdao.create(group);
 		

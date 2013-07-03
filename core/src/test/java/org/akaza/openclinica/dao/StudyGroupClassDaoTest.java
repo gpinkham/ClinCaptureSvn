@@ -19,7 +19,7 @@ public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 	@Test
 	public void testUpdateSetsTheCorrectPropertiesName() throws OpenClinicaException {
 		
-		String name = "Study Group Class 2";
+		String name = "Study Group Class 4";
 		StudyGroupClassBean studyGroupClassBean = (StudyGroupClassBean) studyGroupClassDAO.findByPK(1);
 		
 		studyGroupClassBean.setName(name);
@@ -106,6 +106,22 @@ public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 		assertEquals("Should return correct study group class with correct name", "study group 1", studyGroup.getName());
 	}
 	
+	@Test
+	public void testGetMaxDynamicOrdinal() {
+		
+		assertEquals(1, studyGroupClassDAO.getMaxDynamicOrdinalByStudyId(1));
+	}
+	
+	@Test
+	public void testUpdateDynamicOrdinal() {
+		int newDynamicOrdinal = 7;
+		int studyId = 1;
+		int studyGroupClassId = 1;
+		
+		studyGroupClassDAO.updateDynamicOrdinal(newDynamicOrdinal, studyId, studyGroupClassId);
+		assertEquals(7, ((StudyGroupClassBean) studyGroupClassDAO.findByPK(1)).getDynamicOrdinal());
+	}
+	
 	private EntityBean createStudyGroupClass() {
 		
 		StudyGroupClassBean studyGroupClassBean = new StudyGroupClassBean();
@@ -116,6 +132,7 @@ public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 		studyGroupClassBean.setStatus(Status.AVAILABLE);
 		studyGroupClassBean.setSubjectAssignment("Arm");
 		studyGroupClassBean.setDefault(false);
+		studyGroupClassBean.setDynamicOrdinal(3);
 		
 		return studyGroupClassDAO.create(studyGroupClassBean);
 		

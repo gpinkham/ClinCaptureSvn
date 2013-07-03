@@ -23,6 +23,7 @@ package org.akaza.openclinica.bean.managestudy;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Object for study group class
@@ -48,7 +49,10 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	private String groupNotes = "";// not in DB
 	private String studyGroupName = "";// not in DB
 	private boolean selected = false; // not in DB, tbh
-	private boolean isDefault; //in DB, for Dyn Events
+	private boolean isDefault; //in DB, for Dyn Groups
+	private int dynamicOrdinal = 0; //in DB, for Dyn Groups
+	
+	public static ComparatorForDynGroupClasses comparatorForDynGroupClasses = new ComparatorForDynGroupClasses();
 
 	public boolean isDefault() {
 		return isDefault;
@@ -215,4 +219,31 @@ public class StudyGroupClassBean extends AuditableEntityBean {
 	public void setStudyGroupName(String studyGroupName) {
 		this.studyGroupName = studyGroupName;
 	}
+
+	public int getDynamicOrdinal() {
+		return dynamicOrdinal;
+	}
+
+	public void setDynamicOrdinal(int dynamicOrdinal) {
+		this.dynamicOrdinal = dynamicOrdinal;
+	}
 }
+
+class ComparatorForDynGroupClasses implements Comparator<StudyGroupClassBean> {
+	public int compare(StudyGroupClassBean bean1, StudyGroupClassBean bean2) {
+		if (bean2.isDefault()){
+			return 1;
+		}
+		if (bean1.isDefault()){
+			return -1;
+		}
+		if (bean2.getDynamicOrdinal() > bean1.getDynamicOrdinal()){
+			return -1;
+		}
+		if (bean2.getDynamicOrdinal() < bean1.getDynamicOrdinal()){
+			return 1;
+		}	
+		return 0;
+	}
+}
+

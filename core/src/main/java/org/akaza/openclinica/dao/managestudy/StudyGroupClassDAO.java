@@ -31,6 +31,7 @@ import org.akaza.openclinica.dao.core.TypeNames;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -77,7 +78,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		// date_updated date,
 		// update_id numeric,
 		// subject_assignment varchar(30),
-		// is_default boolean
+		// is_default boolean,
+		// dynamic_ordinal numeric
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.STRING);
@@ -91,7 +93,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		this.setTypeExpected(9, TypeNames.INT);
 		this.setTypeExpected(10, TypeNames.STRING);
 		this.setTypeExpected(11, TypeNames.BOOL);
-
+		this.setTypeExpected(12, TypeNames.INT);
 	}
 
 	/**
@@ -111,6 +113,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		eb.setGroupClassTypeName(classTypeName);
 		eb.setSubjectAssignment((String) hm.get("subject_assignment"));
 		eb.setDefault((Boolean) hm.get("is_default"));
+		eb.setDynamicOrdinal(((Integer) hm.get("dynamic_ordinal")).intValue());
 		return eb;
 	}
 
@@ -131,8 +134,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();
-		this.setTypeExpected(12, TypeNames.STRING);
 		this.setTypeExpected(13, TypeNames.STRING);
+		this.setTypeExpected(14, TypeNames.STRING);
 
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(study.getId()));
@@ -166,8 +169,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		ArrayList answer = new ArrayList();
 
 		this.setTypesExpected();
-		this.setTypeExpected(12, TypeNames.STRING);
 		this.setTypeExpected(13, TypeNames.STRING);
+		this.setTypeExpected(14, TypeNames.STRING);
 
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(studyId));
@@ -322,9 +325,9 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		HashMap variables = new HashMap();
 		int id = getNextPK();
 		// INSERT INTO study_group_class
-		// (NAME,STUDY_ID,OWNER_ID,DATE_CREATED, GROUP_CLASS_TYPE_ID,
-		// STATUS_ID,subject_assignment)
-		// VALUES (?,?,?,NOW(),?,?,?,?)
+		// (STUDY_GROUP_CLASS_ID,NAME,STUDY_ID,OWNER_ID,DATE_CREATED, GROUP_CLASS_TYPE_ID,
+		// STATUS_ID,subject_assignment, is_default, dynamic_ordinal) 
+		// VALUES (?,?,?,?,NOW(),?,?,?,?,?)
 		variables.put(new Integer(1), new Integer(id));
 		variables.put(new Integer(2), sb.getName());
 		variables.put(new Integer(3), new Integer(sb.getStudyId()));
@@ -334,6 +337,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		variables.put(new Integer(6), new Integer(sb.getStatus().getId()));
 		variables.put(new Integer(7), sb.getSubjectAssignment());
 		variables.put(new Integer(8), sb.isDefault());
+		variables.put(new Integer(9), new Integer(sb.getDynamicOrdinal()));
 		this.execute(digester.getQuery("create"), variables);
 		if (isQuerySuccessful()) {
 			sb.setId(id);
@@ -352,7 +356,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		// UPDATE study_group_class SET NAME=?,STUDY_ID=?,
 		// GROUP_class_TYPE_ID=?,
 		// STATUS_ID=?, DATE_UPDATED=?,UPDATE_ID=?,
-		// subject_assignment=?, is_default=? WHERE STUDY_GROUP_class_ID=?
+		// subject_assignment=?, is_default=?, dynamic_ordinal=? WHERE STUDY_GROUP_class_ID=?
 		variables.put(new Integer(1), sb.getName());
 		variables.put(new Integer(2), new Integer(sb.getStudyId()));
 		variables.put(new Integer(3), new Integer(sb.getGroupClassTypeId()));
@@ -362,8 +366,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		variables.put(new Integer(6), new Integer(sb.getUpdater().getId()));
 		variables.put(new Integer(7), sb.getSubjectAssignment());
 		variables.put(new Integer(8), sb.isDefault());
-		variables.put(new Integer(9), new Integer(sb.getId()));
-
+		variables.put(new Integer(9), new Integer(sb.getDynamicOrdinal()));
+		variables.put(new Integer(10), new Integer(sb.getId()));
 		String sql = digester.getQuery("update");
 		this.execute(sql, variables);
 
@@ -386,6 +390,35 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		return pk;
 	}
 
+	public int getMaxDynamicOrdinalByStudyId(int studyId) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+		
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyId));
+
+		int MaxDynamicOrdinal = 0;
+		ArrayList al = select(digester.getQuery("getMaxDynamicOrdinalByStudyId"), variables);
+		
+		if (al.size() > 0) {
+			HashMap h = (HashMap) al.get(0);
+			MaxDynamicOrdinal = ((Integer) h.get("max_ord")).intValue();
+		}
+
+		return MaxDynamicOrdinal;
+	}
+	
+	public void updateDynamicOrdinal(int newDynamicOrdinal, int studyId, int studyGroupClassId) {
+		HashMap variables = new HashMap();
+		
+		variables.put(new Integer(1), newDynamicOrdinal);
+		variables.put(new Integer(2), studyId);
+		variables.put(new Integer(3), studyGroupClassId);
+		
+		String sql = digester.getQuery("updateDynamicOrdinal");
+		this.execute(sql, variables);
+	}
+	
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
 		ArrayList al = new ArrayList();

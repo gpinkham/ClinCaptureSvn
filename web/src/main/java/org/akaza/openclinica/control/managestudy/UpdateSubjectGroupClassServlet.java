@@ -309,6 +309,7 @@ public class UpdateSubjectGroupClassServlet extends SecureController {
 		group.setUpdater(ub);
 		group.setStatus(Status.AVAILABLE);
 		group.setId(oldGroup.getId());
+		group.setDynamicOrdinal(oldGroup.getDynamicOrdinal());
 		
 		group = (StudyGroupClassBean) sgcdao.update(group);
 		

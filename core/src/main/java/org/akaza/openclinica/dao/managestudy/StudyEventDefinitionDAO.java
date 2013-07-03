@@ -342,8 +342,8 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		return answer;
 	}
 	
-	public ArrayList findAllOrderedByStudyGroupClassId(int id) {
-		ArrayList answer = new ArrayList();
+	public ArrayList<StudyEventDefinitionBean> findAllOrderedByStudyGroupClassId(int id) {
+		ArrayList<StudyEventDefinitionBean> answer = new ArrayList();
 
 		this.setTypesExpected();
 		HashMap variables = new HashMap();

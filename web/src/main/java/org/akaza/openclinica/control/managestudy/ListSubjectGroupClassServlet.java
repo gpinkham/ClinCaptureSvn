@@ -23,6 +23,7 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -37,6 +38,7 @@ import org.akaza.openclinica.web.bean.StudyGroupClassRow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -77,10 +79,16 @@ public class ListSubjectGroupClassServlet extends SecureController {
 	@Override
 	public void processRequest() throws Exception {
 		FormProcessor fp = new FormProcessor(request);
+		String action = request.getParameter("action");
 		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 		StudyDAO stdao = new StudyDAO(sm.getDataSource());
 		int parentStudyId = currentStudy.getParentStudyId();
 		ArrayList groups = new ArrayList();
+		ArrayList<StudyGroupClassBean> availableDynGroups = new ArrayList<StudyGroupClassBean>();
+		HashMap<Integer, String> dynGroupClassIdToEventsNames = new HashMap<Integer, String>();
+		ArrayList<Integer> listOfGroupClassOrdinalsWithoutDef = new ArrayList<Integer>();
+		boolean defGroupExist = false;
+		
 		if (parentStudyId > 0) {
 			StudyBean parentStudy = (StudyBean) stdao.findByPK(parentStudyId);
 			groups = sgcdao.findAllByStudy(parentStudy);
@@ -92,13 +100,44 @@ public class ListSubjectGroupClassServlet extends SecureController {
 		for (int i = 0; i < groups.size(); i++) {
 			StudyGroupClassBean group = (StudyGroupClassBean) groups.get(i);
 			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()){
-				ArrayList orderedDefinitions = seddao.findAllOrderedByStudyGroupClassId(group.getId());
+				ArrayList<StudyEventDefinitionBean> orderedDefinitions = seddao.findAllOrderedByStudyGroupClassId(group.getId());
 				group.setEventDefinitions(orderedDefinitions); 
+				StringBuilder strOfEventsNames = new StringBuilder("");
+				if (group.getStatus().isAvailable()){
+					for (StudyEventDefinitionBean def: orderedDefinitions){
+						strOfEventsNames.append(", " + def.getName());
+					}
+					dynGroupClassIdToEventsNames.put(group.getId(), strOfEventsNames.toString().replaceFirst(", ", ""));
+					availableDynGroups.add(group); 
+				}
 			} else {
 				ArrayList studyGroups = sgdao.findAllByGroupClass(group);
 				group.setStudyGroups(studyGroups);
 			}
 		}
+		Collections.sort(availableDynGroups, StudyGroupClassBean.comparatorForDynGroupClasses);
+		
+		if ("submit_order".equals(action)) {
+			for (StudyGroupClassBean dynamicGroup: availableDynGroups) {
+				if (!dynamicGroup.isDefault()){
+					listOfGroupClassOrdinalsWithoutDef.add(dynamicGroup.getDynamicOrdinal());
+				} else {
+					defGroupExist = true;
+				}
+			}
+			for (StudyGroupClassBean dynamicGroup: availableDynGroups) {
+				if (!dynamicGroup.isDefault()){
+					int index = Integer.valueOf(request.getParameter("dynamicGroup" + dynamicGroup.getId()));
+					int newDynamicOrdinal = listOfGroupClassOrdinalsWithoutDef.get(defGroupExist? index-2: index-1);
+					if (newDynamicOrdinal != dynamicGroup.getDynamicOrdinal()){
+						sgcdao.updateDynamicOrdinal(newDynamicOrdinal, parentStudyId > 0? parentStudyId : currentStudy.getId(), dynamicGroup.getId());
+						dynamicGroup.setDynamicOrdinal(newDynamicOrdinal); 
+					}
+				}
+			}
+			Collections.sort(availableDynGroups, StudyGroupClassBean.comparatorForDynGroupClasses);
+		}
+		
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allGroupRows = StudyGroupClassRow.generateRowsFromBeans(groups);
 		boolean isParentStudy = currentStudy.getParentStudyId() > 0 ? false : true;
@@ -117,8 +156,13 @@ public class ListSubjectGroupClassServlet extends SecureController {
 		table.setQuery("ListSubjectGroupClass", new HashMap());
 		table.setRows(allGroupRows);
 		table.computeDisplay();
-
+		
+		
+		request.setAttribute("availableDynGroups", availableDynGroups);
+		request.setAttribute("dynGroupClassIdToEventsNames", dynGroupClassIdToEventsNames);
+		
 		request.setAttribute("table", table);
+		
 		if (request.getParameter("read") != null && request.getParameter("read").equals("true")
 				&& currentRole.getRole().equals(Role.STUDYDIRECTOR)) {
 			request.setAttribute("readOnly", true);

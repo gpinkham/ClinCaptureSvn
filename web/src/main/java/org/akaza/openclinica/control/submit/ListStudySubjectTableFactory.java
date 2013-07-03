@@ -487,17 +487,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllActiveOrderedByStudyGroupClassId(dynGroup
 						.getId()));
 			}
-			Collections.sort(dynamicGroupClasses, new Comparator<StudyGroupClassBean>() {
-				public int compare(StudyGroupClassBean bean1, StudyGroupClassBean bean2) {
-					if (bean2.isDefault()) {
-						return 1;
-					}
-					if (bean1.isDefault()) {
-						return -1;
-					}
-					return 0;
-				}
-			});
+			Collections.sort(dynamicGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
 		}
 		return dynamicGroupClasses;
 	}

@@ -54,18 +54,33 @@
 	<query>
 		<name>create</name>
 		<sql>
-		   INSERT INTO study_group_class 
-		   (STUDY_GROUP_CLASS_ID,NAME,STUDY_ID,OWNER_ID,DATE_CREATED, GROUP_CLASS_TYPE_ID,
-		    STATUS_ID,subject_assignment,is_default=?) 
-		   VALUES (?,?,?,?,sysdate,?,?,?,?)
+			INSERT INTO study_group_class 
+			(STUDY_GROUP_CLASS_ID, NAME, STUDY_ID, OWNER_ID, DATE_CREATED, GROUP_CLASS_TYPE_ID,
+				STATUS_ID, subject_assignment, is_default, dynamic_ordinal) 
+			VALUES (?,?,?,?,sysdate,?,?,?,?,?)
 		</sql>
 	</query>
 	<query>
 		<name>update</name>
 		<sql>
-		  UPDATE study_group_class SET NAME=?,STUDY_ID=?, GROUP_CLASS_TYPE_ID=?,
-		  STATUS_ID=?, DATE_UPDATED=?,UPDATE_ID=?,subject_assignment=?,is_default=?
-		  WHERE STUDY_GROUP_CLASS_ID=?
+			UPDATE study_group_class SET NAME=?,STUDY_ID=?, GROUP_CLASS_TYPE_ID=?,
+				STATUS_ID=?, DATE_UPDATED=?, UPDATE_ID=?, subject_assignment=?, is_default=?, dynamic_ordinal=?
+			WHERE STUDY_GROUP_CLASS_ID=?
+	    </sql>
+	</query>
+	<query>
+        <name>getMaxDynamicOrdinalByStudyId</name>
+        <sql>
+			SELECT MAX(dynamic_ordinal) AS max_ord
+            FROM study_group_class 
+			WHERE study_id=?
+        </sql>
+    </query>
+	<query>
+		<name>updateDynamicOrdinal</name>
+		<sql>
+			UPDATE study_group_class SET dynamic_ordinal=?
+			WHERE study_id=? AND study_group_class_id=?
 	    </sql>
 	</query>
 	<query>
