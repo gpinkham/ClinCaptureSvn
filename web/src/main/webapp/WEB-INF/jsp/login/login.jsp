@@ -11,6 +11,7 @@
 
     <title>ClinCapture</title>
 
+	<meta http-equiv="X-UA-Compatible" content="IE=8" />
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="<c:url value='/includes/styles.css'/>" type="text/css"/>
     <%--link rel="stylesheet" href="<c:url value='/includes/styles2.css'/>" type="text/css" /--%>
@@ -20,10 +21,10 @@
     <%--script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript2.js'/>"></script--%>
 	<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js'/>"></script>
 	<script type="text/javascript">
-		var colorUrl = '../../HelpThemeServlet'
-		var pathArray = window.location.pathname.split( '/' );
-		if(pathArray.indexOf("login") < 0) {
-			colorUrl = 'HelpThemeServlet'
+		var colorUrl = '../../HelpThemeServlet';
+		var pathArray = window.location.pathname;
+		if(pathArray.search("login") < 0) {
+			colorUrl = 'HelpThemeServlet';
 		}
 		jQuery.ajax({
 		url : colorUrl,
@@ -39,8 +40,7 @@
 					newSrc = newSrc.replace('images/', 'images/violet/');
 					jQuery(this).css('background-image', newSrc);
 				});
-			}
-			if (themeColor == 'green') {
+			} else if (themeColor == 'green') {
 				jQuery('a').css('color', '#75b894');
 				jQuery('H1').css('color', '#75b894');
 				jQuery("input").each(function() {
