@@ -61,6 +61,11 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 
 			log.info("Duplicate randomization attempt");
 			throw new WebServiceException("This subject has already been randomized");
+			
+		} else if(httpStatus == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+			
+			log.info("Internal server error at randomize.net");
+			throw new WebServiceException("Randomization error occurred. Please contact your system administrator");
 		}
 
 		return result;
