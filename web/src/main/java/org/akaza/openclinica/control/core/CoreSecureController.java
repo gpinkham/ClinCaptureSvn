@@ -88,7 +88,7 @@ public abstract class CoreSecureController extends HttpServlet {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	protected HashMap errors = new HashMap();
 
-	private static String SCHEDULER = "schedulerFactoryBean";
+    private static String SCHEDULER = "schedulerFactoryBean";
 
 	private StdScheduler scheduler;
 	/**
@@ -140,6 +140,10 @@ public abstract class CoreSecureController extends HttpServlet {
 		pageMessages.add(message);
 		logger.debug(message);
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
+
+        Map storedAttributes = new HashMap();
+        storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+        request.getSession().setAttribute(SecureController.STORED_ATTRIBUTES, storedAttributes);
 	}
 
 	public void init(ServletConfig config) throws ServletException {

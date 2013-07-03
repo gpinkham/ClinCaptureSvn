@@ -147,6 +147,7 @@ public abstract class SecureController extends HttpServlet {
 	protected StudyUserRoleBean currentRole;
 	protected HashMap errors = new HashMap();
 
+    public static final String STORED_ATTRIBUTES = "RememberLastPage_storedAttributes";
 	private static String SCHEDULER = "schedulerFactoryBean";
 	UsageStatsServiceDAO usageStatsServiceDAO;
 	public static final String JOB_HOUR = "jobHour";
@@ -202,7 +203,11 @@ public abstract class SecureController extends HttpServlet {
 		pageMessages.add(message);
 		logger.debug(message);
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
-	}
+
+        Map storedAttributes = new HashMap();
+        storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+        request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+    }
 
 	protected void resetPanel() {
 		panel.reset();
