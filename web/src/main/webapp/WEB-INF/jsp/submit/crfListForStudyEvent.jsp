@@ -74,7 +74,7 @@
             <a href="ViewStudySubject?id=${studySubject.id}"><img src="images/bt_View.gif" border="0" align="left" alt="<fmt:message key="view_subject_record" bundle="${resword}"/>" title="<fmt:message key="view_subject_record" bundle="${resword}"/>" hspace="4"/></a>
 
             <c:choose>
-                <c:when test="${currentRole.id ne 4 and currentRole.id ne 5 and currentRole.id ne 6}">
+                <c:when test="${currentRole.id ne 4 and currentRole.id ne 5 and currentRole.id ne 6 and not study.status.frozen and not study.status.locked}">
                     <c:set var="insertBlankCell" value="true"/>
                     <c:choose>
                         <c:when test="${not studySubject.status.deleted}">
@@ -93,7 +93,7 @@
             <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
 
             <c:choose>
-                <c:when test="${showSubjectSDVButton and not studySubject.status.deleted and (currentRole.id eq 6 or currentRole.id eq 2)}">
+                <c:when test="${showSubjectSDVButton and not studySubject.status.deleted and not study.status.frozen and not study.status.locked and (currentRole.id eq 6 or currentRole.id eq 2) and not study.status.frozen and not study.status.locked}">
                     <a class="sdvLink" href="pages/viewSubjectAggregate?sbb=true&studyId=${studyId}&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId=${studySubject.label}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
                 <c:otherwise>
@@ -102,7 +102,7 @@
             </c:choose>
 
             <c:choose>
-                <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4}">
+                <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4} and not study.status.frozen and not study.status.locked">
                     <a href="SignStudySubject?id=${studySubject.id}"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign_subject " bundle="${resword}"/>" title="<fmt:message key="sign_subject " bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
                 <c:otherwise>
@@ -111,7 +111,7 @@
             </c:choose>
 
             <c:choose>
-                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id eq 2}">
+                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id eq 2 and not study.status.frozen and not study.status.locked}">
                     <a href="ReassignStudySubject?id=${studySubject.id}"><img src="images/bt_Reassign.gif" border="0" align="left" alt="<fmt:message key="reassign" bundle="${resword}"/>" title="<fmt:message key="reassign" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
                 <c:otherwise>
@@ -154,7 +154,7 @@
             <a href="EnterDataForStudyEvent?eventId=${studyEvent.id}"><img src="images/bt_View.gif" border="0" align="left" alt="<fmt:message key="view_study_event" bundle="${resword}"/>" title="<fmt:message key="view_study_event" bundle="${resword}"/>" hspace="4"/></a>
 
             <c:choose>
-                <c:when test="${not studySubject.status.deleted and currentRole.id ne 4 and currentRole.id ne 5 and currentRole.id ne 6}">
+                <c:when test="${not studySubject.status.deleted and currentRole.id ne 4 and currentRole.id ne 5 and currentRole.id ne 6 and not study.status.frozen and not study.status.locked}">
                     <c:choose>
                         <c:when test="${studyEvent.subjectEventStatus.id ne 10}">
                             <a href="RemoveStudyEvent?action=confirm&id=${studyEvent.id}&studySubId=${studySubject.id}"><img src="images/bt_Remove.gif" border="0" align="left" alt="<fmt:message key="remove_study_event" bundle="${resword}"/>" title="<fmt:message key="remove_study_event" bundle="${resword}"/>" hspace="4"/></a>
@@ -172,7 +172,7 @@
             <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
 
             <c:choose>
-                <c:when test="${showSDVButton and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (currentRole.id eq 6 or currentRole.id eq 2)}">
+                <c:when test="${showSDVButton and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (currentRole.id eq 6 or currentRole.id eq 2) and not study.status.frozen and not study.status.locked}">
                     <a class="sdvLink" href="pages/viewAllSubjectSDVtmp?sbb=true&studyId=${studyId}&imagePathPrefix=..%2F&crfId=0&redirection=viewAllSubjectSDVtmp&maxRows=15&showMoreLink=true&sdv_tr_=true&sdv_p_=1&sdv_mr_=15&sdv_f_studySubjectId=${studySubject.label}&sdv_f_eventName=${studyEvent.studyEventDefinition.name}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
                 <c:otherwise>
@@ -181,7 +181,7 @@
             </c:choose>
 
             <c:choose>
-                <c:when test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4}">
+                <c:when test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4 and not study.status.frozen and not study.status.locked}">
                     <a href="UpdateStudyEvent?action=submit&event_id=${studyEvent.id}&ss_id=${studySubject.id}&changeDate=&startDate=20-Jan-2012&startHour=-1&startMinute=-1&startHalf=&endDate=&endHour=-1&endMinute=-1&endHalf=&statusId=8&Submit=Submit+Changes"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign" bundle="${resword}"/>" title="<fmt:message key="sign" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
                 <c:otherwise>
