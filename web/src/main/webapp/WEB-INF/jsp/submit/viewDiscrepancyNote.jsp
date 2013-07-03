@@ -331,7 +331,7 @@
 <c:if test="${!study.status.locked}">
 	<div style="clear:both;"></div>
 	<c:choose>
-    <c:when test="${boxToShow == 0 || id == 0}">
+    <c:when test="${id == 0}">
     	<p id="p">
 			<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>
 		</p>
