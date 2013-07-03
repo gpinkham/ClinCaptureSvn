@@ -1217,7 +1217,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		eventDiv.divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd();
 		if (studyEvents.size() != 0
 				|| (studyEvents.size() == 0 && canScheduleStudySubject(studySubject)
-						&& currentRole.getRole() != Role.MONITOR && !studyBean.getStatus().isFrozen())) {
+						&& currentRole.getRole() != Role.MONITOR && studyBean.getStatus().isAvailable())) {
 			repeatingIconLinkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed,
 					studyEvents.size() > 0 ? ("" + studyEvents.get(0).getId()) : "");
 		}
@@ -1362,7 +1362,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				|| eventSysStatus == Status.LOCKED) {
 
 			if (eventStatus == SubjectEventStatus.NOT_SCHEDULED && canScheduleStudySubject(studySubject)
-					&& currentRole.getRole() != Role.MONITOR && !studyBean.getStatus().isFrozen()) {
+					&& currentRole.getRole() != Role.MONITOR && studyBean.getStatus().isAvailable()) {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
 				String href1 = "PageToCreateNewStudyEvent?studySubjectId=" + studySubject.getId()
@@ -1413,7 +1413,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		eventDiv.divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd();
 		if (eventStatus != SubjectEventStatus.NOT_SCHEDULED
 				|| (eventStatus == SubjectEventStatus.NOT_SCHEDULED && canScheduleStudySubject(studySubject)
-						&& currentRole.getRole() != Role.MONITOR && !studyBean.getStatus().isFrozen())) {
+						&& currentRole.getRole() != Role.MONITOR && studyBean.getStatus().isAvailable())) {
 			iconLinkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed, studyEventId);
 		}
 	}
