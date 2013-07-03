@@ -280,7 +280,7 @@
 
                 </c:when>
                 <c:otherwise>
-                    <fmt:message key="pre_populated_from_study_event" bundle="${resword}"/>
+                    <fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
                 </c:otherwise>
             </c:choose>
         </td>
