@@ -794,6 +794,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     font-weight: bold;
     color: #666666;
     vertical-align: top;
+    text-align: left;
 }
 
 .table_header_column { padding-top: 3px;
@@ -854,6 +855,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     border-bottom-width: 0px;
     border-top-color: #E6E6E6;
     vertical-align: top;
+    text-align: left;
 }
 
 .table_cell_top {
@@ -2053,4 +2055,9 @@ span.re_indicator {
     margin-left: 4px;
     margin-right: -20px;
     white-space: nowrap;
+}
+
+table.crfListTable td {
+    border-left: #CCCCCC 1px solid !important;
+    padding-left: 2px !important;
 }

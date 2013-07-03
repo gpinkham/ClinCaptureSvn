@@ -207,12 +207,12 @@
 
     <c:otherwise>
     <tr>
-        <td class="table_header_row" style="width: auto;"><fmt:message key="CRF_name" bundle="${resword}"/></td>
-        <td class="table_header_row" style="width: 40px;"><fmt:message key="version" bundle="${resword}"/></td>
-        <td class="table_header_row" style="width: 100px;"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
-        <td class="table_header_row ddeColumnHeader" style="width: 100px;"><fmt:message key="validation" bundle="${resword}"/></td>
-        <td class="table_header_row" style="width: 50px;">&nbsp;<%--fmt:message key="status" bundle="${resword}"/--%></td>
-        <td class="table_header_row crfListTableActions" style="width: 60px;">&nbsp;<%--fmt:message key="actions" bundle="${resword}"/--%></td>
+        <td class="table_header_row_left" style="width: auto;"><fmt:message key="CRF_name" bundle="${resword}"/></td>
+        <td class="table_header_row_left" style="width: 40px;"><fmt:message key="version" bundle="${resword}"/></td>
+        <td class="table_header_row_left" style="width: 100px;"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
+        <td class="table_header_row_left ddeColumnHeader" style="width: 100px;"><fmt:message key="validation" bundle="${resword}"/></td>
+        <td class="table_header_row_left" style="width: 50px;">&nbsp;<%--fmt:message key="status" bundle="${resword}"/--%></td>
+        <td class="table_header_row_left crfListTableActions" style="width: 60px;">&nbsp;<%--fmt:message key="actions" bundle="${resword}"/--%></td>
     </tr>
     <c:set var="rowCount" value="${0}" />
 
@@ -233,7 +233,7 @@
                                         <img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/>
                                     </c:if>
                                 </td>
-                                <td class="table_cell">
+                                <td class="table_cell_left">
                                     <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
                                         <c:choose>
                                             <c:when test="${dedc.eventCRF.id > 0}">
@@ -293,14 +293,14 @@
                                         </c:choose>
                                 </td>
 
-                                <td class="table_cell ddeColumn">
+                                <td class="table_cell_left ddeColumn">
                                     <c:if test="${dedc.eventCRF != null && !dedc.eventCRF.notStarted && dedc.eventCRF.owner != null}">
                                         ${dedc.eventCRF.owner.name}
                                     </c:if>
                                     &nbsp;
                                 </td>
 
-                                <td class="table_cell">
+                                <td class="table_cell_left">
                                     <c:if test="${!dedc.edc.doubleEntry}">
                                         n/a
                                     </c:if>
@@ -334,7 +334,7 @@
 
                                 </c:choose>
 
-                                <td class="table_cell" style="vertical-align: middle;">
+                                <td class="table_cell_left" style="vertical-align: middle;">
                                     <c:choose>
                                         <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
                                             <%--<c:when test="${dedc.status.name=='locked'}">--%>
@@ -379,11 +379,11 @@
                         <c:set var="dec" value="${dedc}"/>
 
                         <tr>
-                            <td class="table_cell"><c:out value="${dec.eventCRF.crf.name}" /> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
-                            <td class="table_cell"><c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;</td>
+                            <td class="table_cell_left"><c:out value="${dec.eventCRF.crf.name}" /> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
+                            <td class="table_cell_left"><c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;</td>
 
-                            <td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
-                            <td class="table_cell ddeColumn">
+                            <td class="table_cell_left"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
+                            <td class="table_cell_left ddeColumn">
                                 <c:choose>
                                     <c:when test="${!dec.eventDefinitionCRF.doubleEntry}">
                                         n/a
@@ -446,7 +446,7 @@
                                 </c:choose>
                             </td>
 
-                            <td class="table_cell" style="vertical-align: middle;">
+                            <td class="table_cell_left" style="vertical-align: middle;">
                                 <c:set var="actionQuery" value="" />
                                 <c:if test="${study.status.available}">
                                     <c:if test="${dec.continueInitialDataEntryPermitted}">

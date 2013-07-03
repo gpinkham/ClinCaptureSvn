@@ -1169,7 +1169,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			eventDiv.close();
 			eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 			eventDiv.tr(0).valign("top").close();
-			eventDiv.td(0).styleClass(tableHeaderRowStyleClass).style("border-bottom: none").colspan("2").close();
+			eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).style("border-bottom: none").colspan("2").close();
 			eventDiv.bold().append(occurrence_x_of).append("#" + (i + 1) + " of " + studyEventsSize).br();
 			eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
 
@@ -1251,7 +1251,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin())
 						&& studyBean.getStatus() == Status.AVAILABLE) {
 					eventDiv.tr(0).valign("top").close();
-					eventDiv.td(0).styleClass("table_cell").close();
+					eventDiv.td(0).styleClass("table_cell_left").close();
 					removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
 					eventDiv.tdEnd().trEnd(0);
 				}
