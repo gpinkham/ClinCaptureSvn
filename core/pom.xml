@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.clinovo.clincapture</groupId>
     	<artifactId>clincapture</artifactId>
-		<version>1.0.2.7</version>
+		<version>1.0.2.8-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
