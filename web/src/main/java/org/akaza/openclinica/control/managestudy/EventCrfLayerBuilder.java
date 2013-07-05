@@ -211,7 +211,7 @@ public class EventCrfLayerBuilder {
 			html.nbsp().nbsp();
 			printDataEntry(html, eventCrfBean, reswords.getString("print"));
 			html.tdEnd().trEnd(0);
-			// if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() ||
+			// if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isStudyDirector() ||
 			// currentUser.isSysAdmin())) {
 			if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
 				if (!hiddenCrf()) {
@@ -222,7 +222,7 @@ public class EventCrfLayerBuilder {
 					administrativeEditing(html, eventCrfBean, reswords.getString("edit"));
 					html.tdEnd().trEnd(0);
 				}
-				if (currentRole.isDirector() || currentUser.isSysAdmin()) {
+				if (currentRole.isStudyDirector() || currentUser.isSysAdmin()) {
 					html.tr(0).valign("top").close();
 					html.td(0).styleClass(table_cell_left).close();
 					removeEventCrf(html, eventCrfBean, studySubject);
@@ -254,7 +254,7 @@ public class EventCrfLayerBuilder {
 			html.nbsp().nbsp();
 			viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent(), reswords.getString("print"));
 			html.tdEnd().trEnd(0);
-			if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+			if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isStudyDirector() || currentUser.isSysAdmin())) {
 				html.tr(0).valign("top").close();
 				html.td(0).styleClass(table_cell_left).close();
 				removeEventCrf(html, eventCrfBean, studySubject);
@@ -306,7 +306,7 @@ public class EventCrfLayerBuilder {
 			printDataEntry(html, eventCrfBean, reswords.getString("print"));
 			html.tdEnd().trEnd(0);
 			if (studySubject.getStatus() != Status.DELETED && studySubject.getStatus() != Status.AUTO_DELETED
-					&& (currentRole.isDirector() || currentUser.isSysAdmin())) {
+					&& (currentRole.isStudyDirector() || currentUser.isSysAdmin())) {
 				html.tr(0).valign("top").close();
 				html.td(0).styleClass(table_cell_left).close();
 				restoreEventCrf(html, eventCrfBean, studySubject);
@@ -351,7 +351,7 @@ public class EventCrfLayerBuilder {
 			html.nbsp().nbsp();
 			printDataEntry(html, eventCrfBean, reswords.getString("print"));
 			html.tdEnd().trEnd(0);
-			if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+			if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isStudyDirector() || currentUser.isSysAdmin())) {
 				html.tr(0).valign("top").close();
 				html.td(0).styleClass(table_cell_left).close();
 				removeEventCrf(html, eventCrfBean, studySubject);

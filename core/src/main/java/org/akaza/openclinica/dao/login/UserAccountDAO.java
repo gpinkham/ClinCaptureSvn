@@ -202,9 +202,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		String sql = digester.getQuery("update");
 		this.execute(sql, variables, nullVars);
 
-		if (!uab.isTechAdmin()) {
-			setSysAdminRole(uab, false);
-		}
+		setSysAdminRole(uab, false);
 
 		if (!this.isQuerySuccessful()) {
 			eb.setId(0);
@@ -297,23 +295,22 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		success = success && isQuerySuccessful();
 
 		setSysAdminRole(uab, true);
+        if (!uab.isSysAdmin()) {
+            ArrayList userRoles = uab.getRoles();
+            for (int i = 0; i < userRoles.size(); i++) {
+                StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
 
-		ArrayList userRoles = uab.getRoles();
-		for (int i = 0; i < userRoles.size(); i++) {
-			StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
+                if (studyRole.equals(Role.SYSTEM_ADMINISTRATOR)) {
+                    continue;
+                }
 
-			if (studyRole.equals(Role.ADMIN)) {
-				continue;
-			}
-
-			createStudyUserRole(uab, studyRole);
-			success = success && isQuerySuccessful();
-		}
-
-		if (success) {
-			uab.setId(id);
-		}
-
+                createStudyUserRole(uab, studyRole);
+                success = success && isQuerySuccessful();
+            }
+        }
+        if (success) {
+            uab.setId(id);
+        }
 		return uab;
 	}
 
@@ -369,9 +366,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		Date dateUpdated = (Date) hm.get("date_updated");
 		Integer statusId = (Integer) hm.get("status_id");
 		Integer studyId = (Integer) hm.get("study_id");
-		surb.setName((String) hm.get("user_name"));
 		surb.setUserName((String) hm.get("user_name"));
-		surb.setRoleName((String) hm.get("role_name"));
+        surb.setName((String) hm.get("role_name"));
+        surb.setRoleName((String) hm.get("role_name"));
 		surb.setCreatedDate(dateCreated);
 		surb.setUpdatedDate(dateUpdated);
 		surb.setStatus(Status.get(statusId.intValue()));
@@ -530,11 +527,11 @@ public class UserAccountDAO extends AuditableEntityDAO {
 	/**
 	 * Finds all the studies with roles for a user
 	 * 
-	 * @param userName
+	 * @param user
 	 * @param allStudies
 	 *            The result of calling StudyDAO.findAll();
 	 */
-	public ArrayList findStudyByUser(String userName, ArrayList allStudies) {
+	public ArrayList findStudyByUser(UserAccountBean user, ArrayList allStudies) {
 		this.unsetTypeExpected();
 
 		this.setTypeExpected(1, TypeNames.STRING);
@@ -543,20 +540,22 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		HashMap allStudyUserRoleBeans = new HashMap();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), userName);
+		variables.put(new Integer(1), user.getName());
 		ArrayList alist = this.select(digester.getQuery("findStudyByUser"), variables);
 		Iterator it = alist.iterator();
 
 		while (it.hasNext()) {
 			HashMap hm = (HashMap) it.next();
-			String roleName = (String) hm.get("role_name");
+			String roleName = user.isSysAdmin() || user.isTechAdmin() ? user.getSysAdminRole().getRoleName()
+					: (String) hm.get("role_name");
 			String studyName = (String) hm.get("name");
 			Integer studyId = (Integer) hm.get("study_id");
 			StudyUserRoleBean sur = new StudyUserRoleBean();
 			sur.setRoleName(roleName);
 			sur.setStudyId(studyId.intValue());
 			sur.setStudyName(studyName);
-			sur.setRole(Role.getByName(roleName));
+			sur.setRole(user.isSysAdmin() || user.isTechAdmin() ? user.getSysAdminRole().getRole() : Role
+					.getByName(roleName));
 			allStudyUserRoleBeans.put(studyId, sur);
 		}
 

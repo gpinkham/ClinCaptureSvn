@@ -12,13 +12,7 @@
       <td class="table_cell"><c:out value="${currRow.bean.firstName}"/></td>  
       <td class="table_cell"><c:out value="${currRow.bean.lastName}"/></td>
       <td class="table_cell">
-          <c:if test="${currRow.bean.parentStudyId > 0}">
-              <fmt:message key="${siteRoleMap[currRow.bean.role.id] }" bundle="${resterm}"></fmt:message>
-          </c:if>
-          <c:if test="${currRow.bean.parentStudyId == 0}">
-              <c:out value="${currRow.bean.role.description}"/>
-          </c:if>
-
+          <fmt:message key="${roleMap[currRow.bean.role.id] }" bundle="${resterm}"></fmt:message>
       </td>
       <td class="table_cell"><c:out value="${currRow.bean.studyName}"/></td>
       <td class="table_cell"><c:out value="${currRow.bean.status.name}"/></td>

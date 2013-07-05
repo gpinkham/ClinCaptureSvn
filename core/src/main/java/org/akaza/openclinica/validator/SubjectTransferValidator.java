@@ -60,7 +60,7 @@ public class SubjectTransferValidator implements Validator {
 
 		UserAccountBean ua = subjectTransferBean.getOwner();
 		StudyUserRoleBean role = ua.getRoleByStudy(study);
-		if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
+		if (role.getId() == 0 || role.getRole().equals(Role.STUDY_MONITOR)) {
 			e.reject("subjectTransferValidator.insufficient_permissions",
 					"You do not have sufficient privileges to proceed with this operation.");
 			return;

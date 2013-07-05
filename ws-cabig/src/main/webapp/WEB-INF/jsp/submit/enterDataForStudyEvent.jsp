@@ -71,7 +71,7 @@
                 <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                         <td class="table_tools">
-                            <c:if test="${!userRole.monitor && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && study.status.available}">
+                            <c:if test="${userRole.role.id ne 6 && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && study.status.available}">
                                 <a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"><img src="images/bt_Edit.gif" border="0" align="left"></a>&nbsp;<a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"><fmt:message key="edit_study_event" bundle="${resword}"/></a>
                             </c:if>
                         </td>
@@ -362,7 +362,7 @@
                     &nbsp;
                 </c:when>
 
-                <c:when test="${!userRole.monitor && studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted}">
+                <c:when test="${userRole.role.id ne 6 && studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted}">
                     <td class="table_cell">
                         <a href="#" onclick="javascript:document.startForm<c:out value="${dedc.edc.crf.id}"/>.submit();"
                            onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
@@ -509,7 +509,7 @@
             <%-- added above 112007, tbh --%>
         </c:when>
         <c:otherwise>
-            <c:if test="${!userRole.monitor && studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
+            <c:if test="${userRole.role.id ne 6 && studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
                 <c:if test="${dec.continueInitialDataEntryPermitted}">
                 <a href="<c:out value="${actionQuery}"/>"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
@@ -551,7 +551,7 @@
                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
               ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
 
-            <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
+            <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available)}">
                 <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                    onMouseDown="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
                    onMouseUp="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"

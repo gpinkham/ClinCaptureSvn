@@ -168,7 +168,7 @@
 							<td class="table_tools">
 							<a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')"><fmt:message key="audit_logs" bundle="${resword}"/></a>
                             <c:if test="${study.status.available}">
-                                 <c:if test="${!userRole.monitor}">
+                                 <c:if test="${userRole.role.id ne 6}">
                                     |
 	        		    		    <a href="UpdateStudySubject?id=<c:out value="${studySub.id}"/>&amp;action=show"><fmt:message key="edit_record" bundle="${resword}"/></a>
                                  </c:if>

@@ -115,7 +115,7 @@ public class RunRuleServlet extends SecureController {
 			return;
 		}
 		Role r = currentRole.getRole();
-		if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")

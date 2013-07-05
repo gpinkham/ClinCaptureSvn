@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="skirpichenok" id="2013-07-01-TICKET283-01">
+        <comment>Fix problems with wrong DB data for user roles</comment>
+        <sql splitStatements="false">
+            delete from study_user_role where NOT study_id IS NULL and role_name = 'admin';
+            update user_account set user_type_id = 1 where user_type_id = 3;
+        </sql>
+        <comment>Resolve the role names mismatches between UI and the database. We use only the following roles: 1->system administrator, 2->study administrator, 4->investigator, 5->clinical research coordinator, 6->monitor</comment>
+        <delete tableName="study_user_role">
+            <where>role_name='director'</where>
+        </delete>
+        <update tableName="user_role">
+            <column name="role_name" value="system_administrator"/>
+            <where>role_name='admin'</where>
+        </update>
+        <update tableName="user_role">
+            <column name="role_name" value="clinical_research_coordinator"/>
+            <where>role_name='ra'</where>
+        </update>
+        <update tableName="user_role">
+            <column name="role_name" value="study_administrator"/>
+            <where>role_name='coordinator'</where>
+        </update>
+        <update tableName="user_role">
+            <column name="role_name" value="study_director"/>
+            <where>role_name='director'</where>
+        </update>
+        <update tableName="user_role">
+            <column name="role_name" value="study_monitor"/>
+            <where>role_name='monitor'</where>
+        </update>
+        <update tableName="study_user_role">
+            <column name="role_name" value="investigator"/>
+            <where>role_name='Investigator'</where>
+        </update>
+        <update tableName="study_user_role">
+            <column name="role_name" value="investigator"/>
+            <where>role_name='Data Specialist'</where>
+        </update>
+        <update tableName="study_user_role">
+            <column name="role_name" value="study monitor"/>
+            <where>role_name='monitor'</where>
+        </update>
+        <update tableName="study_user_role">
+            <column name="role_name" value="study administrator"/>
+            <where>role_name='coordinator'</where>
+        </update>
+        <update tableName="study_user_role">
+            <column name="role_name" value="clinical research coordinator"/>
+            <where>role_name='ra'</where>
+        </update>
+        <update tableName="study_user_role">
+            <column name="role_name" value="study monitor"/>
+            <where>role_name='Clinical Research Associate'</where>
+        </update>
+        <update tableName="study_user_role">
+            <column name="role_name" value="system administrator"/>
+            <where>role_name='admin'</where>
+        </update>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2013-07-01-TICKET283-02" dbms="postgresql">
+        <comment>Fix problems with wrong DB data for user roles</comment>
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION check_roles_for_user_type_3_and_1()
+            RETURNS void
+            AS 'DECLARE
+            ur RECORD;
+            BEGIN
+                FOR ur in (select ua.user_id as user_id, ua.user_name as user_name, sur.role_name as role_name from user_account ua left join (select user_name, role_name from study_user_role where role_name = ''system administrator'') sur on sur.user_name = ua.user_name where ua.user_type_id in (3,1))
+                LOOP
+                    IF ur.role_name IS NULL THEN
+                        INSERT INTO study_user_role(role_name, status_id, owner_id, date_created, date_updated, user_name)
+                        VALUES (''system administrator'', 1, ur.user_id, CURRENT_DATE, CURRENT_DATE, ur.user_name);
+                    END IF;
+                END LOOP;
+            END;
+            ' LANGUAGE plpgsql VOLATILE;
+            COMMIT;
+
+            SELECT check_roles_for_user_type_3_and_1();
+            DROP FUNCTION check_roles_for_user_type_3_and_1();
+        </sql>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2013-07-01-TICKET283-03" dbms="oracle">
+        <comment>Fix problems with wrong DB data for user roles</comment>
+        <sql splitStatements="false">
+            CREATE OR REPLACE Procedure check_roles_for_user_type_3_and_1
+            IS
+            cursor user_roles is select ua.user_id as user_id, ua.user_name as user_name, sur.role_name as role_name from user_account ua left join (select user_name, role_name from study_user_role where role_name = 'system administrator') sur on sur.user_name = ua.user_name where ua.user_type_id in (3,1);
+            BEGIN
+                FOR ur in user_roles
+                LOOP
+                    IF ur.role_name IS NULL THEN
+                        INSERT INTO study_user_role(role_name, status_id, owner_id, date_created, date_updated, user_name)
+                        VALUES ('system administrator', 1, ur.user_id, CURRENT_DATE, CURRENT_DATE, ur.user_name);
+                    END IF;
+                END LOOP;
+            RETURN;
+            END;
+
+            EXECUTE check_roles_for_user_type_3_and_1();
+            DROP PROCEDURE check_roles_for_user_type_3_and_1;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

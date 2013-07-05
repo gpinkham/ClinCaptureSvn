@@ -219,7 +219,7 @@ public class CreateStudyServlet extends SecureController {
 			session.setAttribute("newStudy", new StudyBean());
 
 			UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-			Collection users = udao.findAllByRole("coordinator", "director");
+			Collection users = udao.findAllByRole("study_administrator", "study_director");
 			request.setAttribute("users", users);
 
 			forwardPage(Page.CREATE_STUDY1);
@@ -246,15 +246,16 @@ public class CreateStudyServlet extends SecureController {
 				currentStudy = (StudyBean) session.getAttribute("study");
 
 				UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-
-				StudyUserRoleBean sub = new StudyUserRoleBean();
-				sub.setRole(Role.COORDINATOR);
-				sub.setStudyId(currentStudy.getId());
-				sub.setStatus(Status.AVAILABLE);
-				sub.setOwner(ub);
-				udao.createStudyUserRole(ub, sub);
-				currentRole = sub;
-				session.setAttribute("userRole", sub);
+				if (!ub.isSysAdmin()) {
+					StudyUserRoleBean sub = new StudyUserRoleBean();
+					sub.setRole(Role.STUDY_ADMINISTRATOR);
+					sub.setStudyId(currentStudy.getId());
+					sub.setStatus(Status.AVAILABLE);
+					sub.setOwner(ub);
+					udao.createStudyUserRole(ub, sub);
+					currentRole = ub.getRoleByStudy(currentStudy.getId());
+					session.setAttribute("userRole", sub);
+				}
 
 				addPageMessage(respage.getString("the_new_study_created_succesfully_current"));
 
@@ -284,7 +285,7 @@ public class CreateStudyServlet extends SecureController {
 					}
 
 					UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-					Collection users = udao.findAllByRole("coordinator", "director");
+					Collection users = udao.findAllByRole("study_administrator", "study_director");
 					request.setAttribute("users", users);
 
 					forwardPage(Page.CREATE_STUDY1);
@@ -408,22 +409,22 @@ public class CreateStudyServlet extends SecureController {
 				if (selectedUserId > 0) {
 					UserAccountBean user = (UserAccountBean) udao.findByPK(selectedUserId);
 					StudyUserRoleBean sub = new StudyUserRoleBean();
-					sub.setRole(Role.COORDINATOR);
+					sub.setRole(Role.STUDY_ADMINISTRATOR);
 					sub.setStudyId(newstudyBean.getId());
 					sub.setStatus(Status.AVAILABLE);
 					sub.setOwner(ub);
 					udao.createStudyUserRole(user, sub);
-					if (ub.getId() != selectedUserId) {
+					if (!ub.isSysAdmin() && ub.getId() != selectedUserId) {
 						sub = new StudyUserRoleBean();
-						sub.setRole(Role.COORDINATOR);
+						sub.setRole(Role.STUDY_ADMINISTRATOR);
 						sub.setStudyId(newstudyBean.getId());
 						sub.setStatus(Status.AVAILABLE);
 						sub.setOwner(ub);
 						udao.createStudyUserRole(ub, sub);
 					}
-				} else {
+				} else if (!ub.isSysAdmin()) {
 					StudyUserRoleBean sub = new StudyUserRoleBean();
-					sub.setRole(Role.COORDINATOR);
+					sub.setRole(Role.STUDY_ADMINISTRATOR);
 					sub.setStudyId(newstudyBean.getId());
 					sub.setStatus(Status.AVAILABLE);
 					sub.setOwner(ub);
@@ -441,7 +442,7 @@ public class CreateStudyServlet extends SecureController {
 			logger.info("has validation errors in the first section");
 			request.setAttribute("formMessages", errors);
 			UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-			Collection users = udao.findAllByRole("coordinator", "director");
+			Collection users = udao.findAllByRole("study_administrator", "study_director");
 			request.setAttribute("users", users);
 
 			forwardPage(Page.CREATE_STUDY1);

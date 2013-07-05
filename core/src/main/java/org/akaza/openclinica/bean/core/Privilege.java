@@ -32,13 +32,13 @@ import java.util.List;
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class Privilege extends Term {
-	public static final Privilege ADMIN = new Privilege(1, "admin");
-	public static final Privilege STUDYDIRECTOR = new Privilege(2, "director");
+	public static final Privilege SYSTEM_ADMINISTRATOR = new Privilege(1, "system_administrator");
+	public static final Privilege STUDY_DIRECTOR = new Privilege(2, "study_director");
 	public static final Privilege INVESTIGATOR = new Privilege(3, "investigator");
-	public static final Privilege RESEARCHASSISTANT = new Privilege(4, "ra");
-	public static final Privilege MONITOR = new Privilege(5, "monitor");
+	public static final Privilege CLINICAL_RESEARCH_COORDINATOR = new Privilege(4, "clinical_research_coordinator");
+	public static final Privilege STUDY_MONITOR = new Privilege(5, "study_monitor");
 
-	private static final Privilege[] members = { ADMIN, STUDYDIRECTOR, INVESTIGATOR, RESEARCHASSISTANT, MONITOR };
+	private static final Privilege[] members = { SYSTEM_ADMINISTRATOR, STUDY_DIRECTOR, INVESTIGATOR, CLINICAL_RESEARCH_COORDINATOR, STUDY_MONITOR };
 	public static final List list = Arrays.asList(members);
 
 	private Privilege(int id, String name) {

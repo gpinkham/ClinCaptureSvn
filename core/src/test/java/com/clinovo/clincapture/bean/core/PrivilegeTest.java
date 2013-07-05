@@ -26,11 +26,11 @@ import org.junit.Test;
 
 public class PrivilegeTest {
 
-	public static final String ADMIN_KEY = "admin";
-	public static final String STUDYDIRECTOR_KEY = "director";
+	public static final String SYSTEM_ADMINISTRATOR_KEY = "system_administrator";
+	public static final String STUDY_DIRECTOR_KEY = "study_director";
 	public static final String INVESTIGATOR_KEY = "investigator";
-	public static final String RESEARCHASSISTANT_KEY = "ra";
-	public static final String MONITOR_KEY = "monitor";
+	public static final String CLINICAL_RESEARCH_COORDINATOR_KEY = "clinical_research_coordinator";
+	public static final String STUDY_MONITOR_KEY = "study_monitor";
 
 	private Privilege privilege;
 	private ResourceBundle resterm;
@@ -44,16 +44,16 @@ public class PrivilegeTest {
 	@Test
 	public void testAdmin() {
 		privilege = Privilege.get(1);
-		assertEquals(Privilege.ADMIN, privilege);
-		assertEquals(resterm.getString(ADMIN_KEY), privilege.getName());
+		assertEquals(Privilege.SYSTEM_ADMINISTRATOR, privilege);
+		assertEquals(resterm.getString(SYSTEM_ADMINISTRATOR_KEY), privilege.getName());
 		assertNull(privilege.getDescription());
 	}
 
 	@Test
 	public void testDirector() {
 		privilege = Privilege.get(2);
-		assertEquals(Privilege.STUDYDIRECTOR, privilege);
-		assertEquals(resterm.getString(STUDYDIRECTOR_KEY), privilege.getName());
+		assertEquals(Privilege.STUDY_DIRECTOR, privilege);
+		assertEquals(resterm.getString(STUDY_DIRECTOR_KEY), privilege.getName());
 		assertNull(privilege.getDescription());
 	}
 
@@ -68,16 +68,16 @@ public class PrivilegeTest {
 	@Test
 	public void testResearchAssistant() {
 		privilege = Privilege.get(4);
-		assertEquals(Privilege.RESEARCHASSISTANT, privilege);
-		assertEquals(resterm.getString(RESEARCHASSISTANT_KEY), privilege.getName());
+		assertEquals(Privilege.CLINICAL_RESEARCH_COORDINATOR, privilege);
+		assertEquals(resterm.getString(CLINICAL_RESEARCH_COORDINATOR_KEY), privilege.getName());
 		assertNull(privilege.getDescription());
 	}
 
 	@Test
 	public void testMonitor() {
 		privilege = Privilege.get(5);
-		assertEquals(Privilege.MONITOR, privilege);
-		assertEquals(resterm.getString(MONITOR_KEY), privilege.getName());
+		assertEquals(Privilege.STUDY_MONITOR, privilege);
+		assertEquals(resterm.getString(STUDY_MONITOR_KEY), privilege.getName());
 		assertNull(privilege.getDescription());
 	}
 

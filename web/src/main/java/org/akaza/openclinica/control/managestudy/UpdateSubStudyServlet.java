@@ -71,8 +71,8 @@ public class UpdateSubStudyServlet extends SecureController {
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
 		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"));
-		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDYDIRECTOR)
-				|| currentRole.getRole().equals(Role.COORDINATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_DIRECTOR)
+				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 
 			return;
 		}

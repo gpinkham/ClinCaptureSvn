@@ -62,7 +62,7 @@ public class RequestAccountServlet extends SecureController {
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
 		ArrayList studies = (ArrayList) sdao.findAll();
 		ArrayList roles = Role.toArrayList();
-		roles.remove(Role.ADMIN); // admin is not a user role, only used for
+		roles.remove(Role.SYSTEM_ADMINISTRATOR); // admin is not a user role, only used for
 		// tomcat
 
 		request.setAttribute("roles", roles);

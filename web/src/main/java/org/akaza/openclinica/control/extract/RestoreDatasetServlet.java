@@ -77,7 +77,7 @@ public class RestoreDatasetServlet extends SecureController {
 		if (ub.isSysAdmin()) {
 			return;// TODO limit to owner only?
 		}
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
 			return;
 		}

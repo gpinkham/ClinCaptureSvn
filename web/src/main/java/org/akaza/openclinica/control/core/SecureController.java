@@ -438,61 +438,7 @@ public abstract class SecureController extends HttpServlet {
 				request.setAttribute(PAGE_MESSAGE, pageMessages);
 			}
 
-			if (currentStudy.getParentStudyId() > 0) {
-				/*
-				 * The Role decription will be set depending on whether the user logged in at study lever or site level.
-				 */
-				List roles = Role.toArrayList();
-				for (Iterator it = roles.iterator(); it.hasNext();) {
-					Role role = (Role) it.next();
-					switch (role.getId()) {
-					case 2:
-						role.setDescription("site_Study_Coordinator");
-						break;
-					case 3:
-						role.setDescription("site_Study_Director");
-						break;
-					case 4:
-						role.setDescription("site_investigator");
-						break;
-					case 5:
-						role.setDescription("site_Data_Entry_Person");
-						break;
-					case 6:
-						role.setDescription("site_monitor");
-						break;
-					default:
-						logger.info("No role matched when setting role description");
-					}
-				}
-			} else {
-				/*
-				 * If the current study is a site, we will change the role description. issue-2422
-				 */
-				List roles = Role.toArrayList();
-				for (Iterator it = roles.iterator(); it.hasNext();) {
-					Role role = (Role) it.next();
-					switch (role.getId()) {
-					case 2:
-						role.setDescription("Study_Coordinator");
-						break;
-					case 3:
-						role.setDescription("Study_Director");
-						break;
-					case 4:
-						role.setDescription("Investigator");
-						break;
-					case 5:
-						role.setDescription("Data_Entry_Person");
-						break;
-					case 6:
-						role.setDescription("Monitor");
-						break;
-					default:
-						logger.info("No role matched when setting role description");
-					}
-				}
-			}
+            Role.prepareRoleMapWithDescriptions(resterm);
 
 			if (currentRole == null || currentRole.getId() <= 0) {
 				// if current study has been "removed", current role will be

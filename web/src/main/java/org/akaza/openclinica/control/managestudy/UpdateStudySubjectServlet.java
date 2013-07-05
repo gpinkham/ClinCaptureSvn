@@ -72,9 +72,9 @@ public class UpdateStudySubjectServlet extends SecureController {
 			return;
 		}
 
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.INVESTIGATOR)
-				|| currentRole.getRole().equals(Role.RESEARCHASSISTANT)) {
+				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)) {
 			return;
 		}
 
@@ -276,7 +276,7 @@ public class UpdateStudySubjectServlet extends SecureController {
 		java.util.Date enrollDate = sub.getEnrollmentDate();
 
 		if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator()
-				|| (currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant())) {
+				|| (currentStudy.getParentStudyId() > 0 && currentRole.isClinicalResearchCoordinator())) {
 
 			v.addValidation("label", Validator.NO_BLANKS);
 

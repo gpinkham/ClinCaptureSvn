@@ -54,7 +54,7 @@ public class CRFDataImportValidator implements Validator {
 				e);
 		if (study == null)
 			return;
-		boolean isRoleVerified = helper.verifyRole(crfDataImportBean.getUser(), study.getId(), -1, Role.MONITOR, e);
+		boolean isRoleVerified = helper.verifyRole(crfDataImportBean.getUser(), study.getId(), -1, Role.STUDY_MONITOR, e);
 		if (!isRoleVerified)
 			return;
 

@@ -87,9 +87,9 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.INVESTIGATOR)
-				|| currentRole.getRole().equals(Role.RESEARCHASSISTANT)) {
+				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)) {
 			return;
 		}
 

@@ -72,7 +72,7 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 
 		if (ub.hasRoleInStudy(studyId)) {
 			Role r = ub.getRoleByStudy(studyId).getRole();
-			if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+			if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 				return;
 			} else {
 				addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition")

@@ -70,12 +70,7 @@
   <tr><td class="table_header_column"><fmt:message key="date_updated" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${user.updatedDate}" type="date" pattern="${dteFormat}"/>&nbsp;</td></tr>
   <tr><td class="table_header_column"><fmt:message key="updated_by" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${user.updater.name}"/>&nbsp;</td></tr>
   <tr><td class="table_header_column"><fmt:message key="role" bundle="${resword}"/>:</td><td class="table_cell">
-    <c:if test="${uStudy.parentStudyId > 0}">
-              <fmt:message key="${siteRoleMap[uRole.role.id] }" bundle="${resterm}"></fmt:message>
-          </c:if>
-          <c:if test="${uStudy.parentStudyId == 0}">
-              <c:out value="${uRole.role.description}"/>
-          </c:if>
+    <fmt:message key="${roleMap[uRole.role.id] }" bundle="${resterm}"></fmt:message>
   </td></tr>
   <tr><td class="table_header_column"><fmt:message key="study" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${uStudy.name}"/></td></tr>
  

@@ -65,14 +65,16 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                     // get user account bean from security here
                     UserAccountBean user = this.getUserAccount();
                     // is this user allowed to create subjects? if not, throw a ccsystem fault exception
-                    Role r = user.getActiveStudyRole();
-                    if (r != null
-                        && (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r
-                                .equals(Role.ADMIN))) {
-                        // you may pass
-                    } else {
-                        throw new CCSystemFaultException("You do not possess the correct privileges to create a subject.");
-                    }
+					Role r = user.getActiveStudyRole();
+					if (r != null
+							&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
+									|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR) || r
+										.equals(Role.CLINICAL_RESEARCH_COORDINATOR))) {
+						// you may pass
+					} else {
+						throw new CCSystemFaultException(
+								"You do not possess the correct privileges to create a subject.");
+					}
 
                     RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode, getStudyDao(), getStudyParamValueDao());
                     // performedSubjectMilestone

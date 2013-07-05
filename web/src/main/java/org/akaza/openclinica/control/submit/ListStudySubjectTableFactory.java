@@ -219,7 +219,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	@Override
 	public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
 		Role r = currentRole.getRole();
-		boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
+		boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.STUDY_MONITOR);
 
 		// add other tool bar here?
 
@@ -797,10 +797,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				StringBuilder url = new StringBuilder();
 				url.append("<div style=\"padding-top: 3px;\">");
 				url.append(viewStudySubjectLinkBuilder(studySubjectBean));
-				if (getCurrentRole().getRole() != Role.MONITOR) {
+				if (getCurrentRole().getRole() != Role.STUDY_MONITOR) {
 					if (getStudyBean().getStatus() == Status.AVAILABLE
 							&& !(studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)
-							&& getCurrentRole().getRole() != Role.RESEARCHASSISTANT) {
+							&& getCurrentRole().getRole() != Role.CLINICAL_RESEARCH_COORDINATOR) {
 						url.append(removeStudySubjectLinkBuilder(studySubjectBean));
 					}
 					if (getStudyBean().getStatus() == Status.AVAILABLE
@@ -808,7 +808,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
 					}
 					if (studySubjectBean.getStatus() != Status.DELETED
-							&& (currentRole.getRole() == Role.COORDINATOR || currentRole.getRole() == Role.MONITOR)
+							&& (currentRole.getRole() == Role.STUDY_ADMINISTRATOR || currentRole.getRole() == Role.STUDY_MONITOR)
 							&& SDVUtil.permitSDV(studySubjectBean, new DAOWrapper(getStudyDAO(), getStudyEventDAO(),
 									getStudySubjectDAO(), getEventCRFDAO(), getEventDefintionCRFDAO(),
 									getStudyEventDefinitionDao(), getDiscrepancyNoteDAO()))) {
@@ -819,7 +819,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 								.border("0").append("hspace=\"4\"").end());
 					}
 					if (getStudyBean().getStatus() == Status.AVAILABLE
-							&& getCurrentRole().getRole() != Role.RESEARCHASSISTANT
+							&& getCurrentRole().getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
 							&& getCurrentRole().getRole() != Role.INVESTIGATOR
 							&& studySubjectBean.getStatus() == Status.AVAILABLE) {
 						url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
@@ -836,7 +836,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						url.append(signStudySubjectLinkBuilder(studySubjectBean, isSignable));
 					}
 
-					if (getCurrentRole().getRole() == Role.COORDINATOR) {
+					if (getCurrentRole().getRole() == Role.STUDY_ADMINISTRATOR) {
 						url.append(studySubjectLockLinkBuilder(studySubjectBean));
 					}
 
@@ -850,7 +850,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						}
 					}
 				}
-				if (getCurrentRole().getRole() == Role.MONITOR) {
+				if (getCurrentRole().getRole() == Role.STUDY_MONITOR) {
 					if (getStudyBean().getStatus() == Status.AVAILABLE
 							&& discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(studyBean,
 									studySubjectBean.getLabel())) {
@@ -1103,7 +1103,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				eventText + ": <a id=\"" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount
 						+ "\" href=\"#\" style=\"color: #666;\">" + sed.getName() + "</a>").br();
 
-		if (userRole == Role.COORDINATOR || userRole == Role.MONITOR) {
+		if (userRole == Role.STUDY_ADMINISTRATOR || userRole == Role.STUDY_MONITOR) {
 			eventDiv.append("<a class=\"sdvLink\" href=\""
 					+ "pages/viewAllSubjectSDVtmp?sbb=true&studyId="
 					+ studyBean.getId()
@@ -1217,7 +1217,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		eventDiv.divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd();
 		if (studyEvents.size() != 0
 				|| (studyEvents.size() == 0 && canScheduleStudySubject(studySubject)
-						&& currentRole.getRole() != Role.MONITOR && studyBean.getStatus().isAvailable())) {
+						&& currentRole.getRole() != Role.STUDY_MONITOR && studyBean.getStatus().isAvailable())) {
 			repeatingIconLinkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed,
 					studyEvents.size() > 0 ? ("" + studyEvents.get(0).getId()) : "");
 		}
@@ -1248,7 +1248,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				eventDiv.td(0).styleClass("table_cell").close();
 				eventDiv.div().id("crfListWrapper_" + studyEventId).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
-				if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin())
+				if ((currentRole.getRole() == Role.STUDY_DIRECTOR || currentUser.isSysAdmin())
 						&& studyBean.getStatus() == Status.AVAILABLE) {
 					eventDiv.tr(0).valign("top").close();
 					eventDiv.td(0).styleClass("table_cell_left").close();
@@ -1306,7 +1306,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 							+ studyEventId + "&ss_id=" + studySubject.getId() + "\" style=\"color: #666;\">"
 							+ sed.getName() + "</a>").br();
 		}
-		if (userRole == Role.COORDINATOR || userRole == Role.MONITOR) {
+		if (userRole == Role.STUDY_ADMINISTRATOR || userRole == Role.STUDY_MONITOR) {
 			eventDiv.append("<a class=\"sdvLink\" href=\""
 					+ "pages/viewAllSubjectSDVtmp?sbb=true&studyId="
 					+ studyBean.getId()
@@ -1362,7 +1362,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				|| eventSysStatus == Status.LOCKED) {
 
 			if (eventStatus == SubjectEventStatus.NOT_SCHEDULED && canScheduleStudySubject(studySubject)
-					&& currentRole.getRole() != Role.MONITOR && studyBean.getStatus().isAvailable()) {
+					&& currentRole.getRole() != Role.STUDY_MONITOR && studyBean.getStatus().isAvailable()) {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
 				String href1 = "PageToCreateNewStudyEvent?studySubjectId=" + studySubject.getId()
@@ -1386,7 +1386,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				eventDiv.td(0).styleClass("table_cell_left").close();
 				eventDiv.div().id("crfListWrapper_" + studyEventId).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
-				if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin())
+				if ((currentRole.getRole() == Role.STUDY_DIRECTOR || currentUser.isSysAdmin())
 						&& studyBean.getStatus() == Status.AVAILABLE) {
 					eventDiv.tr(0).valign("top").close();
 					eventDiv.td(0).styleClass("table_cell_left").close();
@@ -1413,7 +1413,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		eventDiv.divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd();
 		if (eventStatus != SubjectEventStatus.NOT_SCHEDULED
 				|| (eventStatus == SubjectEventStatus.NOT_SCHEDULED && canScheduleStudySubject(studySubject)
-						&& currentRole.getRole() != Role.MONITOR && studyBean.getStatus().isAvailable())) {
+						&& currentRole.getRole() != Role.STUDY_MONITOR && studyBean.getStatus().isAvailable())) {
 			iconLinkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed, studyEventId);
 		}
 	}

@@ -10,20 +10,6 @@
 <jsp:useBean scope="request" id="studies" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="otherStudy" class="java.lang.String"/>
 
-<c:forEach var="currRole" items="${roles}" varStatus="status">
-    <c:set var="rolesCount" value="${status.count}" />
-</c:forEach>
-<c:choose>
-    <c:when test="${rolesCount > 3}">
-        <c:set var="inclRoleCode1" value="2" />
-        <c:set var="inclRoleCode2" value="6" />
-    </c:when>
-    <c:otherwise>
-        <c:set var="inclRoleCode1" value="4" />
-        <c:set var="inclRoleCode2" value="5" />
-    </c:otherwise>
-</c:choose>
-
 <jsp:include page="../login-include/login-header.jsp"/>
 
 <jsp:include page="../login-include/request-sidebar.jsp"/>
@@ -101,10 +87,8 @@
    <div class="formfieldXL_BG"> 
    <select name="activeStudyRole" class="formfieldXL">
       <c:forEach var="userRole" items="${roles}">
-          <c:if test="${userRole.id == inclRoleCode1 || userRole.id == inclRoleCode2}">
-            <option value="<c:out value="${userRole.id}"/>" <c:if test="${role1.id == userRole.id}">selected</c:if>><c:out value="${userRole.description}"/>
-          </c:if>
-    </c:forEach>
+          <option value="<c:out value="${userRole.id}"/>" <c:if test="${role1.id == userRole.id}">selected</c:if>><c:out value="${userRole.description}"/>
+      </c:forEach>
    </select>
    </div>
   </td></tr> 

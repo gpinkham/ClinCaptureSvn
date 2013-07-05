@@ -162,7 +162,7 @@
 	  onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
 	  name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 	  </td>
-	  <c:if test="${!userRole.monitor}">
+	  <c:if test="${userRole.role.id ne 6}">
 		  <c:choose>
 		   <c:when test="${!currRow.bean.studySubject.status.deleted}">
              <c:if test="${study.status.available}">

@@ -44,7 +44,8 @@ public class InitCreateCRFVersionServlet extends SecureController {
 		}
 
 		if (!request.getParameter(MODULE).equals("admin")
-				&& (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR))) {
+				&& (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(
+						Role.STUDY_ADMINISTRATOR))) {
 			return;
 		}
 

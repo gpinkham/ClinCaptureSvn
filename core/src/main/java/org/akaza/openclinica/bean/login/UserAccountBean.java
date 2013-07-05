@@ -383,11 +383,6 @@ public class UserAccountBean extends AuditableEntityBean {
 	}
 
 	public void addRole(StudyUserRoleBean sur) {
-		if (sur.getRole() != null && sur.getRole().equals(Role.ADMIN)) {
-			addUserType(UserType.SYSADMIN);
-			return;
-		}
-
 		Integer key = new Integer(sur.getStudyId());
 		if (rolesByStudy.containsKey(key)) {
 			Integer index = (Integer) rolesByStudy.get(key);
@@ -396,13 +391,44 @@ public class UserAccountBean extends AuditableEntityBean {
 			roles.add(sur);
 			rolesByStudy.put(key, new Integer(roles.size() - 1));
 		}
+
+        if (sur.getRole() != null && sur.getRole().equals(Role.SYSTEM_ADMINISTRATOR)) {
+            addUserType(UserType.SYSADMIN);
+            return;
+        }
 	}
 
 	public StudyUserRoleBean getRoleByStudy(StudyBean study) {
 		return getRoleByStudy(study.getId());
 	}
 
+	public void updateSysAdminRole(Integer studyId, Integer prevStudyId) {
+		if (sysAdmin || techAdmin) {
+			for (StudyUserRoleBean surb : roles) {
+				if (surb.getRole() == Role.SYSTEM_ADMINISTRATOR) {
+					rolesByStudy.put(studyId, rolesByStudy.remove(prevStudyId));
+					break;
+				}
+			}
+		}
+	}
+
+	public StudyUserRoleBean getSysAdminRole() {
+		StudyUserRoleBean studyUserRoleBean = null;
+		for (StudyUserRoleBean surb : roles) {
+			if (surb.getRole() == Role.SYSTEM_ADMINISTRATOR) {
+				studyUserRoleBean = surb;
+				break;
+			}
+		}
+		return studyUserRoleBean;
+	}
+
 	public StudyUserRoleBean getRoleByStudy(int studyId) {
+        if (sysAdmin || techAdmin) {
+            return getSysAdminRole();
+        }
+
 		Integer key = new Integer(studyId);
 
 		if (rolesByStudy.containsKey(key)) {
@@ -469,16 +495,15 @@ public class UserAccountBean extends AuditableEntityBean {
 		for (int i = 0; i < roles.size(); i++) {
 			StudyUserRoleBean sur = (StudyUserRoleBean) roles.get(i);
 
-			if (sur.getRole().equals(Role.ADMIN)) {
-				addUserType(UserType.SYSADMIN);
-				continue;
-			}
-
 			this.roles.add(sur);
 
 			Integer key = new Integer(sur.getStudyId());
 			Integer value = new Integer(this.roles.size() - 1);
 			rolesByStudy.put(key, value);
+
+            if (sur.getRole().equals(Role.SYSTEM_ADMINISTRATOR)) {
+                addUserType(UserType.SYSADMIN);
+            }
 		}
 	}
 

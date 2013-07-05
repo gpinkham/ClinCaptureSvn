@@ -195,7 +195,7 @@
 				<table cellspacing="0" cellpadding="0" border="0">
 				<tr>
 				<c:choose>
-				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && study.status.available && !currRow.bean.studyEvent.status.deleted && !userRole.monitor}">
+				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6}">
                     <td>
                     <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>', document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>);"
                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
@@ -229,7 +229,7 @@
 
 				<!-- added 12/2012 #121 clinovo -->
 				<c:if test="${(dedc.eventCRF.id > 0 and !dedc.eventCRF.notStarted) && 
- (userBean.sysAdmin || (userRole.director || userRole.coordinator)) &&
+ (userBean.sysAdmin || (userRole.studyDirector || userRole.studyAdministrator)) &&
  (study.status.available || study.status.pending) 
 && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped)}">
    				<td>
@@ -308,7 +308,7 @@
 	     <tr valign="top">
 	     <td>
 		 <c:choose>
-			<c:when test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && !userRole.monitor}">
+			<c:when test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6}">
 			    <c:if test="${dec.continueInitialDataEntryPermitted}">
 		           <a href="#"
 				    onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
@@ -396,7 +396,7 @@
 		    name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
 		 </td>
 		 </c:if>
-		 <c:if test="${(dedc.eventCRF.id>0 and !dedc.eventCRF.notStarted) && (userBean.sysAdmin || (userRole.director || userRole.coordinator)) && (dec.eventCRF.status.name != 'not_started') &&
+		 <c:if test="${(dedc.eventCRF.id>0 and !dedc.eventCRF.notStarted) && (userBean.sysAdmin || (userRole.studyDirector || userRole.studyAdministrator)) && (dec.eventCRF.status.name != 'not_started') &&
  (study.status.available || study.status.pending)
  && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped) }">
    		<td>

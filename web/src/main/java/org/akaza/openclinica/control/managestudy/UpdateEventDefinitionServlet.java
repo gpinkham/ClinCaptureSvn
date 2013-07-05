@@ -62,7 +62,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 		addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"

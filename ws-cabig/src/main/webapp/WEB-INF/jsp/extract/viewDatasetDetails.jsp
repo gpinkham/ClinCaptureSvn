@@ -89,7 +89,7 @@
 <table border="0">
 <tr>
     <c:choose>
-        <c:when test="${!userRole.monitor}">
+        <c:when test="${userRole.role.id ne 6}">
              <td>
                 <form action="EditDataset">
                 <input type="hidden" name="dsId" value="<c:out value="${dataset.id}"/>"/>

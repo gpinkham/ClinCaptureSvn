@@ -185,7 +185,7 @@
 								<table width='60'>
 									<td style="white-space: nowrap;">
 									<c:if test="${study.status.available}">
-										<c:if test="${!userRole.monitor}">
+										<c:if test="${userRole.role.id ne 6}">
 											<a href="UpdateStudySubject?id=<c:out value="${studySub.id}"/>&amp;action=show" onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
 													onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');">
 												<img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="Edit" title="Edit" align="left" hspace="6">

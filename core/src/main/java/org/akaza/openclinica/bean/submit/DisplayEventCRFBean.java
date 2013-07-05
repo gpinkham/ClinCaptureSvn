@@ -201,12 +201,12 @@ public class DisplayEventCRFBean implements Comparable {
 	 *         <code>false</code> otherwise.
 	 */
 	public static boolean isSuper(UserAccountBean user, Role studyRole) {
-		return studyRole.equals(Role.STUDYDIRECTOR) || studyRole.equals(Role.COORDINATOR);
+		return studyRole.equals(Role.SYSTEM_ADMINISTRATOR) || studyRole.equals(Role.STUDY_DIRECTOR) || studyRole.equals(Role.STUDY_ADMINISTRATOR);
 	}
 
 	public static boolean isEditor(UserAccountBean user, Role studyRole) {
 		return isSuper(user, studyRole) || studyRole.equals(Role.INVESTIGATOR)
-				|| studyRole.equals(Role.RESEARCHASSISTANT);
+				|| studyRole.equals(Role.CLINICAL_RESEARCH_COORDINATOR);
 	}
 
 	public static boolean initialDataEntryCompletedMoreThanTwelveHoursAgo(EventCRFBean eventCRF) {

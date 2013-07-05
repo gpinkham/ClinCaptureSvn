@@ -61,7 +61,7 @@ public class AssignUserToStudyServlet extends SecureController {
 			return;
 		}
 
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -128,11 +128,15 @@ public class AssignUserToStudyServlet extends SecureController {
 			request.setAttribute("table", table);
 			ArrayList roles = Role.toArrayList();
 			if (currentStudy.getParentStudyId() > 0) {
-				roles.remove(Role.COORDINATOR);
-				roles.remove(Role.STUDYDIRECTOR);
-			}
+				roles.remove(Role.STUDY_ADMINISTRATOR);
+                roles.remove(Role.STUDY_MONITOR);
+			} else {
+                roles.remove(Role.INVESTIGATOR);
+                roles.remove(Role.CLINICAL_RESEARCH_COORDINATOR);
+            }
 
-			roles.remove(Role.ADMIN); // admin is not a user role, only used
+            roles.remove(Role.STUDY_DIRECTOR); // clincapture does not user the STUDY_DIRECTOR role
+			roles.remove(Role.SYSTEM_ADMINISTRATOR); // admin is not a user role, only used
 			// for
 			// tomcat
 			request.setAttribute("roles", roles);
@@ -254,7 +258,7 @@ public class AssignUserToStudyServlet extends SecureController {
 			int activeStudyId = currentStudy.getId();
 			StudyUserRoleBean sub = udao.findRoleByUserNameAndStudyId(u.getName(), activeStudyId);
 			if (!sub.isActive()) {// doesn't have a role in the current study
-				sub.setRole(Role.RESEARCHASSISTANT);
+				sub.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
 				sub.setStudyId(activeStudyId);
 				u.setActiveStudyId(activeStudyId);
 				u.addRole(sub);

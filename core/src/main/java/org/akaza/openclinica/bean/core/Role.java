@@ -25,35 +25,40 @@ import java.util.*;
 @SuppressWarnings({"rawtypes", "unchecked",  "serial"})
 public class Role extends Term {
 	public static final Role INVALID = new Role(0, "invalid", "invalid", null);
-	public static final Role ADMIN = new Role(1, "admin", "System_Administrator", null);
-	public static final Role COORDINATOR = new Role(2, "coordinator", "Study_Coordinator", null);
-	public static final Role STUDYDIRECTOR = new Role(3, "director", "Study_Director", null);
-	public static final Role INVESTIGATOR = new Role(4, "Investigator", "Investigator", null);
-	public static final Role RESEARCHASSISTANT = new Role(5, "ra", "Data_Entry_Person", null);
-	public static final Role MONITOR = new Role(6, "monitor", "Monitor", null);
+	public static final Role SYSTEM_ADMINISTRATOR = new Role(1, "system_administrator", "System_Administrator", null);
+	public static final Role STUDY_ADMINISTRATOR = new Role(2, "study_administrator", "Study_Administrator", null);
+	// actually clincapture does not use the STUDY_DIRECTOR role.
+	public static final Role STUDY_DIRECTOR = new Role(3, "study_director", "Study_Director", null);
+	public static final Role STUDY_MONITOR = new Role(6, "study_monitor", "Study_Monitor", null);
+	public static final Role INVESTIGATOR = new Role(4, "investigator", "Investigator", null);
+	public static final Role CLINICAL_RESEARCH_COORDINATOR = new Role(5, "clinical_research_coordinator",
+			"Clinical_Research_Coordinator", null);
 
-	private static final Role[] members = { ADMIN, COORDINATOR, STUDYDIRECTOR, INVESTIGATOR, MONITOR, RESEARCHASSISTANT };
+	private static final Role[] members = { SYSTEM_ADMINISTRATOR, STUDY_ADMINISTRATOR, STUDY_DIRECTOR, STUDY_MONITOR,
+			INVESTIGATOR, CLINICAL_RESEARCH_COORDINATOR };
 	public static final List list = Arrays.asList(members);
 
-	public static final Map studyRoleMap = new LinkedHashMap();
+	public static final Map roleMap = new LinkedHashMap();
 	static {
-		studyRoleMap.put(2, "Study_Coordinator");
-		studyRoleMap.put(3, "Study_Director");
-		studyRoleMap.put(4, "Investigator");
-		studyRoleMap.put(5, "Data_Entry_Person");
-		studyRoleMap.put(6, "Monitor");
+		roleMap.put(1, "System_Administrator");
+		roleMap.put(2, "Study_Administrator");
+		roleMap.put(3, "Study_Director");
+		roleMap.put(6, "Study_Monitor");
+		roleMap.put(4, "Investigator");
+		roleMap.put(5, "Clinical_Research_Coordinator");
 	}
 
-	public static final Map siteRoleMap = new LinkedHashMap();
+	public static final Map roleMapWithDescriptions = new LinkedHashMap();
 	static {
-		siteRoleMap.put(2, "site_Study_Coordinator");
-		siteRoleMap.put(3, "site_Study_Director");
-		siteRoleMap.put(4, "site_investigator");
-		siteRoleMap.put(5, "site_Data_Entry_Person");
-		siteRoleMap.put(6, "site_monitor");
+		roleMapWithDescriptions.put(1, "System_Administrator");
+		roleMapWithDescriptions.put(2, "Study_Administrator");
+		roleMapWithDescriptions.put(3, "Study_Director");
+		roleMapWithDescriptions.put(6, "Study_Monitor");
+		roleMapWithDescriptions.put(4, "Investigator");
+		roleMapWithDescriptions.put(5, "Clinical_Research_Coordinator");
 	}
 
-	private List privileges;
+    private List privileges;
 
 	private Role(int id, String name, String description, Privilege[] myPrivs) {
 		super(id, name, description);
@@ -61,6 +66,13 @@ public class Role extends Term {
 	}
 
 	private Role() {
+	}
+
+	public static void prepareRoleMapWithDescriptions(ResourceBundle resterm) {
+		for (Role role : (List<Role>) Role.toArrayList()) {
+			Role.roleMapWithDescriptions.put(role.getId(), resterm.getString((String) Role.roleMap.get(role.getId()))
+					.trim());
+		}
 	}
 
 	public static boolean contains(int id) {

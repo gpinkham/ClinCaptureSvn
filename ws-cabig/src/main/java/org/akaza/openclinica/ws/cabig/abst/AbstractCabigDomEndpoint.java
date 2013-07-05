@@ -390,16 +390,17 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         return mapGenericErrorConfirmation(message, exception, validations);
     }
 
-    public boolean canUserRegisterSubject(UserAccountBean user) {
-        Role r = user.getActiveStudyRole();
-        if (r != null
-            && (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r
-                    .equals(Role.ADMIN))) {
-            // you may pass
-            return true;
-        } else {
-            return false;
-        }
-    }
+	public boolean canUserRegisterSubject(UserAccountBean user) {
+		Role r = user.getActiveStudyRole();
+		if (r != null
+				&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
+						|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR) || r
+							.equals(Role.CLINICAL_RESEARCH_COORDINATOR))) {
+			// you may pass
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 }

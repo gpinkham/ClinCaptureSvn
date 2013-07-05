@@ -56,7 +56,7 @@ public class ViewSiteServlet extends SecureController {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 		int siteId = request.getParameter("id") == null ? 0 : Integer.valueOf(request.getParameter("id"));

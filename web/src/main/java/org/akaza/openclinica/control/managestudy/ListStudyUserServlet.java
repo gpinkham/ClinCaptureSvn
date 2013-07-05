@@ -52,7 +52,7 @@ public class ListStudyUserServlet extends SecureController {
 			return;
 		}
 
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -82,8 +82,7 @@ public class ListStudyUserServlet extends SecureController {
 		table.computeDisplay();
 
 		request.setAttribute("table", table);
-		request.setAttribute("siteRoleMap", Role.siteRoleMap);
-		request.setAttribute("studyRoleMap", Role.studyRoleMap);
+        request.setAttribute("roleMap", Role.roleMap);
 		request.setAttribute("study", currentStudy);
 		forwardPage(Page.LIST_USER_IN_STUDY);
 

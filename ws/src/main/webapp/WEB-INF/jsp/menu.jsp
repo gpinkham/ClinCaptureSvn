@@ -133,7 +133,7 @@
 <a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />"><span style="color: #D4A718;">${assignedDiscrepancies}</span>&nbsp;<fmt:message key="notes_assigned_to_me" bundle="${restext}"/></a><br /><br />
 </span>
 
-<c:if test="${userRole.investigator || userRole.researchAssistant}">
+<c:if test="${userRole.investigator || userRole.clinicalResearchCoordinator}">
 
 <div id="findSubjectsDiv">
     <script type="text/javascript">
@@ -171,7 +171,7 @@
 
 </c:if>
 
-<c:if test="${userRole.coordinator || userRole.director}">
+<c:if test="${userRole.studyAdministrator || userRole.studyDirector}">
 
 
     <script type="text/javascript">

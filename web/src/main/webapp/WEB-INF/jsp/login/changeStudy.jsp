@@ -85,7 +85,7 @@
                    <input type="radio" checked name="studyId" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>
                    <c:out value="${studyRole.studyName}"/>
                        <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
-                       (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>) </td>
+                       (<fmt:message key="${roleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>) </td>
                  </tr>
                </c:if>
             </c:when>
@@ -94,7 +94,7 @@
                  <tr>
                  <td class="table_cell">
                      <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
-                 <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
+                 <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${roleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">
@@ -114,7 +114,7 @@
                       <input type="radio" name="studyId" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>
                       <c:out value="${studyRole.studyName}"/>
                       <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
-                      (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</td>
+                      (<fmt:message key="${roleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</td>
                  </tr>
                </c:if>
             </c:when>
@@ -123,7 +123,7 @@
                  <tr>
                   <td class="table_cell">
                       <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
-                  <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
+                  <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${roleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">

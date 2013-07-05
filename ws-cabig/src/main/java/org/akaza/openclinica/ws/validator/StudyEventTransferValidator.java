@@ -51,7 +51,7 @@ public class StudyEventTransferValidator implements Validator {
         Boolean hasPriviledge = true;
         int parentStudyId = study.getId();
         StudyUserRoleBean role = studyEventTransferBean.getUser().getRoleByStudy(study);
-        if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
+        if (role.getId() == 0 || role.getRole().equals(Role.STUDY_MONITOR)) {
             hasPriviledge = false;
         }
 
@@ -61,7 +61,7 @@ public class StudyEventTransferValidator implements Validator {
 
         if (!hasPriviledge) {
             role = studyEventTransferBean.getUser().getRoleByStudy(study);
-            if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
+            if (role.getId() == 0 || role.getRole().equals(Role.STUDY_MONITOR)) {
                 e.reject("studyEventTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
                 return;
             }

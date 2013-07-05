@@ -476,7 +476,8 @@ public class SDVController {
 
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
 		Role r = currentRole.getRole();
-		if (Role.STUDYDIRECTOR.equals(r) || Role.COORDINATOR.equals(r) || Role.MONITOR.equals(r)) {
+		if (Role.SYSTEM_ADMINISTRATOR.equals(r) || Role.STUDY_DIRECTOR.equals(r) || Role.STUDY_ADMINISTRATOR.equals(r)
+				|| Role.STUDY_MONITOR.equals(r)) {
 			return true;
 		}
 		return false;

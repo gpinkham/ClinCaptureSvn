@@ -43,9 +43,8 @@ public class ViewLogMessageServlet extends SecureController {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
-				|| currentRole.getRole().equals(Role.ADMIN) || currentRole.getRole().equals(Role.INVESTIGATOR)) {// ?
-
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
+				|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
 			return;
 		}
 

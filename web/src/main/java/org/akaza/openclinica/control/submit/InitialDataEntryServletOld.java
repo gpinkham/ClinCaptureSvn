@@ -281,7 +281,8 @@ public class InitialDataEntryServletOld extends SecureController {
 				throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
 			}
 		} else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
-			if (ub.getId() != ecb.getOwnerId() && !r.equals(Role.STUDYDIRECTOR) && !r.equals(Role.COORDINATOR)) {
+			if (ub.getId() != ecb.getOwnerId() && !r.equals(Role.STUDY_DIRECTOR) && !r.equals(Role.STUDY_ADMINISTRATOR)
+					&& !r.equals(Role.SYSTEM_ADMINISTRATOR)) {
 				UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 				String ownerName = ((UserAccountBean) udao.findByPK(ecb.getOwnerId())).getName();
 				MessageFormat mf = new MessageFormat("");

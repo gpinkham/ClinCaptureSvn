@@ -75,7 +75,7 @@ public class StudyEventTransferValidator implements Validator {
 		}
 
 		boolean isRoleVerified = helper.verifyRole(studyEventTransferBean.getUser(), study.getId(), site_id,
-				Role.MONITOR, e);
+				Role.STUDY_MONITOR, e);
 		if (!isRoleVerified)
 			return;
 

@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control;
 
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
@@ -177,12 +178,12 @@ public class MainMenuServlet extends SecureController {
 					request.setAttribute("label", resword.getString("id_generated_Save_Add"));
 				}
                 
-                if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
+                if (currentRole.isInvestigator() || currentRole.isClinicalResearchCoordinator()) {
                     setupListStudySubjectTable();
                 } 
-                if (currentRole.isMonitor()) {
+                if (currentRole.getRole() == Role.STUDY_MONITOR) {
                     setupSubjectSDVTable();
-                } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
+                } else if (currentRole.isSysAdmin() || currentRole.isStudyAdministrator() || currentRole.isStudyDirector()) {
                     if (currentStudy.getStatus().isPending()) {
                     	session.setAttribute("skipURL", "true");
                     	

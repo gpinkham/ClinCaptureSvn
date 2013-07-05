@@ -38,7 +38,7 @@
 		<tr><td>&nbsp;</td></tr>
 		<tr>
 		<td>
-		<c:if test="${(!userRole.monitor && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && !currRow.bean.studyEvent.status.deleted) && (study.status.available)}">
+		<c:if test="${(userRole.role.id ne 6 && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && !currRow.bean.studyEvent.status.deleted) && (study.status.available)}">
         <a href="UpdateStudyEvent?event_id=<c:out value="${currRow.bean.studyEvent.id}"/>&ss_id=<c:out value="${studySub.id}"/>"
 		onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
 		onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img
@@ -271,7 +271,7 @@
 		 <table border="0" cellpadding="0" cellspacing="0">
 	     <tr valign="top">
 	     <td>
-			<c:if test="${!userRole.monitor && !dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted}">
+			<c:if test="${userRole.role.id ne 6 && !dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted}">
 			    <c:if test="${dec.continueInitialDataEntryPermitted}">
 		           <a href="InitialDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}"
 				    onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"

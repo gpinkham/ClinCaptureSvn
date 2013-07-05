@@ -308,7 +308,7 @@ public class StudyModuleController {
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
 		Role r = currentRole.getRole();
 
-		if (Role.ADMIN.equals(r) || Role.STUDYDIRECTOR.equals(r) || Role.COORDINATOR.equals(r)) {
+		if (Role.SYSTEM_ADMINISTRATOR.equals(r) || Role.STUDY_DIRECTOR.equals(r) || Role.STUDY_ADMINISTRATOR.equals(r)) {
 			return true;
 		}
 		return false;

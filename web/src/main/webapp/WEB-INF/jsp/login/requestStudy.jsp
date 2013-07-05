@@ -5,12 +5,33 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
-
 <jsp:include page="../include/home-header.jsp"/>
-
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
+
+<script>
+    function sendUrl() {
+        document.getElementById('requestedStudyId').value = document.getElementById('studySelect').value;
+        document.forms[1].submit();
+    }
+    function submit() {
+        document.getElementById('requestedStudyId').value = '';
+        document.forms[1].submit();
+    }
+</script>
+
+<c:choose>
+    <c:when test="${isThisStudy}">
+        <c:set var="inclRoleCode1" value="2" />
+        <c:set var="inclRoleCode2" value="6" />
+    </c:when>
+    <c:otherwise>
+        <c:set var="inclRoleCode1" value="4" />
+        <c:set var="inclRoleCode2" value="5" />
+    </c:otherwise>
+</c:choose>
+
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
 		<td class="sidebar_tab">
@@ -43,23 +64,10 @@
 <h1><span class="title_manage"><fmt:message key="request_study_access" bundle="${resword}"/> <a href="javascript:openDocWindow('help/1_2_requestStudy_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" ></a></span></h1>
 <P><fmt:message key="fill_out_form_to_request_study" bundle="${restext}"/><p>
 
-<c:forEach var="currRole" items="${roles}" varStatus="status">
-        <c:set var="rolesCount" value="${status.count}" />
-</c:forEach>
-<c:choose>
-    <c:when test="${rolesCount > 3}">
-        <c:set var="inclRoleCode1" value="2" />
-        <c:set var="inclRoleCode2" value="6" />
-    </c:when>
-    <c:otherwise>
-        <c:set var="inclRoleCode1" value="4" />
-        <c:set var="inclRoleCode2" value="5" />
-    </c:otherwise>
-</c:choose>
-
 <form action="RequestStudy" method="post">
 <fmt:message key="field_required" bundle="${resword}"/><br>
 <input type="hidden" name="action" value="confirm">
+<input type="hidden" id="requestedStudyId" name="requestedStudyId">
 <!-- These DIVs define shaded box borders -->
 <div style="width: 600px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -78,7 +86,7 @@
 
   <tr><td class="formlabel"><fmt:message key="study_requested" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
    <c:set var="studyId1" value="${newRole.studyId}"/>
-    <select name="studyId" class="formfieldXL">
+    <select id="studySelect" name="studyId" class="formfieldXL" onchange="sendUrl();">
        <c:forEach var="study" items="${studies}">
         <c:choose>
          <c:when test="${studyId1 == study.id}">
@@ -112,7 +120,7 @@
 </div></div></div></div></div></div></div></div>
 
 </div>
-<input type="submit" name="Submit" value="<fmt:message key="confirm_study_access" bundle="${resword}"/>" class="button_xlong">
+<input type="button" name="Submit" value="<fmt:message key="confirm_study_access" bundle="${resword}"/>" class="button_xlong" onclick="submit();">
 <input type="button" onclick="confirmCancel('MainMenu');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 </form>
 <jsp:include page="../include/footer.jsp"/>

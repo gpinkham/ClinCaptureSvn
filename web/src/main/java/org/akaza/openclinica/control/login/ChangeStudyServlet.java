@@ -55,6 +55,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -90,14 +91,12 @@ public class ChangeStudyServlet extends SecureController {
 
 	@Override
 	public void processRequest() throws Exception {
-
-		String action = request.getParameter("action");// action sent by user
+        String action = request.getParameter("action");// action sent by user
 		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
 
-		ArrayList studies = udao.findStudyByUser(ub.getName(), (ArrayList) sdao.findAll());
-		request.setAttribute("siteRoleMap", Role.siteRoleMap);
-		request.setAttribute("studyRoleMap", Role.studyRoleMap);
+		ArrayList studies = udao.findStudyByUser(ub, (ArrayList) sdao.findAll());
+        request.setAttribute("roleMap", Role.roleMap);
 		if (request.getAttribute("label") != null) {
 			String label = (String) request.getAttribute("label");
 			if (label.length() > 0) {
@@ -121,6 +120,7 @@ public class ChangeStudyServlet extends SecureController {
 
 			forwardPage(Page.CHANGE_STUDY);
 		} else {
+
 			if ("confirm".equalsIgnoreCase(action)) {
 				logger.info("confirm");
 				confirmChangeStudy(studies);
@@ -154,7 +154,6 @@ public class ChangeStudyServlet extends SecureController {
 					request.setAttribute("currentStudy", currentStudy);
 					forwardPage(Page.CHANGE_STUDY_CONFIRM);
 					return;
-
 				}
 			}
 			addPageMessage(restext.getString("no_study_selected"));
@@ -168,6 +167,8 @@ public class ChangeStudyServlet extends SecureController {
 		FormProcessor fp = new FormProcessor(request);
 		int studyId = fp.getInt("studyId");
 		int prevStudyId = currentStudy.getId();
+
+        ub.updateSysAdminRole(studyId, prevStudyId);
 
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
 		StudyBean current = (StudyBean) sdao.findByPK(studyId);
@@ -213,63 +214,6 @@ public class ChangeStudyServlet extends SecureController {
 			ub.setUpdatedDate(new java.util.Date());
 			udao.update(ub);
 
-			if (current.getParentStudyId() > 0) {
-				/*
-				 * The Role decription will be set depending on whether the user logged in at study lever or site level.
-				 * issue-2422
-				 */
-				List roles = Role.toArrayList();
-				for (Iterator it = roles.iterator(); it.hasNext();) {
-					Role role = (Role) it.next();
-					switch (role.getId()) {
-					case 2:
-						role.setDescription("site_Study_Coordinator");
-						break;
-					case 3:
-						role.setDescription("site_Study_Director");
-						break;
-					case 4:
-						role.setDescription("site_investigator");
-						break;
-					case 5:
-						role.setDescription("site_Data_Entry_Person");
-						break;
-					case 6:
-						role.setDescription("site_monitor");
-						break;
-					default:
-						// logger.info("No role matched when setting role description");
-					}
-				}
-			} else {
-				/*
-				 * If the current study is a site, we will change the role description. issue-2422
-				 */
-				List roles = Role.toArrayList();
-				for (Iterator it = roles.iterator(); it.hasNext();) {
-					Role role = (Role) it.next();
-					switch (role.getId()) {
-					case 2:
-						role.setDescription("Study_Coordinator");
-						break;
-					case 3:
-						role.setDescription("Study_Director");
-						break;
-					case 4:
-						role.setDescription("investigator");
-						break;
-					case 5:
-						role.setDescription("Data_Entry_Person");
-						break;
-					case 6:
-						role.setDescription("monitor");
-						break;
-					default:
-						// logger.info("No role matched when setting role description");
-					}
-				}
-			}
-
 			currentRole = (StudyUserRoleBean) session.getAttribute("studyWithRole");
 			session.setAttribute("userRole", currentRole);
 			session.removeAttribute("studyWithRole");
@@ -291,12 +235,12 @@ public class ChangeStudyServlet extends SecureController {
 				currentStudy);
 		request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
-		if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
+		if (currentRole.isInvestigator() || currentRole.isClinicalResearchCoordinator()) {
 			setupListStudySubjectTable();
 		}
 		if (currentRole.isMonitor()) {
 			setupSubjectSDVTable();
-		} else if (currentRole.isCoordinator() || currentRole.isDirector()) {
+		} else if (currentRole.isStudyAdministrator() || currentRole.isStudyDirector()) {
 			if (currentStudy.getStatus().isPending()) {
 				response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
 				return;

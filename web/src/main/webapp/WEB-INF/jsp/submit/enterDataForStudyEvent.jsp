@@ -408,7 +408,7 @@
 					<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4"/>
                 </c:when>
 
-                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && !userRole.monitor}">
+                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && userRole.role.id ne 6}">
                         <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>',document.startForm<c:out value="${dedc.edc.crf.id}"/>);"
                            onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                            onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');">
@@ -431,7 +431,7 @@
         <!-- added clinovo 12/2012 #121 -->
         	<c:if test="${ 
         (study.status.available || study.status.pending)  && 
-        (userBean.sysAdmin || (userRole.director || userRole.coordinator))
+        (userBean.sysAdmin || (userRole.studyDirector || userRole.studyAdministrator))
         && !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)
         && (dedc.eventCRF.id>0 and !dedc.eventCRF.notStarted)}">
 		<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
@@ -575,7 +575,7 @@
         </c:when>
         <c:otherwise>
 			<c:choose>
-            <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && !userRole.monitor}">
+            <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && userRole.role.id ne 6}">
                 <c:if test="${dec.continueInitialDataEntryPermitted}">
                 <a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
@@ -623,7 +623,7 @@
                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
               ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="4"></a>
-			<c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
+			<c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available)}">
                 <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                    onMouseDown="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
                    onMouseUp="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
@@ -638,7 +638,7 @@
             </c:if>
             <!--  reasign crf version -->
           	<!-- added clinovo #121 12/2012 --> 	
- 			<c:if test="${(userBean.sysAdmin || (userRole.director || userRole.coordinator)) &&
+ 			<c:if test="${(userBean.sysAdmin || (userRole.studyDirector || userRole.studyAdministrator)) &&
  				(study.status.available || study.status.pending) 
  				&& !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)}">
    

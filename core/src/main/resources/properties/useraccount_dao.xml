@@ -131,19 +131,19 @@
 	<query>
 		<name>addSysAdminRole</name>
 		<sql>insert into study_user_role (role_name, user_name, status_id, owner_id, date_created, update_id, date_updated)
-			values ('admin',?,1,?,now(),?,now())
+			values ('system administrator',?,1,?,now(),?,now())
 		</sql>
 	</query>
 	<query>
 		<name>removeSysAdminRole</name>
-		<sql>delete from study_user_role where user_name=? and role_name='admin'</sql>	
+		<sql>delete from study_user_role where user_name=? and role_name='system administrator'</sql>
 	</query>
 	<query>
 	 <name>findStudyByUser</name>
 	 <sql>select sur.role_name, sur.study_id ,s.name 
 	      from study_user_role sur, study s
           where sur.study_id = s.study_id and sur.status_id = 1 
-          and sur.role_name != 'admin' and sur.user_name=?
+          and sur.role_name != 'system administrator' and sur.user_name=?
           order by sur.study_id asc
     </sql>
 	</query>

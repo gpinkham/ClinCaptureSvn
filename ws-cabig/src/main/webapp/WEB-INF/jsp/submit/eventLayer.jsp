@@ -447,7 +447,7 @@
 							   
 							    <%--<c:when test="${eventStatus.notScheduled}">--%>
 							    <c:when test="${eventStatus =='not scheduled' || eventStatus == notscheduledi18n}">
-							       <c:if test="${!userRole.monitor && (study.status.available)}">
+							       <c:if test="${userRole.role.id ne 6 && (study.status.available)}">
     							      <tr valign="top">
                                           <td class="table_cell_left">
 	    			    			      <a href="CreateNewStudyEvent?studySubjectId=<c:out value="${subjectId}"/>&studyEventDefinition=<c:out value="${eventDefId}"/>">
@@ -463,7 +463,7 @@
 							    <tr valign="top"><td class="table_cell_left">
 							      <a href="EnterDataForStudyEvent?eventId=<c:out value="${eventId}"/>"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="EnterDataForStudyEvent?eventId=<c:out value="${eventId}"/>"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 							    
-							      <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
+							      <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available)}">
 								  <tr valign="top"><td class="table_cell_left"><a href="UpdateStudyEvent?event_id=<c:out value="${eventId}"/>&ss_id=<c:out value="${subjectId}"/>"><img src="images/bt_Edit.gif" border="0" align="left"></a>
 								  &nbsp;&nbsp; <a href="UpdateStudyEvent?event_id=<c:out value="${eventId}"/>&ss_id=<c:out value="${subjectId}"/>"><fmt:message key="edit" bundle="${resword}"/></a></td></tr>
 								  
@@ -473,7 +473,7 @@
 						 	    </c:when>
 							   
 							    <c:when test="${eventStatus =='locked' || eventStatus == lockedi18n}">
-							      <c:if test="${userRole.director || userBean.sysAdmin}">
+							      <c:if test="${userRole.studyDirector || userBean.sysAdmin}">
 							      
 							        <tr valign="top"><td class="table_cell">
 								    <a href="EnterDataForStudyEvent?eventId=<c:out value="${currEvent.id}"/>"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="EnterDataForStudyEvent?eventId=<c:out value="${currEvent.id}"/>"><fmt:message key="view" bundle="${resword}"/></a></td></tr>

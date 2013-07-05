@@ -124,7 +124,7 @@
 </a><br /><br />
 </span>
 
-<c:if test="${userRole.investigator || userRole.researchAssistant}">
+<c:if test="${userRole.investigator || userRole.clinicalResearchCoordinator}">
 
 <div id="findSubjectsDiv">
     <script type="text/javascript">
@@ -161,7 +161,7 @@
 
 </c:if>
 
-<c:if test="${userRole.coordinator || userRole.director}">
+<c:if test="${userRole.sysAdmin || userRole.studyAdministrator || userRole.studyDirector}">
 
 
     <script type="text/javascript">
@@ -214,7 +214,7 @@
 
 </c:if>
 
-<c:if test="${userRole.monitor}">
+<c:if test="${userRole.role.id eq 6}">
 
 
 <script type="text/javascript">
@@ -272,7 +272,7 @@
 
 </div>
 </c:if>
-<c:if test="${!userRole.monitor}">
+<c:if test="${userRole.role.id ne 6 and userRole.role.id ne 1}">
 <br>
 	<table>
 		<td>

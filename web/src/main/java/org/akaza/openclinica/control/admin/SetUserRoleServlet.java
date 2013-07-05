@@ -100,66 +100,10 @@ public class SetUserRoleServlet extends SecureController {
 				}
 			}
 
-			Map roleMap = new LinkedHashMap();
-			for (Iterator it = getRoles().iterator(); it.hasNext();) {
-				Role role = (Role) it.next();
-				roleMap.put(role.getId(), role.getDescription());
-			}
-
 			Boolean changeRoles = request.getParameter("changeRoles") == null ? false : Boolean.parseBoolean(request
 					.getParameter("changeRoles"));
 			int studyId = fp.getInt("studyId");
-			if (changeRoles) {
-				StudyBean study = (StudyBean) sdao.findByPK(studyId);
-				roleMap = new LinkedHashMap();
-				ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
-
-				if (study.getParentStudyId() > 0) {
-					for (Iterator it = getRoles().iterator(); it.hasNext();) {
-						Role role = (Role) it.next();
-						switch (role.getId()) {
-						case 4:
-							roleMap.put(role.getId(), resterm.getString("site_investigator").trim());
-							break;
-						case 5:
-							roleMap.put(role.getId(), resterm.getString("site_Data_Entry_Person").trim());
-							break;
-						case 6:
-							roleMap.put(role.getId(), resterm.getString("site_monitor").trim());
-							break;
-						default:
-						}
-					}
-				} else {
-					for (Iterator it = getRoles().iterator(); it.hasNext();) {
-						Role role = (Role) it.next();
-						switch (role.getId()) {
-						case 2:
-							roleMap.put(role.getId(), resterm.getString("Study_Coordinator").trim());
-							break;
-						case 3:
-							roleMap.put(role.getId(), resterm.getString("Study_Director").trim());
-							break;
-						case 4:
-							roleMap.put(role.getId(), resterm.getString("Investigator").trim());
-							break;
-						case 5:
-							roleMap.put(role.getId(), resterm.getString("Data_Entry_Person").trim());
-							break;
-						case 6:
-							roleMap.put(role.getId(), resterm.getString("Monitor").trim());
-							break;
-						default:
-						}
-					}
-				}
-			} else {
-				if (currentStudy.getParentStudyId() > 0) {
-					roleMap.remove(Role.COORDINATOR.getId());
-					roleMap.remove(Role.STUDYDIRECTOR.getId());
-				}
-			}
-			request.setAttribute("roles", roleMap);
+			request.setAttribute("roles", Role.roleMapWithDescriptions);
 			request.setAttribute("studyId", studyId);
 			if ("confirm".equalsIgnoreCase(action) || changeRoles) {
 				// Re-order studiesNotHaveRole so that sites
@@ -177,7 +121,10 @@ public class SetUserRoleServlet extends SecureController {
 						}
 					}
 				}
-				
+
+                StudyBean study = (StudyBean)sdao.findByPK(studyId);
+                request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
+
 				request.setAttribute("user", user);
 				request.setAttribute("studies", finalStudiesNotHaveRole);
 				StudyUserRoleBean uRole = new StudyUserRoleBean();
@@ -226,7 +173,7 @@ public class SetUserRoleServlet extends SecureController {
 
 	private ArrayList getRoles() {
 		ArrayList roles = Role.toArrayList();
-		roles.remove(Role.ADMIN);
+		roles.remove(Role.SYSTEM_ADMINISTRATOR);
 
 		return roles;
 	}

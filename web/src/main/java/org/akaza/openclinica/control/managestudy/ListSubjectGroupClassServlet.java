@@ -65,7 +65,7 @@ public class ListSubjectGroupClassServlet extends SecureController {
 			return;
 		}
 
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -164,7 +164,7 @@ public class ListSubjectGroupClassServlet extends SecureController {
 		request.setAttribute("table", table);
 		
 		if (request.getParameter("read") != null && request.getParameter("read").equals("true")
-				&& currentRole.getRole().equals(Role.STUDYDIRECTOR)) {
+				&& currentRole.getRole().equals(Role.STUDY_DIRECTOR)) {
 			request.setAttribute("readOnly", true);
 		}
 		forwardPage(Page.SUBJECT_GROUP_CLASS_LIST);

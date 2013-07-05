@@ -45,7 +45,7 @@
     <c:set var="rolesCount" value="${status.count}" />
 </c:forEach>
 <c:choose>
-    <c:when test="${rolesCount > 3}">
+    <c:when test="${isThisStudy}">
         <c:set var="inclRoleCode1" value="2" />
         <c:set var="inclRoleCode2" value="6" />
     </c:when>

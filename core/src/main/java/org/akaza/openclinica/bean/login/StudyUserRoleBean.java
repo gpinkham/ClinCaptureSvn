@@ -92,12 +92,14 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		this.role = role;
 		super.setId(role.getId());
 		super.setName(role.getCode());
-		this.canSubmitData = this.role == Role.COORDINATOR || this.role == Role.STUDYDIRECTOR
-				|| this.role == Role.RESEARCHASSISTANT || this.role == Role.INVESTIGATOR;
-		this.canExtractData = this.role == Role.COORDINATOR || this.role == Role.STUDYDIRECTOR
+		this.canSubmitData = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
+				|| this.role == Role.STUDY_DIRECTOR || this.role == Role.CLINICAL_RESEARCH_COORDINATOR
 				|| this.role == Role.INVESTIGATOR;
-		this.canManageStudy = this.role == Role.COORDINATOR || this.role == Role.STUDYDIRECTOR;
-		this.canMonitor = this.role == Role.MONITOR;
+		this.canExtractData = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
+				|| this.role == Role.STUDY_DIRECTOR || this.role == Role.INVESTIGATOR;
+		this.canManageStudy = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
+				|| this.role == Role.STUDY_DIRECTOR;
+		this.canMonitor = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_MONITOR;
 	}
 
 	public int getUserAccountId() {
@@ -186,12 +188,7 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		return "";
 	}
 
-	@Override
-	public void setName(String name) {
-		setRoleName(name);
-	}
-
-	@Override
+    @Override
 	public int getId() {
 		if (role != null) {
 			return role.getId();
@@ -244,15 +241,19 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		return this.role == Role.INVESTIGATOR;
 	}
 
-	public boolean isResearchAssistant() {
-		return this.role == Role.RESEARCHASSISTANT;
+	public boolean isClinicalResearchCoordinator() {
+		return this.role == Role.CLINICAL_RESEARCH_COORDINATOR;
 	}
 
-	public boolean isCoordinator() {
-		return this.role == Role.COORDINATOR;
+	public boolean isStudyAdministrator() {
+		return this.role == Role.STUDY_ADMINISTRATOR;
 	}
 
-	public boolean isDirector() {
-		return this.role == Role.STUDYDIRECTOR;
+	public boolean isStudyDirector() {
+		return this.role == Role.STUDY_DIRECTOR;
 	}
+
+    public boolean isSysAdmin() {
+        return this.role == Role.SYSTEM_ADMINISTRATOR;
+    }
 }

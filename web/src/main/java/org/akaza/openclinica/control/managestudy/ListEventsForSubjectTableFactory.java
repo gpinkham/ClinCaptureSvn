@@ -207,7 +207,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	@Override
 	public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
 		Role r = currentRole.getRole();
-		boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
+		boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.STUDY_MONITOR);
 		tableFacade.setToolbar(new ListEventsForSubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(),
 				selectedStudyEventDefinition, addSubjectLinkShow, showMoreLink));
 	}
@@ -801,7 +801,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				StringBuilder url = new StringBuilder();
 
 				url.append(viewStudySubjectLinkBuilder(studySubjectBean));
-				if (getCurrentRole().getRole() != Role.MONITOR) {
+				if (getCurrentRole().getRole() != Role.STUDY_MONITOR) {
 					if (getStudyBean().getStatus() == Status.AVAILABLE
 							&& studySubjectBean.getStatus() != Status.DELETED) {
 						url.append(removeStudySubjectLinkBuilder(studySubjectBean));
@@ -813,7 +813,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 					if (getStudyBean().getStatus() == Status.AVAILABLE
 							&& studySubjectBean.getStatus() == Status.AVAILABLE) {
 						if (currentRole.getRole() != Role.INVESTIGATOR
-								&& currentRole.getRole() != Role.RESEARCHASSISTANT) {
+								&& currentRole.getRole() != Role.CLINICAL_RESEARCH_COORDINATOR) {
 							url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
 						}
 					}
@@ -972,7 +972,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 		if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
-			if (eventStatus == SubjectEventStatus.NOT_SCHEDULED && currentRole.getRole() != Role.MONITOR
+			if (eventStatus == SubjectEventStatus.NOT_SCHEDULED && currentRole.getRole() != Role.STUDY_MONITOR
 					&& !studyBean.getStatus().isFrozen()) {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
@@ -985,7 +985,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				eventDiv.td(0).styleClass("table_cell_left").close();
 				enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
 				eventDiv.tdEnd().trEnd(0);
-				if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin())
+				if ((currentRole.getRole() == Role.STUDY_DIRECTOR || currentUser.isSysAdmin())
 						&& studyBean.getStatus() == Status.AVAILABLE) {
 					eventDiv.tr(0).valign("top").close();
 					eventDiv.td(0).styleClass("table_cell_left").close();
@@ -1000,7 +1000,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 			else if (eventStatus == SubjectEventStatus.LOCKED) {
 				eventDiv.tdEnd().trEnd(0);
-				if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
+				if (currentRole.getRole() == Role.STUDY_DIRECTOR || currentUser.isSysAdmin()) {
 					eventDiv.tr(0).valign("top").close();
 					eventDiv.td(0).styleClass("table_cell_left").close();
 					enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
@@ -1017,7 +1017,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				eventDiv.td(0).styleClass("table_cell_left").close();
 				enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
 				eventDiv.tdEnd().trEnd(0);
-				if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin())
+				if ((currentRole.getRole() == Role.STUDY_DIRECTOR || currentUser.isSysAdmin())
 						&& studyBean.getStatus() == Status.AVAILABLE) {
 					eventDiv.tr(0).valign("top").close();
 					eventDiv.td(0).styleClass("table_cell_left").close();

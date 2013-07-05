@@ -45,7 +45,7 @@
     <c:set var="rolesCount" value="${status.count}" />
 </c:forEach>
 <c:choose>
-    <c:when test="${rolesCount > 3}">
+    <c:when test="${isThisStudy}">
         <c:set var="inclRoleCode1" value="2" />
         <c:set var="inclRoleCode2" value="6" />
     </c:when>
@@ -130,6 +130,12 @@
 	    }
 	    return true;
 	}
+
+  function processStudiesAndRoles() {
+      document.getElementById('roleTr').style.display = document.getElementById('type').value != 2 ? 'none' : '';
+      document.getElementById('studyTr').style.display = document.getElementById('type').value != 2 ? 'none' : '';
+  }
+
   function changeFlag(){
 	  objFlag = MM_findObj('pageIsChanged');
 	  objFlag.value='true';
@@ -254,7 +260,7 @@ int selectedValue;
 		</td>
 	</tr>
 
-	<tr valign="top">
+	<tr valign="top" id="studyTr">
 	  	<td class="formlabel"><fmt:message key="active_study" bundle="${resword}"/>:</td>
 <!-- EDIT !! -->
 		<td valign="top">
@@ -301,7 +307,7 @@ int selectedValue;
 		</td>
 	</tr>
 
-	<tr valign="top">
+	<tr valign="top" id="roleTr">
 	  	<td class="formlabel"><fmt:message key="role" bundle="${resword}"/>:</td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
@@ -330,7 +336,7 @@ int selectedValue;
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
-						<select name="type" id="type" onchange="javascript:changeFlag();" class="formfieldM">
+						<select name="type" id="type" onchange="javascript:changeFlag(); processStudiesAndRoles();" class="formfieldM">
 						<c:forEach var="currType" items="${types}">
 								<c:choose>
 									<c:when test="${userTypeId == currType.id}">
@@ -382,6 +388,7 @@ int selectedValue;
       </td>
 	</tr>
 </table>
+<script>processStudiesAndRoles();</script>
 	</div>
 
 	</div></div></div></div></div></div></div></div>

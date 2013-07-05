@@ -61,7 +61,6 @@
 
         <!-- Subject Controls section -->
         <td class="table_header_row" style="white-space: nowrap;">
-
             <c:choose>
                 <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id ne 6 and not study.status.frozen and not study.status.locked}">
                     <a href="UpdateStudySubject?id=${studySubject.id}&action=show"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_subject" bundle="${resword}"/>" title="<fmt:message key="edit_study_subject" bundle="${resword}"/>" hspace="4"/></a>
@@ -93,7 +92,7 @@
             <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
 
             <c:choose>
-                <c:when test="${showSubjectSDVButton and not studySubject.status.deleted and not study.status.frozen and not study.status.locked and (currentRole.id eq 6 or currentRole.id eq 2) and not study.status.frozen and not study.status.locked}">
+                <c:when test="${showSubjectSDVButton and not studySubject.status.deleted and not study.status.frozen and not study.status.locked and (currentRole.id eq 6 or currentRole.id eq 2 or currentRole.id eq 1) and not study.status.frozen and not study.status.locked}">
                     <a class="sdvLink" href="pages/viewSubjectAggregate?sbb=true&studyId=${studyId}&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId=${studySubject.label}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
                 <c:otherwise>
@@ -102,7 +101,7 @@
             </c:choose>
 
             <c:choose>
-                <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4} and not study.status.frozen and not study.status.locked">
+                <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and (currentRole.id eq 4 or currentRole.id eq 1) and not study.status.frozen and not study.status.locked} ">
                     <a href="SignStudySubject?id=${studySubject.id}"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign_subject " bundle="${resword}"/>" title="<fmt:message key="sign_subject " bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
                 <c:otherwise>
@@ -111,7 +110,7 @@
             </c:choose>
 
             <c:choose>
-                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id eq 2 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (currentRole.id eq 2 or currentRole.id eq 1) and not study.status.frozen and not study.status.locked}">
                     <a href="ReassignStudySubject?id=${studySubject.id}"><img src="images/bt_Reassign.gif" border="0" align="left" alt="<fmt:message key="reassign" bundle="${resword}"/>" title="<fmt:message key="reassign" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
                 <c:otherwise>
@@ -172,7 +171,7 @@
             <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
 
             <c:choose>
-                <c:when test="${showSDVButton and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (currentRole.id eq 6 or currentRole.id eq 2) and not study.status.frozen and not study.status.locked}">
+                <c:when test="${showSDVButton and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (currentRole.id eq 6 or currentRole.id eq 2 or currentRole.id eq 1) and not study.status.frozen and not study.status.locked}">
                     <a class="sdvLink" href="pages/viewAllSubjectSDVtmp?sbb=true&studyId=${studyId}&imagePathPrefix=..%2F&crfId=0&redirection=viewAllSubjectSDVtmp&maxRows=15&showMoreLink=true&sdv_tr_=true&sdv_p_=1&sdv_mr_=15&sdv_f_studySubjectId=${studySubject.label}&sdv_f_eventName=${studyEvent.studyEventDefinition.name}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
                 <c:otherwise>
@@ -181,7 +180,7 @@
             </c:choose>
 
             <c:choose>
-                <c:when test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and (currentRole.id eq 4 or currentRole.id eq 1) and not study.status.frozen and not study.status.locked}">
                     <a href="UpdateStudyEvent?action=submit&event_id=${studyEvent.id}&ss_id=${studySubject.id}&changeDate=&startDate=20-Jan-2012&startHour=-1&startMinute=-1&startHalf=&endDate=&endHour=-1&endMinute=-1&endHalf=&statusId=8&Submit=Submit+Changes"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign" bundle="${resword}"/>" title="<fmt:message key="sign" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
                 <c:otherwise>
@@ -340,7 +339,7 @@
                                             <%--<c:when test="${dedc.status.name=='locked'}">--%>
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         </c:when>
-                                        <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && !userRole.monitor}">
+                                        <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && userRole.role.id ne 6}">
                                                 <c:set var="hideCrfBlankCell" value="false"/>
                                                 <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>',document.startForm<c:out value="${dedc.edc.crf.id}"/>);"
                                                    onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
@@ -496,7 +495,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <c:set var="enterDataWasInserted" value="false"/>
-                                        <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && !userRole.monitor}">
+                                        <c:if test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && userRole.role.id ne 6}">
                                             <c:if test="${dec.continueInitialDataEntryPermitted}">
                                                 <c:set var="hideCrfBlankCell" value="false"/>
                                                 <c:set var="enterDataWasInserted" value="true"/>
@@ -546,7 +545,7 @@
                                            onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                           ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="4"></a>
 
-                                        <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
+                                        <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available)}">
                                             <c:set var="crfSpacersCount" value="4"/>
                                             <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                                                onMouseDown="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"

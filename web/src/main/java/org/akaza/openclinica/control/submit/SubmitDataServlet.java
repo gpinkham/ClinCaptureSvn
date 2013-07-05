@@ -43,8 +43,9 @@ public class SubmitDataServlet extends SecureController {
 		if (currentRole != null) {
 			Role r = currentRole.getRole();
 			if (r != null
-					&& (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) || r.equals(Role.INVESTIGATOR)
-							|| r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.MONITOR))) {
+					&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
+							|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR)
+							|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.STUDY_MONITOR))) {
 				return true;
 			}
 		}
@@ -53,11 +54,12 @@ public class SubmitDataServlet extends SecureController {
 	}
 
 	public static boolean maySubmitData(UserAccountBean ub, StudyUserRoleBean currentRole) {
-		if (currentRole != null) {
+		if (currentRole != null && ub != null) {
 			Role r = currentRole.getRole();
 			if (r != null
-					&& (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) || r.equals(Role.INVESTIGATOR) || r
-							.equals(Role.RESEARCHASSISTANT))) {
+					&& (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_ADMINISTRATOR)
+							|| r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.INVESTIGATOR) || r
+								.equals(Role.CLINICAL_RESEARCH_COORDINATOR))) {
 				return true;
 			}
 		}

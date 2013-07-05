@@ -135,7 +135,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 		FormProcessor fp = new FormProcessor(request);
 
 		request.setAttribute(DIS_TYPES, DiscrepancyNoteType.list);
-		if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+		if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
 			ArrayList<ResolutionStatus> resStatuses = new ArrayList();
 			resStatuses.add(ResolutionStatus.UPDATED);
 			request.setAttribute(RES_STATUSES, resStatuses);
@@ -146,7 +146,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 			ArrayList types2 = DiscrepancyNoteType.toArrayList();
 			types2.remove(DiscrepancyNoteType.QUERY);
 			request.setAttribute(DIS_TYPES2, types2);
-		} else if (currentRole.getRole().equals(Role.MONITOR)) {
+		} else if (currentRole.getRole().equals(Role.STUDY_MONITOR)) {
 			ArrayList<ResolutionStatus> resStatuses = new ArrayList();
 			resStatuses.add(ResolutionStatus.OPEN);
 			resStatuses.add(ResolutionStatus.UPDATED);
@@ -166,13 +166,13 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 		}
 		// logic from CreateDiscrepancyNoteServlet
 		request.setAttribute("unlock", "0");
-		String monitor = fp.getString("monitor");
+		String monitor = fp.getString("study_monitor");
 
 		if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
 			// enter note for all items,
 			// not just blank items
 			request.setAttribute(CAN_MONITOR, "1");
-			request.setAttribute("monitor", monitor);
+			request.setAttribute("study_monitor", monitor);
 		} else {
 			request.setAttribute(CAN_MONITOR, "0");
 		}
@@ -383,7 +383,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 			boxDNMap = new HashMap<Integer, DiscrepancyNoteBean>();
 			// initialize dn for a new thread
 			DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-			if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+			if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
 				dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
 				dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
 				autoviews.put(0, 0);
@@ -404,7 +404,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 			}
 		}
 
-		request.setAttribute("monitor", monitor);
+		request.setAttribute("study_monitor", monitor);
 		request.setAttribute(ENTITY_ID, entityId + "");
 		request.setAttribute(ENTITY_TYPE, name);
 		request.setAttribute(ENTITY_FIELD, field);
@@ -570,7 +570,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 					}
 				}
 				Role r = currentRole.getRole();
-				if (r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.INVESTIGATOR)) {
+				if (r.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || r.equals(Role.INVESTIGATOR)) {
 					if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.QUERY.getId()
 							&& note.getResStatus().getId() == ResolutionStatus.UPDATED.getId()) {
 						dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
@@ -587,7 +587,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 						dn.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
 					} else if (note.getResStatus().getId() == ResolutionStatus.CLOSED.getId()) {
 						dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
-					} else if (r.equals(Role.MONITOR)) {
+					} else if (r.equals(Role.STUDY_MONITOR)) {
 						dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
 					} else if (dn.getDiscrepancyNoteTypeId() == 1) {
 						dn.setResolutionStatusId(ResolutionStatus.RESOLVED.getId());
@@ -734,7 +734,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
 	private void manageStatuses(List<DiscrepancyNoteBean> notes) {
 
-		if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+		if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
 
 			request.setAttribute(SHOW_STATUS, false);
 			request.setAttribute(CAN_CLOSE, false);

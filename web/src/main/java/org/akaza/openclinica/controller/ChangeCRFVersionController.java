@@ -563,7 +563,7 @@ public class ChangeCRFVersionController {
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
 		Role r = currentRole.getRole();
 
-		if (r.equals(Role.ADMIN) || r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+		if (r.equals(Role.SYSTEM_ADMINISTRATOR) || r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 			return true;
 		}
 		return false;

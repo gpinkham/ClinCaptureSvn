@@ -187,7 +187,7 @@ public class ViewDatasetsServlet extends SecureController {
 			return;
 		}
 
-		if (!currentRole.getRole().equals(Role.RESEARCHASSISTANT)) {
+		if (!currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)) {
 			return;
 		}
 

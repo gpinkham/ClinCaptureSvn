@@ -87,8 +87,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 
 		String message = fp.getString(ARG_MESSAGE, true);
 		request.setAttribute(ARG_MESSAGE, message);
-		request.setAttribute("siteRoleMap", Role.siteRoleMap);
-		request.setAttribute("studyRoleMap", Role.studyRoleMap);
+        request.setAttribute("roleMap", Role.roleMap);
 
 		resetPanel();
 		panel.setStudyInfoShown(false);

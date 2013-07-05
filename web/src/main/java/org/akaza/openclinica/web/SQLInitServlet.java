@@ -65,11 +65,11 @@ public class SQLInitServlet extends HttpServlet {
 		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(context).getBean(
 				ConfigurationDao.class);
 		
-		Role.COORDINATOR.setDescription(getField("coordinator"));
-		Role.STUDYDIRECTOR.setDescription(getField("director"));
+		Role.STUDY_ADMINISTRATOR.setDescription(getField("study_administrator"));
+		Role.STUDY_DIRECTOR.setDescription(getField("study_director"));
 		Role.INVESTIGATOR.setDescription(getField("investigator"));
-		Role.RESEARCHASSISTANT.setDescription(getField("ra"));
-		Role.MONITOR.setDescription(getField("monitor"));
+		Role.CLINICAL_RESEARCH_COORDINATOR.setDescription(getField("clinical_research_coordinator"));
+		Role.STUDY_MONITOR.setDescription(getField("study_monitor"));
 
 		String ruleDirectory = "rules";
 		String rootDirectory = getField("filePath");

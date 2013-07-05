@@ -85,8 +85,8 @@ public class VerifyImportedRuleServlet extends SecureController {
 		}
 
 		Role r = currentRole.getRole();
-		if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.INVESTIGATOR)
-				|| r.equals(Role.RESEARCHASSISTANT)) {
+		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR) || r.equals(Role.INVESTIGATOR)
+				|| r.equals(Role.CLINICAL_RESEARCH_COORDINATOR)) {
 			return;
 		}
 

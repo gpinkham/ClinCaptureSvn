@@ -137,7 +137,7 @@ public class ManageStudyServlet extends SecureController {
 		}
 
 		Role r = currentRole.getRole();
-		if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 

@@ -88,7 +88,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 				return Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET;
 			}
 		} else if ("itemdata".equalsIgnoreCase(entityType) || "eventcrf".equalsIgnoreCase(entityType)) {
-			if (currentRole.getRole().equals(Role.MONITOR) || !isCompleted) {
+			if (currentRole.getRole().equals(Role.STUDY_MONITOR) || !isCompleted) {
 				return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
 			} else {
 				return Page.ADMIN_EDIT_SERVLET;
@@ -143,7 +143,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 			ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
 			ItemFormMetadataBean ifmb = ifmdao.findByItemIdAndCRFVersionId(idb.getItemId(), ecb.getCRFVersionId());
 
-			if (currentRole.getRole().equals(Role.MONITOR) || !isCompleted) {
+			if (currentRole.getRole().equals(Role.STUDY_MONITOR) || !isCompleted) {
 				StudyEventDAO sedao = new StudyEventDAO(ds);
 				StudyEventBean seb = (StudyEventBean) sedao.findByPK(id);
 				request.setAttribute(EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
@@ -192,7 +192,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 		// If it's not an ItemData type note, redirect
 		// Monitors to View Subject or
 		// View Study Events <<
-		if (currentRole.getRole().equals(Role.MONITOR) && !"itemdata".equalsIgnoreCase(entityType)
+		if (currentRole.getRole().equals(Role.STUDY_MONITOR) && !"itemdata".equalsIgnoreCase(entityType)
 				&& !"eventcrf".equalsIgnoreCase(entityType)) {
 			redirectMonitor(module, discrepancyNoteBean);
 			return;
@@ -290,9 +290,12 @@ public class ResolveDiscrepancyServlet extends SecureController {
 			session.removeAttribute("module");
 		}
 
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
+		if (currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR)
+				|| currentRole.getRole().equals(Role.STUDY_DIRECTOR)
+				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.INVESTIGATOR)
-				|| currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.MONITOR)) {
+				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
+				|| currentRole.getRole().equals(Role.STUDY_MONITOR)) {
 			return;
 		}
 

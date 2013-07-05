@@ -90,57 +90,6 @@ public class SetUpStudyRole {
 			currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId())).getName());
 		}
 
-		if (currentStudy.getParentStudyId() > 0) {
-			List roles = Role.toArrayList();
-			for (Iterator it = roles.iterator(); it.hasNext();) {
-				Role role = (Role) it.next();
-				switch (role.getId()) {
-				case 2:
-					role.setDescription("site_Study_Coordinator");
-					break;
-				case 3:
-					role.setDescription("site_Study_Director");
-					break;
-				case 4:
-					role.setDescription("site_investigator");
-					break;
-				case 5:
-					role.setDescription("site_Data_Entry_Person");
-					break;
-				case 6:
-					role.setDescription("site_monitor");
-					break;
-				default:
-					break;
-				}
-			}
-		} else {
-			// If the current study is a site, we will change the role description. issue-2422 
-			List roles = Role.toArrayList();
-			for (Iterator it = roles.iterator(); it.hasNext();) {
-				Role role = (Role) it.next();
-				switch (role.getId()) {
-				case 2:
-					role.setDescription("Study_Coordinator");
-					break;
-				case 3:
-					role.setDescription("Study_Director");
-					break;
-				case 4:
-					role.setDescription("investigator");
-					break;
-				case 5:
-					role.setDescription("Data_Entry_Person");
-					break;
-				case 6:
-					role.setDescription("monitor");
-					break;
-				default:
-					break;
-				}
-			}
-		}
-
 		if (currentRole.getId() <= 0) {
 			if (userAccountBean.getId() > 0 && currentStudy.getId() > 0
 					&& !currentStudy.getStatus().getName().equals("removed")) {

@@ -191,7 +191,7 @@ public class UpdateStudyEventServlet extends SecureController {
 			}
 		}
 
-		if (currentRole.isResearchAssistant()) {
+		if (currentRole.isClinicalResearchCoordinator()) {
 			removeSign = true;
 		}
 
@@ -250,8 +250,8 @@ public class UpdateStudyEventServlet extends SecureController {
 			}
 		}
 
-		if (!ub.isSysAdmin() && !currentRole.getRole().equals(Role.STUDYDIRECTOR)
-				&& !currentRole.getRole().equals(Role.COORDINATOR)) {
+		if (!ub.isSysAdmin() && !currentRole.getRole().equals(Role.STUDY_DIRECTOR)
+				&& !currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			statuses.remove(SubjectEventStatus.LOCKED);
 		}
 

@@ -212,7 +212,7 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                     studyBean = this.createStudyParameters(studyBean);
                     // 7670 create a user role for this study
                     StudyUserRoleBean sub = new StudyUserRoleBean();
-                    sub.setRole(Role.COORDINATOR);
+                    sub.setRole(Role.STUDY_ADMINISTRATOR);
                     sub.setStudyId(studyBean.getId());
                     sub.setStatus(Status.AVAILABLE);
                     sub.setOwner(getUserAccount());

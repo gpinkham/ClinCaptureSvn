@@ -41,11 +41,8 @@
 <jsp:useBean scope="request" id="uRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
 <jsp:useBean scope="request" id="roles" class="java.util.ArrayList"/>
 
-<c:forEach var="currRole" items="${roles}" varStatus="status">
-    <c:set var="rolesCount" value="${status.count}" />
-</c:forEach>
 <c:choose>
-    <c:when test="${rolesCount > 3}">
+    <c:when test="${isThisStudy}">
         <c:set var="inclRoleCode1" value="2" />
         <c:set var="inclRoleCode2" value="6" />
     </c:when>

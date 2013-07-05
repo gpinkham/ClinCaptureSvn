@@ -57,7 +57,7 @@ public class UpdateSubjectGroupClassServlet extends SecureController {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + "\n"

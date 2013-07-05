@@ -93,59 +93,6 @@ public class SetUpStudyRole {
         }
         // YW >>
 
-        if (currentStudy.getParentStudyId() > 0) {
-            /*The Role decription will be set depending on whether the user logged in at
-       study lever or site level. issue-2422*/
-            List roles = Role.toArrayList();
-            for (Iterator it = roles.iterator(); it.hasNext();) {
-                Role role = (Role) it.next();
-                switch (role.getId()) {
-                    case 2:
-                        role.setDescription("site_Study_Coordinator");
-                        break;
-                    case 3:
-                        role.setDescription("site_Study_Director");
-                        break;
-                    case 4:
-                        role.setDescription("site_investigator");
-                        break;
-                    case 5:
-                        role.setDescription("site_Data_Entry_Person");
-                        break;
-                    case 6:
-                        role.setDescription("site_monitor");
-                        break;
-                    default:
-                        // logger.info("No role matched when setting role description");
-                }
-            }
-        } else {
-            /*If the current study is a site, we will change the role description. issue-2422*/
-            List roles = Role.toArrayList();
-            for (Iterator it = roles.iterator(); it.hasNext();) {
-                Role role = (Role) it.next();
-                switch (role.getId()) {
-                    case 2:
-                        role.setDescription("Study_Coordinator");
-                        break;
-                    case 3:
-                        role.setDescription("Study_Director");
-                        break;
-                    case 4:
-                        role.setDescription("investigator");
-                        break;
-                    case 5:
-                        role.setDescription("Data_Entry_Person");
-                        break;
-                    case 6:
-                        role.setDescription("monitor");
-                        break;
-                    default:
-                        // logger.info("No role matched when setting role description");
-                }
-            }
-        }
-
         if (currentRole.getId() <= 0) {
             // if (ub.getId() > 0 && currentStudy.getId() > 0) {
             // if current study has been "removed", current role will be

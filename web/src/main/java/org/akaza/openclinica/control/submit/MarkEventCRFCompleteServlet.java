@@ -216,7 +216,8 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 
 		fp = new FormProcessor(request);
 
-		if (currentRole.equals(Role.COORDINATOR) || currentRole.equals(Role.STUDYDIRECTOR)) {
+		if (currentRole.equals(Role.SYSTEM_ADMINISTRATOR) || currentRole.equals(Role.STUDY_ADMINISTRATOR)
+				|| currentRole.equals(Role.STUDY_DIRECTOR)) {
 			return;
 		}
 
@@ -224,14 +225,14 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 
 		Role r = currentRole.getRole();
 		if (ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
-			if (ecb.getOwnerId() != ub.getId() && !r.equals(Role.COORDINATOR) && !r.equals(Role.STUDYDIRECTOR)) {
+			if (ecb.getOwnerId() != ub.getId() && !r.equals(Role.STUDY_ADMINISTRATOR) && !r.equals(Role.STUDY_DIRECTOR)) {
 				request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
 				addPageMessage(respage.getString("not_mark_CRF_complete6"));
 				throw new InsufficientPermissionException(Page.TABLE_OF_CONTENTS_SERVLET,
 						resexception.getString("not_study_owner"), "1");
 			}
 		} else if (ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-			if (ecb.getValidatorId() != ub.getId() && !r.equals(Role.COORDINATOR) && !r.equals(Role.STUDYDIRECTOR)) {
+			if (ecb.getValidatorId() != ub.getId() && !r.equals(Role.STUDY_ADMINISTRATOR) && !r.equals(Role.STUDY_DIRECTOR)) {
 				request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
 				addPageMessage(respage.getString("not_mark_CRF_complete7"));
 				throw new InsufficientPermissionException(Page.TABLE_OF_CONTENTS_SERVLET,

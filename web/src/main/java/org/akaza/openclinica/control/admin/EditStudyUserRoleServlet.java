@@ -86,65 +86,13 @@ public class EditStudyUserRoleServlet extends SecureController {
 			addPageMessage(message);
 			forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
 		} else {
-			Map roleMap = new LinkedHashMap();
-			for (Iterator it = getRoles().iterator(); it.hasNext();) {
-				Role role = (Role) it.next();
-				roleMap.put(role.getId(), role.getDescription());
-			}
-
-			roleMap = new LinkedHashMap();
-			ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
 			StudyBean study = (StudyBean) sdao.findByPK(studyUserRole.getStudyId());
-			if (study.getParentStudyId() == 0) {
-				for (Iterator it = getRoles().iterator(); it.hasNext();) {
-					Role role = (Role) it.next();
-					switch (role.getId()) {
-					case 2:
-						roleMap.put(role.getId(), resterm.getString("Study_Coordinator").trim());
-						break;
-					case 3:
-						roleMap.put(role.getId(), resterm.getString("Study_Director").trim());
-						break;
-					case 4:
-						roleMap.put(role.getId(), resterm.getString("Investigator").trim());
-						break;
-					case 5:
-						roleMap.put(role.getId(), resterm.getString("Data_Entry_Person").trim());
-						break;
-					case 6:
-						roleMap.put(role.getId(), resterm.getString("Monitor").trim());
-						break;
-					default:
-					}
-				}
-			} else {
-				for (Iterator it = getRoles().iterator(); it.hasNext();) {
-					Role role = (Role) it.next();
-					switch (role.getId()) {
-					case 4:
-						roleMap.put(role.getId(), resterm.getString("site_investigator").trim());
-						break;
-					case 5:
-						roleMap.put(role.getId(), resterm.getString("site_Data_Entry_Person").trim());
-						break;
-					case 6:
-						roleMap.put(role.getId(), resterm.getString("site_monitor").trim());
-						break;
-					default:
-					}
-				}
-			}
-
-			if (study.getParentStudyId() > 0) {
-				roleMap.remove(Role.COORDINATOR.getId());
-				roleMap.remove(Role.STUDYDIRECTOR.getId());
-			}
-
+            request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
 			// send the user to the right place..
 			if (!fp.isSubmitted()) {
 				request.setAttribute("userName", uName);
 				request.setAttribute("studyUserRole", studyUserRole);
-				request.setAttribute("roles", roleMap);
+				request.setAttribute("roles", Role.roleMapWithDescriptions);
 				request.setAttribute("chosenRoleId", new Integer(studyUserRole.getRole().getId()));
 				forwardPage(Page.EDIT_STUDY_USER_ROLE);
 			}
@@ -173,7 +121,7 @@ public class EditStudyUserRoleServlet extends SecureController {
 					request.setAttribute("userName", uName);
 					request.setAttribute("studyUserRole", studyUserRole);
 					request.setAttribute("chosenRoleId", new Integer(fp.getInt(INPUT_ROLE)));
-					request.setAttribute("roles", roleMap);
+					request.setAttribute("roles", Role.roleMapWithDescriptions);
 					forwardPage(Page.EDIT_STUDY_USER_ROLE);
 				}
 			}
@@ -182,7 +130,7 @@ public class EditStudyUserRoleServlet extends SecureController {
 
 	private ArrayList getRoles() {
 		ArrayList roles = Role.toArrayList();
-		roles.remove(Role.ADMIN);
+		roles.remove(Role.SYSTEM_ADMINISTRATOR);
 		return roles;
 	}
 

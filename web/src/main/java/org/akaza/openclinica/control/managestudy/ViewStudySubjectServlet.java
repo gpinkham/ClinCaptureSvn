@@ -367,7 +367,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			
 			for (int i = 0; i < displayEvents.size(); i++) {
 				DisplayStudyEventBean decb = displayEvents.get(i);
-				if (!(currentRole.isDirector() || currentRole.isCoordinator())
+				if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator())
 						&& decb.getStudyEvent().getSubjectEventStatus().isLocked()) {
 					decb.getStudyEvent().setEditable(false);
 				}
@@ -397,7 +397,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			
 			if (!"removed".equalsIgnoreCase(studySub.getStatus().getName())
 					&& !"auto-removed".equalsIgnoreCase(studySub.getStatus().getName())) {
-				if (currentStudy.getStatus().isAvailable() && !currentRole.getRole().equals(Role.MONITOR)) {
+				if (currentStudy.getStatus().isAvailable() && !currentRole.getRole().equals(Role.STUDY_MONITOR)) {
 					
 					request.setAttribute("link_schedule_new_event",
 							"CreateNewStudyEvent?" + CreateNewStudyEventServlet.INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT

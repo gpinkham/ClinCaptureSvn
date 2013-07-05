@@ -124,7 +124,7 @@ public class CRFListForStudyEventServlet extends SecureController {
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
 		seb.setStudyEventDefinition(sedb);
-		if (!(currentRole.isDirector() || currentRole.isCoordinator()) && seb.getSubjectEventStatus().isLocked()) {
+		if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator()) && seb.getSubjectEventStatus().isLocked()) {
 			seb.setEditable(false);
 		}
 		return seb;

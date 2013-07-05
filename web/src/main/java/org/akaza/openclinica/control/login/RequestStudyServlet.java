@@ -51,14 +51,25 @@ public class RequestStudyServlet extends SecureController {
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
 		ArrayList studies = sdao.findAllByStatus(Status.AVAILABLE);
 		ArrayList roles = Role.toArrayList();
-		roles.remove(Role.ADMIN); // admin is not a user role, only used for
+		roles.remove(Role.SYSTEM_ADMINISTRATOR); // admin is not a user role, only used for
 		// tomcat
 
-		request.setAttribute("roles", roles);
+		StudyUserRoleBean newRole = new StudyUserRoleBean();
+		StudyBean requestedStudy = studies.size() > 0 ? (StudyBean) studies.get(0) : null;
+		Integer requestedStudyId = request.getParameter("requestedStudyId") == null
+				|| request.getParameter("requestedStudyId").trim().isEmpty() ? null : Integer.parseInt(request
+				.getParameter("requestedStudyId"));
+		if (requestedStudyId != null) {
+			action = null;
+			newRole.setStudyId(requestedStudyId);
+			requestedStudy = (StudyBean) sdao.findByPK(requestedStudyId);
+		}
+		request.setAttribute("isThisStudy", requestedStudy != null ? !(requestedStudy.getParentStudyId() > 0) : false);
+		request.setAttribute("roles", requestedStudy == null ? new ArrayList() : roles);
 		request.setAttribute("studies", studies);
 
 		if (StringUtil.isBlank(action)) {
-			request.setAttribute("newRole", new StudyUserRoleBean());
+			request.setAttribute("newRole", newRole);
 			forwardPage(Page.REQUEST_STUDY);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {

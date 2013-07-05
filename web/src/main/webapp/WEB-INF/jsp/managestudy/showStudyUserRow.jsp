@@ -10,20 +10,6 @@
 
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.UserAccountRow" />
 
-<c:forEach var="currRole" items="${roles}" varStatus="status">
-    <c:set var="rolesCount" value="${status.count}" />
-</c:forEach>
-<c:choose>
-    <c:when test="${rolesCount > 3}">
-        <c:set var="inclRoleCode1" value="2" />
-        <c:set var="inclRoleCode2" value="6" />
-    </c:when>
-    <c:otherwise>
-        <c:set var="inclRoleCode1" value="4" />
-        <c:set var="inclRoleCode2" value="5" />
-    </c:otherwise>
-</c:choose>
-
 <c:choose>
    <c:when test="${currRow.bean.status.id ==1}">
    <tr valign="top">  
@@ -46,22 +32,7 @@
       <div class="formfieldM_BG_noMargin">
        <select name="activeStudyRoleId<c:out value="${count}"/>" class="formfieldM" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
          <c:forEach var="userRole" items="${roles}">
-
-<%--
-          <c:choose>
-           <c:when test="${role1 == userRole.id}">
-             <option value="<c:out value="${userRole.id}"/>" selected><c:out value="${userRole.description}"/>
-           </c:when>
-           <c:otherwise>
-             <option value="<c:out value="${userRole.id}"/>"><c:out value="${userRole.description}"/>
-           </c:otherwise>
-          </c:choose>
---%>
-
-             <c:if test="${userRole.id == inclRoleCode1 || userRole.id == inclRoleCode2}">
-                 <option value="<c:out value="${userRole.id}"/>" <c:if test="${role1 == userRole.id}">selected</c:if>><c:out value="${userRole.description}"/></option>
-             </c:if>
-
+             <option value="<c:out value="${userRole.id}"/>" <c:if test="${role1 == userRole.id}">selected</c:if>><c:out value="${userRole.description}"/></option>
          </c:forEach>
        </select>
          </div>

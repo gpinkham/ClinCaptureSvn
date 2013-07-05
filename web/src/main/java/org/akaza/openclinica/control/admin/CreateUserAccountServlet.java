@@ -100,17 +100,14 @@ public class CreateUserAccountServlet extends SecureController {
 		}
 		addEntityList("studies", finalList, respage.getString("a_user_cannot_be_created_no_study_as_active"),
 				Page.ADMIN_SYSTEM);
-		Map roleMap = new LinkedHashMap();
-		for (Iterator it = getRoles().iterator(); it.hasNext();) {
-			Role role = (Role) it.next();
-			roleMap.put(role.getId(), role.getDescription());
-		}
+
 		// for warning window for back button
 		String pageIsChanged = request.getParameter("pageIsChanged");
 		if (pageIsChanged != null) {
 			request.setAttribute("pageIsChanged", pageIsChanged);
 		}
-		request.setAttribute("roles", roleMap);
+
+        Map roleMap = Role.roleMapWithDescriptions;
 
 		ArrayList types = UserType.toArrayList();
 		types.remove(UserType.INVALID);
@@ -121,53 +118,11 @@ public class CreateUserAccountServlet extends SecureController {
 		Boolean changeRoles = request.getParameter("changeRoles") == null ? false : Boolean.parseBoolean(request
 				.getParameter("changeRoles"));
 		int activeStudy = fp.getInt(INPUT_STUDY);
-		if (changeRoles || activeStudy > 0) {
-			StudyBean study = (StudyBean) sdao.findByPK(activeStudy);
-			roleMap = new LinkedHashMap();
-			ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
+        StudyBean study = (StudyBean)sdao.findByPK(activeStudy);
+        request.setAttribute("roles", roleMap);
+        request.setAttribute("activeStudy", activeStudy);
+        request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
 
-			if (study.getParentStudyId() > 0) {
-				for (Iterator it = getRoles().iterator(); it.hasNext();) {
-					Role role = (Role) it.next();
-					switch (role.getId()) {
-					case 4:
-						roleMap.put(role.getId(), resterm.getString("site_investigator").trim());
-						break;
-					case 5:
-						roleMap.put(role.getId(), resterm.getString("site_Data_Entry_Person").trim());
-						break;
-					case 6:
-						roleMap.put(role.getId(), resterm.getString("site_monitor").trim());
-						break;
-					default:
-					}
-				}
-			} else {
-				for (Iterator it = getRoles().iterator(); it.hasNext();) {
-					Role role = (Role) it.next();
-					switch (role.getId()) {
-					case 2:
-						roleMap.put(role.getId(), resterm.getString("Study_Coordinator").trim());
-						break;
-					case 3:
-						roleMap.put(role.getId(), resterm.getString("Study_Director").trim());
-						break;
-					case 4:
-						roleMap.put(role.getId(), resterm.getString("Investigator").trim());
-						break;
-					case 5:
-						roleMap.put(role.getId(), resterm.getString("Data_Entry_Person").trim());
-						break;
-					case 6:
-						roleMap.put(role.getId(), resterm.getString("Monitor").trim());
-						break;
-					default:
-					}
-				}
-			}
-			request.setAttribute("roles", roleMap);
-		}
-		request.setAttribute("activeStudy", activeStudy);
 		if (!fp.isSubmitted() || changeRoles) {
 			String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL, INPUT_INSTITUTION,
 					INPUT_DISPLAY_PWD };
@@ -183,6 +138,8 @@ public class CreateUserAccountServlet extends SecureController {
 			setPresetValues(presetValues);
 			forwardPage(Page.CREATE_ACCOUNT);
 		} else {
+            UserType type = UserType.get(fp.getInt("type"));
+
 			UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 			Validator v = new Validator(request);
 
@@ -212,8 +169,10 @@ public class CreateUserAccountServlet extends SecureController {
 			v.addValidation(INPUT_INSTITUTION, Validator.LENGTH_NUMERIC_COMPARISON,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
-			v.addValidation(INPUT_STUDY, Validator.ENTITY_EXISTS, sdao);
-			v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
+            if (type != UserType.SYSADMIN) {
+			    v.addValidation(INPUT_STUDY, Validator.ENTITY_EXISTS, sdao);
+			    v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
+            }
 
 			HashMap errors = v.validate();
 
@@ -243,9 +202,10 @@ public class CreateUserAccountServlet extends SecureController {
 				createdUserAccountBean.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
 
 				int studyId = fp.getInt(INPUT_STUDY);
-				Role r = Role.get(fp.getInt(INPUT_ROLE));
-				createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyId, r);
-				UserType type = UserType.get(fp.getInt("type"));
+                int roleId = fp.getInt(INPUT_ROLE);
+                if (type != UserType.SYSADMIN) {
+				    createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyId, Role.get(roleId));
+                }
 				logger.warn("*** found type: " + fp.getInt("type"));
 				logger.warn("*** setting type: " + type.getDescription());
 				createdUserAccountBean.addUserType(type);
@@ -309,7 +269,7 @@ public class CreateUserAccountServlet extends SecureController {
 	private ArrayList getRoles() {
 
 		ArrayList roles = Role.toArrayList();
-		roles.remove(Role.ADMIN);
+		roles.remove(Role.SYSTEM_ADMINISTRATOR);
 
 		return roles;
 	}

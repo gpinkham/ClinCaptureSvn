@@ -252,12 +252,12 @@ public class CoreResources implements ResourceLoaderAware {
 		if (DATAINFO.getProperty("maxInactiveInterval") != null)
 			DATAINFO.setProperty("max_inactive_interval", DATAINFO.getProperty("maxInactiveInterval"));
 
-		DATAINFO.setProperty("ra", "Data_Entry_Person");
+		DATAINFO.setProperty("clinical_research_coordinator", "Clinical_Research_Coordinator");
 		DATAINFO.setProperty("investigator", "Investigator");
-		DATAINFO.setProperty("director", "Study_Director");
+		DATAINFO.setProperty("study_director", "Study_Director");
 
-		DATAINFO.setProperty("coordinator", "Study_Coordinator");
-		DATAINFO.setProperty("monitor", "Monitor");
+		DATAINFO.setProperty("study_administrator", "Study_Administrator");
+		DATAINFO.setProperty("study_monitor", "Study_Monitor");
 		DATAINFO.setProperty("ccts.waitBeforeCommit", "6000");
 
 		String rss_url = DATAINFO.getProperty("rssUrl");

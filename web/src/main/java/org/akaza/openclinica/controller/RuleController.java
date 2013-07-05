@@ -275,7 +275,7 @@ public class RuleController {
 
 	private void mayProceed(UserAccountBean userAccount, StudyBean study) throws Exception {
 		Role r = getRole(userAccount, study).getRole();
-		if (Role.STUDYDIRECTOR.equals(r) || Role.COORDINATOR.equals(r)) {
+		if (Role.SYSTEM_ADMINISTRATOR.equals(r) || Role.STUDY_DIRECTOR.equals(r) || Role.STUDY_ADMINISTRATOR.equals(r)) {
 			return;
 		} else {
 			throw new Exception("Insufficient Permission");

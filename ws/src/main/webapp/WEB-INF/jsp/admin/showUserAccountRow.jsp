@@ -146,12 +146,8 @@
 						<c:otherwise>Study <c:out value="${sur.studyId}" /></c:otherwise>
 					</c:choose>
 					- 
-					  <c:if test="${sur.parentStudyId > 0}">
-                        <fmt:message key="${siteRoleMap[sur.role.id] }" bundle="${resterm}"></fmt:message>
-                      </c:if>
-                      <c:if test="${sur.parentStudyId == 0}">
-                        <fmt:message key="${studyRoleMap[sur.role.id] }" bundle="${resterm}"></fmt:message>
-                      </c:if>
+					<fmt:message key="${roleMap[sur.role.id] }" bundle="${resterm}"></fmt:message>
+
 					<c:if test='${sur.status.deleted}'>
 						</font>
 					</c:if>

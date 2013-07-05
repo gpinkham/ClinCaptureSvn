@@ -53,7 +53,7 @@ public class SetStudyUserRoleServlet extends SecureController {
 			return;
 		}
 
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -80,6 +80,8 @@ public class SetStudyUserRoleServlet extends SecureController {
 			StudyBean userStudy = (StudyBean) sdao.findByPK(fp.getInt("studyId"));
 			if ("confirm".equalsIgnoreCase(action)) {
 				int studyId = Integer.valueOf(studyIdString.trim()).intValue();
+                StudyBean study = (StudyBean) sdao.findByPK(studyId);
+                request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
 
 				request.setAttribute("user", user);
 
@@ -88,23 +90,23 @@ public class SetStudyUserRoleServlet extends SecureController {
 				request.setAttribute("uRole", uRole);
 
 				ArrayList roles = Role.toArrayList();
-				roles.remove(Role.ADMIN); // admin is not a user role, only used for tomcat
+				roles.remove(Role.SYSTEM_ADMINISTRATOR); // admin is not a user role, only used for tomcat
 
 				StudyBean studyBean = (StudyBean) sdao.findByPK(uRole.getStudyId());
 
 				if (currentStudy.getParentStudyId() > 0) {
-					roles.remove(Role.COORDINATOR);
-					roles.remove(Role.STUDYDIRECTOR);
+					roles.remove(Role.STUDY_ADMINISTRATOR);
+					roles.remove(Role.STUDY_DIRECTOR);
 				} else if (studyBean.getParentStudyId() > 0) {
-					roles.remove(Role.COORDINATOR);
-					roles.remove(Role.STUDYDIRECTOR);
+					roles.remove(Role.STUDY_ADMINISTRATOR);
+					roles.remove(Role.STUDY_DIRECTOR);
 					// TODO: redo this fix
-					Role r = Role.RESEARCHASSISTANT;
-					r.setDescription("site_Data_Entry_Person");
-					roles.remove(Role.RESEARCHASSISTANT);
+					Role r = Role.CLINICAL_RESEARCH_COORDINATOR;
+					r.setDescription("Clinical_Research_Coordinator");
+					roles.remove(Role.CLINICAL_RESEARCH_COORDINATOR);
 					roles.add(r);
 					Role ri = Role.INVESTIGATOR;
-					ri.setDescription("site_investigator");
+					ri.setDescription("Investigator");
 					roles.remove(Role.INVESTIGATOR);
 
 					roles.add(ri);

@@ -170,7 +170,7 @@ public class SubjectTransferValidator implements Validator {
 			subjectTransferBean.setStudy(site);
 		}
 		boolean isRoleVerified = helper.verifyRole(subjectTransferBean.getOwner(), study.getId(), site_id,
-				Role.MONITOR, e);
+				Role.STUDY_MONITOR, e);
 		if (!isRoleVerified) {
 			return;
 		}
@@ -197,7 +197,7 @@ public class SubjectTransferValidator implements Validator {
 		// }
 		// UserAccountBean ua = subjectTransferBean.getOwner();
 		// StudyUserRoleBean role = ua.getRoleByStudy(subjectTransferBean.getStudy());
-		// if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
+		// if (role.getId() == 0 || role.getRole().equals(Role.STUDY_MONITOR)) {
 		// e.reject("subjectTransferValidator.insufficient_permissions",
 		// "You do not have sufficient privileges to proceed with this operation.");
 		// return;
@@ -224,7 +224,7 @@ public class SubjectTransferValidator implements Validator {
 		// subjectTransferBean.setStudy(site);//???????????
 		// }
 		// role = ua.getRoleByStudy(site);
-		// if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
+		// if (role.getId() == 0 || role.getRole().equals(Role.STUDY_MONITOR)) {
 		// e.reject("subjectTransferValidator.insufficient_permissions",
 		// "You do not have sufficient privileges to proceed with this operation.");
 		// return;

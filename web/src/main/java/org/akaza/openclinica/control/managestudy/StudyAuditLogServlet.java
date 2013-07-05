@@ -75,7 +75,7 @@ public class StudyAuditLogServlet extends SecureController {
 		}
 
 		Role r = currentRole.getRole();
-		if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR)) {
+		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR) || r.equals(Role.STUDY_MONITOR)) {
 			return;
 		}
 

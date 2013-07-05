@@ -40,7 +40,7 @@ public class ViewStudyUserServlet extends SecureController {
 			return;
 		}
 
-		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -74,7 +74,7 @@ public class ViewStudyUserServlet extends SecureController {
 				StudyDAO sdao = new StudyDAO(sm.getDataSource());
 				StudyBean study = (StudyBean) sdao.findByPK(studyId);
 				request.setAttribute("uStudy", study);
-				request.setAttribute("siteRoleMap", Role.siteRoleMap);
+				request.setAttribute("roleMap", Role.roleMap);
 				// To provide the view with the correct date format
 				// pattern, locale sensitive
 				String pattn = "";
