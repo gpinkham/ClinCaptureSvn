@@ -84,12 +84,7 @@ public class JSONSubmissionContext extends DefaultSubmissionContext {
 		if (randomization.getStratificationLevel() != null 
 				&& randomization.getStratificationLevel().length() > 0) {
 
-			JSONArray array = new JSONArray();
-			JSONObject strataObject = new JSONObject();
-			strataObject.put("StratificationID", "1");
-			strataObject.put("Level", randomization.getStratificationLevel());
-
-			array.put(strataObject);
+			JSONArray array = new JSONArray(randomization.getStratificationLevel());
 
 			postData.put("StrataAnswers", array);
 		}

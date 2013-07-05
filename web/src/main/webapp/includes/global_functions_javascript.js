@@ -2144,25 +2144,18 @@ function randomizeSubject() {
         } 
     }
 
-    var strataLevel = null
+   var strataLevels = []
+    $.each($("div[id^=Rand_StrataData]").find(":selected"), function(index, element) {
 
-    // Check if the strate level item defined
-    if($("#Rand_StrataData :select").size() > 0) {
+        var strata = {
 
-        // Check if selection has been done
-        if($("#Rand_StrataData :select").find(":selected") !== undefined) {
-           
-            var opt2 = $("#Rand_StrataData :select").find(":selected").text();
-
-            strataLevel = $("input:hidden[eleid='requiredParam2']").attr(opt2)} 
-
-            else {
-            
-            alert($("input:hidden[name='requiredParam2Missing']").val());
-
-            return false;
+            // ordering
+            StratificationID: index + 1,
+            Level: $("input[eleid^='"+ $(this).parents("div").attr("id") +"']").attr($(this).text())
         }
-    }
+
+        strataLevels.push(strata)
+    })
 
     var trialId = null
 
@@ -2199,7 +2192,7 @@ function randomizeSubject() {
             subject: subject,
             trialId: trialId,
             eligibility: eligibility,
-            strataLevel: strataLevel
+            strataLevel: JSON.stringify(strataLevels)
         },
 
 
