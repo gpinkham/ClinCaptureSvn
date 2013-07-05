@@ -272,7 +272,7 @@
 
 </div>
 </c:if>
-<c:if test="${userRole.role.id ne 6 and userRole.role.id ne 1}">
+<c:if test="${userRole.role.id ne 6}">
 <br>
 	<table>
 		<td>
