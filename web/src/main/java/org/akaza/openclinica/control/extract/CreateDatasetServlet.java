@@ -139,6 +139,8 @@ public class CreateDatasetServlet extends SecureController {
 	public void processRequest() throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		String action = fp.getString("action");
+        String editedDatasetId = request.getParameter("editedDatasetId");
+        request.setAttribute("editedDatasetId", editedDatasetId);
 		if (StringUtil.isBlank(action)) {
 
 			// step 1 -- instructions, and continue button
@@ -420,12 +422,7 @@ public class CreateDatasetServlet extends SecureController {
 						// FilterDAO fDAO = new FilterDAO(sm.getDataSource());
 						dsb.setSQLStatement(dsb.getSQLStatement() + " " + fb.getSQLStatement());
 					}
-					// YW 2-21-2008 << editing dataset becomes creating a new
-					// dataset if dataset name has been changed.
-					if (dsb.getId() > 0 && !dsb.getName().equals(fp.getString("dsName"))) {
-						dsb.setId(0);
-					}
-					// start//Clinovo Ticket #113 Task 25
+
 					String submit = fp.getString("btnSubmit");
 					if (!resword.getString("continue").equalsIgnoreCase(submit)) {
 						request.setAttribute(BEAN_MONTHS, getMonths());
@@ -433,8 +430,6 @@ public class CreateDatasetServlet extends SecureController {
 						forwardPage(Page.CREATE_DATASET_3);
 					}
 
-					// end//
-					// YW >>
 					dsb.setODMMetaDataVersionName(mdvName);
 					dsb.setODMMetaDataVersionOid(mdvOID);
 					dsb.setODMPriorMetaDataVersionOid(mdvPrevOID);
@@ -467,6 +462,7 @@ public class CreateDatasetServlet extends SecureController {
 				} else {
 					DatasetDAO ddao = new DatasetDAO(sm.getDataSource());
 					DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
+
 					dsb.setStudyId(this.currentStudy.getId());
 
 					dsb.setOwner(ub);
@@ -499,8 +495,6 @@ public class CreateDatasetServlet extends SecureController {
 							forwardPage(Page.EXTRACT_DATASETS_MAIN);
 						}
 					}
-					// YW >>
-
 					logger.info("setting data set id here");
 					// may be easier to just set the dataset bean
 					// back into the session?
@@ -640,9 +634,7 @@ public class CreateDatasetServlet extends SecureController {
 				getGroupAttr(fp, db);
 			} else if (CRFAttr) {
 				getCRFAttr(fp, db);
-			} // else if (discAttr) {
-				// getDiscrepancyAttr(fp, db);
-				// }
+			} 
 		}
 
 	}
@@ -819,9 +811,7 @@ public class CreateDatasetServlet extends SecureController {
 		summary = summary.trim();
 		summary = summary.endsWith(",") ? summary.substring(0, summary.length() - 1) : summary;
 		summary += summary.length() > 0 ? ". " : " ";
-		// if (db.isShowDiscrepancyInformation()) {
-		// summary = summary + "You choose to show Discrepancy Attributes. ";
-		// }
+	
 		if (db.isShowSubjectGroupInformation()) {
 			summary += resword.getString("you_choose_to_show_subject_group");
 		}
