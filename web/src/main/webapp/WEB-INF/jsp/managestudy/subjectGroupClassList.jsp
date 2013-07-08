@@ -25,6 +25,9 @@
 	$("input[value='"+(index+1)+"']").attr('value', '_'+(index+1)); //to change two variables we need third
 	$("input[value='"+index+"']").attr('value', (index+1));
 	$("input[value='_"+(index+1)+"']").attr('value', index);
+	
+	$("td#order"+index).insertAfter($("td#order"+(index+1)));
+	$("td#order"+(index+1)).insertBefore($("input[name^='dynamicGroup'][value="+(index+1)+"]").parent());
   } 
   
   function moveUp(index) {
@@ -101,35 +104,48 @@
 		<img id="excl_dynGroupsOrder" src="images/bt_Collapse.gif" border="0"> 
 		<fmt:message key="order_of_dynamic_groups" bundle="${resword}"/>
 	</a>
-	<br></br>
+	<br/></br>
 	
-	<div id="dynGroupsOrder" style="width: 440px;">
+	<div id="dynGroupsOrder" style="width: 65%;">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td>
-			<table width="85%" border="0" cellpadding="0" cellspacing="0">
+			<table width="90%" border="0" cellpadding="0" cellspacing="0">
 			<tr>
-				<td width="45">
+				<td>
 					<table width="100%" >
-						<tr valign="top">  
-							<td class="table_header_row_left">
+						<tr valign="top">
+							<td class="table_header_row_left" width="40px">
 								<fmt:message key="order" bundle="${resword}"/>
+							</td>
+							<td class="table_header_row">
+								<fmt:message key="dynamic_group_name" bundle="${resword}"/>
+							</td>
+							<td class="table_header_row">
+								<fmt:message key="events" bundle="${resword}"/>
 							</td>
 						</tr>
 						<c:forEach var="dynGroup" items="${availableDynGroups}" varStatus="status">
 						<c:choose>
 							<c:when test="${dynGroup.default}">
-								<c:set var="defaultGroupExists" value="${true}"/>
-								<tr valign="top">  
+								<tr id="content${status.count}">	
+									<c:set var="defaultGroupExists" value="${true}"/>
 									<td class="table_cell_left" id="order${status.count}">
 										&nbsp;
 									</td>
-								</tr>	
+									<td class="table_cell">
+										<c:out value="${dynGroup.name}"/>
+										(<fmt:message key="default" bundle="${resword}"/>)
+									</td>
+									<td class="table_cell">
+										<c:out value="${dynGroupClassIdToEventsNames[dynGroup.id]}"/>
+									</td>
+								</tr>
 							</c:when>
 							<c:otherwise>
-								<tr valign="top">  
+								<tr id="content${status.count}">	
 									<td class="table_cell_left" id="order${status.count}">
 									<c:choose>
 										<c:when test="${status.first}">
@@ -157,37 +173,6 @@
 										</c:otherwise>
 									</c:choose>
 									</td>
-								</tr>
-							</c:otherwise>
-						</c:choose>
-						</c:forEach>
-					</table>
-				</td>
-				<td>
-					<table width="100%" >
-						<tr valign="top">
-							<td class="table_header_row">
-								<fmt:message key="dynamic_group_name" bundle="${resword}"/>
-							</td>
-							<td class="table_header_row">
-								<fmt:message key="events" bundle="${resword}"/>
-							</td>
-						</tr>
-						<c:forEach var="dynGroup" items="${availableDynGroups}" varStatus="status">
-						<c:choose>
-							<c:when test="${dynGroup.default}">
-								<tr id="content${status.count}">			
-									<td class="table_cell">
-										<c:out value="${dynGroup.name}"/>
-										(<fmt:message key="default" bundle="${resword}"/>)
-									</td>
-									<td class="table_cell">
-										<c:out value="${dynGroupClassIdToEventsNames[dynGroup.id]}"/>
-									</td>
-								</tr>
-							</c:when>
-							<c:otherwise>
-								<tr id="content${status.count}">			
 									<td class="table_cell">
 										<c:out value="${dynGroup.name}"/>
 										<input type="hidden" name="dynamicGroup${dynGroup.id}" value="${status.count}">

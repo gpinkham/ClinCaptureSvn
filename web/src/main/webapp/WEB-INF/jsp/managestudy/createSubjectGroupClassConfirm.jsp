@@ -139,12 +139,12 @@
 </div>
 
 <c:if test="${group.groupClassTypeId == 4}">
-	<div style="width: 300px">
+	<div style="width: 70%">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
-			<td width="45">
+			<td width="45px">
 				<table width="100%" >
 					<tr valign="top">  
 						<td class="table_header_row_left">
