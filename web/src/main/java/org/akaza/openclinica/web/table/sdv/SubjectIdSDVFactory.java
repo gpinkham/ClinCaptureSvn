@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -41,6 +42,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -331,6 +333,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			long countOfCRFsThatShouldBeSDVd) {
 
 		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
+        StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCrfDAO = new EventDefinitionCRFDAO(dataSource);
 		CRFDAO crfDAO = new CRFDAO(dataSource);
 		StudyEventBean studyEventBean = null;
@@ -342,6 +345,10 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
 		for (EventCRFBean eventBean : eventCRFBeans) {
 			studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventBean.getStudyEventId());
+            StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean)studyEventDefinitionDAO.findByPK(studyEventBean.getStudyEventDefinitionId());
+            if (!studyEventDefinitionBean.getStatus().isAvailable()) {
+                continue;
+            }
 			CRFBean crfBean = crfDAO.findByVersionId(eventBean.getCRFVersionId());
 			// get number of completed event crfs
 			if (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED) {
