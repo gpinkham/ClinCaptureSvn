@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DatasetItemStatus;
@@ -356,6 +358,12 @@ public class CreateDatasetServlet extends SecureController {
 				if (!StringUtil.isBlank(dsName)) {
 					if (dsName.contains("/") || dsName.contains("\\")) {
 						Validator.addError(errors, "dsName", restext.getString("slash_not_allowed"));
+					}
+					Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(dsName);
+					boolean isContainSpecialSymbol = matcher.find();
+					if (isContainSpecialSymbol) {
+						Validator.addError(errors, "dsName",
+								resexception.getString("dataset_should_not_contain_any_special"));
 					}
 					if (((DatasetBean) session.getAttribute("newDataset")).getId() <= 0) {
 						DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
