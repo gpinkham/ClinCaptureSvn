@@ -40,7 +40,7 @@ import java.util.*;
  * 
  *         Servlet for creating a user account.
  */
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+@SuppressWarnings({"rawtypes", "serial"})
 public class EditStudyUserRoleServlet extends SecureController {
 	public static final String INPUT_ROLE = "role";
 
@@ -126,12 +126,6 @@ public class EditStudyUserRoleServlet extends SecureController {
 				}
 			}
 		}
-	}
-
-	private ArrayList getRoles() {
-		ArrayList roles = Role.toArrayList();
-		roles.remove(Role.SYSTEM_ADMINISTRATOR);
-		return roles;
 	}
 
 	@Override

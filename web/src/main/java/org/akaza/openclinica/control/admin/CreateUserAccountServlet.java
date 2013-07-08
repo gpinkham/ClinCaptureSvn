@@ -20,6 +20,11 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -40,14 +45,6 @@ import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
 
 /**
  * Servlet for creating a user account.
@@ -264,14 +261,6 @@ public class CreateUserAccountServlet extends SecureController {
 				forwardPage(Page.CREATE_ACCOUNT);
 			}
 		}
-	}
-
-	private ArrayList getRoles() {
-
-		ArrayList roles = Role.toArrayList();
-		roles.remove(Role.SYSTEM_ADMINISTRATOR);
-
-		return roles;
 	}
 
 	private UserAccountBean addActiveStudyRole(UserAccountBean createdUserAccountBean, int studyId, Role r) {

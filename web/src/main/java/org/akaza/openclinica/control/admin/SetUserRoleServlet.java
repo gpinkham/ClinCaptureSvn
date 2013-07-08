@@ -171,11 +171,4 @@ public class SetUserRoleServlet extends SecureController {
 		return SecureController.ADMIN_SERVLET_CODE;
 	}
 
-	private ArrayList getRoles() {
-		ArrayList roles = Role.toArrayList();
-		roles.remove(Role.SYSTEM_ADMINISTRATOR);
-
-		return roles;
-	}
-
 }

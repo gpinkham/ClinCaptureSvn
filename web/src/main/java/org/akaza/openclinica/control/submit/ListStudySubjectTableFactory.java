@@ -1082,7 +1082,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private void repeatingEventDivBuilder(HtmlBuilder eventDiv, SubjectBean subject, Integer rowCount,
 			List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed, StudySubjectBean studySubject) {
 
-		String tableHeaderRowStyleClass = "table_header_row";
 		String tableHeaderRowLeftStyleClass = "table_header_row_left";
 		String add_another_occurrence = resword.getString("add_another_occurrence");
 		String occurrence_x_of = resword.getString("ocurrence");
