@@ -198,9 +198,9 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 		int eventId = Integer.valueOf(sedId).intValue();
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 		StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(eventId);
-		String userEmail = sedBean.getEmailAdress();
+		int userId = sedBean.getUserEmailId();
 		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
-		UserAccountBean userBean = (UserAccountBean) uadao.findByUserEmail(userEmail);
+		UserAccountBean userBean = (UserAccountBean) uadao.findByPK(userId);
 		if(userBean.getName() != null) {
 			session.setAttribute("userNameInsteadEmail", userBean.getName());	
 		} else {

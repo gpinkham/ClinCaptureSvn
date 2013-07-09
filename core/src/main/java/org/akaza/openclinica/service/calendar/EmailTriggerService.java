@@ -26,7 +26,7 @@ public class EmailTriggerService {
 	public SimpleTriggerImpl generateEmailSenderTrigger(StudyEventDefinitionBean sedTmp, StudySubjectBean ssb,
 			Date sendEmailDay, int daysBetween, String contactEmail, UserAccountBean uaBean, String studyName) {
 		JobDataMap emailJobDataMap = new JobDataMap();
-		emailJobDataMap.put(EMAIL, sedTmp.getEmailAdress());
+		emailJobDataMap.put(EMAIL, contactEmail);
 		emailJobDataMap.put(USER_ID, uaBean.getId());
 		emailJobDataMap.put(EVENT_NAME, sedTmp.getName());
 		emailJobDataMap.put(SUBJECT_NAME, ssb.getLabel());

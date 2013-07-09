@@ -439,11 +439,11 @@ public class DefineStudyEventServlet extends SecureController {
 		sed.setMaxDay(fp.getInt("maxDay"));
 		sed.setMinDay(fp.getInt("minDay"));
 		sed.setScheduleDay(fp.getInt("schDay"));
-		String userEmail = getEmailByUserName(fp.getString("emailUser"));
-		if("".equals(userEmail)) {
-			sed.setEmailAdress("");
+		int userId = getIdByUserName(fp.getString("emailUser"));
+		if(userId != 0) {
+			sed.setUserEmailId(userId);
 		} else {
-			sed.setEmailAdress(userEmail);
+			sed.setUserEmailId(1);
 		}
 		sed.setEmailDay(fp.getInt("emailDay"));
 		String referenceVisitValue = fp.getString("isReference");
@@ -637,11 +637,10 @@ public class DefineStudyEventServlet extends SecureController {
 		return isValid;
 	}
 
-	private String getEmailByUserName(String userName) {
+	private int getIdByUserName(String userName) {
 		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
-		UserAccountBean userBean = (UserAccountBean) uadao
-				.findByUserName(userName);
-		return userBean.getEmail();
+		UserAccountBean userBean = (UserAccountBean) uadao.findByUserName(userName);
+		return userBean.getId();
 	}
 
 }

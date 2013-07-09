@@ -57,7 +57,7 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 	private int maxDay = 0;
 	private int emailDay = 0;
 	private int scheduleDay = 0;
-	private String emailAdress = "";
+	private int userEmailId = 0;
 	private boolean referenceVisit = false;
 	//end
 	public StudyEventDefinitionBean() {
@@ -298,12 +298,12 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 		this.scheduleDay = schedule_day;
 	}
 	
-	public String getEmailAdress() {
-		return emailAdress;
+	public int getUserEmailId() {
+		return userEmailId;
 	}
 	
-	public void setEmailAdress(String email_adress) {
-		this.emailAdress = email_adress;
+	public void setUserEmailId(int user_email_id) {
+		this.userEmailId = user_email_id;
 	}
 	
 	public boolean getReferenceVisit() {

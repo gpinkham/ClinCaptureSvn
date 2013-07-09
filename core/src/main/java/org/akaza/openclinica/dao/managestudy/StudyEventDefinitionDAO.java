@@ -95,8 +95,8 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		this.setTypeExpected(16, TypeNames.INT);
 		this.setTypeExpected(17, TypeNames.INT);
 		this.setTypeExpected(18, TypeNames.INT);
-		this.setTypeExpected(19, TypeNames.STRING);
-		this.setTypeExpected(20, TypeNames.BOOL);
+		this.setTypeExpected(19, TypeNames.BOOL);
+		this.setTypeExpected(20, TypeNames.INT);
 	}
 
 	/**
@@ -165,8 +165,8 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		variables.put(new Integer(13), new Integer (sedb.getMaxDay()));
 		variables.put(new Integer(14), new Integer (sedb.getEmailDay()));
 		variables.put(new Integer(15), new Integer (sedb.getScheduleDay()));
-		variables.put(new Integer(16), sedb.getEmailAdress());
-		variables.put(new Integer(17), new Boolean(sedb.getReferenceVisit()));
+		variables.put(new Integer(16), new Boolean(sedb.getReferenceVisit()));
+		variables.put(new Integer(17), new Integer (sedb.getUserEmailId()));
 		this.execute(digester.getQuery("create"), variables);
 
 
@@ -190,8 +190,8 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		variables.put(new Integer(11), new Integer (sedb.getMaxDay()));
 		variables.put(new Integer(12), new Integer (sedb.getEmailDay()));
 		variables.put(new Integer(13), new Integer (sedb.getScheduleDay()));
-		variables.put(new Integer(14), sedb.getEmailAdress());
-		variables.put(new Integer(15), new Boolean(sedb.getReferenceVisit()));
+		variables.put(new Integer(14), new Boolean(sedb.getReferenceVisit()));
+		variables.put(new Integer(15), new Integer (sedb.getUserEmailId()));
 		variables.put(new Integer(16), new Integer(sedb.getId()));
 		this.execute(digester.getQuery("update"), variables);
 		return eb;
@@ -229,9 +229,10 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		eb.setEmailDay((dayEmail.intValue()));
 		Integer scheduleDay = (Integer) hm.get("schedule_day");
 		eb.setScheduleDay((scheduleDay.intValue()));
-		eb.setEmailAdress((String) hm.get("email_adress"));
 		Boolean referenceVisit = (Boolean) hm.get("reference_visit");
 		eb.setReferenceVisit(referenceVisit.booleanValue());
+		Integer emailuserId = (Integer) hm.get("email_user_id");
+		eb.setUserEmailId(emailuserId.intValue());
 		//end
 		return eb;
 	}

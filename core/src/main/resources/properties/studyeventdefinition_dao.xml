@@ -78,14 +78,14 @@
 		<name>create</name>
 		<sql>INSERT INTO STUDY_EVENT_DEFINITION (study_event_definition_id ,
 		STUDY_ID, NAME,DESCRIPTION, REPEATING, TYPE, CATEGORY, OWNER_ID,
-		 STATUS_ID,	DATE_CREATED,ordinal,oc_oid,day_min,day_max,day_email,schedule_day,email_adress,reference_visit)
+		 STATUS_ID,	DATE_CREATED,ordinal,oc_oid,day_min,day_max,day_email,schedule_day,reference_visit,email_user_id)
 		VALUES (?,?,?,?,?,?,?,?,?,NOW(),?,?,?,?,?,?,?,?)</sql>
 	</query>
 	<query>
 		<name>update</name>
 		<sql>UPDATE STUDY_EVENT_DEFINITION SET STUDY_ID=?,NAME=?,
 		DESCRIPTION=?,REPEATING=?,TYPE=?,CATEGORY=?,STATUS_ID=?,
-		DATE_UPDATED=NOW(),UPDATE_ID=?, ordinal=?, day_min=?,day_max=?,day_email=?,schedule_day=?,email_adress=?,reference_visit=? WHERE STUDY_EVENT_DEFINITION_ID=?</sql>
+		DATE_UPDATED=NOW(),UPDATE_ID=?, ordinal=?, day_min=?,day_max=?,day_email=?,schedule_day=?,reference_visit=?,email_user_id=? WHERE STUDY_EVENT_DEFINITION_ID=?</sql>
 	</query>
 	<query>
 		<name>findAllWithStudyEvent</name>

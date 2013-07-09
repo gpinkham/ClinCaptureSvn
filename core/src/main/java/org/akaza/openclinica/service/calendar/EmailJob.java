@@ -15,6 +15,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SimpleTrigger;
+import org.quartz.impl.JobDetailImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -40,7 +41,8 @@ public class EmailJob extends QuartzJobBean {
 		Locale locale = new Locale("en-US");
 		ResourceBundleProvider.updateLocale(locale);
 		reswords = ResourceBundleProvider.getWordsBundle();
-		JobDataMap dataMap = context.getMergedJobDataMap();
+		JobDetailImpl jobDetail = (JobDetailImpl) context.getJobDetail();
+		JobDataMap dataMap = jobDetail.getJobDataMap();
 		SimpleTrigger trigger = (SimpleTrigger) context.getTrigger();
 
 		TriggerBean triggerBean = new TriggerBean();
@@ -51,8 +53,8 @@ public class EmailJob extends QuartzJobBean {
 		String daysBetween = dataMap.getString(DAYS_BETWEEN);
 		String studyName = dataMap.getString(STUDY_NAME);
 		daysBetween = "in " + daysBetween + " days";
-
-		logger.error(contactEmail + eventName + subjectlabel);
+		System.out.println("EmailJob " +contactEmail);
+		logger.error(contactEmail + " " + eventName + " " + subjectlabel);
 		try {
 			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
 					.get("applicationContext");

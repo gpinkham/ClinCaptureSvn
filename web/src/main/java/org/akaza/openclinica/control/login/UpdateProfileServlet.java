@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -42,6 +43,14 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
+import org.quartz.JobDataMap;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.StdScheduler;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 /**
  * @author jxu
@@ -52,7 +61,10 @@ import org.apache.commons.lang.StringUtils;
 public class UpdateProfileServlet extends SecureController {
 
 	private static final long serialVersionUID = -2519124535258437372L;
-
+	public static final String EMAIL = "contactEmail";
+	public static final String USER_ID = "user_id";
+	private StdScheduler scheduler;
+	
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
 
@@ -138,7 +150,6 @@ public class UpdateProfileServlet extends SecureController {
 
 		userBean1.setFirstName(fp.getString("firstName"));
 		userBean1.setLastName(fp.getString("lastName"));
-		changeCalendarEventsUserEmail(userBean1.getEmail(), fp.getString("email"));
 		userBean1.setEmail(fp.getString("email"));
 		userBean1.setInstitutionalAffiliation(fp.getString("institutionalAffiliation"));
 		userBean1.setPasswdChallengeQuestion(fp.getString("passwdChallengeQuestion"));
@@ -189,6 +200,7 @@ public class UpdateProfileServlet extends SecureController {
 		if (userBean1 != null) {
 			userBean1.setLastVisitDate(new Date());
 			userBean1.setUpdater(ub);
+			updateCalendarEmailJob(userBean1);
 			udao.update(userBean1);
 
 			session.setAttribute("userBean", userBean1);
@@ -197,20 +209,45 @@ public class UpdateProfileServlet extends SecureController {
 		}
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void changeCalendarEventsUserEmail(String userEmail,String emailForUpdate) {
-		StudyEventDefinitionDAO sedao = new StudyEventDefinitionDAO(sm.getDataSource());
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		ArrayList<StudyBean> studies = (ArrayList) sdao.findAllByUser(ub.getName());
-		for (StudyBean study : studies) {
-			ArrayList<StudyEventDefinitionBean> sedBeans = sedao.findAllActiveByStudy(study);
-			for (StudyEventDefinitionBean sedBean : sedBeans) {
-				if (userEmail.equalsIgnoreCase(sedBean.getEmailAdress()) && !sedBean.getReferenceVisit()) {
-					sedBean.setEmailAdress(emailForUpdate);
-					sedao.update(sedBean);
+	@SuppressWarnings("null")
+	private void updateCalendarEmailJob (UserAccountBean uaBean) {
+		String triggerGroup = "CALENDAR";
+		scheduler = getScheduler();
+		try {
+			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
+			if (legacyTriggers == null && legacyTriggers.size() == 0) {
+				return;
+			}
+			for (TriggerKey triggerKey : legacyTriggers) {
+				Trigger trigger = scheduler.getTrigger(triggerKey);
+				JobDataMap dataMap = trigger.getJobDataMap();
+				String contactEmail = dataMap.getString(EMAIL).toString();
+				int userId = (Integer) dataMap.getInt(USER_ID);
+				logger.info("contact email from calendared " +contactEmail + " for user userId " +userId);
+				logger.info("Old email " +dataMap.getString(EMAIL).toString());
+				if(uaBean.getId() == userId) {
+					dataMap.put(EMAIL, uaBean.getEmail());
+					JobDetailImpl jobDetailBean = new JobDetailImpl();
+					jobDetailBean.setKey(trigger.getJobKey());
+					jobDetailBean.setDescription(trigger.getDescription());
+					jobDetailBean.setGroup(triggerGroup);
+					jobDetailBean.setName(triggerKey.getName());
+					jobDetailBean.setJobClass(org.akaza.openclinica.service.calendar.EmailStatefulJob.class);
+					jobDetailBean.setJobDataMap(dataMap);
+					logger.info("New email " +dataMap.getString(EMAIL).toString());
+					jobDetailBean.setDurability(true);
+					scheduler.addJob(jobDetailBean, true);
 				}
 			}
+		} catch (SchedulerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
-
+	
+	private StdScheduler getScheduler() {
+		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
+				context).getBean("schedulerFactoryBean");
+		return scheduler;
+	}
 }

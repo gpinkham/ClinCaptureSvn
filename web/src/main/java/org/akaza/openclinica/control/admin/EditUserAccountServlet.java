@@ -37,9 +37,17 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.quartz.JobDataMap;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.StdScheduler;
+import org.quartz.impl.matchers.GroupMatcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Servlet for creating a user account.
@@ -84,6 +92,10 @@ public class EditUserAccountServlet extends SecureController {
 	public static final String BUTTON_BACK_VALUE = "Back";
 
 	public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
+	
+	public static final String EMAIL = "contactEmail";
+	public static final String USER_ID = "user_id";
+	private StdScheduler scheduler;
 
 	private ArrayList getAllStudies() {
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
@@ -191,7 +203,6 @@ public class EditUserAccountServlet extends SecureController {
 			} else if (button.equals(resword.getString("submit"))) {
 				user.setFirstName(fp.getString(INPUT_FIRST_NAME));
 				user.setLastName(fp.getString(INPUT_LAST_NAME));
-				changeCalendarEventsUserEmail(user.getEmail(), fp.getString(INPUT_EMAIL));
 				user.setEmail(fp.getString(INPUT_EMAIL));
 				user.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
 				user.setUpdater(ub);
@@ -230,7 +241,7 @@ public class EditUserAccountServlet extends SecureController {
 				} else {
 					udao.update(user);
 				}
-
+				updateCalendarEmailJob(user);
 				addPageMessage(respage.getString("the_user_account") + " \"" + user.getName() + "\" "
 						+ respage.getString("was_updated_succesfully"));
 				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
@@ -347,19 +358,45 @@ public class EditUserAccountServlet extends SecureController {
 		return SecureController.ADMIN_SERVLET_CODE;
 	}
 	
-	@SuppressWarnings({"unchecked"})
-	private void changeCalendarEventsUserEmail(String userEmail, String emailForUpdate) {
-		StudyEventDefinitionDAO sedao = new StudyEventDefinitionDAO(sm.getDataSource());
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		ArrayList<StudyBean> studies = (ArrayList) sdao.findAllByUser(ub.getName());
-		for (StudyBean study : studies) {
-			ArrayList<StudyEventDefinitionBean> sedBeans = sedao.findAllActiveByStudy(study);
-			for (StudyEventDefinitionBean sedBean : sedBeans) {
-				if (userEmail.equals(sedBean.getEmailAdress()) && !sedBean.getReferenceVisit()) {
-					sedBean.setEmailAdress(emailForUpdate);
-					sedao.update(sedBean);
+	@SuppressWarnings("null")
+	private void updateCalendarEmailJob (UserAccountBean uaBean) {
+		String triggerGroup = "CALENDAR";
+		scheduler = getScheduler();
+		try {
+			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
+			if (legacyTriggers == null && legacyTriggers.size() == 0) {
+				return;
+			}
+			for (TriggerKey triggerKey : legacyTriggers) {
+				Trigger trigger = scheduler.getTrigger(triggerKey);
+				JobDataMap dataMap = trigger.getJobDataMap();
+				String contactEmail = dataMap.getString(EMAIL).toString();
+				int userId = (Integer) dataMap.getInt(USER_ID);
+				logger.info("contact email from calendared " +contactEmail + " for user userId " +userId);
+				logger.info("Old email " +dataMap.getString(EMAIL).toString());
+				if(uaBean.getId() == userId) {
+					dataMap.put(EMAIL, uaBean.getEmail());
+					JobDetailImpl jobDetailBean = new JobDetailImpl();
+					jobDetailBean.setKey(trigger.getJobKey());
+					jobDetailBean.setDescription(trigger.getDescription());
+					jobDetailBean.setGroup(triggerGroup);
+					jobDetailBean.setName(triggerKey.getName());
+					jobDetailBean.setJobClass(org.akaza.openclinica.service.calendar.EmailStatefulJob.class);
+					jobDetailBean.setJobDataMap(dataMap);
+					logger.info("New email " +dataMap.getString(EMAIL).toString());
+					jobDetailBean.setDurability(true);
+					scheduler.addJob(jobDetailBean, true);
 				}
 			}
+		} catch (SchedulerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+	}
+	
+	private StdScheduler getScheduler() {
+		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
+				context).getBean("schedulerFactoryBean");
+		return scheduler;
 	}
 }

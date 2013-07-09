@@ -120,7 +120,7 @@ public class CalendarLogic {
 						DateTime dateTimeCompleted = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
 						dateTimeCompleted = dateTimeCompleted.plusDays(schDay);
 						studyEvent.setDateStarted(dateTimeCompleted.toDate());
-						studyEvent.setOwner(getUserByEmail(sedTmp.getEmailAdress()));
+						studyEvent.setOwner(getUserByEmailId(sedTmp.getUserEmailId()));
 						studyEvent.setStatus(Status.AVAILABLE);
 						studyEvent.setLocation("");
 						studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
@@ -128,7 +128,7 @@ public class CalendarLogic {
 						studyEvent.setReferenceVisitId(studyEventBeanRef.getId());
 						studyEvent = (StudyEventBean) sed.create(studyEvent);
 						UserAccountDAO useracdao = new UserAccountDAO(ds);
-						UserAccountBean useracBean = (UserAccountBean) useracdao.findByUserEmail(sedTmp.getEmailAdress());
+						UserAccountBean useracBean = (UserAccountBean) useracdao.findByPK(sedTmp.getUserEmailId());
 						try {
 							logger.info("Start quartz scheduler for this event");
 							DateTime dateTimeEmail = new DateTime(studyEventBeanRef.getUpdatedDate().getTime());
@@ -136,7 +136,7 @@ public class CalendarLogic {
 							int daysBetween = Days.daysBetween(dateTimeEmail.toDateMidnight(),
 									dateTimeCompleted.toDateMidnight()).getDays();
 							ScheduleEmailQuartz(sedTmp, ssb, dateTimeEmail.toDate(), daysBetween,
-									sedTmp.getEmailAdress(), useracBean, studyBean.getName());
+									useracBean.getEmail(), useracBean, studyBean.getName());
 						} catch (SchedulerException e) {
 							e.printStackTrace();
 						}
@@ -204,9 +204,9 @@ public class CalendarLogic {
 		return messageReturn;
 	}
 
-	private UserAccountBean getUserByEmail(String userEmail) {
+	private UserAccountBean getUserByEmailId(int userId) {
 		UserAccountDAO uadao = new UserAccountDAO(ds);
-		UserAccountBean userBean = (UserAccountBean) uadao.findByUserEmail(userEmail);
+		UserAccountBean userBean = (UserAccountBean) uadao.findByPK(userId);
 		return userBean;
 	}
 
@@ -232,8 +232,8 @@ public class CalendarLogic {
 			note.setColumn("end_date");
 		}
 
-		note.setOwner(getUserByEmail(sedb.getEmailAdress()));
-		note.setAssignedUserId(getUserByEmail(sedb.getEmailAdress()).getId());
+		note.setOwner(getUserByEmailId(sedb.getUserEmailId()));
+		note.setAssignedUserId(getUserByEmailId(sedb.getUserEmailId()).getId());
 		note.setCreatedDate(new Date());
 		note.setResolutionStatusId(ResolutionStatus.OPEN.getId());
 		note.setDiscrepancyNoteTypeId(DiscrepancyNoteType.QUERY.getId());
