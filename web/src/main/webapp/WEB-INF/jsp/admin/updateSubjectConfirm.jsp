@@ -110,7 +110,7 @@
  <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+					onClick="javascript: confirmBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
  <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
  <input type="button" onclick="javascript:history.go(-2);"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
 </form>
