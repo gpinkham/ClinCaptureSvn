@@ -1437,6 +1437,7 @@ public class OdmExtractDAO extends DatasetDAO {
 		HashMap<Integer, String> idataOidPoses = new HashMap<Integer, String>();
 
 		String studyIds = study.getId() + "";
+		String parentStudyIds = study.getParentStudyId() > 0 ? study.getParentStudyId() + ""  : studyIds;
 		int datasetItemStatusId = dataset.getDatasetItemStatus().getId();
 		String sql = dataset.getSQLStatement().split("order by")[0].trim();
 		sql = sql.split("study_event_definition_id in")[1];
@@ -1457,10 +1458,10 @@ public class OdmExtractDAO extends DatasetDAO {
 		if (odmVersion.startsWith("oc")) {
 			logger.debug("getOCSubjectEventFormSql="
 					+ getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId,
-							studySubjectIds));
+							studySubjectIds, parentStudyIds));
 			this.setSubjectEventFormDataTypesExpected(odmVersion);
 			ArrayList viewRows = select(getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint,
-					datasetItemStatusId, studySubjectIds));
+					datasetItemStatusId, studySubjectIds, parentStudyIds));
 			Iterator iter = viewRows.iterator();
 			this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses, odmType);
 		} else {
@@ -2190,6 +2191,7 @@ public class OdmExtractDAO extends DatasetDAO {
 			HashMap row = (HashMap) iter.next();
 			String studySubjectLabel = (String) row.get("study_subject_oid");
 			Integer sgcId = (Integer) row.get("sgc_id");
+			System.out.println("subject group class id " + sgcId.toString());
 			String sgcName = (String) row.get("sgc_name");
 			String sgName = (String) row.get("sg_name");
 			String sedOID = (String) row.get("definition_oid");
@@ -2250,7 +2252,8 @@ public class OdmExtractDAO extends DatasetDAO {
 					sub.setStatus(Status.get((Integer) row.get("status_id")).getName());
 				}
 
-				if (sgcId > 0) {
+				if (dataset.isShowSubjectGroupInformation() && sgcId > 0) {
+					// need to look at the get subject group ids as well
 					sgcIdSet.clear();
 					sgcIdSet.add(sgcId);
 					SubjectGroupDataBean sgd = new SubjectGroupDataBean();
@@ -2258,11 +2261,14 @@ public class OdmExtractDAO extends DatasetDAO {
 					sgd.setStudyGroupClassName(sgcName);
 					sgd.setStudyGroupName(sgName);
 					sub.getSubjectGroupData().add(sgd);
+					System.out.println("subject group data size of array " + sub.getSubjectGroupData().size() + " " + dataset.getSubjectGroupIds().toString());
 				}
 
 				data.getExportSubjectData().add(sub);
 				seprev = "";
 				formprev = "";
+				
+				
 			}
 
 			oidPos = data.getExportSubjectData().size() - 1 + "";
@@ -2610,7 +2616,7 @@ public class OdmExtractDAO extends DatasetDAO {
 	}
 
 	protected String getOCSubjectEventFormSql(String studyIds, String sedIds, String itemIds, String dateConstraint,
-			int datasetItemStatusId) {
+			int datasetItemStatusId, String parentStudyIds) {
 		return "select ss.oc_oid as study_subject_oid, ss.label, ss.unique_identifier, ss.secondary_label, ss.gender, ss.date_of_birth,"
 				+ " ss.status_id, ss.sgc_id, ss.sgc_name, ss.sg_name, sed.ordinal as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating,"
 				+ " se.sample_ordinal as sample_ordinal, se.se_location, se.date_start, se.date_end, se.start_time_flag,"
@@ -2633,7 +2639,7 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ dateConstraint
 				+ " and ss.subject_id = s.subject_id)st_sub left join (select sgm.study_subject_id, sgc.study_group_class_id as sgc_id, sgc.name as sgc_name,"
 				+ " sg.study_group_id as sg_id, sg.name as sg_name from subject_group_map sgm, study_group_class sgc, study_group sg where sgc.study_id in ("
-				+ studyIds
+				+ parentStudyIds // should be parent study ids!
 				+ ") and sgm.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = sg.study_group_class_id"
 				+ " and sgm.study_group_id = sg.study_group_id) sb_g on st_sub.study_subject_id = sb_g.study_subject_id) ss, "
 				+ " study_event_definition sed, event_definition_crf edc,"
@@ -2648,7 +2654,7 @@ public class OdmExtractDAO extends DatasetDAO {
 	}
 
 	protected String getOCSubjectEventFormSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint,
-			int datasetItemStatusId, String studySubjectIds) {
+			int datasetItemStatusId, String studySubjectIds, String parentStudyIds) {
 		return "select ss.oc_oid as study_subject_oid, ss.label, ss.unique_identifier, ss.secondary_label, ss.gender, ss.date_of_birth,"
 				+ " ss.status_id, ss.sgc_id, ss.sgc_name, ss.sg_name, sed.ordinal as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating,"
 				+ " se.sample_ordinal as sample_ordinal, se.se_location, se.date_start, se.date_end, se.start_time_flag,"
@@ -2668,7 +2674,7 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ ") "
 				+ " and ss.subject_id = s.subject_id)st_sub left join (select sgm.study_subject_id, sgc.study_group_class_id as sgc_id, sgc.name as sgc_name,"
 				+ " sg.study_group_id as sg_id, sg.name as sg_name from subject_group_map sgm, study_group_class sgc, study_group sg where sgc.study_id in ("
-				+ studyIds
+				+ parentStudyIds // should be parent study ids!!!
 				+ ") and sgm.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = sg.study_group_class_id"
 				+ " and sgm.study_group_id = sg.study_group_id) sb_g on st_sub.study_subject_id = sb_g.study_subject_id) ss, "
 				+ " study_event_definition sed, event_definition_crf edc,"
