@@ -102,7 +102,7 @@
 
             <c:choose>
                 <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and (currentRole.id eq 4 or currentRole.id eq 1) and not study.status.frozen and not study.status.locked} ">
-                    <a href="SignStudySubject?id=${studySubject.id}"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign_subject " bundle="${resword}"/>" title="<fmt:message key="sign_subject " bundle="${resword}"/>" hspace="4"/></a>
+                    <a href="SignStudySubject?id=${studySubject.id}"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign_subject" bundle="${resword}"/>" title="<fmt:message key="sign_subject" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
                 <c:otherwise>
                     <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
