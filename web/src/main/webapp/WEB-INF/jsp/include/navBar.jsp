@@ -267,7 +267,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div>
                 <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector) }">
+                    <c:when test="${study.parentStudyId > 0}">
                     </c:when>
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}pages/studymodule"><fmt:message key="nav_build_study" bundle="${resword}"/></a></div>
@@ -422,7 +422,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div>
                 <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector) }">
+                    <c:when test="${study.parentStudyId > 0}">
                     </c:when>
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}pages/studymodule"><fmt:message key="nav_build_study" bundle="${resword}"/></a></div>
