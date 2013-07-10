@@ -138,14 +138,15 @@
 		<name>removeSysAdminRole</name>
 		<sql>delete from study_user_role where user_name=? and role_name='system administrator'</sql>
 	</query>
-	<query>
-	 <name>findStudyByUser</name>
-	 <sql>select sur.role_name, sur.study_id ,s.name 
-	      from study_user_role sur, study s
-          where sur.study_id = s.study_id and sur.status_id = 1 
-          and sur.role_name != 'system administrator' and sur.user_name=?
-          order by sur.study_id asc
-    </sql>
+    <query>
+	    <name>findStudyByUser</name>
+	    <sql>
+            select sur.role_name, s.study_id ,s.name
+	        from study_user_role sur, study s
+            where (sur.study_id = s.study_id or (sur.study_id is null and sur.role_name = 'system administrator'))
+            and sur.status_id = 1 and sur.user_name=?
+            order by sur.study_id asc
+        </sql>
 	</query>
 	<query>
 		<name>findAllByParent</name>
