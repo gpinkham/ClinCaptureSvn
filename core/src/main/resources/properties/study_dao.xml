@@ -52,12 +52,13 @@
 	<!-- YW 10-18-2007 find studies belonging to a user whose study user role status is not removed or auto-removed -->
 	<query>
 		<name>findAllByUserNotRemoved</name>
-		<sql>SELECT s.* FROM study s, study_user_role sur
-           WHERE sur.user_name = ?
-           AND s.study_id=sur.study_id
-           AND sur.status_id != 5
-           AND sur.status_id != 7
-         </sql>
+		<sql>
+            SELECT s.* FROM study s, study_user_role sur
+            WHERE sur.user_name = ?
+            AND (s.study_id=sur.study_id or (sur.study_id is null and sur.role_name = 'system administrator'))
+            AND sur.status_id != 5
+            AND sur.status_id != 7
+        </sql>
 	</query>
 	<!-- tbh 04/2008 -->
 	<query>
