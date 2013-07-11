@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="skirpichenok" id="2013-07-10-TICKET293-01">
+        <sql splitStatements="false">
+            ALTER TABLE discrepancy_note DROP CONSTRAINT dn_discrepancy_note_type_id_fk;
+
+            update discrepancy_note set discrepancy_note_type_id = 2 where discrepancy_note_type_id = 4;
+            update discrepancy_note set discrepancy_note_type_id = 3 where discrepancy_note_type_id = 6;
+            update discrepancy_note set discrepancy_note_type_id = 4 where discrepancy_note_type_id = 7;
+
+            update discrepancy_note_type set discrepancy_note_type_id = 8 where name = 'Incomplete';
+            update discrepancy_note_type set discrepancy_note_type_id = 9 where name = 'Unclear/Unreadable';
+            update discrepancy_note_type set discrepancy_note_type_id = 2 where name = 'Annotation';
+            update discrepancy_note_type set discrepancy_note_type_id = 3 where name = 'Query';
+            update discrepancy_note_type set discrepancy_note_type_id = 4 where name = 'Reason for Change';
+            update discrepancy_note_type set discrepancy_note_type_id = 6 where name = 'Incomplete';
+            update discrepancy_note_type set discrepancy_note_type_id = 7 where name = 'Unclear/Unreadable';
+
+            ALTER TABLE discrepancy_note
+            ADD CONSTRAINT dn_discrepancy_note_type_id_fk FOREIGN KEY (discrepancy_note_type_id)
+            REFERENCES discrepancy_note_type (discrepancy_note_type_id) MATCH SIMPLE
+            ON UPDATE RESTRICT ON DELETE RESTRICT;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
