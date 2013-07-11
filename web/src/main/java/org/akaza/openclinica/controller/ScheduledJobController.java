@@ -192,7 +192,7 @@ public class ScheduledJobController {
 						.append("this.form.theTriggerGroupName.value='").append(st.getGroup()).append("';")
 						.append("this.form.submit();");
 
-				actions.append("<td><input type=\"submit\" class=\"button\" value=\"Cancel Job\" name=\"cancelJob\" ")
+				actions.append("<td><input type=\"button\" class=\"button\" value=\"Cancel Job\" name=\"cancelJob\" ")
 						.append("onclick=\"").append(jsCodeString.toString()).append("\" /></td>");
 				actions.append("</tr></table>");
 
