@@ -71,60 +71,70 @@
 
 		$("img[src*='images/icon_DoubleCheck_Action.gif']").each(function() {
 			var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/violet/') >= 0) return;
 			newSrc = newSrc.replace('images/', 'images/violet/');
 			$(this).attr('src', newSrc);
 		});
-		$("input[src*='images/icon_DoubleCheck_Action.gif']").each(
-				function() {
-					var newSrc = $(this).attr('src');
-					newSrc = newSrc.replace('images/', 'images/violet/');
-					$(this).attr('src', newSrc);
-				});
+
+		$("input[src*='images/icon_DoubleCheck_Action.gif']").each(function() {
+            var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/violet/') >= 0) return;
+			newSrc = newSrc.replace('images/', 'images/violet/');
+			$(this).attr('src', newSrc);
+		});
 
 		$("img[src*='images/icon_SignedBlue.gif']").each(function() {
 			var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/violet/') >= 0) return;
 			newSrc = newSrc.replace('images/', 'images/violet/');
 			$(this).attr('src', newSrc);
 		});
 
 		$("img[src*='images/create_new.gif']").each(function() {
 			var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/violet/') >= 0) return;
 			newSrc = newSrc.replace('images/', 'images/violet/');
 			$(this).attr('src', newSrc);
 		});
 
 		$("img[src*='images/icon_NDs.gif']").each(function() {
 			var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/violet/') >= 0) return;
 			newSrc = newSrc.replace('images/', 'images/violet/');
 			$(this).attr('src', newSrc);
 		});
 
 		$("input.button_medium").each(function() {
 			var newSrc = $(this).css('background-image');
+            if (newSrc.indexOf('/violet/') >= 0) return;
 			newSrc = newSrc.replace('images/', 'images/violet/');
 			$(this).css('background-image', newSrc);
 		});
 
 		$("input.button").each(function() {
 			var newSrc = $(this).css('background-image');
+            if (newSrc.indexOf('/violet/') >= 0) return;
 			newSrc = newSrc.replace('images/', 'images/violet/');
 			$(this).css('background-image', newSrc);
 		});
 
 		$("input.button_long").each(function() {
 			var newSrc = $(this).css('background-image');
+            if (newSrc.indexOf('/violet/') >= 0) return;
 			newSrc = newSrc.replace('images/', 'images/violet/');
 			$(this).css('background-image', newSrc);
 		});
 
 		$("input.button_xlong").each(function() {
 			var newSrc = $(this).css('background-image');
+            if (newSrc.indexOf('/violet/') >= 0) return;
 			newSrc = newSrc.replace('images/', 'images/violet/');
 			$(this).css('background-image', newSrc);
 		});
 
 		$("button.button_remove").each(function() {
 			var newSrc = $(this).css('background-image');
+            if (newSrc.indexOf('/violet/') >= 0) return;
 			newSrc = newSrc.replace('images/', 'images/violet/');
 			$(this).css('background-image', newSrc);
 		});
@@ -201,59 +211,70 @@
 
 		$("img[src*='images/icon_DoubleCheck_Action.gif']").each(function() {
 			var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/green/') >= 0) return;
 			newSrc = newSrc.replace('images/','images/green/');
 			$(this).attr('src', newSrc);
 		});
+
 		$("input[src*='images/icon_DoubleCheck_Action.gif']").each(function() {
 			var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/green/') >= 0) return;
 			newSrc = newSrc.replace('images/','images/green/');
 			$(this).attr('src', newSrc);
 		});
 
 		$("img[src*='images/icon_SignedBlue.gif']").each(function() {
 			var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/green/') >= 0) return;
 			newSrc = newSrc.replace('images/','images/green/');
 			$(this).attr('src', newSrc);
 		});
 
 		$("img[src*='images/create_new.gif']").each(function() {
 			var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/green/') >= 0) return;
 			newSrc = newSrc.replace('images/','images/green/');
 			$(this).attr('src', newSrc);
 		});
 
 		$("img[src*='images/icon_NDs.gif']").each(function() {
 			var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/green/') >= 0) return;
 			newSrc = newSrc.replace('images/','images/green/');
 			$(this).attr('src', newSrc);
 		});
 
 		$("input.button_medium").each(function() {
 			var newSrc = $(this).css('background-image');
+            if (newSrc.indexOf('/green/') >= 0) return;
 			newSrc = newSrc.replace('images/','images/green/');
 			$(this).css('background-image', newSrc);
 		});
 
 		$("input.button").each(function() {
 			var newSrc = $(this).css('background-image');
+            if (newSrc.indexOf('/green/') >= 0) return;
 			newSrc = newSrc.replace('images/','images/green/');
 			$(this).css('background-image', newSrc);
 		});
 
 		$("input.button_long").each(function() {
 			var newSrc = $(this).css('background-image');
+            if (newSrc.indexOf('/green/') >= 0) return;
 			newSrc = newSrc.replace('images/','images/green/');
 			$(this).css('background-image', newSrc);
 		});
 
 		$("input.button_xlong").each(function() {
 			var newSrc = $(this).css('background-image');
+            if (newSrc.indexOf('/green/') >= 0) return;
 			newSrc = newSrc.replace('images/','images/green/');
 			$(this).css('background-image', newSrc);
 		});
 
 		$("button.button_remove").each(function() {
 			var newSrc = $(this).css('background-image');
+            if (newSrc.indexOf('/green/') >= 0) return;
 			newSrc = newSrc.replace('images/','images/green/');
 			$(this).css('background-image', newSrc);
 		});
