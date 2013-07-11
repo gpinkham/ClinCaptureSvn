@@ -2061,3 +2061,7 @@ table.crfListTable td {
     border-left: #CCCCCC 1px solid !important;
     padding-left: 2px !important;
 }
+
+#s_sdv tr input[name=sdvSubmit] {
+    margin-top: -2px;
+}
