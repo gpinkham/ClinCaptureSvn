@@ -144,11 +144,13 @@
 					<c:if test='${sur.status.deleted}'>
 						<font color='gray'>
 					</c:if>
-					<c:choose>
-						<c:when test='${sur.studyName != ""}'><c:out value="${sur.studyName}" /></c:when>
-						<c:otherwise>Study <c:out value="${sur.studyId}" /></c:otherwise>
-					</c:choose>
-					- 
+                    <c:if test="${sur.studyId > 0}">
+                        <c:choose>
+                            <c:when test='${sur.studyName != ""}'><c:out value="${sur.studyName}" /></c:when>
+                            <c:otherwise>Study <c:out value="${sur.studyId}" /></c:otherwise>
+                        </c:choose>
+                        -
+                    </c:if>
 					<fmt:message key="${roleMap[sur.role.id] }" bundle="${resterm}"></fmt:message>
 
 					<c:if test='${sur.status.deleted}'>
