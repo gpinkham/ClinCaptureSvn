@@ -44,6 +44,15 @@
         .graph .bar span { position: absolute; left: 1em; }
 </style>
 
+<script type="text/JavaScript" language="JavaScript">         
+	//alignment of headers and icons 
+	
+	jQuery(document).ready(function() {  
+		jQuery("div[id^='Event_']").parent().parent().parent().parent().parent().attr("align", "center"); 
+        jQuery("tr.header").attr("align", "center"); 
+}); 
+</script> 
+
 <!-- then instructions-->
 <div id="box" class="dialog">
 <span id="mbm">
