@@ -131,9 +131,6 @@
                                             <c:when test="${userRole.sysAdmin || userBean.techAdmin}">
                                                 <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                <c:if test="${study.status.available}">
-                                                    <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                </c:if>
                                                 <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             </c:when>
@@ -219,9 +216,6 @@
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
-                <c:if test="${study.status.available}">
-                    <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
-                </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
             </div>
@@ -271,21 +265,11 @@
                     </c:when>
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}pages/studymodule"><fmt:message key="nav_build_study" bundle="${resword}"/></a></div>
-                        <!-- <div class="taskLink"><a href="${urlPrefix}ListEventDefinition?read=true"><fmt:message key="nav_event_definitions" bundle="${resword}"/></a></div>  -->
                     </c:otherwise>
                 </c:choose>
             </div>
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudyUser"><fmt:message key="assign_users" bundle="${resword}"/></a></div>
-                    <%--
-                    <c:choose>
-                        <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector) }">
-                        </c:when>
-                        <c:otherwise>
-                            <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
-                        </c:otherwise>
-                    </c:choose>
-                     --%>
             </div>
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_administration" bundle="${resword}"/></div>
@@ -361,9 +345,6 @@
             <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="datasets" bundle="${resword}"/></a></div>
-    <%--             <c:if test="${includeReporting}"> --%>
-    <%--                 <div class="taskLink"><a href="${urlPrefix}reports" target="_blank"><fmt:message key="reporting" bundle="${resword}"/></a></div> --%>
-    <%--             </c:if> --%>
             </div>
             <br clear="all">
             </c:when>
@@ -372,11 +353,6 @@
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
-    <%--
-                <c:if test="${study.status.available}">
-                    <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
-                </c:if>
-    --%>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
             </div>
@@ -426,21 +402,11 @@
                     </c:when>
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}pages/studymodule"><fmt:message key="nav_build_study" bundle="${resword}"/></a></div>
-                        <!-- <div class="taskLink"><a href="${urlPrefix}ListEventDefinition?read=true"><fmt:message key="nav_event_definitions" bundle="${resword}"/></a></div>  -->
                     </c:otherwise>
                 </c:choose>
             </div>
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudyUser"><fmt:message key="assign_users" bundle="${resword}"/></a></div>
-                <%--
-                <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector) }">
-                    </c:when>
-                    <c:otherwise>
-                        <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
-                    </c:otherwise>
-                </c:choose>
-                 --%>
             </div>
             <br clear="all">
             </c:when>
