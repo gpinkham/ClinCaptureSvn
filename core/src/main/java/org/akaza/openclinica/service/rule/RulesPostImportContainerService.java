@@ -224,7 +224,7 @@ public class RulesPostImportContainerService {
 					.setValue(
 							ruleBeanWrapper.getAuditableBean().getExpression().getValue().trim()
 									.replaceAll("(\n|\t|\r)", " "));
-
+			
 			if (isRuleOidValid(ruleBeanWrapper) && isRuleExpressionValid(ruleBeanWrapper, null)) {
 				RuleBean persistentRuleBean = getRuleDao().findByOid(ruleBeanWrapper.getAuditableBean());
 				if (persistentRuleBean != null) {
@@ -446,6 +446,10 @@ public class RulesPostImportContainerService {
 		}
 		if (expressionBean.getContextName() != null && expressionBean.getContext() == null) {
 			beanWrapper.warning(createError("OCRERR_0029"));
+			expressionBean.setContext(Context.OC_RULES_V1);
+		}
+		if (expressionBean.getValue().length() > 4000) {
+			beanWrapper.error(createError("OCRERR_0035"));
 			expressionBean.setContext(Context.OC_RULES_V1);
 		}
 		return expressionBean;
