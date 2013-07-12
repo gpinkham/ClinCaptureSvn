@@ -16,6 +16,8 @@ package org.akaza.openclinica.control.admin;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -277,6 +279,7 @@ public class CreateJobExportServlet extends SecureController {
 		Validator v = new Validator(request);
         v.addValidation(DATASET_ID, Validator.NO_BLANKS_SET);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
+
 		// need to be unique too
 		v.addValidation(JOB_DESC, Validator.NO_BLANKS);
 		v.addValidation(EMAIL, Validator.IS_A_EMAIL);
@@ -304,6 +307,12 @@ public class CreateJobExportServlet extends SecureController {
 			if (jobDesc.length() > 250) {
 				Validator.addError(errors, JOB_DESC, "A job description cannot be more than 250 characters.");
 			}
+		}
+		Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(fp.getString(JOB_NAME));
+		boolean isContainSpecialSymbol = matcher.find();
+		if (isContainSpecialSymbol) {
+			Validator.addError(errors, JOB_NAME, resexception
+					.getString("dataset_should_not_contain_any_special"));
 		}
 		return errors;
 	}

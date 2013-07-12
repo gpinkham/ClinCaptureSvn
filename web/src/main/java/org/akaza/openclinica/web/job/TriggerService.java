@@ -15,6 +15,8 @@ package org.akaza.openclinica.web.job;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,6 +25,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.crfdata.*;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.quartz.JobDataMap;
 import org.quartz.TriggerKey;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
@@ -50,7 +53,8 @@ public class TriggerService {
 	public static final String STUDY_ID = "studyId";
 
 	private static String IMPORT_TRIGGER = "importTrigger";
-
+	public static ResourceBundle resexception;
+	
 	public SimpleTriggerImpl generateTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study,
 			String locale) {
 		Date startDateTime = fp.getDateTime(DATE_START_JOB);
@@ -357,6 +361,15 @@ public class TriggerService {
 		String minutes = fp.getString("minutes");
 
 		HashMap errors = v.validate();
+		Locale locale = request.getLocale();
+		ResourceBundleProvider.updateLocale(locale);
+		resexception = ResourceBundleProvider.getExceptionsBundle(locale);
+		Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(fp.getString(JOB_NAME));
+		boolean isContainSpecialSymbol = matcher.find();
+		if (isContainSpecialSymbol) {
+			Validator.addError(errors, JOB_NAME, resexception
+					.getString("dataset_should_not_contain_any_special"));
+		}
 		int studyId = fp.getInt(STUDY_ID);
 		if (!(studyId > 0)) {
 			Validator.addError(errors, STUDY_ID, "The study should be selected.");

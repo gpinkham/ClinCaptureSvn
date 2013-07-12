@@ -16,6 +16,8 @@ package org.akaza.openclinica.control.admin;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -250,8 +252,15 @@ public class UpdateJobExportServlet extends SecureController {
 	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
 			String properName) {
 		Validator v = new Validator(request);
+		HashMap errors = v.validate();
 		v.addValidation(DATASET_ID, Validator.NO_BLANKS_SET);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
+		Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(fp.getString(JOB_NAME));
+		boolean isContainSpecialSymbol = matcher.find();
+		if (isContainSpecialSymbol) {
+			Validator.addError(errors, JOB_NAME, resexception
+					.getString("dataset_should_not_contain_any_special"));
+		}
 		// need to be unique too
 		v.addValidation(JOB_DESC, Validator.NO_BLANKS);
 		v.addValidation(EMAIL, Validator.IS_A_EMAIL);
@@ -261,7 +270,6 @@ public class UpdateJobExportServlet extends SecureController {
 
 		int formatId = fp.getInt(FORMAT_ID);
 		Date jobDate = fp.getDateTime(DATE_START_JOB);
-		HashMap errors = v.validate();
 		if (formatId == 0) {
 			Validator.addError(errors, FORMAT_ID, "Please pick at least one.");
 		}
