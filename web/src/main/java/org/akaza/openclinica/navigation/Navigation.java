@@ -33,7 +33,7 @@ public class Navigation {
 			"/DeleteStudyUserRole", "/PauseJob", "/SelectItems", "/CreateDiscrepancyNote", 
 			"/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile", "/help",
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc", "/ViewCalendaredEventsForSubject",
-			"/ResetPassword"));
+			"/ResetPassword", "/pages/cancelScheduledJob"));
 	private static String defaultShortURL = "/MainMenu";		
 	
 	/*
