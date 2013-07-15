@@ -115,13 +115,7 @@ public class ListNotesFilter implements CriteriaCommand {
 					criteria += " and " + columnMapping.get(property) + " = '" + value.toString() + "' ";
 				}
 			} else if ("discrepancyNoteBean.resolutionStatus".equalsIgnoreCase(property)) {
-				if ("21".equals(value.toString())) {
-					criteria += " and (dn.resolution_status_id = 1 or dn.resolution_status_id = 2) ";
-				} else if ("321".equals(value.toString())) {
-					criteria += " and (dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3) ";
-				} else {
-					criteria += " and " + columnMapping.get(property) + " = '" + value.toString() + "' ";
-				}
+				criteria += parseResolutionStatus(value.toString());
 			} else if ("discrepancyNoteBean.createdDate".equalsIgnoreCase(property)) {
 				Date date = parseDate((String) value);
 				if (date != null) {
@@ -157,6 +151,19 @@ public class ListNotesFilter implements CriteriaCommand {
 			}
 		}
 		return criteria;
+	}
+
+	private String parseResolutionStatus(String stringValue) {
+		StringBuilder result = new StringBuilder();
+		if (stringValue.length() > 0){
+			result.append(" and (");
+			for (int i = 0; i < stringValue.length(); i++){
+				result.append(" or " + "dn.resolution_status_id = " + stringValue.charAt(i));
+			}
+			result.append(")");
+		}
+		
+		return result.toString().replaceFirst(" or ", "");
 	}
 
 	public static class Filter {

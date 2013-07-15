@@ -2156,36 +2156,61 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		return count != null && count == 0 ? true : false;
 	}
+	
+	public boolean doesSubjectHasSomeNDsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
+		ListNotesFilter listNotesFilter = new ListNotesFilter();
+		listNotesFilter.addFilter("studySubject.label", subjectLabel);
+		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
+		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
+				new ListNotesSort(), 0, 100);
+		return noteBeans.size() > 0;
+	}
 
+	public boolean doesSubjectHasNewNDsInStudy(StudyBean study, String subjectLabel) {
+		return doesSubjectHasSomeNDsInStudy(study, subjectLabel, "1");
+	}
+	
 	public boolean doesSubjectHasUnclosedNDsInStudy(StudyBean study, String subjectLabel) {
+		return doesSubjectHasSomeNDsInStudy(study, subjectLabel, "123");
+	}
+	
+	public boolean doesEventHasSomeNDsInStudy(StudyBean study, String eventLabel, String subjectLabel, String resolutionStatus) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
+		listNotesFilter.addFilter("eventName", eventLabel);
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
-		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "321");
+		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
 		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
 				new ListNotesSort(), 0, 100);
 		return noteBeans.size() > 0;
 	}
 
+	public boolean doesEventHasNewNDsInStudy(StudyBean study, String eventLabel, String subjectLabel) {
+		return doesEventHasSomeNDsInStudy(study, eventLabel, subjectLabel, "1");
+	}
+	
 	public boolean doesEventHasUnclosedNDsInStudy(StudyBean study, String eventLabel, String subjectLabel) {
-		ListNotesFilter listNotesFilter = new ListNotesFilter();
-		listNotesFilter.addFilter("eventName", eventLabel);
-		listNotesFilter.addFilter("studySubject.label", subjectLabel);
-		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "321");
-		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
-				new ListNotesSort(), 0, 100);
-		return noteBeans.size() > 0;
+		return doesEventHasSomeNDsInStudy(study, eventLabel, subjectLabel, "123");
 	}
-
-	public boolean doesCRFHasNDsInStudyForSubject(StudyBean study, String eventLabel, String subjectLabel,
-			String crfName) {
+	
+	public boolean doesCRFHasSomeNDsInStudyForSubject(StudyBean study, String eventLabel, String subjectLabel,
+			String crfName, String resolutionStatus) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("eventName", eventLabel);
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
-		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "321");
+		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
 		listNotesFilter.addFilter("crfName", crfName);
 		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
 				new ListNotesSort(), 0, 100);
 		return noteBeans.size() > 0;
 	}
 
+	public boolean doesCRFHasNewNDsInStudyForSubject(StudyBean study, String eventLabel, String subjectLabel, 
+			String crfName) {
+		return doesCRFHasSomeNDsInStudyForSubject(study, eventLabel, subjectLabel, crfName, "1");
+	}
+	
+	public boolean doesCRFHasUnclosedNDsInStudyForSubject(StudyBean study, String eventLabel, String subjectLabel,
+			String crfName) {
+		return doesCRFHasSomeNDsInStudyForSubject(study, eventLabel, subjectLabel, crfName, "123");
+	}
 }

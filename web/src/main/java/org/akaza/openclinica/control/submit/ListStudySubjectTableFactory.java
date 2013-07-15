@@ -843,19 +843,26 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					url.append(calendaredEventsBuilder(studySubjectBean));
 
 					if (discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel())) {
-
+						String flagColour = "yellow";
+						if (discrepancyNoteDAO.doesSubjectHasNewNDsInStudy(studyBean, studySubjectBean.getLabel())) {
+							flagColour = "red";
+						}
 						if (getStudyBean().getStatus() == Status.AVAILABLE) {
 							// Make sure this is the last icon
-							url.append(createNotesAndDiscrepanciesIcon(studySubjectBean));
+							url.append(createNotesAndDiscrepanciesIcon(studySubjectBean, flagColour));
 						}
 					}
 				}
 				if (getCurrentRole().getRole() == Role.STUDY_MONITOR) {
+					String flagColour = "yellow";
+					if (discrepancyNoteDAO.doesSubjectHasNewNDsInStudy(studyBean, studySubjectBean.getLabel())) {
+						flagColour = "red";
+					}
 					if (getStudyBean().getStatus() == Status.AVAILABLE
 							&& discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(studyBean,
 									studySubjectBean.getLabel())) {
 						// Make sure this is the last icon
-						url.append(createNotesAndDiscrepanciesIcon(studySubjectBean));
+						url.append(createNotesAndDiscrepanciesIcon(studySubjectBean, flagColour));
 					}
 				}
 
@@ -890,16 +897,21 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	}
 
-	private String createNotesAndDiscrepanciesIcon(StudySubjectBean studySubject) {
-
+	private String createNotesAndDiscrepanciesIcon(StudySubjectBean studySubject, String flagColor) {
+		String imagePath = "images/icon_flagYellow.gif";
+		String status = "Not+Closed";
+		if (flagColor.equals("red")){
+			imagePath = "images/icon_Note.gif";
+			status = "New";
+		}
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink
 				.a()
 				.href("ViewNotes?module=submit&maxRows=15&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=15&listNotes_f_studySubject.label="
-						+ studySubject.getLabel() + "&&listNotes_f_discrepancyNoteBean.resolutionStatus=Not+Closed");
-		actionLink.append("onMouseDown=\"javascript:setImage('ndIcon','images/icon_Note.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('ndIcon','images/icon_Note.gif');\"").close();
-		actionLink.img().name("ndIcon").src("images/icon_Note.gif").border("0")
+						+ studySubject.getLabel() + "&&listNotes_f_discrepancyNoteBean.resolutionStatus=" + status);
+		actionLink.append("onMouseDown=\"javascript:setImage('ndIcon','" + imagePath + "');\"");
+		actionLink.append("onMouseUp=\"javascript:setImage('ndIcon','" + imagePath + "');\"").close();
+		actionLink.img().name("ndIcon").src(imagePath).border("0")
 				.alt(resword.getString("view_discrepancy_notes")).title(resword.getString("view_discrepancy_notes"))
 				.end().aEnd();
 
@@ -1602,12 +1614,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 							Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(
 									sedBean.getMaxDay()).toDate();
 							if ((minDate.after(studyEventBean.getUpdatedDate()))
-									&& discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(studyBean, sedBean.getName(),
+									&& discrepancyNoteDAO.doesEventHasNewNDsInStudy(studyBean, sedBean.getName(),
 											subjectBean.getLabel())) {
 								defaultColor = false;
 								break;
 							} else if (maxDate.before(studyEventBean.getUpdatedDate())
-									&& discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(studyBean, sedBean.getName(),
+									&& discrepancyNoteDAO.doesEventHasNewNDsInStudy(studyBean, sedBean.getName(),
 											subjectBean.getLabel())) {
 								defaultColor = false;
 								break;
