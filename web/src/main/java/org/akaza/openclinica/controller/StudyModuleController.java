@@ -129,7 +129,7 @@ public class StudyModuleController {
 		int totalCrf = crfCount + crfWithEventDefinition;
 		int eventDefinitionCount = studyEventDefinitionDao.findAllActiveByStudy(currentStudy).size();
 
-		int subjectGroupCount = studyGroupClassDao.findAllActiveByStudy(currentStudy).size();
+		int subjectGroupCount = studyGroupClassDao.findAllByStudy(currentStudy).size();
 
 		int ruleCount = ruleSetService.getCountByStudy(currentStudy);
 
