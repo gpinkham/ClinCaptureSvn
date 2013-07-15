@@ -150,7 +150,7 @@
 <div style="width: 600px">
 
 <!-- These DIVs define shaded box borders -->
-	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+	<div class="box_T_a"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 		<div class="textbox_center">
 
@@ -333,10 +333,9 @@
 <div id="schedule0" style="display: <c:out value="${display0}"/>">
 <div style="width: 100%">
 <!-- These DIVs define shaded box borders -->
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<div class="box_T_a"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
-
 <table border="0" cellpadding="3" cellspacing="0">
  <tr>
   	<td class="formlabel"><fmt:message key="study_event_definition" bundle="${resword}"/>:</td>
@@ -473,7 +472,6 @@
 </table>
 
 </div>
-
 </div></div></div></div></div></div></div></div>
 
 </div>
@@ -485,7 +483,7 @@
 <div id="schedule1" style="display: <c:out value="${display1}"/>">
 <div style="width: 100%">
 <!-- These DIVs define shaded box borders -->
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<div class="box_T_a"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
 
@@ -638,7 +636,7 @@
 <div id="schedule2" style="display:<c:out value="${display2}"/>">
 <div style="width: 100%">
 <!-- These DIVs define shaded box borders -->
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<div class="box_T_a"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
 
@@ -791,7 +789,7 @@
 <div id="schedule3" style="display:<c:out value="${display3}"/>">
 <div style="width: 100%">
 <!-- These DIVs define shaded box borders -->
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<div class="box_T_a"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
 
