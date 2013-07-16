@@ -1180,7 +1180,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			eventDiv.close();
 			eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 			eventDiv.tr(0).valign("top").close();
-			eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).style("border-bottom: none").colspan("2").close();
+			eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).style("border-bottom: none; border-left: 1px solid #CCCCCC !important;").colspan("2").close();
 			eventDiv.bold().append(occurrence_x_of).append("#" + (i + 1) + " of " + studyEventsSize).br();
 			eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
 

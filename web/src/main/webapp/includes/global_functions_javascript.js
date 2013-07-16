@@ -1787,23 +1787,34 @@ function getSchedulePage(statusBoxId) {
 }
 
 function adjustCrfListTable(studyEventId) {
-    var headeRows = 1;
-    var crfsCellCount = 2;
-    var headerCellCount = 2;
-    jQuery('#crfListWrapper_' + studyEventId + ' .crfListTable tr').each(function() {
-        if (jQuery(this).find("td:last").attr("class").indexOf("crfListTableActions") > 0) {
-            headeRows = 0;
-        }
-        var currVal = parseInt(jQuery(this).find("td:last").children().length);
-        if (headeRows == 1) {
-            headerCellCount = currVal > headerCellCount ? currVal : headerCellCount;
-        } else {
-            crfsCellCount = currVal > crfsCellCount ? currVal : crfsCellCount;
-        }
-    });
-    crfActionIconWidth = 28;
-    crfActionsMaxIconsCount = 9;
-    jQuery('#crfListWrapper_' + studyEventId + ' .crfListTableActions').attr("style", "width: " + (crfActionIconWidth * crfActionsMaxIconsCount) + "px;");
+  var wereRemoved = 0;
+  var popupTotalColumns = 8;
+
+  var hideCol = function(num) {
+    $(".crfListTable tr").find("td:last").find("img:eq(" + (num - wereRemoved) + ")").remove();
+    popupTotalColumns--;
+    wereRemoved++;
+  }
+
+  if ($("#hideCol1").val() == 'true') hideCol(0);
+  if ($("#hideCol2").val() == 'true') hideCol(1);
+  if ($("#hideCol3").val() == 'true') hideCol(2);
+  if ($("#hideCol4").val() == 'true') hideCol(3);
+  if ($("#hideCol5").val() == 'true') hideCol(4);
+  if ($("#hideCol6").val() == 'true') hideCol(5);
+  if ($("#hideCol7").val() == 'true') hideCol(6);
+  if ($("#hideCol8").val() == 'true') hideCol(7);
+
+  $("#popupTotalColumns").val(popupTotalColumns);
+
+  var crfActionIconWidth = 33;
+  var crfActionsMaxIconsCount = parseInt($("#popupTotalColumns").val());
+  crfActionsMaxIconsCount = (crfActionsMaxIconsCount < 2 ? 2 : crfActionsMaxIconsCount);
+  jQuery('#crfListWrapper_' + studyEventId + ' .crfListTableActions').attr("style", "width: " + (crfActionIconWidth * crfActionsMaxIconsCount) + "px;");
+
+  $(".crfListTable tr").find("td:first").each(function() {
+    $(this).attr("style", "border-left : none !important;" + $(this).attr("style"));
+  });
 }
 
 function getCRFList(studyEventId) {
