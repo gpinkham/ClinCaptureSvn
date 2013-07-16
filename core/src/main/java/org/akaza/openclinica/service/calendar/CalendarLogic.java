@@ -91,7 +91,7 @@ public class CalendarLogic {
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(ds);
 			StudyGroupClassBean sgcb = new StudyGroupClassBean();
 			if(subjectDynGroupId == 0) {
-				sgcb = (StudyGroupClassBean) sgcdao.findDefault();
+				sgcb = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(studyBean.getId());
 			} else {
 				sgcb.setId(subjectDynGroupId);
 			}

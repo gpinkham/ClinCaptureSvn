@@ -36,6 +36,7 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.view.Page;
@@ -120,6 +121,7 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 
 		// TODO: make this sensitive to permissions
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 
 		StudyBean studyWithEventDefinitions = currentStudy;
 		if (currentStudy.getParentStudyId() > 0) {
@@ -130,6 +132,13 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 		// find all active definitions with CRFs
 		ArrayList eventDefinitions = seddao.findAllActiveBySubjectAndStudyId(ssb,studyWithEventDefinitions.getId());
 
+		//add definitions from default group
+		int defGrClassId = sgcdao.findDefaultByStudyId(studyWithEventDefinitions.getId()).getId();
+		if (defGrClassId > 0 && ssb.getDynamicGroupClassId() != defGrClassId && ssb.getDynamicGroupClassId() > 0){
+			ArrayList eventDefinitionsFromDefGroup = seddao.findAllActiveOrderedByStudyGroupClassId(defGrClassId);
+			eventDefinitions.addAll(eventDefinitionsFromDefGroup);
+		}
+		
 		Collections.sort(eventDefinitions, new Comparator<StudyEventDefinitionBean>(){
 			public int compare(StudyEventDefinitionBean bean1, StudyEventDefinitionBean bean2) {
 				return bean1.getName().compareTo(bean2.getName());

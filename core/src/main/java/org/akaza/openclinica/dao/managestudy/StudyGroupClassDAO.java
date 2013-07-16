@@ -272,13 +272,16 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
 		return eb;
 	}
 	
-	public EntityBean findDefault() {
+	public EntityBean findDefaultByStudyId(int studyId) {
 		StudyGroupClassBean eb = new StudyGroupClassBean();
 		ArrayList allDefaultGroups = findAllDefault();
-		if (allDefaultGroups.size() > 0) {
-			eb = (StudyGroupClassBean) allDefaultGroups.get(0);
+		for (int i = 0; i < allDefaultGroups.size(); i++){
+			StudyGroupClassBean sgcb = (StudyGroupClassBean) allDefaultGroups.get(i);
+			if (sgcb.getStudyId() == studyId) {
+				eb = sgcb;
+			}
 		}
-
+			
 		return eb;
 	}
 

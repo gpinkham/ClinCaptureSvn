@@ -211,12 +211,16 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 			StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 			
+			int studyId = studySub.getStudyId();
+			StudyDAO studydao = new StudyDAO(sm.getDataSource());
+			StudyBean study = (StudyBean) studydao.findByPK(studyId);
+			
 			StudyGroupClassBean subjDynGroup = new StudyGroupClassBean();
 			String studyEventDefinitionsString = "";
 			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 			if (studySub.getDynamicGroupClassId() == 0) {
 				request.setAttribute("subjDynGroupIsDefault", true);
-				StudyGroupClassBean defaultGroup = (StudyGroupClassBean) sgcdao.findDefault();
+				StudyGroupClassBean defaultGroup = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(study.getParentStudyId() > 0? study.getParentStudyId() : study.getId());
 				if (defaultGroup.getId() > 0){
 					subjDynGroup = defaultGroup;
 				} else {
@@ -252,11 +256,8 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 			request.setAttribute("studySub", studySub);
 
-			int studyId = studySub.getStudyId();
 			int subjectId = studySub.getSubjectId();
-
-			StudyDAO studydao = new StudyDAO(sm.getDataSource());
-			StudyBean study = (StudyBean) studydao.findByPK(studyId);
+			
 			// Check if this StudySubject would be accessed from the Current Study
 			if (studySub.getStudyId() != currentStudy.getId()) {
 				if (currentStudy.getParentStudyId() > 0) {

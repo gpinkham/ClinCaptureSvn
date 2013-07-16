@@ -365,7 +365,7 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		ArrayList<StudyEventDefinitionBean> defsFromGroup = new ArrayList(); 
 		if (ssb.getDynamicGroupClassId() == 0){
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(this.getDs());
-			StudyGroupClassBean sgc = (StudyGroupClassBean) sgcdao.findDefault();
+			StudyGroupClassBean sgc = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(studyId);
 			if (sgc.getId() > 0){
 				defsFromGroup = findAllActiveOrderedByStudyGroupClassId(sgc.getId());
 			}
