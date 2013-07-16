@@ -286,6 +286,7 @@
 </c:when>
 <c:otherwise>
 <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
+<form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
 <tr valign="top">
 	<td class="table_cell_left">
 		<c:out value="${dedc.edc.crf.name}" /> 
@@ -297,7 +298,6 @@
 		</c:if>
 	</td>
 	<td class="table_cell">
-    <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
         <c:choose>
         <c:when test="${dedc.eventCRF.id > 0}">
         <!-- found an event crf id -->
@@ -441,10 +441,10 @@
    			onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><img
       		name="Reassign" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="4"></a>
             </c:if>
-    </form>
 </td>
 
 </tr>
+</form>
 
 <c:set var="rowCount" value="${rowCount + 1}" />
 </c:otherwise>

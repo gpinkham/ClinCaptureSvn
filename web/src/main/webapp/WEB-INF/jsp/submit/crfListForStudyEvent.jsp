@@ -258,6 +258,7 @@
                     </c:when>
                     <c:otherwise>
                         <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
+                        <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
                             <tr valign="top">
                                 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" />
                                     <c:if test="${dedc.edc.requiredCRF}"><span style="color: orange">*</span>
@@ -267,7 +268,6 @@
                                     </c:if>
                                 </td>
                                 <td class="table_cell_left">
-                                    <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
                                         <c:choose>
                                             <c:when test="${dedc.eventCRF.id > 0}">
                                                 <!-- found an event crf id -->
@@ -390,8 +390,6 @@
                                            onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                                            name="bt_View1" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="4"></a>
 
-
-                                    </form>
                                     <c:if test="${not empty crfNDsMap[dedc.edc.crf.id]}">
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
@@ -413,6 +411,7 @@
                                     </c:if>
                                 </td>
                             </tr>
+                            </form>
 
                         <c:set var="rowCount" value="${rowCount + 1}" />
                     </c:otherwise>

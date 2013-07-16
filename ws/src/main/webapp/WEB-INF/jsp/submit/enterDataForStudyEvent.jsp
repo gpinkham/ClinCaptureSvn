@@ -239,13 +239,13 @@
 </c:when>
 <c:otherwise>
 <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}" />
+<form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
 <tr valign="top">
 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" /></td>
     <%--
                  <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
                  --%>
 <td class="table_cell">
-    <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
         <c:choose>
         <c:when test="${dedc.eventCRF.id > 0}">
         <!-- found an event crf id -->
@@ -386,10 +386,10 @@
         </td>
         </tr>
     </table>
-    </form>
 </td>
 
 </tr>
+</form>
 
 <c:set var="rowCount" value="${rowCount + 1}" />
 </c:otherwise>
