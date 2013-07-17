@@ -201,7 +201,7 @@
 	</tr>
 	<tr>
 		<td align="right">
-			<c:if test="${fn:length(availableDynGroups) > 1 && !(defaultGroupExists && fn:length(availableDynGroups) == 2) && (study.parentStudyId == 0)}">
+			<c:if test="${fn:length(availableDynGroups) > 1 && !(defaultGroupExists && fn:length(availableDynGroups) == 2) && (currentStudy.parentStudyId == 0)}">
 				<input type="submit" name="BTN_Change_Group_Order" value="<fmt:message key="submit" bundle="${resword}"/>" class="button"/>
 			</c:if>  
 		</td>
