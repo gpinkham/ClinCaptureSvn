@@ -153,7 +153,7 @@
     <td class="table_cell">
         <c:choose>
             <c:when test="${userType == 1}">
-                <fmt:message key="business_administrator" bundle="${resword}"/>
+                <fmt:message key="system_administrator" bundle="${resword}"/>
             </c:when>
             <c:when test="${userType == 3}">
                 <fmt:message key="technical_administrator" bundle="${resword}"/>
