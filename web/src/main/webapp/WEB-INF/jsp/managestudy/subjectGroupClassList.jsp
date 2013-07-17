@@ -105,7 +105,6 @@
 		<fmt:message key="order_of_dynamic_groups" bundle="${resword}"/>
 	</a>
 	<br/></br>
-	
 	<div id="dynGroupsOrder" style="width: 65%;">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
@@ -133,7 +132,14 @@
 								<tr id="content${status.count}">	
 									<c:set var="defaultGroupExists" value="${true}"/>
 									<td class="table_cell_left" id="order${status.count}">
-										&nbsp;
+										<c:choose>
+											<c:when test="${study.parentStudyId != 0}">
+												&nbsp;${status.count}.
+											</c:when>
+											<c:otherwise>
+												&nbsp;
+											</c:otherwise>
+										</c:choose>
 									</td>
 									<td class="table_cell">
 										<c:out value="${dynGroup.name}"/>
@@ -148,6 +154,9 @@
 								<tr id="content${status.count}">	
 									<td class="table_cell_left" id="order${status.count}">
 									<c:choose>
+										<c:when test="${study.parentStudyId != 0}">
+											&nbsp;${status.count}.
+										</c:when>
 										<c:when test="${status.first}">
 											<c:choose>
 												<c:when test="${fn:length(availableDynGroups) > 1}">
@@ -192,7 +201,7 @@
 	</tr>
 	<tr>
 		<td align="right">
-			<c:if test="${fn:length(availableDynGroups) > 1 && !(defaultGroupExists && fn:length(availableDynGroups) == 2)}">
+			<c:if test="${fn:length(availableDynGroups) > 1 && !(defaultGroupExists && fn:length(availableDynGroups) == 2) && (currentStudy.parentStudyId == 0)}">
 				<input type="submit" name="BTN_Change_Group_Order" value="<fmt:message key="submit" bundle="${resword}"/>" class="button"/>
 			</c:if>  
 		</td>
@@ -208,7 +217,8 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-    <input type="button" onclick="window.location.href=('CreateSubjectGroupClass');" name="BTN_Group" value="<fmt:message key="create_group" bundle="${resword}"/>" class="button_medium"/>
-   
+    <c:if test="${currentStudy.parentStudyId == 0}">
+    	<input type="button" onclick="window.location.href=('CreateSubjectGroupClass');" name="BTN_Group" value="<fmt:message key="create_group" bundle="${resword}"/>" class="button_medium"/>
+   	</c:if>      
  
 <jsp:include page="../include/footer.jsp"/>
