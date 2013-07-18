@@ -1166,10 +1166,10 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		ind++; // update_id
 		this.setTypeExpected(ind, TypeNames.STRING);
 		ind++; // secondary_label
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // studyName
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // dynamic_group_class_id
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; // studyName
 
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(studyId));
