@@ -1286,7 +1286,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private void singleEventDivBuilder(HtmlBuilder eventDiv, SubjectBean subject, Integer rowCount,
 			List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed, StudySubjectBean studySubject) {
 
-		String tableHeaderRowStyleClass = "table_header_row";
 		String tableHeaderRowLeftStyleClass = "table_header_row_left";
 		String add_another_occurrence = resword.getString("add_another_occurrence");
 		String click_for_more_options = resword.getString("click_for_more_options");
