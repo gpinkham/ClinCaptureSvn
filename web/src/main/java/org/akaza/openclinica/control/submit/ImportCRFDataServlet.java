@@ -22,12 +22,16 @@ package org.akaza.openclinica.control.submit;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.sax.SAXSource;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
@@ -44,15 +48,14 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.xml.Unmarshaller;
+import org.xml.sax.InputSource;
+
 
 /**
  * Create a new CRF verison by uploading excel file. Makes use of several other classes to validate and provide accurate
@@ -108,7 +111,7 @@ public class ImportCRFDataServlet extends SecureController {
 
 		String action = request.getParameter("action");
 		CRFVersionBean version = (CRFVersionBean) session.getAttribute("version");
-
+		
 		File xsdFile2 = new File(SpringServletAccess.getPropertiesDir(context) + "ODM1-2-1.xsd");
 
 		if (StringUtil.isBlank(action)) {
@@ -141,40 +144,34 @@ public class ImportCRFDataServlet extends SecureController {
 			if (f == null) {
 				forwardPage(Page.IMPORT_CRF_DATA);
 			}
-
-			Mapping myMap = new Mapping();
-			String ODM_MAPPING_DIRPath = CoreResources.ODM_MAPPING_DIR;
-			myMap.loadMapping(ODM_MAPPING_DIRPath + File.separator + "cd_odm_mapping.xml");
-
-			Unmarshaller um1 = new Unmarshaller(myMap);
+			
 			boolean fail = false;
 			ODMContainer odmContainer = new ODMContainer();
 			session.removeAttribute("odmContainer");
+			JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+			//Create SAXSource
+			InputSource inputSource = new InputSource(new FileInputStream(f));
+			SAXSource saxSource = new SAXSource(inputSource);
 			try {
-
-				InputStreamReader isr = new InputStreamReader(new FileInputStream(f), "UTF-8");
-				odmContainer = (ODMContainer) um1.unmarshal(isr);
-
+				odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
 				logger.debug("Found crf data container for study oid: "
 						+ odmContainer.getCrfDataPostImportContainer().getStudyOID());
 				logger.debug("found length of subject list: "
 						+ odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
-
 				addPageMessage(respage.getString("passed_xml_validation"));
 			} catch (Exception me1) {
 				me1.printStackTrace();
 				logger.info("found exception with xml transform");
-				//
 				logger.info("trying 1.2.1");
 				try {
 					schemaValidator.validateAgainstSchema(f, xsdFile2);
-					InputStreamReader isr = new InputStreamReader(new FileInputStream(f), "UTF-8");
-					odmContainer = (ODMContainer) um1.unmarshal(isr);
+					odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
 				} catch (Exception me2) {
 					// not sure if we want to report me2
 					MessageFormat mf = new MessageFormat("");
 					mf.applyPattern(respage.getString("your_xml_is_not_well_formed"));
-					Object[] arguments = { me1.getMessage() };
+					Object[] arguments = { me2.getMessage() };
 					addPageMessage(mf.format(arguments));
 					forwardPage(Page.IMPORT_CRF_DATA);
 				}

@@ -33,9 +33,9 @@ public class LocaleFlagTest extends BaseTest {
 		Thread.sleep(1000);
 		assertElementPresented(flagElement);
 
-		openViewJobsPage();
-		Thread.sleep(1000);
-		assertElementPresented(flagElement);
+//		openViewJobsPage();
+//		Thread.sleep(1000);
+//		assertElementPresented(flagElement);
 	}
 
 }

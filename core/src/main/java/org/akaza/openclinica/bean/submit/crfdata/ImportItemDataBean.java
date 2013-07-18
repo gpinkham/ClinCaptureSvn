@@ -13,14 +13,26 @@
 
 package org.akaza.openclinica.bean.submit.crfdata;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
 
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(namespace="http://www.cdisc.org/ns/odm/v1.3")
 public class ImportItemDataBean {
+	
 	private String itemOID;
+
 	private String transactionType;
+
 	private String value;
+
 	private String isNull; // boolean, tbh?
 	private ElementRefBean measurementUnitRef = new ElementRefBean();
 	private String reasonForNull;
@@ -28,7 +40,8 @@ public class ImportItemDataBean {
 	private DiscrepancyNotesBean discrepancyNotes = new DiscrepancyNotesBean();
 
 	private boolean hasValueWithNull; // this is just a flag, it is not an attribute/element
-
+	
+	@XmlAttribute(name = "ItemOID")
 	public String getItemOID() {
 		return itemOID;
 	}
@@ -36,7 +49,8 @@ public class ImportItemDataBean {
 	public void setItemOID(String itemOID) {
 		this.itemOID = itemOID;
 	}
-
+	
+	@XmlAttribute(name = "TransactionType")
 	public String getTransactionType() {
 		return transactionType;
 	}
@@ -44,7 +58,8 @@ public class ImportItemDataBean {
 	public void setTransactionType(String transactionType) {
 		this.transactionType = transactionType;
 	}
-
+	
+	@XmlAttribute(name = "Value")
 	public String getValue() {
 		return value;
 	}
@@ -52,7 +67,8 @@ public class ImportItemDataBean {
 	public void setValue(String value) {
 		this.value = value;
 	}
-
+	
+	@XmlAttribute(name = "IsNull")
 	public String getIsNull() {
 		return isNull;
 	}

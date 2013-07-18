@@ -15,10 +15,19 @@ package org.akaza.openclinica.bean.submit.crfdata;
 
 import java.util.ArrayList;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(namespace="http://www.cdisc.org/ns/odm/v1.3")
 public class FormDataBean {
+	
 	private ArrayList<ImportItemGroupDataBean> itemGroupData;
 	private AuditLogsBean auditLogs;
 	private DiscrepancyNotesBean discrepancyNotes;
@@ -29,7 +38,8 @@ public class FormDataBean {
 		auditLogs = new AuditLogsBean();
 		discrepancyNotes = new DiscrepancyNotesBean();
 	}
-
+	
+	@XmlAttribute(name = "FormOID")
 	public String getFormOID() {
 		return formOID;
 	}
@@ -37,7 +47,8 @@ public class FormDataBean {
 	public void setFormOID(String formOID) {
 		this.formOID = formOID;
 	}
-
+	
+	@XmlElement(name = "ItemGroupData", namespace="http://www.cdisc.org/ns/odm/v1.3")
 	public ArrayList<ImportItemGroupDataBean> getItemGroupData() {
 		return itemGroupData;
 	}

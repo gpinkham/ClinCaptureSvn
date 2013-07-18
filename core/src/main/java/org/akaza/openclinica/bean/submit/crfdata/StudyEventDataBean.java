@@ -15,10 +15,19 @@ package org.akaza.openclinica.bean.submit.crfdata;
 
 import java.util.ArrayList;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(namespace="http://www.cdisc.org/ns/odm/v1.3")
 public class StudyEventDataBean {
+	
 	private ArrayList<FormDataBean> formData;
 	private String studyEventOID;
 	private String studyEventRepeatKey;
@@ -30,7 +39,8 @@ public class StudyEventDataBean {
 		auditLogs = new AuditLogsBean();
 		discrepancyNotes = new DiscrepancyNotesBean();
 	}
-
+	
+	@XmlAttribute(name = "StudyEventRepeatKey")
 	public String getStudyEventRepeatKey() {
 		return studyEventRepeatKey;
 	}
@@ -38,7 +48,8 @@ public class StudyEventDataBean {
 	public void setStudyEventRepeatKey(String studyEventRepeatKey) {
 		this.studyEventRepeatKey = studyEventRepeatKey;
 	}
-
+	
+	@XmlAttribute(name = "StudyEventOID")
 	public String getStudyEventOID() {
 		return studyEventOID;
 	}
@@ -46,7 +57,8 @@ public class StudyEventDataBean {
 	public void setStudyEventOID(String studyEventOID) {
 		this.studyEventOID = studyEventOID;
 	}
-
+	
+	@XmlElement(name = "FormData", namespace="http://www.cdisc.org/ns/odm/v1.3")
 	public ArrayList<FormDataBean> getFormData() {
 		return formData;
 	}

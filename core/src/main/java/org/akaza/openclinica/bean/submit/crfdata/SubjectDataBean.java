@@ -15,21 +15,31 @@ package org.akaza.openclinica.bean.submit.crfdata;
 
 import java.util.ArrayList;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(namespace="http://www.cdisc.org/ns/odm/v1.3")
 public class SubjectDataBean {
+	
 	private ArrayList<StudyEventDataBean> studyEventData;
 	private String subjectOID;
 	private AuditLogsBean auditLogs;
 	private DiscrepancyNotesBean discrepancyNotes;
-
+	
 	public SubjectDataBean() {
 		studyEventData = new ArrayList<StudyEventDataBean>();
 		auditLogs = new AuditLogsBean();
 		discrepancyNotes = new DiscrepancyNotesBean();
 	}
-
+	
+	@XmlAttribute(name = "SubjectKey")
 	public String getSubjectOID() {
 		return subjectOID;
 	}
@@ -37,7 +47,8 @@ public class SubjectDataBean {
 	public void setSubjectOID(String subjectOID) {
 		this.subjectOID = subjectOID;
 	}
-
+	
+	@XmlElement(name = "StudyEventData", namespace="http://www.cdisc.org/ns/odm/v1.3")
 	public ArrayList<StudyEventDataBean> getStudyEventData() {
 		return studyEventData;
 	}

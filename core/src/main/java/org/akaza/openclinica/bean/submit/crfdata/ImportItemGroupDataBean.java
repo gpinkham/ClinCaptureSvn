@@ -15,15 +15,27 @@ package org.akaza.openclinica.bean.submit.crfdata;
 
 import java.util.ArrayList;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(namespace="http://www.cdisc.org/ns/odm/v1.3")
 public class ImportItemGroupDataBean {
+	
 	private ArrayList<ImportItemDataBean> itemData;
+	
 	private String itemGroupOID;
+
 	private String itemGroupRepeatKey;
 
 	public ImportItemGroupDataBean() {
 		itemData = new ArrayList<ImportItemDataBean>();
 	}
-
+	
+	@XmlAttribute(name = "ItemGroupRepeatKey" )
 	public String getItemGroupRepeatKey() {
 		return itemGroupRepeatKey;
 	}
@@ -31,7 +43,8 @@ public class ImportItemGroupDataBean {
 	public void setItemGroupRepeatKey(String itemGroupRepeatKey) {
 		this.itemGroupRepeatKey = itemGroupRepeatKey;
 	}
-
+	
+	@XmlAttribute(name = "ItemGroupOID")
 	public String getItemGroupOID() {
 		return itemGroupOID;
 	}
@@ -39,7 +52,8 @@ public class ImportItemGroupDataBean {
 	public void setItemGroupOID(String itemGroupOID) {
 		this.itemGroupOID = itemGroupOID;
 	}
-
+	
+	@XmlElement(name = "ItemData", namespace="http://www.cdisc.org/ns/odm/v1.3")
 	public ArrayList<ImportItemDataBean> getItemData() {
 		return itemData;
 	}
