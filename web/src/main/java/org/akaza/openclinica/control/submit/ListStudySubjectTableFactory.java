@@ -135,7 +135,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		tableFacade.setColumnProperties(columnNames);
 		Row row = tableFacade.getTable().getRow();
 		int index = 0;
-
+		
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
 		configureColumn(row.getColumn(columnNames[index]), currentStudy != null ? currentStudy
 				.getStudyParameterConfig().getStudySubjectIdLabel() : resword.getString("study_subject_ID"), null, null);
@@ -865,10 +865,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						url.append(createNotesAndDiscrepanciesIcon(studySubjectBean, flagColour));
 					}
 				}
-
+				
 				value = "</div>" + url.toString();
 			}
-
+			
 			return value;
 		}
 	}
@@ -920,6 +920,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	private String signStudySubjectLinkBuilder(StudySubjectBean studySubject, boolean isSignable) {
 		String result = "";
+		HtmlBuilder transparentButton = new HtmlBuilder();
 		boolean showHidden = !isSignable ? getStudyEventDAO().findAllByStudySubject(studySubject).size() == 0 : false;
 		if (isSignable || showHidden) {
 			HtmlBuilder actionLink = new HtmlBuilder();
@@ -932,8 +933,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					.alt(resword.getString("sign")).title(resword.getString("sign")).append("hspace=\"4\"").end()
 					.aEnd();
 			result = actionLink.toString();
+		} else if(currentRole.getRole().getId() == 4) {
+			transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0")
+			.append("hspace=\"4\"").end();
 		}
-		return result;
+		return result + transparentButton.toString();
 	}
 
 	private String sdvStudySubjectLinkBuilder(StudySubjectBean studySubject) {
@@ -1005,8 +1009,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		actionLink.img().name("bt_Restore1").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore"))
 				.title(resword.getString("restore")).append("hspace=\"4\"").end().aEnd();
 		HtmlBuilder transparentButton = new HtmlBuilder();
-		if (currentRole.getRole().getId() != 4 && currentRole.getRole().getId() != 5
-				&& currentRole.getRole().getId() != 2) {
+		if (currentRole.getRole().getId() != 5
+				&& currentRole.getRole().getId() != 2 && currentRole.getRole().getId() != 1) {
 			transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0")
 					.append("hspace=\"4\"").end();
 		}
