@@ -456,7 +456,6 @@
                  onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                  onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                 name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-
         </td>
 	  </tr>
 	 </table>
@@ -476,38 +475,10 @@
 </c:forEach>
 </div>
 <br><br>
-    <c:choose>
-        <c:when test="${userBean.sysAdmin}">
             <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-        </c:when>
-        <c:otherwise>
-            <%-- <input type="button" onclick="goBack();" name="cancel" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/> --%>
-        </c:otherwise>
-    </c:choose>
-
-
-
-<br>
- <c:choose>
-  <c:when test="${fromListSite=='yes'}">
-   <p><a href="#" onClick="history.go(-1)"><fmt:message key="go_back_to_site_list" bundle="${resword}"/></a></p>   
-  </c:when>
-  <c:otherwise>
-    <c:choose>
-      <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin}">
-       <p><a href="ListStudy"><fmt:message key="go_back_to_study_list" bundle="${resword}"/></a></p>
-      </c:when>
-      <c:otherwise>
-         <p>
-           <%-- <a href="MainMenu"><fmt:message key="go_back_home" bundle="${resword}"/></a>--%>
-         </p>
-      </c:otherwise>
-    </c:choose>
-  </c:otherwise>
- </c:choose>
 
  <br><br>
 
