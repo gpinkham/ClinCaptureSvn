@@ -326,14 +326,14 @@
                                         </c:choose>
                                 </td>
 
-                                <td class="table_cell_left ddeColumn">
+                                <td class="table_cell_left">
                                     <c:if test="${dedc.eventCRF != null && !dedc.eventCRF.notStarted && dedc.eventCRF.owner != null}">
                                         ${dedc.eventCRF.owner.name}
                                     </c:if>
                                     &nbsp;
                                 </td>
 
-                                <td class="table_cell_left">
+                                <td class="table_cell_left ddeColumn">
                                     <c:if test="${!dedc.edc.doubleEntry}">
                                         n/a
                                     </c:if>
@@ -444,7 +444,6 @@
                                         </c:choose>
                                     </c:otherwise>
                                 </c:choose>
-
                             </td>
 
                             <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
