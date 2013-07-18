@@ -316,6 +316,8 @@ public class DefineStudyEventServlet extends SecureController {
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(5);
 		StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) session.getAttribute("definition");
+		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		UserAccountBean userBean = (UserAccountBean) uadao.findByPK(def1.getUserEmailId());
 		HashMap args = new HashMap();
 		args.put("actionName", "next");
 		args.put("pageNum", "1");
@@ -324,6 +326,16 @@ public class DefineStudyEventServlet extends SecureController {
 		args.put("category", def1.getCategory());
 		args.put("description", def1.getDescription());
 		args.put("type", def1.getType());
+		args.put("schDay", new Integer(def1.getScheduleDay()).toString());
+		args.put("maxDay", new Integer(def1.getMaxDay()).toString());
+		args.put("minDay", new Integer(def1.getMinDay()).toString());
+		args.put("emailDay", new Integer(def1.getEmailDay()).toString());
+		args.put("emailUser", userBean.getName());
+		if ("true".equals(new Boolean(def1.getReferenceVisit()).toString())) {
+			args.put("isReference",   "true");
+		} else {
+			args.put("isReference",   "");
+		}
 		table.setQuery("DefineStudyEvent", args);
 		table.setRows(allRows);
 		table.computeDisplay();
@@ -449,7 +461,7 @@ public class DefineStudyEventServlet extends SecureController {
 		String referenceVisitValue = fp.getString("isReference");
 		if ("true".equalsIgnoreCase(referenceVisitValue)) {
 			sed.setReferenceVisit(true);
-		} else if ("false".equalsIgnoreCase(referenceVisitValue)) {
+		} else {
 			sed.setReferenceVisit(false);
 		}
 		// end
