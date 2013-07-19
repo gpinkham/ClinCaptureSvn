@@ -47,6 +47,10 @@
                         where user_id=?</sql>
         </query>
         <query>
+                <name>updateUserType</name>
+                <sql>update user_account set user_type_id = ? where user_id = ?</sql>
+        </query>
+        <query>
                 <name>createRole</name>
                 <sql>insert into study_user_role (role_name, study_id, status_id, owner_id, date_created)
                 values (?,?,?,?,sysdate)</sql>
@@ -58,6 +62,10 @@
         <query>
                 <name>delete</name>
                 <sql>update user_account set status_id = 5, enabled = 0, update_id=? where user_id = ?</sql>
+        </query>
+        <query>
+            <name>deleteUserRole</name>
+            <sql>delete from study_user_role where user_name = ? and role_name = ? and (study_id = ? or study_id is null)</sql>
         </query>
         <query>
                 <name>deleteStudyUserRolesByUserID</name>

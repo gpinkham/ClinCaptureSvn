@@ -684,6 +684,21 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
 	}
 
+	public void deleteUserRole(int studyId, Role role, UserAccountBean user) {
+		HashMap variables = new HashMap();
+		variables.put(1, user.getName());
+		variables.put(2, role.getName());
+		variables.put(3, studyId);
+		String sql = digester.getQuery("deleteUserRole");
+		this.execute(sql, variables);
+		if (role == Role.SYSTEM_ADMINISTRATOR) {
+			variables = new HashMap();
+			variables.put(1, UserType.USER.getId());
+			variables.put(2, user.getId());
+			this.execute(digester.getQuery("updateUserType"), variables);
+		}
+	}
+
 	/**
 	 * Finds all user and roles in a study
 	 * 

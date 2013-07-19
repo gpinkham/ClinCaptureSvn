@@ -45,6 +45,7 @@ import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -295,8 +296,8 @@ public abstract class CoreSecureController extends HttpServlet {
 
 		request.setCharacterEncoding("UTF-8");
 		response.setHeader("Content-Encoding", "gzip");
-
 		HttpSession session = request.getSession();
+		SecureController.reloadUserBean(session, new UserAccountDAO(dataSource));
 		try {
 			session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
 		} catch (NumberFormatException nfe) {
@@ -310,7 +311,7 @@ public abstract class CoreSecureController extends HttpServlet {
 		}
 
 		UserAccountBean ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
-		StudyBean currentStudy = (StudyBean) session.getAttribute(STUDY);
+		StudyBean currentStudy = (StudyBean) session.getAttribute(STUDY);        
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
 		// Set current language preferences

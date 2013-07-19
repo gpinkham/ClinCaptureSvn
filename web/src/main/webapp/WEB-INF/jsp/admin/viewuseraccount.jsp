@@ -157,7 +157,14 @@ for each study user is in, show:
 		<td class="table_header_column"><fmt:message key="roles" bundle="${resword}"/>:</td>
 		<td class="table_cell">
 			<c:forEach var="studyUserRole" items="${user.roles}">
-				<c:out value="${studyUserRole.studyName}" /> - <c:out value="${studyUserRole.role.description}" /><br/>
+                <c:choose>
+                    <c:when test="${studyUserRole.role.id eq 1}">
+                        <c:out value="${studyUserRole.role.description}" /><br/>
+                    </c:when>
+                    <c:otherwise>
+                        <c:out value="${studyUserRole.studyName}" /> - <c:out value="${studyUserRole.role.description}" /><br/>
+                    </c:otherwise>
+                </c:choose>
 			</c:forEach>
 		</td>
 	</tr>

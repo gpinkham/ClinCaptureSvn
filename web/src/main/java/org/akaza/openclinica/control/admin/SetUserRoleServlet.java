@@ -152,8 +152,10 @@ public class SetUserRoleServlet extends SecureController {
 
 				if (studyId > 0) {
 					udao.createStudyUserRole(user, sur);
-
-					addPageMessage(user.getFirstName() + " " + user.getLastName() + " ("
+                    if (ub.getId() == user.getId()) {
+                        session.setAttribute("reloadUserBean", true);
+                    }
+                    addPageMessage(user.getFirstName() + " " + user.getLastName() + " ("
 							+ resword.getString("username") + ": " + user.getName() + ") "
 							+ respage.getString("has_been_granted_the_role") + " \"" + sur.getRole().getDescription()
 							+ "\" " + respage.getString("in_the_study_site") + " " + userStudy.getName() + ".");

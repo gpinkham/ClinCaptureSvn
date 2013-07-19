@@ -67,7 +67,7 @@ public class DeleteStudyUserRoleServlet extends SecureController {
 
 		StudyUserRoleBean s = udao.findRoleByUserNameAndStudyId(uName, studyId);
 
-		String message;
+		String message = "";
 		if (!s.isActive()) {
 			message = respage.getString("the_specified_user_role_not_exits_for_study");
 		} else if (!EntityAction.contains(action)) {
@@ -80,16 +80,28 @@ public class DeleteStudyUserRoleServlet extends SecureController {
 		} else {
 			EntityAction desiredAction = EntityAction.get(action);
 
-			if (desiredAction.equals(EntityAction.DELETE)) {
-				s.setStatus(Status.DELETED);
-				message = respage.getString("the_study_user_role_deleted");
+			if (ub.isSysAdmin() && desiredAction.equals(EntityAction.DELETE)) {
+                if (s.getUserName().equalsIgnoreCase("root") && s.isSysAdmin()) {
+                    message = respage.getString("you_cannot_remove_the_sysadmin_role_for_the_root_user");
+                } else {
+                    message = s.isSysAdmin() ? respage.getString("the_user_role_deleted") : respage
+                            .getString("the_study_user_role_deleted");
+                    udao.deleteUserRole(studyId, s.getRole(), user);
+                    if (ub.getId() == user.getId()) {
+                        session.setAttribute("reloadUserBean", true);
+                    }
+                }
 			} else {
-				s.setStatus(Status.AVAILABLE);
-				message = respage.getString("the_study_user_role_restored");
+				if (desiredAction.equals(EntityAction.DELETE)) {
+					s.setStatus(Status.DELETED);
+					message = respage.getString("the_study_user_role_deleted");
+				} else {
+					s.setStatus(Status.AVAILABLE);
+					message = respage.getString("the_study_user_role_restored");
+				}
+				s.setUpdater(ub);
+				udao.updateStudyUserRole(s, uName);
 			}
-
-			s.setUpdater(ub);
-			udao.updateStudyUserRole(s, uName);
 		}
 
 		addPageMessage(message);

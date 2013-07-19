@@ -102,6 +102,9 @@ public class RestoreStudyUserRoleServlet extends SecureController {
 				sur.setUpdater(ub);
 				sur.setUpdatedDate(new Date());
 				udao.updateStudyUserRole(sur, userName);
+                if (ub.getId() == user.getId()) {
+                    session.setAttribute("reloadUserBean", true);
+                }
 				addPageMessage(sendEmail(user, sur));
 				forwardPage(Page.LIST_USER_IN_STUDY_SERVLET);
 

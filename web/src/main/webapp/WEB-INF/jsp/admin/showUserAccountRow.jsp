@@ -1,10 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.UserAccountRow" />
+
+<c:set var="totalRoles" value="${fn:length(currRow.bean.roles)}"/>
 
 <tr valign="top" bgcolor="#F5F5F5">
 	<td class="table_cell_left">
@@ -35,11 +38,11 @@
 			<c:otherwise>
 				<c:choose>
 				<c:when test='${currRow.bean.status.deleted}'>
-					<c:set var="confirmQuestion">
+                    <c:set var="confirmQuestion">
 					  <fmt:message key="are_you_sure_you_want_to_restore" bundle="${resword}">
 					    <fmt:param value="${currRow.bean.name}"/>
 					  </fmt:message>
-					</c:set> 
+					</c:set>
 					
 					<c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
 					<img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>
@@ -72,11 +75,17 @@
 				</c:set> 
 				
 				<c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
-				<td><a href="DeleteUser?action=3&userId=<c:out value="${currRow.bean.id}"/>" onClick="<c:out value="${onClick}" />"
-					onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-					onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');">
-					<img name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
-				&nbsp;</td>
+                <c:choose>
+                    <c:when test="${currRow.bean.name eq 'root'}"></c:when>
+                    <c:when test="${currRow.bean.id eq userBean.id}"></c:when>
+                    <c:otherwise>
+                        <td><a href="DeleteUser?action=3&userId=<c:out value="${currRow.bean.id}"/>" onClick="<c:out value="${onClick}" />"
+                               onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
+                               onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');">
+                            <img name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+                            &nbsp;</td>
+                    </c:otherwise>
+                </c:choose>
 				<c:if test='${currRow.bean.status.locked}'>
 				<td><a href="UnLockUser?userId=<c:out value="${currRow.bean.id}"/>"
                     onMouseDown="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"
@@ -159,11 +168,19 @@
 				</td>
 				<td class="table_cell">
 					<c:if test='${!sur.status.deleted}'>
-						<img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>
-						<a href="EditStudyUserRole?studyId=<c:out value="${sur.studyId}" />&userName=<c:out value="${currRow.bean.name}"/>"
-							onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-							onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
-							><img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
+                        <c:choose>
+                            <c:when test="${sur.role.id eq 1}">
+                                <img name="spaceIcon" src="images/bt_Transparent.gif" style="visibility:hidden;" border="0" align="left" hspace="6">
+                                <img name="spaceIcon" src="images/bt_Transparent.gif" style="visibility:hidden;" border="0" align="left" hspace="6">
+                            </c:when>
+                            <c:otherwise>
+                                <img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6">
+                                <a href="EditStudyUserRole?studyId=<c:out value="${sur.studyId}" />&userName=<c:out value="${currRow.bean.name}"/>"
+                                   onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
+                                   onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
+                                        ><img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
+                            </c:otherwise>
+                        </c:choose>
 					</c:if>
 					<c:choose>
 					<c:when test='${sur.status.deleted}'>
@@ -176,11 +193,35 @@
 						   	><img name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
 					</c:when>
 					<c:otherwise>
-						<img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>
-						<a href="DeleteStudyUserRole?studyId=<c:out value="${sur.studyId}" />&userName=<c:out value="${currRow.bean.name}"/>&action=3" onClick="<c:out value="${onClick}" />"
-							onMouseDown="javascript:setImage('bt_Remove3','images/bt_Remove_d.gif');"
-						    onMouseUp="javascript:setImage('bt_Remove3','images/bt_Remove.gif');"
-						   	><img name="bt_Remove3" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+                        <c:if test="${totalRoles > 1}">
+                            <c:choose>
+                                <c:when test="${not userBean.sysAdmin and sur.role.id eq 1}">
+                                </c:when>
+                                <c:when test="${sur.role.id eq 1 and sur.userName eq 'root'}">
+                                </c:when>
+                                <c:when test="${userBean.sysAdmin and sur.role.id eq 1}">
+                                    <c:set var="confirmQuestion">
+                                        <fmt:message key="are_you_want_to_the_role" bundle="${restext}">
+                                            <fmt:param value="${actionName}"/>
+                                            <fmt:param value="${sur.role.description}"/>
+                                        </fmt:message>
+                                    </c:set>
+                                    <c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
+                                    <img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>
+                                    <a href="DeleteStudyUserRole?studyId=<c:out value="${sur.studyId}" />&userName=<c:out value="${currRow.bean.name}"/>&action=3" onClick="<c:out value="${onClick}" />"
+                                       onMouseDown="javascript:setImage('bt_Remove3','images/bt_Remove_d.gif');"
+                                       onMouseUp="javascript:setImage('bt_Remove3','images/bt_Remove.gif');"
+                                            ><img name="bt_Remove3" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+                                </c:when>
+                                <c:otherwise>
+                                    <img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>
+                                    <a href="DeleteStudyUserRole?studyId=<c:out value="${sur.studyId}" />&userName=<c:out value="${currRow.bean.name}"/>&action=3" onClick="<c:out value="${onClick}" />"
+                                       onMouseDown="javascript:setImage('bt_Remove3','images/bt_Remove_d.gif');"
+                                       onMouseUp="javascript:setImage('bt_Remove3','images/bt_Remove.gif');"
+                                            ><img name="bt_Remove3" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:if>
 					</c:otherwise>
 					</c:choose>
 				</td>

@@ -204,11 +204,13 @@
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td valign="top"><div class="formfieldM_BG">
-                        <select name="userType" class="formfieldM">
+                        <c:if test="${editedUser.name eq 'root'}"><input type="hidden" id="userTypeInput" name="userType" value=""/></c:if>
+                        <select <c:if test="${editedUser.name ne 'root'}">name="userType"</c:if> <c:if test="${editedUser.name eq 'root'}">disabled="disabled"</c:if> class="formfieldM">
                             <c:forEach var="type" items="${userTypes}">
                                 <c:choose>
                                     <c:when test="${userTypeId == type.id}">
                                         <option value='<c:out value="${type.id}" />' selected><c:out value="${type.name}" /></option>
+                                        <c:set var="currentTypeId" value="${userTypeId}"/>
                                     </c:when>
                                     <c:otherwise>
                                         <option value='<c:out value="${type.id}" />'><c:out value="${type.name}" /></option>
@@ -216,6 +218,9 @@
                                 </c:choose>
                             </c:forEach>
                         </select>
+                        <c:if test="${editedUser.name eq 'root'}">
+                            <script>$("#userTypeInput").val("${currentTypeId}")</script>
+                        </c:if>
                     </div></td>
                     <td>*</td>
                 </tr>

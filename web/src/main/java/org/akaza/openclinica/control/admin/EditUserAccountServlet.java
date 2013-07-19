@@ -127,7 +127,7 @@ public class EditUserAccountServlet extends SecureController {
 		int userId = fp.getInt(ARG_USERID);
 		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 		UserAccountBean user = (UserAccountBean) udao.findByPK(userId);
-
+        request.setAttribute("editedUser", user);
 		int stepNum = fp.getInt(ARG_STEPNUM);
 
 		if (!fp.isSubmitted()) {
@@ -206,14 +206,19 @@ public class EditUserAccountServlet extends SecureController {
 				user.setUpdater(ub);
 				user.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
 
-				UserType ut = UserType.get(fp.getInt(INPUT_USER_TYPE));
-				if (ut.equals(UserType.SYSADMIN)) {
-					user.addUserType(ut);
-				} else if (ut.equals(UserType.TECHADMIN)) {
-					user.addUserType(ut);
+				if (!user.getName().equalsIgnoreCase("root")) {
+					UserType ut = UserType.get(fp.getInt(INPUT_USER_TYPE));
+					if (ut.equals(UserType.SYSADMIN)) {
+						user.addUserType(ut);
+					} else if (ut.equals(UserType.TECHADMIN)) {
+						user.addUserType(ut);
+					} else {
+						user.addUserType(UserType.USER);
+					}
 				} else {
-					user.addUserType(UserType.USER);
-				}
+                    user.setName("root");
+                    user.addUserType(UserType.SYSADMIN);
+                }
 
 				if (fp.getBoolean(INPUT_RESET_PASSWORD)) {
 					SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean(
@@ -225,6 +230,10 @@ public class EditUserAccountServlet extends SecureController {
 					user.setPasswdTimestamp(null);
 
 					udao.update(user);
+                    udao.update(user);
+                    if (ub.getId() == user.getId()) {
+                        session.setAttribute("reloadUserBean", true);
+                    }
 					if ("no".equalsIgnoreCase(fp.getString(INPUT_DISPLAY_PWD))) {
 						logger.info("displayPwd is no");
 						try {
@@ -238,6 +247,9 @@ public class EditUserAccountServlet extends SecureController {
 					}
 				} else {
 					udao.update(user);
+                    if (ub.getId() == user.getId()) {
+                        session.setAttribute("reloadUserBean", true);
+                    }
 				}
 				updateCalendarEmailJob(user);
 				addPageMessage(respage.getString("the_user_account") + " \"" + user.getName() + "\" "

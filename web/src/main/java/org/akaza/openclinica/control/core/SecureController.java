@@ -23,6 +23,7 @@ package org.akaza.openclinica.control.core;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
@@ -44,6 +45,7 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
@@ -134,7 +136,7 @@ public abstract class SecureController extends HttpServlet {
 	public static final String BR = "<br/>";
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
 
-	protected ServletContext context;
+    protected ServletContext context;
 	protected SessionManager sm;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	protected String logDir;
@@ -200,7 +202,9 @@ public abstract class SecureController extends HttpServlet {
 			pageMessages = new ArrayList();
 		}
 
-		pageMessages.add(message);
+		if (!pageMessages.contains(message)) {
+            pageMessages.add(message);
+        }
 		logger.debug(message);
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
 
@@ -341,11 +345,23 @@ public abstract class SecureController extends HttpServlet {
 		return scheduler;
 	}
 
-	private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
+	static void reloadUserBean(HttpSession session, UserAccountDAO userAccountDao) {
+		if (session.getAttribute("reloadUserBean") != null) {
+			UserAccountBean userAccountBean = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
+			session.setAttribute(USER_BEAN_NAME, userAccountDao.findByUserName(userAccountBean.getName()));
+			session.removeAttribute("study");
+			session.removeAttribute("userRole");
+			session.removeAttribute("reloadUserBean");
+		}
+	}
+    
+    private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
 			UnsupportedEncodingException {
-
+       
 		request.setCharacterEncoding("UTF-8");
 		session = request.getSession();
+		reloadUserBean(session, new UserAccountDAO((DataSource) SpringServletAccess.getApplicationContext(context)
+				.getBean("dataSource")));
 		String newThemeColor = CoreResources.getField("themeColor");
 		session.setAttribute("newThemeColor", newThemeColor);
 		try {
@@ -360,10 +376,10 @@ public abstract class SecureController extends HttpServlet {
 			session.setAttribute(SUPPORT_URL, SQLInitServlet.getSupportURL());
 		}
 
-		ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
-		currentStudy = (StudyBean) session.getAttribute("study");
+        ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
+        currentStudy = (StudyBean) session.getAttribute("study");
 		currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
-
+        
 		// Set current language preferences
 		Locale locale = request.getLocale();
 		ResourceBundleProvider.updateLocale(locale);
