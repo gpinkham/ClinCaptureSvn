@@ -78,7 +78,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
 	private int hideColumnsNumber;
 
-    public static final int POPUP_BASE_WIDTH = 700;
+    public static final int POPUP_BASE_WIDTH = 600;
     public static final String POPUP_BASE_WIDTH_PX = "width: " + POPUP_BASE_WIDTH + "px";
 
 	private Role userRole;

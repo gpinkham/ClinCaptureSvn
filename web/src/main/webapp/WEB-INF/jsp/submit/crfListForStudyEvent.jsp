@@ -240,12 +240,12 @@
 
     <c:otherwise>
     <tr>
-        <td class="table_header_row_left" style="width: auto;"><fmt:message key="CRF_name" bundle="${resword}"/></td>
-        <td class="table_header_row_left" style="width: 40px;"><fmt:message key="version" bundle="${resword}"/></td>
-        <td class="table_header_row_left" style="width: 100px;"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
-        <td class="table_header_row_left ddeColumnHeader" style="width: 100px;"><fmt:message key="validation" bundle="${resword}"/></td>
-        <td class="table_header_row_left" style="width: 50px;">&nbsp;<%--fmt:message key="status" bundle="${resword}"/--%></td>
-        <td class="table_header_row_left crfListTableActions" style="width: 60px;">&nbsp;<%--fmt:message key="actions" bundle="${resword}"/--%></td>
+        <td class="table_header_row_left" style="width: auto; min-width: 170px;"><fmt:message key="CRF_name" bundle="${resword}"/></td>
+        <td class="table_header_row_left" style="width: auto;"><fmt:message key="version" bundle="${resword}"/></td>
+        <td class="table_header_row_left" style="width: auto;"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
+        <td class="table_header_row_left ddeColumnHeader" style="width: auto;"><fmt:message key="validation" bundle="${resword}"/></td>
+        <td class="table_header_row_left" style="width: auto;">&nbsp;<%--fmt:message key="status" bundle="${resword}"/--%></td>
+        <td class="table_header_row_left crfListTableActions" style="width: auto;">&nbsp;<%--fmt:message key="actions" bundle="${resword}"/--%></td>
     </tr>
     <c:set var="rowCount" value="${0}" />
 
