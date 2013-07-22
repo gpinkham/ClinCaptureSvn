@@ -66,7 +66,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private DynamicEventDao dynamicEventDao;
 	private StudyBean studyBean;
 	private String[] columnNames = new String[] {};
-	private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
+	private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;    
+    private ArrayList<StudyEventDefinitionBean> studyEventDefinitionsFullList;
 	private ArrayList<StudyGroupClassBean> studyGroupClasses;
 	private ArrayList<StudyGroupClassBean> dynamicGroupClasses;
 	private StudyUserRoleBean currentRole;
@@ -225,8 +226,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 		// filter study group classes by dynamic groups #todo
 
-		tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(),
-				addSubjectLinkShow, showMoreLink));
+		tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitionsForFilter(),
+				getStudyGroupClasses(), addSubjectLinkShow, showMoreLink));
 	}
 
 	@Override
@@ -440,6 +441,18 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		}
 
 		return auditUserLoginSort;
+	}
+
+	private ArrayList<StudyEventDefinitionBean> getStudyEventDefinitionsForFilter() {
+		if (studyEventDefinitionsFullList == null) {
+			if (studyBean.getParentStudyId() > 0) {
+				studyEventDefinitionsFullList = getStudyEventDefinitionDao().findAllByStudy(
+						(StudyBean) getStudyDAO().findByPK(studyBean.getParentStudyId()));
+			} else {
+				studyEventDefinitionsFullList = getStudyEventDefinitionDao().findAllByStudy(studyBean);
+			}
+		}
+		return studyEventDefinitionsFullList;
 	}
 
 	private ArrayList<StudyEventDefinitionBean> getStudyEventDefinitions() {

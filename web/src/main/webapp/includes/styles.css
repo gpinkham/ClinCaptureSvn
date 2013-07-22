@@ -1290,7 +1290,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 
 .vline_B { background-image: url(../images/leftbar_vline.gif);
     background-repeat: no-repeat;
-    background-position: top-right;
+    background-position: top;
     padding-top: 6px;
     padding-left: 3px;
 }
@@ -1821,22 +1821,6 @@ body { margin: 0px; }
     filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="overlay.png", sizingMethod="scale");
 }
 
-container
-{
-    width:100%;
-    margin:0px;
-    height:81px;
-    background-image:url(../images/main_BG.gif);
-    background-repeat: repeat-x;
-}
-
-akaza_logo{
-    margin-left: 0px;
-    width: 359;
-    height:81px;
-    float: left;
-}
-
 /* initially created for creating new or child dn box */
 .dnBoxCol1 { float:left; width:120; }
 .dnBoxCol1-1 { float:left; width:120; margin-top:10; }
@@ -1869,8 +1853,7 @@ div#sumBox { -moz-border-radius: 3px 3px 3px 3px;
 	-moz-box-shadow: 4px 4px 4px #CACACA;
 	-webkit-box-shadow: 4px 4px 4px #CACACA;
 	box-shadow: 4px 4px 4px #CACACA;
-	}
-	}
+}
 
 div#sumBox table { border-style: none; }
 
@@ -2070,4 +2053,27 @@ table.crfListTable td {
 
 #s_sdv tr input[name=sdvSubmit] {
     margin-top: -2px;
+}
+
+#listEventsForSubject tr.header td {
+    text-align: center;
+}
+
+#listEventsForSubject > tbody > tr > td {
+    text-align: left;
+}
+
+#listEventsForSubject > tbody > tr > td > table {
+    width: 100%;
+}
+
+#listEventsForSubject > tbody > tr > td > table > tbody > tr > td {
+    text-align: center;
+    white-space: nowrap;
+}
+
+#listEventsForSubject div.actions {
+    padding-top: 2px;
+    text-align: left;
+    white-space: nowrap;
 }

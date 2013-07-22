@@ -92,7 +92,8 @@
 
 
 <br>
-<input type="button" onclick="confirmExit('MainMenu');"  name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>
+
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
 
 <c:import url="../include/workflow.jsp">
    <c:param name="module" value="submit"/>

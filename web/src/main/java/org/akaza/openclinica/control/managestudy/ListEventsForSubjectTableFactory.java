@@ -112,6 +112,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		imageIconPaths.put(6, "images/icon_Skipped.gif");
 		imageIconPaths.put(7, "images/icon_Locked.gif");
 		imageIconPaths.put(8, "images/icon_Signed.gif");
+		imageIconPaths.put(9, "images/icon_DoubleCheck.gif");
+		imageIconPaths.put(10, "images/icon_Invalid.gif");
 
 		crfColumnImageIconPaths.put(0, "images/CRF_status_icon_Invalid.gif");
 		crfColumnImageIconPaths.put(1, "images/CRF_status_icon_Scheduled.gif");
@@ -173,8 +175,11 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 					new SubjectEventCRFStatusDroplistFilterEditor(), true, false);
 		}
 
-		String actionsHeader = resword.getString("rule_actions")
-				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
+		String actionsHeader = "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
+				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
+				+ resword.getString("rule_actions")
+				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
+				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
 		configureColumn(row.getColumn(columnNames[columnNames.length - 1]), actionsHeader, new ActionsCellEditor(),
 				new DefaultActionsEditor(locale), true, false);
 	}
@@ -722,7 +727,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				url.append(eventDivBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents,
 						studyEventDefinition, studySubjectBean));
 				url.append("<img src='" + imageIconPaths.get(subjectEventStatus.getId())
-						+ "' border='0' style='position: relative; left: 7px;'>");
+						+ "' border='0' style=''>");
 				url.append("</a></td></tr></table>");
 			}
 
@@ -821,9 +826,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				value = url.toString();
 			}
 
-			return value;
+			return "<div class=\"actions\">" + value + "</div>";
 		}
-
 	}
 
 	class DisplayBean {

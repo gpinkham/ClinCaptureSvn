@@ -21,7 +21,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.RememberLastPage;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
@@ -41,12 +41,15 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings({ "rawtypes" })
-public class ListEventsForSubjectsServlet extends SecureController {
+public class ListEventsForSubjectsServlet extends RememberLastPage {
 
-	private static final long serialVersionUID = 1L;
-	private StudyEventDefinitionDAO studyEventDefinitionDAO;
+    private static final long serialVersionUID = 1L;
+    public static final String SAVED_LIST_EVENTS_FOR_SUBJECTS_URL = "savedListEventsForSubjectsUrl";
+    private StudyEventDefinitionDAO studyEventDefinitionDAO;
 	private SubjectDAO subjectDAO;
 	private StudySubjectDAO studySubjectDAO;
 	private StudyEventDAO studyEventDAO;
@@ -80,7 +83,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
 
 	@Override
 	public void processRequest() throws Exception {
-
+        analyzeUrl();
 		FormProcessor fp = new FormProcessor(request);
 		if (fp.getString("showMoreLink").equals("")) {
 			showMoreLink = true;
@@ -101,7 +104,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
 		int definitionId = fp.getInt("defId");
 		if (definitionId <= 0) {
 			addPageMessage(respage.getString("please_choose_an_ED_ta_to_vies_details"));
-			forwardPage(Page.LIST_STUDY_SUBJECTS);
+			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
 			return;
 		}
 
@@ -131,7 +134,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
 		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
 		session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 		//
-		forwardPage(Page.LIST_EVENTS_FOR_SUBJECTS);
+        analyzeForward(Page.LIST_EVENTS_FOR_SUBJECTS);
 
 	}
 
@@ -194,4 +197,41 @@ public class ListEventsForSubjectsServlet extends SecureController {
 		return studyGroupDAO;
 	}
 
+	private String parseDefId(String currentDefId, String savedUrl) {
+		String pattern = ".*defId=(\\d*).*";
+		Pattern p = Pattern.compile(pattern);
+		Matcher m = p.matcher(savedUrl);
+		return m.find() ? m.group(m.groupCount()) : currentDefId;
+	}
+
+	@Override
+	protected String getUrlKey() {
+		return SAVED_LIST_EVENTS_FOR_SUBJECTS_URL;
+	}
+
+	@Override
+	protected String getDefaultUrl() {
+		FormProcessor fp = new FormProcessor(request);
+		if (fp.getString("showMoreLink").equals("")) {
+			showMoreLink = true;
+		} else {
+			showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
+		}
+		String currentDefId = fp.getString("defId");
+		String savedUrl = (String) request.getSession().getAttribute(SAVED_LIST_EVENTS_FOR_SUBJECTS_URL);
+		if (savedUrl != null && !currentDefId.equals(parseDefId(currentDefId, savedUrl))) {
+			savedUrl = null;
+			request.getSession().removeAttribute(SAVED_LIST_EVENTS_FOR_SUBJECTS_URL);
+		}
+		savedUrl = savedUrl != null ? savedUrl.replaceAll(".*" + request.getContextPath() + "/ListStudySubjects", "")
+				: savedUrl;
+		return request.getMethod().equalsIgnoreCase("POST") && savedUrl != null ? savedUrl : "?module="
+				+ fp.getString("module") + "&defId=" + fp.getString("defId") + "&maxRows=15&showMoreLink="
+				+ showMoreLink + "&listEventsForSubject_tr_=true&listEventsForSubject_p_=1&listEventsForSubject_mr_=15";
+	}
+
+	@Override
+	protected boolean userDoesNotUseJmesaTableForNavigation() {
+		return request.getQueryString() == null || !request.getQueryString().contains("&listEventsForSubject_p_=");
+	}
 }
