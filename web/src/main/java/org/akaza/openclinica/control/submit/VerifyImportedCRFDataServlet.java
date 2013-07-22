@@ -204,6 +204,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 							+ wrapper.isSavable());
 					if (wrapper.isSavable()) {
 						ArrayList<Integer> eventCrfInts = new ArrayList<Integer>();
+						con.commit();
+						con.setAutoCommit(true);
 						for (DisplayItemBean displayItemBean : wrapper
 								.getDisplayItemBeans()) {
 
@@ -328,6 +330,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 							}
 
 							eventCrfDao.update(eventCrfBean, con);
+							con.setAutoCommit(false);
 						}
 
 						StudyEventDAO sedao = new StudyEventDAO(

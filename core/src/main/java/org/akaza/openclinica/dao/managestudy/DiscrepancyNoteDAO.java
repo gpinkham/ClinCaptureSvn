@@ -93,7 +93,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
     public DiscrepancyNoteDAO(DataSource ds, Connection connection) {
-        super(ds);
+        super(ds, connection);
+        setQueryNames();
     }
 
 	@Override
