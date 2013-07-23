@@ -81,5 +81,4 @@ public class HttpTransportProtocol implements Callable<RandomizationResult> {
 	public void setSubmissionContext(SubmissionContext context) {
 		this.context = context;
 	}
-
 }
