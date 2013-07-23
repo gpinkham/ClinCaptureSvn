@@ -142,6 +142,10 @@
 </div>
 
 <c:if test="${group.groupClassTypeId == 4}">
+	</br>
+	<div id="events" class="table_title_manage">
+		<fmt:message key="study_events" bundle="${resword}"/>:
+	</div>
 	<div style="width: 70%">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
@@ -211,6 +215,7 @@
 	</div>
 </c:if>   
 
+</br>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>

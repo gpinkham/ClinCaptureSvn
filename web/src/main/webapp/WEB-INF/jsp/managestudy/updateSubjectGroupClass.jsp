@@ -47,19 +47,19 @@
 	switch (index) {
 		case '4':
 			$("div#groups").hide();
-			$("div#definitions").show();
+			$("div#events").show();
 			$("tr#isDefaultRow").show();   
 			$("tr#subjAssignmentRow").hide(); 
 			break
 		case '':
-			$("div#definitions").hide();
+			$("div#events").hide();
 			$("div#groups").hide();
 			//$("input#isDefault").attr("checked", "");
 			$("tr#isDefaultRow").hide();   
 			$("tr#subjAssignmentRow").hide(); 
 			break
 		default: 
-			$("div#definitions").hide();
+			$("div#events").hide();
 			$("div#groups").show();
 			$("input#isDefault").attr("checked", "");
 			$("tr#isDefaultRow").hide();   
@@ -307,24 +307,22 @@
 			</td>
 		</tr> 		
 	</table>
-	<br>
 </div>
 </div></div></div></div></div></div></div></div></div>
 </div>
- 
+
+ </br>
  <%-- Dynamic Group Section --%>
- <div id="definitions" style="display: none">
- 
+ <div id="events" class="table_title_manage">
+	<fmt:message key="study_events" bundle="${resword}"/>:
+	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dynamicEvents"/></jsp:include>
  <div style="width: 600px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-<div class="tablebox_center">
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<fmt:message key="study_events" bundle="${resword}"/>:
-<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dynamicEvents"/></jsp:include>
-<br></br>
-	<table border="1" cellpadding="0" cellspacing="0" width="100%">
+ <div class="tablebox_center">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 		<tr valign="top">
-			<td class="table_header_row">&nbsp;</td>
+			<td class="table_header_row_left">&nbsp;</td>
 			<td class="table_header_row"><fmt:message key="name" bundle="${resword}"/></td>
 			<td class="table_header_row"><fmt:message key="OID" bundle="${resword}"/></td>
 			<td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
@@ -361,6 +359,8 @@
 </div></div></div></div></div></div></div></div>
 </div>
 </div>
+
+</br>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
@@ -436,17 +436,10 @@
 
 				<!-- These DIVs define shaded box borders -->
 						<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
 							<div class="textbox_center" align="center">
-
-							<span class="title_manage">
-				
-					
-							<fmt:message key="manage_groups" bundle="${resword}"/>
-					
-				
-							</span>
-
+								<span class="title_manage">
+									<fmt:message key="manage_groups" bundle="${resword}"/>
+								</span>
 							</div>
 						</div></div></div></div></div></div></div></div>
 

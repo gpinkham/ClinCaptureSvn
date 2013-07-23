@@ -86,19 +86,19 @@
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
-<br>
 
 <c:choose>
 	<c:when test="${group.groupClassTypeId == 4}">
+		</br>
 		<div class="table_title_manage"><fmt:message key="study_events" bundle="${resword}"/>:</div>
 		<div id="definitions">
 		<div style="width: 600px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 		<div class="tablebox_center">
-			<table border="1" cellpadding="0" cellspacing="0" width="100%">
+			<table border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tr valign="top">
-					<td class="table_header_row">&nbsp;</td>
+					<td class="table_header_row_left">&nbsp;</td>
 					<td class="table_header_row"><fmt:message key="name" bundle="${resword}"/></td>
 					<td class="table_header_row"><fmt:message key="OID" bundle="${resword}"/></td>
 					<td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
@@ -128,9 +128,6 @@
 							<td class="table_cell aka_red_highlight"><c:out value="${definition.status.name}"/></td>	
 						</c:otherwise>
 					</c:choose>
-					<td class="table_cell">
-						
-					</td>
 				</tr>
 				</c:forEach>
 			</table>
@@ -140,6 +137,7 @@
 		</div>
 	</c:when>
 	<c:otherwise>
+		</br>
 		<div class="table_title_manage"><fmt:message key="study_group_and_associated_subjects" bundle="${resword}"/>:</div>
 		<div style="width: 600px">
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -175,7 +173,6 @@
 	</c:otherwise>
 </c:choose>
 
-<!-- <p><a href="#" onClick="history.go(-1)"><fmt:message key="back_to_group_class_list" bundle="${resword}"/></a></p> -->
 <p>
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
