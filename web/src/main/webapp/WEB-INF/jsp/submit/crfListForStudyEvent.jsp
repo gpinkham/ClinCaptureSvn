@@ -258,7 +258,6 @@
                     </c:when>
                     <c:otherwise>
                         <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
-                        <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
                             <tr valign="top">
                                 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" />
                                     <c:if test="${dedc.edc.requiredCRF}"><span style="color: orange">*</span>
@@ -268,6 +267,7 @@
                                     </c:if>
                                 </td>
                                 <td class="table_cell_left">
+                                    <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
                                         <c:choose>
                                             <c:when test="${dedc.eventCRF.id > 0}">
                                                 <!-- found an event crf id -->
@@ -324,6 +324,7 @@
                                                 <c:out value="${dedc.eventCRF.crfVersion.name}"/>
                                             </c:otherwise>
                                         </c:choose>
+                                    </form>
                                 </td>
 
                                 <td class="table_cell_left">
@@ -411,7 +412,6 @@
                                     </c:if>
                                 </td>
                             </tr>
-                            </form>
 
                         <c:set var="rowCount" value="${rowCount + 1}" />
                     </c:otherwise>
