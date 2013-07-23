@@ -10,20 +10,20 @@ import javax.servlet.http.HttpServletRequest;
 public class Navigation {
 	
 	//"skip!"-set of pages, non pop-ups
-	private static Set<String> exclusionURLs = new HashSet<String>(Arrays.asList("/PageToCreateNewStudyEvent",
-			"/CRFListForStudyEvent", "/InitialDataEntry", "/VerifyImportedCRFData",
-			"/AdministrativeEditing", "/UpdateStudySubject", "/RemoveStudySubject", "/ResolveDiscrepancy", 
-			"/RestoreStudySubject", "/UpdateStudyEvent", "/RemoveStudyEvent", "/RestoreStudyEvent", 
-			"/DeleteEventCRF", "/RemoveEventCRF", "/RestoreEventCRF", "/CreateOneDiscrepancyNote",
-			"/InitUpdateSubStudy", "/RemoveStudyUserRole", "/ViewSectionDataEntry", "/CreateSubjectGroupClass",
-			"/SetStudyUserRole", "/UpdateProfile", "/SectionPreview", "/DefineStudyEvent", 
-			"/InitUpdateEventDefinition", "/UpdateEventDefinition", "/RemoveEventDefinition", "/RemoveSubject", 
-			"/RemoveStudy", "/ViewUserAccount", "/EditUserAccount", "/SetUserRole", "/ViewUserAccount", 
-			"/Configure", "/CreateUserAccount", "/UpdateJobImport", "/CreateJobExport", "/CreateJobImport",
-			"/UpdateProfile", "/RemoveDataset", "/LockStudySubject", "/pages/extract",
-			"/CreateNewStudyEvent", "/UpdateSubject", "/UpdateSubjectGroupClass", "/ViewSubjectGroupClass",
-			"/RemoveSubjectGroupClass", "/RestoreSubjectGroupClass", "/UpdateJobExport", "/EditDataset",
-            "/RemoveSite", "/RestoreSite"));
+    private static Set<String> exclusionURLs = new HashSet<String>(Arrays.asList("/PageToCreateNewStudyEvent",
+            "/CRFListForStudyEvent", "/InitialDataEntry", "/VerifyImportedCRFData", "/AdministrativeEditing",
+            "/UpdateStudySubject", "/RemoveStudySubject", "/ResolveDiscrepancy", "/RestoreStudySubject",
+            "/UpdateStudyEvent", "/RemoveStudyEvent", "/RestoreStudyEvent", "/DeleteEventCRF", "/RemoveEventCRF",
+            "/RestoreEventCRF", "/CreateOneDiscrepancyNote", "/InitUpdateSubStudy", "/RemoveStudyUserRole",
+            "/ViewSectionDataEntry", "/CreateSubjectGroupClass", "/SetStudyUserRole", "/UpdateProfile",
+            "/SectionPreview", "/DefineStudyEvent", "/InitUpdateEventDefinition", "/UpdateEventDefinition",
+            "/RemoveEventDefinition", "/RemoveSubject", "/RemoveStudy", "/ViewUserAccount", "/EditUserAccount",
+            "/SetUserRole", "/ViewUserAccount", "/Configure", "/CreateUserAccount", "/UpdateJobImport",
+            "/CreateJobExport", "/CreateJobImport", "/UpdateProfile", "/RemoveDataset", "/LockStudySubject",
+            "/pages/extract", "/CreateNewStudyEvent", "/UpdateSubject", "/UpdateSubjectGroupClass",
+            "/ViewSubjectGroupClass", "/RemoveSubjectGroupClass", "/RestoreSubjectGroupClass", "/UpdateJobExport",
+            "/EditDataset", "/RemoveSite", "/RestoreSite", "/extract", "/ViewSelected", "/SelectItems",
+            "/CreateDataset", "/EditSelected", "/EditDataset"));
 	//ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",

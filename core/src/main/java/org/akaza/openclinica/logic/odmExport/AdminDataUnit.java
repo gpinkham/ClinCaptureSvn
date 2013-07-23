@@ -65,7 +65,7 @@ public class AdminDataUnit extends OdmUnit {
 		if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
 			String mvoid = "";
 			if (this.dataset != null && this.dataset.getId() > 0) {
-				mvoid = this.dataset.getODMMetaDataVersionOid();
+				mvoid = this.dataset.getOdmMetaDataVersionOid();
 			}
 			if (mvoid.length() > 0) {
 				mvoid += "-" + studyOID;
@@ -75,7 +75,7 @@ public class AdminDataUnit extends OdmUnit {
 			odmAdminData.setMetaDataVersionOID(mvoid);
 
 		} else {
-			odmAdminData.setMetaDataVersionOID(this.dataset.getODMMetaDataVersionOid());
+			odmAdminData.setMetaDataVersionOID(this.dataset.getOdmMetaDataVersionOid());
 			if (odmAdminData.getMetaDataVersionOID() == null || odmAdminData.getMetaDataVersionOID().length() <= 0) {
 				odmAdminData.setMetaDataVersionOID("v1.0.0");
 			}

@@ -82,8 +82,8 @@ public class ExtractController {
 	 *         there
 	 */
 	@RequestMapping(method = RequestMethod.GET)
-	public ModelMap processSubmit(@RequestParam("id") String id, @RequestParam("datasetId") String datasetId,
-			HttpServletRequest request, HttpServletResponse response) {
+	public ModelMap processSubmit(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam("id") String id, @RequestParam("datasetId") String datasetId) {
 		ModelMap map = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		// String datasetId = (String)request.getAttribute("datasetId");

@@ -7,7 +7,6 @@
 
 <jsp:include page="../include/extract-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -82,9 +81,8 @@
 
 <p><fmt:message key="not_filter_study_by_enrollment_leave_blank" bundle="${restext}"/></p>
 
-<form action="CreateDataset" method="post">
+<form id="datasetForm" action="CreateDataset" method="post">
 <input type="hidden" name="action" value="scopesubmit"/>
-
 <%--<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="firstmonth"/></jsp:include>--%>
 
 <table>
@@ -96,7 +94,7 @@
 			<c:set var="monthNum" value="${1}" />
 			<c:forEach var="month" items="${months}">
 				<c:choose>
-					<c:when test="${firstMonth == monthNum}">
+					<c:when test="${newDataset.firstMonth == monthNum}">
 						<option value='<c:out value="${monthNum}" />' selected><c:out value="${month}" /></option>
 					</c:when>
 					<c:otherwise>
@@ -114,7 +112,7 @@
 			<c:set var="yearNum" value="${1980}" />
 			<c:forEach var="year" items="${years}">
 				<c:choose>
-					<c:when test="${firstYear == yearNum}">
+					<c:when test="${newDataset.firstYear == year}">
 						<option value='<c:out value="${year}" />' selected><c:out value="${year}" /></option>
 					</c:when>
 					<c:otherwise>
@@ -133,8 +131,9 @@
 				<option value="0">-<fmt:message key="select" bundle="${resword}"/>-</option>
 			<c:set var="monthNum" value="${1}" />
 			<c:forEach var="month" items="${months}">
+                ${lastmonth} ==  ${monthNum} -> ${lastmonth == monthNum}
 				<c:choose>
-					<c:when test="${lastMonth == monthNum}">
+					<c:when test="${newDataset.lastMonth == monthNum}">
 						<option value='<c:out value="${monthNum}" />' selected><c:out value="${month}" /></option>
 					</c:when>
 					<c:otherwise>
@@ -151,8 +150,9 @@
 				<option value="2100">-<fmt:message key="select" bundle="${resword}"/>-</option>
 			<c:set var="yearNum" value="${1980}" />
 			<c:forEach var="year" items="${years}">
+                ${lastyear} ==  ${year} -> ${lastyear == year}
 				<c:choose>
-					<c:when test="${lastYear == yearNum}">
+					<c:when test="${newDataset.lastYear == year}">
 						<option value='<c:out value="${year}" />' selected><c:out value="${year}" /></option>
 					</c:when>
 					<c:otherwise>
@@ -169,11 +169,12 @@
 <p><fmt:message key="save_export_dataset_or_apply_filter" bundle="${restext}"/></p>
 <table>
   <tr>
-		<td>
-			<input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="history.go(-1);"/>
-			<input type="submit" name="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium"/>
-            <input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
-        </td>
+        <td>
+            <input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_viewselected');"/></td>
+        <td>
+			<input id="btnSubmit" type="submit" name="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium"/></td>
+        <td>
+            <input type="button" onclick="confirmCancel('ViewDatasets');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
 	</tr>
 </table>
 </form>

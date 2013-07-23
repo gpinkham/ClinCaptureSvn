@@ -82,10 +82,17 @@ public class DatasetBean extends AuditableEntityBean {
 	// put up here since we know it's going to be changed, tbh
 
 	private String odmMetaDataVersionName;
-	private String odmMetaDataVersionOid;
+    private String odmMetaDataVersionOid;
 	private String odmPriorStudyOid;
 	private String odmPriorMetaDataVersionOid;
 	private DatasetItemStatus datasetItemStatus;
+
+    private int firstMonth = 0;
+    private int firstYear = 1900;
+    private int lastMonth = 0;
+    private int lastYear = 2100;
+
+    private ArrayList allSelectedGroups;
 
 	public DatasetBean() {
 	}
@@ -543,38 +550,6 @@ public class DatasetBean extends AuditableEntityBean {
 		this.subjectGroupIds = subjectGroupIds;
 	}
 
-	public void setODMMetaDataVersionName(String odmMetaDataVersionName) {
-		this.odmMetaDataVersionName = odmMetaDataVersionName;
-	}
-
-	public String getODMMetaDataVersionName() {
-		return this.odmMetaDataVersionName;
-	}
-
-	public void setODMMetaDataVersionOid(String odmMetaDataVersionOid) {
-		this.odmMetaDataVersionOid = odmMetaDataVersionOid;
-	}
-
-	public String getODMMetaDataVersionOid() {
-		return this.odmMetaDataVersionOid;
-	}
-
-	public void setODMPriorStudyOid(String odmPriorStudyOid) {
-		this.odmPriorStudyOid = odmPriorStudyOid;
-	}
-
-	public String getODMPriorStudyOid() {
-		return this.odmPriorStudyOid;
-	}
-
-	public void setODMPriorMetaDataVersionOid(String odmPriorMetaDataVersionOid) {
-		this.odmPriorMetaDataVersionOid = odmPriorMetaDataVersionOid;
-	}
-
-	public String getODMPriorMetaDataVersionOid() {
-		return this.odmPriorMetaDataVersionOid;
-	}
-
 	public DatasetItemStatus getDatasetItemStatus() {
 		return datasetItemStatus;
 	}
@@ -590,4 +565,75 @@ public class DatasetBean extends AuditableEntityBean {
 		return sql;
 	}
 
+    public int getFirstMonth() {
+        return firstMonth;
+    }
+
+    public void setFirstMonth(int firstMonth) {
+        this.firstMonth = firstMonth;
+    }
+
+    public int getFirstYear() {
+        return firstYear;
+    }
+
+    public void setFirstYear(int firstYear) {
+        this.firstYear = firstYear;
+    }
+
+    public int getLastMonth() {
+        return lastMonth;
+    }
+
+    public void setLastMonth(int lastMonth) {
+        this.lastMonth = lastMonth;
+    }
+
+    public int getLastYear() {
+        return lastYear;
+    }
+
+    public void setLastYear(int lastYear) {
+        this.lastYear = lastYear;
+    }
+
+    public String getOdmMetaDataVersionOid() {
+        return odmMetaDataVersionOid;
+    }
+
+    public void setOdmMetaDataVersionOid(String odmMetaDataVersionOid) {
+        this.odmMetaDataVersionOid = odmMetaDataVersionOid;
+    }
+
+    public String getOdmMetaDataVersionName() {
+        return odmMetaDataVersionName;
+    }
+
+    public void setOdmMetaDataVersionName(String odmMetaDataVersionName) {
+        this.odmMetaDataVersionName = odmMetaDataVersionName;
+    }
+
+    public String getOdmPriorStudyOid() {
+        return odmPriorStudyOid;
+    }
+
+    public void setOdmPriorStudyOid(String odmPriorStudyOid) {
+        this.odmPriorStudyOid = odmPriorStudyOid;
+    }
+
+    public String getOdmPriorMetaDataVersionOid() {
+        return odmPriorMetaDataVersionOid;
+    }
+
+    public void setOdmPriorMetaDataVersionOid(String odmPriorMetaDataVersionOid) {
+        this.odmPriorMetaDataVersionOid = odmPriorMetaDataVersionOid;
+    }
+
+    public ArrayList getAllSelectedGroups() {
+        return allSelectedGroups;
+    }
+
+    public void setAllSelectedGroups(ArrayList allSelectedGroups) {
+        this.allSelectedGroups = allSelectedGroups;
+    }
 }

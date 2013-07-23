@@ -42,12 +42,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class EditSelectedServlet extends SecureController {
 
-	Locale locale;
+    Locale locale;
 
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
@@ -73,52 +74,47 @@ public class EditSelectedServlet extends SecureController {
 	 * This function exists in four different places... needs to be added to an additional superclass for Submit
 	 * Data Control Servlets, tbh July 2007
 	 */
-	public void setUpStudyGroups() {
-		ArrayList sgclasses = (ArrayList) session.getAttribute("allSelectedGroups");
+	public void setUpStudyGroups(DatasetBean db) {
+		ArrayList sgclasses = db.getAllSelectedGroups();
 		if (sgclasses == null || sgclasses.size() == 0) {
 			StudyDAO studydao = new StudyDAO(sm.getDataSource());
 			StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
 			StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
 			sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
 		}
-		session.setAttribute("allSelectedGroups", sgclasses);
-		request.setAttribute("allSelectedGroups", sgclasses);
+        db.setAllSelectedGroups(sgclasses);
 	}
 
-	@Override
+    @Override
 	public void processRequest() throws Exception {
-		FormProcessor fp = new FormProcessor(request);
+        FormProcessor fp = new FormProcessor(request);
 		boolean selectAll = fp.getBoolean("all");
 		boolean selectAllItemsGroupsAttrs = fp.getBoolean("allAttrsAndItems");
 		// Only show a "select all items" like on a side info panel if
 		// it is not part of the EditSelected-related JSP>>
 		request.setAttribute("EditSelectedSubmitted", true);
-		
+
 		ItemDAO idao = new ItemDAO(sm.getDataSource());
 		ItemFormMetadataDAO imfdao = new ItemFormMetadataDAO(sm.getDataSource());
 		CRFDAO crfdao = new CRFDAO(sm.getDataSource());
 
 		DatasetBean db = (DatasetBean) session.getAttribute("newDataset");
-		if (db == null) {
-			db = new DatasetBean();
-			session.setAttribute("newDataset", db);
-		}
-		
+
 		HashMap eventlist = (LinkedHashMap) session.getAttribute("eventsForCreateDataset");
 		ArrayList<String> ids = CreateDatasetServlet.allSedItemIdsInStudy(eventlist, crfdao, idao);
 		if (selectAll) {
-			db = selectAll(db);
+			db = selectAll(db, null);
 
 			MessageFormat msg = new MessageFormat("");
 			msg.setLocale(locale);
 			msg.applyPattern(respage.getString("choose_include_all_items_dataset"));
-			Object[] arguments = { ids.size() };
+			Object[] arguments = { db.getItemMap().size() };
 			addPageMessage(msg.format(arguments));
 		}
 
 		if (selectAllItemsGroupsAttrs) {
 			logger.info("select everything....");
-			db = selectAll(db);
+			db = selectAll(db, imfdao);
 			db.setShowCRFcompletionDate(true);
 			db.setShowCRFinterviewerDate(true);
 			db.setShowCRFinterviewerName(true);
@@ -139,48 +135,35 @@ public class EditSelectedServlet extends SecureController {
 			db.setShowSubjectStatus(true);
 			db.setShowSubjectUniqueIdentifier(true);
 
-			// select all groups
-			ArrayList sgclasses = (ArrayList) session.getAttribute("allSelectedGroups");
-			//
 			ArrayList newsgclasses = new ArrayList();
 			StudyDAO studydao = new StudyDAO(sm.getDataSource());
 			StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
 			StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
-			sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
+            ArrayList sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
 			for (int i = 0; i < sgclasses.size(); i++) {
 				StudyGroupClassBean sgclass = (StudyGroupClassBean) sgclasses.get(i);
 				sgclass.setSelected(true);
 				newsgclasses.add(sgclass);
 			}
-			session.setAttribute("allSelectedGroups", newsgclasses);
-			request.setAttribute("allSelectedGroups", newsgclasses);
+            db.setAllSelectedGroups(newsgclasses);
 		}
 
-		session.setAttribute("newDataset", db);
-
-		HashMap events = (HashMap) session.getAttribute(CreateDatasetServlet.EVENTS_FOR_CREATE_DATASET);
-		if (events == null) {
-			events = new HashMap();
-		}
-		ArrayList allSelectItems = selectAll ? selectAll(events, crfdao, idao) : ViewSelectedServlet.getAllSelected(db,
-				idao, imfdao);
-		session.setAttribute("numberOfStudyItems", new Integer(ids.size()).toString());
-		session.setAttribute("allSelectedItems", allSelectItems);
-		setUpStudyGroups();
+		session.setAttribute("numberOfStudyItems", db.getItemMap().size());
+		setUpStudyGroups(db);
 		forwardPage(Page.CREATE_DATASET_VIEW_SELECTED);
-
 	}
 
-	public DatasetBean selectAll(DatasetBean db) {
+	public DatasetBean selectAll(DatasetBean db, ItemFormMetadataDAO imfdao) {
 		HashMap events = (HashMap) session.getAttribute(CreateDatasetServlet.EVENTS_FOR_CREATE_DATASET);
 		if (events == null) {
 			events = new HashMap();
 		}
 		request.setAttribute("eventlist", events);
 
-		ItemDAO idao = new ItemDAO(sm.getDataSource());
-		CRFDAO crfdao = new CRFDAO(sm.getDataSource());
-		ArrayList allItems = selectAll(events, crfdao, idao);
+		db.getItemMap().clear();
+		db.getItemIds().clear();
+		db.getItemDefCrf().clear();
+
 		Iterator it = events.keySet().iterator();
 		while (it.hasNext()) {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) it.next();
@@ -189,10 +172,15 @@ public class EditSelectedServlet extends SecureController {
 			}
 		}
 
-		db.getItemDefCrf().clear();
-		db.setItemDefCrf(allItems);
-		return db;
+        ItemDAO idao = new ItemDAO(sm.getDataSource());
+        CRFDAO crfdao = new CRFDAO(sm.getDataSource());
+        db.setItemDefCrf(selectAll(events, crfdao, idao, imfdao));
+		for (ItemBean item : (List<ItemBean>) db.getItemDefCrf()) {
+			db.getItemIds().add(item.getId());
+			db.getItemMap().put(item.getDefId() + "_" + item.getId(), item);
+		}
 
+		return db;
 	}
 
 	/**
@@ -201,10 +189,8 @@ public class EditSelectedServlet extends SecureController {
 	 * @param events
 	 * @return
 	 */
-	public static ArrayList selectAll(HashMap events, CRFDAO crfdao, ItemDAO idao) {
-
+	public static ArrayList selectAll(HashMap events, CRFDAO crfdao, ItemDAO idao, ItemFormMetadataDAO imfdao) {
 		ArrayList allItems = new ArrayList();
-
 		Iterator it = events.keySet().iterator();
 		while (it.hasNext()) {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) it.next();
@@ -218,11 +204,13 @@ public class EditSelectedServlet extends SecureController {
 					item.setDefName(sed.getName());
 					item.setDefId(sed.getId());
 					item.setSelected(true);
+                    if (imfdao != null) {
+                        item.setItemMetas(imfdao.findAllByItemId(item.getId()));
+                    }
 				}
 				allItems.addAll(items);
 			}
 		}
 		return allItems;
-
 	}
 }

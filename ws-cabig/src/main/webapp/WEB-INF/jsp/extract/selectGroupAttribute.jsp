@@ -84,7 +84,7 @@ function notSelectAll() {
 <td class="table_header_column_top"><fmt:message key="status" bundle="${resword}"/></td>
 <td class="table_header_column_top"><fmt:message key="subject_assignment" bundle="${resword}"/></td>
 </tr>
-   <c:forEach var='sgclass' items='${allSelectedGroups}'>
+   <c:forEach var='sgclass' items='${newDataset.allSelectedGroups}'>
    
    <tr>
    

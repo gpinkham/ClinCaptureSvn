@@ -184,9 +184,9 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
 		else {
 			session.setAttribute("mayProcessUploading", "false");
-			addPageMessage(respage.getString("not_perform_administrative_editing_because"), request);
+			addPageMessage(respage.getString("you_may_not_perform_administrative_editing"), request);
 			throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
-					resexception.getString("not_correct_stage"), "1");
+					respage.getString("you_may_not_perform_administrative_editing"), "1");
 		}
 		return;
 	}

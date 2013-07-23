@@ -31,6 +31,7 @@ import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.control.RememberLastPage;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -51,9 +52,11 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
  * 
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class ViewDatasetsServlet extends SecureController {
+public class ViewDatasetsServlet extends RememberLastPage {
 
 	Locale locale;
+
+    public static final String SAVED_VIEW_DATASETS_URL = "savedViewDatasetsUrl";
 
 	public static String getLink(int dsId) {
 		return "ViewDatasets?action=details&datasetId=" + dsId;
@@ -61,13 +64,11 @@ public class ViewDatasetsServlet extends SecureController {
 
 	@Override
 	public void processRequest() throws Exception {
+        analyzeUrl();
 		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
 		String action = request.getParameter("action");
 		resetPanel();
 		request.setAttribute(STUDY_INFO_PANEL, panel);
-		session.removeAttribute("allSelectedItems");
-		session.removeAttribute("allSelectedGroups");
-		session.removeAttribute("allItems");
 		session.removeAttribute("newDataset");
 		if (StringUtil.isBlank(action)) {
 			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
@@ -117,7 +118,7 @@ public class ViewDatasetsServlet extends SecureController {
 			// this is the old code that the tabling code replaced:
 			// ArrayList datasets = (ArrayList)dsdao.findAll();
 			// request.setAttribute("datasets", datasets);
-			forwardPage(Page.VIEW_DATASETS);
+            analyzeForward(Page.VIEW_DATASETS);
 		} else {
 			if ("owner".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
@@ -146,7 +147,7 @@ public class ViewDatasetsServlet extends SecureController {
 
 				// ArrayList datasets = (ArrayList)dsdao.findByOwnerId(ownerId);
 				// request.setAttribute("datasets", datasets);
-				forwardPage(Page.VIEW_DATASETS);
+                analyzeForward(Page.VIEW_DATASETS);
 				// }
 			} else if ("details".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
@@ -210,8 +211,6 @@ public class ViewDatasetsServlet extends SecureController {
 		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
 		DatasetBean db = dsdao.initialDatasetData(datasetId);
 		session.setAttribute("newDataset", db);
-		session.setAttribute("allItems", db.getItemDefCrf().clone());
-		session.setAttribute("allSelectedItems", db.getItemDefCrf().clone());
 		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 		StudyDAO studydao = new StudyDAO(sm.getDataSource());
 		StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
@@ -227,8 +226,32 @@ public class ViewDatasetsServlet extends SecureController {
 				}
 			}
 		}
-		session.setAttribute("allSelectedGroups", allSelectedGroups);
+        db.setAllSelectedGroups(allSelectedGroups);
 
 		return db;
 	}
+
+    @Override
+    protected String getUrlKey() {
+        return SAVED_VIEW_DATASETS_URL;
+    }
+
+    @Override
+    protected String getDefaultUrl() {
+        FormProcessor fp = new FormProcessor(request);
+        String eblFiltered = fp.getString("ebl_filtered");
+        String eblFilterKeyword = fp.getString("ebl_filterKeyword");
+        String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
+        String eblSortAscending = fp.getString("ebl_sortAscending");
+        return "?submitted=1&module=" + fp.getString("module") + "&ebl_page=1&ebl_sortColumnInd="
+                + (!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0") + "&ebl_sortAscending="
+                + (!eblSortAscending.isEmpty() ? eblSortAscending : "1") + "&ebl_filtered="
+                + (!eblFiltered.isEmpty() ? eblFiltered : "0") + "&ebl_filterKeyword="
+                + (!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "") + "&&ebl_paginated=1";
+    }
+
+    @Override
+    protected boolean userDoesNotUseJmesaTableForNavigation() {
+        return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
+    }
 }

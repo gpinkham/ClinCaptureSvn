@@ -7,7 +7,6 @@
 
 <jsp:include page="../include/extract-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -55,9 +54,9 @@
 <jsp:param name="saveAndExport" value="1"/>
 </jsp:include>
 --%>
-<p><fmt:message key="confirm_dataset_properties" bundle="${restext}"/>
+<p><fmt:message key="confirm_dataset_properties" bundle="${restext}"/></p>
 
-<form action="CreateDataset" method="post">
+<form id="datasetForm" action="CreateDataset" method="post">
 <input type="hidden" name="action" value="confirmall" />
 
 <table>
@@ -104,11 +103,11 @@
 <table>
 	<tr>
 		<td colspan="3" align="left">
-		  <input type="submit" name="btnSubmit" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/></td>
+          <input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_scopesubmit');"/></td>
 		<td>
-		  <input type="submit" name="btnSubmit" title="<fmt:message key="create_new_dataset" bundle="${resword}"/>" value="<fmt:message key="submit_for_dataset" bundle="${resword}"/>" class="button_medium"/></td>
+		  <input type="submit" id="btnSubmit" name="btnSubmit" title="<fmt:message key="create_new_dataset" bundle="${resword}"/>" value="<fmt:message key="submit_for_dataset" bundle="${resword}"/>" class="button_medium"/></td>
 		<td>
-		 <input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
+		  <input type="button" onclick="confirmCancel('ViewDatasets');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/></td>
 	</tr>
 </table>
 

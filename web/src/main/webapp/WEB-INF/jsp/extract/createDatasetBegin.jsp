@@ -53,13 +53,14 @@
 <li><fmt:message key="specify_metadata_for_the_dataset" bundle="${restext}"/>
 <li><fmt:message key="save_and_export_desired_format" bundle="${restext}"/>
 </ol></p>
-<form action="CreateDataset" method="post">
+
+<form id="datasetForm" action="CreateDataset" method="post">
 <input type="hidden" name="action" value="begin"/>
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-<input type="submit" name="BTN_Continue" id="ContinueCreating" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" size="50" />
+<input type="submit" name="btnSubmit" id="ContinueCreating" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" size="50"/>
 <%-- <input type="submit" name="Submit" value="<fmt:message key="proceed_to_create_a_dataset" bundle="${restext}"/>" class="button_xlong"/> --%>
 <%-- <input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/> --%>
 </form>

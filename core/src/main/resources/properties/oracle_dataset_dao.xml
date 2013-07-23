@@ -46,7 +46,7 @@
 		  			odm_metadataversion_name, odm_metadataversion_oid,
 		  			odm_prior_study_oid, odm_prior_metadataversion_oid, show_secondary_id,
 		  			dataset_item_status_id)
-		  			VALUES (?,?,?,?,?,?,sysdate,sysdate,?,sysdate,date'2005-11-15',
+		  			VALUES (?,?,?,?,?,?,sysdate,sysdate,?,?,?,
 		  			?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 </sql>
         </query>

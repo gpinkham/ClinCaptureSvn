@@ -144,9 +144,9 @@ public class MetadataUnit extends OdmUnit {
 		if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
 			// populate MetaDataVersion attributes
 			if (dataset != null) {
-				metadata.setOid(dataset.getODMMetaDataVersionOid() + "-" + study.getOid());
-				metadata.setName(dataset.getODMMetaDataVersionName() + "-" + study.getOid());
-				this.setParentMetaDataVersionOid(dataset.getODMMetaDataVersionOid());
+				metadata.setOid(dataset.getOdmMetaDataVersionOid() + "-" + study.getOid());
+				metadata.setName(dataset.getOdmMetaDataVersionName() + "-" + study.getOid());
+				this.setParentMetaDataVersionOid(dataset.getOdmMetaDataVersionOid());
 			}
 			if (metadata.getOid() == null || metadata.getOid().length() <= 0) {
 				metadata.setOid("v1.0.0" + "-" + study.getOid());
@@ -163,8 +163,8 @@ public class MetadataUnit extends OdmUnit {
 			oedao.getUpdatedSiteMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion());
 		} else {
 			if (dataset != null) {
-				metadata.setOid(dataset.getODMMetaDataVersionOid());
-				metadata.setName(dataset.getODMMetaDataVersionName());
+				metadata.setOid(dataset.getOdmMetaDataVersionOid());
+				metadata.setName(dataset.getOdmMetaDataVersionName());
 			}
 			if (metadata.getOid() == null || metadata.getOid().length() <= 0) {
 				metadata.setOid("v1.0.0");
@@ -177,8 +177,8 @@ public class MetadataUnit extends OdmUnit {
 			String psOid = new String();
 			String pmOid = new String();
 			if (dataset != null) {
-				psOid = dataset.getODMPriorStudyOid();
-				pmOid = dataset.getODMPriorMetaDataVersionOid();
+				psOid = dataset.getOdmPriorStudyOid();
+				pmOid = dataset.getOdmPriorMetaDataVersionOid();
 			}
 			if (pmOid != null && pmOid.length() > 0) {
 				MetaDataVersionIncludeBean ib = metadata.getInclude();

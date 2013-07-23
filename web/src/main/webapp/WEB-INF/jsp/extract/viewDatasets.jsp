@@ -55,8 +55,6 @@
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showDatasetRow.jsp" /></c:import>
 
 <br>
-</br>
-<br>
        <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"

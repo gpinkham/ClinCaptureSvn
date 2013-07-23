@@ -7,9 +7,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-
 <jsp:include page="../include/extract-header.jsp"/>
-
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -59,10 +57,10 @@
 <c:set var="dsDesc" value="${newDataset.description}" />
 <c:set var="itemStatusId" value="${newDataset.datasetItemStatus.id}"/>
 <c:set var="dsStatusId" value="${0}" />
-<c:set var="mdvOID" value="${mdvOID}"/>
-<c:set var="mdvName" value="${mdvName}"/>
-<c:set var="mdvPrevStudy" value="${mdvPrevStudy}"/>
-<c:set var="mdvPrevOID" value="${mdvPrevOID}"/>
+<c:set var="mdvOID" value="${newDataset.odmMetaDataVersionOid}"/>
+<c:set var="mdvName" value="${newDataset.odmMetaDataVersionName}"/>
+<c:set var="mdvPrevStudy" value="${newDataset.odmPriorStudyOid}"/>
+<c:set var="mdvPrevOID" value="${newDataset.odmPriorMetaDataVersionOid}"/>
 
 <c:forEach var="presetValue" items="${presetValues}">
 	<c:if test='${presetValue.key == "dsName"}'>
@@ -109,9 +107,8 @@
 
 <c:if test="${newDataset.id<=0}"><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/> <font color="red"><fmt:message key="name_description_required" bundle="${restext}"/></font></c:if>
 
-<form action="CreateDataset" method="post">
+<form id="datasetForm" action="CreateDataset" method="post">
 <input type="hidden" name="action" value="specifysubmit"/>
-
 <table>
 	<tr>
 
@@ -145,7 +142,7 @@
 	<div class="textbox_center" align="center">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 		<c:choose>
-		<c:when test="${newDataset.id<=0 || itemStatusId==1}">
+		<c:when test='${itemStatusId eq null or itemStatusId eq "1"}'>
  		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="1" checked></td>
    		    <td class="table_cell"><fmt:message key="completed_items" bundle="${resterm}"/></td></tr>
    		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="2"></td>
@@ -153,7 +150,7 @@
    		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="3"></td>
    			<td class="table_cell"><fmt:message key="completed_and_non_completed_items" bundle="${resterm}"/></td></tr>
    		</c:when>
-   			<c:when test="${itemStatusId==2}">
+   			<c:when test='${itemStatusId eq "2"}'>
    		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="1"></td>
    		    <td class="table_cell"><fmt:message key="completed_items" bundle="${resterm}"/></td></tr>
    		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="2" checked></td>
@@ -161,7 +158,7 @@
    		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="3"></td>
    			<td class="table_cell"><fmt:message key="completed_and_non_completed_items" bundle="${resterm}"/></td></tr>
    		</c:when>
-   			<c:when test="${itemStatusId==3}">
+   			<c:when test='${itemStatusId eq "3"}'>
    		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="1"></td>
    		    <td class="table_cell"><fmt:message key="completed_items" bundle="${resterm}"/></td></tr>
    		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="2"></td>
@@ -314,9 +311,11 @@
 <table>
 	<tr>
 		<td colspan="3" align="left">
-		  <input type="submit" name="btnSubmit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium"/></td>
-		<td>
-		 <input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
+          <input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_beginsubmit');"/></td>
+        <td>
+		  <input type="submit" id="btnSubmit" name="btnSubmit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium"/></td>
+        <td>
+          <input type="button" onclick="confirmCancel('ViewDatasets');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/></td>
 	</tr>
 </table>
 

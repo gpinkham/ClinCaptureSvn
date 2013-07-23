@@ -235,7 +235,13 @@ public class DatasetDAO extends AuditableEntityDAO {
 		}
 
 		variables.put(Integer.valueOf(10), db.getDateStart());
+        if (db.getDateStart() == null) {
+            nullVars.put(Integer.valueOf(10), Integer.valueOf(Types.DATE));
+        }
 		variables.put(Integer.valueOf(11), db.getDateEnd());
+        if (db.getDateEnd() == null) {
+            nullVars.put(Integer.valueOf(11), Integer.valueOf(Types.DATE));
+        }
 		variables.put(Integer.valueOf(12), Integer.valueOf(db.getId()));
 		this.execute(digester.getQuery("update"), variables, nullVars);
 		return eb;
@@ -265,29 +271,38 @@ public class DatasetDAO extends AuditableEntityDAO {
 		variables.put(Integer.valueOf(5), db.getSQLStatement());
 		variables.put(Integer.valueOf(6), Integer.valueOf(db.getOwnerId()));
 		variables.put(Integer.valueOf(7), Integer.valueOf(db.getNumRuns()));
-		variables.put(Integer.valueOf(8), new Boolean(db.isShowEventLocation()));
-		variables.put(Integer.valueOf(9), new Boolean(db.isShowEventStart()));
-		variables.put(Integer.valueOf(10), new Boolean(db.isShowEventEnd()));
-		variables.put(Integer.valueOf(11), new Boolean(db.isShowSubjectDob()));
-		variables.put(Integer.valueOf(12), new Boolean(db.isShowSubjectGender()));
-		variables.put(Integer.valueOf(13), new Boolean(db.isShowEventStatus()));
-		variables.put(Integer.valueOf(14), new Boolean(db.isShowSubjectStatus()));
-		variables.put(Integer.valueOf(15), new Boolean(db.isShowSubjectUniqueIdentifier()));
-		variables.put(Integer.valueOf(16), new Boolean(db.isShowSubjectAgeAtEvent()));
-		variables.put(Integer.valueOf(17), new Boolean(db.isShowCRFstatus()));
-		variables.put(Integer.valueOf(18), new Boolean(db.isShowCRFversion()));
-		variables.put(Integer.valueOf(19), new Boolean(db.isShowCRFinterviewerName()));
-		variables.put(Integer.valueOf(20), new Boolean(db.isShowCRFinterviewerDate()));
-		variables.put(Integer.valueOf(21), new Boolean(db.isShowSubjectGroupInformation()));
-		variables.put(Integer.valueOf(22), new Boolean(false));
+        variables.put(Integer.valueOf(8), db.getDateStart());
+        if (db.getDateStart() == null) {
+            nullVars.put(Integer.valueOf(8), Integer.valueOf(Types.DATE));
+        }
+        variables.put(Integer.valueOf(9), db.getDateEnd());
+        if (db.getDateEnd() == null) {
+            nullVars.put(Integer.valueOf(9), Integer.valueOf(Types.DATE));
+        }
+
+		variables.put(Integer.valueOf(10), new Boolean(db.isShowEventLocation()));
+		variables.put(Integer.valueOf(11), new Boolean(db.isShowEventStart()));
+		variables.put(Integer.valueOf(12), new Boolean(db.isShowEventEnd()));
+		variables.put(Integer.valueOf(13), new Boolean(db.isShowSubjectDob()));
+		variables.put(Integer.valueOf(14), new Boolean(db.isShowSubjectGender()));
+		variables.put(Integer.valueOf(15), new Boolean(db.isShowEventStatus()));
+		variables.put(Integer.valueOf(16), new Boolean(db.isShowSubjectStatus()));
+		variables.put(Integer.valueOf(17), new Boolean(db.isShowSubjectUniqueIdentifier()));
+		variables.put(Integer.valueOf(18), new Boolean(db.isShowSubjectAgeAtEvent()));
+		variables.put(Integer.valueOf(19), new Boolean(db.isShowCRFstatus()));
+		variables.put(Integer.valueOf(20), new Boolean(db.isShowCRFversion()));
+		variables.put(Integer.valueOf(21), new Boolean(db.isShowCRFinterviewerName()));
+		variables.put(Integer.valueOf(22), new Boolean(db.isShowCRFinterviewerDate()));
+		variables.put(Integer.valueOf(23), new Boolean(db.isShowSubjectGroupInformation()));
+		variables.put(Integer.valueOf(24), new Boolean(false));
 		// currently not changing structure to allow for disc notes to be added
 		// in the future
-		variables.put(Integer.valueOf(23), db.getODMMetaDataVersionName());
-		variables.put(Integer.valueOf(24), db.getODMMetaDataVersionOid());
-		variables.put(Integer.valueOf(25), db.getODMPriorStudyOid());
-		variables.put(Integer.valueOf(26), db.getODMPriorMetaDataVersionOid());
-		variables.put(Integer.valueOf(27), db.isShowSubjectSecondaryId());
-		variables.put(Integer.valueOf(28), db.getDatasetItemStatus().getId());
+		variables.put(Integer.valueOf(25), db.getOdmMetaDataVersionName());
+		variables.put(Integer.valueOf(26), db.getOdmMetaDataVersionOid());
+		variables.put(Integer.valueOf(27), db.getOdmPriorStudyOid());
+		variables.put(Integer.valueOf(28), db.getOdmPriorMetaDataVersionOid());
+		variables.put(Integer.valueOf(29), db.isShowSubjectSecondaryId());
+		variables.put(Integer.valueOf(30), db.getDatasetItemStatus().getId());
 
 		this.executeWithPK(digester.getQuery("create"), variables, nullVars);
 
@@ -333,10 +348,10 @@ public class DatasetDAO extends AuditableEntityDAO {
 		
 		eb.setSubjectGroupIds(getGroupIds(eb.getId()));
 		// }
-		eb.setODMMetaDataVersionName((String) hm.get("odm_metadataversion_name"));
-		eb.setODMMetaDataVersionOid((String) hm.get("odm_metadataversion_oid"));
-		eb.setODMPriorStudyOid((String) hm.get("odm_prior_study_oid"));
-		eb.setODMPriorMetaDataVersionOid((String) hm.get("odm_prior_metadataversion_oid"));
+		eb.setOdmMetaDataVersionName((String) hm.get("odm_metadataversion_name"));
+		eb.setOdmMetaDataVersionOid((String) hm.get("odm_metadataversion_oid"));
+		eb.setOdmPriorStudyOid((String) hm.get("odm_prior_study_oid"));
+		eb.setOdmPriorMetaDataVersionOid((String) hm.get("odm_prior_metadataversion_oid"));
 		eb.setShowSubjectSecondaryId((Boolean) hm.get("show_secondary_id"));
 		int isId = ((Integer) hm.get("dataset_item_status_id")).intValue();
 		isId = isId > 0 ? isId : 1;
@@ -601,6 +616,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 			Integer itemId = ib.getId();
 			String key = defId + "_" + itemId;
 			if (!db.getItemMap().containsKey(key)) {
+                ib.setDefId(defId);
 				ib.setSelected(true);
 				ib.setDefName(defName);
 				ib.setCrfName(crfName);
@@ -658,7 +674,13 @@ public class DatasetDAO extends AuditableEntityDAO {
 		}
 
 		variables.put(Integer.valueOf(10), db.getDateStart());
+        if (db.getDateStart() == null) {
+            nullVars.put(Integer.valueOf(10), Integer.valueOf(Types.DATE));
+        }
 		variables.put(Integer.valueOf(11), db.getDateEnd());
+        if (db.getDateEnd() == null) {
+            nullVars.put(Integer.valueOf(11), Integer.valueOf(Types.DATE));
+        }
 		variables.put(Integer.valueOf(12), new Boolean(db.isShowEventLocation()));
 		variables.put(Integer.valueOf(13), new Boolean(db.isShowEventStart()));
 		variables.put(Integer.valueOf(14), new Boolean(db.isShowEventEnd()));
@@ -674,10 +696,10 @@ public class DatasetDAO extends AuditableEntityDAO {
 		variables.put(Integer.valueOf(24), new Boolean(db.isShowCRFinterviewerDate()));
 		variables.put(Integer.valueOf(25), new Boolean(db.isShowSubjectGroupInformation()));
 		variables.put(Integer.valueOf(26), new Boolean(false));
-		variables.put(Integer.valueOf(27), db.getODMMetaDataVersionName());
-		variables.put(Integer.valueOf(28), db.getODMMetaDataVersionOid());
-		variables.put(Integer.valueOf(29), db.getODMPriorStudyOid());
-		variables.put(Integer.valueOf(30), db.getODMPriorMetaDataVersionOid());
+		variables.put(Integer.valueOf(27), db.getOdmMetaDataVersionName());
+		variables.put(Integer.valueOf(28), db.getOdmMetaDataVersionOid());
+		variables.put(Integer.valueOf(29), db.getOdmPriorStudyOid());
+		variables.put(Integer.valueOf(30), db.getOdmPriorMetaDataVersionOid());
 		variables.put(Integer.valueOf(31), new Boolean(db.isShowSubjectSecondaryId()));
 		variables.put(Integer.valueOf(32), Integer.valueOf(db.getDatasetItemStatus().getId()));
 		variables.put(Integer.valueOf(33), Integer.valueOf(db.getId()));

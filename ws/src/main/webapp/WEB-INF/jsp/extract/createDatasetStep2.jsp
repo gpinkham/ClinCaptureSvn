@@ -145,7 +145,7 @@ function notSelectAll() {
 
 </c:if>
 <br>
-<c:if test="${!empty allItems}">
+<c:if test="${!empty allCrfItems}">
 <form action="CreateDataset" method="post" name="cl">
 <input type="hidden" name="action" value="beginsubmit"/>
 <input type="hidden" name="crfId" value="<c:out value="${crf.id}"/>">
@@ -188,7 +188,7 @@ function notSelectAll() {
 
   </tr>
 <c:set var="count" value="0"/>
-<c:forEach var='item' items='${allItems}'>
+<c:forEach var='item' items='${allCrfItems}'>
   <tr>
    <td class="table_cell">
    <c:choose>

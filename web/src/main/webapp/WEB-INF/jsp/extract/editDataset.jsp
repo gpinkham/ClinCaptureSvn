@@ -84,20 +84,20 @@
 </table>
 
 
-<form action="CreateDataset" method="post" name="cl">
+<form id="datasetForm" action="CreateDataset" method="post" name="cl">
 <input type="hidden" name="action" value="beginsubmit"/>
 <input type="hidden" name="crfId" value="-1">
 <input type="hidden" name="defId" value="<c:out value="${definition.id}"/>">
 <P><B><fmt:message key="show_items_this_dataset" bundle="${restext}"/></b></p>
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
+   <td><input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+              value="<fmt:message key="back" bundle="${resword}"/>"
+              class="button_medium"
+              onclick="datasetConfirmGoTo('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'ViewDatasets');"/>
+   </td>
    <td><input type="submit" name="save" value="<fmt:message key="add_or_remove_items" bundle="${resword}"/>" class="button_xlong"/></td>
    <td><input type="submit" name="saveContinue" value="<fmt:message key="continue_to_define_scope" bundle="${resword}"/>" class="button_xlong"/></td>
-   <td><input type="button" name="BTN_Smart_Cancel" id="GoToPreviousPage"
-					value="<fmt:message key="cancel" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
-	</td>  
 	</tr>
 </table>
 <br>
@@ -106,13 +106,13 @@
 
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
+   <td><input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+              value="<fmt:message key="back" bundle="${resword}"/>"
+              class="button_medium"
+              onclick="datasetConfirmGoTo('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'ViewDatasets');"/>
+   </td>
    <td><input type="submit" name="save" value="<fmt:message key="add_or_remove_items" bundle="${resword}"/>" class="button_xlong"/></td>
    <td><input type="submit" name="saveContinue" value="<fmt:message key="continue_to_define_scope" bundle="${resword}"/>" class="button_xlong"/></td>
-   <td><input type="button" name="BTN_Smart_Cancel" id="GoToPreviousPage"
-					value="<fmt:message key="cancel" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
-	</td>
   </tr>
 </table>
 </form>

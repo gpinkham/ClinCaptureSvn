@@ -145,20 +145,23 @@ function notSelectAll() {
 
 </c:if>
 <br>
-<c:if test="${!empty allItems}">
-<form action="CreateDataset" method="post" name="cl">
+
+<form id="datasetForm" action="CreateDataset" method="post" name="cl">
 <input type="hidden" name="action" value="beginsubmit"/>
+<c:if test="${!empty allCrfItems}">
 <input type="hidden" name="crfId" value="<c:out value="${crf.id}"/>">
 <input type="hidden" name="defId" value="<c:out value="${definition.id}"/>">
 
 <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="all"/></jsp:include>
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
-  <td><input type="checkbox" name="all" value="1"
-	onClick="javascript:selectAll();"> <fmt:message key="select_all_items" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
-   <td><input type="submit" name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong"/></td>
+   <td><input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_begin');"/></td>
+   <td><input type="submit" id="btnSubmit" name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong"/></td>
    <td><input type="submit" name="saveContinue" value="<fmt:message key="save_and_define_scope" bundle="${resword}"/>" class="button_xlong"/></td>
    <td><input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
+  </tr>
+  <tr>
+   <td colspan="4" style="padding-top: 20px;"><input type="checkbox" name="all" value="1" onClick="javascript:selectAll();"> <fmt:message key="select_all_items" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
   </tr>
 </table>
 <br/>
@@ -188,7 +191,7 @@ function notSelectAll() {
 
   </tr>
 <c:set var="count" value="0"/>
-<c:forEach var='item' items='${allItems}'>
+<c:forEach var='item' items='${allCrfItems}'>
   <tr>
    <td class="table_cell">
    <c:choose>
@@ -381,17 +384,31 @@ function notSelectAll() {
 
 </div></div></div></div></div></div></div></div>
 </div>
-<table border="0" cellpadding="0" cellspacing="0" >
+<table border="0" cellpadding="0" cellspacing="0">
   <tr>
-   <td><input type="submit" name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong"/></td>
+   <td><input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_begin');"/></td>
+   <td><input type="submit" id="btnSubmit" name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong"/></td>
    <td><input type="submit" name="saveContinue" value="<fmt:message key="save_and_define_scope" bundle="${resword}"/>" class="button_xlong"/></td>
    <td><input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
   </tr>
 </table>
-</form>
 </c:if>
 
 <c:import url="../include/workflow.jsp">
    <c:param name="module" value="extract"/>
 </c:import>
+
+<c:if test="${empty allCrfItems}">
+    <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 20px;">
+        <td>
+            <input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_begin');"/></td>
+        <td>
+            <input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
+        <td>
+            <input type="submit" id="btnSubmit" value="<fmt:message key="submit" bundle="${resword}"/>" style="display: none;"/></td>
+    </table>
+</c:if>
+
+</form>
+
 <jsp:include page="../include/footer.jsp"/>

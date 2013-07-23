@@ -74,74 +74,41 @@ public class ViewSelectedServlet extends SecureController {
 	 * setup study groups, tbh, added july 2007 FIXME in general a repeated set of code -- need to create a superclass
 	 * which will contain this class, tbh
 	 */
-	public void setUpStudyGroups() {
-		ArrayList sgclasses = (ArrayList) session.getAttribute("allSelectedGroups");
+	public void setUpStudyGroups(DatasetBean db) {
+		ArrayList sgclasses = db.getAllSelectedGroups();
 		if (sgclasses == null || sgclasses.size() == 0) {
 			StudyDAO studydao = new StudyDAO(sm.getDataSource());
 			StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
 			StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
 			sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
 		}
-		session.setAttribute("allSelectedGroups", sgclasses);
-		session.setAttribute("numberOfStudyGroups", sgclasses.size());
-		request.setAttribute("allSelectedGroups", sgclasses);
+        db.setAllSelectedGroups(sgclasses);
 	}
 
 	@Override
 	public void processRequest() throws Exception {
-
-		DatasetBean db = (DatasetBean) session.getAttribute("newDataset");
 		HashMap events = (HashMap) session.getAttribute(CreateDatasetServlet.EVENTS_FOR_CREATE_DATASET);
 		if (events == null) {
 			events = new HashMap();
 		}
 		request.setAttribute("eventlist", events);
 
+        DatasetBean db = (DatasetBean) session.getAttribute("newDataset");
+
 		CRFDAO crfdao = new CRFDAO(sm.getDataSource());
 		ItemDAO idao = new ItemDAO(sm.getDataSource());
-		ItemFormMetadataDAO imfdao = new ItemFormMetadataDAO(sm.getDataSource());
-		ArrayList ids = CreateDatasetServlet.allSedItemIdsInStudy(events, crfdao, idao);// new
-																						// ArrayList();
-		session.setAttribute("numberOfStudyItems", new Integer(ids.size()).toString());
+		ArrayList ids = CreateDatasetServlet.allSedItemIdsInStudy(events, crfdao, idao);
 
-		ArrayList items = new ArrayList();
-		if (db == null || db.getItemIds().size() == 0) {
-			session.setAttribute("allSelectedItems", items);
-			setUpStudyGroups();// FIXME can it be that we have no selected
-			// items and
-			// some selected groups? tbh
-			forwardPage(Page.CREATE_DATASET_VIEW_SELECTED);
-			return;
-		}
-
-		items = getAllSelected(db, idao, imfdao);
-
-		session.setAttribute("allSelectedItems", items);
+		session.setAttribute("numberOfStudyItems", new Integer(db.getItemMap().size()).toString());
 
 		FormProcessor fp = new FormProcessor(request);
 		String status = fp.getString("status");
 		if (!StringUtil.isBlank(status) && "html".equalsIgnoreCase(status)) {
 			forwardPage(Page.CREATE_DATASET_VIEW_SELECTED_HTML);
 		} else {
-			setUpStudyGroups();
+			setUpStudyGroups(db);
 			forwardPage(Page.CREATE_DATASET_VIEW_SELECTED);
 		}
 
 	}
-
-	public static ArrayList getAllSelected(DatasetBean db, ItemDAO idao, ItemFormMetadataDAO imfdao) throws Exception {
-		ArrayList items = new ArrayList();
-		ArrayList itemDefCrfs = db.getItemDefCrf();
-
-		for (int i = 0; i < itemDefCrfs.size(); i++) {
-			ItemBean item = (ItemBean) itemDefCrfs.get(i);
-			item.setSelected(true);
-			ArrayList metas = imfdao.findAllByItemId(item.getId());
-			item.setItemMetas(metas);
-			items.add(item);
-		}
-
-		return items;
-	}
-
 }

@@ -77,8 +77,8 @@ public class SelectItemsServlet extends SecureController {
 
 	}
 
-	public void setUpStudyGroupPage() {
-		ArrayList sgclasses = (ArrayList) session.getAttribute("allSelectedGroups");
+	public void setUpStudyGroupPage(DatasetBean db) {
+		ArrayList sgclasses = db.getAllSelectedGroups();
 		if (sgclasses == null || sgclasses.size() == 0) {
 			StudyDAO studydao = new StudyDAO(sm.getDataSource());
 			StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
@@ -94,8 +94,7 @@ public class SelectItemsServlet extends SecureController {
 				// hmm, set it back into the array list? tbh
 			}
 		}
-		session.setAttribute("allSelectedGroups", sgclasses);
-		request.setAttribute("allSelectedGroups", sgclasses);
+        db.setAllSelectedGroups(sgclasses);
 	}
 
 	@Override
@@ -112,7 +111,7 @@ public class SelectItemsServlet extends SecureController {
 		ItemDAO idao = new ItemDAO(sm.getDataSource());
 		ItemFormMetadataDAO imfdao = new ItemFormMetadataDAO(sm.getDataSource());
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-
+		DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
 		HashMap events = (HashMap) session.getAttribute(CreateDatasetServlet.EVENTS_FOR_CREATE_DATASET);
 		if (events == null) {
 			events = new HashMap();
@@ -139,10 +138,9 @@ public class SelectItemsServlet extends SecureController {
 			} else if (CRFAttr > 0) {
 				forwardPage(Page.CREATE_DATASET_CRF_ATTR);
 			} else if (groupAttr > 0) {
-				setUpStudyGroupPage();
+				setUpStudyGroupPage(dsb);
 				forwardPage(Page.CREATE_DATASET_GROUP_ATTR);
-			} 
-			else {
+			} else {
 				forwardPage(Page.CREATE_DATASET_2);
 			}
 			return;
@@ -155,16 +153,11 @@ public class SelectItemsServlet extends SecureController {
 		session.setAttribute("definition", sed);
 
 		DatasetBean db = (DatasetBean) session.getAttribute("newDataset");
-		if (db == null) {
-			db = new DatasetBean();
-		}
-
-		session.setAttribute("newDataset", db);
 
 		ArrayList items = idao.findAllActiveByCRF(crf);
 		for (int i = 0; i < items.size(); i++) {
 			ItemBean item = (ItemBean) items.get(i);
-			
+
 			ItemFormMetadataBean meta = imfdao.findByItemIdAndCRFVersionId(item.getId(), item.getItemMeta()
 					.getCrfVersionId());
 			meta.setCrfVersionName(item.getItemMeta().getCrfVersionName());
@@ -190,10 +183,11 @@ public class SelectItemsServlet extends SecureController {
 			}
 
 		}
-		ArrayList itemArray = new ArrayList(itemMap.values());
-		// now sort them by ordinal/name
-		Collections.sort(itemArray);
-		session.setAttribute("allItems", itemArray);
+
+        ArrayList allCrfItems = new ArrayList(itemMap.values());
+        // now sort them by ordinal/name
+        Collections.sort(allCrfItems);
+        session.setAttribute("allCrfItems", allCrfItems);
 
 		forwardPage(Page.CREATE_DATASET_2);
 	}

@@ -41,7 +41,7 @@
 
 <p><fmt:message key="can_view_items_selected_inclusion" bundle="${restext}"/></p>
 
-<c:if test="${!empty allSelectedItems}">
+<c:if test="${!empty newDataset.itemDefCrf}">
 <p><b><fmt:message key="show_items_this_dataset" bundle="${restext}"/></b></p>
 
 <span class="table_title_extract"><fmt:message key="subject_attributes" bundle="${resword}"/></span>
@@ -253,7 +253,7 @@
 </tr>
 <%-- five columns --%>
 
-   <c:forEach var="sgclass" items="${allSelectedGroups}">
+   <c:forEach var="sgclass" items="${newDataset.allSelectedGroups}">
    <tr>
    <c:if test="${sgclass.selected}">
 		<td class="table_cell"><c:out value="${sgclass.name}"/></td>
@@ -289,7 +289,7 @@
 
   </tr>
 <c:set var="count" value="0"/>
-<c:forEach var='item' items='${allSelectedItems}'>
+<c:forEach var='item' items='${newDataset.itemDefCrf}'>
   <tr>
    <td class="table_cell"><c:out value="${item.name}"/></td>
    <td class="table_cell"><c:out value="${item.description}"/>&nbsp;</td>

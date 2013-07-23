@@ -23,7 +23,7 @@
 
 <fmt:message key="instructions_extract_select_CRF_and_group" bundle="${resword}"/>
 
-<form action="CreateDataset" method="post" name="cl">
+<form id="datasetForm" action="CreateDataset" method="post" name="cl">
 <input type="hidden" name="action" value="beginsubmit"/>
 <input type="hidden" name="crfId" value="0">
 <input type="hidden" name="CRFAttr" value="1">
@@ -76,7 +76,8 @@
  
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
-   <td><input type="submit" name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong"/></td>
+   <td><input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_begin');"/></td>
+   <td><input type="submit" id="btnSubmit" name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong"/></td>
    <td><input type="submit" name="saveContinue" value="<fmt:message key="save_and_define_scope" bundle="${resword}"/>" class="button_xlong"/></td>
    <td><input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>   
   </tr>

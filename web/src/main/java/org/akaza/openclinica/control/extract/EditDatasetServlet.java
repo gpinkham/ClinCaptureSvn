@@ -22,6 +22,8 @@ package org.akaza.openclinica.control.extract;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -74,7 +76,8 @@ public class EditDatasetServlet extends SecureController {
 			return;
 		}
 
-		if ((currentRole.isMonitor() || currentRole.isInvestigator()) && (dataset.getOwnerId() != ub.getId())) {
+		if ((currentRole.getRole() == Role.STUDY_MONITOR || currentRole.getRole() == Role.INVESTIGATOR)
+				&& (dataset.getOwnerId() != ub.getId())) {
 			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
 					+ respage.getString("change_active_study_or_contact"));
 			forwardPage(Page.MENU_SERVLET);
@@ -113,7 +116,6 @@ public class EditDatasetServlet extends SecureController {
 		request.setAttribute("dataset", dataset);
 		request.setAttribute("statuses", getStatuses());
 		forwardPage(Page.EDIT_DATASET);
-		// }
 	}
 
 	@Override
@@ -152,9 +154,18 @@ public class EditDatasetServlet extends SecureController {
 	public DatasetBean initializeAttributes(int datasetId) {
 		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
 		DatasetBean db = dsdao.initialDatasetData(datasetId);
+        Calendar calendar = GregorianCalendar.getInstance();
+        if (db.getDateStart() != null) {
+            calendar.setTime(db.getDateStart());
+            db.setFirstMonth(calendar.get(Calendar.MONTH) + 1);
+            db.setFirstYear(calendar.get(Calendar.YEAR));
+        }
+        if (db.getDateEnd() != null) {
+            calendar.setTime(db.getDateEnd());
+            db.setLastMonth(calendar.get(Calendar.MONTH) + 1);
+            db.setLastYear(calendar.get(Calendar.YEAR));
+        }
 		session.setAttribute("newDataset", db);
-		session.setAttribute("allItems", db.getItemDefCrf().clone());
-		session.setAttribute("allSelectedItems", db.getItemDefCrf().clone());
 		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 		StudyDAO studydao = new StudyDAO(sm.getDataSource());
 		StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
@@ -170,8 +181,7 @@ public class EditDatasetServlet extends SecureController {
 				}
 			}
 		}
-		session.setAttribute("allSelectedGroups", allSelectedGroups);
-
+        db.setAllSelectedGroups(allSelectedGroups);
 		return db;
 	}
 }

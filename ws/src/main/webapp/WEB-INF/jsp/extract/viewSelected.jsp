@@ -64,7 +64,7 @@ function notSelectAll() {
 
 <br><br>
 </c:if>
-<c:if test="${!empty allSelectedItems}">
+<c:if test="${!empty newDataset.itemDefCrf}">
 <form action="CreateDataset" method="post" name="cl">
 <input type="hidden" name="action" value="beginsubmit"/>
 <input type="hidden" name="crfId" value="-1">

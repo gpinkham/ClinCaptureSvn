@@ -245,7 +245,7 @@
 </tr>
 <%-- five columns --%>
 
-   <c:forEach var="sgclass" items="${allSelectedGroups}">
+   <c:forEach var="sgclass" items="${newDataset.allSelectedGroups}">
    <tr>
 	<c:choose>
    		<c:when test="${sgclass.selected}">
@@ -289,7 +289,7 @@
 
   </tr>
 <c:set var="count" value="0"/>
-<c:forEach var='item' items='${allSelectedItems}'>
+<c:forEach var='item' items='${newDataset.itemDefCrf}'>
   <tr>
    <td class="table_cell">
    <c:choose>

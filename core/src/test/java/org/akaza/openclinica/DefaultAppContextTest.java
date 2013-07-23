@@ -2,7 +2,10 @@ package org.akaza.openclinica;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
+import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
@@ -12,11 +15,15 @@ import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.junit.Before;
@@ -31,8 +38,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 
 	protected DataSource dataSource = getDataSource();
-	
+
+    protected ItemDAO idao;
+    protected CRFDAO crfdao;
+    protected StudyDAO studyDAO;
+    protected DatasetDAO datasetDAO;
+    protected ItemFormMetadataDAO imfdao;
 	protected StudyEventDAO studyEventDao;
+    protected UserAccountDAO userAccountDAO;
 	protected DynamicEventDao dynamicEventDao;
 	protected DiscrepancyNoteDAO discrepancyNoteDAO;
 	protected DnDescriptionDao dnDescriptionDao;
@@ -61,7 +74,13 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		super.setUp();
 		
 		// DAO that require data source
+        idao = new ItemDAO(dataSource);
+        crfdao = new CRFDAO(dataSource);
+        studyDAO = new StudyDAO(dataSource);
+        datasetDAO = new DatasetDAO(dataSource);
+        imfdao = new ItemFormMetadataDAO(dataSource);
 		studyEventDao = new StudyEventDAO(dataSource);
+        userAccountDAO = new UserAccountDAO(dataSource);
 		dynamicEventDao = new DynamicEventDao(dataSource);
 		discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 		studyGroupClassDAO = new StudyGroupClassDAO(dataSource);

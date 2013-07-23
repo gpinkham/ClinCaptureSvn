@@ -2,6 +2,7 @@ var currentPopupUid;
 var subjectMatrixPopupStick;
 var popupInterval;
 var popupIntervalForEventId;
+var firstFormState;
 
 function selectAllChecks(formObj,value){
     if(formObj) {
@@ -87,6 +88,26 @@ function confirmBackSmart(Message, servletURL, defaultURL){
     if(confirm1){
         goBackSmart(servletURL, defaultURL);
     }
+}
+
+function datasetConfirmGoTo(message, formId, address) {
+	var newFormState = $("#" + formId).serialize();
+	var confirm1 = newFormState != firstFormState ? confirm(message) : true;
+	if (confirm1) {
+		window.location.href = address;
+	}
+}
+
+function datasetConfirmBack(message, formId, address, action) {
+	var newFormState = $("#" + formId).serialize();
+	var confirm1 = $("#" + formId).length != 0
+			&& newFormState != firstFormState ? confirm(message) : true;
+	if (confirm1) {
+    $("#" + formId).attr("action", address);
+		$("#" + formId + " input[name='action']").val(action);
+		$("#" + formId + " input[id='btnSubmit']").attr("onclick", "");
+		$("#" + formId + " input[id='btnSubmit']").click();
+	}
 }
 
 function hideCols(tableId,columnNumArray,showTable){
@@ -2268,4 +2289,7 @@ function urlParam(name){
 $(function() {
     // enable the ability to uncheck the radio buttons in the CRF's
     bindRadioButtons();
+    if ($("#datasetForm").length > 0) {
+      firstFormState = $("#datasetForm").serialize();
+    }
 });

@@ -75,7 +75,7 @@ public class ClinicalDataUnit extends OdmUnit {
 		if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
 			String mvoid = "";
 			if (this.dataset != null) {
-				mvoid = this.dataset.getODMMetaDataVersionOid();
+				mvoid = this.dataset.getOdmMetaDataVersionOid();
 			}
 			if (mvoid.length() > 0) {
 				mvoid += "-" + studyOID;
@@ -85,7 +85,7 @@ public class ClinicalDataUnit extends OdmUnit {
 			odmClinicalData.setMetaDataVersionOID(mvoid);
 
 		} else {
-			odmClinicalData.setMetaDataVersionOID(this.dataset.getODMMetaDataVersionOid());
+			odmClinicalData.setMetaDataVersionOID(this.dataset.getOdmMetaDataVersionOid());
 			if (odmClinicalData.getMetaDataVersionOID() == null
 					|| odmClinicalData.getMetaDataVersionOID().length() <= 0) {
 				odmClinicalData.setMetaDataVersionOID("v1.0.0");
