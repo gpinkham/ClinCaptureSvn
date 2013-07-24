@@ -21,12 +21,14 @@
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.core.EntityAction;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -57,6 +59,9 @@ public class DeleteStudyUserRoleServlet extends SecureController {
 
 	@Override
 	protected void processRequest() throws Exception {
+		String message = "";
+		String additionalMessage = "";
+        Page forwardTo = Page.LIST_USER_ACCOUNTS_SERVLET;
 		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 
 		FormProcessor fp = new FormProcessor(request);
@@ -67,7 +72,6 @@ public class DeleteStudyUserRoleServlet extends SecureController {
 
 		StudyUserRoleBean s = udao.findRoleByUserNameAndStudyId(uName, studyId);
 
-		String message = "";
 		if (!s.isActive()) {
 			message = respage.getString("the_specified_user_role_not_exits_for_study");
 		} else if (!EntityAction.contains(action)) {
@@ -79,23 +83,33 @@ public class DeleteStudyUserRoleServlet extends SecureController {
 			message = respage.getString("the_role_cannot_be_restored_since_user_deleted");
 		} else {
 			EntityAction desiredAction = EntityAction.get(action);
-
 			if (ub.isSysAdmin() && desiredAction.equals(EntityAction.DELETE)) {
                 if (s.getUserName().equalsIgnoreCase("root") && s.isSysAdmin()) {
                     message = respage.getString("you_cannot_remove_the_sysadmin_role_for_the_root_user");
                 } else {
-                    message = s.isSysAdmin() ? respage.getString("the_user_role_deleted") : respage
-                            .getString("the_study_user_role_deleted");
+					if (s.isSysAdmin()) {						
+						message = respage.getString("the_user_role_deleted");
+						if (ub.getId() == user.getId()) {
+							forwardTo = Page.MENU_SERVLET;
+							Navigation.removeUrl(request, "/ListUserAccounts");
+							additionalMessage = respage.getString("you_may_not_perform_administrative_functions");
+						}
+					} else {
+						message = respage.getString("the_study_user_role_deleted");
+					}
                     udao.deleteUserRole(studyId, s.getRole(), user);
-                    if (ub.getId() == user.getId()) {
-                        session.setAttribute("reloadUserBean", true);
-                    }
                 }
 			} else {
 				if (desiredAction.equals(EntityAction.DELETE)) {
 					s.setStatus(Status.DELETED);
 					message = respage.getString("the_study_user_role_deleted");
-				} else {
+					if (ub.getId() == user.getId()
+							&& (s.getRole() == Role.STUDY_ADMINISTRATOR || s.getRole() == Role.STUDY_DIRECTOR)) {
+						forwardTo = Page.MENU_SERVLET;
+						Navigation.removeUrl(request, "/ListUserAccounts");
+						additionalMessage = respage.getString("you_may_not_perform_administrative_functions");
+					}
+                } else {
 					s.setStatus(Status.AVAILABLE);
 					message = respage.getString("the_study_user_role_restored");
 				}
@@ -103,9 +117,14 @@ public class DeleteStudyUserRoleServlet extends SecureController {
 				udao.updateStudyUserRole(s, uName);
 			}
 		}
-
 		addPageMessage(message);
-		forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+		if (!additionalMessage.isEmpty()) {
+			addPageMessage(additionalMessage);
+		}
+        if (ub.getId() == user.getId()) {
+            session.setAttribute("reloadUserBean", true);
+        }
+		forwardPage(forwardTo);
 	}
 
 	// public void processRequest(HttpServletRequest request,

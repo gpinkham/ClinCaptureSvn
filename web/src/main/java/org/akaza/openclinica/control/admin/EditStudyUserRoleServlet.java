@@ -30,6 +30,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -104,18 +105,24 @@ public class EditStudyUserRoleServlet extends SecureController {
 				HashMap errors = v.validate();
 
 				if (errors.isEmpty()) {
+                    Page forwardTo = Page.LIST_USER_ACCOUNTS_SERVLET;
 					int roleId = fp.getInt(INPUT_ROLE);
 					Role r = Role.get(roleId);
 					studyUserRole.setRoleName(r.getName());
 					studyUserRole.setUpdater(ub);
 					udao.updateStudyUserRole(studyUserRole, uName);
-                    if (ub.getId() == studyUserRole.getUserAccountId()) {
-                        session.setAttribute("reloadUserBean", true);
-                    }
-					String message = respage.getString("the_user_in_study_has_been_updated");
-					addPageMessage(message);
-
-					forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+					addPageMessage(respage.getString("the_user_in_study_has_been_updated"));
+					if (ub.getId() == studyUserRole.getUserAccountId()) {
+						session.setAttribute("reloadUserBean", true);
+						if (!ub.isSysAdmin() && !ub.isTechAdmin()
+								&& studyUserRole.getRole() != Role.STUDY_ADMINISTRATOR
+								&& studyUserRole.getRole() != Role.STUDY_DIRECTOR) {
+							forwardTo = Page.MENU_SERVLET;
+							Navigation.removeUrl(request, "/ListUserAccounts");
+							addPageMessage(respage.getString("you_may_not_perform_administrative_functions"));
+						}
+					}
+					forwardPage(forwardTo);
 				} else {
 					String message = respage.getString("the_role_choosen_was_invalid_choose_another");
 					addPageMessage(message);

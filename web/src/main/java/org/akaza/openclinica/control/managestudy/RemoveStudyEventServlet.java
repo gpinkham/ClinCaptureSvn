@@ -175,6 +175,7 @@ public class RemoveStudyEventServlet extends SecureController {
 	}
 
 	private void forwardToViewStudySubjectPage() throws Exception {
+        storePageMessages();
 		String id = (String) request.getAttribute("id");
 		String savedUrl = (String) request.getSession().getAttribute(
 				ViewStudySubjectServlet.SAVED_VIEW_STUDY_SUBJECT_URL);

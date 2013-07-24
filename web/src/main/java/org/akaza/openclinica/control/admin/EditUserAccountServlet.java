@@ -31,6 +31,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -199,13 +200,14 @@ public class EditUserAccountServlet extends SecureController {
 				request.setAttribute("userName", user.getName());
 				forwardPage(Page.EDIT_ACCOUNT);
 			} else if (button.equals(resword.getString("submit"))) {
+                Page forwardTo = Page.LIST_USER_ACCOUNTS_SERVLET;
 				user.setFirstName(fp.getString(INPUT_FIRST_NAME));
 				user.setLastName(fp.getString(INPUT_LAST_NAME));
 				user.setEmail(fp.getString(INPUT_EMAIL));
 				user.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
 				user.setUpdater(ub);
 				user.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
-
+                boolean wasSysAdmin = user.isSysAdmin();
 				if (!user.getName().equalsIgnoreCase("root")) {
 					UserType ut = UserType.get(fp.getInt(INPUT_USER_TYPE));
 					if (ut.equals(UserType.SYSADMIN)) {
@@ -219,7 +221,6 @@ public class EditUserAccountServlet extends SecureController {
                     user.setName("root");
                     user.addUserType(UserType.SYSADMIN);
                 }
-
 				if (fp.getBoolean(INPUT_RESET_PASSWORD)) {
 					SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean(
 							"securityManager"));
@@ -231,9 +232,7 @@ public class EditUserAccountServlet extends SecureController {
 
 					udao.update(user);
                     udao.update(user);
-                    if (ub.getId() == user.getId()) {
-                        session.setAttribute("reloadUserBean", true);
-                    }
+                    
 					if ("no".equalsIgnoreCase(fp.getString(INPUT_DISPLAY_PWD))) {
 						logger.info("displayPwd is no");
 						try {
@@ -247,14 +246,19 @@ public class EditUserAccountServlet extends SecureController {
 					}
 				} else {
 					udao.update(user);
-                    if (ub.getId() == user.getId()) {
-                        session.setAttribute("reloadUserBean", true);
-                    }
 				}
 				updateCalendarEmailJob(user);
 				addPageMessage(respage.getString("the_user_account") + " \"" + user.getName() + "\" "
 						+ respage.getString("was_updated_succesfully"));
-				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+				if (ub.getId() == user.getId()) {
+					session.setAttribute("reloadUserBean", true);
+					if (wasSysAdmin && !user.isSysAdmin()) {
+						forwardTo = Page.MENU_SERVLET;
+						Navigation.removeUrl(request, "/ListUserAccounts");
+						addPageMessage(respage.getString("you_may_not_perform_administrative_functions"));
+					}
+				}
+                forwardPage(forwardTo);
 			} else {
 				throw new InconsistentStateException(Page.ADMIN_SYSTEM,
 						resexception.getString("an_invalid_submit_button_was_clicked"));

@@ -234,7 +234,9 @@ public abstract class SecureController extends HttpServlet {
         }
 		logger.debug(message);
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
+    }
 
+    protected void storePageMessages() {
         Map storedAttributes = new HashMap();
         storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
         request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);

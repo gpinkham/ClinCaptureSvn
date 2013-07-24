@@ -141,13 +141,9 @@ public abstract class CoreSecureController extends HttpServlet {
 		pageMessages.add(message);
 		logger.debug(message);
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
-
-        Map storedAttributes = new HashMap();
-        storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
-        request.getSession().setAttribute(SecureController.STORED_ATTRIBUTES, storedAttributes);
 	}
 
-	public void init(ServletConfig config) throws ServletException {
+    public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		try {
 			ServletContext context = getServletContext();

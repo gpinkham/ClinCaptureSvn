@@ -96,12 +96,6 @@ public class ListUserAccountsServlet extends RememberLastPage {
 			setToPanel(resword.getString("users"), new Integer(allUsers.size()).toString());
 		}
 
-		if (request.getAttribute(PAGE_MESSAGE) != null) {
-			logger.debug("found page messages");
-			// pass it down the line?
-			request.setAttribute(PAGE_MESSAGE, request.getAttribute(PAGE_MESSAGE));
-		}
-
 		analyzeForward(Page.LIST_USER_ACCOUNTS);
 	}
 

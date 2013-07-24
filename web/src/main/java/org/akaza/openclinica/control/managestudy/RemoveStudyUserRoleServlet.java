@@ -32,6 +32,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -63,7 +64,7 @@ public class RemoveStudyUserRoleServlet extends SecureController {
 
 	}
 
-	@Override
+    @Override
 	public void processRequest() throws Exception {
 
 		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
@@ -89,6 +90,7 @@ public class RemoveStudyUserRoleServlet extends SecureController {
 				forwardPage(Page.REMOVE_USER_ROLE_IN_STUDY);
 			} else {
 				// remove role
+                Page forwardTo = Page.LIST_USER_IN_STUDY_SERVLET;
 				FormProcessor fp = new FormProcessor(request);
 				String userName = fp.getString("name");
 				int studyId = fp.getInt("studyId");
@@ -101,13 +103,19 @@ public class RemoveStudyUserRoleServlet extends SecureController {
 				sur.setUpdater(ub);
 				sur.setUpdatedDate(new Date());
 				udao.updateStudyUserRole(sur, userName);
-                if (ub.getId() == user.getId()) {
-                    session.setAttribute("reloadUserBean", true);
-                }
 				addPageMessage(sendEmail(user, sur));
-
-				forwardPage(Page.LIST_USER_IN_STUDY_SERVLET);
-
+				if (ub.getId() == user.getId()) {
+					session.setAttribute("reloadUserBean", true);
+					if (!ub.isSysAdmin() && !ub.isTechAdmin()
+							&& (sur.getRole() == Role.STUDY_ADMINISTRATOR || sur.getRole() == Role.STUDY_DIRECTOR)) {
+						forwardTo = Page.MENU_SERVLET;
+						Navigation.removeUrl(request, "/ListStudyUser");
+						addPageMessage(restext
+								.getString("no_have_correct_privilege_current_study_to_manage_user_roles")
+								+ respage.getString("change_study_contact_sysadmin"));
+					}
+				}
+				forwardPage(forwardTo);
 			}
 
 		}
@@ -120,19 +128,26 @@ public class RemoveStudyUserRoleServlet extends SecureController {
 	 * @param response
 	 */
 	private String sendEmail(UserAccountBean u, StudyUserRoleBean sub) throws Exception {
-
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
 		StudyBean study = (StudyBean) sdao.findByPK(sub.getStudyId());
 		logger.info("Sending email...");
-		String body = u.getFirstName() + " " + u.getLastName() + "(" + resword.getString("username") + ": "
-				+ u.getName() + ") " + respage.getString("has_been_removed_from_the_study_site") + study.getName()
-				+ " " + respage.getString("with_role") + " " + sub.getRoleName() + ". "
-				+ respage.getString("the_user_will_no_longer_access_to_the_study");
-		// Mantis Issue: 5768. Email Notification Removed
-		// sendEmail(u.getEmail().trim(), respage.getString("remove_user_role"), body, false);
-		// sendEmail(ub.getEmail().trim(), respage.getString("remove_user_role"), body, false);
-		// sendEmail(EmailEngine.getAdminEmail(), respage.getString("remove_user_role"), body, false);
-
+		String body = u.getFirstName()
+				+ " "
+				+ u.getLastName()
+				+ "("
+				+ resword.getString("username")
+				+ ": "
+				+ u.getName()
+				+ ") "
+				+ respage.getString("has_been_removed_from_the_study_site")
+				+ study.getName()
+				+ " "
+				+ respage.getString("with_role")
+				+ " "
+				+ sub.getRoleName()
+				+ ". "
+				+ (!u.isSysAdmin() && !u.isTechAdmin() ? respage
+						.getString("the_user_will_no_longer_access_to_the_study") : "");
 		return body;
 
 	}
