@@ -168,12 +168,14 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 				study.getId(), study.getParentStudyId()) : findAllParentsByDefinition(definitionId);
 	}
 
-	public int countOfCRFsThatShouldBeSDVd(int studyId) {
+	public int countOfCRFsThatShouldBeSDVd(StudyBean studyBean) {
 		unsetTypeExpected();
 		setTypeExpected(1, TypeNames.INT);
+		setTypeExpected(2, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(1, studyId);
+		variables.put(1, studyBean.getId());
+		variables.put(2, studyBean.getParentStudyId());
 		String sql = digester.getQuery("countOfCRFsThatShouldBeSDVd");
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();

@@ -232,19 +232,16 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
 	private Collection<SubjectAggregateContainer> getFilteredItems(StudySubjectSDVFilter filterSet,
 			StudySubjectSDVSort sortSet, int rowStart, int rowEnd) {
-
 		List<SubjectAggregateContainer> rows = new ArrayList<SubjectAggregateContainer>();
-		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 		List<StudySubjectBean> studySubjectBeans = studySubjectDAO.findAllByStudySDV(studyId, studyId, filterSet,
 				sortSet, rowStart, rowEnd);
-		SubjectAggregateContainer containerTmp = null;
-
-		int countOfCRFsThatShouldBeSDVd = eventDefinitionCRFDAO.countOfCRFsThatShouldBeSDVd(studyId);
 
 		for (StudySubjectBean studSubjBean : studySubjectBeans) {
-			containerTmp = getRow(studSubjBean, countOfCRFsThatShouldBeSDVd);
-			rows.add(containerTmp);
+			SubjectAggregateContainer containerTmp = getRow(studSubjBean);
+            if (containerTmp != null) {
+			    rows.add(containerTmp);
+            }
 		}
 
 		return rows;
@@ -255,7 +252,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		return "<img hspace='2' border='0'  title='SDV Complete' alt='SDV Status' src='" + prefix + "images/icon_";
 	}
 
-	private SubjectAggregateContainer getRow(StudySubjectBean studySubjectBean, int countOfCRFsThatShouldBeSDVd) {
+	private SubjectAggregateContainer getRow(StudySubjectBean studySubjectBean) {
 		SubjectAggregateContainer row = new SubjectAggregateContainer();
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		StudyDAO studyDAO = new StudyDAO(dataSource);
@@ -274,12 +271,20 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		List<EventCRFBean> eventCRFBeans = eventCRFDAO.getEventCRFsByStudySubject(studySubjectBean.getId(),
 				studySubjectBean.getStudyId(), studySubjectBean.getStudyId());
 
-		HashMap<String, Integer> stats = getEventCRFStats(eventCRFBeans, studySubjectBean, countOfCRFsThatShouldBeSDVd);
+		HashMap<String, Integer> stats = getEventCRFStats(eventCRFBeans, studyBean, studySubjectBean);
 
-		row.setNumberCRFComplete(stats.get("numberOfCompletedEventCRFs") + "");
-		row.setNumberOfCRFsSDV(stats.get("numberOfSDVdEventCRFs") + "");
-
+		int countOfCRFsThatShouldBeSDVd = stats.get("countOfCRFsThatShouldBeSDVd");
+		int numberOfCompletedEventCRFs = stats.get("numberOfCompletedEventCRFs");
+		int numberOfSDVdEventCRFs = stats.get("numberOfSDVdEventCRFs");
 		boolean studySubjectSDVd = stats.get("studySubjectSDVd") == 1 ? true : false;
+		boolean shouldDisplaySDVButton = stats.get("shouldDisplaySDVButton") == 1 ? true : false;
+
+		if (numberOfCompletedEventCRFs == 0) {
+			return null;
+		}
+
+        row.setNumberCRFComplete(numberOfCompletedEventCRFs + "");
+        row.setNumberOfCRFsSDV(numberOfSDVdEventCRFs + "");
 
 		StringBuilder sdvStatus = new StringBuilder("");
 		if (studySubjectSDVd) {
@@ -316,7 +321,8 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 					.append("this.form.theStudySubjectId.value='").append(studySubjectBean.getId()).append("';")
 					.append("this.form.submit();");
 
-			actions.append("<td><input type=\"submit\" class=\"button\" value=\"SDV\" name=\"sdvSubmit\" ")
+			actions.append("<td><input type=\"image\" src=\"").append(contextPath)
+					.append("/images/icon_DoubleCheck_Action.gif\"").append(" name=\"sdvSubmit\" ")
 					.append("onclick=\"").append(jsCodeString.toString()).append("\" /></td>");
 		} else if (!studySubjectSDVd) {
 			actions.append("<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>");
@@ -329,8 +335,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
 	}
 
-	private HashMap<String, Integer> getEventCRFStats(List<EventCRFBean> eventCRFBeans, StudySubjectBean studySubject,
-			long countOfCRFsThatShouldBeSDVd) {
+	private HashMap<String, Integer> getEventCRFStats(List<EventCRFBean> eventCRFBeans, StudyBean studyBean, StudySubjectBean studySubject) {
 
 		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
@@ -341,6 +346,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		Integer numberOfSDVdEventCRFs = 0;
 		Integer countOfEventCRFsThatSDVd = 0;
 		Integer countOfCompletedEventCRFsThatSghouldBeSDVd = 0;
+        int countOfCRFsThatShouldBeSDVd = eventDefinitionCrfDAO.countOfCRFsThatShouldBeSDVd(studyBean);
 		boolean canNotMarkAsSDVd = countOfCRFsThatShouldBeSDVd == 0 ? true : false;
 
 		for (EventCRFBean eventBean : eventCRFBeans) {
@@ -381,7 +387,8 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			}
 		}
 		HashMap<String, Integer> stats = new HashMap<String, Integer>();
-		stats.put("numberOfCompletedEventCRFs", numberOfCompletedEventCRFs);
+		stats.put("countOfCRFsThatShouldBeSDVd", countOfCRFsThatShouldBeSDVd);
+        stats.put("numberOfCompletedEventCRFs", numberOfCompletedEventCRFs);
 		stats.put("numberOfSDVdEventCRFs", numberOfSDVdEventCRFs);
 		stats.put("studySubjectSDVd", !canNotMarkAsSDVd && countOfEventCRFsThatSDVd == countOfCRFsThatShouldBeSDVd ? 1
 				: 0);
