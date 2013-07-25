@@ -77,7 +77,7 @@
 <jsp:useBean scope="session" id="enrollDateStr" class="java.lang.String"/>
 
 <body class="aka_bodywidth" onload=
-  "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none'; new Effect.Appear('centralContainer', {duration:1});};
+  "if(! detectFirefoxWindows(navigator.userAgent) && document.getElementById('centralContainer') != undefined){document.getElementById('centralContainer').style.display='none'; new Effect.Appear('centralContainer', {duration:1});};
         <c:if test='${popUpURL != ""}'>
 		openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>">
 
@@ -130,7 +130,7 @@
 
 	  <td>
 	  	<div class="formfieldXL_BG">
-	  	<input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL">
+	  	<input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
 	  	</div>
 	  	<br>
 	  	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include>
@@ -224,7 +224,7 @@
 			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 			<td>
 			<div class="formfieldM_BG">
-				<select name="dynamicGroupClassId" class="formfieldM" onChange="showDynamicEventsSection(${defaultDynGroupClassId});">
+				<select name="dynamicGroupClassId" class="formfieldM" onChange="setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. '); showDynamicEventsSection(${defaultDynGroupClassId});">
 					<option value="0"><fmt:message key="default_group" bundle="${resword}"/></option>
 					<c:forEach var="dynGroup" items="${dynamicGroups}">
 					<c:if test="${dynGroup.id != defaultDynGroupClassId}">
