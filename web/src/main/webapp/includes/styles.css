@@ -2052,9 +2052,29 @@ table.crfListTable td {
 }
 
 #s_sdv tr input[name=sdvSubmit] {
-    margin-top: -2px;
+    margin-top: 0px;
+    padding-top: 0px !important;
 }
 
+#s_sdv > thead > tr > td:last-of-type {
+    white-space: nowrap;
+}
+
+#s_sdv > tbody > tr > td:last-of-type {
+    white-space: nowrap;
+}
+
+#s_sdv > tbody > tr > td:last-of-type input[name=sdvSubmit] {
+    padding-top: 2px;
+}
+
+#sdv > thead > tr > td:last-of-type {
+    white-space: nowrap;
+}
+
+#sdv > tbody > tr > td:last-of-type {
+    white-space: nowrap;
+}
 #listEventsForSubject tr.header td {
     text-align: center;
 }
