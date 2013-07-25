@@ -103,8 +103,8 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 				+ " AND (( rs.crf_version_id = :crfVersionId AND rs.crf_id = :crfId ) "
 				+ " OR (rs.crf_version_id is null AND rs.crf_id = :crfId ))) OR ( rs.study_event_definition_id is null "
 				+ " and rs.item_id in (select item_id from item_form_metadata where crf_version_id = :crfVersionId)  ))";
-		org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
-		q.setInteger("crfVersionId", crfVersion.getId());
+        org.hibernate.Query q = getSessionFactory().openSession().createSQLQuery(query).addEntity(domainClass());
+        q.setInteger("crfVersionId", crfVersion.getId());
 		q.setInteger("crfId", crfBean.getId());
 		q.setInteger("studyId",
 				currentStudy.getParentStudyId() != 0 ? currentStudy.getParentStudyId() : currentStudy.getId());
