@@ -202,6 +202,9 @@ public class CreateUserAccountServlet extends SecureController {
                 int roleId = fp.getInt(INPUT_ROLE);
                 if (type != UserType.SYSADMIN) {
 				    createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyId, Role.get(roleId));
+                } else {
+                	System.out.println("found a sys admin type, setting the active study id " + ub.getActiveStudyId());
+                	createdUserAccountBean.setActiveStudyId(ub.getActiveStudyId());
                 }
 				logger.warn("*** found type: " + fp.getInt("type"));
 				logger.warn("*** setting type: " + type.getDescription());
