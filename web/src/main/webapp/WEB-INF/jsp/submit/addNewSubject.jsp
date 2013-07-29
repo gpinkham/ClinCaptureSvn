@@ -156,7 +156,7 @@
 					<td valign="top"><div class="formfieldXL_BG">
 					<c:choose>
 					 <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
-					  <input onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45" class="formfield" disabled>
+					  <input onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45" class="formfieldXL" disabled>
 					  <input type="hidden" name="label" value="<c:out value="${label}"/>">
 					 </c:when>
 					 <c:otherwise>
@@ -182,7 +182,8 @@
 					<td valign="top"><div class="formfieldXL_BG">
 						<input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" size="50" class="formfieldXL">
 					</div></td>
-					<td valign="top">* <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+					<td valign="top">* <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+					<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
 					<img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 				</tr>
 				<tr>
