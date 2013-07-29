@@ -79,6 +79,7 @@ public class Navigation {
 		//delete contextPath part of URL to do saved links shorter
 		String requestShortURI = request.getRequestURI().replaceAll(request.getContextPath(), "");
 		String requestShortURL = requestShortURI;
+		
 		if (request.getQueryString()!=null){ 
 			requestShortURL = requestShortURL+"?"+request.getQueryString();
     	}
@@ -88,7 +89,7 @@ public class Navigation {
 					visitedURLs.pop();
 				}
 				if (!exclusionURLs.contains(requestShortURI)) {
-					if (!visitedURLs.peek().contains(requestShortURI)){
+					if (!visitedURLs.peek().split("\\?")[0].equals(requestShortURI)){
 						visitedURLs.push(requestShortURL);
 					}
 				} else {
