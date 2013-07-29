@@ -1290,9 +1290,13 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 
 .vline_B { background-image: url(../images/leftbar_vline.gif);
     background-repeat: no-repeat;
-    background-position: top;
+    background-position: top left;
     padding-top: 6px;
     padding-left: 3px;
+}
+
+.vline_B img {
+    padding-bottom: 4px;
 }
 
 .leftmenu { padding-top: 6px;

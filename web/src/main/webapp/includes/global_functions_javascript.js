@@ -103,10 +103,10 @@ function datasetConfirmBack(message, formId, address, action) {
 	var confirm1 = $("#" + formId).length != 0
 			&& newFormState != firstFormState ? confirm(message) : true;
 	if (confirm1) {
-    $("#" + formId).attr("action", address);
-		$("#" + formId + " input[name='action']").val(action);
-		$("#" + formId + " input[id='btnSubmit']").attr("onclick", "");
-		$("#" + formId + " input[id='btnSubmit']").click();
+    $("#" + formId)[0].setAttribute("action", address);
+		$("#" + formId + " input[name=action]").val(action);
+    $("#" + formId + " input[id=btnSubmit]")[0].setAttribute("onclick", "");
+		$("#" + formId + " input[id=btnSubmit]").click();
 	}
 }
 
