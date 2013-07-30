@@ -273,12 +273,9 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
 		HashMap<String, Integer> stats = getEventCRFStats(eventCRFBeans, studyBean, studySubjectBean);
 
-		int countOfCRFsThatShouldBeSDVd = stats.get("countOfCRFsThatShouldBeSDVd");
 		int numberOfCompletedEventCRFs = stats.get("numberOfCompletedEventCRFs");
 		int numberOfSDVdEventCRFs = stats.get("numberOfSDVdEventCRFs");
 		boolean studySubjectSDVd = stats.get("studySubjectSDVd") == 1 ? true : false;
-		boolean shouldDisplaySDVButton = stats.get("shouldDisplaySDVButton") == 1 ? true : false;
-
 		if (numberOfCompletedEventCRFs == 0) {
 			return null;
 		}

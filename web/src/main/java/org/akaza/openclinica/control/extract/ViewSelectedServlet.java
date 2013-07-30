@@ -27,15 +27,11 @@ import java.util.Locale;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -45,7 +41,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "serial"})
 public class ViewSelectedServlet extends SecureController {
 
 	Locale locale;
@@ -94,10 +90,6 @@ public class ViewSelectedServlet extends SecureController {
 		request.setAttribute("eventlist", events);
 
         DatasetBean db = (DatasetBean) session.getAttribute("newDataset");
-
-		CRFDAO crfdao = new CRFDAO(sm.getDataSource());
-		ItemDAO idao = new ItemDAO(sm.getDataSource());
-		ArrayList ids = CreateDatasetServlet.allSedItemIdsInStudy(events, crfdao, idao);
 
 		session.setAttribute("numberOfStudyItems", new Integer(db.getItemMap().size()).toString());
 

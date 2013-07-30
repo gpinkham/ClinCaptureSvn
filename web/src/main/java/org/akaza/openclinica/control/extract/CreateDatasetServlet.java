@@ -23,7 +23,6 @@ package org.akaza.openclinica.control.extract;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -149,8 +148,7 @@ public class CreateDatasetServlet extends SecureController {
         request.setAttribute(BEAN_MONTHS, getMonths());
         request.setAttribute(BEAN_YEARS, getYears());
 		if (StringUtil.isBlank(action)) {
-			// step 1 -- instructions, and continue button
-			Calendar calendar = GregorianCalendar.getInstance();
+			GregorianCalendar.getInstance();
 			DatasetBean dsb = new DatasetBean();
 			String temp = dsb.getOdmMetaDataVersionOid();
 			dsb.setName("");
@@ -233,7 +231,6 @@ public class CreateDatasetServlet extends SecureController {
                 } else {
                     for (String key : (Set<String>)dsb.getItemMap().keySet()) {
                         if (!xyz.contains(key)) {
-                            int x = 0;
                         }
                     }
                 }

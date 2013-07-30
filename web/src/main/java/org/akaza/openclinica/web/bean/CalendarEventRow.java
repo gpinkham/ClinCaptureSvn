@@ -85,12 +85,14 @@ public class CalendarEventRow extends EntityBeanRow {
                 + sdf.format(thisEvent.getDateEmail()) + " " + thisEvent.getReferenceVisit() + " " + thisEvent.getEventsReferenceVisit();
     }
 
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     public ArrayList generatRowsFromBeans(ArrayList beans) {
         return CalendarEventRow.generateRowsFromBeans(beans);
     }
 
-    public static ArrayList generateRowsFromBeans(ArrayList beans) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public static ArrayList generateRowsFromBeans(ArrayList beans) {
         ArrayList answer = new ArrayList();
 
         for (int i = 0; i < beans.size(); i++) {

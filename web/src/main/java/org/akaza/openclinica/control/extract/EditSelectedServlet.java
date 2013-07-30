@@ -41,7 +41,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -94,14 +93,9 @@ public class EditSelectedServlet extends SecureController {
 		// it is not part of the EditSelected-related JSP>>
 		request.setAttribute("EditSelectedSubmitted", true);
 
-		ItemDAO idao = new ItemDAO(sm.getDataSource());
 		ItemFormMetadataDAO imfdao = new ItemFormMetadataDAO(sm.getDataSource());
-		CRFDAO crfdao = new CRFDAO(sm.getDataSource());
-
 		DatasetBean db = (DatasetBean) session.getAttribute("newDataset");
 
-		HashMap eventlist = (LinkedHashMap) session.getAttribute("eventsForCreateDataset");
-		ArrayList<String> ids = CreateDatasetServlet.allSedItemIdsInStudy(eventlist, crfdao, idao);
 		if (selectAll) {
 			db = selectAll(db, null);
 

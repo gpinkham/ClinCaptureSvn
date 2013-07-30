@@ -118,7 +118,8 @@ public class ViewCalendaredEventsForSubjectServlet extends SecureController {
 		forwardPage(Page.SHOW_CALENDAR_FUNC_PER_SUBJ);
 	}
 
-    private EntityBeanTable getTable(ArrayList events, int subjectId) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private EntityBeanTable getTable(ArrayList events, int subjectId) {
         FormProcessor fp = new FormProcessor(request);
         EntityBeanTable table = fp.getEntityBeanTable();
         String[] columns = { resword.getString("calendared_event_name"), resword.getString("min_max_date_range"),
