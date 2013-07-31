@@ -27,6 +27,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
 import java.util.Date;
 
+@SuppressWarnings("serial")
 public class CalendarFuncBean extends AuditableEntityBean {
 	
 	private Date dateMax = new Date();

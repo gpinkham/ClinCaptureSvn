@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
 
+@SuppressWarnings("unchecked")
 public class DatasetDaoTest extends DefaultAppContextTest {
 
     private DatasetBean createDateset() {
