@@ -91,8 +91,7 @@ public class BaseTest {
 	
 	protected HttpClient createMockHttpClient(String response, int status) throws Exception {
 
-		HttpClient client = new HttpClientMock(status, response);
+		return new HttpClientMock(status, response);
 
-		return client;
 	}
 }
