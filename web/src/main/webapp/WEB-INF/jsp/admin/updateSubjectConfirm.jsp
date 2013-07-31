@@ -41,7 +41,6 @@
 
 
 <h1><span class="title_manage"><fmt:message key="confirm_subject_details" bundle="${resword}"/></span></h1>
-<P><fmt:message key="field_required" bundle="${resword}"/></P>
 <form action="UpdateSubject" method="post">
 <input type="hidden" name="action" value="submit">
 <input type="hidden" name="id" value="<c:out value="${subjectToUpdate.id}"/>">
@@ -55,62 +54,56 @@
 	<tr valign="top">
 	  	<td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
 		<td class="table_cell">
-		  <c:out value="${subjectToUpdate.uniqueIdentifier}"/>
+			<c:out value="${fields['personId']}"/>
 		</td>
 	</tr>
 
-    <c:set var="genderShow" value="${true}"/>
-    <fmt:message key="gender" bundle="${resword}" var="genderLabel"/>
-    <c:if test="${study ne null}">
-        <c:set var="genderShow" value="${!(study.studyParameterConfig.genderRequired == 'false')}"/>
-        <c:set var="genderLabel" value="${study.studyParameterConfig.genderLabel}"/>
-    </c:if>
-    <c:if test="${genderShow}">
-        <tr valign="top">
-            <td class="table_header_column">${genderLabel}:</td>
-            <td class="table_cell">
-             <c:choose>
-             <c:when test="${subjectToUpdate.gender == 109}">
-              <fmt:message key="male" bundle="${resword}"/>
-             </c:when>
-             <c:when test="${subjectToUpdate.gender == 102}">
-              <fmt:message key="female" bundle="${resword}"/>
-             </c:when>
-             <c:otherwise>
-             <fmt:message key="not_specified" bundle="${resword}"/>
-            </c:otherwise>
-            </c:choose>
-            </td>
-        </tr>
-    </c:if>
-
-	<c:choose>
-	<c:when test="${subjectToUpdate.dobCollected}">
 	<tr valign="top">
-		<td class="table_header_column"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
-	  	<td class="table_cell">
-		  <fmt:formatDate value="${subjectToUpdate.dateOfBirth}" pattern="${dteFormat}"/>
-	  	</td>
-	</tr>
-    </c:when>
-    <c:otherwise>
-      <tr valign="top">
-		<td class="table_header_column"><fmt:message key="year_of_birth" bundle="${resword}"/>:</td>
-	  	<td class="table_cell">
-		  <c:out value="${yearOfBirth}"/>
-	  	</td>
-	</tr>
-    </c:otherwise>
+        <td class="table_header_column">${parameters['genderLabel']}:</td>
+        <td class="table_cell">
+			<c:choose>
+				<c:when test="${fields['gender'] == 'm'}">
+					<fmt:message key="male" bundle="${resword}"/>
+				</c:when>
+				<c:when test="${fields['gender'] == 'f'}">
+					<fmt:message key="female" bundle="${resword}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="not_specified" bundle="${resword}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+    </tr>
+    
+	<c:choose>
+		<c:when test="${parameters['collectDob'] != '2'}">
+			<tr valign="top">
+				<td class="table_header_column"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
+				<td class="table_cell">
+					<c:out value="${fields['dateOfBirth']}"/>
+				</td>
+			</tr>
+		</c:when>
+		<c:otherwise>
+			<tr valign="top">
+				<td class="table_header_column"><fmt:message key="year_of_birth" bundle="${resword}"/>:</td>
+				<td class="table_cell">
+					<c:out value="${fields['dateOfBirth']}"/>
+				</td>
+			</tr>
+		</c:otherwise>
     </c:choose>
+	
 </table>
 </div>
 </div></div></div></div></div></div></div></div>
-
 </div>
- <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+
+</br>
+ <input type="button" name="BTN_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
-					onClick="javascript: confirmBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
+					onClick="javascript: window.location.href=('UpdateSubject?action=back&amp;id=${subjectToUpdate.id}');" />
  <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
  <input type="button" onclick="javascript:history.go(-2);"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
 </form>

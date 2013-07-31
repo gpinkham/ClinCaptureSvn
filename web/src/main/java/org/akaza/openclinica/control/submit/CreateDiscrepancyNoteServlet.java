@@ -235,6 +235,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 				StudySubjectBean ssub = (StudySubjectBean) new StudySubjectDAO(sm.getDataSource()).findByPK(entityId);
 				SubjectBean sub = (SubjectBean) new SubjectDAO(sm.getDataSource()).findByPK(ssub.getSubjectId());
 				preUserId = ssub.getOwnerId();
+				
 				if (!StringUtil.isBlank(column)) {
 					if ("enrollment_date".equalsIgnoreCase(column)) {
 						if (ssub.getEnrollmentDate() != null) {
@@ -244,7 +245,13 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 						}
 						request.setAttribute("entityName", resword.getString("enrollment_date"));
 					} else if ("gender".equalsIgnoreCase(column)) {
-						request.setAttribute("entityValue", sub.getGender() + "");
+						String genderToDisplay = resword.getString("not_specified");
+						if ('m' == sub.getGender()) {
+							genderToDisplay = resword.getString("male");
+						} else if ('f' == sub.getGender()) {
+							genderToDisplay = resword.getString("female");
+						} 
+						request.setAttribute("entityValue", genderToDisplay);
 						request.setAttribute("entityName", resword.getString("gender"));
 					} else if ("date_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
@@ -253,6 +260,15 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 							request.setAttribute("entityValue", resword.getString("N/A"));
 						}
 						request.setAttribute("entityName", resword.getString("date_of_birth"));
+					} else if ("year_of_birth".equalsIgnoreCase(column)) {
+						if (sub.getDateOfBirth() != null) {
+							GregorianCalendar cal = new GregorianCalendar();
+							cal.setTime(sub.getDateOfBirth());
+							request.setAttribute("entityValue", String.valueOf(cal.get(Calendar.YEAR)));
+						} else {
+							request.setAttribute("entityValue", resword.getString("N/A"));
+						}
+						request.setAttribute("entityName", resword.getString("year_of_birth"));
 					} else if ("unique_identifier".equalsIgnoreCase(column)) {
 						if (sub.getUniqueIdentifier() != null) {
 							request.setAttribute("entityValue", sub.getUniqueIdentifier());
@@ -265,13 +281,26 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 				preUserId = sub.getOwnerId();
 				if (!StringUtil.isBlank(column)) {
 					if ("gender".equalsIgnoreCase(column)) {
-						request.setAttribute("entityValue", sub.getGender() + "");
+						String genderToDisplay = resword.getString("not_specified");
+						if ('m' == sub.getGender()) {
+							genderToDisplay = resword.getString("male");
+						} else if ('f' == sub.getGender()) {
+							genderToDisplay = resword.getString("female");
+						} 
+						request.setAttribute("entityValue", genderToDisplay);
 						request.setAttribute("entityName", resword.getString("gender"));
 					} else if ("date_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
 							request.setAttribute("entityValue", dateFormatter.format(sub.getDateOfBirth()));
 						}
 						request.setAttribute("entityName", resword.getString("date_of_birth"));
+					} else if ("year_of_birth".equalsIgnoreCase(column)) {
+						if (sub.getDateOfBirth() != null) {
+							GregorianCalendar cal = new GregorianCalendar();
+							cal.setTime(sub.getDateOfBirth());
+							request.setAttribute("entityValue", String.valueOf(cal.get(Calendar.YEAR)));
+						}
+						request.setAttribute("entityName", resword.getString("year_of_birth"));
 					} else if ("unique_identifier".equalsIgnoreCase(column)) {
 						request.setAttribute("entityValue", sub.getUniqueIdentifier());
 						request.setAttribute("entityName", resword.getString("unique_identifier"));

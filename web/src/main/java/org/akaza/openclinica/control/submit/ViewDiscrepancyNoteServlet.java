@@ -24,9 +24,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -274,13 +276,26 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 						}
 						request.setAttribute("entityName", resword.getString("enrollment_date"));
 					} else if ("gender".equalsIgnoreCase(column)) {
-						request.setAttribute("entityValue", sub.getGender() + "");
+						String genderToDisplay = resword.getString("not_specified");
+						if ('m' == sub.getGender()) {
+							genderToDisplay = resword.getString("male");
+						} else if ('f' == sub.getGender()) {
+							genderToDisplay = resword.getString("female");
+						} 
+						request.setAttribute("entityValue", genderToDisplay);
 						request.setAttribute("entityName", resword.getString("gender"));
 					} else if ("date_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
 							request.setAttribute("entityValue", dateFormatter.format(sub.getDateOfBirth()));
 						}
 						request.setAttribute("entityName", resword.getString("date_of_birth"));
+					} else if ("year_of_birth".equalsIgnoreCase(column)) {
+						if (sub.getDateOfBirth() != null) {
+							GregorianCalendar cal = new GregorianCalendar();
+							cal.setTime(sub.getDateOfBirth());
+							request.setAttribute("entityValue", String.valueOf(cal.get(Calendar.YEAR)));
+						}
+						request.setAttribute("entityName", resword.getString("year_of_birth"));
 					} else if ("unique_identifier".equalsIgnoreCase(column)) {
 						if (sub.getUniqueIdentifier() != null) {
 							request.setAttribute("entityValue", sub.getUniqueIdentifier());
@@ -302,13 +317,26 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
 				if (!StringUtil.isBlank(column)) {
 					if ("gender".equalsIgnoreCase(column)) {
-						request.setAttribute("entityValue", ssub.getGender() + "");
+						String genderToDisplay = resword.getString("not_specified");
+						if ('m' == sub.getGender()) {
+							genderToDisplay = resword.getString("male");
+						} else if ('f' == sub.getGender()) {
+							genderToDisplay = resword.getString("female");
+						} 
+						request.setAttribute("entityValue", genderToDisplay);
 						request.setAttribute("entityName", resword.getString("gender"));
 					} else if ("date_of_birth".equalsIgnoreCase(column)) {
 						if (sub.getDateOfBirth() != null) {
 							request.setAttribute("entityValue", dateFormatter.format(sub.getDateOfBirth()));
 						}
 						request.setAttribute("entityName", resword.getString("date_of_birth"));
+					} else if ("year_of_birth".equalsIgnoreCase(column)) {
+						if (sub.getDateOfBirth() != null) {
+							GregorianCalendar cal = new GregorianCalendar();
+							cal.setTime(sub.getDateOfBirth());
+							request.setAttribute("entityValue", String.valueOf(cal.get(Calendar.YEAR)));
+						}
+						request.setAttribute("entityName", resword.getString("year_of_birth"));	
 					} else if ("unique_identifier".equalsIgnoreCase(column)) {
 						request.setAttribute("entityValue", sub.getUniqueIdentifier());
 						request.setAttribute("entityName", resword.getString("unique_identifier"));
@@ -420,13 +448,12 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 			StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
 			int parentStudyForNoteSub = 0;
 			StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-
+			
 			StudySubjectBean notessub = (StudySubjectBean) ssdao.findByPK(subjectId);
 			StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(notessub.getStudyId());
 			if (null != studyBeanSub) {
 				parentStudyForNoteSub = studyBeanSub.getParentStudyId();
 			}
-			
 			if (notessub.getStudyId() != currentStudy.getId() && currentStudy.getId() != parentStudyForNoteSub) {
 				addPageMessage(noAccessMessage);
 				throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");

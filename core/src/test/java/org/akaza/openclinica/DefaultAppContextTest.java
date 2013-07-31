@@ -2,7 +2,6 @@ package org.akaza.openclinica;
 
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.extract.DatasetDAO;

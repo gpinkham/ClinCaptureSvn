@@ -128,10 +128,8 @@ public class CreateSubStudyServlet extends SecureController {
 							configs.add(scg);
 						}
 					}
-
 				}
 				newStudy.setStudyParameters(configs);
-
 
 				try {
 					local_df.parse(fp.getString(INPUT_START_DATE));
@@ -441,18 +439,6 @@ public class CreateSubStudyServlet extends SecureController {
 			spvdao.create(spv);
 		}
 		
-		StudyParameterValueBean spv = new StudyParameterValueBean();
-		StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parent.getId(), "collectDob");
-		spv.setStudyId(study.getId());
-		spv.setParameter("collectDob");
-		spv.setValue(parentSPV.getValue());
-		spvdao.create(spv);
-
-		parentSPV = spvdao.findByHandleAndStudy(parent.getId(), "genderRequired");
-		spv.setParameter("genderRequired");
-		spv.setValue(parentSPV.getValue());
-		spvdao.create(spv);
-
 		this.submitSiteEventDefinitions(study);
 
 		session.removeAttribute("newStudy");

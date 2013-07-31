@@ -38,8 +38,6 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="request" id="fathers" class="java.util.ArrayList" />
-<jsp:useBean scope="request" id="mothers" class="java.util.ArrayList" />
 <jsp:useBean scope="session" id="subjectToUpdate" class="org.akaza.openclinica.bean.submit.SubjectBean" />
 <jsp:useBean scope="session" id="localBirthDate" class="java.lang.String" />
 
@@ -63,95 +61,162 @@
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
-<table border="0" cellpadding="0" cellspacing="0">
+<table border="0" cellpadding="0" cellspacing="10">
 	<tr valign="top">
 	  	<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
 		<td>
-		  <div class="formfieldXL_BG"><input type="text" name="uniqueIdentifier" value="<c:out value="${subjectToUpdate.uniqueIdentifier}"/>" class="formfieldXL"></div>
-		  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include>
+			
+			 <c:choose>
+				<c:when test="${parameters['subjectPersonIdRequired'] == 'required'}">
+					<table>
+						<tr>
+							<td>
+								<div class="formfieldXL_BG">
+									<input type="text" name="uniqueIdentifier" value="<c:out value="${fields['personId']}"/>" class="formfieldXL">
+								</div>
+							</td>
+							<td>
+								 *
+								<c:if test="${parameters['discrepancyManagement']}">
+									<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+									<img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+								</c:if>
+							</td>
+						</tr>
+					</table>
+				</c:when>
+				<c:when test="${parameters['subjectPersonIdRequired'] == 'optional'}">
+					<table>
+						<tr>
+							<td>
+								<div class="formfieldXL_BG">
+									<input type="text" name="uniqueIdentifier" value="<c:out value="${fields['personId']}"/>" class="formfieldXL">
+								</div>
+							</td>
+							<td>
+								<c:if test="${parameters['discrepancyManagement']}">
+									<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+									<img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+								</c:if>
+							</td>
+						</tr>
+					</table>
+				</c:when>
+				<c:otherwise>
+					<div class="formfieldXL_BG">
+						<input type="text" name="uniqueIdentifier" disabled="true" value="<fmt:message key="not_used" bundle="${resword}"/>" class="formfieldXL">
+					</div>
+				</c:otherwise>
+            </c:choose>
+			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include>
 		</td>
 	</tr>
-
-    <c:if test="${genderShow}">
-        <tr valign="top">
-            <td class="formlabel">${genderLabel}:</td>
-            <td>
-             <c:choose>
-             <c:when test="${subjectToUpdate.gender == 109}">
-              <input type="radio" name="gender" checked value="m"><fmt:message key="male" bundle="${resword}"/>
-              <input type="radio" name="gender" value="f"><fmt:message key="female" bundle="${resword}"/>
-              <input type="radio" name="gender" value=""><fmt:message key="not_specified" bundle="${resword}"/>
-             </c:when>
-             <c:when test="${subjectToUpdate.gender == 102}">
-              <input type="radio" name="gender" value="m"><fmt:message key="male" bundle="${resword}"/>
-              <input type="radio" checked name="gender" value="f"><fmt:message key="female" bundle="${resword}"/>
-              <input type="radio" name="gender" value=""><fmt:message key="not_specified" bundle="${resword}"/>
-             </c:when>
-             <c:otherwise>
-             <input type="radio" name="gender" value="m"><fmt:message key="male" bundle="${resword}"/>
-             <input type="radio" name="gender" value="f"><fmt:message key="female" bundle="${resword}"/>
-             <input type="radio" checked name="gender" value=""><fmt:message key="not_specified" bundle="${resword}"/>
-            </c:otherwise>
-            </c:choose>
-            <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include>
-            <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-            <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=gender&column=gender','spanAlert-gender'); return false;">
-            <img name="flag_gender" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
-            </c:if>
-            </td>
-        </tr>
-    </c:if>
-
+    
+    <tr valign="top">
+		<td class="formlabel">${parameters['genderLabel']}:</td>
+        <td>
+			<table style="padding-bottom: 4px">
+				<tr>
+					<td>
+						<c:choose>
+							<c:when test="${fields['gender'] == 'm'}">
+								<input type="radio" name="gender" checked value="m"><fmt:message key="male" bundle="${resword}"/>
+								<input type="radio" name="gender" value="f"><fmt:message key="female" bundle="${resword}"/>
+								<input type="radio" name="gender" value=""><fmt:message key="not_specified" bundle="${resword}"/>
+							</c:when>
+							<c:when test="${fields['gender'] == 'f'}">
+								<input type="radio" name="gender" value="m"><fmt:message key="male" bundle="${resword}"/>
+								<input type="radio" checked name="gender" value="f"><fmt:message key="female" bundle="${resword}"/>
+								<input type="radio" name="gender" value=""><fmt:message key="not_specified" bundle="${resword}"/>
+							</c:when>
+							<c:otherwise>
+								<input type="radio" name="gender" value="m"><fmt:message key="male" bundle="${resword}"/>
+								<input type="radio" name="gender" value="f"><fmt:message key="female" bundle="${resword}"/>
+								<input type="radio" checked name="gender" value=""><fmt:message key="not_specified" bundle="${resword}"/>
+							</c:otherwise>
+						</c:choose>
+					</td>
+					<td>
+						<c:if test="${parameters['genderRequired']}">
+							*
+						</c:if>
+						<c:if test="${parameters['discrepancyManagement']}">
+							<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=gender&column=gender','spanAlert-gender'); return false;">
+							<img name="flag_gender" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+						</c:if>
+					</td>
+				</tr>
+			</table>
+			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include>
+		</td>
+    </tr>
+	
 	<c:choose>
-	<c:when test="${subjectToUpdate.dobCollected==true && subjectToUpdate.dateOfBirth != null }">
-	<tr valign="top">
-		<td class="formlabel"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
-	  	<td>
-		  <div class="formfieldXL_BG">
-		  <%--
-		  <input type="text" name="dateOfBirth" size="15" value="<fmt:formatDate value="${subjectToUpdate.dateOfBirth}"  pattern="${dteFormat}"/>" class="formfieldXL">
-		  --%>
-		  <input type="text" name="dateOfBirth" size="15" value="<c:out value="${localBirthDate}"/>" class="formfieldXL">
-		  </div>
-		  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dateOfBirth"/></jsp:include>
-	  	</td><td class="formlabel">(<fmt:message key="date_format" bundle="${resformat}"/>) *
-	  	<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-		 <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=dateOfBirth&column=date_of_birth','spanAlert-yearOfBirth'); return false;">
-		 <img name="flag_dateOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
-		</c:if>
-	  	</td>
-	</tr>
+	<c:when test="${parameters['collectDob'] == '1'}">
+		<tr valign="top">
+			<td class="formlabel"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
+			<td>
+				<table border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td>
+							<div class="formfieldM_BG">
+								<input type="text" name="dateOfBirth" size="15" value="<c:out value="${fields['dateOfBirth']}"/>" class="formfieldM">
+							</div>
+						</td>
+						<td class="formlabel">
+							(<fmt:message key="date_format" bundle="${resformat}"/>)*
+							<c:if test="${parameters['discrepancyManagement']}">
+								<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">
+								<img name="flag_dateOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+							</c:if>
+						</td>
+					</tr>
+				</table>
+				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dateOfBirth"/></jsp:include>
+			</td>
+		</tr>
 	</c:when>
-	<c:when test="${subjectToUpdate.dobCollected==false && subjectToUpdate.dateOfBirth == null}">
-	<tr valign="top">
-		<td class="formlabel"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
-	  	<td>
-		  <div class="formfieldXL_BG"><input type="text" name="dateOfBirth" size="15" value="<c:out value="${dateOfBirth}"/>" class="formfieldXL"></div>
-		  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yearOfBirth"/></jsp:include>
-	  	</td><td class="formlabel">(<fmt:message key="date_format" bundle="${resformat}"/>) *
-	  	<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-		 <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=dateOfBirth&column=date_of_birth','spanAlert-yearOfBirth'); return false;">
-		 <img name="flag_dateOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
-		</c:if>
-	  	</td>
-	</tr>
+	<c:when test="${parameters['collectDob'] == '2'}">
+		<tr valign="top">
+			<td class="formlabel"><fmt:message key="year_of_birth" bundle="${resword}"/>:</td>
+			<td>
+				<table border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td>
+							<div class="formfieldM_BG">
+								<input type="text" name="yearOfBirth" size="15" value="<c:out value="${fields['dateOfBirth']}"/>" class="formfieldM">
+							</div>
+						</td>
+						<td class="formlabel">
+							(<fmt:message key="date_format_year" bundle="${resformat}"/>)*
+							<c:if test="${parameters['discrepancyManagement']}">
+								<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=yearOfBirth&column=year_of_birth','spanAlert-yearOfBirth'); return false;">
+								<img name="flag_yearOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+							</c:if>
+						</td> 
+					</tr>
+				</table>
+				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yearOfBirth"/></jsp:include>
+			</td>
+		</tr>
 	</c:when>
 	<c:otherwise>
-	<tr valign="top">
-		<td class="formlabel"><fmt:message key="year_of_birth" bundle="${resword}"/>:</td>
-	  	<td>
-		  <div class="formfieldM_BG"><input type="text" name="yearOfBirth" size="15" value="<c:out value="${yearOfBirth}"/>" class="formfieldM"></div>
-		  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yearOfBirth"/></jsp:include>
-	  	</td><td class="formlabel">(<fmt:message key="date_format_year" bundle="${resformat}"/>)*
-	  	<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-		 <a href="#" onClick="openDefWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=yearOfBirth&column=date_of_birth','spanAlert-yearOfBirth'); return false;">
-		 <img name="flag_yearOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
-		</c:if>
-	  	</td>
-	</tr>
+		<tr valign="top">
+			<td class="formlabel"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
+			<td>
+				<table border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td>
+							<div class="formfieldM_BG">
+								<input type="text" name="dateOfBirth" disabled="true" size="15" value="<fmt:message key="not_used" bundle="${resword}"/>" class="formfieldM">
+							</div>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
 	</c:otherwise>
     </c:choose>
-
 </table>
 </div>
 </div></div></div></div></div></div></div></div>
@@ -189,7 +254,7 @@
 
     saveEditUserFormState(updateSubjectFormState);
 </script>
-
+</br>
 </div>
  <input type="button" onclick="back_checkEditUserFormState();"  name="BTN_Smart_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/>
  <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">

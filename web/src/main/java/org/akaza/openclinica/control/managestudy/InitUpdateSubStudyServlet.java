@@ -63,7 +63,6 @@ public class InitUpdateSubStudyServlet extends SecureController {
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 				+ respage.getString("change_study_contact_sysadmin"));
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
-
 	}
 
 	@Override
@@ -108,7 +107,6 @@ public class InitUpdateSubStudyServlet extends SecureController {
 							configs.add(scg);
 						}
 					}
-
 				}
 
 				study.setStudyParameters(configs);

@@ -14,8 +14,10 @@
 package org.akaza.openclinica.control.submit;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -334,14 +336,26 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					String column = dnb.getColumn().trim();
 					if (!StringUtil.isBlank(column)) {
 						if ("gender".equalsIgnoreCase(column)) {
-							dnb.setEntityValue(sb.getGender() + "");
+							String genderToDisplay = resword.getString("not_specified");
+							if ('m' == sb.getGender()) {
+								genderToDisplay = resword.getString("male");
+							} else if ('f' == sb.getGender()) {
+								genderToDisplay = resword.getString("female");
+							} 
+							dnb.setEntityValue(genderToDisplay);
 							dnb.setEntityName(resword.getString("gender"));
 						} else if ("date_of_birth".equals(column)) {
 							if (sb.getDateOfBirth() != null) {
 								dnb.setEntityValue(sb.getDateOfBirth().toString());
-
 							}
 							dnb.setEntityName(resword.getString("date_of_birth"));
+						} else if ("year_of_birth".equals(column)) {
+							if (sb.getDateOfBirth() != null) {
+								GregorianCalendar cal = new GregorianCalendar();
+								cal.setTime(sb.getDateOfBirth());
+								dnb.setEntityValue(String.valueOf(cal.get(Calendar.YEAR)));
+							}
+							dnb.setEntityName(resword.getString("year_of_birth"));
 						} else if ("unique_identifier".equalsIgnoreCase(column)) {
 							dnb.setEntityName(resword.getString("unique_identifier"));
 							dnb.setEntityValue(sb.getUniqueIdentifier());
@@ -796,7 +810,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
 					builder.close();
 					builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0")
-							.alt(resword.getString("view_within_crf")).title(resword.getString("view_within_crf"))
+							.alt(resword.getString("view_within_record")).title(resword.getString("view_within_record"))
 							.align("left").append("hspace=\"6\"").close();
 					builder.aEnd();
 				} else {
@@ -804,7 +818,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 						builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
 						builder.close();
 						builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0")
-								.alt(resword.getString("view_within_crf")).title(resword.getString("view_within_crf"))
+								.alt(resword.getString("view_within_record")).title(resword.getString("view_within_record"))
 								.align("left").append("hspace=\"6\"").close();
 						builder.aEnd();
 					}

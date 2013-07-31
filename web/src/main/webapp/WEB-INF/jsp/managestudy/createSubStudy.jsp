@@ -254,20 +254,6 @@ function updateThis(multiSelEle, count) {
    </c:choose>
 
    <tr valign="top"><td class="formlabel"><fmt:message key="${key}" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
-   <%--
-   <c:set var="status1" value="${newStudy.status.id}"/>   
-   <select name="statusId" class="formfieldXL">
-      <c:forEach var="status" items="${statuses}">    
-       <c:choose>
-        <c:when test="${status1 == status.id}">   
-         <option value="<c:out value="${status.id}"/>" selected><c:out value="${status.name}"/>
-        </c:when>
-        <c:otherwise>
-         <option value="<c:out value="${status.id}"/>"><c:out value="${status.name}"/>      
-        </c:otherwise>
-       </c:choose> 
-    </c:forEach>
-   </select></div> --%>
    <input type="text" name="statusName" value="<c:out value="${study.status.name}"/>" class="formfieldL" disabled>
    <input type="hidden" name="statusId" value="${study.status.id}">
 
@@ -276,7 +262,7 @@ function updateThis(multiSelEle, count) {
      
   <c:forEach var="config" items="${newStudy.studyParameters}">   
    <c:choose>
-   <c:when test="${config.parameter.handle=='collectDOB'}">
+   <c:when test="${config.parameter.handle=='collectDob'}">
      <tr valign="top"><td class="formlabel"><fmt:message key="collect_subject_date_of_birth" bundle="${resword}"/>:</td><td>
        <c:choose>
          <c:when test="${config.value.value == '1'}">
@@ -716,18 +702,10 @@ function updateThis(multiSelEle, count) {
 
 				<!-- These DIVs define shaded box borders -->
 						<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
 							<div class="textbox_center" align="center">
-
-							<span class="title_manage">
-
-
-
-							<fmt:message key="manage_study" bundle="${resword}"/>
-
-
-							</span>
-
+								<span class="title_manage">
+									<fmt:message key="manage_study" bundle="${resword}"/>
+								</span>
 							</div>
 						</div></div></div></div></div></div></div></div>
 
@@ -737,44 +715,27 @@ function updateThis(multiSelEle, count) {
 
 				<!-- These DIVs define shaded box borders -->
 						<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
 							<div class="textbox_center" align="center">
-
-							<span class="title_manage">
-
-
-							 <fmt:message key="manage_sites" bundle="${resword}"/>
-
-
-							</span>
-
+								<span class="title_manage">
+							 		<fmt:message key="manage_sites" bundle="${resword}"/>
+								</span>
 							</div>
 						</div></div></div></div></div></div></div></div>
-
 						</td>
 						<td><img src="images/arrow.gif"></td>
 						<td>
 
 				<!-- These DIVs define shaded box borders -->
 						<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
 							<div class="textbox_center" align="center">
-
-							<span class="title_manage">
-
-
-							 <b><fmt:message key="create_new_site" bundle="${resword}"/></b>
-
-
-							</span>
-
+								<span class="title_manage">
+							 		<b><fmt:message key="create_new_site" bundle="${resword}"/></b>
+								</span>
 							</div>
 						</div></div></div></div></div></div></div></div>
-
 						</td>
 					</tr>
 				</table>
-
 
 		<!-- end Workflow items -->
 
