@@ -238,10 +238,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 				sortSet, rowStart, rowEnd);
 
 		for (StudySubjectBean studSubjBean : studySubjectBeans) {
-			SubjectAggregateContainer containerTmp = getRow(studSubjBean);
-            if (containerTmp != null) {
-			    rows.add(containerTmp);
-            }
+			rows.add(getRow(studSubjBean));
 		}
 
 		return rows;
@@ -276,9 +273,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		int numberOfCompletedEventCRFs = stats.get("numberOfCompletedEventCRFs");
 		int numberOfSDVdEventCRFs = stats.get("numberOfSDVdEventCRFs");
 		boolean studySubjectSDVd = stats.get("studySubjectSDVd") == 1 ? true : false;
-		if (numberOfCompletedEventCRFs == 0) {
-			return null;
-		}
+		boolean shouldDisplaySDVButton = stats.get("shouldDisplaySDVButton") == 1 ? true : false;
 
         row.setNumberCRFComplete(numberOfCompletedEventCRFs + "");
         row.setNumberOfCRFsSDV(numberOfSDVdEventCRFs + "");
@@ -291,8 +286,10 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			sdvStatus.append(getIconForCrfStatusPrefix()).append("DoubleCheck").append(ICON_FORCRFSTATUS_SUFFIX)
 					.append("</a></center>");
 		} else {
-			sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ").append("class='sdvCheck'")
-					.append(" name='").append("sdvCheck_").append(studySubjectBean.getId()).append("' /></center>");
+            if (numberOfCompletedEventCRFs > 0) {
+                sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ").append("class='sdvCheck'")
+                        .append(" name='").append("sdvCheck_").append(studySubjectBean.getId()).append("' /></center>");
+            }
 
 		}
 		row.setSdvStatus(sdvStatus.toString());
@@ -312,7 +309,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		urlPrefix.append(path).append("\">");
 		actions.append(urlPrefix).append(SDVUtil.VIEW_ICON_HTML).append("</a></td>");
 
-		if (!studySubjectSDVd && stats.get("shouldDisplaySDVButton") == 1) {
+		if (!studySubjectSDVd && shouldDisplaySDVButton && numberOfCompletedEventCRFs > 0) {
 			StringBuilder jsCodeString = new StringBuilder("this.form.method='GET'; this.form.action='")
 					.append(contextPath).append("/pages/sdvStudySubject").append("';")
 					.append("this.form.theStudySubjectId.value='").append(studySubjectBean.getId()).append("';")
@@ -332,36 +329,34 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
 	}
 
-	private HashMap<String, Integer> getEventCRFStats(List<EventCRFBean> eventCRFBeans, StudyBean studyBean, StudySubjectBean studySubject) {
-
+	private HashMap<String, Integer> getEventCRFStats(List<EventCRFBean> eventCRFBeans, StudyBean studyBean,
+			StudySubjectBean studySubject) {
 		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-        StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
+		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCrfDAO = new EventDefinitionCRFDAO(dataSource);
 		CRFDAO crfDAO = new CRFDAO(dataSource);
 		StudyEventBean studyEventBean = null;
 		Integer numberOfCompletedEventCRFs = 0;
 		Integer numberOfSDVdEventCRFs = 0;
-		Integer countOfEventCRFsThatSDVd = 0;
-		Integer countOfCompletedEventCRFsThatSghouldBeSDVd = 0;
-        int countOfCRFsThatShouldBeSDVd = eventDefinitionCrfDAO.countOfCRFsThatShouldBeSDVd(studyBean);
-		boolean canNotMarkAsSDVd = countOfCRFsThatShouldBeSDVd == 0 ? true : false;
-
+		List<Integer> eventCRFDefIds = eventDefinitionCrfDAO.getRequiredEventCRFDefIdsThatShouldBeSDVd(studyBean);
+		List<Integer> eventCRFDefIdsCopy = new ArrayList<Integer>(eventCRFDefIds);
+		boolean canNotMarkAsSDVd = eventCRFDefIds.size() == 0 ? true : false;
 		for (EventCRFBean eventBean : eventCRFBeans) {
 			studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventBean.getStudyEventId());
-            StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean)studyEventDefinitionDAO.findByPK(studyEventBean.getStudyEventDefinitionId());
-            if (!studyEventDefinitionBean.getStatus().isAvailable()) {
-                continue;
-            }
+			StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO
+					.findByPK(studyEventBean.getStudyEventDefinitionId());
+			if (!studyEventDefinitionBean.getStatus().isAvailable()) {
+				continue;
+			}
 			CRFBean crfBean = crfDAO.findByVersionId(eventBean.getCRFVersionId());
 			// get number of completed event crfs
-			if (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED) {
+			if (eventBean.getStatus() == Status.UNAVAILABLE && eventBean.getDateCompleted() != null) {
 				numberOfCompletedEventCRFs++;
 			}
 			// get number of completed event SDVd eventeventDefinitionCrfDAOs
 			if (eventBean.isSdvStatus()) {
 				numberOfSDVdEventCRFs++;
 			}
-
 			// get number of all non SDVd events that are 100% or partial required
 			EventDefinitionCRFBean eventDefinitionCrf = eventDefinitionCrfDAO
 					.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventBean.getStudyEventDefinitionId(),
@@ -370,28 +365,24 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 				eventDefinitionCrf = eventDefinitionCrfDAO.findForStudyByStudyEventDefinitionIdAndCRFId(
 						studyEventBean.getStudyEventDefinitionId(), crfBean.getId());
 			}
-
 			if (eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
 					|| eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) {
 				if (eventBean.isSdvStatus()) {
-					countOfEventCRFsThatSDVd++;
+					eventCRFDefIds.remove((Integer) eventDefinitionCrf.getId());
+					eventCRFDefIdsCopy.remove((Integer) eventDefinitionCrf.getId());
 				}
-				if (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED) {
-					countOfCompletedEventCRFsThatSghouldBeSDVd++;
+				if (eventBean.getStatus() == Status.UNAVAILABLE && eventBean.getDateCompleted() != null) {
+					eventCRFDefIdsCopy.remove((Integer) eventDefinitionCrf.getId());
 				} else {
 					canNotMarkAsSDVd = true;
 				}
 			}
 		}
 		HashMap<String, Integer> stats = new HashMap<String, Integer>();
-		stats.put("countOfCRFsThatShouldBeSDVd", countOfCRFsThatShouldBeSDVd);
-        stats.put("numberOfCompletedEventCRFs", numberOfCompletedEventCRFs);
+		stats.put("numberOfCompletedEventCRFs", numberOfCompletedEventCRFs);
 		stats.put("numberOfSDVdEventCRFs", numberOfSDVdEventCRFs);
-		stats.put("studySubjectSDVd", !canNotMarkAsSDVd && countOfEventCRFsThatSDVd == countOfCRFsThatShouldBeSDVd ? 1
-				: 0);
-		stats.put("shouldDisplaySDVButton", !canNotMarkAsSDVd
-				&& countOfCompletedEventCRFsThatSghouldBeSDVd == countOfCRFsThatShouldBeSDVd
-				&& countOfEventCRFsThatSDVd < countOfCRFsThatShouldBeSDVd ? 1 : 0);
+		stats.put("studySubjectSDVd", !canNotMarkAsSDVd && eventCRFDefIds.size() == 0 ? 1 : 0);
+		stats.put("shouldDisplaySDVButton", !canNotMarkAsSDVd && eventCRFDefIdsCopy.size() == 0 ? 1 : 0);
 		return stats;
 	}
 

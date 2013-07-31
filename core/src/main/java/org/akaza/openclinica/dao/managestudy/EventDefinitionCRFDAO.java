@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -168,23 +169,21 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 				study.getId(), study.getParentStudyId()) : findAllParentsByDefinition(definitionId);
 	}
 
-	public int countOfCRFsThatShouldBeSDVd(StudyBean studyBean) {
+	public List<Integer> getRequiredEventCRFDefIdsThatShouldBeSDVd(StudyBean studyBean) {
+		List<Integer> result = new ArrayList<Integer>();
 		unsetTypeExpected();
 		setTypeExpected(1, TypeNames.INT);
 		setTypeExpected(2, TypeNames.INT);
-
 		HashMap variables = new HashMap();
 		variables.put(1, studyBean.getId());
 		variables.put(2, studyBean.getParentStudyId());
-		String sql = digester.getQuery("countOfCRFsThatShouldBeSDVd");
+		String sql = digester.getQuery("requiredEventCRFDefIdsThatShouldBeSDVd");
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
-
-		if (it.hasNext()) {
-			return (Integer) ((HashMap) it.next()).get("count");
-		} else {
-			return 0;
+		while (it.hasNext()) {
+			result.add((Integer) ((HashMap) it.next()).get("event_definition_crf_id"));
 		}
+		return result;
 	}
 
 	/**

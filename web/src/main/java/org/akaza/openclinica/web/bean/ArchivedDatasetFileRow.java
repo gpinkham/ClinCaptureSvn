@@ -19,9 +19,9 @@
  */
 package org.akaza.openclinica.web.bean;
 
-import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
-
 import java.util.ArrayList;
+
+import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ArchivedDatasetFileRow extends EntityBeanRow {

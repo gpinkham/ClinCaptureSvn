@@ -14,8 +14,8 @@
 		<sql>SELECT * FROM EVENT_DEFINITION_CRF Where study_event_definition_id=? order by ordinal asc</sql>
 	</query>
     <query>
-        <name>countOfCRFsThatShouldBeSDVd</name>
-        <sql>SELECT count(edc.event_definition_crf_id) FROM event_definition_crf edc, study st WHERE edc.study_id = st.study_id and (st.study_id=? or st.study_id=?) and edc.status_id = 1 and edc.source_data_verification_code in (1,2)</sql>
+        <name>requiredEventCRFDefIdsThatShouldBeSDVd</name>
+        <sql>SELECT edc.event_definition_crf_id FROM event_definition_crf edc, study st WHERE edc.study_id = st.study_id and (st.study_id=? or st.study_id=?) and edc.status_id = 1 and required_crf = true and edc.source_data_verification_code in (1,2)</sql>
     </query>
     <query>
         <name>findAllByStudy</name>
