@@ -15,13 +15,11 @@ package org.akaza.openclinica.util;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public final class SDVUtil {
@@ -30,38 +28,10 @@ public final class SDVUtil {
 	}
 
 	public static boolean permitSDV(StudySubjectBean studySubjectBean, DAOWrapper daoWrapper) {
-		boolean sdv = !studySubjectBean.getStatus().isSigned();
+		boolean sdv = !studySubjectBean.getStatus().isSigned() && !studySubjectBean.getStatus().isDeleted();
 		if (sdv) {
-			List<Integer> sedIdList = new ArrayList<Integer>();
 			StudyBean studyBean = (StudyBean) daoWrapper.getSdao().findByPK(studySubjectBean.getStudyId());
-			List<StudyEventDefinitionBean> sedList = daoWrapper.getSeddao().findAllByStudy(studyBean);
-			for (StudyEventDefinitionBean sedBean : sedList) {
-				if (sedBean.isActive()) {
-					ArrayList eventDefCrfs = daoWrapper.getEdcdao().findAllByEventDefinitionId(sedBean.getId());
-					for (EventDefinitionCRFBean eventDefinitionCrf : (ArrayList<EventDefinitionCRFBean>) eventDefCrfs) {
-						if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive())
-							continue;
-						if (eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
-								|| eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) {
-							sedIdList.add(sedBean.getId());
-							break;
-						}
-					}
-				}
-			}
-
-			boolean canTheSubjectBeSDVed = daoWrapper.getSsdao().canTheSubjectBeSDVed(studySubjectBean.getId(),
-					studyBean.getId(), studyBean.getId());
-
-			if (canTheSubjectBeSDVed) {
-				ArrayList studyEvents = daoWrapper.getSedao().findAllByStudySubject(studySubjectBean);
-				for (StudyEventBean studyEventBean : (ArrayList<StudyEventBean>) studyEvents) {
-					if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SOURCE_DATA_VERIFIED) {
-						sedIdList.remove((Integer) studyEventBean.getStudyEventDefinitionId());
-					}
-				}
-			}
-			sdv = canTheSubjectBeSDVed && sedIdList.size() > 0 ? true : false;
+			sdv = daoWrapper.getSsdao().allowSDVSubject(studySubjectBean.getId(), studyBean.getId(), studyBean.getId());
 		}
 		return sdv;
 	}

@@ -350,7 +350,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			}
 			CRFBean crfBean = crfDAO.findByVersionId(eventBean.getCRFVersionId());
 			// get number of completed event crfs
-			if (eventBean.getStatus() == Status.UNAVAILABLE && eventBean.getDateCompleted() != null) {
+			if (eventBean.getStatus().getId() >= Status.UNAVAILABLE.getId() && eventBean.getDateCompleted() != null) {
 				numberOfCompletedEventCRFs++;
 			}
 			// get number of completed event SDVd eventeventDefinitionCrfDAOs
@@ -371,7 +371,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 					eventCRFDefIds.remove((Integer) eventDefinitionCrf.getId());
 					eventCRFDefIdsCopy.remove((Integer) eventDefinitionCrf.getId());
 				}
-				if (eventBean.getStatus() == Status.UNAVAILABLE && eventBean.getDateCompleted() != null) {
+				if (eventBean.getStatus().getId() >= Status.UNAVAILABLE.getId() && eventBean.getDateCompleted() != null) {
 					eventCRFDefIdsCopy.remove((Integer) eventDefinitionCrf.getId());
 				} else {
 					canNotMarkAsSDVd = true;

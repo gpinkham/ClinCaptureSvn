@@ -301,23 +301,23 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		}
 	}
 
-	public boolean canTheSubjectBeSDVed(int studySubjectId, int studyId, int parentStudyId) {
+	public boolean allowSDVSubject(int studySubjectId, int studyId, int parentStudyId) {
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
+		this.setTypeExpected(1, TypeNames.BOOL);
 
 		HashMap variables = new HashMap();
 		variables.put(1, studySubjectId);
-		variables.put(2, studyId);
-		variables.put(3, parentStudyId);
+		variables.put(2, parentStudyId);
+		variables.put(3, studyId);
 
-		String sql = digester.getQuery("countAllByStudyAndStudySubjectSDV");
+		String sql = digester.getQuery("allowSDVSubject");
 
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count == 1;
+            Boolean allow = (Boolean) ((HashMap) it.next()).get("allow");
+			return allow;
 		} else {
 			return false;
 		}

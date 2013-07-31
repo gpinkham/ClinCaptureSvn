@@ -821,7 +821,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
 					}
 					if (studySubjectBean.getStatus() != Status.DELETED
-							&& (currentRole.getRole() == Role.STUDY_ADMINISTRATOR || currentRole.getRole() == Role.STUDY_MONITOR)
+							&& (currentRole.getRole() == Role.STUDY_ADMINISTRATOR || currentRole.getRole() == Role.STUDY_MONITOR || currentUser.isSysAdmin())
 							&& SDVUtil.permitSDV(studySubjectBean, new DAOWrapper(getStudyDAO(), getStudyEventDAO(),
 									getStudySubjectDAO(), getEventCRFDAO(), getEventDefintionCRFDAO(),
 									getStudyEventDefinitionDao(), getDiscrepancyNoteDAO()))) {

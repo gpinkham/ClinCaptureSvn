@@ -16,11 +16,13 @@ import org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
@@ -45,10 +47,12 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
     protected ItemFormMetadataDAO imfdao;
 	protected StudyEventDAO studyEventDao;
     protected UserAccountDAO userAccountDAO;
+    protected StudySubjectDAO studySubjectDAO;
 	protected DynamicEventDao dynamicEventDao;
-	protected DiscrepancyNoteDAO discrepancyNoteDAO;
 	protected DnDescriptionDao dnDescriptionDao;
 	protected StudyGroupClassDAO studyGroupClassDAO;
+    protected DiscrepancyNoteDAO discrepancyNoteDAO;
+    protected EventDefinitionCRFDAO eventDefinitionCRFDAO;
 	protected StudyEventDefinitionDAO studyEventDefinitionDAO;
 	// DAOS
 	@Autowired protected RuleDao ruleDao;
@@ -81,9 +85,11 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		studyEventDao = new StudyEventDAO(dataSource);
         userAccountDAO = new UserAccountDAO(dataSource);
 		dynamicEventDao = new DynamicEventDao(dataSource);
+        studySubjectDAO = new StudySubjectDAO(dataSource);
+        dnDescriptionDao = new DnDescriptionDao(dataSource);
 		discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 		studyGroupClassDAO = new StudyGroupClassDAO(dataSource);
-		dnDescriptionDao = new DnDescriptionDao(dataSource);
+        eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 	}
 }
