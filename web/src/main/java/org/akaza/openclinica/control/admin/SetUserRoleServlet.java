@@ -108,22 +108,26 @@ public class SetUserRoleServlet extends SecureController {
 			if ("confirm".equalsIgnoreCase(action) || changeRoles) {
 				// Re-order studiesNotHaveRole so that sites
 				// under their studies;
-				ArrayList finalStudiesNotHaveRole = new ArrayList();
+				boolean userRolesFilter = checkRolesFilter(user);
+                ArrayList finalStudiesNotHaveRole = new ArrayList();
 				Iterator iter_study = studiesNotHaveRole.iterator();
 				while (iter_study.hasNext()) {
 					StudyBean s = (StudyBean) iter_study.next();
-					finalStudiesNotHaveRole.add(s);
-					Iterator iter_site = sitesNotHaveRole.iterator();
+                    if (userRolesFilter) {
+                        finalStudiesNotHaveRole.add(s);
+                    }
+                    Iterator iter_site = sitesNotHaveRole.iterator();
 					while (iter_site.hasNext()) {
 						StudyBean site = (StudyBean) iter_site.next();
 						if (site.getParentStudyId() == s.getId()) {
+                            if (!userRolesFilter) {
 							finalStudiesNotHaveRole.add(site);
+                            }
 						}
 					}
 				}
 
-                StudyBean study = (StudyBean)sdao.findByPK(studyId);
-                request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
+                request.setAttribute("isThisStudy", userRolesFilter);
 
 				request.setAttribute("user", user);
 				request.setAttribute("studies", finalStudiesNotHaveRole);
@@ -172,5 +176,18 @@ public class SetUserRoleServlet extends SecureController {
 	protected String getAdminServlet() {
 		return SecureController.ADMIN_SERVLET_CODE;
 	}
+
+    private boolean checkRolesFilter(UserAccountBean userBean) {
+        boolean displayStudy = true;
+        ArrayList<StudyUserRoleBean> userRolesBean = userBean.getRoles();
+        for (StudyUserRoleBean userRoleBean : userRolesBean) {
+            //if user crc or investigator
+            if (userRoleBean.getId() == 4 || userRoleBean.getId() == 5) {
+                displayStudy = false;
+                break;
+            }
+        }
+        return displayStudy;
+    }
 
 }
