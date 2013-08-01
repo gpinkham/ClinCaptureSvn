@@ -44,9 +44,10 @@
 		  SHOW_CRF_INT_NAME,SHOW_CRF_INT_DATE,
 		  SHOW_GROUP_INFO,SHOW_DISC_INFO,
 		  odm_metadataversion_name, odm_metadataversion_oid,
-		  odm_prior_study_oid, odm_prior_metadataversion_oid, show_secondary_id, dataset_item_status_id)
+		  odm_prior_study_oid, odm_prior_metadataversion_oid, show_secondary_id, dataset_item_status_id,
+          exclude_items)
 		  VALUES (?,?,?,?,?,?,NOW(),NOW(),?,?,?,
-		  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		</sql>
 	</query>
 	<query>
@@ -112,19 +113,19 @@
 	<!-- YW, Feb. 2008, for editing dataset -->
 	<query>
 		<name>updateAll</name>
-		<sql>UPDATE DATASET SET STUDY_ID=?,STATUS_ID=?,NAME=?,DESCRIPTION=?,
-		SQL_STATEMENT=?,DATE_LAST_RUN=?,NUM_RUNS=?,
-		DATE_UPDATED=NOW(),UPDATE_ID=?,APPROVER_ID=?,DATE_START=?,
-		DATE_END=?,
-		SHOW_EVENT_LOCATION=?,SHOW_EVENT_START=?,SHOW_EVENT_END=?,
-		SHOW_SUBJECT_DOB=?,SHOW_SUBJECT_GENDER=?,SHOW_EVENT_STATUS=?,
-		SHOW_SUBJECT_STATUS=?,SHOW_SUBJECT_UNIQUE_ID=?,SHOW_SUBJECT_AGE_AT_EVENT=?,
-		SHOW_CRF_STATUS=?,SHOW_CRF_VERSION=?,
-		SHOW_CRF_INT_NAME=?,SHOW_CRF_INT_DATE=?,
-		SHOW_GROUP_INFO=?,SHOW_DISC_INFO=?,
-		odm_metadataversion_name=?, odm_metadataversion_oid=?,
-		odm_prior_study_oid=?, odm_prior_metadataversion_oid=?,
-		show_secondary_id=?, dataset_item_status_id=?
-		WHERE DATASET_ID=?</sql>
+        <sql>UPDATE DATASET SET STUDY_ID=?,STATUS_ID=?,NAME=?,DESCRIPTION=?,
+            SQL_STATEMENT=?,exclude_items=?,DATE_LAST_RUN=?,NUM_RUNS=?,
+            DATE_UPDATED=NOW(),UPDATE_ID=?,APPROVER_ID=?,DATE_START=?,
+            DATE_END=?,
+            SHOW_EVENT_LOCATION=?,SHOW_EVENT_START=?,SHOW_EVENT_END=?,
+            SHOW_SUBJECT_DOB=?,SHOW_SUBJECT_GENDER=?,SHOW_EVENT_STATUS=?,
+            SHOW_SUBJECT_STATUS=?,SHOW_SUBJECT_UNIQUE_ID=?,SHOW_SUBJECT_AGE_AT_EVENT=?,
+            SHOW_CRF_STATUS=?,SHOW_CRF_VERSION=?,
+            SHOW_CRF_INT_NAME=?,SHOW_CRF_INT_DATE=?,
+            SHOW_GROUP_INFO=?,SHOW_DISC_INFO=?,
+            odm_metadataversion_name=?, odm_metadataversion_oid=?,
+            odm_prior_study_oid=?, odm_prior_metadataversion_oid=?,
+            show_secondary_id=?, dataset_item_status_id=?
+            WHERE DATASET_ID=?</sql>
 	</query>
 </queries>

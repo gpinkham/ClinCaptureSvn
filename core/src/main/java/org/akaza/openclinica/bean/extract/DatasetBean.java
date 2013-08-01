@@ -94,6 +94,8 @@ public class DatasetBean extends AuditableEntityBean {
 
     private ArrayList allSelectedGroups;
 
+    private String excludeItems;
+
 	public DatasetBean() {
 	}
 
@@ -635,5 +637,13 @@ public class DatasetBean extends AuditableEntityBean {
 
     public void setAllSelectedGroups(ArrayList allSelectedGroups) {
         this.allSelectedGroups = allSelectedGroups;
+    }
+
+    public String getExcludeItems() {
+        return excludeItems;
+    }
+
+    public void setExcludeItems(String excludeItems) {
+        this.excludeItems = excludeItems;
     }
 }

@@ -96,8 +96,8 @@ public class DatasetDaoTest extends DefaultAppContextTest {
             dataset = datasets.get(0);
         }
         assertTrue(dataset.getId() > 0);
-        dataset = (DatasetBean)datasetDAO.initialDatasetData(dataset.getId());
-        assertTrue(dataset.getItemMap().size() > 0);
+        dataset = datasetDAO.initialDatasetData(dataset.getId());
+        assertTrue(dataset.getItemIds().size() > 0);
     }
 
 }

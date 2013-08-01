@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -60,7 +62,7 @@ function notSelectAll() {
 <form id="datasetForm" action="EditSelected" method="post" name="cl">
  <input type="hidden" name="all" value="1">
  <input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_begin');"/>
- <input type="submit" id="btnSubmit" name="submit" value="<fmt:message key="select_all_items_in_study" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="there_a_total_of" bundle="${resword}"><fmt:param value="${numberOfStudyItems}"/></fmt:message>")'/>
+ <input type="submit" id="btnSubmit" name="submit" value="<fmt:message key="select_all_items_in_study" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="there_a_total_of" bundle="${resword}"><fmt:param value="${totalNumberOfStudyItems}"/></fmt:message>")'/>
  <input type="button" onclick="confirmCancel('ViewDatasets');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
 </form>
 

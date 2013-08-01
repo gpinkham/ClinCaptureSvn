@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -323,16 +325,23 @@
    <td class="table_cell"><c:out value="${item.defName}"/>&nbsp;</td>
    <td class="table_cell"><c:out value="${item.crfName}"/>&nbsp;</td>
     <td class="table_cell">
-      <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
         <c:choose>
-          <c:when test="${status.last}">
-           <c:out value="${meta.crfVersionName}"/>
-          </c:when>
-          <c:otherwise>
-           <c:out value="${meta.crfVersionName}"/>,<br>
-          </c:otherwise>
+            <c:when test="${fn:length(item.itemMetas) eq 0}">
+                ${item.itemMeta.crfVersionName}
+            </c:when>
+            <c:otherwise>
+                <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
+                    <c:choose>
+                        <c:when test="${status.last}">
+                            <c:out value="${meta.crfVersionName}"/>
+                        </c:when>
+                        <c:otherwise>
+                            <c:out value="${meta.crfVersionName}"/>,<br>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>&nbsp;
+            </c:otherwise>
         </c:choose>
-      </c:forEach>
     </td>
    <td class="table_cell"><c:out value="${item.dataType.name}"/>&nbsp;</td>
    <td class="table_cell"><c:out value="${item.units}"/>&nbsp;</td>
@@ -348,16 +357,23 @@
    </td>
 
     <td class="table_cell">
-      <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
         <c:choose>
-          <c:when test="${status.last}">
-           <c:out value="${meta.responseSet.label}"/>
-          </c:when>
-          <c:otherwise>
-            <c:out value="${meta.responseSet.label}"/>,<br>
-          </c:otherwise>
+            <c:when test="${fn:length(item.itemMetas) eq 0}">
+                ${item.itemMeta.responseSet.label}
+            </c:when>
+            <c:otherwise>
+                <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
+                    <c:choose>
+                        <c:when test="${status.last}">
+                            <c:out value="${meta.responseSet.label}"/>
+                        </c:when>
+                        <c:otherwise>
+                            <c:out value="${meta.responseSet.label}"/>,<br>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>&nbsp;
+            </c:otherwise>
         </c:choose>
-      </c:forEach>
     </td>
 
 

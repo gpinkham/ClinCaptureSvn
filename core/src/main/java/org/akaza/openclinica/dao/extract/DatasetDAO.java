@@ -26,6 +26,7 @@ import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
@@ -34,10 +35,14 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.sql.DataSource;
@@ -125,6 +130,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		this.setTypeExpected(34, TypeNames.STRING);// odm_prior_metadataversion_oid
 		this.setTypeExpected(35, TypeNames.BOOL);// show_secondary_id
 		this.setTypeExpected(36, TypeNames.INT);// dataset_item_status_id
+        this.setTypeExpected(37, TypeNames.STRING);// exclude_items
 	}
 
 	public void setExtractTypesExpected() {
@@ -212,6 +218,8 @@ public class DatasetDAO extends AuditableEntityDAO {
 		this.setTypeExpected(15, TypeNames.STRING);// sed_name
 		this.setTypeExpected(16, TypeNames.INT);// crf_id
 		this.setTypeExpected(17, TypeNames.STRING);// crf_name
+        this.setTypeExpected(18, TypeNames.INT);// cv_version_id
+        this.setTypeExpected(19, TypeNames.STRING);// cv_name
 	}
 
 	public EntityBean update(EntityBean eb) {
@@ -262,6 +270,13 @@ public class DatasetDAO extends AuditableEntityDAO {
 		 * table mapping dataset id to study group classes id, tbh
 		 */
 		DatasetBean db = (DatasetBean) eb;
+        String excludeItems = "";
+        for (String key : (Set<String>) db.getItemMap().keySet()) {
+            ItemBean ib = (ItemBean) db.getItemMap().get(key);
+            if (!ib.isSelected()) {
+                excludeItems += (excludeItems.isEmpty() ? "" : ",") + key;
+            }
+        }
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		HashMap nullVars = new HashMap();
 		variables.put(Integer.valueOf(1), Integer.valueOf(db.getStudyId()));
@@ -303,6 +318,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		variables.put(Integer.valueOf(28), db.getOdmPriorMetaDataVersionOid());
 		variables.put(Integer.valueOf(29), db.isShowSubjectSecondaryId());
 		variables.put(Integer.valueOf(30), db.getDatasetItemStatus().getId());
+		variables.put(Integer.valueOf(31), excludeItems);
 
 		this.executeWithPK(digester.getQuery("create"), variables, nullVars);
 
@@ -357,6 +373,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 		isId = isId > 0 ? isId : 1;
 		DatasetItemStatus dis = DatasetItemStatus.get(isId);
 		eb.setDatasetItemStatus(dis);
+        eb.setExcludeItems((String) hm.get("exclude_items"));
 		return eb;
 	}
 
@@ -589,13 +606,17 @@ public class DatasetDAO extends AuditableEntityDAO {
 	/**
 	 * Initialize itemMap, itemIds, itemDefCrf and groupIds for a DatasetBean
 	 * 
-	 * @param db
+	 * @param datasetId
 	 * @return
 	 * @author ywang (Feb., 2008)
 	 */
 	public DatasetBean initialDatasetData(int datasetId) {
 		ItemDAO idao = new ItemDAO(ds);
 		DatasetBean db = (DatasetBean) findByPK(datasetId);
+		List<String> excludeItems = new ArrayList<String>();
+		if (db.getExcludeItems() != null && !db.getExcludeItems().trim().isEmpty()) {
+			excludeItems = Arrays.asList(db.getExcludeItems().trim().split(","));
+		}
 		String sql = db.getSQLStatement();
 		sql = sql.split("study_event_definition_id in")[1];
 		String[] ss = sql.split("and item_id in");
@@ -613,14 +634,20 @@ public class DatasetDAO extends AuditableEntityDAO {
 			Integer defId = (Integer) row.get("sed_id");
 			String defName = (String) row.get("sed_name");
 			String crfName = (String) row.get("crf_name");
+			Integer crfVersionId = (Integer) row.get("cv_version_id");
+			String crfVersionName = (String) row.get("cv_name");
 			Integer itemId = ib.getId();
-			String key = defId + "_" + itemId;
+			String key = defId + "_" + crfVersionId + "_" + itemId;
 			if (!db.getItemMap().containsKey(key)) {
-                ib.setDefId(defId);
-				ib.setSelected(true);
+				ib.setDefId(defId);
+				ib.setSelected(!excludeItems.contains(key));
 				ib.setDefName(defName);
 				ib.setCrfName(crfName);
 				ib.setDatasetItemMapKey(key);
+				ItemFormMetadataBean imf = new ItemFormMetadataBean();
+				imf.setCrfVersionName(crfVersionName);
+				imf.setCrfVersionId(crfVersionId);
+				ib.setItemMeta(imf);
 				if (!db.getEventIds().contains(defId)) {
 					db.getEventIds().add(defId);
 				}
@@ -630,11 +657,13 @@ public class DatasetDAO extends AuditableEntityDAO {
 			}
 		}
 		db.setSubjectGroupIds(getGroupIds(db.getId()));
+		Collections.sort(db.getItemDefCrf(), new ItemBean.ItemBeanComparator(0));
 		return db;
 	}
 
 	protected String getDefinitionCrfItemSql(String sedIds, String itemIds) {
-		return "select item.*, sed.study_event_definition_id as sed_id, sed.name as sed_name, crf.crf_id, crf.name as crf_name"
+		return "select item.*, sed.study_event_definition_id as sed_id, sed.name as sed_name, crf.crf_id, crf.name as crf_name, "
+				+ " cv.crf_version_id as cv_version_id,  cv.name as cv_name"
 				+ " from study_event_definition sed, event_definition_crf edc, crf, crf_version cv,item_form_metadata ifm, item"
 				+ " where sed.study_event_definition_id in "
 				+ sedIds
@@ -655,6 +684,13 @@ public class DatasetDAO extends AuditableEntityDAO {
 	public EntityBean updateAll(EntityBean eb) {
 		eb.setActive(false);
 		DatasetBean db = (DatasetBean) eb;
+        String excludeItems = "";
+        for (String key : (Set<String>) db.getItemMap().keySet()) {
+            ItemBean ib = (ItemBean) db.getItemMap().get(key);
+            if (!ib.isSelected()) {
+                excludeItems += (excludeItems.isEmpty() ? "" : ",") + key;
+            }
+        }
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
 		variables.put(Integer.valueOf(1), Integer.valueOf(db.getStudyId()));
@@ -662,48 +698,48 @@ public class DatasetDAO extends AuditableEntityDAO {
 		variables.put(Integer.valueOf(3), db.getName());
 		variables.put(Integer.valueOf(4), db.getDescription());
 		variables.put(Integer.valueOf(5), db.getSQLStatement());
-		variables.put(Integer.valueOf(6), db.getDateLastRun());
-		variables.put(Integer.valueOf(7), Integer.valueOf(db.getNumRuns()));
+        variables.put(Integer.valueOf(6), excludeItems);
+		variables.put(Integer.valueOf(7), db.getDateLastRun());
+		variables.put(Integer.valueOf(8), Integer.valueOf(db.getNumRuns()));
 
-		variables.put(Integer.valueOf(8), Integer.valueOf(db.getUpdaterId()));
+		variables.put(Integer.valueOf(9), Integer.valueOf(db.getUpdaterId()));
 		if (db.getApproverId() <= 0) {
-			nullVars.put(Integer.valueOf(9), Integer.valueOf(Types.NUMERIC));
-			variables.put(Integer.valueOf(9), null);
+			nullVars.put(Integer.valueOf(10), Integer.valueOf(Types.NUMERIC));
+			variables.put(Integer.valueOf(10), null);
 		} else {
-			variables.put(Integer.valueOf(9), Integer.valueOf(db.getApproverId()));
+			variables.put(Integer.valueOf(10), Integer.valueOf(db.getApproverId()));
 		}
 
-		variables.put(Integer.valueOf(10), db.getDateStart());
+		variables.put(Integer.valueOf(11), db.getDateStart());
         if (db.getDateStart() == null) {
-            nullVars.put(Integer.valueOf(10), Integer.valueOf(Types.DATE));
-        }
-		variables.put(Integer.valueOf(11), db.getDateEnd());
-        if (db.getDateEnd() == null) {
             nullVars.put(Integer.valueOf(11), Integer.valueOf(Types.DATE));
         }
-		variables.put(Integer.valueOf(12), new Boolean(db.isShowEventLocation()));
-		variables.put(Integer.valueOf(13), new Boolean(db.isShowEventStart()));
-		variables.put(Integer.valueOf(14), new Boolean(db.isShowEventEnd()));
-		variables.put(Integer.valueOf(15), new Boolean(db.isShowSubjectDob()));
-		variables.put(Integer.valueOf(16), new Boolean(db.isShowSubjectGender()));
-		variables.put(Integer.valueOf(17), new Boolean(db.isShowEventStatus()));
-		variables.put(Integer.valueOf(18), new Boolean(db.isShowSubjectStatus()));
-		variables.put(Integer.valueOf(19), new Boolean(db.isShowSubjectUniqueIdentifier()));
-		variables.put(Integer.valueOf(20), new Boolean(db.isShowSubjectAgeAtEvent()));
-		variables.put(Integer.valueOf(21), new Boolean(db.isShowCRFstatus()));
-		variables.put(Integer.valueOf(22), new Boolean(db.isShowCRFversion()));
-		variables.put(Integer.valueOf(23), new Boolean(db.isShowCRFinterviewerName()));
-		variables.put(Integer.valueOf(24), new Boolean(db.isShowCRFinterviewerDate()));
-		variables.put(Integer.valueOf(25), new Boolean(db.isShowSubjectGroupInformation()));
-		variables.put(Integer.valueOf(26), new Boolean(false));
-		variables.put(Integer.valueOf(27), db.getOdmMetaDataVersionName());
-		variables.put(Integer.valueOf(28), db.getOdmMetaDataVersionOid());
-		variables.put(Integer.valueOf(29), db.getOdmPriorStudyOid());
-		variables.put(Integer.valueOf(30), db.getOdmPriorMetaDataVersionOid());
-		variables.put(Integer.valueOf(31), new Boolean(db.isShowSubjectSecondaryId()));
-		variables.put(Integer.valueOf(32), Integer.valueOf(db.getDatasetItemStatus().getId()));
-		variables.put(Integer.valueOf(33), Integer.valueOf(db.getId()));
-
+		variables.put(Integer.valueOf(12), db.getDateEnd());
+        if (db.getDateEnd() == null) {
+            nullVars.put(Integer.valueOf(12), Integer.valueOf(Types.DATE));
+        }
+		variables.put(Integer.valueOf(13), new Boolean(db.isShowEventLocation()));
+		variables.put(Integer.valueOf(14), new Boolean(db.isShowEventStart()));
+		variables.put(Integer.valueOf(15), new Boolean(db.isShowEventEnd()));
+		variables.put(Integer.valueOf(16), new Boolean(db.isShowSubjectDob()));
+		variables.put(Integer.valueOf(17), new Boolean(db.isShowSubjectGender()));
+		variables.put(Integer.valueOf(18), new Boolean(db.isShowEventStatus()));
+		variables.put(Integer.valueOf(19), new Boolean(db.isShowSubjectStatus()));
+		variables.put(Integer.valueOf(20), new Boolean(db.isShowSubjectUniqueIdentifier()));
+		variables.put(Integer.valueOf(21), new Boolean(db.isShowSubjectAgeAtEvent()));
+		variables.put(Integer.valueOf(22), new Boolean(db.isShowCRFstatus()));
+		variables.put(Integer.valueOf(23), new Boolean(db.isShowCRFversion()));
+		variables.put(Integer.valueOf(24), new Boolean(db.isShowCRFinterviewerName()));
+		variables.put(Integer.valueOf(25), new Boolean(db.isShowCRFinterviewerDate()));
+		variables.put(Integer.valueOf(26), new Boolean(db.isShowSubjectGroupInformation()));
+		variables.put(Integer.valueOf(27), new Boolean(false));
+		variables.put(Integer.valueOf(28), db.getOdmMetaDataVersionName());
+		variables.put(Integer.valueOf(29), db.getOdmMetaDataVersionOid());
+		variables.put(Integer.valueOf(30), db.getOdmPriorStudyOid());
+		variables.put(Integer.valueOf(31), db.getOdmPriorMetaDataVersionOid());
+		variables.put(Integer.valueOf(32), new Boolean(db.isShowSubjectSecondaryId()));
+		variables.put(Integer.valueOf(33), Integer.valueOf(db.getDatasetItemStatus().getId()));
+		variables.put(Integer.valueOf(34), Integer.valueOf(db.getId()));
 		this.execute(digester.getQuery("updateAll"), variables, nullVars);
 		if (isQuerySuccessful()) {
 			eb.setActive(true);

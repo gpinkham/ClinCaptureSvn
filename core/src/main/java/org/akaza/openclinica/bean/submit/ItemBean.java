@@ -27,6 +27,7 @@ import org.akaza.openclinica.bean.oid.OidGenerator;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * <P>
@@ -46,7 +47,42 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 
 	private int itemDataTypeId = 0;
 
-	@Override
+    private String crfVersion;
+
+    public String getCrfVersion() {
+        return crfVersion;
+    }
+
+    public void setCrfVersion(String crfVersion) {
+        this.crfVersion = crfVersion;
+    }
+
+    public static class ItemBeanComparator implements Comparator<ItemBean> {
+
+		private int defId;
+
+		public ItemBeanComparator(int defId) {
+			this.defId = defId;
+		}
+
+		public int compare(ItemBean itemBean1, ItemBean itemBean2) {
+			int result;
+			if (itemBean1.getDefId() == 0) {
+				itemBean1.setDefId(defId);
+			}
+			if (itemBean2.getDefId() == 0) {
+				itemBean2.setDefId(defId);
+			}
+			if (itemBean1.getDefId() == itemBean2.getDefId()) {
+				result = ((Integer) itemBean1.getId()).compareTo(itemBean2.getId());
+			} else {
+				result = ((Integer) itemBean1.getDefId()).compareTo(itemBean2.getDefId());
+			}
+			return result;
+		}
+	}
+
+    @Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();

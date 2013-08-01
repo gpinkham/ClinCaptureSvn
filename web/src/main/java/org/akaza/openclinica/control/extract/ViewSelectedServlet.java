@@ -91,8 +91,10 @@ public class ViewSelectedServlet extends SecureController {
 
         DatasetBean db = (DatasetBean) session.getAttribute("newDataset");
 
-		session.setAttribute("numberOfStudyItems", new Integer(db.getItemMap().size()).toString());
-
+		request.setAttribute("numberOfStudyItems", new Integer(db.getItemIds().size()).toString());
+		request.setAttribute("subjectAgeAtEvent",
+				currentStudy.getStudyParameterConfig().getCollectDob().equals("3") ? "0" : "1");
+        
 		FormProcessor fp = new FormProcessor(request);
 		String status = fp.getString("status");
 		if (!StringUtil.isBlank(status) && "html".equalsIgnoreCase(status)) {

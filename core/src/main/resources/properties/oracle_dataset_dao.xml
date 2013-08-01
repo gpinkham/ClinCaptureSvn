@@ -45,9 +45,9 @@
 		  			SHOW_GROUP_INFO,SHOW_DISC_INFO,
 		  			odm_metadataversion_name, odm_metadataversion_oid,
 		  			odm_prior_study_oid, odm_prior_metadataversion_oid, show_secondary_id,
-		  			dataset_item_status_id)
+		  			dataset_item_status_id, exclude_items)
 		  			VALUES (?,?,?,?,?,?,sysdate,sysdate,?,?,?,
-		  			?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		  			?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 </sql>
         </query>
         <query>
@@ -115,7 +115,7 @@
 		<query>
 			<name>updateAll</name>
 			<sql>UPDATE DATASET SET STUDY_ID=?,STATUS_ID=?,NAME=?,DESCRIPTION=?,
-			SQL_STATEMENT=?,DATE_LAST_RUN=?,NUM_RUNS=?,
+			SQL_STATEMENT=?,exclude_items=?,DATE_LAST_RUN=?,NUM_RUNS=?,
 			DATE_UPDATED=sysdate,UPDATE_ID=?,APPROVER_ID=?,DATE_START=?,
 			DATE_END=?,
 			SHOW_EVENT_LOCATION=?,SHOW_EVENT_START=?,SHOW_EVENT_END=?,
@@ -127,6 +127,6 @@
 			odm_metadataversion_name=?, odm_metadataversion_oid=?,
 			odm_prior_study_oid=?, odm_prior_metadataversion_oid=?,
 			show_secondary_id=?, dataset_item_status_id=?
-			WHERE DATASET_ID=?</sql>
+            WHERE DATASET_ID=?</sql>
 		</query>
 </queries>

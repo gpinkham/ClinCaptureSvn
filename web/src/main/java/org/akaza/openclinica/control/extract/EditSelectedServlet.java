@@ -39,6 +39,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -102,7 +103,7 @@ public class EditSelectedServlet extends SecureController {
 			MessageFormat msg = new MessageFormat("");
 			msg.setLocale(locale);
 			msg.applyPattern(respage.getString("choose_include_all_items_dataset"));
-			Object[] arguments = { db.getItemMap().size() };
+			Object[] arguments = { db.getItemIds().size() };
 			addPageMessage(msg.format(arguments));
 		}
 
@@ -142,7 +143,7 @@ public class EditSelectedServlet extends SecureController {
             db.setAllSelectedGroups(newsgclasses);
 		}
 
-		session.setAttribute("numberOfStudyItems", db.getItemMap().size());
+		request.setAttribute("numberOfStudyItems", db.getItemIds().size());
 		setUpStudyGroups(db);
 		forwardPage(Page.CREATE_DATASET_VIEW_SELECTED);
 	}
@@ -155,7 +156,7 @@ public class EditSelectedServlet extends SecureController {
 		request.setAttribute("eventlist", events);
 
 		db.getItemMap().clear();
-		db.getItemIds().clear();
+        db.getItemIds().clear();
 		db.getItemDefCrf().clear();
 
 		Iterator it = events.keySet().iterator();
@@ -170,12 +171,24 @@ public class EditSelectedServlet extends SecureController {
         CRFDAO crfdao = new CRFDAO(sm.getDataSource());
         db.setItemDefCrf(selectAll(events, crfdao, idao, imfdao));
 		for (ItemBean item : (List<ItemBean>) db.getItemDefCrf()) {
-			db.getItemIds().add(item.getId());
-			db.getItemMap().put(item.getDefId() + "_" + item.getId(), item);
+            db.getItemIds().add(item.getId());
+			db.getItemMap().put(item.getDefId() + "_" + item.getItemMeta().getCrfVersionId()+ "_" + item.getId(), item);
 		}
 
 		return db;
 	}
+
+    @SuppressWarnings("unused")
+	private static boolean containsItem(ArrayList allItems, ItemBean item) {
+        boolean result = false;
+        for (ItemBean itemBean : (List<ItemBean>)allItems) {
+            if (itemBean.getId() == item.getId()) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
 
 	/**
 	 * Finds all the items in a study giving all events in the study
@@ -184,7 +197,7 @@ public class EditSelectedServlet extends SecureController {
 	 * @return
 	 */
 	public static ArrayList selectAll(HashMap events, CRFDAO crfdao, ItemDAO idao, ItemFormMetadataDAO imfdao) {
-		ArrayList allItems = new ArrayList();
+        ArrayList allItems = new ArrayList();
 		Iterator it = events.keySet().iterator();
 		while (it.hasNext()) {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) it.next();
@@ -198,13 +211,15 @@ public class EditSelectedServlet extends SecureController {
 					item.setDefName(sed.getName());
 					item.setDefId(sed.getId());
 					item.setSelected(true);
-                    if (imfdao != null) {
-                        item.setItemMetas(imfdao.findAllByItemId(item.getId()));
-                    }
+                    item.setCrfVersion("" + crf.getId());
+					if (imfdao != null) {
+						item.setItemMetas(imfdao.findAllByItemId(item.getId()));
+					}
 				}
-				allItems.addAll(items);
+                allItems.addAll(items);
 			}
 		}
+		Collections.sort(allItems, new ItemBean.ItemBeanComparator(0));
 		return allItems;
 	}
 }

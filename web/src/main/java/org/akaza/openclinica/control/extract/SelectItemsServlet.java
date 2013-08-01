@@ -157,7 +157,7 @@ public class SelectItemsServlet extends SecureController {
 		ArrayList items = idao.findAllActiveByCRF(crf);
 		for (int i = 0; i < items.size(); i++) {
 			ItemBean item = (ItemBean) items.get(i);
-
+            item.setDefId(sed.getId());
 			ItemFormMetadataBean meta = imfdao.findByItemIdAndCRFVersionId(item.getId(), item.getItemMeta()
 					.getCrfVersionId());
 			meta.setCrfVersionName(item.getItemMeta().getCrfVersionName());
@@ -166,27 +166,18 @@ public class SelectItemsServlet extends SecureController {
 		HashMap itemMap = new HashMap();
 		for (int i = 0; i < items.size(); i++) {
 			ItemBean item = (ItemBean) items.get(i);
-
-			if (!itemMap.containsKey(defId + "_" + item.getId())) {
-				if (db.getItemMap().containsKey(defId + "_" + item.getId())) {
-					item.setSelected(true);
-					item.setDatasetItemMapKey(defId + "_" + item.getId());
-				}
-				itemMap.put(defId + "_" + item.getId(), item);
-			} else {
-				// same item,combine the metadata
-				ItemBean uniqueItem = (ItemBean) itemMap.get(defId + "_" + item.getId());
-				uniqueItem.getItemMetas().add(item.getItemMetas().get(0));
-				if (db.getItemMap().containsKey(defId + "_" + uniqueItem.getId())) {
-					uniqueItem.setSelected(true);
-				}
+			ItemBean selectedItem = (ItemBean) db.getItemMap().get(
+					defId + "_" + item.getItemMeta().getCrfVersionId() + "_" + item.getId());
+			if (selectedItem != null && selectedItem.isSelected()) {
+				item.setSelected(true);
+				item.setDatasetItemMapKey(defId + "_" + item.getItemMeta().getCrfVersionId() + "_" + item.getId());
 			}
-
+			itemMap.put(defId + "_" + item.getItemMeta().getCrfVersionId() + "_" + item.getId(), item);
 		}
 
-        ArrayList allCrfItems = new ArrayList(itemMap.values());
+		ArrayList allCrfItems = new ArrayList(itemMap.values());
         // now sort them by ordinal/name
-        Collections.sort(allCrfItems);
+        Collections.sort(allCrfItems, new ItemBean.ItemBeanComparator(0));
         session.setAttribute("allCrfItems", allCrfItems);
 
 		forwardPage(Page.CREATE_DATASET_2);

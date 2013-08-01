@@ -23,12 +23,14 @@ package org.akaza.openclinica.control.extract;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,8 +72,6 @@ import org.akaza.openclinica.web.SQLInitServlet;
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class CreateDatasetServlet extends SecureController {
-
-    private static Set xyz;
 
 	public static final String BEAN_YEARS = "years";
 
@@ -215,7 +215,7 @@ public class CreateDatasetServlet extends SecureController {
 					ArrayList sedItemIds = CreateDatasetServlet.allSedItemIdsInStudy(events, crfdao, idao);
 
 					request.setAttribute("eventlist", events);
-					session.setAttribute("numberOfStudyItems", new HashSet(sedItemIds).size());
+                    session.setAttribute("totalNumberOfStudyItems", sedItemIds.size());
 					session.setAttribute(EVENTS_FOR_CREATE_DATASET, events);
 
 					// forwardPage(Page.CREATE_DATASET_2);
@@ -226,17 +226,9 @@ public class CreateDatasetServlet extends SecureController {
 				String saveItems = fp.getString(SAVE_BUTTON);
 				extractIdsFromForm(dsb);
 				extractEventIds(dsb);
-                if (xyz == null) {
-                    xyz = dsb.getItemMap().keySet();
-                } else {
-                    for (String key : (Set<String>)dsb.getItemMap().keySet()) {
-                        if (!xyz.contains(key)) {
-                        }
-                    }
-                }
 				if (!StringUtil.isBlank(saveItems)) {
 					request.setAttribute("eventlist", session.getAttribute(EVENTS_FOR_CREATE_DATASET));
-					String summary = respage.getString("you_have_selected") + " " + dsb.getItemMap().size() + " "
+					String summary = respage.getString("you_have_selected") + " " + dsb.getItemIds().size() + " "
 							+ respage.getString("items_so_far");
 					summary += genAttMsg(dsb);
 					addPageMessage(summary);
@@ -265,7 +257,7 @@ public class CreateDatasetServlet extends SecureController {
 						forwardPage(Page.CREATE_DATASET_2);
 					} else {
 
-						String summary = respage.getString("you_have_selected") + " " + dsb.getItemMap().size() + " "
+						String summary = respage.getString("you_have_selected") + " " + dsb.getItemIds().size() + " "
 								+ respage.getString("items_totally_for_this_dataset");
 
 						summary += genAttMsg(dsb);
@@ -516,49 +508,52 @@ public class CreateDatasetServlet extends SecureController {
 			defName = sed.getName();
 		}
 
-        if (crfId > 0) {
-            db.setItemDefCrf((ArrayList)session.getAttribute("allCrfItems"));
-        }
+		CRFBean crf = (CRFBean) new CRFDAO(sm.getDataSource()).findByPK(crfId);
 
-        db.getItemIds().clear();
-        db.getItemMap().clear();
+		int i = 0;
+		Iterator<ItemBean> iterator;
+		if (crfId > 0) {
+			iterator = ((ArrayList) session.getAttribute("allCrfItems")).iterator();
+		} else {
+			iterator = db.getItemDefCrf().iterator();
+		}
+		while (iterator.hasNext()) {
+			ItemBean selectedItem = iterator.next();
+			String checked = fp.getString("itemSelected" + i);
+			String itemCrfName = fp.getString("itemCrfName" + i);
+			String itemDefName = fp.getString("itemDefName" + i);
+			if (crfId > 0 || (!itemCrfName.isEmpty() && !itemDefName.isEmpty())) {
+				selectedItem.setSelected(!StringUtil.isBlank(checked) && "yes".equalsIgnoreCase(checked.trim()));
+				String selectedItemKey = selectedItem.getDefId() == 0 ? (defId + "_"
+						+ selectedItem.getItemMeta().getCrfVersionId() + "_" + selectedItem.getId()) : (selectedItem
+						.getDefId() + "_" + selectedItem.getItemMeta().getCrfVersionId() + "_" + selectedItem.getId());
+				if (selectedItem.isSelected()) {
+					if (!"".equals(crf.getName())) {
+						selectedItem.setCrfName(crf.getName());
+					} else {
+						selectedItem.setCrfName(itemCrfName);
+					}
+					if (!"".equals(defName)) {
+						selectedItem.setDefName(defName);
+					} else {
+						selectedItem.setDefName(itemDefName);
+					}
+				}
+				db.getItemMap().put(selectedItemKey, selectedItem);
+			}
+			i++;
+		}
 
-        CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        CRFBean crf = (CRFBean) cdao.findByPK(crfId);
+		db.getItemIds().clear();
+		db.getItemDefCrf().clear();
+		db.getItemDefCrf().addAll(db.getItemMap().values());
+        Collections.sort(db.getItemDefCrf(), new ItemBean.ItemBeanComparator(0));
+		for (ItemBean itemBean : (List<ItemBean>) db.getItemDefCrf()) {
+			if (itemBean.isSelected()) {
+				db.getItemIds().add(itemBean.getId());
+			}
+		}
 
-        int i = 0;
-        Iterator<ItemBean> iterator = db.getItemDefCrf().iterator();
-        while (iterator.hasNext()) {
-            ItemBean selectedItem = iterator.next();
-            String checked = fp.getString("itemSelected" + i);
-            String itemCrfName = fp.getString("itemCrfName" + i);
-            String itemDefName = fp.getString("itemDefName" + i);
-            selectedItem.setSelected(!StringUtil.isBlank(checked) && "yes".equalsIgnoreCase(checked.trim()));
-            if (selectedItem.isSelected()) {
-                if (!"".equals(crf.getName())) {
-                    selectedItem.setCrfName(crf.getName());
-                } else {
-                    selectedItem.setCrfName(itemCrfName);
-                }
-                if (!"".equals(defName)) {
-                    selectedItem.setDefName(defName);
-                } else {
-                    selectedItem.setDefName(itemDefName);
-                }
-
-                if (!db.getItemMap().containsKey(selectedItem.getDatasetItemMapKey())) {
-                    // logger.info("one item selected");
-                    logger.info("one item selected");
-                    db.getItemIds().add(new Integer(selectedItem.getId()));
-                    if (selectedItem.getDefId() == 0) {
-                        db.getItemMap().put(defId + "_" + selectedItem.getId(), selectedItem);
-                    } else {
-                        db.getItemMap().put(selectedItem.getDefId() + "_" + selectedItem.getId(), selectedItem);
-                    }
-                }
-            }
-            i++;
-        }
 
         if (crfId == -1) {// from view selected page
             getSubAttr(fp, db);
