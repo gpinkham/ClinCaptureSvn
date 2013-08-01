@@ -26,7 +26,7 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class DnDescriptionDao<K, V extends ArrayList> extends AuditableEntityDAO {
+public class DnDescriptionDao extends AuditableEntityDAO {
 
 	public DnDescriptionDao(DataSource ds) {
 		super(ds);
@@ -53,8 +53,8 @@ public class DnDescriptionDao<K, V extends ArrayList> extends AuditableEntityDAO
 		this.setTypeExpected(1, TypeNames.INT);// primary key
 		this.setTypeExpected(2, TypeNames.STRING);// name
 		this.setTypeExpected(3, TypeNames.STRING);// description
-		this.setTypeExpected(4, TypeNames.BOOL); // is site visible
-		this.setTypeExpected(5, TypeNames.INT); // study id
+		this.setTypeExpected(4, TypeNames.INT); // study id
+		this.setTypeExpected(5, TypeNames.STRING); // visibility level
 	}
 
 	public Object getRFCDescriptionFromHashMap(HashMap hm) {
@@ -62,13 +62,13 @@ public class DnDescriptionDao<K, V extends ArrayList> extends AuditableEntityDAO
 		int id = ((Integer) hm.get("dn_rfc_description_id")).intValue();
 		String description = (String) hm.get("description");
 		String name = (String) hm.get("name");
-		boolean isSiteVisible = (Boolean) hm.get("is_site_visible");
+		String visibilityLevel = (String) hm.get("visibility_level");
 		int studyId = ((Integer) hm.get("study_id")).intValue();
 		term.setId(id);
 		term.setDescription(description);
 		term.setName(name);
 		term.setStudyId(studyId);
-		term.setSiteVisible(isSiteVisible);
+		term.setVisibilityLevel(visibilityLevel);
 		return term;
 	}
 	
@@ -81,10 +81,10 @@ public class DnDescriptionDao<K, V extends ArrayList> extends AuditableEntityDAO
 		}
 	}
 
-	public Collection findAll() throws OpenClinicaException {
+	public Collection<DnDescription> findAll() {
 		this.setTypesExpected();
-		ArrayList alist = this.select(digester.getQuery("findAll"));
-		ArrayList al = new ArrayList();
+		ArrayList<DnDescription> alist = this.select(digester.getQuery("findAll"));
+		ArrayList<DnDescription> al = new ArrayList<DnDescription>();
 		Iterator it = alist.iterator();
 		while (it.hasNext()) {
 			DnDescription term = (DnDescription) this.getEntityFromHashMap((HashMap) it.next());
@@ -93,7 +93,7 @@ public class DnDescriptionDao<K, V extends ArrayList> extends AuditableEntityDAO
 		return al;
 	}
 	
-	public Collection findAllByStudyId(int studyId) throws OpenClinicaException {
+	public Collection<DnDescription> findAllByStudyId(int studyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(studyId));
@@ -102,7 +102,7 @@ public class DnDescriptionDao<K, V extends ArrayList> extends AuditableEntityDAO
 
 		ArrayList alist = this.select(sql, variables);
 		Iterator it = alist.iterator();
-		ArrayList al = new ArrayList();
+		ArrayList<DnDescription> al = new ArrayList<DnDescription>();
 		while (it.hasNext()) {
 			DnDescription term = (DnDescription) this.getEntityFromHashMap((HashMap) it.next());
 			al.add(term);
@@ -111,7 +111,7 @@ public class DnDescriptionDao<K, V extends ArrayList> extends AuditableEntityDAO
 
 	}
 	
-	public EntityBean findByPK(int id) throws OpenClinicaException {
+	public EntityBean findByPK(int id) {
 		DnDescription term = new DnDescription();
 		this.setTypesExpected();
 
@@ -129,26 +129,26 @@ public class DnDescriptionDao<K, V extends ArrayList> extends AuditableEntityDAO
 		return term;
 	}
 
-	public EntityBean create(EntityBean eb) throws OpenClinicaException {
+	public EntityBean create(EntityBean eb) {
 		DnDescription teb = (DnDescription) eb;
 		HashMap variables = new HashMap();
 
 		variables.put(Integer.valueOf(1), teb.getName());
 		variables.put(Integer.valueOf(2), teb.getDescription());
-		variables.put(Integer.valueOf(3), new Boolean(teb.isSiteVisible()));
-		variables.put(Integer.valueOf(4), Integer.valueOf(teb.getStudyId()));
+		variables.put(Integer.valueOf(3), Integer.valueOf(teb.getStudyId()));
+		variables.put(Integer.valueOf(4), teb.getVisibilityLevel());
 		this.execute(digester.getQuery("create"), variables);
 		return teb;
 	}
 
-	public EntityBean update(EntityBean eb) throws OpenClinicaException {
+	public EntityBean update(EntityBean eb) {
 		DnDescription teb = (DnDescription) eb;
 		HashMap variables = new HashMap();
 		
 		variables.put(Integer.valueOf(1), teb.getName());
 		variables.put(Integer.valueOf(2), teb.getDescription());
-		variables.put(Integer.valueOf(3), new Boolean(teb.isSiteVisible()));
-		variables.put(Integer.valueOf(4), Integer.valueOf(teb.getStudyId()));
+		variables.put(Integer.valueOf(3), Integer.valueOf(teb.getStudyId()));
+		variables.put(Integer.valueOf(4), teb.getVisibilityLevel());
 		
 		variables.put(Integer.valueOf(5), Integer.valueOf(teb.getId()));
 		
@@ -156,28 +156,28 @@ public class DnDescriptionDao<K, V extends ArrayList> extends AuditableEntityDAO
 		return eb;
 	}
 	
-	public void deleteByPK(int key) throws OpenClinicaException {
+	public void deleteByPK(int key) {
 		HashMap variables = new HashMap();
 		variables.put(Integer.valueOf(1), Integer.valueOf(key));
 		this.execute(digester.getQuery("deleteByPK"), variables);
 	}
 	
-	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase)
+	public Collection<DnDescription> findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase)
 			throws OpenClinicaException {
-		ArrayList al = new ArrayList();
+		ArrayList<DnDescription> al = new ArrayList<DnDescription>();
 		// TODO
 		return al;
 	}
 
-	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
+	public Collection<DnDescription> findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) throws OpenClinicaException {
-		ArrayList al = new ArrayList();
+		ArrayList<DnDescription> al = new ArrayList<DnDescription>();
 		// TODO
 		return al;
 	}
 
-	public Collection findAllByPermission(Object objCurrentUser, int intActionType) throws OpenClinicaException {
-		ArrayList al = new ArrayList();
+	public Collection<DnDescription> findAllByPermission(Object objCurrentUser, int intActionType) throws OpenClinicaException {
+		ArrayList<DnDescription> al = new ArrayList<DnDescription>();
 		// TODO
 		return al;
 	}

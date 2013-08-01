@@ -37,7 +37,6 @@ public class DnDescriptionDaoTest extends DefaultAppContextTest {
 		assertEquals(updatedDesc, term.getDescription());
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void findAllTest() throws OpenClinicaException {
 		ArrayList<DnDescription> terms = (ArrayList<DnDescription>) dnDescriptionDao.findAll();
@@ -51,6 +50,7 @@ public class DnDescriptionDaoTest extends DefaultAppContextTest {
 		assertEquals(2, term2.getId());
 		assertNotNull(term2.getDescription());
 		assertNotNull(term2.getName());
+		assertEquals("Study", term2.getVisibilityLevel());
 	}
 	
 	@Test
@@ -59,14 +59,19 @@ public class DnDescriptionDaoTest extends DefaultAppContextTest {
 		term3.setName("threeName");
 		term3.setDescription("the third description");
 		dnDescriptionDao.create(term3);
-		assertNotNull(term3);
+		assertNotNull(term3.getId());
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void findAllByStudyTest() throws OpenClinicaException {
 		ArrayList<DnDescription> descriptions = (ArrayList<DnDescription>) dnDescriptionDao.findAllByStudyId(1);
 		assertNotNull(descriptions);
 	}
-
+	
+	@Test
+	public void deleteByPK() throws OpenClinicaException {
+		dnDescriptionDao.deleteByPK(2);
+		ArrayList<DnDescription> descriptions = (ArrayList<DnDescription>) dnDescriptionDao.findAllByStudyId(1);
+		assertEquals(1, descriptions.size());
+	}
 }

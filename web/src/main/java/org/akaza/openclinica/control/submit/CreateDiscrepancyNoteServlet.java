@@ -474,10 +474,13 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 						int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
 						ArrayList<DnDescription> rfcDescriptions = (ArrayList<DnDescription>) descriptionDao.findAllByStudyId(parentStudyId);
 						for (DnDescription rfcTerm : rfcDescriptions) {
-							if (rfcTerm.isSiteVisible()) {
+							if ("Site".equals(rfcTerm.getVisibilityLevel())) {
 								siteVisibleDescs.add(rfcTerm);
-							} else {
+							} else if ("Study".equals(rfcTerm.getVisibilityLevel())) {
 								studyVisibleDescs.add(rfcTerm);
+							} else if ("Study and Site".equals(rfcTerm.getVisibilityLevel())) {
+								studyVisibleDescs.add(rfcTerm);
+								siteVisibleDescs.add(rfcTerm);
 							}
 						}
 						

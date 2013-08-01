@@ -11,11 +11,11 @@
     </query>
     <query>
         <name>create</name>
-        <sql>INSERT INTO DN_RFC_DESCRIPTION (NAME, DESCRIPTION) VALUES (?, ?)</sql>
+        <sql>INSERT INTO DN_RFC_DESCRIPTION (NAME, DESCRIPTION, STUDY_ID, VISIBILITY_LEVEL) VALUES (?, ?, ?, ?)</sql>
     </query>
     <query>
         <name>update</name>
-        <sql>UPDATE DN_RFC_DESCRIPTION SET NAME = ?, DESCRIPTION = ? WHERE DN_RFC_DESCRIPTION = ?</sql>
+        <sql>UPDATE DN_RFC_DESCRIPTION SET NAME = ?, DESCRIPTION = ?, STUDY_ID = ?, VISIBILITY_LEVEL = ? WHERE DN_RFC_DESCRIPTION_ID = ?</sql>
     </query>
 	<query>
 		<name>deleteByPK</name>

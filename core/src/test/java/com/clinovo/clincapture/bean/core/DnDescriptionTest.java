@@ -30,7 +30,7 @@ public class DnDescriptionTest {
 	@Test 
 	public void isSiteVisibleTest() {
 		dnDescription = new DnDescription();
-		assertTrue(dnDescription.isSiteVisible());
+		assertEquals("", dnDescription.getVisibilityLevel());
 	}
 	
 	@Test

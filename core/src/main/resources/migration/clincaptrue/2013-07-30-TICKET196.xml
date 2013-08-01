@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="igor" id="2013-07-30-TICKET196-01">
+        <comment>Remove column is_site_visible and add column visibility_level</comment>
+		<addColumn tableName="dn_rfc_description" >
+            <column name="visibility_level" type="VARCHAR(255)"/>
+        </addColumn>
+		<dropColumn columnName="is_site_visible" tableName="dn_rfc_description"/>
+    </changeSet>
+</databaseChangeLog>

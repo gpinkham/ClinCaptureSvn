@@ -276,16 +276,12 @@ function updateThis(multiSelEle, count) {
     </c:forEach>
    </select></div>
 
-<%--   <div class="formfieldXL_BG">
-   <input type="text" name="statusName" value="Available" class="formfieldL" disabled>
-   <input type="hidden" name="statusId" value="1">
-   </div>--%>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td><td class="formlabel">*</td></tr>
 
 
   <c:forEach var="config" items="${newStudy.studyParameters}">
    <c:choose>
-   <c:when test="${config.parameter.handle=='collectDOB'}">
+   <c:when test="${config.parameter.handle=='collectDob'}">
      <tr valign="top"><td class="formlabel"><fmt:message key="collect_subject_date_of_birth" bundle="${resword}"/>:</td><td>
        <c:choose>
          <c:when test="${config.value.value == '1'}">
@@ -533,7 +529,7 @@ function updateThis(multiSelEle, count) {
 	<c:set var="defCount" value="${defCount+1}"/>
 	<c:choose>
 	<c:when test="${def.status.id==5 || def.status.id==7}">
-	&nbsp&nbsp&nbsp&nbsp<b><img name="ExpandGroup3" src="images/bt_Collapse.gif" border="0"> <c:out value="${def.name}"/> &nbsp&nbsp&nbsp&nbsp (<fmt:message key="this_removed" bundle="${resword}"/>)</b>
+	&nbsp&nbsp&nbsp&nbsp<b><img name="ExpandGroup3" src="images/bt_Collapse.gif" border="0"> <c:out value="${def.name}"/> &nbsp;&nbsp;&nbsp;&nbsp; (<fmt:message key="this_removed" bundle="${resword}"/>)</b>
 	</c:when>
 	<c:otherwise>
 	&nbsp&nbsp&nbsp&nbsp<b><a href="javascript:leftnavExpand('sed<c:out value="${defCount}"/>');">

@@ -16,13 +16,13 @@ public class DnDescription extends EntityBean {
 
 	private static final long serialVersionUID = 1L;
 	private String description;
-	private boolean isSiteVisible;
 	private int studyId;
+	private String visibilityLevel;
 	
 	public DnDescription() {
 		description = "";
-		isSiteVisible = true;
 		studyId = 0;
+		visibilityLevel = "";
 	}
 	
 	public String getDescription() {
@@ -33,12 +33,12 @@ public class DnDescription extends EntityBean {
 		this.description = description;
 	}
 	
-	public boolean isSiteVisible() {
-		return isSiteVisible;
+	public String getVisibilityLevel() {
+		return visibilityLevel;
 	}
 	
-	public void setSiteVisible(boolean isSiteVisible) {
-		this.isSiteVisible = isSiteVisible;
+	public void setVisibilityLevel(String visibilityLevel) {
+		this.visibilityLevel = visibilityLevel;
 	}
 
 	public int getStudyId() {
