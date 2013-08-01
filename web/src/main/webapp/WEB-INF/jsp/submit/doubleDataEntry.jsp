@@ -192,18 +192,22 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 	<div id="errorMessagesContainer" class="aka_err_message">
         <ul>
             <c:forEach var="formMsg" items="${formMessages}">
-				<c:choose>
-				<c:when test="${hasShown}">
-				<li style="color:  #006633"><span style="text-decoration: underline"><strong>
-                    <label onclick="getFocused('<c:out value="${formMsg.key}" />');"><c:out value="${formMsg.value}" /></label>
-                </strong></span></li>
-				</c:when>
-				<c:otherwise>
-                <li style="color:  #ff0000"><span style="text-decoration: underline"><strong>
-                    <label onclick="getFocused('<c:out value="${formMsg.key}" />');"><c:out value="${formMsg.value}" /></label>
-                </strong></span></li>
-				</c:otherwise>
-				</c:choose>
+                <c:choose>
+                    <c:when test="${hasShown}">
+                        <c:forEach items="${message.value}" var="value">
+                            <li style="color:  #006633"><span style="text-decoration: underline"><strong>
+                                <label onclick="getFocused('<c:out value="${message.key}" />');"><c:out value="${value}" /></label>
+                            </strong></span></li>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <c:forEach items="${message.value}" var="value">
+                            <li style="color:  #ff0000"><span style="text-decoration: underline"><strong>
+                                <label onclick="getFocused('<c:out value="${message.key}" />');"><c:out value="${value}" /></label>
+                            </strong></span></li>
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
             </c:forEach>
         </ul>
         <!--  Use the formMessages request attribute to grab each validation
