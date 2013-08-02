@@ -1,19 +1,31 @@
 build.properties
+
 core/target/
-web/target/
-ws/target/
-ws-cabig/target/
-core/.classpath
 core/.project
+core/.classpath
 core/.settings/
-web/.classpath
+core/openclinica-test.log
+
+web/target/
 web/.project
 web/.settings/
-ws/.classpath
+web/.classpath
+
+ws/target/
 ws/.project
 ws/.settings/
+ws/.classpath
 
-core/openclinica-test.log
+ws-cabig/target/
+ws-cabig/.project
+ws-cabig/.settings/
+ws-cabig/.classpath
+
+medical-coding/target
+medical-coding/.project
+medical-coding/.settings/
+medical-coding/.classpath
+medical-coding/test.log
 
 .DS_Store
 

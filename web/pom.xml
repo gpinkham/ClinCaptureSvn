@@ -22,6 +22,10 @@
 			<artifactId>core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.clinovo.clincapture</groupId>
+			<artifactId>medical-coding</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>saxon</artifactId>
 			<version>8.7</version>

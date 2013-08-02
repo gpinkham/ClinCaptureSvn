@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<success>
+	<accessedResource>/bioportal/search/</accessedResource>
+	<accessDate>2013-07-30 10:03:10.953 PDT</accessDate>
+	<data>
+		<page>
+			<pageNum>1</pageNum>
+			<numPages>1</numPages>
+			<pageSize>3</pageSize>
+			<numResultsPage>3</numResultsPage>
+			<numResultsTotal>3</numResultsTotal>
+			<contents class="org.ncbo.stanford.bean.search.SearchResultListBean">
+				<searchResultList>
+					<searchBean>
+						<ontologyVersionId>42280</ontologyVersionId>
+						<ontologyId>1422</ontologyId>
+						<ontologyDisplayLabel>Medical Dictionary for Regulatory Activities</ontologyDisplayLabel>
+						<recordType>apreferredname</recordType>
+						<objectType>class</objectType>
+						<conceptId>http://purl.bioontology.org/ontology/MEDDRA/10025044</conceptId>
+						<conceptIdShort>10025044</conceptIdShort>
+						<preferredName>Lung cancer</preferredName>
+						<contents>Lung cancer</contents>
+						<isObsolete>0</isObsolete>
+					</searchBean>
+					<searchBean>
+						<ontologyVersionId>42280</ontologyVersionId>
+						<ontologyId>1422</ontologyId>
+						<ontologyDisplayLabel>Medical Dictionary for Regulatory Activities</ontologyDisplayLabel>
+						<recordType>apreferredname</recordType>
+						<objectType>class</objectType>
+						<conceptId>http://purl.bioontology.org/ontology/MEDDRA/10001245</conceptId>
+						<conceptIdShort>10001245</conceptIdShort>
+						<preferredName>Adenosquamous cell lung cancer</preferredName>
+						<contents>Adenosquamous cell lung cancer</contents>
+						<isObsolete>0</isObsolete>
+					</searchBean>
+					<searchBean>
+						<ontologyVersionId>42280</ontologyVersionId>
+						<ontologyId>1422</ontologyId>
+						<ontologyDisplayLabel>Medical Dictionary for Regulatory Activities</ontologyDisplayLabel>
+						<recordType>apreferredname</recordType>
+						<objectType>class</objectType>
+						<conceptId>http://purl.bioontology.org/ontology/MEDDRA/10007096</conceptId>
+						<conceptIdShort>10007096</conceptIdShort>
+						<preferredName>Cancer of lung</preferredName>
+						<contents>Cancer of lung</contents>
+						<isObsolete>0</isObsolete>
+					</searchBean>
+				</searchResultList>
+				<ontologyHitList>
+					<ontologyHitBean>
+						<ontologyVersionId>42280</ontologyVersionId>
+						<ontologyId>1422</ontologyId>
+						<ontologyDisplayLabel>Medical Dictionary for Regulatory Activities</ontologyDisplayLabel>
+						<numHits>3</numHits>
+					</ontologyHitBean>
+				</ontologyHitList>
+				<numHitsTotal>98</numHitsTotal>
+			</contents>
+		</page>
+	</data>
+</success>
