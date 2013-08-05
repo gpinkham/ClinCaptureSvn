@@ -216,15 +216,24 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
                     <c:when test="${hasShown}">
                         <c:forEach items="${message.value}" var="value">
                             <li style="color:  #006633"><span style="text-decoration: underline"><strong>
-                                <label onclick="getFocused('<c:out value="${message.key}" />');"><c:out value="${value}" /></label>
+                                <label onclick="getFocused('<c:out value="${message.key}"/>');"><c:out
+                                        value="${value}"/></label>
                             </strong></span></li>
                         </c:forEach>
                     </c:when>
                     <c:otherwise>
                         <c:forEach items="${message.value}" var="value">
-                            <li style="color:  #ff0000"><span style="text-decoration: underline"><strong>
-                                <label onclick="getFocused('<c:out value="${message.key}" />');"><c:out value="${value}" /></label>
-                            </strong></span></li>
+                            <c:choose>
+                                <c:when test="${Hardrules}">
+                                    <li style="color: #ff0000">
+                                </c:when>
+                                <c:otherwise>
+                                    <li style="color: #ffa500">
+                                </c:otherwise>
+                            </c:choose>
+                           <span style="text-decoration: underline"><strong>
+                               <label onclick="getFocused('<c:out value="${message.key}"/>');"><c:out value="${value}"/></label>
+                           </strong></span></li>
                         </c:forEach>
                     </c:otherwise>
                 </c:choose>

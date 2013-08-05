@@ -185,7 +185,15 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     <div id="errorMessagesContainer" class="aka_err_message">
         <ul>
             <c:forEach var="formMsg" items="${formMessages}">
-                <li style="color:  #ff0000"><span style="text-decoration: underline"><strong><label for="<c:out value="${formMsg.key}" />"><c:out value="${formMsg.value}" /></label></strong></span></li>
+                <c:choose>
+                    <c:when test="${Hardrules}">
+                        <li style="color: #ff0000">
+                    </c:when>
+                    <c:otherwise>
+                        <li style="color: #ffa500">
+                    </c:otherwise>
+                </c:choose>
+                <span style="text-decoration: underline"><strong><label for="<c:out value="${formMsg.key}" />"><c:out value="${formMsg.value}" /></label></strong></span></li>
             </c:forEach>
         </ul>
         <!--  Use the formMessages request attribute to grab each validation

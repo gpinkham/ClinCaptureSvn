@@ -1208,7 +1208,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				}
 			}
 
+            //get hardrules. skip soft if errors > 0
 			errors = v.validate();
+            if (errors.size() > 0 && !checkDobleDataEntryErrors(errors)) {
+                request.setAttribute("Hardrules", true);
+            }
 			reshuffleErrorGroupNamesKK(errors, allItems, request);
 
 			if (this.isAdminForcedReasonForChange(request) && this.isAdministrativeEditing() && errors.isEmpty()) {
@@ -1219,6 +1223,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				// change everything here from changed items list to changed
 				// items map
 				if (changedItemsMap.size() > 0) {
+                    request.setAttribute("Hardrules", true);
 					logger.debug("found admin force reason for change: changed items " + changedItems.toString()
 							+ " and changed items list: " + changedItemsList.toString() + " changed items map: "
 							+ changedItemsMap.toString());
@@ -1286,6 +1291,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					session.setAttribute("shouldRunValidation", null);
 					session.setAttribute("rulesErrors", null);
 				} else {
+                    //get softrules
 					errors = ruleValidator.validate();
 					reshuffleErrorGroupNamesKK(errors, allItems, request);
 					if (errors.size() > 0) {
@@ -5057,4 +5063,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				.getServletContext()).getBean("schedulerFactoryBean");
 		return scheduler;
 	}
+
+    private static boolean checkDobleDataEntryErrors(HashMap errors) {
+        Iterator iter = errors.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry pairs = (Map.Entry) iter.next();
+            if (pairs.getValue().toString().contains(respage.getString("value_you_specified"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
