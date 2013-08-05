@@ -2232,7 +2232,6 @@ function randomizeSubject() {
             
             if(data.match(/UnknownHostException/)) {
 
-                var urlPattern = new RegExp("^Exception:(.*)")
                 alert("The randomization service is not available. Consult your system administrator")
 
             } else if(data.match(/Invalid Site/)) {
