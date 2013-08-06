@@ -179,7 +179,7 @@ public class UpdateSubjectGroupClassServlet extends SecureController {
 		FormProcessor fp = new FormProcessor(request);
 		
 		Map<String, String> fields = new HashMap<String, String>();
-		fields.put("groupClassName", fp.getString("name"));
+		fields.put("groupClassName", fp.getString("name").trim());
 		fields.put("groupClassTypeId", fp.getString("groupClassTypeId"));
 		fields.put("subjectAssignment", fp.getString("subjectAssignment"));
 		fields.put("isDefault", fp.getString("isDefault"));
@@ -244,7 +244,7 @@ public class UpdateSubjectGroupClassServlet extends SecureController {
 			StringBuilder rowsWithDuplicateNames = new StringBuilder("");
 			Set<String> setOfNames = new HashSet<String>();
 			for (int i = 0; i < 50; i++) {
-				String name = fp.getString("studyGroup" + i);
+				String name = fp.getString("studyGroup" + i).trim();
 				String description = fp.getString("studyGroupDescription" + i);
 				int studyGroupId = fp.getInt("studyGroupId" + i);
 				if (!StringUtil.isBlank(name)) {
@@ -269,7 +269,7 @@ public class UpdateSubjectGroupClassServlet extends SecureController {
 		}
 		
 		for (StudyGroupClassBean thisBean : allStudyGroupClasses) {
-			if ((fp.getString("name").trim().equals(thisBean.getName()))&&(!fp.getString("name").trim().equals(oldGroup.getName()))) {
+			if ((fp.getString("name").trim().equals(thisBean.getName().trim()))&&(!fp.getString("name").trim().equals(oldGroup.getName().trim()))) {
 				Validator.addError(errors, "name", resexception.getString("group_class_name_used_choose_unique"));
 			}
 		}
@@ -283,7 +283,7 @@ public class UpdateSubjectGroupClassServlet extends SecureController {
 		if (errors.isEmpty()) {
 			logger.info("no errors in the first section");
 			StudyGroupClassBean group = new StudyGroupClassBean();
-			group.setName(fp.getString("name"));
+			group.setName(fp.getString("name").trim());
 			group.setGroupClassTypeId(fp.getInt("groupClassTypeId"));
 			group.setDefault(isDefault);
 			if (!String.valueOf(GroupClassType.DYNAMIC.getId()).equals(request.getParameter("groupClassTypeId"))){ //dynamic group
