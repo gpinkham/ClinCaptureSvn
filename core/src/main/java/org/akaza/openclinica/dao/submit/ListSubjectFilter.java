@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class ListSubjectFilter implements CriteriaCommand {
 
@@ -32,11 +33,13 @@ public class ListSubjectFilter implements CriteriaCommand {
 	String defaultFormat = "yyyy-MM-dd";
 	DateFormat theDefaultFormat;
 	String i18Format;
+	Locale locale;
 
-	public ListSubjectFilter(String dateFormat) {
+	public ListSubjectFilter(String dateFormat, Locale locale) {
 
 		theDefaultFormat = new SimpleDateFormat(defaultFormat);
 		i18Format = dateFormat;
+		this.locale = locale;
 
 		columnMapping.put("subject.uniqueIdentifier", "s.unique_identifier");
 		columnMapping.put("subject.gender", "s.gender");
@@ -79,11 +82,27 @@ public class ListSubjectFilter implements CriteriaCommand {
 				criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString()
 						+ "%')" + " ";
 			} else if (property.equals("studySubjectIdAndStudy")) {
-				criteria = criteria + " and ";
-				criteria = criteria + " ( UPPER(study.unique_identifier) like UPPER('%" + value.toString() + "%')"
-						+ " ";
+				criteria = criteria + " and (";
+				String val = value.toString();
+				for (int i = 1; i < val.split("-", -1).length; i++) {
+					StringBuilder strB = new StringBuilder();
+					for (int j = 0; j < i; j++) {
+						strB.append("-");
+						strB.append(val.split("-", -1)[j]);
+					}
+					String str1 = strB.toString().replaceFirst("-", "");
+					String str2 = val.replaceFirst(str1+"-", "");
+					
+					criteria = criteria + " ( UPPER(study.unique_identifier) like UPPER('%" + str1 +"')";
+					criteria = criteria + " and ";
+					criteria = criteria + "  UPPER(ss.label) like UPPER('" + str2 + "%')" + " ) ";
+					criteria = criteria + " or ";
+				}
+				criteria = criteria + " ( UPPER(study.unique_identifier) like UPPER('%" + val +"%')";
 				criteria = criteria + " or ";
-				criteria = criteria + "  UPPER(ss.label) like UPPER('%" + value.toString() + "%')" + " ) ";
+				criteria = criteria + "  UPPER(ss.label) like UPPER('%" + val + "%')" + " ) ";
+
+				criteria = criteria + " )";
 			} else {
 				criteria = criteria + " and ";
 				criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString()
@@ -114,8 +133,8 @@ public class ListSubjectFilter implements CriteriaCommand {
 
 	private String onlyYearAndMonthAndDay(String value, String column) {
 		String criteria = "";
-		try {
-			DateFormat format = new SimpleDateFormat(i18Format);
+		try { 
+			DateFormat format = new SimpleDateFormat(i18Format, locale);
 			Date startDate = format.parse(value);
 			DateTime dt = new DateTime(startDate.getTime());
 			dt = dt.plusDays(1);

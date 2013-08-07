@@ -221,7 +221,7 @@ public class SubjectDAO extends AuditableEntityDAO {
 			Integer count = (Integer) ((HashMap) it.next()).get("count");
 			return count;
 		} else {
-			return null;
+			return 0;
 		}
 	}
 

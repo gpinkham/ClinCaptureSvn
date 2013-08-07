@@ -73,18 +73,18 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	@Override
 	protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-		String[] proprtyColumns = new String[] { "subject.uniqueIdentifier", "studySubjectIdAndStudy",
+		String[] propertyColumns = new String[] { "subject.uniqueIdentifier", "studySubjectIdAndStudy",
 				"subject.gender", "subject.createdDate", "subject.owner", "subject.updatedDate", "subject.updater",
 				"subject.status", "actions" };
 
 		if (currentStudy != null
 				&& !currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
-			proprtyColumns = new String[] { "subject.uniqueIdentifier", "studySubjectIdAndStudy",
+			propertyColumns = new String[] { "subject.uniqueIdentifier", "studySubjectIdAndStudy",
 					"subject.createdDate", "subject.owner", "subject.updatedDate", "subject.updater", "subject.status",
 					"actions" };
 		}
 
-		tableFacade.setColumnProperties(proprtyColumns);
+		tableFacade.setColumnProperties(propertyColumns);
 
 		Row row = tableFacade.getTable().getRow();
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
@@ -192,12 +192,12 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	 *            The Limit to use.
 	 */
 	protected ListSubjectFilter getListSubjectFilter(Limit limit) {
-		ListSubjectFilter listSubjectFilter = new ListSubjectFilter(getDateFormat());
+		ListSubjectFilter listSubjectFilter = new ListSubjectFilter(getDateFormat(), getLocale());
 		FilterSet filterSet = limit.getFilterSet();
 		Collection<Filter> filters = filterSet.getFilters();
 		for (Filter filter : filters) {
 			String property = filter.getProperty();
-			String value = Status.getByName(filter.getValue()).getId() + "";
+			String value = filter.getValue();
 			listSubjectFilter.addFilter(property, value);
 		}
 
@@ -318,8 +318,9 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	private String updateSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
 		builder.a().href("UpdateSubject?action=show&id=" + subjectId);
-		builder.onmouseout("javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');");
-		builder.onmouseover("javascript:setImage('bt_Edit1','images/bt_Edit.gif');");
+		//if you really need use builder.onmouseout("javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');");
+		//or builder.onmouseover("javascript:setImage('bt_Edit1','images/bt_Edit.gif');");
+		//but don't forget about color theme - you can brake it!
 		builder.close();
 		builder.img().name("bt_Edit1").src("images/bt_Edit.gif").border("0").alt(resword.getString("edit"))
 				.title(resword.getString("edit")).align("left").append("hspace=\"6\"").close();
@@ -330,8 +331,6 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	private String removeSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
 		builder.a().href("RemoveSubject?action=confirm&id=" + subjectId);
-		builder.onmouseout("javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');");
-		builder.onmouseover("javascript:setImage('bt_Remove1','images/bt_Remove.gif');");
 		builder.close();
 		builder.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove"))
 				.title(resword.getString("remove")).append("hspace=\"2\"").close();
@@ -342,8 +341,6 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	private String viewSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
 		builder.a().href("ViewSubject?action=show&id=" + subjectId);
-		builder.onmouseout("javascript:setImage('bt_View1','images/bt_View_d.gif');");
-		builder.onmouseover("javascript:setImage('bt_View1','images/bt_View.gif');");
 		builder.close();
 		builder.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view"))
 				.title(resword.getString("view")).align("left").append("hspace=\"6\"").close();
@@ -354,8 +351,6 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	private String restoreSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
 		builder.a().href("RestoreSubject?action=confirm&id=" + subjectId);
-		builder.onmouseout("javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');");
-		builder.onmouseover("javascript:setImage('bt_Restore3','images/bt_Restore.gif');");
 		builder.close();
 		builder.img().name("bt_Restore3").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore"))
 				.title(resword.getString("restore")).align("left").append("hspace=\"6\"").close();
