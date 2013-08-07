@@ -377,15 +377,24 @@ function updateThis(multiSelEle, count) {
 		  </td>
 		  </tr>
 	</c:when>
-   <c:when test="${config.parameter.handle=='markImportedCRFAsCompleted'}">
-       <tr valign="top">
-           <td class="formlabel"><fmt:message key="markImportedCRFAsCompleted" bundle="${resword}"/></td>
-           <td>
+    <c:when test="${config.parameter.handle=='markImportedCRFAsCompleted'}">
+        <tr valign="top">
+            <td class="formlabel"><fmt:message key="markImportedCRFAsCompleted" bundle="${resword}"/></td>
+            <td>
                 <input type="radio" <c:if test="${newStudy.studyParameterConfig.markImportedCRFAsCompleted== 'yes'}">checked</c:if> name="markImportedCRFAsCompleted" value="yes"><fmt:message key="yes" bundle="${resword}"/>
                 <input type="radio" <c:if test="${newStudy.studyParameterConfig.markImportedCRFAsCompleted== 'no'}">checked</c:if> name="markImportedCRFAsCompleted" value="no"><fmt:message key="no" bundle="${resword}"/>
-           </td>
-       </tr>
-   </c:when>
+            </td>
+        </tr>
+    </c:when>
+    <c:when test="${config.parameter.handle=='allowSdvWithOpenQueries'}">
+        <tr valign="top">
+            <td class="formlabel"><fmt:message key="allowSdvWithOpenQueries" bundle="${resword}"/></td>
+            <td>
+                <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowSdvWithOpenQueries== 'yes'}">checked</c:if> name="allowSdvWithOpenQueries" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowSdvWithOpenQueries== 'no'}">checked</c:if> name="allowSdvWithOpenQueries" value="no"><fmt:message key="no" bundle="${resword}"/>
+            </td>
+        </tr>
+    </c:when>
 	<c:when test="${config.parameter.handle=='interviewerNameRequired'}">
 		   <tr valign="top"><td class="formlabel"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td>
                <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewerNameRequired== 'yes'}">checked</c:if> name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>

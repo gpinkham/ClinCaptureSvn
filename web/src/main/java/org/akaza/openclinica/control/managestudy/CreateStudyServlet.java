@@ -776,6 +776,7 @@ public class CreateStudyServlet extends SecureController {
 		newStudy.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
 
 		newStudy.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
+        newStudy.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 
 		session.setAttribute("newStudy", newStudy);
 
@@ -923,6 +924,10 @@ public class CreateStudyServlet extends SecureController {
 		spv.setParameter("markImportedCRFAsCompleted");
 		spv.setValue(newStudy.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
 		spvdao.create(spv);
+
+        spv.setParameter("allowSdvWithOpenQueries");
+        spv.setValue(newStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries());
+        spvdao.create(spv);
 
 		logger.info("study parameters created done");
 

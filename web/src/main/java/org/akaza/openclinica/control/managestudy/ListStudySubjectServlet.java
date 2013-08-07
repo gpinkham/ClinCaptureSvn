@@ -181,6 +181,9 @@ public abstract class ListStudySubjectServlet extends SecureController {
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "markImportedCRFAsCompleted");
 		currentStudy.getStudyParameterConfig().setMarkImportedCRFAsCompleted(parentSPV.getValue());
 
+        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "allowSdvWithOpenQueries");
+        currentStudy.getStudyParameterConfig().setAllowSdvWithOpenQueries(parentSPV.getValue());
+
 		// for all the study groups for each group class
 		for (int i = 0; i < studyGroupClasses.size(); i++) {
 			StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClasses.get(i);

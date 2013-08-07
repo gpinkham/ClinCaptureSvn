@@ -39,6 +39,7 @@ import org.akaza.openclinica.controller.helper.table.SubjectAggregateContainer;
 import org.akaza.openclinica.dao.StudySubjectSDVFilter;
 import org.akaza.openclinica.dao.StudySubjectSDVSort;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -179,8 +180,9 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		int rowStart = limit.getRowSelect().getRowStart();
 		int page = limit.getRowSelect().getPage();
 		int pageSize = limit.getRowSelect().getMaxRows();
-		Collection<SubjectAggregateContainer> items = getFilteredItems(studySubjectSDVFilter, studySubjectSDVSort,
-				rowStart, page * pageSize);
+		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
+		Collection<SubjectAggregateContainer> items = getFilteredItems(currentStudy, studySubjectSDVFilter,
+				studySubjectSDVSort, rowStart, page * pageSize);
 		tableFacade.setItems(items);
 
 	}
@@ -230,15 +232,15 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		tableFacade.setToolbar(new SDVToolbarSubject(showMoreLink));
 	}
 
-	private Collection<SubjectAggregateContainer> getFilteredItems(StudySubjectSDVFilter filterSet,
-			StudySubjectSDVSort sortSet, int rowStart, int rowEnd) {
+	private Collection<SubjectAggregateContainer> getFilteredItems(StudyBean currentStudy,
+			StudySubjectSDVFilter filterSet, StudySubjectSDVSort sortSet, int rowStart, int rowEnd) {
 		List<SubjectAggregateContainer> rows = new ArrayList<SubjectAggregateContainer>();
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 		List<StudySubjectBean> studySubjectBeans = studySubjectDAO.findAllByStudySDV(studyId, studyId, filterSet,
 				sortSet, rowStart, rowEnd);
 
 		for (StudySubjectBean studSubjBean : studySubjectBeans) {
-			rows.add(getRow(studSubjBean));
+			rows.add(getRow(studSubjBean, currentStudy));
 		}
 
 		return rows;
@@ -249,11 +251,12 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		return "<img hspace='2' border='0'  title='SDV Complete' alt='SDV Status' src='" + prefix + "images/icon_";
 	}
 
-	private SubjectAggregateContainer getRow(StudySubjectBean studySubjectBean) {
+	private SubjectAggregateContainer getRow(StudySubjectBean studySubjectBean, StudyBean currentStudy) {
 		SubjectAggregateContainer row = new SubjectAggregateContainer();
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		StudyGroupDAO studyGroupDAO = new StudyGroupDAO(dataSource);
+        DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 
 		row.setStudySubjectId(studySubjectBean.getLabel());
 		row.setPersonId(studySubjectBean.getUniqueIdentifier());
@@ -274,6 +277,8 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		int numberOfSDVdEventCRFs = stats.get("numberOfSDVdEventCRFs");
 		boolean studySubjectSDVd = stats.get("studySubjectSDVd") == 1 ? true : false;
 		boolean shouldDisplaySDVButton = stats.get("shouldDisplaySDVButton") == 1 ? true : false;
+        String allowSdvWithOpenQueries = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries();
+        boolean subjectHasUnclosedNDsInStudy = allowSdvWithOpenQueries.equals("no") && discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel());
 
         row.setNumberCRFComplete(numberOfCompletedEventCRFs + "");
         row.setNumberOfCRFsSDV(numberOfSDVdEventCRFs + "");
@@ -286,7 +291,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			sdvStatus.append(getIconForCrfStatusPrefix()).append("DoubleCheck").append(ICON_FORCRFSTATUS_SUFFIX)
 					.append("</a></center>");
 		} else {
-            if (numberOfCompletedEventCRFs > 0) {
+            if (numberOfCompletedEventCRFs > 0 && !subjectHasUnclosedNDsInStudy) {
                 sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ").append("class='sdvCheck'")
                         .append(" name='").append("sdvCheck_").append(studySubjectBean.getId()).append("' /></center>");
             }
@@ -309,7 +314,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		urlPrefix.append(path).append("\">");
 		actions.append(urlPrefix).append(SDVUtil.VIEW_ICON_HTML).append("</a></td>");
 
-		if (!studySubjectSDVd && shouldDisplaySDVButton && numberOfCompletedEventCRFs > 0) {
+		if (!studySubjectSDVd && shouldDisplaySDVButton && numberOfCompletedEventCRFs > 0 && !subjectHasUnclosedNDsInStudy) {
 			StringBuilder jsCodeString = new StringBuilder("this.form.method='GET'; this.form.action='")
 					.append(contextPath).append("/pages/sdvStudySubject").append("';")
 					.append("this.form.theStudySubjectId.value='").append(studySubjectBean.getId()).append("';")

@@ -62,7 +62,6 @@ public class StudyParameterConfig {
 
 	private String eventLocationRequired;
 
-	// clinovo - start (ticket #11)
 	private String secondaryIdRequired; // required, optional, or not used
 
 	private String dateOfEnrollmentForStudyRequired; // required, optional, or not used
@@ -74,9 +73,7 @@ public class StudyParameterConfig {
 	private String dateOfEnrollmentForStudyLabel;
 
 	private String genderLabel;
-	// clinovo - end
 
-	// clinovo - start (ticket #12)
 	private String startDateTimeRequired;
 
 	private String useStartTime;
@@ -88,10 +85,10 @@ public class StudyParameterConfig {
 	private String startDateTimeLabel;
 
 	private String endDateTimeLabel;
-	// clinovo - end
 
-	// clinovo - ticket #47
 	private String markImportedCRFAsCompleted;
+
+    private String allowSdvWithOpenQueries;
 
 	public StudyParameterConfig() {
 		collectDob = "1";
@@ -112,24 +109,23 @@ public class StudyParameterConfig {
 		secondaryLabelViewable = "false";
 		adminForcedReasonForChange = "true";
 		eventLocationRequired = "not_used";
-		// clinovo - start (ticket #11)
+
 		secondaryIdRequired = "no";
 		dateOfEnrollmentForStudyRequired = "yes";
 		studySubjectIdLabel = "Study Subject ID";
 		secondaryIdLabel = "Secondary ID";
 		dateOfEnrollmentForStudyLabel = "Date of Enrollment for Study";
 		genderLabel = "Sex";
-		// clinovo - end
-		// clinovo - start (ticket #12)
+
 		startDateTimeRequired = "yes";
 		useStartTime = "yes";
 		endDateTimeRequired = "no";
 		useEndTime = "yes";
 		startDateTimeLabel = "Start Date/Time";
 		endDateTimeLabel = "End Date/Time";
-		// clinovo - end
-		// clinovo - ticket #47
+
 		markImportedCRFAsCompleted = "no";
+        allowSdvWithOpenQueries = "no";
 	}
 
 	/**
@@ -351,7 +347,6 @@ public class StudyParameterConfig {
 		this.eventLocationRequired = eventLocationRequired;
 	}
 
-	// clinovo - start (ticket #11)
 	public String getSecondaryIdRequired() {
 		return secondaryIdRequired;
 	}
@@ -400,9 +395,6 @@ public class StudyParameterConfig {
 		this.genderLabel = genderLabel;
 	}
 
-	// clinovo - end
-
-	// clinovo - start (ticket #12)
 	public String getStartDateTimeRequired() {
 		return startDateTimeRequired;
 	}
@@ -451,9 +443,6 @@ public class StudyParameterConfig {
 		this.endDateTimeLabel = endDateTimeLabel;
 	}
 
-	// clinovo - end
-
-	// clinovo - start (ticket #47)
 	public String getMarkImportedCRFAsCompleted() {
 		return markImportedCRFAsCompleted;
 	}
@@ -461,5 +450,12 @@ public class StudyParameterConfig {
 	public void setMarkImportedCRFAsCompleted(String markImportedCRFAsCompleted) {
 		this.markImportedCRFAsCompleted = markImportedCRFAsCompleted;
 	}
-	// clinovo - end
+
+    public String getAllowSdvWithOpenQueries() {
+        return allowSdvWithOpenQueries;
+    }
+
+    public void setAllowSdvWithOpenQueries(String allowSdvWithOpenQueries) {
+        this.allowSdvWithOpenQueries = allowSdvWithOpenQueries;
+    }
 }

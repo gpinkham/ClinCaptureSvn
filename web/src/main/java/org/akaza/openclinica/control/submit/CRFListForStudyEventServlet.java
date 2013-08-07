@@ -111,6 +111,8 @@ public class CRFListForStudyEventServlet extends SecureController {
 			studyWithSED.setId(currentStudy.getParentStudyId());
 		}
 
+        request.setAttribute("currentStudy", currentStudy);
+
 		AuditableEntityBean aeb = sedao.findByPKAndStudy(eventId, studyWithSED);
 
 		if (!aeb.isActive()) {

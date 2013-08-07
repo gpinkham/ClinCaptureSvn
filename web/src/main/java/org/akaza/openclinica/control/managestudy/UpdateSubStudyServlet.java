@@ -313,6 +313,7 @@ public class UpdateSubStudyServlet extends SecureController {
 		study.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
 		
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
+        study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 
 		ArrayList parameters = study.getStudyParameters();
 

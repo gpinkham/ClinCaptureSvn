@@ -470,6 +470,7 @@ public class UpdateStudyServletNew extends SecureController {
 		study.getStudyParameterConfig().setStartDateTimeLabel(fp.getString("startDateTimeLabel"));
 		study.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
+        study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		if (!errors.isEmpty()) {
 			request.setAttribute("formMessages", errors);
 		}
@@ -770,6 +771,10 @@ public class UpdateStudyServletNew extends SecureController {
 		spv.setValue(newStudy.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
 		updateParameter(spvdao, spv);
 
+        spv.setParameter("allowSdvWithOpenQueries");
+        spv.setValue(newStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries());
+        updateParameter(spvdao, spv);
+
 		StudyBean curStudy = (StudyBean) session.getAttribute("study");
 		if (curStudy != null && study1.getId() == curStudy.getId()) {
 			super.currentStudy = study1;
@@ -883,6 +888,9 @@ public class UpdateStudyServletNew extends SecureController {
 			childspv.setValue(newStudy.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
 			updateParameter(spvdao, childspv);
 
+            childspv.setParameter("allowSdvWithOpenQueries");
+            childspv.setValue(newStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries());
+            updateParameter(spvdao, childspv);
 		}
 	}
 

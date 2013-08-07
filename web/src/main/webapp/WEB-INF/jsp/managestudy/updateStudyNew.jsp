@@ -1737,6 +1737,24 @@
 			</td>
 		</tr>
 
+        <tr valign="top">
+            <td class="formlabel">
+                <fmt:message key="allowSdvWithOpenQueries" bundle="${resword}"/>
+            </td>
+            <td>
+                <c:choose>
+                    <c:when test="${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes'}">
+                        <input type="radio" checked name="allowSdvWithOpenQueries" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" name="allowSdvWithOpenQueries" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="radio" name="allowSdvWithOpenQueries" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" checked name="allowSdvWithOpenQueries" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                    </c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
+
 		<tr>
 			<td>&nbsp;</td>
 		</tr>

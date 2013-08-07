@@ -689,33 +689,40 @@ public class SDVUtil {
 		SubjectDAO subjectDAO = new SubjectDAO(dataSource);
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-
+        DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
+        StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 
 		StudySubjectBean studySubjectBean = null;
 		SubjectBean subjectBean = null;
 		StudyEventBean studyEventBean = null;
 		StudyBean studyBean = null;
 		EventDefinitionCRFBean eventDefinitionCRFBean = null;
+        StudyEventDefinitionBean studyEventDefinitionBean = null;
 
 		Collection<SubjectSDVContainer> allRows = new ArrayList<SubjectSDVContainer>();
 		SubjectSDVContainer tempSDVBean = null;
 		StringBuilder actions = new StringBuilder("");
 
 		for (EventCRFBean crfBean : eventCRFBeans) {
-
 			tempSDVBean = new SubjectSDVContainer();
 
+
+            StudyBean currentStudy = (StudyBean)request.getSession().getAttribute("study");
 			studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(crfBean.getStudySubjectId());
 			studyEventBean = (StudyEventBean) studyEventDAO.findByPK(crfBean.getStudyEventId());
-
+            studyEventDefinitionBean = (StudyEventDefinitionBean)studyEventDefinitionDAO.findByPK(studyEventBean.getStudyEventDefinitionId());
 			subjectBean = (SubjectBean) subjectDAO.findByPK(studySubjectBean.getSubjectId());
 			// find out the study's identifier
 			studyBean = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
-			tempSDVBean.setStudyIdentifier(studyBean.getIdentifier());
-
 			eventDefinitionCRFBean = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean,
 					studyEventBean.getId(), crfBean.getCRFVersionId());
+
+            String allowSdvWithOpenQueries = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries();
+            boolean subjectHasUnclosedNDsInStudy = allowSdvWithOpenQueries.equals("no") && discrepancyNoteDAO.doesCRFHasUnclosedNDsInStudyForSubject(studyBean, studyEventDefinitionBean.getName(), studySubjectBean.getLabel(), eventDefinitionCRFBean.getCrfName());
+
+            tempSDVBean.setStudyIdentifier(studyBean.getIdentifier());
+
 			SourceDataVerification sourceData = eventDefinitionCRFBean.getSourceDataVerification();
 			if (sourceData != null) {
 				tempSDVBean.setSdvRequirementDefinition(sourceData.toString());
@@ -764,10 +771,11 @@ public class SDVUtil {
 				sdvStatus.append(getIconForSdvStatusPrefix()).append("DoubleCheck").append(ICON_FORCRFSTATUS_SUFFIX)
 						.append("</a></center>");
 			} else {
-				sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ")
-						.append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME).append(crfBean.getId())
-						.append("' /></center>");
-
+				if (!subjectHasUnclosedNDsInStudy) {
+					sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ")
+							.append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME).append(crfBean.getId())
+							.append("' /></center>");
+				}
 			}
 			tempSDVBean.setSdvStatus(sdvStatus.toString());
 			tempSDVBean.setStudySubjectId(studySubjectBean.getLabel());
@@ -801,7 +809,7 @@ public class SDVUtil {
 			}
 
 			actions = new StringBuilder("");
-			if (!crfBean.isSdvStatus()) {
+			if (!crfBean.isSdvStatus() && !subjectHasUnclosedNDsInStudy) {
 				StringBuilder jsCodeString = new StringBuilder("this.form.method='GET'; this.form.action='")
 						.append(request.getContextPath()).append("/pages/handleSDVGet").append("';")
 						.append("this.form.crfId.value='").append(crfBean.getId()).append("';")

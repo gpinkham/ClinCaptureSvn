@@ -807,81 +807,71 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			Boolean isSignable = (Boolean) ((HashMap<Object, Object>) item).get("isSignable");
 			Integer studySubjectId = studySubjectBean.getId();
 			if (studySubjectId != null) {
+                String flagColour = null;
+                if (discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel())) {
+                    flagColour = "yellow";
+                    if (discrepancyNoteDAO.doesSubjectHasNewNDsInStudy(studyBean, studySubjectBean.getLabel())) {
+                        flagColour = "red";
+                    }
+                }
 				StringBuilder url = new StringBuilder();
 				url.append("<div style=\"padding-top: 3px;\">");
 				url.append(viewStudySubjectLinkBuilder(studySubjectBean));
+				if (getStudyBean().getStatus() == Status.AVAILABLE
+						&& !(studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)
+						&& getCurrentRole().getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
+						&& getCurrentRole().getRole() != Role.STUDY_MONITOR) {
+					url.append(removeStudySubjectLinkBuilder(studySubjectBean));
+				}
+				if (getStudyBean().getStatus() == Status.AVAILABLE
+						&& getCurrentRole().getRole() != Role.STUDY_MONITOR
+						&& (studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)) {
+					url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
+				}
+				if (studySubjectBean.getStatus() != Status.DELETED
+						&& (currentRole.getRole() == Role.STUDY_ADMINISTRATOR
+								|| currentRole.getRole() == Role.STUDY_MONITOR || currentUser.isSysAdmin())
+						&& SDVUtil.permitSDV(studySubjectBean, new DAOWrapper(getStudyDAO(), getStudyEventDAO(),
+								getStudySubjectDAO(), getEventCRFDAO(), getEventDefintionCRFDAO(),
+								getStudyEventDefinitionDao(), getDiscrepancyNoteDAO()))) {
+					url.append(sdvStudySubjectLinkBuilder(studySubjectBean, studyBean.getStudyParameterConfig()
+							.getAllowSdvWithOpenQueries(), flagColour));
+				} else if (currentRole.getRole().getId() != 5 && currentRole.getRole().getId() != 4) {
+					HtmlBuilder transparentButton = new HtmlBuilder();
+					url.append(transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif")
+							.border("0").append("hspace=\"4\"").end());
+				}
+				if (getStudyBean().getStatus() == Status.AVAILABLE
+						&& getCurrentRole().getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
+						&& getCurrentRole().getRole() != Role.INVESTIGATOR
+						&& getCurrentRole().getRole() != Role.STUDY_MONITOR
+						&& studySubjectBean.getStatus() == Status.AVAILABLE) {
+					url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
+				} else if (getStudyBean().getStatus() == Status.AVAILABLE
+						&& (studySubjectBean.getStatus() != Status.DELETED || studySubjectBean.getStatus() != Status.AUTO_DELETED)
+						&& currentRole.getRole().getId() != 6 && currentRole.getRole().getId() != 5
+						&& currentRole.getRole().getId() != 4) {
+					HtmlBuilder transparentButton = new HtmlBuilder();
+					url.append(transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif")
+							.border("0").append("hspace=\"4\"").end());
+				}
+				if (getCurrentRole().getRole() == Role.INVESTIGATOR && getStudyBean().getStatus() == Status.AVAILABLE
+						&& studySubjectBean.getStatus() != Status.DELETED) {
+					url.append(signStudySubjectLinkBuilder(studySubjectBean, isSignable));
+				}
+
+				if (getCurrentRole().getRole() == Role.STUDY_ADMINISTRATOR) {
+					url.append(studySubjectLockLinkBuilder(studySubjectBean));
+				}
 				if (getCurrentRole().getRole() != Role.STUDY_MONITOR) {
-					if (getStudyBean().getStatus() == Status.AVAILABLE
-							&& !(studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)
-							&& getCurrentRole().getRole() != Role.CLINICAL_RESEARCH_COORDINATOR) {
-						url.append(removeStudySubjectLinkBuilder(studySubjectBean));
-					}
-					if (getStudyBean().getStatus() == Status.AVAILABLE
-							&& (studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)) {
-						url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
-					}
-					if (studySubjectBean.getStatus() != Status.DELETED
-							&& (currentRole.getRole() == Role.STUDY_ADMINISTRATOR || currentRole.getRole() == Role.STUDY_MONITOR || currentUser.isSysAdmin())
-							&& SDVUtil.permitSDV(studySubjectBean, new DAOWrapper(getStudyDAO(), getStudyEventDAO(),
-									getStudySubjectDAO(), getEventCRFDAO(), getEventDefintionCRFDAO(),
-									getStudyEventDefinitionDao(), getDiscrepancyNoteDAO()))) {
-						url.append(sdvStudySubjectLinkBuilder(studySubjectBean));
-					} else if (currentRole.getRole().getId() != 5 && currentRole.getRole().getId() != 4) {
-						HtmlBuilder transparentButton = new HtmlBuilder();
-						url.append(transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif")
-								.border("0").append("hspace=\"4\"").end());
-					}
-					if (getStudyBean().getStatus() == Status.AVAILABLE
-							&& getCurrentRole().getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
-							&& getCurrentRole().getRole() != Role.INVESTIGATOR
-							&& studySubjectBean.getStatus() == Status.AVAILABLE) {
-						url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
-					} else if (getStudyBean().getStatus() == Status.AVAILABLE
-							&& (studySubjectBean.getStatus() != Status.DELETED || studySubjectBean.getStatus() != Status.AUTO_DELETED)
-							&& currentRole.getRole().getId() != 5 && currentRole.getRole().getId() != 4) {
-						HtmlBuilder transparentButton = new HtmlBuilder();
-						url.append(transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif")
-								.border("0").append("hspace=\"4\"").end());
-					}
-					if (getCurrentRole().getRole() == Role.INVESTIGATOR
-							&& getStudyBean().getStatus() == Status.AVAILABLE
-							&& studySubjectBean.getStatus() != Status.DELETED) {
-						url.append(signStudySubjectLinkBuilder(studySubjectBean, isSignable));
-					}
-
-					if (getCurrentRole().getRole() == Role.STUDY_ADMINISTRATOR) {
-						url.append(studySubjectLockLinkBuilder(studySubjectBean));
-					}
-
 					url.append(calendaredEventsBuilder(studySubjectBean));
-
-					if (discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel())) {
-						String flagColour = "yellow";
-						if (discrepancyNoteDAO.doesSubjectHasNewNDsInStudy(studyBean, studySubjectBean.getLabel())) {
-							flagColour = "red";
-						}
-						if (getStudyBean().getStatus() == Status.AVAILABLE) {
-							// Make sure this is the last icon
-							url.append(createNotesAndDiscrepanciesIcon(studySubjectBean, flagColour));
-						}
-					}
 				}
-				if (getCurrentRole().getRole() == Role.STUDY_MONITOR) {
-					String flagColour = "yellow";
-					if (discrepancyNoteDAO.doesSubjectHasNewNDsInStudy(studyBean, studySubjectBean.getLabel())) {
-						flagColour = "red";
-					}
-					if (getStudyBean().getStatus() == Status.AVAILABLE
-							&& discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(studyBean,
-									studySubjectBean.getLabel())) {
-						// Make sure this is the last icon
-						url.append(createNotesAndDiscrepanciesIcon(studySubjectBean, flagColour));
-					}
-				}
-				
+                if (flagColour != null && getStudyBean().getStatus() == Status.AVAILABLE) {
+                    // Make sure this is the last icon
+                    url.append(createNotesAndDiscrepanciesIcon(studySubjectBean, flagColour));
+                }
 				value = "</div>" + url.toString();
 			}
-			
 			return value;
 		}
 	}
@@ -953,19 +943,29 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		return result + transparentButton.toString();
 	}
 
-	private String sdvStudySubjectLinkBuilder(StudySubjectBean studySubject) {
-		HtmlBuilder actionLink = new HtmlBuilder();
-		actionLink
-				.a()
-				.href("pages/viewSubjectAggregate?sbb=true&studyId="
-                        + studyBean.getId()
-                        + "&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId="
-                        + studySubject.getLabel()).close();
-		actionLink.img().src("images/icon_DoubleCheck_Action.gif").border("0").alt(resword.getString("perform_sdv"))
-				.title(resword.getString("perform_sdv")).append("hspace=\"4\"").end().aEnd();
+	private String sdvStudySubjectLinkBuilder(StudySubjectBean studySubject, String allowSdvWithOpenQueries,
+			String flagColour) {
+		String result = "";
+		if (allowSdvWithOpenQueries.equals("yes") || (allowSdvWithOpenQueries.equals("no") && flagColour == null)) {
+			HtmlBuilder actionLink = new HtmlBuilder();
+			actionLink
+					.a()
+					.href("pages/viewSubjectAggregate?sbb=true&studyId="
+							+ studyBean.getId()
+							+ "&studySubjectId=&theStudySubjectId=0&redirection=viewSubjectAggregate&maxRows=15&showMoreLink=true&s_sdv_tr_=true&s_sdv_p_=1&s_sdv_mr_=15&s_sdv_f_studySubjectId="
+							+ studySubject.getLabel()).close();
+			actionLink.img().src("images/icon_DoubleCheck_Action.gif").border("0")
+					.alt(resword.getString("perform_sdv")).title(resword.getString("perform_sdv"))
+					.append("hspace=\"4\"").end().aEnd();
 
-		return actionLink.toString();
-
+			result = actionLink.toString();
+		} else {
+			HtmlBuilder transparentButton = new HtmlBuilder();
+			transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0")
+					.append("hspace=\"4\"").end();
+			result = transparentButton.toString();
+		}
+		return result;
 	}
 
 	private String reAssignStudySubjectLinkBuilder(StudySubjectBean studySubject) {

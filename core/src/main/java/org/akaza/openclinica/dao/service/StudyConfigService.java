@@ -173,10 +173,11 @@ public class StudyConfigService {
 					spc.setStartDateTimeLabel(spv.getValue());
 				} else if (handle.equalsIgnoreCase("endDateTimeLabel")) {
 					spc.setEndDateTimeLabel(spv.getValue());
-				}
-				else if (handle.equalsIgnoreCase("markImportedCRFAsCompleted")) {
+				} else if (handle.equalsIgnoreCase("markImportedCRFAsCompleted")) {
 					spc.setMarkImportedCRFAsCompleted(spv.getValue());
-				}
+				} else if (handle.equalsIgnoreCase("allowSdvWithOpenQueries")) {
+                    spc.setAllowSdvWithOpenQueries(spv.getValue());
+                }
 			}
 		}
 		study.setStudyParameterConfig(spc);
@@ -263,10 +264,11 @@ public class StudyConfigService {
 				study.getStudyParameterConfig().setStartDateTimeLabel(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("endDateTimeLabel")) {
 				study.getStudyParameterConfig().setEndDateTimeLabel(spvb.getValue());
-			}
-			else if (parameter.equalsIgnoreCase("markImportedCRFAsCompleted")) {
+			} else if (parameter.equalsIgnoreCase("markImportedCRFAsCompleted")) {
 				study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(spvb.getValue());
-			}
+			} else if (parameter.equalsIgnoreCase("allowSdvWithOpenQueries")) {
+                study.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
+            }
 		}
 		return study;
 
@@ -350,10 +352,11 @@ public class StudyConfigService {
 				site.getStudyParameterConfig().setStartDateTimeLabel(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("endDateTimeLabel")) {
 				site.getStudyParameterConfig().setEndDateTimeLabel(spvb.getValue());
-			}
-			else if (parameter.equalsIgnoreCase("markImportedCRFAsCompleted")) {
+			} else if (parameter.equalsIgnoreCase("markImportedCRFAsCompleted")) {
 				site.getStudyParameterConfig().setMarkImportedCRFAsCompleted(spvb.getValue());
-			}
+			} else if (parameter.equalsIgnoreCase("allowSdvWithOpenQueries")) {
+                site.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
+            }
 		}
 		return site;
 	}
