@@ -132,6 +132,12 @@ public class UpdateSubjectServlet extends SecureController {
 					}
 				}
 				
+				if (!"".equals(gender)){
+					if ("true".equals(parameters.get("genderRequired"))){
+						genderToDisplay = gender;
+					}
+				}
+				
 				if (birthDate != null){
 					if ("1".equals(parameters.get("collectDob"))){
 						dateToDisplay = local_df.format(birthDate);
@@ -180,12 +186,14 @@ public class UpdateSubjectServlet extends SecureController {
 					subject.setUniqueIdentifier(fields.get("personId"));
 				}
 				
-				if ("m".equals(fields.get("gender"))) {
-					subject.setGender('m');
-				} else if ("f".equals(fields.get("gender"))) {
-					subject.setGender('f');
-				} else {
-					subject.setGender(' ');
+				if ("true".equals(parameters.get("genderRequired"))) {
+					if ("m".equals(fields.get("gender"))) {
+						subject.setGender('m');
+					} else if ("f".equals(fields.get("gender"))) {
+						subject.setGender('f');
+					} else {
+						subject.setGender(' ');
+					}
 				}
 				
 				Date dateOfBirth = new Date();
@@ -292,9 +300,9 @@ public class UpdateSubjectServlet extends SecureController {
 			}
 		}
 		
-		
-		fields.put("gender", fp.getString("gender") == ""? "" : String.valueOf(fp.getString("gender").charAt(0)));
+		// should be after v.validate()
 		if ("true".equals(parameters.get("genderRequired"))) {
+			fields.put("gender", fp.getString("gender") == ""? "" : String.valueOf(fp.getString("gender").charAt(0)));
 			if ("".equals(fp.getString("gender"))){
 				Validator.addError(errors, "gender", resexception.getString("please_choose_the_gender_of_the_subject"));
 			}

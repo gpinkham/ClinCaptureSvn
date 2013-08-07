@@ -111,7 +111,8 @@
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include>
 		</td>
 	</tr>
-    
+	
+    <c:if test="${parameters['genderRequired']}">
     <tr valign="top">
 		<td class="formlabel">${parameters['genderLabel']}:</td>
         <td>
@@ -150,6 +151,7 @@
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include>
 		</td>
     </tr>
+	</c:if>	
 	
 	<c:choose>
 	<c:when test="${parameters['collectDob'] == '1'}">
@@ -157,11 +159,19 @@
 			<td class="formlabel"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
 			<td>
 				<table border="0" cellpadding="0" cellspacing="0">
-					<tr>
+					<tr valign="top">
 						<td>
 							<div class="formfieldM_BG">
-								<input type="text" name="dateOfBirth" size="15" value="<c:out value="${fields['dateOfBirth']}"/>" class="formfieldM">
+								<input type="text" name="dateOfBirth" id="dateOfBirth" size="15" value="<c:out value="${fields['dateOfBirth']}"/>" class="formfieldM">
 							</div>
+						</td>
+						<td>
+							<A HREF="#" >
+								<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="startDateTrigger"/>
+								<script type="text/javascript">
+									Calendar.setup({inputField  : "dateOfBirth", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "startDateTrigger" });
+								</script>
+							</a>
 						</td>
 						<td class="formlabel">
 							(<fmt:message key="date_format" bundle="${resformat}"/>)*
@@ -257,7 +267,9 @@
 </br>
 </div>
  <input type="button" onclick="back_checkEditUserFormState();"  name="BTN_Smart_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/>
- <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+ <c:if test="${parameters['genderRequired'] || parameters['collectDob'] != 3 || parameters['subjectPersonIdRequired'] != 'not used'}">
+	<input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+ </c:if>
  <img src="images/icon_UnchangedData.gif" style="visibility:hidden" alt="Data Status" name="DataStatus_bottom">
  </form>
 

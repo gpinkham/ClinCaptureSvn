@@ -59,8 +59,9 @@
 	</tr>
 
 	<tr valign="top">
-        <td class="table_header_column">${parameters['genderLabel']}:</td>
-        <td class="table_cell">
+        <td class="table_header_column">${parameters['genderLabel']}:</td>				
+		<td class="table_cell">
+		<c:if test="${parameters['genderRequired']}">
 			<c:choose>
 				<c:when test="${fields['gender'] == 'm'}">
 					<fmt:message key="male" bundle="${resword}"/>
@@ -72,6 +73,7 @@
 					<fmt:message key="not_specified" bundle="${resword}"/>
 				</c:otherwise>
 			</c:choose>
+		</c:if>	
 		</td>
     </tr>
     
