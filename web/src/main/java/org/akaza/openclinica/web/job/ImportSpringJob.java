@@ -19,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.sql.DataSource;
+import javax.xml.bind.JAXBContext;
+import javax.xml.transform.sax.SAXSource;
 
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -53,8 +55,6 @@ import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.apache.commons.lang.StringUtils;
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.xml.Unmarshaller;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -69,6 +69,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.xml.sax.InputSource;
 
 /**
  * Import Spring Job, a job running asynchronously on the Tomcat server using Spring and Quartz.
@@ -291,16 +292,10 @@ public class ImportSpringJob extends QuartzJobBean {
 			RuleSetServiceInterface ruleSetService) throws Exception {
 		StringBuffer msg = new StringBuffer();
 		StringBuffer auditMsg = new StringBuffer();
-		Mapping myMap = new Mapping();
-
 		String propertiesPath = CoreResources.PROPERTIES_DIR;
 
 		File xsdFile2 = new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
 		boolean fail = false;
-		String ODM_MAPPING_DIR_path = CoreResources.ODM_MAPPING_DIR;
-		myMap.loadMapping(ODM_MAPPING_DIR_path + File.separator + "cd_odm_mapping.xml");
-
-		Unmarshaller um1 = new Unmarshaller(myMap);
 		ODMContainer odmContainer = new ODMContainer();
 		for (File f : dest) {
 			String regex = "\\s+"; // all whitespace, one or more times
@@ -324,11 +319,13 @@ public class ImportSpringJob extends QuartzJobBean {
 			msg.append(firstLine);
 			out.write(firstLine);
 			auditMsg.append(firstLine);
-
+            JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
+            javax.xml.bind.Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            //Create SAXSource
+            InputSource inputSource = new InputSource(new FileInputStream(f));
+            SAXSource saxSource = new SAXSource(inputSource);
 			try {
-
-				odmContainer = (ODMContainer) um1.unmarshal(new FileReader(f));
-
+                odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
 				logger.debug("Found crf data container for study oid: "
 						+ odmContainer.getCrfDataPostImportContainer().getStudyOID());
 				logger.debug("found length of subject list: "
@@ -338,7 +335,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				try {
 					schemaValidator.validateAgainstSchema(f, xsdFile2);
 					// for backwards compatibility, we also try to validate vs
-					odmContainer = (ODMContainer) um1.unmarshal(new FileReader(f));
+                    odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
 				} catch (Exception me2) {
 					// not sure if we want to report me2
 
