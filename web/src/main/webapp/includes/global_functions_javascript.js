@@ -1,7 +1,6 @@
 var currentPopupUid;
 var subjectMatrixPopupStick;
 var popupInterval;
-var popupIntervalForEventId;
 var firstFormState;
 
 function selectAllChecks(formObj,value){
@@ -1445,19 +1444,79 @@ function leftnavExpand(strLeftNavRowElementName){
     }
 }
 
-function layersShowOrHide() {
-    var arrayArgs = layersShowOrHide.arguments;
-    var objLayer;
-    var strShowOrHide = arrayArgs[0];
-    var i;
+function showPopupForEvents(obj, e) {
+  if (!subjectMatrixPopupStick) {
+    clearInterval(popupInterval);
+    var coords = analyzeEvent(e);
+    popupInterval = setInterval(function() {
+      currentPopupUid = obj;
+      processPopupForEvents(coords.top, coords.left);
+    }, 1000);
+  }
+}
 
-    for (i=1;i<=arrayArgs.length-1;i++) {
-        if ((objLayer=MM_findObj(arrayArgs[i]))!=null) {
-            // for IE and NS compatibility
-            if (objLayer.style) { objLayer = objLayer.style; }
-            objLayer.visibility = strShowOrHide;
-        }
+function justShowPopupForEvents(obj, e) {
+  clearInterval(popupInterval);
+  var coords = analyzeEvent(e);
+  setTimeout(function() {
+    currentPopupUid = obj;
+    processPopupForEvents(coords.top, coords.left);
+  }, 200);
+}
+
+function closePopupForEvents() {
+  clearInterval(popupInterval);
+  subjectMatrixPopupStick = undefined;
+}
+
+var popupForEventsMouseDown = function(ev) {
+  var element =  ev.target || ev.srcElement;
+  if (ev.target.nodeName.toLowerCase() != "html") {
+    if (currentPopupUid != undefined && jQuery(ev.target).closest("#" + currentPopupUid).length == 0) {
+      jQuery(".calendar").remove();
+      jQuery("#" + currentPopupUid).css("visibility", "hidden");
+      currentPopupUid = undefined;
+      subjectMatrixPopupStick = undefined;
+      jQuery("*").unbind("mousedown", popupForEventsMouseDown);
+    } else {
+      subjectMatrixPopupStick = true;
     }
+  }
+}
+
+function processPopupForEvents(top, left) {
+  $("div[id^=Lock_]").css("display", "none");
+  $("div[id^=Event_]").css("display", "none");
+  $("div[id^=S_Lock_]").css("display", "none");
+  $("div[id^=S_Event_]").css("display", "none");
+  $("#" + currentPopupUid + " tr[id^=Menu_off_]").css("display", "none");
+  $("#" + currentPopupUid + " tr[id^=Menu_on_]").css("display", "");
+  $("#" + currentPopupUid + " tr[id^=S_Menu_off_]").css("display", "none");
+  $("#" + currentPopupUid + " tr[id^=S_Menu_on_]").css("display", "");
+  var objLayer = $("#" + currentPopupUid);
+  if (objLayer.length > 0) {
+    objLayer.css("display", "");
+    objLayer.css("visibility", "visible");
+    objLayer.css("z-index", "9999");
+    objLayer.css("left", left);
+    objLayer.css("top", top);
+    jQuery("*").unbind("mousedown", popupForEventsMouseDown).bind("mousedown", popupForEventsMouseDown);
+  }
+}
+
+function layersShowOrHide() {
+  var arrayArgs = layersShowOrHide.arguments;
+  var objLayer;
+  var strShowOrHide = arrayArgs[0];
+  var i;
+
+  for (i=1;i<=arrayArgs.length-1;i++) {
+    if ((objLayer=MM_findObj(arrayArgs[i]))!=null) {
+      // for IE and NS compatibility
+      if (objLayer.style) { objLayer = objLayer.style; }
+      objLayer.visibility = strShowOrHide;
+    }
+  }
 }
 
 /* 
@@ -1857,12 +1916,11 @@ function getCRFList(studyEventId) {
 
 function closePopup() {
     clearInterval(popupInterval);
-    popupIntervalForEventId = undefined;
     subjectMatrixPopupStick = undefined;
 }
 
 function canShowPopup(studyEventId) {
-    return !subjectMatrixPopupStick && popupIntervalForEventId != studyEventId;
+    return !subjectMatrixPopupStick;
 }
 
 function showPopup(studyEventId, statusBoxId, statusBoxNum, event) {
@@ -1876,11 +1934,8 @@ function showPopup(studyEventId, statusBoxId, statusBoxNum, event) {
 
 function justShowPopup(studyEventId, statusBoxId, statusBoxNum, event) {
     clearInterval(popupInterval);
-    if (this.disablePopup) return;
-    this.disablePopup = true;
     var coords = analyzeEvent(event);
     setTimeout(function() {
-        this.disablePopup = false;
         hideAllTooltips(studyEventId, statusBoxId, statusBoxNum, coords.top, coords.left);
     }, 200);
 }

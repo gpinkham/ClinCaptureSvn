@@ -912,8 +912,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		// Event Div
 		eventDiv.div()
 				.id("S_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
-				.style("position: absolute; visibility: hidden; z-index: 3;width:" + divWidth
-						+ "px; top: 0px; float: left;").close();
+				.style("position: absolute; visibility: hidden; z-index: 3; top: 0px; float: left;").close();
 		eventDiv.div().styleClass("box_T").close().div().styleClass("box_L").close().div().styleClass("box_R").close()
 				.div().styleClass("box_B").close().div().styleClass("box_TL").close().div().styleClass("box_TR")
 				.close().div().styleClass("box_BL").close().div().styleClass("box_BR").close();
@@ -1125,21 +1124,16 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				+ "'); ";
 		String href2 = "javascript:leftnavExpand('S_Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount
 				+ "'); ";
-		String onmouseover = "moveObject('S_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount
+		String onmouseover = "showPopupForEvents('S_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount
 				+ "', event); ";
 		onmouseover += "setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount
 				+ "','images/icon_expand.gif');";
-		String onmouseout = "layersShowOrHide('hidden','S_Event_" + studySubjectLabel + "_" + sed.getId() + "_"
-				+ rowCount + "'); ";
-		onmouseout += "setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount
-				+ "','images/icon_blank.gif');";
-		String onClick1 = "layersShowOrHide('visible','Lock_all'); ";
-		String onClick2 = "LockObject('S_Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "',event); ";
+		String onClick = "justShowPopupForEvents('S_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "',event); ";
 		String href = studyEvents.size() > 1 ? href1Repeating + href2 : href1 + href2;
 		builder.a().href(href);
 		builder.onmouseover(onmouseover);
-		builder.onmouseout(onmouseout);
-		builder.onclick(onClick1 + onClick2);
+		builder.onmouseout("clearInterval(popupInterval);");
+		builder.onclick(onClick);
 		builder.close();
 
 	}
@@ -1150,7 +1144,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				+ "'); ";
 		String href2 = "javascript:leftnavExpand('S_Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount
 				+ "'); ";
-		String onClick1 = "layersShowOrHide('hidden','Lock_all'); ";
+		String onClick1 = "closePopupForEvents(); layersShowOrHide('hidden','Lock_all'); ";
 		String onClick2 = "layersShowOrHide('hidden','S_Event_" + studySubjectLabel + "_" + sed.getId() + "_"
 				+ rowCount + "'); ";
 		String onClick3 = "layersShowOrHide('hidden','S_Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount

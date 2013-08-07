@@ -123,7 +123,7 @@ public class EventCrfLayerBuilder {
 
 		// Event Div
 		html.div().id("Event_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount)
-				.style("position: absolute; visibility: hidden; z-index: 3;width:180px; top: 0px;").close();
+				.style("position: absolute; visibility: hidden; z-index: 3; top: 0px;").close();
 		html.div().styleClass("box_T").close().div().styleClass("box_L").close().div().styleClass("box_R").close()
 				.div().styleClass("box_B").close().div().styleClass("box_TL").close().div().styleClass("box_TR")
 				.close().div().styleClass("box_BL").close().div().styleClass("box_BR").close();
@@ -598,7 +598,7 @@ public class EventCrfLayerBuilder {
 				+ "'); ";
 		String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount
 				+ "'); ";
-		String onClick1 = "layersShowOrHide('hidden','Lock_all'); ";
+		String onClick1 = "closePopupForEvents(); layersShowOrHide('hidden','Lock_all'); ";
 		String onClick2 = "layersShowOrHide('hidden','Event_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount
 				+ "'); ";
 		String onClick3 = "layersShowOrHide('hidden','Lock_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount
@@ -642,20 +642,15 @@ public class EventCrfLayerBuilder {
 				+ "'); ";
 		String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount
 				+ "'); ";
-		String onmouseover = "moveObject('Event_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount
+		String onmouseover = "showPopupForEvents('Event_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount
 				+ "', event); ";
 		onmouseover += "setImage('CRFicon" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "','"
 				+ expandedIcon + "');";
-		String onmouseout = "layersShowOrHide('hidden','Event_" + studySubjectLabel + "_" + crf.getId() + "_"
-				+ rowCount + "'); ";
-		onmouseout += "setImage('CRFicon_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "','" + icon
-				+ "');";
-		String onClick1 = "layersShowOrHide('visible','Lock_all'); ";
-		String onClick2 = "LockObject('Lock_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "',event); ";
+		String onClick = "justShowPopupForEvents('Event_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "',event); ";
 		builder.a().href(href1 + href2);
 		builder.onmouseover(onmouseover);
-		builder.onmouseout(onmouseout);
-		builder.onclick(onClick1 + onClick2);
+		builder.onmouseout("clearInterval(popupInterval);");
+		builder.onclick(onClick);
 		builder.close();
 
 	}
