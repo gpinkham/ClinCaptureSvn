@@ -412,7 +412,7 @@ public class AddNewSubjectServlet extends SecureController {
 				}
 			}
 
-			String label = fp.getString(INPUT_LABEL);
+			String label = fp.getString(INPUT_LABEL).trim();
 			// Shaoyu Su: if the form submitted for field "INPUT_LABEL" has
 			// value of "AUTO_LABEL",
 			// then Study Subject ID should be created when db row is inserted.
@@ -769,7 +769,7 @@ public class AddNewSubjectServlet extends SecureController {
 				// enroll the subject in the active study
 				studySubject.setSubjectId(subject.getId());
 				studySubject.setStudyId(currentStudy.getId());
-				studySubject.setLabel(fp.getString(INPUT_LABEL));
+				studySubject.setLabel(label);
 				studySubject.setSecondaryLabel(fp.getString(INPUT_SECONDARY_LABEL));
 				studySubject.setStatus(Status.AVAILABLE);
 				studySubject.setEnrollmentDate(fp.getDate(INPUT_ENROLLMENT_DATE));
@@ -786,17 +786,17 @@ public class AddNewSubjectServlet extends SecureController {
 				}
 
 				// Shaoyu Su: prevent same label ("Study Subject ID")
-				if (fp.getString(INPUT_LABEL).equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
-					synchronized (simpleLockObj) {
+				synchronized (simpleLockObj) {
+					if (label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
 						int nextLabel = ssd.findTheGreatestLabel() + 1;
 						studySubject.setLabel(nextLabel + "");
 						studySubject = ssd.createWithoutGroup(studySubject);
 						if (showExistingRecord && !existingSubShown) {
 							fp.addPresetValue(INPUT_LABEL, label);
 						}
+					} else {
+						studySubject = ssd.createWithoutGroup(studySubject);
 					}
-				} else {
-					studySubject = ssd.createWithoutGroup(studySubject);
 				}
 				if (!classes.isEmpty() && studySubject.isActive()) {
 					SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
