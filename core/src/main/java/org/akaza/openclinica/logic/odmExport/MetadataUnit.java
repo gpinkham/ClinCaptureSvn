@@ -132,6 +132,7 @@ public class MetadataUnit extends OdmUnit {
 		study = studyConfig.setParametersForStudy(study);
 		MetaDataVersionBean metadata = this.odmStudy.getMetaDataVersion();
 		metadata.setStudy(study);
+		metadata.setExcludeItems(dataset.getExcludeItems());
 
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(this.ds);
 		int parentId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();

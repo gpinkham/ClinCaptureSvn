@@ -22,12 +22,14 @@ package org.akaza.openclinica.dao.extract;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -323,16 +325,18 @@ public class OdmExtractDAO extends DatasetDAO {
 	public void setEventGroupItemDataWithUnitTypesExpected() {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);// event_crf_id;
-		this.setTypeExpected(2, TypeNames.INT);// item_group_id;
-		this.setTypeExpected(3, TypeNames.STRING);// item_group_oid
-		this.setTypeExpected(4, TypeNames.STRING);// item_group_name
-		this.setTypeExpected(5, TypeNames.INT);// item_id
-		this.setTypeExpected(6, TypeNames.STRING);// item_oid
-		this.setTypeExpected(7, TypeNames.INT);// item_data_ordinal
-		this.setTypeExpected(8, TypeNames.STRING);// value
-		this.setTypeExpected(9, TypeNames.INT);// item_data_type_id
-		this.setTypeExpected(10, TypeNames.INT);// item_data_id
-		this.setTypeExpected(11, TypeNames.STRING);// mu_oid
+		this.setTypeExpected(2, TypeNames.INT);// crf_version_id
+		this.setTypeExpected(3, TypeNames.INT);// item_group_id;
+		this.setTypeExpected(4, TypeNames.STRING);// item_group_oid
+		this.setTypeExpected(5, TypeNames.STRING);// item_group_name
+		this.setTypeExpected(6, TypeNames.INT);// item_id
+		this.setTypeExpected(7, TypeNames.STRING);// item_oid
+		this.setTypeExpected(8, TypeNames.INT);// item_data_ordinal
+		this.setTypeExpected(9, TypeNames.STRING);// value
+		this.setTypeExpected(10, TypeNames.INT);// item_data_type_id
+		this.setTypeExpected(11, TypeNames.INT);// item_data_id
+		this.setTypeExpected(12, TypeNames.STRING);// mu_oid
+		this.setTypeExpected(13, TypeNames.INT);// study_event_definition_id
 	}
 
 	public void setEventCrfIdsByItemDataTypesExpected() {
@@ -1303,11 +1307,11 @@ public class OdmExtractDAO extends DatasetDAO {
 			inPoses.put(itOID + "-" + cvOID, itDetail.getItemPresentInForm().size() - 1);
 		}
 
-		this.getSCDs(cvIds, its, itPoses, inPoses);
+		this.getSCDs(metadata, cvIds, its, itPoses, inPoses);
 	}
 
-	protected void getSCDs(String crfVersionIds, ArrayList<ItemDefBean> its, HashMap<String, Integer> itPoses,
-			HashMap<String, Integer> inFormPoses) {
+	protected void getSCDs(MetaDataVersionBean metadata, String crfVersionIds, ArrayList<ItemDefBean> its,
+			HashMap<String, Integer> itPoses, HashMap<String, Integer> inFormPoses) {
 		logger.debug("Begin to execute getSCDsSql");
 		this.setSCDsTypesExpected();
 		ArrayList rows = this.select(this.getSCDsSql(crfVersionIds));
@@ -1539,6 +1543,10 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId,
 						studySubjectIds));
 		String idataIds = "";
+		List<String> excludeItems = new ArrayList<String>();
+		if (dataset.getExcludeItems() != null && !dataset.getExcludeItems().trim().isEmpty()) {
+			excludeItems = Arrays.asList(dataset.getExcludeItems().trim().split(","));
+		}
 		if (viewRows.size() > 0) {
 			Iterator iter = viewRows.iterator();
 			ExportSubjectDataBean sub = new ExportSubjectDataBean();
@@ -1553,6 +1561,8 @@ public class OdmExtractDAO extends DatasetDAO {
 			while (iter.hasNext()) {
 				HashMap row = (HashMap) iter.next();
 				Integer ecId = (Integer) row.get("event_crf_id");
+				Integer cvId = (Integer) row.get("crf_version_id");
+				Integer sedId = (Integer) row.get("study_event_definition_id");
 				Integer igId = (Integer) row.get("item_group_id");
 				String igOID = (String) row.get("item_group_oid");
 				String igName = (String) row.get("item_group_name");
@@ -1563,6 +1573,7 @@ public class OdmExtractDAO extends DatasetDAO {
 				Integer datatypeid = (Integer) row.get("item_data_type_id");
 				Integer idataId = (Integer) row.get("item_data_id");
 				String muOid = (String) row.get("mu_oid");
+
 				String key = "";
 				if (ecId != ecprev) {
 					logger.debug("Found ecId=" + ecId + " in subjectEventFormSql is:" + oidPoses.containsKey(ecId));
@@ -1596,7 +1607,7 @@ public class OdmExtractDAO extends DatasetDAO {
 					// "distinct" because of their same
 					// ecId+igOID+itOID+itDataOrdinal (08-2008)
 					key = itId + "_" + itDataOrdinal + key;
-					if (!itprev.equals(key)) {
+					if (!itprev.equals(key) && !excludeItems.contains(sedId + "_" + cvId + "_" + itId)) {
 						itprev = key;
 						ImportItemDataBean it = new ImportItemDataBean();
 						it.setItemOID(itOID);
@@ -1618,7 +1629,7 @@ public class OdmExtractDAO extends DatasetDAO {
 							if (datatypeid == 9) {
 								try {
 									itValue = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(
-											oc_df_string).parse(itValue));
+											local_df_string, locale).parse(itValue));
 								} catch (Exception fe) {
 									logger.debug("Item -" + itOID + " value " + itValue
 											+ " might not be ODM date format yyyy-MM-dd.");
@@ -2693,7 +2704,7 @@ public class OdmExtractDAO extends DatasetDAO {
 			int datasetItemStatusId, String studySubjectIds) {
 		String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
 		String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
-		return "select cvidata.event_crf_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name,"
+        return "select cvidata.event_crf_id, cvidata.crf_version_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name,"
 				+ " cvidata.item_id, cvidata.item_oid, cvidata.item_data_ordinal, cvidata.value, cvidata.item_data_type_id, cvidata.item_data_id"
 				+ " from (select ec.event_crf_id, ec.crf_version_id, item.item_id, item.oc_oid as item_oid,"
 				+ " idata.ordinal as item_data_ordinal, idata.value as value, item.item_data_type_id, idata.item_data_id as item_data_id from item,"
@@ -2826,11 +2837,12 @@ public class OdmExtractDAO extends DatasetDAO {
 
 	protected String getEventGroupItemWithUnitSql(String studyIds, String sedIds, String itemIds,
 			String dateConstraint, int datasetItemStatusId, String studySubjectIds) {
-		return "select cvit.*, mu.oc_oid as mu_oid from ("
+		return "select cvit.*, mu.oc_oid as mu_oid, xxec.study_event_definition_id as study_event_definition_id from ("
 				+ this.getEventGroupItemSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId,
 						studySubjectIds)
 				+ " )cvit left join (select item.item_id, mu.oc_oid from versioning_map vm, item, measurement_unit mu where vm.item_id in "
-				+ itemIds + " and vm.item_id = item.item_id and item.units = mu.name )mu on cvit.item_id = mu.item_id";
+				+ itemIds + " and vm.item_id = item.item_id and item.units = mu.name )mu on cvit.item_id = mu.item_id " +
+                " left join (select xec.event_crf_id as event_crf_id, xsed.study_event_definition_id as study_event_definition_id from event_crf xec, study_event xse, study_event_definition xsed where xse.study_event_id = xec.study_event_id and xsed.study_event_definition_id = xse.study_event_definition_id) xxec on xxec.event_crf_id = cvit.event_crf_id;";
 	}
 
 	protected String getItemGroupAndItemMetaWithUnitSql(String crfVersionIds) {

@@ -26,6 +26,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,6 +44,7 @@ public class MetaDataVersionBean extends ElementOIDBean {
 	private List<ItemGroupDefBean> itemGroupDefs;
 	private List<ItemDefBean> itemDefs;
 	private List<CodeListBean> codeLists;
+	private List<String> excludeItems;
 	// OpenClinica system has set softhard constraint on study level
 	private String softhard;
 
@@ -196,5 +198,23 @@ public class MetaDataVersionBean extends ElementOIDBean {
 
 	public void setRuleSetRules(List<RuleSetRuleBean> ruleSetRules) {
 		this.ruleSetRules = ruleSetRules;
+	}
+
+	public List<String> getExcludeItems() {
+		return excludeItems;
+	}
+
+	public void setExcludeItems(List<String> excludeItems) {
+		this.excludeItems = excludeItems;
+	}
+
+	public void setExcludeItems(String excludeItems) {
+		this.excludeItems = new ArrayList<String>();
+		if (excludeItems != null && !excludeItems.trim().isEmpty()) {
+			List<String> valueList = Arrays.asList(excludeItems.split(","));
+			for (String value : valueList) {
+				this.excludeItems.add(value.replaceFirst("[^_]*_", ""));
+			}
+		}
 	}
 }

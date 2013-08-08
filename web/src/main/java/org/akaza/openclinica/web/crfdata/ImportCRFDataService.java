@@ -85,11 +85,17 @@ public class ImportCRFDataService {
 
 	private ItemDataDAO itemDataDao;
 
+    private Locale locale;
+
 	public static ResourceBundle respage;
+
+    public static ResourceBundle resformat;
 
 	public ImportCRFDataService(DataSource ds, Locale locale) {
 		ResourceBundleProvider.updateLocale(locale);
 		respage = ResourceBundleProvider.getPageMessagesBundle(locale);
+        resformat = ResourceBundleProvider.getFormatBundle(locale);
+        this.locale = locale;
 		this.ds = ds;
 	}
 
@@ -510,15 +516,24 @@ public class ImportCRFDataService {
 					try {
 						sdf_sqldate.parse(dateValue);
 						displayItemBean.getData().setValue(dateValue);
-					} catch (ParseException pe1) {
+					} catch (ParseException pe) {
+						try {
+							/*
+							 * here we are trying to parse the dates from the old XML files that were generated before
+							 * the fix for the #414 we can remove it in a future
+							 */
+							sdf_sqldate = new SimpleDateFormat(resformat.getString("date_format_string"), locale);
+							sdf_sqldate.parse(dateValue);
+							displayItemBean.getData().setValue(dateValue);
+						} catch (ParseException pe1) {
+							// next version; fail if it does not pass iso 8601
+							MessageFormat mf = new MessageFormat("");
+							mf.applyPattern(respage.getString("you_have_a_date_value_which_is_not"));
+							Object[] arguments = { displayItemBean.getItem().getOid() };
 
-						// next version; fail if it does not pass iso 8601
-						MessageFormat mf = new MessageFormat("");
-						mf.applyPattern(respage.getString("you_have_a_date_value_which_is_not"));
-						Object[] arguments = { displayItemBean.getItem().getOid() };
+							hardv.put(itemOid, mf.format(arguments));
 
-						hardv.put(itemOid, mf.format(arguments));
-
+						}
 					}
 				}
 
