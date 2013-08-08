@@ -192,7 +192,7 @@ public class EventCrfLayerBuilder {
 		html.tr(0).id("Menu_on_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount).style("display: none")
 				.close();
 		html.td(0).colspan("2").close();
-		html.table(0).border("0").cellpadding("0").cellspacing("0").close();
+		html.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 		if (eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
 				|| eventCrfStatus == DataEntryStage.ADMINISTRATIVE_EDITING) {
 
