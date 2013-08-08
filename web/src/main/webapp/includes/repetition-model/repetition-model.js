@@ -73,6 +73,13 @@ replaceRowPrefix = function(node, rowPrefix, newRowPrefix) {
     for (i = 0; i < node.children.length; i++) {
         replaceRowPrefix(node.children[i], rowPrefix, newRowPrefix);
     }
+    // fix calendar buttons
+    $("a[id^=anchor" + rowPrefix + "]").each(function() {
+      try {
+        var _html = $(this).get(0).outerHTML;
+        $(this).get(0).outerHTML = _html.replace(new RegExp(rowPrefix, "g"), newRowPrefix);
+      } catch (e) {}
+    });
 }
 
 processRemoveButtons = function() {
