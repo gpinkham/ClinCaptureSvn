@@ -40,7 +40,7 @@
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 		<c:if test="${newDataset.id>0}">
 		<div class="sidebar_tab_content">
-		<P><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/> <font color="red"><fmt:message key="name_description_required" bundle="${restext}"/></font></P>
+		<P><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/> <fmt:message key="name_description_required" bundle="${restext}"/></P>
 		<p><fmt:message key="copy_dataset_by_change_name" bundle="${restext}"/></p>
 		</div>
 		</c:if>
@@ -105,7 +105,7 @@
 <p>Please enter the dataset properties in the fields below.  Be descriptive.  <font color="red">All fields are required.</font></p>
 -->
 
-<c:if test="${newDataset.id<=0}"><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/> <font color="red"><fmt:message key="name_description_required" bundle="${restext}"/></font></c:if>
+<c:if test="${newDataset.id<=0}"><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/> <fmt:message key="name_description_required" bundle="${restext}"/></c:if>
 
 <form id="datasetForm" action="CreateDataset" method="post">
 <input type="hidden" name="action" value="specifysubmit"/>
@@ -114,8 +114,8 @@
 
 		<td><fmt:message key="name" bundle="${resword}"/>:</td>
 
-		<td><input type="text" name="dsName" size="30" value="<c:out value='${dsName}' />"/>
-		<c:if test="${newDataset.id>0}"><fmt:message key="change_dataset_name_create_copy" bundle="${restext}"/></c:if>
+		<td><input type="text" name="dsName" size="30" value="<c:out value='${dsName}' />"/><span class="asterisk">*</span>
+		<%--c:if test="${newDataset.id>0}"><fmt:message key="change_dataset_name_create_copy" bundle="${restext}"/></c:if--%>
 
 		<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dsName"/></jsp:include>
 
@@ -127,7 +127,7 @@
 
 		<td><fmt:message key="description" bundle="${resword}"/>:</td>
 
-		<td><textarea name="dsDesc" cols="40" rows="4"><c:out value="${dsDesc}" /></textarea>
+		<td><textarea name="dsDesc" cols="40" rows="4"><c:out value="${dsDesc}" /></textarea><span class="asterisk">*</span>
 
 		<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dsDesc"/></jsp:include>
 

@@ -37,8 +37,35 @@ function notSelectAll() {
 
 <jsp:include page="../include/extract-header.jsp"/>
 
+<%--<jsp:include page="../include/sidebar.jsp"/>--%>
+<!-- *JSP* ${pageContext.page['class'].simpleName} -->
+<jsp:include page="../include/sideAlert.jsp"/>
+<!-- then instructions-->
+<tr id="sidebar_Instructions_open" style="display: none">
+    <td class="sidebar_tab">
 
-<jsp:include page="../include/sidebar.jsp"/>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+
+        <b><fmt:message key="instructions" bundle="${resword}"/></b>
+
+        <div class="sidebar_tab_content">
+
+        </div>
+
+    </td>
+
+</tr>
+<tr id="sidebar_Instructions_closed" style="display: all">
+    <td class="sidebar_tab">
+
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+
+        <b><fmt:message key="instructions" bundle="${resword}"/></b>
+
+    </td>
+</tr>
+
+<jsp:include page="../include/createDatasetSideInfo.jsp"/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
@@ -52,10 +79,6 @@ function notSelectAll() {
 <h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="view_selected_items" bundle="${resword}"/> <a href="javascript:openDocWindow('help/4_2_createDataset_Help.html#step1')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 </c:otherwise>
 </c:choose>
-
-<P><jsp:include page="../showInfo.jsp"/></P>
-
-<P><jsp:include page="../include/alertbox.jsp"/></P>
 
 <c:if test="${empty newDataset.itemDefCrf}">
 <p><fmt:message key="can_view_items_selected_inclusion" bundle="${restext}"/><fmt:message key="select_all_items_inclusion_clicking" bundle="${restext}"/></p>

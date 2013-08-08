@@ -94,7 +94,7 @@
 					class="button_medium"
 					onClick="javascript: window.location.href='ViewDatasets'" />
 	</td>
-    <c:choose>
+    <%--c:choose>
         <c:when test="${!(userRole.monitor || userRole.investigator)}">
              <td>
                 <form action="EditDataset">
@@ -113,13 +113,13 @@
                 </td>
             </c:if>
         </c:otherwise>
-    </c:choose>
-  <td>
+    </c:choose--%>
+  <%--td>
    <form action="ExportDataset">
     <input type="hidden" name="datasetId" value="<c:out value="${dataset.id}"/>"/>
     <input type="submit" value="<fmt:message key="export_this_dataset" bundle="${resword}"/>" class="button_xlong"/><br>
    </form>
-  </td>
+  </td--%>
 </tr>
 </table>
 <c:import url="../include/workflow.jsp">

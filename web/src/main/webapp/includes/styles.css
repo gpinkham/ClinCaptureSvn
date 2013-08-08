@@ -2101,3 +2101,8 @@ table.crfListTable td {
     text-align: left;
     white-space: nowrap;
 }
+
+span.asterisk {
+    padding-left: 4px;
+    vertical-align: top;
+}
