@@ -113,7 +113,7 @@
             </c:choose>
 
             <c:choose>
-                <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and (currentRole.id eq 4 or currentRole.id eq 1) and not study.status.frozen and not study.status.locked} ">
+                <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4 and not study.status.frozen and not study.status.locked} ">
                     <c:set var="hideCol6" value="false"/>
                     <a href="SignStudySubject?id=${studySubject.id}"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign_subject" bundle="${resword}"/>" title="<fmt:message key="sign_subject" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -205,7 +205,7 @@
             </c:choose>
 
             <c:choose>
-                <c:when test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and (currentRole.id eq 4 or currentRole.id eq 1) and not study.status.frozen and not study.status.locked}">
+                <c:when test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4 and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol6" value="false"/>
                     <a href="UpdateStudyEvent?action=submit&event_id=${studyEvent.id}&ss_id=${studySubject.id}&changeDate=&startDate=20-Jan-2012&startHour=-1&startMinute=-1&startHalf=&endDate=&endHour=-1&endMinute=-1&endHalf=&statusId=8&Submit=Submit+Changes"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign" bundle="${resword}"/>" title="<fmt:message key="sign" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
