@@ -56,6 +56,7 @@
 <input type="hidden" name="action" value="confirm">
 <input type="hidden" name="id" value="<c:out value="${subjectToUpdate.id}"/>">
 <input type="hidden" name="studySubId" value="<c:out value="${studySubId}"/>">
+<input type="hidden" name="isDataChanged" value="<c:out value="${isDataChanged}"/>">
 <!-- These DIVs define shaded box borders -->
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -65,7 +66,6 @@
 	<tr valign="top">
 	  	<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
 		<td>
-			
 			 <c:choose>
 				<c:when test="${parameters['subjectPersonIdRequired'] == 'required'}">
 					<table>
@@ -252,7 +252,8 @@
         if ((updateSubjectFormState.uniqueIdentifier != undefined && updateSubjectFormState.uniqueIdentifier != newState.uniqueIdentifier) ||
             (updateSubjectFormState.gender != undefined && updateSubjectFormState.gender != newState.gender) ||
             (updateSubjectFormState.dateOfBirth != undefined && updateSubjectFormState.dateOfBirth != newState.dateOfBirth) ||
-            (updateSubjectFormState.yearOfBirth != undefined && updateSubjectFormState.yearOfBirth != newState.yearOfBirth)) {
+            (updateSubjectFormState.yearOfBirth != undefined && updateSubjectFormState.yearOfBirth != newState.yearOfBirth) ||
+			($("input[name=isDataChanged]").val() == 'true')) {
             ok = confirm('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>');
         } else {
             ok = true;
@@ -261,7 +262,7 @@
         	goBackSmart('${navigationURL}', '${defaultURL}');
         }
     }
-
+ 
     saveEditUserFormState(updateSubjectFormState);
 </script>
 </br>

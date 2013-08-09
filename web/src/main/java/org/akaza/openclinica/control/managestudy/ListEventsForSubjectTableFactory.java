@@ -896,8 +896,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 		String studySubjectLabel = studySubject.getLabel();
 
-		String divWidth = studyEvents.size() >= 3 ? "540" : studyEvents.size() == 2 ? "360" : "180";
-
 		HtmlBuilder eventDiv = new HtmlBuilder();
 
 		eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();

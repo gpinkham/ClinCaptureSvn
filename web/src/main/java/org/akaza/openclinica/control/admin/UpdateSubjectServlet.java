@@ -77,6 +77,8 @@ public class UpdateSubjectServlet extends SecureController {
 		FormProcessor fp = new FormProcessor(request);
 		FormDiscrepancyNotes discNotes = null;
 		Map<String, String> fields = new HashMap<String, String>();
+		Map<String, String> parameters;
+		SubjectBean subject;
 		
 		String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
 		if (StringUtil.isBlank(fromResolvingNotes)) {
@@ -97,8 +99,8 @@ public class UpdateSubjectServlet extends SecureController {
 				clearSession();
 				
 				StudyDAO sdao = new StudyDAO(sm.getDataSource());
-				Map<String, String> parameters = new HashMap<String, String>();
-				SubjectBean subject = (SubjectBean) subjdao.findByPK(subjectId);
+				parameters = new HashMap<String, String>();
+				subject = (SubjectBean) subjdao.findByPK(subjectId);
 				session.setAttribute("subjectToUpdate", subject);
 				
 				ArrayList<StudyParamsConfig> listOfParams = new ArrayList<StudyParamsConfig>();
@@ -123,7 +125,7 @@ public class UpdateSubjectServlet extends SecureController {
 				Date birthDate = subject.getDateOfBirth();
 				
 				String personIdToDisplay = "";
-				String genderToDisplay = gender;
+				String genderToDisplay = "";
 				String dateToDisplay = "";
 				
 				if (!"".equals(personId)){
@@ -153,6 +155,7 @@ public class UpdateSubjectServlet extends SecureController {
 				fields.put("dateOfBirth", dateToDisplay);
 				
 				session.setAttribute("fields", fields);
+				session.setAttribute("oldValues", new HashMap<String, String>(fields));
 				
 				discNotes = new FormDiscrepancyNotes();
 				session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
@@ -175,11 +178,22 @@ public class UpdateSubjectServlet extends SecureController {
 			} else if ("confirm".equalsIgnoreCase(action)) {
 				confirm();
 			} else if ("back".equalsIgnoreCase(action)) {
+				fields = (HashMap<String, String>) session.getAttribute("fields");
+				HashMap<String, String> oldValues = (HashMap<String, String>) session.getAttribute("oldValues");
+				boolean isDataChanged = false;
+
+				if (!fields.get("personId").equals(oldValues.get("personId")) || 
+							!fields.get("gender").equals(oldValues.get("gender")) || 
+							!fields.get("dateOfBirth").equals(oldValues.get("dateOfBirth"))){
+					isDataChanged = true;
+				}
+				request.setAttribute("isDataChanged", isDataChanged);
+				
 				forwardPage(Page.UPDATE_SUBJECT);
 			} else if ("submit".equalsIgnoreCase(action)) {
-				SubjectBean subject = (SubjectBean) session.getAttribute("subjectToUpdate");
+				subject = (SubjectBean) session.getAttribute("subjectToUpdate");
 				fields = (HashMap<String, String>) session.getAttribute("fields");
-				Map<String, String> parameters = (HashMap<String, String>) session.getAttribute("parameters");
+				parameters = (HashMap<String, String>) session.getAttribute("parameters");
 				
 				subject.setUpdater(ub);
 				if (!"not used".equals(parameters.get("subjectPersonIdRequired"))) {
@@ -354,6 +368,7 @@ public class UpdateSubjectServlet extends SecureController {
 	private void clearSession() {
 		session.removeAttribute("parameters");
 		session.removeAttribute("fields");
+		session.removeAttribute("oldValues");
 		session.removeAttribute("subjectToUpdate");
 		session.removeAttribute("id");
 		session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
