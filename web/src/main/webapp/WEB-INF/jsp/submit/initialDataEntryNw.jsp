@@ -228,7 +228,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
                                     <li style="color: #ff0000">
                                 </c:when>
                                 <c:otherwise>
-                                    <li style="color: #ffa500">
+                                    <li style="color: #E46E16">
                                 </c:otherwise>
                             </c:choose>
                            <span style="text-decoration: underline"><strong>
