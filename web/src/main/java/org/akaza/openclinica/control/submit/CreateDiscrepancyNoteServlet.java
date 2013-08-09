@@ -621,7 +621,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 			// (after a CRF is marked complete) to a Reason For Change note.
 			isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
 			if (DiscrepancyNoteType.get(typeId) == DiscrepancyNoteType.ANNOTATION) {
-				note.setAssignedUserId(preUserId);
+				note.setAssignedUserId(isReasonForChange ? ub.getId() : preUserId);
 				if ("itemdata".equalsIgnoreCase(entityType)) {
 					if (isReasonForChange) {
 						typeId = DiscrepancyNoteType.REASON_FOR_CHANGE.getId();
