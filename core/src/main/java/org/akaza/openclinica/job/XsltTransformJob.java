@@ -314,8 +314,8 @@ public class XsltTransformJob extends QuartzJobBean {
 
 					if (successMsg.contains("$linkURL")) {
 						successMsg = successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getSystemURL()
-								+ "AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
-								+ "AccessFile?fileId=" + fbFinal.getId() + " </a>");
+								+ "/AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
+								+ "/AccessFile?fileId=" + fbFinal.getId() + " </a>");
 					}
 					emailBuffer.append("<p>" + successMsg + "</p>");
 					logMe("System time begining.." + sysTimeBegin);
