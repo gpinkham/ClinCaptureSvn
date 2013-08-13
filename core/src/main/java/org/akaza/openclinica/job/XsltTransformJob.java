@@ -254,7 +254,7 @@ public class XsltTransformJob extends QuartzJobBean {
 			String jobName = dataMap.getString(XsltTriggerService.JOB_NAME);
 			// String emailBody = "";
 			StringBuffer emailBuffer = new StringBuffer("");
-			emailBuffer.append("<p>" + pageMessages.getString("email_header_1") + " " + EmailEngine.getAdminEmail()
+			emailBuffer.append("<p>" + pageMessages.getString("email_header_1")
 					+ " " + pageMessages.getString("email_header_2") + " Job Execution "
 					+ pageMessages.getString("email_header_3") + "</p>");
 			emailBuffer.append("<P>Dataset: " + datasetBean.getName() + "</P>");

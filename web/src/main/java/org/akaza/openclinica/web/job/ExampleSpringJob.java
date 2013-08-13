@@ -174,8 +174,8 @@ public class ExampleSpringJob extends QuartzJobBean {
 				ExtractBean eb = generateFileService.generateExtractBean(datasetBean, activeStudy, parentStudy);
 				StringBuffer message = new StringBuffer();
 				StringBuffer auditMessage = new StringBuffer();
-				message.append("<p>" + pageMessages.getString("email_header_1") + " " + EmailEngine.getAdminEmail()
-						+ " " + pageMessages.getString("email_header_2") + " Job Execution "
+				message.append("<p>" + pageMessages.getString("email_header_1") + " "
+						+ pageMessages.getString("email_header_2") + " Job Execution "
 						+ pageMessages.getString("email_header_3") + "</p>");
 				message.append("<P>Dataset: " + datasetBean.getName() + "</P>");
 				message.append("<P>Study: " + activeStudy.getName() + "</P>");

@@ -141,8 +141,7 @@ public class RuleRunner {
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
 
 		sb.append(respage.getString("email_header_1"));
-
-		sb.append(" " + contextPath + " ");
+		sb.append(" ");
 		sb.append(respage.getString("email_header_2"));
 		sb.append(" '" + currentStudy.getName() + "' ");
 		sb.append(respage.getString("email_header_3"));
