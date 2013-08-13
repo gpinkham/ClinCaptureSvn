@@ -777,6 +777,7 @@ public class CreateStudyServlet extends SecureController {
 
 		newStudy.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
         newStudy.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
+        newStudy.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
 
 		session.setAttribute("newStudy", newStudy);
 
@@ -927,6 +928,10 @@ public class CreateStudyServlet extends SecureController {
 
         spv.setParameter("allowSdvWithOpenQueries");
         spv.setValue(newStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries());
+        spvdao.create(spv);
+
+        spv.setParameter("replaceExisitingDataDuringImport");
+        spv.setValue(newStudy.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
         spvdao.create(spv);
 
 		logger.info("study parameters created done");

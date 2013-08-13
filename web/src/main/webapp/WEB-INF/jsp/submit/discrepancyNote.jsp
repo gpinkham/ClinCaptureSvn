@@ -112,35 +112,6 @@ function timeOutWindow(close,duration) {
 	}
 }
 
-// ClinCapture #42  start
-//function setStatusWithId(typeId,id,filter1,nw,ud,rs,cl,na) {
-//	objtr1=document.getElementById('res1'+id);
-//	objtr2=document.getElementById('resStatusId'+id);
-//	if (typeId == 2|| typeId ==4    //annotation or reason for change
-//            || typeId == 1 ) {      // ClinCapture #42 no state transition for failed validation check
-//  		objtr2.disabled = true;
-//  		objtr2.options.length = 0;
-//  		objtr2.options[0]=new Option(na, '5');
-//	} else {
-//		objtr2.disabled = false;
-//		if(id > 0 ) {
-//		} else {
-//  			objtr2.options.length = 0;
-//			objtr2.options[0]=new Option(nw, '1');
-//			if(filter1=="22" || (filter1=="2" && typeId==1)) {
-////		  		objtr2.options[1]=new Option(rs, '3'); //ClinCapture #42
-//			} else if(filter1=="1") {
-////				objtr2.options[1]=new Option(ud,'2'); //ClinCapture #42
-////				objtr2.options[0]=new Option(cl,'4'); //ClinCapture #42
-//			} else {
-////				objtr2.options[0]=new Option(ud,'2'); //ClinCapture #42
-////				objtr2.options[2]=new Option(rs,'3'); //ClinCapture #42
-////				objtr2.options[1]=new Option(cl,'4'); //ClinCapture #42
-//			}
-//		}
-//	}
-//}
-
 // typeId -  discrepancyNoteTypeId
 // filter1 - whichResStatus
 function setStatusWithId(typeId, id, filter1, nw, ud, rs, cl, na) {
@@ -180,7 +151,15 @@ function setYPos(id) {
 			document.documentElement.scrollTop : document.body.scrollTop;
 	setValue("ypos"+id,y);
 }
-//-->
+
+ $(document).ready(function() { 
+	var parentId = $("input[name=parentId]").val();
+	if($("select[id=typeId"+parentId+"]").val() === '2') {
+		$("span[id=user1"+parentId+"]").hide();
+		$("span[id=user2"+parentId+"]").hide();
+	}
+	});
+
 </script>
 
 <c:set var="parentId" value="${param.parentId}"/>
@@ -211,6 +190,7 @@ function setYPos(id) {
 	<input type="hidden" name="column" value="${param.column}"/>
 	<input type="hidden" name="close${parentId}" value=""/>
 	<input type="hidden" name="ypos${parentId}" value="0"/>
+	<input type="hidden" name="isRfc" value="${!isRFCExist}"/>
 	<!-- *JSP* submit/discrepancyNote.jsp -->
 	<td valign="top">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -233,10 +213,24 @@ function setYPos(id) {
 		<div style="clear:both;"></div> 
 		<div class="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
 		<div class="dnBoxCol2-1">
-			<span id="description${parentId}">
-				<div class="formfieldXL_BG"><input type="text" id="description${parentId}id" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
-				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
-			</span>
+		<c:choose>
+			<c:when test="${!isRFCExist}">
+				<div class="formfieldL_BG">
+					<select name="description" id="description" class="formFieldL">
+						<c:forEach var="rfcTerm" items="${dnDescriptions}">
+							<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
+						</c:forEach>
+						<option value="Other"><fmt:message key="other" bundle="${resword}"/>
+					</select>
+				</div>
+			</c:when>
+			<c:otherwise>
+				<span id="description${parentId}">
+					<div class="formfieldXL_BG"><input type="text" id="description${parentId}id" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
+					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
+				</span>
+			</c:otherwise>
+		</c:choose>
 		</div>
 		<div class="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
 		<div class="dnBoxCol2">

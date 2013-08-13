@@ -35,6 +35,7 @@ import javax.xml.transform.sax.SAXSource;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -107,6 +108,7 @@ public class ImportCRFDataServlet extends SecureController {
 		String module = fp.getString(MODULE);
 		// keep the module in the session
 		session.setAttribute(MODULE, module);
+        request.setAttribute("study", request.getSession().getAttribute("study"));
 
 		String action = request.getParameter("action");
 		CRFVersionBean version = (CRFVersionBean) session.getAttribute("version");
@@ -237,8 +239,9 @@ public class ImportCRFDataServlet extends SecureController {
 						List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
 						tempDisplayItemBeanWrappers = getImportCRFDataService().lookupValidationErrors(request,
 								odmContainer, ub, totalValidationErrors, hardValidationErrors, permittedEventCRFIds);
-						logger.debug("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
-						logger.debug("size of total validation errors: " + totalValidationErrors.size());
+						logger.info("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
+						logger.info("size of total validation errors: " + totalValidationErrors.size());
+						logger.info("size of hard validation errors: " + hardValidationErrors.size());
 						displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
 					} catch (NullPointerException npe1) {
 						// what if you have 2 event crfs but the third is a fake?
@@ -271,6 +274,12 @@ public class ImportCRFDataServlet extends SecureController {
 						displayItemBeanWrappers);
 				session.setAttribute("summaryStats", ssBean);
 				session.setAttribute("subjectData", odmContainer.getCrfDataPostImportContainer().getSubjectData());
+				if (request.getAttribute("hasSkippedItems") != null) {
+					addPageMessage(resword.getString("import_msg_part1")
+							+ " "
+							+ (currentStudy.getParentStudyId() > 0 ? resword.getString("site") : resword
+									.getString("study")) + " " + resword.getString("import_msg_part2"));
+				}
 				forwardPage(Page.VERIFY_IMPORT_SERVLET);
 			}
 		}

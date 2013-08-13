@@ -41,6 +41,7 @@ import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.DnDescription;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -60,6 +61,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -760,9 +762,39 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 	}
 
 	private void manageStatuses(List<DiscrepancyNoteBean> notes) {
-
+		boolean isRFCExist = false;
+		for (DiscrepancyNoteBean note: notes) {
+			if (note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
+				isRFCExist = true;
+			}
+		}
+		request.setAttribute("isRFCExist", isRFCExist);
+		
+		ArrayList<DnDescription> siteVisibleDescs = new ArrayList<DnDescription>();
+		ArrayList<DnDescription> studyVisibleDescs = new ArrayList<DnDescription>();
+		DnDescriptionDao descriptionDao = new DnDescriptionDao(sm.getDataSource());
+		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+		ArrayList<DnDescription> dnDescriptions = new ArrayList<DnDescription>();
+		ArrayList<DnDescription> rfcDescriptions = (ArrayList<DnDescription>) descriptionDao.findAllByStudyId(parentStudyId);
+		
+		for (DnDescription rfcTerm : rfcDescriptions) {
+			if ("Site".equals(rfcTerm.getVisibilityLevel())) {
+				siteVisibleDescs.add(rfcTerm);
+			} else if ("Study".equals(rfcTerm.getVisibilityLevel())) {
+				studyVisibleDescs.add(rfcTerm);
+			} else if ("Study and Site".equals(rfcTerm.getVisibilityLevel())) {
+				studyVisibleDescs.add(rfcTerm);
+				siteVisibleDescs.add(rfcTerm);
+			}
+		}
+		if (currentStudy.getParentStudyId() > 0) {
+			dnDescriptions = siteVisibleDescs;
+		} else {
+			dnDescriptions = studyVisibleDescs;
+		}
+		request.setAttribute("dnDescriptions", dnDescriptions);
+		
 		if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
-
 			request.setAttribute(SHOW_STATUS, false);
 			request.setAttribute(CAN_CLOSE, false);
 			request.setAttribute(DIS_TYPES, Arrays.asList(DiscrepancyNoteType.ANNOTATION));
@@ -773,9 +805,15 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 		} else {
 			request.setAttribute(SHOW_STATUS, true);
 			request.setAttribute(CAN_CLOSE, true);
-			request.setAttribute(DIS_TYPES, DiscrepancyNoteType.simpleList);
+			
 			request.setAttribute(RES_STATUSES, Arrays.asList(ResolutionStatus.UPDATED, ResolutionStatus.CLOSED));
-			request.setAttribute(DIS_TYPES2, DiscrepancyNoteType.simpleList);
+			if (isRFCExist){
+				request.setAttribute(DIS_TYPES, Arrays.asList(DiscrepancyNoteType.ANNOTATION));
+				request.setAttribute(DIS_TYPES2, Arrays.asList(DiscrepancyNoteType.ANNOTATION));
+			} else {
+				request.setAttribute(DIS_TYPES, DiscrepancyNoteType.simpleList);
+				request.setAttribute(DIS_TYPES2, DiscrepancyNoteType.simpleList);
+			}
 			request.setAttribute(RES_STATUSES2, ResolutionStatus.simpleList);
 		}
 	}

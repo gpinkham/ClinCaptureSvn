@@ -395,6 +395,15 @@ function updateThis(multiSelEle, count) {
             </td>
         </tr>
     </c:when>
+   <c:when test="${config.parameter.handle=='replaceExisitingDataDuringImport'}">
+       <tr valign="top">
+           <td class="formlabel"><fmt:message key="replaceExisitingDataDuringImport" bundle="${resword}"/></td>
+           <td>
+               <input type="radio" <c:if test="${newStudy.studyParameterConfig.replaceExisitingDataDuringImport== 'yes'}">checked</c:if> name="replaceExisitingDataDuringImport" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+               <input type="radio" <c:if test="${newStudy.studyParameterConfig.replaceExisitingDataDuringImport== 'no'}">checked</c:if> name="replaceExisitingDataDuringImport" value="no"><fmt:message key="no" bundle="${resword}"/>
+           </td>
+       </tr>
+   </c:when>
 	<c:when test="${config.parameter.handle=='interviewerNameRequired'}">
 		   <tr valign="top"><td class="formlabel"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td>
                <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewerNameRequired== 'yes'}">checked</c:if> name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>

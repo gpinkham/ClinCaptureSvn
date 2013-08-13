@@ -471,6 +471,7 @@ public class UpdateStudyServletNew extends SecureController {
 		study.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
         study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
+        study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
 		if (!errors.isEmpty()) {
 			request.setAttribute("formMessages", errors);
 		}
@@ -775,6 +776,10 @@ public class UpdateStudyServletNew extends SecureController {
         spv.setValue(newStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries());
         updateParameter(spvdao, spv);
 
+        spv.setParameter("replaceExisitingDataDuringImport");
+        spv.setValue(newStudy.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
+        updateParameter(spvdao, spv);
+
 		StudyBean curStudy = (StudyBean) session.getAttribute("study");
 		if (curStudy != null && study1.getId() == curStudy.getId()) {
 			super.currentStudy = study1;
@@ -890,6 +895,10 @@ public class UpdateStudyServletNew extends SecureController {
 
             childspv.setParameter("allowSdvWithOpenQueries");
             childspv.setValue(newStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries());
+            updateParameter(spvdao, childspv);
+
+            childspv.setParameter("replaceExisitingDataDuringImport");
+            childspv.setValue(newStudy.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
             updateParameter(spvdao, childspv);
 		}
 	}

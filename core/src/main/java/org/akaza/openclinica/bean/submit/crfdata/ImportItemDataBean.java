@@ -39,6 +39,8 @@ public class ImportItemDataBean {
 	private AuditLogsBean auditLogs = new AuditLogsBean();
 	private DiscrepancyNotesBean discrepancyNotes = new DiscrepancyNotesBean();
 
+    private boolean skip;
+    
 	private boolean hasValueWithNull; // this is just a flag, it is not an attribute/element
 	
 	@XmlAttribute(name = "ItemOID")
@@ -115,5 +117,13 @@ public class ImportItemDataBean {
 
 	public void setHasValueWithNull(boolean hasValueWithNull) {
 		this.hasValueWithNull = hasValueWithNull;
+	}
+
+	public boolean isSkip() {
+		return skip;
+	}
+
+	public void setSkip(boolean skip) {
+		this.skip = skip;
 	}
 }

@@ -233,6 +233,7 @@ public class ImportCRFDataService {
 		// create a second Validator, this one for hard edit checks
 		HashMap<String, String> hardValidator = new HashMap<String, String>();
 
+		StudyBean forStudyBean = (StudyBean) request.getAttribute("study");
 		StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
 		StudyDAO studyDAO = new StudyDAO(ds);
 		StudyBean studyBean = studyDAO.findByOid(odmContainer.getCrfDataPostImportContainer().getStudyOID());
@@ -326,6 +327,7 @@ public class ImportCRFDataService {
 								List<ItemBean> itemBeans = itemDAO.findByOid(importItemDataBean.getItemOID());
 								if (!itemBeans.isEmpty()) {
 									ItemBean itemBean = itemBeans.get(0);
+                                    itemBean.setImportItemDataBean(importItemDataBean);
 									logger.debug("   found " + itemBean.getName());
 									DisplayItemBean displayItemBean = new DisplayItemBean();
 									displayItemBean.setItem(itemBean);
@@ -366,6 +368,7 @@ public class ImportCRFDataService {
 										// if you do indeed leave off this in the XML it will pass but return 'null' tbh
 										attachValidator(displayItemBean, importHelper, discValidator, hardValidator,
 												request, eventCRFRepeatKey, studySubjectBean.getOid());
+										checkExistingData(request, displayItemBean, itemBean, forStudyBean);
 										displayItemBeans.add(displayItemBean);
 
 									} else {
@@ -406,6 +409,7 @@ public class ImportCRFDataService {
 											// displayItemBean.setMetadata(metadataBean);
 											// set event def crf?
 											displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
+											checkExistingData(request, displayItemBean, itemBean, forStudyBean);
 											displayItemBeans.add(displayItemBean);
 											logger.debug("... adding display item bean");
 										}
@@ -476,6 +480,20 @@ public class ImportCRFDataService {
 		return wrappers;
 	}
 
+	private void checkExistingData(HttpServletRequest request, DisplayItemBean displayItemBean, ItemBean itemBean, StudyBean currentStudy) {
+		if (currentStudy.getStudyParameterConfig().getReplaceExisitingDataDuringImport().equals("no")) {
+			ItemDataBean existingItemDataBean = getItemDataDao().findByItemIdAndEventCRFIdAndOrdinal(
+					displayItemBean.getItem().getId(), displayItemBean.getData().getEventCRFId(),
+					displayItemBean.getData().getOrdinal());
+			if (existingItemDataBean != null && existingItemDataBean.getId() > 0
+					&& existingItemDataBean.getValue() != null && !existingItemDataBean.getValue().isEmpty()) {
+				displayItemBean.setSkip(true);
+                request.setAttribute("hasSkippedItems", true);
+				itemBean.getImportItemDataBean().setSkip(true);
+			}
+		}
+	}
+    
 	private ItemDataBean createItemDataBean(ItemBean itemBean, EventCRFBean eventCrfBean, String value,
 			UserAccountBean ub, int ordinal) {
 

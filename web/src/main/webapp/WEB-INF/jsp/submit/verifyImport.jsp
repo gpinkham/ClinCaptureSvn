@@ -354,6 +354,18 @@
 		<br />
 
 
+        <c:set var="subjectSpan" value="4"/>
+        <c:set var="formOidSpan" value="2"/>
+        <c:set var="eventCrfOidSpan" value="3"/>
+        <c:set var="studyEventOidSpan" value="3"/>
+        <c:set var="crfVersionOidSpan" value="3"/>
+        <c:if test="${study.studyParameterConfig.replaceExisitingDataDuringImport == 'no'}">
+            <c:set var="subjectSpan" value="5"/>
+            <c:set var="formOidSpan" value="3"/>
+            <c:set var="eventCrfOidSpan" value="4"/>
+            <c:set var="studyEventOidSpan" value="4"/>
+            <c:set var="crfVersionOidSpan" value="3"/>
+        </c:if>
 
 		<!--  valid data section, show all valid data -->
 		<fmt:message key="valid_data_imported" bundle="${resword}"/>
@@ -373,7 +385,7 @@
 
 				<c:forEach var="subjectDataBean" items="${subjectData}">
 					<tr valign="top">
-						<td class="table_header_row" colspan="4"><fmt:message
+						<td class="table_header_row" colspan="${subjectSpan}"><fmt:message
 							key="study_subject" bundle="${resword}" />: <c:out
 							value="${subjectDataBean.subjectOID}" /></td>
 					</tr>
@@ -382,7 +394,7 @@
 						<tr valign="top">
 							<td class="table_header_row"><fmt:message
 								key="event_CRF_OID" bundle="${resword}" /></td>
-							<td class="table_header_row" colspan="3"></td>
+							<td class="table_header_row" colspan="${eventCrfOidSpan}"></td>
 						</tr>
 						<tr valign="top">
 							<td class="table_cell_left"><c:out
@@ -400,14 +412,14 @@
 									<c:set var="studyEventRepeatKey" value="${1}" />
 								</c:otherwise>
 							</c:choose></td>
-							<td class="table_cell" colspan="3"></td>
+							<td class="table_cell" colspan="${studyEventOidSpan}"></td>
 						</tr>
 						<c:forEach var="formData" items="${studyEventData.formData}">
 							<tr valign="top">
 								<td class="table_header_row"></td>
 								<td class="table_header_row"><fmt:message
 									key="CRF_version_OID" bundle="${resword}" /></td>
-								<td class="table_header_row" colspan="2"></td>
+								<td class="table_header_row" colspan="${crfVersionOidSpan}"></td>
 							</tr>
 							<tr valign="top">
 								<td class="table_cell_left"></td>
@@ -418,7 +430,7 @@
 								<tr valign="top">
 									<td class="table_header_row"></td>
 									<td class="table_header_row"></td>
-									<td class="table_header_row" colspan="2"><c:out
+									<td class="table_header_row" colspan="${formOidSpan}"><c:out
 										value="${itemGroupData.itemGroupOID}" /> <c:choose>
 										<c:when test="${itemGroupData.itemGroupRepeatKey != null}">
 					    				(<fmt:message key="repeated_key" bundle="${resword}">
@@ -446,6 +458,13 @@
 												value="${itemData.itemOID}" /></td>
 											<%-- or add it here? --%>
 											<td class="table_cell"><c:out value="${itemData.value}" /></td>
+                                            <c:if test="${study.studyParameterConfig.replaceExisitingDataDuringImport == 'no'}">
+                                                <td class="table_cell">
+                                                    <c:if test="${itemData.skip}">
+                                                        <fmt:message key="will_be_skipped" bundle="${resword}"/>
+                                                    </c:if>
+                                                </td>
+                                            </c:if>
 										</tr>
 									</c:if>
 								</c:forEach>

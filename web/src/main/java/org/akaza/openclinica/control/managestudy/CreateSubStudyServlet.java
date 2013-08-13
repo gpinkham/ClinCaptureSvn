@@ -126,6 +126,8 @@ public class CreateSubStudyServlet extends SecureController {
 								scg.getValue().setValue(fp.getString("markImportedCRFAsCompleted"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")) {
                                 scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));
+                            } else if (scg.getParameter().getHandle().equalsIgnoreCase("replaceExisitingDataDuringImport")) {
+                                scg.getValue().setValue(fp.getString("replaceExisitingDataDuringImport"));
                             }
 							configs.add(scg);
 						}
@@ -394,6 +396,11 @@ public class CreateSubStudyServlet extends SecureController {
                     scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));
                     study.getStudyParameterConfig().setAllowSdvWithOpenQueries(
                             fp.getString("allowSdvWithOpenQueries"));
+                } else if (scg.getParameter().getHandle().equalsIgnoreCase("replaceExisitingDataDuringImport")
+                        && !fp.getString("replaceExisitingDataDuringImport").isEmpty()) {
+                    scg.getValue().setValue(fp.getString("replaceExisitingDataDuringImport"));
+                    study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
+                            fp.getString("replaceExisitingDataDuringImport"));
                 }
 			}
 		}

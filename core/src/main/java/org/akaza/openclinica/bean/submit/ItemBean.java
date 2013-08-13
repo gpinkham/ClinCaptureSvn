@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.oid.ItemOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -48,6 +49,8 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 	private int itemDataTypeId = 0;
 
     private String crfVersion;
+
+    private ImportItemDataBean importItemDataBean;
 
     public String getCrfVersion() {
         return crfVersion;
@@ -465,5 +468,13 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 
 	public void setDefId(int defId) {
 		this.defId = defId;
+	}
+
+	public ImportItemDataBean getImportItemDataBean() {
+		return importItemDataBean;
+	}
+
+	public void setImportItemDataBean(ImportItemDataBean importItemDataBean) {
+		this.importItemDataBean = importItemDataBean;
 	}
 }

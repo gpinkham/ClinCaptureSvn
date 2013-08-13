@@ -45,6 +45,8 @@ public class DisplayItemBean implements Comparable {
 
 	private int totNA;
 
+	private boolean skip;
+
 	private ArrayList<DiscrepancyNoteBean> discrepancyNotes;
 
 	// not in the database
@@ -598,4 +600,12 @@ public class DisplayItemBean implements Comparable {
 	public void setInstantFrontStrGroup(InstantOnChangeFrontStrGroup instantFrontStrGroup) {
 		this.instantFrontStrGroup = instantFrontStrGroup;
 	}
+
+	public boolean isSkip() {
+		return skip;
+	}
+
+	public void setSkip(boolean skip) {
+		this.skip = skip;
+	}  
 }

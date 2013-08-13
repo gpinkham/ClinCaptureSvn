@@ -177,6 +177,8 @@ public class StudyConfigService {
 					spc.setMarkImportedCRFAsCompleted(spv.getValue());
 				} else if (handle.equalsIgnoreCase("allowSdvWithOpenQueries")) {
                     spc.setAllowSdvWithOpenQueries(spv.getValue());
+                } else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
+                    spc.setReplaceExisitingDataDuringImport(spv.getValue());
                 }
 			}
 		}
@@ -268,6 +270,8 @@ public class StudyConfigService {
 				study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("allowSdvWithOpenQueries")) {
                 study.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
+            } else if (parameter.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
+                study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
             }
 		}
 		return study;
@@ -356,6 +360,8 @@ public class StudyConfigService {
 				site.getStudyParameterConfig().setMarkImportedCRFAsCompleted(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("allowSdvWithOpenQueries")) {
                 site.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
+            } else if (parameter.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
+                site.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
             }
 		}
 		return site;

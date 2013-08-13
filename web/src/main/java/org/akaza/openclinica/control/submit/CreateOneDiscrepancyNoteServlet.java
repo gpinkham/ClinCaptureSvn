@@ -79,6 +79,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 	public static final String EMAIL_USER_ACCOUNT = "sendEmail";
 	public static final String BOX_DN_MAP = "boxDNMap";
 	public static final String BOX_TO_SHOW = "boxToShow";
+	public static final String IS_REASON_FOR_CHANGE = "isRfc";
 
 	@Override
 	protected void mayProceed() throws InsufficientPermissionException {
@@ -124,19 +125,30 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		}
 		String ypos = fp.getString("ypos" + parentId);
 		int refresh = 0;
-
-		String description = fp.getString("description" + parentId);
-		int typeId = fp.getInt("typeId" + parentId);
+		
+		boolean isReasonForChange = Boolean.valueOf(fp.getString(IS_REASON_FOR_CHANGE));
+		String description = "";
+		int typeId = 0;
+		
 		String detailedDes = fp.getString("detailedDes" + parentId);
 		int resStatusId = fp.getInt(RES_STATUS_ID + parentId);
 		int assignedUserAccountId = fp.getInt(SUBMITTED_USER_ACCOUNT_ID + parentId);
 		String viewNoteLink = fp.getString("viewDNLink" + parentId);
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "fromBox", "1");
-
 		Validator v = new Validator(request);
-		v.addValidation("description" + parentId, Validator.NO_BLANKS);
-		v.addValidation("description" + parentId, Validator.LENGTH_NUMERIC_COMPARISON,
+		
+		if (isReasonForChange) {
+			typeId = DiscrepancyNoteType.REASON_FOR_CHANGE.getId();
+			dn.setDisType(DiscrepancyNoteType.REASON_FOR_CHANGE);
+			description = fp.getString("description");
+		} else {
+			description = fp.getString("description" + parentId);
+			typeId = fp.getInt("typeId" + parentId);
+			v.addValidation("description" + parentId, Validator.NO_BLANKS);
+			v.addValidation("description" + parentId, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+		}
+		
 		v.addValidation("detailedDes" + parentId, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1000);
 		v.addValidation("typeId" + parentId, Validator.NO_BLANKS);

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="skirpichenok" id="2013-08-09-TICKET32-01">
+        <comment>Insert a new record in the studyParameter table</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="31"/>
+            <column name="handle" value="replaceExisitingDataDuringImport"/>
+            <column name="name" value="replaceExisitingDataDuringImport"/>
+            <column name="description" value="Replace exisiting data during import"/>
+            <column name="default_value" value="no"/>
+            <!-- can be no, yes -->
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+        <insert tableName="audit_log_event_type">
+            <column name="audit_log_event_type_id" valueNumeric="35"/>
+            <column name="name" value="item_data_skipped"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

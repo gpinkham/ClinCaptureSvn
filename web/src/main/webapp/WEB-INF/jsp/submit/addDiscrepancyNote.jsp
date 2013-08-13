@@ -235,7 +235,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 				<c:forEach var="rfcTerm" items="${dnDescriptions}">
 					<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
 				</c:forEach>
-				<option value="Other">Other
+				<option value="Other"><fmt:message key="other" bundle="${resword}"/>
 			</select>
 			</div>
 		</c:when>

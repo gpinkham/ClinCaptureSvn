@@ -51,6 +51,8 @@ import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.admin.AuditDAO;
+import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -149,7 +151,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 			CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(
 					sm.getDataSource(), con);
 			String action = request.getParameter("action");
-
+            StringBuffer skippedItemsSql = new StringBuffer();
 			FormProcessor fp = new FormProcessor(request);
 
 			// checks which module the requests are from
@@ -208,7 +210,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 						con.setAutoCommit(true);
 						for (DisplayItemBean displayItemBean : wrapper
 								.getDisplayItemBeans()) {
-
+                            
 							eventCrfBeanId = displayItemBean.getData()
 									.getEventCRFId();
 							eventCrfBean = (EventCRFBean) eventCrfDao
@@ -218,79 +220,55 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 							logger.debug("found status here: "
 									+ eventCrfBean.getStatus().getName());
 
-							ItemDataBean itemDataBean = new ItemDataBean();
-							itemDataBean = itemDataDao
-									.findByItemIdAndEventCRFIdAndOrdinal(
-											displayItemBean.getItem().getId(),
-											eventCrfBean.getId(),
-											displayItemBean.getData()
-													.getOrdinal());
-							if (wrapper.isOverwrite()
-									&& itemDataBean.getStatus() != null) {
-								logger.debug("just tried to find item data bean on item name "
-										+ displayItemBean.getItem().getName());
-								itemDataBean.setUpdatedDate(new Date());
-								itemDataBean.setUpdater(ub);
-								itemDataBean.setValue(displayItemBean.getData()
-										.getValue());
-								// set status?
-								itemDataDao.update(itemDataBean, con);
-								logger.debug("updated: "
-										+ itemDataBean.getItemId());
-								// need to set pk here in order to create dn
-								displayItemBean.getData().setId(
-										itemDataBean.getId());
-							} else {
-								itemDataDao.create(displayItemBean.getData(),
-										con);
-								logger.debug("created: "
-										+ displayItemBean.getData().getItemId()
-										+ "event CRF ID = "
-										+ eventCrfBean.getId()
-										+ "CRF VERSION ID ="
-										+ eventCrfBean.getCRFVersionId());
-								ItemDataBean itemDataBean2 = itemDataDao
-										.findByItemIdAndEventCRFIdAndOrdinal(
-												displayItemBean.getItem()
-														.getId(), eventCrfBean
-														.getId(),
-												displayItemBean.getData()
-														.getOrdinal());
-								logger.debug("found: id "
-										+ itemDataBean2.getId() + " name "
-										+ itemDataBean2.getName());
-								displayItemBean.getData().setId(
-										itemDataBean2.getId());
-							}
-							ItemDAO idao = new ItemDAO(sm.getDataSource());
-							ItemBean ibean = (ItemBean) idao
-									.findByPK(displayItemBean.getData()
-											.getItemId());
-							String itemOid = displayItemBean.getItem().getOid()
-									+ "_" + wrapper.getStudyEventRepeatKey()
-									+ "_"
-									+ displayItemBean.getData().getOrdinal()
-									+ "_" + wrapper.getStudySubjectOid();
-							if (wrapper.getValidationErrors().containsKey(
-									itemOid)) {
-								ArrayList messageList = (ArrayList) wrapper
-										.getValidationErrors().get(itemOid);
-								// could be more then one will have to iterate
-								for (int iter = 0; iter < messageList.size(); iter++) {
-									String message = (String) messageList
-											.get(iter);
-									DiscrepancyNoteBean parentDn = createDiscrepancyNote(
-											ibean, message, eventCrfBean,
-											displayItemBean, null, ub,
-											sm.getDataSource(), currentStudy,
-											con);
-									createDiscrepancyNote(ibean, message,
-											eventCrfBean, displayItemBean,
-											parentDn.getId(), ub,
-											sm.getDataSource(), currentStudy,
-											con);
+                            ItemDataBean itemDataBean = new ItemDataBean();
+                            itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean
+                                    .getItem().getId(), eventCrfBean.getId(), displayItemBean.getData()
+                                    .getOrdinal());
+							if (!displayItemBean.isSkip()) {
+								if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
+									logger.debug("just tried to find item data bean on item name "
+											+ displayItemBean.getItem().getName());
+									itemDataBean.setUpdatedDate(new Date());
+									itemDataBean.setUpdater(ub);
+									itemDataBean.setValue(displayItemBean.getData().getValue());
+									// set status?
+									itemDataDao.update(itemDataBean, con);
+									logger.debug("updated: " + itemDataBean.getItemId());
+									// need to set pk here in order to create dn
+									displayItemBean.getData().setId(itemDataBean.getId());
+								} else {
+									itemDataDao.create(displayItemBean.getData(), con);
+									logger.debug("created: " + displayItemBean.getData().getItemId()
+											+ "event CRF ID = " + eventCrfBean.getId() + "CRF VERSION ID ="
+											+ eventCrfBean.getCRFVersionId());
+									ItemDataBean itemDataBean2 = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(
+											displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
+													.getData().getOrdinal());
+									logger.debug("found: id " + itemDataBean2.getId() + " name "
+											+ itemDataBean2.getName());
+									displayItemBean.getData().setId(itemDataBean2.getId());
 								}
-							}
+								ItemDAO idao = new ItemDAO(sm.getDataSource());
+								ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
+								String itemOid = displayItemBean.getItem().getOid() + "_"
+										+ wrapper.getStudyEventRepeatKey() + "_"
+										+ displayItemBean.getData().getOrdinal() + "_" + wrapper.getStudySubjectOid();
+								if (wrapper.getValidationErrors().containsKey(itemOid)) {
+									ArrayList messageList = (ArrayList) wrapper.getValidationErrors().get(itemOid);
+									// could be more then one will have to iterate
+									for (int iter = 0; iter < messageList.size(); iter++) {
+										String message = (String) messageList.get(iter);
+										DiscrepancyNoteBean parentDn = createDiscrepancyNote(ibean, message,
+												eventCrfBean, displayItemBean, null, ub, sm.getDataSource(),
+												currentStudy, con);
+										createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean,
+												parentDn.getId(), ub, sm.getDataSource(), currentStudy, con);
+									}
+								}
+							} else {
+                                skippedItemsSql.append("INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id) " +
+                                        "VALUES (35, now(), " + ub.getId() + ", 'item_data', " + itemDataBean.getId() + ", '" + displayItemBean.getItem().getName() + "', '" + itemDataBean.getValue() + "', '" + displayItemBean.getData().getValue() + "', " + displayItemBean.getData().getEventCRFId() + "); ");
+                            }
 							if (!eventCrfInts.contains(new Integer(eventCrfBean
 									.getId()))) {
 								if (currentStudy.getStudyParameterConfig()
@@ -364,6 +342,9 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 				System.out.println("Data is committed");
 				con.commit();
 				con.close();
+                if (!skippedItemsSql.toString().isEmpty()) {
+                    new AuditDAO(sm.getDataSource()).select(skippedItemsSql.toString());
+                }
 				try {
 					con = sm.getDataSource().getConnection();
 					con.setAutoCommit(false);

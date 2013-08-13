@@ -90,6 +90,8 @@ public class StudyParameterConfig {
 
     private String allowSdvWithOpenQueries;
 
+    private String replaceExisitingDataDuringImport;
+
 	public StudyParameterConfig() {
 		collectDob = "1";
 		discrepancyManagement = "true";
@@ -126,6 +128,7 @@ public class StudyParameterConfig {
 
 		markImportedCRFAsCompleted = "no";
         allowSdvWithOpenQueries = "no";
+        replaceExisitingDataDuringImport = "no";
 	}
 
 	/**
@@ -457,5 +460,13 @@ public class StudyParameterConfig {
 
     public void setAllowSdvWithOpenQueries(String allowSdvWithOpenQueries) {
         this.allowSdvWithOpenQueries = allowSdvWithOpenQueries;
+    }
+
+    public String getReplaceExisitingDataDuringImport() {
+        return replaceExisitingDataDuringImport;
+    }
+
+    public void setReplaceExisitingDataDuringImport(String replaceExisitingDataDuringImport) {
+        this.replaceExisitingDataDuringImport = replaceExisitingDataDuringImport;
     }
 }
