@@ -51,6 +51,8 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -71,6 +73,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -106,6 +109,7 @@ public class ImportCRFDataService {
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
 		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
 		StudyDAO studyDAO = new StudyDAO(ds);
+        CRFDAO crfDAO = new CRFDAO(ds);
 		StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
 
 		String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
@@ -141,9 +145,9 @@ public class ImportCRFDataService {
 
 					ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
 					for (CRFVersionBean crfVersionBean : crfVersionBeans) {
-
-						ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean,
-								studySubjectBean, crfVersionBean);
+						CRFBean crfBean = ((CRFBean) crfDAO.findByPK(crfVersionBean.getCrfId()));
+						ArrayList<EventCRFBean> eventCrfBeans = new EventCRFDAO(ds)
+								.findAllByStudyEventAndCrfOrCrfVersionOid(studyEventBean, crfBean.getOid());
 						// what if we have begun with creating a study
 						// event, but haven't entered data yet? this would
 						// have us with a study event, but no corresponding
@@ -233,12 +237,13 @@ public class ImportCRFDataService {
 		// create a second Validator, this one for hard edit checks
 		HashMap<String, String> hardValidator = new HashMap<String, String>();
 
-		StudyBean forStudyBean = (StudyBean) request.getAttribute("study");
 		StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
 		StudyDAO studyDAO = new StudyDAO(ds);
 		StudyBean studyBean = studyDAO.findByOid(odmContainer.getCrfDataPostImportContainer().getStudyOID());
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
 		StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
+        StudyConfigService scs = new StudyConfigService(ds);
+        studyBean = scs.setParametersForStudy(studyBean);
 		int maxOrdinal = 1;
 		HashMap<String, ItemDataBean> blankCheck = new HashMap<String, ItemDataBean>();
 		ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
@@ -368,7 +373,7 @@ public class ImportCRFDataService {
 										// if you do indeed leave off this in the XML it will pass but return 'null' tbh
 										attachValidator(displayItemBean, importHelper, discValidator, hardValidator,
 												request, eventCRFRepeatKey, studySubjectBean.getOid());
-										checkExistingData(request, displayItemBean, itemBean, forStudyBean);
+										checkExistingData(request, displayItemBean, itemBean, studyBean);
 										displayItemBeans.add(displayItemBean);
 
 									} else {
@@ -409,7 +414,7 @@ public class ImportCRFDataService {
 											// displayItemBean.setMetadata(metadataBean);
 											// set event def crf?
 											displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
-											checkExistingData(request, displayItemBean, itemBean, forStudyBean);
+											checkExistingData(request, displayItemBean, itemBean, studyBean);
 											displayItemBeans.add(displayItemBean);
 											logger.debug("... adding display item bean");
 										}
@@ -724,11 +729,14 @@ public class ImportCRFDataService {
 			}
 			ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
 
-			StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
-			StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-			CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
-			ItemGroupDAO itemGroupDAO = new ItemGroupDAO(ds);
-			ItemDAO itemDAO = new ItemDAO(ds);
+            StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
+            StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
+            StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+            CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+            ItemGroupDAO itemGroupDAO = new ItemGroupDAO(ds);
+            EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
+            ItemDAO itemDAO = new ItemDAO(ds);
+            CRFDAO crfDAO = new CRFDAO(ds);
 
 			if (subjectDataBeans != null) {// need to do this so as not to
 				// throw the exception below and
@@ -776,6 +784,25 @@ public class ImportCRFDataService {
 
 												logger.debug("logged an error with form " + formOid + " and se oid "
 														+ sedOid);
+											} else {
+												CRFBean crfBean = ((CRFBean) crfDAO.findByPK(crfVersionBean.getCrfId()));
+												List<StudyEventBean> studyEventBeanList = (List<StudyEventBean>) studyEventDAO
+														.findAllByDefinitionAndSubject(studyEventDefintionBean,
+																studySubjectBean);
+												for (StudyEventBean studyEventBean : studyEventBeanList) {
+													List<EventCRFBean> eventCRFBeanList = (List<EventCRFBean>) eventCRFDAO
+															.findAllByStudyEventAndCrfOrCrfVersionOid(studyEventBean,
+																	crfBean.getOid());
+													for (EventCRFBean eventCRFBean : eventCRFBeanList) {
+														if (eventCRFBean.getCRFVersionId() != crfVersionBean.getId()) {
+															mf.applyPattern(respage
+																	.getString("you_already_have_started_other_crf_version_for_study_event_and_subject"));
+															Object[] arguments = { studyEventDefintionBean.getName(),
+																	studySubjectBean.getName() };
+															errors.add(mf.format(arguments));
+														}
+													}
+												}
 											}
 										}
 									} else {

@@ -108,7 +108,6 @@ public class ImportCRFDataServlet extends SecureController {
 		String module = fp.getString(MODULE);
 		// keep the module in the session
 		session.setAttribute(MODULE, module);
-        request.setAttribute("study", request.getSession().getAttribute("study"));
 
 		String action = request.getParameter("action");
 		CRFVersionBean version = (CRFVersionBean) session.getAttribute("version");

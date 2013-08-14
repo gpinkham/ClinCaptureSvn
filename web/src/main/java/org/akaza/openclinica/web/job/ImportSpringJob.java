@@ -29,6 +29,7 @@ import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
@@ -42,8 +43,11 @@ import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -113,9 +117,10 @@ public class ImportSpringJob extends QuartzJobBean {
 	private DataSource dataSource;
 	private OpenClinicaMailSender mailSender;
 	private ImportCRFDataService dataService;
-	private ItemDataDAO itemDataDao;
+	private ItemDataDAO itemDataDao;    
 	private EventCRFDAO eventCrfDao;
 	private AuditEventDAO auditEventDAO;
+    private EventDefinitionCRFDAO edcdao;
 	private TriggerService triggerService;
 
 	@Override
@@ -159,10 +164,12 @@ public class ImportSpringJob extends QuartzJobBean {
 			dataSource = (DataSource) appContext.getBean("dataSource");
 			mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
 			RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) appContext.getBean("ruleSetService");
-
+            
 			itemDataDao = new ItemDataDAO(dataSource);
 			eventCrfDao = new EventCRFDAO(dataSource);
 			auditEventDAO = new AuditEventDAO(dataSource);
+            edcdao = new EventDefinitionCRFDAO(dataSource);
+            StudyConfigService scs = new StudyConfigService(dataSource);
 
 			int userId = dataMap.getInt(USER_ID);
 			UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
@@ -186,6 +193,7 @@ public class ImportSpringJob extends QuartzJobBean {
 			} else {
 				studyBean = (StudyBean) studyDAO.findByName(studyName);
 			}
+            studyBean = scs.setParametersForStudy(studyBean);
 			File fileDirectory = new File(SQLInitServlet.getField("filePath") + DIR_PATH + File.separator);
 			if ("".equals(directory)) { // avoid NPEs
 			} else {
@@ -444,7 +452,6 @@ public class ImportSpringJob extends QuartzJobBean {
 				MockHttpServletRequest request = new MockHttpServletRequest();
 				request.addPreferredLocale(locale);
 				try {
-                    request.setAttribute("study", studyBean);
 					List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
 					tempDisplayItemBeanWrappers = getImportCRFDataService(dataSource).lookupValidationErrors(request,
 							odmContainer, ub, totalValidationErrors, hardValidationErrors, permittedEventCRFIds);
@@ -530,6 +537,28 @@ public class ImportSpringJob extends QuartzJobBean {
 						for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
 							eventCrfBeanId = displayItemBean.getData().getEventCRFId();
 							eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
+
+							eventCrfBean.setNotStarted(false);
+							eventCrfBean.setStatus(Status.AVAILABLE);
+
+							if (studyBean.getStudyParameterConfig().getMarkImportedCRFAsCompleted()
+									.equalsIgnoreCase("yes")) {
+								EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId(studyBean,
+                                        eventCrfBean.getStudyEventId(), eventCrfBean.getCRFVersionId());
+
+								eventCrfBean.setUpdaterId(ub.getId());
+								eventCrfBean.setUpdater(ub);
+								eventCrfBean.setUpdatedDate(new Date());
+								eventCrfBean.setDateCompleted(new Date());
+								eventCrfBean.setDateValidateCompleted(new Date());
+								eventCrfBean.setStatus(Status.UNAVAILABLE);
+								eventCrfBean.setStage(edcb.isDoubleEntry() ? DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
+                                        : DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE);
+								itemDataDao.updateStatusByEventCRF(eventCrfBean, Status.UNAVAILABLE);
+							}
+
+							eventCrfDao.update(eventCrfBean);
+
 							logger.debug("found value here: " + displayItemBean.getData().getValue());
 							logger.debug("found status here: " + eventCrfBean.getStatus().getName());
                             ItemDataBean itemDataBean = new ItemDataBean();
