@@ -82,7 +82,7 @@
             WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id=? )
             AND ss.study_subject_id = se.study_subject_id AND se.study_event_id = dse.study_event_id
             AND dn.discrepancy_note_id = dse.discrepancy_note_id AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND dn.discrepancy_note_id = dad.discrepancy_note_id
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id AND sed.status_id not in (5,7)
     	</sql>
     </query>
     <query>
@@ -113,7 +113,7 @@
             AND ss.study_subject_id = ec.study_subject_id AND ec.event_crf_id = dec.event_crf_id
             AND dn.discrepancy_note_id = dec.discrepancy_note_id
             AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND dn.discrepancy_note_id = dad.discrepancy_note_id
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id AND sed.status_id not in (5,7)
     	</sql>
     </query>
     <query>
@@ -146,7 +146,7 @@
             AND ss.study_subject_id = ec.study_subject_id AND ec.event_crf_id = itd.event_crf_id
             AND itd.item_data_id = did.item_data_id AND dn.discrepancy_note_id = did.discrepancy_note_id
             AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-            AND dn.discrepancy_note_id = dad.discrepancy_note_id
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id AND sed.status_id not in (5,7)
     	</sql>
     </query>
     <query>
