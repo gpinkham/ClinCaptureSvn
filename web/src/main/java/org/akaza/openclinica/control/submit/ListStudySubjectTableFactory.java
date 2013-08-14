@@ -825,6 +825,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				}
 				if (getStudyBean().getStatus() == Status.AVAILABLE
 						&& getCurrentRole().getRole() != Role.STUDY_MONITOR
+						&& getCurrentRole().getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
 						&& (studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)) {
 					url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
 				}
@@ -1557,22 +1558,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			if (studyEventBeanList.size() == 0) {
 				transparentIcon.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0")
 						.append("hspace=\"4\"").end();
-			}
-		}
-		if (currentRole.getRole().getId() == 5) {
-			transparentIcon = new HtmlBuilder();
-			List<StudyEventBean> studyEventBeanList = getStudyEventDAO().findAllByStudySubject(studySubject);
-			if (studyEventBeanList.size() == 0) {
-				transparentIcon.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0")
-						.append("hspace=\"4\"").end();
-			} else {
-				for (StudyEventBean eventBean : studyEventBeanList) {
-					if (eventBean.getSubjectEventStatus() != SubjectEventStatus.REMOVED) {
-						transparentIcon.img().name("bt_Transparent").src("images/bt_Transparent.gif").border("0")
-								.append("hspace=\"4\"").end();
-						break;
-					}
-				}
 			}
 		}
 
