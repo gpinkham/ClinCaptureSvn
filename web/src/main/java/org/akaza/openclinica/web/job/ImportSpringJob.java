@@ -303,11 +303,15 @@ public class ImportSpringJob extends QuartzJobBean {
 	private ArrayList<String> processData(File[] dest, DataSource dataSource, ResourceBundle respage,
 			UserAccountBean ub, StudyBean studyBean, File destDirectory, TriggerBean triggerBean,
 			RuleSetServiceInterface ruleSetService) throws Exception {
+        boolean hasSkippedItems = false;
 		StringBuffer msg = new StringBuffer();
 		StringBuffer auditMsg = new StringBuffer();
         StringBuffer skippedItemsSql = new StringBuffer();
-		String propertiesPath = CoreResources.PROPERTIES_DIR;
-
+		String propertiesPath = CoreResources.PROPERTIES_DIR;        
+        // create a 'fake' request to generate the validation errors
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addPreferredLocale(locale);
+        
 		File xsdFile2 = new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
 		boolean fail = false;
 		ODMContainer odmContainer = new ODMContainer();
@@ -447,21 +451,12 @@ public class ImportSpringJob extends QuartzJobBean {
 					auditMsg.append(respage.getString("the_event_crf_not_correct_status") + "<br/>");
 				}
 
-				// create a 'fake' request to generate the validation errors
-
-				MockHttpServletRequest request = new MockHttpServletRequest();
-				request.addPreferredLocale(locale);
 				try {
 					List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
 					tempDisplayItemBeanWrappers = getImportCRFDataService(dataSource).lookupValidationErrors(request,
 							odmContainer, ub, totalValidationErrors, hardValidationErrors, permittedEventCRFIds);
 					logger.debug("size of total validation errors: " + totalValidationErrors.size());
-					if (request.getAttribute("hasSkippedItems") != null) {
-						msg.append("<br/>"
-								+ (studyBean.getParentStudyId() > 0 ? respage.getString("site") : respage
-										.getString("study")) + " '" + studyBean.getName() + "' "
-								+ respage.getString("import_job_msg") + "  <br/>");
-					}
+                    hasSkippedItems = request.getAttribute("hasSkippedItems") != null;
 					displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
 				} catch (NullPointerException npe1) {
 					// what if you have 2 event crfs but the third is a fake?
@@ -489,18 +484,18 @@ public class ImportSpringJob extends QuartzJobBean {
 			ArrayList<SubjectDataBean> subjectData = odmContainer.getCrfDataPostImportContainer().getSubjectData();
 
 			if (!hardValidationErrors.isEmpty()) {
-
 				String messageHardVals = triggerService.generateHardValidationErrorMessage(subjectData,
-						hardValidationErrors, false);
+						hardValidationErrors, false, false, respage);
 				out.write(messageHardVals);
 			} else {
 				if (!totalValidationErrors.isEmpty()) {
 					String totalValErrors = triggerService.generateHardValidationErrorMessage(subjectData,
-							totalValidationErrors, false);
+							totalValidationErrors, false, false, respage);
 					out.write(totalValErrors);
 					// here we also append data to the file, tbh 06/2010
 				}
-				String validMsgs = triggerService.generateValidMessage(subjectData, totalValidationErrors);
+				String validMsgs = triggerService.generateValidMessage(subjectData, totalValidationErrors,
+                        hasSkippedItems, respage);
 				out.write(validMsgs);
 			}
 			out.close();
@@ -618,6 +613,15 @@ public class ImportSpringJob extends QuartzJobBean {
 				msg.append(respage.getString("data_has_been_successfully_import") + "<br/>");
 				auditMsg.append(respage.getString("data_has_been_successfully_import") + "<br/>");
 
+				if (hasSkippedItems) {
+					String additionalMsg = "<br/>"
+							+ (studyBean.getParentStudyId() > 0 ? respage.getString("site") : respage
+									.getString("study")) + " '" + studyBean.getName() + "' "
+							+ respage.getString("import_job_msg") + "  <br/>";
+					msg.append(additionalMsg);
+					auditMsg.append(additionalMsg);
+				}
+                
 				String linkMessage = respage.getString("you_can_review_the_data") + SQLInitServlet.getSystemURL()
 						+ respage.getString("you_can_review_the_data_2") + SQLInitServlet.getSystemURL()
 						+ respage.getString("you_can_review_the_data_3") + generalFileDir + f.getName() + "&tn="
