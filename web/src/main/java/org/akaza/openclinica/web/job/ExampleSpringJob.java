@@ -28,7 +28,6 @@ import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.extract.SPSSReportBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
