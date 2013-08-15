@@ -290,7 +290,7 @@
                                                 </c:forEach>
 
                                             </c:when>
-                                            <c:when test="${dedc.eventCRF.id == 0}">
+                                            <c:when test="${dedc.eventCRF.notStarted || dedc.eventCRF.id == 0}">
 
                                                 <select name="versionId<c:out value="${dedc.edc.crf.id}"/>" onchange="javascript:changeQuery<c:out value="${dedc.edc.crf.id}"/>();">
 
@@ -299,7 +299,7 @@
                                                         <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${currRow.bean.studyEvent.id}&subjectId=${studySub.subjectId}" />
 
                                                         <c:choose>
-                                                            <c:when test="${dedc.edc.defaultVersionId==version.id}">
+                                                            <c:when test="${(dedc.edc.defaultVersionId == version.id && dedc.eventCRF.id == 0) || (dedc.eventCRF.CRFVersionId == version.id && dedc.eventCRF.notStarted)}">
                                                                 <option value="<c:out value="${version.id}"/>" selected>
                                                                     <c:out value="${version.name}"/>
                                                                 </option>

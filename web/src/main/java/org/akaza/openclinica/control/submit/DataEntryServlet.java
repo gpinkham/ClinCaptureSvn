@@ -1963,6 +1963,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
 						+ eventCRFId);
 				// there is an event CRF already, only need to update
 				ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
+                int crfVersionId = fp.getInt(INPUT_CRF_VERSION_ID);
+				if (ecb.isNotStarted() && crfVersionId > 0 && crfVersionId != ecb.getCRFVersionId()) {
+					ecb.setCRFVersionId(crfVersionId);
+					ecb = (EventCRFBean) ecdao.update(ecb);
+				}
 				int studyEventId = fp.getInt(INPUT_STUDY_EVENT_ID);
 				request.setAttribute(INPUT_EVENT_CRF, ecb);
 				if (studyEventId > 0) {
@@ -1970,6 +1975,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					StudyEventBean sEvent = (StudyEventBean) sedao.findByPK(studyEventId);
 					ecb = updateECB(sEvent, request);
 				}
+                session.setAttribute("ecb", ecb);
 				request.setAttribute(INPUT_EVENT_CRF, ecb);
 			} else {
 				// CRF id <=0, so we need to create a new CRF

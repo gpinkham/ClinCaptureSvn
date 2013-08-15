@@ -133,6 +133,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <!--InitialDataEntry  inputs-->
 <form id="mainForm" name="crfForm" method="post" action="InitialDataEntry">
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
+<input type="hidden" name="crfVersionId" value="<c:out value="${section.eventCRF.CRFVersionId}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
 <input type="hidden" name="tab" value="<c:out value="${tabId}"/>" />

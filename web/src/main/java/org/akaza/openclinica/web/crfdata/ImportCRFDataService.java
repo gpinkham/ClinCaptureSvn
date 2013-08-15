@@ -792,7 +792,9 @@ public class ImportCRFDataService {
 															.findAllByStudyEventAndCrfOrCrfVersionOid(studyEventBean,
 																	crfBean.getOid());
 													for (EventCRFBean eventCRFBean : eventCRFBeanList) {
-														if (eventCRFBean.getCRFVersionId() != crfVersionBean.getId()) {
+														if (!eventCRFBean.isNotStarted()
+																&& eventCRFBean.getCRFVersionId() != crfVersionBean
+																		.getId()) {
 															mf.applyPattern(respage
 																	.getString("you_already_have_started_other_crf_version_for_study_event_and_subject"));
 															Object[] arguments = { studyEventDefintionBean.getName(),
