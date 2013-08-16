@@ -293,6 +293,7 @@ public final class SubjectEventStatusUtil {
 		}
 		boolean notAllStartedSDVRequiredCRFsAreSDVed = false;
 		boolean hasRequiredCRFs = requiredCrfIds.size() > 0;
+        boolean hasSDVedCRFs = false;
 		for (EventCRFBean eventCRFBean : eventCRFs) {
 			if (eventCRFBean.isNotStarted())
 				continue;
@@ -311,6 +312,9 @@ public final class SubjectEventStatusUtil {
 								.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)) {
 					notAllStartedSDVRequiredCRFsAreSDVed = true;
 				}
+                if (!hasSDVedCRFs && eventCRFBean.isSdvStatus()) {
+                    hasSDVedCRFs  = true;
+                }
 			} else {
 				hasStarted = true;
 			}
@@ -320,7 +324,7 @@ public final class SubjectEventStatusUtil {
 			if (hasRequiredCRFs) {
 				state = requiredCrfIds.size() > 0 ? State.DES : State.DEC;
 			}
-			if (hasSDVRequiredCRFs && !notAllStartedSDVRequiredCRFsAreSDVed && state == State.DEC) {
+			if (hasSDVedCRFs && hasSDVRequiredCRFs && !notAllStartedSDVRequiredCRFsAreSDVed && state == State.DEC) {
 				state = State.SDV;
 			}
 		}

@@ -34,7 +34,6 @@ import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -54,6 +53,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -62,9 +62,10 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import org.akaza.openclinica.util.DAOWrapper;
+import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.
@@ -143,12 +144,13 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 			con = sm.getDataSource().getConnection();
 			con.setAutoCommit(false);
 			System.out.println("JDBC open connection for transaction");
+			StudyDAO sdao = new StudyDAO(sm.getDataSource());
+			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource(), con);
+			StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+			StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource(), con);
 			ItemDataDAO itemDataDao = new ItemDataDAO(sm.getDataSource(), con);
-			EventCRFDAO eventCrfDao = new EventCRFDAO(sm.getDataSource(), con);
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(
-					sm.getDataSource());
-			CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(
-					sm.getDataSource(), con);
+			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource(), con);
+			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 			String action = request.getParameter("action");
             StringBuffer skippedItemsSql = new StringBuffer();
 			FormProcessor fp = new FormProcessor(request);
@@ -162,12 +164,12 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 			panel.setOrderedData(true);
 
 			setToPanel(resword.getString("create_CRF"),
-					respage.getString("br_create_new_CRF_entering"));
+                    respage.getString("br_create_new_CRF_entering"));
 
 			setToPanel(resword.getString("create_CRF_version"),
-					respage.getString("br_create_new_CRF_uploading"));
+                    respage.getString("br_create_new_CRF_uploading"));
 			setToPanel(resword.getString("revise_CRF_version"),
-					respage.getString("br_if_you_owner_CRF_version"));
+                    respage.getString("br_if_you_owner_CRF_version"));
 			setToPanel(resword.getString("CRF_spreadsheet_template"),
 					respage.getString("br_download_blank_CRF_spreadsheet_from"));
 			setToPanel(
@@ -204,7 +206,6 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 					logger.debug("=== right before we check to make sure it is savable: "
 							+ wrapper.isSavable());
 					if (wrapper.isSavable()) {
-						ArrayList<Integer> eventCrfInts = new ArrayList<Integer>();
 						con.commit();
 						con.setAutoCommit(true);
 						for (DisplayItemBean displayItemBean : wrapper
@@ -212,7 +213,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                             
 							eventCrfBeanId = displayItemBean.getData()
 									.getEventCRFId();
-							eventCrfBean = (EventCRFBean) eventCrfDao
+							eventCrfBean = (EventCRFBean) ecdao
 									.findByPK(eventCrfBeanId);
 							logger.debug("found value here: "
 									+ displayItemBean.getData().getValue());
@@ -268,72 +269,43 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                                 skippedItemsSql.append("INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id) " +
                                         "VALUES (35, now(), " + ub.getId() + ", 'item_data', " + itemDataBean.getId() + ", '" + displayItemBean.getItem().getName() + "', '" + itemDataBean.getValue() + "', '" + displayItemBean.getData().getValue() + "', " + displayItemBean.getData().getEventCRFId() + "); ");
                             }
-							if (!eventCrfInts.contains(new Integer(eventCrfBean
-									.getId()))) {
-								if (currentStudy.getStudyParameterConfig()
-										.getMarkImportedCRFAsCompleted()
-										.equalsIgnoreCase("yes")) {
-									crfBusinessLogicHelper.markCRFComplete(
-											eventCrfBean, ub, con);
-								}
-								eventCrfInts.add(new Integer(eventCrfBean
-										.getId()));
-							}
-
-							EventDefinitionCRFBean edcb = edcdao
-									.findByStudyEventIdAndCRFVersionId(
-											currentStudy,
-											eventCrfBean.getStudyEventId(),
-											eventCrfBean.getCRFVersionId());
 
 							eventCrfBean.setNotStarted(false);
 							eventCrfBean.setStatus(Status.AVAILABLE);
 
-							if (currentStudy.getStudyParameterConfig()
-									.getMarkImportedCRFAsCompleted()
+							if (currentStudy.getStudyParameterConfig().getMarkImportedCRFAsCompleted()
 									.equalsIgnoreCase("yes")) {
+								EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId(currentStudy,
+                                        eventCrfBean.getStudyEventId(), eventCrfBean.getCRFVersionId());
+
 								eventCrfBean.setUpdaterId(ub.getId());
 								eventCrfBean.setUpdater(ub);
 								eventCrfBean.setUpdatedDate(new Date());
 								eventCrfBean.setDateCompleted(new Date());
-								eventCrfBean
-										.setDateValidateCompleted(new Date());
+								eventCrfBean.setDateValidateCompleted(new Date());
 								eventCrfBean.setStatus(Status.UNAVAILABLE);
-								eventCrfBean
-										.setStage(edcb.isDoubleEntry() ? DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
-												: DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE);
-								itemDataDao.updateStatusByEventCRF(
-										eventCrfBean, Status.UNAVAILABLE, con);
+								eventCrfBean.setStage(edcb.isDoubleEntry() ? DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
+                                        : DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE);
+								itemDataDao.updateStatusByEventCRF(eventCrfBean, Status.UNAVAILABLE, con);
 							}
 
-							eventCrfDao.update(eventCrfBean, con);
+							ecdao.update(eventCrfBean, con);
 							con.setAutoCommit(false);
 						}
 
-						StudyEventDAO sedao = new StudyEventDAO(
-								sm.getDataSource(), con);
-						StudyEventBean seb = (StudyEventBean) sedao
-								.findByPK(eventCrfBean.getStudyEventId());
+						if (eventCrfBean.getStudyEventId() > 0) {
+							StudyEventBean seb = (StudyEventBean) sedao.findByPK(eventCrfBean.getStudyEventId());
+							StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
+							StudyBean sb = (StudyBean) sdao.findByPK(ssb.getStudyId());
 
-						ArrayList allCRFs = eventCrfDao
-								.findAllByStudyEventAndStatus(seb,
-										Status.UNAVAILABLE);
-						ArrayList allEDCs = (ArrayList) edcdao
-								.findAllActiveByEventDefinitionId(currentStudy,
-										seb.getStudyEventDefinitionId());
-						logger.debug("count for event crf: " + allCRFs.size()
-								+ " count for edcs: " + allEDCs.size());
-						if (allCRFs.size() == allEDCs.size()) {
-							seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
-						} else if (seb.getSubjectEventStatus() == SubjectEventStatus.NOT_SCHEDULED
-								|| seb.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED
-								|| seb.getSubjectEventStatus() == SubjectEventStatus.SOURCE_DATA_VERIFIED
-								|| seb.getSubjectEventStatus() == SubjectEventStatus.COMPLETED) {
-							seb.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+							SubjectEventStatusUtil.determineSubjectEventState(seb, sb, new DAOWrapper(sdao, sedao,
+									ssdao, ecdao, edcdao, dndao));
+							seb.setUpdatedDate(new Date());
+							seb.setUpdater(ub);
+
+							sedao.update(seb, con);
 						}
-						sedao.update(seb, con);
 					}
-
 				}
 
 				addPageMessage(respage

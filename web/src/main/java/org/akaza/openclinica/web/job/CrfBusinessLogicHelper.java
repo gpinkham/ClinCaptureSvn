@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
  * Helper methods will be placed in this class - DRY
  */
 @SuppressWarnings({"rawtypes"})
+@Deprecated
 public class CrfBusinessLogicHelper {
 
 	DataSource ds;
