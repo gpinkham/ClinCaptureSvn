@@ -42,7 +42,7 @@ public class StudyEventDataBean {
 	
 	@XmlAttribute(name = "StudyEventRepeatKey")
 	public String getStudyEventRepeatKey() {
-		return studyEventRepeatKey;
+		return studyEventRepeatKey == null || studyEventRepeatKey.trim().isEmpty() ? "1" : studyEventRepeatKey;
 	}
 
 	public void setStudyEventRepeatKey(String studyEventRepeatKey) {
