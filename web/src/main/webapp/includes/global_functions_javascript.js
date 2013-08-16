@@ -2216,6 +2216,8 @@ $(function() {
 ========================================================================================== */
 function randomizeSubject() {
 
+      disableRandomizeCRFButtons(true)
+
     var crf = $("input:hidden[name='crfId']").val();
     
     var eligibility = null;
@@ -2287,30 +2289,37 @@ function randomizeSubject() {
             
             if(data.match(/UnknownHostException/)) {
 
+                disableRandomizeCRFButtons(false)
                 alert("The randomization service is not available. Consult your system administrator")
 
             } else if(data.match(/Invalid Site/)) {
 
+                disableRandomizeCRFButtons(false)
                 alert("The Site Id configured is invalid. Please contact your system administrator")
 
             } else if(data.match(/Invalid Trial/)) {
 
+                disableRandomizeCRFButtons(false)
                 alert("The Trial Id configured is invalid. Please contact your system administrator")
 
             } else if(data.match(/Invalid Strata/)) {
 
+                disableRandomizeCRFButtons(false)
                 alert("The Stratification level missing. Please contact your system administrator")
 
             } else if(data.match(/^\</)) {
 
+                disableRandomizeCRFButtons(false)
                 alert("An error occurred during the randomization call. Please contact your system administrator")
 
             } else if(data.match(/Site is not auth/)) {
 
+                disableRandomizeCRFButtons(false)
                 alert("The Site configured is not authorized to randomize subjects . Please contact your system administrator")
 
             } else if(data.match(/Exception/)) {
 
+                disableRandomizeCRFButtons(false)
                 var exceptionPattern = new RegExp("^.*:(.*)")
                 alert(exceptionPattern.exec(data)[1])
 
@@ -2329,6 +2338,8 @@ function randomizeSubject() {
 
                 $(dateInput).attr("readonly", "readonly");
                 $(resultInput).attr("readonly", "readonly");
+
+                $("input[type='submit']").removeAttr("disabled")
             }
         }
     })
@@ -2347,3 +2358,17 @@ $(function() {
       firstFormState = $("#datasetForm").serialize();
     }
 });
+
+disableRandomizeCRFButtons = function(flag) {
+
+    if(flag) {
+
+        $("input[type='submit']").attr("disabled", "disabled")
+        $("input[eleid='randomize']").attr("disabled", "disabled")
+
+    } else {
+
+        $("input[type='submit']").removeAttr("disabled")
+        $("input[eleid='randomize']").removeAttr("disabled")
+    }
+}
