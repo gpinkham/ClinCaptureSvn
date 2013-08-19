@@ -282,6 +282,7 @@ public class ImportCRFDataService {
 					maxOrdinal = 1;// JN:Moving maxOrdinal here, so max ordinal is there per form rather than per study
 									// eventData bean
 
+                    CRFDAO crfDAO = new CRFDAO(ds);
 					CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
 					EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
 					ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
@@ -299,7 +300,14 @@ public class ImportCRFDataService {
 					logger.debug("iterating through form beans: found " + crfVersion.getOid());
 					// may be the point where we cut off item groups etc and
 					// instead work on sections
-					EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
+					CRFBean crfBean = ((CRFBean) crfDAO.findByPK(crfVersion.getCrfId()));
+					ArrayList<EventCRFBean> eventCrfBeans = eventCRFDAO.findAllByStudyEventAndCrfOrCrfVersionOid(
+							studyEvent, crfBean.getOid());
+					EventCRFBean eventCRFBean = eventCrfBeans.get(0);
+					if (eventCRFBean.isNotStarted() && eventCRFBean.getCRFVersionId() != crfVersion.getId()) {
+						eventCRFBean.setCRFVersionId(crfVersion.getId());
+						eventCRFBean = (EventCRFBean) eventCRFDAO.update(eventCRFBean);
+					}
 					EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
 					EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO
 							.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), crfVersion.getId());
@@ -426,8 +434,7 @@ public class ImportCRFDataService {
 
 					}
 
-					CRFDAO crfDAO = new CRFDAO(ds);
-					CRFBean crfBean = crfDAO.findByVersionId(crfVersion.getCrfId());
+					crfBean = crfDAO.findByVersionId(crfVersion.getCrfId());
 					// seems like an extravagance, but is not contained in crf
 					// version or event crf bean
 					validationErrors = discValidator.validate("noregex"); // do not validate against regex provided in

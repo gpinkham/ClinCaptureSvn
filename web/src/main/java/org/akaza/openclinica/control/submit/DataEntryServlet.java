@@ -140,8 +140,11 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 @SuppressWarnings({"unchecked", "rawtypes", "serial"})
 public abstract class DataEntryServlet extends CoreSecureController {
 
-	Locale locale;
+    Locale locale;
 
+	public static final String DATA_ENTRY_CURRENT_CRF_VERSION_OID = "dataEntryCurrentCrfVersionOid";
+	public static final String DATA_ENTRY_CURRENT_CRF_OID = "dataEntryCurrentCrfOid";
+    
 	// these inputs come from the form, from another JSP via POST,
 	// or from another JSP via GET
 	// e.g. InitialDataEntry?eventCRFId=123&sectionId=234
@@ -498,8 +501,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) seddao.findByPK(edcBean
 				.getStudyEventDefinitionId());
 
+		CRFDAO cdao = new CRFDAO(getDataSource());
 		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
 		CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
+		CRFBean crfBean = (CRFBean) cdao.findByPK(crfVersionBean.getCrfId());
+
+		request.setAttribute(DATA_ENTRY_CURRENT_CRF_VERSION_OID, crfVersionBean.getOid());
+		request.setAttribute(DATA_ENTRY_CURRENT_CRF_OID, crfBean.getOid());
 
 		Phase phase2 = Phase.INITIAL_DATA_ENTRY;
 		if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
@@ -4019,6 +4027,18 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		}
 	}
 
+	private DisplayItemBean getDisplayItemBeanForFirstItemDataBean(List<DisplayItemBean> items,
+			List<ItemDataBean> dataItems) {
+		for (DisplayItemBean displayItemBean : items) {
+			for (ItemDataBean itemDataBean : dataItems) {
+				if (displayItemBean.getItem().getId() == itemDataBean.getItemId()) {
+					return displayItemBean;
+				}
+			}
+		}
+		return null;
+	}
+    
 	/**
 	 * Constructs a list of DisplayItemWithGroupBean, which is used for display a section of items on the UI
 	 * 
@@ -4067,22 +4087,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				// to arrange item groups and other single items, the ordinal of
 				// a item group will be the ordinal of the first item in this
 				// group
-				DisplayItemBean firstItem = itemGroup.getItems().get(0);
-				DisplayItemBean checkItem = firstItem;
-				// does not work if there is not any data in the first item of the group
-				// i.e. imports.
-				// does it make a difference if we take a last item?
-				boolean noNeedToSwitch = false;
-				for (int i = 0; i < data.size(); i++) {
-					ItemDataBean idb = (ItemDataBean) data.get(i);
-					if (idb.getItemId() == firstItem.getItem().getId()) {
-						noNeedToSwitch = true;
-					}
-				}
-				if (!noNeedToSwitch) {
-					checkItem = itemGroup.getItems().get(itemGroup.getItems().size() - 1);
-				}
-				// so we are either checking the first or the last item, BUT ONLY ONCE
+				DisplayItemBean firstItem = data.size() > 0 ? getDisplayItemBeanForFirstItemDataBean(
+						itemGroup.getItems(), data) : itemGroup.getItems().get(0);
+
 				newOne.setPageNumberLabel(firstItem.getMetadata().getPageNumberLabel());
 
 				newOne.setItemGroup(itemGroup);
@@ -4100,7 +4107,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					ItemDataBean idb = (ItemDataBean) data.get(i);
 
 					logger.debug("check all columns: " + checkAllColumns);
-					if (idb.getItemId() == checkItem.getItem().getId()) {
+					if (idb.getItemId() == firstItem.getItem().getId()) {
 						hasData = true;
 						logger.debug("set has data to --TRUE--");
 						checkAllColumns = 0;
@@ -4121,7 +4128,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 						newOne.getDbItemGroups().add(digb);
 					}
 				}
-
+                
 				List<DisplayItemGroupBean> groupRows = newOne.getItemGroups();
 				logger.trace("how many group rows:" + groupRows.size());
 				logger.trace("how big is the data:" + data.size());
@@ -4195,22 +4202,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		// to arrange item groups and other single items, the ordinal of
 		// a item group will be the ordinal of the first item in this
 		// group
-		DisplayItemBean firstItem = itemGroup.getItems().get(0);
-		DisplayItemBean checkItem = firstItem;
-		// does not work if there is not any data in the first item of the group
-		// i.e. imports.
-		// does it make a difference if we take a last item?
-		boolean noNeedToSwitch = false;
-		for (int i = 0; i < data.size(); i++) {
-			ItemDataBean idb = (ItemDataBean) data.get(i);
-			if (idb.getItemId() == firstItem.getItem().getId()) {
-				noNeedToSwitch = true;
-			}
-		}
-		if (!noNeedToSwitch) {
-			checkItem = itemGroup.getItems().get(itemGroup.getItems().size() - 1);
-		}
-		// so we are either checking the first or the last item, BUT ONLY ONCE
+		DisplayItemBean firstItem = data.size() > 0 ? getDisplayItemBeanForFirstItemDataBean(itemGroup.getItems(), data)
+				: itemGroup.getItems().get(0);
+
 		itemWithGroup.setPageNumberLabel(firstItem.getMetadata().getPageNumberLabel());
 
 		itemWithGroup.setItemGroup(itemGroup);
@@ -4227,7 +4221,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			ItemDataBean idb = (ItemDataBean) data.get(i);
 
 			logger.debug("check all columns: " + checkAllColumns);
-			if (idb.getItemId() == checkItem.getItem().getId()) {
+			if (idb.getItemId() == firstItem.getItem().getId()) {
 				hasData = true;
 				logger.debug("set has data to --TRUE--");
 				checkAllColumns = 0;
