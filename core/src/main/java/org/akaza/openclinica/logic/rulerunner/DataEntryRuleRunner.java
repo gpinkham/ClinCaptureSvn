@@ -13,9 +13,11 @@
 
 package org.akaza.openclinica.logic.rulerunner;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.domain.rule.RuleBean;
@@ -63,6 +65,8 @@ public class DataEntryRuleRunner extends RuleRunner {
 
 	public MessageContainer runRules(UserAccountBean ub,
 			List<RuleSetBean> ruleSets, HashMap<String, String> variableAndValue) {
+		String currentCrfVersionOid = (String) request.getAttribute("dataEntryCurrentCrfVersionOid");
+		String currentCrfOid = (String) request.getAttribute("dataEntryCurrentCrfOid");
 		allActionContainerListBasedOnRuleExecutionResult = null;
 		if (variableAndValue == null || variableAndValue.isEmpty()) {
 			logger.warn("You must be executing Rules in Batch");
@@ -100,8 +104,12 @@ public class DataEntryRuleRunner extends RuleRunner {
 				}
 				for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
 					ruleSet.setTarget(expressionBean);
-
-					for (RuleSetRuleBean ruleSetRule : ruleSet
+					String ruleSetForCrfVersionOid = getExpressionService().getCrfOid(ruleSet.getTarget().getValue());
+					if (!ruleSetForCrfVersionOid.equals(currentCrfVersionOid)
+							&& !ruleSetForCrfVersionOid.equals(currentCrfOid)) {
+						continue;
+					}             
+                    for (RuleSetRuleBean ruleSetRule : ruleSet
 							.getRuleSetRules()) {
 						RuleBean rule = ruleSetRule.getRuleBean();
 						ExpressionObjectWrapper eow = new ExpressionObjectWrapper(
