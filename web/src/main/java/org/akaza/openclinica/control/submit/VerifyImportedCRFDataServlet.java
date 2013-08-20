@@ -102,7 +102,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 			EventCRFBean eventCrfBean, DisplayItemBean displayItemBean, Integer parentId, UserAccountBean uab,
 			DataSource ds, StudyBean study, Connection con) {
 		DiscrepancyNoteBean note = new DiscrepancyNoteBean();
-		StudySubjectDAO ssdao = new StudySubjectDAO(ds);
+		StudySubjectDAO ssdao = new StudySubjectDAO(ds, con);
 		note.setDescription(message);
 		note.setDetailedNotes("Failed Validation Check");
 		note.setOwner(uab);
@@ -142,7 +142,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 		try {
 			session.setMaxInactiveInterval(10800);
 			con = sm.getDataSource().getConnection();
-			con.setAutoCommit(false);
+            con.setAutoCommit(false);
 			System.out.println("JDBC open connection for transaction");
 			StudyDAO sdao = new StudyDAO(sm.getDataSource());
 			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource(), con);
@@ -237,16 +237,11 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 									// need to set pk here in order to create dn
 									displayItemBean.getData().setId(itemDataBean.getId());
 								} else {
-									itemDataDao.create(displayItemBean.getData(), con);
+									itemDataBean = (ItemDataBean) itemDataDao.create(displayItemBean.getData(), con);
 									logger.debug("created: " + displayItemBean.getData().getItemId()
 											+ "event CRF ID = " + eventCrfBean.getId() + "CRF VERSION ID ="
 											+ eventCrfBean.getCRFVersionId());
-									ItemDataBean itemDataBean2 = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(
-											displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
-													.getData().getOrdinal());
-									logger.debug("found: id " + itemDataBean2.getId() + " name "
-											+ itemDataBean2.getName());
-									displayItemBean.getData().setId(itemDataBean2.getId());
+									displayItemBean.getData().setId(itemDataBean.getId());
 								}
 								ItemDAO idao = new ItemDAO(sm.getDataSource());
 								ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());

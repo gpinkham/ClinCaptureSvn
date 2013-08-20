@@ -59,6 +59,11 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		setQueryNames();
 	}
 
+	public StudySubjectDAO(DataSource ds, Connection connection) {
+		super(ds, connection);
+		setQueryNames();
+	}
+
 	public StudySubjectDAO(DataSource ds, DAODigester digester) {
 		super(ds);
 		this.digester = digester;

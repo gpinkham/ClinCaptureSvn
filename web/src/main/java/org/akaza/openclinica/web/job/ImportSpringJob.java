@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -328,6 +329,7 @@ public class ImportSpringJob extends QuartzJobBean {
 			UserAccountBean ub, StudyBean studyBean, File destDirectory, TriggerBean triggerBean,
 			RuleSetServiceInterface ruleSetService) throws Exception {
         boolean hasSkippedItems = false;
+        boolean runRulesOptimisation = true;
 		StringBuffer msg = new StringBuffer();
 		StringBuffer auditMsg = new StringBuffer();
         StringBuffer skippedItemsSql = new StringBuffer();
@@ -540,8 +542,8 @@ public class ImportSpringJob extends QuartzJobBean {
 				msg.append(triggerService.generateSummaryStatsMessage(ssBean, respage) + "<br/>");
 				// setup ruleSets to run if applicable
 				logger.debug("=== about to run rules ===");
-				List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(dataSource, studyBean, ub,
-						ruleSetService, odmContainer);
+				List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(runRulesOptimisation,
+						dataSource.getConnection(), dataSource, studyBean, ub, ruleSetService, odmContainer);
 
 				for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
 
@@ -573,13 +575,11 @@ public class ImportSpringJob extends QuartzJobBean {
                                     // need to set pk here in order to create dn
                                     displayItemBean.getData().setId(itemDataBean.getId());
                                 } else {
-                                    itemDataDao.create(displayItemBean.getData());
-                                    logger.debug("created: " + displayItemBean.getData().getItemId());
-                                    ItemDataBean itemDataBean2 = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(
-                                            displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
-                                                    .getData().getOrdinal());
-                                    logger.debug("found: id " + itemDataBean2.getId() + " name " + itemDataBean2.getName());
-                                    displayItemBean.getData().setId(itemDataBean2.getId());
+                                    itemDataBean = (ItemDataBean) itemDataDao.create(displayItemBean.getData());
+                                    logger.debug("created: " + displayItemBean.getData().getItemId()
+                                            + "event CRF ID = " + eventCrfBean.getId() + "CRF VERSION ID ="
+                                            + eventCrfBean.getCRFVersionId());
+                                    displayItemBean.getData().setId(itemDataBean.getId());
                                 }
                                 ItemDAO idao = new ItemDAO(dataSource);
                                 ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
@@ -660,7 +660,8 @@ public class ImportSpringJob extends QuartzJobBean {
 				msg.append(linkMessage);
 				auditMsg.append(linkMessage);
 
-				auditMsg.append(this.runRules(studyBean, ub, containers, ruleSetService, ExecutionMode.SAVE));
+				auditMsg.append(this.runRules(runRulesOptimisation, dataSource.getConnection(), studyBean, ub,
+						containers, ruleSetService, ExecutionMode.SAVE));
 			}
 		}// end for loop
 			// is the writer still not closed? try to close it
@@ -733,8 +734,9 @@ public class ImportSpringJob extends QuartzJobBean {
 	}
 
 	@Transactional
-	private List<ImportDataRuleRunnerContainer> ruleRunSetup(DataSource dataSource, StudyBean studyBean,
-			UserAccountBean userBean, RuleSetServiceInterface ruleSetService, ODMContainer odmContainer) {
+	private List<ImportDataRuleRunnerContainer> ruleRunSetup(Boolean runRulesOptimisation, Connection connection,
+			DataSource dataSource, StudyBean studyBean, UserAccountBean userBean,
+			RuleSetServiceInterface ruleSetService, ODMContainer odmContainer) {
 		List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
 		if (odmContainer != null) {
 			ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
@@ -752,7 +754,8 @@ public class ImportSpringJob extends QuartzJobBean {
 				}
 				if (containers != null && !containers.isEmpty()) {
 					logger.debug("=== dry run of rules in data entry ===");
-					ruleSetService.runRulesInImportData(containers, studyBean, userBean, ExecutionMode.DRY_RUN);
+					ruleSetService.runRulesInImportData(runRulesOptimisation, connection, containers, studyBean,
+							userBean, ExecutionMode.DRY_RUN);
 				}
 
 			}
@@ -761,14 +764,14 @@ public class ImportSpringJob extends QuartzJobBean {
 	}
 
 	@Transactional
-	private StringBuffer runRules(StudyBean studyBean, UserAccountBean userBean,
-			List<ImportDataRuleRunnerContainer> containers, RuleSetServiceInterface ruleSetService,
-			ExecutionMode executionMode) {
+	private StringBuffer runRules(Boolean runRulesOptimisation, Connection connection, StudyBean studyBean,
+			UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
+			RuleSetServiceInterface ruleSetService, ExecutionMode executionMode) {
 		StringBuffer messages = new StringBuffer();
 		if (containers != null && !containers.isEmpty()) {
 			logger.debug("=== real running of rules in import data ===");
-			HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(containers, studyBean,
-					userBean, executionMode);
+			HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(runRulesOptimisation,
+					connection, containers, studyBean, userBean, executionMode);
 			messages = extractRuleActionWarnings(summary);
 		}
 		return messages;

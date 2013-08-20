@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -116,13 +117,29 @@ public class RuleRunner {
 			theStudyName = theStudy.getName() + " / " + theStudy.getIdentifier();
 		}
 
-		// get the eventCrf & subsequently the CRF Version
 		// EventCRFBean eventCrf = (EventCRFBean) getEventCrfDao().findAllByStudyEvent(studyEvent).get(0);
-		EventCRFBean eventCrf = (EventCRFBean) getEventCrfDao().findAllByStudyEventAndCrfOrCrfVersionOid(studyEvent,
-				getExpressionService().getCrfOid(ruleSet.getTarget().getValue())).get(0);
+		// get the eventCrf & subsequently the CRF Version
+		CRFBean crf;
+		EventCRFBean eventCrf;
+		String crfVersionOid = getExpressionService().getCrfOid(ruleSet.getTarget().getValue());
+		CRFVersionBean crfVersion = getCrfVersionDao().findByOid(crfVersionOid);
+		if (crfVersion != null && crfVersion.getCrfId() > 0) {
+			crf = (CRFBean) getCrfDao().findByPK(crfVersion.getCrfId());
+		} else {
+			crf = getCrfDao().findByOid(crfVersionOid);
+		}
+		logger.debug("rule checking: " + getExpressionService().getCrfOid(ruleSet.getTarget().getValue()));
+		logger.debug("expression checking " + ruleSet.getTarget().getValue());
+		List<EventCRFBean> eventCrfList = (List<EventCRFBean>) getEventCrfDao()
+				.findAllByStudyEventAndCrfOrCrfVersionOid(studyEvent, crf.getOid());
+		if (eventCrfList != null && eventCrfList.size() > 0) {
+			eventCrf = eventCrfList.get(0);
+		} else {
+			return new HashMap<String, String>();
+		}
 
-		CRFVersionBean crfVersion = (CRFVersionBean) getCrfVersionDao().findByPK(eventCrf.getCRFVersionId());
-		CRFBean crf = (CRFBean) getCrfDao().findByPK(crfVersion.getCrfId());
+		crfVersion = (CRFVersionBean) getCrfVersionDao().findByPK(eventCrf.getCRFVersionId());
+		crf = (CRFBean) getCrfDao().findByPK(crfVersion.getCrfId());
 
 		String studyEventDefinitionName = getExpressionService().getStudyEventDefinitionFromExpression(
 				ruleSet.getTarget().getValue(), currentStudy).getName();
