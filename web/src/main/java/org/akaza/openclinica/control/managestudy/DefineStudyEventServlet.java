@@ -492,7 +492,6 @@ public class DefineStudyEventServlet extends SecureController {
 				CRFBean cb = new CRFBean();
 				cb.setId(id);
 				cb.setName(name);
-
 				// only find active verions
 				ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
 				cb.setVersions(versions);
@@ -532,7 +531,7 @@ public class DefineStudyEventServlet extends SecureController {
 		logger.trace("about to set tmpCRFIdMap " + tmpCRFIdMap.toString());
 		session.setAttribute("tmpCRFIdMap", tmpCRFIdMap);
 
-		if (crfArray.size() == 0 && !isBack) {// no crf seleted
+		if (crfArray.size() == 0 && !isBack) {// no crf selected
 			addPageMessage(respage.getString("no_CRF_selected_for_definition_add_later"));
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
 			sed.setCrfs(new ArrayList());
@@ -541,10 +540,10 @@ public class DefineStudyEventServlet extends SecureController {
 
 		} else {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-			if (sed.getCrfs().isEmpty()) {
-				logger.info("setting crfs into defintion to review: " + crfArray.toString());
-				sed.setCrfs(crfArray);// crfs selected by user
-			}
+			
+			logger.info("setting crfs into defintion to review: " + crfArray.toString());
+			sed.setCrfs(crfArray);// crfs selected by user
+			
 			session.setAttribute("definition", sed);
 
 			ArrayList<String> sdvOptions = new ArrayList<String>();
