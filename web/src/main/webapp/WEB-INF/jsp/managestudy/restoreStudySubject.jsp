@@ -20,7 +20,7 @@
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 
 		<div class="sidebar_tab_content">
-         <fmt:message key="confirm_restoration_of_this_subject_to_study"  bundle="${resword}"/> <c:out value="${study.name}"/>. <fmt:message key="the_subject_and_all_data_associated_with_it_in" bundle="${resword}"/> 
+         <fmt:message key="confirm_restoration_of_this_subject_to_study"  bundle="${resword}"/> <c:out value="${subjectStudy.name}"/>. <fmt:message key="the_subject_and_all_data_associated_with_it_in" bundle="${resword}"/> 
 		</div>
 
 		</td>
@@ -39,7 +39,7 @@
 
 <jsp:useBean scope="session" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="subjectStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 <jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
 <h1><span class="title_manage">
 <fmt:message key="restore_subject_to_study" bundle="${resword}"/>
@@ -49,8 +49,8 @@
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <fmt:message key="study_subject_ID" bundle="${resword}" var="studySubjectIdLabel"/>
-<c:if test="${study ne null}">
-   <c:set var="studySubjectIDLabel" value="${study.studyParameterConfig.studySubjectIdLabel}"/>
+<c:if test="${subjectStudy ne null}">
+   <c:set var="studySubjectIDLabel" value="${subjectStudy.studyParameterConfig.studySubjectIdLabel}"/>
 </c:if>
 
 <div class="tablebox_center">
@@ -61,13 +61,13 @@
 
   <c:set var="genderShow" value="${true}"/>
   <fmt:message key="gender" bundle="${resword}" var="genderLabel"/>
-  <c:if test="${study ne null}">
-      <c:set var="genderShow" value="${!(study.studyParameterConfig.genderRequired == 'false')}"/>
-      <c:set var="genderLabel" value="${study.studyParameterConfig.genderLabel}"/>
+  <c:if test="${subjectStudy ne null}">
+      <c:set var="genderShow" value="${!(subjectStudy.studyParameterConfig.genderRequired == 'false')}"/>
+      <c:set var="genderLabel" value="${subjectStudy.studyParameterConfig.genderLabel}"/>
   </c:if>
   <c:if test="${genderShow}">
       <tr valign="top">
-          <td class="table_header_column">${genderLabel}:</td
+          <td class="table_header_column">${genderLabel}:</td>
           <td class="table_cell"><c:out value="${subject.gender}"/></td>
       </tr>
   </c:if>
@@ -76,9 +76,9 @@
 
   <c:set var="secondaryIdShow" value="${true}"/>
   <fmt:message key="secondary_ID" bundle="${resword}" var="secondaryIdLabel"/>
-  <c:if test="${study ne null}">
-      <c:set var="secondaryIdShow" value="${!(study.studyParameterConfig.secondaryIdRequired == 'not_used')}"/>
-      <c:set var="secondaryIdLabel" value="${study.studyParameterConfig.secondaryIdLabel}"/>
+  <c:if test="${subjectStudy ne null}">
+      <c:set var="secondaryIdShow" value="${!(subjectStudy.studyParameterConfig.secondaryIdRequired == 'not_used')}"/>
+      <c:set var="secondaryIdLabel" value="${subjectStudy.studyParameterConfig.secondaryIdLabel}"/>
   </c:if>
   <c:if test="${secondaryIdShow}">
       <tr valign="top">
@@ -89,9 +89,9 @@
 
   <c:set var="enrollmentDateShow" value="${true}"/>
   <fmt:message key="enrollment_date" bundle="${resword}" var="enrollmentDateLabel"/>
-  <c:if test="${study ne null}">
-      <c:set var="enrollmentDateShow" value="${!(study.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'not_used')}"/>
-      <c:set var="enrollmentDateLabel" value="${study.studyParameterConfig.dateOfEnrollmentForStudyLabel}"/>
+  <c:if test="${subjectStudy ne null}">
+      <c:set var="enrollmentDateShow" value="${!(subjectStudy.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'not_used')}"/>
+      <c:set var="enrollmentDateLabel" value="${subjectStudy.studyParameterConfig.dateOfEnrollmentForStudyLabel}"/>
   </c:if>
   <c:if test="${enrollmentDateShow}">
       <tr valign="top">
@@ -129,17 +129,7 @@
         <td class="table_header_row"><fmt:message key="update_by" bundle="${resword}"/></td>
         <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
       </tr>
-    <%--<c:forEach var="event" items="${events}">--%>
-    <%--<tr>      --%>
-        <%--<td class="table_cell"><fmt:formatDate value="${event.updatedDate}" pattern="${dteFormat}"/></td>--%>
-        <%--<td class="table_cell"><c:out value="${event.studyEventDefinition.name}"/></td>--%>
-        <%--<td class="table_cell"><fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/></td>--%>
-        <%--<td class="table_cell"><fmt:formatDate value="${event.dateEnded}" pattern="${dteFormat}"/></td>--%>
-        <%--<td class="table_cell"><c:out value="${event.location}"/></td>--%>
-        <%--<td class="table_cell"><c:out value="${event.updater.name}"/></td>--%>
-        <%--<td class="table_cell"><c:out value="${event.status.name}"/></td>--%>
-     <%--</tr>--%>
-     <%--</c:forEach>  --%>
+   
        <c:forEach var="displayEvents" items="${events}">
        <tr>
            <td class="table_cell"><fmt:formatDate value="${displayEvents.studyEvent.updatedDate}" pattern="${dteFormat}"/></td>

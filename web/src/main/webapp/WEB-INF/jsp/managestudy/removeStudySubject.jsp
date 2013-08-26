@@ -15,8 +15,6 @@
   </c:otherwise> 
  </c:choose>
 
-
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
@@ -29,7 +27,7 @@
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 
 		<div class="sidebar_tab_content">
-          <fmt:message key="confirm_removal_of_this_subject_from_study"  bundle="${resword}"/> <c:out value="${study.name}"/>. <fmt:message key="the_subject_and_all_data_associated_with_it_in_this_Study"  bundle="${resword}"/>
+          <fmt:message key="confirm_removal_of_this_subject_from_study"  bundle="${resword}"/> <c:out value="${subjectStudy.name}"/>. <fmt:message key="the_subject_and_all_data_associated_with_it_in_this_Study"  bundle="${resword}"/>
 		</div>
 
 		</td>
@@ -48,7 +46,7 @@
 
 <jsp:useBean scope="session" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="subjectStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 <jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
 <h1><span class="title_manage">
 <fmt:message key="remove_subject_from_Study"  bundle="${resword}"/>
@@ -61,8 +59,8 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 
   <fmt:message key="study_subject_ID" bundle="${resword}" var="studySubjectLabel"/>
-  <c:if test="${study ne null}">
-    <c:set var="studySubjectLabel" value="${study.studyParameterConfig.studySubjectIdLabel}"/>
+  <c:if test="${subjectStudy ne null}">
+    <c:set var="studySubjectLabel" value="${subjectStudy.studyParameterConfig.studySubjectIdLabel}"/>
   </c:if>
   <tr valign="top">
       <td class="table_header_column">${studySubjectLabel}:</td>
@@ -73,9 +71,9 @@
 
   <c:set var="genderShow" value="${true}"/>
   <fmt:message key="gender" bundle="${resword}" var="genderLabel"/>
-  <c:if test="${study ne null}">
-      <c:set var="genderShow" value="${!(study.studyParameterConfig.genderRequired == 'false')}"/>
-      <c:set var="genderLabel" value="${study.studyParameterConfig.genderLabel}"/>
+  <c:if test="${subjectStudy ne null}">
+      <c:set var="genderShow" value="${!(subjectStudy.studyParameterConfig.genderRequired == 'false')}"/>
+      <c:set var="genderLabel" value="${subjectStudy.studyParameterConfig.genderLabel}"/>
   </c:if>
   <c:if test="${genderShow}">
     <tr valign="top">
@@ -84,15 +82,11 @@
     </tr>
   </c:if>
 
-    <%-- below line removed because it causes confusion with OpenClinica Study Subject ID line above, tbh --%>
-  <%-- <tr valign="top"><td class="table_header_column">${studySubjectLabel}:</td><td class="table_cell"><c:out value="${studySub.id}"/></td></tr> --%>
-  <%-- <tr valign="top"><td class="table_header_column"><fmt:message key="label" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.label}"/></td></tr> --%>
-
   <c:set var="secondaryIdShow" value="${true}"/>
   <fmt:message key="secondary_ID" bundle="${resword}" var="secondaryIdLabel"/>
-  <c:if test="${study ne null}">
-      <c:set var="secondaryIdShow" value="${!(study.studyParameterConfig.secondaryIdRequired == 'not_used')}"/>
-      <c:set var="secondaryIdLabel" value="${study.studyParameterConfig.secondaryIdLabel}"/>
+  <c:if test="${subjectStudy ne null}">
+      <c:set var="secondaryIdShow" value="${!(subjectStudy.studyParameterConfig.secondaryIdRequired == 'not_used')}"/>
+      <c:set var="secondaryIdLabel" value="${subjectStudy.studyParameterConfig.secondaryIdLabel}"/>
   </c:if>
   <c:if test="${secondaryIdShow}">
   <tr valign="top">
@@ -103,9 +97,9 @@
 
   <c:set var="enrollmentDateShow" value="${true}"/>
   <fmt:message key="enrollment_date" bundle="${resword}" var="enrollmentDateLabel"/>
-  <c:if test="${study ne null}">
-      <c:set var="enrollmentDateShow" value="${!(study.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'not_used')}"/>
-      <c:set var="enrollmentDateLabel" value="${study.studyParameterConfig.dateOfEnrollmentForStudyLabel}"/>
+  <c:if test="${subjectStudy ne null}">
+      <c:set var="enrollmentDateShow" value="${!(subjectStudy.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'not_used')}"/>
+      <c:set var="enrollmentDateLabel" value="${subjectStudy.studyParameterConfig.dateOfEnrollmentForStudyLabel}"/>
   </c:if>
   <c:if test="${enrollmentDateShow}">
     <tr valign="top"><td class="table_header_column">${enrollmentDateLabel}:</td>
