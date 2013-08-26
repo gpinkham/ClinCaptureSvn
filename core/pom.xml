@@ -283,6 +283,12 @@
 			<groupId>org.akaza.openclinica.odm</groupId>
 			<artifactId>openclinica-odm</artifactId>
 			<version>0.1.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.jmock</groupId>
