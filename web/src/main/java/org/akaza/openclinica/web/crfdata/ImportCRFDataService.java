@@ -276,6 +276,14 @@ public class ImportCRFDataService {
 						.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), sedBean.getId(),
 								ordinal);
 
+                if (studyEvent.getId() == 0) {
+                    MessageFormat mf = new MessageFormat("");
+                    mf.applyPattern(respage.getString("your_study_event_oid_is_not_scheduled"));
+                    Object[] arguments = { sedBean.getOid() };
+
+                    throw new OpenClinicaException(mf.format(arguments), "");
+                }
+
 				displayItemBeans = new ArrayList<DisplayItemBean>();
 
 				for (FormDataBean formDataBean : formDataBeans) {
