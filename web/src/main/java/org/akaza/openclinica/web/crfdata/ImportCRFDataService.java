@@ -321,7 +321,9 @@ public class ImportCRFDataService {
 							.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), crfVersion.getId());
 					if (permittedEventCRFIds.contains(new Integer(eventCRFBean.getId()))) {
 						for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
-
+							if (itemGroupDataBean.getItemGroupRepeatKey() == null) {
+								maxOrdinal = 1;
+							}
 							ArrayList<ItemBean> blankCheckItems = new ArrayList<ItemBean>();
 							ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
 							logger.debug("iterating through group beans: " + itemGroupDataBean.getItemGroupOID());

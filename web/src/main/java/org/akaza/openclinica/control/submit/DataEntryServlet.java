@@ -4036,7 +4036,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				}
 			}
 		}
-		return null;
+		return items.get(0);
 	}
     
 	/**
@@ -4087,8 +4087,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				// to arrange item groups and other single items, the ordinal of
 				// a item group will be the ordinal of the first item in this
 				// group
-				DisplayItemBean firstItem = data.size() > 0 ? getDisplayItemBeanForFirstItemDataBean(
-						itemGroup.getItems(), data) : itemGroup.getItems().get(0);
+				DisplayItemBean firstItem = getDisplayItemBeanForFirstItemDataBean(itemGroup.getItems(), data);
 
 				newOne.setPageNumberLabel(firstItem.getMetadata().getPageNumberLabel());
 
@@ -4202,8 +4201,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		// to arrange item groups and other single items, the ordinal of
 		// a item group will be the ordinal of the first item in this
 		// group
-		DisplayItemBean firstItem = data.size() > 0 ? getDisplayItemBeanForFirstItemDataBean(itemGroup.getItems(), data)
-				: itemGroup.getItems().get(0);
+		DisplayItemBean firstItem = getDisplayItemBeanForFirstItemDataBean(itemGroup.getItems(), data);
 
 		itemWithGroup.setPageNumberLabel(firstItem.getMetadata().getPageNumberLabel());
 
