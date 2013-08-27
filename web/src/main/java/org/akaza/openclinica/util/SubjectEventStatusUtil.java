@@ -171,7 +171,7 @@ public final class SubjectEventStatusUtil {
 					}
 				}
 			}
-			if (countOfDeletedEventCRFs == countOfStartedEventCRFs) {
+			if (countOfDeletedEventCRFs == countOfStartedEventCRFs && countOfStartedEventCRFs > 0) {
 				studyEventBean.setStatus(Status.DELETED);
 				studyEventBean.setSubjectEventStatus(SubjectEventStatus.REMOVED);
 				studyEventBean.setUpdater(ub);
