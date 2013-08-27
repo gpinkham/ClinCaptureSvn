@@ -96,6 +96,7 @@ public class RuleRunner {
 		return ruleOid + " " + message;
 	}
 
+	@SuppressWarnings("unchecked")
 	HashMap<String, String> prepareEmailContents(RuleSetBean ruleSet, RuleSetRuleBean ruleSetRule,
 			StudyBean currentStudy, RuleActionBean ruleAction) {
 
@@ -117,8 +118,6 @@ public class RuleRunner {
 			theStudyName = theStudy.getName() + " / " + theStudy.getIdentifier();
 		}
 
-		// EventCRFBean eventCrf = (EventCRFBean) getEventCrfDao().findAllByStudyEvent(studyEvent).get(0);
-		// get the eventCrf & subsequently the CRF Version
 		CRFBean crf;
 		EventCRFBean eventCrf;
 		String crfVersionOid = getExpressionService().getCrfOid(ruleSet.getTarget().getValue());

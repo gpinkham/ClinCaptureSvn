@@ -552,7 +552,6 @@ public class ImportSpringJob extends QuartzJobBean {
 
 					logger.debug("right before we check to make sure it is savable: " + wrapper.isSavable());
 					if (wrapper.isSavable()) {
-						ArrayList<Integer> eventCrfInts = new ArrayList<Integer>();
 						logger.debug("wrapper problems found : " + wrapper.getValidationErrors().toString());
 						for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
 							eventCrfBeanId = displayItemBean.getData().getEventCRFId();
