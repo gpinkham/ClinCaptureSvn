@@ -768,6 +768,7 @@ public class ImportCRFDataService {
 					}
 
 					ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
+					ArrayList<Integer> listOfCrfIds = new ArrayList<Integer>();
 					if (studyEventDataBeans != null) {
 						for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
 							String sedOid = studyEventDataBean.getStudyEventOID();
@@ -778,7 +779,19 @@ public class ImportCRFDataService {
 								Object[] arguments = { sedOid, oid };
 								errors.add(mf.format(arguments));
 								logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
+							} else {
+								EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(ds);
+								ArrayList<EventDefinitionCRFBean> requiredCrfs = (ArrayList<EventDefinitionCRFBean>)
+										eventDefinitionCrfDao.findAllByEventDefinitionId(studyEventDefintionBean.getId());
+								
+								for (EventDefinitionCRFBean def : requiredCrfs) {
+									int crfId = def.getCrfId();
+									listOfCrfIds.add(Integer.valueOf(crfId));
+								}
+								
 							}
+							
+							
 
 							ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 							if (formDataBeans != null) {
@@ -801,6 +814,11 @@ public class ImportCRFDataService {
 														+ sedOid);
 											} else {
 												CRFBean crfBean = ((CRFBean) crfDAO.findByPK(crfVersionBean.getCrfId()));
+												if (!listOfCrfIds.contains(Integer.valueOf(crfBean.getId()))) {
+													mf.applyPattern(respage.getString("crf_does_not_belong_to_event"));
+													Object[] arguments = { formOid };
+													errors.add(mf.format(arguments));
+												}
 												List<StudyEventBean> studyEventBeanList = (List<StudyEventBean>) studyEventDAO
 														.findAllByDefinitionAndSubject(studyEventDefintionBean,
 																studySubjectBean);
@@ -817,6 +835,8 @@ public class ImportCRFDataService {
 															Object[] arguments = { studyEventDefintionBean.getName(),
 																	studySubjectBean.getName() };
 															errors.add(mf.format(arguments));
+														} else {
+															System.out.println("wound up here, possible to create a double?");
 														}
 													}
 												}
