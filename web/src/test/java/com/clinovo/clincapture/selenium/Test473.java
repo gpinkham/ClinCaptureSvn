@@ -1,4 +1,4 @@
-package com.clinovo.clincapture.selenium.webdriver.tests;
+package com.clinovo.clincapture.selenium;
 
 import static org.junit.Assert.assertTrue;
 
