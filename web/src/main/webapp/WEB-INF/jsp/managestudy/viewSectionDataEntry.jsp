@@ -104,6 +104,8 @@
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 	<script language="JavaScript" type="text/javascript">
 		jQuery(document).ready(function() {
+            jQuery("table > tbody  tr").attr("repeat", "0");
+            jQuery("table > tbody  button").attr("disabled", "true");
 			jQuery("table > tbody  input").attr("disabled", "disabled");   	
 			jQuery("table > tbody a").removeAttr("onmouseover"); 
 			//next code disable Disc Note flags 
