@@ -320,6 +320,7 @@ public final class SubjectEventStatusUtil {
 			}
 			state = getHighestState(state, eventCRFState);
 		}
+
 		if (!justScheduled && !hasStarted) {
 			if (hasRequiredCRFs) {
 				state = requiredCrfIds.size() > 0 ? State.DES : State.DEC;
@@ -330,5 +331,4 @@ public final class SubjectEventStatusUtil {
 		}
 		setSubjectEventState(studyEventBean, studyBean, daoWrapper, state);
 	}
-
 }

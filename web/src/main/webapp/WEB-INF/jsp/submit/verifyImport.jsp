@@ -51,10 +51,7 @@
 	</td>
 </tr>
 
-
-
 <jsp:include page="../include/sideInfo.jsp"/>
-
 
 <jsp:useBean scope='session' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
@@ -101,8 +98,6 @@
 	<tr valign="top">
     	<td class="table_cell_left"><fmt:message key="validation_rules_generated" bundle="${resword}"/>: <c:out value="${summaryStats.discNoteCount}" /></td>
 	</tr>
-
-
 
 </table>
 </div>
@@ -195,9 +190,6 @@
 				</c:forEach>
 			</c:forEach>
 		</c:forEach>
-
-
-
 	</table>
 	</div>
 	</div></div></div></div></div></div></div></div>
@@ -221,7 +213,6 @@
 		</td>
 	</tr>
 	<input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
-
 
 	</table>
 	</div>
@@ -336,9 +327,6 @@
 						</c:forEach>
 					</c:forEach>
 				</c:forEach>
-
-
-
 			</table>
 			</div>
 			</div>
@@ -352,7 +340,6 @@
 			</div>
 		</c:if>
 		<br />
-
 
         <c:set var="subjectSpan" value="4"/>
         <c:set var="formOidSpan" value="2"/>
@@ -472,9 +459,6 @@
 						</c:forEach>
 					</c:forEach>
 				</c:forEach>
-
-
-
 			</table>
 			</div>
 			</div>
@@ -487,7 +471,6 @@
 			</div>
 			</div>
 			<br />
-			
 			
 <form action="VerifyImportedCRFData?action=save" method="POST">
 
@@ -509,17 +492,17 @@
 		</td>
 		<td>
 			<c:if test="${overwriteCount == 0}">
-				<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
+				<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
 			</c:if> 
 			<c:if test="${overwriteCount > 0 }">
 				<input type="submit"
 					value="<fmt:message key="continue" bundle="${resword}"/>"
-					class="button_long" onClick="return checkOverwriteStatus();">
+					class="button_medium" onClick="return checkOverwriteStatus();">
 			</c:if>	
 		</td>
 			<%-- added an alert above --%>
 		<td>
-			<input id="Cancel" class="button_long" type="button" name="BTN_Cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="window.location.href=('ListStudySubjects');"/>
+			<input id="Cancel" class="button_medium" type="button" name="BTN_Cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="window.location.href=('ListStudySubjects');"/>
 		</td>	
 	</table>
 </form>				

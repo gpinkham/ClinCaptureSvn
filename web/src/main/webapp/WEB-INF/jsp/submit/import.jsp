@@ -41,11 +41,7 @@
 	</td>
 </tr>
 
-
-
 <jsp:include page="../include/sideInfo.jsp"/>
-
-
 <jsp:useBean scope='session' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='crfName' class='java.lang.String'/>
@@ -68,8 +64,6 @@
 </a></h1>
 <p><fmt:message key="import_instructions" bundle="${restext}"/></p>
 
-
-
 <form action="ImportCRFData?action=confirm&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post" ENCTYPE="multipart/form-data">
 <div style="width: 400px">
 
@@ -80,12 +74,11 @@
 <tr>
 	<td class="formlabel"><fmt:message key="xml_file_to_upload" bundle="${resterms}"/>:</td>
 	<td>
-		<div class="formfieldFile_BG"><input type="file" name="xml_file" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');"> </div>
+		<input type="file" name="xml_file" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
 		<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="xml_file"/></jsp:include>
 	</td>
 </tr>
 <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
-
 
 </table>
 </div>
@@ -97,8 +90,8 @@
 					value="<fmt:message key="back" bundle="${resword}"/>" 
 					class="button_medium" 
 					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
-<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
-<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">
+<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+<img src="images/icon_UnchangedData.gif" style="visibility:hidden" alt="Data Status" name="DataStatus_bottom">
 </form>
 
 
