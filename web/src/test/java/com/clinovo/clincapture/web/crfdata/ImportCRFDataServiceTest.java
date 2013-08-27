@@ -1,6 +1,8 @@
 package com.clinovo.clincapture.web.crfdata;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -15,8 +17,6 @@ import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.InputSource;
@@ -47,10 +47,6 @@ public class ImportCRFDataServiceTest {
 		} else {
 			fail("XML not found!");
 		}
-	}
-
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	@Test

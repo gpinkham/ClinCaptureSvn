@@ -1603,13 +1603,17 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				refEventResult = (StudyEventBean) getStudyEventDAO().findByPK(studyEventBean.getReferenceVisitId());
 				logger.info("found for completed event");
 				// if null RV for event not found.
-				if (studyEventBean.getUpdatedDate() != null && refEventResult != null) {
-					// for completed events
+				if (refEventResult != null) {
+					
+                    // Reference event should be completed, signed or SDVed
 					if (refEventResult.getSubjectEventStatus().isCompleted()
 							|| refEventResult.getSubjectEventStatus().isSigned()
 							|| refEventResult.getSubjectEventStatus().isSourceDataVerified()) {
-						// Reference event should be completed, signed or SDVed
-						if (studyEventBean.getSubjectEventStatus().isCompleted()) {
+                        // Should analyze color if event completed, signed or SDVed (based on dateUpdate)
+						if (studyEventBean.getSubjectEventStatus().isCompleted()
+                            || studyEventBean.getSubjectEventStatus().isSigned()
+                            || studyEventBean.getSubjectEventStatus().isSourceDataVerified()
+                            && studyEventBean.getUpdatedDate() != null) {
 							Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(
 									sedBean.getMinDay()).toDate();
 							Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(
@@ -1626,8 +1630,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 								break;
 							}
 						}
-						// for sheduled events
-						if (studyEventBean.getSubjectEventStatus().isScheduled()) {
+						
+						// for scheduled events (based on start date)
+						if (studyEventBean.getSubjectEventStatus().isScheduled() && studyEventBean.getDateStarted() != null) {
 							Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(
 									sedBean.getMaxDay() + 1).toDate();
 							if (maxDate.before(new Date())) {
