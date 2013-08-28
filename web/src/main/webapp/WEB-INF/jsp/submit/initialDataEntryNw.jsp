@@ -311,8 +311,8 @@ TabFullName[<c:out value="${count}"/>]="<c:out value="${section.label}"/> (<c:ou
 TabSectionId[<c:out value="${count}"/>]= <c:out value="${section.id}"/>;
 
 TabLabel[<c:out value="${count}"/>]="<c:out value="${section.label}"/>";
-if (TabLabel[<c:out value="${count}"/>].length>8) {
-    var shortName = TabLabel[<c:out value="${count}"/>].substring(0,7);
+if (TabLabel[<c:out value="${count}"/>].length>20) {
+    var shortName = TabLabel[<c:out value="${count}"/>].substring(0,19);
     TabLabel[<c:out value="${count}"/>]= shortName + '...' + "<span id='secNumItemsCom<c:out value="${count}"/>' style='font-weight: normal;'>(<c:out value="${completedItems}"/>/<c:out value="${section.numItems}" />)</span>";
 } else {
     TabLabel[<c:out value="${count}"/>]="<c:out value="${section.label}"/> " + "<span id='secNumItemsCom<c:out value="${count}"/>' style='font-weight: normal;'>(<c:out value="${completedItems}"/>/<c:out value="${section.numItems}" />)</span>";
