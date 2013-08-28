@@ -26,8 +26,7 @@ public class DataImportServletTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		ClassLoader loader = Thread.currentThread().getContextClassLoader(); 
-		stream = loader.getResourceAsStream("DataImportServletXmlTest.xml");
+		stream = this.getClass().getClassLoader().getResourceAsStream("com/clinovo/DataImportServletXmlTest.xml");
 	}
 	
 	@Test

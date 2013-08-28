@@ -32,8 +32,7 @@ public class ImportCRFDataServiceTest {
 		Locale locale = new Locale("EN");
 		service = new ImportCRFDataService(null, locale);
 		container = new ODMContainer();
-		ClassLoader loader = Thread.currentThread().getContextClassLoader(); 
-		stream = loader.getResourceAsStream("DataImportServletXmlTest.xml");
+		stream = this.getClass().getClassLoader().getResourceAsStream("com/clinovo/DataImportServletXmlTest.xml");
 		JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		if (stream != null) {
