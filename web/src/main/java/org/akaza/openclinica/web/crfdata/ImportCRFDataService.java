@@ -18,6 +18,8 @@ import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -92,6 +94,21 @@ public class ImportCRFDataService {
 
     public static ResourceBundle resformat;
 
+	private static class ItemGroupComparator<T extends ImportItemGroupDataBean> implements Comparator<T> {
+		public int compare(T g1, T g2) {
+			int result = 0;
+			if (g1 != null && g2 != null && g1.getItemGroupOID() != null && g2.getItemGroupOID() != null) {
+				if (g1.getItemGroupOID().equals(g2.getItemGroupOID())) {
+					result = (g1.getItemGroupRepeatKey() + g1.getItemGroupOID())
+							.compareTo((g2.getItemGroupRepeatKey() + g2.getItemGroupOID()));
+				} else {
+					result = g1.getItemGroupOID().compareTo(g2.getItemGroupOID());
+				}
+			}
+			return result;
+		}
+	}
+    
 	public ImportCRFDataService(DataSource ds, Locale locale) {
 		ResourceBundleProvider.updateLocale(locale);
 		respage = ResourceBundleProvider.getPageMessagesBundle(locale);
@@ -319,11 +336,15 @@ public class ImportCRFDataService {
 					EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
 					EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO
 							.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), crfVersion.getId());
+					String prevItemGroupOid = null;
+					Collections.sort(itemGroupDataBeans, new ItemGroupComparator());
 					if (permittedEventCRFIds.contains(new Integer(eventCRFBean.getId()))) {
 						for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
-							if (itemGroupDataBean.getItemGroupRepeatKey() == null) {
+							if (prevItemGroupOid != null
+									&& !prevItemGroupOid.equals(itemGroupDataBean.getItemGroupOID())) {
 								maxOrdinal = 1;
 							}
+							prevItemGroupOid = itemGroupDataBean.getItemGroupOID();
 							ArrayList<ItemBean> blankCheckItems = new ArrayList<ItemBean>();
 							ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
 							logger.debug("iterating through group beans: " + itemGroupDataBean.getItemGroupOID());
@@ -450,7 +471,6 @@ public class ImportCRFDataService {
 											+ " blank items");
 								}
 							}
-							blankCheckItems = new ArrayList<ItemBean>();
 						}// end item group data beans
 
 					}
