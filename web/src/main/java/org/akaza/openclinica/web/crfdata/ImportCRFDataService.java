@@ -338,7 +338,7 @@ public class ImportCRFDataService {
 								throw new OpenClinicaException(mf.format(arguments), "");
 							}
 							totalItemDataBeanCount += itemDataBeans.size();
-
+                            HashMap<String, DisplayItemBean> nonDuplicationMap = new HashMap<String, DisplayItemBean>();
 							for (ImportItemDataBean importItemDataBean : itemDataBeans) {
 								logger.debug("   iterating through item data beans: " + importItemDataBean.getItemOID());
 								ItemDAO itemDAO = new ItemDAO(ds);
@@ -390,9 +390,20 @@ public class ImportCRFDataService {
 										attachValidator(displayItemBean, importHelper, discValidator, hardValidator,
 												request, eventCRFRepeatKey, studySubjectBean.getOid());
 										checkExistingData(request, displayItemBean, itemBean, studyBean);
-										displayItemBeans.add(displayItemBean);
+                                        String key = displayItemBean.getData().getItemId() + "_"
+                                                + displayItemBean.getData().getEventCRFId() + "_"
+                                                + displayItemBean.getData().getOrdinal();
+                                        if (!nonDuplicationMap.containsKey(key)) {
+                                            nonDuplicationMap.put(key, displayItemBean);
+                                        } else {
+                                            MessageFormat mf = new MessageFormat("");
+                                            mf.applyPattern(respage.getString("we_have_found_a_diplicate"));
+                                            Object[] arguments = {importItemDataBean.getItemOID()};
 
-									} else {
+                                            throw new OpenClinicaException(mf.format(arguments), "");
+                                        }
+                                        displayItemBeans.add(displayItemBean);
+                                    } else {
 										MessageFormat mf = new MessageFormat("");
 										mf.applyPattern(respage.getString("no_metadata_could_be_found"));
 										Object[] arguments = { importItemDataBean.getItemOID() };
@@ -513,7 +524,7 @@ public class ImportCRFDataService {
 			}
 		}
 	}
-    
+
 	private ItemDataBean createItemDataBean(ItemBean itemBean, EventCRFBean eventCrfBean, String value,
 			UserAccountBean ub, int ordinal) {
 
