@@ -142,9 +142,8 @@ public class ImportHelper {
 							NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
 				} else if (idt.equals(ItemDataType.INTEGER)) {
-					// hard edit check, will comment out for now, tbh 05/2008
-					// v.addValidation(inputName, Validator.IS_AN_INTEGER);
-					// v.alwaysExecuteLastValidation(inputName);
+					v.addValidation(inputName, Validator.IS_AN_INTEGER);
+					v.alwaysExecuteLastValidation(inputName);
 
 				} else if (idt.equals(ItemDataType.REAL)) {
 					// hard edit check, will comment out for now, tbh 05/08
