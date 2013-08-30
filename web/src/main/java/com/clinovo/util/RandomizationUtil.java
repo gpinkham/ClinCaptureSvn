@@ -58,7 +58,7 @@ public class RandomizationUtil {
 		StudyGroupClassBean studyGroupClass = RandomizationUtil.studyGroupDAO.findByNameAndStudyId(
 				randomizationResult.getRandomizationResult(), Integer.valueOf(randomizationResult.getStudyId()));
 
-		if (studyGroupClass.getId() > 0) {
+		if (studyGroupClass != null && studyGroupClass.getId() > 0) {
 
 			// We have a group that matches the random group
 			StudySubjectBean subject = RandomizationUtil.studySubjectDAO.findByLabelAndStudy(

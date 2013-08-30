@@ -193,6 +193,7 @@ public class RandomizationUtilTest {
 	private StudyGroupClassBean createSubjectGroup() {
 
 		StudyGroupClassBean studyGroupClassBean = new StudyGroupClassBean();
+		studyGroupClassBean.setId(1);
 		studyGroupClassBean.setName("test-group");
 
 		return studyGroupClassBean;
