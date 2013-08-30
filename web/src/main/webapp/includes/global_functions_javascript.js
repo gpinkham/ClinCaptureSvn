@@ -1876,14 +1876,14 @@ function adjustCrfListTable(studyEventId) {
     wereRemoved++;
   }
 
-  if ($("#hideCol1").val() == 'true') hideCol(0);
-  if ($("#hideCol2").val() == 'true') hideCol(1);
-  if ($("#hideCol3").val() == 'true') hideCol(2);
-  if ($("#hideCol4").val() == 'true') hideCol(3);
-  if ($("#hideCol5").val() == 'true') hideCol(4);
-  if ($("#hideCol6").val() == 'true') hideCol(5);
-  if ($("#hideCol7").val() == 'true') hideCol(6);
-  if ($("#hideCol8").val() == 'true') hideCol(7);
+  if ($("#crfListWrapper_" + studyEventId + " #hideCol1").val() == 'true') hideCol(0);
+  if ($("#crfListWrapper_" + studyEventId + " #hideCol2").val() == 'true') hideCol(1);
+  if ($("#crfListWrapper_" + studyEventId + " #hideCol3").val() == 'true') hideCol(2);
+  if ($("#crfListWrapper_" + studyEventId + " #hideCol4").val() == 'true') hideCol(3);
+  if ($("#crfListWrapper_" + studyEventId + " #hideCol5").val() == 'true') hideCol(4);
+  if ($("#crfListWrapper_" + studyEventId + " #hideCol6").val() == 'true') hideCol(5);
+  if ($("#crfListWrapper_" + studyEventId + " #hideCol7").val() == 'true') hideCol(6);
+  if ($("#crfListWrapper_" + studyEventId + " #hideCol8").val() == 'true') hideCol(7);
 
   $("#popupTotalColumns").val(popupTotalColumns);
 
