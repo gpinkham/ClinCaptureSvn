@@ -82,12 +82,6 @@ public class ChangeCRFVersionController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-	// Autowire the class that handles the sidebar structure with a configured
-	// bean named "sidebarInit"
-	@Autowired
-	@Qualifier("sidebarInit")
-	private SidebarInit sidebarInit;
-
 	ResourceBundle resword, resformat;
 
 	public ChangeCRFVersionController() {

@@ -48,6 +48,7 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.akaza.openclinica.validator.rule.action.InsertActionValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 
@@ -62,6 +63,7 @@ import javax.sql.DataSource;
  * @author Krikor Krumlian
  * 
  */
+@Component
 public class RulesPostImportContainerService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -76,6 +78,10 @@ public class RulesPostImportContainerService {
 	private InsertActionValidator insertActionValidator;
 	ResourceBundle respage;
 
+	public RulesPostImportContainerService() {
+		oidGenerator = new GenericOidGenerator();
+	}
+	
 	public RulesPostImportContainerService(DataSource ds, StudyBean currentStudy) {
 		oidGenerator = new GenericOidGenerator();
 		this.ds = ds;

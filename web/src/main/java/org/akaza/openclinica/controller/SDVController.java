@@ -38,7 +38,6 @@ import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory;
 import org.jmesa.facade.TableFacade;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -54,21 +53,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller("sdvController")
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class SDVController {
+	
 	public final static String SUBJECT_SDV_TABLE_ATTRIBUTE = "sdvTableAttribute";
 	@Autowired
-	@Qualifier("dataSource")
 	private DataSource dataSource;
 
 	@Autowired
-	@Qualifier("sdvUtil")
 	private SDVUtil sdvUtil;
 
 	@Autowired
-	@Qualifier("sdvFactory")
 	private SubjectIdSDVFactory sdvFactory;
 
 	@Autowired
-	@Qualifier("sidebarInit")
 	private SidebarInit sidebarInit;
 
 	public SDVController() {

@@ -2164,5 +2164,4 @@
         <servlet-name>medicalCodingServlet</servlet-name>
         <url-pattern>/code</url-pattern>
     </servlet-mapping>
-
 </web-app>

@@ -32,7 +32,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.stereotype.Component;
 
+@Component
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class CoreResources implements ResourceLoaderAware {
 
@@ -72,22 +74,25 @@ public class CoreResources implements ResourceLoaderAware {
 			setODM_MAPPING_DIR();
 			webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
 
-			String dbName = dataInfo.getProperty("dbType").trim();
+			if (dataInfo != null) {
+				
+				String dbName = dataInfo.getProperty("dbType").trim();
 
-			DATAINFO = dataInfo;
-			dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
-												// instance
-			EXTRACTINFO = extractInfo;
+				DATAINFO = dataInfo;
+				dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
+													// instance
+				EXTRACTINFO = extractInfo;
 
-			DB_NAME = dbName;
-			SQLFactory factory = SQLFactory.getInstance();
-			factory.run(dbName, resourceLoader);
-			if (extractInfo != null) {
-				copyBaseToDest(resourceLoader);
-				copyODMMappingXMLtoResources(resourceLoader);
-				extractProperties = findExtractProperties();
-				// JN: this is in for junits to run without extract props
-				copyImportRulesFiles();
+				DB_NAME = dbName;
+				SQLFactory factory = SQLFactory.getInstance();
+				factory.run(dbName, resourceLoader);
+				if (extractInfo != null) {
+					copyBaseToDest(resourceLoader);
+					copyODMMappingXMLtoResources(resourceLoader);
+					extractProperties = findExtractProperties();
+					// JN: this is in for junits to run without extract props
+					copyImportRulesFiles();
+				}
 			}
 
 		} catch (OpenClinicaSystemException e) {

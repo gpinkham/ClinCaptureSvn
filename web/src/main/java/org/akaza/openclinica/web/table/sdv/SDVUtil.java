@@ -82,11 +82,14 @@ import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.view.html.editor.HtmlCellEditor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
 /**
  * A utility class that implements the details of the Source Data Verification (SDV) Jmesa tables.
  */
+@Component
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SDVUtil {
 
@@ -143,6 +146,7 @@ public class SDVUtil {
 		CRF_STATUS_ICONS.put(7, "Locked");
 	}
 
+	@Autowired
 	private DataSource dataSource;
 
 	public NoEscapeHtmlCellEditor getCellEditorNoEscapes() {

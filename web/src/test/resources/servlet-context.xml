@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:oxm="http://www.springframework.org/schema/oxm"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+            http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd
+            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+                                       http://www.springframework.org/schema/security/oauth2 
+                           http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+
+
+	<context:component-scan base-package="com.clinovo" />
+	<context:component-scan base-package="org.akaza.openclinica" />
+
+	<oauth:client-details-service id="clientDetails">
+		<oauth:client client-id="trusted-client"
+			authorized-grant-types="password,authorization_code,refresh_token" />
+		<oauth:client client-id="less-trusted-client"
+			authorized-grant-types="authorization_code" />
+		<oauth:client client-id="designer"
+			authorized-grant-types="authorization_code,refresh_token" />
+	</oauth:client-details-service>
+
+	<bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="maxActive" value="50" />
+		<property name="maxIdle" value="2" />
+		<property name="maxWait" value="180000" />
+		<property name="removeAbandoned" value="true" />
+		<property name="removeAbandonedTimeout" value="300" />
+		<property name="logAbandoned" value="true" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnReturn" value="true" />
+		<property name="timeBetweenEvictionRunsMillis" value="300000" />
+		<property name="minEvictableIdleTimeMillis" value="600000" />
+		<property name="url"
+			value="dbc:postgresql://localhost:5432/clincapture-test" />
+		<property name="username" value="clincapture" />
+		<property name="password" value="clincapture" />
+		<property name="bigStringTryClob" value="true" />
+
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mappingLocations">
+			<list>
+				<value>classpath:com/clinovo/typedefs.hbm.xml</value>
+			</list>
+		</property>
+		<property name="annotatedClasses">
+			<list>
+				<value>com.clinovo.model.Term</value>
+				<value>com.clinovo.model.Synonym</value>
+				<value>com.clinovo.model.Dictionary</value>
+				<value>org.akaza.openclinica.domain.rule.RuleSetBean</value>
+				<value>org.akaza.openclinica.domain.rule.RuleSetAuditBean</value>
+				<value>org.akaza.openclinica.domain.rule.expression.ExpressionBean
+				</value>
+				<value>org.akaza.openclinica.domain.rule.RuleSetRuleBean</value>
+				<value>org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean
+				</value>
+				<value>org.akaza.openclinica.domain.rule.RuleBean</value>
+				<value>org.akaza.openclinica.domain.rule.action.RuleActionBean
+				</value>
+				<value>org.akaza.openclinica.domain.rule.action.RuleActionRunBean
+				</value>
+				<value>org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean
+				</value>
+				<value>org.akaza.openclinica.domain.rule.action.EmailActionBean
+				</value>
+				<value>org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean
+				</value>
+				<value>org.akaza.openclinica.domain.rule.action.ShowActionBean
+				</value>
+				<value>org.akaza.openclinica.domain.rule.action.HideActionBean
+				</value>
+				<value>org.akaza.openclinica.domain.rule.action.InsertActionBean
+				</value>
+				<value>org.akaza.openclinica.domain.rule.action.PropertyBean</value>
+				<value>org.akaza.openclinica.domain.user.AuthoritiesBean</value>
+				<value>org.akaza.openclinica.domain.managestudy.StudyModuleStatus
+				</value>
+				<value>org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean
+				</value>
+				<value>org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean
+				</value>
+				<value>org.akaza.openclinica.domain.technicaladmin.ConfigurationBean
+				</value>
+				<value>org.akaza.openclinica.domain.admin.MeasurementUnit</value>
+				<value>org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean
+				</value>
+				<value>org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean
+				</value>
+				<value>org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean
+				</value>
+				<value>org.akaza.openclinica.domain.usageStats.LogUsageStatsBean
+				</value>
+				<value>org.akaza.openclinica.domain.OpenClinicaVersionBean</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+				<prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory
+				</prop>
+				<prop key="hibernate.cache.use_second_level_cache">true</prop>
+				<prop key="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</prop>
+				<prop key="hibernate.generate_statistics">true</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				<prop key="hibernate.generate_statistics">true</prop>
+
+
+			</props>
+		</property>
+		<property name="namingStrategy">
+			<bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
+		</property>
+	</bean>
+
+	<bean id="urlMapping"
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<prop key="/oauth/confirm_access">accessConfirmationController</prop>
+			</props>
+		</property>
+		<property name="alwaysUseFullPath" value="true" />
+	</bean>
+
+
+	<!-- Simple redirects to internal resources; URL path substring becomes 
+		view name (e.g. '/login.htm' -> 'login') -->
+	<bean name="/login/login"
+		class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
+	<bean name="/denied"
+		class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
+
+	<bean
+		class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
+
+	<bean class="org.akaza.openclinica.controller.SidebarInit" name="sidebarInit">
+		<property name="alertsBoxSetup" value="OPENALERTS" />
+		<property name="enableIconsBoxSetup" value="DISABLEICONS" />
+		<property name="infoBoxSetup" value="OPENINFO" />
+		<property name="instructionsBoxSetup" value="OPENINSTRUCTIONS" />
+	</bean>
+
+	<bean name="setUpUserInterceptor"
+		class="org.akaza.openclinica.controller.helper.SetUpUserInterceptor">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean name="sdvFactory"
+		class="org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+
+	<bean name="scheduledJobTableFactory"
+		class="org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory">
+	</bean>
+
+
+	<bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller">
+		<property name="mappingLocation" value="classpath:properties/mappingMarshaller.xml" />
+	</bean>
+
+	<oxm:jaxb2-marshaller id="jaxbMarshaller"
+		contextPath="org.cdisc.ns.odm.v130:org.openclinica.ns.odm_ext_v130.v31:org.openclinica.ns.rules.v31:org.openclinica.ns.response.v31:org.openclinica.ns.rules_test.v31" />
+
+	<bean id="marshallingHttpMessageConverter"
+		class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+		<property name="marshaller" ref="jaxbMarshaller" />
+		<property name="unmarshaller" ref="jaxbMarshaller" />
+		<property name="supportedMediaTypes" value="application/xml" />
+	</bean>
+
+	<bean id="stringHttpMessageConverter"
+		class="org.springframework.http.converter.StringHttpMessageConverter" />
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<util:list id="beanList">
+				<ref bean="marshallingHttpMessageConverter" />
+			</util:list>
+		</property>
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />
+
+
+	<!-- Resolves logical view names to JSP views -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		id="internalViewResolver" p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />
+
+	<!-- AOP-block for "smart" back-button, aspect waves with @Controller-annotated 
+		spring beans -->
+
+	<aop:config proxy-target-class="true">
+		<aop:pointcut id="allControllersPointcut"
+			expression="@within(org.springframework.stereotype.Controller) 
+	 		and args(request, ..)" />
+
+		<aop:aspect ref="backButtonAdvice">
+			<aop:before pointcut-ref="allControllersPointcut" method="simpleBeforeAdvice" />
+		</aop:aspect>
+	</aop:config>
+
+	<bean id="backButtonAdvice" class="org.akaza.openclinica.navigation.BackButtonAdvice" />
+</beans>

@@ -15,7 +15,6 @@
 </c:choose>
 
 <link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
-<!--script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script-->
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/dn_teable_functions.js"></script>

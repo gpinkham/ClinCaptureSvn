@@ -27,10 +27,4 @@
 		<security:user-service properties="/WEB-INF/users.properties" />
 	</security:authentication-provider>
 
-	<!--<security:global-method-security secured-annotations="enabled">
-		<security:protect-pointcut
-			expression="execution(* com.springsource..*Service.*(..))"
-			access="ROLE_USER" />
-	</security:global-method-security>
-
---></beans>
+</beans>

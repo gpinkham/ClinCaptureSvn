@@ -14,10 +14,12 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class StudyModuleStatusDao extends AbstractDomainDao<StudyModuleStatus> {
 	@Override
-	Class<StudyModuleStatus> domainClass() {
+	public Class<StudyModuleStatus> domainClass() {
 		return StudyModuleStatus.class;
 	}
 

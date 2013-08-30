@@ -18,13 +18,15 @@ import java.sql.Connection;
 import org.akaza.openclinica.domain.DomainObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractDomainDao<T extends DomainObject> {
 
+	@Autowired
 	private SessionFactory sessionFactory;
 
-	abstract Class<T> domainClass();
+	public abstract Class<T> domainClass();
 
 	public String getDomainClassName() {
 		return domainClass().getName();
@@ -82,7 +84,6 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
 	
 	protected Session getSessionForTransaction(Connection con) {
 		if (con != null) {
-			System.out.println("Im using my own connection");
 			return sessionFactory.openSession(con);
 		} else {
 			return sessionFactory.getCurrentSession();

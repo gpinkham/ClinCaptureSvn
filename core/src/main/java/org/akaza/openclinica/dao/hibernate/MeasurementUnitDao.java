@@ -29,7 +29,7 @@ import org.akaza.openclinica.domain.admin.MeasurementUnit;
 @SuppressWarnings({ "unchecked" })
 public class MeasurementUnitDao extends AbstractDomainDao<MeasurementUnit> {
 	@Override
-	Class<MeasurementUnit> domainClass() {
+	public Class<MeasurementUnit> domainClass() {
 		return MeasurementUnit.class;
 	}
 

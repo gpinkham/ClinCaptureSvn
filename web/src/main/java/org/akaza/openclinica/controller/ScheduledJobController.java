@@ -14,7 +14,12 @@
 package org.akaza.openclinica.controller;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,7 +35,11 @@ import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobs;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.jmesa.facade.TableFacade;
-import org.quartz.*;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobKey;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -38,7 +47,6 @@ import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -55,17 +63,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ScheduledJobController {
 	public final static String SCHEDULED_TABLE_ATTRIBUTE = "scheduledTableAttribute";
 	@Autowired
-	@Qualifier("dataSource")
 	private BasicDataSource dataSource;
 	private String SCHEDULER = "schedulerFactoryBean";
 
 	@Autowired
-	@Qualifier("scheduledJobTableFactory")
 	private ScheduledJobTableFactory scheduledJobTableFactory;
 	public static final String EP_BEAN = "epBean";
 
 	@Autowired
-	@Qualifier("sdvUtil")
 	private SDVUtil sdvUtil;
 
 	protected final static Logger logger = LoggerFactory

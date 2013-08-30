@@ -16,9 +16,11 @@ package org.akaza.openclinica.dao.hibernate;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Projections;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 
+@Repository("auditUserLoginDao")
 public class AuditUserLoginDao extends AbstractDomainDao<AuditUserLoginBean> {
 
 	@Override

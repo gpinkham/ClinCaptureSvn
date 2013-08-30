@@ -36,6 +36,7 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.HtmlSnippets;
 import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.web.WebContext;
+import org.springframework.stereotype.Component;
 
 /**
  * View builder for the list of scheduled jobs with an ability to cancel the job
@@ -43,6 +44,7 @@ import org.jmesa.web.WebContext;
  * @author jnyayapathi
  * 
  */
+@Component
 @SuppressWarnings({"unchecked"})
 public class ScheduledJobTableFactory extends AbstractTableFactory {
 	@Override

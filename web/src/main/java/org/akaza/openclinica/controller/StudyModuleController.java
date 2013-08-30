@@ -34,7 +34,6 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
@@ -43,7 +42,6 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -61,19 +59,15 @@ import org.springframework.web.bind.support.SessionStatus;
 @SuppressWarnings({"rawtypes","unchecked"})
 public class StudyModuleController {
 	@Autowired
-	@Qualifier("sidebarInit")
 	private SidebarInit sidebarInit;
 
 	@Autowired
-	@Qualifier("studyModuleStatusDao")
 	private StudyModuleStatusDao studyModuleStatusDao;
 
 	@Autowired
-	@Qualifier("ruleSetService")
 	private RuleSetServiceInterface ruleSetService;
 
 	@Autowired
-	@Qualifier("dataSource")
 	private BasicDataSource dataSource;
 
 	private StudyEventDefinitionDAO studyEventDefinitionDao;

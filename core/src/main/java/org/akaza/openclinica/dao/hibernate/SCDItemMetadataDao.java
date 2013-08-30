@@ -28,7 +28,7 @@ import java.util.List;
 public class SCDItemMetadataDao extends AbstractDomainDao<SCDItemMetadataBean> {
 
 	@Override
-	Class<SCDItemMetadataBean> domainClass() {
+	public Class<SCDItemMetadataBean> domainClass() {
 		return SCDItemMetadataBean.class;
 	}
 

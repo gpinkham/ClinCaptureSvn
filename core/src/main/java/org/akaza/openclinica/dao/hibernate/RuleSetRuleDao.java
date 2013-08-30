@@ -25,10 +25,12 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.hibernate.stat.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
+@Repository
 public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 
 	private CoreResources coreResources;

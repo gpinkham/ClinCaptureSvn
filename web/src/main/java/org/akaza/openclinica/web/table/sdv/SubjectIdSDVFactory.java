@@ -64,10 +64,12 @@ import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.web.WebContext;
+import org.springframework.stereotype.Component;
 
 /**
  * A Jmesa table that represents study subjects in each row.
  */
+@Component
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SubjectIdSDVFactory extends AbstractTableFactory {
 

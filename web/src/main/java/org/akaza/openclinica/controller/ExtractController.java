@@ -36,7 +36,6 @@ import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,11 +49,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/extract")
 public class ExtractController {
 	@Autowired
-	@Qualifier("sidebarInit")
 	private SidebarInit sidebarInit;
 
 	@Autowired
-	@Qualifier("dataSource")
 	private BasicDataSource dataSource;
 
 	private DatasetDAO datasetDao;

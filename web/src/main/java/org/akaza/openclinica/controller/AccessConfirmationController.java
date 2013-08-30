@@ -33,7 +33,8 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @SessionAttributes(types = AuthorizationRequest.class)
 public class AccessConfirmationController {
-
+	
+	@Autowired
 	private ClientDetailsService clientDetailsService;
 
 	@RequestMapping("/oauth/confirm_access")
@@ -45,7 +46,6 @@ public class AccessConfirmationController {
 		return new ModelAndView("access_confirmation", model);
 	}
 
-	@Autowired
 	public void setClientDetailsService(ClientDetailsService clientDetailsService) {
 		this.clientDetailsService = clientDetailsService;
 	}
