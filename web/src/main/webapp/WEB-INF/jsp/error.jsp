@@ -32,22 +32,18 @@
 <input type="hidden" id="error_page" value="true"/>
 
 <font class="bodytext">
-<c:set var="referer" value="MainMenu"/>
-<c:forEach var="refererValue" items="${pageContext.request.headerNames}">
-	<c:if test="${refererValue eq 'referer'}">
-		<!-- found it! -->
-		<c:set var="referer" value="${header[refererValue]}"/>
-	</c:if>
-</c:forEach>
 <fmt:message key="error_page" bundle="${resword}">
 	<%--<fmt:param><%=request.getHeader("Referer")%></fmt:param>--%>
 	<%-- tbh 02/2010 remove HTML/XML from the referer name --%>
-	<fmt:param><c:out value="${referer}"/></fmt:param>
 	<fmt:param><%=SQLInitServlet.getField("mail.errormsg")%></fmt:param>
 </fmt:message>
+<br></br>
+<br></br>
+<input type="button" name="BTN_Back_Smart" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
 
 </font>
-</td></tr></table>
+</td></tr>
+</table>
 
 <c:choose>
 	<c:when test="${userBean != null && userRole != null && userRole.role.name != 'invalid' && passwordExpired == 'no'}">

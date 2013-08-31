@@ -78,11 +78,6 @@ public class ViewNotesServlet extends RememberLastPage {
 	public static final int ALL = -1;
 	private boolean showMoreLink;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.akaza.openclinica.control.core.SecureController#processRequest()
-	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected void processRequest() throws Exception {
@@ -109,14 +104,8 @@ public class ViewNotesServlet extends RememberLastPage {
 		}
 
 		int oneSubjectId = fp.getInt("id");
-		// BWP 11/03/2008 3029: This session attribute in removed in
-		// ResolveDiscrepancyServlet.mayProceed() >>
 		session.setAttribute("subjectId", oneSubjectId);
-		// >>
 
-		/*
-		 * ClinCapture #71 get discrepancy notes' type filter value by name
-		 */
 		int discNoteTypeId = 0;
 		try {
 			DiscrepancyNoteType discNoteType = DiscrepancyNoteType.getByName(request
@@ -130,20 +119,14 @@ public class ViewNotesServlet extends RememberLastPage {
 
 		boolean removeSession = fp.getBoolean("removeSession");
 
-		// BWP 11/03/2008 3029: This session attribute in removed in
-		// ResolveDiscrepancyServlet.mayProceed() >>
 		session.setAttribute("module", module);
-		// >>
-
+		
 		// Do we only want to view the notes for 1 subject?
 		String viewForOne = fp.getString("viewForOne");
 
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
 		dndao.setFetchMapping(true);
 
-		/*
-		 * ClinCapture #71 get discrepancy notes' status filter value by name
-		 */
 		int resolutionStatusId = 0;
 		try {
 			ResolutionStatus resolutionStatus = ResolutionStatus.getByName(request
@@ -242,13 +225,9 @@ public class ViewNotesServlet extends RememberLastPage {
 		request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames(resterm));
 		request.setAttribute("typeKeys", customTotalMap);
 		request.setAttribute("grandTotal", customTotalMap.get("Total"));
-		// long endTime = System.currentTimeMillis();
-
-		// System.out.println("Time taken[" + (startTime)/1000 + "]");
-		// System.out.println("Time taken[" + (endTime)/1000 + "]");
-		// System.out.println("Time taken[" + (endTime - startTime)/1000 + "]");
 
 		analyzeForward(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY);
+		
 	}
 
 	@SuppressWarnings("rawtypes")
