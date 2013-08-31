@@ -61,7 +61,7 @@ public class ImportHelperTest {
 		request.setParameter(displayItemBean.getItem().getOid(), displayItemBean.getData().getValue());
 		importHelper.validateDisplayItemBeanText(discrepancyValidator, displayItemBean, displayItemBean.getItem()
 				.getOid());
-		HashMap validationErrors = discrepancyValidator.validate("noregex");
+		HashMap<?, ?> validationErrors = discrepancyValidator.validate("noregex");
 		assertEquals(validationErrors.size(), 1);
 	}
 
@@ -71,7 +71,7 @@ public class ImportHelperTest {
 		request.setParameter(displayItemBean.getItem().getOid(), displayItemBean.getData().getValue());
 		importHelper.validateDisplayItemBeanText(discrepancyValidator, displayItemBean, displayItemBean.getItem()
 				.getOid());
-		HashMap validationErrors = discrepancyValidator.validate("noregex");
+		HashMap<?, ?> validationErrors = discrepancyValidator.validate("noregex");
 		assertEquals(validationErrors.size(), 0);
 	}
 }
