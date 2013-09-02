@@ -781,10 +781,10 @@ public class UpdateStudyEventServlet extends SecureController {
 		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
 			if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
 				request.setAttribute(HAS_LOCATION_NOTE, "yes");
-			} else if ("start_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+			} else if ("date_start".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
 				request.setAttribute(HAS_START_DATE_NOTE, "yes");
 
-			} else if ("end_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+			} else if ("date_end".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
 				request.setAttribute(HAS_END_DATE_NOTE, "yes");
 			}
 		}

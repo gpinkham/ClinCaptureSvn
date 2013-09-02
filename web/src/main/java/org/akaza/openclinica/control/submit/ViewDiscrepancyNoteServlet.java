@@ -120,6 +120,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 	public String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
 	public String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note")
 			+ respage.getString("change_study_contact_sysadmin");
+    public String subjectIdNotFound = respage.getString("subject_id_not_found");
 
 	@Override
 	protected void mayProceed() throws InsufficientPermissionException {
@@ -216,8 +217,18 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
 		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
 
-		int subjectId = fp.getInt(CreateDiscrepancyNoteServlet.SUBJECT_ID, true);
-		int itemId = fp.getInt(CreateDiscrepancyNoteServlet.ITEM_ID, true);
+        int subjectId = fp.getInt(CreateDiscrepancyNoteServlet.SUBJECT_ID, true);
+        boolean subjectNotFound = false;
+        try {
+            if (subjectId == 0 && "studyEvent".equalsIgnoreCase(name)) {
+                subjectId = Integer.valueOf((String) session.getAttribute(CreateDiscrepancyNoteServlet.SUBJECT_ID));
+                subjectNotFound = true;
+            }
+        } catch (Exception e) {
+            addPageMessage(subjectIdNotFound);
+            throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
+        }
+        int itemId = fp.getInt(CreateDiscrepancyNoteServlet.ITEM_ID, true);
 
 		StudySubjectBean ssub = new StudySubjectBean();
 		if (subjectId > 0) {
@@ -676,8 +687,10 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 			ArrayList itemAuditEvents = adao.findItemAuditEvents(entityId, name);
 			request.setAttribute("itemAudits", itemAuditEvents);
 		}
-
-		forwardPage(Page.VIEW_DISCREPANCY_NOTE);
+        if (subjectNotFound) {
+            session.removeAttribute(CreateDiscrepancyNoteServlet.SUBJECT_ID);
+        }
+        forwardPage(Page.VIEW_DISCREPANCY_NOTE);
 	}
 
 	private void setupStudyEventCRFAttributes(EventCRFBean eventCRFBean) {

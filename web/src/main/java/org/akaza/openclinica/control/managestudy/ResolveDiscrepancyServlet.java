@@ -129,6 +129,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 			request.setAttribute(EnterDataForStudyEventServlet.INPUT_EVENT_ID, String.valueOf(id));
 			request.setAttribute(UpdateStudyEventServlet.EVENT_ID, String.valueOf(id));
 			request.setAttribute(UpdateStudyEventServlet.STUDY_SUBJECT_ID, String.valueOf(seb.getStudySubjectId()));
+            session.setAttribute(CreateDiscrepancyNoteServlet.SUBJECT_ID,  String.valueOf(seb.getStudySubjectId()));
 		}
 
 		// this is for item data

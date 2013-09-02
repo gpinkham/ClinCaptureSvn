@@ -220,7 +220,7 @@ public class CalendarLogic {
 			message = message.replace("{0}", studySubjectBean.getLabel()).replace("{1}", sedb.getName());
 			note.setDetailedNotes(message);
 			note.setEntityName(resword.getString("start_date"));
-			note.setColumn("start_date");
+			note.setColumn("date_start");
 		}
 		if (statement == false) {
 			String message = resexception.getString("data_has_enteret_too_late_in_the_calendaror");
@@ -229,7 +229,7 @@ public class CalendarLogic {
 			message = message.replace("{0}", studySubjectBean.getLabel()).replace("{1}", sedb.getName());
 			note.setDetailedNotes(message);
 			note.setEntityName(resword.getString("end_date"));
-			note.setColumn("end_date");
+			note.setColumn("date_end");
 		}
 
 		note.setOwner(getUserByEmailId(sedb.getUserEmailId()));
