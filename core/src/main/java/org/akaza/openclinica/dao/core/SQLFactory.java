@@ -188,52 +188,12 @@ public class SQLFactory {
 			fileList.put(this.DAO_RULESET_AUDIT, "oracle_ruleset_audit_dao.xml");
 			fileList.put(this.DAO_RULESETRULE_AUDIT, "oracle_rulesetrule_audit_dao.xml");
 			fileList.put(this.DAO_ODM_EXTRACT, "oracle_odm_extract_dao.xml");
-		} else if ("postgres".equals(dbName)) {
-			fileList.put(this.DAO_USERACCOUNT, "useraccount_dao.xml");
-			fileList.put(this.DAO_ARCHIVED_DATASET_FILE, "archived_dataset_file_dao.xml");
-			fileList.put(this.DAO_STUDY, "study_dao.xml");
-			fileList.put(this.DAO_STUDYEVENTDEFNITION, "studyeventdefinition_dao.xml");
-			fileList.put(this.DAO_STUDYEVENT, "study_event_dao.xml");
-			fileList.put(this.DAO_STUDYGROUP, "study_group_dao.xml");
-			fileList.put(this.DAO_STUDYGROUPCLASS, "study_group_class_dao.xml");
-			fileList.put(this.DAO_STUDYSUBJECT, "study_subject_dao.xml");
-			fileList.put(this.DAO_SUBJECT, "subject_dao.xml");
-			fileList.put(this.DAO_SUBJECTGROUPMAP, "subject_group_map_dao.xml");
-			fileList.put(this.DAO_EVENTDEFINITIONCRF, "event_definition_crf_dao.xml");
-			fileList.put(this.DAO_AUDITEVENT, "audit_event_dao.xml");
-			fileList.put(this.DAO_AUDIT, "audit_dao.xml");
-            fileList.put(this.DAO_DYNAMIC_EVENT, "dynamic_event_dao.xml");
-			fileList.put(this.DAO_ITEM, "item_dao.xml");
-			fileList.put(this.DAO_ITEMDATA, "itemdata_dao.xml");
-			fileList.put(this.DAO_CRF, "crf_dao.xml");
-			fileList.put(this.DAO_CRFVERSION, "crfversion_dao.xml");
-			fileList.put(this.DAO_DATASET, "dataset_dao.xml");
-			fileList.put(this.DAO_SECTION, "section_dao.xml");
-			fileList.put(this.DAO_DN_DESCRIPTION, "dn_description_dao.xml");
-			fileList.put(this.DAO_EVENTCRF, "eventcrf_dao.xml");
-			fileList.put(this.DAO_ITEMFORMMETADATA, "item_form_metadata_dao.xml");
-			fileList.put(this.DAO_DISCREPANCY_NOTE, "discrepancy_note_dao.xml");
-			fileList.put(this.DAO_STUDY_PARAMETER, "study_parameter_value_dao.xml");
-			fileList.put(this.DAO_ITEM_GROUP, "item_group_dao.xml");
-			fileList.put(this.DAO_ITEM_GROUP_METADATA, "item_group_metadata_dao.xml");
+			
+		} else {
+			
+			addPostgresDigesters(fileList);
 
-			fileList.put(this.DAO_RULESET, "ruleset_dao.xml");
-			fileList.put(this.DAO_RULE, "rule_dao.xml");
-			fileList.put(this.DAO_RULE_ACTION, "action_dao.xml");
-			fileList.put(this.DAO_EXPRESSION, "expression_dao.xml");
-			fileList.put(this.DAO_RULESET_RULE, "rulesetrule_dao.xml");
-			fileList.put(this.DAO_RULESET_AUDIT, "ruleset_audit_dao.xml");
-			fileList.put(this.DAO_RULESETRULE_AUDIT, "rulesetrule_audit_dao.xml");
-			fileList.put(this.DAO_SUBJECTTRANSFER, "subjecttransfer_dao.xml");
-
-			fileList.put(this.DAO_ODM_EXTRACT, "odm_extract_dao.xml");
-
-			// add files here as we port over to postgres, tbh
-		}// should be either oracle or postgres, but what if the file is
-			// gone?
-		else {
-			// throw an exception here, ssachs
-		}
+		} 
 
 		Set DAONames = fileList.keySet();
 		Iterator DAONamesIt = DAONames.iterator();
@@ -261,5 +221,48 @@ public class SQLFactory {
 				ioe.printStackTrace();
 			}
 		}
+	}
+	
+	private void addPostgresDigesters(HashMap fileList) {
+		
+		fileList.put(this.DAO_USERACCOUNT, "useraccount_dao.xml");
+		fileList.put(this.DAO_ARCHIVED_DATASET_FILE, "archived_dataset_file_dao.xml");
+		fileList.put(this.DAO_STUDY, "study_dao.xml");
+		fileList.put(this.DAO_STUDYEVENTDEFNITION, "studyeventdefinition_dao.xml");
+		fileList.put(this.DAO_STUDYEVENT, "study_event_dao.xml");
+		fileList.put(this.DAO_STUDYGROUP, "study_group_dao.xml");
+		fileList.put(this.DAO_STUDYGROUPCLASS, "study_group_class_dao.xml");
+		fileList.put(this.DAO_STUDYSUBJECT, "study_subject_dao.xml");
+		fileList.put(this.DAO_SUBJECT, "subject_dao.xml");
+		fileList.put(this.DAO_SUBJECTGROUPMAP, "subject_group_map_dao.xml");
+		fileList.put(this.DAO_EVENTDEFINITIONCRF, "event_definition_crf_dao.xml");
+		fileList.put(this.DAO_AUDITEVENT, "audit_event_dao.xml");
+		fileList.put(this.DAO_AUDIT, "audit_dao.xml");
+        fileList.put(this.DAO_DYNAMIC_EVENT, "dynamic_event_dao.xml");
+		fileList.put(this.DAO_ITEM, "item_dao.xml");
+		fileList.put(this.DAO_ITEMDATA, "itemdata_dao.xml");
+		fileList.put(this.DAO_CRF, "crf_dao.xml");
+		fileList.put(this.DAO_CRFVERSION, "crfversion_dao.xml");
+		fileList.put(this.DAO_DATASET, "dataset_dao.xml");
+		fileList.put(this.DAO_SECTION, "section_dao.xml");
+		fileList.put(this.DAO_DN_DESCRIPTION, "dn_description_dao.xml");
+		fileList.put(this.DAO_EVENTCRF, "eventcrf_dao.xml");
+		fileList.put(this.DAO_ITEMFORMMETADATA, "item_form_metadata_dao.xml");
+		fileList.put(this.DAO_DISCREPANCY_NOTE, "discrepancy_note_dao.xml");
+		fileList.put(this.DAO_STUDY_PARAMETER, "study_parameter_value_dao.xml");
+		fileList.put(this.DAO_ITEM_GROUP, "item_group_dao.xml");
+		fileList.put(this.DAO_ITEM_GROUP_METADATA, "item_group_metadata_dao.xml");
+
+		fileList.put(this.DAO_RULESET, "ruleset_dao.xml");
+		fileList.put(this.DAO_RULE, "rule_dao.xml");
+		fileList.put(this.DAO_RULE_ACTION, "action_dao.xml");
+		fileList.put(this.DAO_EXPRESSION, "expression_dao.xml");
+		fileList.put(this.DAO_RULESET_RULE, "rulesetrule_dao.xml");
+		fileList.put(this.DAO_RULESET_AUDIT, "ruleset_audit_dao.xml");
+		fileList.put(this.DAO_RULESETRULE_AUDIT, "rulesetrule_audit_dao.xml");
+		fileList.put(this.DAO_SUBJECTTRANSFER, "subjecttransfer_dao.xml");
+
+		fileList.put(this.DAO_ODM_EXTRACT, "odm_extract_dao.xml");
+
 	}
 }

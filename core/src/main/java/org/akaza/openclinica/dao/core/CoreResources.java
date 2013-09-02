@@ -319,7 +319,14 @@ public class CoreResources implements ResourceLoaderAware {
 					+ ":" + DATAINFO.getProperty("db");
 			driver = "oracle.jdbc.driver.OracleDriver";
 			hibernateDialect = "org.hibernate.dialect.OracleDialect";
+			
+		} else {
+			
+			url = DATAINFO.getProperty("url");
+			driver = DATAINFO.getProperty("driver");
+			hibernateDialect = DATAINFO.getProperty("hibernate.dialect");
 		}
+		
 		DATAINFO.setProperty("dataBase", database);
 		DATAINFO.setProperty("url", url.trim());
 		DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
