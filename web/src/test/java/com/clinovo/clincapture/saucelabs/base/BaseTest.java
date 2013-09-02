@@ -100,7 +100,7 @@ public class BaseTest extends SeleneseTestBase {
 	
 	public void setTestProperties() {
 
-		String resource = "test.properties";
+		String resource = "web-test.properties";
 		Properties prop = new Properties();
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();           
 		InputStream stream = loader.getResourceAsStream(resource);
@@ -116,7 +116,7 @@ public class BaseTest extends SeleneseTestBase {
 	@Before
 	public void setUp() throws Exception {
 		
-		// pull the following from test.properties: saucelabs.name and saucelabs.access.key
+		// pull the following from web-test.properties: saucelabs.name and saucelabs.access.key
 		this.setTestProperties();
 		
 		selenium = new DefaultSelenium("ondemand.saucelabs.com", 80, "{\"username\": \"" + sauceName + "\","

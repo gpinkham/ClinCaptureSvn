@@ -25,6 +25,13 @@
 			<groupId>com.clinovo.clincapture</groupId>
 			<artifactId>medical-coding</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.clinovo.clincapture</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>saxon</artifactId>
@@ -246,6 +253,11 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>org.dbunit</groupId>
+            <artifactId>dbunit</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 	
 	<build>

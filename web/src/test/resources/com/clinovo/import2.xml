@@ -5,138 +5,136 @@
      CreationDateTime="2013-08-28T08:42:41+03:00" FileType="Snapshot" ODMVersion="1.3"
      xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd">
     <ClinicalData StudyOID="S_DEFAULTS1" MetaDataVersionOID="v1.0.0">
-        <SubjectData SubjectKey="SS_XXXX002" OpenClinica:StudySubjectID="XXXX-002">
-            <StudyEventData StudyEventOID="SE_STUDYEXIT" StudyEventRepeatKey="1">
-                <FormData FormOID="F_TESTFORM_10">
-                    <ItemGroupData ItemGroupOID="IG_TESTF_UNGROUPED" TransactionType="Insert">
-                        <ItemData ItemOID="I_TESTF_CM_TXT_NAME1" Value="11">
+        <SubjectData SubjectKey="SS_SSID1" OpenClinica:StudySubjectID="XXXX-002">
+            <StudyEventData StudyEventOID="SE_ED1NONRE" StudyEventRepeatKey="1">
+                <FormData FormOID="F_AGEN_V20">
+                    <ItemGroupData ItemGroupOID="IG_AGEN_UNGROUPED" TransactionType="Insert">
+                        <ItemData ItemOID="I_AGEN_PERIODSTART" Value="11">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM_TXT_NAME2" Value="12">
+                        <ItemData ItemOID="I_AGEN_PERIODEND" Value="12">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM_TT_NAME1" Value="23">
+                        <ItemData ItemOID="I_AGEN_DOSEDATE" Value="23">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM_TT_NAME2" Value="24">
-                        </ItemData>
-                    </ItemGroupData>
-                    <ItemGroupData ItemGroupOID="IG_TESTF_CONCOMITANTMEDICATIONS" ItemGroupRepeatKey="1"
-                                   TransactionType="Insert">
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_NAME" Value="1">
-                        </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_DOSE" Value="2">
-                        </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_ROUTE" Value="3">
-                        </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_FRQ" Value="4">
-                        </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_INDC" Value="5">
+                        <ItemData ItemOID="I_AGEN_DOSETIME" Value="24">
                         </ItemData>
                     </ItemGroupData>
-                    <ItemGroupData ItemGroupOID="IG_TESTF_CONCOMITANTMEDICATIONS" ItemGroupRepeatKey="2"
+                    <ItemGroupData ItemGroupOID="IG_AGEN_DOSETABLE" ItemGroupRepeatKey="1"
                                    TransactionType="Insert">
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_NAME" Value="6">
+                        <ItemData ItemOID="I_AGEN_AGENT_NAME" Value="1">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_DOSE" Value="7">
+                        <ItemData ItemOID="I_AGEN_AGENT_DOSE" Value="2">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_ROUTE" Value="8">
+                        <ItemData ItemOID="I_AGEN_MTD_DETERMINED" Value="3">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_FRQ" Value="9">
+                        <ItemData ItemOID="I_AGEN_MTD_DOSE" Value="4">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_INDC" Value="10">
+                        <ItemData ItemOID="I_AGEN_AGENT_INTERRUPTED" Value="5">
                         </ItemData>
                     </ItemGroupData>
-                    <ItemGroupData ItemGroupOID="IG_TESTF_CONCOMITANTMEDICATIONS2" ItemGroupRepeatKey="1"
+                    <ItemGroupData ItemGroupOID="IG_AGEN_DOSETABLE" ItemGroupRepeatKey="2"
                                    TransactionType="Insert">
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_NAME" Value="13">
+                        <ItemData ItemOID="I_AGEN_AGENT_NAME" Value="6">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_DOSE" Value="14">
+                        <ItemData ItemOID="I_AGEN_AGENT_DOSE" Value="7">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_ROUTE" Value="15">
+                        <ItemData ItemOID="I_AGEN_MTD_DETERMINED" Value="8">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_FRQ" Value="16">
+                        <ItemData ItemOID="I_AGEN_MTD_DOSE" Value="9">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_INDC" Value="17">
+                        <ItemData ItemOID="I_AGEN_AGENT_INTERRUPTED" Value="10">
                         </ItemData>
                     </ItemGroupData>
-                    <ItemGroupData ItemGroupOID="IG_TESTF_CONCOMITANTMEDICATIONS2" ItemGroupRepeatKey="2"
+                    <ItemGroupData ItemGroupOID="IG_CONC_UNGROUPED" ItemGroupRepeatKey="1"
                                    TransactionType="Insert">
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_NAME" Value="18">
+                        <ItemData ItemOID="I_AGEN_DATE_INTERRUPTED" Value="13">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_DOSE" Value="19">
+                        <ItemData ItemOID="I_AGEN_REASON_INTERRUPTED" Value="14">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_ROUTE" Value="20">
+                        <ItemData ItemOID="I_AGEN_RESTARTED" Value="15">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_FRQ" Value="21">
+                        <ItemData ItemOID="I_AGEN_DATE_RESTARTED" Value="16">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_INDC" Value="22">
+                        <ItemData ItemOID="I_AGEN_REASONRESTARTED" Value="17">
+                        </ItemData>
+                    </ItemGroupData>
+                    <ItemGroupData ItemGroupOID="IG_CONC_UNGROUPED" ItemGroupRepeatKey="2"
+                                   TransactionType="Insert">
+                        <ItemData ItemOID="I_AGEN_DATE_INTERRUPTED" Value="18">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_REASON_INTERRUPTED" Value="19">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_RESTARTED" Value="20">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_DATE_RESTARTED" Value="21">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_REASONRESTARTED" Value="22">
                         </ItemData>
                     </ItemGroupData>
 
                 </FormData>
             </StudyEventData>
-            <StudyEventData StudyEventOID="SE_STUDYEXIT" StudyEventRepeatKey="2">
-                <FormData FormOID="F_TESTFORM_10">
-                    <ItemGroupData ItemGroupOID="IG_TESTF_UNGROUPED" TransactionType="Insert">
-                        <ItemData ItemOID="I_TESTF_CM_TXT_NAME1" Value="j">
+            <StudyEventData StudyEventOID="SE_ED1NONRE" StudyEventRepeatKey="2">
+                <FormData FormOID="F_AGEN_V20">
+                    <ItemGroupData ItemGroupOID="IG_AGEN_UNGROUPED" TransactionType="Insert">
+                        <ItemData ItemOID="I_AGEN_PERIODSTART" Value="j">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM_TXT_NAME2" Value="k">
+                        <ItemData ItemOID="I_AGEN_PERIODEND" Value="k">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM_TT_NAME1" Value="z">
+                        <ItemData ItemOID="I_AGEN_DOSEDATE" Value="z">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM_TT_NAME2" Value="w">
-                        </ItemData>
-                    </ItemGroupData>
-                    <ItemGroupData ItemGroupOID="IG_TESTF_CONCOMITANTMEDICATIONS" ItemGroupRepeatKey="1"
-                                   TransactionType="Insert">
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_NAME" Value="a">
-                        </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_DOSE" Value="2">
-                        </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_ROUTE" Value="3">
-                        </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_FRQ" Value="4">
-                        </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_INDC" Value="b">
+                        <ItemData ItemOID="I_AGEN_DOSETIME" Value="v">
                         </ItemData>
                     </ItemGroupData>
-                    <ItemGroupData ItemGroupOID="IG_TESTF_CONCOMITANTMEDICATIONS" ItemGroupRepeatKey="2"
+                    <ItemGroupData ItemGroupOID="IG_AGEN_DOSETABLE" ItemGroupRepeatKey="1"
                                    TransactionType="Insert">
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_NAME" Value="c">
+                        <ItemData ItemOID="I_AGEN_AGENT_NAME" Value="a">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_DOSE" Value="5">
-
-
+                        <ItemData ItemOID="I_AGEN_AGENT_DOSE" Value="2">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_ROUTE" Value="6">
+                        <ItemData ItemOID="I_AGEN_MTD_DETERMINED" Value="3">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_FRQ" Value="7">
+                        <ItemData ItemOID="I_AGEN_MTD_DOSE" Value="4">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM001_TXT_INDC" Value="g">
+                        <ItemData ItemOID="I_AGEN_AGENT_INTERRUPTED" Value="b">
                         </ItemData>
                     </ItemGroupData>
-                    <ItemGroupData ItemGroupOID="IG_TESTF_CONCOMITANTMEDICATIONS2" ItemGroupRepeatKey="1"
+                    <ItemGroupData ItemGroupOID="IG_AGEN_DOSETABLE" ItemGroupRepeatKey="2"
                                    TransactionType="Insert">
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_NAME" Value="o">
+                        <ItemData ItemOID="I_AGEN_AGENT_NAME" Value="c">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_DOSE" Value="8">
+                        <ItemData ItemOID="I_AGEN_AGENT_DOSE" Value="5">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_ROUTE" Value="9">
+                        <ItemData ItemOID="I_AGEN_MTD_DETERMINED" Value="6">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_FRQ" Value="10">
+                        <ItemData ItemOID="I_AGEN_MTD_DOSE" Value="7">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_INDC" Value="p">
+                        <ItemData ItemOID="I_AGEN_AGENT_INTERRUPTED" Value="g">
                         </ItemData>
                     </ItemGroupData>
-                    <ItemGroupData ItemGroupOID="IG_TESTF_CONCOMITANTMEDICATIONS2" ItemGroupRepeatKey="2"
+                    <ItemGroupData ItemGroupOID="IG_CONC_UNGROUPED" ItemGroupRepeatKey="1"
                                    TransactionType="Insert">
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_NAME" Value="r">
+                        <ItemData ItemOID="I_AGEN_DATE_INTERRUPTED" Value="o">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_DOSE" Value="11">
+                        <ItemData ItemOID="I_AGEN_REASON_INTERRUPTED" Value="8">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_ROUTE" Value="12">
+                        <ItemData ItemOID="I_AGEN_RESTARTED" Value="9">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_FRQ" Value="13">
+                        <ItemData ItemOID="I_AGEN_DATE_RESTARTED" Value="10">
                         </ItemData>
-                        <ItemData ItemOID="I_TESTF_CM002_TXT_INDC" Value="s">
+                        <ItemData ItemOID="I_AGEN_REASONRESTARTED" Value="p">
+                        </ItemData>
+                    </ItemGroupData>
+                    <ItemGroupData ItemGroupOID="IG_CONC_UNGROUPED" ItemGroupRepeatKey="2"
+                                   TransactionType="Insert">
+                        <ItemData ItemOID="I_AGEN_DATE_INTERRUPTED" Value="r">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_REASON_INTERRUPTED" Value="11">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_RESTARTED" Value="12">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_DATE_RESTARTED" Value="13">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_REASONRESTARTED" Value="s">
                         </ItemData>
                     </ItemGroupData>
 

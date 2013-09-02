@@ -96,7 +96,7 @@ public class SQLFactory {
 		this.ehCacheWrapper = ehCacheWrapper;
 	}
 
-	public static String JUNIT_XML_DIR = System.getProperty("user.dir")
+	public static String JUNIT_XML_DIR = (System.getProperty("user.dir").indexOf(File.separator + "web") > 0 ? System.getProperty("user.dir").replace(File.separator + "web", "") : System.getProperty("user.dir"))
 			+ (System.getProperty("user.dir").indexOf(File.separator + "core") < 0 ? (File.separator + "core") : "")
 			+ File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
 			+ "properties" + File.separator;

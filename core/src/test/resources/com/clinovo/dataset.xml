@@ -69,6 +69,12 @@
 		owner_id="1" status_id="1" date_created="2008-07-02" date_updated="2008-07-02"
 		update_id="1" subject_event_status_id="3" start_time_flag="false"
 		end_time_flag="false" />
+    <study_event study_event_id="11" study_event_definition_id="1"
+        study_subject_id="1" location="Boston" sample_ordinal="2"
+        date_start="2008-07-11 00:00:00.0" date_end="2008-07-11 00:00:00.0"
+        owner_id="1" status_id="1" date_created="2008-07-02" date_updated="2008-07-02"
+        update_id="1" subject_event_status_id="3" start_time_flag="false"
+        end_time_flag="false" />
 	<study_event study_event_id="2" study_event_definition_id="2"
 		study_subject_id="1" location="Boston" sample_ordinal="1"
 		date_start="2008-07-01 12:00:00.0" owner_id="1" status_id="1"
@@ -82,6 +88,24 @@
 
 	<event_crf event_crf_id="1" study_event_id="1"
 		crf_version_id="1" date_interviewed="2001-12-12" interviewer_name="Krikor"
+		completion_status_id="1" status_id="1" annotations="" validator_id="0"
+		validator_annotations="" validate_string="" owner_id="1" date_created="2008-07-02"
+		study_subject_id="1" date_updated="2008-07-02" update_id="1"
+		electronic_signature_status="false" />
+    <event_crf event_crf_id="11" study_event_id="11"
+		crf_version_id="2" date_interviewed="2001-12-12" interviewer_name="Krikor"
+		completion_status_id="1" status_id="1" annotations="" validator_id="0"
+		validator_annotations="" validate_string="" owner_id="1" date_created="2008-07-02"
+		study_subject_id="1" date_updated="2008-07-02" update_id="1"
+		electronic_signature_status="false" />
+    <event_crf event_crf_id="12" study_event_id="11"
+		crf_version_id="1" date_interviewed="2001-12-12" interviewer_name="Krikor"
+		completion_status_id="1" status_id="1" annotations="" validator_id="0"
+		validator_annotations="" validate_string="" owner_id="1" date_created="2008-07-02"
+		study_subject_id="1" date_updated="2008-07-02" update_id="1"
+		electronic_signature_status="false" />
+    <event_crf event_crf_id="13" study_event_id="1"
+		crf_version_id="2" date_interviewed="2001-12-12" interviewer_name="Krikor"
 		completion_status_id="1" status_id="1" annotations="" validator_id="0"
 		validator_annotations="" validate_string="" owner_id="1" date_created="2008-07-02"
 		study_subject_id="1" date_updated="2008-07-02" update_id="1"
