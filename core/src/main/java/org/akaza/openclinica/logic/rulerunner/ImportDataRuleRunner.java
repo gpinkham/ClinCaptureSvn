@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -59,7 +60,8 @@ public class ImportDataRuleRunner extends RuleRunner {
 	 * @return Returned RuleActionBean summary with key as groupOrdinalPLusItemOid.
 	 */
 	@Transactional
-	public HashMap<String, ArrayList<String>> runRules(Boolean optimiseRuleValidator, Connection connection, List<ImportDataRuleRunnerContainer> containers, StudyBean study,
+	public HashMap<String, ArrayList<String>> runRules(Boolean optimiseRuleValidator, Connection connection,
+			List<ImportDataRuleRunnerContainer> containers, Set<Integer> skippedItemIds, StudyBean study,
 			UserAccountBean ub, ExecutionMode executionMode) {
 		HashMap<String, ArrayList<String>> messageMap = new HashMap<String, ArrayList<String>>();
 
@@ -70,7 +72,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 			}
 		} else if (executionMode == ExecutionMode.SAVE) {
 			for (ImportDataRuleRunnerContainer container : containers) {
-				MessageContainer messageContainer = this.runRules(connection, study, ub,
+				MessageContainer messageContainer = this.runRules(connection, study, ub, skippedItemIds,
 						(HashMap<String, String>) container.getVariableAndValue(),
 						container.getRuleActionContainerMap());
 				messageMap.putAll(messageContainer.getByMessageType(MessageType.ERROR));
@@ -172,7 +174,8 @@ public class ImportDataRuleRunner extends RuleRunner {
 
 	@Transactional
 	private MessageContainer runRules(Connection connection, StudyBean currentStudy, UserAccountBean ub,
-			HashMap<String, String> variableAndValue, HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted) {
+			Set<Integer> skippedItemIds, HashMap<String, String> variableAndValue,
+			HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted) {
 		// Copied from DataEntryRuleRunner runRules
 		MessageContainer messageContainer = new MessageContainer();
 		for (Map.Entry<String, ArrayList<RuleActionContainer>> entry : toBeExecuted.entrySet()) {
@@ -195,6 +198,10 @@ public class ImportDataRuleRunner extends RuleRunner {
 
 				ItemDataBean itemData = getExpressionService().getItemDataBeanFromDb(
 						ruleActionContainer.getRuleSetBean().getTarget().getValue());
+
+				if (skippedItemIds.contains(itemData.getItemId())) {
+					continue;
+				}
 
                 RuleActionBean rab = ap.execute(
                         RuleRunnerMode.IMPORT_DATA,

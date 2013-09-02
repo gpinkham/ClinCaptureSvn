@@ -25,9 +25,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
@@ -264,7 +266,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, auditMessages.get(1));
 				String skippedItemsSql = auditMessages.get(2);
 				if (!skippedItemsSql.isEmpty()) {
-					auditEventDAO.select(skippedItemsSql);
+					auditEventDAO.execute(skippedItemsSql);
 				}
 				try {
 					if (contactEmail != null && !"".equals(contactEmail)) {
@@ -544,7 +546,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				logger.debug("=== about to run rules ===");
 				List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(runRulesOptimisation,
 						dataSource.getConnection(), dataSource, studyBean, ub, ruleSetService, odmContainer);
-
+				Set<Integer> skippedItemIds = new HashSet<Integer>();
 				for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
 
 					int eventCrfBeanId = -1;
@@ -599,6 +601,7 @@ public class ImportSpringJob extends QuartzJobBean {
                                     }
                                 }
                             } else {
+								skippedItemIds.add(displayItemBean.getItem().getId());
                                 skippedItemsSql.append("INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id) " +
                                         "VALUES (35, now(), " + ub.getId() + ", 'item_data', " + itemDataBean.getId() + ", '" + displayItemBean.getItem().getName() + "', '" + itemDataBean.getValue() + "', '" + displayItemBean.getData().getValue() + "', " + displayItemBean.getData().getEventCRFId() + "); ");
                             }
@@ -659,8 +662,8 @@ public class ImportSpringJob extends QuartzJobBean {
 				msg.append(linkMessage);
 				auditMsg.append(linkMessage);
 
-				auditMsg.append(this.runRules(runRulesOptimisation, dataSource.getConnection(), studyBean, ub,
-						containers, ruleSetService, ExecutionMode.SAVE));
+				auditMsg.append(this.runRules(runRulesOptimisation, dataSource.getConnection(), skippedItemIds,
+						studyBean, ub, containers, ruleSetService, ExecutionMode.SAVE));
 			}
 		}// end for loop
 			// is the writer still not closed? try to close it
@@ -763,14 +766,14 @@ public class ImportSpringJob extends QuartzJobBean {
 	}
 
 	@Transactional
-	private StringBuffer runRules(Boolean runRulesOptimisation, Connection connection, StudyBean studyBean,
+	private StringBuffer runRules(Boolean runRulesOptimisation, Connection connection, Set<Integer> skippedItemIds, StudyBean studyBean,
 			UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
 			RuleSetServiceInterface ruleSetService, ExecutionMode executionMode) {
 		StringBuffer messages = new StringBuffer();
 		if (containers != null && !containers.isEmpty()) {
 			logger.debug("=== real running of rules in import data ===");
 			HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(runRulesOptimisation,
-					connection, containers, studyBean, userBean, executionMode);
+					connection, containers, skippedItemIds, studyBean, userBean, executionMode);
 			messages = extractRuleActionWarnings(summary);
 		}
 		return messages;

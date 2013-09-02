@@ -200,7 +200,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 				List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) session
 						.getAttribute("importedData");
 				Set<Integer> studyEventIds = new HashSet<Integer>();
-
+                Set<Integer> skippedItemIds = new HashSet<Integer>();
 				for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
 					
 					HashMap<Integer, EventCRFBean> idToEventCrfBeans = new HashMap<Integer, EventCRFBean>();
@@ -265,6 +265,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 									}
 								}
 							} else {
+                                skippedItemIds.add(displayItemBean.getItem().getId());
                                 skippedItemsSql.append("INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id) " +
                                         "VALUES (35, now(), " + ub.getId() + ", 'item_data', " + itemDataBean.getId() + ", '" + displayItemBean.getItem().getName() + "', '" + itemDataBean.getValue() + "', '" + displayItemBean.getData().getValue() + "', " + displayItemBean.getData().getEventCRFId() + "); ");
                             }
@@ -328,15 +329,14 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 				
 				con.close();
                 if (!skippedItemsSql.toString().isEmpty()) {
-                    new AuditDAO(sm.getDataSource()).select(skippedItemsSql.toString());
+                    new AuditDAO(sm.getDataSource()).execute(skippedItemsSql.toString());
                 }
 				try {
 					con = sm.getDataSource().getConnection();
 					con.setAutoCommit(false);
 					logger.debug("=== about to run rules ===");
-					addPageMessage(this.ruleActionWarnings(this.runRules(runRulesOptimisation, con,
-							currentStudy, ub, containers, ruleSetService,
-							ExecutionMode.SAVE)));
+					addPageMessage(this.ruleActionWarnings(this.runRules(runRulesOptimisation, con, skippedItemIds,
+							currentStudy, ub, containers, ruleSetService, ExecutionMode.SAVE)));
 					con.commit();
 					con.close();
 				} catch (SQLException sqle) {
@@ -374,20 +374,21 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 				}
 				if (containers != null && !containers.isEmpty()) {
 					logger.debug("=== running rules dry run ===");
-					ruleSetService.runRulesInImportData(runRulesOptimisation, connection, containers, studyBean, userBean, ExecutionMode.DRY_RUN);
+					ruleSetService.runRulesInImportData(runRulesOptimisation, connection, containers, studyBean,
+							userBean, ExecutionMode.DRY_RUN);
 				}
 			}
 		}
 		return containers;
 	}
 
-	private List<String> runRules(Boolean runRulesOptimisation, Connection connection, StudyBean studyBean, UserAccountBean userBean,
+	private List<String> runRules(Boolean runRulesOptimisation, Connection connection, Set<Integer> skippedItemIds, StudyBean studyBean, UserAccountBean userBean,
 			List<ImportDataRuleRunnerContainer> containers, RuleSetServiceInterface ruleSetService,
 			ExecutionMode executionMode) {
 
 		List<String> messages = new ArrayList<String>();
 		if (containers != null && !containers.isEmpty()) {
-			HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(runRulesOptimisation, connection, containers, studyBean,
+			HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(runRulesOptimisation, connection, containers, skippedItemIds, studyBean,
 					userBean, executionMode);
 			logger.debug("=== found summary " + summary.toString());
 			messages = extractRuleActionWarnings(summary);

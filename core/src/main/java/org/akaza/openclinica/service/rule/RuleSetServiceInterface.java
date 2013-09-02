@@ -81,18 +81,23 @@ public interface RuleSetServiceInterface {
 
 	/**
 	 * @param containers
+     * @param skippedItemIds
 	 * @param study
 	 * @param ub
 	 * @param executionMode
 	 * @return RuleActionBean summary with key as groupOrdinalPLusItemOid.
 	 */
 	public abstract HashMap<String, ArrayList<String>> runRulesInImportData(
-			List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub,
-			ExecutionMode executionMode);
+			List<ImportDataRuleRunnerContainer> containers, Set<Integer> skippedItemIds, StudyBean study,
+			UserAccountBean ub, ExecutionMode executionMode);
 
-    public abstract HashMap<String, ArrayList<String>> runRulesInImportData(Boolean optimiseRuleValidator, Connection connection,
-            List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub,
-            ExecutionMode executionMode);
+	public abstract HashMap<String, ArrayList<String>> runRulesInImportData(Boolean optimiseRuleValidator,
+			Connection connection, List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub,
+			ExecutionMode executionMode);
+    
+	public abstract HashMap<String, ArrayList<String>> runRulesInImportData(Boolean optimiseRuleValidator,
+			Connection connection, List<ImportDataRuleRunnerContainer> containers, Set<Integer> skippedItemIds,
+			StudyBean study, UserAccountBean ub, ExecutionMode executionMode);
 
 	public abstract List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study,
 			StudyEventDefinitionBean sed, CRFVersionBean crfVersion);
