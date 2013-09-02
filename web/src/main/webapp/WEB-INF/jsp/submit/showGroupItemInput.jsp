@@ -248,7 +248,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="isFirst" value="${param.isFirst}" />
 <c:set var="repeatParentId" value="${param.repeatParentId}" />
 <c:set var="rowCount" value="${param.rowCount}" />
-<c:set var="inputName" value="${repeatParentId}_[${rowCount}]input${itemId}" />
+<c:set var="inputName" value="${repeatParentId}_[${repeatParentId}]input${itemId}" />
 <c:set var="parsedInputName" value="${repeatParentId}_${rowCount}input${itemId}" />
 <c:set var="isHorizontal" value="${param.isHorizontal}" />
 <c:set var="defValue" value="${param.defaultValue}" />
