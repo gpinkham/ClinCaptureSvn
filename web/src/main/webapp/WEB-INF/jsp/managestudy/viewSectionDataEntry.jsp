@@ -640,9 +640,10 @@ function checkDataStatus() {
 																				<c:set var="sectionBorders"
 																					value="${section.section.borders}" />
 																				<tr>
-																					<td><c:set var="uniqueId" value="0" /> <c:set
+																					<td>
+                                                                                        <c:set var="uniqueId" value="0" /> <c:set
 																							var="repeatParentId"
-																							value="${displayItem.itemGroup.itemGroupBean.name}" />
+																							value="${displayItem.itemGroup.itemGroupBean.oid}" />
 
 																						<c:set var="repeatNumber"
 																							value="${displayItem.itemGroup.groupMetaBean.repeatNum}" />
@@ -844,7 +845,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																										<c:set var="columnNum" value="1" />
 																										<!-- hasError is set to true when validation error happens-->
 																										<c:choose>
-																											<c:when test="${status.last}">
+																											<c:when test="${status.last && !status.first}">
 																												<!-- for the last but not the first row and only row, we need to use [] so the repetition javascript can copy it to create new row-->
 																												<tr id="<c:out value="${repeatParentId}"/>"
 																													repeat="template"
@@ -878,7 +879,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																																		<c:import
 																																			url="../submit/showGroupItemInputMonitor.jsp">
 																																			<c:param name="repeatParentId"
-																																				value="${repeatParentId}" />
+																																				value="${displayItem.itemGroup.itemGroupBean.oid}" />
 																																			<c:param name="rowCount"
 																																				value="${uniqueId}" />
 																																			<c:param name="key"
@@ -915,7 +916,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																																		<c:import
 																																			url="../submit/showGroupItemInputMonitor.jsp">
 																																			<c:param name="repeatParentId"
-																																				value="${repeatParentId}" />
+																																				value="${displayItem.itemGroup.itemGroupBean.oid}" />
 																																			<c:param name="rowCount"
 																																				value="${uniqueId}" />
 																																			<c:param name="key"
@@ -944,7 +945,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																																	<c:import
 																																		url="../submit/showGroupItemInputMonitor.jsp">
 																																		<c:param name="repeatParentId"
-																																			value="${repeatParentId}" />
+																																			value="${displayItem.itemGroup.itemGroupBean.oid}" />
 																																		<c:param name="rowCount"
 																																			value="${uniqueId}" />
 																																		<c:param name="key"
@@ -970,7 +971,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																																	<c:import
 																																		url="../submit/showGroupItemInputMonitor.jsp">
 																																		<c:param name="repeatParentId"
-																																			value="${repeatParentId}" />
+																																			value="${displayItem.itemGroup.itemGroupBean.oid}" />
 																																		<c:param name="rowCount"
 																																			value="${uniqueId}" />
 																																		<c:param name="key"
@@ -1054,7 +1055,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																																	<c:import
 																																		url="../submit/showGroupItemInputMonitor.jsp">
 																																		<c:param name="repeatParentId"
-																																			value="${repeatParentId}" />
+																																			value="${displayItem.itemGroup.itemGroupBean.oid}" />
 																																		<c:param name="rowCount"
 																																			value="${uniqueId}" />
 																																		<c:param name="key"
@@ -1091,7 +1092,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																																	<c:import
 																																		url="../submit/showGroupItemInputMonitor.jsp">
 																																		<c:param name="repeatParentId"
-																																			value="${repeatParentId}" />
+																																			value="${displayItem.itemGroup.itemGroupBean.oid}" />
 																																		<c:param name="rowCount"
 																																			value="${uniqueId}" />
 																																		<c:param name="key"
@@ -1119,7 +1120,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																																	value="${bodyItem}" /> <c:import
 																																	url="../submit/showGroupItemInputMonitor.jsp">
 																																	<c:param name="repeatParentId"
-																																		value="${repeatParentId}" />
+																																		value="${displayItem.itemGroup.itemGroupBean.oid}" />
 																																	<c:param name="rowCount"
 																																		value="${uniqueId}" />
 																																	<c:param name="key"
@@ -1144,7 +1145,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																																	value="${bodyItem}" /> <c:import
 																																	url="../submit/showGroupItemInputMonitor.jsp">
 																																	<c:param name="repeatParentId"
-																																		value="${repeatParentId}" />
+																																		value="${displayItem.itemGroup.itemGroupBean.oid}" />
 																																	<c:param name="rowCount"
 																																		value="${uniqueId}" />
 																																	<c:param name="key"
@@ -1323,6 +1324,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 													url="../submit/showItemInputMonitor.jsp">
 													<c:param name="key" value="${numOfDate}" />
 													<c:param name="tabNum" value="${itemNum}" />
+                                                    <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
 													<%-- add default value from the crf --%>
 													<c:param name="defaultValue"
 														value="${displayItem.singleItem.metadata.defaultValue}" />
@@ -1330,6 +1332,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 														value="${displayItem.singleItem.metadata.responseLayout}" />
 													<c:param name="originJSP" value="initialDataEntry" />
 													<c:param name="isLocked" value="${isLocked}" />
+                                                    <c:param name="isLast" value="${false}"/>
 												</c:import>
 
 											</td>
@@ -1411,12 +1414,14 @@ but the custom tag uses that, not this jstl code--%> <c:if
 														url="../submit/showItemInputMonitor.jsp">
 														<c:param name="key" value="${numOfDate}" />
 														<c:param name="tabNum" value="${itemNum}" />
+                                                        <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
 														<c:param name="defaultValue"
 															value="${childItem.metadata.defaultValue}" />
 														<c:param name="respLayout"
 															value="${childItem.metadata.responseLayout}" />
 														<c:param name="originJSP" value="initialDataEntry" />
 														<c:param name="isLocked" value="${isLocked}" />
+                                                        <c:param name="isLast" value="${false}"/>
 													</c:import> <%--	<br />--%>
 													<%--<c:import url="../showMessage.jsp"><c:param name="key" value="input${childItem.item.id}" /></c:import>--%>
 												</td>

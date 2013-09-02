@@ -868,7 +868,7 @@ but the custom tag uses that, not this jstl code--%>
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${false}"/>
@@ -889,7 +889,7 @@ but the custom tag uses that, not this jstl code--%>
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${false}"/>
@@ -909,13 +909,13 @@ but the custom tag uses that, not this jstl code--%>
                     <c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
                     <c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
                     <c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
-                    <c:param name="repeatParentId" value="${repeatParentId}"/>
+                    <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                     <c:param name="rowCount" value="${uniqueId}"/>
                     <c:param name="isLast" value="${false}"/>
                     <c:param name="side" value="left"/>
                 </c:import>
                 <c:import url="../submit/showGroupItemInput.jsp">
-                    <c:param name="repeatParentId" value="${repeatParentId}"/>
+                    <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                     <c:param name="rowCount" value="${uniqueId}"/>
                     <c:param name="key" value="${numOfDate}" />
                     <c:param name="isLast" value="${false}"/>
@@ -928,7 +928,7 @@ but the custom tag uses that, not this jstl code--%>
                     <c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
                     <c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
                     <c:param name="linkText" value="${bodyItem.metadata.rightItemText}"/>
-                    <c:param name="repeatParentId" value="${repeatParentId}"/>
+                    <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                     <c:param name="rowCount" value="${uniqueId}"/>
                     <c:param name="isLast" value="${false}"/>
                     <c:param name="side" value="right"/>
@@ -944,13 +944,13 @@ but the custom tag uses that, not this jstl code--%>
                     <c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
                     <c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
                     <c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
-                    <c:param name="repeatParentId" value="${repeatParentId}"/>
+                    <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                     <c:param name="rowCount" value="${uniqueId}"/>
                     <c:param name="isLast" value="${false}"/>
                     <c:param name="side" value="left"/>
                 </c:import>
                 <c:import url="../submit/showGroupItemInput.jsp">
-                    <c:param name="repeatParentId" value="${repeatParentId}"/>
+                    <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                     <c:param name="rowCount" value="${uniqueId}"/>
                     <c:param name="key" value="${numOfDate}" />
                     <c:param name="isLast" value="${false}"/>
@@ -963,7 +963,7 @@ but the custom tag uses that, not this jstl code--%>
                     <c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
                     <c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
                     <c:param name="linkText" value="${bodyItem.metadata.rightItemText}"/>
-                    <c:param name="repeatParentId" value="${repeatParentId}"/>
+                    <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                     <c:param name="rowCount" value="${uniqueId}"/>
                     <c:param name="isLast" value="${false}"/>
                     <c:param name="side" value="right"/>
@@ -1080,7 +1080,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
-                            <c:param name="repeatParentId" value="${repeatParentId}"/>
+                            <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                             <c:param name="rowCount" value="${uniqueId}"/>
                             <c:param name="key" value="${numOfDate}" />
                             <c:param name="isLast" value="${true}"/>
@@ -1102,7 +1102,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
-                            <c:param name="repeatParentId" value="${repeatParentId}"/>
+                            <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                             <c:param name="rowCount" value="${uniqueId}"/>
                             <c:param name="key" value="${numOfDate}" />
                             <c:param name="isLast" value="${true}"/>
@@ -1119,7 +1119,7 @@ but the custom tag uses that, not this jstl code--%>
                 <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${true}"/>
@@ -1139,13 +1139,13 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
                         <c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
                         <c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="isLast" value="${true}"/>
                         <c:param name="side" value="left"/>
                     </c:import>
                     <c:import url="../submit/showGroupItemInput.jsp">
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${true}"/>
@@ -1159,7 +1159,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
                         <c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
                         <c:param name="linkText" value="${bodyItem.metadata.rightItemText}"/>
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="isLast" value="${true}"/>
                         <c:param name="side" value="right"/>

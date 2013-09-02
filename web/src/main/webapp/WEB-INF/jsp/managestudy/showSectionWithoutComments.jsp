@@ -123,7 +123,9 @@
     <td valign="top" nowrap="nowrap">
         <%-- display the HTML input tag --%>
       <c:set var="displayItem" scope="request" value="${displayItem}" />
-      <c:import url="../submit/showItemInput.jsp" />
+      <c:import url="../submit/showItemInput.jsp">
+            <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
+      </c:import>
         <%--    <c:import url="../showMessage.jsp"><c:param name="key" value="input${displayItem.item.id}" /></c:import> --%>
     </td>
     <c:if test='${displayItem.item.units != ""}'>
@@ -190,7 +192,9 @@
           <td valign="top" nowrap="nowrap">
               <%-- display the HTML input tag --%>
             <c:set var="displayItem" scope="request" value="${childItem}" />
-            <c:import url="../submit/showItemInput.jsp" />
+            <c:import url="../submit/showItemInput.jsp">
+                <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
+            </c:import>
           </td>
           <c:if test='${childItem.item.units != ""}'>
             <td valign="top"> <c:out value="(${childItem.item.units})" escapeXml="false"/> </td>

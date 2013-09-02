@@ -104,7 +104,7 @@
 <c:set var="isFirst" value="${param.isFirst}" />
 <c:set var="repeatParentId" value="${param.repeatParentId}" />
 <c:set var="rowCount" value="${param.rowCount}" />
-<c:set var="inputName" value="${repeatParentId}_[${repeatParentId}]input${itemId}" />
+<c:set var="inputName" value="${repeatParentId}_[${rowCount}]input${itemId}" />
 <c:set var="parsedInputName" value="${repeatParentId}_${rowCount}input${itemId}" />
 <c:set var="isHorizontal" value="${param.isHorizontal}" />
 <c:set var="defValue" value="${param.defaultValue}" />
@@ -483,12 +483,11 @@
     </c:otherwise>
   </c:choose>
   <c:choose>
-    <c:when test="${displayItem.numDiscrepancyNotes > 0 && !isLast}">
-
+    <c:when test="${displayItem.numDiscrepancyNotes > 0}">
         <a class="dnLink"
            tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip()"
            onClick="openDNoteWindow('<c:out value="${contextPath}" />/ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
-            <img id="flag_<c:out value="${inputName}"/>" name="flag_input<c:out value="${inputName}" />"
+            <img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}" />"
                  src="<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
             <input type="hidden" value="<c:out value="${contextPath}" />/ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>"/>
         </a>
