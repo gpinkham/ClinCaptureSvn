@@ -302,7 +302,7 @@ public class ImportCRFDataService {
                 }
 
 				displayItemBeans = new ArrayList<DisplayItemBean>();
-
+                HashMap prevValidationErrors = new HashMap();
 				for (FormDataBean formDataBean : formDataBeans) {
 					maxOrdinal = 1;// JN:Moving maxOrdinal here, so max ordinal is there per form rather than per study
 									// eventData bean
@@ -515,7 +515,8 @@ public class ImportCRFDataService {
 							studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(),
 							crfVersion.getName(), studySubjectBean.getOid(),
 							studyEventDataBean.getStudyEventRepeatKey());
-
+					displayItemBeanWrapper.getValidationErrors().putAll(prevValidationErrors);
+					prevValidationErrors = displayItemBeanWrapper.getValidationErrors();
 					// JN: Commenting out the following code, since we shouldn't re-initialize at this point, as
 					// validationErrors would get overwritten and the
 					// older errors will be overriden. Moving it after the form.
