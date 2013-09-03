@@ -218,11 +218,9 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
 
         int subjectId = fp.getInt(CreateDiscrepancyNoteServlet.SUBJECT_ID, true);
-        boolean subjectNotFound = false;
         try {
             if (subjectId == 0 && "studyEvent".equalsIgnoreCase(name)) {
                 subjectId = Integer.valueOf((String) session.getAttribute(CreateDiscrepancyNoteServlet.SUBJECT_ID));
-                subjectNotFound = true;
             }
         } catch (Exception e) {
             addPageMessage(subjectIdNotFound);
@@ -687,9 +685,6 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 			ArrayList itemAuditEvents = adao.findItemAuditEvents(entityId, name);
 			request.setAttribute("itemAudits", itemAuditEvents);
 		}
-        if (subjectNotFound) {
-            session.removeAttribute(CreateDiscrepancyNoteServlet.SUBJECT_ID);
-        }
         forwardPage(Page.VIEW_DISCREPANCY_NOTE);
 	}
 

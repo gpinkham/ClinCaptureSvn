@@ -13,7 +13,7 @@
 <jsp:useBean scope='session' id='boxToShow'  class="java.lang.String"/>
 
 <script language="JavaScript">
-<!--
+
 function showOnly(strLeftNavRowElementName){
     var objLeftNavRowElement;
 
