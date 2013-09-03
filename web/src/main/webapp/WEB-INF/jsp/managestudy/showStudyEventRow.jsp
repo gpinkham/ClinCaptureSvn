@@ -105,21 +105,29 @@
 
 				<td class="table_cell" width="50">
 
-				<c:choose>
-				<c:when test="${dedc.eventCRF.id > 0}">
-				<!-- found an event crf id -->
-					<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.eventCRF.CRFVersionId}"/>">
-				</c:when>
-				<c:otherwise>
-				<!-- did not find an event crf id -->
-					<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.edc.defaultVersionId}"/>">
-				</c:otherwise>
-				</c:choose>
-
-				  <c:set var="versionCount" value="0"/>
-				  <c:forEach var="version" items="${dedc.edc.versions}">
-				    <c:set var="versionCount" value="${versionCount+1}"/>
-				  </c:forEach>
+				<c:set var="versionCount" value="0"/>
+				<c:set var="firstVersionId" value="0"/>
+					<c:forEach var="version" items="${dedc.edc.versions}">
+						<c:if test="${versionCount == 0}">
+							<c:set var="firstVersionId" value="${version.id}"/>
+						</c:if>
+                        <c:set var="versionCount" value="${versionCount+1}"/>
+                    </c:forEach>
+							
+					<c:choose>
+						<c:when test="${dedc.eventCRF.notStarted && dedc.eventCRF.id == 0}">
+							<input type="hidden" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
+						</c:when>
+						<c:when test="${versionCount > 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
+							<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.eventCRF.crfVersion.id}"/>">
+						</c:when>
+						<c:when test="${versionCount == 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
+							<input type="hidden" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
+						</c:when>
+						<c:otherwise>
+							<input type="hidden" name="crfVersionId" value="<c:out value="${defaultVersionId}"/>">
+						</c:otherwise>
+					</c:choose>
 
 				 <c:choose>
 				 <c:when test="${versionCount<=1}">
@@ -420,6 +428,5 @@
 	</c:otherwise>
     </c:choose>
         </td>
-
 
     </tr>
