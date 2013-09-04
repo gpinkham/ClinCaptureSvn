@@ -93,19 +93,16 @@
 
             <div class="tablebox_center">
                 <table border="0" cellpadding="0" cellspacing="0" >
-                    <tr><td class="formlabel"><fmt:message key="first_name" bundle="${resword}"/>:</td><td><c:out value="${user.firstName}"/></td></tr>
-                    <tr><td class="formlabel"><fmt:message key="last_name" bundle="${resword}"/>:</td><td><c:out value="${user.lastName}"/></td></tr>
                     <c:choose>
                         <c:when test="${fn:length(studies) eq 0}">
-                            <tr>
-                                <td></td>
-                                <td class="formlabel" style="text-align:right;">
-                                    <p><b><fmt:message key="all_available_roles" bundle="${resword}"/></b></p>
-
-                                </td></tr>
+                            <tr><td width="40px"></td><td style="padding-top: 7px;"><fmt:message key="first_name" bundle="${resword}"/>: <c:out value="${user.firstName}"/></td></tr>
+                            <tr><td></td><td style="padding-top: 4px;"><fmt:message key="last_name" bundle="${resword}"/>: <c:out value="${user.lastName}"/></td></tr>
+                            <tr><td></td><td class="formlabel" style="text-align:right;"><p><b><fmt:message key="all_available_roles" bundle="${resword}"/></b></p></td></tr>
                         </c:when>
                         <c:otherwise>
-                            <tr><td class="formlabel"><fmt:message key="study_name" bundle="${resword}"/>:</td>
+                            <tr><td width="40px"></td><td class="formlabel"  style="padding-top: 7px;"><fmt:message key="first_name" bundle="${resword}"/>:</td><td  style="padding-top: 7px;"><c:out value="${user.firstName}"/></td></tr>
+                            <tr><td></td><td class="formlabel"><fmt:message key="last_name" bundle="${resword}"/>:</td><td><c:out value="${user.lastName}"/></td></tr>
+                            <tr><td></td><td class="formlabel"><fmt:message key="study_name" bundle="${resword}"/>:</td>
                                 <td onchange="javascript:changeIcon();"><div class="formfieldXL_BG">
                                     <select name="studyId" class="formfieldXL" onchange="sendUrl();">
                                         <c:forEach var="userStudy" items="${studies}">
@@ -136,7 +133,7 @@
                                 </div>
                                 </td>
                             </tr>
-                            <tr><td class="formlabel"><fmt:message key="study_user_role" bundle="${resword}"/>:</td>
+                            <tr><td></td><td class="formlabel"><fmt:message key="study_user_role" bundle="${resword}"/>:</td>
                                 <td onchange="javascript:changeIcon();"><div class="formfieldXL_BG">
                                     <c:set var="role1" value="${uRole.role}"/>
                                     <select name="roleId" class="formfieldXL" onchange="javascript:'changeFlag();'">
