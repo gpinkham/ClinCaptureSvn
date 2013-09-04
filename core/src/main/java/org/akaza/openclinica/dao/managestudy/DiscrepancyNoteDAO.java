@@ -501,17 +501,17 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(digester.getQuery("findAllStudySubjectDNByStudy"));
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllStudyEventDNByStudy"));
-		sql.append(filterPart).append(UNION_OP);
+		sql.append(filterPart).append(filter.getAdditionalStudyEventFilter()).append(UNION_OP);
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
 		}
-		sql.append(filterPart).append(UNION_OP);
+		sql.append(filterPart).append(filter.getAdditionalStudyEventFilter()).append(UNION_OP);
 		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
 		}
-		sql.append(filterPart);
+		sql.append(filterPart).append(filter.getAdditionalStudyEventFilter());
 		sql.append(") dns ");
 		// additional filters crfName, eventName, entityName
 		sql.append(filter.getAdditionalFilter());
@@ -2175,8 +2175,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return doesSubjectHasSomeNDsInStudy(study, subjectLabel, "123");
 	}
 	
-	public boolean doesEventHasSomeNDsInStudy(StudyBean study, String eventLabel, String subjectLabel, String resolutionStatus) {
+	public boolean doesEventHasSomeNDsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel, String resolutionStatus) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
+        listNotesFilter.addFilter("eventId", eventId);
 		listNotesFilter.addFilter("eventName", eventLabel);
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
@@ -2185,33 +2186,34 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return noteBeans.size() > 0;
 	}
 
-	public boolean doesEventHasNewNDsInStudy(StudyBean study, String eventLabel, String subjectLabel) {
-		return doesEventHasSomeNDsInStudy(study, eventLabel, subjectLabel, "1");
+	public boolean doesEventHasNewNDsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel) {
+		return doesEventHasSomeNDsInStudy(study, eventLabel, eventId, subjectLabel, "1");
 	}
 	
-	public boolean doesEventHasUnclosedNDsInStudy(StudyBean study, String eventLabel, String subjectLabel) {
-		return doesEventHasSomeNDsInStudy(study, eventLabel, subjectLabel, "123");
+	public boolean doesEventHasUnclosedNDsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel) {
+		return doesEventHasSomeNDsInStudy(study, eventLabel, eventId, subjectLabel, "123");
 	}
 	
-	public boolean doesCRFHasSomeNDsInStudyForSubject(StudyBean study, String eventLabel, String subjectLabel,
-			String crfName, String resolutionStatus) {
+	public boolean doesCRFHasSomeNDsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
+			String subjectLabel, String crfName, String resolutionStatus) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
+        listNotesFilter.addFilter("eventId", eventId);
+        listNotesFilter.addFilter("crfName", crfName);
 		listNotesFilter.addFilter("eventName", eventLabel);
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
-		listNotesFilter.addFilter("crfName", crfName);
 		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
 				new ListNotesSort(), 0, 100);
 		return noteBeans.size() > 0;
 	}
 
-	public boolean doesCRFHasNewNDsInStudyForSubject(StudyBean study, String eventLabel, String subjectLabel, 
-			String crfName) {
-		return doesCRFHasSomeNDsInStudyForSubject(study, eventLabel, subjectLabel, crfName, "1");
+	public boolean doesCRFHasNewNDsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
+			String subjectLabel, String crfName) {
+		return doesCRFHasSomeNDsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "1");
 	}
-	
-	public boolean doesCRFHasUnclosedNDsInStudyForSubject(StudyBean study, String eventLabel, String subjectLabel,
-			String crfName) {
-		return doesCRFHasSomeNDsInStudyForSubject(study, eventLabel, subjectLabel, crfName, "123");
+
+	public boolean doesCRFHasUnclosedNDsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
+			String subjectLabel, String crfName) {
+		return doesCRFHasSomeNDsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "123");
 	}
 }

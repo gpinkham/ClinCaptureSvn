@@ -30,6 +30,8 @@ public class ListNotesFilter implements CriteriaCommand {
 
 	HashMap<String, String> additionalColumnMapping = new HashMap<String, String>();
 
+	HashMap<String, String> additionalStudyEventColumnMapping = new HashMap<String, String>();
+
 	private boolean dateCreatedCorrect = true;
 	private boolean dateUpdatedCorrect = true;
 
@@ -51,6 +53,8 @@ public class ListNotesFilter implements CriteriaCommand {
 		additionalColumnMapping.put("eventName", "dns.event_name");
 		additionalColumnMapping.put("entityName", "dns.item_name");
 		additionalColumnMapping.put("entityValue", "dns.item_value");
+
+		additionalStudyEventColumnMapping.put("eventId", "se.study_event_id");
 	}
 
 	public void addFilter(String property, Object value) {
@@ -199,8 +203,19 @@ public class ListNotesFilter implements CriteriaCommand {
 		}
 	}
 
+	public String getAdditionalStudyEventFilter() {
+		StringBuilder builder = new StringBuilder("");
+		for (ListNotesFilter.Filter filter : this.getFilters()) {
+			String property = filter.getProperty();
+			if (property.equals("eventId")) {
+				builder.append(" and ").append(additionalStudyEventColumnMapping.get("eventId")).append(" = ")
+						.append(filter.getValue()).append(" ");
+			}
+		}
+		return builder.toString();
+	}
+    
 	public String getAdditionalFilter() {
-
 		StringBuilder builder = new StringBuilder(" where 1=1 ");
 		for (ListNotesFilter.Filter filter : this.getFilters()) {
 			String property = filter.getProperty();

@@ -224,9 +224,9 @@ public class CRFListForStudyEventServlet extends SecureController {
 		}
 		
 		String eventName = seb.getStudyEventDefinition().getName();
-		if (discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(currentStudy, eventName, studySubjectBean.getLabel())){
+		if (discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(currentStudy, eventName, eventId, studySubjectBean.getLabel())){
 			String eventFlagColor = "yellow";
-			if (discrepancyNoteDAO.doesEventHasNewNDsInStudy(currentStudy, eventName, studySubjectBean.getLabel())){
+			if (discrepancyNoteDAO.doesEventHasNewNDsInStudy(currentStudy, eventName, eventId, studySubjectBean.getLabel())){
 				eventFlagColor = "red";
 			}
 			request.setAttribute(EVENT_FLAG_COLOR, eventFlagColor);
@@ -246,27 +246,31 @@ public class CRFListForStudyEventServlet extends SecureController {
 
 				String crfName = displayEventCRFBean.getEventCRF().getCrf().getName();
 				Integer crfId = displayEventCRFBean.getEventCRF().getCrf().getId();
-				
-				if (discrepancyNoteDAO.doesCRFHasUnclosedNDsInStudyForSubject(currentStudy, eventName, studySubjectBean.getLabel(), crfName)){
+
+				if (discrepancyNoteDAO.doesCRFHasUnclosedNDsInStudyForSubject(currentStudy, eventName, eventId,
+						studySubjectBean.getLabel(), crfName)) {
 					String crfFlagColor = "yellow";
-					if (discrepancyNoteDAO.doesCRFHasNewNDsInStudyForSubject(currentStudy, eventName, studySubjectBean.getLabel(), crfName)){
+					if (discrepancyNoteDAO.doesCRFHasNewNDsInStudyForSubject(currentStudy, eventName, eventId,
+							studySubjectBean.getLabel(), crfName)) {
 						crfFlagColor = "red";
 					}
-					notedMap.put(crfId,	crfFlagColor);
+					notedMap.put(crfId, crfFlagColor);
 				}
-				
+
 			} else if (bean instanceof DisplayEventDefinitionCRFBean) {
 				DisplayEventDefinitionCRFBean displayEventDefinitionCRFBean = (DisplayEventDefinitionCRFBean) bean;
 
 				String crfName = displayEventDefinitionCRFBean.getEdc().getCrf().getName();
 				Integer crfId = displayEventDefinitionCRFBean.getEdc().getCrf().getId();
 
-				if (discrepancyNoteDAO.doesCRFHasUnclosedNDsInStudyForSubject(currentStudy, eventName, studySubjectBean.getLabel(), crfName)){
+				if (discrepancyNoteDAO.doesCRFHasUnclosedNDsInStudyForSubject(currentStudy, eventName, eventId,
+						studySubjectBean.getLabel(), crfName)) {
 					String crfFlagColor = "yellow";
-					if (discrepancyNoteDAO.doesCRFHasNewNDsInStudyForSubject(currentStudy, eventName, studySubjectBean.getLabel(), crfName)){
+					if (discrepancyNoteDAO.doesCRFHasNewNDsInStudyForSubject(currentStudy, eventName, eventId,
+							studySubjectBean.getLabel(), crfName)) {
 						crfFlagColor = "red";
 					}
-					notedMap.put(crfId,	crfFlagColor);
+					notedMap.put(crfId, crfFlagColor);
 				}
 			}
 		}

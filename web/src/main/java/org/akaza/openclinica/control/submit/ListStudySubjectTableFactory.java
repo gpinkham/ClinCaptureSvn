@@ -1619,12 +1619,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 							Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(
 									sedBean.getMaxDay()).toDate();
 							if ((minDate.after(studyEventBean.getUpdatedDate()))
-									&& discrepancyNoteDAO.doesEventHasNewNDsInStudy(studyBean, sedBean.getName(),
+									&& discrepancyNoteDAO.doesEventHasNewNDsInStudy(studyBean, sedBean.getName(), studyEventBean.getId(),
 											subjectBean.getLabel())) {
 								defaultColor = false;
 								break;
 							} else if (maxDate.before(studyEventBean.getUpdatedDate())
-									&& discrepancyNoteDAO.doesEventHasNewNDsInStudy(studyBean, sedBean.getName(),
+									&& discrepancyNoteDAO.doesEventHasNewNDsInStudy(studyBean, sedBean.getName(), studyEventBean.getId(),
 											subjectBean.getLabel())) {
 								defaultColor = false;
 								break;

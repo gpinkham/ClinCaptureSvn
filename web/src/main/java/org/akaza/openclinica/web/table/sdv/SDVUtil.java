@@ -723,7 +723,10 @@ public class SDVUtil {
 					studyEventBean.getId(), crfBean.getCRFVersionId());
 
             String allowSdvWithOpenQueries = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries();
-            boolean subjectHasUnclosedNDsInStudy = allowSdvWithOpenQueries.equals("no") && discrepancyNoteDAO.doesCRFHasUnclosedNDsInStudyForSubject(studyBean, studyEventDefinitionBean.getName(), studySubjectBean.getLabel(), eventDefinitionCRFBean.getCrfName());
+			boolean subjectHasUnclosedNDsInStudy = allowSdvWithOpenQueries.equals("no")
+					&& discrepancyNoteDAO.doesCRFHasUnclosedNDsInStudyForSubject(studyBean,
+							studyEventDefinitionBean.getName(), studyEventBean.getId(), studySubjectBean.getLabel(),
+							eventDefinitionCRFBean.getCrfName());
 
             tempSDVBean.setStudyIdentifier(studyBean.getIdentifier());
 
