@@ -1415,7 +1415,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				}
 				ecb.setNotStarted(false);
 				ecdao.update(ecb);
-
+				
+				request.setAttribute("previousSEStatus", studyEventBean.getSubjectEventStatus());
+				
 				StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean
 						.getStudyEventDefinitionId());
 				SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, study, new DAOWrapper(studydao,
@@ -3749,7 +3751,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 		seb.setUpdatedDate(new Date());
 		seb.setUpdater(ub);
-
+		
+		SubjectEventStatus previousSEStatus = (SubjectEventStatus) request.getAttribute("previousSEStatus");
+		
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 		DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(getDataSource());
 		StudyBean study = (StudyBean) session.getAttribute("study");
@@ -3758,7 +3762,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		seb = (StudyEventBean) sedao.update(seb);
 
 		//Clinovo calendar func
-		if (seb.getSubjectEventStatus() == SubjectEventStatus.COMPLETED) {
+		if (seb.getSubjectEventStatus() == SubjectEventStatus.COMPLETED && previousSEStatus != SubjectEventStatus.COMPLETED) {
 			System.out.println("AutoSchedule");
 			StdScheduler scheduler = getScheduler(request);
 			CalendarLogic calLogic = new CalendarLogic(getDataSource(),scheduler);
