@@ -349,6 +349,7 @@
 		<c:param name="field" value="${field}"/>				
 		<c:param name="column" value="${column}"/>
 		<c:param name="boxId" value="box${0}New"/>
+		<c:param name="isRfc" value="${!isRFCExist}"/>
 	</c:import>
 </c:if>  
 
@@ -366,4 +367,3 @@
 
 <jsp:include page="../include/changeTheme.jsp"/>
 </html>
-

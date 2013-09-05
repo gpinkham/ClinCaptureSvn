@@ -190,7 +190,7 @@ function setYPos(id) {
 	<input type="hidden" name="column" value="${param.column}"/>
 	<input type="hidden" name="close${parentId}" value=""/>
 	<input type="hidden" name="ypos${parentId}" value="0"/>
-	<input type="hidden" name="isRfc" value="${!isRFCExist}"/>
+	<input type="hidden" name="isRfc" value="${param.isRfc}"/>
 	<!-- *JSP* submit/discrepancyNote.jsp -->
 	<td valign="top">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -214,8 +214,9 @@ function setYPos(id) {
 		<div class="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
 		<div class="dnBoxCol2-1">
 		<c:choose>
-			<c:when test="${!isRFCExist}">
+			<c:when test="${param.isRfc}">
 				<div class="formfieldL_BG">
+				
 					<select name="description" id="description" class="formFieldL">
 						<c:forEach var="rfcTerm" items="${dnDescriptions}">
 							<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
