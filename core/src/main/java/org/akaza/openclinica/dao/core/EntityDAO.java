@@ -541,7 +541,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			}
 			ps = con.prepareStatement(query);
 			ps = psf.generate(ps);// enter variables here!
-			if (ps.executeUpdate() != 1) {
+			if (ps.executeUpdate() < 0) {
 				logger.warn("Problem with executing dynamic query, EntityDAO: " + query);
 				throw new SQLException();
 
