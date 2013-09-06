@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.dao.managestudy;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
 	private boolean dateIsOk(String dateStr) {
 		boolean result = false;
 		try {
-			new Date(dateStr);
+			new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
 			result = true;
 		} catch (Exception e) {
 		}
@@ -66,7 +67,8 @@ public class FindSubjectsFilter implements CriteriaCommand {
 			if (property.equals("studySubject.createdDate")) {
 				if (dateIsOk(value.toString())) {
 					criteria = criteria + " and ";
-					criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
+					criteria = criteria + " to_char(" + columnMapping.get(property) + ", 'yyyy-MM-dd') = '"
+							+ value.toString() + "' ";
 				}
 			} else if (property.equals("studySubject.status")) {
 				criteria = criteria + " and ";

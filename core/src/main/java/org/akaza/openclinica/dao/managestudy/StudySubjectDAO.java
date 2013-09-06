@@ -110,7 +110,7 @@ public class StudySubjectDAO<K, V extends ArrayList> extends AuditableEntityDAO 
 		ind++; // enrollment_date
 		this.setTypeExpected(ind, TypeNames.DATE);
 		ind++; // date_created
-		this.setTypeExpected(ind, TypeNames.DATE);
+		this.setTypeExpected(ind, TypeNames.TIMESTAMP);
 		ind++; // date_updated
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // owner_id

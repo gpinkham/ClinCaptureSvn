@@ -36,6 +36,7 @@ import org.akaza.openclinica.dao.submit.*;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.util.*;
 import org.apache.commons.lang.StringUtils;
+import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
@@ -74,7 +75,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private UserAccountBean currentUser;
 	private boolean showMoreLink;
 	private ResourceBundle resword;
-	private ResourceBundle resformat;
+	private ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 	private ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
 	private int hideColumnsNumber;
 
@@ -367,7 +368,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private int getColumnNamesMap(TableFacade tableFacade) {
-		int startFrom = 4;
+		int startFrom = 5;
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
 
 		ArrayList<String> columnNamesList = new ArrayList<String>();
@@ -1546,7 +1547,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 	private String formatDate(Date date) {
 		String format = resformat.getString("date_format_string");
-		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		SimpleDateFormat sdf = new SimpleDateFormat(format, locale);
 		return sdf.format(date);
 	}
 
