@@ -1112,7 +1112,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(2, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(1, Integer.valueOf(sb.getId()));
+		variables.put(1, Integer.valueOf(sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId()));
 		variables.put(2, Integer.valueOf(eventOrdinal));
 		variables.put(3, crfVersionOID);
 		variables.put(4, Integer.valueOf(studySubjectId));

@@ -16,7 +16,11 @@
  */
 package org.akaza.openclinica.control.urlRewrite;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +42,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
@@ -86,7 +91,8 @@ public class UrlRewriteServlet extends CoreSecureController {
 						requestURI.length());
 			}
 
-			ocResource = getOpenClinicaResourceFromURL(requestOIDStr);
+			ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(request.getLocale());
+			ocResource = getOpenClinicaResourceFromURL(requestOIDStr, resexception);
 			if (null != ocResource) {
 				if (ocResource.isInValid()) {
 					response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -182,9 +188,8 @@ public class UrlRewriteServlet extends CoreSecureController {
 	 *            - example "S_CPCS/320999/SE_CPCS%5B1%5D/F_CPCS_1"
 	 * @return
 	 */
-	public OpenClinicaResource getOpenClinicaResourceFromURL(String URLPath/*
-																			 * , String queryString
-																			 */) {
+	public OpenClinicaResource getOpenClinicaResourceFromURL(String URLPath, ResourceBundle resexception)
+			throws UnsupportedEncodingException {
 		OpenClinicaResource openClinicaResource = new OpenClinicaResource();
 
 		if ((null != URLPath) && (!URLPath.equals(""))) {
@@ -212,7 +217,7 @@ public class UrlRewriteServlet extends CoreSecureController {
 
 					for (int i = 0; i < tokens.length; i++) {
 
-						URLParamValue = tokens[i].trim();
+						URLParamValue = URLDecoder.decode(tokens[i].trim(), "UTF-8").trim();
 						logger.info("URLPAramValue::" + URLParamValue);
 						if ((null != URLParamValue) && (!URLParamValue.equals(""))) {
 							switch (i) {
@@ -254,12 +259,14 @@ public class UrlRewriteServlet extends CoreSecureController {
 								// separate study event OID and study event
 								// repeat key
 								String seoid = "";
+                                eventRepeatKey = null;
 								String eventOrdinal = "";
 								if (URLParamValue.contains("%5B") && URLParamValue.contains("%5D")) {
 									seoid = URLParamValue.substring(0, URLParamValue.indexOf("%5B"));
 									openClinicaResource.setStudyEventDefOID(seoid);
 									eventOrdinal = URLParamValue.substring(URLParamValue.indexOf("%5B") + 3,
 											URLParamValue.indexOf("%5D"));
+                                    eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
 								} else if (URLParamValue.contains("[") && URLParamValue.contains("]")) {
 									seoid = URLParamValue.substring(0, URLParamValue.indexOf("["));
 									logger.info("seoid" + seoid);
@@ -267,12 +274,11 @@ public class UrlRewriteServlet extends CoreSecureController {
 									eventOrdinal = URLParamValue.substring(URLParamValue.indexOf("[") + 1,
 											URLParamValue.indexOf("]"));
 									logger.info("eventOrdinal::" + eventOrdinal);
-
-								} else {// event ordinal not specified
-									openClinicaResource.setInValid(true);
-									openClinicaResource.getMessages().add(
-											resexception.getString("event_ordinal_not_specified"));
-									return openClinicaResource;
+                                    eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
+								} else {
+									seoid = URLParamValue;
+									openClinicaResource.setStudyEventDefOID(seoid);
+									logger.info("seoid" + seoid);
 								}
 								if ((null != seoid) && (null != study)) {
 									sed = sedefdao.findByOidAndStudy(seoid, study.getId(), study.getParentStudyId());
@@ -288,7 +294,6 @@ public class UrlRewriteServlet extends CoreSecureController {
 									}
 								}
 								if (null != eventRepeatKey) {
-									eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
 									// validate the event ordinal specified exists in database
 									studyEvent = (StudyEventBean) sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(
 											subject.getId(), sed.getId(), eventRepeatKey);
@@ -301,6 +306,9 @@ public class UrlRewriteServlet extends CoreSecureController {
 									} else {
 										openClinicaResource.setStudyEventRepeatKey(eventRepeatKey);
 									}
+								} else {
+									eventRepeatKey = 1;
+									openClinicaResource.setStudyEventRepeatKey(eventRepeatKey);
 								}
 								break;
 							}
@@ -322,7 +330,6 @@ public class UrlRewriteServlet extends CoreSecureController {
 										return openClinicaResource;
 									} else {
 										if (null != study) {
-
 											HashMap studySubjectCRFDataDetails = sedao.getStudySubjectCRFData(study,
 													studySubjectId, eventDefId, URLParamValue, eventRepeatKey);
 											if ((null != studySubjectCRFDataDetails)
