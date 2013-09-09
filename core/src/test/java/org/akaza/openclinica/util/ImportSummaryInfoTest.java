@@ -1,10 +1,11 @@
 package org.akaza.openclinica.util;
 
-import static junit.framework.Assert.assertTrue;
-import static junitx.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.junit.Before;

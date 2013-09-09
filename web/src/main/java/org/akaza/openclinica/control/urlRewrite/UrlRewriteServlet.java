@@ -19,7 +19,6 @@ package org.akaza.openclinica.control.urlRewrite;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.servlet.ServletException;
