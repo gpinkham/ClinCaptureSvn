@@ -99,83 +99,80 @@
         <form name="startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
 				
 			<tr valign="top">
-
-			   <td class="table_cell" width="180"><c:out value="${dedc.edc.crf.name}"/> <c:if test="${dedc.edc.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
-			   
-
+				<td class="table_cell" width="180"><c:out value="${dedc.edc.crf.name}"/> 
+					<c:if test="${dedc.edc.requiredCRF}">	
+						<span style="color: orange">*</span>
+					</c:if> 
+					<c:if test="${dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2}">
+						<img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/>
+					</c:if>
+				</td>
 				<td class="table_cell" width="50">
 
 				<c:set var="versionCount" value="0"/>
 				<c:set var="firstVersionId" value="0"/>
-					<c:forEach var="version" items="${dedc.edc.versions}">
-						<c:if test="${versionCount == 0}">
-							<c:set var="firstVersionId" value="${version.id}"/>
-						</c:if>
-                        <c:set var="versionCount" value="${versionCount+1}"/>
-                    </c:forEach>
+				<c:forEach var="version" items="${dedc.edc.versions}">
+					<c:if test="${versionCount == 0}">
+						<c:set var="firstVersionId" value="${version.id}"/>
+					</c:if>
+                    <c:set var="versionCount" value="${versionCount+1}"/>
+                </c:forEach>
 							
-					<c:choose>
-						<c:when test="${dedc.eventCRF.notStarted && dedc.eventCRF.id == 0}">
-							<input type="hidden" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
-						</c:when>
-						<c:when test="${versionCount > 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
-							<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.eventCRF.crfVersion.id}"/>">
-						</c:when>
-						<c:when test="${versionCount == 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
-							<input type="hidden" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
-						</c:when>
-						<c:otherwise>
-							<input type="hidden" name="crfVersionId" value="<c:out value="${defaultVersionId}"/>">
-						</c:otherwise>
-					</c:choose>
-
-				 <c:choose>
-				 <c:when test="${versionCount<=1}">
-				   <c:forEach var="version" items="${dedc.edc.versions}">
-				     <c:out value="${version.name}"/>
-				   </c:forEach>
-				 </c:when>
-
-				 <c:when test="${dedc.eventCRF.id == 0}">
-
-				<select name="versionId<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" onchange="javascript:changeQuery<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>();">
-
-				 <c:forEach var="version" items="${dedc.edc.versions}">
-
-				 <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${currRow.bean.studyEvent.id}&subjectId=${studySub.subjectId}" />
-
-				 <c:choose>
-                  <c:when test="${dedc.edc.defaultVersionId==version.id}">
-                  <option value="<c:out value="${version.id}"/>" selected>
-					<c:out value="${version.name}"/>
-				  </option>
-                  </c:when>
-                  <c:otherwise>
-                    <option value="<c:out value="${version.id}"/>">
-						<c:out value="${version.name}"/>
-					</option>
-                  </c:otherwise>
-                  </c:choose>
-
-                 </c:forEach>
-                 </select>
-
-                 <SCRIPT LANGUAGE="JavaScript">
-                 function changeQuery<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>() {
-                  var qer = document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.value;
-                  document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.crfVersionId.value=qer;
-
-                 }
-                </SCRIPT>
-                 </c:when>
-
-				 <c:otherwise><c:out value="${dedc.eventCRF.crfVersion.name}"/></c:otherwise>
-
-				 </c:choose>
-
-				</td>
 				<c:choose>
+					<c:when test="${dedc.eventCRF.notStarted && dedc.eventCRF.id == 0}">
+						<input type="hidden" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
+					</c:when>
+					<c:when test="${versionCount > 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
+						<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.eventCRF.crfVersion.id}"/>">
+					</c:when>
+					<c:when test="${versionCount == 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
+						<input type="hidden" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
+					</c:when>
+					<c:otherwise>
+						<input type="hidden" name="crfVersionId" value="<c:out value="${defaultVersionId}"/>">
+					</c:otherwise>
+				</c:choose>
 
+				<c:choose>
+					<c:when test="${versionCount<=1}">
+						<c:forEach var="version" items="${dedc.edc.versions}">
+							<c:out value="${version.name}"/>
+						</c:forEach>
+					</c:when>
+
+					<c:when test="${dedc.eventCRF.notStarted || dedc.eventCRF.id == 0}">
+						<select name="versionId<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" onchange="javascript:changeQuery<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>();">
+							<c:forEach var="version" items="${dedc.edc.versions}">
+								<c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${currRow.bean.studyEvent.id}&subjectId=${studySub.subjectId}" />
+								<c:choose>
+									<c:when test="${(dedc.edc.defaultVersionId == version.id && dedc.eventCRF.id == 0) || (dedc.eventCRF.CRFVersionId == version.id && dedc.eventCRF.notStarted)}">
+										<option value="<c:out value="${version.id}"/>" selected>
+											<c:out value="${version.name}"/>
+										</option>
+									</c:when>
+									<c:otherwise>
+										<option value="<c:out value="${version.id}"/>">
+											<c:out value="${version.name}"/>
+										</option>
+									</c:otherwise>
+								</c:choose>
+							</c:forEach>
+						</select>
+
+						<SCRIPT LANGUAGE="JavaScript">
+							function changeQuery<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>() {
+								var qer = document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.value;
+								document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.crfVersionId.value=qer;
+							}
+						</SCRIPT>
+					</c:when>
+					<c:otherwise>
+						<c:out value="${dedc.eventCRF.crfVersion.name}"/>
+					</c:otherwise>
+				</c:choose>
+				</td>
+				
+				<c:choose>
 				<c:when test="${dedc.status.name=='locked'}">
 					<td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
 						<img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
