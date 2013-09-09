@@ -65,6 +65,7 @@ import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.util.DAOWrapper;
+import org.akaza.openclinica.util.ImportSummaryInfo;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -81,7 +82,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 	private Boolean runRulesOptimisation = true;
 	
 	private static final long serialVersionUID = 1L;
-	
+
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
 
@@ -142,6 +143,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 	@SuppressWarnings(value = { "unchecked", "deprecation" })
 	public void processRequest() throws Exception {
 		try {
+            ImportSummaryInfo summary = new ImportSummaryInfo();
 			session.setMaxInactiveInterval(10800);
 			con = sm.getDataSource().getConnection();
             con.setAutoCommit(false);
@@ -187,7 +189,6 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 			}
 
 			if ("save".equalsIgnoreCase(action)) {
-
 				// setup ruleSets to run if applicable
 				RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) SpringServletAccess
 						.getApplicationContext(context).getBean(
@@ -196,38 +197,40 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 				List<ImportDataRuleRunnerContainer> containers = this
 						.ruleRunSetup(runRulesOptimisation, con, sm.getDataSource(), currentStudy,
 								ub, ruleSetService);
-
 				List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) session
 						.getAttribute("importedData");
 				Set<Integer> studyEventIds = new HashSet<Integer>();
-                Set<Integer> skippedItemIds = new HashSet<Integer>();
+				Set<Integer> skippedItemIds = new HashSet<Integer>();
 				for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
-					
 					HashMap<Integer, EventCRFBean> idToEventCrfBeans = new HashMap<Integer, EventCRFBean>();
-					logger.debug("=== right before we check to make sure it is savable: "
-							+ wrapper.isSavable());
+					logger.debug("=== right before we check to make sure it is savable: " + wrapper.isSavable());
 					if (wrapper.isSavable()) {
 						con.commit();
-						con.setAutoCommit(false);
-						
+                        logger.debug("wrapper problems found : " + wrapper.getValidationErrors().toString());
 						for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
-                            EventCRFBean eventCrfBean = new EventCRFBean();
+							EventCRFBean eventCrfBean = new EventCRFBean();
+							ItemDataBean itemDataBean = new ItemDataBean();
 							int eventCrfBeanId = displayItemBean.getData().getEventCRFId();
 							if (idToEventCrfBeans.containsKey(eventCrfBeanId)) {
 								eventCrfBean = idToEventCrfBeans.get(eventCrfBeanId);
 							} else {
 								eventCrfBean = (EventCRFBean) ecdao.findByPK(eventCrfBeanId);
-								idToEventCrfBeans.put(eventCrfBeanId, eventCrfBean);
+								if (!displayItemBean.isSkip()) {
+									idToEventCrfBeans.put(eventCrfBeanId, eventCrfBean);
+								}
 							}
-							logger.debug("found value here: "
-									+ displayItemBean.getData().getValue());
-							logger.debug("found status here: "
-									+ eventCrfBean.getStatus().getName());
-
-                            ItemDataBean itemDataBean = new ItemDataBean();
-                            itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean
-                                    .getItem().getId(), eventCrfBean.getId(), displayItemBean.getData()
-                                    .getOrdinal());
+                            logger.debug("found value here: " + displayItemBean.getData().getValue());
+                            logger.debug("found status here: " + eventCrfBean.getStatus().getName());
+							StudyEventBean studyEventBean = (StudyEventBean) sedao.findByPK(eventCrfBean
+									.getStudyEventId());
+							itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem()
+									.getId(), eventCrfBean.getId(), displayItemBean.getData().getOrdinal());                          
+							summary.processStudySubject(eventCrfBean.getStudySubjectId(), displayItemBean.isSkip());
+							summary.processStudyEvent(studyEventBean.getId() + "_" + studyEventBean.getRepeatingNum(),
+									displayItemBean.isSkip());
+							summary.processItem(studyEventBean.getId() + "_" + studyEventBean.getRepeatingNum() + "_"
+									+ displayItemBean.getItem().getId() + "_" + displayItemBean.getData().getOrdinal(),
+									displayItemBean.isSkip());
 							if (!displayItemBean.isSkip()) {
 								if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
 									logger.debug("just tried to find item data bean on item name "
@@ -271,9 +274,9 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                             }
 						}
 						
-						for (EventCRFBean eventCrfBean: idToEventCrfBeans.values()){
+						for (EventCRFBean eventCrfBean : idToEventCrfBeans.values()) {
 							studyEventIds.add(eventCrfBean.getStudyEventId());
-							
+
 							eventCrfBean.setNotStarted(false);
 							eventCrfBean.setStatus(Status.AVAILABLE);
 							if (currentStudy.getStudyParameterConfig().getMarkImportedCRFAsCompleted()
@@ -288,17 +291,17 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 								eventCrfBean.setDateValidateCompleted(new Date());
 								eventCrfBean.setStatus(Status.UNAVAILABLE);
 								eventCrfBean.setStage(edcb.isDoubleEntry() ? DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
-                                    : DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE);
+										: DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE);
 								itemDataDao.updateStatusByEventCRF(eventCrfBean, Status.UNAVAILABLE, con);
 							}
 
 							ecdao.update(eventCrfBean, con);
 						}
-						
-						for (int studyEventId: studyEventIds){
+
+						for (int studyEventId : studyEventIds) {
 							if (studyEventId > 0) {
 								StudyEventBean seb = (StudyEventBean) sedao.findByPK(studyEventId);
-								
+
 								seb.setUpdatedDate(new Date());
 								seb.setUpdater(ub);
 
@@ -308,29 +311,31 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 					}
 				}
 
-				addPageMessage(respage
-						.getString("data_has_been_successfully_import"));
-				System.out.println("Data is committed");
 				con.commit();
 				con.setAutoCommit(true);
-				
-				for (int studyEventId: studyEventIds){
+
+				for (int studyEventId : studyEventIds) {
 					if (studyEventId > 0) {
 						StudyEventBean seb = (StudyEventBean) sedao.findByPK(studyEventId);
 						StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
 						StudyBean sb = (StudyBean) sdao.findByPK(ssb.getStudyId());
-					
-						SubjectEventStatusUtil.determineSubjectEventState(seb, sb, new DAOWrapper(sdao, sedao,
-						ssdao, ecdao, edcdao, dndao));
-						
+
+						SubjectEventStatusUtil.determineSubjectEventState(seb, sb, new DAOWrapper(sdao, sedao, ssdao,
+								ecdao, edcdao, dndao));
+
 						sedao.update(seb, con);
 					}
 				}
-				
+
+				addPageMessage(respage.getString("data_has_been_successfully_import"));
+				System.out.println("Data is committed");
+
+				addPageMessage(summary.prepareSummaryMessage(currentStudy, resword));
+
 				con.close();
-                if (!skippedItemsSql.toString().isEmpty()) {
-                    new AuditDAO(sm.getDataSource()).execute(skippedItemsSql.toString());
-                }
+				if (!skippedItemsSql.toString().isEmpty()) {
+					new AuditDAO(sm.getDataSource()).execute(skippedItemsSql.toString());
+				}
 				try {
 					con = sm.getDataSource().getConnection();
 					con.setAutoCommit(false);

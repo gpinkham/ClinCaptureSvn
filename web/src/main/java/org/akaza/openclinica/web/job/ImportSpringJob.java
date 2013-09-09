@@ -75,6 +75,7 @@ import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.util.DAOWrapper;
+import org.akaza.openclinica.util.ImportSummaryInfo;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
@@ -109,6 +110,7 @@ public class ImportSpringJob extends QuartzJobBean {
 	XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
 
 	ResourceBundle respage;
+    ResourceBundle resword;
 
 	Locale locale;
 	public static final String DIRECTORY = "filePathDir";
@@ -173,6 +175,7 @@ public class ImportSpringJob extends QuartzJobBean {
 
 		ResourceBundleProvider.updateLocale(locale);
 		respage = ResourceBundleProvider.getPageMessagesBundle();
+        resword = ResourceBundleProvider.getWordsBundle();
 		triggerService = new TriggerService();
 
 		JobDataMap dataMap = context.getMergedJobDataMap();
@@ -330,6 +333,7 @@ public class ImportSpringJob extends QuartzJobBean {
 	private ArrayList<String> processData(File[] dest, DataSource dataSource, ResourceBundle respage,
 			UserAccountBean ub, StudyBean studyBean, File destDirectory, TriggerBean triggerBean,
 			RuleSetServiceInterface ruleSetService) throws Exception {
+        ImportSummaryInfo summary = new ImportSummaryInfo();
         boolean hasSkippedItems = false;
         boolean runRulesOptimisation = true;
 		StringBuffer msg = new StringBuffer();
@@ -546,69 +550,85 @@ public class ImportSpringJob extends QuartzJobBean {
 				logger.debug("=== about to run rules ===");
 				List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(runRulesOptimisation,
 						dataSource.getConnection(), dataSource, studyBean, ub, ruleSetService, odmContainer);
+				Set<Integer> studyEventIds = new HashSet<Integer>();
 				Set<Integer> skippedItemIds = new HashSet<Integer>();
 				for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
-
-					int eventCrfBeanId = -1;
-					EventCRFBean eventCrfBean = new EventCRFBean();
-
+                    HashMap<Integer, EventCRFBean> idToEventCrfBeans = new HashMap<Integer, EventCRFBean>();
 					logger.debug("right before we check to make sure it is savable: " + wrapper.isSavable());
 					if (wrapper.isSavable()) {
 						logger.debug("wrapper problems found : " + wrapper.getValidationErrors().toString());
 						for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
-							eventCrfBeanId = displayItemBean.getData().getEventCRFId();
-							eventCrfBean = (EventCRFBean) ecdao.findByPK(eventCrfBeanId);
-							logger.debug("found value here: " + displayItemBean.getData().getValue());
-							logger.debug("found status here: " + eventCrfBean.getStatus().getName());
-                            ItemDataBean itemDataBean = new ItemDataBean();
-                            itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem()
-                                    .getId(), eventCrfBean.getId(), displayItemBean.getData().getOrdinal());
+							EventCRFBean eventCrfBean = new EventCRFBean();
+							ItemDataBean itemDataBean = new ItemDataBean();
+							int eventCrfBeanId = displayItemBean.getData().getEventCRFId();
+							if (idToEventCrfBeans.containsKey(eventCrfBeanId)) {
+								eventCrfBean = idToEventCrfBeans.get(eventCrfBeanId);
+							} else {
+								eventCrfBean = (EventCRFBean) ecdao.findByPK(eventCrfBeanId);
+								if (!displayItemBean.isSkip()) {
+									idToEventCrfBeans.put(eventCrfBeanId, eventCrfBean);
+								}
+							}
+                            logger.debug("found value here: " + displayItemBean.getData().getValue());
+                            logger.debug("found status here: " + eventCrfBean.getStatus().getName());
+							StudyEventBean studyEventBean = (StudyEventBean) sedao.findByPK(eventCrfBean
+									.getStudyEventId());
+							itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem()
+									.getId(), eventCrfBean.getId(), displayItemBean.getData().getOrdinal());
+							summary.processStudySubject(eventCrfBean.getStudySubjectId(), displayItemBean.isSkip());
+							summary.processStudyEvent(studyEventBean.getId() + "_" + studyEventBean.getRepeatingNum(),
+									displayItemBean.isSkip());
+							summary.processItem(studyEventBean.getId() + "_" + studyEventBean.getRepeatingNum() + "_"
+									+ displayItemBean.getItem().getId() + "_" + displayItemBean.getData().getOrdinal(),
+									displayItemBean.isSkip());
                             if (!displayItemBean.isSkip()) {
-                                if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
-                                    logger.debug("just tried to find item data bean on item name "
-                                            + displayItemBean.getItem().getName());
-                                    itemDataBean.setUpdatedDate(new Date());
-                                    itemDataBean.setUpdater(ub);
-                                    itemDataBean.setValue(displayItemBean.getData().getValue());
-                                    // set status?
-                                    itemDataDao.update(itemDataBean);
-                                    logger.debug("updated: " + itemDataBean.getItemId());
-                                    // need to set pk here in order to create dn
-                                    displayItemBean.getData().setId(itemDataBean.getId());
-                                } else {
-                                    itemDataBean = (ItemDataBean) itemDataDao.create(displayItemBean.getData());
-                                    logger.debug("created: " + displayItemBean.getData().getItemId()
-                                            + "event CRF ID = " + eventCrfBean.getId() + "CRF VERSION ID ="
-                                            + eventCrfBean.getCRFVersionId());
-                                    displayItemBean.getData().setId(itemDataBean.getId());
-                                }
-                                ItemDAO idao = new ItemDAO(dataSource);
-                                ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
-                                logger.debug("*** checking for validation errors: " + ibean.getName());
-                                String itemOid = displayItemBean.getItem().getOid() + "_"
-                                        + wrapper.getStudyEventRepeatKey() + "_" + displayItemBean.getData().getOrdinal()
-                                        + "_" + wrapper.getStudySubjectOid();
-                                if (wrapper.getValidationErrors().containsKey(itemOid)) {
-                                    ArrayList messageList = (ArrayList) wrapper.getValidationErrors().get(itemOid);
-                                    for (int iter = 0; iter < messageList.size(); iter++) {
-                                        String message = (String) messageList.get(iter);
-
-                                        DiscrepancyNoteBean parentDn = createDiscrepancyNote(ibean, message, eventCrfBean,
-                                                displayItemBean, null, ub, dataSource, studyBean);
-                                        createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean,
-                                                parentDn.getId(), ub, dataSource, studyBean);
-                                        logger.debug("*** created disc note with message: " + message);
-                                    }
-                                }
+								if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
+									logger.debug("just tried to find item data bean on item name "
+											+ displayItemBean.getItem().getName());
+									itemDataBean.setUpdatedDate(new Date());
+									itemDataBean.setUpdater(ub);
+									itemDataBean.setValue(displayItemBean.getData().getValue());
+									// set status?
+									itemDataDao.update(itemDataBean);
+									logger.debug("updated: " + itemDataBean.getItemId());
+									// need to set pk here in order to create dn
+									displayItemBean.getData().setId(itemDataBean.getId());
+								} else {
+									itemDataBean = (ItemDataBean) itemDataDao.create(displayItemBean.getData());
+									logger.debug("created: " + displayItemBean.getData().getItemId()
+											+ "event CRF ID = " + eventCrfBean.getId() + "CRF VERSION ID ="
+											+ eventCrfBean.getCRFVersionId());
+									displayItemBean.getData().setId(itemDataBean.getId());
+								}
+								ItemDAO idao = new ItemDAO(dataSource);
+								ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
+								logger.debug("*** checking for validation errors: " + ibean.getName());
+								String itemOid = displayItemBean.getItem().getOid() + "_"
+										+ wrapper.getStudyEventRepeatKey() + "_"
+										+ displayItemBean.getData().getOrdinal() + "_" + wrapper.getStudySubjectOid();
+								if (wrapper.getValidationErrors().containsKey(itemOid)) {
+									ArrayList messageList = (ArrayList) wrapper.getValidationErrors().get(itemOid);
+									for (int iter = 0; iter < messageList.size(); iter++) {
+										String message = (String) messageList.get(iter);
+										DiscrepancyNoteBean parentDn = createDiscrepancyNote(ibean, message,
+												eventCrfBean, displayItemBean, null, ub, dataSource, studyBean);
+										createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean,
+												parentDn.getId(), ub, dataSource, studyBean);
+										logger.debug("*** created disc note with message: " + message);
+									}
+								}
                             } else {
 								skippedItemIds.add(displayItemBean.getItem().getId());
                                 skippedItemsSql.append("INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id) " +
                                         "VALUES (35, now(), " + ub.getId() + ", 'item_data', " + itemDataBean.getId() + ", '" + displayItemBean.getItem().getName() + "', '" + itemDataBean.getValue() + "', '" + displayItemBean.getData().getValue() + "', " + displayItemBean.getData().getEventCRFId() + "); ");
                             }
+						}
+
+						for (EventCRFBean eventCrfBean : idToEventCrfBeans.values()) {
+							studyEventIds.add(eventCrfBean.getStudyEventId());
 
 							eventCrfBean.setNotStarted(false);
 							eventCrfBean.setStatus(Status.AVAILABLE);
-
 							if (studyBean.getStudyParameterConfig().getMarkImportedCRFAsCompleted()
 									.equalsIgnoreCase("yes")) {
 								EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId(studyBean,
@@ -628,23 +648,38 @@ public class ImportSpringJob extends QuartzJobBean {
 							ecdao.update(eventCrfBean);
 						}
 
-						if (eventCrfBean.getStudyEventId() > 0) {
-							StudyEventBean seb = (StudyEventBean) sedao.findByPK(eventCrfBean.getStudyEventId());
-							StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
-							StudyBean sb = (StudyBean) sdao.findByPK(ssb.getStudyId());
+						for (int studyEventId : studyEventIds) {
+							if (studyEventId > 0) {
+								StudyEventBean seb = (StudyEventBean) sedao.findByPK(studyEventId);
 
-							SubjectEventStatusUtil.determineSubjectEventState(seb, sb, new DAOWrapper(sdao, sedao,
-									ssdao, ecdao, edcdao, dndao));
-							seb.setUpdatedDate(new Date());
-							seb.setUpdater(ub);
+								seb.setUpdatedDate(new Date());
+								seb.setUpdater(ub);
 
-							sedao.update(seb);
-						}                     
+								sedao.update(seb);
+							}
+						}                       
 					}
 				}
+
+				for (int studyEventId : studyEventIds) {
+					if (studyEventId > 0) {
+						StudyEventBean seb = (StudyEventBean) sedao.findByPK(studyEventId);
+						StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
+						StudyBean sb = (StudyBean) sdao.findByPK(ssb.getStudyId());
+
+						SubjectEventStatusUtil.determineSubjectEventState(seb, sb, new DAOWrapper(sdao, sedao, ssdao,
+								ecdao, edcdao, dndao));
+
+						sedao.update(seb);
+					}
+				}
+
 				msg.append(respage.getString("data_has_been_successfully_import") + "<br/>");
 				auditMsg.append(respage.getString("data_has_been_successfully_import") + "<br/>");
 
+				msg.append(summary.prepareSummaryMessage(studyBean, resword));
+				auditMsg.append(summary.prepareSummaryMessage(studyBean, resword));
+                
 				if (hasSkippedItems) {
 					String additionalMsg = "<br/>"
 							+ (studyBean.getParentStudyId() > 0 ? respage.getString("site") : respage

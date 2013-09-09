@@ -18,7 +18,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.job.ImportSpringJob;
+import org.akaza.openclinica.web.SQLInitServlet;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,6 +32,9 @@ import java.io.FileReader;
  */
 @SuppressWarnings({ "serial" })
 public class ViewLogMessageServlet extends SecureController {
+
+	public static final String DEST_DIR = "Event_CRF_Data";
+	public static final String IMPORT_DIR = SQLInitServlet.getField("filePath") + DEST_DIR + File.separator;
 
 	private static final String LOG_MESSAGE = "logmsg";
 	private static final String FILE_NAME = "filename";
@@ -59,7 +62,7 @@ public class ViewLogMessageServlet extends SecureController {
 	@Override
 	protected void processRequest() throws Exception {
 		try {
-			File destDirectory = new File(ImportSpringJob.IMPORT_DIR_2);
+			File destDirectory = new File(IMPORT_DIR);
 			FormProcessor fp = new FormProcessor(request);
 			String regex = "\\s+"; // all whitespace, one or more times
 			String replacement = "_"; // replace with underscores
