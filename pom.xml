@@ -644,6 +644,7 @@
 				    	<checkModificationExclude>build.properties</checkModificationExclude>
 				    	<checkModificationExclude>medical-coding/test.log</checkModificationExclude>
 				      	<checkModificationExclude>core/openclinica-test.log</checkModificationExclude>
+				      	<checkModificationExclude>web/openclinica-test.log</checkModificationExclude>
 				    </checkModificationExcludes>
 				  </configuration>
 				</plugin>
