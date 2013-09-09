@@ -5,6 +5,7 @@ core/.project
 core/.classpath
 core/.settings/
 core/openclinica-test.log
+web/openclinica-test.log
 
 web/target/
 web/.project
