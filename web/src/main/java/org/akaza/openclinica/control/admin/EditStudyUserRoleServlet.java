@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.TermType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -100,7 +102,7 @@ public class EditStudyUserRoleServlet extends SecureController {
 
 			// process the form
 			else {
-				Validator v = new Validator(request);
+				Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 				v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
 				HashMap errors = v.validate();
 

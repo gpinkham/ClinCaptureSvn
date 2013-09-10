@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -145,7 +147,7 @@ public class EditUserAccountServlet extends SecureController {
 			request.setAttribute("userName", user.getName());
 			forwardPage(Page.EDIT_ACCOUNT);
 		} else if (stepNum == EDIT_STEP) {
-			Validator v = new Validator(request);
+			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 
 			v.addValidation(INPUT_FIRST_NAME, Validator.NO_BLANKS);
 			v.addValidation(INPUT_LAST_NAME, Validator.NO_BLANKS);

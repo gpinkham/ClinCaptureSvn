@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.MessageFormat;
@@ -235,8 +237,9 @@ public class ImportCRFDataServlet extends SecureController {
 
 					try {
 						List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
-						tempDisplayItemBeanWrappers = getImportCRFDataService().lookupValidationErrors(request,
-								odmContainer, ub, totalValidationErrors, hardValidationErrors, permittedEventCRFIds);
+						tempDisplayItemBeanWrappers = getImportCRFDataService().lookupValidationErrors(
+								new ValidatorHelper(request, getConfigurationDao()), odmContainer, ub,
+								totalValidationErrors, hardValidationErrors, permittedEventCRFIds);
 						logger.info("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
 						logger.info("size of total validation errors: " + totalValidationErrors.size());
 						logger.info("size of hard validation errors: " + hardValidationErrors.size());

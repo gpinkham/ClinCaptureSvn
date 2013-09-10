@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,6 +96,7 @@ import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -280,6 +283,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(
+				request.getSession().getServletContext()).getBean(ConfigurationDao.class);
+		ValidatorHelper validatorHelper = new ValidatorHelper(request, configurationDao);
 
 		// JN:The following were the the global variables, moved as local.
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
@@ -691,8 +698,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
 			String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
 
-			DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
-			RuleValidator ruleValidator = new RuleValidator(request);
+			DiscrepancyValidator v = new DiscrepancyValidator(validatorHelper, discNotes);
+			RuleValidator ruleValidator = new RuleValidator(validatorHelper);
 			logger.debug("SZE 1  :: " + allItems.size());
 			logMe("Looping inside !submitted  " + System.currentTimeMillis());
 			for (int i = 0; i < allItems.size(); i++) {
@@ -1032,7 +1039,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			// do calculation for 'calculation' and 'group-calculation' type
 			// items
 			// and write the result in DisplayItemBean's ItemDateBean - data
-			ScoreItemValidator sv = new ScoreItemValidator(request, discNotes);
+			ScoreItemValidator sv = new ScoreItemValidator(validatorHelper, discNotes);
 			// *** doing calc here, load it where? ***
 			SessionManager sm = (SessionManager) request.getSession().getAttribute("sm");
 			ScoreCalculator sc = new ScoreCalculator(sm, ecb, ub);

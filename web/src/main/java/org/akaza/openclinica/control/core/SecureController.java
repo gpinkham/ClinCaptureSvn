@@ -81,6 +81,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -1201,5 +1202,9 @@ public abstract class SecureController extends HttpServlet {
 			request.setAttribute("isStartDateUsed", !NOT_USED.equals(config.getStartDateTimeRequired()));
 			request.setAttribute("startDateLabel", config.getStartDateTimeLabel());
 		}
+	}
+
+	public ConfigurationDao getConfigurationDao() {
+		return (ConfigurationDao) SpringServletAccess.getApplicationContext(context).getBean("configurationDao");
 	}
 }

@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,7 +79,7 @@ public class UpdateStudyServletNew extends SecureController {
 	public void processRequest() throws Exception {
 		resetPanel();
 		FormProcessor fp = new FormProcessor(request);
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		int studyId = fp.getInt("id");
 		studyId = studyId == 0 ? fp.getInt("studyId") : studyId;
 		String action = fp.getString("action");

@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -52,7 +54,7 @@ public class ContactServlet extends SecureController {
 			forwardPage(Page.CONTACT);
 		} else {
 			if ("submit".equalsIgnoreCase(action)) {
-				Validator v = new Validator(request);
+				Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 				v.addValidation("name", Validator.NO_BLANKS);
 				v.addValidation("email", Validator.IS_A_EMAIL);
 				v.addValidation("subject", Validator.NO_BLANKS);

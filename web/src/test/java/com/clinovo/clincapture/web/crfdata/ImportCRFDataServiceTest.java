@@ -1,5 +1,7 @@
 package com.clinovo.clincapture.web.crfdata;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +15,11 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.xml.sax.InputSource;
 
@@ -28,7 +32,11 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 		protected MockHttpServletRequest request = new MockHttpServletRequest();
 		protected UserAccountBean ub;
 		protected ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
+		protected ValidatorHelper validatorHelper;
+		protected ConfigurationDao configurationDao;
 		{
+			configurationDao = Mockito.mock(ConfigurationDao.class);
+
 			ub = new UserAccountBean();
 			ub.setId(1);
 
@@ -38,6 +46,8 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 			permittedEventCRFIds.add(11);
 			permittedEventCRFIds.add(12);
 			permittedEventCRFIds.add(13);
+
+			validatorHelper = new ValidatorHelper(request, configurationDao);
 		}
 	}
 
@@ -217,7 +227,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 
 	@Test
 	public void testLookupValidationErrorsForFileImport1() throws Exception {
-		List<DisplayItemBeanWrapper> wrappers = holder1.service.lookupValidationErrors(holder1.request,
+		List<DisplayItemBeanWrapper> wrappers = holder1.service.lookupValidationErrors(holder1.validatorHelper,
 				holder1.container, holder1.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder1.permittedEventCRFIds);
 		assertEquals(wrappers.get(0).getDisplayItemBeans().size(), 6);
@@ -225,7 +235,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 
 	@Test
 	public void testLookupValidationErrorsForFileImport2() throws Exception {
-		List<DisplayItemBeanWrapper> wrappers = holder2.service.lookupValidationErrors(holder2.request,
+		List<DisplayItemBeanWrapper> wrappers = holder2.service.lookupValidationErrors(holder2.validatorHelper,
 				holder2.container, holder2.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder2.permittedEventCRFIds);
 		assertEquals(wrappers.get(0).getDisplayItemBeans().size() + wrappers.get(1).getDisplayItemBeans().size(), 48);
@@ -233,7 +243,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 
 	@Test
 	public void testLookupValidationErrorsForFileImport3() throws Exception {
-		List<DisplayItemBeanWrapper> wrappers = holder3.service.lookupValidationErrors(holder3.request,
+		List<DisplayItemBeanWrapper> wrappers = holder3.service.lookupValidationErrors(holder3.validatorHelper,
 				holder3.container, holder3.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder3.permittedEventCRFIds);
 		assertEquals(wrappers.get(0).getDisplayItemBeans().size(), 24);

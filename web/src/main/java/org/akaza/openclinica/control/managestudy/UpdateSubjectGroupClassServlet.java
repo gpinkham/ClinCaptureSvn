@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -175,7 +177,7 @@ public class UpdateSubjectGroupClassServlet extends SecureController {
 		boolean isDefault = false;
 		StudyGroupClassBean oldGroup = (StudyGroupClassBean) session.getAttribute("oldGroup");
 		
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		
 		Map<String, String> fields = new HashMap<String, String>();

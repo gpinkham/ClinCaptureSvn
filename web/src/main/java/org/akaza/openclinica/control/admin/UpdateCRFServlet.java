@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -116,7 +118,7 @@ public class UpdateCRFServlet extends SecureController {
 	 * @throws Exception
 	 */
 	private void confirmCRF() throws Exception {
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
 		v.addValidation("name", Validator.NO_BLANKS);

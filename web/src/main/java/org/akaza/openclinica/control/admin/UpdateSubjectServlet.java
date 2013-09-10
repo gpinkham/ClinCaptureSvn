@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,6 +35,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -41,6 +44,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
@@ -260,7 +264,8 @@ public class UpdateSubjectServlet extends SecureController {
 		SubjectBean subject = (SubjectBean) session.getAttribute("subjectToUpdate");
 		FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session
 				.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-		DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
+		DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()),
+				discNotes);
 		FormProcessor fp = new FormProcessor(request);
 		
 		Map<String, String> fields =  (HashMap<String, String>) session.getAttribute("fields");

@@ -1,5 +1,7 @@
 package com.clinovo.clincapture.web.crfdata;
 
+import com.clinovo.util.ValidatorHelper;
+
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -12,18 +14,21 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.crfdata.ImportHelper;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 public class ImportHelperTest {
 
 	protected ImportHelper importHelper;
 	protected MockHttpServletRequest request;
+    protected ConfigurationDao configurationDao;
 	protected FormDiscrepancyNotes formDiscrepancyNotes;
-	protected DiscrepancyValidator discrepancyValidator;
+	protected DiscrepancyValidator discrepancyValidator;    
 
 	protected DisplayItemBean displayItemBean;
 
@@ -33,9 +38,12 @@ public class ImportHelperTest {
 		request.setPreferredLocales(Arrays.asList(new Locale[] { new Locale("en") }));
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
+        configurationDao = Mockito.mock(ConfigurationDao.class);
+                
 		importHelper = new ImportHelper();
 		formDiscrepancyNotes = new FormDiscrepancyNotes();
-		discrepancyValidator = new DiscrepancyValidator(request, formDiscrepancyNotes);
+		discrepancyValidator = new DiscrepancyValidator(new ValidatorHelper(request, configurationDao),
+				formDiscrepancyNotes);
 
 		displayItemBean = new DisplayItemBean();
 

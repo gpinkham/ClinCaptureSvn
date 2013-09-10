@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -120,7 +122,7 @@ public class TestRuleServlet extends SecureController {
 	public void processRequest() throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		String action = request.getParameter("action");
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 
 		if (StringUtil.isBlank(action)) {
 			request.setAttribute("result", resword.getString("test_rule_default_result"));

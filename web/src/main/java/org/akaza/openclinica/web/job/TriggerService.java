@@ -13,12 +13,12 @@
 
 package org.akaza.openclinica.web.job;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -114,25 +114,16 @@ public class TriggerService {
 		jobDataMap.put(CDISC, cdisc);
 		jobDataMap.put(ExampleSpringJob.CDISC12, cdisc12);
 		jobDataMap.put(ExampleSpringJob.LOCALE, locale);
-		// System.out.println("found 1.2: " +
-		// jobDataMap.get(ExampleSpringJob.CDISC12));
 		jobDataMap.put(ExampleSpringJob.CDISC13, cdisc13);
-		// System.out.println("found 1.3: " +
-		// jobDataMap.get(ExampleSpringJob.CDISC13));
 		jobDataMap.put(ExampleSpringJob.CDISC13OC, cdisc13oc);
-		// System.out.println("found 1.3oc: " +
-		// jobDataMap.get(ExampleSpringJob.CDISC13OC));
 		jobDataMap.put(SPSS, spss);
 		jobDataMap.put(USER_ID, userAccount.getId());
-		// StudyDAO studyDAO = new StudyDAO();
 		jobDataMap.put(STUDY_ID, study.getId());
 		jobDataMap.put(STUDY_NAME, study.getName());
 		jobDataMap.put(STUDY_OID, study.getOid());
 
 		trigger.setJobDataMap(jobDataMap);
-		// trigger.setRepeatInterval(interval.longValue());
-		// System.out.println("default for volatile: " + trigger.isVolatile());
-		// trigger.setVolatility(false);
+		
 		return trigger;
 	}
 
@@ -182,7 +173,6 @@ public class TriggerService {
 		jobDataMap.put(STUDY_NAME, study.getName());
 		jobDataMap.put(STUDY_OID, study.getOid());
 		jobDataMap.put(DIRECTORY, directory);
-		System.out.println("just set directory: " + directory);
 		jobDataMap.put(ExampleSpringJob.LOCALE, locale);
 		jobDataMap.put("hours", hours);
 		jobDataMap.put("minutes", minutes);
@@ -192,9 +182,10 @@ public class TriggerService {
 		return trigger;
 	}
 
-	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
+	public HashMap validateForm(ValidatorHelper validatorHelper, Set<TriggerKey> triggerKeys,
 			String properName) {
-		Validator v = new Validator(request);
+        FormProcessor fp = validatorHelper.getFormProcessor();
+		Validator v = new Validator(validatorHelper);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
 		// need to be unique too
 		v.addValidation(JOB_DESC, Validator.NO_BLANKS);
@@ -356,9 +347,10 @@ public class TriggerService {
 		return generateHardValidationErrorMessage(subjectData, totalValidationErrors, true, hasSkippedItems, respage);
 	}
 
-	public HashMap validateImportJobForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
+	public HashMap validateImportJobForm(ValidatorHelper validatorHelper, Set<TriggerKey> triggerKeys,
 			String properName) {
-		Validator v = new Validator(request);
+        FormProcessor fp = validatorHelper.getFormProcessor();
+		Validator v = new Validator(validatorHelper);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
 		// need to be unique too
 		v.addValidation(JOB_DESC, Validator.NO_BLANKS);
@@ -376,7 +368,7 @@ public class TriggerService {
 		String minutes = fp.getString("minutes");
 
 		HashMap errors = v.validate();
-		Locale locale = request.getLocale();
+		Locale locale = validatorHelper.getLocale();
 		ResourceBundleProvider.updateLocale(locale);
 		resexception = ResourceBundleProvider.getExceptionsBundle(locale);
 		Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(fp.getString(JOB_NAME));
@@ -390,7 +382,6 @@ public class TriggerService {
 			Validator.addError(errors, STUDY_ID, "The study should be selected.");
 		}
 		if ((hours.equals("0")) && (minutes.equals("0"))) {
-			System.out.println("got in the ERROR LOOP");
 			// throw an error here, at least one should be greater than zero
 			// errors.put(TAB, "Error Message - Pick one of the below");
 			Validator.addError(errors, "hours", "At least one of the following should be greater than zero.");
@@ -403,16 +394,16 @@ public class TriggerService {
 		return errors;
 	}
 
-	public HashMap validateImportJobForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys) {
-		return validateImportJobForm(fp, request, triggerKeys, "");
+	public HashMap validateImportJobForm(ValidatorHelper validatorHelper, Set<TriggerKey> triggerKeys) {
+		return validateImportJobForm(validatorHelper, triggerKeys, "");
 	}
 
-	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys) {
-		return validateForm(fp, request, triggerKeys, "");
+	public HashMap validateForm(ValidatorHelper validatorHelper, Set<TriggerKey> triggerKeys) {
+		return validateForm(validatorHelper, triggerKeys, "");
 	}
 
-	public HashMap validateImportForm(HttpServletRequest request) {
-		Validator v = new Validator(request);
+	public HashMap validateImportForm(ValidatorHelper validatorHelper) {
+		Validator v = new Validator(validatorHelper);
 
 		HashMap errors = v.validate();
 

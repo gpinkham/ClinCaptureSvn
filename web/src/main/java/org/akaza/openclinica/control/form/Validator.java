@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.form;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -33,11 +35,9 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.EntityDAO;
-import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -60,8 +60,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * 
  * A class to validate form input.
@@ -70,7 +68,7 @@ import javax.servlet.http.HttpServletRequest;
  * The general usage of the Validator is as follows:
  * 
  * <code>
- * Validator v = new Validator(request); // request is an HttpServletRequest object
+ * Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao())); // request is an HttpServletRequest object
  * 
  * // fieldName is the name of your HTML input field.
  * // validationType is one of the Validator static ints
@@ -430,15 +428,15 @@ public class Validator {
 
 	protected HashMap errors;
 
-	protected HttpServletRequest request;
+	protected ValidatorHelper validatorHelper;
 
 	protected ResourceBundle resformat;
 
-	public Validator(HttpServletRequest request) {
+	public Validator(ValidatorHelper validatorHelper) {
 		validations = new HashMap();
 		errors = new HashMap();
-		this.request = request;
-		locale = request.getLocale();
+		this.validatorHelper = validatorHelper;
+		locale = validatorHelper.getLocale();
 		resformat = ResourceBundleProvider.getFormatBundle(locale);
 		restext = ResourceBundleProvider.getTextsBundle(locale);
 		resexception = ResourceBundleProvider.getExceptionsBundle(locale);
@@ -683,7 +681,7 @@ public class Validator {
 
 	protected void addError(String fieldName, Validation v) {
 
-		locale = request.getLocale();
+		locale = validatorHelper.getLocale();
 		resexception = ResourceBundleProvider.getExceptionsBundle(locale);
 		resword = ResourceBundleProvider.getWordsBundle(locale);
 
@@ -744,7 +742,7 @@ public class Validator {
 				errorMessage = resexception.getString("input_not_acceptable_option");
 				break;
 			case IS_A_PASSWORD:
-				errorMessage = resexception.getString("password_must_be_at_least") + getPwdMinLen(request) + " "
+				errorMessage = resexception.getString("password_must_be_at_least") + getPwdMinLen(validatorHelper) + " "
 						+ resword.getString("characters_long") + ".";
 				break;
 			case IS_A_USERNAME:
@@ -960,7 +958,7 @@ public class Validator {
 			}
 			break;
 		case IS_A_PASSWORD:
-			int pwdMinLen = getPwdMinLen(request);
+			int pwdMinLen = getPwdMinLen(validatorHelper);
 			if (pwdMinLen > 0
 					&& !lengthComparesToStaticValue(fieldName, NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO,
 							pwdMinLen)) {
@@ -1128,8 +1126,8 @@ public class Validator {
 	 * Instead of rewriting the whole Validation do this.
 	 */
 	protected String getFieldValue(String fieldName) {
-		return request.getParameter(fieldName) == null ? request.getAttribute(fieldName) == null ? null : request
-				.getAttribute(fieldName).toString() : request.getParameter(fieldName);
+		return validatorHelper.getParameter(fieldName) == null ? validatorHelper.getAttribute(fieldName) == null ? null
+				: validatorHelper.getAttribute(fieldName).toString() : validatorHelper.getParameter(fieldName);
 	}
 
 	// validation functions that determine whether a field passes validation
@@ -1226,7 +1224,7 @@ public class Validator {
 	 *         given input is not date formatted or null or empty .
 	 */
 	protected boolean isDateWithoutRequiredCheck(String fieldName) {
-		String fieldValue = request.getParameter(fieldName);
+		String fieldValue = validatorHelper.getParameter(fieldName);
 		if (StringUtil.isBlank(fieldValue)) {
 			return true;
 		}
@@ -1605,7 +1603,7 @@ public class Validator {
 	}
 
 	protected boolean isSetBlank(String fieldName) {
-		String fieldValues[] = request.getParameterValues(fieldName);
+		String fieldValues[] = validatorHelper.getParameterValues(fieldName);
 
 		if (fieldValues == null || fieldValues.length == 0) {
 			return true;
@@ -1626,7 +1624,7 @@ public class Validator {
 
 		String fieldValues[];
 		if (multValues) {
-			fieldValues = request.getParameterValues(fieldName);
+			fieldValues = validatorHelper.getParameterValues(fieldName);
 		} else {
 			fieldValues = new String[1];
 			String fieldValue = getFieldValue(fieldName);
@@ -1670,7 +1668,7 @@ public class Validator {
 		String fieldValues[];
 		if (multValues) {
 			// fieldValues = request.getParameterValues(fieldName);
-			fieldValues = request.getParameter(fieldName).split(",");
+			fieldValues = validatorHelper.getParameter(fieldName).split(",");
 		} else {
 			fieldValues = new String[1];
 			String fieldValue = getFieldValue(fieldName);
@@ -1714,7 +1712,7 @@ public class Validator {
 		String glue = "";
 
 		if (isMultiple) {
-			String[] fieldValues = request.getParameterValues(fieldName);
+			String[] fieldValues = validatorHelper.getParameterValues(fieldName);
 
 			if (fieldValues != null) {
 				for (String element : fieldValues) {
@@ -2058,10 +2056,8 @@ public class Validator {
 		return message;
 	}
 
-	private int getPwdMinLen(HttpServletRequest request) {
-		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(
-				request.getSession().getServletContext()).getBean(ConfigurationDao.class);
-		PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
+	private int getPwdMinLen(ValidatorHelper validatorHelper) {
+		PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(validatorHelper.getConfigurationDao());
 		return passwordRequirementsDao == null ? 0 : passwordRequirementsDao.minLength();
 	}
 }

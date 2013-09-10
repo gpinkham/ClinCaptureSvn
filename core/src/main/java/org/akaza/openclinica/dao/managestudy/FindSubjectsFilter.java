@@ -15,7 +15,6 @@ package org.akaza.openclinica.dao.managestudy;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,7 +49,6 @@ public class FindSubjectsFilter implements CriteriaCommand {
 		return theCriteria;
 	}
 
-	@SuppressWarnings("deprecation")
 	private boolean dateIsOk(String dateStr) {
 		boolean result = false;
 		try {

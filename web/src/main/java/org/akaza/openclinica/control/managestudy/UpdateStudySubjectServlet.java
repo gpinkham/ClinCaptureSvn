@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -272,7 +274,8 @@ public class UpdateStudySubjectServlet extends SecureController {
 		StudySubjectBean sub = (StudySubjectBean) session.getAttribute("studySub");
 		FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session
 				.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-		DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
+		DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()),
+				discNotes);
 		java.util.Date enrollDate = sub.getEnrollmentDate();
 
 		if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator()

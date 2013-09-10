@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -99,7 +101,7 @@ public class CreateCRFServlet extends SecureController {
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 
-				Validator v = new Validator(request);
+				Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 
 				v.addValidation("name", Validator.NO_BLANKS);
 				String name = fp.getString("name");

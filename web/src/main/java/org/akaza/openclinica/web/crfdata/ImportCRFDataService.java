@@ -13,6 +13,8 @@
 
 package org.akaza.openclinica.web.crfdata;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -26,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -238,8 +239,8 @@ public class ImportCRFDataService {
 		return ssBean;
 	}
 
-	public List<DisplayItemBeanWrapper> lookupValidationErrors(HttpServletRequest request, ODMContainer odmContainer,
-			UserAccountBean ub, HashMap<String, String> totalValidationErrors,
+	public List<DisplayItemBeanWrapper> lookupValidationErrors(ValidatorHelper validatorHelper,
+			ODMContainer odmContainer, UserAccountBean ub, HashMap<String, String> totalValidationErrors,
 			HashMap<String, String> hardValidationErrors, ArrayList<Integer> permittedEventCRFIds)
 			throws OpenClinicaException {
 
@@ -248,7 +249,7 @@ public class ImportCRFDataService {
 		List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
 		ImportHelper importHelper = new ImportHelper();
 		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
-		DiscrepancyValidator discValidator = new DiscrepancyValidator(request, discNotes);
+		DiscrepancyValidator discValidator = new DiscrepancyValidator(validatorHelper, discNotes);
 		// create a second Validator, this one for hard edit checks
 		HashMap<String, String> hardValidator = new HashMap<String, String>();
 
@@ -409,8 +410,8 @@ public class ImportCRFDataService {
 										String eventCRFRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
 										// if you do indeed leave off this in the XML it will pass but return 'null' tbh
 										attachValidator(displayItemBean, importHelper, discValidator, hardValidator,
-												request, eventCRFRepeatKey, studySubjectBean.getOid());
-										checkExistingData(request, displayItemBean, itemBean, studyBean);
+                                                validatorHelper, eventCRFRepeatKey, studySubjectBean.getOid());
+										checkExistingData(validatorHelper, displayItemBean, itemBean, studyBean);
                                         String key = displayItemBean.getData().getItemId() + "_"
                                                 + displayItemBean.getData().getEventCRFId() + "_"
                                                 + displayItemBean.getData().getOrdinal();
@@ -462,7 +463,7 @@ public class ImportCRFDataService {
 											// displayItemBean.setMetadata(metadataBean);
 											// set event def crf?
 											displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
-											checkExistingData(request, displayItemBean, itemBean, studyBean);
+											checkExistingData(validatorHelper, displayItemBean, itemBean, studyBean);
 											displayItemBeans.add(displayItemBean);
 											logger.debug("... adding display item bean");
 										}
@@ -522,7 +523,7 @@ public class ImportCRFDataService {
 					// older errors will be overriden. Moving it after the form.
 					// Removing the comments for now, since it seems to be creating duplicate Discrepancy Notes.
 					validationErrors = new HashMap();
-					discValidator = new DiscrepancyValidator(request, discNotes);
+					discValidator = new DiscrepancyValidator(validatorHelper, discNotes);
 					// reset to allow for new errors...
 				}
 				wrappers.add(displayItemBeanWrapper);
@@ -532,7 +533,7 @@ public class ImportCRFDataService {
 		return wrappers;
 	}
 
-	private void checkExistingData(HttpServletRequest request, DisplayItemBean displayItemBean, ItemBean itemBean, StudyBean currentStudy) {
+	private void checkExistingData(ValidatorHelper validatorHelper, DisplayItemBean displayItemBean, ItemBean itemBean, StudyBean currentStudy) {
 		if (currentStudy.getStudyParameterConfig().getReplaceExisitingDataDuringImport().equals("no")) {
 			ItemDataBean existingItemDataBean = getItemDataDao().findByItemIdAndEventCRFIdAndOrdinal(
 					displayItemBean.getItem().getId(), displayItemBean.getData().getEventCRFId(),
@@ -540,7 +541,7 @@ public class ImportCRFDataService {
 			if (existingItemDataBean != null && existingItemDataBean.getId() > 0
 					&& existingItemDataBean.getValue() != null && !existingItemDataBean.getValue().isEmpty()) {
 				displayItemBean.setSkip(true);
-                request.setAttribute("hasSkippedItems", true);
+                validatorHelper.setAttribute("hasSkippedItems", true);
 				itemBean.getImportItemDataBean().setSkip(true);
 			}
 		}
@@ -562,7 +563,7 @@ public class ImportCRFDataService {
 	}
 
 	private void attachValidator(DisplayItemBean displayItemBean, ImportHelper importHelper, DiscrepancyValidator v,
-			HashMap<String, String> hardv, javax.servlet.http.HttpServletRequest request, String eventCRFRepeatKey,
+			HashMap<String, String> hardv, ValidatorHelper validatorHelper, String eventCRFRepeatKey,
 			String studySubjectOID) throws OpenClinicaException {
 		org.akaza.openclinica.bean.core.ResponseType rt = displayItemBean.getMetadata().getResponseSet()
 				.getResponseType();
@@ -647,7 +648,7 @@ public class ImportCRFDataService {
 				}
 			}
 
-			request.setAttribute(itemOid, displayItemBean.getData().getValue());
+            validatorHelper.setAttribute(itemOid, displayItemBean.getData().getValue());
 			displayItemBean = importHelper.validateDisplayItemBeanText(v, displayItemBean, itemOid);
 
 		} else if (rt.equals(ResponseType.CALCULATION) || rt.equals(ResponseType.GROUP_CALCULATION)) {
@@ -674,7 +675,7 @@ public class ImportCRFDataService {
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
 			String theValue = matchValueWithOptions(displayItemBean, displayItemBean.getData().getValue(),
 					displayItemBean.getMetadata().getResponseSet().getOptions());
-			request.setAttribute(itemOid, theValue);
+            validatorHelper.setAttribute(itemOid, theValue);
 			logger.debug("        found the value for radio/single: " + theValue);
 			if (theValue == null && displayItemBean.getData().getValue() != null
 					&& !displayItemBean.getData().getValue().isEmpty()) {
@@ -686,7 +687,7 @@ public class ImportCRFDataService {
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
 			String theValue = matchValueWithManyOptions(displayItemBean, displayItemBean.getData().getValue(),
 					displayItemBean.getMetadata().getResponseSet().getOptions());
-			request.setAttribute(itemOid, theValue);
+            validatorHelper.setAttribute(itemOid, theValue);
 			if (theValue == null && displayItemBean.getData().getValue() != null
 					&& !displayItemBean.getData().getValue().isEmpty()) {
 				hardv.put(itemOid, "This is not in the correct response set.");

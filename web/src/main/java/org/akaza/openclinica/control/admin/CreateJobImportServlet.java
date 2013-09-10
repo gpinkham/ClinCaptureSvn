@@ -13,6 +13,8 @@
 
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -119,7 +121,7 @@ public class CreateJobImportServlet extends SecureController {
 			forwardPage(Page.CREATE_JOB_IMPORT);
 		} else if ("confirmall".equalsIgnoreCase(action)) {
 			// collect form information
-			HashMap errors = triggerService.validateImportJobForm(fp, request,
+			HashMap errors = triggerService.validateImportJobForm(new ValidatorHelper(request, getConfigurationDao()),
 					scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(IMPORT_TRIGGER)));
 
 			Date startTime = getJobStartTime(errors, fp);

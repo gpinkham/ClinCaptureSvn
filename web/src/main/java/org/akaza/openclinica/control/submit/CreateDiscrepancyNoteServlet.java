@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.DnDescription;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -591,7 +593,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 				logger.debug("No note tree initailized in session");
 			}
 
-			Validator v = new Validator(request);
+			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 			String description = fp.getString("description");
 			int typeId = fp.getInt("typeId");
 			int assignedUserAccountId = fp.getInt(SUBMITTED_USER_ACCOUNT_ID);

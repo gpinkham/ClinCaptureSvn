@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -233,7 +235,8 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 				discNotes = new FormDiscrepancyNotes();
 				session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 			}
-			DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
+			DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()),
+					discNotes);
 
 			String strStart = fp.getDateTimeInputString(INPUT_STARTDATE_PREFIX);
 			if (!strStart.equals("")) {

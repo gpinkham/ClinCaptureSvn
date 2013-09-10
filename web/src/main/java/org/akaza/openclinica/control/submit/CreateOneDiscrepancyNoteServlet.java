@@ -19,6 +19,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -135,7 +137,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		int assignedUserAccountId = fp.getInt(SUBMITTED_USER_ACCOUNT_ID + parentId);
 		String viewNoteLink = fp.getString("viewDNLink" + parentId);
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "fromBox", "1");
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		
 		if (isReasonForChange) {
 			typeId = DiscrepancyNoteType.REASON_FOR_CHANGE.getId();

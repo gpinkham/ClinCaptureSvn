@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -146,7 +148,7 @@ public class InitialDataEntryServletOld extends SecureController {
 			ArrayList items = section.getItems();
 
 			if (fp.getBoolean(INPUT_CHECK_INPUTS)) {
-				Validator v = new Validator(request);
+				Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 
 				// TODO: always validate null values
 				for (int i = 0; i < items.size(); i++) {

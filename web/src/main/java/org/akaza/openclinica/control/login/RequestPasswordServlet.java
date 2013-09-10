@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.util.Date;
 
 import org.akaza.openclinica.bean.login.PwdChallengeQuestion;
@@ -81,7 +83,7 @@ public class RequestPasswordServlet extends SecureController {
 	 * @param response
 	 */
 	private void confirmPassword() throws Exception {
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("email", Validator.IS_A_EMAIL);

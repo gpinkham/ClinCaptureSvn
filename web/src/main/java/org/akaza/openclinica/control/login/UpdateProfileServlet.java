@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -107,7 +109,7 @@ public class UpdateProfileServlet extends SecureController {
 
 	@SuppressWarnings("rawtypes")
 	private void confirmProfile(UserAccountBean userBean1, UserAccountDAO udao) throws Exception {
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
 		v.addValidation("firstName", Validator.NO_BLANKS);

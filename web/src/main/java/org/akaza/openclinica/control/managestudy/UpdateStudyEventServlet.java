@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -270,7 +272,8 @@ public class UpdateStudyEventServlet extends SecureController {
 		request.setAttribute(EVENT_DEFINITION_BEAN, sed);
 		if (action.equalsIgnoreCase("submit")) {
 			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-			DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
+			DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()),
+					discNotes);
 			SubjectEventStatus ses = SubjectEventStatus.get(fp.getInt(SUBJECT_EVENT_STATUS_ID));
 
 			if (ses == SubjectEventStatus.LOCKED && studyEvent.getSubjectEventStatus() != SubjectEventStatus.LOCKED) {

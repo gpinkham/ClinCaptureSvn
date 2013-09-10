@@ -22,9 +22,9 @@
  */
 package org.akaza.openclinica.control.form;
 
-import java.util.HashMap;
+import com.clinovo.util.ValidatorHelper;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 
 /**
  * 
@@ -42,12 +42,12 @@ import javax.servlet.http.HttpServletRequest;
  */
 @SuppressWarnings({ "rawtypes" })
 public class RuleValidator extends Validator {
-	public RuleValidator(HttpServletRequest request, FormDiscrepancyNotes notes) {
-		super(request);
+	public RuleValidator(ValidatorHelper validatorHelper, FormDiscrepancyNotes notes) {
+		super(validatorHelper);
 	}
 
-	public RuleValidator(HttpServletRequest request) {
-		super(request);
+	public RuleValidator(ValidatorHelper validatorHelper) {
+		super(validatorHelper);
 	}
 
 	@Override

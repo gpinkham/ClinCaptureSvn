@@ -19,6 +19,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.util.HashMap;
 
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -61,7 +63,7 @@ public class ConfigurePasswordRequirementsServlet extends SecureController {
 			forwardPage(Page.CONFIGURATION_PASSWORD_REQUIREMENTS);
 
 		} else {
-			Validator v = new Validator(request);
+			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 			for (String key : passwordRequirementsDao.intConfigKeys()) {
 				v.addValidation(key, Validator.IS_AN_INTEGER);
 			}

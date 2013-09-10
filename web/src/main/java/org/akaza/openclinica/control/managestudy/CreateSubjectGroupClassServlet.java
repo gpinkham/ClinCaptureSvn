@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -134,7 +136,7 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 		boolean atLeastOneEventDefSelected = false;
 		boolean isDefault = false;
 		
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		
 		Map<String, String> fields = new HashMap<String, String>();

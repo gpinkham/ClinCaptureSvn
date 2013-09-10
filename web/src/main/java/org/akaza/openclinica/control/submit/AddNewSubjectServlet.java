@@ -21,6 +21,8 @@
 package org.akaza.openclinica.control.submit;
 
 // import org.akaza.openclinica.bean.core.Role;
+import com.clinovo.util.ValidatorHelper;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -242,7 +244,8 @@ public class AddNewSubjectServlet extends SecureController {
 			if (discNotes == null) {
 				discNotes = new FormDiscrepancyNotes();
 			}
-			DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
+			DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()),
+					discNotes);
 
 			v.addValidation(INPUT_LABEL, Validator.NO_BLANKS);
 

@@ -22,7 +22,7 @@
  */
 package org.akaza.openclinica.control.form;
 
-import javax.servlet.http.HttpServletRequest;
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * A Validator for 'calculation' and 'group-calculation' type Items whose fieldNames are always from request attribute.
@@ -31,14 +31,14 @@ import javax.servlet.http.HttpServletRequest;
  * 
  */
 public class ScoreItemValidator extends DiscrepancyValidator {
-	public ScoreItemValidator(HttpServletRequest request, FormDiscrepancyNotes notes) {
+	public ScoreItemValidator(ValidatorHelper validatorHelper, FormDiscrepancyNotes notes) {
 		// super(request);
-		super(request, notes);
+		super(validatorHelper, notes);
 	}
 
 	@Override
 	protected String getFieldValue(String fieldName) {
-		return (String) request.getAttribute(fieldName);
+		return (String) validatorHelper.getAttribute(fieldName);
 	}
 
 }

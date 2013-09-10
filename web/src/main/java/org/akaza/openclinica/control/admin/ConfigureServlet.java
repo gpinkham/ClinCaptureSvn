@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -58,7 +60,7 @@ public class ConfigureServlet extends SecureController {
 			setPresetValues(fp.getPresetValues());
 			forwardPage(Page.CONFIGURATION);
 		} else {
-			Validator v = new Validator(request);
+			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 			v.addValidation("lockcount", Validator.IS_AN_INTEGER);
 			v.addValidation("lockcount", Validator.NO_BLANKS);
 			v.addValidation("lockcount", Validator.IS_IN_RANGE, 1, 25);

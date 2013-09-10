@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -131,7 +133,7 @@ public class ChangeStudyServlet extends SecureController {
 	}
 
 	private void confirmChangeStudy(ArrayList studies) throws Exception {
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		v.addValidation("studyId", Validator.IS_AN_INTEGER);
 

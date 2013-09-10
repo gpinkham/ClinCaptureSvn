@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -71,7 +73,7 @@ public class ResetPasswordServlet extends SecureController {
 		logger.info("Change expired password");
 
 		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		errors.clear();
 		FormProcessor fp = new FormProcessor(request);
 		String mustChangePwd = request.getParameter("mustChangePwd");

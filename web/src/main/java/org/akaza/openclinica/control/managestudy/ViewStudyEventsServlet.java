@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -130,7 +132,7 @@ public class ViewStudyEventsServlet extends SecureController {
 			endDate = defaultEndDate;
 			setPresetValues(presetValues);
 		} else {
-			Validator v = new Validator(request);
+			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 			v.addValidation(INPUT_STARTDATE, Validator.IS_A_DATE);
 			v.addValidation(INPUT_ENDDATE, Validator.IS_A_DATE);
 			errors = v.validate();

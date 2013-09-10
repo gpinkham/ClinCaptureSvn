@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -205,7 +207,7 @@ public class DefineStudyEventServlet extends SecureController {
 	 * @throws Exception
 	 */
 	private void confirmDefinition1() throws Exception {
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("type", Validator.NO_BLANKS);

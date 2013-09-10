@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -138,7 +140,7 @@ public class UpdateStudyServlet extends SecureController {
 	 * @throws Exception
 	 */
 	private void confirmStudy1() throws Exception {
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
 		v.addValidation("name", Validator.NO_BLANKS);
@@ -199,7 +201,7 @@ public class UpdateStudyServlet extends SecureController {
 	}
 
 	private void confirmStudy2() throws Exception {
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
 		v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
@@ -258,7 +260,7 @@ public class UpdateStudyServlet extends SecureController {
 	 * @throws Exception
 	 */
 	private void confirmStudy3(boolean isInterventional) throws Exception {
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
 		v.addValidation("purpose", Validator.NO_BLANKS);
@@ -306,7 +308,7 @@ public class UpdateStudyServlet extends SecureController {
 	 */
 	private void confirmStudy4() throws Exception {
 		FormProcessor fp = new FormProcessor(request);
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		v.addValidation("conditions", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
 		v.addValidation("keywords", Validator.LENGTH_NUMERIC_COMPARISON,
@@ -349,7 +351,7 @@ public class UpdateStudyServlet extends SecureController {
 	 */
 	private void confirmStudy5() throws Exception {
 		FormProcessor fp = new FormProcessor(request);
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
 			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
 		}
@@ -399,7 +401,7 @@ public class UpdateStudyServlet extends SecureController {
 
 	private void confirmStudy6() throws Exception {
 		FormProcessor fp = new FormProcessor(request);
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		v.addValidation("medlineIdentifier", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 		v.addValidation("url", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
@@ -425,7 +427,7 @@ public class UpdateStudyServlet extends SecureController {
 
 	private void confirmWholeStudy() throws Exception {
 		FormProcessor fp = new FormProcessor(request);
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		errors = v.validate();
 
 		StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");

@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.login;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.TermType;
@@ -90,7 +92,7 @@ public class RequestStudyServlet extends SecureController {
 	 * @param response
 	 */
 	private void confirm() throws Exception {
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		v.addValidation("studyId", Validator.IS_AN_INTEGER);
 		v.addValidation("studyRoleId", Validator.IS_VALID_TERM, TermType.ROLE);
 

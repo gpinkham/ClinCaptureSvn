@@ -22,10 +22,10 @@
  */
 package org.akaza.openclinica.control.form;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 
@@ -45,8 +45,8 @@ import javax.servlet.http.HttpServletRequest;
 public class DiscrepancyValidator extends Validator {
 	private final FormDiscrepancyNotes notes;
 
-	public DiscrepancyValidator(HttpServletRequest request, FormDiscrepancyNotes notes) {
-		super(request);
+	public DiscrepancyValidator(ValidatorHelper validatorHelper, FormDiscrepancyNotes notes) {
+		super(validatorHelper);
 		this.notes = notes;
 	}
 

@@ -13,6 +13,8 @@
 
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -148,8 +150,9 @@ public class UpdateJobImportServlet extends SecureController {
 			setUpServlet(updatingTrigger);
 			forwardPage(Page.UPDATE_JOB_IMPORT);
 		} else if ("confirmall".equalsIgnoreCase(action)) {
-			HashMap errors = triggerService.validateImportJobForm(fp, request,
-					scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")), updatingTrigger.getKey().getName());
+			HashMap errors = triggerService.validateImportJobForm(new ValidatorHelper(request, getConfigurationDao()),
+					scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")), updatingTrigger.getKey()
+							.getName());
 
 			Date startTime = getJobStartTime(errors, fp);
 

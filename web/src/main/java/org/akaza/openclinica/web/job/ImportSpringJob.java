@@ -13,6 +13,8 @@
 
 package org.akaza.openclinica.web.job;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,6 +60,7 @@ import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -88,7 +91,6 @@ import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,8 +138,13 @@ public class ImportSpringJob extends QuartzJobBean {
 	public static final String IMPORT_DIR_2 = SQLInitServlet.getField("filePath") + DEST_DIR + File.separator;
 
 	private DataSource dataSource;
+
     private TriggerService triggerService;
     private ImportCRFDataService dataService;
+    private RuleSetServiceInterface ruleSetService;
+
+    private ValidatorHelper validatorHelper;
+
     private OpenClinicaMailSender mailSender;
 
     private StudyDAO sdao;
@@ -148,6 +155,7 @@ public class ImportSpringJob extends QuartzJobBean {
     private DiscrepancyNoteDAO dndao;
 	private AuditEventDAO auditEventDAO;
     private EventDefinitionCRFDAO edcdao;
+    private ConfigurationDao configurationDao;
 
 	@Override
 	protected void executeInternal(final JobExecutionContext context) throws JobExecutionException {
@@ -190,7 +198,8 @@ public class ImportSpringJob extends QuartzJobBean {
 					.get("applicationContext");
 			dataSource = (DataSource) appContext.getBean("dataSource");
 			mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
-			RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) appContext.getBean("ruleSetService");
+			ruleSetService = (RuleSetServiceInterface) appContext.getBean("ruleSetService");
+            configurationDao = (ConfigurationDao) appContext.getBean("configurationDao");
 
 			sdao = new StudyDAO(dataSource);
 			ecdao = new EventCRFDAO(dataSource);
@@ -202,6 +211,8 @@ public class ImportSpringJob extends QuartzJobBean {
 			edcdao = new EventDefinitionCRFDAO(dataSource);
 			StudyConfigService scs = new StudyConfigService(dataSource);
 			UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+
+            validatorHelper = new ValidatorHelper(configurationDao, locale);
 
 			int userId = dataMap.getInt(USER_ID);
 			UserAccountBean ub = (UserAccountBean) userAccountDAO.findByPK(userId);
@@ -339,11 +350,8 @@ public class ImportSpringJob extends QuartzJobBean {
 		StringBuffer msg = new StringBuffer();
 		StringBuffer auditMsg = new StringBuffer();
         StringBuffer skippedItemsSql = new StringBuffer();
-		String propertiesPath = CoreResources.PROPERTIES_DIR;        
-        // create a 'fake' request to generate the validation errors
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addPreferredLocale(locale);
-        
+		String propertiesPath = CoreResources.PROPERTIES_DIR;
+
 		File xsdFile2 = new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
 		boolean fail = false;
 		ODMContainer odmContainer = new ODMContainer();
@@ -485,10 +493,11 @@ public class ImportSpringJob extends QuartzJobBean {
 
 				try {
 					List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
-					tempDisplayItemBeanWrappers = getImportCRFDataService(dataSource).lookupValidationErrors(request,
-							odmContainer, ub, totalValidationErrors, hardValidationErrors, permittedEventCRFIds);
+					tempDisplayItemBeanWrappers = getImportCRFDataService(dataSource).lookupValidationErrors(
+							validatorHelper, odmContainer, ub, totalValidationErrors, hardValidationErrors,
+							permittedEventCRFIds);
 					logger.debug("size of total validation errors: " + totalValidationErrors.size());
-                    hasSkippedItems = request.getAttribute("hasSkippedItems") != null;
+                    hasSkippedItems = validatorHelper.getAttribute("hasSkippedItems") != null;
 					displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
 				} catch (NullPointerException npe1) {
 					// what if you have 2 event crfs but the third is a fake?
@@ -669,6 +678,9 @@ public class ImportSpringJob extends QuartzJobBean {
 
 						SubjectEventStatusUtil.determineSubjectEventState(seb, sb, new DAOWrapper(sdao, sedao, ssdao,
 								ecdao, edcdao, dndao));
+						
+						seb.setUpdatedDate(new Date());
+						seb.setUpdater(ub);
 
 						sedao.update(seb);
 					}

@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -138,7 +140,7 @@ public class CreateUserAccountServlet extends SecureController {
             UserType type = UserType.get(fp.getInt("type"));
 
 			UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-			Validator v = new Validator(request);
+			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 
 			// username must not be blank,
 			// must be in the format specified by Validator.USERNAME,

@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -365,7 +367,8 @@ public class TableOfContentsServlet extends SecureController {
 				session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
 			}
-			DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
+			DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()),
+					discNotes);
 
 			v.addValidation(INPUT_INTERVIEWER, Validator.NO_BLANKS);
 			v.addValidation(INPUT_INTERVIEW_DATE, Validator.IS_A_DATE);

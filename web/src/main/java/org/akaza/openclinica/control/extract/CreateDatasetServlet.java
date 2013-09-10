@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.extract;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -338,7 +340,7 @@ public class CreateDatasetServlet extends SecureController {
 				dsb.setStatus(Status.get(fp.getInt("dsStatus")));
 				dsb.setDatasetItemStatus(DatasetItemStatus.get(fp.getInt("itemStatus")));
 
-				Validator v = new Validator(request);
+				Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 
 				v.addValidation("dsName", Validator.NO_BLANKS);
 				v.addValidation("dsName", Validator.NO_SEMI_COLONS_OR_COLONS);

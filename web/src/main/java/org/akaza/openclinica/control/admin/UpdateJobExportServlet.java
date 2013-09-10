@@ -13,6 +13,8 @@
 
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -251,7 +253,7 @@ public class UpdateJobExportServlet extends SecureController {
 
 	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
 			String properName) {
-		Validator v = new Validator(request);
+		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		HashMap errors = v.validate();
 		v.addValidation(DATASET_ID, Validator.NO_BLANKS_SET);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
