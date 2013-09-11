@@ -23,6 +23,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
@@ -42,6 +43,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 
     protected ItemDAO idao;
     protected CRFDAO crfdao;
+    protected CRFVersionDAO crfVersionDao;
     protected StudyDAO studyDAO;
     protected DatasetDAO datasetDAO;
     protected ItemFormMetadataDAO imfdao;
@@ -79,6 +81,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		// DAO that require data source
         idao = new ItemDAO(dataSource);
         crfdao = new CRFDAO(dataSource);
+        crfVersionDao = new CRFVersionDAO(dataSource);
         studyDAO = new StudyDAO(dataSource);
         datasetDAO = new DatasetDAO(dataSource);
         imfdao = new ItemFormMetadataDAO(dataSource);

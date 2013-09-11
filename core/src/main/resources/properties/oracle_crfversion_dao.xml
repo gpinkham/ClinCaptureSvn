@@ -90,38 +90,38 @@
 	<!-- all deletes are not prepareStatements-->
 	<query>
 		<name>delete</name>
-		<sql>delete from CRF_VERSION where crf_version_id=</sql>
+		<sql>delete from CRF_VERSION where crf_version_id=?</sql>
 	</query>	
 	<query>
 		<name>deleteItemsByVersion</name>
-		<sql>delete from item where item_id=</sql>
+		<sql>delete from item where item_id=?</sql>
 	</query>
 	<query>
 		<name>deleteItemMapByVersion</name>
-		<sql>delete from versioning_map where crf_version_id=</sql>
+		<sql>delete from versioning_map where crf_version_id=?</sql>
 	</query>
 	<query>
 		<name>deleteSectionsByVersion</name>
-		<sql>delete from section where crf_version_id=</sql>
+		<sql>delete from section where crf_version_id=?</sql>
 	</query>
 	<query>
 		<name>deleteScdItemMetadataByVersion</name>
 		<sql>delete from scd_item_metadata scd where scd.scd_item_form_metadata_id in (
 				select ifm.item_form_metadata_id from item_form_metadata ifm 
-				where ifm.show_item=0 and ifm.crf_version_id=
+				where ifm.show_item=0 and ifm.crf_version_id=?
 		</sql>
 	</query>
 	<query>
 		<name>deleteItemMetaDataByVersion</name>
-		<sql>delete from item_form_metadata where crf_version_id=</sql>
+		<sql>delete from item_form_metadata where crf_version_id=?</sql>
 	</query>
     <query>
 		<name>deleteResponseSetByVersion</name>
-		<sql>delete from response_set where version_id=</sql>
+		<sql>delete from response_set where version_id=?</sql>
 	</query>
 	<query>
 		<name>deleteItemGroupMetaByVersion</name>
-		<sql>delete from item_group_metadata where crf_version_id=</sql>
+		<sql>delete from item_group_metadata where crf_version_id=?</sql>
 	</query>
 	<query>
 		<name>getCRFIdFromCRFVersionId</name>

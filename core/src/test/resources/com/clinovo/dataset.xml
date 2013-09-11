@@ -3,15 +3,18 @@
 
 	<crf crf_id="1" status_id="1" name="Agent Administration"
 		description="Cal&apos;s Test v1; new template" owner_id="1"
-		date_created="2008-07-02" oc_oid="F_AGEN" />
+		date_created="2008-07-02" oc_oid="F_AGEN" source_study_id="1" />
 	<crf crf_id="2" status_id="1" name="Concomitant Medications AG"
-		description="Test" owner_id="1" date_created="2008-07-02" oc_oid="F_CONC" />
+		description="Test" owner_id="1" date_created="2008-07-02" oc_oid="F_CONC" source_study_id="1" />
 	<crf_version crf_version_id="1" crf_id="1" name="v2.0"
 		description="Cal&apos;s Test v1; new template" revision_notes="rev agoodwin 10.16.2007"
 		status_id="1" date_created="2008-07-02" owner_id="1" oc_oid="F_AGEN_V20" />
 	<crf_version crf_version_id="2" crf_id="2" name="v2.0"
 		description="Test" revision_notes="agoodwin 10.16.2007" status_id="1"
 		date_created="2008-07-02" owner_id="1" oc_oid="F_CONC_V20" />
+	<crf_version crf_version_id="3" crf_id="2" name="v3.0"
+		description="Test delete query" revision_notes="agoodwin 10.16.2007" status_id="1"
+		date_created="2008-07-02" owner_id="1" oc_oid="F_CONC_V30" />
 
 	<subject subject_id="1" status_id="1" date_of_birth="2008-07-01"
 		gender="m" unique_identifier="pID1" date_created="2008-07-02"
