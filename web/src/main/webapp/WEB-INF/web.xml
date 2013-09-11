@@ -749,9 +749,9 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreStudyUserRoleServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListStudySubjectsServlet</servlet-name>
+        <servlet-name>listStudySubjectsServlet</servlet-name>
         <display-name>ListStudySubject</display-name>
-        <servlet-class>org.akaza.openclinica.control.submit.ListStudySubjectsServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ListStudySubjectsManageServlet</servlet-name>
@@ -808,7 +808,7 @@
         <display-name>RestoreEventCRF</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreEventCRFServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>ViewCRFVersionServlet</servlet-name>
         <display-name>ViewCRFVersion</display-name>
@@ -824,7 +824,7 @@
         <display-name>ReassignStudySubject</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ReassignStudySubjectServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>RemoveDatasetServlet</servlet-name>
         <display-name>RemoveDataset</display-name>
@@ -1100,7 +1100,7 @@
         <display-name>ListEventsForSubject</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ListEventsForSubjectServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>ListEventsForSubjectsServlet</servlet-name>
         <display-name>ListEventsForSubjects</display-name>
@@ -1142,13 +1142,13 @@
         <display-name>ViewRuleSet</display-name>
         <servlet-class>org.akaza.openclinica.control.submit.ViewRuleSetServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>ViewRuleAssignmentNewServlet</servlet-name>
         <display-name>ViewRuleAssignmentNew</display-name>
         <servlet-class>org.akaza.openclinica.control.submit.ViewRuleAssignmentNewServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>DownloadRuleSetXmlServlet</servlet-name>
         <display-name>DownloadRuleSetXml</display-name>
@@ -1299,42 +1299,42 @@
         <servlet-name>ListDiscNotesForCRFServlet</servlet-name>
         <url-pattern>/ListDiscNotesForCRFServlet</url-pattern>
     </servlet-mapping>
-   
+
     <servlet-mapping>
         <servlet-name>ViewJobServlet</servlet-name>
         <url-pattern>/ViewJob</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>ViewAllJobsServlet</servlet-name>
         <url-pattern>/ViewAllJobs</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>ViewImportJobServlet</servlet-name>
         <url-pattern>/ViewImportJob</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>ViewSingleJobServlet</servlet-name>
         <url-pattern>/ViewSingleJob</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>PauseJobServlet</servlet-name>
         <url-pattern>/PauseJob</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>CreateJobExportServlet</servlet-name>
         <url-pattern>/CreateJobExport</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>CreateJobImportServlet</servlet-name>
         <url-pattern>/CreateJobImport</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>UpdateJobExportServlet</servlet-name>
         <url-pattern>/UpdateJobExport</url-pattern>
@@ -1344,7 +1344,7 @@
         <servlet-name>UpdateJobImportServlet</servlet-name>
         <url-pattern>/UpdateJobImport</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>VerifyImportedRuleServlet</servlet-name>
         <url-pattern>/VerifyImportedRule</url-pattern>
@@ -1375,12 +1375,12 @@
         <servlet-name>ViewRuleAssignmentServlet</servlet-name>
         <url-pattern>/ViewRuleAssignmentNew</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>DownloadRuleSetXmlServlet</servlet-name>
         <url-pattern>/DownloadRuleSetXml</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>ViewRuleAssignmentNewServlet</servlet-name>
         <url-pattern>/ViewRuleAssignment</url-pattern>
@@ -1440,12 +1440,12 @@
         <servlet-name>MainMenuServlet</servlet-name>
         <url-pattern>/MainMenu</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>EditDatasetServlet</servlet-name>
         <url-pattern>/EditDataset</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>RemoveDatasetServlet</servlet-name>
         <url-pattern>/RemoveDataset</url-pattern>
@@ -1454,7 +1454,7 @@
         <servlet-name>RestoreDatasetServlet</servlet-name>
         <url-pattern>/RestoreDataset</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>AccessFileServlet</servlet-name>
         <url-pattern>/AccessFile</url-pattern>
@@ -1476,7 +1476,7 @@
         <servlet-name>AuditLogStudyServlet</servlet-name>
         <url-pattern>/AuditLogStudy</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>ManageStudyServlet</servlet-name>
         <url-pattern>/ManageStudy</url-pattern>
@@ -1634,7 +1634,7 @@
         <servlet-name>DataEntryServlet</servlet-name>
         <url-pattern>/DataEntry</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>DoubleDataEntryServlet</servlet-name>
         <url-pattern>/DoubleDataEntry</url-pattern>
@@ -1772,7 +1772,7 @@
         <url-pattern>/ListStudySubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListStudySubjectsServlet</servlet-name>
+        <servlet-name>listStudySubjectsServlet</servlet-name>
         <url-pattern>/ListStudySubjects</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

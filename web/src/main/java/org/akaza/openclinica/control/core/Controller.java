@@ -11,48 +11,26 @@
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
-/*
- * OpenClinica is distributed under the
- * GNU Lesser General Public License (GNU LGPL).
-
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
- */
-
 package org.akaza.openclinica.control.core;
 
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletContext;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -81,8 +59,6 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
-import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
-import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -110,9 +86,9 @@ import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
-import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -120,110 +96,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * This class enhances the Controller in several ways.
+ * Abstract class for creating a controller servlet and extending capabilities of Controller. However, not using
+ * the SingleThreadModel.
  * 
- * <ol>
- * <li>The method mayProceed, for which the class is named, is declared abstract and is called before processRequest.
- * This method indicates whether the user may proceed with the action he wishes to perform (as indicated by various
- * attributes or parameters in request or session). Note, howeveer, that the method has a void return, and throws
- * InsufficientPermissionException. The intention is that if the user may not proceed with his desired action, the
- * method should throw an exception. InsufficientPermissionException will accept a Page object which indicates where the
- * user should be redirected in order to be informed that he has insufficient permission, and the process method
- * enforces this redirection by catching an InsufficientPermissionException object.
- * 
- * <li>Four new members, session, request, response, and the UserAccountBean object ub have been declared protected, and
- * are set in the process method. This allows developers to avoid passing these objects between methods, and moreover it
- * accurately encodes the fact that these objects represent the state of the servlet.
- * 
- * <br/>
- * In particular, please note that it is no longer necessary to generate a bean for the session manager, the current
- * user or the current study.
- * 
- * <li>The method processRequest has been declared abstract. This change is unlikely to affect most code, since by
- * custom processRequest is declared in each subclass anyway.
- * 
- * <li>The standard try-catch block within most processRequest methods has been included in the process method, which
- * calls the processRequest method. Therefore, subclasses may throw an Exception in the processRequest method without
- * having to handle it.
- * 
- * <li>The addPageMessage method has been declared to streamline the process of setting page-level messages. The
- * accompanying showPageMessages.jsp file in jsp/include/ automatically displays all of the page messages; the developer
- * need only include this file in the jsp.
- * 
- * <li>The addEntityList method makes it easy to add a Collection of EntityBeans to the request. Note that this method
- * should only be used for Collections from which one EntityBean must be selected by the user. If the Collection is
- * empty, this method will throw an InconsistentStateException, taking the user to an error page and settting a page
- * message indicating that the user may not proceed because no entities are present. Note that the error page and the
- * error message must be specified.
- * </ol>
+ * @author jnyayapathi
  * 
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public abstract class SecureController extends HttpServlet {
+public abstract class Controller extends BaseController {
 
-	public static final String BR = "<br/>";
-	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
-
-    protected ServletContext context;
-	protected SessionManager sm;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	protected String logDir;
-	protected String logLevel;
-	protected HttpSession session;
-	protected HttpServletRequest request;
-	protected HttpServletResponse response;
-	protected UserAccountBean ub;
-	protected StudyBean currentStudy;
-	protected StudyUserRoleBean currentRole;
-	protected HashMap errors = new HashMap();
 
-    public static final String STORED_ATTRIBUTES = "RememberLastPage_storedAttributes";
-	private static String SCHEDULER = "schedulerFactoryBean";
-	UsageStatsServiceDAO usageStatsServiceDAO;
-	public static final String JOB_HOUR = "jobHour";
-	public static final String JOB_MINUTE = "jobMinute";
+	private static HashMap unavailableCRFList = new HashMap();
 
-	private StdScheduler scheduler;
-	/**
-	 * local_df is set to the client locale in each request.
-	 */
-	protected SimpleDateFormat local_df = new SimpleDateFormat("MM/dd/yyyy");
-	public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword,
-			resworkflow;
-
-	protected StudyInfoPanel panel = new StudyInfoPanel();
-
-	public static final String PAGE_MESSAGE = "pageMessages";// for showing
-	// page
-	// wide message
-
-	public static final String INPUT_MESSAGES = "formMessages"; // for showing
-	// input-specific
-	// messages
-
-	public static final String PRESET_VALUES = "presetValues"; // for setting
-	// preset values
-
-	public static final String ADMIN_SERVLET_CODE = "admin";
-
-	public static final String BEAN_TABLE = "table";
-
-	public static final String STUDY_INFO_PANEL = "panel"; // for setting the
-	// side panel
-
-	public static final String BREADCRUMB_TRAIL = "breadcrumbs";
-
-	public static final String POP_UP_URL = "popUpURL";
-
-	// Use this variable as the key for the support url
-	public static final String SUPPORT_URL = "supportURL";
-
-	public static final String MODULE = "module";// to determine which module
-
-	public static final String NOT_USED = "not_used";
-	public static final String STUDY = "study";
-
-	protected void addPageMessage(String message) {
+	protected void addPageMessage(String message, HttpServletRequest request) {
 		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 
 		if (pageMessages == null) {
@@ -231,23 +117,20 @@ public abstract class SecureController extends HttpServlet {
 		}
 
 		if (!pageMessages.contains(message)) {
-            pageMessages.add(message);
-        }
+			pageMessages.add(message);
+		}
 		logger.debug(message);
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
-    }
-
-    protected void storePageMessages() {
-        Map storedAttributes = new HashMap();
-        storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
-        request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
-    }
-
-	protected void resetPanel() {
-		panel.reset();
 	}
 
-	protected void setToPanel(String title, String info) {
+	protected void storePageMessages(HttpServletRequest request) {
+		Map storedAttributes = new HashMap();
+		storedAttributes.put(PAGE_MESSAGE, request.getAttribute(PAGE_MESSAGE));
+		request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+	}
+
+	protected void setToPanel(String title, String info, HttpServletRequest request) {
+		StudyInfoPanel panel = getStudyInfoPanel(request);
 		if (panel.isOrderedData()) {
 			ArrayList data = panel.getUserOrderedData();
 			data.add(new StudyInfoPanelLine(title, info));
@@ -258,43 +141,47 @@ public abstract class SecureController extends HttpServlet {
 		request.setAttribute(STUDY_INFO_PANEL, panel);
 	}
 
-	protected void setInputMessages(HashMap messages) {
+	protected void setInputMessages(HashMap messages, HttpServletRequest request) {
 		request.setAttribute(INPUT_MESSAGES, messages);
 	}
 
-	protected void setPresetValues(HashMap presetValues) {
+	protected void setPresetValues(HashMap presetValues, HttpServletRequest request) {
 		request.setAttribute(PRESET_VALUES, presetValues);
 	}
 
-	protected void setTable(EntityBeanTable table) {
+	protected void setTable(EntityBeanTable table, HttpServletRequest request) {
 		request.setAttribute(BEAN_TABLE, table);
 	}
 
 	@Override
-	public void init() throws ServletException {
-		context = getServletContext();
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
 	}
 
 	/**
 	 * Process request
 	 * 
 	 * @throws Exception
+	 * @param request
+	 * @param response
 	 */
-	protected abstract void processRequest() throws Exception;
+	protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
-	protected abstract void mayProceed() throws InsufficientPermissionException;
+	protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException;
 
 	public static final String USER_BEAN_NAME = "userBean";
 
-	public void passwdTimeOut() {
+	public void passwdTimeOut(HttpServletRequest request, HttpServletResponse response) {
+		UserAccountBean ub = getUserAccountBean(request);
 		Date lastChangeDate = ub.getPasswdTimestamp();
 		if (lastChangeDate == null) {
 			addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". "
-					+ respage.getString("password_set"));
+					+ respage.getString("password_set"), request);
 			int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
 			if (pwdChangeRequired == 1) {
 				request.setAttribute("mustChangePass", "yes");
-				forwardPage(Page.RESET_PASSWORD);
+				forwardPage(Page.RESET_PASSWORD, request, response);
 			}
 		}
 	}
@@ -306,10 +193,10 @@ public abstract class SecureController extends HttpServlet {
 		try {
 			if (jobName != null && groupName != null) {
 				logger.info("trying to retrieve status on " + jobName + " " + groupName);
-				Trigger.TriggerState state = getScheduler(request).getTriggerState(
+				Trigger.TriggerState state = getStdScheduler().getTriggerState(
 						TriggerKey.triggerKey(jobName, groupName));
 				logger.info("found state: " + state);
-				org.quartz.JobDetail details = getScheduler(request).getJobDetail(JobKey.jobKey(jobName, groupName));
+				org.quartz.JobDetail details = getStdScheduler().getJobDetail(JobKey.jobKey(jobName, groupName));
 				org.quartz.JobDataMap dataMap = details.getJobDataMap();
 				String failMessage = dataMap.getString("failMessage");
 				if (state == Trigger.TriggerState.NONE || state == Trigger.TriggerState.COMPLETE) {
@@ -322,7 +209,7 @@ public abstract class SecureController extends HttpServlet {
 						// ERROR: relation "demographics" already exists
 						// More information may be available in the log files.
 						addPageMessage("The extract data job failed with the message: <br/><br/>" + failMessage
-								+ "<br/><br/>More information may be available in the log files.");
+								+ "<br/><br/>More information may be available in the log files.", request);
 						request.getSession().removeAttribute("jobName");
 						request.getSession().removeAttribute("groupName");
 						request.getSession().removeAttribute("datasetId");
@@ -332,14 +219,15 @@ public abstract class SecureController extends HttpServlet {
 						if (success != null) {
 
 							if (successMsg.contains("$linkURL")) {
-								successMsg = decodeLINKURL(successMsg, datasetId);
+								successMsg = decodeLINKURL(request, successMsg, datasetId);
 							}
 
 							if (successMsg != null && !successMsg.isEmpty()) {
-								addPageMessage(successMsg);
+								addPageMessage(successMsg, request);
 							} else {
-								addPageMessage("Your Extract is now completed. Please go to review them at <a href='ExportDataset?datasetId="
-										+ datasetId + "'> Here </a>.");
+								addPageMessage(
+										"Your Extract is now completed. Please go to review them at <a href='ExportDataset?datasetId="
+												+ datasetId + "'> Here </a>.", request);
 							}
 							request.getSession().removeAttribute("jobName");
 							request.getSession().removeAttribute("groupName");
@@ -357,9 +245,8 @@ public abstract class SecureController extends HttpServlet {
 
 	}
 
-	private String decodeLINKURL(String successMsg, Integer datasetId) {
-
-		ArchivedDatasetFileDAO asdfDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
+	private String decodeLINKURL(HttpServletRequest request, String successMsg, Integer datasetId) {
+		ArchivedDatasetFileDAO asdfDAO = getArchivedDatasetFileDAO();
 
 		ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
 
@@ -367,12 +254,6 @@ public abstract class SecureController extends HttpServlet {
 				+ fileBeans.get(0).getId() + "\">here </a>");
 
 		return successMsg;
-	}
-
-	private StdScheduler getScheduler(HttpServletRequest request) {
-		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
-				request.getSession().getServletContext()).getBean(SCHEDULER);
-		return scheduler;
 	}
 
 	static void reloadUserBean(HttpSession session, UserAccountDAO userAccountDao) {
@@ -384,16 +265,16 @@ public abstract class SecureController extends HttpServlet {
 			session.removeAttribute("reloadUserBean");
 		}
 	}
-    
-    private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
+
+	private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
 			UnsupportedEncodingException {
-       
+
 		request.setCharacterEncoding("UTF-8");
-		session = request.getSession();
-		reloadUserBean(session, new UserAccountDAO((DataSource) SpringServletAccess.getApplicationContext(context)
-				.getBean("dataSource")));
+		HttpSession session = request.getSession();
+		reloadUserBean(session, getUserAccountDAO());
 		String newThemeColor = CoreResources.getField("themeColor");
 		session.setAttribute("newThemeColor", newThemeColor);
+		ApplicationContext applicationContext = SpringServletAccess.getApplicationContext(getServletContext());
 		try {
 			session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
 		} catch (NumberFormatException nfe) {
@@ -406,10 +287,10 @@ public abstract class SecureController extends HttpServlet {
 			session.setAttribute(SUPPORT_URL, SQLInitServlet.getSupportURL());
 		}
 
-        ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
-        currentStudy = (StudyBean) session.getAttribute("study");
-		currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
-        
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		// Set current language preferences
 		Locale locale = request.getLocale();
 		ResourceBundleProvider.updateLocale(locale);
@@ -423,32 +304,34 @@ public abstract class SecureController extends HttpServlet {
 		respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
-		local_df = new SimpleDateFormat(resformat.getString("date_format_string"), locale);
-
-		String includeReportingVar = "includeReporting";
-		if ("true".equals(SQLInitServlet.getField("include.reporting"))) {
-			request.setAttribute(includeReportingVar, true);
-		} else {
-			request.setAttribute(includeReportingVar, false);
-		}
+		HashMap errors = getErrorsHolder(request);
 
 		try {
 			String userName = request.getRemoteUser();
-			sm = new SessionManager(ub, userName, SpringServletAccess.getApplicationContext(context));
-			ub = sm.getUserBean();
-			session.setAttribute("userBean", ub);
+			SessionManager sm = new SessionManager(ub, userName, applicationContext);
+			request.setAttribute(SESSION_MANAGER, sm);
 
-			StudyDAO sdao = new StudyDAO(sm.getDataSource());
+			ub = sm.getUserBean();
+			request.getSession().setAttribute(USER_BEAN_NAME, ub);
+
+			String includeReportingVar = "includeReporting";
+			if ("true".equals(SQLInitServlet.getField("include.reporting"))) {
+				request.setAttribute(includeReportingVar, true);
+			} else {
+				request.setAttribute(includeReportingVar, false);
+			}
+
+			StudyDAO sdao = getStudyDAO();
 			if (currentStudy == null || currentStudy.getId() <= 0) {
 				if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
-					StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+					StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 					currentStudy = (StudyBean) sdao.findByPK(ub.getActiveStudyId());
 
 					ArrayList studyParameters = spvdao.findParamConfigByStudy(currentStudy);
 
 					currentStudy.setStudyParameters(studyParameters);
 
-					StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+					StudyConfigService scs = getStudyConfigService();
 					if (currentStudy.getParentStudyId() <= 0) {// top study
 						scs.setParametersForStudy(currentStudy);
 
@@ -459,8 +342,8 @@ public abstract class SecureController extends HttpServlet {
 					}
 
 					// set up the panel here
+					StudyInfoPanel panel = getStudyInfoPanel(request);
 					panel.reset();
-					session.setAttribute(STUDY_INFO_PANEL, panel);
 				} else {
 					currentStudy = new StudyBean();
 				}
@@ -472,7 +355,19 @@ public abstract class SecureController extends HttpServlet {
 				}
 			}
 
-            Role.prepareRoleMapWithDescriptions(resterm);
+			if (this instanceof ListStudySubjectsServlet && currentStudy != null
+					&& currentStudy.getStatus() != Status.AVAILABLE) {
+				String startWith = BR;
+				ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
+				if (pageMessages == null) {
+					startWith = "";
+					pageMessages = new ArrayList();
+				}
+				pageMessages.add(startWith + resword.getString(STUDY_SHOUD_BE_IN_AVAILABLE_MODE) + BR);
+				request.setAttribute(PAGE_MESSAGE, pageMessages);
+			}
+
+			Role.prepareRoleMapWithDescriptions(resterm);
 
 			if (currentRole == null || currentRole.getId() <= 0) {
 				// if current study has been "removed", current role will be
@@ -502,43 +397,39 @@ public abstract class SecureController extends HttpServlet {
 				session.setAttribute("userRole", currentRole);
 			}
 
-			request.setAttribute("isAdminServlet", getAdminServlet());
-
-			this.request = request;
-			this.response = response;
+			request.setAttribute("isAdminServlet", getAdminServlet(request));
 
 			if (!request.getRequestURI().endsWith("ResetPassword")) {
-				passwdTimeOut();
+				passwdTimeOut(request, response);
 			}
-			mayProceed();
+			mayProceed(request, response);
 			pingJobServer(request);
 
 			long startTime = System.currentTimeMillis();
 
-			processRequest();
+			processRequest(request, response);
 
 			long endTime = System.currentTimeMillis();
 			long reportTime = (endTime - startTime) / 1000;
 			logger.info("Time taken [" + reportTime + " seconds]");
 			// If the time taken is over 5 seconds, write it to the stats table
 			if (reportTime > 5) {
-				getUsageStatsServiceDAO(context).savePageLoadTimeToDB(this.getClass().toString(),
+				getUsageStatsServiceDAO().savePageLoadTimeToDB(this.getClass().toString(),
 						new Long(reportTime).toString());
 			}
 			// Call the usagestats dao here and record a time in the db
 		} catch (InconsistentStateException ise) {
 			ise.printStackTrace();
-			logger.warn("InconsistentStateException: org.akaza.openclinica.control.SecureController: "
-					+ ise.getMessage());
+			logger.warn("InconsistentStateException: org.akaza.openclinica.control.Controller: " + ise.getMessage());
 
-			addPageMessage(ise.getOpenClinicaMessage());
-			forwardPage(ise.getGoTo());
+			addPageMessage(ise.getOpenClinicaMessage(), request);
+			forwardPage(ise.getGoTo(), request, response);
 		} catch (InsufficientPermissionException ipe) {
 			ipe.printStackTrace();
-			logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.SecureController: "
+			logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.Controller: "
 					+ ipe.getMessage());
 
-			forwardPage(ipe.getGoTo());
+			forwardPage(ipe.getGoTo(), request, response);
 		} catch (OutOfMemoryError ome) {
 			ome.printStackTrace();
 			long heapSize = Runtime.getRuntime().totalMemory();
@@ -548,17 +439,10 @@ public abstract class SecureController extends HttpServlet {
 			session.setAttribute("ome", "yes");
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error(SecureController.getStackTrace(e));
+			logger.error(getStackTrace(e));
 
-			forwardPage(Page.ERROR);
+			forwardPage(Page.ERROR, request, response);
 		}
-	}
-
-	private UsageStatsServiceDAO getUsageStatsServiceDAO(ServletContext context) {
-		usageStatsServiceDAO = this.usageStatsServiceDAO != null ? usageStatsServiceDAO
-				: (UsageStatsServiceDAO) SpringServletAccess.getApplicationContext(context).getBean(
-						"usageStatsServiceDAO");
-		return usageStatsServiceDAO;
 	}
 
 	public static String getStackTrace(Throwable t) {
@@ -568,6 +452,15 @@ public abstract class SecureController extends HttpServlet {
 		pw.flush();
 		sw.flush();
 		return sw.toString();
+	}
+
+	public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+			IOException {
+		if (request.getMethod().equalsIgnoreCase("GET")) {
+			doGet(request, response);
+		} else if (request.getMethod().equalsIgnoreCase("POST")) {
+			doPost(request, response);
+		}
 	}
 
 	/**
@@ -621,7 +514,8 @@ public abstract class SecureController extends HttpServlet {
 	 * @param checkTrail
 	 *            The command to check for, and set a trail in the session.
 	 */
-	protected void forwardPage(Page jspPage, boolean checkTrail) {
+	protected void forwardPage(Page jspPage, boolean checkTrail, HttpServletRequest request,
+			HttpServletResponse response) {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Pragma", "no-cache");
 		response.setDateHeader("Expires", -1);
@@ -634,28 +528,21 @@ public abstract class SecureController extends HttpServlet {
 		try {
 			if (checkTrail) {
 				BreadcrumbTrail bt = new BreadcrumbTrail();
-				if (session != null) {// added bu jxu, fixed bug for log out
-					ArrayList trail = (ArrayList) session.getAttribute("trail");
+				if (request.getSession() != null) {// added bu jxu, fixed bug for log out
+					ArrayList trail = (ArrayList) request.getSession().getAttribute("trail");
 					if (trail == null) {
 						trail = bt.generateTrail(jspPage, request);
 					} else {
 						bt.setTrail(trail);
 						trail = bt.generateTrail(jspPage, request);
 					}
-					session.setAttribute("trail", trail);
-					panel = (StudyInfoPanel) session.getAttribute(STUDY_INFO_PANEL);
-					if (panel == null) {
-						panel = new StudyInfoPanel();
-						panel.setData(jspPage, session, request);
-					} else {
-						panel.setData(jspPage, session, request);
-					}
-
-					session.setAttribute(STUDY_INFO_PANEL, panel);
+					request.getSession().setAttribute("trail", trail);
+					StudyInfoPanel panel = getStudyInfoPanel(request);
+					panel.setData(jspPage, request.getSession(), request);
 				}
 				// we are also using checkTrail to update the panel, tbh
 			}
-			context.getRequestDispatcher(jspPage.getFileName()).forward(request, response);
+			getServletContext().getRequestDispatcher(jspPage.getFileName()).forward(request, response);
 		} catch (Exception se) {
 			if ("View Notes".equals(jspPage.getTitle())) {
 				String viewNotesURL = jspPage.getFileName();
@@ -665,9 +552,9 @@ public abstract class SecureController extends HttpServlet {
 					int p = t.length() > 0 ? Integer.valueOf(t).intValue() : -1;
 					if (p > 1) {
 						viewNotesURL = viewNotesURL.replace("listNotes_p_=" + p, "listNotes_p_=" + (p - 1));
-						forwardPage(Page.setNewPage(viewNotesURL, "View Notes"));
+						forwardPage(Page.setNewPage(viewNotesURL, "View Notes"), request, response);
 					} else if (p <= 0) {
-						forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY);
+						forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY, request, response);
 					}
 				}
 			}
@@ -676,8 +563,8 @@ public abstract class SecureController extends HttpServlet {
 
 	}
 
-	protected void forwardPage(Page jspPage) {
-		this.forwardPage(jspPage, true);
+	protected void forwardPage(Page jspPage, HttpServletRequest request, HttpServletResponse response) {
+		this.forwardPage(jspPage, true, request, response);
 	}
 
 	/**
@@ -698,8 +585,8 @@ public abstract class SecureController extends HttpServlet {
 	 *            The Page to go to if the collection is empty.
 	 * @throws InconsistentStateException
 	 */
-	protected void addEntityList(String beanName, Collection list, String messageIfEmpty, Page destinationIfEmpty)
-			throws InconsistentStateException {
+	protected void addEntityList(String beanName, Collection list, String messageIfEmpty, Page destinationIfEmpty,
+			HttpServletRequest request, HttpServletResponse response) throws InconsistentStateException {
 		if (list.isEmpty()) {
 			throw new InconsistentStateException(destinationIfEmpty, messageIfEmpty);
 		}
@@ -708,14 +595,15 @@ public abstract class SecureController extends HttpServlet {
 	}
 
 	/**
-	 * @return A blank String if this servlet is not an Administer System servlet. SecureController.ADMIN_SERVLET_CODE
+	 * @return A blank String if this servlet is not an Administer System servlet. Controller.ADMIN_SERVLET_CODE
 	 *         otherwise.
+	 * @param request
 	 */
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
 		return "";
 	}
 
-	protected void setPopUpURL(String url) {
+	protected void setPopUpURL(HttpServletRequest request, String url) {
 		if (url != null && request != null) {
 			request.setAttribute(POP_UP_URL, url);
 			request.setAttribute("hasPopUp", 1);
@@ -740,11 +628,9 @@ public abstract class SecureController extends HttpServlet {
 	 *            String
 	 * @param adao
 	 *            AuditableEntityDAO
-	 * @param ds
-	 *            javax.sql.DataSource
 	 */
-	protected boolean entityIncluded(int entityId, String userName, AuditableEntityDAO adao, DataSource ds) {
-		StudyDAO sdao = new StudyDAO(ds);
+	protected boolean entityIncluded(int entityId, String userName, AuditableEntityDAO adao) {
+		StudyDAO sdao = getStudyDAO();
 		ArrayList<StudyBean> studies = (ArrayList<StudyBean>) sdao.findAllByUserNotRemoved(userName);
 		for (int i = 0; i < studies.size(); ++i) {
 			if (adao.findByPKAndStudy(entityId, studies.get(i)).getId() > 0) {
@@ -767,17 +653,17 @@ public abstract class SecureController extends HttpServlet {
 		return false;
 	}
 
-	public String getRequestURLMinusServletPath() {
+	public String getRequestURLMinusServletPath(HttpServletRequest request) {
 		String requestURLMinusServletPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
 		return requestURLMinusServletPath;
 	}
 
-	public String getHostPath() {
-		String requestURLMinusServletPath = getRequestURLMinusServletPath();
+	public String getHostPath(HttpServletRequest request) {
+		String requestURLMinusServletPath = getRequestURLMinusServletPath(request);
 		return requestURLMinusServletPath.substring(0, requestURLMinusServletPath.lastIndexOf("/"));
 	}
 
-	public String getContextPath() {
+	public String getContextPath(HttpServletRequest request) {
 		String contextPath = request.getContextPath().replaceAll("/", "");
 		return contextPath;
 	}
@@ -785,17 +671,17 @@ public abstract class SecureController extends HttpServlet {
 	/*
 	 * To check if the current study is LOCKED
 	 */
-	public void checkStudyLocked(Page page, String message) {
-		if (currentStudy.getStatus().equals(Status.LOCKED)) {
-			addPageMessage(message);
-			forwardPage(page);
+	public void checkStudyLocked(Page page, String message, HttpServletRequest request, HttpServletResponse response) {
+		if (getCurrentStudy(request).getStatus().equals(Status.LOCKED)) {
+			addPageMessage(message, request);
+			forwardPage(page, request, response);
 		}
 	}
 
-	public void checkStudyLocked(String url, String message) {
+	public void checkStudyLocked(String url, String message, HttpServletRequest request, HttpServletResponse response) {
 		try {
-			if (currentStudy.getStatus().equals(Status.LOCKED)) {
-				addPageMessage(message);
+			if (getCurrentStudy(request).getStatus().equals(Status.LOCKED)) {
+				addPageMessage(message, request);
 				response.sendRedirect(url);
 			}
 		} catch (Exception ex) {
@@ -807,17 +693,17 @@ public abstract class SecureController extends HttpServlet {
 	 * To check if the current study is FROZEN
 	 */
 
-	public void checkStudyFrozen(Page page, String message) {
-		if (currentStudy.getStatus().equals(Status.FROZEN)) {
-			addPageMessage(message);
-			forwardPage(page);
+	public void checkStudyFrozen(Page page, String message, HttpServletRequest request, HttpServletResponse response) {
+		if (getCurrentStudy(request).getStatus().equals(Status.FROZEN)) {
+			addPageMessage(message, request);
+			forwardPage(page, request, response);
 		}
 	}
 
-	public void checkStudyFrozen(String url, String message) {
+	public void checkStudyFrozen(String url, String message, HttpServletRequest request, HttpServletResponse response) {
 		try {
-			if (currentStudy.getStatus().equals(Status.FROZEN)) {
-				addPageMessage(message);
+			if (getCurrentStudy(request).getStatus().equals(Status.FROZEN)) {
+				addPageMessage(message, request);
 				response.sendRedirect(url);
 			}
 		} catch (Exception ex) {
@@ -826,9 +712,11 @@ public abstract class SecureController extends HttpServlet {
 
 	}
 
-	public ArrayList getEventDefinitionsByCurrentStudy() {
-		StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(sm.getDataSource());
+	public ArrayList getEventDefinitionsByCurrentStudy(HttpServletRequest request) {
+		SessionManager sm = getSessionManager(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyDAO studyDAO = getStudyDAO();
+		StudyEventDefinitionDAO studyEventDefinitionDAO = getStudyEventDefinitionDAO();
 		int parentStudyId = currentStudy.getParentStudyId();
 		ArrayList allDefs = new ArrayList();
 		if (parentStudyId > 0) {
@@ -841,10 +729,12 @@ public abstract class SecureController extends HttpServlet {
 		return allDefs;
 	}
 
-	public ArrayList getStudyGroupClassesByCurrentStudy() {
-		StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-		StudyGroupClassDAO studyGroupClassDAO = new StudyGroupClassDAO(sm.getDataSource());
-		StudyGroupDAO studyGroupDAO = new StudyGroupDAO(sm.getDataSource());
+	public ArrayList getStudyGroupClassesByCurrentStudy(HttpServletRequest request) {
+		SessionManager sm = getSessionManager(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyDAO studyDAO = getStudyDAO();
+		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
+		StudyGroupDAO studyGroupDAO = getStudyGroupDAO();
 		int parentStudyId = currentStudy.getParentStudyId();
 		ArrayList studyGroupClasses = new ArrayList();
 		if (parentStudyId > 0) {
@@ -865,9 +755,10 @@ public abstract class SecureController extends HttpServlet {
 
 	}
 
-	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(int studyId) {
-		StudyGroupClassDAO studyGroupClassDAO = new StudyGroupClassDAO(sm.getDataSource());
-		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(sm.getDataSource());
+	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(HttpServletRequest request, int studyId) {
+		SessionManager sm = getSessionManager(request);
+		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
+		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
 		ArrayList<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO
 				.findAllActiveDynamicGroupsByStudyId(studyId);
 		for (StudyGroupClassBean dynGroup : dynamicGroupClasses) {
@@ -879,8 +770,8 @@ public abstract class SecureController extends HttpServlet {
 		return dynamicGroupClasses;
 	}
 
-	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByCurrentStudy() {
-		return getDynamicGroupClassesByStudyId(currentStudy.getId());
+	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByCurrentStudy(HttpServletRequest request) {
+		return getDynamicGroupClassesByStudyId(request, getCurrentStudy(request).getId());
 	}
 
 	protected UserDetails getUserDetails() {
@@ -892,30 +783,32 @@ public abstract class SecureController extends HttpServlet {
 		}
 	}
 
-	public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail, Boolean sendMessage)
+	public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail, Boolean sendMessage,
+			HttpServletRequest request) throws Exception {
+		return sendEmail(to, EmailEngine.getAdminEmail(), subject, body, htmlEmail,
+				respage.getString("your_message_sent_succesfully"), respage.getString("mail_cannot_be_sent_to_admin"),
+				sendMessage, request);
+	}
+
+	public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail, HttpServletRequest request)
 			throws Exception {
 		return sendEmail(to, EmailEngine.getAdminEmail(), subject, body, htmlEmail,
 				respage.getString("your_message_sent_succesfully"), respage.getString("mail_cannot_be_sent_to_admin"),
-				sendMessage);
-	}
-
-	public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail) throws Exception {
-		return sendEmail(to, EmailEngine.getAdminEmail(), subject, body, htmlEmail,
-				respage.getString("your_message_sent_succesfully"), respage.getString("mail_cannot_be_sent_to_admin"),
-				true);
-	}
-
-	public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail) throws Exception {
-		return sendEmail(to, from, subject, body, htmlEmail, respage.getString("your_message_sent_succesfully"),
-				respage.getString("mail_cannot_be_sent_to_admin"), true);
+				true, request);
 	}
 
 	public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail,
-			String successMessage, String failMessage, Boolean sendMessage) throws Exception {
+			HttpServletRequest request) throws Exception {
+		return sendEmail(to, from, subject, body, htmlEmail, respage.getString("your_message_sent_succesfully"),
+				respage.getString("mail_cannot_be_sent_to_admin"), true, request);
+	}
+
+	public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail,
+			String successMessage, String failMessage, Boolean sendMessage, HttpServletRequest request)
+			throws Exception {
 		Boolean messageSent = true;
 		try {
-			JavaMailSenderImpl mailSender = (JavaMailSenderImpl) SpringServletAccess.getApplicationContext(context)
-					.getBean("mailSender");
+			JavaMailSenderImpl mailSender = getMailSender();
 			MimeMessage mimeMessage = mailSender.createMimeMessage();
 
 			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, htmlEmail);
@@ -926,13 +819,13 @@ public abstract class SecureController extends HttpServlet {
 
 			mailSender.send(mimeMessage);
 			if (successMessage != null && sendMessage) {
-				addPageMessage(successMessage);
+				addPageMessage(successMessage, request);
 			}
 			logger.debug("Email sent successfully on {}", new Date());
 		} catch (MailException me) {
 			me.printStackTrace();
 			if (failMessage != null && sendMessage) {
-				addPageMessage(failMessage);
+				addPageMessage(failMessage, request);
 			}
 			logger.debug("Email could not be sent on {} due to: {}", new Date(), me.toString());
 			messageSent = false;
@@ -970,10 +863,11 @@ public abstract class SecureController extends HttpServlet {
 	}
 
 	public synchronized static HashMap getUnavailableCRFList() {
-		return CoreSecureController.getUnavailableCRFList();
+		return unavailableCRFList;
 	}
 
-	public void dowloadFile(File f, String contentType) throws Exception {
+	public void dowloadFile(File f, String contentType, HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 
 		response.setHeader("Content-disposition", "attachment; filename=\"" + f.getName() + "\";");
 		response.setContentType("text/xml");
@@ -1009,7 +903,7 @@ public abstract class SecureController extends HttpServlet {
 		}
 	}
 
-	public String getPageServletFileName() {
+	public String getPageServletFileName(HttpServletRequest request) {
 		String fileName = request.getServletPath();
 		String temp = request.getPathInfo();
 		if (temp != null) {
@@ -1022,7 +916,7 @@ public abstract class SecureController extends HttpServlet {
 		return fileName;
 	}
 
-	public String getPageURL() {
+	public String getPageURL(HttpServletRequest request) {
 		String url = request.getRequestURL().toString();
 		String query = request.getQueryString();
 		if (url != null && url.length() > 0 && query != null) {
@@ -1031,31 +925,32 @@ public abstract class SecureController extends HttpServlet {
 		return url;
 	}
 
-	public DiscrepancyNoteBean getNoteInfo(DiscrepancyNoteBean note) {
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+	public DiscrepancyNoteBean getNoteInfo(HttpServletRequest request, DiscrepancyNoteBean note) {
+		SessionManager sm = getSessionManager(request);
+		StudySubjectDAO ssdao = getStudySubjectDAO();
 		if ("itemData".equalsIgnoreCase(note.getEntityType())) {
 			int itemDataId = note.getEntityId();
-			ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+			ItemDataDAO iddao = getItemDataDAO();
 			ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
-			ItemDAO idao = new ItemDAO(sm.getDataSource());
+			ItemDAO idao = getItemDAO();
 			if (StringUtil.isBlank(note.getEntityName())) {
 				ItemBean item = (ItemBean) idao.findByPK(itemData.getItemId());
 				note.setEntityName(item.getName());
 				request.setAttribute("item", item);
 			}
-			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-			StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+			EventCRFDAO ecdao = getEventCRFDAO();
+			StudyEventDAO svdao = getStudyEventDAO();
 
 			EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
 			StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
 
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
 					.findByPK(event.getStudyEventDefinitionId());
 			note.setEventName(sed.getName());
 			note.setEventStart(event.getDateStarted());
 
-			CRFDAO cdao = new CRFDAO(sm.getDataSource());
+			CRFDAO cdao = getCRFDAO();
 			CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
 			note.setCrfName(crf.getName());
 			note.setEventCRFId(ec.getId());
@@ -1072,19 +967,19 @@ public abstract class SecureController extends HttpServlet {
 
 		} else if ("eventCrf".equalsIgnoreCase(note.getEntityType())) {
 			int eventCRFId = note.getEntityId();
-			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-			StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+			EventCRFDAO ecdao = getEventCRFDAO();
+			StudyEventDAO svdao = getStudyEventDAO();
 
 			EventCRFBean ec = (EventCRFBean) ecdao.findByPK(eventCRFId);
 			StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
 
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
 					.findByPK(event.getStudyEventDefinitionId());
 			note.setEventName(sed.getName());
 			note.setEventStart(event.getDateStarted());
 
-			CRFDAO cdao = new CRFDAO(sm.getDataSource());
+			CRFDAO cdao = getCRFDAO();
 			CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
 			note.setCrfName(crf.getName());
 			StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
@@ -1093,10 +988,10 @@ public abstract class SecureController extends HttpServlet {
 
 		} else if ("studyEvent".equalsIgnoreCase(note.getEntityType())) {
 			int eventId = note.getEntityId();
-			StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+			StudyEventDAO svdao = getStudyEventDAO();
 			StudyEventBean event = (StudyEventBean) svdao.findByPK(eventId);
 
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
 					.findByPK(event.getStudyEventDefinitionId());
 			note.setEventName(sed.getName());
@@ -1112,30 +1007,32 @@ public abstract class SecureController extends HttpServlet {
 
 		} else if ("Subject".equalsIgnoreCase(note.getEntityType())) {
 			int subjectId = note.getEntityId();
-			StudySubjectBean ss = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
+			StudySubjectBean ss = ssdao.findBySubjectIdAndStudy(subjectId, getCurrentStudy(request));
 			note.setSubjectName(ss.getName());
 		}
 
 		return note;
 	}
 
-	public void checkRoleByUserAndStudy(UserAccountBean ub, int studyId, int siteId) {
+	public void checkRoleByUserAndStudy(HttpServletRequest request, HttpServletResponse response, UserAccountBean ub,
+			int studyId, int siteId) {
 		StudyUserRoleBean studyUserRole = ub.getRoleByStudy(studyId);
 		StudyUserRoleBean siteUserRole = new StudyUserRoleBean();
 		if (siteId != 0) {
 			siteUserRole = ub.getRoleByStudy(siteId);
 		}
 		if (studyUserRole.getRole().equals(Role.INVALID) && siteUserRole.getRole().equals(Role.INVALID)) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"));
-			forwardPage(Page.MENU_SERVLET);
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study") + " "
+							+ respage.getString("change_active_study_or_contact"), request);
+			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
 	}
 
 	/**
-	 * A inner class designed to allow the implementation of a JUnit test case for abstract SecureController. The inner
-	 * class allows the test case to call the outer class' private process() method.
+	 * A inner class designed to allow the implementation of a JUnit test case for abstract Controller. The inner class
+	 * allows the test case to call the outer class' private process() method.
 	 * 
 	 * @author Bruce W. Perry 01/2008
 	 * @see org.akaza.openclinica.servlettests.SecureControllerServletTest
@@ -1149,7 +1046,7 @@ public abstract class SecureController extends HttpServlet {
 
 		public void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
 				UnsupportedEncodingException {
-			SecureController.this.process(request, response);
+			Controller.this.process(request, response);
 		}
 	}
 
@@ -1190,9 +1087,5 @@ public abstract class SecureController extends HttpServlet {
 			request.setAttribute("isStartDateUsed", !NOT_USED.equals(config.getStartDateTimeRequired()));
 			request.setAttribute("startDateLabel", config.getStartDateTimeLabel());
 		}
-	}
-
-	public ConfigurationDao getConfigurationDao() {
-		return (ConfigurationDao) SpringServletAccess.getApplicationContext(context).getBean("configurationDao");
 	}
 }

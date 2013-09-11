@@ -20,23 +20,23 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.control.RememberLastPage;
-import org.akaza.openclinica.control.core.CoreSecureController;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.dynamicevent.*;
-import org.akaza.openclinica.dao.managestudy.*;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
-import java.util.Locale;
 import java.util.Date;
 import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Servlet for creating a table.
@@ -44,29 +44,17 @@ import java.util.HashMap;
  * @author Krikor Krumlian
  */
 @SuppressWarnings({ "rawtypes" })
+@Component
 public class ListStudySubjectsServlet extends RememberLastPage {
 
 	public static final String SAVED_SUBJECT_MATRIX_URL = "savedSubjectMatrixUrl";
 	private static final long serialVersionUID = 1L;
-	private StudyEventDefinitionDAO studyEventDefinitionDAO;
-	private SubjectDAO subjectDAO;
-	private StudySubjectDAO studySubjectDAO;
-	private StudyEventDAO studyEventDAO;
-	private StudyGroupClassDAO studyGroupClassDAO;
-	private SubjectGroupMapDAO subjectGroupMapDAO;
-	private StudyDAO studyDAO;
-	private EventCRFDAO eventCRFDAO;
-	private EventDefinitionCRFDAO eventDefintionCRFDAO;
-	private DiscrepancyNoteDAO discrepancyNoteDAO;
-	private StudyGroupDAO studyGroupDAO;
-	private DynamicEventDao dynamicEventDao;
-	private boolean showMoreLink;
-	Locale locale;
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -76,21 +64,31 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-		analyzeUrl();
-		CoreSecureController.removeLockedCRF(ub.getId());
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if (shouldRedirect(request, response)) {
+			return;
+		}
+
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		Controller.removeLockedCRF(ub.getId());
 		FormProcessor fp = new FormProcessor(request);
+
+		boolean showMoreLink;
 		if (fp.getString("showMoreLink").equals("")) {
 			showMoreLink = true;
 		} else {
 			showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
 		}
+
 		String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
 		// set up auto study subject id
 		if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
@@ -103,13 +101,13 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 
 		if (fp.getRequest().getParameter("subjectOverlay") == null) {
 			Date today = new Date(System.currentTimeMillis());
-			String todayFormatted = local_df.format(today);
+			String todayFormatted = getLocalDf(request).format(today);
 			if (request.getAttribute(PRESET_VALUES) != null) {
 				fp.setPresetValues((HashMap) request.getAttribute(PRESET_VALUES));
 			}
 			fp.addPresetValue(AddNewSubjectServlet.INPUT_ENROLLMENT_DATE, todayFormatted);
 			fp.addPresetValue(AddNewSubjectServlet.INPUT_EVENT_START_DATE, todayFormatted);
-			setPresetValues(fp.getPresetValues());
+			setPresetValues(fp.getPresetValues(), request);
 		}
 
 		request.setAttribute("closeInfoShowIcons", true);
@@ -119,20 +117,24 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 					fp.getString("findSubjects_f_studySubject.label"), currentStudy);
 			if (studySubject.getId() > 0) {
 				request.setAttribute("id", new Integer(studySubject.getId()).toString());
-				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 			} else {
-				createTable();
+				createTable(request, response, showMoreLink);
 			}
 		} else {
-			createTable();
+			createTable(request, response, showMoreLink);
 		}
 
 	}
 
-	private void createTable() throws Exception {
+	private void createTable(HttpServletRequest request, HttpServletResponse response, boolean showMoreLink)
+			throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(showMoreLink);
-		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
+		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDAO());
 		factory.setSubjectDAO(getSubjectDAO());
 		factory.setStudySubjectDAO(getStudySubjectDAO());
 		factory.setStudyEventDAO(getStudyEventDAO());
@@ -149,83 +151,18 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		factory.setDynamicEventDao(getDynamicEventDao());
 		String findSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("findSubjectsHtml", findSubjectsHtml);
-		request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
-		request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
-		
-		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
-		session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+		request.setAttribute("allDefsArray", getEventDefinitionsByCurrentStudy(request));
+		request.setAttribute("studyGroupClasses", getStudyGroupClassesByCurrentStudy(request));
 
-		analyzeForward(Page.LIST_STUDY_SUBJECTS);
+		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
+		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+
+		forward(Page.LIST_STUDY_SUBJECTS, request, response);
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
-	}
-
-	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-		studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource())
-				: studyEventDefinitionDAO;
-		return studyEventDefinitionDAO;
-	}
-
-	public SubjectDAO getSubjectDAO() {
-		subjectDAO = this.subjectDAO == null ? new SubjectDAO(sm.getDataSource()) : subjectDAO;
-		return subjectDAO;
-	}
-
-	public StudySubjectDAO getStudySubjectDAO() {
-		studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
-		return studySubjectDAO;
-	}
-
-	public StudyGroupClassDAO getStudyGroupClassDAO() {
-		studyGroupClassDAO = this.studyGroupClassDAO == null ? new StudyGroupClassDAO(sm.getDataSource())
-				: studyGroupClassDAO;
-		return studyGroupClassDAO;
-	}
-
-	public SubjectGroupMapDAO getSubjectGroupMapDAO() {
-		subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource())
-				: subjectGroupMapDAO;
-		return subjectGroupMapDAO;
-	}
-
-	public StudyEventDAO getStudyEventDAO() {
-		studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
-		return studyEventDAO;
-	}
-
-	public StudyDAO getStudyDAO() {
-		studyDAO = this.studyDAO == null ? new StudyDAO(sm.getDataSource()) : studyDAO;
-		return studyDAO;
-	}
-
-	public EventCRFDAO getEventCRFDAO() {
-		eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
-		return eventCRFDAO;
-	}
-
-	public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
-		eventDefintionCRFDAO = this.eventDefintionCRFDAO == null ? new EventDefinitionCRFDAO(sm.getDataSource())
-				: eventDefintionCRFDAO;
-		return eventDefintionCRFDAO;
-	}
-
-	public DiscrepancyNoteDAO getDiscrepancyNoteDAO() {
-		discrepancyNoteDAO = this.discrepancyNoteDAO == null ? new DiscrepancyNoteDAO(sm.getDataSource())
-				: discrepancyNoteDAO;
-		return discrepancyNoteDAO;
-	}
-
-	public StudyGroupDAO getStudyGroupDAO() {
-		studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
-		return studyGroupDAO;
-	}
-	
-	public DynamicEventDao getDynamicEventDao() {
-		dynamicEventDao = this.dynamicEventDao == null ? new DynamicEventDao(sm.getDataSource()) : dynamicEventDao;
-		return dynamicEventDao;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return ADMIN_SERVLET_CODE;
 	}
 
 	@Override
@@ -234,7 +171,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getDefaultUrl() {
+	protected String getDefaultUrl(HttpServletRequest request) {
+		boolean showMoreLink;
 		FormProcessor fp = new FormProcessor(request);
 		if (fp.getString("showMoreLink").equals("")) {
 			showMoreLink = true;
@@ -253,7 +191,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected boolean userDoesNotUseJmesaTableForNavigation() {
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&findSubjects_p_=");
 	}
+
 }
