@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -71,7 +70,6 @@ public class RuleSetServiceTest extends DefaultAppContextTest {
 	}
 
 	private void parseFile(String fileName) throws Exception {
-		Locale locale = new Locale("EN");
 		container = new ODMContainer();
 		stream = this.getClass().getClassLoader().getResourceAsStream("com/clinovo/" + fileName);
 		JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);

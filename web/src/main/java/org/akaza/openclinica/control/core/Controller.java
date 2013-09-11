@@ -304,7 +304,7 @@ public abstract class Controller extends BaseController {
 		respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
-		HashMap errors = getErrorsHolder(request);
+		getErrorsHolder(request);
 
 		try {
 			String userName = request.getRemoteUser();
@@ -713,7 +713,6 @@ public abstract class Controller extends BaseController {
 	}
 
 	public ArrayList getEventDefinitionsByCurrentStudy(HttpServletRequest request) {
-		SessionManager sm = getSessionManager(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyDAO studyDAO = getStudyDAO();
 		StudyEventDefinitionDAO studyEventDefinitionDAO = getStudyEventDefinitionDAO();
@@ -730,7 +729,7 @@ public abstract class Controller extends BaseController {
 	}
 
 	public ArrayList getStudyGroupClassesByCurrentStudy(HttpServletRequest request) {
-		SessionManager sm = getSessionManager(request);
+		getSessionManager(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyDAO studyDAO = getStudyDAO();
 		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
@@ -756,7 +755,7 @@ public abstract class Controller extends BaseController {
 	}
 
 	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(HttpServletRequest request, int studyId) {
-		SessionManager sm = getSessionManager(request);
+		
 		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
 		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
 		ArrayList<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO
@@ -926,7 +925,7 @@ public abstract class Controller extends BaseController {
 	}
 
 	public DiscrepancyNoteBean getNoteInfo(HttpServletRequest request, DiscrepancyNoteBean note) {
-		SessionManager sm = getSessionManager(request);
+		
 		StudySubjectDAO ssdao = getStudySubjectDAO();
 		if ("itemData".equalsIgnoreCase(note.getEntityType())) {
 			int itemDataId = note.getEntityId();

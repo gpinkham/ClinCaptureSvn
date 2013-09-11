@@ -174,6 +174,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return (SessionManager) request.getAttribute(SESSION_MANAGER);
 	}
 
+	@SuppressWarnings("rawtypes")
 	public HashMap getErrorsHolder(HttpServletRequest request) {
 		HashMap errors = (HashMap) request.getAttribute(ERRORS_HOLDER);
 		if (errors == null) {
@@ -269,6 +270,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return ruleSetAuditDao;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public ItemGroupDAO getItemGroupDAO() {
 		return new ItemGroupDAO(getDataSource());
 	}
@@ -297,6 +299,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new SubjectDAO(getDataSource());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public StudySubjectDAO getStudySubjectDAO() {
 		return new StudySubjectDAO(getDataSource());
 	}
@@ -313,10 +316,12 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new StudyEventDAO(getDataSource());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public StudyDAO getStudyDAO() {
 		return new StudyDAO(getDataSource());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public EventCRFDAO getEventCRFDAO() {
 		return new EventCRFDAO(getDataSource());
 	}
@@ -333,10 +338,12 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new StudyGroupDAO(getDataSource());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public DynamicEventDao getDynamicEventDao() {
 		return new DynamicEventDao(getDataSource());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public StudyEventDefinitionDAO getStudyEventDefinitionDAO() {
 		return new StudyEventDefinitionDAO(getDataSource());
 	}
@@ -349,10 +356,12 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new StudyParameterValueDAO(getDataSource());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public CRFVersionDAO getCRFVersionDAO() {
 		return new CRFVersionDAO(getDataSource());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public CRFDAO getCRFDAO() {
 		return new CRFDAO(getDataSource());
 	}
@@ -369,10 +378,12 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new ItemDataDAO(getDataSource());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public ItemDAO getItemDAO() {
 		return new ItemDAO(getDataSource());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public ItemFormMetadataDAO getItemFormMetadataDAO() {
 		return new ItemFormMetadataDAO(getDataSource());
 	}
@@ -393,6 +404,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new AuditEventDAO(getDataSource());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public ItemGroupMetadataDAO getItemGroupMetadataDAO() {
 		return new ItemGroupMetadataDAO(getDataSource());
 	}
