@@ -116,16 +116,20 @@ public class UrlRewriteServlet extends CoreSecureController {
 					}
 					if (null != ocResource.getStudyEventId()) {
 						request.setAttribute("eventId", ocResource.getStudyEventId().toString());
+						request.setAttribute("exitTo", "EnterDataForStudyEvent?eventId=" + ocResource.getStudyEventId());
 					}
 					if (null != ocResource.getStudySubjectID()) {
 						request.setAttribute("studySubjectId", ocResource.getStudySubjectID().toString());
+						if (request.getAttribute("exitTo") == null) {
+							request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());
+						}
 					}
 					if ((null != mapQueryParams) && (mapQueryParams.size() != 0)) {
 						if (mapQueryParams.containsKey("tabId")) {
 							request.setAttribute("tabId", mapQueryParams.get("tabId"));
 						}
 						if ((null != ocResource.getStudySubjectID()) && (mapQueryParams.containsKey("exitTo"))) {
-							request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());
+							//request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());
 						}
 						SectionDAO sdao = new SectionDAO(getDataSource());
 						if (mapQueryParams.containsKey("tabId")) {
@@ -141,7 +145,6 @@ public class UrlRewriteServlet extends CoreSecureController {
 
 						}
 					}
-
 					forwardPage(Page.VIEW_SECTION_DATA_ENTRY_SERVLET_REST_URL, request, response);
 				}
 			}

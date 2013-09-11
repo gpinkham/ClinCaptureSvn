@@ -263,6 +263,11 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
 		<%-- <input type="button" onclick="window.location.href='${viewSectionDataEntryReferer}';" title="<fmt:message key="exit_to_subject_matrix" bundle="${resword}"/>" value="<fmt:message key="exit" bundle="${resword}"/>" class="button"/> --%>
 
 		<c:choose>
+            <c:when test="${exitTo ne null and !empty exitTo}">
+                <input type="button" onclick="window.location.href='${exitTo}';"
+                       value="<fmt:message key="exit" bundle="${resword}"/>"
+                       class="button" />
+            </c:when>
 			<c:when test="${justCloseWindow}">
 				<input type="button" onclick="window.close();"
 					value="<fmt:message key="exit" bundle="${resword}"/>"

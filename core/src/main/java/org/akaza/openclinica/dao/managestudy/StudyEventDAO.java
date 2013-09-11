@@ -1100,7 +1100,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.INT);
-		this.setTypeExpected(2, TypeNames.INT);
+		this.setTypeExpected(3, TypeNames.INT);
 
 		HashMap variables = new HashMap();
 		variables.put(1, Integer.valueOf(sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId()));

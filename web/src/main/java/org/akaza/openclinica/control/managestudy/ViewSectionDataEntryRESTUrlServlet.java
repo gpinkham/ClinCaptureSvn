@@ -70,9 +70,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 		boolean isSubmitted = false;
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-		if (!fp.getString("exitTo").equals("")) {
-			request.setAttribute("exitTo", request.getContextPath() + "/" + fp.getString("exitTo"));
-
+		if (!fp.getString("exitTo", true).equals("")) {
+			request.setAttribute("exitTo", request.getContextPath() + "/" + fp.getString("exitTo", true));
 		}
 		int crfVersionId = fp.getInt("crfVersionId", true);
 
