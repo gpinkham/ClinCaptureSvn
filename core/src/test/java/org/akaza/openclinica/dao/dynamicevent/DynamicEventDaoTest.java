@@ -13,11 +13,9 @@
 package org.akaza.openclinica.dao.dynamicevent;
 
 import org.akaza.openclinica.DefaultAppContextTest;
-import org.akaza.openclinica.bean.core.DnDescription;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
-import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings({"deprecation"})

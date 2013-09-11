@@ -65,6 +65,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
 
+@SuppressWarnings("serial")
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
 
 	public static final String STUDY = "study";

@@ -5,7 +5,6 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 
