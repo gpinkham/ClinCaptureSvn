@@ -160,17 +160,6 @@
 		<sql>SELECT * FROM STUDY WHERE study_id=? or parent_study_id=? order by study_id asc</sql>
 	</query>
     <query>
-        <name>countLockedByEvents</name>
-        <sql>
-            select count(se.study_event_id)
-            from study_event se
-            join study_event_definition sed on sed.study_event_definition_id = se.study_event_definition_id
-            join study s on s.parent_study_id = sed.study_id
-            join study_subject ss on ss.study_subject_id = se.study_subject_id and ss.study_id = s.study_id
-            where s.study_id=? and was_locked_by=true;
-        </sql>
-    </query>
-    <query>
         <name>countLockedEvents</name>
         <sql>
             select count(se.study_event_id)
@@ -195,14 +184,14 @@
     <query>
         <name>analyzeEvents</name>
         <sql>
-            select s.study_id as studyId, count(se1.study_event_id) as countEvents, count(se2.study_event_id) as countLockedEvents, count(se3.study_event_id) as countLockedByEvents
+            select s.study_id as studyId, count(se1.study_event_id) as countEvents, count(se2.study_event_id) as countLockedEvents
             from study s
             join study_event_definition sed on sed.study_id = s.parent_study_id
-            join study_subject ss on  ss.study_id = s.study_id
+            join study_subject ss on ss.study_id = s.study_id
+            join subject sbj on sbj.subject_id = ss.subject_id
             left join study_event se1 on se1.study_subject_id = ss.study_subject_id and se1.study_event_definition_id = sed.study_event_definition_id
             left join study_event se2 on se2.study_subject_id = ss.study_subject_id and se2.study_event_definition_id = sed.study_event_definition_id and se2.subject_event_status_id = 7
-            left join study_event se3 on se3.study_subject_id = ss.study_subject_id and se3.study_event_definition_id = sed.study_event_definition_id and se3.was_locked_by = true
-            where s.study_id in (?)
+            where s.study_id in (?) and sbj.status_id = 1
             group by studyId;
         </sql>
     </query>

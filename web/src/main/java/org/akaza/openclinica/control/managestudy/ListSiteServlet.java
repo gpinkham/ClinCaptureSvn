@@ -86,12 +86,10 @@ public class ListSiteServlet extends RememberLastPage {
 				Map<String, Integer> map = infoMap.get(sb.getId());
 				int countEvents = map.get("countEvents");
 				if (countEvents > 0) {
-					boolean hasLockedBy = map.get("countLockedByEvents") > 0;
 					int countLockedEvents = map.get("countLockedEvents");
-					boolean allLocked = countEvents == countLockedEvents;
-					if (allLocked && hasLockedBy) {
+					if (countEvents == countLockedEvents) {
 						sb.setShowUnlockEventsButton(true);
-					} else if (!allLocked) {
+					} else {
 						sb.setShowLockEventsButton(true);
 					}
 				}

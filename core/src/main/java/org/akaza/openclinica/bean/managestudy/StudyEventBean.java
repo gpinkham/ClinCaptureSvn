@@ -73,8 +73,6 @@ public class StudyEventBean extends AuditableEntityBean {
 	private boolean startTimeFlag = false;
 	private boolean endTimeFlag = false;
 
-	private int dynamicEventId;
-	
 	private int referenceVisitId;
 	
 	public int getReferenceVisitId() {
@@ -83,18 +81,6 @@ public class StudyEventBean extends AuditableEntityBean {
 	
 	public void setReferenceVisitId(int referenceVisitId) {
 		this.referenceVisitId = referenceVisitId;
-	}
-
-	public int getDynamicEventId() {
-		return dynamicEventId;
-	}
-
-	public void setDynamicEventId(int dynamicEventId) {
-		this.dynamicEventId = dynamicEventId;
-	}
-
-	public boolean isDynamic() {
-		return dynamicEventId > 0;
 	}
 
 	// For display discrepancy notes in a matrix-type study/event grid; 5/2/2008

@@ -862,24 +862,6 @@ public class StudyDAO<K, V> extends AuditableEntityDAO implements IStudyDAO {
 		return sb;
 	}
 
-	public int countLockedByEvents(int studyId) {
-		int result = 0;
-
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), studyId);
-		String sql = digester.getQuery("countLockedByEvents");
-
-		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
-
-		if (it.hasNext()) {
-			result = (Integer) ((HashMap) it.next()).get("count");
-		}
-		return result;
-	}
-
 	public int countLockedEvents(int studyId) {
 		int result = 0;
 
@@ -928,7 +910,6 @@ public class StudyDAO<K, V> extends AuditableEntityDAO implements IStudyDAO {
 			Map<String, Integer> map = new HashMap<String, Integer>();
 			map.put("countEvents", 0);
 			map.put("countLockedEvents", 0);
-			map.put("countLockedByEvents", 0);
 			infoMap.put(sb.getId(), map);
 			tmp += (tmp.isEmpty() ? "" : ", ") + sb.getId();
 		}
@@ -952,7 +933,6 @@ public class StudyDAO<K, V> extends AuditableEntityDAO implements IStudyDAO {
 					Map<String, Integer> map = infoMap.get(rs.getInt("studyId"));
 					map.put("countEvents", rs.getInt("countEvents"));
 					map.put("countLockedEvents", rs.getInt("countLockedEvents"));
-					map.put("countLockedByEvents", rs.getInt("countLockedByEvents"));
 				}
 				if (logger.isInfoEnabled()) {
 					logger.info("Executing dynamic query, StudyDAO.analyzeEvents:query " + sql);

@@ -109,8 +109,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(14, TypeNames.BOOL); // start_time_flag
 		this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
 		this.setTypeExpected(16, TypeNames.INT); // prev_status
-		this.setTypeExpected(17, TypeNames.INT); // dynamic_event_id
-		this.setTypeExpected(18, TypeNames.INT); //reference_visit_id
+		this.setTypeExpected(17, TypeNames.INT); //reference_visit_id
 	}
 
 	public void setTypesExpected(boolean withSubject) {
@@ -139,10 +138,9 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
 
 		this.setTypeExpected(16, TypeNames.INT); // prev_status
-		this.setTypeExpected(17, TypeNames.INT); // dynamic_event_id
-		this.setTypeExpected(18, TypeNames.INT); //reference_visit_id
+		this.setTypeExpected(17, TypeNames.INT); //reference_visit_id
 		if (withSubject) {
-			this.setTypeExpected(19, TypeNames.STRING);
+			this.setTypeExpected(18, TypeNames.STRING);
 		}
 	}
 
@@ -188,9 +186,6 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		Integer prevSubjectEventStatus = (Integer) hm.get("prev_subject_event_status");
 		eb.setPrevSubjectEventStatus(SubjectEventStatus.getByCode(prevSubjectEventStatus));
-
-		Integer dynamicEventId = (Integer) hm.get("dynamic_event_id");
-		eb.setDynamicEventId(dynamicEventId);
 		
 		Integer referenceVisitId = (Integer) hm.get("reference_visit_id");
 		eb.setReferenceVisitId(referenceVisitId);
@@ -225,9 +220,6 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		Integer prevSubjectEventStatus = (Integer) hm.get("prev_subject_event_status");
 		eb.setPrevSubjectEventStatus(SubjectEventStatus.getByCode(prevSubjectEventStatus));
 
-		Integer dynamicEventId = (Integer) hm.get("dynamic_event_id");
-		eb.setDynamicEventId(dynamicEventId);
-		
 		eb.setReferenceVisitId((Integer) hm.get("reference_visit_id"));
 		
 		if (withSubject) {
@@ -579,9 +571,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		variables.put(Integer.valueOf(12), sb.getEndTimeFlag()); // YW
 		// end_time_flag
 		variables.put(Integer.valueOf(13), Integer.valueOf(sb.getPrevSubjectEventStatus().getId()));
-		variables.put(Integer.valueOf(14), Integer.valueOf(sb.getDynamicEventId()));
-		variables.put(Integer.valueOf(15), sb.getReferenceVisitId());
-		variables.put(Integer.valueOf(16), Integer.valueOf(sb.getId()));
+		variables.put(Integer.valueOf(14), sb.getReferenceVisitId());
+		variables.put(Integer.valueOf(15), Integer.valueOf(sb.getId()));
 
 		String sql = digester.getQuery("update");
 
