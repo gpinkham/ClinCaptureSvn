@@ -57,6 +57,7 @@ public class DeleteCRFVersionServlet extends SecureController {
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, "not admin", "1");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void processRequest() throws Exception {
 		FormProcessor fp = new FormProcessor(request);

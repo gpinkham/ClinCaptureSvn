@@ -73,6 +73,7 @@ public class RemoveCRFServlet extends SecureController {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void processRequest() throws Exception {
 

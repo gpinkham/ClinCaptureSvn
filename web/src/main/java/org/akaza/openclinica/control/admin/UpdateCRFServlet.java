@@ -168,6 +168,7 @@ public class UpdateCRFServlet extends SecureController {
 	 * Inserts the new study into database
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	private void submitCRF() throws Exception {
 		CRFDAO cdao = new CRFDAO(sm.getDataSource());
 		CRFBean crf = (CRFBean) session.getAttribute(CRF);

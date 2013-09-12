@@ -62,6 +62,7 @@ public class RestoreCRFVersionServlet extends SecureController {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void processRequest() throws Exception {
 
