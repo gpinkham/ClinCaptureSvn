@@ -143,6 +143,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 
+        request.setAttribute("expandCrfInfo", false);
+
 		String cw = request.getParameter("cw");
 		if (cw != null) {
 			request.setAttribute(JUST_CLOSE_WINDOW, true);

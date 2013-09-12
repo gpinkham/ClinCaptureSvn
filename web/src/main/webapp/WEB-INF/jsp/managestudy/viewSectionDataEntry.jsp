@@ -66,7 +66,6 @@
 			src="<c:out value="${contextPath}" />/includes/global_functions_javascript.js"></script>
 		<script type="text/JavaScript" language="JavaScript"
 			src="<c:out value="${contextPath}" />/includes/Tabs.js"></script>
-		<!-- <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script> -->
 		<script type="text/javascript" language="JavaScript"
 			src="<c:out value="${contextPath}" />/includes/repetition-model/repetition-model.js"></script>
 		<script type="text/JavaScript" language="JavaScript"
@@ -96,24 +95,20 @@
 		</c:if>
 </head>
 <body class="aka_bodywidth"
-	onload="
-        <c:if test='${popUpURL != ""}'>
-        openDNoteWindow('<c:out value="${popUpURL}" />');">
-	</c:if>
+	onload="<c:if test='${popUpURL != ""}'>
+            openDNoteWindow('<c:out value="${popUpURL}" />');
+	        </c:if>">
 	
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-	<script language="JavaScript" type="text/javascript">
+<script language="JavaScript" type="text/javascript">
 		jQuery(document).ready(function() {
             jQuery("table > tbody  tr").attr("repeat", "0");
             jQuery("table > tbody  button").attr("disabled", "true");
-			jQuery("table > tbody  input").attr("disabled", "disabled");   	
-			jQuery("table > tbody a").removeAttr("onmouseover"); 
-			//next code disable Disc Note flags 
-			//jQuery("table > tbody .tablebox_center a").removeAttr("onclick"); 
-			//jQuery("table > tbody .tablebox_center a").removeAttr("href");
-			jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
-			jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
-			jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
+            jQuery("table > tbody  input").attr("disabled", "disabled");
+            jQuery("table > tbody a").removeAttr("onmouseover");
+            jQuery("table > tbody .tablebox_center select").attr("disabled", "disabled");
+            jQuery("table > tbody .tablebox_center textarea").attr("disabled", "disabled");
+            jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
 		});
 </script>
 	<div id="centralContainer"
@@ -195,15 +190,6 @@
 			</tr>
 		</table>
 
-
-
-		<%--<c:if test="${tabId == null || tabId == 0 || fn:length(tabId) < 1}">
-    <c:set var="tabId" value="1" />
-</c:if>
-<c:if test="${! (param.tab == 0 || fn:length(param.tab) < 1)}">
-    <c:set var="tabId" value="${param.tab}" />
-</c:if>--%>
-
 		<form id="mainForm" name="crfForm" method="post"
 			action="ViewSectionDataEntry">
 			<input type="hidden" name="action" value="saveNotes" /> <input
@@ -217,8 +203,9 @@
 				name="eventDefinitionCRFId"
 				value="<c:out value="${eventDefinitionCRFId}"/>" />
 		</form>
-		<script type="text/javascript" language="JavaScript">
-    // <![CDATA[
+
+<script type="text/javascript" language="JavaScript">
+
     function getSib(theSibling) {
         var sib;
         do {
@@ -231,18 +218,9 @@
         return sib;
     }
 
-
-
-    // ]]>
 </script>
 
 		<c:import url="../submit/interviewer.jsp" />
-		<%-- <c:param var="fromPage" value="vsde"/>
-</c:import> --%>
-		<!--<br><br>-->
-		<%-- provide links from viewsectiondata page
-http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId=3
- http://svn.akazaresearch.com:8080/OpenClinica-2.2/ViewCRF?module=&crfId=40 [^]--%>
 
 		<c:set var="eventId" value="${eventId}" />
 		<c:set var="studySubjectId" value="${studySubjectId}" />
@@ -252,15 +230,6 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
 		<p>
 			<fmt:message key="enter_note_for_item" bundle="${restext}" />
 		</p>
-		<%-- <form id="mainForm" name="crfForm" method="post" action="DeleteVariables">
-
-	<input type="submit" onclick="javascript: history.go(-${skipedPages});" value="<fmt:message "exit" bundle="${resword}"/>" class="button"/>
-</form>--%>
-		<%--c:set var="backUrl" value="window.location.href='EnterDataForStudyEvent?eventId=${eventId}';"/>
-    <c:if test="${empty eventId}">
-        <c:set var="backUrl" value="window.location.href='${viewSectionDataEntryReferer}';"/>
-    </c:if--%>
-		<%-- <input type="button" onclick="window.location.href='${viewSectionDataEntryReferer}';" title="<fmt:message key="exit_to_subject_matrix" bundle="${resword}"/>" value="<fmt:message key="exit" bundle="${resword}"/>" class="button"/> --%>
 
 		<c:choose>
             <c:when test="${exitTo ne null and !empty exitTo}">
@@ -285,25 +254,12 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
 		<br /> <br> <c:set var="sectionNum" value="0" /> <c:forEach
 				var="section" items="${toc.sections}">
 				<c:set var="sectionNum" value="${sectionNum+1}" />
-			</c:forEach> <%-- removed, tbh 102007 --%> <%--
- <br />
-<div class="homebox_bullets">
-  <a href="ViewCRFVersion?id=<c:out value="${section.crfVersion.id}"/>"><fmt:message key="view_CRF_version_metadata" bundle="${resworkflow}"/></a></div>
-<br />
-  <div class="homebox_bullets"><a href="ViewCRF?crfId=<c:out value="${section.crf.id}"/>">View CRF Details</a></div>
-<br />
-			<div class="homebox_bullets"><a href="ListCRF">Go Back to CRF List</a></div>
-<br />
---%> <!-- section tabs here -->
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<%--<td align="right" valign="middle" style="padding-left: 12px; display: none" id="TabsBack">--%>
-					<%--<a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0" style="margin-top:10px"></a></td>--%>
-					<%--<td align="right" style="padding-left: 12px" id="TabsBackDis">--%>
-					<%--<img src="<c:out value="${contextPath}" />/images/arrow_back_dis.gif" border="0"/></td>--%>
+			</c:forEach> <%-- removed, tbh 102007 --%>
+<!-- section tabs here -->
+<table border="0" cellpadding="0" cellspacing="0">
+<tr>
 
-
-					<script type="text/JavaScript" language="JavaScript">
+<script type="text/JavaScript" language="JavaScript">
 
     // Total number of tabs (one for each CRF)
     var TabsNumber = <c:out value="${sectionNum}"/>;
@@ -313,7 +269,6 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
 
     // Number of tabs to display at a time  o
     var TabsShown = TabsNumber; /* was 3; */
-
 
     // Labels to display on each tab (name of CRF)
     var TabLabel = new Array(TabsNumber)
@@ -358,8 +313,6 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
     <c:set var="count" value="${count+1}"/>
     </c:forEach>
     DisplaySectionTabs();
-
-    //selectTabs(${tabId},${sectionNum},'crfHeaderTabs');
 
     function DisplaySectionTabs() {
         TabID = 1;
@@ -430,53 +383,16 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
         }
     }
 
-    /*
-function checkDataStatus() {
-
- objImage=document.getElementById('status_top');
- if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-   return confirm('<fmt:message key="you_have_unsaved_data" bundle="${resword}"/>');
-    }
-
-    return true;
-  }*/
     function gotoLink() {
         var OptionIndex = document.crfForm.sectionSelect.selectedIndex;
         window.location = document.crfForm.sectionSelect.options[OptionIndex].value;
     }
 </script>
-					<%--
-<td align="right" id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
-<td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="<c:out value="${contextPath}" />/images/arrow_next.gif" border="0" style=
-  "margin-top:10px;margin-right:6px"/></a></td>
-<td>&nbsp;
-    <div class="formfieldM_BG_noMargin">
-        <select class="formfieldM" name="sectionSelect" size="1" onchange="gotoLink();">
-            <c:set var="tabCount" value="1"/>
-            <option selected>-- <fmt:message key="select_to_jump" bundle="${resword}"/> --</option>
-            <c:forEach var="sec" items="${toc.sections}">
-                <c:choose>
-                    <c:when test="${studySubject != null && studySubject.id>0}">
-                        <c:set var="tabUrl"
-                               value="ViewSectionDataEntry?ecId=${EventCRFBean.id}&crfVersionId=${section.crfVersion.id}&sectionId=${sec.id}&tabId=${tabCount}&studySubjectId=${studySubjectId}&eventDefinitionCRFId=${eventDefinitionCRFId}"/>
-                    </c:when>
-                    <c:otherwise>
-                        <c:set var="tabUrl"
-                               value="ViewSectionDataEntry?crfVersionId=${section.crfVersion.id}&sectionId=${sec.id}&ecId=${EventCRFBean.id}&tabId=${tabCount}&eventDefinitionCRFId=${eventDefinitionCRFId}"/>
-                    </c:otherwise>
-                </c:choose>
-                <option value="<c:out value="${tabUrl}"/>"><c:out value="${sec.name}"/></option>
-                <c:set var="tabCount" value="${tabCount+1}"/>
-            </c:forEach>
-        </select>
-    </div>
-</td>
---%>
+
 				</tr>
 			</table> <script type="text/javascript" language="JavaScript">    function checkSectionStatus() {
 
         objImage = document.getElementById('status_top');
-    //alert(objImage.src);
         if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif') > 0) {
             return confirm('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');
         }
@@ -487,7 +403,6 @@ function checkDataStatus() {
 
     function checkEntryStatus(strImageName) {
         objImage = MM_findObj(strImageName);
-    //alert(objImage.src);
         if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif') > 0) {
             return confirm('<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>');
         }
@@ -554,7 +469,6 @@ function checkDataStatus() {
 																			<%--  BWP: corrected "column span="2" "--%>
 																			<c:if test="${displayItem.pageNumberLabel != ''}">
 																				<tr class="aka_stripes">
-																					<%--  <td class="aka_header_border" colspan="2">width="100%"--%>
 																					<td class="aka_header_border" colspan="2">
 																						<table border="0" cellpadding="0" cellspacing="0"
 																							style="margin-bottom: 6px;">
@@ -658,9 +572,8 @@ function checkDataStatus() {
 																						</c:if> <c:set var="repeatMax"
 																							value="${displayItem.itemGroup.groupMetaBean.repeatMax}" />
 																						<c:set var="totalColsPlusSubcols" value="0" /> <c:set
-																							var="questionNumber" value="" /> <%--the itemgroups include a group for orphaned items, in the order they should appear,
-but the custom tag uses that, not this jstl code--%> <c:if
-																							test="${! (repeatParentId eq 'Ungrouped')}">
+																							var="questionNumber" value="" /> <%--the itemgroups include a group for orphaned items, in the order they should appear, but the custom tag uses that, not this jstl code--%>
+                                                                                        <c:if test="${! (repeatParentId eq 'Ungrouped')}">
 																							<%-- implement group header--%>
 																							<c:if
 																								test="${! (displayItem.itemGroup.groupMetaBean.header eq '')}">
@@ -681,13 +594,11 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																											items="${displayItem.itemGroup.items}">
 																											<c:set var="questionNumber"
 																												value="${thItem.metadata.questionNumberLabel}" />
-																											<%-- We have to add a second row of headers if the response_layout property is
-     horizontal for checkboxes. --%>
+																											<%-- We have to add a second row of headers if the response_layout property is horizontal for checkboxes. --%>
 																											<c:set var="isHorizontalCellLevel"
 																												scope="request" value="${false}" />
 																											<c:if
-																												test="${thItem.metadata.responseLayout eq 'horizontal' ||
-      thItem.metadata.responseLayout eq 'Horizontal'}">
+																												test="${thItem.metadata.responseLayout eq 'horizontal' || thItem.metadata.responseLayout eq 'Horizontal'}">
 																												<c:set var="isHorizontal" scope="request"
 																													value="${true}" />
 																												<c:set var="isHorizontalCellLevel"
@@ -701,9 +612,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																											</c:if>
 																											<c:choose>
 																												<c:when
-																													test="${isHorizontalCellLevel && sectionBorders == 1 &&
-        (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
-              thItem.metadata.responseSet.responseType.name eq 'radio')}">
+																													test="${isHorizontalCellLevel && sectionBorders == 1 && (thItem.metadata.responseSet.responseType.name eq 'checkbox' || thItem.metadata.responseSet.responseType.name eq 'radio')}">
 																													<th
 																														colspan="<c:out value='${optionsLen}'/>"
 																														class="aka_headerBackground aka_padding_large aka_cellBorders_dark">
@@ -712,9 +621,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																															value="${totalColsPlusSubcols + optionsLen}" />
 																												</c:when>
 																												<c:when
-																													test="${isHorizontalCellLevel &&
-        (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
-              thItem.metadata.responseSet.responseType.name eq 'radio')}">
+																													test="${isHorizontalCellLevel && (thItem.metadata.responseSet.responseType.name eq 'checkbox' || thItem.metadata.responseSet.responseType.name eq 'radio')}">
 																													<th
 																														colspan="<c:out value='${optionsLen}'/>"
 																														class="aka_headerBackground aka_padding_large aka_cellBorders">
@@ -784,16 +691,13 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																												<c:set var="isHorizontalCellLevel"
 																													scope="request" value="${false}" />
 																												<c:if
-																													test="${thItem.metadata.responseLayout eq 'horizontal' ||
-      thItem.metadata.responseLayout eq 'Horizontal'}">
+																													test="${thItem.metadata.responseLayout eq 'horizontal' || thItem.metadata.responseLayout eq 'Horizontal'}">
 																													<c:set var="isHorizontalCellLevel"
 																														scope="request" value="${true}" />
 																												</c:if>
 																												<c:choose>
 																													<c:when
-																														test="${isHorizontalCellLevel && sectionBorders == 1 &&
-                    (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
-              thItem.metadata.responseSet.responseType.name eq 'radio')}">
+																														test="${isHorizontalCellLevel && sectionBorders == 1 && (thItem.metadata.responseSet.responseType.name eq 'checkbox' || thItem.metadata.responseSet.responseType.name eq 'radio')}">
 																														<c:forEach var="respOpt"
 																															items="${thItem.metadata.responseSet.options}">
 																															<th
@@ -803,9 +707,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																														</c:forEach>
 																													</c:when>
 																													<c:when
-																														test="${isHorizontalCellLevel &&
-                    (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
-              thItem.metadata.responseSet.responseType.name eq 'radio')}">
+																														test="${isHorizontalCellLevel && (thItem.metadata.responseSet.responseType.name eq 'checkbox' || thItem.metadata.responseSet.responseType.name eq 'radio')}">
 																														<c:forEach var="respOpt"
 																															items="${thItem.metadata.responseSet.options}">
 																															<th
@@ -863,15 +765,13 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																														<c:set var="isHorizontalCellLevel"
 																															scope="request" value="${false}" />
 																														<c:if
-																															test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
-      bodyItem.metadata.responseLayout eq 'Horizontal'}">
+																															test="${bodyItem.metadata.responseLayout eq 'horizontal' || bodyItem.metadata.responseLayout eq 'Horizontal'}">
 																															<c:set var="isHorizontalCellLevel"
 																																scope="request" value="${true}" />
 																														</c:if>
 																														<c:choose>
 																															<c:when
-																																test="${isHorizontalCellLevel && sectionBorders == 1 && (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
-           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
+																																test="${isHorizontalCellLevel && sectionBorders == 1 && (bodyItem.metadata.responseSet.responseType.name eq 'radio' || bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
 																																<%-- For horizontal checkboxes, radio buttons--%>
 																																<c:forEach var="respOption"
 																																	items="${bodyItem.metadata.responseSet.options}">
@@ -906,9 +806,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																																</c:forEach>
 																															</c:when>
 																															<c:when
-																																test="${isHorizontalCellLevel &&
-                (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
-           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
+																																test="${isHorizontalCellLevel && (bodyItem.metadata.responseSet.responseType.name eq 'radio' || bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
 																																<%-- For horizontal checkboxes, radio buttons--%>
 																																<c:forEach var="respOption"
 																																	items="${bodyItem.metadata.responseSet.options}">
@@ -1038,16 +936,13 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																													<c:set var="isHorizontalCellLevel"
 																														scope="request" value="${false}" />
 																													<c:if
-																														test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
-      bodyItem.metadata.responseLayout eq 'Horizontal'}">
+																														test="${bodyItem.metadata.responseLayout eq 'horizontal' || bodyItem.metadata.responseLayout eq 'Horizontal'}">
 																														<c:set var="isHorizontalCellLevel"
 																															scope="request" value="${true}" />
 																													</c:if>
 																													<c:choose>
 																														<c:when
-																															test="${isHorizontalCellLevel &&
-            sectionBorders == 1 && (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
-           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
+																															test="${isHorizontalCellLevel && sectionBorders == 1 && (bodyItem.metadata.responseSet.responseType.name eq 'radio' || bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
 																															<%-- For horizontal checkboxes, radio buttons--%>
 																															<c:forEach var="respOption"
 																																items="${bodyItem.metadata.responseSet.options}">
@@ -1082,9 +977,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																															</c:forEach>
 																														</c:when>
 																														<c:when
-																															test="${isHorizontalCellLevel &&
-           (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
-           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
+																															test="${isHorizontalCellLevel && (bodyItem.metadata.responseSet.responseType.name eq 'radio' || bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
 																															<%-- For horizontal checkboxes, radio buttons--%>
 																															<c:forEach var="respOption"
 																																items="${bodyItem.metadata.responseSet.options}">
@@ -1177,8 +1070,8 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																														<c:when test="${sectionBorders == 1}">
 																															<td
 																																class="aka_padding_norm aka_cellBorders_dark">
-																																<%-- check for manual in the input name; if rowCount > 0 then manual
-                   will be in the name --%> <c:choose>
+																																<%-- check for manual in the input name; if rowCount > 0 then manual will be in the name --%>
+                                                                                                                                <c:choose>
 																																	<c:when test="${uniqueId ==0}">
 																																		<input type="hidden"
 																																			name="<c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>.newRow"
@@ -1198,8 +1091,8 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																														<c:otherwise>
 																															<td
 																																class="aka_padding_norm aka_cellBorders">
-																																<%-- check for manual in the input name; if rowCount > 0 then manual
-                   will be in the name --%> <c:choose>
+																																<%-- check for manual in the input name; if rowCount > 0 then manual will be in the name --%>
+                                                                                                                                <c:choose>
 																																	<c:when test="${uniqueId ==0}">
 																																		<input type="hidden"
 																																			name="<c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>.newRow"
@@ -1229,8 +1122,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 																										<tr>
 																											<c:choose>
 																												<c:when test="${sectionBorders == 1}">
-																													<%-- Add 1 to the totalColsPlusSubcols variable to accomodate the cell
-                    containing the remove button--%>
+																													<%-- Add 1 to the totalColsPlusSubcols variable to accomodate the cell containing the remove button--%>
 																													<td
 																														class="aka_padding_norm aka_cellBorders_dark"
 																														colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
@@ -1292,7 +1184,6 @@ but the custom tag uses that, not this jstl code--%> <c:if
 				<c:set var="numOfTr" value="${numOfTr+1}" />
 				<c:if test="${!empty displayItem.singleItem.metadata.header}">
 					<tr class="aka_stripes">
-						<%--<td class="table_cell_left" bgcolor="#F5F5F5">--%>
 						<td class="table_cell_left aka_stripes"><b><c:out
 									value="${displayItem.singleItem.metadata.header}"
 									escapeXml="false" /></b></td>
@@ -1350,13 +1241,6 @@ but the custom tag uses that, not this jstl code--%> <c:if
 													value="${displayItem.singleItem.metadata.rightItemText}"
 													escapeXml="false" /></td>
 										</tr>
-										<%--try this, displaying error messages in their own row--%>
-										<%--We won't need this if the error messages are not embedded in the form:
-                            <tr>
-                              <td valign="top" colspan="4" style="text-align:right">
-                                <c:import url="../showMessage.jsp"><c:param name="key" value=
-                                  "input${displayItem.singleItem.item.id}" /></c:import> </td>
-                            </tr>--%>
 									</table></td>
 								<c:if test="${itemStatus.last}">
 							</tr>
@@ -1369,7 +1253,6 @@ but the custom tag uses that, not this jstl code--%> <c:if
 				<c:if test="${displayItem.singleItem.numChildren > 0}">
 					<tr>
 						<%-- indentation --%>
-						<!--<td class="table_cell">&nbsp;</td>-->
 						<%-- NOW SHOW THE CHILDREN --%>
 
 						<td class="table_cell">
@@ -1403,9 +1286,6 @@ but the custom tag uses that, not this jstl code--%> <c:if
 									<td valign="top">
 										<table border="0">
 											<tr>
-												<%--          <td valign="top" class="text_block">
-                                  <c:out value="${childItem.metadata.questionNumberLabel}" escapeXml="false"/>
-                                  <c:out value="${childItem.metadata.leftItemText}" escapeXml="false"/></td>--%>
 												<td valign="top" class="aka_ques_block"><c:out
 														value="${childItem.metadata.questionNumberLabel}"
 														escapeXml="false" /></td>
@@ -1427,8 +1307,7 @@ but the custom tag uses that, not this jstl code--%> <c:if
 														<c:param name="originJSP" value="initialDataEntry" />
 														<c:param name="isLocked" value="${isLocked}" />
                                                         <c:param name="isLast" value="${false}"/>
-													</c:import> <%--	<br />--%>
-													<%--<c:import url="../showMessage.jsp"><c:param name="key" value="input${childItem.item.id}" /></c:import>--%>
+													</c:import>
 												</td>
 												<c:if test='${childItem.item.units != ""}'>
 													<td valign="top"><c:out
@@ -1457,8 +1336,6 @@ but the custom tag uses that, not this jstl code--%> <c:if
 				</c:if>
 
 				</c:otherwise>
-				<%--end comment here to see problem with this part of the JSP, and
-  include an <c:otherwise></c:otherwise>--%>
 
 				</c:choose>
 

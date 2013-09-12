@@ -191,6 +191,8 @@ if(!window.RepetitionElement || (
 
       RepetitionElement.__updateAddButtons();
       RepetitionElement.__updateMoveButtons();
+
+      initCrfMoreInfo();
     },
 
   /*##############################################################################################

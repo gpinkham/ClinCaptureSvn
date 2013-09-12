@@ -39,7 +39,6 @@
 
 </style>
 
-
 <script type="text/javascript" language="javascript">
 
     window.expandCrfInfo = '${empty expandCrfInfo ? false : expandCrfInfo}';
@@ -49,7 +48,7 @@
     var closing = true;
     function clsWin() {
         if(closing) {
-            jq.post("CheckCRFLocked?userId=<c:out value="${userBean.id}"/>&exitTo=<c:out value="${exitTo}" />", function(data){
+            $.post("CheckCRFLocked?userId=<c:out value="${userBean.id}"/>&exitTo=<c:out value="${exitTo}" />", function(data){
                 return;
             });
         }
@@ -64,21 +63,8 @@
        $("select").click(function(event){
            closing = false;
         });
-       //$('.CRF_infobox_closed').show();
-      
-     //  $('#nameNote1').mouseover(function(event){
-       //  $.getJSON("InitialDataEntry",{ name:0 },function(discrepancyNote){
-    	//		alert('w'+discrepancyNote);
-        //});
-       // });
-      
-       });
+    });
      
-
-
-
-
-   
       function genToolTipFromArray(flag){
     	  var resStatus = new Array();
     	  var detailedNotes= new Array();
@@ -206,10 +192,6 @@ function callTip(html)
 
 </script>
 
-<%--<c:set var="inputVal" value="input${itemId}" />--%>
-
-<%--<c:set var="hasNameNote" value="${param.hasNameNote}"/>
-<c:set var="hasDateNote" value="${param.hasDateNote}"/>--%>
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 <c:forEach var="presetValue" items="${presetValues}">
     <c:if test='${presetValue.key == "interviewer"}'>
@@ -223,10 +205,11 @@ function callTip(html)
 <!-- End of Alert Box -->
 <table border="0" cellpadding="0" cellspacing="0" onLoad="">
 
+<b style="display: none;" id="moreInfoText"><fmt:message key="More_info" bundle="${resword}"/></b>
 <c:choose>
     <c:when test="${study.studyParameterConfig.interviewerNameRequired == 'yes' || study.studyParameterConfig.interviewDateRequired == 'yes'}">
         <tr id="CRF_infobox_closed" style="display: all;">
-            <td style="padding-top: 3px; padding-left: 6px;" nowrap>
+            <td style="padding-top: 3px; padding-left: 0px;" nowrap>
                 <div class="moreCrfInfoBlock">
                     <div class="crfInfoBlock">
                         <div class="crfInfoDiv"><b>Study: </b>${studyTitle}</div>
@@ -237,8 +220,9 @@ function callTip(html)
                     <div class="crfInfoBlock">
                         <div class="crfInfoDiv"><b>Form: </b>${toc.crf.name}</div>
                         <div class="crfInfoDiv">
-                            <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
-                                <img src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" hspace="10">
+                            <a href="javascript: processCrfMoreInfo();" id="showMoreInfo">
+                                <img id="moreInfoExpandedImg" src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" hspace="10">
+                                <img id="moreInfoCollapsedImg" src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" hspace="10">
                                 <b><fmt:message key="More_info" bundle="${resword}"/></b>
                             </a>
                         </div>
@@ -246,8 +230,8 @@ function callTip(html)
                 </div>
             </td>
         </tr>
-        <tr id="CRF_infobox_open" style="display: none;">
-        <td>
+        <tr id="CRF_infobox_open">
+        <td style="padding-top: 15px;">
         <table border="0" cellpadding="0" cellspacing="0">
         <tr>
             <td valign="bottom">
@@ -258,10 +242,7 @@ function callTip(html)
                                 <div class="tab_R_h" style="padding-right: 40px;">
                                 <div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
 
-                                <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
-                                    <img src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" hspace="10">
                                     <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
-                                </a>
 
                             </div></div></div>
                         </td>
@@ -272,7 +253,7 @@ function callTip(html)
     </c:when>
     <c:otherwise>
         <tr id="CRF_infobox_closed">
-            <td style="padding-top: 3px; padding-left: 6px;" nowrap>
+            <td style="padding-top: 3px; padding-left: 0px;" nowrap>
                 <div class="moreCrfInfoBlock">
                     <div class="crfInfoBlock">
                         <div class="crfInfoDiv"><b>Study: </b>${studyTitle}</div>
@@ -283,8 +264,9 @@ function callTip(html)
                     <div class="crfInfoBlock">
                         <div class="crfInfoDiv"><b>Form: </b>${toc.crf.name}</div>
                         <div class="crfInfoDiv">
-                            <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
-                                <img src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" hspace="10">
+                            <a href="javascript: processCrfMoreInfo();" id="showMoreInfo">
+                                <img id="moreInfoExpandedImg" src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" hspace="10">
+                                <img id="moreInfoCollapsedImg" src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" hspace="10">
                                 <b><fmt:message key="More_info" bundle="${resword}"/></b>
                             </a>
                         </div>
@@ -292,8 +274,8 @@ function callTip(html)
                 </div>
             </td>
         </tr>
-        <tr id="CRF_infobox_open" style="display: none;">
-        <td>
+        <tr id="CRF_infobox_open">
+        <td style="padding-top: 15px;">
         <table border="0" cellpadding="0" cellspacing="0">
         <tr>
             <td valign="bottom">
@@ -304,10 +286,8 @@ function callTip(html)
                                 <div class="tab_R_h" style="padding-right: 40px;">
                                 <div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
 
-                                <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
-                                    <img src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" hspace="10">
                                     <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
-                                </a>
+
                             </div></div></div>
                         </td>
                     </tr>
@@ -364,10 +344,6 @@ function callTip(html)
     </c:choose>
     		<td class="table_cell_top" >&nbsp;</td>
             <td class="table_cell_noborder" style="padding-left:3px">&nbsp;</td>
-            <!--  
-            <td class="table_cell" style="color: #789EC5"><b></td>
-            <td class="table_cell_left" style="color: #789EC5"></td>
-            -->
 </tr>
 
 <tr>
@@ -461,10 +437,8 @@ function callTip(html)
                     <c:when test="${study.studyParameterConfig.collectDob == '2' && subject.dateOfBirth.year != null}">${subject.dateOfBirth.year + 1900}</c:when>
                     <c:otherwise> <fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}" /></c:otherwise>
                 </c:choose>
-                <%-->> --%>
             </c:if>
-    
-            
+
             <br />
         </td>
 
@@ -509,27 +483,6 @@ function callTip(html)
     
 
 </tr>
-<%--<tr>
-  <td class="table_cell_noborder" style="color: #789EC5">
-
-  </td>
-  <td class="table_cell_noborder" style="color: #789EC5">
-  </td>
-  <td class="table_cell_top" style="color: #789EC5">
-    <b>${genderLabel}:</b>
-  </td>
-  <td class="table_cell_noborder" style="color: #789EC5">
-    <c:choose>
-      <c:when test="${subject.gender==109}">M</c:when>
-      <c:when test="${subject.gender==102}">F</c:when>
-      <c:otherwise>
-        <c:out value="${subject.gender}" />
-      </c:otherwise>
-    </c:choose>
-  </td>
-</tr>--%>
-<%-- find out whether the item is involved with an error message, and if so, outline the
-form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
 <c:forEach var="frmMsg" items="${formMessages}">
     <c:if test="${frmMsg.key eq 'interviewer'}">
@@ -591,15 +544,12 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                                    value="<c:out value="${interviewer}" />">
                             </c:otherwise>
                             </c:choose></div>
-                        <%--BWP>>new error message design:  <jsp:include page="../showMessage.jsp">
-                          <jsp:param name="key" value="interviewer" />
-                        </jsp:include>--%>
             </td>
             <td valign="top" nowrap>
                 <c:set var="isNewDN" value="${hasNameNote eq 'yes' ? 0 : 1}"/>
 
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                    <%--<c:if test="${! (enclosingPage eq 'viewSectionData')}">--%>
+
                 <c:choose>
                   <c:when test="${nameNoteResStatus == 0}">
                       <c:set var="imageFileName" value="icon_noNote" />
@@ -638,7 +588,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                         </a>
                      </c:otherwise>
                  </c:choose>
-                        <%--</c:if>--%>
+
                     </c:if>
             </td>
         </tr>
@@ -656,24 +606,22 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
     <c:choose>
         <c:when test="${isInError_Dat}">
             <fmt:message key="interview_date" bundle="${resword}"/>: <span class="aka_exclaim_error">! </span>&nbsp;<br />
-            <%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%>
         </c:when>
         <c:otherwise>
             <fmt:message key="interview_date" bundle="${resword}"/>:
             <c:if test="${study.studyParameterConfig.interviewDateRequired=='yes'}">
                 *
             </c:if>&nbsp;<br />
-            <%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%>
         </c:otherwise>
     </c:choose>
     </c:if>
-</td><!--</a>-->
+</td>
 <td class="table_cell_left"> 
     <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
     <table border="0" cellpadding="0" cellspacing="0">
 
         <tr>
-            <%----%>
+
             <td valign="top">
                 <c:choose>
                 <c:when
@@ -702,20 +650,12 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                             </c:choose>
 
                         </div>
-                        <%-- BWP>>new error message design: <jsp:include page="../showMessage.jsp">
-                          <jsp:param name="key" value="interviewDate" />
-                        </jsp:include>--%>
             </td>
-            <%--        document.getElementById('testdiv1').style.top=(parseInt(document.getElementById('testdiv1').style.top) - 10)+'px'; --%>
             <td valign="top" nowrap>
 
                 <a href="#" onmouseover="Calendar.setup({inputField  : 'interviewDate', ifFormat    : '<fmt:message key='date_format_calender' bundle='${resformat}'/>', button      : 'interviewDateTrigger' });">
                     <img src="<c:out value="${contextPath}" />/images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="interviewDateTrigger" /></a>
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                    <%-- ViewDiscrepancyNote?writeToDB=1&subjectId=<c:out value="${discrepancyNote.subjectId}"/>&itemId=<c:out value="${item.id}"/>&id=<c:out value="${discrepancyNote.entityId}"/>&name=<c:out value="${discrepancyNote.entityType}"/>&field=<c:out value="${discrepancyNote.field}"/>&column=<c:out value="${discrepancyNote.column}"/>&enterData=<c:out value="${enterData}"/>&monitor=<c:out value="${monitor}"/>&blank=<c:out value="${blank}"/>" --%>
-                    <%--BWP: 2808 related>>
-                    and switched it back for 2898--%>
-                    <%-- <c:if test="${! (enclosingPage eq 'viewSectionData')}">--%>
                 <c:set var="isNewDNDate" value="${hasDateNote eq 'yes' ? 0 : 1}"/>
                 <c:choose>
                   <c:when test="${IntrvDateNoteResStatus == 0}">
@@ -755,7 +695,6 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                         </a>
                     </c:otherwise>
                   </c:choose>
-                        <%--  </c:if>--%>
                     </c:if>
             </td>
         </tr>
@@ -808,5 +747,5 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 </table>
 
 <script>
-    expandCrfInfoIfThereAreErrors();
+    initCrfMoreInfo();
 </script>
