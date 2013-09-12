@@ -17,8 +17,8 @@ public class ValidatorHelperTest {
 
 	private Locale locale;
 	private MockHttpServletRequest request;
-	private ValidatorHelper validatorHelper1;
-	private ValidatorHelper validatorHelper2;
+	private ValidatorHelper notRequestBasedValidatorHelper;
+	private ValidatorHelper requestBasedValidatorHelper;
 	private ConfigurationDao configurationDao;
 
 	@Before
@@ -31,61 +31,61 @@ public class ValidatorHelperTest {
 
 		configurationDao = Mockito.mock(ConfigurationDao.class);
 
-		validatorHelper1 = new ValidatorHelper(configurationDao, locale);
-		validatorHelper1.setAttribute("attr1", true);
+		notRequestBasedValidatorHelper = new ValidatorHelper(configurationDao, locale);
+		notRequestBasedValidatorHelper.setAttribute("attr1", true);
 
-		validatorHelper2 = new ValidatorHelper(request, configurationDao);
+		requestBasedValidatorHelper = new ValidatorHelper(request, configurationDao);
 		request.setAttribute("attr2", true);
 		request.setParameter("param2", "test value");
 	}
 
 	@Test
-	public void testLocaleForValidatorHelper1() {
-		assertEquals(validatorHelper1.getLocale(), locale);
+	public void testThatNotRequestBasedValidatorHelperReturnsCorrectLocale() {
+		assertEquals(notRequestBasedValidatorHelper.getLocale(), locale);
 	}
 
 	@Test
-	public void testConfigurationDaoForValidatorHelper1() {
-		assertEquals(validatorHelper1.getConfigurationDao(), configurationDao);
+	public void testThatNotRequestBasedValidatorHelperReturnsCorrectConfigurationDao() {
+		assertEquals(notRequestBasedValidatorHelper.getConfigurationDao(), configurationDao);
 	}
 
 	@Test
-	public void testGetAttributeForValidatorHelper1() {
-		assertTrue((Boolean) validatorHelper1.getAttribute("attr1"));
+	public void testThatGetAttributeFromNotRequestBasedValidatorHelperReturnsCorrectValue() {
+		assertTrue((Boolean) notRequestBasedValidatorHelper.getAttribute("attr1"));
 	}
 
 	@Test
-	public void testGetParameterForValidatorHelper1() {
-		assertNull(validatorHelper1.getParameter("attr1"));
+	public void testThatGetParameterFromNotRequestBasedValidatorHelperReturnsNull() {
+		assertNull(notRequestBasedValidatorHelper.getParameter("attr1"));
 	}
 
 	@Test
-	public void testGetParameterValuesForValidatorHelper1() {
-        assertEquals(validatorHelper1.getParameterValues("attr1").length, 1);
+	public void testThatGetParameterValuesFromNotRequestBasedValidatorHelperReturnsCorrectLength() {
+		assertEquals(notRequestBasedValidatorHelper.getParameterValues("attr1").length, 1);
 	}
 
 	@Test
-	public void testLocaleForValidatorHelper2() {
-		assertEquals(validatorHelper2.getLocale(), request.getLocale());
+	public void testThatRequestBasedValidatorHelperReturnsCorrectLocale() {
+		assertEquals(requestBasedValidatorHelper.getLocale(), request.getLocale());
 	}
 
 	@Test
-	public void testConfigurationDaoForValidatorHelper2() {
-		assertEquals(validatorHelper2.getConfigurationDao(), configurationDao);
+	public void testThatRequestBasedValidatorHelperReturnsCorrectConfigurationDao() {
+		assertEquals(requestBasedValidatorHelper.getConfigurationDao(), configurationDao);
 	}
 
 	@Test
-	public void testGetAttributeForValidatorHelper2() {
-		assertTrue((Boolean) validatorHelper2.getAttribute("attr2"));
+	public void testThatGetAttributeFromRequestBasedValidatorHelperReturnsCorrectValue() {
+		assertTrue((Boolean) requestBasedValidatorHelper.getAttribute("attr2"));
 	}
 
 	@Test
-	public void testGetParameterForValidatorHelper2() {
-		assertEquals(validatorHelper2.getParameter("param2"), "test value");
+	public void testThatGetParameterFromRequestBasedValidatorHelperReturnsCorrectValue() {
+		assertEquals(requestBasedValidatorHelper.getParameter("param2"), "test value");
 	}
 
 	@Test
-	public void testGetParameterValuesForValidatorHelper2() {
-		assertEquals(validatorHelper2.getParameterValues("param2").length, 1);
+	public void testThatGetParameterValuesFromRequestBasedValidatorHelperReturnsCorrectLength() {
+		assertEquals(requestBasedValidatorHelper.getParameterValues("param2").length, 1);
 	}
 }

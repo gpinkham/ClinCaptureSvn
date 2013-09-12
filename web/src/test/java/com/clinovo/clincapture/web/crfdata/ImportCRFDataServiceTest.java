@@ -1,7 +1,6 @@
 package com.clinovo.clincapture.web.crfdata;
 
 import com.clinovo.util.ValidatorHelper;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,7 +85,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 	}
 
 	@Test
-	public void testValidateStudyMetadata() {
+	public void testThatErrorMessagesListIsNotNull() {
 		ArrayList<String> errorMessages = new ArrayList<String>();
 		int currentStudyId = 1;
 		errorMessages = (ArrayList<String>) holder.service.validateStudyMetadata(holder.container, currentStudyId);
@@ -94,7 +93,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 	}
 
 	@Test
-	public void testValidateStudyMetadataWithData() {
+	public void testThatSizeOfTheErrorMessagesListIsCorrect() {
 		ArrayList<String> errorMessages = new ArrayList<String>();
 		int currentStudyId = 1;
 		errorMessages = (ArrayList<String>) holder.service.validateStudyMetadata(holder.container, currentStudyId);
@@ -102,131 +101,131 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 	}
 
 	@Test
-	public void testGenerateSummaryStats() {
+	public void testThatGeneratedSummaryStatsBeanIsNotNull() {
 		List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
 		SummaryStatsBean stats = holder.service.generateSummaryStatsBean(holder.container, wrappers);
 		assertNotNull(stats);
 	}
 
 	@Test
-	public void testStatsGetEventCrfCount() {
+	public void testThatGetEventCrfCountReturnsCorrectValue() {
 		List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
 		SummaryStatsBean stats = holder.service.generateSummaryStatsBean(holder.container, wrappers);
 		assertEquals(1, stats.getEventCrfCount());
 	}
 
 	@Test
-	public void testStatsGetDiscNoteCount() {
+	public void testThatGetDiscNoteCountReturnsCorrectValue() {
 		List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
 		SummaryStatsBean stats = holder.service.generateSummaryStatsBean(holder.container, wrappers);
 		assertEquals(0, stats.getDiscNoteCount());
 	}
 
 	@Test
-	public void testStatsGetStudySubjectCount() {
+	public void testThatGetStudySubjectCountReturnsCorrectValue() {
 		List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
 		SummaryStatsBean stats = holder.service.generateSummaryStatsBean(holder.container, wrappers);
 		assertEquals(1, stats.getStudySubjectCount());
 	}
 
 	@Test
-	public void testSubjectDataSizeForFileImport1() throws Exception {
+	public void testThatGetSubjectDataFromTestFile1ReturnsCorrectSize() throws Exception {
 		assertEquals(holder1.container.getCrfDataPostImportContainer().getSubjectData().size(), 1);
 	}
 
 	@Test
-	public void testStudyEventDataSizeForFileImport1() throws Exception {
+	public void testThatGetStudyEventDataFromTestFile1ReturnsCorrectSize() throws Exception {
 		assertEquals(holder1.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData()
 				.size(), 1);
 	}
 
 	@Test
-	public void testFormDataSizeForFileImport1() throws Exception {
+	public void testThatGetFormDataFromTestFile1ReturnsCorrectSize() throws Exception {
 		assertEquals(
 				holder1.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().size(), 2);
 	}
 
 	@Test
-	public void testItemGroupDataSizeForFileImport11() throws Exception {
+	public void testThatGetItemGroupDataFromFirstFormDataFromTestFile1ReturnsCorrectSize() throws Exception {
 		assertEquals(
 				holder1.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().get(0).getItemGroupData().size(), 1);
 	}
 
 	@Test
-	public void testItemGroupDataSizeForFileImport12() throws Exception {
+	public void testThatGetItemGroupDataFromSecondFormDataFromTestFile1ReturnsCorrectSize() throws Exception {
 		assertEquals(
 				holder1.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().get(1).getItemGroupData().size(), 1);
 	}
 
 	@Test
-	public void testSubjectDataSizeForFileImport2() throws Exception {
+	public void testThatGetSubjectDataFromTestFile2ReturnsCorrectSize() throws Exception {
 		assertEquals(holder2.container.getCrfDataPostImportContainer().getSubjectData().size(), 1);
 	}
 
 	@Test
-	public void testStudyEventDataSizeForFileImport2() throws Exception {
+	public void testThatGetStudyEventDataFromTestFile2ReturnsCorrectSize() throws Exception {
 		assertEquals(holder2.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData()
 				.size(), 2);
 	}
 
 	@Test
-	public void testFormDataSizeForFileImport21() throws Exception {
+	public void testThatGetFormDataFromFirstStudyEventFromTestFile2ReturnsCorrectSize() throws Exception {
 		assertEquals(
 				holder2.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().size(), 1);
 	}
 
 	@Test
-	public void testFormDataSizeForFileImport22() throws Exception {
+	public void testThatGetFormDataFromSecondStudyEventFromTestFile2ReturnsCorrectSize() throws Exception {
 		assertEquals(
 				holder2.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(1)
 						.getFormData().size(), 1);
 	}
 
 	@Test
-	public void testItemGroupDataSizeForFileImport21() throws Exception {
+	public void testThatGetItemGroupDataFromFirstStudyEventFromTestFile2ReturnsCorrectSize() throws Exception {
 		assertEquals(
 				holder2.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().get(0).getItemGroupData().size(), 5);
 	}
 
 	@Test
-	public void testItemGroupDataSizeForFileImport22() throws Exception {
+	public void testThatGetItemGroupDataFromSecondStudyEventFromTestFile2ReturnsCorrectSize() throws Exception {
 		assertEquals(
 				holder2.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(1)
 						.getFormData().get(0).getItemGroupData().size(), 5);
 	}
 
 	@Test
-	public void testSubjectDataSizeForFileImport3() throws Exception {
+	public void testThatGetSubjectDataFromTestFile3ReturnsCorrectSize() throws Exception {
 		assertEquals(holder3.container.getCrfDataPostImportContainer().getSubjectData().size(), 1);
 	}
 
 	@Test
-	public void testStudyEventDataSizeForFileImport3() throws Exception {
+	public void testThatGetStudyEventFromTestFile3ReturnsCorrectSize() throws Exception {
 		assertEquals(holder3.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData()
 				.size(), 1);
 	}
 
 	@Test
-	public void testFormDataSizeForFileImport3() throws Exception {
+	public void testThatGetFormDataFromTestFile3ReturnsCorrectSize() throws Exception {
 		assertEquals(
 				holder3.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().size(), 1);
 	}
 
 	@Test
-	public void testItemGroupDataSizeForFileImport3() throws Exception {
+	public void testThatGetItemGroupDataFromTestFile3ReturnsCorrectSize() throws Exception {
 		assertEquals(
 				holder3.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
 						.getFormData().get(0).getItemGroupData().size(), 5);
 	}
 
 	@Test
-	public void testLookupValidationErrorsForFileImport1() throws Exception {
+	public void testThatGetDisplayItemBeansFromTestFile1ReturnsCorrectSize() throws Exception {
 		List<DisplayItemBeanWrapper> wrappers = holder1.service.lookupValidationErrors(holder1.validatorHelper,
 				holder1.container, holder1.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder1.permittedEventCRFIds);
@@ -234,7 +233,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 	}
 
 	@Test
-	public void testLookupValidationErrorsForFileImport2() throws Exception {
+	public void testThatGetDisplayItemBeansFromTestFile2ReturnsCorrectSize() throws Exception {
 		List<DisplayItemBeanWrapper> wrappers = holder2.service.lookupValidationErrors(holder2.validatorHelper,
 				holder2.container, holder2.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder2.permittedEventCRFIds);
@@ -242,7 +241,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 	}
 
 	@Test
-	public void testLookupValidationErrorsForFileImport3() throws Exception {
+	public void testThatGetDisplayItemBeansFromTestFile3ReturnsCorrectSize() throws Exception {
 		List<DisplayItemBeanWrapper> wrappers = holder3.service.lookupValidationErrors(holder3.validatorHelper,
 				holder3.container, holder3.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder3.permittedEventCRFIds);
