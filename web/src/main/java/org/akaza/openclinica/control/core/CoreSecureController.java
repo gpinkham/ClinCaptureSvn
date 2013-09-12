@@ -259,9 +259,7 @@ public abstract class CoreSecureController extends HttpServlet {
 					request.getSession().removeAttribute("jobName");
 					request.getSession().removeAttribute("groupName");
 					request.getSession().removeAttribute("datasetId");
-				} else {
-
-				}
+				} 
 			}
 		} catch (SchedulerException se) {
 			se.printStackTrace();
@@ -271,12 +269,16 @@ public abstract class CoreSecureController extends HttpServlet {
 
 	private String decodeLINKURL(String successMsg, Integer datasetId) {
 
+		successMsg = "";
+
 		ArchivedDatasetFileDAO asdfDAO = new ArchivedDatasetFileDAO(getDataSource());
 
 		ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
 
-		successMsg = successMsg.replace("$linkURL", "<a href=\"" + SQLInitServlet.getSystemURL() + "AccessFile?fileId="
-				+ fileBeans.get(0).getId() + "\">here </a>");
+		if (fileBeans.size() > 0) {
+			successMsg = successMsg.replace("$linkURL", "<a href=\"" + SQLInitServlet.getSystemURL()
+					+ "AccessFile?fileId=" + fileBeans.get(0).getId() + "\">here</a>");
+		}
 
 		return successMsg;
 	}

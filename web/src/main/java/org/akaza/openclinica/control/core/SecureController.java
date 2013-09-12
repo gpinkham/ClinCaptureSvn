@@ -337,8 +337,8 @@ public abstract class SecureController extends HttpServlet {
 							if (successMsg != null && !successMsg.isEmpty()) {
 								addPageMessage(successMsg);
 							} else {
-								addPageMessage("Your Extract is now completed. Please go to review them at <a href='ExportDataset?datasetId="
-										+ datasetId + "'> Here </a>.");
+								addPageMessage("Your Extract is now completed. Please go to review it <a href='ExportDataset?datasetId="
+										+ datasetId + "'>here</a>.");
 							}
 							request.getSession().removeAttribute("jobName");
 							request.getSession().removeAttribute("groupName");
@@ -346,9 +346,7 @@ public abstract class SecureController extends HttpServlet {
 						}
 					}
 
-				} else {
-
-				}
+				} 
 			}
 		} catch (SchedulerException se) {
 			se.printStackTrace();
@@ -358,12 +356,16 @@ public abstract class SecureController extends HttpServlet {
 
 	private String decodeLINKURL(String successMsg, Integer datasetId) {
 
+		successMsg = "";
+
 		ArchivedDatasetFileDAO asdfDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
 
 		ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
 
-		successMsg = successMsg.replace("$linkURL", "<a href=\"" + SQLInitServlet.getSystemURL() + "AccessFile?fileId="
-				+ fileBeans.get(0).getId() + "\">here </a>");
+		if (fileBeans.size() > 0) {
+			successMsg = successMsg.replace("$linkURL", "<a href=\"" + SQLInitServlet.getSystemURL()
+					+ "AccessFile?fileId=" + fileBeans.get(0).getId() + "\">here</a>");
+		}
 
 		return successMsg;
 	}
