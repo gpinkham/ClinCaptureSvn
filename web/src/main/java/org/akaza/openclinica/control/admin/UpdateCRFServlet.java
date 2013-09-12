@@ -35,6 +35,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings({ "rawtypes", "serial" })
 public class UpdateCRFServlet extends SecureController {
@@ -77,7 +79,8 @@ public class UpdateCRFServlet extends SecureController {
 
 	@Override
 	public void processRequest() throws Exception {
-		resetPanel();
+
+        resetPanel();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 
@@ -165,10 +168,11 @@ public class UpdateCRFServlet extends SecureController {
 	 * Inserts the new study into database
 	 * 
 	 */
-	private void submitCRF() {
+	private void submitCRF() throws Exception {
 		CRFDAO cdao = new CRFDAO(sm.getDataSource());
 		CRFBean crf = (CRFBean) session.getAttribute(CRF);
-		logger.info("CRF bean to be updated:" + crf.getName());
+        String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
+        logger.info("CRF bean to be updated:" + crf.getName());
 
 		crf.setUpdater(ub);
 		crf.setUpdatedDate(new Date());
@@ -177,7 +181,15 @@ public class UpdateCRFServlet extends SecureController {
 
 		session.removeAttribute(CRF);
 		addPageMessage(respage.getString("the_CRF_has_been_updated_succesfully"));
-		forwardPage(Page.CRF_LIST_SERVLET);
+
+        if (keyValue != null) {
+            Map storedAttributes = new HashMap();
+            storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+            request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+            response.sendRedirect(response.encodeRedirectURL(keyValue));
+        } else {
+            forwardPage(Page.CRF_LIST_SERVLET);
+        }
 	}
 
 	@Override

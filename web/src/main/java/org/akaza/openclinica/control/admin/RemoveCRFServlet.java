@@ -45,6 +45,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Removes a crf
@@ -77,6 +79,7 @@ public class RemoveCRFServlet extends SecureController {
 		CRFDAO cdao = new CRFDAO(sm.getDataSource());
 		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 		FormProcessor fp = new FormProcessor(request);
+        String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
 
 		// checks which module the requests are from
 		String module = fp.getString(MODULE);
@@ -173,8 +176,14 @@ public class RemoveCRFServlet extends SecureController {
 
 				addPageMessage(respage.getString("the_CRF") + crf.getName() + " "
 						+ respage.getString("has_been_removed_succesfully"));
-				forwardPage(Page.CRF_LIST_SERVLET);
-
+                if (keyValue != null) {
+                    Map storedAttributes = new HashMap();
+                    storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+                    request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+                    response.sendRedirect(response.encodeRedirectURL(keyValue));
+                } else {
+                    forwardPage(Page.CRF_LIST_SERVLET);
+                }
 			}
 		}
 

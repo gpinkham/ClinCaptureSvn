@@ -41,6 +41,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings({ "serial", "rawtypes" })
 public class RestoreCRFServlet extends SecureController {
@@ -71,6 +73,7 @@ public class RestoreCRFServlet extends SecureController {
 		// checks which module the requests are from
 		String module = fp.getString(MODULE);
 		request.setAttribute(MODULE, module);
+        String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
 
 		int crfId = fp.getInt("id", true);
 
@@ -155,8 +158,14 @@ public class RestoreCRFServlet extends SecureController {
 
 				addPageMessage(respage.getString("the_CRF") + crf.getName() + " "
 						+ respage.getString("has_been_restored_succesfully"));
-				forwardPage(Page.CRF_LIST_SERVLET);
-
+                if (keyValue != null) {
+                    Map storedAttributes = new HashMap();
+                    storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+                    request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+                    response.sendRedirect(response.encodeRedirectURL(keyValue));
+                } else {
+                    forwardPage(Page.CRF_LIST_SERVLET);
+                }
 			}
 		}
 	}

@@ -21,6 +21,8 @@
 package org.akaza.openclinica.control.admin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -60,7 +62,9 @@ public class DeleteCRFVersionServlet extends SecureController {
 		FormProcessor fp = new FormProcessor(request);
 		int versionId = fp.getInt(VERSION_ID, true);
 		String action = request.getParameter("action");
-		if (versionId == 0) {
+        String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
+
+        if (versionId == 0) {
 			addPageMessage(respage.getString("please_choose_a_CRF_version_to_delete"));
 			forwardPage(Page.CRF_LIST_SERVLET);
 		} else {
@@ -107,7 +111,14 @@ public class DeleteCRFVersionServlet extends SecureController {
 				} else {
 					addPageMessage(respage.getString("the_CRF_version_cannot_be_deleted"));
 				}
-				forwardPage(Page.CRF_LIST_SERVLET);
+                if (keyValue != null) {
+                    Map storedAttributes = new HashMap();
+                    storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+                    request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+                    response.sendRedirect(response.encodeRedirectURL(keyValue));
+                } else {
+                    forwardPage(Page.CRF_LIST_SERVLET);
+                }
 			}
 
 		}
