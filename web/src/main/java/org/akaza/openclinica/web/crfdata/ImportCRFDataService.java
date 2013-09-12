@@ -479,8 +479,8 @@ public class ImportCRFDataService {
 					crfBean = crfDAO.findByVersionId(crfVersion.getCrfId());
 					// seems like an extravagance, but is not contained in crf
 					// version or event crf bean
-					validationErrors = discValidator.validate("noregex"); // do not validate against regex provided in
-																			// Excel template
+					validationErrors = discValidator.validate();
+
 					for (Object errorKey : validationErrors.keySet()) {
 						if (!totalValidationErrors.containsKey(errorKey.toString()))
 							totalValidationErrors.put(errorKey.toString(), validationErrors.get(errorKey).toString());
