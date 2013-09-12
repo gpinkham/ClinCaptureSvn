@@ -205,7 +205,6 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 					HashMap<Integer, EventCRFBean> idToEventCrfBeans = new HashMap<Integer, EventCRFBean>();
 					logger.debug("=== right before we check to make sure it is savable: " + wrapper.isSavable());
 					if (wrapper.isSavable()) {
-						con.commit();
                         logger.debug("wrapper problems found : " + wrapper.getValidationErrors().toString());
 						for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
 							EventCRFBean eventCrfBean = new EventCRFBean();
@@ -277,6 +276,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 						for (EventCRFBean eventCrfBean : idToEventCrfBeans.values()) {
 							studyEventIds.add(eventCrfBean.getStudyEventId());
 
+							eventCrfBean.setSdvStatus(false);
 							eventCrfBean.setNotStarted(false);
 							eventCrfBean.setStatus(Status.AVAILABLE);
 							if (currentStudy.getStudyParameterConfig().getMarkImportedCRFAsCompleted()

@@ -636,6 +636,7 @@ public class ImportSpringJob extends QuartzJobBean {
 						for (EventCRFBean eventCrfBean : idToEventCrfBeans.values()) {
 							studyEventIds.add(eventCrfBean.getStudyEventId());
 
+							eventCrfBean.setSdvStatus(false);
 							eventCrfBean.setNotStarted(false);
 							eventCrfBean.setStatus(Status.AVAILABLE);
 							if (studyBean.getStudyParameterConfig().getMarkImportedCRFAsCompleted()
