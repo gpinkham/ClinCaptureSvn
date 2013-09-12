@@ -40,7 +40,7 @@ public class ActionProcessorFacade {
 		case FILE_DISCREPANCY_NOTE:
 			return new DiscrepancyNoteActionProcessor(connection, ds, ruleActionRunLogDao, ruleSetRule);
 		case EMAIL:
-			return new EmailActionProcessor(ds, mailSender, ruleActionRunLogDao, ruleSetRule, connection);
+			return new EmailActionProcessor(connection, ds, mailSender, ruleActionRunLogDao, ruleSetRule);
 		case SHOW:
 			return new ShowActionProcessor(ds, itemMetadataService, ruleSet, connection);
 		case HIDE:

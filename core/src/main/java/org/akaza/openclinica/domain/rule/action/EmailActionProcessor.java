@@ -19,12 +19,11 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
+import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
@@ -45,28 +44,21 @@ import javax.sql.DataSource;
 public class EmailActionProcessor implements ActionProcessor {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	Connection connection;
 	DataSource ds;
 	EmailEngine emailEngine;
 	JavaMailSenderImpl mailSender;
 	RuleActionRunLogDao ruleActionRunLogDao;
+	DiscrepancyNoteService discrepancyNoteService;
 	RuleSetRuleBean ruleSetRule;
-	Connection con;
 
-	public EmailActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionRunLogDao ruleActionRunLogDao,
-			RuleSetRuleBean ruleSetRule) {
+	public EmailActionProcessor(Connection connection, DataSource ds, JavaMailSenderImpl mailSender,
+			RuleActionRunLogDao ruleActionRunLogDao, RuleSetRuleBean ruleSetRule) {
+		this.connection = connection;
 		this.ds = ds;
 		this.mailSender = mailSender;
 		this.ruleSetRule = ruleSetRule;
 		this.ruleActionRunLogDao = ruleActionRunLogDao;
-	}
-	
-	public EmailActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionRunLogDao ruleActionRunLogDao,
-			RuleSetRuleBean ruleSetRule, Connection con) {
-		this.ds = ds;
-		this.mailSender = mailSender;
-		this.ruleSetRule = ruleSetRule;
-		this.ruleActionRunLogDao = ruleActionRunLogDao;
-		this.con = con;
 	}
 
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode,
@@ -79,10 +71,13 @@ public class EmailActionProcessor implements ActionProcessor {
 
 		case SAVE: {
 			HashMap<String, String> arg0 = (HashMap<String, String>) arguments[0];
-			sendEmail(ruleAction, ub, arg0.get("body"), arg0.get("subject"));
+            if (!sendEmail(ruleAction, ub, arg0.get("body"), arg0.get("subject"))) {
+				getDiscrepancyNoteService().saveFieldNotes(((EmailActionBean) ruleAction).getExceptionMessage(),
+						itemDataBean.getId(), itemData, connection, currentStudy, ub, true);
+            }
 			RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean,
 					itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
-			ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog, con);
+			ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog, connection);
 			return null;
 		}
 		default:
@@ -90,9 +85,8 @@ public class EmailActionProcessor implements ActionProcessor {
 		}
 	}
 
-	private void sendEmail(RuleActionBean ruleAction, UserAccountBean ub, String body, String subject)
-			throws OpenClinicaSystemException {
-
+	private boolean sendEmail(RuleActionBean ruleAction, UserAccountBean ub, String body, String subject) {
+		boolean sent = true;
 		logger.info("Sending email...");
 		try {
 			MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -105,13 +99,11 @@ public class EmailActionProcessor implements ActionProcessor {
 
 			mailSender.send(mimeMessage);
 			logger.debug("Email sent successfully on {}", new Date());
-		} catch (MailException me) {
-			logger.error("Email could not be sent");
-			throw new OpenClinicaSystemException(me.getMessage());
-		} catch (MessagingException me) {
-			logger.error("Email could not be sent");
-			throw new OpenClinicaSystemException(me.getMessage());
+		} catch (Exception e) {
+			sent = false;
+			logger.error("Email could not be sent. ", e);
 		}
+		return sent;
 	}
 
 	private InternetAddress[] processMultipleImailAddresses(String to) throws MessagingException {
@@ -130,10 +122,14 @@ public class EmailActionProcessor implements ActionProcessor {
 
 	}
 
+	private DiscrepancyNoteService getDiscrepancyNoteService() {
+		discrepancyNoteService = this.discrepancyNoteService != null ? discrepancyNoteService
+				: new DiscrepancyNoteService(ds);
+		return discrepancyNoteService;
+	}
+
 	public Object execute(SubmissionContext context) {
-		
 		// Do nothing
 		return null;
 	}
-
 }

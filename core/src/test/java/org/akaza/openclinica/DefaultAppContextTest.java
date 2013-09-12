@@ -9,6 +9,7 @@ import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
+import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
@@ -61,6 +62,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	@Autowired protected RuleSetDao ruleSetDao;
 	@Autowired protected AuthoritiesDao authoritiesDao;
 	@Autowired protected RuleSetRuleDao ruleSetRuleDao;
+    @Autowired protected RuleActionRunLogDao ruleActionRunLogDao;
 	
 	@Autowired protected RuleSetAuditDao ruleSetAuditDao;
 	@Autowired protected ConfigurationDao configurationDao;

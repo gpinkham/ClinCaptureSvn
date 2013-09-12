@@ -36,6 +36,7 @@ import org.akaza.openclinica.domain.rule.action.ActionProcessor;
 import org.akaza.openclinica.domain.rule.action.ActionProcessorFacade;
 import org.akaza.openclinica.domain.rule.action.ActionType;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
+import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
@@ -55,6 +56,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 	private EventCRFBean ecb;
 	private StudyBean currentStudy;
 	private ResourceBundle respagemsgs;
+	private ResourceBundle resexception;
 	private HttpServletRequest request;
 	private ExecutionMode executionMode;
 	private List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult;
@@ -64,8 +66,8 @@ public class DataEntryRuleRunner extends RuleRunner {
 			JavaMailSenderImpl mailSender, EventCRFBean ecb) {
 		super(ds, requestURLMinusServletPath, contextPath, mailSender);
 		this.ecb = ecb;
-		respagemsgs = ResourceBundleProvider
-				.getPageMessagesBundle(ResourceBundleProvider.getLocale());
+		respagemsgs = ResourceBundleProvider.getPageMessagesBundle(ResourceBundleProvider.getLocale());
+		resexception = ResourceBundleProvider.getExceptionsBundle(ResourceBundleProvider.getLocale());
 	}
 
 	public MessageContainer runRules(UserAccountBean ub,
@@ -214,6 +216,11 @@ public class DataEntryRuleRunner extends RuleRunner {
 								ruleActionContainer.getRuleSetBean()
 										.getTarget().getValue());
 
+				if (ruleActionContainer.getRuleAction() instanceof EmailActionBean) {
+					((EmailActionBean) ruleActionContainer.getRuleAction()).setExceptionMessage(resexception
+							.getString("email_action_processor_exception"));
+				}
+
 				RuleActionBean rab = ap.execute(
 						RuleRunnerMode.DATA_ENTRY,
 						executionMode,
@@ -236,11 +243,11 @@ public class DataEntryRuleRunner extends RuleRunner {
 					} else {
 						messageContainer
 								.add(getExpressionService()
-										.getGroupOrdninalConcatWithItemOid(
-												ruleActionContainer
-														.getRuleSetBean()
-														.getTarget().getValue()),
-										ruleActionContainer.getRuleAction());
+                                        .getGroupOrdninalConcatWithItemOid(
+                                                ruleActionContainer
+                                                        .getRuleSetBean()
+                                                        .getTarget().getValue()),
+                                        ruleActionContainer.getRuleAction());
 					}
 				}
 				logger.info(

@@ -27,6 +27,7 @@ public class EmailActionBean extends RuleActionBean {
 
 	private String message;
 	private String to;
+    private String exceptionMessage;
 
 	public EmailActionBean() {
 		setActionType(ActionType.EMAIL);
@@ -98,4 +99,12 @@ public class EmailActionBean extends RuleActionBean {
 		return true;
 	}
 
+    @Transient
+    public String getExceptionMessage() {
+        return exceptionMessage;
+    }
+
+    public void setExceptionMessage(String exceptionMessage) {
+        this.exceptionMessage = exceptionMessage;
+    }
 }
