@@ -299,11 +299,12 @@ public class CRFVersionDAO<K, V> extends AuditableEntityDAO implements ICRFVersi
 	/**
 	 * Deletes a CRF version
 	 */
+	@Deprecated
 	public void delete(int id) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(id));
+		// variables.put(new Integer(1), new Integer(id));
 
-		String sql = digester.getQuery("delete");
+		String sql = digester.getQuery("delete") + id;
 		this.execute(sql, variables);
 	}
 

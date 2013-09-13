@@ -143,7 +143,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		ItemDataType dataType = getDataType(idb.getItemId());
 		if (dataType.equals(ItemDataType.DATE)) {
 			idb.setValue(Utils.convertedItemDateValue(idb.getValue(),
-					local_df_string, oc_df_string));
+					local_df_string, oc_df_string, locale));
 		} else if (dataType.equals(ItemDataType.PDATE)) {
 			idb.setValue(formatPDate(idb.getValue()));
 		}
@@ -181,7 +181,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		// inserting into database
 		ItemDataType dataType = getDataType(idb.getItemId());
 		if (dataType.equals(ItemDataType.DATE)) {
-			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
 		} else if (dataType.equals(ItemDataType.PDATE)) {
 			idb.setValue(formatPDate(idb.getValue()));
 		}
@@ -209,7 +209,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		// inserting into database
 		ItemDataType dataType = getDataType(idb.getItemId());
 		if (dataType.equals(ItemDataType.DATE)) {
-			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
 		} else if (dataType.equals(ItemDataType.PDATE)) {
 			idb.setValue(formatPDate(idb.getValue()));
 		}
@@ -263,7 +263,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 		// Convert to oc_date_format_string pattern before
 		// inserting into database
-		idb.setValue(Utils.convertedItemDateValue(idb.getValue(), current_df_string, oc_df_string));
+		idb.setValue(Utils.convertedItemDateValue(idb.getValue(), current_df_string, oc_df_string, locale));
 
 		idb.setActive(false);
 
@@ -310,7 +310,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		ItemDataType dataType = getDataType(idb.getItemId());
 		if (dataType.equals(ItemDataType.DATE)) {
 			idb.setValue(Utils.convertedItemDateValue(idb.getValue(),
-					local_df_string, oc_df_string));
+					local_df_string, oc_df_string, locale));
 		} else if (dataType.equals(ItemDataType.PDATE)) {
 			idb.setValue(formatPDate(idb.getValue()));
 		}
@@ -339,7 +339,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		// inserting into database
 		ItemDataType dataType = getDataType(idb.getItemId());
 		if (dataType.equals(ItemDataType.DATE)) {
-			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
 		} else if (dataType.equals(ItemDataType.PDATE)) {
 			idb.setValue(formatPDate(idb.getValue()));
 		}
@@ -374,45 +374,54 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 	public String formatPDate(String pDate) {
 		String temp = "";
-		String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_year_month"));
-		String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_year"));
-		String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_string"));
+        String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+                "date_format_year_month"));
+        String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+                "date_format_year"));
+        String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+                "date_format_string"));
 		try {
-			if (StringUtil.isFormatDate(pDate, dateFormat)) {
-				temp = new SimpleDateFormat(oc_df_string).format(new SimpleDateFormat(dateFormat).parse(pDate));
-			} else if (StringUtil.isPartialYear(pDate, yearFormat)) {
+			if (StringUtil.isFormatDate(pDate, "yyyy-MM-dd") || StringUtil.isFormatDate(pDate, "yyyy-MM")
+					|| StringUtil.isFormatDate(pDate, "yyyy")) {
 				temp = pDate;
-			} else if (StringUtil.isPartialYearMonth(pDate, yearMonthFormat)) {
-				temp = new SimpleDateFormat("yyyy-MM").format(new SimpleDateFormat(yearMonthFormat).parse(pDate));
+			} else if (StringUtil.isFormatDate(pDate, dateFormat, locale)) {
+				temp = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(dateFormat, locale).parse(pDate));
+			} else if (StringUtil.isPartialYear(pDate, yearFormat, locale)) {
+				temp = pDate;
+			} else if (StringUtil.isPartialYearMonth(pDate, yearMonthFormat, locale)) {
+				temp = new SimpleDateFormat("yyyy-MM").format(new SimpleDateFormat(yearMonthFormat, locale)
+						.parse(pDate));
 			}
 		} catch (Exception ex) {
-			logger.warn("Parsial Date Parsing Exception........");
+			logger.warn("Partial Date Parsing Exception........");
 		}
-
 		return temp;
 	}
 
 	public String reFormatPDate(String pDate) {
 		String temp = "";
-		String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_year_month"));
-		String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-				"date_format_string"));
-		try {
-			if (StringUtil.isFormatDate(pDate, oc_df_string)) {
-				temp = new SimpleDateFormat(dateFormat).format(new SimpleDateFormat(oc_df_string).parse(pDate));
+        String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+                "date_format_year_month"));
+        String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+                "date_format_year"));
+        String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+                "date_format_string"));
+        try {
+			if (StringUtil.isFormatDate(pDate, dateFormat, locale)
+					|| StringUtil.isFormatDate(pDate, yearMonthFormat, locale)
+					|| StringUtil.isFormatDate(pDate, yearFormat, locale)) {
+				temp = pDate;
+			} else if (StringUtil.isFormatDate(pDate, "yyyy-MM-dd")) {
+				temp = new SimpleDateFormat(dateFormat, locale).format(new SimpleDateFormat("yyyy-MM-dd").parse(pDate));
 			} else if (StringUtil.isPartialYear(pDate, "yyyy")) {
 				temp = pDate;
 			} else if (StringUtil.isPartialYearMonth(pDate, "yyyy-MM")) {
-				temp = new SimpleDateFormat(yearMonthFormat).format(new SimpleDateFormat("yyyy-MM").parse(pDate));
+				temp = new SimpleDateFormat(yearMonthFormat, locale).format(new SimpleDateFormat("yyyy-MM")
+						.parse(pDate));
 			}
-		} catch (Exception ex) {
-			logger.warn("Parsial Date Parsing Exception........");
-		}
-
+        } catch (Exception ex) {
+            logger.warn("Partial Date Parsing Exception........");
+        }
 		return temp;
 	}
 

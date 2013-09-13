@@ -22,6 +22,7 @@
 package org.akaza.openclinica.bean.core;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
@@ -142,8 +143,7 @@ public class Utils {
 	 * @author ywang 12-06-2007
 	 */
 	public static String convertedItemDateValue(String itemValue, String from_pattern, String to_pattern, Locale locale) {
-		String temp = itemValue == null ? null : itemValue.trim();
-		if (itemValue != null && temp.length() > 4 && temp.length() == from_pattern.length()) {
+		if (itemValue != null && !StringUtil.isFormatDate(itemValue, to_pattern)) {
 			SimpleDateFormat sdf = new SimpleDateFormat(from_pattern, locale);
 			sdf.setLenient(false);
 			try {

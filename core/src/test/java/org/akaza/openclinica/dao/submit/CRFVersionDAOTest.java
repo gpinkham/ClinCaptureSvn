@@ -105,6 +105,7 @@ public class CRFVersionDAOTest extends DefaultAppContextTest {
 		assertTrue(newDescription.equals(crfVer.getDescription()));
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testThatDeleteRemovesSpecifiedVersionFromDB() throws OpenClinicaException {
 		int crfVerPK = 3;

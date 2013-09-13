@@ -1084,9 +1084,9 @@ public class Validator {
 			boolean isPDate = Boolean.FALSE;
 			String fieldValue = getFieldValue(fieldName);
 			if (fieldValue != null) {
-				if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"))
-						|| StringUtil.isPartialYear(fieldValue, "yyyy")
-						|| StringUtil.isPartialYearMonth(fieldValue, resformat.getString("date_format_year_month"))) {
+				if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"), locale)
+						|| StringUtil.isPartialYear(fieldValue, resformat.getString("date_format_year"), locale)
+						|| StringUtil.isPartialYearMonth(fieldValue, resformat.getString("date_format_year_month"), locale)) {
 
 					isPDate = true;
 				}

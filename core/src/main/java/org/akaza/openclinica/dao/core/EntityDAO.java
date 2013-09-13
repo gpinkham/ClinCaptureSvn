@@ -115,6 +115,8 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	// initializeI18nStrings() method; for JUnit tests
 	protected String oc_df_string = "";
 	protected String local_df_string = "";
+    protected String local_yf_string = "";
+    protected String local_ymf_string = "";
 
 	protected EhCacheWrapper ehCacheWrapper;
 
@@ -1073,6 +1075,8 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			// oc_df_string = ResourceBundleProvider.getFormatBundle(locale).getString("oc_date_format_string");
 			oc_df_string = ApplicationConstants.getDateFormatInItemData();
 			local_df_string = ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string");
+            local_yf_string = ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year");
+            local_ymf_string = ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month");
 		}
 	}
 

@@ -62,6 +62,7 @@ import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -578,9 +579,33 @@ public class ImportCRFDataService {
 				|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
 			ItemFormMetadataBean ifm = displayItemBean.getMetadata();
 			String widthDecimal = ifm.getWidthDecimal();
-			// what if it's a date? parse if out so that we go from iso 8601 to
-			// mm/dd/yyyy
-			if (displayItemBean.getItem().getDataType().equals(ItemDataType.DATE)) {
+			if (displayItemBean.getItem().getDataType().equals(ItemDataType.PDATE)) {
+				if (!"".equals(displayItemBean.getData().getValue())) {
+                    try {
+                        SimpleDateFormat sdf_sqldate;
+                        if (StringUtil.isFormatDate(displayItemBean.getData().getValue(), "yyyy-MM-dd")) {
+                            sdf_sqldate = new SimpleDateFormat("yyyy-MM-dd");
+                            sdf_sqldate.parse(displayItemBean.getData().getValue());
+                        } else if (StringUtil.isPartialYear(displayItemBean.getData().getValue(), "yyyy")) {
+                            sdf_sqldate = new SimpleDateFormat("yyyy");
+                            sdf_sqldate.parse(displayItemBean.getData().getValue());
+                        } else if (StringUtil.isPartialYearMonth(displayItemBean.getData().getValue(), "yyyy-MM")) {
+                            sdf_sqldate = new SimpleDateFormat("yyyy-MM");
+                            sdf_sqldate.parse(displayItemBean.getData().getValue());
+                        } else {
+                            throw new Exception();
+                        }
+                    } catch (Exception e) {
+						MessageFormat mf = new MessageFormat("");
+						mf.applyPattern(respage.getString("you_have_a_pdate_value_which_is_not"));
+						Object[] arguments = { displayItemBean.getItem().getOid() };
+						hardv.put(itemOid, mf.format(arguments));
+					}
+				}
+			} else
+            // what if it's a date? parse if out so that we go from iso 8601 to
+            // mm/dd/yyyy
+            if (displayItemBean.getItem().getDataType().equals(ItemDataType.DATE)) {
 				if (!"".equals(displayItemBean.getData().getValue())) {
 					String dateValue = displayItemBean.getData().getValue();
 					SimpleDateFormat sdf_sqldate = new SimpleDateFormat("yyyy-MM-dd");
@@ -601,13 +626,10 @@ public class ImportCRFDataService {
 							MessageFormat mf = new MessageFormat("");
 							mf.applyPattern(respage.getString("you_have_a_date_value_which_is_not"));
 							Object[] arguments = { displayItemBean.getItem().getOid() };
-
 							hardv.put(itemOid, mf.format(arguments));
-
 						}
 					}
 				}
-
 			} else if (displayItemBean.getItem().getDataType().equals(ItemDataType.ST)) {
 				int width = Validator.parseWidth(widthDecimal);
 				if (width > 0 && displayItemBean.getData().getValue().length() > width) {

@@ -291,7 +291,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		// JN:The following were the the global variables, moved as local.
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
-		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+		ItemDataDAO iddao = new ItemDataDAO(getDataSource(), locale);
 		HttpSession session = request.getSession();
 		StudyBean currentStudy = (StudyBean) session.getAttribute("study");
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute("userRole");

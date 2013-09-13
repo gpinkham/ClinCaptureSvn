@@ -83,6 +83,7 @@ import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
@@ -1626,10 +1627,34 @@ public class OdmExtractDAO extends DatasetDAO {
 								it.setReasonForNull(itValue.trim());
 							}
 						} else {
-							if (datatypeid == 9) {
+							if (datatypeid == 10) {
 								try {
-									itValue = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(
-											local_df_string, locale).parse(itValue));
+									if (!(StringUtil.isFormatDate(itValue, "yyyy-MM-dd")
+											|| StringUtil.isPartialYear(itValue, "yyyy") || StringUtil
+												.isPartialYearMonth(itValue, "yyyy-MM"))) {
+										if (StringUtil.isFormatDate(itValue, local_df_string, locale)) {
+											itValue = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(
+													local_df_string, locale).parse(itValue));
+										} else if (StringUtil.isPartialYear(itValue, local_yf_string, locale)) {
+											itValue = new SimpleDateFormat("yyyy").format(new SimpleDateFormat(
+													local_yf_string, locale).parse(itValue));
+										} else if (StringUtil.isPartialYearMonth(itValue, local_ymf_string, locale)) {
+											itValue = new SimpleDateFormat("yyyy-MM").format(new SimpleDateFormat(
+													local_ymf_string, locale).parse(itValue));
+										} else {
+											throw new Exception();
+										}
+									}
+								} catch (Exception fe) {
+									logger.debug("Item -" + itOID + " value " + itValue
+											+ " might not be ODM partial date format yyyy-MM-dd, yyyy-MM or yyyy.");
+								}
+							} else if (datatypeid == 9) {
+								try {
+									if (!StringUtil.isFormatDate(itValue, "yyyy-MM-dd")) {
+										itValue = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(
+												local_df_string, locale).parse(itValue));
+									}
 								} catch (Exception fe) {
 									logger.debug("Item -" + itOID + " value " + itValue
 											+ " might not be ODM date format yyyy-MM-dd.");
