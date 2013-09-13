@@ -133,22 +133,19 @@ public class ImportHelper {
 					v.addValidation(inputName, Validator.IS_REQUIRED);
 				}
 			} else {
-
 				if (idt.equals(ItemDataType.ST)) {
 					// a string's size could be more than 255, which is more
 					// than
 					// the db field length
 					v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
 							NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-
 				} else if (idt.equals(ItemDataType.INTEGER)) {
 					v.addValidation(inputName, Validator.IS_AN_INTEGER);
 					v.alwaysExecuteLastValidation(inputName);
-
 				} else if (idt.equals(ItemDataType.REAL)) {
 					// hard edit check, will comment out for now, tbh 05/08
-					// v.addValidation(inputName, Validator.IS_A_NUMBER);
-					// v.alwaysExecuteLastValidation(inputName);
+					v.addValidation(inputName, Validator.IS_A_NUMBER);
+					v.alwaysExecuteLastValidation(inputName);
 				} else if (idt.equals(ItemDataType.BL)) {
 					// there is no validation here since this data type is
 					// explicitly
@@ -157,23 +154,20 @@ public class ImportHelper {
 					// number, the
 					// value will be true; otherwise, 0
 				} else if (idt.equals(ItemDataType.BN)) {
-
+					//
 				} else if (idt.equals(ItemDataType.SET)) {
 					// v.addValidation(inputName, Validator.NO_BLANKS_SET);
 					v.addValidation(inputName, Validator.IN_RESPONSE_SET_SINGLE_VALUE, dib.getMetadata()
 							.getResponseSet());
-				}
-
-				else if (idt.equals(ItemDataType.DATE)) {
+				} else if (idt.equals(ItemDataType.DATE)) {
 					// hard edit check, will comment out for now, tbh 05/08
-					// v.addValidation(inputName, Validator.IS_A_DATE);
-					// v.alwaysExecuteLastValidation(inputName);
+					v.addValidation(inputName, Validator.IS_A_IMPORT_DATE);
+					v.alwaysExecuteLastValidation(inputName);
 				}
 
 				String customValidationString = dib.getMetadata().getRegexp();
 				if (!StringUtil.isBlank(customValidationString)) {
 					Validation customValidation = null;
-
 					if (customValidationString.startsWith("func:")) {
 						try {
 							customValidation = Validator.processCRFValidationFunction(customValidationString);
@@ -186,7 +180,6 @@ public class ImportHelper {
 						} catch (Exception e) {
 						}
 					}
-
 					if (customValidation != null) {
 						customValidation.setErrorMessage(dib.getMetadata().getRegexpErrorMsg());
 						v.addValidation(inputName, customValidation);

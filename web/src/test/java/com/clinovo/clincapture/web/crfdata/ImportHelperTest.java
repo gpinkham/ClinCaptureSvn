@@ -25,6 +25,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 public class ImportHelperTest {
 
 	protected ImportHelper importHelper;
+	protected ItemBean ib;
 	protected MockHttpServletRequest request;
     protected ConfigurationDao configurationDao;
 	protected FormDiscrepancyNotes formDiscrepancyNotes;
@@ -47,10 +48,9 @@ public class ImportHelperTest {
 
 		displayItemBean = new DisplayItemBean();
 
-		ItemBean ib = new ItemBean();
+		ib = new ItemBean();
 		ib.setOid("xxx_oid");
 		ib.setId(1);
-		ib.setDataType(ItemDataType.INTEGER);
 
 		displayItemBean.setItem(ib);
 
@@ -65,21 +65,67 @@ public class ImportHelperTest {
 
 	@Test
 	public void testWrongInteger() {
+		ib.setDataType(ItemDataType.INTEGER);
 		displayItemBean.getData().setValue("string");
 		request.setParameter(displayItemBean.getItem().getOid(), displayItemBean.getData().getValue());
 		importHelper.validateDisplayItemBeanText(discrepancyValidator, displayItemBean, displayItemBean.getItem()
 				.getOid());
-		HashMap<?, ?> validationErrors = discrepancyValidator.validate("noregex");
+		HashMap<?, ?> validationErrors = discrepancyValidator.validate();
 		assertEquals(validationErrors.size(), 1);
 	}
 
 	@Test
 	public void testCorrectInteger() {
+		ib.setDataType(ItemDataType.INTEGER);
 		displayItemBean.getData().setValue("1");
 		request.setParameter(displayItemBean.getItem().getOid(), displayItemBean.getData().getValue());
 		importHelper.validateDisplayItemBeanText(discrepancyValidator, displayItemBean, displayItemBean.getItem()
 				.getOid());
-		HashMap<?, ?> validationErrors = discrepancyValidator.validate("noregex");
+		HashMap<?, ?> validationErrors = discrepancyValidator.validate();
+		assertEquals(validationErrors.size(), 0);
+	}
+
+	@Test
+	public void testWrongReal() {
+		ib.setDataType(ItemDataType.REAL);
+		displayItemBean.getData().setValue("string");
+		request.setParameter(displayItemBean.getItem().getOid(), displayItemBean.getData().getValue());
+		importHelper.validateDisplayItemBeanText(discrepancyValidator, displayItemBean, displayItemBean.getItem()
+				.getOid());
+		HashMap<?, ?> validationErrors = discrepancyValidator.validate();
+		assertEquals(validationErrors.size(), 1);
+	}
+
+	@Test
+	public void testCorrectReal() {
+		ib.setDataType(ItemDataType.REAL);
+		displayItemBean.getData().setValue("1.1");
+		request.setParameter(displayItemBean.getItem().getOid(), displayItemBean.getData().getValue());
+		importHelper.validateDisplayItemBeanText(discrepancyValidator, displayItemBean, displayItemBean.getItem()
+				.getOid());
+		HashMap<?, ?> validationErrors = discrepancyValidator.validate();
+		assertEquals(validationErrors.size(), 0);
+	}
+
+	@Test
+	public void testWrongImportDate() {
+		ib.setDataType(ItemDataType.DATE);
+		displayItemBean.getData().setValue("10-10-2013");
+		request.setParameter(displayItemBean.getItem().getOid(), displayItemBean.getData().getValue());
+		importHelper.validateDisplayItemBeanText(discrepancyValidator, displayItemBean, displayItemBean.getItem()
+				.getOid());
+		HashMap<?, ?> validationErrors = discrepancyValidator.validate();
+		assertEquals(validationErrors.size(), 1);
+	}
+
+	@Test
+	public void testCorrectImportDate() {
+		ib.setDataType(ItemDataType.DATE);
+		displayItemBean.getData().setValue("2013-10-10");
+		request.setParameter(displayItemBean.getItem().getOid(), displayItemBean.getData().getValue());
+		importHelper.validateDisplayItemBeanText(discrepancyValidator, displayItemBean, displayItemBean.getItem()
+				.getOid());
+		HashMap<?, ?> validationErrors = discrepancyValidator.validate();
 		assertEquals(validationErrors.size(), 0);
 	}
 }

@@ -373,6 +373,7 @@ public class Validator {
 	public static final int IS_A_NUMBER = 2;
 	public static final int IS_IN_RANGE = 3;
 	public static final int IS_A_DATE = 4;
+	public static final int IS_A_IMPORT_DATE = 44;
 	public static final int IS_DATE_TIME = 21;
 	public static final int CHECK_SAME = 5;// this is for matching passwords,
 	// e.g.
@@ -707,6 +708,10 @@ public class Validator {
 				errorMessage = resexception.getString("input_not_valid_date") + getDateRegEx().getDescription() + " "
 						+ resexception.getString("format1") + ".";
 				break;
+			case IS_A_IMPORT_DATE:
+				errorMessage = resexception.getString("input_not_valid_date") + "yyyy-MM-dd" + " "
+						+ resexception.getString("format1") + ".";
+				break;
 			case IS_DATE_TIME:
 				errorMessage = resexception.getString("input_not_valid_date_time")
 						+ getDateTimeRegEx().getDescription() + " " + resexception.getString("format2") + ".";
@@ -894,6 +899,11 @@ public class Validator {
 			break;
 		case IS_A_DATE:
 			if (!isDate(fieldName)) {
+				addError(fieldName, v);
+			}
+			break;
+		case IS_A_IMPORT_DATE:
+			if (!isImportDate(fieldName)) {
 				addError(fieldName, v);
 			}
 			break;
@@ -1217,6 +1227,24 @@ public class Validator {
 		}
 	}
 
+	protected boolean isImportDate(String fieldName) {
+		String fieldValue = getFieldValue(fieldName);
+		if (StringUtil.isBlank(fieldValue)) {
+			return false;
+		}
+		if (!StringUtil.isFormatDate(fieldValue, "yyyy-MM-dd")) {
+			return false;
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		sdf.setLenient(false);
+		try {
+			java.util.Date date = sdf.parse(fieldValue);
+			return isYearNotFourDigits(date);
+		} catch (ParseException fe) {
+			return false;
+		}
+	}
+    
 	/**
 	 * @param fieldName
 	 *            The name of a field containing some text string.
