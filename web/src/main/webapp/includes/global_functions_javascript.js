@@ -2385,7 +2385,7 @@ codeItem = function(item) {
             $("div[id="+($(item).attr("itemid"))+"]").html(data);
         },
         error: function (e) {
-            alert("Error:" +e);
+            console.log("Error:" + e);
         }
     })
 }
@@ -2403,15 +2403,15 @@ saveCodedItem = function(item) {
         data: {
 
             item: $(item).children('div').attr("id"),
-            code: $(item).children('div').text().trim(),
+            code: $(item).siblings("input").val().trim(),
         },
 
         success: function(data) {
 
-            alert("SUCCESS")
+            console.log("Medical coding executed successfully")
         },
         error: function(e) {
-            alert("Error:" + e);
+            console.log("Error:" + e);
         }
     })
 }
@@ -2530,52 +2530,4 @@ function Pager(tableName, itemsPerPage) {
         element.innerHTML = pagerHtml;
 
     }
-
-}
-
-codeItem = function(item) {
-
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-
-    $.ajax({
-
-        type: "POST",
-        url: url+"/codedItem",
-        data: {
-
-            item: $(item).attr("itemid")
-        },
-
-        success: function(data) {
-
-            $("div[id="+($(item).attr("itemid"))+"]").html(data);
-        },
-        error: function (e) {
-            alert("Error:" +e);
-        }
-    })
-}
-
-saveCodedItem = function(item) {
-
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-    
-    $.ajax({
-
-        type: "POST",
-        url: url + "/saveCodedItem",
-        data: {
-
-            item: $(item).children('div').attr("id"),
-            code: $(item).children('div').text().trim(),
-        },
-
-        success: function(data) {
-
-            alert("SUCCESS")
-        },
-        error: function(e) {
-            alert("Error:" + e);
-        }
-    })
 }
