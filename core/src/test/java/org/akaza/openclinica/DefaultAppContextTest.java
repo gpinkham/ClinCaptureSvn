@@ -3,6 +3,7 @@ package org.akaza.openclinica;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
@@ -22,7 +23,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -31,6 +31,15 @@ import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.clinovo.dao.CodedItemDAO;
+import com.clinovo.dao.DictionaryDAO;
+import com.clinovo.dao.SynonymDAO;
+import com.clinovo.dao.TermDAO;
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DictionaryService;
+import com.clinovo.service.SynonymService;
+import com.clinovo.service.TermService;
 
 /**
  * To avoid the constant loading of beans from the application context, which can take a lot of memory on the test, we
@@ -57,6 +66,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
     protected DiscrepancyNoteDAO discrepancyNoteDAO;
     protected EventDefinitionCRFDAO eventDefinitionCRFDAO;
 	protected StudyEventDefinitionDAO studyEventDefinitionDAO;
+	
 	// DAOS
 	@Autowired protected RuleDao ruleDao;
 	@Autowired protected RuleSetDao ruleSetDao;
@@ -69,8 +79,17 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	@Autowired protected AuditUserLoginDao auditUserLoginDao;
 	@Autowired protected RuleSetRuleAuditDao ruleSetRuleAuditDao;
 	@Autowired protected DatabaseChangeLogDao databaseChangeLogDao;
-
+	
+	@Autowired protected TermDAO termDAO;
+	@Autowired protected SynonymDAO synonymDAO;
+	@Autowired protected CodedItemDAO codedItemDAO;
+	@Autowired protected DictionaryDAO dictionaryDAO;
+	
 	// Services
+	@Autowired protected TermService termService;
+	@Autowired protected SynonymService synonymService;
+	@Autowired protected CodedItemService codedItemService;
+	@Autowired protected DictionaryService dictionaryService;
 	@Autowired protected RuleSetServiceInterface ruleSetService;
 	@Autowired protected RulesPostImportContainerService postImportContainerService;
 	

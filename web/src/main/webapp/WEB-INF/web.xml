@@ -2154,14 +2154,4 @@
         <servlet-name>randomizeServlet</servlet-name>
         <url-pattern>/randomize</url-pattern>
     </servlet-mapping>
-    
-    <servlet>
-		<servlet-name>medicalCodingServlet</servlet-name>
-        <servlet-class>com.clinovo.servlet.MedicalCodingServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>medicalCodingServlet</servlet-name>
-        <url-pattern>/code</url-pattern>
-    </servlet-mapping>
 </web-app>

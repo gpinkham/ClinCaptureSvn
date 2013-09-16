@@ -21,6 +21,8 @@ import com.clinovo.http.HttpTransport;
 
 public class BioPortalSearchInterface implements SearchInterface {
 
+	private static final String ICD10_DICTIONARY_ID = "1516";
+	private static final String MEDDRA_DICTIONARY_ID = "1422";
 	private static final String CONCEPT_ID = "conceptId";
 	private static final String PREFERRED_NAME = "preferredName";
 	private static final String CONCEPT_ID_SHORT = "conceptIdShort";
@@ -40,7 +42,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 		method.setPath("/bioportal/search/");
 		method.setQueryString(new NameValuePair[] {
 
-		new NameValuePair("query", term), new NameValuePair("ontologyids", dictionary),
+		new NameValuePair("query", term), new NameValuePair("ontologyids", getDictionary(dictionary)),
 				new NameValuePair("apikey", BioPortalSearchInterface.API_KEY)
 
 		});
@@ -48,6 +50,17 @@ public class BioPortalSearchInterface implements SearchInterface {
 		transport.setMethod(method);
 
 		return processResponse(transport.processRequest());
+	}
+
+	private String getDictionary(String dictionary) throws SearchException {
+		
+		if("meddra".equalsIgnoreCase(dictionary)) {
+			return MEDDRA_DICTIONARY_ID;
+		} else if("icd10".equalsIgnoreCase(dictionary)) {
+			return ICD10_DICTIONARY_ID;
+		}
+		
+		throw new SearchException("Unknown dictionary type specified");
 	}
 
 	private List<Classification> processResponse(String httpResponse) throws Exception {

@@ -30,19 +30,19 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 	@Test
 	public void testThatSearchDoesNotReturnNull() throws Exception {
 
-		assertNotNull(searchInterface.search("term", "dictionary"));
+		assertNotNull(searchInterface.search("term", "ICD10"));
 	}
 
 	@Test
 	public void testThatSearchReturnsExpectedNumberOfTerms() throws Exception {
 
-		assertEquals(3, searchInterface.search("term", "dictionary").size());
+		assertEquals(3, searchInterface.search("term", "meDdRa").size());
 	}
 
 	@Test
 	public void testThatSearchReturnsClassificationsEachHavingAndId() throws Exception {
 
-		for (Classification classification : searchInterface.search("term", "dictionary")) {
+		for (Classification classification : searchInterface.search("term", "ICD10")) {
 
 			assertNotNull(classification.getId());
 		}
@@ -51,7 +51,7 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 	@Test
 	public void testThatSearchReturnsClassificationEachHavingACode() throws Exception {
 
-		for (Classification classification : searchInterface.search("term", "dictionary")) {
+		for (Classification classification : searchInterface.search("term", "meDdRa")) {
 
 			assertNotNull(classification.getCode());
 		}
@@ -60,7 +60,7 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 	@Test
 	public void testThatSearchReturnsClassificationsEachHavingAName() throws Exception {
 
-		for (Classification classification : searchInterface.search("term", "dictionary")) {
+		for (Classification classification : searchInterface.search("term", "ICD10")) {
 
 			assertNotNull(classification.getTerm());
 		}
@@ -69,7 +69,7 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 	@Test
 	public void testThatSearchReturnsClassificationsEachHavingADictionary() throws Exception {
 
-		for (Classification classification : searchInterface.search("term", "dictionary")) {
+		for (Classification classification : searchInterface.search("term", "meDdRa")) {
 
 			assertNotNull(classification.getDictionary());
 		}

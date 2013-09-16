@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="markg" id="2013-05-17-TICKET50">
+		<comment>Creating the dictionary table</comment>
+		<createTable tableName="dictionary">
+			<column autoIncrement="true" name="id" type="INT">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="type" type="INT" />
+			<column name="version" type="INT" />
+			<column name="name" type="VARCHAR(255)" />
+			<column name="description" type="VARCHAR(2048)" />
+			<column name="date_created" type="java.sql.Types.DATE" />
+			<column name="date_updated" type="java.sql.Types.DATE" />
+		</createTable>
+	</changeSet>
+	<changeSet author="markg" id="2013-05-17-TICKET50-SYNONYM">
+		<comment>Creating the synonym table</comment>
+		<createTable tableName="synonym">
+			<column autoIncrement="true" name="id" type="INT">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="version" type="INT" />
+			<column name="dictionary_id" type="INT" />
+			<column name="name" type="VARCHAR(255)" />
+			<column name="code" type="VARCHAR(255)" />
+			<column name="date_created" type="java.sql.Types.DATE" />
+		</createTable>
+	</changeSet>
+	<changeSet author="markg" id="2013-05-17-TICKET50-TERM">
+		<comment>Creating the term table</comment>
+		<createTable tableName="term">
+			<column autoIncrement="true" name="id" type="INT">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="version" type="INT" />
+			<column name="dictionary_id" type="INT" />
+			<column name="code" type="VARCHAR(255)" />
+			<column name="preferred_name" type="VARCHAR(255)" />
+			<column name="date_created" type="java.sql.Types.DATE" />
+		</createTable>
+	</changeSet>
+	<changeSet author="markg" id="2013-05-17-TICKET50-CODED_ITEM">
+		<comment>Creating the code item table</comment>
+		<createTable tableName="coded_item">
+			<column autoIncrement="true" name="id" type="INT">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="item_id" type="INT" />
+			<column name="version" type="INT" />
+			<column name="status" type="VARCHAR(255)" />
+			<column name="dictionary" type="VARCHAR(255)" />
+			<column name="coded_term" type="VARCHAR(255)" />
+			<column name="verbatim_term" type="VARCHAR(255)" />
+		</createTable>
+	</changeSet>
+</databaseChangeLog>

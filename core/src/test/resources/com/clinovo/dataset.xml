@@ -1039,4 +1039,36 @@
 	<dn_rfc_description dn_rfc_description_id="2"
 		 name="Protocol Deviation" description="Standard Protocol Deviation" 
 		 study_id="1" visibility_level="Study"/>
+		 
+	<dictionary id="1" name="Test Dictionary"
+		description="This is a test dictionary" type="1" date_created="2013-08-19"
+		date_updated="2013-08-19" version="0"/>
+		
+	<dictionary id="2" name="Test Dictionary 2"
+		description="This is a second test dictionary" type="2" date_created="2013-08-19"
+		date_updated="2013-08-19" version="0"/>
+		
+	<synonym id="1" name="some synonym"
+		code="SOME-CODE" dictionary_id="1" date_created="2013-08-19" version="0"/>
+		
+	<synonym id="2" name="some synonym 2"
+		code="SOME-CODE-2" dictionary_id="2" date_created="2013-08-19" version="0"/>
+		
+	<synonym id="3" name="some synonym 3"
+		code="SOME-CODE-3" dictionary_id="2" date_created="2013-08-19" version="0"/>
+		
+	<term id="1" preferred_name="some preferred name"
+		code="SOME-CODE" dictionary_id="1" date_created="2013-08-19" version="0"/>
+		
+	<term id="2" preferred_name="some preferred name 2"
+		code="SOME-CODE-2" dictionary_id="1" date_created="2013-08-19" version="0"/>
+		
+	<term id="3" preferred_name="some preferred name 3"
+		code="SOME-CODE-3" dictionary_id="2" date_created="2013-08-19" version="0"/>
+		
+	<coded_item id="1" dictionary="some-dictionary" verbatim_term="some-verbatim-term" coded_term="some-coded-term" status="UNKNOWN" item_id="1" version="0" />
+	<coded_item id="2" dictionary="some-dictionary-2" verbatim_term="some-verbatim-term-2" coded_term="some-coded-term-2" status="CODED" item_id="2" version="0" />
+	<coded_item id="3" dictionary="some-dictionary" verbatim_term="some-verbatim-term-3" coded_term="some-coded-term-3" status="NOT_CODED" item_id="3" version="0" />
+	<coded_item id="4" dictionary="some-dictionary-2" verbatim_term="some-verbatim-term-4" coded_term="some-coded-term-4" status="NOT_CODED" item_id="4" version="0" />
+		
 </dataset>

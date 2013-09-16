@@ -2106,3 +2106,32 @@ span.asterisk {
     padding-left: 4px;
     vertical-align: top;
 }
+
+.pg-normal {
+    color: #4d4d4d;
+}
+
+.pg-selected {
+    color: #ffffff;
+    background: #4d4d4d;
+}
+
+.wrapText {
+    word-wrap: break-word;
+    display: inline-block;
+    width: 280px;
+}
+
+.itemsTable {
+    border-collapse: collapse;
+    width: 450px;
+    height: 340px;
+}
+
+.itemsTable td {
+    padding: 10px 0;
+}
+
+.itemsTable tr {
+    border-top: 1px #4d4d4d solid;
+}

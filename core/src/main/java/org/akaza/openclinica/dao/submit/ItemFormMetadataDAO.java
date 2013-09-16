@@ -40,9 +40,6 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.domain.crfdata.InstantOnChangePairContainer;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
-/**
- * @author ssachs
- */
 @SuppressWarnings({"rawtypes","unchecked"})
 public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 
