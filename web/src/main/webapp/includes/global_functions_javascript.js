@@ -2403,7 +2403,7 @@ saveCodedItem = function(item) {
         data: {
 
             item: $(item).children('div').attr("id"),
-            code: $(item).children("div").val().trim(),
+            code: $(item).children('div').text().trim()
         },
 
         success: function(data) {
