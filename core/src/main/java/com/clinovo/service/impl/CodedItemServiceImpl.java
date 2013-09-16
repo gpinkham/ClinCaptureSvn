@@ -149,7 +149,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 
 		String subHeader = bean.getSubHeader();
 		
-		Pattern pattern = Pattern.compile("^<.*>");
+		Pattern pattern = Pattern.compile("^<.*dictionary=.*verbatimterm=.*>");
 		Matcher matcher = pattern.matcher(subHeader);
 		
 		if (subHeader != null && !subHeader.isEmpty() && matcher.matches()) {
