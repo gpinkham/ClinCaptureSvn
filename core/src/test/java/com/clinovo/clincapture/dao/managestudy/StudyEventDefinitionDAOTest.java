@@ -40,4 +40,25 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 			ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllActiveBySubjectAndStudyId(ssb, studyId);
 			assertEquals(3, result.size());
 		} 	
+		
+		@Test
+		@SuppressWarnings("unchecked")
+		public void testFindAllActiveBySubjectFromActiveDynGroupAndStudyId_1() throws OpenClinicaException {
+			int studyId = 1;
+			StudySubjectBean ssb = new StudySubjectBean();
+			ssb.setDynamicGroupClassId(1);
+			ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
+			assertEquals(3, result.size());
+		} 	
+		
+		@Test
+		@SuppressWarnings("unchecked")
+		public void testFindAllActiveBySubjectFromActiveDynGroupAndStudyId_2() throws OpenClinicaException {
+			int studyId = 1;
+			StudySubjectBean ssb = new StudySubjectBean();
+			ssb.setDynamicGroupClassId(3);
+			ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
+			assertEquals(1, result.size());
+		} 	
+		
 	}

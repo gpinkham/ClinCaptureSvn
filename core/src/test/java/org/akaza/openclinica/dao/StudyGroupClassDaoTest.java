@@ -109,7 +109,7 @@ public class StudyGroupClassDaoTest extends DefaultAppContextTest {
 	@Test
 	public void testGetMaxDynamicOrdinal() {
 		
-		assertEquals(1, studyGroupClassDAO.getMaxDynamicOrdinalByStudyId(1));
+		assertEquals(2, studyGroupClassDAO.getMaxDynamicOrdinalByStudyId(1));
 	}
 	
 	@Test

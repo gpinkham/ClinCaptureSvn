@@ -132,7 +132,7 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 		}
 		
 		// find all active definitions with CRFs
-		ArrayList eventDefinitions = seddao.findAllActiveBySubjectAndStudyId(ssb,studyWithEventDefinitions.getId());
+		ArrayList eventDefinitions = seddao.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb,studyWithEventDefinitions.getId());
 
 		//add definitions from default group
 		int defGrClassId = sgcdao.findDefaultByStudyId(studyWithEventDefinitions.getId()).getId();

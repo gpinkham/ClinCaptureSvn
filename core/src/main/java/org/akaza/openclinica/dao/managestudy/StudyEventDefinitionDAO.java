@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
@@ -359,6 +360,26 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		}
 
 		return answer;
+	}
+	
+	public ArrayList findAllActiveBySubjectFromActiveDynGroupAndStudyId(StudySubjectBean ssb, int studyId) {
+		ArrayList<StudyEventDefinitionBean> defsFromActiveGroup = new ArrayList(); 
+		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(this.getDs());
+		if (ssb.getDynamicGroupClassId() == 0){
+			StudyGroupClassBean sgc = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(studyId);
+			if (sgc.getId() > 0){
+				defsFromActiveGroup = findAllActiveOrderedByStudyGroupClassId(sgc.getId());
+			}
+		} else {
+			StudyGroupClassBean sgc = (StudyGroupClassBean) sgcdao.findByPK(ssb.getDynamicGroupClassId());
+			if (sgc.getStatus() == Status.AVAILABLE) {
+				defsFromActiveGroup = findAllActiveOrderedByStudyGroupClassId(ssb.getDynamicGroupClassId());
+			}
+		}
+		ArrayList<StudyEventDefinitionBean> nonGroupDefs = findAllActiveNotClassGroupedByStudyId(studyId);
+		defsFromActiveGroup.addAll(nonGroupDefs);
+		
+		return defsFromActiveGroup;
 	}
 	
 	public ArrayList findAllActiveBySubjectAndStudyId(StudySubjectBean ssb, int studyId) {
