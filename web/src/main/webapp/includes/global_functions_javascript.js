@@ -2376,7 +2376,8 @@ codeItem = function(item) {
         url: url+"/codedItem",
         data: {
 
-            item: $(item).attr("itemid")
+            item: $(item).attr("itemid"),
+            verbatimTerm: $(item).parent().siblings("td").find("input").val().trim()
         },
 
         success: function(data) {
@@ -2408,6 +2409,7 @@ saveCodedItem = function(item) {
 
         success: function(data) {
 
+            $(item).parents('div').siblings("input").val($(item).children('div').text().trim());
             console.log("Medical coding executed successfully")
         },
         error: function(e) {

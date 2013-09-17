@@ -118,6 +118,7 @@ public class CodedItemsController {
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
 		String codedItemItemId = request.getParameter("item");
+		String verbatimTerm = request.getParameter("verbatimTerm");
 
 		CodedItem codedItem = codedItemService.findByItemId(Integer.parseInt(codedItemItemId));
 
@@ -125,8 +126,7 @@ public class CodedItemsController {
 
 		try {
 
-			List<Classification> classifications = search.getClassifications(codedItem.getVerbatimTerm(),
-					codedItem.getDictionary());
+			List<Classification> classifications = search.getClassifications(verbatimTerm, codedItem.getDictionary());
 			
 			map.addAttribute("itemId", codedItem.getItemId());
 			map.addAttribute("classification", classifications);
@@ -169,12 +169,16 @@ public class CodedItemsController {
 		StringBuilder actions = new StringBuilder("");
 
 		for (CodedItem codedItem : codedItems) {
+			
+			String inputTerm = codedItem.isCoded() ? codedItem.getCodedTerm() : codedItem.getVerbatimTerm();
+			
 			CodedItemRow tempBean = new CodedItemRow();
 			tempBean.setItemId(codedItem.getItemId());
 			tempBean.setVerbatimTerm(codedItem.getVerbatimTerm());
-			actions.append(codedItem.getCodedTerm()).append(CodedItemRow.CODED_DIV_PREFIX)
-					.append(codedItem.getItemId()).append(CodedItemRow.CODED_DIV_SUFIX);
-			tempBean.setCodedColumn(actions.toString());
+            actions.append(CodedItemRow.CODED_DIV_PREFIX).append(inputTerm)
+                   .append(CodedItemRow.CODED_DIV_MIDDLE).append(codedItem.getItemId())
+                   .append(CodedItemRow.CODED_DIV_SUFIX);
+            tempBean.setCodedColumn(actions.toString());
 			actions.setLength(0);
 			tempBean.setDictionary(codedItem.getDictionary());
 			actions.append(CodedItemRow.AJAX_REQUEST_PREFIX).append(codedItem.getItemId())

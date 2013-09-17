@@ -21,7 +21,8 @@ public class CodedItemRow {
     private String verbatimTerm = "";
     private String actionColumn = "";
 
-    public final static String CODED_DIV_PREFIX = "<div id=\"";
+    public final static String CODED_DIV_PREFIX = "Search: <input style=\"border:1px solid #a6a6a6;margin-bottom: 2px;background-color:#d9d9d9;color:#4D4D4D\" type=\"text\" value=\"";
+    public final static String CODED_DIV_MIDDLE = "\"/><div id=\"";
     public final static String CODED_DIV_SUFIX = "\"></div>";
     public final static String AJAX_REQUEST_PREFIX = "<a onClick=\"codeItem(this)\" itemId=\"";
     public final static String AJAX_REQUEST_SUFIX = "\"><img style=\"float:left;\" width=\"17\" border=\"0\" title=\"Code\" alt=\"Code\" src=\"../images/code.png\" name=\"codeBtn\"/></a>";
