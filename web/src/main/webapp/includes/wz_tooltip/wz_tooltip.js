@@ -1194,28 +1194,36 @@ Number.prototype.EndTimer = function()
 }
 function tt_GetWndCliSiz(s)
 {
-	var db, y = window["inner" + s], sC = "client" + s, sN = "number";
-	if(typeof y == sN)
-	{
-		var y2;
-		return(
-			// Gecko or Opera with scrollbar
-			// ... quirks mode
-			((db = document.body) && typeof(y2 = db[sC]) == sN && y2 &&  y2 <= y) ? y2 
-			// ... strict mode
-			: ((db = document.documentElement) && typeof(y2 = db[sC]) == sN && y2 && y2 <= y) ? y2
-			// No scrollbar, or clientarea size == 0, or other browser (KHTML etc.)
-			: y
-		);
-	}
-	// IE
-	return(
-		// document.documentElement.client+s functional, returns > 0
-		((db = document.documentElement) && (y = db[sC])) ? y
-		// ... not functional, in which case document.body.client+s 
-		// is the clientarea size, fortunately
-		: document.body[sC]
-	);
+  var v = 0;
+  if (s == "Width") {
+    if (self.innerHeight)
+    {
+      v = self.innerWidth;
+    }
+    else if (document.documentElement && document.documentElement.clientHeight)
+    {
+      v = document.documentElement.clientWidth;
+    }
+    else if (document.body)
+    {
+      v = document.body.clientWidth;
+    }
+  } else
+  if (s == "Height") {
+    if (self.innerHeight)
+    {
+      v = self.innerHeight;
+    }
+    else if (document.documentElement && document.documentElement.clientHeight)
+    {
+      v = document.documentElement.clientHeight;
+    }
+    else if (document.body)
+    {
+      v = document.body.clientHeight;
+    }
+  }
+  return v;
 }
 function tt_SetOpa(el, opa)
 {
