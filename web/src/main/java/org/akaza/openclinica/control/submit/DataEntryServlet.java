@@ -2660,8 +2660,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					// a string's size could be more than 255, which is more
 					// than
 					// the db field length
-					v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
-							NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+					if(ibMeta.getResponseSet().getResponseType() == org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) {
+                        v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
+                                NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1024);
+                    } else {
+                        v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
+                                NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+                    }
 
 				} else if (idt.equals(ItemDataType.INTEGER)) {
 					v.addValidation(inputName, Validator.IS_AN_INTEGER);
