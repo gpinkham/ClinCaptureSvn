@@ -163,6 +163,9 @@ public class ImportHelper {
 					// hard edit check, will comment out for now, tbh 05/08
 					v.addValidation(inputName, Validator.IS_A_IMPORT_DATE);
 					v.alwaysExecuteLastValidation(inputName);
+				} else if (idt.equals(ItemDataType.PDATE)) {
+					v.addValidation(inputName, Validator.IS_A_IMPORT_PARTIAL_DATE);
+					v.alwaysExecuteLastValidation(inputName);
 				}
 
 				String customValidationString = dib.getMetadata().getRegexp();
@@ -177,6 +180,8 @@ public class ImportHelper {
 					} else if (customValidationString.startsWith("regexp:")) {
 						try {
 							customValidation = Validator.processCRFValidationRegex(customValidationString);
+							customValidation.setConvertDate(idt.equals(ItemDataType.DATE));
+							customValidation.setConvertPDate(idt.equals(ItemDataType.PDATE));
 						} catch (Exception e) {
 						}
 					}

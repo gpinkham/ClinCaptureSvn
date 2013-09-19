@@ -30,6 +30,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.TermType;
 import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -347,7 +348,7 @@ public class Validator {
 	Locale locale;
 	ResourceBundle restext, resexception, resword;
 
-	public static ValidatorRegularExpression getDateRegEx() {
+    public static ValidatorRegularExpression getDateRegEx() {
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 		return new ValidatorRegularExpression(resformat.getString("date_format"), resformat.getString("date_regexp"));
 	}
@@ -374,6 +375,7 @@ public class Validator {
 	public static final int IS_IN_RANGE = 3;
 	public static final int IS_A_DATE = 4;
 	public static final int IS_A_IMPORT_DATE = 44;
+    public static final int IS_A_IMPORT_PARTIAL_DATE = 45;
 	public static final int IS_DATE_TIME = 21;
 	public static final int CHECK_SAME = 5;// this is for matching passwords,
 	// e.g.
@@ -708,10 +710,20 @@ public class Validator {
 				errorMessage = resexception.getString("input_not_valid_date") + getDateRegEx().getDescription() + " "
 						+ resexception.getString("format1") + ".";
 				break;
+			case IS_PARTIAL_DATE:
+				errorMessage = resexception.getString("input_not_partial_date") + " ("
+						+ resformat.getString("date_format_year") + ", or "
+						+ resformat.getString("date_format_year_month") + ", or "
+						+ resformat.getString("date_format_string");
+				break;
 			case IS_A_IMPORT_DATE:
-				errorMessage = resexception.getString("input_not_valid_date") + "yyyy-MM-dd" + " "
+				errorMessage = resexception.getString("input_not_valid_pdate") + "yyyy-MM-dd" + " "
 						+ resexception.getString("format1") + ".";
 				break;
+			case IS_A_IMPORT_PARTIAL_DATE:
+				errorMessage = resexception.getString("input_not_valid_pdate") + "yyyy, or yyyy-MM, or yyyy-MM-dd" + " "
+						+ resexception.getString("format1") + ".";
+				break;       
 			case IS_DATE_TIME:
 				errorMessage = resexception.getString("input_not_valid_date_time")
 						+ getDateTimeRegEx().getDescription() + " " + resexception.getString("format2") + ".";
@@ -817,12 +829,6 @@ public class Validator {
 			case IS_AN_RULE:
 				errorMessage = resexception.getString("input_not_integer");
 				break;
-			case IS_PARTIAL_DATE:
-				errorMessage = resexception.getString("input_not_partial_date") + " ("
-						+ resformat.getString("date_format_year") + ", or "
-						+ resformat.getString("date_format_year_month") + ", or "
-						+ resformat.getString("date_format_string");
-				break;
 			case BARCODE_EAN_13:
 				errorMessage = resexception.getString("input_not_barcode");
 				break;
@@ -877,7 +883,7 @@ public class Validator {
 		return;
 	}
 
-	protected HashMap validate(String fieldName, Validation v) {
+	protected HashMap validate(String fieldName, Validation v) {     
 		switch (v.getType()) {
 		case NO_BLANKS:
 			if (isBlank(fieldName)) {
@@ -902,12 +908,41 @@ public class Validator {
 				addError(fieldName, v);
 			}
 			break;
+		case IS_PARTIAL_DATE:
+			boolean isPDate = Boolean.FALSE;
+			String fieldValue = getFieldValue(fieldName);
+			if (fieldValue != null) {
+				if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"), locale)
+						|| StringUtil.isPartialYear(fieldValue, resformat.getString("date_format_year"), locale)
+						|| StringUtil.isPartialYearMonth(fieldValue, resformat.getString("date_format_year_month"),
+								locale)) {
+					isPDate = true;
+				}
+			}
+			if (!isPDate) {
+				addError(fieldName, v);
+			}
+			break;
 		case IS_A_IMPORT_DATE:
 			if (!isImportDate(fieldName)) {
 				addError(fieldName, v);
 			}
 			break;
-		case IS_DATE_TIME:
+		case IS_A_IMPORT_PARTIAL_DATE:
+			boolean isImportPDate = Boolean.FALSE;
+			String importFieldValue = getFieldValue(fieldName);
+			if (importFieldValue != null) {
+				if (StringUtil.isFormatDate(importFieldValue, "yyyy-MM-dd", locale)
+						|| StringUtil.isPartialYear(importFieldValue, "yyyy", locale)
+						|| StringUtil.isPartialYearMonth(importFieldValue, "yyyy-MM", locale)) {
+					isImportPDate = true;
+				}
+			}
+			if (!isImportPDate) {
+				addError(fieldName, v);
+			}
+			break;
+        case IS_DATE_TIME:
 			if (!isDateTime(fieldName)) {
 				addError(fieldName, v);
 			}
@@ -1059,7 +1094,7 @@ public class Validator {
 			}
 			break;
 		case MATCHES_REGULAR_EXPRESSION:
-			if (!matchesRegex(fieldName, v.getString(0))) {
+			if (!matchesRegex(fieldName, v)) {
 				addError(fieldName, v);
 			}
 			break;
@@ -1089,21 +1124,6 @@ public class Validator {
 			}
 			v.setErrorMessage(sb.toString());
 			addError(fieldName, v);
-			break;
-		case IS_PARTIAL_DATE:
-			boolean isPDate = Boolean.FALSE;
-			String fieldValue = getFieldValue(fieldName);
-			if (fieldValue != null) {
-				if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"), locale)
-						|| StringUtil.isPartialYear(fieldValue, resformat.getString("date_format_year"), locale)
-						|| StringUtil.isPartialYearMonth(fieldValue, resformat.getString("date_format_year_month"), locale)) {
-
-					isPDate = true;
-				}
-			}
-			if (!isPDate) {
-				addError(fieldName, v);
-			}
 			break;
 		case IS_VALID_WIDTH_DECIMAL:
 			ArrayList<String> params = (ArrayList<String>) v.getArg(0);
@@ -1137,7 +1157,8 @@ public class Validator {
 	 */
 	protected String getFieldValue(String fieldName) {
 		return validatorHelper.getParameter(fieldName) == null ? validatorHelper.getAttribute(fieldName) == null ? null
-				: validatorHelper.getAttribute(fieldName).toString() : validatorHelper.getParameter(fieldName);
+				: validatorHelper.getAttribute(fieldName).toString()
+				: validatorHelper.getParameter(fieldName);
 	}
 
 	// validation functions that determine whether a field passes validation
@@ -1227,24 +1248,24 @@ public class Validator {
 		}
 	}
 
-	protected boolean isImportDate(String fieldName) {
-		String fieldValue = getFieldValue(fieldName);
-		if (StringUtil.isBlank(fieldValue)) {
-			return false;
-		}
-		if (!StringUtil.isFormatDate(fieldValue, "yyyy-MM-dd")) {
-			return false;
-		}
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		sdf.setLenient(false);
-		try {
-			java.util.Date date = sdf.parse(fieldValue);
-			return isYearNotFourDigits(date);
-		} catch (ParseException fe) {
-			return false;
-		}
-	}
-    
+    protected boolean isImportDate(String fieldName) {
+        String fieldValue = getFieldValue(fieldName);
+        if (StringUtil.isBlank(fieldValue)) {
+            return false;
+        }
+        if (!StringUtil.isFormatDate(fieldValue, "yyyy-MM-dd")) {
+            return false;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf.setLenient(false);
+        try {
+            java.util.Date date = sdf.parse(fieldValue);
+            return isYearNotFourDigits(date);
+        } catch (ParseException fe) {
+            return false;
+        }
+    }
+   
 	/**
 	 * @param fieldName
 	 *            The name of a field containing some text string.
@@ -1521,20 +1542,24 @@ public class Validator {
 
 		return compares;
 	}
-
-	protected boolean matchesRegex(String fieldName, String regex) {
-		ValidatorRegularExpression vre = new ValidatorRegularExpression(regex, regex);
-		return matchesRegex(fieldName, vre);
+    
+	private boolean matchesRegex(String fieldName, Validation v) {
+		ValidatorRegularExpression vre = new ValidatorRegularExpression(v.getString(0), v.getString(0));
+		return matchesRegex(fieldName, v, vre);
 	}
 
-	protected boolean matchesRegex(String fieldName, ValidatorRegularExpression re) {
-		String fieldValue = getFieldValue(fieldName);
+	private boolean matchesRegex(String fieldName, ValidatorRegularExpression re) {
+		return matchesRegex(fieldName, null, re);
+	}
+
+	private boolean matchesRegex(String fieldName, Validation v, ValidatorRegularExpression re) {
+		String fieldValue = prepareFieldValue(getFieldValue(fieldName), v);
 
 		if (fieldValue == null) {
 			return false;
 		}
 
-		Pattern p = null;
+		Pattern p;
 		try {
 			p = Pattern.compile(re.getRegularExpression());
 		} catch (PatternSyntaxException pse) {
@@ -1547,6 +1572,27 @@ public class Validator {
 		}
 
 		return false;
+	}
+
+	private String prepareFieldValue(String fieldValue, Validation v) {
+		if (v != null && fieldValue != null && !fieldValue.isEmpty()) {
+			if (v.isConvertDate()) {
+				fieldValue = Utils.convertedItemDateValue(fieldValue, "yyyy-MM-dd",
+						resformat.getString("date_format_string"), locale);
+			} else if (v.isConvertPDate()) {
+				if (StringUtil.isFormatDate(fieldValue, "yyyy-MM-dd")) {
+					fieldValue = Utils.convertedItemDateValue(fieldValue, "yyyy-MM-dd",
+							resformat.getString("date_format_string"), locale);
+				} else if (StringUtil.isPartialYear(fieldValue, "yyyy")) {
+					fieldValue = Utils.convertedItemDateValue(fieldValue, "yyyy",
+							resformat.getString("date_format_year"), locale);
+				} else if (StringUtil.isPartialYearMonth(fieldValue, "yyyy-MM")) {
+					fieldValue = Utils.convertedItemDateValue(fieldValue, "yyyy-MM",
+							resformat.getString("date_format_year_month"), locale);
+				}
+			}
+		}
+		return fieldValue;
 	}
 
 	protected boolean entityExists(String fieldName, EntityDAO edao) {

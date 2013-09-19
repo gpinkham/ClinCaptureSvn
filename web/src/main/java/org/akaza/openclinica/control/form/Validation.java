@@ -34,6 +34,10 @@ public class Validation {
 
 	private boolean alwaysExecuted;
 
+	private boolean convertPDate;
+
+	private boolean convertDate;
+
 	public Validation(int type) {
 		this.type = type;
 		arguments = new ArrayList();
@@ -184,4 +188,20 @@ public class Validation {
 	public void setAlwaysExecuted(boolean alwaysExecuted) {
 		this.alwaysExecuted = alwaysExecuted;
 	}
+
+    public boolean isConvertPDate() {
+        return convertPDate;
+    }
+
+    public void setConvertPDate(boolean convertPDate) {
+        this.convertPDate = convertPDate;
+    }
+
+    public boolean isConvertDate() {
+        return convertDate;
+    }
+
+    public void setConvertDate(boolean convertDate) {
+        this.convertDate = convertDate;
+    }
 }
