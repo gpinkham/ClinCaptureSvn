@@ -21,37 +21,30 @@
 package org.akaza.openclinica.control;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.SiteStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudyStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFactory;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
-import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.table.sdv.SDVUtil;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 
@@ -61,40 +54,31 @@ import java.util.Locale;
  * 
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class MainMenuServlet extends SecureController {
-
-	Locale locale;
-	private StudyEventDefinitionDAO studyEventDefinitionDAO;
-	private SubjectDAO subjectDAO;
-	private StudySubjectDAO studySubjectDAO;
-	private StudyEventDAO studyEventDAO;
-	private StudyGroupClassDAO studyGroupClassDAO;
-	private SubjectGroupMapDAO subjectGroupMapDAO;
-	private StudyDAO studyDAO;
-	private EventCRFDAO eventCRFDAO;
-	private EventDefinitionCRFDAO eventDefintionCRFDAO;
-	private StudyGroupDAO studyGroupDAO;
-	private DiscrepancyNoteDAO discrepancyNoteDAO;
-	private DynamicEventDao dynamicEventDao;
+@Component
+public class MainMenuServlet extends Controller {
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+		//
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		ub.incNumVisitsToMainMenu();
-		session.setAttribute(USER_BEAN_NAME, ub);
+		request.getSession().setAttribute(USER_BEAN_NAME, ub);
 		request.setAttribute("iconInfoShown", true);
 		request.setAttribute("closeInfoShowIcons", false);
 
 		if (ub == null || ub.getId() == 0) {// in case database connection is
 			// broken
-			forwardPage(Page.MENU, false);
+			forwardPage(Page.MENU, false, request, response);
 			return;
 		}
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = new StudyDAO(getDataSource());
 		ArrayList studies = null;
 
 		long pwdExpireDay = new Long(SQLInitServlet.getField("passwd_expiration_time")).longValue();
@@ -104,7 +88,7 @@ public class MainMenuServlet extends SecureController {
 		// time log in or pwd expired
 		int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
 		// update last visit date to current date
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO udao = getUserAccountDAO();
 		UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
 		ub1.setLastVisitDate(new Date(System.currentTimeMillis()));
 		// have to actually set the above to a timestamp? tbh
@@ -115,8 +99,8 @@ public class MainMenuServlet extends SecureController {
 		// Use study Id in JSPs
 		request.setAttribute("studyId", currentStudy.getId());
 		// Event Definition list and Group Class list for add suybject window.
-		request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
-		request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
+		request.setAttribute("allDefsArray", getEventDefinitionsByCurrentStudy(request));
+		request.setAttribute("studyGroupClasses", getStudyGroupClassesByCurrentStudy(request));
 		if (lastPwdChangeDate != null || pwdChangeRequired == 0) {// not a new user
 
 			if (lastPwdChangeDate == null && pwdChangeRequired == 0) {
@@ -126,41 +110,41 @@ public class MainMenuServlet extends SecureController {
 			// compute difference between current date and lastPwdChangeDate
 			long difference = Math.abs(cal.getTime().getTime() - lastPwdChangeDate.getTime());
 			long days = difference / (1000 * 60 * 60 * 24);
-			session.setAttribute("passwordExpired", "no");
+			request.getSession().setAttribute("passwordExpired", "no");
 
 			if (pwdExpireDay != 0 && days >= pwdExpireDay) {// password expired, need to be changed
 				studies = (ArrayList) sdao.findAllByUser(ub.getName());
 				request.setAttribute("studies", studies);
-				session.setAttribute("userBean1", ub);
-				addPageMessage(respage.getString("password_expired"));
+                request.getSession().setAttribute("userBean1", ub);
+				addPageMessage(respage.getString("password_expired"), request);
 				// Add the feature that if password is expired,
 				// have to go through /ResetPassword page
-				session.setAttribute("passwordExpired", "yes");
+                request.getSession().setAttribute("passwordExpired", "yes");
 				if (pwdChangeRequired == 1) {
 					request.setAttribute("mustChangePass", "yes");
-					addPageMessage(respage.getString("your_password_has_expired_must_change"));
+					addPageMessage(respage.getString("your_password_has_expired_must_change"), request);
 				} else {
 					request.setAttribute("mustChangePass", "no");
 					addPageMessage(respage.getString("password_expired") + " "
-							+ respage.getString("if_you_do_not_want_change_leave_blank"));
+							+ respage.getString("if_you_do_not_want_change_leave_blank"), request);
 				}
-				forwardPage(Page.RESET_PASSWORD);
+				forwardPage(Page.RESET_PASSWORD, request, response);
 			} else {
 
 				if (ub.getNumVisitsToMainMenu() <= 1) {
 					if (ub.getLastVisitDate() != null) {
 						addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName()
 								+ ". " + respage.getString("last_logged") + " "
-								+ local_df.format(ub.getLastVisitDate()) + ". ");
+								+ getLocalDf(request).format(ub.getLastVisitDate()) + ". ", request);
 					} else {
 						addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName()
-								+ ". ");
+								+ ". ", request);
 					}
 
 					if (currentStudy.getStatus().isLocked()) {
-						addPageMessage(respage.getString("current_study_locked"));
+						addPageMessage(respage.getString("current_study_locked"), request);
 					} else if (currentStudy.getStatus().isFrozen()) {
-						addPageMessage(respage.getString("current_study_frozen"));
+						addPageMessage(respage.getString("current_study_frozen"), request);
 					}
 				}
 
@@ -170,7 +154,7 @@ public class MainMenuServlet extends SecureController {
 
 				int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId()
 						: currentStudy.getId();
-				StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+				StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 				StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
 				currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
 				String idSetting = parentSPV.getValue();
@@ -179,52 +163,52 @@ public class MainMenuServlet extends SecureController {
 				}
                 
                 if (currentRole.isInvestigator() || currentRole.isClinicalResearchCoordinator()) {
-                    setupListStudySubjectTable();
+                    setupListStudySubjectTable(request, response);
                 } 
                 if (currentRole.getRole() == Role.STUDY_MONITOR) {
-                    setupSubjectSDVTable();
+                    setupSubjectSDVTable(request);
                 } else if (currentRole.isSysAdmin() || currentRole.isStudyAdministrator() || currentRole.isStudyDirector()) {
                     if (currentStudy.getStatus().isPending()) {
-                    	session.setAttribute("skipURL", "true");
+                    	request.getSession().setAttribute("skipURL", "true");
                     	
                         response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
                         return;
                     }
-					setupStudySiteStatisticsTable();
-					setupSubjectEventStatusStatisticsTable();
-					setupStudySubjectStatusStatisticsTable();
+					setupStudySiteStatisticsTable(request, response);
+					setupSubjectEventStatusStatisticsTable(request, response);
+					setupStudySubjectStatusStatisticsTable(request, response);
 					if (currentStudy.getParentStudyId() == 0) {
-						setupStudyStatisticsTable();
+						setupStudyStatisticsTable(request, response);
 					}
 
 				}
 				udao.updatePasswdHistory(ub); 
-				forwardPage(Page.MENU);
+				forwardPage(Page.MENU, request, response);
 			}
 
 		} else {
 			studies = (ArrayList) sdao.findAllByUser(ub.getName());
 			request.setAttribute("studies", studies);
-			session.setAttribute("userBean1", ub);
+            request.getSession().setAttribute("userBean1", ub);
 
 			if (pwdChangeRequired != 1) {
 				udao.updatePasswdHistory(ub); 
-				forwardPage(Page.MENU);
+				forwardPage(Page.MENU, request, response);
 			}
 		}
 
 	}
 
-	private void setupSubjectSDVTable() {
-
+	private void setupSubjectSDVTable(HttpServletRequest request) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		request.setAttribute("studyId", currentStudy.getId());
 		request.setAttribute("showMoreLink", "true");
 		String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
 		request.setAttribute("sdvMatrix", sdvMatrix);
 	}
 
-	private void setupStudySubjectStatusStatisticsTable() {
-
+	private void setupStudySubjectStatusStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		StudySubjectStatusStatisticsTableFactory factory = new StudySubjectStatusStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -233,8 +217,8 @@ public class MainMenuServlet extends SecureController {
 		request.setAttribute("studySubjectStatusStatistics", studySubjectStatusStatistics);
 	}
 
-	private void setupSubjectEventStatusStatisticsTable() {
-
+	private void setupSubjectEventStatusStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		EventStatusStatisticsTableFactory factory = new EventStatusStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -244,32 +228,33 @@ public class MainMenuServlet extends SecureController {
 		request.setAttribute("subjectEventStatusStatistics", subjectEventStatusStatistics);
 	}
 
-	private void setupStudySiteStatisticsTable() {
-
+	private void setupStudySiteStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		SiteStatisticsTableFactory factory = new SiteStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
 		factory.setStudyDao(getStudyDAO());
 		String studySiteStatistics = factory.createTable(request, response).render();
 		request.setAttribute("studySiteStatistics", studySiteStatistics);
-
 	}
 
-	private void setupStudyStatisticsTable() {
-
+	private void setupStudyStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		StudyStatisticsTableFactory factory = new StudyStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
 		factory.setStudyDao(getStudyDAO());
 		String studyStatistics = factory.createTable(request, response).render();
 		request.setAttribute("studyStatistics", studyStatistics);
-
 	}
 
-	private void setupListStudySubjectTable() {
+	private void setupListStudySubjectTable(HttpServletRequest request, HttpServletResponse response) {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(true);
-		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
+		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDAO());
 		factory.setSubjectDAO(getSubjectDAO());
 		factory.setStudySubjectDAO(getStudySubjectDAO());
 		factory.setStudyEventDAO(getStudyEventDAO());
@@ -287,74 +272,4 @@ public class MainMenuServlet extends SecureController {
 		String findSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("findSubjectsHtml", findSubjectsHtml);
 	}
-
-	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-		studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource())
-				: studyEventDefinitionDAO;
-		return studyEventDefinitionDAO;
-	}
-
-	public DynamicEventDao getDynamicEventDao() {
-		dynamicEventDao = this.dynamicEventDao == null ? new DynamicEventDao(sm.getDataSource()) : dynamicEventDao;
-		return dynamicEventDao;
-	}
-	
-	public SubjectDAO getSubjectDAO() {
-		subjectDAO = this.subjectDAO == null ? new SubjectDAO(sm.getDataSource()) : subjectDAO;
-		return subjectDAO;
-	}
-
-	public StudySubjectDAO getStudySubjectDAO() {
-		studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
-		return studySubjectDAO;
-	}
-
-	public StudyGroupClassDAO getStudyGroupClassDAO() {
-		studyGroupClassDAO = this.studyGroupClassDAO == null ? new StudyGroupClassDAO(sm.getDataSource())
-				: studyGroupClassDAO;
-		return studyGroupClassDAO;
-	}
-
-	public SubjectGroupMapDAO getSubjectGroupMapDAO() {
-		subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource())
-				: subjectGroupMapDAO;
-		return subjectGroupMapDAO;
-	}
-
-	public StudyEventDAO getStudyEventDAO() {
-		studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
-		return studyEventDAO;
-	}
-
-	public StudyDAO getStudyDAO() {
-		studyDAO = this.studyDAO == null ? new StudyDAO(sm.getDataSource()) : studyDAO;
-		return studyDAO;
-	}
-
-	public EventCRFDAO getEventCRFDAO() {
-		eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
-		return eventCRFDAO;
-	}
-
-	public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
-		eventDefintionCRFDAO = this.eventDefintionCRFDAO == null ? new EventDefinitionCRFDAO(sm.getDataSource())
-				: eventDefintionCRFDAO;
-		return eventDefintionCRFDAO;
-	}
-
-	public StudyGroupDAO getStudyGroupDAO() {
-		studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
-		return studyGroupDAO;
-	}
-
-	public DiscrepancyNoteDAO getDiscrepancyNoteDAO() {
-		discrepancyNoteDAO = this.discrepancyNoteDAO == null ? new DiscrepancyNoteDAO(sm.getDataSource())
-				: discrepancyNoteDAO;
-		return discrepancyNoteDAO;
-	}
-
-	public SDVUtil getSDVUtil() {
-		return (SDVUtil) SpringServletAccess.getApplicationContext(context).getBean("sdvUtil");
-	}
-
 }

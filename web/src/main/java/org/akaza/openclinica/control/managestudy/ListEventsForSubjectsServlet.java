@@ -20,53 +20,36 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.control.RememberLastPage;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @SuppressWarnings({ "rawtypes" })
+@Component
 public class ListEventsForSubjectsServlet extends RememberLastPage {
 
     private static final long serialVersionUID = 1L;
     public static final String SAVED_LIST_EVENTS_FOR_SUBJECTS_URL = "savedListEventsForSubjectsUrl";
-    private StudyEventDefinitionDAO studyEventDefinitionDAO;
-	private SubjectDAO subjectDAO;
-	private StudySubjectDAO studySubjectDAO;
-	private StudyEventDAO studyEventDAO;
-	private StudyGroupClassDAO studyGroupClassDAO;
-	private SubjectGroupMapDAO subjectGroupMapDAO;
-	private StudyDAO studyDAO;
-	private StudyGroupDAO studyGroupDAO;
-	private EventCRFDAO eventCRFDAO;
-	private EventDefinitionCRFDAO eventDefintionCRFDAO;
-	private CRFDAO crfDAO;
-	Locale locale;
-	private boolean showMoreLink;
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -77,13 +60,21 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-        analyzeUrl();
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (shouldRedirect(request, response)) {
+            return;
+        }
+
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
+        boolean showMoreLink;
 		FormProcessor fp = new FormProcessor(request);
 		if (fp.getString("showMoreLink").equals("")) {
 			showMoreLink = true;
@@ -103,13 +94,13 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 
 		int definitionId = fp.getInt("defId");
 		if (definitionId <= 0) {
-			addPageMessage(respage.getString("please_choose_an_ED_ta_to_vies_details"));
-			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+			addPageMessage(respage.getString("please_choose_an_ED_ta_to_vies_details"), request);
+			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			return;
 		}
 
 		ListEventsForSubjectTableFactory factory = new ListEventsForSubjectTableFactory(showMoreLink);
-		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
+		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDAO());
 		factory.setSubjectDAO(getSubjectDAO());
 		factory.setStudySubjectDAO(getStudySubjectDAO());
 		factory.setStudyEventDAO(getStudyEventDAO());
@@ -122,79 +113,19 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		factory.setCurrentUser(ub);
 		factory.setEventCRFDAO(getEventCRFDAO());
 		factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
-		factory.setCrfDAO(getCrfDAO());
-		factory.setSelectedStudyEventDefinition((StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(
+		factory.setCrfDAO(getCRFDAO());
+		factory.setSelectedStudyEventDefinition((StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(
 				definitionId));
 		String listEventsForSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("listEventsForSubjectsHtml", listEventsForSubjectsHtml);
 		request.setAttribute("defId", definitionId);
 		// For event definitions and group class list in the add subject popup
-		request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
-		request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
+		request.setAttribute("allDefsArray", getEventDefinitionsByCurrentStudy(request));
+		request.setAttribute("studyGroupClasses", getStudyGroupClassesByCurrentStudy(request));
 		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
-		session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
-		//
-        analyzeForward(Page.LIST_EVENTS_FOR_SUBJECTS);
+		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
-	}
-
-	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-		studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource())
-				: studyEventDefinitionDAO;
-		return studyEventDefinitionDAO;
-	}
-
-	public SubjectDAO getSubjectDAO() {
-		subjectDAO = this.subjectDAO == null ? new SubjectDAO(sm.getDataSource()) : subjectDAO;
-		return subjectDAO;
-	}
-
-	public StudySubjectDAO getStudySubjectDAO() {
-		studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
-		return studySubjectDAO;
-	}
-
-	public StudyGroupClassDAO getStudyGroupClassDAO() {
-		studyGroupClassDAO = this.studyGroupClassDAO == null ? new StudyGroupClassDAO(sm.getDataSource())
-				: studyGroupClassDAO;
-		return studyGroupClassDAO;
-	}
-
-	public SubjectGroupMapDAO getSubjectGroupMapDAO() {
-		subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource())
-				: subjectGroupMapDAO;
-		return subjectGroupMapDAO;
-	}
-
-	public StudyEventDAO getStudyEventDAO() {
-		studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
-		return studyEventDAO;
-	}
-
-	public StudyDAO getStudyDAO() {
-		studyDAO = this.studyDAO == null ? new StudyDAO(sm.getDataSource()) : studyDAO;
-		return studyDAO;
-	}
-
-	public EventCRFDAO getEventCRFDAO() {
-		eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
-		return eventCRFDAO;
-	}
-
-	public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
-		eventDefintionCRFDAO = this.eventDefintionCRFDAO == null ? new EventDefinitionCRFDAO(sm.getDataSource())
-				: eventDefintionCRFDAO;
-		return eventDefintionCRFDAO;
-	}
-
-	public CRFDAO getCrfDAO() {
-		crfDAO = this.crfDAO == null ? new CRFDAO(sm.getDataSource()) : crfDAO;
-		return crfDAO;
-	}
-
-	public StudyGroupDAO getStudyGroupDAO() {
-		studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
-		return studyGroupDAO;
+        forward(Page.LIST_EVENTS_FOR_SUBJECTS, request, response);
 	}
 
 	private String parseDefId(String currentDefId, String savedUrl) {
@@ -210,8 +141,9 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getDefaultUrl() {
+	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
+        boolean showMoreLink;
 		if (fp.getString("showMoreLink").equals("")) {
 			showMoreLink = true;
 		} else {
@@ -231,7 +163,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected boolean userDoesNotUseJmesaTableForNavigation() {
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&listEventsForSubject_p_=");
 	}
 }

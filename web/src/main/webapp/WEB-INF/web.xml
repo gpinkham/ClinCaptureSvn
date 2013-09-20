@@ -344,10 +344,10 @@
     </servlet>
 
     <servlet>
-        <servlet-name>MainMenuServlet</servlet-name>
+        <servlet-name>mainMenuServlet</servlet-name>
         <display-name>MainMenuServlet</display-name>
         <description>The Main Servlet</description>
-        <servlet-class>org.akaza.openclinica.control.MainMenuServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LogoutServlet</servlet-name>
@@ -398,9 +398,9 @@
         <servlet-class>org.akaza.openclinica.control.extract.ShowFileServlet</servlet-class>
     </servlet>
      <servlet>
-        <servlet-name>StudyAuditLogServlet</servlet-name>
+        <servlet-name>studyAuditLogServlet</servlet-name>
         <display-name>StudyAuditLog</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.StudyAuditLogServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AuditLogUserServlet</servlet-name>
@@ -1081,9 +1081,9 @@
         <servlet-class>org.akaza.openclinica.control.submit.DownloadAttachedFileServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewNotesServlet</servlet-name>
+        <servlet-name>viewNotesServlet</servlet-name>
         <display-name>ViewNotes</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewNotesServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewNoteServlet</servlet-name>
@@ -1102,9 +1102,9 @@
     </servlet>
 
     <servlet>
-        <servlet-name>ListEventsForSubjectsServlet</servlet-name>
+        <servlet-name>listEventsForSubjectsServlet</servlet-name>
         <display-name>ListEventsForSubjects</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListEventsForSubjectsServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -1437,7 +1437,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>MainMenuServlet</servlet-name>
+        <servlet-name>mainMenuServlet</servlet-name>
         <url-pattern>/MainMenu</url-pattern>
     </servlet-mapping>
 
@@ -1469,7 +1469,7 @@
         <url-pattern>/AuditLogUser</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>StudyAuditLogServlet</servlet-name>
+        <servlet-name>studyAuditLogServlet</servlet-name>
         <url-pattern>/StudyAuditLog</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2038,7 +2038,7 @@
     	<url-pattern>/DownloadAttachedFile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewNotesServlet</servlet-name>
+        <servlet-name>viewNotesServlet</servlet-name>
         <url-pattern>/ViewNotes</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2054,7 +2054,7 @@
         <url-pattern>/ListEventsForSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListEventsForSubjectsServlet</servlet-name>
+        <servlet-name>listEventsForSubjectsServlet</servlet-name>
         <url-pattern>/ListEventsForSubjects</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

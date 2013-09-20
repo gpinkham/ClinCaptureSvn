@@ -19,15 +19,20 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.Locale;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * @author thickerson
@@ -35,9 +40,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class StudyAuditLogServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class StudyAuditLogServlet extends Controller {
 
 	public static String getLink(int userId) {
 		return "AuditLogStudy";
@@ -49,10 +53,12 @@ public class StudyAuditLogServlet extends SecureController {
 	 * then return them much like in ViewStudySubjectAuditLogServet.process() currentStudy instead of studyId?
 	 */
 	@Override
-	protected void processRequest() throws Exception {
-		StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-		SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
-		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        StudyBean currentStudy = getCurrentStudy(request);
+
+		StudySubjectDAO subdao = getStudySubjectDAO();
+		SubjectDAO sdao = getSubjectDAO();
+		UserAccountDAO uadao = getUserAccountDAO();
 
 		StudyAuditLogTableFactory factory = new StudyAuditLogTableFactory();
 		factory.setSubjectDao(sdao);
@@ -63,12 +69,14 @@ public class StudyAuditLogServlet extends SecureController {
 		String auditLogsHtml = factory.createTable(request, response).render();
 		request.setAttribute("auditLogsHtml", auditLogsHtml);
 
-		forwardPage(Page.AUDIT_LOGS_STUDY);
+		forwardPage(Page.AUDIT_LOGS_STUDY, request, response);
 
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -80,7 +88,7 @@ public class StudyAuditLogServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 	}
 
