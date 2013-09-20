@@ -2,6 +2,7 @@ package com.clinovo.model;
 
 
 import org.akaza.openclinica.control.AbstractTableFactory;
+import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Limit;
 import org.jmesa.view.component.Row;
@@ -44,7 +45,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("codedItem.dictionary"), "Dictionary", null, null);
         configureColumn(row.getColumn("version"), "Version", new VersionCellEditor(), null, true, true);
         configureColumn(row.getColumn("codedColumn"), "Coded", new CodedCellEditor(), null, false, false);
-        configureColumn(row.getColumn("actionColumn"), "Actions", new ActionCellEditor(), null, false, false);
+        configureColumn(row.getColumn("actionColumn"), "Actions", new ActionCellEditor(), new DefaultActionsEditor(
+                locale), true, false);
     }
 
     @Override
