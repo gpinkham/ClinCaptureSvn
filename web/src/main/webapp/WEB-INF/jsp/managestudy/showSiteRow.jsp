@@ -62,7 +62,7 @@
        </c:otherwise>
       </c:choose>
       </c:if>
-      <c:if test="${userRoleId eq 2}">
+      <c:if test="${userRoleId eq 1 or userRoleId eq 2}">
           <c:choose>
               <c:when test="${currRow.bean.showUnlockEventsButton}">
                   <td>
