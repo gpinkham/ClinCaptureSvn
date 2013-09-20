@@ -14,21 +14,14 @@
  *******************************************************************************/
 package com.clinovo.controller;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import com.clinovo.model.CodedItemsTableFactory;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.StudyInfoPanel;
-import org.jmesa.facade.TableFacade;
-import org.jmesa.facade.TableFacadeFactory;
-import org.jmesa.util.ItemUtils;
-import org.jmesa.view.editor.AbstractCellEditor;
-import org.jmesa.view.html.component.HtmlColumn;
-import org.jmesa.view.html.component.HtmlRow;
-import org.jmesa.view.html.component.HtmlTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +33,6 @@ import com.clinovo.coding.Search;
 import com.clinovo.coding.model.Classification;
 import com.clinovo.coding.source.impl.BioPortalSearchInterface;
 import com.clinovo.model.CodedItem;
-import com.clinovo.model.CodedItemRow;
 import com.clinovo.model.Status.CodeStatus;
 import com.clinovo.service.CodedItemService;
 
@@ -55,7 +47,7 @@ public class CodedItemsController {
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
 	@RequestMapping("/codedItems")
-	public ModelMap dictionaryHandler(HttpServletRequest request) throws Exception {
+	public ModelMap dictionaryHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		ModelMap map = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
@@ -64,39 +56,9 @@ public class CodedItemsController {
 		List<CodedItem> codedItems = codedItemService.findCodedItemsByStatus(CodeStatus.CODED);
 		List<CodedItem> unCodedItems = codedItemService.findCodedItemsByStatus(CodeStatus.NOT_CODED);
 
-		TableFacade facade = TableFacadeFactory.createTableFacade("codedQuestions", request);
-		facade.setTotalRows(items.size());
-		facade.setColumnProperties("verbatimTerm", "dictionary", "dictionaryVersion", "codedColumn", "actionColumn");
-		facade.setItems(getItemRows(items));
-
-		HtmlRow row = (HtmlRow) facade.getTable().getRow();
-
-		HtmlColumn verbatimTerm = row.getColumn("verbatimTerm");
-		verbatimTerm.setTitle("Verbatim Term");
-
-		HtmlColumn dictionary = row.getColumn("dictionary");
-		dictionary.setTitle("Dictionary");
-
-		HtmlColumn version = row.getColumn("dictionaryVersion");
-		version.setTitle("Version");
-
-		HtmlColumn coding = row.getColumn("codedColumn");
-		coding.getCellRenderer().setCellEditor(new HtmlCellFormatter());
-		coding.setTitle("Coding");
-		coding.setSortable(false);
-		coding.setFilterable(false);
-		coding.setWidth("320");
-
-		HtmlColumn actions = row.getColumn("actionColumn");
-		actions.setTitle("Actions");
-		actions.getCellRenderer().setCellEditor(new HtmlCellFormatter());
-		actions.setSortable(false);
-		actions.setFilterable(false);
-
-		HtmlTable table = (HtmlTable) facade.getTable();
-		table.setRow(row);
-		table.getTableRenderer().setWidth("800");
-		String codedQuestionsTable = facade.render();
+		CodedItemsTableFactory factory = new CodedItemsTableFactory();
+		factory.setCodedItems(items);
+		String codedItemsTable = factory.createTable(request, response).render();
 
 		StudyInfoPanel panel = new StudyInfoPanel();
 		panel.reset();
@@ -106,7 +68,7 @@ public class CodedItemsController {
 		map.addAttribute("allItems", items);
 		map.addAttribute("codedItems", codedItems.size());
 		map.addAttribute("unCodedItems", unCodedItems.size());
-		map.addAttribute("codedQuestionsHtml", codedQuestionsTable);
+		map.addAttribute("codedQuestionsHtml", codedItemsTable);
 
 		return map;
 	}
@@ -155,42 +117,5 @@ public class CodedItemsController {
 		
 		// Redirect to main
 		return "codedItems";
-	}
-
-	private static class HtmlCellFormatter extends AbstractCellEditor {
-		public Object getValue(Object o, String s, int i) {
-			return ItemUtils.getItemValue(o, s);
-		}
-	}
-
-	private Collection<CodedItemRow> getItemRows(List<CodedItem> codedItems) {
-
-		Collection<CodedItemRow> allRows = new ArrayList<CodedItemRow>();
-		StringBuilder actions = new StringBuilder("");
-
-		for (CodedItem codedItem : codedItems) {
-			
-			String inputTerm = codedItem.isCoded() ? codedItem.getCodedTerm() : codedItem.getVerbatimTerm();
-			
-			CodedItemRow tempBean = new CodedItemRow();
-			tempBean.setItemId(codedItem.getItemId());
-			tempBean.setVerbatimTerm(codedItem.getVerbatimTerm());
-            actions.append(CodedItemRow.CODED_DIV_PREFIX).append(inputTerm)
-                   .append(CodedItemRow.CODED_DIV_MIDDLE).append(codedItem.getItemId())
-                   .append(CodedItemRow.CODED_DIV_SUFIX);
-            tempBean.setCodedColumn(actions.toString());
-			actions.setLength(0);
-			tempBean.setDictionary(codedItem.getDictionary());
-			actions.append(CodedItemRow.AJAX_REQUEST_PREFIX).append(codedItem.getItemId())
-					.append(CodedItemRow.AJAX_REQUEST_SUFIX).append(CodedItemRow.GOTO_CRF_DEFID)
-					.append(CodedItemRow.GOTO_CRF_CRFVER).append(CodedItemRow.GOTO_CRF_SSID)
-					.append(CodedItemRow.GOTO_CRF_TABID).append(CodedItemRow.GOTO_CRF_EVENTID)
-					.append(CodedItemRow.GOTO_CRF_SUFIX);
-			tempBean.setActionColumn(actions.toString());
-			allRows.add(tempBean);
-			actions.setLength(0);
-		}
-
-		return allRows;
 	}
 }
