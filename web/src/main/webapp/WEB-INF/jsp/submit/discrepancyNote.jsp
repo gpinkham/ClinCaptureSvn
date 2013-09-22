@@ -77,25 +77,31 @@ function addText(id,text) {
 	}
 }
 
-function hide(strLeftNavRowElementName){
-	
-	        var objLeftNavRowElement;
-	        
-	        objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-	        if (objLeftNavRowElement != null) {
-	            if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-	            objLeftNavRowElement.display = "none";
+function hideElement(elementName){
+	        hide(elementName, "none");
+		}
+		
+function showElement(elementName){
+	        hide(elementName, "");
+		}
+		
+function hide(elementName, propertyValue){
+	        var objElement;
+	        objElement = MM_findObj(elementName);
+	        if (objElement != null) {
+	            if (objElement.style) { objElement = objElement.style; }
+	            objElement.display = propertyValue;
 	        }
 	    }
 	    
 function setElements(typeId,user1,user2,id,filter1,nw,ud,rs,cl,na) {
 	setStatusWithId(typeId,id,filter1,nw,ud,rs,cl,na);
 	if(typeId == 3) {//query
-		leftnavExpand(user1+id);
-		leftnavExpand(user2+id);	
-	}else {
-		hide(user1+id);
-		hide(user2+id);
+		showElement(user1+id);
+		showElement(user2+id);	
+	} else {
+		hideElement(user1+id);
+		hideElement(user2+id);
 	}
 }
 
@@ -151,14 +157,10 @@ function setYPos(id) {
 			document.documentElement.scrollTop : document.body.scrollTop;
 	setValue("ypos"+id,y);
 }
-
- $(document).ready(function() { 
-	var parentId = $("input[name=parentId]").val();
-	if($("select[id=typeId"+parentId+"]").val() === '2') {
-		$("span[id=user1"+parentId+"]").hide();
-		$("span[id=user2"+parentId+"]").hide();
-	}
-	});
+	
+	$(document).ready(function() {
+		$( "select[id*=typeId]" ).change();
+	})
 
 </script>
 
@@ -190,7 +192,7 @@ function setYPos(id) {
 	<input type="hidden" name="column" value="${param.column}"/>
 	<input type="hidden" name="close${parentId}" value=""/>
 	<input type="hidden" name="ypos${parentId}" value="0"/>
-	<input type="hidden" name="isRfc" value="${param.isRfc}"/>
+	<input type="hidden" name="isRFC" value="${param.isRFC}"/>
 	<!-- *JSP* submit/discrepancyNote.jsp -->
 	<td valign="top">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -212,11 +214,11 @@ function setYPos(id) {
 		</div>
 		<div style="clear:both;"></div> 
 		<div class="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
-		<div class="dnBoxCol2-1">
+		<div class="dnBoxCol2-1"> 
 		<c:choose>
-			<c:when test="${param.isRfc}">
+			<c:when test="${param.isRFC}">  
 				<div class="formfieldL_BG">
-				
+				 
 					<select name="description" id="description" class="formFieldL">
 						<c:forEach var="rfcTerm" items="${dnDescriptions}">
 							<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>

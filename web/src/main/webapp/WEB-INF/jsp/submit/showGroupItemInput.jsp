@@ -173,12 +173,12 @@ function removeSwitch(eventCRFId,itemId,id,attribute,str1,str2,filename,filePath
 	var downloadLink = 'DownloadAttachedFile?eventCRFId=' + eventCRFId + '&fileName=' + filePathName;
 	if(rm.getAttribute('value')=='<fmt:message key="remove" bundle="${resword}"/>') {
 		input.setAttribute("value","");
-		if(a) {
+		if(a) { 
 			div.appendChild(a);
-			div.removeChild(a);
+			div.removeChild(a); 
 		}
 		if(ft) {
-			div.appendChild(ft);
+			div.appendChild(ft); 
 			div.appendChild(up);
 			div.removeChild(ft);
 			div.removeChild(up);
@@ -186,7 +186,7 @@ function removeSwitch(eventCRFId,itemId,id,attribute,str1,str2,filename,filePath
 		}
 		var new_a = document.createElement('del');
 		new_a.setAttribute("id","a"+itemId);
-		if(navigator.appName=="Microsoft Internet Explorer") {
+		if(navigator.appName=="Microsoft Internet Explorer") { 
 			new_a.style.setAttribute("color","red");
 		} else {
 			new_a.setAttribute("style","color:red");
@@ -297,7 +297,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
   <c:otherwise>
     <c:set var="inputTxtValue" value="${displayItem.metadata.responseSet.value}"/>
    </c:otherwise>
-</c:choose>
+</c:choose> 
 
 <c:forEach var="frmMsg" items="${formMessages}">
   <c:if test="${frmMsg.key eq errorInputName}">
@@ -324,7 +324,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 		<c:choose>
     	<c:when test="${isInError}">
       		<span class="aka_exclaim_error">! </span><input class="aka_input_error" type="text" id="ft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
-		</c:when>
+		</c:when> 
 		<c:otherwise>	
 			<input type="text" id="ft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
 		</c:otherwise>
@@ -742,46 +742,44 @@ function switchStr(itemId, id,attribute,str1,str2) {
     <c:otherwise>
     </c:otherwise>
   </c:choose>
-  <c:choose>
-    <c:when test="${displayItem.numDiscrepancyNotes > 0}">
-        <a class="dnLink"
-           tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip();"
-           onClick="openDNoteWindow('ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
-            <img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}" />"
-                 src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-            <input type="hidden" value="ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>"/>
-        </a>
-
-    </c:when>
-    <c:otherwise>
-     <c:if test="${(isLocked == null) || (isLocked eq 'no')}">
-      <c:set var="imageFileName" value="icon_noNote" />
-      <c:choose>
-          <c:when test="${originJSP eq 'administrativeEditing'}">
-              <c:set var="writeToDb" value="1"/>
-          </c:when>
-          <c:otherwise>
-              <c:set var="writeToDb" value="0"/>
-          </c:otherwise>
-      </c:choose>
-         <c:set var="eventName" value="${toc.studyEventDefinition.name}"/>
-         <c:set var="eventDate" value="${toc.studyEvent.dateStarted}"/>
-         <c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
-
-         <a class="dnLink"
-            tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip();"
-            onClick="openDNWindow('CreateDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupOid=<c:out value="${repeatParentId}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=${writeToDb}&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
-             <img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>"
-                  src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-             <input type="hidden" value="ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>"/>
-         </a>
-
-    </c:if>
-    </c:otherwise>
-  </c:choose>
-
-
-
+    
+	<c:choose>
+		<c:when test="${originJSP eq 'initialDataEntry'}">
+			<c:set var="writeToDB" value="0"/>
+			<c:set var="dataId" value="0"/>
+		</c:when> 
+		<c:otherwise>
+			<c:set var="writeToDB" value="1"/>
+			<c:set var="dataId" value="${displayItem.data.id}"/>
+		</c:otherwise>
+	</c:choose>
+	
+	<c:choose>
+		<c:when test="${displayItem.numDiscrepancyNotes > 0}">
+			<a class="dnLink"
+						tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip();"
+						onClick="openDNoteWindow('ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&originJSP=<c:out value="${param.originJSP}"/>','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
+				<img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}" />"
+						src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
+				<input type="hidden" value="ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&originJSP=<c:out value="${param.originJSP}"/>"/>
+			</a>
+		</c:when>
+		<c:otherwise>
+			<c:if test="${(isLocked == null) || (isLocked eq 'no')}">
+				<c:set var="imageFileName" value="icon_noNote" />
+				<c:set var="eventName" value="${toc.studyEventDefinition.name}"/>
+				<c:set var="eventDate" value="${toc.studyEvent.dateStarted}"/>
+				<c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
+				<a class="dnLink"
+							tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip();"
+							onClick="openDNWindow('CreateDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupOid=<c:out value="${repeatParentId}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=${writeToDB}&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}&originJSP=<c:out value="${param.originJSP}"/>&enterData=1','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
+					<img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>"
+							src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
+					<input type="hidden" value="ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${dataId}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&originJSP=<c:out value="${param.originJSP}"/>&writeToDB=${writeToDB}"/>
+				</a>
+			</c:if>
+		</c:otherwise>
+	</c:choose>
 </c:if>
 <%-- we won't need this if we're not embedding error messages
 <br><c:import url="../showMessage.jsp"><c:param name="key" value=
@@ -801,9 +799,9 @@ adding units...
       String grLabel = displayBean.getMetadata().getGroupLabel();
       boolean grouped = (grLabel != null && (! "".equalsIgnoreCase(grLabel)) &&
       (! grLabel.equalsIgnoreCase("ungrouped")));
-
+ 
       if(! grouped) {
-         td = this.addUnits(td,displayBean);
+         td = this.addUnits(td,displayBean); 
       }  else {
         //the radio or checkbox does appear in a group table
         //Do not add units if the layout is horizontal

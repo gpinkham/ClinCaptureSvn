@@ -376,7 +376,7 @@ public class UpdateSubjectGroupClassServlet extends SecureController {
 			addPageMessage(respage.getString("the_subject_group_class_updated_succesfully"));
 		}
 		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
-		session.setAttribute("pageMessages", pageMessages);
+		request.setAttribute("pageMessages", pageMessages);
 		
 		clearSession();
 		

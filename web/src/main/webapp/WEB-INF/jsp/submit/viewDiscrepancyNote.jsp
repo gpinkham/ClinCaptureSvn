@@ -157,9 +157,9 @@
                 </c:when>
                 <c:otherwise>
                     <%-- <a href="javascript:scrollToY('audit');"><fmt:message key="Audit_History" bundle="${resword}"/></a> --%>
-                </c:otherwise>
+                </c:otherwise> 
                 </c:choose>
-                </td>
+                </td>  
                 </tr>
                 <c:if test="${name eq 'itemData' ||name eq 'ItemData'}">
 	                <tr>
@@ -176,7 +176,7 @@
         </div></div></div></div></div></div></div>
     </td>
     </tr>
-
+ 
 </table>
 
 
@@ -349,7 +349,7 @@
 		<c:param name="field" value="${field}"/>				
 		<c:param name="column" value="${column}"/>
 		<c:param name="boxId" value="box${0}New"/>
-		<c:param name="isRfc" value="${!isRFCExist}"/>
+		<c:param name="isRFC" value="${isRFC}"/>
 	</c:import>
 </c:if>  
 

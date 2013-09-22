@@ -149,7 +149,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 <input type="hidden" name="enterData" value="<c:out value="${enterData}" />">
 <input type="hidden" name="eventCRFId" value="<c:out value="${eventCRFId}"/>">
 <input type="hidden" name="errorFlag" value="<c:out value="${errorFlag}"/>">
-<input type="hidden" name="isRfc" value="<c:out value="${isRfc}"/>">
+<input type="hidden" name="isRFC" value="<c:out value="${isRFC}"/>">
 
 <c:set var="name" value="${discrepancyNote.entityType}"/>
 <!-- Entity box -->
@@ -175,7 +175,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 		<div class="textbox_center">
 		<table border="0" cellpadding="0" cellspacing="0">
-        <tr>
+        <tr>   
 	        <td class="table_cell_noborder"><fmt:message key="subject" bundle="${resword}"/>:&nbsp;&nbsp;</td>
 	        <td class="table_cell_noborder"><b><c:out value="${discrepancyNote.subjectName}"/></b></td>
 	        <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="event" bundle="${resword}"/>:&nbsp;&nbsp;</td>
@@ -191,7 +191,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
                     <c:otherwise>
                         <b><fmt:formatDate value="${discrepancyNote.eventStart}" pattern="${dteFormat}"/></b>
                     </c:otherwise>
-                </c:choose>
+                </c:choose> 
             </td>
             <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</td>
             <td class="table_cell_noborder"><b><c:out value="${discrepancyNote.crfName == '' ? 'N/A' : discrepancyNote.crfName}"/></b></td>
@@ -229,7 +229,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 	<div class="dnBoxCol1 dnBoxText"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
 	<div class="dnBoxCol2 dnBoxText">
 	<c:choose>
-		<c:when test="${isRfc == 1}">
+		<c:when test="${isRFC}">
 			<div class="formfieldL_BG">
 			<select name="description" id="description" class="formFieldL">
 				<c:forEach var="rfcTerm" items="${dnDescriptions}">

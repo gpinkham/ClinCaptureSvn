@@ -112,7 +112,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 	public static final String BOX_TO_SHOW = "boxToShow";
 	public static final String VIEW_DN_LINK = "viewDNLink";
 	public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
-	public static final String IS_REASON_FOR_CHANGE = "isRfc";
+	public static final String IS_REASON_FOR_CHANGE = "isRFC";
 	public static final String CAN_MONITOR = "canMonitor";
 	public static final String ERROR_FLAG = "errorFlag";
 	public static final String FROM_BOX = "fromBox";
@@ -770,13 +770,11 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 	}
 
 	private void manageStatuses(List<DiscrepancyNoteBean> notes) {
-		boolean isRFCExist = false;
-		for (DiscrepancyNoteBean note: notes) {
-			if (note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
-				isRFCExist = true;
-			}
-		}
-		request.setAttribute("isRFCExist", isRFCExist);
+		
+		String originJSP = request.getParameter("originJSP") == null? "" : request.getParameter("originJSP");
+		boolean isRFC = originJSP.equals("administrativeEditing")? true : false;
+		
+		request.setAttribute("isRFC", isRFC);
 		
 		ArrayList<DnDescription> siteVisibleDescs = new ArrayList<DnDescription>();
 		ArrayList<DnDescription> studyVisibleDescs = new ArrayList<DnDescription>();
@@ -815,7 +813,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 			request.setAttribute(CAN_CLOSE, true);
 			
 			request.setAttribute(RES_STATUSES, Arrays.asList(ResolutionStatus.UPDATED, ResolutionStatus.CLOSED));
-			if (isRFCExist){
+			if (isRFC){
 				request.setAttribute(DIS_TYPES, Arrays.asList(DiscrepancyNoteType.ANNOTATION));
 				request.setAttribute(DIS_TYPES2, Arrays.asList(DiscrepancyNoteType.ANNOTATION));
 			} else {

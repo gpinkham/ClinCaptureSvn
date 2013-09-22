@@ -126,11 +126,11 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                 <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
             </c:when>
             <c:otherwise>
-              
+               
             </c:otherwise>
-        </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
+        </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td> 
 		<h1><span class="title_manage"> <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
-<%--</div>--%>
+<%--</div>--%> 
 
 <form id="mainForm" name="crfForm" method="POST" action="AdministrativeEditing">
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
@@ -1181,7 +1181,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 										<c:param name="linkText" value="${displayItem.singleItem.metadata.leftItemText}"/>
 										<c:param name="side" value="left"/>
 									</c:import>
-							</td>
+							</td> 
 
                             <td valign="top" nowrap="nowrap">
                                     <%-- display the HTML input tag --%>

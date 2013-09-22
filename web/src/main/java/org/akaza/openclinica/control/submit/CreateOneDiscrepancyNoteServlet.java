@@ -81,7 +81,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 	public static final String EMAIL_USER_ACCOUNT = "sendEmail";
 	public static final String BOX_DN_MAP = "boxDNMap";
 	public static final String BOX_TO_SHOW = "boxToShow";
-	public static final String IS_REASON_FOR_CHANGE = "isRfc";
+	public static final String IS_REASON_FOR_CHANGE = "isRFC";
 
 	@Override
 	protected void mayProceed() throws InsufficientPermissionException {

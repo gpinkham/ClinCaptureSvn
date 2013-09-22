@@ -96,7 +96,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
 	public static final String WRITE_TO_DB = "writeToDB";
 
-	public static final String IS_REASON_FOR_CHANGE = "isRfc";
+	public static final String IS_REASON_FOR_CHANGE = "isRFC";
 
 	public static final String PRESET_RES_STATUS = "strResStatus";
 
@@ -152,10 +152,11 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 		request.setAttribute(DIS_TYPES, types);
 		request.setAttribute(RES_STATUSES, ResolutionStatus.toArrayList());
 
-		boolean writeToDB = fp.getBoolean(WRITE_TO_DB, true); // this should be set based on a new property of
-																// DisplayItemBean
-		boolean isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
-		request.setAttribute(IS_REASON_FOR_CHANGE, isReasonForChange ? "1" : "0");
+		boolean writeToDB = fp.getBoolean(WRITE_TO_DB, true); // this should be set based on a new property of DisplayItemBean
+		String originJSP = request.getParameter("originJSP") == null? "" : request.getParameter("originJSP");
+		boolean isRFC = originJSP.equals("administrativeEditing")? true : false;
+		
+		request.setAttribute(IS_REASON_FOR_CHANGE, isRFC);
 		int entityId = fp.getInt(ENTITY_ID);
 		// subjectId has to be added to the database when disc notes area saved
 		// as entity_type 'subject'
@@ -415,9 +416,15 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 			actualStatusesList = Arrays.asList(ResolutionStatus.NOT_APPLICABLE);
 			request.setAttribute(WHICH_RES_STATUSES, "2");
 		} else {
+			if (originJSP.equals("administrativeEditing")) {
+				request.setAttribute(DIS_TYPES, Arrays.asList(DiscrepancyNoteType.ANNOTATION));
+			} else {
+				request.setAttribute(DIS_TYPES, DiscrepancyNoteType.simpleList);
+			}
+			
 			request.setAttribute("showStatus", true);
 			request.setAttribute(RES_STATUSES, ResolutionStatus.simpleList);
-			request.setAttribute(DIS_TYPES, DiscrepancyNoteType.simpleList);
+			
 			actualStatusesList = ResolutionStatus.simpleList;
 			request.setAttribute(WHICH_RES_STATUSES, "1");
 		}
@@ -461,15 +468,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
 			if (parent.getId() == 0 || isNew) {// no parent, new note thread
 				if (enteringData) {
-					if (isInError) {
-						dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId()); // ClinCapture #42
-
-						dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
-					} else {
-						dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
-						dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
-					}
-					if (isReasonForChange) {
+					dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId()); // ClinCapture #42
+					dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
+					if (isRFC) {
 						ArrayList<DnDescription> siteVisibleDescs = new ArrayList<DnDescription>();
 						ArrayList<DnDescription> studyVisibleDescs = new ArrayList<DnDescription>();
 						DnDescriptionDao descriptionDao = new DnDescriptionDao(sm.getDataSource());
@@ -491,11 +492,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 						} else {
 							dnDescriptions = studyVisibleDescs;
 						}
-
-						dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId()); // ClinCapture #42
-
-						dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
-					}
+					} 
+					request.setAttribute("isRFC", isRFC);
 					request.setAttribute("autoView", "0");
 					// above set to automatically open up the user panel
 				} else {
@@ -528,7 +526,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
 			}
 
-			// ClinCapture #42
 			if (actualStatusesList.size() == 1 && actualStatusesList.get(0).equals(ResolutionStatus.NOT_APPLICABLE)) {
 				dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
 				dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
@@ -587,10 +584,12 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
 		} else {
 			FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
-
+		
+			isRFC = request.getParameter("isRFC") == null? false : Boolean.valueOf(request.getParameter("isRFC"));
+			
 			if (noteTree == null) {
 				noteTree = new FormDiscrepancyNotes();
-				logger.debug("No note tree initailized in session");
+				logger.debug("No note tree initialized in session");
 			}
 
 			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
@@ -621,11 +620,11 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 			// Annotations associated with an edit check to a Failed Validation (FV) note
 			// Annotation associated with a field changed under Administrative Editing
 			// (after a CRF is marked complete) to a Reason For Change note.
-			isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
+			//isRFC = fp.getBoolean(IS_REASON_FOR_CHANGE);
 			if (DiscrepancyNoteType.get(typeId) == DiscrepancyNoteType.ANNOTATION) {
-				note.setAssignedUserId(isReasonForChange ? ub.getId() : preUserId);
+				note.setAssignedUserId(isRFC ? ub.getId() : preUserId);
 				if ("itemdata".equalsIgnoreCase(entityType)) {
-					if (isReasonForChange) {
+					if (isRFC) {
 						typeId = DiscrepancyNoteType.REASON_FOR_CHANGE.getId();
 						note.setDisType(DiscrepancyNoteType.REASON_FOR_CHANGE);
 						note.setDiscrepancyNoteTypeId(typeId);
@@ -927,7 +926,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return result;
+		return writeToDB && result;
 	}
 
 	/**
