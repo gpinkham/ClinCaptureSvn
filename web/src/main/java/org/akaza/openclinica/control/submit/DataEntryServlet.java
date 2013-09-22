@@ -129,6 +129,7 @@ import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrParcel;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.util.DAOWrapper;
+import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.form.FormBeanUtil;
@@ -281,6 +282,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		logger.trace(message);
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -291,7 +293,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		// JN:The following were the the global variables, moved as local.
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
-		ItemDataDAO iddao = new ItemDataDAO(getDataSource(), locale);
+        
+        ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
+		ItemDataDAO iddao = new ItemDataDAO(getDataSource(), locale);        
+        EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+        SectionDAO sdao = new SectionDAO(getDataSource());
+        
 		HttpSession session = request.getSession();
 		StudyBean currentStudy = (StudyBean) session.getAttribute("study");
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
@@ -307,7 +314,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 		boolean hasGroup = false;
 
-		EventCRFDAO ecdao = null;
 		FormProcessor fp = new FormProcessor(request);
 		logMe("Enterting DataEntry Servlet" + System.currentTimeMillis());
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
@@ -364,40 +370,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		// Create disc note threads out of the various notes
 		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
-		// variables that provide values for the CRF discrepancy note header
-		int updatedNum = 0;
-		int openNum = 0;
-		int closedNum = 0;
-		int resolvedNum = 0;
-		int notAppNum = 0;
-		DiscrepancyNoteBean tempBean;
 
-		for (DiscrepancyNoteThread dnThread : noteThreads) {
-
-			// Do not count parent beans, only the last child disc note of the thread.
-
-			tempBean = dnThread.getLinkedNoteList().getLast();
-			if (tempBean != null) {
-				if (ResolutionStatus.UPDATED.equals(tempBean.getResStatus())) {
-					updatedNum++;
-				} else if (ResolutionStatus.OPEN.equals(tempBean.getResStatus())) {
-					openNum++;
-				} else if (ResolutionStatus.CLOSED.equals(tempBean.getResStatus())) {
-					closedNum++;
-				} else if (ResolutionStatus.RESOLVED.equals(tempBean.getResStatus())) {
-					resolvedNum++;
-				} else if (ResolutionStatus.NOT_APPLICABLE.equals(tempBean.getResStatus())) {
-					notAppNum++;
-				}
-			}
-
-		}
+        DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, noteThreads);
 		logMe("Entering DataEntry Create disc note threads out of the various notes DONE" + System.currentTimeMillis());
-		request.setAttribute("updatedNum", updatedNum + "");
-		request.setAttribute("openNum", openNum + "");
-		request.setAttribute("closedNum", closedNum + "");
-		request.setAttribute("resolvedNum", resolvedNum + "");
-		request.setAttribute("notAppNum", notAppNum + "");
 
 		String fromViewNotes = fp.getString("fromViewNotes");
 		if (fromViewNotes != null && "1".equals(fromViewNotes)) {
@@ -3430,8 +3405,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 	/*
 	 * change to explicitly re-set the section bean after reviewing the disc note counts
 	 */
-
-	protected DisplaySectionBean populateNotesWithDBNoteCounts(FormDiscrepancyNotes discNotes,
+    protected DisplaySectionBean populateNotesWithDBNoteCounts(FormDiscrepancyNotes discNotes,
 			DisplaySectionBean section, HttpServletRequest request) {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
@@ -3506,7 +3480,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 						ArrayList notes = discNotes.getNotes(inputName);
 						dib.setNumDiscrepancyNotes(numNotes + notes.size());
 						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, notes));
-
+                        DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib);
 						dib = setTotals(dib, itemDataId, notes, ecb.getId());
 						logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId()
 								+ " " + inputName);
@@ -3536,9 +3510,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				dib.setNumDiscrepancyNotes(numNotes + discNotes.getNotes(inputFieldName).size());
 				dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId,
 						discNotes.getNotes(inputFieldName)));
+                DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib);
 				dib = setTotals(dib, itemDataId, discNotes.getNotes(inputFieldName), ecb.getId());
 
 				ArrayList childItems = dib.getChildren();
+
+                // 1 new
+                // 2 updated
+                // 4 closed
+                // 5 not applicable
+
 				for (int j = 0; j < childItems.size(); j++) {
 					DisplayItemBean child = (DisplayItemBean) childItems.get(j);
 					int childItemDataId = child.getData().getId();
@@ -3551,6 +3532,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					child.setNumDiscrepancyNotes(childNumNotes + discNotes.getNotes(childInputFieldName).size());
 					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(childItemDataId,
 							discNotes.getNotes(childInputFieldName)));
+                    DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib);
 					child = setTotals(child, childItemDataId, discNotes.getNotes(childInputFieldName), ecb.getId());
 					childItems.set(j, child);
 				}

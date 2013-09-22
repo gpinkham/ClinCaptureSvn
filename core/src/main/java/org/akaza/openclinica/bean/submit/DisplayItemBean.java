@@ -85,6 +85,12 @@ public class DisplayItemBean implements Comparable {
 	 */
 	private int discrepancyNoteStatus;
 
+	private boolean firstNewDn;
+	private boolean firstUpdatedDn;
+	private boolean firstResolutionProposed;
+	private boolean firstClosedDn;
+	private boolean firstAnnotation;
+
 	/**
 	 * It is true if a scd item will display because of chosen options.
 	 */
@@ -607,5 +613,45 @@ public class DisplayItemBean implements Comparable {
 
 	public void setSkip(boolean skip) {
 		this.skip = skip;
-	}  
+	}
+
+	public boolean isFirstNewDn() {
+		return firstNewDn;
+	}
+
+	public void setFirstNewDn(boolean firstNewDn) {
+		this.firstNewDn = firstNewDn;
+	}
+
+	public boolean isFirstUpdatedDn() {
+		return firstUpdatedDn;
+	}
+
+	public void setFirstUpdatedDn(boolean firstUpdatedDn) {
+		this.firstUpdatedDn = firstUpdatedDn;
+	}
+
+	public boolean isFirstResolutionProposed() {
+		return firstResolutionProposed;
+	}
+
+	public void setFirstResolutionProposed(boolean firstResolutionProposed) {
+		this.firstResolutionProposed = firstResolutionProposed;
+	}
+
+	public boolean isFirstClosedDn() {
+		return firstClosedDn;
+	}
+
+	public void setFirstClosedDn(boolean firstClosedDn) {
+		this.firstClosedDn = firstClosedDn;
+	}
+
+	public boolean isFirstAnnotation() {
+		return firstAnnotation;
+	}
+
+	public void setFirstAnnotation(boolean firstAnnotation) {
+		this.firstAnnotation = firstAnnotation;
+	}
 }

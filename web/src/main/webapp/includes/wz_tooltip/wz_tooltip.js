@@ -1196,11 +1196,11 @@ function tt_GetWndCliSiz(s)
 {
   var v = 0;
   if (s == "Width") {
-    if (self.innerHeight)
+    if (self.innerWidth)
     {
       v = self.innerWidth;
     }
-    else if (document.documentElement && document.documentElement.clientHeight)
+    else if (document.documentElement && document.documentElement.clientWidth)
     {
       v = document.documentElement.clientWidth;
     }

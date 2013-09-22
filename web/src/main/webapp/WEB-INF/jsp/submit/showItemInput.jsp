@@ -941,7 +941,25 @@ include the default value first in the select list --%>
       <c:otherwise>
       </c:otherwise>
     </c:choose>
-	
+
+	<c:choose>
+		<c:when test="${displayItem.firstNewDn}">
+			<a id="firstNewDn"></a>
+		</c:when>
+		<c:when test="${displayItem.firstUpdatedDn}">
+			<a id="firstUpdatedDn"></a>
+		</c:when>
+		<c:when test="${displayItem.firstResolutionProposed}">
+			<a id="firstResolutionProposed"></a>
+		</c:when>
+		<c:when test="${displayItem.firstClosedDn}">
+			<a id="firstClosedDn"></a>
+		</c:when>
+		<c:when test="${displayItem.firstAnnotation}">
+			<a id="firstAnnotation"></a>
+		</c:when>
+	</c:choose>
+
 	<c:choose>
 		<c:when test="${originJSP eq 'initialDataEntry'}">
 			<c:set var="writeToDB" value="0"/>

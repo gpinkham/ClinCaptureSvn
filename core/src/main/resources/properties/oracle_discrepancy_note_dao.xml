@@ -1042,16 +1042,26 @@ and column_name='interviewer_name'
     <query>
         <name>findAllTopNotesByEventCRF</name>
         <sql>
-            SELECT distinct dn.*
+            SELECT distinct dn.*, id.item_id
             FROM discrepancy_note dn, dn_item_data_map dsm,
             item_data id
             where id.event_crf_id=?
             AND dsm.column_name='value'
             AND (dn.entity_type='itemData' or dn.entity_type='ItemData')
-            AND dn.parent_dn_id is null
+            AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
             AND dn.discrepancy_note_id=dsm.discrepancy_note_id
             AND dsm.item_data_id = id.item_data_id
             order by dn.date_created desc
+        </sql>
+    </query>
+    <query>
+        <name>findLatestChildByParent</name>
+        <sql>
+            SELECT dn.*
+            FROM discrepancy_note dn
+            WHERE parent_dn_id=?
+            and dn.discrepancy_note_id =
+            (select max(discrepancy_note_id) from discrepancy_note where parent_dn_id = ?)
         </sql>
     </query>
     <query>

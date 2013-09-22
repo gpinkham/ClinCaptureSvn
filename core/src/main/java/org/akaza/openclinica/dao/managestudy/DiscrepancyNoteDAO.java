@@ -156,6 +156,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		eb.setResStatus(ResolutionStatus.get(eb.getResolutionStatusId()));
 		eb.setStudyId(selectInt(hm, "study_id"));
 		eb.setAssignedUserId(selectInt(hm, "assigned_user_id"));
+		if (hm.get("item_id") != null) {
+			eb.setItemId((Integer) hm.get("item_id"));
+		}
 		if (eb.getAssignedUserId() > 0) {
 			UserAccountDAO userAccountDAO = new UserAccountDAO(ds);
 			UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(eb.getAssignedUserId());
@@ -2001,6 +2004,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList<DiscrepancyNoteBean> findAllTopNotesByEventCRF(int eventCRFId) {
 		this.setTypesExpected();
+        this.setTypeExpected(12, TypeNames.INT);
 		ArrayList alist = new ArrayList();
 		HashMap variables = new HashMap();
 		variables.put(Integer.valueOf(1), Integer.valueOf(eventCRFId));

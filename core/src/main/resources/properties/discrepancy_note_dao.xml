@@ -1135,7 +1135,7 @@ and column_name='interviewer_name'
     <query>
         <name>findAllTopNotesByEventCRF</name>
         <sql>
-            SELECT distinct dn.*
+            SELECT distinct dn.*, id.item_id
             FROM discrepancy_note dn, dn_item_data_map dsm,
             item_data id
             where id.event_crf_id=?

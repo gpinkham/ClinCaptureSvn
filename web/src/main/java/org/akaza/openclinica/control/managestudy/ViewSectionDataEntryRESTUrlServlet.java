@@ -20,7 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.*;
@@ -35,6 +34,7 @@ import org.akaza.openclinica.dao.submit.*;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
@@ -129,7 +129,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		// for a particular event
 		session.removeAttribute("presetValues");
 
-		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+        ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
+        EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		SectionDAO sdao = new SectionDAO(getDataSource());
 		String age = "";
 		if (sectionId == 0 && crfVersionId == 0 && eventCRFId == 0) {
@@ -177,37 +178,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			// Create disc note threads out of the various notes
 			DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 			noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
-			// variables that provide values for the CRF discrepancy note header
-			int updatedNum = 0;
-			int openNum = 0;
-			int closedNum = 0;
-			int resolvedNum = 0;
-			int notAppNum = 0;
-			DiscrepancyNoteBean tempBean;
-			for (DiscrepancyNoteThread dnThread : noteThreads) {
-				 // Do not count parent beans, only the last child disc note of the thread.
-				 
-				tempBean = dnThread.getLinkedNoteList().getLast();
-				if (tempBean != null) {
-					if (ResolutionStatus.UPDATED.equals(tempBean.getResStatus())) {
-						updatedNum++;
-					} else if (ResolutionStatus.OPEN.equals(tempBean.getResStatus())) {
-						openNum++;
-					} else if (ResolutionStatus.CLOSED.equals(tempBean.getResStatus())) {
-						closedNum++;
-					} else if (ResolutionStatus.RESOLVED.equals(tempBean.getResStatus())) {
-						resolvedNum++;
-					} else if (ResolutionStatus.NOT_APPLICABLE.equals(tempBean.getResStatus())) {
-						notAppNum++;
-					}
-				}
 
-			}
-			request.setAttribute("updatedNum", updatedNum + "");
-			request.setAttribute("openNum", openNum + "");
-			request.setAttribute("closedNum", closedNum + "");
-			request.setAttribute("resolvedNum", resolvedNum + "");
-			request.setAttribute("notAppNum", notAppNum + "");
+            DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, noteThreads);
 
 			DisplayTableOfContentsBean displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(),
 					currentStudy);

@@ -2533,3 +2533,37 @@ function Pager(tableName, itemsPerPage) {
 
     }
 }
+
+function getBrowserClientWidth() {
+  var v = 0;
+  if (self.innerWidth)
+  {
+    v = self.innerWidth;
+  }
+  else if (document.documentElement && document.documentElement.clientWidth)
+  {
+    v = document.documentElement.clientWidth;
+  }
+  else if (document.body)
+  {
+    v = document.body.clientWidth;
+  }
+  return v;
+}
+
+function getBrowserClientHeight() {
+  var v = 0;
+  if (self.innerHeight)
+  {
+    v = self.innerHeight;
+  }
+  else if (document.documentElement && document.documentElement.clientHeight)
+  {
+    v = document.documentElement.clientHeight;
+  }
+  else if (document.body)
+  {
+    v = document.body.clientHeight;
+  }
+  return v;
+}
