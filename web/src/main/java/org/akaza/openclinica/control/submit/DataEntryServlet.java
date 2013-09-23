@@ -371,9 +371,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
-        DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, noteThreads);
-		logMe("Entering DataEntry Create disc note threads out of the various notes DONE" + System.currentTimeMillis());
-
 		String fromViewNotes = fp.getString("fromViewNotes");
 		if (fromViewNotes != null && "1".equals(fromViewNotes)) {
 			request.setAttribute("fromViewNotes", fromViewNotes);
@@ -466,6 +463,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					ecb.getCRFVersionId());
 			eventDefinitionCRFId = edcBean.getId();
 		}
+
+        DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, eventDefinitionCRFId,
+                noteThreads);
+        logMe("Entering DataEntry Create disc note threads out of the various notes DONE" + System.currentTimeMillis());
 
 		logMe("Entering some EVENT DEF CRF CHECK DONE " + System.currentTimeMillis());
 		logMe("Entering some Study EVENT DEF CRF CHECK  " + System.currentTimeMillis());

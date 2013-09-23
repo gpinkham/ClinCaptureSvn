@@ -14,6 +14,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
+import org.akaza.openclinica.view.Page;
 
 public class DiscrepancyShortcutsAnalyzer {
 
@@ -216,9 +217,38 @@ public class DiscrepancyShortcutsAnalyzer {
 		return tabNum;
 	}
 
+	private static String buildLink(FormProcessor fp, ItemFormMetadataBean ifmbean, EventCRFBean eventCrfBean,
+			int eventDefinitionCRFId, int tabNum) {
+		String link = "";
+		if (fp.getRequest().getServletPath().equalsIgnoreCase(Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName())
+				|| fp.getRequest().getServletPath()
+						.equalsIgnoreCase(Page.VIEW_SECTION_DATA_ENTRY_SERVLET_REST_URL.getFileName())) {
+			link = fp.getRequest().getRequestURL().toString()
+					.replaceAll(fp.getRequest().getServletPath(), Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName())
+					+ "?eventDefinitionCRFId="
+					+ eventDefinitionCRFId
+					+ "&studySubjectId="
+					+ eventCrfBean.getStudySubjectId()
+					+ "&ecId="
+					+ eventCrfBean.getId()
+					+ "&crfVersionId="
+					+ eventCrfBean.getCRFVersionId()
+					+ "&sectionId="
+					+ ifmbean.getSectionId()
+					+ "&tabId="
+					+ tabNum
+					+ (fp.getString("exitTo", true).isEmpty() ? "" : "&exitTo=" + fp.getString("exitTo", true));
+		} else {
+			link = fp.getRequest().getRequestURL() + "?eventCRFId=" + eventCrfBean.getId() + "&sectionId="
+					+ ifmbean.getSectionId() + "&tab=" + tabNum
+					+ (fp.getString("exitTo", true).isEmpty() ? "" : "&exitTo=" + fp.getString("exitTo", true));
+		}
+		return link;
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void prepareDnShortcutLinks(HttpServletRequest request, EventCRFBean eventCrfBean, SectionDAO sdao,
-			ItemFormMetadataDAO ifmdao, List<DiscrepancyNoteThread> noteThreads) {
+			ItemFormMetadataDAO ifmdao, int eventDefinitionCRFId, List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyNoteBean tempBean;
 		FormProcessor fp = new FormProcessor(request);
 		Map<String, Integer> linkMap = new HashMap<String, Integer>();
@@ -229,11 +259,9 @@ public class DiscrepancyShortcutsAnalyzer {
 			tempBean = dnThread.getLinkedNoteList().getLast();
 			if (tempBean != null && tempBean.getEntityType().equalsIgnoreCase("itemData")) {
 				ItemFormMetadataBean ifmbean = ifmdao.findByItemIdAndCRFVersionId(tempBean.getItemId(),
-						eventCrfBean.getCRFVersionId());
-				int tabNum = getTabNum(sections, ifmbean.getSectionId());
-				String link = request.getServletPath().replaceAll("/", "") + "?eventCRFId=" + eventCrfBean.getId()
-						+ "&sectionId=" + ifmbean.getSectionId() + "&tab=" + tabNum
-						+ (fp.getString("exitTo").isEmpty() ? "" : "&exitTo=" + fp.getString("exitTo"));
+                        eventCrfBean.getCRFVersionId());
+				String link = buildLink(fp, ifmbean, eventCrfBean, eventDefinitionCRFId,
+						getTabNum(sections, ifmbean.getSectionId()));
 				if (ResolutionStatus.UPDATED.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalUpdated();
 					Integer sectionId = linkMap.get(FIRST_UPDATED_DN);
