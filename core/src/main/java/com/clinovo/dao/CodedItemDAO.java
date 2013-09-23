@@ -75,4 +75,22 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 		
 		return (CodedItem) q.uniqueResult();
 	}
+
+	public List<CodedItem> findByEventCRF(int eventCRFId) {
+		
+		String query = "from " + getDomainClassName() + " do  where do.eventCrfId = :eventCrfId";
+		Query q = getCurrentSession().createQuery(query);
+		q.setInteger("eventCrfId", eventCRFId);
+
+		return q.list();
+	}
+
+	public List<CodedItem> findByCRFVersion(int crfVersionId) {
+		
+		String query = "from " + getDomainClassName() + " do  where do.crfVersionId = :crfVersionId";
+		Query q = getCurrentSession().createQuery(query);
+		q.setInteger("crfVersionId", crfVersionId);
+
+		return q.list();
+	}
 }

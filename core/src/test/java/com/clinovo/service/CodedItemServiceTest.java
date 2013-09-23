@@ -1,6 +1,7 @@
 package com.clinovo.service;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -101,10 +102,52 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 	}
 
 	@Test
+	public void testThatFindByItemIdReturnsCodedItemWithEventCRFId() {
+		assertNotNull(codedItemService.findByItemId(1).getEventCrfId());
+	}
+	
+	@Test
+	public void testThatFindByItemIdReturnsCodedItemWithValidEventCRFId() {
+		assertEquals(1, codedItemService.findByItemId(2).getEventCrfId());
+	}
+	
+	@Test
+	public void testThatFindByEventCRFDoesNotReturnNull() {
+		assertNotNull(codedItemService.findByEventCRF(1));
+	}
+	
+	@Test
+	public void testThatFindByEventCRFReturnsCorrectNumberOfMappedItems() {
+		assertEquals(2, codedItemService.findByEventCRF(2).size());
+	}
+	
+	@Test
+	public void testThatFindByIdReturnsCodedItemWithCRFVersionId() {
+		assertNotNull(codedItemService.findCodedItem(3).getCrfVersionId());
+	}
+	
+	@Test
+	public void testThatFindByIdReturnsCodedItemWithCorrectCRFVersionId() {
+		assertEquals(1, codedItemService.findCodedItem(4).getCrfVersionId());
+	}
+	
+	@Test
+	public void testThatFindByCRFVersionDoesNotReturnNull() {
+		assertNotNull(codedItemService.findByCRFVersion(1));
+	}
+	
+	@Test
+	public void testThatFindByCRFVersionReturnsCorrectNumberOfMappedItems() {
+		assertEquals(2, codedItemService.findByCRFVersion(2).size());
+	}
+	
+	@Test
 	public void testThatSaveCodedItemDoesNotReturnNull() throws Exception {
 		
 		CodedItem codedItem = new CodedItem();
-		codedItem.setItemId(1);
+		codedItem.setItemId(31);
+		codedItem.setEventCrfId(2);
+		codedItem.setCodedTerm("modified-coded-term");
 		
 		assertNotNull(codedItemService.saveCodedItem(codedItem));
 	}
@@ -114,16 +157,37 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 
 		// Valid due to Id
 		CodedItem codedItem = new CodedItem();
-		codedItem.setItemId(1);
+		codedItem.setItemId(32);
+		codedItem.setEventCrfId(2);
+		codedItem.setCodedTerm("modified-coded-term");
 
 		assertNotNull(codedItemService.saveCodedItem(codedItem).getId());
 	}
 
 	@Test
+	public void testThatSaveCodedItemUpdatesItemDataValue() throws Exception {
+		
+		// Valid due to Id
+		CodedItem codedItem = new CodedItem();
+		codedItem.setItemId(32);
+		codedItem.setEventCrfId(2);
+		codedItem.setCodedTerm("modified-coded-term");
+		
+		// Simulate save
+		codedItemService.saveCodedItem(codedItem);
+		
+		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
+		
+		assertEquals("modified-coded-term", itemDataDAO.findByItemIdAndEventCRFId(32, 2).getValue());
+	}
+	
+	@Test
 	public void testThatSaveCodedItemPersistsNewCodedItemToDB() throws Exception {
 
 		CodedItem codedItem = new CodedItem();
-		codedItem.setItemId(1);
+		codedItem.setItemId(33);
+		codedItem.setEventCrfId(2);
+		codedItem.setCodedTerm("modified-coded-term");
 
 		codedItemService.saveCodedItem(codedItem);
 		assertEquals(5, codedItemService.findAll().size());

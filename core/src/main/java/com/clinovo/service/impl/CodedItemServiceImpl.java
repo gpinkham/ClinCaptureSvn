@@ -13,9 +13,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +36,17 @@ import com.clinovo.service.CodedItemService;
 
 @Service
 @Transactional
+@SuppressWarnings("rawtypes")
 public class CodedItemServiceImpl implements CodedItemService {
 
 	@Autowired
-	private CodedItemDAO codeItemDAO;
-
-	@Autowired
 	private DataSource dataSource;
+	
+	private EventCRFDAO eventCRFDAO;
+	
+	@Autowired
+	private CodedItemDAO codeItemDAO;
+	
 
 	public List<CodedItem> findAll() throws Exception {
 
@@ -89,7 +95,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		UserAccountBean loggedInUser = (UserAccountBean) userDAO.findByUserName(authentication.getName());
-		ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
+		ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByItemIdAndEventCRFId(codedItem.getItemId(), codedItem.getEventCrfId());
 		
 		if (itemData.getId() > 0) {
 
@@ -102,7 +108,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 			
 		} else {
 			
-			throw new CodeException("ItemData for this Form not found. Has the CRF been completed?");
+			throw new CodeException("ItemData for this Item not found. Has the CRF been completed?");
 		}
 
 		codedItem.setStatus("CODED");
@@ -113,7 +119,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 		codeItemDAO.deleteCodedItem(codedItem);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	private List<CodedItem> initializeCodedItems() throws Exception {
 
 		List<CodedItem> codedItems = new ArrayList<CodedItem>();
@@ -126,21 +132,30 @@ public class CodedItemServiceImpl implements CodedItemService {
 			if (isItemCodable(bean)) {
 
 				CodedItem codedItem = createCodeItem(bean);
-
 				codedItems.add(codeItemDAO.saveOrUpdate(codedItem));
 			}
 		}
+		
 		return codedItems;
 	}
 
 	private CodedItem createCodeItem(ItemFormMetadataBean bean) throws Exception {
-
+		
 		CodedItem item = new CodedItem();
-		Element element = createDocument(bean).getDocumentElement();
+		ArrayList eventCRFs = getEventCRFDAO().findAllByCRFVersion(bean.getCrfVersionId());
+		
+		if(!eventCRFs.isEmpty()) {
+			
+			EventCRFBean eventBean = (EventCRFBean) eventCRFs.get(0);
+			Element element = createDocument(bean).getDocumentElement();
 
-		item.setItemId(bean.getId());
-		item.setDictionary(element.getAttribute("dictionary"));
-		item.setVerbatimTerm(element.getAttribute("verbatimterm"));
+			item.setItemId(bean.getItemId());
+			item.setEventCrfId(eventBean.getId());
+			item.setCrfVersionId(bean.getCrfVersionId());
+			item.setDictionary(element.getAttribute("dictionary"));
+			item.setVerbatimTerm(element.getAttribute("verbatimterm"));
+		}
+
 
 		return item;
 	}
@@ -152,15 +167,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 		Pattern pattern = Pattern.compile("^<.*dictionary=.*verbatimterm=.*>");
 		Matcher matcher = pattern.matcher(subHeader);
 		
-		if (subHeader != null && !subHeader.isEmpty() && matcher.matches()) {
+		return subHeader != null && !subHeader.isEmpty() && matcher.matches();
 
-			Document document = createDocument(bean);
-			Element root = document.getDocumentElement();
-
-			return root.getAttribute("dictionary") != null;
-		}
-
-		return false;
 	}
 
 	private Document createDocument(ItemFormMetadataBean bean) throws Exception {
@@ -176,4 +184,20 @@ public class CodedItemServiceImpl implements CodedItemService {
 		return document;
 	}
 
+	public List<CodedItem> findByEventCRF(int eventCRFId) {
+		return codeItemDAO.findByEventCRF(eventCRFId);
+	}
+
+	public List<CodedItem> findByCRFVersion(int crfVersionId) {
+		return codeItemDAO.findByCRFVersion(crfVersionId);
+	}
+
+	private EventCRFDAO getEventCRFDAO() {
+		
+		if(eventCRFDAO == null) {
+			return new EventCRFDAO(dataSource);
+		}
+		
+		return eventCRFDAO;
+	}
 }

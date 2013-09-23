@@ -16,6 +16,9 @@ import com.clinovo.model.Status.CodeStatus;
 public class CodedItem extends AbstractMutableDomainObject {
 
 	private int itemId;
+	private int eventCrfId;
+	private int crfVersionId;
+	
 	private String codedTerm = "";
 	private String dictionary = "";
 	private String verbatimTerm = "";
@@ -60,6 +63,14 @@ public class CodedItem extends AbstractMutableDomainObject {
 	public void setItemId(int itemId) {
 		this.itemId = itemId;
 	}
+	
+	public int getEventCrfId() {
+		return this.eventCrfId;
+	}
+	
+	public void setEventCrfId(int eventCRFId) {
+		this.eventCrfId = eventCRFId;
+	}
 
 	@Transient
 	public CodeStatus getCodeStatus() {
@@ -70,5 +81,13 @@ public class CodedItem extends AbstractMutableDomainObject {
 	public boolean isCoded() {
 
 		return !this.status.equals("NOT_CODED");
+	}
+
+	public int getCrfVersionId() {
+		return this.crfVersionId;
+	}
+	
+	public void setCrfVersionId(int crfVersionId) {
+		this.crfVersionId = crfVersionId;
 	}
 }

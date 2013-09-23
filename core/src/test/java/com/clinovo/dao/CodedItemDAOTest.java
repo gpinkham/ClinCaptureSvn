@@ -95,7 +95,6 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 		assertEquals(2, codedItemDAO.findByStatus(CodeStatus.NOT_CODED).size());
 	}
 	
-	
 	@Test
 	public void testThatFindByItemIdDoesNotReturnNull() {
 		assertNotNull(codedItemDAO.findByItemId(1));
@@ -109,6 +108,46 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindByItemIdReturnsCodedItemWithVerbatimTerm() {
 		assertEquals(codedItemDAO.findByItemId(3).getVerbatimTerm(), "some-verbatim-term-3");
+	}
+	
+	@Test
+	public void testThatFindByItemIdReturnsCodedItemWithEventCRFId() {
+		assertNotNull(codedItemDAO.findByItemId(1).getEventCrfId());
+	}
+	
+	@Test
+	public void testThatFindByItemIdReturnsCodedItemWithValidEventCRFId() {
+		assertEquals(1, codedItemDAO.findByItemId(2).getEventCrfId());
+	}
+	
+	@Test
+	public void testThatFindByEventCRFDoesNotReturnNull() {
+		assertNotNull(codedItemDAO.findByEventCRF(1));
+	}
+	
+	@Test
+	public void testThatFindByEventCRFReturnsCorrectNumberOfMappedItems() {
+		assertEquals(2, codedItemDAO.findByEventCRF(2).size());
+	}
+	
+	@Test
+	public void testThatFindByIdReturnsCodedItemWithCRFVersionId() {
+		assertNotNull(codedItemDAO.findById(3).getCrfVersionId());
+	}
+	
+	@Test
+	public void testThatFindByIdReturnsCodedItemWithCorrectCRFVersionId() {
+		assertEquals(2, codedItemDAO.findById(1).getCrfVersionId());
+	}
+	
+	@Test
+	public void testThatFindByCRFVersionDoesNotReturnNull() {
+		assertNotNull(codedItemDAO.findByCRFVersion(1));
+	}
+	
+	@Test
+	public void testThatFindByCRFVersionReturnsCorrectNumberOfMappedItems() {
+		assertEquals(2, codedItemDAO.findByCRFVersion(2).size());
 	}
 	
 	@Test

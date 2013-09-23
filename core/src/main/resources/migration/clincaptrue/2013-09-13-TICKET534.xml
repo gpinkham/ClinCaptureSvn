@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	
+	<changeSet author="markg" id="2013-09-13-TICKET534">
+		<addColumn tableName="coded_item">
+			<column name="event_crf_id" type="INT" />
+			<column name="crf_version_id" type="INT" />
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>

@@ -25,4 +25,8 @@ public interface CodedItemService {
 
 	CodedItem saveCodedItem(CodedItem codedItem) throws Exception;
 
+	List<CodedItem> findByEventCRF(int eventCRFId);
+
+	List<CodedItem> findByCRFVersion(int i);
+
 }
