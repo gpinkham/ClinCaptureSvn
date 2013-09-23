@@ -50,6 +50,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -141,13 +142,34 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 			eventDefinitions.addAll(eventDefinitionsFromDefGroup);
 		}
 		
+		//sort by name
 		Collections.sort(eventDefinitions, new Comparator<StudyEventDefinitionBean>(){
 			public int compare(StudyEventDefinitionBean bean1, StudyEventDefinitionBean bean2) {
 				return bean1.getName().compareTo(bean2.getName());
 			}
 		});
-		ArrayList eventDefinitionsScheduled = eventDefinitions;
-
+		
+		//filter notStarted events
+		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+		Map<Integer, StudyEventBean> StudyEventDefinitionIdToStudyEvent = new HashMap<Integer, StudyEventBean>();
+		ArrayList<StudyEventBean> studyEvents = sedao.findAllByStudySubject(ssb);
+		for (int i = 0; i < studyEvents.size(); i++) {
+			StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(i);
+			StudyEventDefinitionIdToStudyEvent.put(studyEvent.getStudyEventDefinitionId(), studyEvent);
+		}
+		ArrayList eventDefinitionsScheduled = new ArrayList();
+		for (int i = 0; i < eventDefinitions.size(); i++) {
+			StudyEventDefinitionBean eventDefinition = (StudyEventDefinitionBean) eventDefinitions.get(i);
+			if (StudyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())){
+				if (StudyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus().isNotScheduled()) {
+					eventDefinitionsScheduled.add(eventDefinition);
+				}
+			} else {
+				eventDefinitionsScheduled.add(eventDefinition);
+			}
+		}
+		eventDefinitions = eventDefinitionsScheduled;
+		
 		if (!fp.isSubmitted()) {
 
 			HashMap presetValues = new HashMap();
@@ -458,8 +480,7 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 				forwardPage(Page.PAGE_TO_CREATE_NEW_STUDY_EVENT);
 			} else {
 				System.out.println("error is empty");
-				StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
-
+				
 				StudyEventBean studyEvent = new StudyEventBean();
 				studyEvent.setStudyEventDefinitionId(definition.getId());
 				studyEvent.setStudySubjectId(studySubject.getId());
@@ -491,9 +512,9 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 				studyEvent.setLocation(fp.getString(INPUT_LOCATION));
 				studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 
-				studyEvent.setSampleOrdinal(sed.getMaxSampleOrdinal(definition, studySubject) + 1);
+				studyEvent.setSampleOrdinal(sedao.getMaxSampleOrdinal(definition, studySubject) + 1);
 
-				studyEvent = (StudyEventBean) sed.create(studyEvent);
+				studyEvent = (StudyEventBean) sedao.create(studyEvent);
 
 				if (!studyEvent.isActive()) {
 					throw new OpenClinicaException(restext.getString("event_not_created_in_database"), "2");
@@ -550,9 +571,9 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 								studyEventScheduled.setLocation(fp.getString(INPUT_SCHEDULED_LOCATION[i]));
 								studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 
-								studyEventScheduled.setSampleOrdinal(sed.getMaxSampleOrdinal(
+								studyEventScheduled.setSampleOrdinal(sedao.getMaxSampleOrdinal(
 										definitionScheduleds.get(i), studySubject) + 1);
-								studyEventScheduled = (StudyEventBean) sed.create(studyEventScheduled);
+								studyEventScheduled = (StudyEventBean) sedao.create(studyEventScheduled);
 								if (!studyEventScheduled.isActive()) {
 									throw new OpenClinicaException(
 											restext.getString("scheduled_event_not_created_in_database"), "2");
