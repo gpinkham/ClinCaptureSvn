@@ -168,10 +168,8 @@ public class CreateUserAccountServlet extends SecureController {
 			v.addValidation(INPUT_INSTITUTION, Validator.LENGTH_NUMERIC_COMPARISON,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
-            if (type != UserType.SYSADMIN) {
-			    v.addValidation(INPUT_STUDY, Validator.ENTITY_EXISTS, sdao);
-			    v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
-            }
+			v.addValidation(INPUT_STUDY, Validator.ENTITY_EXISTS, sdao);
+			v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
 
 			HashMap errors = v.validate();
 
@@ -202,12 +200,9 @@ public class CreateUserAccountServlet extends SecureController {
 
 				int studyId = fp.getInt(INPUT_STUDY);
                 int roleId = fp.getInt(INPUT_ROLE);
-                if (type != UserType.SYSADMIN) {
-				    createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyId, Role.get(roleId));
-                } else {
-                	System.out.println("found a sys admin type, setting the active study id " + ub.getActiveStudyId());
-                	createdUserAccountBean.setActiveStudyId(ub.getActiveStudyId());
-                }
+
+                createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyId, Role.get(roleId));
+
 				logger.warn("*** found type: " + fp.getInt("type"));
 				logger.warn("*** setting type: " + type.getDescription());
 				createdUserAccountBean.addUserType(type);

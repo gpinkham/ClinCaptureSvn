@@ -28,9 +28,10 @@ import java.util.ArrayList;
 public class UserAccountRow extends EntityBeanRow {
 	// columns:
 	public static final int COL_USERNAME = 0;
-	public static final int COL_FIRSTNAME = 1;
-	public static final int COL_LASTNAME = 2;
-	public static final int COL_STATUS = 3;
+    public static final int COL_USERTYPE = 1;
+	public static final int COL_FIRSTNAME = 2;
+	public static final int COL_LASTNAME = 3;
+	public static final int COL_STATUS = 4;
 
 	@Override
 	protected int compareColumn(Object row, int sortingColumn) {
@@ -45,6 +46,12 @@ public class UserAccountRow extends EntityBeanRow {
 		switch (sortingColumn) {
 		case COL_USERNAME:
 			answer = thisAccount.getName().toLowerCase().compareTo(argAccount.getName().toLowerCase());
+			break;
+		case COL_USERTYPE:
+			String thisRoleLevel = (thisAccount.isSysAdmin() ? 1 : 2) + "_";
+			String argRoleLevel = (argAccount.isSysAdmin() ? 1 : 2) + "_";
+			answer = (thisRoleLevel + thisAccount.getName()).toLowerCase().compareTo(
+					argRoleLevel + (argAccount.getName()).toLowerCase());
 			break;
 		case COL_FIRSTNAME:
 			answer = thisAccount.getFirstName().toLowerCase().compareTo(argAccount.getFirstName().toLowerCase());

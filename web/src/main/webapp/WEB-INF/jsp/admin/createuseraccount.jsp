@@ -129,11 +129,6 @@
 	        window.location.href=(Adress);
 	    }
 	    return true;
-	}
-
-  function processStudiesAndRoles() {
-      document.getElementById('roleTr').style.display = document.getElementById('type').value != 2 ? 'none' : '';
-      document.getElementById('studyTr').style.display = document.getElementById('type').value != 2 ? 'none' : '';
   }
 
   function changeFlag(){
@@ -336,7 +331,7 @@ int selectedValue;
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
-						<select name="type" id="type" onchange="javascript:changeFlag(); processStudiesAndRoles();" class="formfieldM">
+						<select name="type" id="type" onchange="javascript:changeFlag();" class="formfieldM">
 						<c:forEach var="currType" items="${types}">
 								<c:choose>
 									<c:when test="${userTypeId == currType.id}">
@@ -388,7 +383,6 @@ int selectedValue;
       </td>
 	</tr>
 </table>
-<script>processStudiesAndRoles();</script>
 	</div>
 
 	</div></div></div></div></div></div></div></div>

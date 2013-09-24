@@ -86,29 +86,6 @@
 		<td class="table_header_column"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td>
 		<td class="table_cell"><c:out value="${user.institutionalAffiliation}" />&nbsp;</td>
 	</tr>
-
-	<tr>
-		<td class="table_header_column"><fmt:message key="business_administrator" bundle="${resword}"/>:</td>
-		<c:choose>
-			<c:when test="${user.sysAdmin}">
-				<td class="table_cell"><fmt:message key="yes" bundle="${resword}"/></td>
-			</c:when>
-			<c:otherwise>
-				<td class="table_cell"><fmt:message key="no" bundle="${resword}"/></td>
-			</c:otherwise>
-		</c:choose>
-	</tr>
-	<tr>
-		<td class="table_header_column"><fmt:message key="technical_administrator" bundle="${resword}"/>:</td>
-		<c:choose>
-			<c:when test="${user.techAdmin}">
-				<td class="table_cell"><fmt:message key="yes" bundle="${resword}"/></td>
-			</c:when>
-			<c:otherwise>
-				<td class="table_cell"><fmt:message key="no" bundle="${resword}"/></td>
-			</c:otherwise>
-		</c:choose>
-	</tr>
 	<tr>
 		<td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td>
 		<td class="table_cell"><c:out value="${user.status.name}" />&nbsp;</td>
@@ -152,7 +129,17 @@ for each study user is in, show:
 �	Link to reload page including full audit record for User.
 
 -->
-
+	<tr>
+        <td class="table_header_column"><fmt:message key="user_type" bundle="${resword}"/>:</td>
+        <c:choose>
+            <c:when test="${user.sysAdmin}">
+                <td class="table_cell"><fmt:message key="administrator" bundle="${resword}"/></td>
+            </c:when>
+            <c:otherwise>
+                <td class="table_cell"><fmt:message key="user" bundle="${resword}"/></td>
+            </c:otherwise>
+        </c:choose>
+    </tr>
 	<tr>
 		<td class="table_header_column"><fmt:message key="roles" bundle="${resword}"/>:</td>
 		<td class="table_cell">

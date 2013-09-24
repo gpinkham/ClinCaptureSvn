@@ -74,10 +74,11 @@ public class ListUserAccountsServlet extends RememberLastPage {
 
 		ArrayList allUserRows = UserAccountRow.generateRowsFromBeans(allUsers);
 
-		String[] columns = { resword.getString("user_name"), resword.getString("first_name"),
-				resword.getString("last_name"), resword.getString("status"), resword.getString("actions") };
+		String[] columns = { resword.getString("user_name"), resword.getString("user_type"),
+				resword.getString("first_name"), resword.getString("last_name"), resword.getString("status"),
+				resword.getString("actions") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
-		table.hideColumnLink(4);
+		table.hideColumnLink(5);
 		table.setQuery("ListUserAccounts", new HashMap());
 
 		table.setRows(allUserRows);

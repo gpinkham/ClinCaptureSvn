@@ -47,6 +47,12 @@
 <p></p>
 --%>
 
+<style>
+    div.tablebox_center > table {
+        width: 100%;
+    }
+</style>
+
 <c:import url="../include/showTable.jsp">
 	<c:param name="rowURL" value="showUserAccountRow.jsp" />
 </c:import>

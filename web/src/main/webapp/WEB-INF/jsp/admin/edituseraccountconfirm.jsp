@@ -152,16 +152,16 @@
     <td class="table_header_column"><fmt:message key="user_type" bundle="${resword}"/>:</td>
     <td class="table_cell">
         <c:choose>
-            <c:when test="${userType == 1}">
-                <fmt:message key="system_administrator" bundle="${resword}"/>
-            </c:when>
-            <c:when test="${userType == 3}">
-                <fmt:message key="technical_administrator" bundle="${resword}"/>
-            </c:when>
-            <c:otherwise>
-                <fmt:message key="user" bundle="${resword}"/>
-            </c:otherwise>
-        </c:choose>
+          <c:when test="${userType == 1}">
+            <fmt:message key="administrator" bundle="${resword}"/>
+          </c:when>
+          <c:when test="${userType == 3}">
+            <td class="table_cell"><fmt:message key="technical_administrator" bundle="${resword}"/></td>
+          </c:when>
+          <c:otherwise>
+            <fmt:message key="user" bundle="${resword}"/>
+          </c:otherwise>
+      </c:choose>
     </td>
   </tr>
   

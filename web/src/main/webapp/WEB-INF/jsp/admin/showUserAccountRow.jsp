@@ -20,6 +20,16 @@
 			</c:otherwise>
 		</c:choose>
 	</td>
+    <td class="table_cell">
+        <c:choose>
+            <c:when test="${currRow.bean.sysAdmin}">
+                <fmt:message key="administrator" bundle="${resword}"/>
+            </c:when>
+            <c:otherwise>
+                <fmt:message key="user" bundle="${resword}"/>
+            </c:otherwise>
+        </c:choose>
+    </td>
 	<td class="table_cell"><c:out value="${currRow.bean.firstName}" /></td>
 	<td class="table_cell"><c:out value="${currRow.bean.lastName}" /></td>
 	<td class="table_cell"><c:out value="${currRow.bean.status.name}" /></td>
@@ -62,12 +72,13 @@
 					onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
 					onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
 					><img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a></td>
-			    <td><a href="SetUserRole?action=confirm&userId=<c:out value="${currRow.bean.id}"/>"
-		          onMouseDown="javascript:setImage('bt_SetRole1','images/bt_SetRole_d.gif');"
-		          onMouseUp="javascript:setImage('bt_SetRole1','images/bt_SetRole.gif');"><img 
-		          name="bt_SetRole1" src="images/bt_SetRole.gif" border="0" alt="<fmt:message key="set_role" bundle="${resword}"/>" title="<fmt:message key="set_role" bundle="${resword}"/>" align="left" hspace="6"></a>
-		        </td>		
-		
+			    <c:if test="${currRow.bean.name ne 'root'}">
+                    <td><a href="SetUserRole?action=confirm&userId=<c:out value="${currRow.bean.id}"/>"
+                      onMouseDown="javascript:setImage('bt_SetRole1','images/bt_SetRole_d.gif');"
+                      onMouseUp="javascript:setImage('bt_SetRole1','images/bt_SetRole.gif');"><img
+                      name="bt_SetRole1" src="images/bt_SetRole.gif" border="0" alt="<fmt:message key="set_role" bundle="${resword}"/>" title="<fmt:message key="set_role" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    </td>
+                </c:if>
 				<c:set var="confirmQuestion">
 				 <fmt:message key="are_you_sure_you_want_to_remove" bundle="${resword}">
 				   <fmt:param value="${currRow.bean.name}"/>
@@ -111,6 +122,7 @@
 	<c:when test="${empty currRow.bean.roles}">
 		<tr valign="top">
 			<td class="table_cell_left">&nbsp;</td>
+            <td class="table_cell_left">&nbsp;</td>
 			<td class="table_cell" colspan="3"><i><fmt:message key="no_roles_assigned" bundle="${resword}"/></i></td>
 			<td class="table_cell">&nbsp;</td>
 		</tr>
@@ -149,6 +161,7 @@
 			<c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
 			<tr valign="top">
 				<td class="table_cell_left">&nbsp;</td>
+                <td class="table_cell_left">&nbsp;</td>
 				<td class="table_cell" colspan="3" >
 					<c:if test='${sur.status.deleted}'>
 						<font color='gray'>

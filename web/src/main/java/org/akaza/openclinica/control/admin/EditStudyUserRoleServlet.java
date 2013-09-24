@@ -114,7 +114,7 @@ public class EditStudyUserRoleServlet extends SecureController {
 					studyUserRole.setUpdater(ub);
 					udao.updateStudyUserRole(studyUserRole, uName);
 					addPageMessage(respage.getString("the_user_in_study_has_been_updated"));
-					if (ub.getId() == studyUserRole.getUserAccountId()) {
+					if (ub.getName().equals(studyUserRole.getUserName())) {
 						session.setAttribute("reloadUserBean", true);
 						if (!ub.isSysAdmin() && !ub.isTechAdmin()
 								&& studyUserRole.getRole() != Role.STUDY_ADMINISTRATOR

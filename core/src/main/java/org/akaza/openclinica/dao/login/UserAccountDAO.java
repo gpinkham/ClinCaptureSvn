@@ -202,8 +202,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		String sql = digester.getQuery("update");
 		this.execute(sql, variables, nullVars);
 
-		setSysAdminRole(uab, false);
-
 		if (!this.isQuerySuccessful()) {
 			eb.setId(0);
 			logger.warn("query failed: " + sql);
@@ -294,19 +292,11 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.execute(digester.getQuery("insert"), variables);
 		success = success && isQuerySuccessful();
 
-		setSysAdminRole(uab, true);
-        if (!uab.isSysAdmin()) {
-            ArrayList userRoles = uab.getRoles();
-            for (int i = 0; i < userRoles.size(); i++) {
-                StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
-
-                if (studyRole.equals(Role.SYSTEM_ADMINISTRATOR)) {
-                    continue;
-                }
-
-                createStudyUserRole(uab, studyRole);
-                success = success && isQuerySuccessful();
-            }
+        ArrayList userRoles = uab.getRoles();
+        for (int i = 0; i < userRoles.size(); i++) {
+            StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
+            createStudyUserRole(uab, studyRole);
+            success = success && isQuerySuccessful();
         }
         if (success) {
             uab.setId(id);
@@ -546,7 +536,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
 		while (it.hasNext()) {
 			HashMap hm = (HashMap) it.next();
-			String roleName = user.isSysAdmin() || user.isTechAdmin() ? user.getSysAdminRole().getRoleName()
+			String roleName = user.getName().equals(UserAccountBean.ROOT) ? user.getSysAdminRole().getRoleName()
 					: (String) hm.get("role_name");
 			String studyName = (String) hm.get("name");
 			Integer studyId = (Integer) hm.get("study_id");
@@ -554,7 +544,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 			sur.setRoleName(roleName);
 			sur.setStudyId(studyId.intValue());
 			sur.setStudyName(studyName);
-			sur.setRole(user.isSysAdmin() || user.isTechAdmin() ? user.getSysAdminRole().getRole() : Role
+			sur.setRole(user.getName().equals(UserAccountBean.ROOT) ? user.getSysAdminRole().getRole() : Role
 					.getByName(roleName));
 			allStudyUserRoleBeans.put(studyId, sur);
 		}
@@ -691,12 +681,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		variables.put(3, studyId);
 		String sql = digester.getQuery("deleteUserRole");
 		this.execute(sql, variables);
-		if (role == Role.SYSTEM_ADMINISTRATOR) {
-			variables = new HashMap();
-			variables.put(1, UserType.USER.getId());
-			variables.put(2, user.getId());
-			this.execute(digester.getQuery("updateUserType"), variables);
-		}
 	}
 
 	/**

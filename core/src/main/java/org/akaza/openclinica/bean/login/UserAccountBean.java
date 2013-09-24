@@ -36,9 +36,11 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
  */
 public class UserAccountBean extends AuditableEntityBean {
 
-	private static final long serialVersionUID = -7373737639499260727L;
-	
-	private String passwd;
+    private static final long serialVersionUID = -7373737639499260727L;
+
+    public static final String ROOT = "root";
+
+    private String passwd;
 	private String firstName;
 	private String lastName;
 	private String email;
@@ -391,11 +393,6 @@ public class UserAccountBean extends AuditableEntityBean {
 			roles.add(sur);
 			rolesByStudy.put(key, new Integer(roles.size() - 1));
 		}
-
-        if (sur.getRole() != null && sur.getRole().equals(Role.SYSTEM_ADMINISTRATOR)) {
-            addUserType(UserType.SYSADMIN);
-            return;
-        }
 	}
 
 	public StudyUserRoleBean getRoleByStudy(StudyBean study) {
@@ -403,7 +400,7 @@ public class UserAccountBean extends AuditableEntityBean {
 	}
 
 	public void updateSysAdminRole(Integer studyId, Integer prevStudyId) {
-		if (sysAdmin || techAdmin) {
+		if (name.equals(ROOT)) {
 			for (StudyUserRoleBean surb : roles) {
 				if (surb.getRole() == Role.SYSTEM_ADMINISTRATOR) {
 					rolesByStudy.put(studyId, rolesByStudy.remove(prevStudyId));
@@ -425,7 +422,7 @@ public class UserAccountBean extends AuditableEntityBean {
 	}
 
 	public StudyUserRoleBean getRoleByStudy(int studyId) {
-        if (sysAdmin || techAdmin) {
+        if (name.equals(ROOT)) {
             return getSysAdminRole();
         }
 

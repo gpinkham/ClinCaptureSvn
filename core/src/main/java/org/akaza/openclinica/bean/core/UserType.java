@@ -28,7 +28,7 @@ import java.util.List;
 public class UserType extends Term {
 
 	public static final UserType INVALID = new UserType(0, "invalid");
-	public static final UserType SYSADMIN = new UserType(1, "system_administrator");
+	public static final UserType SYSADMIN = new UserType(1, "administrator");
 	public static final UserType USER = new UserType(2, "user");
 	public static final UserType TECHADMIN = new UserType(3, "technical_administrator");
 
