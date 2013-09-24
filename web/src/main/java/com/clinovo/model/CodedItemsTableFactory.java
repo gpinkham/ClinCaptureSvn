@@ -7,6 +7,7 @@ import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Limit;
 import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.CellEditor;
+import org.jmesa.view.html.editor.DroplistFilterEditor;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,7 +23,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     public final static String CODED_DIV_MIDDLE = "\"/><div id=\"";
     public final static String CODED_DIV_SUFIX = "\"></div>";
     public final static String AJAX_REQUEST_PREFIX = "<a onClick=\"codeItem(this)\" itemId=\"";
-    public final static String AJAX_REQUEST_SUFIX = "\"><img style=\"float:left;\" width=\"17\" border=\"0\" title=\"Code\" alt=\"Code\" src=\"../images/code.png\" name=\"codeBtn\"/></a>";
+    public final static String AJAX_REQUEST_MIDDLE = "\"><img style=\"float:left;\" width=\"17\" border=\"0\" title=\"Code\" alt=\"Code\" src=\"../images/";
+    public final static String AJAX_REQUEST_SUFIX =  "\" name=\"codeBtn\"/></a>";
     public final static String GOTO_CRF_DEFID = "&nbsp;&nbsp;<a onmouseup=\"javascript:setImage('Complete','../images/icon_DEcomplete.gif');\" href=\"ViewSectionDataEntry?eventDefinitionCRFId=";
     public final static String GOTO_CRF_CRFVER = "&amp;crfVersionId=";
     public final static String GOTO_CRF_SSID = "&amp;studySubjectId=";
@@ -39,11 +41,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
     	
         tableFacade.setColumnProperties("codedItem.verbatimTerm", "codedItem.dictionary",
-                "version", "codedColumn", "actionColumn");
+                "version", "codedItem.isCoded", "codedColumn", "actionColumn");
         Row row = tableFacade.getTable().getRow();
-        configureColumn(row.getColumn("codedItem.verbatimTerm"), "Verbatium Term", null, null);
+        configureColumn(row.getColumn("codedItem.verbatimTerm"), "Verbatim Term", null, null);
         configureColumn(row.getColumn("codedItem.dictionary"), "Dictionary", null, null);
         configureColumn(row.getColumn("version"), "Version", new VersionCellEditor(), null, true, true);
+        configureColumn(row.getColumn("codedItem.isCoded"), "Status", new StatusCellEditor(), new StatusDroplistFilterEditor());
         configureColumn(row.getColumn("codedColumn"), "Coded", new CodedCellEditor(), null, false, false);
         configureColumn(row.getColumn("actionColumn"), "Actions", new ActionCellEditor(), new DefaultActionsEditor(
                 locale), true, false);
@@ -65,6 +68,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             h.put("codedItem.itemId", codedItem.getItemId());
             h.put("codedItem.verbatimTerm", codedItem.getVerbatimTerm());
             h.put("codedItem.dictionary", codedItem.getDictionary());
+            h.put("codedItem.isCoded", codedItem.isCoded() ? "Completed" : "Available");
 
             codedItemsResult.add(h);
         }
@@ -106,18 +110,40 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private class ActionCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
             String value = "";
-            Integer itemId = (Integer) ((HashMap<Object, Object>) item).get("codedItem.itemId");
-
-            if (itemId != null) {
+            CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
+            String codedItemButton = codedItem.isCoded() ? "code_confirm.png" : "code_blue.png";
+            if (codedItem != null) {
                 StringBuilder url = new StringBuilder();
-                url.append(AJAX_REQUEST_PREFIX).append(itemId)
-                        .append(AJAX_REQUEST_SUFIX).append(GOTO_CRF_DEFID)
-                        .append(GOTO_CRF_CRFVER).append(GOTO_CRF_SSID)
-                        .append(GOTO_CRF_TABID).append(GOTO_CRF_EVENTID)
-                        .append(GOTO_CRF_SUFIX);
+                url.append(AJAX_REQUEST_PREFIX).append(codedItem.getItemId())
+                        .append(AJAX_REQUEST_MIDDLE).append(codedItemButton).append(AJAX_REQUEST_SUFIX)
+                        .append(GOTO_CRF_DEFID).append(GOTO_CRF_CRFVER).append(GOTO_CRF_SSID)
+                        .append(GOTO_CRF_TABID).append(GOTO_CRF_EVENTID).append(GOTO_CRF_SUFIX);
                 value = url.toString();
             }
             return value;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private class StatusCellEditor implements CellEditor {
+        public Object getValue(Object item, String property, int cowcount) {
+            String value = "";
+            String codedItemStatus = (String) ((HashMap<Object, Object>) item).get("codedItem.isCoded");
+            if (!codedItemStatus.isEmpty()) {
+                StringBuilder url = new StringBuilder();
+                url.append(codedItemStatus);
+                value = url.toString();
+            }
+            return value;
+        }
+    }
+
+    private class StatusDroplistFilterEditor extends DroplistFilterEditor {
+        protected List<Option> getOptions() {
+            List<Option> options = new ArrayList<Option>();
+            options.add(new Option("Completed", "Completed"));
+            options.add(new Option("Available", "Available"));
+            return options;
         }
     }
 

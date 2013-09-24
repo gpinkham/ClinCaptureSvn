@@ -146,6 +146,14 @@
 		$('button.button_search').css('background-image',
 				'url(images/violet/button_Search_BG.gif)');
 		$('.sidebar').css('color', '#AA62C6');
+
+        $("img[src*='images/code_blue.png']").each(function() {
+            var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/violet/') >= 0) return;
+            newSrc = newSrc.replace('images/code_blue.png', 'images/violet/code_violet.png');
+            $(this).attr('src', newSrc);
+        });
+
 	</script>
 </c:if>
 <c:if test="${(color == 'green')}">
@@ -283,5 +291,13 @@
 		$('input.button_search:submit').css('background-image', 'url(images/green/button_Search_BG.gif)');
 		$('button.button_search').css('background-image', 'url(images/green/button_Search_BG.gif)');
 		$('.sidebar').css('color', '#75b894');
+
+        $("img[src*='images/code_blue.png']").each(function() {
+            var newSrc = $(this).attr('src');
+            if (newSrc.indexOf('/green/') >= 0) return;
+            newSrc = newSrc.replace('images/code_blue.png', 'images/green/code_green.png');
+            $(this).attr('src', newSrc);
+        });
+
     </script>
 </c:if>
