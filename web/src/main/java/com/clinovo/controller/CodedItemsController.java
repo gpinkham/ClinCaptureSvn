@@ -18,8 +18,12 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import com.clinovo.model.CodedItemsTableFactory;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.slf4j.Logger;
@@ -36,6 +40,7 @@ import com.clinovo.model.CodedItem;
 import com.clinovo.model.Status.CodeStatus;
 import com.clinovo.service.CodedItemService;
 
+
 @Controller
 public class CodedItemsController {
 
@@ -44,8 +49,12 @@ public class CodedItemsController {
 	@Autowired
 	private CodedItemService codedItemService;
 
+	@Autowired
+    private DataSource dataSource;
+
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
+	@SuppressWarnings("rawtypes")
 	@RequestMapping("/codedItems")
 	public ModelMap dictionaryHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -57,7 +66,12 @@ public class CodedItemsController {
 		List<CodedItem> unCodedItems = codedItemService.findCodedItemsByStatus(CodeStatus.NOT_CODED);
 
 		CodedItemsTableFactory factory = new CodedItemsTableFactory();
+
 		factory.setCodedItems(items);
+		factory.setStudyDAO(new StudyDAO(dataSource));
+		factory.setEventCRFDAO(new EventCRFDAO(dataSource));
+		factory.setEventDefinitionCRFDAO(new EventDefinitionCRFDAO(dataSource));
+
 		String codedItemsTable = factory.createTable(request, response).render();
 
 		StudyInfoPanel panel = new StudyInfoPanel();
