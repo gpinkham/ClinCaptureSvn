@@ -451,38 +451,38 @@
 		question_number_label="1" left_item_text="Start of Agent Administration Period"
 		right_item_text="" section_id="1" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="1" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="2"
 		item_id="2" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="2" page_number_label="1"
 		question_number_label="2" left_item_text="End of Agent Administration Period"
 		right_item_text="" section_id="1" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="2" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="3"
 		item_id="3" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="0" page_number_label="1"
 		question_number_label="a" left_item_text="Date" right_item_text=""
 		section_id="1" response_set_id="1" regexp="" regexp_error_msg=""
-		ordinal="3" required="false" default_value="" response_layout="" />
+		ordinal="3" required="false" default_value="" response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="4"
 		item_id="4" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="0" page_number_label="1"
 		question_number_label="a" left_item_text="Time" right_item_text=""
 		section_id="1" response_set_id="1" regexp="" regexp_error_msg=""
-		ordinal="4" required="false" default_value="" response_layout="" />
+		ordinal="4" required="false" default_value="" response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="5"
 		item_id="5" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="0" page_number_label="1"
 		question_number_label="b" left_item_text="Agent Name" right_item_text=""
 		section_id="1" response_set_id="1" regexp="" regexp_error_msg=""
-		ordinal="5" required="false" default_value="" response_layout="" />
+		ordinal="5" required="false" default_value="" response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="6"
 		item_id="6" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="0" page_number_label="1"
 		question_number_label="c" left_item_text="Agent Dose" right_item_text=""
 		section_id="1" response_set_id="1" regexp="" regexp_error_msg=""
-		ordinal="6" required="false" default_value="" response_layout="" />
+		ordinal="6" required="false" default_value="" response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="7"
 		item_id="7" crf_version_id="1" header="MTD" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="2"
@@ -490,105 +490,105 @@
 		left_item_text="Was the maximum tolerated dose (MTD) determined?"
 		right_item_text="" section_id="1" response_set_id="2" regexp=""
 		regexp_error_msg="" ordinal="7" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="8"
 		item_id="8" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="2" page_number_label="2"
 		question_number_label="4" left_item_text="Maximum tolerated dose:"
 		right_item_text="" section_id="1" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="8" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="9"
 		item_id="9" crf_version_id="1" header="Changes" subheader=""
 		parent_id="0" parent_label="" column_number="1" page_number_label="3"
 		question_number_label="5" left_item_text="Was agent interrupted during this period?"
 		right_item_text="" section_id="1" response_set_id="2" regexp=""
 		regexp_error_msg="" ordinal="9" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="10"
 		item_id="10" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="3"
 		question_number_label="6" left_item_text="If Yes, specify date stopped:"
 		right_item_text="" section_id="1" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="10" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="11"
 		item_id="11" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="3"
 		question_number_label="7" left_item_text="Specify reason stopped:"
 		right_item_text="" section_id="1" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="11" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="12"
 		item_id="12" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="3"
 		question_number_label="8" left_item_text="Was agent restarted?"
 		right_item_text="" section_id="1" response_set_id="2" regexp=""
 		regexp_error_msg="" ordinal="12" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="13"
 		item_id="13" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="3"
 		question_number_label="9" left_item_text="If Yes, specify date restarted:"
 		right_item_text="" section_id="1" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="13" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="14"
 		item_id="14" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="4"
 		question_number_label="10" left_item_text="Specify reason restarted:"
 		right_item_text="" section_id="1" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="14" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="15"
 		item_id="15" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="4"
 		question_number_label="11" left_item_text="Was agent regimen modified during this period?"
 		right_item_text="" section_id="1" response_set_id="2" regexp=""
 		regexp_error_msg="" ordinal="15" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="16"
 		item_id="16" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="4"
 		question_number_label="12" left_item_text="If Yes, specify date modified:"
 		right_item_text="" section_id="1" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="16" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="17"
 		item_id="17" crf_version_id="1" header="New Regimen" subheader=""
 		parent_id="0" parent_label="" column_number="1" page_number_label="4"
 		question_number_label="13" left_item_text="Specify new regimen:  Dose:"
 		right_item_text="" section_id="2" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="17" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="18"
 		item_id="18" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="2" page_number_label="4"
 		question_number_label="14" left_item_text="Frequency:"
 		right_item_text="" section_id="2" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="18" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="19"
 		item_id="19" crf_version_id="1" header="Compliance" subheader=""
 		parent_id="0" parent_label="" column_number="1" page_number_label="5"
 		question_number_label="15" left_item_text="Amount of agent provided at last visit:"
 		right_item_text="" section_id="2" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="19" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="20"
 		item_id="20" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="5"
 		question_number_label="16" left_item_text="Amount of agent returned this visit:"
 		right_item_text="" section_id="2" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="20" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="21"
 		item_id="21" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="5"
 		question_number_label="17" left_item_text="Amount of agent taken during this period:"
 		right_item_text="" section_id="2" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="21" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="22"
 		item_id="22" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="5"
@@ -596,89 +596,107 @@
 		left_item_text="Amount of agent missing/not accounted for this period:"
 		right_item_text="" section_id="2" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="22" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="23"
 		item_id="23" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="5"
 		question_number_label="19" left_item_text="Is the participant compliant with protocol?"
 		right_item_text="" section_id="2" response_set_id="3" regexp=""
 		regexp_error_msg="" ordinal="23" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="24"
 		item_id="24" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="2" page_number_label="5"
 		question_number_label="20" left_item_text="If No, specify reason for noncompliance:"
 		right_item_text="" section_id="2" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="24" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="25"
 		item_id="25" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label="5"
 		question_number_label="21" left_item_text="Was agent provided at this visit?"
 		right_item_text="" section_id="2" response_set_id="2" regexp=""
 		regexp_error_msg="" ordinal="25" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="26"
 		item_id="26" crf_version_id="1" header="" subheader="" parent_id="0"
 		parent_label="" column_number="2" page_number_label="5"
 		question_number_label="22" left_item_text="Amount of agent provided at this visit:"
 		right_item_text="" section_id="2" response_set_id="1" regexp=""
 		regexp_error_msg="" ordinal="26" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="27"
 		item_id="27" crf_version_id="1" header="Comments" subheader=""
 		parent_id="0" parent_label="" column_number="1" page_number_label="5"
 		question_number_label="23" left_item_text="Comments:" right_item_text=""
 		section_id="3" response_set_id="4" regexp="" regexp_error_msg=""
-		ordinal="27" required="false" default_value="" response_layout="" />
+		ordinal="27" required="false" default_value="" response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="28"
 		item_id="28" crf_version_id="2" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label=""
 		question_number_label="" left_item_text="Medication name:"
 		right_item_text="" section_id="4" response_set_id="5" regexp=""
 		regexp_error_msg="" ordinal="1" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="29"
 		item_id="29" crf_version_id="2" header="" subheader="" parent_id="0"
 		parent_label="" column_number="2" page_number_label=""
 		question_number_label="" left_item_text="Start Date:" right_item_text=""
 		section_id="4" response_set_id="5" regexp="" regexp_error_msg=""
-		ordinal="2" required="false" default_value="" response_layout="" />
+		ordinal="2" required="false" default_value="" response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="30"
 		item_id="30" crf_version_id="2" header="" subheader="" parent_id="0"
 		parent_label="" column_number="3" page_number_label=""
 		question_number_label="" left_item_text="End Date:" right_item_text=""
 		section_id="4" response_set_id="5" regexp="" regexp_error_msg=""
-		ordinal="3" required="false" default_value="" response_layout="" />
+		ordinal="3" required="false" default_value="" response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="31"
 		item_id="31" crf_version_id="2" header="" subheader="" parent_id="0"
 		parent_label="" column_number="4" page_number_label=""
 		question_number_label="" left_item_text="Ongoing/Continuing:"
 		right_item_text="" section_id="4" response_set_id="6" regexp=""
 		regexp_error_msg="" ordinal="4" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="32"
 		item_id="32" crf_version_id="2" header="" subheader="" parent_id="0"
 		parent_label="" column_number="1" page_number_label=""
 		question_number_label="" left_item_text="Reason for use (non-study medication)"
 		right_item_text="" section_id="4" response_set_id="5" regexp=""
 		regexp_error_msg="" ordinal="5" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="33"
 		item_id="33" crf_version_id="2" header="" subheader="" parent_id="0"
 		parent_label="" column_number="2" page_number_label=""
 		question_number_label="" left_item_text="Route of administration:"
 		right_item_text="" section_id="4" response_set_id="5" regexp=""
 		regexp_error_msg="" ordinal="6" required="false" default_value=""
-		response_layout="" />
+		response_layout="" code_ref="" />
 	<item_form_metadata item_form_metadata_id="34"
 		item_id="34" crf_version_id="2" header="" subheader="" parent_id="0"
 		parent_label="" column_number="3" page_number_label=""
 		question_number_label="" left_item_text="Dose form:" right_item_text=""
 		section_id="4" response_set_id="5" regexp="" regexp_error_msg=""
-		ordinal="7" required="false" default_value="" response_layout="" />
+		ordinal="7" required="false" default_value="" response_layout="" code_ref="" />
+    <item_form_metadata item_form_metadata_id="35"
+        item_id="4" crf_version_id="2" header="" subheader="" parent_id="0"
+        parent_label="" column_number="0" page_number_label="1"
+    	question_number_label="a" left_item_text="Time" right_item_text=""
+    	section_id="1" response_set_id="1" regexp="" regexp_error_msg=""
+    	ordinal="4" required="false" default_value="" response_layout="" code_ref="" />
+    <item_form_metadata item_form_metadata_id="36"
+        item_id="5" crf_version_id="2" header="" subheader="" parent_id="0"
+        parent_label="" column_number="0" page_number_label="1"
+        question_number_label="a" left_item_text="Time" right_item_text=""
+        section_id="1" response_set_id="1" regexp="" regexp_error_msg=""
+        ordinal="4" required="false" default_value="" response_layout="" code_ref="" />
+    <item_form_metadata item_form_metadata_id="37"
+        item_id="6" crf_version_id="2" header="" subheader="" parent_id="0"
+        parent_label="" column_number="0" page_number_label="1"
+        question_number_label="a" left_item_text="Time" right_item_text=""
+        section_id="1" response_set_id="1" regexp="" regexp_error_msg=""
+        ordinal="4" required="false" default_value="" response_layout="" code_ref="" />
 
-	<item_group item_group_id="1" name="Ungrouped" crf_id="1"
+    <item_group item_group_id="1" name="Ungrouped" crf_id="1"
 		status_id="1" date_created="2008-07-02" owner_id="1" oc_oid="IG_AGEN_UNGROUPED" />
 	<item_group item_group_id="2" name="DoseTable" crf_id="1"
 		status_id="1" date_created="2008-07-02" owner_id="1" oc_oid="IG_AGEN_DOSETABLE" />

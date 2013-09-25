@@ -774,6 +774,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 						} else {
 							isRequired = "1".equals(required) ? true : false;
 						}
+						
+						String codeRef = "";
+						cell = sheet.getRow(k).getCell((short) 27);
+						codeRef = getValue(cell);
 
 						// Create oid for Item Bean
 						String itemOid = idao.getValidOid(new ItemBean(), crfName, itemName, itemOids);
@@ -964,7 +968,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							sql2 = "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID,"
 									+ "ITEM_ID,SUBHEADER,header,LEFT_ITEM_TEXT,"
 									+ "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
-									+ "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
+									+ "REGEXP,REGEXP_ERROR_MSG,REQUIRED, code_ref)" + " VALUES ("
 									+ versionIdString
 									+ ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
 									+ stripQuotes(responseLabel)
@@ -1003,7 +1007,12 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 									+ "','"
 									+ stripQuotes(regexpError)
 									+ "', "
-									+ (isRequired ? 1 : 0) + ")";
+									+ (isRequired ? 1 : 0)
+									+ "', "
+									+ "'"
+									+ stripQuotes(codeRef)
+									+ "'"
+									+ ")";
 
 							logger.warn(sql2);
 
@@ -1011,7 +1020,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							sql2 = "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID,"
 									+ "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
 									+ "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
-									+ "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
+									+ "REGEXP,REGEXP_ERROR_MSG,REQUIRED,CODE_REF)" + " VALUES ("
 									+ versionIdString
 									+ ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
 									+ stripQuotes(responseLabel)
@@ -1051,6 +1060,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 									+ stripQuotes(regexpError)
 									+ "', "
 									+ isRequired
+									+ "', "
+									+ "'"
+									+ stripQuotes(codeRef)
+									+ "'"
 									+ ")";
 						}
 

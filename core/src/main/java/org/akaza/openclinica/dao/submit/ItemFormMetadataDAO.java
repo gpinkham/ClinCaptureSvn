@@ -119,6 +119,7 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 	}
 
 	public Object getEntityFromHashMap(HashMap hm) {
+		
 		ItemFormMetadataBean answer = new ItemFormMetadataBean();
 
 		answer.setId(getIntFromRow(hm, "item_form_metadata_id"));
@@ -144,6 +145,7 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		answer.setResponseLayout(getStringFromRow(hm, "response_layout"));
 		answer.setWidthDecimal(getStringFromRow(hm, "width_decimal"));
 		answer.setShowItem(getBooleanFromRow(hm, "show_item"));
+        answer.setCodeRef(getStringFromRow(hm, "code_ref"));
 		ResponseSetBean rsb = new ResponseSetBean();
 
 		rsb.setId(getIntFromRow(hm, "response_set_id"));
@@ -201,22 +203,24 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypeExpected(ind, TypeNames.BOOL);
 		ind++; // required 20
 		this.setTypeExpected(ind, TypeNames.STRING); // default_value
-		ind++;
+		ind++; // 21
 		this.setTypeExpected(ind, TypeNames.STRING); // response_layout 21
-		ind++;
+		ind++; // 22
 		this.setTypeExpected(ind, TypeNames.STRING); // width_decimal 22
-		ind++;
+		ind++; // 23
 		// will need to set the boolean value here, tbh 23
-		this.setTypeExpected(ind, TypeNames.BOOL);
-		ind++; // show_item 24
-		this.setTypeExpected(ind, TypeNames.INT);
-		ind++; // response_set.response_type_id 25
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // response_set.label 26
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // response_set.options_text 27
-		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; // response_set.options_values
+        this.setTypeExpected(ind, TypeNames.BOOL);
+        ind++; // show_item 24
+        this.setTypeExpected(ind, TypeNames.STRING);
+        ind++; // code_ref 25
+        this.setTypeExpected(ind, TypeNames.INT);
+        ind++; // response_set.response_type_id 26
+        this.setTypeExpected(ind, TypeNames.STRING);
+        ind++; // response_set.label 27
+        this.setTypeExpected(ind, TypeNames.STRING);
+        ind++; // response_set.options_text 28
+        this.setTypeExpected(ind, TypeNames.STRING);
+        ind++; // response_set.options_values // 29
 	}
 
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase)
@@ -368,10 +372,10 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
 		this.setTypesExpected();
-		this.setTypeExpected(28, TypeNames.STRING);// version name
-		this.setTypeExpected(29, TypeNames.STRING);// group_label
-		this.setTypeExpected(30, TypeNames.INT);// repeat_max
-		this.setTypeExpected(31, TypeNames.STRING);// section_name
+		this.setTypeExpected(29, TypeNames.STRING);// version name
+		this.setTypeExpected(30, TypeNames.STRING);// group_label
+		this.setTypeExpected(31, TypeNames.INT);// repeat_max
+		this.setTypeExpected(32, TypeNames.STRING);// section_name
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		variables.put(new Integer(1), new Integer(itemId));
 
@@ -402,10 +406,10 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
 		this.setTypesExpected();
-		this.setTypeExpected(28, TypeNames.STRING);// version name
-		this.setTypeExpected(29, TypeNames.STRING);// group_label
-		this.setTypeExpected(30, TypeNames.INT);// repeat_max
-		this.setTypeExpected(31, TypeNames.STRING);// section_name
+		this.setTypeExpected(29, TypeNames.STRING);// version name
+		this.setTypeExpected(30, TypeNames.STRING);// group_label
+		this.setTypeExpected(31, TypeNames.INT);// repeat_max
+		this.setTypeExpected(32, TypeNames.STRING);// section_name
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		variables.put(new Integer(1), new Integer(itemId));
 
@@ -543,6 +547,8 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		variables.put(new Integer(ind), ifmb.getWidthDecimal());
 		ind++;
 		variables.put(new Integer(ind), new Boolean(ifmb.isShowItem()));
+		ind++;
+		variables.put(new Integer(ind), ifmb.getCodeRef());
 
 		execute("create", variables);
 
@@ -606,6 +612,8 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		variables.put(new Integer(ind), new Boolean(ifmb.isShowItem()));
 		ind++;
 		variables.put(new Integer(ind), ifmb.getId());
+		ind++;
+		variables.put(new Integer(ind), ifmb.getCodeRef());
 
 		execute("update", variables);
 
@@ -634,11 +642,11 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 	public ItemFormMetadataBean findByItemIdAndCRFVersionId(int itemId, int crfVersionId) {
 		this.setTypesExpected();
 		// TODO note to come back here, tbh
-		this.setTypeExpected(28, TypeNames.STRING);// version name
+		this.setTypeExpected(29, TypeNames.STRING);// version name
 		// add more here for display, tbh 082007
-		this.setTypeExpected(29, TypeNames.STRING);// group_label
-		this.setTypeExpected(30, TypeNames.INT);// repeat_max
-		this.setTypeExpected(31, TypeNames.STRING);// section_name
+		this.setTypeExpected(30, TypeNames.STRING);// group_label
+		this.setTypeExpected(31, TypeNames.INT);// repeat_max
+		this.setTypeExpected(32, TypeNames.STRING);// section_name
 
 		logMe("Current Thread:::" + Thread.currentThread() + "types Expected?");
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
@@ -835,6 +843,8 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		ind++; // d_ifm_id 11
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // option_name 12
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; 
 		this.setTypeExpected(ind, TypeNames.STRING);
 	}
 

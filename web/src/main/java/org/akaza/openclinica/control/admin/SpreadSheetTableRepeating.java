@@ -960,6 +960,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 						cell = sheet.getRow(k).getCell((short) cellIndex);
 						String display = getValue(cell);
 						String controlItemName = "", optionValue = "", message = "";
+						
+						++cellIndex;
+						// default is true
+						cell = sheet.getRow(k).getCell((short) cellIndex);
+						String codeRef = getValue(cell);
+						
 						if (!StringUtil.isBlank(display)) {
 							if (isShowItem != false) {
 								errors.add(resPageMsg.getString("the") + " "
@@ -1288,7 +1294,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 							sql2 = "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID,"
 									+ "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
 									+ "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
-									+ "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)"
+									+ "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item, code_ref)"
 									+ " VALUES ("
 									+ versionIdString
 									+ ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
@@ -1337,14 +1343,18 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 									+ widthDecimal
 									+ "', "
 									+ (isShowItem ? 1 : 0)
+									+ ", '"
+									+ stripQuotes(codeRef)
+									+ "'"
 									+ ")";
+							
 							logger.debug(sql2);
 
 						} else {
 							sql2 = "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID,"
 									+ "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
 									+ "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
-									+ "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)"
+									+ "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item, code_ref)"
 									+ " VALUES ("
 									+ versionIdString
 									+ ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
@@ -1390,7 +1400,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 									+ "','"
 									+ stripQuotes(responseLayout)
 									+ "','"
-									+ widthDecimal + "'," + isShowItem + ")";
+									+ widthDecimal 
+									+ "'," 
+									+ isShowItem 
+									+ ", '"
+									+ codeRef
+									+ "'"
+									+ ")";
 
 						}
 						queries.add(sql2);

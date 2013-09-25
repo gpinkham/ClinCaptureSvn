@@ -48,6 +48,7 @@ import java.util.List;
  */
 @SuppressWarnings({ "rawtypes", "serial" })
 public class ItemDataType extends Term {
+	
 	public static final ItemDataType INVALID = new ItemDataType(0, "invalid", "Invalid_Type");
 	public static final ItemDataType BL = new ItemDataType(1, "bl", "Boolean");
 
@@ -67,8 +68,9 @@ public class ItemDataType extends Term {
 	public static final ItemDataType DATE = new ItemDataType(9, "date", "date");
 	public static final ItemDataType PDATE = new ItemDataType(10, "pdate", "partial_date");
 	public static final ItemDataType FILE = new ItemDataType(11, "file", "file");
+	public static final ItemDataType CODE = new ItemDataType(12, "code", "code");
 
-	private static final ItemDataType[] members = { BL, BN, ED, TEL, ST, INTEGER, REAL, SET, DATE, PDATE, FILE };
+	private static final ItemDataType[] members = { BL, BN, ED, TEL, ST, INTEGER, REAL, SET, DATE, PDATE, FILE, CODE };
 
 	public static final List list = Arrays.asList(members);
 

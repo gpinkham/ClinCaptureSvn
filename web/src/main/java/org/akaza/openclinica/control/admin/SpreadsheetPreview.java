@@ -84,7 +84,7 @@ public final class SpreadsheetPreview implements Preview {
 		String[] itemHeaders = { "item_name", "description_label", "left_item_text", "units", "right_item_text",
 				"section_label", "header", "subheader", "parent_item", "column_number", "page_number",
 				"question_number", "response_type", "response_label", "response_options_text", "response_values",
-				"data_type", "validation", "validation_error_message", "phi", "required" };
+				"data_type", "validation", "validation_error_message", "phi", "required", "code_ref" };
 		String[] sectionHeaders = { "section_label", "section_title", "subtitle", "instructions", "page_number",
 				"parent_section" };
 		Map<String, String> rowCells = new HashMap<String, String>();
@@ -112,7 +112,8 @@ public final class SpreadsheetPreview implements Preview {
 								|| headers[k].equalsIgnoreCase("question_number")
 								|| headers[k].equalsIgnoreCase("section_title")
 								|| headers[k].equalsIgnoreCase("subtitle")
-								|| headers[k].equalsIgnoreCase("instructions")) {
+								|| headers[k].equalsIgnoreCase("instructions")
+								|| headers[k].equalsIgnoreCase("code_ref")) {
 							rowCells.put(headers[k], getCellValue(cell));
 						} else {
 							rowCells.put(headers[k], getCellValue(cell).replaceAll("<[^>]*>", ""));

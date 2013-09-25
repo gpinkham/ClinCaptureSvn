@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="markg" id="2013-09-23-TICKET52">
+		<comment>Add the medical coding data type to the database</comment>
+		<insert tableName="item_data_type">
+			<column name="item_data_type_id" valueNumeric="12" />
+			<column name="code" value="CODE" />
+			<column name="name" value="Medical Coding" />
+			<column name="definition" value="Type to be coded medically" />
+		</insert>
+	</changeSet>
+
+	<changeSet author="markg" id="2013-09-23-TICKET52-2">
+		<addColumn tableName="item_form_metadata">
+			<column name="code_ref" type="VARCHAR(255)" />
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>

@@ -34,6 +34,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 	private String parentLabel;
 	private int columnNumber;
 	private String pageNumberLabel;
+	private String codeRef = "";
 
 	@Override
 	public int hashCode() {
@@ -695,5 +696,13 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 			return true;
 		}
 		return false;
+	}
+
+	public String getCodeRef() {
+		return this.codeRef;
+	}
+	
+	public void setCodeRef(String codeRef) {
+		this.codeRef = codeRef;
 	}
 }

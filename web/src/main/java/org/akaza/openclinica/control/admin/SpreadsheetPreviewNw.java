@@ -111,20 +111,12 @@ public final class SpreadsheetPreviewNw implements Preview {
 		HSSFSheet sheet;
 		HSSFRow row;
 		HSSFCell cell;
-		// static item headers for a CRF; TODO: change these so they are not
-		// static and hard-coded
-		/*
-		 * New itemHeaders String[] itemHeaders = {"item_name","description_label","left_item_text",
-		 * "units","right_item_text","section_label","group_label","header",
-		 * "subheader","parent_item","column_number","page_number", "question_number","response_type","response_label",
-		 * "response_options_text","response_values","response_layout","default_value", "data_type",
-		 * "validation","validation_error_message","phi","required"};
-		 */
+		
 		String[] itemHeaders = { "item_name", "description_label", "left_item_text", "units", "right_item_text",
 				"section_label", "group_label", "header", "subheader", "parent_item", "column_number", "page_number",
 				"question_number", "response_type", "response_label", "response_options_text", "response_values",
 				"response_layout", "default_value", "data_type", "width_decimal", "validation",
-				"validation_error_message", "phi", "required" };
+				"validation_error_message", "phi", "required", "code_ref" };
 		String[] sectionHeaders = { "section_label", "section_title", "subtitle", "instructions", "page_number",
 				"parent_section", "borders" };
 		Map<String, String> rowCells = new HashMap<String, String>();
@@ -180,13 +172,13 @@ public final class SpreadsheetPreviewNw implements Preview {
 								|| headers[k].equalsIgnoreCase("section_title")
 								|| headers[k].equalsIgnoreCase("subtitle")
 								|| headers[k].equalsIgnoreCase("instructions")
-								|| headers[k].equalsIgnoreCase("response_options_text")) {
+								|| headers[k].equalsIgnoreCase("response_options_text")
+								|| headers[k].equalsIgnoreCase("code_ref")) {
 							rowCells.put(headers[k], getCellValue(cell).replaceAll("\\\\,", "\\,"));
 						} else {
 							rowCells.put(headers[k],
 									getCellValue(cell).replaceAll("\\\\,", "\\,").replaceAll("<[^>]*>", ""));
 						}
-						// logger.warn("BADS: "+headers[k]+": "+getCellValue(cell));
 					}
 					// item_name
 

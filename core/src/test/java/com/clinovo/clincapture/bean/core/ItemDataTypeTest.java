@@ -175,7 +175,7 @@ public class ItemDataTypeTest {
 		assertFalse(ItemDataType.contains(0));
 		assertTrue(ItemDataType.contains(1));
 		assertTrue(ItemDataType.contains(11));
-		assertFalse(ItemDataType.contains(12));
+		assertTrue(ItemDataType.contains(12));
 	}
 
 	@Test
