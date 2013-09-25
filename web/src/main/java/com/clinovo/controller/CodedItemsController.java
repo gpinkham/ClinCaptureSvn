@@ -92,6 +92,7 @@ public class CodedItemsController {
 			
 			map.addAttribute("itemId", codedItem.getItemId());
 			map.addAttribute("classification", classifications);
+			map.addAttribute("itemDictionary", codedItem.getDictionary());
 
 		} catch (Exception e) {
 
