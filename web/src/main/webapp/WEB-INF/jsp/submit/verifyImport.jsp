@@ -208,7 +208,7 @@
 	<tr>
 		<td class="formlabel"><fmt:message key="xml_file_to_upload" bundle="${resterm}"/>:</td>
 		<td>
-			<div class="formfieldFile_BG"><input type="file" name="xml_file" > </div>
+			<input type="file" name="xml_file" > 
 			<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="xml_file"/></jsp:include>
 		</td>
 	</tr>
@@ -220,7 +220,12 @@
 	</div>
 
 	<br clear="all">
-	<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
+	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+               value="<fmt:message key="back" bundle="${resword}"/>"
+               class="button_medium"
+               onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+	
+	<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
 
 	</form>
 	</c:when>
