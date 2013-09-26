@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -205,13 +206,20 @@ public class CreateNewStudyEventServlet extends SecureController {
 			studyWithEventDefinitions = new StudyBean();
 			studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
 		}
+
 		// find all active definitions with CRFs
-		ArrayList eventDefinitions = seddao.findAllActiveByStudy(studyWithEventDefinitions);
-
-		Collections.sort(eventDefinitions);
-
-		ArrayList eventDefinitionsScheduled = eventDefinitions;
-
+		ArrayList eventDefinitions = new ArrayList();
+		ArrayList eventDefinitionsScheduled = new ArrayList();
+		if (ssb == null) {
+			eventDefinitions = seddao.findAllActiveByStudy(studyWithEventDefinitions);
+			Collections.sort(eventDefinitions);
+		} else {
+			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
+			StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+			eventDefinitions = selectNotStartedStudyEventDefs(ssb, studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
+		}
+		eventDefinitionsScheduled = eventDefinitions;
+		
 		if (!fp.isSubmitted()) {
 
 			HashMap presetValues = new HashMap();
@@ -864,5 +872,40 @@ public class CreateNewStudyEventServlet extends SecureController {
 		discrepancyNoteDAO = this.discrepancyNoteDAO == null ? new DiscrepancyNoteDAO(sm.getDataSource())
 				: discrepancyNoteDAO;
 		return discrepancyNoteDAO;
+	}
+	
+	public static ArrayList<StudyEventDefinitionBean> selectNotStartedStudyEventDefs(StudySubjectBean ssb, int studyId, StudyEventDefinitionDAO seddao, StudyGroupClassDAO sgcdao, StudyEventDAO sedao) {
+		ArrayList eventDefinitions = seddao.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
+		
+		//add definitions from default group
+		int defGrClassId = sgcdao.findDefaultByStudyId(studyId).getId();
+		if (defGrClassId > 0 && ssb.getDynamicGroupClassId() != defGrClassId && ssb.getDynamicGroupClassId() > 0){
+			ArrayList eventDefinitionsFromDefGroup = seddao.findAllActiveOrderedByStudyGroupClassId(defGrClassId);
+			eventDefinitions.addAll(eventDefinitionsFromDefGroup);
+		}
+		
+		//sort by ordinal
+		Collections.sort(eventDefinitions);
+				
+		//filter notStarted events
+		Map<Integer, StudyEventBean> StudyEventDefinitionIdToStudyEvent = new HashMap<Integer, StudyEventBean>();
+		ArrayList<StudyEventBean> studyEvents = sedao.findAllByStudySubject(ssb);
+		for (int i = 0; i < studyEvents.size(); i++) {
+			StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(i);
+			StudyEventDefinitionIdToStudyEvent.put(studyEvent.getStudyEventDefinitionId(), studyEvent);
+		}
+		ArrayList notStartedAndRepeatingEventDefinitions = new ArrayList();
+		for (int i = 0; i < eventDefinitions.size(); i++) {
+			StudyEventDefinitionBean eventDefinition = (StudyEventDefinitionBean) eventDefinitions.get(i);
+			if (StudyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())){
+				if (StudyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus().isNotScheduled() ||
+						eventDefinition.isRepeating()) {
+					notStartedAndRepeatingEventDefinitions.add(eventDefinition);
+				}
+			} else {
+				notStartedAndRepeatingEventDefinitions.add(eventDefinition);
+			}
+		}
+		return notStartedAndRepeatingEventDefinitions;
 	}
 }

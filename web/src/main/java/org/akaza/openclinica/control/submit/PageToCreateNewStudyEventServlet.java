@@ -45,12 +45,9 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -124,7 +121,7 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 
 		// TODO: make this sensitive to permissions
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
+		
 
 		StudyBean studyWithEventDefinitions = currentStudy;
 		if (currentStudy.getParentStudyId() > 0) {
@@ -132,43 +129,10 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 			studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
 		}
 		
-		// find all active definitions with CRFs
-		ArrayList eventDefinitions = seddao.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb,studyWithEventDefinitions.getId());
-
-		//add definitions from default group
-		int defGrClassId = sgcdao.findDefaultByStudyId(studyWithEventDefinitions.getId()).getId();
-		if (defGrClassId > 0 && ssb.getDynamicGroupClassId() != defGrClassId && ssb.getDynamicGroupClassId() > 0){
-			ArrayList eventDefinitionsFromDefGroup = seddao.findAllActiveOrderedByStudyGroupClassId(defGrClassId);
-			eventDefinitions.addAll(eventDefinitionsFromDefGroup);
-		}
-		
-		//sort by name
-		Collections.sort(eventDefinitions, new Comparator<StudyEventDefinitionBean>(){
-			public int compare(StudyEventDefinitionBean bean1, StudyEventDefinitionBean bean2) {
-				return bean1.getName().compareTo(bean2.getName());
-			}
-		});
-		
-		//filter notStarted events
+		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		Map<Integer, StudyEventBean> StudyEventDefinitionIdToStudyEvent = new HashMap<Integer, StudyEventBean>();
-		ArrayList<StudyEventBean> studyEvents = sedao.findAllByStudySubject(ssb);
-		for (int i = 0; i < studyEvents.size(); i++) {
-			StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(i);
-			StudyEventDefinitionIdToStudyEvent.put(studyEvent.getStudyEventDefinitionId(), studyEvent);
-		}
-		ArrayList eventDefinitionsScheduled = new ArrayList();
-		for (int i = 0; i < eventDefinitions.size(); i++) {
-			StudyEventDefinitionBean eventDefinition = (StudyEventDefinitionBean) eventDefinitions.get(i);
-			if (StudyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())){
-				if (StudyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus().isNotScheduled()) {
-					eventDefinitionsScheduled.add(eventDefinition);
-				}
-			} else {
-				eventDefinitionsScheduled.add(eventDefinition);
-			}
-		}
-		eventDefinitions = eventDefinitionsScheduled;
+		ArrayList eventDefinitions = CreateNewStudyEventServlet.selectNotStartedStudyEventDefs(ssb, studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
+		ArrayList eventDefinitionsScheduled = eventDefinitions;
 		
 		if (!fp.isSubmitted()) {
 
