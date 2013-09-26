@@ -142,6 +142,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input id="hasPopUp" type="hidden" name="hasPopUp" value="${requestScope['hasPopUp']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
+<input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
 <script type="text/javascript" language="JavaScript">
     // <![CDATA[
     function getSib(theSibling){

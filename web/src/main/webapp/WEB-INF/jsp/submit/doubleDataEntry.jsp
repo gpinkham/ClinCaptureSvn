@@ -140,6 +140,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
+<input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
 
 <script type="text/javascript" language="JavaScript">
     // <![CDATA[

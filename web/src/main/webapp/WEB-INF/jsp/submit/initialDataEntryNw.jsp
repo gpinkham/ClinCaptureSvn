@@ -142,6 +142,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="exitTo" value="${exitTo}" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="isFirstTimeOnSection" value="<c:out value="${section.section.id}"/>" />
+<input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
 
 <!-- For randomization -->
 <input type="hidden" name="crfId" value="<c:out value="${section.crf.id}"/>" />
