@@ -15,7 +15,7 @@ public class Navigation {
 			"/CRFListForStudyEvent", "/InitialDataEntry", "/VerifyImportedCRFData", "/AdministrativeEditing",
 			"/UpdateStudySubject", "/RemoveStudySubject", "/ResolveDiscrepancy", "/RestoreStudySubject",
 			"/UpdateStudyEvent", "/RemoveStudyEvent", "/RestoreStudyEvent", "/DeleteEventCRF", "/RemoveEventCRF",
-			"/RestoreEventCRF", "/CreateOneDiscrepancyNote", "/InitUpdateSubStudy", "/EditStudyUserRole",
+			"/RestoreEventCRF", "/CreateOneDiscrepancyNote", "/InitUpdateSubStudy", "/UpdateSubStudy", "/EditStudyUserRole",
 			"/RemoveStudyUserRole", "/ViewSectionDataEntry", "/CreateSubjectGroupClass", "/SetStudyUserRole",
 			"/UpdateProfile", "/SectionPreview", "/DefineStudyEvent", "/InitUpdateEventDefinition",
 			"/UpdateEventDefinition", "/RemoveEventDefinition", "/RemoveSubject", "/RemoveStudy", "/ViewUserAccount",
