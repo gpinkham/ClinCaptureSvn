@@ -312,6 +312,26 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		return answer;
 	}
 
+    public ItemFormMetadataBean findAllByCRFVersionIdAndItemId(int crfVersionId, int itemId) {
+        ItemFormMetadataBean answer = null;
+
+        this.setTypesExpected();
+
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        variables.put(new Integer(1), new Integer(itemId));
+        variables.put(new Integer(2), new Integer(crfVersionId));
+
+        String sql = digester.getQuery("findAllByCRFVersionIdAndItemId");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            answer = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+
+        return answer;
+    }
+
 	public ArrayList<ItemFormMetadataBean> findAllByCRFIdItemIdAndHasValidations(int crfId, int itemId) {
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 

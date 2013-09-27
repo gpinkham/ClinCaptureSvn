@@ -376,9 +376,9 @@ public class ImportCRFDataService {
 									DisplayItemBean displayItemBean = new DisplayItemBean();
 									displayItemBean.setItem(itemBean);
 
-									ArrayList<ItemFormMetadataBean> metadataBeans = itemFormMetadataDAO
-											.findAllByItemId(itemBean.getId());
-									logger.debug("      found metadata item beans: " + metadataBeans.size());
+									ItemFormMetadataBean metadataBean = itemFormMetadataDAO
+											.findAllByCRFVersionIdAndItemId(crfVersion.getId(), itemBean.getId());
+									logger.debug("      found metadata item bean: " + metadataBean);
 									int groupOrdinal = 1;
 									if (itemGroupDataBean.getItemGroupRepeatKey() != null) {
 										try {
@@ -398,12 +398,7 @@ public class ImportCRFDataService {
 											+ itemBean.getOid() + "_" + subjectDataBean.getSubjectOID();
 									blankCheck.put(newKey, itemDataBean);
 									logger.info("adding " + newKey + " to blank checks");
-									if (!metadataBeans.isEmpty()) {
-										ItemFormMetadataBean metadataBean = metadataBeans.get(0);
-										// also
-										// possible
-										// nullpointer
-
+									if (metadataBean != null) {
 										displayItemBean.setData(itemDataBean);
 										displayItemBean.setMetadata(metadataBean);
 										// set event def crf?
