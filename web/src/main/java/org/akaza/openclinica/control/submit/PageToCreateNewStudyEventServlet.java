@@ -131,7 +131,7 @@ public class PageToCreateNewStudyEventServlet extends SecureController {
 		
 		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		ArrayList eventDefinitions = CreateNewStudyEventServlet.selectNotStartedStudyEventDefs(ssb, studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
+		ArrayList eventDefinitions = CreateNewStudyEventServlet.selectNotStartedOrRepeatingSortedEventDefs(ssb, studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
 		ArrayList eventDefinitionsScheduled = eventDefinitions;
 		
 		if (!fp.isSubmitted()) {

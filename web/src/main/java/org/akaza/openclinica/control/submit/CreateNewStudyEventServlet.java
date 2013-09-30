@@ -39,6 +39,7 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
@@ -216,7 +217,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 		} else {
 			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
 			StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-			eventDefinitions = selectNotStartedStudyEventDefs(ssb, studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
+			eventDefinitions = selectNotStartedOrRepeatingSortedEventDefs(ssb, studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
 		}
 		eventDefinitionsScheduled = eventDefinitions;
 		
@@ -874,29 +875,54 @@ public class CreateNewStudyEventServlet extends SecureController {
 		return discrepancyNoteDAO;
 	}
 	
-	public static ArrayList<StudyEventDefinitionBean> selectNotStartedStudyEventDefs(StudySubjectBean ssb, int studyId, StudyEventDefinitionDAO seddao, StudyGroupClassDAO sgcdao, StudyEventDAO sedao) {
-		ArrayList eventDefinitions = seddao.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
+	public static ArrayList<StudyEventDefinitionBean> selectNotStartedOrRepeatingSortedEventDefs(StudySubjectBean ssb, int parentStudyId, StudyEventDefinitionDAO seddao, StudyGroupClassDAO sgcdao, StudyEventDAO sedao) {
+		/*
+		 * notStarted or repeating eventDefs ordered like on Subject Matrix
+		 */
 		
-		//add definitions from default group
-		int defGrClassId = sgcdao.findDefaultByStudyId(studyId).getId();
-		if (defGrClassId > 0 && ssb.getDynamicGroupClassId() != defGrClassId && ssb.getDynamicGroupClassId() > 0){
-			ArrayList eventDefinitionsFromDefGroup = seddao.findAllActiveOrderedByStudyGroupClassId(defGrClassId);
-			eventDefinitions.addAll(eventDefinitionsFromDefGroup);
-		}
+		ArrayList<StudyEventDefinitionBean> result = new ArrayList<StudyEventDefinitionBean>();
 		
-		//sort by ordinal
-		Collections.sort(eventDefinitions);
-				
-		//filter notStarted events
+		
 		Map<Integer, StudyEventBean> StudyEventDefinitionIdToStudyEvent = new HashMap<Integer, StudyEventBean>();
 		ArrayList<StudyEventBean> studyEvents = sedao.findAllByStudySubject(ssb);
 		for (int i = 0; i < studyEvents.size(); i++) {
 			StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(i);
 			StudyEventDefinitionIdToStudyEvent.put(studyEvent.getStudyEventDefinitionId(), studyEvent);
 		}
+		
+		ArrayList<StudyGroupClassBean> allActiveDynGroupClasses = sgcdao.findAllActiveDynamicGroupsByStudyId(parentStudyId);
+		Collections.sort(allActiveDynGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
+		
+		//ordered eventDefs from dynGroups
+		for (StudyGroupClassBean dynGroup: allActiveDynGroupClasses){
+			ArrayList<StudyEventDefinitionBean> orderedEventDefinitionsFromDynGroup = seddao.findAllActiveOrderedByStudyGroupClassId(dynGroup.getId());
+			for (StudyEventDefinitionBean eventDefinition: orderedEventDefinitionsFromDynGroup) {
+				if (dynGroup.isDefault() || (ssb.getDynamicGroupClassId() != 0 && dynGroup.getId() == ssb.getDynamicGroupClassId())){
+					//eventDefs from defDynGroup and subject's dynGroup
+					if (StudyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())){
+						if (StudyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus().isNotScheduled() ||
+								eventDefinition.isRepeating()) {
+							result.add(eventDefinition);
+						}
+					} else {
+						result.add(eventDefinition);
+					}
+				} else {
+					//eventDefs from others dynGroups
+					if (eventDefinition.isRepeating()) {
+						result.add(eventDefinition);
+					}
+				}
+			} 
+		}
+		
+		ArrayList eventDefinitionsNotFromDynGroup = seddao.findAllActiveNotClassGroupedByStudyId(parentStudyId);
+		//sort by study event definition ordinal
+		Collections.sort(eventDefinitionsNotFromDynGroup);
+		//filter notStarted and repeating eventDefs
 		ArrayList notStartedAndRepeatingEventDefinitions = new ArrayList();
-		for (int i = 0; i < eventDefinitions.size(); i++) {
-			StudyEventDefinitionBean eventDefinition = (StudyEventDefinitionBean) eventDefinitions.get(i);
+		for (int i = 0; i < eventDefinitionsNotFromDynGroup.size(); i++) {
+			StudyEventDefinitionBean eventDefinition = (StudyEventDefinitionBean) eventDefinitionsNotFromDynGroup.get(i);
 			if (StudyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())){
 				if (StudyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus().isNotScheduled() ||
 						eventDefinition.isRepeating()) {
@@ -906,6 +932,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 				notStartedAndRepeatingEventDefinitions.add(eventDefinition);
 			}
 		}
-		return notStartedAndRepeatingEventDefinitions;
+		result.addAll(notStartedAndRepeatingEventDefinitions);
+		return result;
 	}
 }
