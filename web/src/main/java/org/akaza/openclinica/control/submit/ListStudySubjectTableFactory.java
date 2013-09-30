@@ -894,7 +894,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					url.append(signStudySubjectLinkBuilder(studySubjectBean, isSignable));
 				}
 
-				if (getCurrentRole().getRole() == Role.STUDY_ADMINISTRATOR) {
+				if (getCurrentRole().getRole() == Role.STUDY_ADMINISTRATOR || getCurrentRole().getRole() == Role.SYSTEM_ADMINISTRATOR) {
 					url.append(studySubjectLockLinkBuilder(studySubjectBean));
 				}
 				if (getCurrentRole().getRole() != Role.STUDY_MONITOR) {

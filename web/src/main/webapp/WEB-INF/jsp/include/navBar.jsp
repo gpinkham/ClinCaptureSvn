@@ -232,7 +232,7 @@
                 <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
                 <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector) }">
+                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector || userBean.name == 'root')}">
                     </c:when>
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
@@ -241,7 +241,7 @@
             </div>
             <div class="taskRightColumn">
                 <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector) }">
+                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector || userBean.name == 'root')}">
                     </c:when>
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
@@ -278,7 +278,9 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudy"><fmt:message key="nav_studies" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ListUserAccounts"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="${urlPrefix}ListCRF?module=admin"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
+                <c:if test="${study.parentStudyId <= 0}">
+                	<div class="taskLink"><a href="${urlPrefix}ListCRF?module=admin"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
+                </c:if>
             </div>
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewAllJobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
