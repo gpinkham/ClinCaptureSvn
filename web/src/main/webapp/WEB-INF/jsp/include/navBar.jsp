@@ -131,13 +131,14 @@
                                             <c:when test="${userRole.sysAdmin || userBean.techAdmin}">
                                                 <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                <li><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                <li><a name="codedItems" href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             </c:when>
                                             <c:when test="${userRole.studyAdministrator || userRole.studyDirector}">
                                                 <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                <li><a name="codedItems" href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             </c:when>
@@ -157,10 +158,19 @@
                                                 </c:if>
                                                 <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             </c:when>
+                                            <c:when test="${userRole.studyCoder }">
+                                                <li><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            </c:when>
                                             <c:when test="${userRole.monitor }">
                                                 <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                                <li><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_sdv" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                <li><a name="codedItems" href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                <li>
+                                                    <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}">
+                                                        <fmt:message key="nav_sdv" bundle="${resword}"/>
+                                                    </a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                                                </li>
                                                 <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             </c:when>
                                         </c:choose>
@@ -246,7 +256,7 @@
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
                         <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-                        <div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
+                        <div class="taskLink"><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a></div>
                     </c:otherwise>
                 </c:choose>
                 <c:if test="${includeReporting}">
@@ -298,6 +308,7 @@
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a></div>
                 <c:if test="${includeReporting}">
                     <div class="taskLink"><a href="${urlPrefix}reports" target="_blank"><fmt:message key="reporting" bundle="${resword}"/></a></div>
                 </c:if>
@@ -352,7 +363,10 @@
             </div>
             <br clear="all">
             </c:when>
-
+            <c:when test="${userRole.studyCoder}">
+                <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
+                <div class="taskLink"><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a></div>
+            </c:when>
             <c:when test="${userRole.studyAdministrator || userRole.studyDirector}">
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
@@ -386,6 +400,7 @@
                 <c:otherwise>
                     <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
                     <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a></div>
                 </c:otherwise>
             </c:choose>
             <c:if test="${includeReporting}">

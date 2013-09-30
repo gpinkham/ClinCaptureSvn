@@ -2373,7 +2373,7 @@ codeItem = function(item) {
     $.ajax({
 
         type: "POST",
-        url: url+"/codedItem",
+        url: url + "/codedItem",
         data: {
 
             item: $(item).attr("itemid"),

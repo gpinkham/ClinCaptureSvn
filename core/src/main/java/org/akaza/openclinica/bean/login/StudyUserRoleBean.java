@@ -62,13 +62,15 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	// from name,not guaranteed to have a value
 
 	// User role capabilities, use this instead the role name.
+	private boolean canMonitor;
 	private boolean canSubmitData;
 	private boolean canExtractData;
 	private boolean canManageStudy;
+	private boolean canCode = false;
+
 
 	private int userAccountId = 0;
 
-	private boolean canMonitor;
 
 	public StudyUserRoleBean() {
 		role = Role.INVALID;
@@ -89,17 +91,24 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	 *            The role to set.
 	 */
 	public void setRole(Role role) {
+		
 		this.role = role;
 		super.setId(role.getId());
 		super.setName(role.getCode());
+		
 		this.canSubmitData = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
 				|| this.role == Role.STUDY_DIRECTOR || this.role == Role.CLINICAL_RESEARCH_COORDINATOR
 				|| this.role == Role.INVESTIGATOR;
+		
 		this.canExtractData = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
 				|| this.role == Role.STUDY_DIRECTOR || this.role == Role.INVESTIGATOR;
+		
 		this.canManageStudy = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
 				|| this.role == Role.STUDY_DIRECTOR;
+		
 		this.canMonitor = this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_MONITOR;
+		
+		this.canCode = this.role == Role.STUDY_CODER || this.role == Role.STUDY_ADMINISTRATOR;
 	}
 
 	public int getUserAccountId() {
@@ -256,4 +265,16 @@ public class StudyUserRoleBean extends AuditableEntityBean {
     public boolean isSysAdmin() {
         return this.role == Role.SYSTEM_ADMINISTRATOR;
     }
+    
+    public boolean isStudyCoder() {
+    	return this.role.equals(Role.STUDY_CODER);
+    }
+
+	public boolean isCanCode() {
+		return canCode;
+	}
+
+	public void setCanCode(boolean canCode) {
+		this.canCode = canCode;
+	}
 }

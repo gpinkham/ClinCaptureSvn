@@ -24,6 +24,9 @@ import java.util.*;
 
 @SuppressWarnings({"rawtypes", "unchecked",  "serial"})
 public class Role extends Term {
+	
+	public static final String study_coder = "study_coder";
+	
 	public static final Role INVALID = new Role(0, "invalid", "invalid", null);
 	public static final Role SYSTEM_ADMINISTRATOR = new Role(1, "system_administrator", "System_Administrator", null);
 	public static final Role STUDY_ADMINISTRATOR = new Role(2, "study_administrator", "Study_Administrator", null);
@@ -33,9 +36,10 @@ public class Role extends Term {
 	public static final Role INVESTIGATOR = new Role(4, "investigator", "Investigator", null);
 	public static final Role CLINICAL_RESEARCH_COORDINATOR = new Role(5, "clinical_research_coordinator",
 			"Clinical_Research_Coordinator", null);
+	public static final Role STUDY_CODER = new Role(7, "study_coder", study_coder, null);
 
 	private static final Role[] members = { SYSTEM_ADMINISTRATOR, STUDY_ADMINISTRATOR, STUDY_DIRECTOR, STUDY_MONITOR,
-			INVESTIGATOR, CLINICAL_RESEARCH_COORDINATOR };
+			INVESTIGATOR, CLINICAL_RESEARCH_COORDINATOR, STUDY_CODER };
 	public static final List list = Arrays.asList(members);
 
 	public static final Map roleMap = new LinkedHashMap();
@@ -46,6 +50,7 @@ public class Role extends Term {
 		roleMap.put(6, "Study_Monitor");
 		roleMap.put(4, "Investigator");
 		roleMap.put(5, "Clinical_Research_Coordinator");
+		roleMap.put(7, study_coder);
 	}
 
 	public static final Map roleMapWithDescriptions = new LinkedHashMap();
@@ -56,13 +61,13 @@ public class Role extends Term {
 		roleMapWithDescriptions.put(6, "Study_Monitor");
 		roleMapWithDescriptions.put(4, "Investigator");
 		roleMapWithDescriptions.put(5, "Clinical_Research_Coordinator");
+		roleMapWithDescriptions.put(7, study_coder);
 	}
 
     private List privileges;
 
 	private Role(int id, String name, String description, Privilege[] myPrivs) {
 		super(id, name, description);
-		// privileges = Arrays.asList(myPrivs);
 	}
 
 	private Role() {

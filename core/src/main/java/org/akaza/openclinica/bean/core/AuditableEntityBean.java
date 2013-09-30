@@ -140,7 +140,6 @@ public class AuditableEntityBean extends EntityBean {
 
 		try {
 			if (udao == null) {
-				// SessionManager sm = new SessionManager();
 				udao = new UserAccountDAO(SessionManager.getStaticDataSource());
 			}
 			if (updater == null || updater.getId() != updaterId) {
@@ -150,17 +149,6 @@ public class AuditableEntityBean extends EntityBean {
 		} catch (Exception e) {
 			updater = null;
 		}
-
-		// try {
-		// if (udao == null) {
-		// SessionManager sm = new SessionManager(null, "tomh");
-		// udao = new UserAccountDAO(sm.getDataSource());
-		// }
-		// updater = (UserAccountBean) udao.findByPK(updaterId);
-		// }
-		// catch (Exception e) {
-		// updater = null;
-		// }
 
 		return updater;
 	}
@@ -193,9 +181,7 @@ public class AuditableEntityBean extends EntityBean {
 	public void setUpdaterId(int updaterId) {
 		this.updaterId = updaterId;
 
-		/*
-		 * if ((updater != null) || (updater.getId() != updaterId)) { updater = null; getUpdater(); }
-		 */}
+	}
 
 	/**
 	 * @return Returns the createdDate.

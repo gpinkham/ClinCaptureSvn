@@ -186,6 +186,9 @@ public abstract class ListStudySubjectServlet extends SecureController {
 
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "replaceExisitingDataDuringImport");
         currentStudy.getStudyParameterConfig().setReplaceExisitingDataDuringImport(parentSPV.getValue());
+        
+        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "allowCodingVerification");
+        currentStudy.getStudyParameterConfig().setAllowCodingVerification(parentSPV.getValue());
 
 		// for all the study groups for each group class
 		for (int i = 0; i < studyGroupClasses.size(); i++) {

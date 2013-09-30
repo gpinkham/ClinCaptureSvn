@@ -27,6 +27,7 @@ package org.akaza.openclinica.bean.service;
  * 
  */
 public class StudyParameterConfig {
+	
 	private String collectDob;
 
 	private String discrepancyManagement;
@@ -91,6 +92,8 @@ public class StudyParameterConfig {
     private String allowSdvWithOpenQueries;
 
     private String replaceExisitingDataDuringImport;
+    
+    private String allowCodingVerification = "no";
 
 	public StudyParameterConfig() {
 		collectDob = "1";
@@ -469,4 +472,12 @@ public class StudyParameterConfig {
     public void setReplaceExisitingDataDuringImport(String replaceExisitingDataDuringImport) {
         this.replaceExisitingDataDuringImport = replaceExisitingDataDuringImport;
     }
+
+	public String getAllowCodingVerification() {
+		return allowCodingVerification;
+	}
+
+	public void setAllowCodingVerification(String allowCodingVerification) {
+		this.allowCodingVerification = allowCodingVerification;
+	}
 }

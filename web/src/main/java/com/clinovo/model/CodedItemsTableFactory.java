@@ -1,11 +1,21 @@
 package com.clinovo.model;
 
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -14,31 +24,29 @@ import org.jmesa.limit.Limit;
 import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ArrayList;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @SuppressWarnings("rawtypes")
 public class CodedItemsTableFactory extends AbstractTableFactory {
 
 	private StudyDAO studyDAO;
+	private int studyId = -1;
 	private EventCRFDAO eventCRFDAO;
 	private List<CodedItem> codedItems;
 	private EventDefinitionCRFDAO eventDefCRFDAO;
+	private DataSource datasource;
 
-    public final static String CODED_DIV_PREFIX = "Search: <input style=\"border:1px solid #a6a6a6;margin-bottom: 2px;background-color:#d9d9d9;color:#4D4D4D\" type=\"text\" value=\"";
-    public final static String CODED_DIV_MIDDLE = "\"/><div id=\"";
-    public final static String CODED_DIV_SUFIX = "\"></div>";
-    public final static String AJAX_REQUEST_PREFIX = "<a onClick=\"codeItem(this)\" itemId=\"";
-    public final static String AJAX_REQUEST_MIDDLE = "\"><img style=\"float:left;\" width=\"17\" border=\"0\" title=\"Code\" alt=\"Code\" src=\"../images/";
-    public final static String AJAX_REQUEST_SUFIX =  "\" name=\"codeBtn\"/></a>";
-    public final static String GOTO_CRF_DEFID = "&nbsp;&nbsp;<a onmouseup=\"javascript:setImage('Complete','../images/icon_DEcomplete.gif');\" href=\"../ViewSectionDataEntry?eventDefinitionCRFId=";
-    public final static String GOTO_CRF_CRFID = "&amp;ecId=";
-    public final static String GOTO_CRF_EVENTID = "&amp;tabId=1&eventId=";
-    public final static String GOTO_CRF_SUFIX = "&amp;viewFull=yes\"><img border=\"0\" title=\"Open CRF\" alt=\"GoToCRF\" src=\"../images/icon_DEcomplete.gif\" name=\"GOTO\"/></a>";
+    private String CODED_DIV_PREFIX = "Search: <input style=\"border:1px solid #a6a6a6;margin-bottom: 2px;background-color:#d9d9d9;color:#4D4D4D\" type=\"text\" value=\"";
+    private final String CODED_DIV_MIDDLE = "\"/><div id=\"";
+    private final String CODED_DIV_SUFIX = "\"></div>";
+    private String AJAX_REQUEST_PREFIX = "<a onClick=\"codeItem(this)\" itemId=\"";
+    private final String AJAX_REQUEST_MIDDLE = "\"><img style=\"float:left;\" width=\"17\" border=\"0\" title=\"Code\" alt=\"Code\" src=\"../images/";
+    private final String AJAX_REQUEST_SUFIX =  "\" name=\"codeBtn\"/></a>";
+    private final String GOTO_CRF_DEFID = "&nbsp;&nbsp;<a onmouseup=\"javascript:setImage('Complete','../images/icon_DEcomplete.gif');\" href=\"../ViewSectionDataEntry?eventDefinitionCRFId=";
+    private final String GOTO_CRF_CRFID = "&amp;ecId=";
+    private final String GOTO_CRF_EVENTID = "&amp;tabId=1&eventId=";
+    private final String GOTO_CRF_SUFIX = "&amp;viewFull=yes\"><img border=\"0\" title=\"Open CRF\" alt=\"GoToCRF\" src=\"../images/icon_DEcomplete.gif\" name=\"GOTO\"/></a>";
 
     @Override
     protected String getTableName() {
@@ -89,6 +97,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     }
 
     private class VersionCellEditor implements CellEditor {
+    	
         public Object getValue(Object item, String property, int rowcount) {
             String value = "";
             String version = "";
@@ -103,12 +112,22 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     @SuppressWarnings("unchecked")
     private class CodedCellEditor implements CellEditor {
+    	
         public Object getValue(Object item, String property, int rowcount) {
+        	
             String value = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
             String inputTerm = codedItem.isCoded() ? codedItem.getCodedTerm() : codedItem.getVerbatimTerm();
+            
             if (codedItem != null) {
+            	
                 StringBuilder url = new StringBuilder();
+                
+				if (isLoggedInUserMonitor()) {
+
+					CODED_DIV_PREFIX = "<input style=\"border:1px solid #a6a6a6;margin-bottom: 2px;background-color:#d9d9d9;color:#4D4D4D\" disabled=\"true\" type=\"text\" value=\"";
+				}
+				
                 url.append(CODED_DIV_PREFIX).append(inputTerm)
                         .append(CODED_DIV_MIDDLE).append(codedItem.getItemId())
                         .append(CODED_DIV_SUFIX);
@@ -120,7 +139,9 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     
     @SuppressWarnings("unchecked")
     private class ActionCellEditor implements CellEditor {
+    	
 		public Object getValue(Object item, String property, int rowcount) {
+			
             String value = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
             EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(codedItem.getEventCrfId());
@@ -129,7 +150,14 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             String codedItemButton = codedItem.isCoded() ? "code_confirm.png" : "code_blue.png";
 
             if (codedItem != null) {
+            	
                 StringBuilder url = new StringBuilder();
+                
+                // Monitor is readonly
+ 				if (isLoggedInUserMonitor()) {
+ 					
+ 					AJAX_REQUEST_PREFIX = "<a itemId=\"";
+ 				}
                 url.append(AJAX_REQUEST_PREFIX).append(codedItem.getItemId())
                         .append(AJAX_REQUEST_MIDDLE).append(codedItemButton).append(AJAX_REQUEST_SUFIX)
                         .append(GOTO_CRF_DEFID).append(eventDefCRFBean.getStudyEventDefinitionId())
@@ -143,10 +171,13 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     @SuppressWarnings("unchecked")
     private class StatusCellEditor implements CellEditor {
+    	
         public Object getValue(Object item, String property, int cowcount) {
+        	
             String value = "";
             String codedItemStatus = (String) ((HashMap<Object, Object>) item).get("codedItem.isCoded");
             if (!codedItemStatus.isEmpty()) {
+            	
                 StringBuilder url = new StringBuilder();
                 url.append(codedItemStatus);
                 value = url.toString();
@@ -156,7 +187,9 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     }
 
     private class StatusDroplistFilterEditor extends DroplistFilterEditor {
+    	
         protected List<Option> getOptions() {
+        	
             List<Option> options = new ArrayList<Option>();
             options.add(new Option("Completed", "Completed"));
             options.add(new Option("Available", "Available"));
@@ -179,4 +212,28 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     public void setEventDefinitionCRFDAO(EventDefinitionCRFDAO eventDefenitionCRFDAO) {
         this.eventDefCRFDAO = eventDefenitionCRFDAO;
     }
+
+	public void setStudyId(String studyId) {
+
+		try {
+			this.studyId = Integer.parseInt(studyId);
+		} catch (Exception ex) {
+			this.studyId = 1;
+		}
+	}
+
+	public void setDataSource(DataSource datasource) {
+		this.datasource = datasource;
+	}
+	
+	public boolean isLoggedInUserMonitor() {
+
+		UserAccountDAO userDAO = new UserAccountDAO(datasource);
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		// Really type coding for root
+		UserAccountBean loggedInUser = (UserAccountBean) userDAO.findByUserName(authentication.getName());
+
+		return loggedInUser.getRoleByStudy(studyId).getName().equalsIgnoreCase("study monitor");
+	}
 }

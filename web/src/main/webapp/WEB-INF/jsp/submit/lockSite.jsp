@@ -148,99 +148,6 @@
 
 <c:forEach var="config" items="${siteToView.studyParameters}">
 <c:choose>
-    <%--
-    <c:when test="${config.parameter.handle=='collectDOB'}">
-      <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject" bundle="${resword}"/></td><td class="table_cell">
-        <c:choose>
-          <c:when test="${config.value.value == '1'}">
-           <fmt:message key="yes" bundle="${resword}"/>
-          </c:when>
-          <c:when test="${config.value.value == '2'}">
-
-           <fmt:message key="only_year_of_birth" bundle="${resword}"/>
-
-          </c:when>
-          <c:otherwise>
-           <fmt:message key="not_used" bundle="${resword}"/>
-          </c:otherwise>
-       </c:choose>
-       </td></tr>
-
-    </c:when>
-
-    <c:when test="${config.parameter.handle=='discrepancyManagement'}">
-           <tr valign="top"><td class="table_header_column"><fmt:message key="allow_discrepancy_management" bundle="${resword}"/>:</td><td class="table_cell">
-            <c:choose>
-            <c:when test="${config.value.value == 'false'}">
-             <fmt:message key="No" bundle="${resword}"/>
-            </c:when>
-            <c:otherwise>
-            <fmt:message key="yes" bundle="${resword}"/>
-            </c:otherwise>
-           </c:choose>
-           </td>
-           </tr>
-     </c:when>
-
-     <c:when test="${config.parameter.handle=='genderRequired'}">
-           <tr valign="top"><td class="table_header_column"><fmt:message key="gender_required" bundle="${resword}"/>:</td><td class="table_cell">
-            <c:choose>
-            <c:when test="${config.value.value == false}">
-            <fmt:message key="No" bundle="${resword}"/>
-            </c:when>
-            <c:otherwise>
-            <fmt:message key="yes" bundle="${resword}"/>
-            </c:otherwise>
-           </c:choose>
-           </td>
-           </tr>
-     </c:when>
-     <c:when test="${config.parameter.handle=='subjectPersonIdRequired'}">
-           <tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td><td class="table_cell">
-            <c:choose>
-            <c:when test="${config.value.value == 'required'}">
-             <fmt:message key="required" bundle="${resword}"/>
-            </c:when>
-             <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
-              <fmt:message key="optional" bundle="${resword}"/>
-            </c:when>
-            <c:otherwise>
-              <fmt:message key="not_used" bundle="${resword}"/>
-            </c:otherwise>
-           </c:choose>
-           </td>
-           </tr>
-     </c:when>
-     <c:when test="${config.parameter.handle=='subjectIdGeneration'}">
-            <tr valign="top"><td class="table_header_column"><fmt:message key="how_to_generate" bundle="${resword}"/>:</td><td class="table_cell">
-            <c:choose>
-            <c:when test="${config.value.value == 'manual'}">
-              <fmt:message key="manual_entry" bundle="${resword}"/>
-            </c:when>
-             <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'auto editable'}">
-               <fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
-            </c:when>
-            <c:otherwise>
-             <fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
-            </c:otherwise>
-           </c:choose>
-           </td>
-           </tr>
-     </c:when>
-     <c:when test="${config.parameter.handle=='subjectIdPrefixSuffix'}">
-            <tr valign="top"><td class="table_header_column"><fmt:message key="generate_subject_ID" bundle="${resword}"/>:</td><td class="table_cell">
-            <c:choose>
-            <c:when test="${config.value.value == 'true'}">
-             <fmt:message key="yes" bundle="${resword}"/>
-            </c:when>
-            <c:otherwise>
-            <fmt:message key="no" bundle="${resword}"/>
-            </c:otherwise>
-           </c:choose>
-           </td>
-           </tr>
-     </c:when>
-     --%>
     <c:when test="${config.parameter.handle=='markImportedCRFAsCompleted'}">
         <tr valign="top">
             <td class="table_header_column"><fmt:message key="markImportedCRFAsCompleted" bundle="${resword}"/></td>
@@ -286,6 +193,21 @@
             </td>
         </tr>
     </c:when>
+    <c:when test="${config.parameter.handle=='allowCodingVerification'}">
+        <tr valign="top">
+            <td class="table_header_column"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
+            <td class="table_cell">
+                <c:choose>
+                    <c:when test="${config.value.value== 'yes'}">
+                        <fmt:message key="yes" bundle="${resword}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <fmt:message key="no" bundle="${resword}"/>
+                    </c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
+    </c:when>
     <c:when test="${config.parameter.handle=='interviewerNameRequired'}">
         <tr valign="top"><td class="table_header_column"><fmt:message key="when_entering_data" bundle="${resword}"/></td><td class="table_cell">
             <c:choose>
@@ -316,21 +238,6 @@
         </td>
         </tr>
     </c:when>
-    <%--
-    <c:when test="${config.parameter.handle=='interviewerNameEditable'}">
-          <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_editable" bundle="${resword}"/></td><td class="table_cell">
-           <c:choose>
-           <c:when test="${config.value.value== 'true'}">
-            <fmt:message key="yes" bundle="${resword}"/>
-           </c:when>
-           <c:otherwise>
-           <fmt:message key="no" bundle="${resword}"/>
-           </c:otherwise>
-          </c:choose>
-          </td>
-          </tr>
-    </c:when>
-    --%>
     <c:when test="${config.parameter.handle=='interviewDateRequired'}">
         <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_required" bundle="${resword}"/></td><td class="table_cell">
             <c:choose>
@@ -362,21 +269,6 @@
         </td>
         </tr>
     </c:when>
-    <%--
-    <c:otherwise>
-         <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_editable" bundle="${resword}"/></td><td class="table_cell">
-          <c:choose>
-          <c:when test="${config.value.value== 'true'}">
-           <fmt:message key="yes" bundle="${resword}"/>
-          </c:when>
-          <c:otherwise>
-           <fmt:message key="no" bundle="${resword}"/>
-          </c:otherwise>
-         </c:choose>
-         </td>
-         </tr>
-    </c:otherwise>
-    --%>
 </c:choose>
 
 </c:forEach>

@@ -167,6 +167,9 @@ public class MainMenuServlet extends Controller {
                 } 
                 if (currentRole.getRole() == Role.STUDY_MONITOR) {
                     setupSubjectSDVTable(request);
+                } else if(currentRole.getRole().equals(Role.STUDY_CODER)) {
+                    response.sendRedirect(request.getContextPath() + "/pages/codedItems");
+                    return;
                 } else if (currentRole.isSysAdmin() || currentRole.isStudyAdministrator() || currentRole.isStudyDirector()) {
                     if (currentStudy.getStatus().isPending()) {
                     	request.getSession().setAttribute("skipURL", "true");

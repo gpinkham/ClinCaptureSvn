@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="markg" id="2013-08-09-TICKET424">
+		<comment>Add coding role to the user_role table</comment>
+		<insert tableName="user_role">
+			<column name="role_id" valueNumeric="7" />
+			<column name="role_name" value="study_coder" />
+			<column name="parent_id" value="1" />
+			<column name="role_desc"
+				value="This role allows a user to perform medical coding" />
+		</insert>
+	</changeSet>
+
+	<changeSet author="mapkon" id="2013-08-09-TICKET424-01">
+		<comment>Insert a new record in the studyParameter table</comment>
+		<insert tableName="study_parameter">
+			<column name="study_parameter_id" valueNumeric="32" />
+			<column name="handle" value="allowCodingVerification" />
+			<column name="name" value="allowCodingVerification" />
+			<column name="description" value="Allow medical coding verification" />
+			<column name="default_value" value="no" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+	</changeSet>
+</databaseChangeLog>

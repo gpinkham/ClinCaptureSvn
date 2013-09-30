@@ -317,6 +317,7 @@ public class UpdateSubStudyServlet extends SecureController {
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
         study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
         study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
+        study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("allowCodingVerification"));
 
 		ArrayList parameters = study.getStudyParameters();
 

@@ -5009,7 +5009,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 		if (eventCRFId > 0) {
 			if (!entityIncluded(eventCRFId, ub.getName(), edao, getDataSource())) {
-				System.out.println("Checking on ecrfid " + eventCRFId + " user name " + ub.getName());
 				addPageMessage(respage.getString("required_event_CRF_belong"), request);
 				throw new InsufficientPermissionException(Page.MENU_SERVLET,
 						resexception.getString("entity_not_belong_studies"), "1");

@@ -44,13 +44,13 @@ import com.clinovo.service.CodedItemService;
 @Controller
 public class CodedItemsController {
 
+	@Autowired
+    private DataSource datasource;
+	
 	private Search search = new Search();
 
 	@Autowired
 	private CodedItemService codedItemService;
-
-	@Autowired
-    private DataSource dataSource;
 
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -60,17 +60,21 @@ public class CodedItemsController {
 
 		ModelMap map = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
-
+		
+		String studyId = request.getParameter("study");
+		
 		List<CodedItem> items = codedItemService.findAll();
 		List<CodedItem> codedItems = codedItemService.findCodedItemsByStatus(CodeStatus.CODED);
 		List<CodedItem> unCodedItems = codedItemService.findCodedItemsByStatus(CodeStatus.NOT_CODED);
 
 		CodedItemsTableFactory factory = new CodedItemsTableFactory();
 
+		factory.setStudyId(studyId);
 		factory.setCodedItems(items);
-		factory.setStudyDAO(new StudyDAO(dataSource));
-		factory.setEventCRFDAO(new EventCRFDAO(dataSource));
-		factory.setEventDefinitionCRFDAO(new EventDefinitionCRFDAO(dataSource));
+		factory.setDataSource(datasource);
+		factory.setStudyDAO(new StudyDAO(datasource));
+		factory.setEventCRFDAO(new EventCRFDAO(datasource));
+		factory.setEventDefinitionCRFDAO(new EventDefinitionCRFDAO(datasource));
 
 		String codedItemsTable = factory.createTable(request, response).render();
 

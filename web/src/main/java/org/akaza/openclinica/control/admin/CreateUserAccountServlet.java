@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.util.ValidatorHelper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -35,6 +33,7 @@ import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -43,10 +42,13 @@ import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+
+import com.clinovo.util.ValidatorHelper;
 
 /**
  * Servlet for creating a user account.
@@ -105,9 +107,18 @@ public class CreateUserAccountServlet extends SecureController {
 		if (pageIsChanged != null) {
 			request.setAttribute("pageIsChanged", pageIsChanged);
 		}
-
-        Map roleMap = Role.roleMapWithDescriptions;
-
+		
+		StudyParameterValueDAO dao = new StudyParameterValueDAO(sm.getDataSource());
+		StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(), "allowCodingVerification");
+		
+		Map roleMap = null;
+		if(allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
+			roleMap = Role.roleMapWithDescriptions;
+		} else {
+			Role.roleMapWithDescriptions.remove(7);
+			roleMap = Role.roleMapWithDescriptions;
+		}
+        
 		ArrayList types = UserType.toArrayList();
 		types.remove(UserType.INVALID);
 		types.remove(UserType.TECHADMIN);

@@ -538,9 +538,6 @@ public class Page {
 			"Create Dataset and select group Attribute");
 	public final static Page CREATE_DATASET_CRF_ATTR = new Page("/WEB-INF/jsp/extract/selectCRFAttributes.jsp",
 			"Create Dataset and select CRF Attribute");
-	// public final static Page CREATE_DATASET_DISC_ATTR = new
-	// Page("/WEB-INF/jsp/extract/selectDiscrepancyAttributes.jsp","Create
-	// Dataset and select discrepancy Attribute");
 	public final static Page CREATE_DATASET_SELECT_ITEMS = new Page("/WEB-INF/jsp/extract/selectItems.jsp",
 			"Create Dataset and select Items");
 
@@ -822,7 +819,7 @@ public class Page {
 	public final static Page LOCK_SITE = new Page("/WEB-INF/jsp/submit/lockSite.jsp", "Lock / Unlock Site");
 	public final static Page LOCK_STUDY_SUBJECT = new Page("/WEB-INF/jsp/submit/lockStudySubject.jsp",
 			"Lock / Unlock Study Subject");
-
+	
 	/**
 	 * Constructs the JSP Page instance
 	 * 
