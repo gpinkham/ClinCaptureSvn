@@ -52,8 +52,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping(value = "/InitialDataEntry")
 @SuppressWarnings({"serial"})
 public class InitialDataEntryServlet extends DataEntryServlet {
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	
 	Locale locale;
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 
 	@Override
@@ -279,5 +280,4 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 	protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
 		return false;
 	}
-
 }

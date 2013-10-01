@@ -1089,9 +1089,9 @@
 	<term id="3" preferred_name="some preferred name 3"
 		code="SOME-CODE-3" dictionary_id="2" date_created="2013-08-19" version="0"/>
 		
-	<coded_item id="1" dictionary="some-dictionary" verbatim_term="some-verbatim-term" coded_term="some-coded-term" status="UNKNOWN" item_id="1" event_crf_id="1" crf_version_id="2" version="0" />
-	<coded_item id="2" dictionary="some-dictionary-2" verbatim_term="some-verbatim-term-2" coded_term="some-coded-term-2" status="CODED" item_id="2" event_crf_id="1" crf_version_id="2"  version="0" />
-	<coded_item id="3" dictionary="some-dictionary" verbatim_term="some-verbatim-term-3" coded_term="some-coded-term-3" status="NOT_CODED" item_id="3" event_crf_id="2" crf_version_id="1"  version="0" />
-	<coded_item id="4" dictionary="some-dictionary-2" verbatim_term="some-verbatim-term-4" coded_term="some-coded-term-4" status="NOT_CODED" item_id="4" event_crf_id="2" crf_version_id="1"  version="0" />
+	<coded_item id="1" dictionary="some-dictionary" verbatim_term="some-verbatim-term" coded_term="some-coded-term" status="UNKNOWN" item_id="1" item_data_id="1" event_crf_id="1" crf_version_id="2" subject_id="1" version="0" />
+	<coded_item id="2" dictionary="some-dictionary-2" verbatim_term="some-verbatim-term-2" coded_term="some-coded-term-2" status="CODED" item_id="2" item_data_id="2" event_crf_id="1" crf_version_id="2" subject_id="2"  version="0" />
+	<coded_item id="3" dictionary="some-dictionary" verbatim_term="some-verbatim-term-3" coded_term="some-coded-term-3" status="NOT_CODED" item_id="3" item_data_id="3" event_crf_id="2" crf_version_id="1" subject_id="1" version="0" />
+	<coded_item id="4" dictionary="some-dictionary-2" verbatim_term="some-verbatim-term-4" coded_term="some-coded-term-4" status="NOT_CODED" item_id="4" item_data_id="4" event_crf_id="2" crf_version_id="1"  subject_id="2" version="0" />
 		
 </dataset>

@@ -32,7 +32,7 @@
                         <td></td>
                         <td>Code:</td>
                         <td>
-                            <div id="${itemId}" class="wrapText">
+                            <div id="${itemDataId}" class="wrapText">
                                 <c:out value="${obj.code}"/>
                             </div>
                         </td>

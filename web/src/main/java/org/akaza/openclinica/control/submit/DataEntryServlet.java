@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.util.ValidatorHelper;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -138,6 +136,9 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.quartz.impl.StdScheduler;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import com.clinovo.service.CodedItemService;
+import com.clinovo.util.ValidatorHelper;
+
 /**
  * @author ssachs
  */
@@ -145,7 +146,8 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 public abstract class DataEntryServlet extends CoreSecureController {
 
     Locale locale;
-
+    protected CodedItemService codedItemService;
+    
 	public static final String DATA_ENTRY_CURRENT_CRF_VERSION_OID = "dataEntryCurrentCrfVersionOid";
 	public static final String DATA_ENTRY_CURRENT_CRF_OID = "dataEntryCurrentCrfOid";
     
@@ -2815,8 +2817,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
 	 * @param request
 	 *            TODO
 	 * @return <code>true</code> if the query succeeded, <code>false</code> otherwise.
+	 * @throws Exception 
 	 */
-	protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, HttpServletRequest request) {
+	protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, HttpServletRequest request) throws Exception {
+		
 		ItemDataBean idb = dib.getData();
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		if (dib.getEditFlag() != null && "remove".equalsIgnoreCase(dib.getEditFlag())
@@ -2827,11 +2831,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				if (!dib.getMetadata().isShowItem()
 						&& !(dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0)
 						&& idb.getValue().equals("")
-						&& !getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {// (dib.getItem().getId(),
-																									// ecb, idb)) {// &&
-																									// !getItemMetadataService().isShown(dib.getItem().getId(),
-																									// ecb,
-																									// dib.getData())) {
+						&& !getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {
+					
 					logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id "
 							+ dib.getItem().getId());
 					return true;
@@ -2846,11 +2847,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				}
 			}
 		}
+		
 		return writeToDB(idb, dib, iddao, ordinal, request);
 	}
 
 	protected boolean writeToDB(ItemDataBean itemData, DisplayItemBean dib, ItemDataDAO iddao, int ordinal,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws Exception {
 		ItemDataBean idb = itemData;
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
@@ -2871,6 +2873,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				idb.setCreatedDate(new Date());
 				idb.setOwner(ub);
 				idb = (ItemDataBean) iddao.create(idb);
+				
+				// create coded items for event/crf
+				if (getCodedItemService() != null) {
+					codedItemService.createCodedItem(ecb, dib.getItem());
+				}
+				
 			} else {
 				idb.setUpdater(ub);
 				// should we update the logic here for nonrepeats?
@@ -3700,6 +3708,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			ecb.setUpdatedDate(new Date());
 			ecb.setDateCompleted(new Date());
 			ecb.setDateValidateCompleted(new Date());
+			
 		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && edcb.isDoubleEntry()) {
 			newStatus = Status.UNAVAILABLE;
 			ecb.setUpdaterId(ub.getId());
@@ -5070,5 +5079,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
         return false;
     }
+    
+	protected CodedItemService getCodedItemService() {
 
+		if (codedItemService == null) {
+			codedItemService = SpringServletAccess.getApplicationContext(getServletContext()).getBean(
+					CodedItemService.class);
+		}
+
+		return codedItemService;
+	}
 }

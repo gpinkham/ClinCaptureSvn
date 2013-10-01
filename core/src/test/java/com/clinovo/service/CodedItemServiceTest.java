@@ -88,27 +88,27 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatFindByItemIdDoesNotReturnNull() {
-		assertNotNull(codedItemService.findByItemId(1));
+		assertNotNull(codedItemService.findByItem(1));
 	}
 
 	@Test
 	public void testThatFindByItemIdReturnsCodedItemWithDictionary() {
-		assertEquals(codedItemService.findByItemId(2).getDictionary(), "some-dictionary-2");
+		assertEquals(codedItemService.findByItem(2).get(0).getDictionary(), "some-dictionary-2");
 	}
 
 	@Test
 	public void testThatFindByItemIdReturnsCodedItemWithVerbatimTerm() {
-		assertEquals(codedItemService.findByItemId(3).getVerbatimTerm(), "some-verbatim-term-3");
+		assertEquals(codedItemService.findByItem(3).get(0).getVerbatimTerm(), "some-verbatim-term-3");
 	}
 
 	@Test
 	public void testThatFindByItemIdReturnsCodedItemWithEventCRFId() {
-		assertNotNull(codedItemService.findByItemId(1).getEventCrfId());
+		assertNotNull(codedItemService.findByItem(1).get(0).getEventCrfId());
 	}
 	
 	@Test
 	public void testThatFindByItemIdReturnsCodedItemWithValidEventCRFId() {
-		assertEquals(1, codedItemService.findByItemId(2).getEventCrfId());
+		assertEquals(1, codedItemService.findByItem(2).get(0).getEventCrfId());
 	}
 	
 	@Test
@@ -139,6 +139,31 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindByCRFVersionReturnsCorrectNumberOfMappedItems() {
 		assertEquals(2, codedItemService.findByCRFVersion(2).size());
+	}
+	
+	@Test
+	public void testThatFindByItemDataDoesNotReturnNull() {
+		assertNotNull(codedItemService.findByItemData(1));
+	}
+	
+	@Test
+	public void testThatFindByItemDataReturnsCodedItemWithCorrectDictionary() {
+		assertEquals("some-dictionary-2", codedItemService.findByItemData(2).getDictionary());
+	}
+	
+	@Test
+	public void testThatFindByItemDataReturnsCodedItemWithCorrectVerbatimTerm() {
+		assertEquals("some-verbatim-term-3", codedItemService.findByItemData(3).getVerbatimTerm());
+	}
+	
+	@Test
+	public void testThatFindByItemDataReturnsCodedItemWithCorrectCodedTerm() {
+		assertEquals("some-coded-term-3", codedItemService.findByItemData(3).getCodedTerm());	
+	}
+	
+	@Test
+	public void testThatFindByItemDataReturnsCodedItemWithCorrectItemId() {
+		assertEquals(4, codedItemService.findByItemData(4).getItemId());
 	}
 	
 	@Test

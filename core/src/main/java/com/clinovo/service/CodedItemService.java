@@ -2,6 +2,9 @@ package com.clinovo.service;
 
 import java.util.List;
 
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.Status.CodeStatus;
 
@@ -13,7 +16,7 @@ public interface CodedItemService {
 	
 	void deleteCodedItem(CodedItem codedItem);
 
-	CodedItem findByItemId(int codedItemItemId);
+	List<CodedItem> findByItem(int codedItemItemId);
 
 	List<CodedItem> findCodedItemsByVerbatimTerm(String verbatimTerm);
 
@@ -27,6 +30,12 @@ public interface CodedItemService {
 
 	List<CodedItem> findByEventCRF(int eventCRFId);
 
-	List<CodedItem> findByCRFVersion(int i);
+	List<CodedItem> findByCRFVersion(int crfVersion);
+	
+	List<CodedItem> findBySubject(int subject);
+	
+	CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean itemBean) throws Exception;
+
+	CodedItem findByItemData(int itemDataId);
 
 }

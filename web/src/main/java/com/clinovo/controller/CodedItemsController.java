@@ -23,6 +23,8 @@ import javax.sql.DataSource;
 import com.clinovo.model.CodedItemsTableFactory;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.StudyInfoPanel;
@@ -75,6 +77,8 @@ public class CodedItemsController {
 		factory.setStudyDAO(new StudyDAO(datasource));
 		factory.setEventCRFDAO(new EventCRFDAO(datasource));
 		factory.setEventDefinitionCRFDAO(new EventDefinitionCRFDAO(datasource));
+		factory.setStudySubjectDAO(new StudySubjectDAO(datasource));
+		factory.setStudyEventDefinitionDAO(new StudyEventDefinitionDAO(datasource));
 
 		String codedItemsTable = factory.createTable(request, response).render();
 
@@ -97,10 +101,10 @@ public class CodedItemsController {
 		ModelMap map = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
-		String codedItemItemId = request.getParameter("item");
+		String codedItemItemDataId = request.getParameter("item");
 		String verbatimTerm = request.getParameter("verbatimTerm");
 
-		CodedItem codedItem = codedItemService.findByItemId(Integer.parseInt(codedItemItemId));
+		CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
 
 		search.setSearchInterface(new BioPortalSearchInterface());
 
@@ -108,8 +112,8 @@ public class CodedItemsController {
 
 			List<Classification> classifications = search.getClassifications(verbatimTerm, codedItem.getDictionary());
 			
-			map.addAttribute("itemId", codedItem.getItemId());
 			map.addAttribute("classification", classifications);
+			map.addAttribute("itemDataId", codedItem.getItemDataId());
 			map.addAttribute("itemDictionary", codedItem.getDictionary());
 
 		} catch (Exception e) {
@@ -127,10 +131,11 @@ public class CodedItemsController {
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		
 		String code = request.getParameter("code");
-		String codedItemItemId = request.getParameter("item");
+		String codedItemItemDataId = request.getParameter("item");
 		
-		CodedItem codedItem = codedItemService.findByItemId(Integer.parseInt(codedItemItemId));
+		CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
 		codedItem.setCodedTerm(code);
+		codedItem.setStatus("CODED");
 		
 		codedItemService.saveCodedItem(codedItem);
 		

@@ -67,13 +67,13 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 		this.getCurrentSession().delete(codedItem);
 	}
 
-	public CodedItem findByItemId(int codedItemItemId) {
+	public List<CodedItem> findByItemId(int codedItemItemId) {
 		
 		String query = "from " + getDomainClassName() + " do  where do.itemId = :itemId";
 		org.hibernate.Query q = getCurrentSession().createQuery(query);
 		q.setInteger("itemId", codedItemItemId);
 		
-		return (CodedItem) q.uniqueResult();
+		return q.list();
 	}
 
 	public List<CodedItem> findByEventCRF(int eventCRFId) {
@@ -92,5 +92,23 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 		q.setInteger("crfVersionId", crfVersionId);
 
 		return q.list();
+	}
+
+	public List<CodedItem> findBySubject(int subjectId) {
+		
+		String query = "from " + getDomainClassName() + " do  where do.subjectId = :subjectId";
+		Query q = getCurrentSession().createQuery(query);
+		q.setInteger("subjectId", subjectId);
+
+		return q.list();
+	}
+
+	public CodedItem findByItemData(int itemDataId) {
+		
+		String query = "from " + getDomainClassName() + " do  where do.itemDataId = :itemDataId";
+		org.hibernate.Query q = getCurrentSession().createQuery(query);
+		q.setInteger("itemDataId", itemDataId);
+		
+		return (CodedItem) q.uniqueResult();
 	}
 }

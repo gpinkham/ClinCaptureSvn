@@ -15,9 +15,11 @@ import com.clinovo.model.Status.CodeStatus;
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "coded_item_id_seq") })
 public class CodedItem extends AbstractMutableDomainObject {
 
-	private int itemId;
-	private int eventCrfId;
-	private int crfVersionId;
+	private int itemId = -1;
+	private int subjectId = -1;
+	private int itemDataId = -1;
+	private int eventCrfId = -1;
+	private int crfVersionId = -1;
 	
 	private String codedTerm = "";
 	private String dictionary = "";
@@ -89,5 +91,21 @@ public class CodedItem extends AbstractMutableDomainObject {
 	
 	public void setCrfVersionId(int crfVersionId) {
 		this.crfVersionId = crfVersionId;
+	}
+
+	public int getSubjectId() {
+		return this.subjectId;
+	}
+	
+	public void setSubjectId(int studySubjectId) {
+		this.subjectId = studySubjectId;
+	}
+
+	public int getItemDataId() {
+		return itemDataId;
+	}
+
+	public void setItemDataId(int itemDataId) {
+		this.itemDataId = itemDataId;
 	}
 }
