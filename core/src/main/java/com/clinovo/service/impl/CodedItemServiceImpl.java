@@ -129,14 +129,18 @@ public class CodedItemServiceImpl implements CodedItemService {
 			ItemDataBean data = itemDataDAO.findByItemIdAndEventCRFId(refItem.getId(), eventCRF.getId());
 
 			// Now the item
-			cItem.setItemId(item.getId());
-			cItem.setItemDataId(data.getId());
-			cItem.setEventCrfId(eventCRF.getId());
-			cItem.setVerbatimTerm(data.getValue());
-			cItem.setSubjectId(eventCRF.getStudySubjectId());
-			cItem.setCrfVersionId(eventCRF.getCRFVersionId());
+			
+			if (data.getValue() != null && !data.getValue().isEmpty()) {
+				
+				cItem.setItemId(item.getId());
+				cItem.setItemDataId(data.getId());
+				cItem.setEventCrfId(eventCRF.getId());
+				cItem.setVerbatimTerm(data.getValue());
+				cItem.setSubjectId(eventCRF.getStudySubjectId());
+				cItem.setCrfVersionId(eventCRF.getCRFVersionId());
 
-			cItem = saveCodedItem(cItem);
+				cItem = saveCodedItem(cItem);
+			}
 		}
 
 		return cItem;
