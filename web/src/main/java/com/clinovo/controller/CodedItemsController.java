@@ -68,7 +68,6 @@ public class CodedItemsController {
 		List<CodedItem> items = codedItemService.findAll();
 		List<CodedItem> codedItems = codedItemService.findCodedItemsByStatus(CodeStatus.CODED);
 		List<CodedItem> unCodedItems = codedItemService.findCodedItemsByStatus(CodeStatus.NOT_CODED);
-
 		CodedItemsTableFactory factory = new CodedItemsTableFactory();
 
 		factory.setStudyId(studyId);
@@ -103,6 +102,7 @@ public class CodedItemsController {
 
 		String codedItemItemDataId = request.getParameter("item");
 		String verbatimTerm = request.getParameter("verbatimTerm");
+        String dictionary = request.getParameter("dictionary");
 
 		CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
 
@@ -110,7 +110,7 @@ public class CodedItemsController {
 
 		try {
 
-			List<Classification> classifications = search.getClassifications(verbatimTerm, codedItem.getDictionary());
+			List<Classification> classifications = search.getClassifications(verbatimTerm, dictionary);
 			
 			map.addAttribute("classification", classifications);
 			map.addAttribute("itemDataId", codedItem.getItemDataId());
@@ -132,9 +132,11 @@ public class CodedItemsController {
 		
 		String code = request.getParameter("code");
 		String codedItemItemDataId = request.getParameter("item");
+        String codedItemSelectedDictionary = request.getParameter("dictionary");
 		
 		CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
 		codedItem.setCodedTerm(code);
+        codedItem.setDictionary(codedItemSelectedDictionary);
 		codedItem.setStatus("CODED");
 		
 		codedItemService.saveCodedItem(codedItem);
@@ -142,4 +144,21 @@ public class CodedItemsController {
 		// Redirect to main
 		return "codedItems";
 	}
+
+    @RequestMapping("/uncodeCodedItem")
+    public String unCodeCodedItemHandler(HttpServletRequest request) throws Exception {
+
+        ResourceBundleProvider.updateLocale(request.getLocale());
+
+        String codedItemDataId = request.getParameter("item");
+
+        CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemDataId));
+        codedItem.setCodedTerm("");
+        codedItem.setStatus("NOT_CODED");
+
+        codedItemService.saveCodedItem(codedItem);
+
+        // Redirect to main
+        return "codedItems";
+    }
 }

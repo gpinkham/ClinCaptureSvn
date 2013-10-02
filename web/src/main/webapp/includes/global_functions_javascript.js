@@ -2382,6 +2382,7 @@ codeItem = function(item) {
         data: {
 
             item: $(item).attr("itemid"),
+            dictionary: $(item).parent().siblings("td").find("select option:selected").val(),
             verbatimTerm: $(item).parent().siblings("td").find("input").val().trim()
         },
 
@@ -2409,18 +2410,75 @@ saveCodedItem = function(item) {
         data: {
 
             item: $(item).children('div').attr("id"),
+            dictionary:  $(item).parents('tr').find("select option:selected").val(),
             code: $(item).children('div').text().trim()
         },
 
         success: function(data) {
 
-            $(item).parents('div').siblings("input").val($(item).children('div').text().trim());
+            /* update code icon from available to code completed */
+            $(item).parents('td').find("a[name='Code'][itemid=" + $(item).children('div').attr("id") + "]").children('img').attr('src', '../images/code_confirm.png');
+            /* update status from Available to Completed */
+            $(item).parents('td').siblings("td").filter(function () {
+                return $(this).text() == 'Available';}).text("Completed");
+            /* update coding box from verbatim term to coded term */
+            $(item).parents('div').siblings("input").val($(item).children('div').text().trim()).attr('disabled', true);
+            /* display unCode icon */
+            $(item).parents('td').find("a[name='unCode'][itemid=" + $(item).children('div').attr("id") + "]").css("display", "");
+
             console.log("Medical coding executed successfully")
         },
         error: function(e) {
             console.log("Error:" + e);
         }
     })
+}
+
+uncodeCodeItem = function(item) {
+
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var confirmText = "Uncoding this item will reset the coded item and its status. Do you want to proceed?";
+
+    if(confirm(confirmText)) {
+        $.ajax({
+
+            type: "POST",
+            url: url + "/uncodeCodedItem",
+            data: {
+
+                item: $(item).attr("itemid")
+            },
+
+            success: function(data) {
+
+                /* get theme color and choose icon */
+                var codeItemButtonSrc = "../images/code_blue.png";
+                var color = $('*').find('a').css('color').toLowerCase();
+                if (color == 'rgb(170, 98, 198)' || color == '#aa62c6') {
+                    codeItemButtonSrc = "../images/violet/code_violet.png";
+                }
+                if (color == 'rgb(117, 184, 148)' || color == '#75b894') {
+                    codeItemButtonSrc = "../images/green/code_green.png";
+                }
+
+                /* change completed code icon to available */
+                $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc)
+                /* change status from completed to available */
+                $(item).parent().siblings("td").filter(function () {
+                    return $(this).text() == 'Completed'; }).text("Available");
+                /* change input box value from coded term to verbatim term */
+                $(item).parent().siblings("td").find("input:first").val($(item).parent().siblings("td:first").text()).attr("disabled", false);
+                /* hide unCode icon */
+                $(item).css("display", "none");
+
+                console.log("Medical uncoding executed successfully");
+            },
+            error: function(e) {
+                console.log("Error:" + e);
+            }
+        })
+    }
+    return false;
 }
 
 function initCrfMoreInfo() {
