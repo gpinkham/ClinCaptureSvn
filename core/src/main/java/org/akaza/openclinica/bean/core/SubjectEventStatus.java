@@ -135,7 +135,9 @@ public class SubjectEventStatus extends Term implements Comparable {
 	}
 
 	public static SubjectEventStatus get(int id) {
-		return (SubjectEventStatus) Term.get(id, list);
+		List allList = new ArrayList(list);
+		allList.add(0, SubjectEventStatus.INVALID);
+		return (SubjectEventStatus) Term.get(id, allList);
 	}
 
 	public static ArrayList toArrayList() {
