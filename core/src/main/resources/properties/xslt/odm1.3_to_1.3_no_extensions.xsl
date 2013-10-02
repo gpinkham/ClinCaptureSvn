@@ -19,47 +19,14 @@
 	<!-- 1. TBD -->
 	<!-- ****************************************************************************************************** -->
 
-
-	<!-- standard copy template -->
-	<xsl:strip-space elements="*" />
-
 	<xsl:template name="copyTemplate" match="node()|@*">
 
 		<xsl:copy>
 			<xsl:apply-templates select="@*|*|text()" />
 		</xsl:copy>
 	</xsl:template>
-
-
 	
 <xsl:template name="removeOCExtnElmnt" priority="2" match="//*[namespace-uri()='http://www.openclinica.org/ns/odm_ext_v130/v3.1' or namespace-uri()='http://www.openclinica.org/ns/rules/v3.1']" ></xsl:template>
-
 <xsl:template name="removeOCExtnAttrib" priority="1" match="//@*[namespace-uri()='http://www.openclinica.org/ns/odm_ext_v130/v3.1' or namespace-uri()='http://www.openclinica.org/ns/rules/v3.1']" ></xsl:template>
-<!--
-	<xsl:template name="namespaceTo1.2_no" priority="1"
-		match="//@*[namespace-uri()='http://www.openclinica.org/ns/odm_ext_v130/v3.1' ] ">
-		<xsl:element name="{local-name()}" namespace="''">
-			<xsl:apply-templates select="@*|*|text()" />
-		</xsl:element>
-	</xsl:template>
-
-	<xsl:template name="namespaceTo1.2_rules" priority="2"
-		match="//@*[namespace-uri()='http://www.openclinica.org/ns/rules/v3.1' ] ">
-		<xsl:element name="{local-name()}" namespace="''">
-			<xsl:apply-templates select="@*|*|text()" />
-		</xsl:element>
-	</xsl:template>
--->
-<!--
-
-	<xsl:template priority="4" match="@ODMVersion">
-		<xsl:attribute name="ODMVersion">1.2</xsl:attribute>
-	</xsl:template>
-	-->
 <xsl:template match="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:RuleImport" priority="3"></xsl:template>
-
-
-	
-	<!--<xsl:template priority="4" match="ODM[@xmlns:OpenClinica='http://www.openclinica.org/ns/odm_ext_v130/v3.1']"/>-->
-
 </xsl:stylesheet>

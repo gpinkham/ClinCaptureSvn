@@ -64,7 +64,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 		// when collecting data, only item with value has been collected.
 		StringBuffer xml = this.getXmlOutput();
 		String indent = this.getIndent();
-		String nls = System.getProperty("line.separator");
+		String nls = "\n";
 		if (header) {
 			xml.append(indent + "<ClinicalData StudyOID=\"" + StringEscapeUtils.escapeXml(clinicalData.getStudyOID())
 					+ "\" MetaDataVersionOID=\""
@@ -317,7 +317,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 			if (audits != null && audits.size() > 0) {
 				StringBuffer xml = this.getXmlOutput();
 				String indent = this.getIndent();
-				String nls = System.getProperty("line.separator");
+				String nls = "\n";
 				xml.append(currentIndent + "<OpenClinica:AuditLogs EntityID=\"" + auditLogs.getEntityID() + "\">");
 				xml.append(nls);
 				for (AuditLogBean audit : audits) {
@@ -332,7 +332,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 	protected void addOneAuditLog(AuditLogBean audit, String currentIndent) {
 		if (audit != null) {
 			StringBuffer xml = this.getXmlOutput();
-			String nls = System.getProperty("line.separator");
+			String nls = "\n";
 			String i = audit.getOid();
 			String u = audit.getUserId();
 			Date d = audit.getDatetimeStamp();
@@ -384,7 +384,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 			if (dns != null && dns.size() > 0) {
 				StringBuffer xml = this.getXmlOutput();
 				String indent = this.getIndent();
-				String nls = System.getProperty("line.separator");
+				String nls = "\n";
 				xml.append(currentIndent + "<OpenClinica:DiscrepancyNotes EntityID=\"" + DNs.getEntityID() + "\">");
 				xml.append(nls);
 				for (DiscrepancyNoteBean dn : dns) {
@@ -399,7 +399,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 	protected void addOneDN(DiscrepancyNoteBean dn, String currentIndent) {
 		StringBuffer xml = this.getXmlOutput();
 		String indent = this.getIndent();
-		String nls = System.getProperty("line.separator");
+		String nls = "\n";
 		xml.append(currentIndent + "<OpenClinica:DiscrepancyNote ");
 		if (dn.getOid() != null) {
 			String i = dn.getOid();

@@ -20,11 +20,6 @@
 	<!-- ****************************************************************************************************** -->
 
 
-	<!-- standard copy template -->
-	<xsl:strip-space elements="*" />
-
-
-
 	<xsl:template name="copyTemplate" match="node()|@*">
 
 		<xsl:copy>
@@ -32,13 +27,6 @@
 		</xsl:copy>
 	</xsl:template>
 
-
-
-
-
-
-	<!-- Namespace uri needs to be changed to cdisc 1.2 -->
-	<!-- Namespace uri needs to be changed to cdisc 1.2 -->
 	
 	<xsl:template name="namespaceTo1.2" priority="1"
 		match="//*[namespace-uri()='http://www.cdisc.org/ns/odm/v1.3'] ">
@@ -50,22 +38,6 @@
 <xsl:template name="removeOCExtnElmnt" priority="3" match="//*[ namespace-uri()='http://www.openclinica.org/ns/odm_ext_v130/v3.1' or namespace-uri()='http://www.openclinica.org/ns/rules/v3.1']" ></xsl:template>
 
 <xsl:template name="removeOCExtnAttrib" priority="2" match="//@*[ namespace-uri()='http://www.openclinica.org/ns/odm_ext_v130/v3.1' or namespace-uri()='http://www.openclinica.org/ns/rules/v3.1']" ></xsl:template>
-<!--
-	<xsl:template name="namespaceTo1.2_no" priority="1"
-		match="//@*[namespace-uri()='http://www.openclinica.org/ns/odm_ext_v130/v3.1' ] ">
-		<xsl:element name="{local-name()}" namespace="''">
-			<xsl:apply-templates select="@*|*|text()" />
-		</xsl:element>
-	</xsl:template>
-
-	<xsl:template name="namespaceTo1.2_rules" priority="2"
-		match="//@*[namespace-uri()='http://www.openclinica.org/ns/rules/v3.1' ] ">
-		<xsl:element name="{local-name()}" namespace="''">
-			<xsl:apply-templates select="@*|*|text()" />
-		</xsl:element>
-	</xsl:template>
-
--->
 
 	<xsl:template priority="4" match="@ODMVersion">
 		<xsl:attribute name="ODMVersion">1.2</xsl:attribute>

@@ -148,7 +148,7 @@ public class SPSSReportBean extends ReportBean {
 
 			int startItem = columns.size() - items.size();
 
-			System.out.println("--> generated start item " + startItem + " from " + columns.size() + " minus "
+			logger.debug("--> generated start item " + startItem + " from " + columns.size() + " minus "
 					+ items.size());
 			answer.append("/VARIABLES = \n");
 
@@ -203,7 +203,7 @@ public class SPSSReportBean extends ReportBean {
 			}
 
 			// items
-			System.out.println("--> looking at " + startItem + " out of " + columns.size());
+			logger.debug("--> looking at " + startItem + " out of " + columns.size());
 			for (int i = startItem; i < columns.size(); i++) {
 				DisplayItemHeaderBean dih = (DisplayItemHeaderBean) items.get(i - startItem);
 				ItemBean ib = dih.getItem();

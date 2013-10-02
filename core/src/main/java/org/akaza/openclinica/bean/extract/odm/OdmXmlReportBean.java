@@ -46,7 +46,7 @@ public abstract class OdmXmlReportBean {
 	private ODMSASFormatNameValidator sasFormatValidator;
 	private TreeSet<String> uniqueNameTable;
 
-	private static String nls = System.getProperty("line.separator");
+	private static String nls = "\n";
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 

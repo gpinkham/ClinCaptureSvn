@@ -56,7 +56,7 @@ public class AdminDataReportBean extends OdmXmlReportBean {
 		this.odmAdminDataMap = odmAdminDataMap;
 	}
 
-	private static String nls = System.getProperty("line.separator");
+	private static String nls = "\n";
 
 	/**
 	 * has not been implemented yet

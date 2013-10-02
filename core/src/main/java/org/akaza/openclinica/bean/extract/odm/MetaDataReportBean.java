@@ -100,7 +100,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
 		this.coreResources = coreResources;
 	}
 
-	private static String nls = System.getProperty("line.separator");
+	private static String nls = "\n";
 
 	/**
 	 * has not been implemented yet

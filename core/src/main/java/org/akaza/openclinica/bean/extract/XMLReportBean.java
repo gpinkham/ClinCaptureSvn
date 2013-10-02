@@ -35,7 +35,7 @@ public class XMLReportBean extends ReportBean {
 		StringBuffer buffer = new StringBuffer();
 		for (int i = 0; i < dataLines.size(); ++i) {
 			buffer.append(dataLines.get(i));
-			buffer.append(System.getProperty("line.separator"));
+			buffer.append("\n");
 		}
 		return buffer.toString();
 	}
