@@ -45,6 +45,16 @@
                 </sql>
         </query>
         <query>
+		<name>findByNameAndCRFVersionId</name>
+		<sql>
+			select distinct i.* from item i, item_form_metadata ifm,crf_version c 
+            where i.name=?
+            and i.item_id= ifm.item_id 
+            and ifm.crf_version_id=c.crf_version_id 
+            and c.crf_Version_id=?
+		</sql>
+		</query>
+        <query>
 			<name>findAllNonRepeatingParentsBySectionId</name>
 			<sql>
 				  SELECT i.*, m.crf_version_id FROM item i, item_form_metadata m

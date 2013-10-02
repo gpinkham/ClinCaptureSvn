@@ -125,7 +125,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 		if (item.getDataType().equals(ItemDataType.CODE)) {
 
 			ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getId(), eventCRF.getCRFVersionId());
-			ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFId(meta.getCodeRef(), eventCRF.getCRFVersionId());
+			ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(), eventCRF.getCRFVersionId());
 			ItemDataBean data = itemDataDAO.findByItemIdAndEventCRFId(refItem.getId(), eventCRF.getId());
 
 			// Now the item

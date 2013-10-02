@@ -406,6 +406,27 @@ public class ItemDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		}
 		return eb;
 	}
+	
+	public EntityBean findByNameAndCRFVersionId(String itemName, int crfVersionId) {
+		
+		ItemBean itemBean = new ItemBean();
+		this.setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), itemName);
+		variables.put(new Integer(2), new Integer(crfVersionId));
+
+		String sql = digester.getQuery("findByNameAndCRFVersionId");
+		ArrayList items = this.select(sql, variables);
+		
+		Iterator it = items.iterator();
+		if (it.hasNext()) {
+			itemBean = (ItemBean) this.getEntityFromHashMap((HashMap) it.next());
+		}
+		
+		return itemBean;
+		
+	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
