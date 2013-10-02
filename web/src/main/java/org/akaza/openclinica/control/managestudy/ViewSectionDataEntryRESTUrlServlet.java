@@ -144,6 +144,10 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			request.setAttribute("studySubject", sub);
 		}
 
+        ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
+        List<DiscrepancyNoteBean> eventCrfNotes = new ArrayList<DiscrepancyNoteBean>();
+        List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
+
 		if (eventCRFId > 0) {
 			// for event crf, the input crfVersionId from url =0
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
@@ -165,9 +169,6 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			}
 			// Get the status/number of item discrepancy notes
 			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-			ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
-			List<DiscrepancyNoteBean> eventCrfNotes = new ArrayList<DiscrepancyNoteBean>();
-			List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
 
 			allNotes = dndao.findAllTopNotesByEventCRF(eventCRFId);
 			eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
@@ -332,7 +333,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 				eventDefinitionCRFId, request);
 		dsb.setDisplayItemGroups(displayItemWithGroups);
 
-		super.populateNotesWithDBNoteCounts(discNotes, dsb, request);
+		super.populateNotesWithDBNoteCounts(discNotes, noteThreads, dsb, request);
 
 		if (fp.getString("fromViewNotes") != null && "1".equals(fp.getString("fromViewNotes"))) {
 			request.setAttribute("fromViewNotes", fp.getString("fromViewNotes"));

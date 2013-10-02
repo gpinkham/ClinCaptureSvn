@@ -420,13 +420,11 @@ form element in red --%>
     </c:otherwise>
   </c:choose>
 
-  <c:choose>
-    <c:when test="${displayItem.firstNewDn}"><a id="firstNewDn"></a></c:when>
-    <c:when test="${displayItem.firstUpdatedDn}"><a id="firstUpdatedDn"></a></c:when>
-    <c:when test="${displayItem.firstResolutionProposed}"><a id="firstResolutionProposed"></a></c:when>
-    <c:when test="${displayItem.firstClosedDn}"><a id="firstClosedDn"></a></c:when>
-    <c:when test="${displayItem.firstAnnotation}"><a id="firstAnnotation"></a></c:when>
-  </c:choose>
+  <c:if test="${displayItem.firstNewDn}"><a id="firstNewDn" rel="${itemId}" alt=""></a></c:if>
+  <c:if test="${displayItem.firstUpdatedDn}"><a id="firstUpdatedDn" rel="${itemId}" alt=""></a></c:if>
+  <c:if test="${displayItem.firstResolutionProposed}"><a id="firstResolutionProposed" rel="${itemId}" alt=""></a></c:if>
+  <c:if test="${displayItem.firstClosedDn}"><a id="firstClosedDn" rel="${itemId}" alt=""></a></c:if>
+  <c:if test="${displayItem.firstAnnotation}"><a id="firstAnnotation" rel="${itemId}" alt=""></a></c:if>
 
   <c:choose>
     <c:when test="${displayItem.numDiscrepancyNotes > 0}">

@@ -91,7 +91,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 	public static final String END_DATE = "end_date";
 	public static final String SHOW_STATUS = "showStatus";
 	public static final String CAN_CLOSE = "canClose";
-	Locale locale;
+    Locale locale;
 
 	public static final String ENTITY_ID = "id";
 	public static final String PARENT_ID = "parentId";
@@ -138,7 +138,8 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 	@Override
 	protected void processRequest() throws Exception {
 		FormProcessor fp = new FormProcessor(request);
-
+		int itemId = fp.getInt(CreateDiscrepancyNoteServlet.ITEM_ID);
+		request.setAttribute(CreateDiscrepancyNoteServlet.ITEM_ID, itemId);
 		request.setAttribute(DIS_TYPES, DiscrepancyNoteType.list);
 		if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
 			ArrayList<ResolutionStatus> resStatuses = new ArrayList();
@@ -225,8 +226,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         } catch (Exception e) {
             addPageMessage(subjectIdNotFound);
             throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
-        }
-        int itemId = fp.getInt(CreateDiscrepancyNoteServlet.ITEM_ID, true);
+        }        
 
 		StudySubjectBean ssub = new StudySubjectBean();
 		if (subjectId > 0) {
@@ -539,7 +539,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 			int pId = note.getParentDnId();
 			note.setDisType(DiscrepancyNoteType.get(note.getDiscrepancyNoteTypeId()));
 			note.setResStatus(ResolutionStatus.get(note.getResolutionStatusId()));
-			if (pId == 0) {
+			if (pId == 0) {                
 				noteTree.put(new Integer(note.getId()), note);
 			}
 		}

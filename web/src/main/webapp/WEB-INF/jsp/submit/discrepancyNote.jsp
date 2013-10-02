@@ -187,6 +187,7 @@ function setYPos(id) {
 	<input type="hidden" name="parentId" value="${parentId}"/>
 	<input type="hidden" name="viewDNLink${parentId}" value="${viewDNLink}"/>
 	<input type="hidden" name="id" value="${param.entityId}"/>
+    <input type="hidden" name="itemId" value="${param.itemId}"/>
 	<input type="hidden" name="name" value="${param.entityType}"/>
 	<input type="hidden" name="field" value="${param.field}"/>
 	<input type="hidden" name="column" value="${param.column}"/>

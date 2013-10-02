@@ -2,6 +2,9 @@ var currentPopupUid;
 var subjectMatrixPopupStick;
 var popupInterval;
 var firstFormState;
+var dnShortcutAnchors = ["firstNewDn", "firstUpdatedDn", "firstResolutionProposed", "firstClosedDn", "firstAnnotation"];
+var dnShortcutLinks = ["dnShortcutTotalNew", "dnShortcutTotalUpdated", "dnShortcutTotalResolutionProposed", "dnShortcutTotalClosed", "dnShortcutTotalAnnotations"];
+var dnFlagImages = ["icon_Note.gif", "icon_flagYellow.gif", "icon_flagBlack.gif", "icon_flagGreen.gif", "icon_flagWhite.gif"];
 
 function selectAllChecks(formObj,value){
     if(formObj) {
@@ -1385,15 +1388,17 @@ function MM_findObjInParentWin(strParentWinImageName) { //v4.0
 //     Must be called from within a popup window that was opened by the parent window
 //-------------------------------------------------------------------------
 
-function setImageInParentWin(strParentWinImageName,strParentWinImageFullPath) {
+function setImageInParentWin(strParentWinImageName,strParentWinImageFullPath, resolutionStatusId) {
     var objImage;
-
     if (window.opener && !window.opener.closed) {
         objImage = MM_findObjInParentWin(strParentWinImageName);
         if (objImage != null) {
             objImage.src = strParentWinImageFullPath;
         }
-
+        if (window.opener.updateCRFHeader != undefined) {
+            var v = strParentWinImageName.match(/_(\d*)input\d*/) || strParentWinImageName.match(/_manual(\d*)input\d*/);
+            window.opener.updateCRFHeader(strParentWinImageName.replace(/flag_.*input/, ""), (v != undefined && v.length == 2 ? v[1] : ""), resolutionStatusId);
+        }
     }
 }
 
@@ -2566,4 +2571,154 @@ function getBrowserClientHeight() {
     v = document.body.clientHeight;
   }
   return v;
+}
+
+function resetHighlightedFieldsForDNShortcutAnchors(idToHighlight) {
+  var bgc = "";
+  var commonParent = undefined;
+  for (var i = 0; i < dnShortcutAnchors.length; i++) {
+    var id = dnShortcutAnchors[i];
+    var inputHolderElement = $("#itemHolderId_" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel"));
+    var inputElement = inputHolderElement.find("input[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]");
+    if (inputElement.attr("type") != undefined && (inputElement.attr("type").toLowerCase() == "radio" || inputElement.attr("type").toLowerCase() == "checkbox")) {
+      inputElement = inputElement.parent();
+    }
+    bgc = id == idToHighlight? "yellow" : "";
+    if (commonParent == undefined || (bgc == "" && inputElement.parent()[0] != commonParent[0])) {
+      inputElement.css("background-color", bgc);
+    }
+    if (bgc == "yellow" && commonParent == undefined) {
+      commonParent = inputElement.parent();
+    }
+  }
+}
+
+function highlightFieldForDNShortcutAnchor(idToHighlight) {
+  resetHighlightedFieldsForDNShortcutAnchors(idToHighlight);
+}
+
+function getDNShortcutAnchorId(resolutionStatusId) {
+  var result = "";
+  switch (resolutionStatusId) {
+    case 1 : {
+      result = dnShortcutAnchors[0];
+      break;
+    }
+    case 2 : {
+      result = dnShortcutAnchors[1];
+      break;
+    }
+    case 3 : {
+      result = dnShortcutAnchors[2];
+      break;
+    }
+    case 4 : {
+      result = dnShortcutAnchors[3];
+      break;
+    }
+    case 5 : {
+      result = dnShortcutAnchors[4];
+      break;
+    }
+  }
+  return result;
+}
+
+function updateCRFHeaderFunction(parametersHolder) {
+	try {
+		jQuery.ajax({
+	    url : "UpdateCRFHeader",
+		  type : "GET",
+			data : parametersHolder,
+			cache : false,
+			success : function(data) {
+				if (data.indexOf("dnShortcutsTable") >= 0) {
+					$('#dnShortcutsTable')[0].outerHTML = $.trim(data);
+          for (var i = 0; i < dnShortcutLinks.length; i++) {
+            if (parseInt($.trim($("#" + dnShortcutLinks[i]).text())) == 0) {
+              var inputHolderElement = $("#itemHolderId_" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel"));
+              var inputElement =  inputHolderElement.find("input[id*=" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel") + "]");
+              if (inputElement.attr("type") != undefined && (inputElement.attr("type").toLowerCase() == "radio" || inputElement.attr("type").toLowerCase() == "checkbox")) {
+                inputElement =  inputElement.parent();
+              }
+              inputElement.css("background", "");
+              $("#" + dnShortcutAnchors[i]).remove();
+            }
+          }
+				}
+			}
+    });
+	} catch (e) {
+		//
+	}
+}
+
+function addMissedDNShortcutAnchors() {
+  var regexp = new RegExp("flag_.*input\d*");
+  $("img[id^=flag]").filter(function () { return regexp.test($(this).attr("id")) && $(this).attr("id").indexOf("_[") < 0; }).each(function(){
+    var v = $(this).attr("id").match(/_(\d*)input\d*/) || $(this).attr("id").match(/_manual(\d*)input\d*/);
+    for (var i = 0; i < dnShortcutAnchors.length; i++) {
+      if ($(this).attr("src").toLowerCase().indexOf(dnFlagImages[i].toLowerCase()) >= 0 && $("#" + dnShortcutAnchors[i]).length == 0) {
+        $(this).closest(".itemHolderClass").prepend( "<a id=\"" + dnShortcutAnchors[i] + "\" rel=\"" + $(this).attr("id").replace(/flag_.*input/, "") + "\" alt=\"" + (v != undefined && v.length == 2 ? v[1] : "") + "\"></a>" );
+      }
+    }
+  });
+}
+
+function addDNShortcutAnchorsForItem(parametersHolder) {
+  try {
+    jQuery.ajax({
+      url : "UpdateDNShortcutAnchors",
+      type : "GET",
+      data : parametersHolder,
+      cache : false,
+      success : function(data) {
+        if (data.indexOf("id=") >= 0) {
+          var inputHolderElement = $("#itemHolderId_" + parametersHolder.rowCount + "input" + parametersHolder.itemId);
+          inputHolderElement.prepend(data);
+        }
+        addMissedDNShortcutAnchors();
+      }
+    });
+  } catch (e) {
+    //
+  }
+}
+
+function removeAllDNShortcutAnchorsForItem(parametersHolder) {
+  var inputHolderElement = $("#itemHolderId_" + parametersHolder.rowCount + "input" + parametersHolder.itemId);
+  for (var i = 0; i < dnShortcutAnchors.length; i++) {
+    inputHolderElement.find("#" + dnShortcutAnchors[i]).remove();
+  }
+}
+
+function removeAnchorIfItsBelowThanCurrent(id, parametersHolder) {
+  if ($("#" + id).length == 1) {
+    var prevAnchorHolder = $("#" + id).closest(".itemHolderClass");
+    var newAnchorHolder = $("#itemHolderId_" + parametersHolder.rowCount + "input" + parametersHolder.itemId);
+    var prevAnchorHolderRowCount = parseInt(prevAnchorHolder.attr("id").replace(/itemHolderId_/, "").replace(/input.*/, ""));
+    var newAnchorHolderRowCount = parseInt(parametersHolder.rowCount);
+    var prevAnchorHolderItemId = parseInt(prevAnchorHolder.attr("id").replace(/itemHolderId_.*input/, ""));
+    var newAnchorHolderItemId = parseInt(parametersHolder.itemId);
+    if ((isNaN(prevAnchorHolderRowCount) || isNaN(newAnchorHolderRowCount)) && prevAnchorHolderItemId > newAnchorHolderItemId) {
+      $("#" + id).remove();
+    } else
+    if (!isNaN(prevAnchorHolderRowCount) && !isNaN(newAnchorHolderRowCount) && newAnchorHolderRowCount < prevAnchorHolderRowCount) {
+      $("#" + id).remove();
+    } else
+    if (!isNaN(prevAnchorHolderRowCount) && !isNaN(newAnchorHolderRowCount) && newAnchorHolderRowCount == prevAnchorHolderRowCount && prevAnchorHolderItemId > newAnchorHolderItemId) {
+      $("#" + id).remove();
+    }
+  }
+}
+
+function addDNShortcutAnchor(parametersHolder) {
+  var id = getDNShortcutAnchorId(parametersHolder.resolutionStatusId)
+  if (id != "") {
+    resetHighlightedFieldsForDNShortcutAnchors();
+    removeAnchorIfItsBelowThanCurrent(id, parametersHolder);
+    removeAllDNShortcutAnchorsForItem(parametersHolder);
+    addDNShortcutAnchorsForItem(parametersHolder);
+  }
+  updateCRFHeaderFunction(parametersHolder);
 }

@@ -64,7 +64,7 @@
 	</c:if>
 
 </head>
-<body class="aka_bodywidth" onload=document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none'"  onunload="javascript:clsWin();">
+<body class="aka_bodywidth" onload="document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';" onunload="javascript:clsWin();">
 <%-- BWP:  onload=
   "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});} TabsForwardByNum(<c:out value="${tabId}"/>);"
   alert(self.screen.availWidth);
@@ -136,7 +136,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
-<input type="hidden" name="tab" value="<c:out value="${tabId}"/>" />
+<input type="hidden" name="tabId" value="<c:out value="${tabId}"/>" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
@@ -298,7 +298,7 @@ function DisplaySectionTabs()
 
     {
         sectionId = TabSectionId[TabID-1];
-        url = "DoubleDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=${exitTo}";
+        url = "DoubleDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID <c:if test="${exitTo ne null && !empty exitTo}"> + "&exitTo=${exitTo}"</c:if>;
         currTabID = <c:out value="${tabId}"/>;
 
         document.write('<td nowrap style="display:inline-block;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
@@ -396,7 +396,7 @@ window.onload = initmb;
         <c:set var="tabCount" value="1"/>
         <option selected>-- <fmt:message key="select_to_jump" bundle="${resword}"/> --</option>
         <c:forEach var="sec" items="${toc.sections}" >
-            <c:set var="tabUrl" value = "DoubleDataEntry?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tab=${tabCount}&exitTo=${exitTo}"/>
+            <c:set var="tabUrl" value = "DoubleDataEntry?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tabId=${tabCount}&exitTo=${exitTo}"/>
             <option value="<c:out value="${tabUrl}"/>"><c:out value="${sec.name}"/></option>
             <c:set var="tabCount" value="${tabCount+1}"/>
         </c:forEach>
@@ -798,7 +798,7 @@ window.onload = initmb;
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
             <%-- For horizontal checkboxes, radio buttons--%>
             <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
@@ -819,7 +819,7 @@ window.onload = initmb;
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
             <%-- For horizontal checkboxes, radio buttons--%>
             <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
@@ -836,7 +836,7 @@ window.onload = initmb;
             </c:forEach>
         </c:when>
         <c:when test="${sectionBorders == 1}">
-            <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
+            <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
 				<!-- text goes here -->
 				<c:import url="../submit/generateGroupItemTxt.jsp">
@@ -873,7 +873,7 @@ window.onload = initmb;
         </c:when>
         <%-- could be a radio or checkbox that is not horizontal --%>
         <c:otherwise>
-            <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
+            <td class="itemHolderClass aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
 				<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -988,7 +988,7 @@ window.onload = initmb;
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
                 <%-- For horizontal checkboxes, radio buttons--%>
                 <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
+                    <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
@@ -1010,7 +1010,7 @@ window.onload = initmb;
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
                 <%-- For horizontal checkboxes, radio buttons--%>
                 <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
+                    <td class="itemHolderClass aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
@@ -1028,7 +1028,7 @@ window.onload = initmb;
                 </c:forEach>
             </c:when>
             <c:when test="${sectionBorders == 1}">
-                <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
 					<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -1064,7 +1064,7 @@ window.onload = initmb;
             </c:when>
             <%-- could be a radio or checkbox that is not horizontal --%>
             <c:otherwise>
-                <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
 				<!-- link text here -->
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
 					<c:import url="../submit/generateGroupItemTxt.jsp">
@@ -1243,8 +1243,8 @@ window.onload = initmb;
 	<tr id="tr${numOfTr}" style="display:none">
 </c:otherwise>
 </c:choose>
-    <td class="table_cell_left">
-        <table border="0" >
+    <td class="itemHolderClass table_cell_left" id="itemHolderId_input${displayItem.singleItem.item.id}">
+        <table border="0">
             <tr>
                 </c:if>
 
@@ -1400,7 +1400,7 @@ window.onload = initmb;
                     </c:forEach>
 
                     <td valign="top">
-                        <table border="0">
+                        <table border="0" class="itemHolderClass" id="itemHolderId_input${childItem.item.id}">
                             <tr>
 
 

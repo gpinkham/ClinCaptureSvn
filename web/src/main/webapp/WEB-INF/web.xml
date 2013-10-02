@@ -344,6 +344,18 @@
     </servlet>
 
     <servlet>
+        <servlet-name>updateCRFHeaderServlet</servlet-name>
+        <display-name>UpdateCRFHeaderServlet</display-name>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>updateDNShortcutAnchorsServlet</servlet-name>
+        <display-name>UpdateDNShortcutAnchorsServlet</display-name>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>mainMenuServlet</servlet-name>
         <display-name>MainMenuServlet</display-name>
         <description>The Main Servlet</description>
@@ -1434,6 +1446,16 @@
     <servlet-mapping>
         <servlet-name>FormServlet</servlet-name>
         <url-pattern>/form</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>updateCRFHeaderServlet</servlet-name>
+        <url-pattern>/UpdateCRFHeader</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>updateDNShortcutAnchorsServlet</servlet-name>
+        <url-pattern>/UpdateDNShortcutAnchors</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

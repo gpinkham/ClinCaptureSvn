@@ -68,7 +68,9 @@ import javax.sql.DataSource;
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
 public class CreateDiscrepancyNoteServlet extends SecureController {
 
-	Locale locale;
+    Locale locale;
+
+    public static final String UPDATED_DISCREPANCY_NOTE = "updatedDiscrepancyNote";
 
 	public static final String DIS_TYPES = "discrepancyTypes";
 
@@ -465,6 +467,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 			dnb.setField(field);
 			dnb.setParentDnId(parent.getId());
 			dnb.setCreatedDate(new Date());
+            dnb.setItemId(itemId);
 
 			if (parent.getId() == 0 || isNew) {// no parent, new note thread
 				if (enteringData) {
@@ -581,7 +584,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
 			// set the user account id for the user who completed data entry
 			forwardPage(Page.ADD_DISCREPANCY_NOTE);
-
 		} else {
 			FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 		
@@ -616,6 +618,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 			note.setCreatedDate(new Date());
 			note.setResolutionStatusId(resStatusId);
 			note.setDiscrepancyNoteTypeId(typeId);
+            note.setItemId(itemId);
 
 			// Annotations associated with an edit check to a Failed Validation (FV) note
 			// Annotation associated with a field changed under Administrative Editing
@@ -735,6 +738,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 					 * sure the system flags error while changing data for items which already has a DiscrepanyNote
 					 */
 					manageReasonForChangeState(session, field);
+                    request.setAttribute(UPDATED_DISCREPANCY_NOTE, note);
 					forwardPage(Page.ADD_DISCREPANCY_NOTE_DONE);
 				} else {
 					// if not creating a new thread(note), update exsiting notes
@@ -887,6 +891,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 					}
 					addPageMessage(respage.getString("note_saved_into_db"));
 					addPageMessage(respage.getString("page_close_automatically"));
+                    request.setAttribute(UPDATED_DISCREPANCY_NOTE, note);
 					forwardPage(Page.ADD_DISCREPANCY_NOTE_SAVE_DONE);
 				}
 

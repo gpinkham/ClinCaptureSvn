@@ -147,9 +147,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     Locale locale;
     protected CodedItemService codedItemService;
-    
+
 	public static final String DATA_ENTRY_CURRENT_CRF_VERSION_OID = "dataEntryCurrentCrfVersionOid";
 	public static final String DATA_ENTRY_CURRENT_CRF_OID = "dataEntryCurrentCrfOid";
+    public static final String ACTION = "action";
     
 	// these inputs come from the form, from another JSP via POST,
 	// or from another JSP via GET
@@ -284,9 +285,37 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		logger.trace(message);
 	}
 
+	private void prepareSessionNotesIfValidationsWillFail(HttpServletRequest request, boolean hasGroup,
+			boolean isSubmitted, ArrayList<DiscrepancyNoteBean> allNotes) {
+		try {
+			if (request.getMethod().equalsIgnoreCase("POST") && request.getAttribute("section") == null) {
+				request.setAttribute("section", getDisplayBean(hasGroup, false, request, isSubmitted).getSection());
+				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
+						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+				if (fdn != null) {
+					for (Object list : fdn.getFieldNotes().values()) {
+						for (DiscrepancyNoteBean discrepancyNoteBean : (List<DiscrepancyNoteBean>) list) {
+							if (discrepancyNoteBean.getId() == 0) {
+								allNotes.add(discrepancyNoteBean);
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error("An error has occured in the prepareSessionNotesIfValidationsWillFail method.", e);
+		}
+	}
+    
 	@SuppressWarnings("unused")
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        FormProcessor fp = new FormProcessor(request);
+
+        String action = fp.getString(ACTION);
+        if (request.getMethod().equalsIgnoreCase("POST") && action.equalsIgnoreCase("ide_s")) {
+            request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+        }
 
 		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(
 				request.getSession().getServletContext()).getBean(ConfigurationDao.class);
@@ -316,7 +345,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 		boolean hasGroup = false;
 
-		FormProcessor fp = new FormProcessor(request);
 		logMe("Enterting DataEntry Servlet" + System.currentTimeMillis());
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 		locale = request.getLocale();
@@ -371,7 +399,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		logMe("Entering DataEntry Create disc note threads out of the various notes" + System.currentTimeMillis());
 		// Create disc note threads out of the various notes
 		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
-		noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
+		prepareSessionNotesIfValidationsWillFail(request, hasGroup, isSubmitted, allNotes);
+        noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
 		String fromViewNotes = fp.getString("fromViewNotes");
 		if (fromViewNotes != null && "1".equals(fromViewNotes)) {
@@ -599,8 +628,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, null);
 
 			discNotes = new FormDiscrepancyNotes();
-
-			section = populateNotesWithDBNoteCounts(discNotes, section, request);
+            
+			section = populateNotesWithDBNoteCounts(discNotes, noteThreads, section, request);
 			populateInstantOnChange(request.getSession(), ecb, section);
 			logger.debug("+++ just ran populateNotes, printing field notes: " + discNotes.getFieldNotes().toString());
 			logger.debug("found disc notes: " + discNotes.getNumExistingFieldNotes().toString());
@@ -1244,7 +1273,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				reshuffleErrorGroupNamesKK(errors, allItems, request);
 			}
 
-			populateNotesWithDBNoteCounts(discNotes, section, request);
+			populateNotesWithDBNoteCounts(discNotes, noteThreads, section, request);
 
 			logger.debug("errors here: " + errors.toString());
 			logMe("error check  Loop begin  " + System.currentTimeMillis());
@@ -1794,12 +1823,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
 								request.setAttribute(INPUT_EVENT_CRF, ecb);
 								request.setAttribute(INPUT_SECTION, previousSec);
 								int tabNum = 0;
-								if (fp.getString("tab") == null) {
+								if (fp.getString("tabId") == null) {
 									tabNum = 1;
 								} else {
-									tabNum = fp.getInt("tab");
+									tabNum = fp.getInt("tabId");
 								}
-								request.setAttribute("tab", new Integer(tabNum - 1).toString());
+								request.setAttribute("tabId", new Integer(tabNum - 1).toString());
 								forwardPage(getServletPage(request), request, response);
 							}
 						} else if (!fp.getString(GO_NEXT).equals("")) {
@@ -1808,12 +1837,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
 								request.setAttribute(INPUT_EVENT_CRF, ecb);
 								request.setAttribute(INPUT_SECTION, nextSec);
 								int tabNum = 0;
-								if (fp.getString("tab") == null) {
+								if (fp.getString("tabId") == null) {
 									tabNum = 1;
 								} else {
-									tabNum = fp.getInt("tab");
+									tabNum = fp.getInt("tabId");
 								}
-								request.setAttribute("tab", new Integer(tabNum + 1).toString());
+								request.setAttribute("tabId", new Integer(tabNum + 1).toString());
 								forwardPage(getServletPage(request), request, response);
 							}
 						}
@@ -1874,13 +1903,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
 								}
 
 								int tabNum = 0;
-								if (fp.getString("tab") == null) {
+								if (fp.getString("tabId") == null) {
 									tabNum = 1;
 								} else {
-									tabNum = fp.getInt("tab");
+									tabNum = fp.getInt("tabId");
 								}
 								if (!section.isLastSection()) {
-									request.setAttribute("tab", new Integer(tabNum + 1).toString());
+									request.setAttribute("tabId", new Integer(tabNum + 1).toString());
 								}
 
 								forwardPage(getServletPage(request), request, response);
@@ -2031,7 +2060,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			sb = (SectionBean) sdao.findByPK(sectionId);
 		}
 
-		int tabId = fp.getInt("tab", true);
+		int tabId = fp.getInt("tabId", true);
 		if (tabId <= 0) {
 			tabId = 1;
 		}
@@ -3414,8 +3443,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 	/*
 	 * change to explicitly re-set the section bean after reviewing the disc note counts
 	 */
-    protected DisplaySectionBean populateNotesWithDBNoteCounts(FormDiscrepancyNotes discNotes,
-			DisplaySectionBean section, HttpServletRequest request) {
+	protected DisplaySectionBean populateNotesWithDBNoteCounts(FormDiscrepancyNotes discNotes,
+			List<DiscrepancyNoteThread> noteThreads, DisplaySectionBean section, HttpServletRequest request) {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		ArrayList<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesFromEventCRF(ecb);
@@ -3487,10 +3516,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 						discNotes.setNumExistingFieldNotes(inputName, numNotes);
 						ArrayList notes = discNotes.getNotes(inputName);
+                        notes.addAll(dndao.findExistingNotesForItemData(itemDataId));
 						dib.setNumDiscrepancyNotes(numNotes + notes.size());
 						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, notes));
-                        DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib);
 						dib = setTotals(dib, itemDataId, notes, ecb.getId());
+                        DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, notes);
 						logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId()
 								+ " " + inputName);
 						items.set(j, dib);
@@ -3516,18 +3546,15 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				String inputFieldName = "input" + itemId;
 
 				discNotes.setNumExistingFieldNotes(inputFieldName, numNotes);
-				dib.setNumDiscrepancyNotes(numNotes + discNotes.getNotes(inputFieldName).size());
+                ArrayList notes = discNotes.getNotes(inputFieldName);
+                notes.addAll(dndao.findExistingNotesForItemData(itemDataId));
+				dib.setNumDiscrepancyNotes(numNotes + notes.size());
 				dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId,
 						discNotes.getNotes(inputFieldName)));
-                DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib);
 				dib = setTotals(dib, itemDataId, discNotes.getNotes(inputFieldName), ecb.getId());
+                DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, notes);
 
 				ArrayList childItems = dib.getChildren();
-
-                // 1 new
-                // 2 updated
-                // 4 closed
-                // 5 not applicable
 
 				for (int j = 0; j < childItems.size(); j++) {
 					DisplayItemBean child = (DisplayItemBean) childItems.get(j);
@@ -3538,11 +3565,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 					logger.debug("*** setting " + childInputFieldName);
 					discNotes.setNumExistingFieldNotes(childInputFieldName, childNumNotes);
-					child.setNumDiscrepancyNotes(childNumNotes + discNotes.getNotes(childInputFieldName).size());
+                    notes = discNotes.getNotes(inputFieldName);
+                    notes.addAll(dndao.findExistingNotesForItemData(itemDataId));
+					child.setNumDiscrepancyNotes(childNumNotes + notes.size());
 					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(childItemDataId,
 							discNotes.getNotes(childInputFieldName)));
-                    DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib);
 					child = setTotals(child, childItemDataId, discNotes.getNotes(childInputFieldName), ecb.getId());
+                    DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, child, notes);
 					childItems.set(j, child);
 				}
 				dib.setChildren(childItems);

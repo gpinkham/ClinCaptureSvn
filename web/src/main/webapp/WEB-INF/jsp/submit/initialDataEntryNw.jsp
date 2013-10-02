@@ -136,7 +136,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="crfVersionId" value="<c:out value="${section.eventCRF.CRFVersionId}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
-<input type="hidden" name="tab" value="<c:out value="${tabId}"/>" />
+<input type="hidden" name="tabId" value="<c:out value="${tabId}"/>" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
@@ -328,7 +328,7 @@ function DisplaySectionTabs()
 
     {
         sectionId = TabSectionId[TabID-1];
-        url = "InitialDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=${exitTo}";
+        url = "InitialDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID <c:if test="${exitTo ne null && !empty exitTo}"> + "&exitTo=${exitTo}"</c:if>;
         currTabID = <c:out value="${tabId}"/>;
 
         document.write('<td nowrap style="display:inline-block;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
@@ -429,7 +429,7 @@ window.onload = initmb;
         <c:set var="tabCount" value="1"/>
         <option selected>-- <fmt:message key="select_to_jump" bundle="${resword}"/> --</option>
         <c:forEach var="sec" items="${toc.sections}" >
-            <c:set var="tabUrl" value = "InitialDataEntry?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tab=${tabCount}&exitTo=${exitTo}"/>
+            <c:set var="tabUrl" value = "InitialDataEntry?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tabId=${tabCount}&exitTo=${exitTo}"/>
             <option value="<c:out value="${tabUrl}"/>"><c:out value="${sec.name}"/></option>
             <c:set var="tabCount" value="${tabCount+1}"/>
         </c:forEach>
@@ -859,7 +859,7 @@ but the custom tag uses that, not this jstl code--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
             <%-- For horizontal checkboxes, radio buttons--%>
             <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
@@ -880,7 +880,7 @@ but the custom tag uses that, not this jstl code--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
             <%-- For horizontal checkboxes, radio buttons--%>
             <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
@@ -897,7 +897,7 @@ but the custom tag uses that, not this jstl code--%>
             </c:forEach>
         </c:when>
         <c:when test="${sectionBorders == 1}">
-            <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
+            <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
                 <c:import url="../submit/generateGroupItemTxt.jsp">
                     <c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -932,7 +932,7 @@ but the custom tag uses that, not this jstl code--%>
         </c:when>
         <%-- could be a radio or checkbox that is not horizontal --%>
         <c:otherwise>
-            <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
+            <td class="itemHolderClass aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
                 <c:import url="../submit/generateGroupItemTxt.jsp">
                     <c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -1071,7 +1071,7 @@ but the custom tag uses that, not this jstl code--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
                 <%-- For horizontal checkboxes, radio buttons--%>
                 <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
+                    <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
@@ -1093,7 +1093,7 @@ but the custom tag uses that, not this jstl code--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
                 <%-- For horizontal checkboxes, radio buttons--%>
                 <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
+                    <td class="itemHolderClass aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
@@ -1111,7 +1111,7 @@ but the custom tag uses that, not this jstl code--%>
                 </c:forEach>
             </c:when>
             <c:when test="${sectionBorders == 1}">
-                <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
                         <c:param name="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
@@ -1127,7 +1127,7 @@ but the custom tag uses that, not this jstl code--%>
             </c:when>
             <%-- could be a radio or checkbox that is not horizontal --%>
             <c:otherwise>
-                <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:import url="../submit/generateGroupItemTxt.jsp">
                         <c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -1313,7 +1313,7 @@ but the custom tag uses that, not this jstl code--%>
 </c:otherwise>
 </c:choose>
     <td class="table_cell_left">
-        <table border="0" >
+        <table border="0" class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}">
             <tr>
                     </c:if>
 
@@ -1476,7 +1476,7 @@ but the custom tag uses that, not this jstl code--%>
                     </c:forEach>
 
                     <td valign="top">
-                        <table border="0">
+                        <table border="0" class="itemHolderClass" id="itemHolderId_input${childItem.item.id}">
                         	<%-- this is where we need to set the block for shown items (children), tbh --%>
                      		<tr>
                                     <%--          <td valign="top" class="text_block">

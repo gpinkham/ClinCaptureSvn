@@ -99,7 +99,7 @@
             openDNoteWindow('<c:out value="${popUpURL}" />');
 	        </c:if>">
 	
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+<script type="text/javascript" language="JavaScript" src="${contextPath}/includes/jmesa/jquery.blockUI.js"></script>
 <script language="JavaScript" type="text/javascript">
 		jQuery(document).ready(function() {
             jQuery("table > tbody  tr").attr("repeat", "0");
@@ -197,7 +197,7 @@
 				value="<c:out value="${section.eventCRF.id}"/>" /> <input
 				type="hidden" name="sectionId"
 				value="<c:out value="${section.section.id}"/>" /> <input
-				type="hidden" name="tab" value="<c:out value="${tabId}"/>" /> <input
+				type="hidden" name="tabId" value="<c:out value="${tabId}"/>" /> <input
 				type="hidden" name="studySubjectId"
 				value="<c:out value="${studySubjectId}"/>" /> <input type="hidden"
 				name="eventDefinitionCRFId"
@@ -316,11 +316,11 @@
             sectionId = TabSectionId[TabID - 1];
         <c:choose>
         <c:when test="${studySubject != null && studySubject.id>0}">
-            url = "<c:out value="${contextPath}" />/ViewSectionDataEntry?${cwParam}ecId=" + <c:out value="${EventCRFBean.id}"/> + "&crfVersionId=${section.crfVersion.id}&sectionId=" + sectionId + "&tabId=" + TabID + "&studySubjectId=${studySubjectId}"+"&eventDefinitionCRFId=${eventDefinitionCRFId}&exitTo=${exitTo}";
+            url = "<c:out value="${contextPath}" />/ViewSectionDataEntry?${cwParam}eventCRFId=" + <c:out value="${EventCRFBean.id}"/> + "&crfVersionId=${section.crfVersion.id}&sectionId=" + sectionId + "&tabId=" + TabID + "&studySubjectId=${studySubjectId}"+"&eventDefinitionCRFId=${eventDefinitionCRFId}&exitTo=${exitTo}";
 
         </c:when>
         <c:otherwise>
-            url = "<c:out value="${contextPath}" />/ViewSectionDataEntry?${cwParam}crfVersionId=" + <c:out value="${section.crfVersion.id}"/> + "&sectionId=" + sectionId + "&ecId=" + <c:out value="${EventCRFBean.id}"/> + "&tabId=" + TabID+"&eventDefinitionCRFId=${eventDefinitionCRFId}&exitTo=${exitTo}";
+            url = "<c:out value="${contextPath}" />/ViewSectionDataEntry?${cwParam}crfVersionId=" + <c:out value="${section.crfVersion.id}"/> + "&sectionId=" + sectionId + "&eventCRFId=" + <c:out value="${EventCRFBean.id}"/> + "&tabId=" + TabID+"&eventDefinitionCRFId=${eventDefinitionCRFId}&exitTo=${exitTo}";
 
         </c:otherwise>
         </c:choose>
@@ -769,8 +769,8 @@
 																																<%-- For horizontal checkboxes, radio buttons--%>
 																																<c:forEach var="respOption"
 																																	items="${bodyItem.metadata.responseSet.options}">
-																																	<td
-																																		class="aka_padding_norm aka_cellBorders_dark">
+																																	<td id="itemHolderId_${uniqueId}input${bodyItem.item.id}"
+                                                                                                                                        class="itemHolderClass aka_padding_norm aka_cellBorders_dark">
 																																		<c:set var="displayItem"
 																																			scope="request" value="${bodyItem}" />
 																																		<c:set var="responseOptionBean"
@@ -784,7 +784,7 @@
 																																			<c:param name="key"
 																																				value="${numOfDate}" />
 																																			<c:param name="isLast"
-																																				value="${true}" />
+																																				value="${false}" />
 																																			<c:param name="tabNum"
 																																				value="${itemNum}" />
 																																			<c:param name="isHorizontal"
@@ -804,8 +804,8 @@
 																																<%-- For horizontal checkboxes, radio buttons--%>
 																																<c:forEach var="respOption"
 																																	items="${bodyItem.metadata.responseSet.options}">
-																																	<td
-																																		class="aka_padding_norm aka_cellBorders">
+																																	<td id="itemHolderId_${uniqueId}input${bodyItem.item.id}"
+                                                                                                                                        class="itemHolderClass aka_padding_norm aka_cellBorders">
 																																		<c:set var="displayItem"
 																																			scope="request" value="${bodyItem}" />
 																																		<c:set var="responseOptionBean"
@@ -819,7 +819,7 @@
 																																			<c:param name="key"
 																																				value="${numOfDate}" />
 																																			<c:param name="isLast"
-																																				value="${true}" />
+																																				value="${false}" />
 																																			<c:param name="tabNum"
 																																				value="${itemNum}" />
 																																			<c:param name="isHorizontal"
@@ -835,8 +835,8 @@
 																																</c:forEach>
 																															</c:when>
 																															<c:when test="${sectionBorders == 1}">
-																																<td
-																																	class="aka_padding_norm aka_cellBorders_dark">
+																																<td id="itemHolderId_${uniqueId}input${bodyItem.item.id}"
+                                                                                                                                    class="itemHolderClass aka_padding_norm aka_cellBorders_dark">
 																																	<c:set var="displayItem"
 																																		scope="request" value="${bodyItem}" />
 																																	<c:import
@@ -847,7 +847,7 @@
 																																			value="${uniqueId}" />
 																																		<c:param name="key"
 																																			value="${numOfDate}" />
-																																		<c:param name="isLast" value="${true}" />
+																																		<c:param name="isLast" value="${false}" />
 																																		<c:param name="tabNum"
 																																			value="${itemNum}" />
 																																		<c:param name="defaultValue"
@@ -861,8 +861,8 @@
 																															</c:when>
 																															<%-- could be a radio or checkbox that is not horizontal --%>
 																															<c:otherwise>
-																																<td
-																																	class="aka_padding_norm aka_cellBorders">
+																																<td id="itemHolderId_${uniqueId}input${bodyItem.item.id}"
+                                                                                                                                    class="itemHolderClass aka_padding_norm aka_cellBorders">
 																																	<c:set var="displayItem"
 																																		scope="request" value="${bodyItem}" />
 																																	<c:import
@@ -873,7 +873,7 @@
 																																			value="${uniqueId}" />
 																																		<c:param name="key"
 																																			value="${numOfDate}" />
-																																		<c:param name="isLast" value="${true}" />
+																																		<c:param name="isLast" value="${false}" />
 																																		<c:param name="tabNum"
 																																			value="${itemNum}" />
 																																		<c:param name="defaultValue"
@@ -940,8 +940,8 @@
 																															<%-- For horizontal checkboxes, radio buttons--%>
 																															<c:forEach var="respOption"
 																																items="${bodyItem.metadata.responseSet.options}">
-																																<td
-																																	class="aka_padding_norm aka_cellBorders_dark">
+																																<td id="itemHolderId_${uniqueId}input${bodyItem.item.id}"
+                                                                                                                                    class="itemHolderClass aka_padding_norm aka_cellBorders_dark">
 																																	<c:set var="displayItem"
 																																		scope="request" value="${bodyItem}" />
 																																	<c:set var="responseOptionBean"
@@ -975,8 +975,8 @@
 																															<%-- For horizontal checkboxes, radio buttons--%>
 																															<c:forEach var="respOption"
 																																items="${bodyItem.metadata.responseSet.options}">
-																																<td
-																																	class="aka_padding_norm aka_cellBorders">
+																																<td id="itemHolderId_${uniqueId}input${bodyItem.item.id}"
+                                                                                                                                    class="itemHolderClass aka_padding_norm aka_cellBorders">
 																																	<c:set var="displayItem"
 																																		scope="request" value="${bodyItem}" />
 																																	<c:set var="responseOptionBean"
@@ -1006,8 +1006,8 @@
 																															</c:forEach>
 																														</c:when>
 																														<c:when test="${sectionBorders == 1}">
-																															<td
-																																class="aka_padding_norm aka_cellBorders_dark">
+																															<td id="itemHolderId_${uniqueId}input${bodyItem.item.id}"
+                                                                                                                                class="itemHolderClass aka_padding_norm aka_cellBorders_dark">
 																																<c:set var="displayItem" scope="request"
 																																	value="${bodyItem}" /> <c:import
 																																	url="../submit/showGroupItemInputMonitor.jsp">
@@ -1031,8 +1031,8 @@
 																														</c:when>
 																														<%-- could be a radio or checkbox that is not horizontal --%>
 																														<c:otherwise>
-																															<td
-																																class="aka_padding_norm aka_cellBorders">
+																															<td id="itemHolderId_${uniqueId}input${bodyItem.item.id}"
+                                                                                                                                class="itemHolderClass aka_padding_norm aka_cellBorders">
 																																<c:set var="displayItem" scope="request"
 																																	value="${bodyItem}" /> <c:import
 																																	url="../submit/showGroupItemInputMonitor.jsp">
@@ -1192,7 +1192,7 @@
 				</c:if>
 				<tr>
 					<td class="table_cell_left">
-						<table border="0">
+						<table border="0" class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}">
 							<tr>
 								<td valign="top"></c:if> <c:if
 										test="${displayItem.singleItem.metadata.columnNumber >1}">
@@ -1278,7 +1278,7 @@
 									</c:forEach>
 
 									<td valign="top">
-										<table border="0">
+										<table border="0" class="itemHolderClass" id="itemHolderId_input${childItem.item.id}">
 											<tr>
 												<td valign="top" class="aka_ques_block"><c:out
 														value="${childItem.metadata.questionNumberLabel}"

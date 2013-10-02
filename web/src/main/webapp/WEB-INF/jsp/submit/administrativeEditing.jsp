@@ -136,7 +136,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
-<input type="hidden" name="tab" value="<c:out value="${tabId}"/>" />
+<input type="hidden" name="tabId" value="<c:out value="${tabId}"/>" />
 <input type="hidden" name="fromViewNotes" value="<c:out value="${fromViewNotes}"/>" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
@@ -252,7 +252,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
         {
             sectionId = TabSectionId[TabID-1];
-            url = "AdministrativeEditing?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=${exitTo}";
+            url = "AdministrativeEditing?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID <c:if test="${exitTo ne null && !empty exitTo}"> + "&exitTo=${exitTo}"</c:if>;
             currTabID = <c:out value="${tabId}"/>;
 
             document.write('<td nowrap style="display:inline-block;" class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
@@ -336,7 +336,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         <c:set var="tabCount" value="1"/>
         <option selected>-- <fmt:message key="select_to_jump" bundle="${resword}"/> --</option>
         <c:forEach var="sec" items="${toc.sections}" >
-            <c:set var="tabUrl" value = "AdministrativeEditing?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tab=${tabCount}&exitTo=${exitTo}"/>
+            <c:set var="tabUrl" value = "AdministrativeEditing?eventCRFId=${section.eventCRF.id}&sectionId=${sec.id}&tabId=${tabCount}&exitTo=${exitTo}"/>
             <option value="<c:out value="${tabUrl}"/>"><c:out value="${sec.name}"/></option>
             <c:set var="tabCount" value="${tabCount+1}"/>
         </c:forEach>
@@ -697,7 +697,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
             <%-- For horizontal checkboxes, radio buttons--%>
             <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
@@ -719,7 +719,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
             <%-- For horizontal checkboxes, radio buttons--%>
             <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
@@ -737,7 +737,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             </c:forEach>
         </c:when>
         <c:when test="${sectionBorders == 1}">
-            <td class="aka_padding_norm aka_cellBorders_dark">
+            <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
 				<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -773,7 +773,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         </c:when>
         <%-- could be a radio or checkbox that is not horizontal --%>
         <c:otherwise>
-            <td class="aka_padding_norm aka_cellBorders">
+            <td class="itemHolderClass aka_padding_norm aka_cellBorders" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
 				<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -869,7 +869,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
                 <%-- For horizontal checkboxes, radio buttons--%>
                 <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders_dark">
+                    <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
@@ -892,7 +892,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
                 <%-- For horizontal checkboxes, radio buttons--%>
                 <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders">
+                    <td class="itemHolderClass aka_padding_norm aka_cellBorders" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
@@ -911,7 +911,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                 </c:forEach>
             </c:when>
             <c:when test="${sectionBorders == 1}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders_dark" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
 					<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -948,7 +948,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             </c:when>
             <%-- could be a radio or checkbox that is not horizontal --%>
             <c:otherwise>
-                <td class="aka_padding_norm aka_cellBorders">
+                <td class="itemHolderClass aka_padding_norm aka_cellBorders" id="itemHolderId_${uniqueId}input${bodyItem.item.id}">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
 					<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -1128,7 +1128,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 </c:otherwise>
 </c:choose>
     <td class="table_cell_left">
-        <table border="0" >
+        <table border="0" class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}">>
             <tr>
                 	</c:if>
 
@@ -1276,7 +1276,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                     </c:forEach>
 
                     <td valign="top">
-                        <table border="0">
+                        <table border="0" class="itemHolderClass" id="itemHolderId_input${childItem.item.id}">
                             <tr>
 
                                 <td valign="top" class="aka_ques_block"><c:out value="${childItem.metadata.questionNumberLabel}" escapeXml="false"/></td>

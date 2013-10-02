@@ -66,7 +66,9 @@ import org.akaza.openclinica.web.SQLInitServlet;
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class CreateOneDiscrepancyNoteServlet extends SecureController {
 
-	Locale locale;
+    public static final String UPDATED_DISCREPANCY_NOTE = "updatedDiscrepancyNote";
+    Locale locale;
+    public static final String REFRESH_PARENT_WINDOW = "refreshParentWindow";
 	public static final String ENTITY_ID = "id";
 	public static final String SUBJECT_ID = "subjectId";
 	public static final String ITEM_ID = "itemId";
@@ -102,6 +104,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 
 	@Override
 	protected void processRequest() throws Exception {
+        Page forwardTo = null;
 		FormProcessor fp = new FormProcessor(request);
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
 
@@ -350,7 +353,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 				if ("true".equals(close)) {
 					addPageMessage(respage.getString("note_saved_into_db"));
 					addPageMessage(respage.getString("page_close_automatically"));
-					forwardPage(Page.ADD_DISCREPANCY_NOTE_SAVE_DONE);
+                    forwardTo = Page.ADD_DISCREPANCY_NOTE_SAVE_DONE;
 					logger.info("Should forwardPage to ADD_DISCREPANCY_NOTE_SAVE_DONE.");
 				} else {
 					if (parentId == dn.getParentDnId()) {
@@ -374,7 +377,10 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		session.setAttribute(BOX_DN_MAP, boxDNMap);
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "refresh", refresh + "");
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "y", ypos != null && ypos.length() > 0 ? ypos : "0");
-		forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()));
+        request.setAttribute(REFRESH_PARENT_WINDOW, true);
+        dn.setItemId(fp.getInt(ITEM_ID));
+        request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn);
+		forwardPage(forwardTo == null ? Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()) : forwardTo);
 	}
 
 	private void updateStudySubjectStatus(String entityType, int entityId) {

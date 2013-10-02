@@ -715,7 +715,7 @@ function callTip(html)
 </tr>
 
 <tr>
-<table border="0" cellspacing="1" cellpadding="0" width="100%">
+<table id="dnShortcutsTable" border="0" cellspacing="1" cellpadding="0" width="100%">
   <tr>
   <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#CC0000;" width="20%"><fmt:message key="open" bundle="${resword}"/></td>
   <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#D4A718;" width="20%"><fmt:message key="updated" bundle="${resword}"/></td>
@@ -724,11 +724,11 @@ function callTip(html)
   <td valign="top" align="center" class="table_cell_left"  style="border-right:1px solid #E6E6E6;color:black" width="20%"> <fmt:message key="not_applicable" bundle="${resword}"/></td>
   </tr>
   <tr>
-  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#CC0000;" width="20%"><a href="${discrepancyShortcutsAnalyzer.firstNewDnLink}"><div style="width: 100%; text-align: center;">&nbsp;${discrepancyShortcutsAnalyzer.totalNew}&nbsp;</div></a></td>
-  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#D4A718;" width="20%"><a href="${discrepancyShortcutsAnalyzer.firstUpdatedDnLink}"><div style="width: 100%; text-align: center;">&nbsp;${discrepancyShortcutsAnalyzer.totalUpdated}&nbsp;</div></a></td>
-  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black;" width="20%"><a href="${discrepancyShortcutsAnalyzer.firstResolutionProposedLink}"><div style="width: 100%; text-align: center;">&nbsp;${discrepancyShortcutsAnalyzer.totalResolutionProposed}&nbsp;</div></a></td>
-  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#7CB98F;" width="20%"><a href="${discrepancyShortcutsAnalyzer.firstClosedDnLink}"><div style="width: 100%; text-align: center;">&nbsp;${discrepancyShortcutsAnalyzer.totalClosed}&nbsp;</div></a></td>
-  <td valign="top" align="center" class="table_cell_left"  style="border-right:1px solid #E6E6E6;color:black" width="20%"><a href="${discrepancyShortcutsAnalyzer.firstAnnotationLink}"><div style="width: 100%; text-align: center;">&nbsp;${discrepancyShortcutsAnalyzer.totalAnnotations}&nbsp;</div></a></td>
+  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#CC0000;" width="20%"><a class="dnShortcut" href="${discrepancyShortcutsAnalyzer.firstNewDnLink}" onclick="highlightFieldForDNShortcutAnchor('firstNewDn');"><div style="width: 100%; text-align: center;" id="dnShortcutTotalNew">&nbsp;${discrepancyShortcutsAnalyzer.totalNew}&nbsp;</div></a></td>
+  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#D4A718;" width="20%"><a class="dnShortcut" href="${discrepancyShortcutsAnalyzer.firstUpdatedDnLink}" onclick="highlightFieldForDNShortcutAnchor('firstUpdatedDn');"><div style="width: 100%; text-align: center;" id="dnShortcutTotalUpdated">&nbsp;${discrepancyShortcutsAnalyzer.totalUpdated}&nbsp;</div></a></td>
+  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black;" width="20%"><a class="dnShortcut" href="${discrepancyShortcutsAnalyzer.firstResolutionProposedLink}" onclick="highlightFieldForDNShortcutAnchor('firstResolutionProposed');"><div style="width: 100%; text-align: center;" id="dnShortcutTotalResolutionProposed">&nbsp;${discrepancyShortcutsAnalyzer.totalResolutionProposed}&nbsp;</div></a></td>
+  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#7CB98F;" width="20%"><a class="dnShortcut" href="${discrepancyShortcutsAnalyzer.firstClosedDnLink}" onclick="highlightFieldForDNShortcutAnchor('firstClosedDn');"><div style="width: 100%; text-align: center;" id="dnShortcutTotalClosed">&nbsp;${discrepancyShortcutsAnalyzer.totalClosed}&nbsp;</div></a></td>
+  <td valign="top" align="center" class="table_cell_left"  style="border-right:1px solid #E6E6E6;color:black" width="20%"><a class="dnShortcut" href="${discrepancyShortcutsAnalyzer.firstAnnotationLink}" onclick="highlightFieldForDNShortcutAnchor('firstAnnotation');"><div style="width: 100%; text-align: center;" id="dnShortcutTotalAnnotations">&nbsp;${discrepancyShortcutsAnalyzer.totalAnnotations}&nbsp;</div></a></td>
   </tr>
   </table>
 </tr>
@@ -757,11 +757,11 @@ function callTip(html)
                 var dnShortcutId = document.location.href.substring(start, end);
                 var positionTop = parseInt($(dnShortcutId).position().top);
                 var browserClientHeight = getBrowserClientHeight();
-                console.log("" + positionTop + " > " + browserClientHeight);
                 if (positionTop > 0) {
                     if (positionTop > browserClientHeight) {
                         document.location.href = document.location.href;
                     }
+                    highlightFieldForDNShortcutAnchor(dnShortcutId.replace("#", ""));
                     clearInterval(dnShortcutInterval);
                 }
             } else {
@@ -774,4 +774,25 @@ function callTip(html)
     $(document).ready(function () {
         dnShortcutInterval = setInterval(dnShortcutFunction, 1);
     });
+    window.updateCRFHeader = function(itemId, rowCount, resolutionStatusId) {
+        var parametersHolder = {
+            servletPath: document.location.pathname.replace("<%=request.getContextPath()%>", ""),
+            tabId: "<%=request.getParameter("tabId")%>",
+            sectionId: "<%=request.getParameter("sectionId")%>",
+            itemId: parseInt(itemId),
+            rowCount: rowCount,
+            resolutionStatusId: parseInt(resolutionStatusId),
+            eventCRFId: parseInt("<%=request.getParameter("eventCRFId")%>"),
+            eventDefinitionCRFId: parseInt("<%=request.getParameter("eventDefinitionCRFId")%>"),
+            studyEventId: parseInt("<%=request.getParameter("studyEventId")%>"),
+            subjectId: parseInt("<%=request.getParameter("subjectId")%>"),
+            action: "<%=request.getParameter("action")%>",
+            exitTo: "<%=request.getParameter("exitTo")%>",
+            crfVersionId: parseInt("<%=request.getParameter("crfVersionId")%>")
+        }
+        if (parametersHolder.exitTo.toLowerCase() == "null") {
+            parametersHolder.exitTo = "";
+        }
+        addDNShortcutAnchor(parametersHolder);
+    };
 </script>

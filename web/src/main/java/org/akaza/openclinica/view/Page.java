@@ -760,6 +760,10 @@ public class Page {
 	public final static Page ADD_DISCREPANCY_NOTE_SAVE_DONE = new Page(
 			"/WEB-INF/jsp/submit/addDiscrepancyNoteSaveDone.jsp", "Add Discrepancy Note Save Done");
 
+	public final static Page UPDATE_CRF_HEADER_PAGE = new Page(path + "submit/updateCRFHeader.jsp", "Update CRF Header");
+
+    public final static Page UPDATE_DN_SHORTCUT_ANCHORS_PAGE = new Page(path + "submit/updateDNShortcutAnchors.jsp", "Update DN Shortcut  Anchors");
+
 	public final static Page VIEW_DISCREPANCY_NOTE = new Page("/WEB-INF/jsp/submit/viewDiscrepancyNote.jsp",
 			"View Discrepancy Note");
 	public final static Page VIEW_DISCREPANCY_NOTES_IN_STUDY = new Page("/WEB-INF/jsp/managestudy/viewNotes.jsp",

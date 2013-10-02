@@ -25,6 +25,11 @@ public class DiscrepancyShortcutsAnalyzer {
 	public static final String FIRST_RESOLUTION_PROPOSED = "#firstResolutionProposed";
 	public static final String FIRST_CLOSED_DN = "#firstClosedDn";
 	public static final String FIRST_ANNOTATION = "#firstAnnotation";
+	public static final String SERVLET_PATH = "servletPath";
+	public static final String SECTION_ID = "sectionId";
+	public static final String TAB_ID = "tabId";
+
+	private boolean hasNotes;
 
 	private int totalNew;
 	private int totalUpdated;
@@ -204,6 +209,14 @@ public class DiscrepancyShortcutsAnalyzer {
 		this.firstAnnotationLink = firstAnnotationLink;
 	}
 
+	public boolean isHasNotes() {
+		return hasNotes;
+	}
+
+	public void setHasNotes(boolean hasNotes) {
+		this.hasNotes = hasNotes;
+	}
+
 	private static int getTabNum(List<SectionBean> sections, int sectionId) {
 		int tabNum = 1;
 		if (sections != null && sections.size() > 0) {
@@ -218,18 +231,27 @@ public class DiscrepancyShortcutsAnalyzer {
 	}
 
 	private static String buildLink(FormProcessor fp, ItemFormMetadataBean ifmbean, EventCRFBean eventCrfBean,
-			int eventDefinitionCRFId, int tabNum) {
+			int eventDefinitionCRFId, List<SectionBean> sections) {
 		String link = "";
-		if (fp.getRequest().getServletPath().equalsIgnoreCase(Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName())
-				|| fp.getRequest().getServletPath()
-						.equalsIgnoreCase(Page.VIEW_SECTION_DATA_ENTRY_SERVLET_REST_URL.getFileName())) {
-			link = fp.getRequest().getRequestURL().toString()
+		int currentTabId;
+		int currentSectionId;
+		int tabNum = getTabNum(sections, ifmbean.getSectionId());
+		String servletPath = fp.getString(SERVLET_PATH).isEmpty() ? fp.getRequest().getServletPath() : fp
+				.getString("servletPath");
+		SectionBean currentSection = (SectionBean) fp.getRequest().getAttribute("section");
+		if (fp.getRequest().getMethod().equalsIgnoreCase("POST")) {
+			currentSectionId = currentSection.getId();
+			currentTabId = getTabNum(sections, currentSectionId);
+		} else {
+			currentTabId = fp.getInt(TAB_ID) == 0 ? 1 : fp.getInt(TAB_ID);
+			currentSectionId = fp.getInt(SECTION_ID) == 0 ? (sections != null && sections.size() > 0 ? sections.get(0)
+					.getId() : 0) : fp.getInt(SECTION_ID);
+		}
+		if (servletPath.equalsIgnoreCase(Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName())
+				|| servletPath.equalsIgnoreCase(Page.VIEW_SECTION_DATA_ENTRY_SERVLET_REST_URL.getFileName())) {
+			link = currentSectionId == ifmbean.getSectionId() ? "" : fp.getRequest().getRequestURL().toString()
 					.replaceAll(fp.getRequest().getServletPath(), Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName())
-					+ "?eventDefinitionCRFId="
-					+ eventDefinitionCRFId
-					+ "&studySubjectId="
-					+ eventCrfBean.getStudySubjectId()
-					+ "&ecId="
+					+ "?eventCRFId="
 					+ eventCrfBean.getId()
 					+ "&crfVersionId="
 					+ eventCrfBean.getCRFVersionId()
@@ -237,10 +259,20 @@ public class DiscrepancyShortcutsAnalyzer {
 					+ ifmbean.getSectionId()
 					+ "&tabId="
 					+ tabNum
+					+ "&studySubjectId="
+					+ eventCrfBean.getStudySubjectId()
+					+ "&eventDefinitionCRFId="
+					+ eventDefinitionCRFId
 					+ (fp.getString("exitTo", true).isEmpty() ? "" : "&exitTo=" + fp.getString("exitTo", true));
 		} else {
-			link = fp.getRequest().getRequestURL() + "?eventCRFId=" + eventCrfBean.getId() + "&sectionId="
-					+ ifmbean.getSectionId() + "&tab=" + tabNum
+			link = currentTabId == tabNum ? "" : fp.getRequest().getRequestURL().toString()
+					.replaceAll(fp.getRequest().getServletPath(), servletPath)
+					+ "?eventCRFId="
+					+ eventCrfBean.getId()
+					+ "&sectionId="
+					+ ifmbean.getSectionId()
+					+ "&tabId="
+					+ tabNum
 					+ (fp.getString("exitTo", true).isEmpty() ? "" : "&exitTo=" + fp.getString("exitTo", true));
 		}
 		return link;
@@ -252,16 +284,19 @@ public class DiscrepancyShortcutsAnalyzer {
 		DiscrepancyNoteBean tempBean;
 		FormProcessor fp = new FormProcessor(request);
 		Map<String, Integer> linkMap = new HashMap<String, Integer>();
-		List<SectionBean> sections = sdao.findAllByCRFVersionId(eventCrfBean.getCRFVersionId());
 		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = new DiscrepancyShortcutsAnalyzer();
 		request.setAttribute("discrepancyShortcutsAnalyzer", discrepancyShortcutsAnalyzer);
+		if (request.getMethod().equalsIgnoreCase("POST") && request.getAttribute("section") == null) {
+			return;
+		}
+		List<SectionBean> sections = sdao.findAllByCRFVersionId(eventCrfBean.getCRFVersionId());
 		for (DiscrepancyNoteThread dnThread : noteThreads) {
 			tempBean = dnThread.getLinkedNoteList().getLast();
 			if (tempBean != null && tempBean.getEntityType().equalsIgnoreCase("itemData")) {
+				discrepancyShortcutsAnalyzer.setHasNotes(true);
 				ItemFormMetadataBean ifmbean = ifmdao.findByItemIdAndCRFVersionId(tempBean.getItemId(),
-                        eventCrfBean.getCRFVersionId());
-				String link = buildLink(fp, ifmbean, eventCrfBean, eventDefinitionCRFId,
-						getTabNum(sections, ifmbean.getSectionId()));
+						eventCrfBean.getCRFVersionId());
+				String link = buildLink(fp, ifmbean, eventCrfBean, eventDefinitionCRFId, sections);
 				if (ResolutionStatus.UPDATED.equals(tempBean.getResStatus())) {
 					discrepancyShortcutsAnalyzer.incTotalUpdated();
 					Integer sectionId = linkMap.get(FIRST_UPDATED_DN);
@@ -303,46 +338,49 @@ public class DiscrepancyShortcutsAnalyzer {
 		}
 	}
 
-	public static void prepareDnShortcutAnchors(HttpServletRequest request, DisplayItemBean dib) {
+	public static void prepareDnShortcutAnchors(HttpServletRequest request, DisplayItemBean dib, List<DiscrepancyNoteBean> notes) {
 		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = (DiscrepancyShortcutsAnalyzer) request
 				.getAttribute(DISCREPANCY_SHORTCUTS_ANALYZER);
-		int status = dib.getDiscrepancyNoteStatus();
-		switch (status) {
-		case 1: {
-			discrepancyShortcutsAnalyzer.incSectionTotalNew();
-			if (discrepancyShortcutsAnalyzer.getSectionTotalNew() == 1) {
-				dib.setFirstNewDn(true);
+		for (DiscrepancyNoteBean tempBean : notes) {
+			if (tempBean.getEntityType().equalsIgnoreCase("itemData")) {
+				switch (tempBean.getResolutionStatusId()) {
+				case 1: {
+					discrepancyShortcutsAnalyzer.incSectionTotalNew();
+					if (discrepancyShortcutsAnalyzer.getSectionTotalNew() == 1) {
+						dib.setFirstNewDn(true);
+					}
+					break;
+				}
+				case 2: {
+					discrepancyShortcutsAnalyzer.incSectionTotalUpdated();
+					if (discrepancyShortcutsAnalyzer.getSectionTotalUpdated() == 1) {
+						dib.setFirstUpdatedDn(true);
+					}
+					break;
+				}
+				case 3: {
+					discrepancyShortcutsAnalyzer.incSectionTotalResolutionProposed();
+					if (discrepancyShortcutsAnalyzer.getSectionTotalResolutionProposed() == 1) {
+						dib.setFirstResolutionProposed(true);
+					}
+					break;
+				}
+				case 4: {
+					discrepancyShortcutsAnalyzer.incSectionTotalClosed();
+					if (discrepancyShortcutsAnalyzer.getSectionTotalClosed() == 1) {
+						dib.setFirstClosedDn(true);
+					}
+					break;
+				}
+				case 5: {
+					discrepancyShortcutsAnalyzer.incSectionTotalAnnotations();
+					if (discrepancyShortcutsAnalyzer.getSectionTotalAnnotations() == 1) {
+						dib.setFirstAnnotation(true);
+					}
+					break;
+				}
+				}
 			}
-			break;
-		}
-		case 2: {
-			discrepancyShortcutsAnalyzer.incSectionTotalUpdated();
-			if (discrepancyShortcutsAnalyzer.getSectionTotalUpdated() == 1) {
-				dib.setFirstUpdatedDn(true);
-			}
-			break;
-		}
-		case 3: {
-			discrepancyShortcutsAnalyzer.incSectionTotalResolutionProposed();
-			if (discrepancyShortcutsAnalyzer.getSectionTotalResolutionProposed() == 1) {
-				dib.setFirstResolutionProposed(true);
-			}
-			break;
-		}
-		case 4: {
-			discrepancyShortcutsAnalyzer.incSectionTotalClosed();
-			if (discrepancyShortcutsAnalyzer.getSectionTotalClosed() == 1) {
-				dib.setFirstClosedDn(true);
-			}
-			break;
-		}
-		case 5: {
-			discrepancyShortcutsAnalyzer.incSectionTotalAnnotations();
-			if (discrepancyShortcutsAnalyzer.getSectionTotalAnnotations() == 1) {
-				dib.setFirstAnnotation(true);
-			}
-			break;
-		}
 		}
 	}
 }

@@ -319,6 +319,7 @@
 				<c:param name="field" value="${field}"/>				
 				<c:param name="column" value="${column}"/>
 				<c:param name="boxId" value="box${note.value.id}"/>
+                <c:param name="itemId" value="${itemId}"/>
 				<c:param name="typeId" value="${note.value.discrepancyNoteTypeId}"/>
 				<c:param name="typeName" value="${note.value.disType.name}"/>
 			</c:import>
@@ -349,6 +350,7 @@
 		<c:param name="field" value="${field}"/>				
 		<c:param name="column" value="${column}"/>
 		<c:param name="boxId" value="box${0}New"/>
+        <c:param name="itemId" value="${itemId}"/>
 		<c:param name="isRFC" value="${isRFC}"/>
 	</c:import>
 </c:if>  
@@ -361,6 +363,9 @@
 </c:import>
 </div>
 <div style="clear:both;"></div>
+<script type="text/javascript" language="javascript">
+    setImageInParentWin('flag_<c:out value="${updatedDiscrepancyNote.field}"/>', '<c:out value="${updatedDiscrepancyNote.resStatus.iconFilePath}"/>', '${updatedDiscrepancyNote.resStatus.id}');
+</script>
 </body>
 
 <input type="button" name="BTN_Close" id="CloseWindow" value="<fmt:message key="close_window" bundle="${resword}"/>" class="button_medium" onClick="javascript:window.close();"/>

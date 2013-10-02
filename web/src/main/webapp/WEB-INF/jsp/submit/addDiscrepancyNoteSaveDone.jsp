@@ -1,3 +1,4 @@
+<%@ page import="org.akaza.openclinica.bean.core.ResolutionStatus" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -29,9 +30,10 @@
 
 
 </style>
-    <script type="text/javascript" language="javascript">
-        setImageInParentWin('flag_<c:out value="${discrepancyNote.field}"/>', '<c:out value="${discrepancyNote.resStatus.iconFilePath}"/>');
-    </script>
+
+<script type="text/javascript" language="javascript">
+    setImageInParentWin('flag_<c:out value="${updatedDiscrepancyNote.field}"/>', '<c:out value="${updatedDiscrepancyNote.resStatus.iconFilePath}"/>', '${updatedDiscrepancyNote.resStatus.id}');
+</script>
 
 </head>
 <body class="popup_BG" style="margin: 25px;" onload="javascript:refreshSource('true','/ViewNotes?');javascript:window.setTimeout('window.close()',3000);">

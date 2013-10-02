@@ -27,9 +27,10 @@
 
 
 </style>
-    <script type="text/javascript" language="javascript">
-        setImageInParentWin('flag_<c:out value="${discrepancyNote.field}"/>', '<c:out value="${discrepancyNote.resStatus.iconFilePath}"/>');
-    </script>
+
+<script type="text/javascript" language="javascript">
+    setImageInParentWin('flag_<c:out value="${updatedDiscrepancyNote.field}"/>', '<c:out value="${updatedDiscrepancyNote.resStatus.iconFilePath}"/>', '${updatedDiscrepancyNote.resStatus.id}');
+</script>
 
 </head>
 <body class="popup_BG" style="margin: 25px;">
@@ -56,7 +57,7 @@
      </c:if>
         <c:if test="${hasNotes == 'yes'}">        
         <tr valign="top">
-            <td colspan="2"><a href="ViewDiscrepancyNote?id=<c:out value="${discrepancyNote.entityId}"/>&name=<c:out value="${discrepancyNote.entityType}"/>&field=<c:out value="${discrepancyNote.field}"/>&column=<c:out value="${discrepancyNote.column}"/>">
+            <td colspan="2"><a href="ViewDiscrepancyNote?id=<c:out value="${updatedDiscrepancyNote.entityId}"/>&name=<c:out value="${updatedDiscrepancyNote.entityType}"/>&field=<c:out value="${updatedDiscrepancyNote.field}"/>&column=<c:out value="${updatedDiscrepancyNote.column}"/>">
             <fmt:message key="view_parent_and_related_note" bundle="${resword}"/></a> 
            </td>         
         </tr>
