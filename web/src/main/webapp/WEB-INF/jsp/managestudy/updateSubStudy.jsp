@@ -19,9 +19,12 @@
 <jsp:useBean scope='session' id='definitions' class='java.util.ArrayList'/>
 <jsp:useBean scope='session' id='sdvOptions' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='messages' class='java.util.HashMap'/>
+
 <c:set var="startDate" value="" />
 <c:set var="endDate" value="" />
 <c:set var="protocolDateVerification" value="" />
+<c:set var="dictionaries">MedDRA,ICD9,ICD10</c:set>
+<c:set var="selectedDictionary" value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>
 
 <c:forEach var="presetValue" items="${presetValues}">
 	<c:if test='${presetValue.key == "startDate"}'>
@@ -423,15 +426,6 @@ function updateThis(multiSelEle, count) {
            </td>
        </tr>
    </c:when>
-   <c:when test="${config.parameter.handle=='allowCodingVerification'}">
-       <tr valign="top">
-           <td class="formlabel"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
-           <td>
-               <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="allowCodingVerification" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-               <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="allowCodingVerification" value="no"><fmt:message key="no" bundle="${resword}"/>
-           </td>
-       </tr>
-   </c:when>
 	<c:when test="${config.parameter.handle=='interviewerNameRequired'}">
 		   <tr valign="top"><td class="formlabel"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td>
 		   <c:choose>
@@ -524,6 +518,41 @@ function updateThis(multiSelEle, count) {
 		  </td>
 		  </tr>
 	 </c:when>
+
+   <c:when test="${config.parameter.handle == 'defaultMedicalCodingDictionary'}">
+      <tr valign="top">
+        <td class="formlabel"><fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/></td>
+          <td>
+            <c:choose>
+              <c:when test="${config.value.value == ''}">
+                <select id="dictionaries" name="defaultMedicalCodingDictionary">
+                  <option value="0"></option>
+                    <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+                      <option value="${dictionary}">${dictionary}</option>
+                    </c:forTokens>
+                  </select>
+                </c:when>
+                <c:otherwise>
+                  <select id="dictionaries" name="defaultMedicalCodingDictionary">
+                    <option value="0"></option>
+                    <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+                      <option value="${dictionary}" ${dictionary == selectedDictionary ? 'selected' : ''}>${dictionary}</option>
+                    </c:forTokens>
+                  </select>
+                </c:otherwise>
+              </c:choose>
+           </td>
+       </tr>
+   </c:when>
+   <c:when test="${config.parameter.handle=='allowCodingVerification'}">
+       <tr valign="top">
+           <td class="formlabel"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
+           <td>
+               <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="allowCodingVerification" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+               <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="allowCodingVerification" value="no"><fmt:message key="no" bundle="${resword}"/>
+           </td>
+       </tr>
+   </c:when>
 	 <c:otherwise>
 		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_editable" bundle="${resword}"/></td><td>
 		   <c:choose>

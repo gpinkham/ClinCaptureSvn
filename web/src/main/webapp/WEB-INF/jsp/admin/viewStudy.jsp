@@ -7,7 +7,10 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+
+<c:set var="dictionaries">MedDRA,ICD9,ICD10</c:set>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<c:set var="selectedDictionary" value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>
 
 
 <c:choose>
@@ -26,8 +29,6 @@
  </c:otherwise>
 </c:choose>
 
-
-<!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -121,19 +122,6 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="protocol_verification" bundle="${resword}"/>:</td><td class="table_cell">
   <fmt:formatDate value="${studyToView.protocolDateVerification}" pattern="${dteFormat}"/>
   </td></tr>
-
-  <!--
-  <tr valign="top"><td class="table_header_column">Collect Subject Father/Mother Information?:</td><td class="table_cell">
-  <c:choose>
-    <c:when test="${studyToView.genetic == true}">
-     Yes
-    </c:when>
-    <c:otherwise>
-     No
-    </c:otherwise>
-   </c:choose>
- </td></tr>
- -->
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/>:</td><td class="table_cell">
    <fmt:formatDate value="${studyToView.datePlannedStart}" pattern="${dteFormat}"/>
@@ -273,10 +261,6 @@
   <c:out value="${studyToView.facilityCountry}"/>&nbsp;
   </td></tr>
 
-  <!--<tr valign="top"><td class="table_header_column"><fmt:message key="facility_recruitment_status" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.facilityRecruitmentStatus}"/>&nbsp;
- </td></tr> -->
-
   <tr valign="top"><td class="table_header_column"><fmt:message key="facility_contact_name" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.facilityContactName}"/>&nbsp;
   </td></tr>
@@ -293,10 +277,7 @@
   <c:out value="${studyToView.facilityContactEmail}"/>&nbsp;
   </td></tr>
 
-
-
    <tr bgcolor="#F5F5F5"><td class="table_header_column" colspan="2" ><b><fmt:message key="section" bundle="${resword}"/> E: <fmt:message key="related_infomation" bundle="${resword}"/></b></td></tr>
-
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="medline_identifier_references" bundle="${resword}"/></td><td class="table_cell">
   <c:out value="${studyToView.medlineIdentifier}"/>&nbsp;
@@ -383,22 +364,6 @@
   </c:choose>
   </td>
   </tr>
-
-
-  <!--
-   <tr valign="top"><td class="table_header_column">Generate Study Subject ID Automatically With Prefix/Suffix?:</td>
-   <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.subjectIdPrefixSuffix == 'true'}">
-    Yes
-   </c:when>
-   <c:otherwise>
-     No
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
- -->
 
  <tr valign="top"><td class="table_header_column"><fmt:message key="show_person_id_on_crf_header" bundle="${resword}"/></td>
    <td class="table_cell">
@@ -688,9 +653,7 @@
           </c:choose>
       </td>
   </tr>
-  <%-- clinovo - end --%>
 
-  <%-- clinovo - start (ticket #47) --%>
   <tr valign="top">
       <td class="table_header_column">
           <fmt:message key="markImportedCRFAsCompleted" bundle="${resword}"/>
@@ -706,7 +669,6 @@
           </c:choose>
       </td>
   </tr>
-  <%-- clinovo - end --%>
 
   <tr valign="top">
       <td class="table_header_column">
@@ -738,6 +700,15 @@
               </c:otherwise>
           </c:choose>
       </td>
+  </tr>
+
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/>
+    </td>
+    <td class="table_cell">
+        ${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}
+    </td>
   </tr>
 
   <tr valign="top">

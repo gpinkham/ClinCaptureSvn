@@ -7,11 +7,11 @@
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
-<!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
-<!-- then instructions-->
+<c:set var="dictionaries">MedDRA,ICD9,ICD10</c:set>
+<c:set var="selectedDictionary" value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>
+
 <tr id="sidebar_Instructions_open" style="display: all">
 		<td class="sidebar_tab">
 
@@ -404,15 +404,6 @@ function updateThis(multiSelEle, count) {
            </td>
        </tr>
    </c:when>
-  <c:when test="${config.parameter.handle=='allowCodingVerification'}">
-       <tr valign="top">
-           <td class="formlabel"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
-           <td>
-               <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowCodingVerification== 'yes'}">checked</c:if> name="allowCodingVerification" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-               <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowCodingVerification== 'no'}">checked</c:if> name="allowCodingVerification" value="no"><fmt:message key="no" bundle="${resword}"/>
-           </td>
-       </tr>
-   </c:when>
 	<c:when test="${config.parameter.handle=='interviewerNameRequired'}">
 		   <tr valign="top"><td class="formlabel"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td>
                <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewerNameRequired== 'yes'}">checked</c:if> name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
@@ -477,6 +468,42 @@ function updateThis(multiSelEle, count) {
 		  </td>
 		  </tr>
 	 </c:when>
+  
+   <c:when test="${config.parameter.handle =='defaultMedicalCodingDictionary'}">
+      <tr valign="top">
+        <td class="formlabel"><fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/></td>
+          <td>
+            <c:choose>
+              <c:when test="${newStudy.studyParameterConfig.defaultMedicalCodingDictionary == ''}">
+                <select id="dictionaries" name="defaultMedicalCodingDictionary">
+                  <option value="0"></option>
+                  <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+                    <option value="${dictionary}">${dictionary}</option>
+                  </c:forTokens>
+                </select>
+                </c:when>
+                <c:otherwise>
+                  <select id="dictionaries" name="defaultMedicalCodingDictionary">
+                    <option value="0"></option>
+                    <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+                      <option value="${dictionary}" ${dictionary == selectedDictionary ? 'selected' : ''}>${dictionary}</option>
+                    </c:forTokens>
+                  </select>
+                </c:otherwise>
+              </c:choose>
+           </td>
+       </tr>
+   </c:when>
+   <c:when test="${config.parameter.handle=='allowCodingVerification'}">
+       <tr valign="top">
+           <td class="formlabel"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
+           <td>
+               <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowCodingVerification== 'yes'}">checked</c:if> name="allowCodingVerification" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+               <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowCodingVerification== 'no'}">checked</c:if> name="allowCodingVerification" value="no"><fmt:message key="no" bundle="${resword}"/>
+           </td>
+       </tr>
+   </c:when>
+
 	 <c:otherwise>	  
 		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_editable" bundle="${resword}"/></td><td>
 		   <c:choose>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="markg" id="2013-10-01-TICKET573">
+		<comment>Insert the default medical coding study configuration option record in the studyParameter table</comment>
+		<insert tableName="study_parameter">
+			<column name="study_parameter_id" valueNumeric="33" />
+			<column name="handle" value="defaultMedicalCodingDictionary" />
+			<column name="name" value="defaultMedicalCodingDictionary" />
+			<column name="description" value="Study wide default medical coding dictionary" />
+			<column name="default_value" value="NULL" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+	</changeSet>
+</databaseChangeLog>

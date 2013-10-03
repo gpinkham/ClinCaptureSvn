@@ -475,6 +475,7 @@ public class UpdateStudyServletNew extends SecureController {
         study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
         study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
         study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
+        study.getStudyParameterConfig().setDefaultMedicalCodingDictionary(fp.getString("defaultMedicalCodingDictionary"));
         
 		if (!errors.isEmpty()) {
 			request.setAttribute("formMessages", errors);
@@ -787,6 +788,10 @@ public class UpdateStudyServletNew extends SecureController {
         spv.setParameter("allowCodingVerification");
         spv.setValue(newStudy.getStudyParameterConfig().getAllowCodingVerification());
         updateParameter(spvdao, spv);
+        
+        spv.setParameter("defaultMedicalCodingDictionary");
+        spv.setValue(newStudy.getStudyParameterConfig().getDefaultMedicalCodingDictionary());
+        updateParameter(spvdao, spv);
 
 		StudyBean curStudy = (StudyBean) session.getAttribute("study");
 		if (curStudy != null && study1.getId() == curStudy.getId()) {
@@ -911,6 +916,10 @@ public class UpdateStudyServletNew extends SecureController {
             
             childspv.setParameter("allowCodingVerification");
             childspv.setValue(newStudy.getStudyParameterConfig().getAllowCodingVerification());
+            updateParameter(spvdao, childspv);
+            
+            childspv.setParameter("defaultMedicalCodingDictionary");
+            childspv.setValue(newStudy.getStudyParameterConfig().getDefaultMedicalCodingDictionary());
             updateParameter(spvdao, childspv);
 		}
 	}

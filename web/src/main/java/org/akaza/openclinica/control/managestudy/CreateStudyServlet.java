@@ -781,6 +781,7 @@ public class CreateStudyServlet extends SecureController {
         newStudy.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
         newStudy.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
         newStudy.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
+        newStudy.getStudyParameterConfig().setAllowCodingVerification(fp.getString("defaultMedicalCodingDictionary"));
 
 		session.setAttribute("newStudy", newStudy);
 
@@ -939,6 +940,10 @@ public class CreateStudyServlet extends SecureController {
         
         spv.setParameter("allowCodingVerification");
         spv.setValue(newStudy.getStudyParameterConfig().getAllowCodingVerification());
+        spvdao.create(spv);
+        
+        spv.setParameter("defaultMedicalCodingDictionary");
+        spv.setValue(newStudy.getStudyParameterConfig().getDefaultMedicalCodingDictionary());
         spvdao.create(spv);
 
 		logger.info("study parameters created done");

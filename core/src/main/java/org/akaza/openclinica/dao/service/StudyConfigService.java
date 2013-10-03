@@ -179,9 +179,11 @@ public class StudyConfigService {
                     spc.setAllowSdvWithOpenQueries(spv.getValue());
                 } else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
                     spc.setReplaceExisitingDataDuringImport(spv.getValue());
-                } else if(handle.equalsIgnoreCase("allowCodingVerification")) {
-                	spc.setAllowCodingVerification(spv.getValue());
-                }
+				} else if (handle.equalsIgnoreCase("allowCodingVerification")) {
+					spc.setAllowCodingVerification(spv.getValue());
+				} else if (handle.equalsIgnoreCase("defaultMedicalCodingDictionary")) {
+					spc.setDefaultMedicalCodingDictionary(spv.getValue());
+				}
 			}
 		}
 		study.setStudyParameterConfig(spc);
@@ -274,9 +276,11 @@ public class StudyConfigService {
                 study.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
             } else if (parameter.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
                 study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
-            } else if(parameter.equalsIgnoreCase("allowCodingVerification")) {
-            	study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
-            }
+			} else if (parameter.equalsIgnoreCase("allowCodingVerification")) {
+				study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
+			} else if (parameter.equalsIgnoreCase("defaultMedicalCodingDictionary")) {
+				study.getStudyParameterConfig().setDefaultMedicalCodingDictionary(spvb.getValue());
+			}
 		}
 		return study;
 
@@ -366,9 +370,11 @@ public class StudyConfigService {
                 site.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
             } else if (parameter.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
                 site.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
-            } else if(parameter.equalsIgnoreCase("allowCodingVerification")) {
-            	site.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
-            }
+			} else if (parameter.equalsIgnoreCase("allowCodingVerification")) {
+				site.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
+			} else if (parameter.equalsIgnoreCase("defaultMedicalCodingDictionary")) {
+				site.getStudyParameterConfig().setDefaultMedicalCodingDictionary(spvb.getValue());
+			}
 		}
 		return site;
 	}

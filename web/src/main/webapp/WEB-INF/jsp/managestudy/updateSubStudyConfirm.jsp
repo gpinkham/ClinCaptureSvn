@@ -3,12 +3,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+
+<c:set var="dictionaries">MedDRA,ICD9,ICD10</c:set>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<c:set var="selectedDictionary" value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
-<!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
 <!-- then instructions-->
@@ -111,10 +112,6 @@
   <c:out value="${newStudy.facilityCountry}"/>
   </td></tr> 
   
-  <!--<tr valign="top"><td class="table_header_column"><fmt:message key="facility_recruitment_status" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${newStudy.facilityRecruitmentStatus}"/>
- </td></tr>  -->
-  
   <tr valign="top"><td class="table_header_column"><fmt:message key="facility_contact_name" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${newStudy.facilityContactName}"/>
   </td></tr>   
@@ -140,8 +137,7 @@
    </c:otherwise>
   </c:choose>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="${key}" bundle="${resword}"/>:</td><td class="table_cell">
-   <%-- <c:out value="${newStudy.status.name}"/> --%> <c:out value="Available"/>
+  <tr valign="top"><td class="table_header_column"><fmt:message key="${key}" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="Available"/>
    </td></tr> 
    
    <c:forEach var="config" items="${newStudy.studyParameters}">   
@@ -282,21 +278,6 @@
            </td>
        </tr>
    </c:when>
-   <c:when test="${config.parameter.handle=='allowCodingVerification'}">
-       <tr valign="top">
-           <td class="table_header_column"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
-           <td class="table_cell">
-               <c:choose>
-                   <c:when test="${config.value.value== 'yes'}">
-                       <fmt:message key="yes" bundle="${resword}"/>
-                   </c:when>
-                   <c:otherwise>
-                       <fmt:message key="no" bundle="${resword}"/>
-                   </c:otherwise>
-               </c:choose>
-           </td>
-       </tr>
-   </c:when>
 	<c:when test="${config.parameter.handle=='interviewerNameRequired'}">
 		   <tr valign="top"><td class="table_header_column"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td class="table_cell">
 		   <c:choose>
@@ -371,7 +352,48 @@
 		  </td>
 		  </tr>
 	 </c:when>
-	 <c:otherwise>	  
+	 
+   	<c:when test="${config.parameter.handle == 'defaultMedicalCodingDictionary'}">
+       	<tr valign="top">
+           <td class="formlabel"><fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/></td>
+           <td>
+              <c:choose>
+                <c:when test="${config.value.value == ''}">
+                  <select id="dictionaries" name="defaultMedicalCodingDictionary">
+                    <option value="0"></option>
+                    <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+                      <option value="${dictionary}">${dictionary}</option>
+                    </c:forTokens>
+                  </select>
+                </c:when>
+                <c:otherwise>
+                  <select id="dictionaries" name="defaultMedicalCodingDictionary">
+                    <option value="0"></option>
+                    <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+                      <option value="${dictionary}" ${dictionary == selectedDictionary ? 'selected' : ''}>${dictionary}</option>
+                    </c:forTokens>
+                  </select>
+                </c:otherwise>
+              </c:choose>
+           	</td>
+       </tr>
+   	</c:when>
+   	<c:when test="${config.parameter.handle=='allowCodingVerification'}">
+       	<tr valign="top">
+           <td class="table_header_column"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
+           <td class="table_cell">
+               <c:choose>
+                   <c:when test="${config.value.value== 'yes'}">
+                       <fmt:message key="yes" bundle="${resword}"/>
+                   </c:when>
+                   <c:otherwise>
+                       <fmt:message key="no" bundle="${resword}"/>
+                   </c:otherwise>
+               </c:choose>
+           </td>
+    	</tr>
+   	</c:when>
+	<c:otherwise>	  
 		  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_date_editable" bundle="${resword}"/></td><td class="table_cell">
 		   <c:choose>
 		   <c:when test="${config.value.value== 'true'}">

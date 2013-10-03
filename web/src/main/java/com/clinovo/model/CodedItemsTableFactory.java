@@ -16,6 +16,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
@@ -24,6 +25,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Limit;
@@ -132,7 +134,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     @SuppressWarnings("unchecked")
     private class DictionaryCellEditor implements CellEditor {
-        public Object getValue(Object item, String property, int rowcount) {
+    	
+        private StudyParameterValueDAO studyParameterDAO = null;
+
+		public Object getValue(Object item, String property, int rowcount) {
             String value = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
             StringBuilder url = new StringBuilder();
@@ -147,6 +152,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         private StringBuilder selectItemDictionary(String codedItemDictionary) {
 
             HashMap<String, String> dictionaries = new HashMap<String, String>();
+            
             dictionaries.put("", "&nbsp;");
             dictionaries.put("MedDRA", "MedDRA");
             dictionaries.put("ICD9", "ICD9");
@@ -169,12 +175,36 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         }
 
         private String isSelected(Object key, String codeditemDictionary) {
+        	
+        	StudyParameterValueBean defaultMedicalCodingDictionaryParam = getStudyParameterDAO().findByHandleAndStudy(studyId, "defaultMedicalCodingDictionary");
+        	String defaultMedicalCodingDictionary = defaultMedicalCodingDictionaryParam.getValue();
+        	
             String selected = "";
-            if (key.toString().equalsIgnoreCase(codeditemDictionary)) {
-                selected = " selected ";
-            }
+			if (key.toString().equalsIgnoreCase(codeditemDictionary)) {
+
+				selected = " selected ";
+			} else {
+
+				// Not selected
+				if (selected.isEmpty()) {
+					if (codeditemDictionary != null && codeditemDictionary.isEmpty()
+							&& key.equals(defaultMedicalCodingDictionary)) {
+						selected = " selected ";
+					}
+				}
+			}
+            
             return selected;
         }
+
+		private StudyParameterValueDAO getStudyParameterDAO() {
+			
+			if(studyParameterDAO == null) {
+				studyParameterDAO = new StudyParameterValueDAO(datasource);
+			}
+			
+			return studyParameterDAO;
+		}
     }
     
 	

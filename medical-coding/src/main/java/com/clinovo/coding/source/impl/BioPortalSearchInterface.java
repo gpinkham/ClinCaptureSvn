@@ -21,14 +21,19 @@ import com.clinovo.http.HttpTransport;
 
 public class BioPortalSearchInterface implements SearchInterface {
 
-	private static final String ICD10_DICTIONARY_ID = "1516";
-	private static final String MEDDRA_DICTIONARY_ID = "1422";
-	private static final String CONCEPT_ID = "conceptId";
-	private static final String PREFERRED_NAME = "preferredName";
-	private static final String CONCEPT_ID_SHORT = "conceptIdShort";
-	private static final Object DICTIONARY_NAME = "ontologyDisplayLabel";
-
 	private HttpTransport transport = null;
+	
+	// Supported dictionary ids
+	private final String ICD9_DICTIONARY_ID = "3195"; 
+	private final String ICD10_DICTIONARY_ID = "1516";
+	private final String MEDDRA_DICTIONARY_ID = "1422";
+	
+	// props
+	private final String CONCEPT_ID = "conceptId";
+	private final String PREFERRED_NAME = "preferredName";
+	private final String CONCEPT_ID_SHORT = "conceptIdShort";
+	private final Object DICTIONARY_NAME = "ontologyDisplayLabel";
+
 	public static final String URL = "http://rest.bioontology.org";
 	public static final String API_KEY = "b32c11a0-04e7-4120-975e-525819283996";
 
@@ -54,10 +59,12 @@ public class BioPortalSearchInterface implements SearchInterface {
 
 	private String getDictionary(String dictionary) throws SearchException {
 		
-		if("meddra".equalsIgnoreCase(dictionary)) {
+		if ("meddra".equalsIgnoreCase(dictionary)) {
 			return MEDDRA_DICTIONARY_ID;
-		} else if("icd10".equalsIgnoreCase(dictionary)) {
+		} else if ("icd10".equalsIgnoreCase(dictionary)) {
 			return ICD10_DICTIONARY_ID;
+		} else if ("icd9".equalsIgnoreCase(dictionary)) {
+			return ICD9_DICTIONARY_ID;
 		}
 		
 		throw new SearchException("Unknown dictionary type specified");

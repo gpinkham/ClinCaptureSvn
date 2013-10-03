@@ -8,8 +8,6 @@
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
-<!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
 <!-- then instructions-->
@@ -193,21 +191,6 @@
             </td>
         </tr>
     </c:when>
-    <c:when test="${config.parameter.handle=='allowCodingVerification'}">
-        <tr valign="top">
-            <td class="table_header_column"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
-            <td class="table_cell">
-                <c:choose>
-                    <c:when test="${config.value.value== 'yes'}">
-                        <fmt:message key="yes" bundle="${resword}"/>
-                    </c:when>
-                    <c:otherwise>
-                        <fmt:message key="no" bundle="${resword}"/>
-                    </c:otherwise>
-                </c:choose>
-            </td>
-        </tr>
-    </c:when>
     <c:when test="${config.parameter.handle=='interviewerNameRequired'}">
         <tr valign="top"><td class="table_header_column"><fmt:message key="when_entering_data" bundle="${resword}"/></td><td class="table_cell">
             <c:choose>
@@ -259,14 +242,35 @@
             <c:choose>
                 <c:when test="${config.value.value== 'blank'}">
                     <fmt:message key="blank" bundle="${resword}"/>
-
                 </c:when>
                 <c:otherwise>
-
                     <fmt:message key="pre_populated_from_study_event" bundle="${resword}"/>
                 </c:otherwise>
             </c:choose>
         </td>
+        </tr>
+    </c:when>
+    <c:when test="${config.parameter.handle == 'defaultMedicalCodingDictionary'}">
+        <tr valign="top">
+            <td class="table_header_column"><fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/></td>
+            <td class="table_cell">
+                ${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}
+            </td>
+        </tr>
+    </c:when>
+    <c:when test="${config.parameter.handle=='allowCodingVerification'}">
+        <tr valign="top">
+            <td class="table_header_column"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
+            <td class="table_cell">
+                <c:choose>
+                    <c:when test="${config.value.value== 'yes'}">
+                        <fmt:message key="yes" bundle="${resword}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <fmt:message key="no" bundle="${resword}"/>
+                    </c:otherwise>
+                </c:choose>
+            </td>
         </tr>
     </c:when>
 </c:choose>

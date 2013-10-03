@@ -6,9 +6,10 @@
 
 <jsp:include page="../include/admin-header.jsp"/>
 
-
-<!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
+
+<c:set var="dictionaries">MedDRA,ICD9,ICD10</c:set>
+<c:set var="selectedDictionary" value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
@@ -164,25 +165,6 @@
   </td>
   </tr>
 
-  <!--
-   <tr valign="top"><td class="formlabel"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/>:</td><td>
-   <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.subjectIdPrefixSuffix == 'true'}">
-    <input type="radio" checked name="subjectIdPrefixSuffix" value="true"><fmt:message key="yes" bundle="${resword}"/>
-    <input type="radio" name="subjectIdPrefixSuffix" value="false"><fmt:message key="no" bundle="${resword}"/>
-
-   </c:when>
-   <c:otherwise>
-    <input type="radio" name="subjectIdPrefixSuffix" value="true"><fmt:message key="yes" bundle="${resword}"/>
-    <input type="radio" checked name="subjectIdPrefixSuffix" value="false"><fmt:message key="no" bundle="${resword}"/>
-
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-  -->
-
-
    <tr><td>&nbsp;</td></tr>
    <tr valign="top"><td class="formlabel"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td>
    <c:choose>
@@ -319,7 +301,6 @@
   </td>
   </tr>
 
-  <%-- clinovo - start (ticket #11) --%>
   <tr>
       <td>&nbsp;</td>
   </tr>
@@ -447,9 +428,7 @@
   <tr>
       <td>&nbsp;</td>
   </tr>
-  <%-- clinovo - end --%>
 
-  <%-- clinovo - start (ticket #12) --%>
   <tr valign="top" style="border: 1px solid black;width: 100%;">
       <td class="formlabel" style="border-top: 1px solid black;text-align: left;">
           <fmt:message key="studyEventForm" bundle="${resword}"/>:
@@ -569,9 +548,7 @@
           </c:choose>
       </td>
   </tr>
-  <%-- clinovo - end --%>
 
-  <%-- clinovo - start (ticket #47) --%>
   <tr>
       <td>&nbsp;</td>
   </tr>
@@ -637,6 +614,32 @@
   </tr>
 
   <tr valign="top">
+    <td class="formlabel">
+        <fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/>
+    </td>
+    <td>
+      <c:choose>
+        <c:when test="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary == ''}">
+          <select id="dictionaries" name="defaultMedicalCodingDictionary">
+            <option value="0"></option>
+            <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+              <option value="${dictionary}">${dictionary}</option>
+            </c:forTokens>
+          </select>
+          </c:when>
+          <c:otherwise>
+            <select id="dictionaries" name="defaultMedicalCodingDictionary">
+                <option value="0"></option>
+                <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+                  <option value="${dictionary}" ${dictionary == selectedDictionary ? 'selected' : ''}>${dictionary}</option>
+              </c:forTokens>
+            </select>
+          </c:otherwise>
+        </c:choose>
+      </td>
+  </tr>
+
+  <tr valign="top">
       <td class="formlabel">
           <fmt:message key="allowCodingVerification" bundle="${resword}"/>
       </td>
@@ -653,10 +656,10 @@
           </c:choose>
       </td>
   </tr>
+
   <tr>
       <td>&nbsp;</td>
   </tr>
-  <%-- clinovo - end --%>
 
 </table>
 </div>

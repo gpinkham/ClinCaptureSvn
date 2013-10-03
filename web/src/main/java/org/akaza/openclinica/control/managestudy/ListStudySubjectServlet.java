@@ -189,6 +189,9 @@ public abstract class ListStudySubjectServlet extends SecureController {
         
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "allowCodingVerification");
         currentStudy.getStudyParameterConfig().setAllowCodingVerification(parentSPV.getValue());
+        
+        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "defaultMedicalCodingDictionary");
+        currentStudy.getStudyParameterConfig().setDefaultMedicalCodingDictionary(parentSPV.getValue());
 
 		// for all the study groups for each group class
 		for (int i = 0; i < studyGroupClasses.size(); i++) {

@@ -130,9 +130,11 @@ public class CreateSubStudyServlet extends SecureController {
                                 scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));
                             } else if (scg.getParameter().getHandle().equalsIgnoreCase("replaceExisitingDataDuringImport")) {
                                 scg.getValue().setValue(fp.getString("replaceExisitingDataDuringImport"));
-                            } else if (scg.getParameter().getHandle().equalsIgnoreCase("allowCodingVerification")) {
-                                scg.getValue().setValue(fp.getString("allowCodingVerification"));
-                            }
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowCodingVerification")) {
+								scg.getValue().setValue(fp.getString("allowCodingVerification"));
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("defaultMedicalCodingDictionary")) {
+								scg.getValue().setValue(fp.getString("defaultMedicalCodingDictionary"));
+							}
 							configs.add(scg);
 						}
 					}
@@ -410,7 +412,12 @@ public class CreateSubStudyServlet extends SecureController {
                     scg.getValue().setValue(fp.getString("allowCodingVerification"));
                     study.getStudyParameterConfig().setAllowCodingVerification(
                             fp.getString("allowCodingVerification"));
-                }
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("defaultMedicalCodingDictionary")
+						&& !fp.getString("defaultMedicalCodingDictionary").isEmpty()) {
+					scg.getValue().setValue(fp.getString("defaultMedicalCodingDictionary"));
+					study.getStudyParameterConfig().setDefaultMedicalCodingDictionary(
+							fp.getString("defaultMedicalCodingDictionary"));
+				}
 			}
 		}
 

@@ -8,7 +8,9 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.admin" var="resadmin"/>
 
+<c:set var="dictionaries">MedDRA,ICD9,ICD10</c:set>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<c:set var="selectedDictionary" value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>
 
 <c:choose>
 	<c:when test="${userRole.role.id > 3}">
@@ -19,9 +21,6 @@
 	</c:otherwise>
 </c:choose>
 
-
-
-<!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <jsp:useBean scope="request" id="facRecruitStatusMap" class="java.util.HashMap"/>
@@ -106,6 +105,7 @@
 			}	
 		}
 	})	
+
  </script>
 
 <h1><span class="title_manage">
@@ -935,23 +935,6 @@
 				</td>
 			</tr>
 
-      <!--<tr valign="top"><td class="formlabel"><fmt:message key="facility_recruitment_status" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
-      <c:set var="facStatus" value="${studyToView.facilityRecruitmentStatus}"/>
-      <select class="formfieldXL" name="facRecStatus" onchange="javascript:changeIcon()">
-       <option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-       <c:forEach var="recStatus" items="${facRecruitStatusMap}">
-           <c:choose>
-            <c:when test="${facStatus == recStatus.key}">
-             <option value="<c:out value="${recStatus.key}"/>" selected><c:out value="${recStatus.value}"/>
-            </c:when>
-            <c:otherwise>
-             <option value="<c:out value="${recStatus.key}"/>"><c:out value="${recStatus.value}"/>
-            </c:otherwise>
-           </c:choose>
-        </c:forEach>
-      </select> </div>
-      </td></tr>
-      -->
 			<tr valign="top">
 				<td class="formlabel">
 					<fmt:message key="facility_contact_name" bundle="${resword}"/>:
@@ -1590,9 +1573,7 @@
 	<tr>
 		<td>&nbsp;</td>
 	</tr>
-	<%-- clinovo - end --%>
 
-	<%-- clinovo - start (ticket #12) --%>
 	<tr valign="top" style="border: 1px solid black;width: 100%;">
 		<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
 			<fmt:message key="studyEventForm" bundle="${resword}"/>:
@@ -1704,9 +1685,7 @@
 				</c:choose>
 			</td>
 		</tr>
-  <%-- clinovo - end --%>
 
-  <%-- clinovo - start (ticket #47) --%>
 		<tr>
 			<td>&nbsp;</td>
 		</tr>
@@ -1772,6 +1751,44 @@
                 </c:choose>
             </td>
         </tr>
+
+        <tr>
+			<td>&nbsp;</td>
+		</tr>
+		<tr valign="top" style="border: 1px solid black;width: 100%;">
+			<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
+				<fmt:message key="medical_coding" bundle="${resword}"/>:
+			</td>
+			<td style=" border-top: 1px solid black; text-align: left;">
+				&nbsp;
+			</td>
+		</tr>
+		<tr valign="top">
+            <td class="formlabel">
+                <fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/>:
+            </td>
+            <td>
+                <c:choose>
+                    <c:when test="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary == ''}">
+                        <select id="dictionaries" name="defaultMedicalCodingDictionary">
+                        	<option value="0"></option>
+					        <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+							    <option value="${dictionary}">${dictionary}</option>
+							</c:forTokens>
+					    </select>
+                    </c:when>
+                    <c:otherwise>
+                        <select id="dictionaries" name="defaultMedicalCodingDictionary">
+                        	<option value="0"></option>
+					        <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+							    <option value="${dictionary}" ${dictionary == selectedDictionary ? 'selected' : ''}>${dictionary}</option>
+							</c:forTokens>
+					    </select>
+                    </c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
+        <tr><td>&nbsp;</td></tr>
         <tr valign="top">
             <td class="formlabel">
                 <fmt:message key="allowCodingVerification" bundle="${resword}"/>
@@ -1793,8 +1810,6 @@
 		<tr>
 			<td>&nbsp;</td>
 		</tr>
-  <%-- clinovo - end --%>
-
 	</table>
 </div>
 </div></div></div></div></div></div></div></div>

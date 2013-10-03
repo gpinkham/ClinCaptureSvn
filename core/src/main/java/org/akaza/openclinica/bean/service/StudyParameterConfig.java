@@ -93,9 +93,13 @@ public class StudyParameterConfig {
 
     private String replaceExisitingDataDuringImport;
     
+    // Medical coding parameters
     private String allowCodingVerification = "no";
+    private String defaultMedicalCodingDictionary = "";
+    
 
 	public StudyParameterConfig() {
+		
 		collectDob = "1";
 		discrepancyManagement = "true";
 		genderRequired = "true";
@@ -479,5 +483,13 @@ public class StudyParameterConfig {
 
 	public void setAllowCodingVerification(String allowCodingVerification) {
 		this.allowCodingVerification = allowCodingVerification;
+	}
+
+	public String getDefaultMedicalCodingDictionary() {
+		return defaultMedicalCodingDictionary;
+	}
+
+	public void setDefaultMedicalCodingDictionary(String defaultMedicalCodingDictionary) {
+		this.defaultMedicalCodingDictionary = defaultMedicalCodingDictionary;
 	}
 }

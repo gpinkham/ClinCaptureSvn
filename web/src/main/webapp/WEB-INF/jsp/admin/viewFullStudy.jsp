@@ -6,7 +6,10 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+
+<c:set var="dictionaries">MedDRA,ICD9,ICD10</c:set>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<c:set var="selectedDictionary" value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>
 
 <c:choose>
 	<c:when test="${userRole.role.id > 3}">
@@ -16,10 +19,7 @@
 		<jsp:include page="../include/admin-header.jsp"/>
 	</c:otherwise>
 </c:choose>
-<%--<jsp:include page="../include/admin-header.jsp"/>--%>
 
-
-<!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -55,28 +55,27 @@
 
 
 
-<script language="JavaScript">
+<script language = "JavaScript" >
+  function leftnavExpand(strLeftNavRowElementName) {
+    var objLeftNavRowElement;
 
-         function leftnavExpand(strLeftNavRowElementName){
-	       var objLeftNavRowElement;
+    objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+    if (objLeftNavRowElement != null) {
+      if (objLeftNavRowElement.style) {
+        objLeftNavRowElement = objLeftNavRowElement.style;
+      }
+      objLeftNavRowElement.display = (objLeftNavRowElement.display == "none") ? "" : "none";
+      objExCl = MM_findObj("excl_" + strLeftNavRowElementName);
+      if (objLeftNavRowElement.display == "none") {
+        objExCl.src = "images/bt_Expand.gif";
+      } else {
+        objExCl.src = "images/bt_Collapse.gif";
+      }
+    }
+  }
+</script>
 
-           objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-           if (objLeftNavRowElement != null) {
-             if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-	           objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
-               objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-               if(objLeftNavRowElement.display == "none"){
-                   objExCl.src = "images/bt_Expand.gif"; 
-               }else{
-                   objExCl.src = "images/bt_Collapse.gif";
-               }
-	         }
-           }
-
-
- </script>
-<h1><span class="title_manage"><c:out value="${studyToView.name}"/> <%-- <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> --%></span></h1>
-
+<h1><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1>
 
 <strong><fmt:message key="download_study_meta" bundle="${restext}"/>
 <a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"> 
@@ -198,20 +197,6 @@
   <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#VerificationDate'); return false;"><fmt:message key="protocol_verification" bundle="${resword}"/></a>:</td><td class="table_cell">
   <fmt:formatDate value="${studyToView.protocolDateVerification}" pattern="${dteFormat}"/>
   </td></tr>
-
- <!--
-  <tr valign="top"><td class="table_header_column">Collect Subject Father/Mother Information?:</td><td class="table_cell">
-  <c:choose>
-    <c:when test="${studyToView.genetic == true}">
-     Yes
-    </c:when>
-    <c:otherwise>
-     No
-    </c:otherwise>
-   </c:choose>
- </td></tr>
- -->
-
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/>:</td><td class="table_cell">
    <fmt:formatDate value="${studyToView.datePlannedStart}" pattern="${dteFormat}"/>
@@ -807,9 +792,7 @@
           </c:choose>
       </td>
   </tr>
-  <%-- clinovo - end --%>
 
-  <%-- clinovo - start (ticket #47) --%>
   <tr valign="top">
       <td class="table_header_column">
           <fmt:message key="markImportedCRFAsCompleted" bundle="${resword}"/>
@@ -825,7 +808,6 @@
           </c:choose>
       </td>
   </tr>
-  <%-- clinovo - end --%>
 
   <tr valign="top">
       <td class="table_header_column">
@@ -850,22 +832,6 @@
       <td class="table_cell">
           <c:choose>
               <c:when test="${studyToView.studyParameterConfig.replaceExisitingDataDuringImport == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
-
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="allowCodingVerification" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.allowCodingVerification == 'yes'}">
                   <fmt:message key="yes" bundle="${resword}"/>
               </c:when>
               <c:otherwise>
@@ -913,6 +879,31 @@
             <fmt:message key="${studyToView.studyParameterConfig.eventLocationRequired}" bundle="${resword}"/>
        </td>
     </tr>
+
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/>
+    </td>
+    <td class="table_cell">
+        ${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}
+    </td>
+  </tr>
+
+  <tr valign="top">
+      <td class="table_header_column">
+          <fmt:message key="allowCodingVerification" bundle="${resword}"/>
+      </td>
+      <td class="table_cell">
+          <c:choose>
+              <c:when test="${studyToView.studyParameterConfig.allowCodingVerification == 'yes'}">
+                  <fmt:message key="yes" bundle="${resword}"/>
+              </c:when>
+              <c:otherwise>
+                  <fmt:message key="no" bundle="${resword}"/>
+              </c:otherwise>
+          </c:choose>
+      </td>
+  </tr>
     
 </table>
 
@@ -1060,11 +1051,4 @@
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </br>
 
-
-<%--<br>--%>
-<%--<input type="button" onclick="confirmExit('ListStudy');"  name="cancel" value="   <fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>--%>
-<%--<br>--%>
- <%--<c:import url="../include/workflow.jsp">--%>
-  <%--<c:param name="module" value="admin"/>--%>
- <%--</c:import>--%>
 <jsp:include page="../include/footer.jsp"/>
