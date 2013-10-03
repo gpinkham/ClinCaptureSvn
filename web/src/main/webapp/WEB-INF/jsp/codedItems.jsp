@@ -78,7 +78,7 @@
     </table> 
 </div>
 
-<form  action="${pageContext.request.contextPath}/pages/codedItems" style="clear:left; float:left;">
+<form action="${pageContext.request.contextPath}/pages/codedItems" style="clear:left; float:left;">
     ${codedQuestionsHtml}
 </form>
 

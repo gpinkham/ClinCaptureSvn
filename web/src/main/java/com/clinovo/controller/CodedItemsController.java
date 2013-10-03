@@ -43,6 +43,10 @@ import com.clinovo.model.Status.CodeStatus;
 import com.clinovo.service.CodedItemService;
 
 
+/**
+ * The controller for managing coded items. Acts as the glue between the service layer and the UI -
+ * 
+ */
 @Controller
 public class CodedItemsController {
 
@@ -56,6 +60,16 @@ public class CodedItemsController {
 
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
+	/**
+	 * Handle for retrieving all the coded items.
+	 * 
+	 * @param request The incoming request
+	 * @param response The response to redirect to
+	 * 
+	 * @return Map with coded item attributes that will be placed on the UX.
+	 * 
+	 * @throws Exception For all exceptions
+	 */
 	@SuppressWarnings("rawtypes")
 	@RequestMapping("/codedItems")
 	public ModelMap dictionaryHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -94,6 +108,15 @@ public class CodedItemsController {
 		return map;
 	}
 
+	/**
+	 * Handle for coding a specified item
+	 * 
+	 * @param request The request containing the item to code
+	 * 
+	 * @return Map with attributes to be used on the UX-
+	 * 
+	 * @throws Exception For all exceptions
+	 */
 	@RequestMapping("/codedItem")
 	public ModelMap codeItemHandler(HttpServletRequest request) throws Exception {
 
@@ -125,6 +148,15 @@ public class CodedItemsController {
 
 	}
 	
+	/**
+	 * Handle for saving a coded item
+	 * 
+	 * @param request The request containing the coded item to save
+	 * 
+	 * @return Redirects to the coded items handler.
+	 * 
+	 * @throws Exception For all exception
+	 */
 	@RequestMapping("/saveCodedItem")
 	public String saveCodedItemHandler(HttpServletRequest request) throws Exception {
 		
@@ -145,6 +177,15 @@ public class CodedItemsController {
 		return "codedItems";
 	}
 
+	/**
+	 * Handle for uncoding a given coded item.
+	 * 
+	 * @param request The request containing the item to uncode.
+	 * 
+	 * @return Redirects to coded items.
+	 * 
+	 * @throws Exception For all exceptions
+	 */
     @RequestMapping("/uncodeCodedItem")
     public String unCodeCodedItemHandler(HttpServletRequest request) throws Exception {
 
