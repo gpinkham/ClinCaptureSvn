@@ -2416,6 +2416,9 @@ saveCodedItem = function(item) {
 
         success: function(data) {
 
+            /* update code item version */
+            var versionNumber = parseInt($(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text().trim());
+            $(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text(versionNumber + 1);
             /* update code icon from available to code completed */
             $(item).parents('td').find("a[name='Code'][itemid=" + $(item).children('div').attr("id") + "]").children('img').attr('src', '../images/code_confirm.png');
             /* update status from Available to Completed */
@@ -2463,6 +2466,9 @@ uncodeCodeItem = function(item) {
 
                 /* change completed code icon to available */
                 $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc)
+                /* change code item version */
+                var versionNumber = parseInt($(item).parent('td').siblings("td").find("div[name='codedItemVersion']").text().trim());
+                $(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text(versionNumber + 1);
                 /* change status from completed to available */
                 $(item).parent().siblings("td").filter(function () {
                     return $(this).text() == 'Completed'; }).text("Available");

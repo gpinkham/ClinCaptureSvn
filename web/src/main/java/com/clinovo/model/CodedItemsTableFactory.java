@@ -47,21 +47,23 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 	private StudySubjectDAO studySubjectDAO;
 	private StudyEventDefinitionDAO studyEventDefDao;
 
-    private String CODED_DIV_PREFIX = "Search: <input style=\"border:1px solid #a6a6a6;margin-bottom: 2px;background-color:#d9d9d9;color:#4D4D4D\" type=\"text\" value=\"";
+    private String CODED_DIV_PREFIX = "";
     private final String CODED_DIV_MIDDLE = "\"/><div id=\"";
     private final String CODED_DIV_SUFIX = "\"></div>";
     private final String COLUMN_WIDTH_PREFIX = "<div style=\"width:";
 	private final String COLUMN_WIDTH_SUFFIX = "px\"/>";
-	private String AJAX_REQUEST_PREFIX = "<a onClick=\"codeItem(this)\" name=\"Code\" itemId=\"";
+	private String AJAX_REQUEST_PREFIX = "";
 	private final String AJAX_REQUEST_MIDDLE = "\"><img style=\"float:left;\" width=\"17\" border=\"0\" title=\"Code\" alt=\"Code\" src=\"../images/";
     private final String AJAX_REQUEST_SUFIX =  "\"/></a>";
-    private final String GOTO_CRF_CRFID = "&amp;ecId=";
-    private final String GOTO_CRF_EVENTID = "&amp;tabId=1&eventId=";
+    private final String GOTO_CRF_EVENTCRFID = "&nbsp;&nbsp;<a onmouseup=\"javascript:setImage('Complete','../images/icon_DEcomplete.gif');\" href=\"../ViewSectionDataEntry?eventCRFId=";
+    private final String GOTO_CRF_EVENTDEFCRFID = "&eventDefinitionCRFId=";
+    private final String GOTO_CRF_EVENTID = "&tabId=1&eventId=";
     private final String GOTO_CRF_SUFIX = "&amp;viewFull=yes\"><img border=\"0\" title=\"Open CRF\" alt=\"GoToCRF\" height=\"17px\" src=\"../images/icon_DEcomplete.gif\" name=\"GOTO\"/></a>";
-    private final String GOTO_CRF_DEFID = "&nbsp;&nbsp;<a onmouseup=\"javascript:setImage('Complete','../images/icon_DEcomplete.gif');\" href=\"../ViewSectionDataEntry?eventDefinitionCRFId=";
     public final static String AJAX_UNCODE_ITEM_PREFIX = "&nbsp;&nbsp;<a onClick=\"uncodeCodeItem(this)\" name=\"unCode\" itemId=\"";
     public final static String AJAX_UNCODE_ITEM_SUFFIX = "\"><img width=\"17\" border=\"0\" title=\"UnCode\" src=\"../images/code_uncode.png\" name=\"codeBtn\"/></a>";
     public final static String AJAX_UNCODE_ITEM_SUFFIX_HIDDEN = "\" style=\"display:none\"><img width=\"17\" border=\"0\" alt=\"UnCode\" src=\"../images/code_uncode.png\" name=\"codeBtn\"/></a>";
+    public final static String DIV_VERSION_PREFIX = "<div name=\"codedItemVersion\">";
+    public final static String DIV_VERSION_SUFIX = "</div>";
 
     @Override
     protected String getTableName() {
@@ -141,7 +143,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             String value = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
             StringBuilder url = new StringBuilder();
-            url.append(selectItemDictionary(codedItem.getDictionary()))
+            url.append(selectItemDictionary(codedItem))
                     .append(COLUMN_WIDTH_PREFIX)
                     .append("100")
                     .append(COLUMN_WIDTH_SUFFIX);
@@ -149,7 +151,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             return value;
         }
 
-        private StringBuilder selectItemDictionary(String codedItemDictionary) {
+        private StringBuilder selectItemDictionary(CodedItem codedItem) {
 
             HashMap<String, String> dictionaries = new HashMap<String, String>();
             
@@ -160,17 +162,21 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             Iterator iterator = dictionaries.entrySet().iterator();
 
             StringBuilder dictionariesHtml = new StringBuilder("");
-            dictionariesHtml.append("<select>");
-            while (iterator.hasNext()) {
-                Map.Entry mapEntry = (Map.Entry) iterator.next();
-                dictionariesHtml.append("\"<option value=\"")
-                        .append(mapEntry.getKey()).append("\"")
-                        .append(isSelected(mapEntry.getKey(), codedItemDictionary))
-                        .append(">").append(mapEntry.getValue())
-                        .append("</option>");
+            if (isLoggedInUserMonitor()) {
+                dictionariesHtml.append(codedItem.getDictionary());
+                return dictionariesHtml;
+            } else {
+                dictionariesHtml.append("<select>");
+                while (iterator.hasNext()) {
+                    Map.Entry mapEntry = (Map.Entry) iterator.next();
+                    dictionariesHtml.append("\"<option value=\"")
+                            .append(mapEntry.getKey()).append("\"")
+                            .append(isSelected(mapEntry.getKey(), codedItem.getDictionary()))
+                            .append(">").append(mapEntry.getValue())
+                            .append("</option>");
+                }
+                dictionariesHtml.append("</select>");
             }
-            dictionariesHtml.append("</select>");
-
             return dictionariesHtml;
         }
 
@@ -213,10 +219,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
 		public Object getValue(Object item, String property, int rowcount) {
             String value = "";
-            Integer version = (Integer) ((HashMap<Object, Object>) item).get("codedItem.version");
-            if (version != null) {
+            CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
+            if (codedItem != null) {
                 StringBuilder url = new StringBuilder();
-                url.append(version);
+                url.append(DIV_VERSION_PREFIX)
+                        .append(codedItem.getVersion())
+                        .append(DIV_VERSION_SUFIX);
                 value = url.toString();
             }
             return value;
@@ -236,10 +244,20 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             	
                 StringBuilder url = new StringBuilder();
                 
-				if (isLoggedInUserMonitor() || codedItem.isCoded()) {
+				if (isLoggedInUserMonitor()) {
 
-					CODED_DIV_PREFIX = "Search: <input style=\"border:1px solid #a6a6a6;margin-bottom: 2px;background-color:#d9d9d9;color:#4D4D4D\" disabled=\"true\" type=\"text\" value=\"";
-				}
+                    url.append(inputTerm)
+                        .append(COLUMN_WIDTH_PREFIX)
+                        .append("250")
+                        .append(COLUMN_WIDTH_SUFFIX);
+					return url.toString();
+				} else if (codedItem.isCoded()) {
+
+                    CODED_DIV_PREFIX = "Search: <input style=\"border:1px solid #a6a6a6;margin-bottom: 2px;background-color:#d9d9d9;color:#4D4D4D\" disabled=\"true\" type=\"text\" value=\"";
+                } else {
+
+                    CODED_DIV_PREFIX = "Search: <input style=\"border:1px solid #a6a6a6;margin-bottom: 2px;background-color:#d9d9d9;color:#4D4D4D\" type=\"text\" value=\"";
+                }
 				
                 url.append(CODED_DIV_PREFIX).append(inputTerm)
                         .append(CODED_DIV_MIDDLE)
@@ -263,9 +281,9 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
             EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(codedItem.getEventCrfId());
             StudyBean studyBean = (StudyBean) studyDAO.findByStudySubjectId(eventCRFBean.getStudySubjectId());
-            EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, codedItem.getEventCrfId(), codedItem.getCrfVersionId());
+            EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(), codedItem.getCrfVersionId());
             String codedItemButton = codedItem.isCoded() ? "code_confirm.png" : "code_blue.png";
-            String uncodedItemButton = (AJAX_UNCODE_ITEM_PREFIX) + codedItem.getItemDataId() + (codedItem.isCoded() ? (AJAX_UNCODE_ITEM_SUFFIX) : AJAX_UNCODE_ITEM_SUFFIX_HIDDEN);
+            String uncodedItemButton = "";
 
             if (codedItem != null) {
             	
@@ -275,17 +293,21 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
  				if (isLoggedInUserMonitor()) {
  					
  					AJAX_REQUEST_PREFIX = "<a itemId=\"";
- 				}
+ 				} else {
+
+                    AJAX_REQUEST_PREFIX = "<a onClick=\"codeItem(this)\" name=\"Code\" itemId=\"";
+                    uncodedItemButton = (AJAX_UNCODE_ITEM_PREFIX) + codedItem.getItemDataId() + (codedItem.isCoded() ? (AJAX_UNCODE_ITEM_SUFFIX) : AJAX_UNCODE_ITEM_SUFFIX_HIDDEN);
+                }
  				
                 url.append(AJAX_REQUEST_PREFIX)
                 	.append(codedItem.getItemDataId())
                     .append(AJAX_REQUEST_MIDDLE)
                     .append(codedItemButton)
                     .append(AJAX_REQUEST_SUFIX)
-                    .append(GOTO_CRF_DEFID)
-                    .append(eventDefCRFBean.getStudyEventDefinitionId())
-                    .append(GOTO_CRF_CRFID)
+                    .append(GOTO_CRF_EVENTCRFID)
                     .append(eventCRFBean.getId())
+                    .append(GOTO_CRF_EVENTDEFCRFID)
+                    .append(eventDefCRFBean.getId())
                     .append(GOTO_CRF_EVENTID)
                     .append(eventCRFBean.getStudyEventId()).append(GOTO_CRF_SUFIX)
                     .append(uncodedItemButton)
@@ -410,10 +432,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         return subjectBean;
     }
 
-    private StudyEventDefinitionBean getStudyEventDefinitionBean(int eventCrdId, int crfVersionId) {
-        EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(crfVersionId);
+    private StudyEventDefinitionBean getStudyEventDefinitionBean(int eventCrfId, int crfVersionId) {
+        EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(eventCrfId);
         StudyBean studyBean = (StudyBean) studyDAO.findByStudySubjectId(eventCRFBean.getStudySubjectId());
-        EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, eventCrdId, crfVersionId);
+        EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(), crfVersionId);
         StudyEventDefinitionBean studyEventDefBean = studyEventDefDao.findByEventDefinitionCRFId(eventDefCRFBean.getId());
         return studyEventDefBean;
     }

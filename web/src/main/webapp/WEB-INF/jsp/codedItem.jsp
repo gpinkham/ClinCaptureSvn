@@ -4,6 +4,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
+<c:set var="color" scope="session" value="${newThemeColor}"/>
+
 <c:choose>
     <c:when test="${fn:length(classification) eq 0}">
         <br>
@@ -37,7 +39,14 @@
                             </div>
                         </td>
                         <td>
-                            <input type="button" name="codeItemBtn" class="loginbutton" value="code" style="background-image: url(../images/violet/loginbutton_BG.gif);" onclick="saveCodedItem($(this).parent().prev(  ))" />
+                            <c:set var="codeButtonColor" value="../images/loginbutton_BG.gif"/>
+                                <c:if test="${(color == 'violet')}">
+                                     <c:set var="codeButtonColor" value="../images/violet/loginbutton_BG.gif"/>
+                                </c:if>
+                                <c:if test="${(color == 'green')}">
+                                     <c:set var="codeButtonColor" value="../images/green/loginbutton_BG.gif"/>
+                                </c:if>
+                            <input type="button" name="codeItemBtn" class="loginbutton" value="code" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="saveCodedItem($(this).parent().prev(  ))" />
                         </td>
                     </tr>
                     <tr>

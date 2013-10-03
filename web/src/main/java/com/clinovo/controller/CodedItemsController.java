@@ -114,7 +114,7 @@ public class CodedItemsController {
 			
 			map.addAttribute("classification", classifications);
 			map.addAttribute("itemDataId", codedItem.getItemDataId());
-			map.addAttribute("itemDictionary", codedItem.getDictionary());
+			map.addAttribute("itemDictionary", dictionary);
 
 		} catch (Exception e) {
 
