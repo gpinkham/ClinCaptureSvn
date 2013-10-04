@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -12,6 +13,8 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.service.DiscrepancyNoteThread;
+import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -39,14 +42,15 @@ public class UpdateDNShortcutAnchorsServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 
 		List<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(STUDY);
 
 		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 
 		int itemId = fp.getInt(ITEM_ID);
 		int rowCount = fp.getInt(ROW_COUNT);
 		int eventCRFId = fp.getInt(EVENT_CRF_ID);
-        String rowCountStr = fp.getString(ROW_COUNT);
 		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 				AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 		if (fdn.getFieldNotes() != null) {
@@ -62,7 +66,7 @@ public class UpdateDNShortcutAnchorsServlet extends Controller {
 			}
 		}
 
-		if (eventCRFId > 0 && itemId > 0 && !rowCountStr.isEmpty()) {
+		if (eventCRFId > 0 && itemId > 0) {
 			List<ItemDataBean> itemDataList = iddao.findAllByEventCRFIdAndItemId(eventCRFId, itemId);
 			if (itemDataList != null) {
 				for (ItemDataBean itemDataBean : itemDataList) {
@@ -76,13 +80,15 @@ public class UpdateDNShortcutAnchorsServlet extends Controller {
 
 		ItemDataBean itemDataBean = new ItemDataBean();
 		itemDataBean.setItemId(itemId);
-		itemDataBean.setOrdinal(rowCountStr.isEmpty() ? -1 : rowCount);
+		itemDataBean.setOrdinal(fp.getString(ROW_COUNT).isEmpty() ? -1 : rowCount);
 		DisplayItemBean dib = new DisplayItemBean();
 		dib.setDbData(itemDataBean);
 		request.setAttribute(DISPLAY_ITEM_BEAN, dib);
 		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = new DiscrepancyShortcutsAnalyzer();
 		request.setAttribute(DISCREPANCY_SHORTCUTS_ANALYZER, discrepancyShortcutsAnalyzer);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, allNotes);
+		List<DiscrepancyNoteThread> noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(),
+				currentStudy, null, -1, true);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
 
 		forwardPage(Page.UPDATE_DN_SHORTCUT_ANCHORS_PAGE, request, response);
 	}

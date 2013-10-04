@@ -2783,6 +2783,6 @@ function addDNShortcutAnchor(parametersHolder) {
     removeAnchorIfItsBelowThanCurrent(id, parametersHolder);
     removeAllDNShortcutAnchorsForItem(parametersHolder);
     addDNShortcutAnchorsForItem(parametersHolder);
+    updateCRFHeaderFunction(parametersHolder);
   }
-  updateCRFHeaderFunction(parametersHolder);
 }

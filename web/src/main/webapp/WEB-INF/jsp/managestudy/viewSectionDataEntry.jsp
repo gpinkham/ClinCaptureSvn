@@ -111,6 +111,9 @@
             jQuery("table > tbody .tablebox_center button").attr("disabled", "disabled");
 		});
 </script>
+
+<c:set var="prevItemHolderId" value="0"/>
+
 	<div id="centralContainer"
 		style="padding-left: 3em; margin-top: 1em; background-color: white; color: black;">
 
@@ -1193,12 +1196,13 @@
 				<tr>
 					<td class="table_cell_left">
 						<table border="0" class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}">
+              <c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/>
 							<tr>
 								<td valign="top"></c:if> <c:if
 										test="${displayItem.singleItem.metadata.columnNumber >1}">
 										<td valign="top">
 									</c:if>
-									<table border="0">
+									<table border="0" <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>>
 										<tr>
 											<td valign="top" class="aka_ques_block"><c:out
 													value="${displayItem.singleItem.metadata.questionNumberLabel}"
@@ -1279,6 +1283,7 @@
 
 									<td valign="top">
 										<table border="0" class="itemHolderClass" id="itemHolderId_input${childItem.item.id}">
+                      <c:set var="prevItemHolderId" value="${childItem.item.id}"/>
 											<tr>
 												<td valign="top" class="aka_ques_block"><c:out
 														value="${childItem.metadata.questionNumberLabel}"

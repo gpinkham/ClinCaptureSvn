@@ -18,7 +18,7 @@ import org.akaza.openclinica.view.Page;
 
 public class DiscrepancyShortcutsAnalyzer {
 
-	public static final String DISCREPANCY_SHORTCUTS_ANALYZER = "discrepancyShortcutsAnalyzer";
+    public static final String DISCREPANCY_SHORTCUTS_ANALYZER = "discrepancyShortcutsAnalyzer";
 
 	public static final String FIRST_NEW_DN = "#firstNewDn";
 	public static final String FIRST_UPDATED_DN = "#firstUpdatedDn";
@@ -29,7 +29,7 @@ public class DiscrepancyShortcutsAnalyzer {
 	public static final String SECTION_ID = "sectionId";
 	public static final String TAB_ID = "tabId";
 
-	private boolean hasNotes;
+    private boolean hasNotes;
 
 	private int totalNew;
 	private int totalUpdated;
@@ -280,19 +280,20 @@ public class DiscrepancyShortcutsAnalyzer {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void prepareDnShortcutLinks(HttpServletRequest request, EventCRFBean eventCrfBean, SectionDAO sdao,
-			ItemFormMetadataDAO ifmdao, int eventDefinitionCRFId, List<DiscrepancyNoteThread> noteThreads) {
+			ItemFormMetadataDAO ifmdao, int eventDefinitionCRFId, List<SectionBean> sections,
+			List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyNoteBean tempBean;
 		FormProcessor fp = new FormProcessor(request);
 		Map<String, Integer> linkMap = new HashMap<String, Integer>();
 		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = new DiscrepancyShortcutsAnalyzer();
-		request.setAttribute("discrepancyShortcutsAnalyzer", discrepancyShortcutsAnalyzer);
+		request.setAttribute(DISCREPANCY_SHORTCUTS_ANALYZER, discrepancyShortcutsAnalyzer);
 		if (request.getMethod().equalsIgnoreCase("POST") && request.getAttribute("section") == null) {
 			return;
-		}
-		List<SectionBean> sections = sdao.findAllByCRFVersionId(eventCrfBean.getCRFVersionId());
+		}		
 		for (DiscrepancyNoteThread dnThread : noteThreads) {
 			tempBean = dnThread.getLinkedNoteList().getLast();
-			if (tempBean != null && tempBean.getEntityType().equalsIgnoreCase("itemData")) {
+			if (tempBean != null && tempBean.getEntityType().equalsIgnoreCase("itemData")
+					&& tempBean.getParentDnId() == 0) {
 				discrepancyShortcutsAnalyzer.setHasNotes(true);
 				ItemFormMetadataBean ifmbean = ifmdao.findByItemIdAndCRFVersionId(tempBean.getItemId(),
 						eventCrfBean.getCRFVersionId());
@@ -338,11 +339,14 @@ public class DiscrepancyShortcutsAnalyzer {
 		}
 	}
 
-	public static void prepareDnShortcutAnchors(HttpServletRequest request, DisplayItemBean dib, List<DiscrepancyNoteBean> notes) {
+	public static void prepareDnShortcutAnchors(HttpServletRequest request, DisplayItemBean dib,
+			List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = (DiscrepancyShortcutsAnalyzer) request
 				.getAttribute(DISCREPANCY_SHORTCUTS_ANALYZER);
-		for (DiscrepancyNoteBean tempBean : notes) {
-			if (tempBean.getEntityType().equalsIgnoreCase("itemData")) {
+		for (DiscrepancyNoteThread dnThread : noteThreads) {
+			DiscrepancyNoteBean tempBean = dnThread.getLinkedNoteList().getLast();
+			if (tempBean != null && tempBean.getEntityType().equalsIgnoreCase("itemData")
+					&& tempBean.getParentDnId() == 0) {
 				switch (tempBean.getResolutionStatusId()) {
 				case 1: {
 					discrepancyShortcutsAnalyzer.incSectionTotalNew();

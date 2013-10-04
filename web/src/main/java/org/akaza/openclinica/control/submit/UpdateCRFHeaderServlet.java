@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -41,8 +42,9 @@ public class UpdateCRFHeaderServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 
 		StudyBean currentStudy = getCurrentStudy(request);
+        List<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
 		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
-		List<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
+        List<SectionBean> allSections = new ArrayList<SectionBean>();
 
 		SectionDAO sdao = new SectionDAO(getDataSource());
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
@@ -74,12 +76,13 @@ public class UpdateCRFHeaderServlet extends Controller {
 			if (!eventCrfNotes.isEmpty()) {
 				allNotes.addAll(eventCrfNotes);
 			}
+            allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 		}
 
 		List<DiscrepancyNoteThread> noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(),
 				currentStudy, null, -1, true);
 
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, eventDefinitionCRFId,
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, eventDefinitionCRFId, allSections,
 				noteThreads);
 
 		forwardPage(Page.UPDATE_CRF_HEADER_PAGE, request, response);

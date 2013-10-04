@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -25,6 +26,7 @@ public class DiscrepancyShortcutsAnalyzerTest {
 	private DiscrepancyNoteThread discrepancyNoteThread;
 	@SuppressWarnings("rawtypes")
 	private ArrayList discrepancyNotes;
+	private List<DiscrepancyNoteThread> noteThreads;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Before
@@ -38,14 +40,17 @@ public class DiscrepancyShortcutsAnalyzerTest {
 		itemBean = new ItemBean();
 		itemBean.setId(1);
 		displayItemBean.setItem(itemBean);
+		noteThreads = new ArrayList();
 		discrepancyNotes = new ArrayList();
 		discrepancyNoteBean = new DiscrepancyNoteBean();
 		discrepancyNoteBean.setItemId(1);
 		discrepancyNoteBean.setEntityType("itemData");
+		discrepancyNoteBean.setParentDnId(0);
 		discrepancyNotes.add(discrepancyNoteBean);
 		discrepancyNoteThread = new DiscrepancyNoteThread();
 		discrepancyNoteThread.setLinkedNoteList(new LinkedList(discrepancyNotes));
 		displayItemBean.setDiscrepancyNotes(discrepancyNotes);
+		noteThreads.add(discrepancyNoteThread);
 		request.setAttribute("discrepancyShortcutsAnalyzer", new DiscrepancyShortcutsAnalyzer());
 	}
 
@@ -53,7 +58,7 @@ public class DiscrepancyShortcutsAnalyzerTest {
 	@Test
 	public void testThatIsFirstNewDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(1);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, discrepancyNotes);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
 		assertTrue(displayItemBean.isFirstNewDn());
 	}
 
@@ -61,7 +66,7 @@ public class DiscrepancyShortcutsAnalyzerTest {
 	@Test
 	public void testThatIsFirstUpdatedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(2);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, discrepancyNotes);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
 		assertTrue(displayItemBean.isFirstUpdatedDn());
 	}
 
@@ -69,7 +74,7 @@ public class DiscrepancyShortcutsAnalyzerTest {
 	@Test
 	public void testThatIsFirstResolutionProposedReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(3);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, discrepancyNotes);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
 		assertTrue(displayItemBean.isFirstResolutionProposed());
 	}
 
@@ -77,7 +82,7 @@ public class DiscrepancyShortcutsAnalyzerTest {
 	@Test
 	public void testThatIsFirstClosedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(4);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, discrepancyNotes);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
 		assertTrue(displayItemBean.isFirstClosedDn());
 	}
 
@@ -85,7 +90,7 @@ public class DiscrepancyShortcutsAnalyzerTest {
 	@Test
 	public void testThatIsFirstAnnotationReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(5);
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, discrepancyNotes);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, displayItemBean, noteThreads);
 		assertTrue(displayItemBean.isFirstAnnotation());
 	}
 }

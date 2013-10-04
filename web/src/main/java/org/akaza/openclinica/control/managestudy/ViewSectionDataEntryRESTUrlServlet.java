@@ -180,7 +180,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 			noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
-			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, eventDefinitionCRFId,
+            List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
+			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, eventDefinitionCRFId, allSections,
 					noteThreads);
 
 			DisplayTableOfContentsBean displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(),

@@ -67,7 +67,7 @@
   "document.getElementById('centralContainer').style.display='none'; new Effect.Appear('centralContainer', {duration:1});<jsp:include page="../include/showPopUp2.jsp"/>"
   TabsForwardByNum(<c:out value="${tabId}"/>); alert(self.screen.availWidth);
 margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
-
+<c:set var="prevItemHolderId" value="0"/>
 <c:set var="markCRFMethodName" value="displayMessageFromCheckbox(this, undefined)"/>
 
 <div id="centralContainer" style=
@@ -1128,7 +1128,8 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 </c:otherwise>
 </c:choose>
     <td class="table_cell_left">
-        <table border="0" class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}">>
+        <table border="0" class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}">
+            <c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/>
             <tr>
                 	</c:if>
 
@@ -1158,11 +1159,11 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 						<%-- put in highlighting here, tbh --%>
                         <c:choose>
                     		<c:when test="${displayItem.singleItem.metadata.highlighted}">
-								<table border="0" cellspacing="0" cellpadding="1" class="aka_group_show">
+								<table border="0" cellspacing="0" cellpadding="1" class="aka_group_show <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">itemHolderClass</c:if>" <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>>
                     			<tr>
                     		</c:when>
                     		<c:otherwise>
-								<table border="0" cellspacing="0" cellpadding="1">
+								<table border="0" cellspacing="0" cellpadding="1" <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>>
                     			<tr>
                     		</c:otherwise>
                     	</c:choose><%-- end of highlighting block, tbh --%>
@@ -1277,6 +1278,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
                     <td valign="top">
                         <table border="0" class="itemHolderClass" id="itemHolderId_input${childItem.item.id}">
+                            <c:set var="prevItemHolderId" value="${childItem.item.id}"/>
                             <tr>
 
                                 <td valign="top" class="aka_ques_block"><c:out value="${childItem.metadata.questionNumberLabel}" escapeXml="false"/></td>

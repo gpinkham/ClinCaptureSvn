@@ -69,6 +69,8 @@
   "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});} TabsForwardByNum(<c:out value="${tabId}"/>);"
   alert(self.screen.availWidth);
 margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
+
+<c:set var="prevItemHolderId" value="0"/>
 <div id="centralContainer" style=
   "padding-left:3em; margin-top:1em;background-color: white; color:black;">
 
@@ -1244,6 +1246,7 @@ window.onload = initmb;
 </c:otherwise>
 </c:choose>
     <td class="itemHolderClass table_cell_left" id="itemHolderId_input${displayItem.singleItem.item.id}">
+        <c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/>
         <table border="0">
             <tr>
                 </c:if>
@@ -1280,11 +1283,11 @@ window.onload = initmb;
 						</c:forEach>
                         <c:choose>
                     		<c:when test="${isItemShown && hasShown}">
-								<table border="0" cellspacing="0" cellpadding="1" class="aka_group_show">
+								<table border="0" cellspacing="0" cellpadding="1" class="aka_group_show <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">itemHolderClass</c:if>" <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>>
                     			<tr>
                     		</c:when>
                     		<c:otherwise>
-								<table border="0" cellspacing="0" cellpadding="1">
+								<table border="0" cellspacing="0" cellpadding="1" <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>>
                     			<tr>
                     		</c:otherwise>
                     	</c:choose>
@@ -1401,6 +1404,7 @@ window.onload = initmb;
 
                     <td valign="top">
                         <table border="0" class="itemHolderClass" id="itemHolderId_input${childItem.item.id}">
+                            <c:set var="prevItemHolderId" value="${childItem.item.id}"/>
                             <tr>
 
 
