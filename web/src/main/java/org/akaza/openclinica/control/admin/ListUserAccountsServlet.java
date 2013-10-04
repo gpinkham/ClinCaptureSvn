@@ -24,22 +24,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.RememberLastPage;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.util.InactiveAnalyzer;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+@Component
 public class ListUserAccountsServlet extends RememberLastPage {
 
 	public static final String PATH = "ListUserAccounts";
@@ -47,9 +53,10 @@ public class ListUserAccountsServlet extends RememberLastPage {
 	public static final String SAVED_USER_LIST_URL = "savedUserListUrl";
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
 		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("you_may_not_perform_administrative_functions"));
+			addPageMessage(respage.getString("you_may_not_perform_administrative_functions"), request);
 			throw new InsufficientPermissionException(Page.ADMIN_SYSTEM_SERVLET,
 					respage.getString("you_may_not_perform_administrative_functions"), "1");
 		}
@@ -58,11 +65,14 @@ public class ListUserAccountsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-		analyzeUrl();
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (shouldRedirect(request, response)) {
+            return;
+        }
+
 		FormProcessor fp = new FormProcessor(request);
 
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO udao = getUserAccountDAO();
 		EntityBeanTable table = fp.getEntityBeanTable();
 
 		ArrayList allUsers = getAllUsers(udao);
@@ -90,14 +100,15 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		request.setAttribute(ARG_MESSAGE, message);
         request.setAttribute("roleMap", Role.roleMap);
 
-		resetPanel();
+        StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 		if (allUsers.size() > 0) {
-			setToPanel(resword.getString("users"), new Integer(allUsers.size()).toString());
+			setToPanel(resword.getString("users"), new Integer(allUsers.size()).toString(), request);
 		}
 
-		analyzeForward(Page.LIST_USER_ACCOUNTS);
+		forward(Page.LIST_USER_ACCOUNTS, request, response);
 	}
 
 	private ArrayList getAllUsers(UserAccountDAO udao) {
@@ -112,7 +123,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 	 *            The users to display in the table of users. Each element is a UserAccountBean.
 	 */
 	private void setStudyNamesInStudyUserRoles(ArrayList users) {
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		ArrayList allStudies = (ArrayList) sdao.findAll();
 		HashMap studiesById = new HashMap();
 
@@ -143,8 +154,8 @@ public class ListUserAccountsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 
 	@Override
@@ -152,8 +163,8 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		return SAVED_USER_LIST_URL;
 	}
 
-	@Override
-	protected String getDefaultUrl() {
+    @Override
+	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		String eblFiltered = fp.getString("ebl_filtered");
 		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
@@ -167,7 +178,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected boolean userDoesNotUseJmesaTableForNavigation() {
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 	}
 }

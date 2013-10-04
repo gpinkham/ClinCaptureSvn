@@ -54,7 +54,6 @@ public class DiscrepancyShortcutsAnalyzerTest {
 		request.setAttribute("discrepancyShortcutsAnalyzer", new DiscrepancyShortcutsAnalyzer());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testThatIsFirstNewDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(1);
@@ -62,7 +61,6 @@ public class DiscrepancyShortcutsAnalyzerTest {
 		assertTrue(displayItemBean.isFirstNewDn());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testThatIsFirstUpdatedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(2);
@@ -70,7 +68,6 @@ public class DiscrepancyShortcutsAnalyzerTest {
 		assertTrue(displayItemBean.isFirstUpdatedDn());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testThatIsFirstResolutionProposedReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(3);
@@ -78,7 +75,6 @@ public class DiscrepancyShortcutsAnalyzerTest {
 		assertTrue(displayItemBean.isFirstResolutionProposed());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testThatIsFirstClosedDnReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(4);
@@ -86,7 +82,6 @@ public class DiscrepancyShortcutsAnalyzerTest {
 		assertTrue(displayItemBean.isFirstClosedDn());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testThatIsFirstAnnotationReturnsCorrectValue() throws Exception {
 		discrepancyNoteBean.setResolutionStatusId(5);

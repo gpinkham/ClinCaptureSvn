@@ -465,9 +465,9 @@
         <servlet-class>org.akaza.openclinica.control.admin.EditUserAccountServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListUserAccountsServlet</servlet-name>
+        <servlet-name>listUserAccountsServlet</servlet-name>
         <display-name>ListUserAccounts</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.ListUserAccountsServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>EditStudyUserRoleServlet</servlet-name>
@@ -1537,7 +1537,7 @@
         <url-pattern>/Contact</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListUserAccountsServlet</servlet-name>
+        <servlet-name>listUserAccountsServlet</servlet-name>
         <url-pattern>/ListUserAccounts</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
