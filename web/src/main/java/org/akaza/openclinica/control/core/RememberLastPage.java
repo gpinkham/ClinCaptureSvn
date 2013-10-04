@@ -51,6 +51,13 @@ public abstract class RememberLastPage extends Controller {
 				if (keyValue == null && defaultUrl != null) {
 					keyValue = request.getRequestURL() + defaultUrl;
 					request.getSession().setAttribute(key, keyValue);
+					if (userDoesNotUseJmesaTableForNavigation(request)) {
+						result = true;
+						storeAttributes(request);
+						// for navigation purpose (to brake double url in stack)
+						request.getSession().setAttribute("skipURL", "true");
+						response.sendRedirect(response.encodeRedirectURL(keyValue));
+					}
 				}
 			}
 		}
