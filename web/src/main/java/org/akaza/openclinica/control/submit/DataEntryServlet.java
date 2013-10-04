@@ -2906,27 +2906,34 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				
 				// create coded items for event/crf
 				if (getCodedItemService() != null) {
-					codedItemService.createCodedItem(ecb, dib.getItem());
+					codedItemService.createCodedItem(ecb, dib.getItem(), idb);
 				}
 				
 			} else {
+				
 				idb.setUpdater(ub);
 				// should we update the logic here for nonrepeats?
-				// //System.out.println("string util is blank: update an item data " + idb.getId() + " :" +
-				// idb.getValue());
 				logger.info("update item update_id " + idb.getUpdater().getId());
 				idb = (ItemDataBean) iddao.updateValue(idb);
 			}
 		} else {
+			
 			// for the items in group, they have editFlag
 			if ("add".equalsIgnoreCase(dib.getEditFlag())) {
+				
 				idb.setOrdinal(ordinal);
 				idb.setCreatedDate(new Date());
 				idb.setOwner(ub);
 				logger.debug("create a new item data" + idb.getItemId() + idb.getValue());
 				idb.setUpdater(ub);
 				idb = (ItemDataBean) iddao.upsert(idb);
+				
+				if (getCodedItemService() != null) {
+					codedItemService.createCodedItem(ecb, dib.getItem(), idb);
+				}
+				
 			} else if ("edit".equalsIgnoreCase(dib.getEditFlag())) {
+				
 				idb.setUpdater(ub);
 
 				logger.info("update item update_id " + idb.getUpdater().getId());
@@ -2934,9 +2941,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				// an import data, it won't exist; we need to check on item_data_id
 				// to make sure we are running the correct command on the db
 				if (idb.getId() != 0) {
+					
 					idb.setUpdatedDate(new Date());
 					idb = (ItemDataBean) iddao.updateValue(idb);
+					
 				} else {
+					
 					idb.setCreatedDate(new Date());
 					idb.setOrdinal(ordinal);
 					idb.setOwner(ub);
@@ -2945,6 +2955,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				}
 
 			} else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
+				
 				logger.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
 				idb.setUpdater(ub);
 				idb.setStatus(Status.DELETED);
@@ -2979,7 +2990,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					dnDao.update(itemParentNote);
 				}
 			}
-
 		}
 
 		return idb.isActive();
@@ -3510,9 +3520,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 						}
 
 						int itemDataId = dib.getData().getId();
-						int numNotes = 0;
 						if (i <= itemWithGroup.getDbItemGroups().size() - 1) {
-							numNotes = dndao.findNumExistingNotesForItem(itemDataId);
+							dndao.findNumExistingNotesForItem(itemDataId);
 						} else {
 							dib.getData().setId(0);
 						}

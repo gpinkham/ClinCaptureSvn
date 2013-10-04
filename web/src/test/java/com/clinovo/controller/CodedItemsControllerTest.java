@@ -14,13 +14,15 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 
 	@Test
 	public void testThatGetRequestResolvesWith200Status() throws Exception {
+		
 		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER).accept(MediaType.ALL))
 			.andExpect(status().isOk());
 	}
 
 	@Test
 	public void testThatGetRequestOnWrongUrlRedirectsToErrorPage() throws Exception {
-		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER + "brian").accept(MediaType.ALL))
+		
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER + "brian"))
 			.andExpect(status().isNotFound());
 	}
 
@@ -47,6 +49,14 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("codedQuestionsHtml"));
 	}
+	
+	@Test
+	public void testThatGetRequestReturnsRequestWithAllItemsAttribute() throws Exception {
+
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("allItems"));
+	}
 
 	@Test
 	public void testThatGetRequestReturnsRequestWithCodedItemsAttribute() throws Exception {
@@ -55,5 +65,28 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("codedItems"));
 	}
+	
+	@Test
+	public void testThatGetRequestReturnsRequestWithUnCodedItemsAttribute() throws Exception {
 
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("unCodedItems"));
+	}
+	
+	@Test
+	public void testThatGetRequestReturnsRequestWithCodedItemsHtmlAttribute() throws Exception {
+
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("codedQuestionsHtml"));
+	}
+	
+	@Test
+	public void testThatGetRequestReturnsRequestWithPanelAttribute() throws Exception {
+
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("panel"));
+	}
 }

@@ -114,7 +114,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 		codeItemDAO.deleteCodedItem(codedItem);
 	}
 
-	public CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item) throws Exception {
+	public CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item, ItemDataBean itemData) throws Exception {
 
 		CodedItem cItem = new CodedItem();
 
@@ -124,14 +124,17 @@ public class CodedItemServiceImpl implements CodedItemService {
 
 		if (item.getDataType().equals(ItemDataType.CODE)) {
 
-			ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getId(), eventCRF.getCRFVersionId());
-			ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(), eventCRF.getCRFVersionId());
-			ItemDataBean data = itemDataDAO.findByItemIdAndEventCRFId(refItem.getId(), eventCRF.getId());
+			ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getId(),
+					eventCRF.getCRFVersionId());
+			ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(),
+					eventCRF.getCRFVersionId());
+			
+			// We use the ordinal to cater for repeat items
+			ItemDataBean data = itemDataDAO.findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), eventCRF.getId(), itemData.getOrdinal());
 
 			// Now the item
-			
 			if (data.getValue() != null && !data.getValue().isEmpty()) {
-				
+
 				cItem.setItemId(item.getId());
 				cItem.setItemDataId(data.getId());
 				cItem.setEventCrfId(eventCRF.getId());

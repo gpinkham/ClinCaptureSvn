@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.Status.CodeStatus;
@@ -48,7 +49,7 @@ public interface CodedItemService {
 	
 	List<CodedItem> findBySubject(int subject);
 	
-	CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean itemBean) throws Exception;
+	CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean itemBean, ItemDataBean itemData) throws Exception;
 
 	CodedItem findByItemData(int itemDataId);
 
