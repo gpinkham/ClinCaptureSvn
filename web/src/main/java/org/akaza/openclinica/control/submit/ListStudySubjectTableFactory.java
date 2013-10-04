@@ -110,6 +110,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 	private ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
 	private int hideColumnsNumber;
+    private boolean sortForMainMenuServlet;
 
     public static final int POPUP_BASE_WIDTH = 600;
     public static final String POPUP_BASE_WIDTH_PX = "width: " + POPUP_BASE_WIDTH + "px";
@@ -263,6 +264,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				getStudyGroupClasses(), addSubjectLinkShow, showMoreLink));
 	}
 
+	private FindSubjectsSort sortForMainMenuServlet() {
+		FindSubjectsSort findSubjectsSort = new FindSubjectsSort();
+		findSubjectsSort.addSort("studySubject.createdDate", "desc");
+		return findSubjectsSort;
+	}
+
 	@Override
 	public void setDataAndLimitVariables(TableFacade tableFacade) {
 		Limit limit = tableFacade.getLimit();
@@ -277,7 +284,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			tableFacade.setTotalRows(totalRows);
 		}
 
-		FindSubjectsSort subjectSort = getSubjectSort(limit);
+		FindSubjectsSort subjectSort = sortForMainMenuServlet ? sortForMainMenuServlet() : getSubjectSort(limit);
 
 		int rowStart = limit.getRowSelect().getRowStart();
 		int rowEnd = limit.getRowSelect().getRowEnd();
@@ -674,7 +681,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		this.itemDataDAO = itemDataDAO;
 	}
 
-	private class CharFilterMatcher implements FilterMatcher {
+	public void setSortForMainMenuServlet(boolean sortForMainMenuServlet) {
+		this.sortForMainMenuServlet = sortForMainMenuServlet;
+	}
+
+    private class CharFilterMatcher implements FilterMatcher {
 		public boolean evaluate(Object itemValue, String filterValue) {
 			String item = StringUtils.lowerCase(String.valueOf(itemValue));
 			String filter = StringUtils.lowerCase(String.valueOf(filterValue));

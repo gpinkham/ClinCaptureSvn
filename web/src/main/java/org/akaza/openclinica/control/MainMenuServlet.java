@@ -272,6 +272,7 @@ public class MainMenuServlet extends Controller {
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setStudyGroupDAO(getStudyGroupDAO());
 		factory.setDynamicEventDao(getDynamicEventDao());
+        factory.setSortForMainMenuServlet(true);
 		String findSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("findSubjectsHtml", findSubjectsHtml);
 	}
