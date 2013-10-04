@@ -27,6 +27,10 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import com.clinovo.model.RandomizationResult;
 import com.clinovo.util.XMLUtil;
 
+/**
+ * 
+ * The XML submission context from randomization.
+ */
 public class XMLSubmissionContext extends DefaultSubmissionContext {
 
 	public RandomizationResult processResponse(String response, int httpStatus) throws Exception {

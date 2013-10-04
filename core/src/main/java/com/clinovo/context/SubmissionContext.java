@@ -24,7 +24,7 @@ import com.clinovo.model.Randomization;
 import com.clinovo.model.RandomizationResult;
 
 /**
- * Specifies a contract between a randomization specific type and the expected communication processing. 
+ * Specifies a contract between a randomization specific type and the expected processing context. 
  * 
  * The implementing object should be context aware and provide an eco-system for the returned data to be processed to
  * the expected standard/format.

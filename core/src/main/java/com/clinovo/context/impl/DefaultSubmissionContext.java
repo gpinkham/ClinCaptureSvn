@@ -24,6 +24,10 @@ import org.slf4j.LoggerFactory;
 import com.clinovo.context.SubmissionContext;
 import com.clinovo.model.Randomization;
 
+/**
+ * The default submission context for all randomization contexts. This abstracts out generic concerns like authentication -
+ * 
+ */
 public abstract class DefaultSubmissionContext implements SubmissionContext {
 
 	protected PostMethod method = null;

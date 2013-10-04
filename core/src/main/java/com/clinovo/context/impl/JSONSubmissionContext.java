@@ -31,6 +31,9 @@ import org.json.JSONObject;
 
 import com.clinovo.model.RandomizationResult;
 
+/**
+ * The JSON submission context from randomization.
+ */
 public class JSONSubmissionContext extends DefaultSubmissionContext {
 
 	public RandomizationResult processResponse(String response, int httpStatus) throws Exception {
