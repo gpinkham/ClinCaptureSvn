@@ -22,42 +22,42 @@ import org.akaza.openclinica.view.Page;
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public abstract class RememberLastPage extends Controller {
 
-	protected abstract String getUrlKey();
+    protected abstract String getUrlKey();
 
 	protected abstract String getDefaultUrl(HttpServletRequest request);
 
 	protected abstract boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request);
 
+	private boolean redirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		storeAttributes(request);
+		// for navigation purpose (to brake double url in stack)
+		request.getSession().setAttribute("skipURL", "true");
+		response.sendRedirect(response.encodeRedirectURL((String) request.getSession().getAttribute(getUrlKey())));
+		return true;
+	}
+
 	protected boolean shouldRedirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		boolean result = false;
-		String keyValue = (String) request.getSession().getAttribute(getUrlKey());
-		if (userDoesNotUseJmesaTableForNavigation(request) && keyValue != null) {
-			result = true;
-			storeAttributes(request);
-			// for navigation purpose (to brake double url in stack)
-			request.getSession().setAttribute("skipURL", "true");
-			response.sendRedirect(response.encodeRedirectURL(keyValue));
-		} else {
-			String key = getUrlKey();
-			String defaultUrl = getDefaultUrl(request);
-			if (request.getMethod().equalsIgnoreCase("POST") || !userDoesNotUseJmesaTableForNavigation(request)) {
-				request.getSession().setAttribute(
-						key,
-						request.getMethod().equalsIgnoreCase("GET") ? (request.getRequestURL() + "?" + request
-								.getQueryString()) : (defaultUrl != null ? (request.getRequestURL() + defaultUrl)
-								: null));
+		String key = getUrlKey();
+		String defaultUrl = getDefaultUrl(request);
+		String keyValue = (String) request.getSession().getAttribute(key);
+		if (keyValue == null && defaultUrl != null) {
+			request.getSession().setAttribute(key, request.getRequestURL() + defaultUrl);
+		}
+		if (request.getMethod().equalsIgnoreCase("POST")) {
+			if (request.getHeader(REFERER) != null
+					&& !request.getHeader(REFERER).toLowerCase()
+							.startsWith(request.getRequestURL().toString().toLowerCase())) {
+				result = redirect(request, response);
+			} else if (defaultUrl != null) {
+				request.getSession().setAttribute(key, request.getRequestURL() + defaultUrl);
+			}
+		} else if (request.getMethod().equalsIgnoreCase("GET")) {
+			if (userDoesNotUseJmesaTableForNavigation(request)) {
+				result = redirect(request, response);
 			} else {
-				keyValue = (String) request.getSession().getAttribute(key);
-				if (keyValue == null && defaultUrl != null) {
-					keyValue = request.getRequestURL() + defaultUrl;
-					request.getSession().setAttribute(key, keyValue);
-					if (userDoesNotUseJmesaTableForNavigation(request)) {
-						result = true;
-						storeAttributes(request);
-						// for navigation purpose (to brake double url in stack)
-						request.getSession().setAttribute("skipURL", "true");
-						response.sendRedirect(response.encodeRedirectURL(keyValue));
-					}
+				if (request.getQueryString() != null) {
+					request.getSession().setAttribute(key, request.getRequestURL() + "?" + request.getQueryString());
 				}
 			}
 		}

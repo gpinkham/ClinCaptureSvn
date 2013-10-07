@@ -71,6 +71,7 @@ import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
 import org.jmesa.limit.FilterSet;
 import org.jmesa.limit.Limit;
+import org.jmesa.limit.Order;
 import org.jmesa.limit.Sort;
 import org.jmesa.limit.SortSet;
 import org.jmesa.view.component.Row;
@@ -264,16 +265,25 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				getStudyGroupClasses(), addSubjectLinkShow, showMoreLink));
 	}
 
-	private FindSubjectsSort sortForMainMenuServlet() {
-		FindSubjectsSort findSubjectsSort = new FindSubjectsSort();
-		findSubjectsSort.addSort("studySubject.createdDate", "desc");
-		return findSubjectsSort;
+	private void prepareLimit(Limit limit) {
+		boolean found = false;
+		for (Sort sort : limit.getSortSet().getSorts()) {
+			if (sort.getProperty().equalsIgnoreCase("studySubject.createdDate")) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			limit.getSortSet().getSorts().add(new Sort(1, "studySubject.createdDate", Order.DESC));
+		}
 	}
 
 	@Override
 	public void setDataAndLimitVariables(TableFacade tableFacade) {
 		Limit limit = tableFacade.getLimit();
-
+		if (sortForMainMenuServlet) {
+			prepareLimit(limit);
+		}
 		userRole = ((StudyUserRoleBean) tableFacade.getWebContext().getSessionAttribute("userRole")).getRole();
 
 		FindSubjectsFilter subjectFilter = getSubjectFilter(limit);
@@ -284,7 +294,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			tableFacade.setTotalRows(totalRows);
 		}
 
-		FindSubjectsSort subjectSort = sortForMainMenuServlet ? sortForMainMenuServlet() : getSubjectSort(limit);
+		FindSubjectsSort subjectSort = getSubjectSort(limit);
 
 		int rowStart = limit.getRowSelect().getRowStart();
 		int rowEnd = limit.getRowSelect().getRowEnd();

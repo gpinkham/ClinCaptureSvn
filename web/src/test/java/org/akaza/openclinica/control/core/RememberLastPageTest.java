@@ -33,6 +33,7 @@ public class RememberLastPageTest {
 
 		session = new MockHttpSession();
 		request = new MockHttpServletRequest();
+        request.setMethod("GET");
 		request.setPreferredLocales(Arrays.asList(new Locale[] { locale }));
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		Whitebox.setInternalState(request, "session", session);

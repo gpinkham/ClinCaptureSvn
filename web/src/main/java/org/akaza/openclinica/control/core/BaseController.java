@@ -68,6 +68,8 @@ import org.springframework.web.context.ServletContextAware;
 @SuppressWarnings("serial")
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
 
+    public static final String REFERER = "referer";
+
 	public static final String STUDY = "study";
 	public static final String USER_ROLE = "userRole";
 	public static final String USER_BEAN_NAME = "userBean";
