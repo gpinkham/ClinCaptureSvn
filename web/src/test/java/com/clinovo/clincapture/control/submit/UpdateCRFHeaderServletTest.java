@@ -50,29 +50,29 @@ public class UpdateCRFHeaderServletTest extends AbstractContextSentiveTest {
 	}
 
 	@Test
-	public void testThatGetFirstNewDnLinkReturnsCorrect() throws Exception {
+	public void testThatGetFirstNewDnLinkReturnsCorrectValue() throws Exception {
 		assertEquals(discrepancyShortcutsAnalyzer.getFirstNewDnLink(), DiscrepancyShortcutsAnalyzer.FIRST_NEW_DN);
 	}
 
 	@Test
-	public void testThatGetFirstClosedDnLinkReturnsCorrect() throws Exception {
+	public void testThatGetFirstClosedDnLinkReturnsCorrectValue() throws Exception {
 		assertEquals(discrepancyShortcutsAnalyzer.getFirstClosedDnLink(), DiscrepancyShortcutsAnalyzer.FIRST_CLOSED_DN);
 	}
 
 	@Test
-	public void testThatGetFirstUpdatedDnLinkReturnsCorrect() throws Exception {
+	public void testThatGetFirstUpdatedDnLinkReturnsCorrectValue() throws Exception {
 		assertEquals(discrepancyShortcutsAnalyzer.getFirstUpdatedDnLink(),
 				DiscrepancyShortcutsAnalyzer.FIRST_UPDATED_DN);
 	}
 
 	@Test
-	public void testThatGetFirstAnnotationLinkReturnsCorrect() throws Exception {
+	public void testThatGetFirstAnnotationLinkReturnsCorrectValue() throws Exception {
 		assertEquals(discrepancyShortcutsAnalyzer.getFirstAnnotationLink(),
 				DiscrepancyShortcutsAnalyzer.FIRST_ANNOTATION);
 	}
 
 	@Test
-	public void testThatGetFirstResolutionProposedLinkReturnsCorrect() throws Exception {
+	public void testThatGetFirstResolutionProposedLinkReturnsCorrectValue() throws Exception {
 		assertEquals(discrepancyShortcutsAnalyzer.getFirstResolutionProposedLink(),
 				DiscrepancyShortcutsAnalyzer.FIRST_RESOLUTION_PROPOSED);
 	}

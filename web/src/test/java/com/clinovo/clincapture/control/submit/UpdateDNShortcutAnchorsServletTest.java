@@ -50,27 +50,27 @@ public class UpdateDNShortcutAnchorsServletTest extends AbstractContextSentiveTe
 	}
 
 	@Test
-	public void testThatGetTotalNewReturnsCorrect() throws Exception {
+	public void testThatGetTotalNewReturnsCorrectValue() throws Exception {
 		assertEquals(discrepancyShortcutsAnalyzer.getTotalNew(), 0);
 	}
 
 	@Test
-	public void testThatGetTotalClosedReturnsCorrect() throws Exception {
+	public void testThatGetTotalClosedReturnsCorrectValue() throws Exception {
 		assertEquals(discrepancyShortcutsAnalyzer.getTotalClosed(), 0);
 	}
 
 	@Test
-	public void testThatGetTotalUpdatedReturnsCorrect() throws Exception {
+	public void testThatGetTotalUpdatedReturnsCorrectValue() throws Exception {
 		assertEquals(discrepancyShortcutsAnalyzer.getTotalUpdated(), 0);
 	}
 
 	@Test
-	public void testThatGetTotalAnnotationsReturnsCorrect() throws Exception {
+	public void testThatGetTotalAnnotationsReturnsCorrectValue() throws Exception {
 		assertEquals(discrepancyShortcutsAnalyzer.getTotalAnnotations(), 0);
 	}
 
 	@Test
-	public void testThatGetTotalResolutionProposedReturnsCorrect() throws Exception {
+	public void testThatGetTotalResolutionProposedReturnsCorrectValue() throws Exception {
 		assertEquals(discrepancyShortcutsAnalyzer.getTotalResolutionProposed(), 0);
 	}
 }
