@@ -20,10 +20,14 @@
  */
 package org.akaza.openclinica.control.login;
 
-import org.akaza.openclinica.control.core.CoreSecureController;
-import org.akaza.openclinica.control.core.SecureController;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Performs Log out action
@@ -32,25 +36,27 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings({ "serial" })
-public class LogoutServlet extends SecureController {
+@Component
+public class LogoutServlet extends Controller {
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        //
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		sm = null;// set sm to null after user logs out
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        request.setAttribute(SESSION_MANAGER, null);
 		logger.info("User  : {} , email address : {} Logged Out ", ub.getName(), ub.getEmail());
 		removeLockedCRF(ub.getId());
-		CoreSecureController.removeLockedCRF(ub.getId());
-		session.removeAttribute("userBean");
-		session.removeAttribute("study");
-		session.removeAttribute("userRole");
-		session.removeAttribute("passwordExpired");
-		session.invalidate();
-		forwardPage(Page.LOGOUT, false);
+		Controller.removeLockedCRF(ub.getId());
+        request.getSession().removeAttribute("userBean");
+        request.getSession().removeAttribute("study");
+        request.getSession().removeAttribute("userRole");
+        request.getSession().removeAttribute("passwordExpired");
+        request.getSession().invalidate();
+		forwardPage(Page.LOGOUT, false, request, response);
 	}
 
 }

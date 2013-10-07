@@ -24,15 +24,18 @@ import com.clinovo.util.ValidatorHelper;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
@@ -50,6 +53,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.stereotype.Component;
 
 /**
  * @author jxu
@@ -57,58 +61,61 @@ import org.quartz.impl.matchers.GroupMatcher;
  * 
  *          Servlet for processing 'update profile' request from user
  */
-public class UpdateProfileServlet extends SecureController {
+@Component
+public class UpdateProfileServlet extends Controller {
 
 	private static final long serialVersionUID = -2519124535258437372L;
 	public static final String EMAIL = "contactEmail";
 	public static final String USER_ID = "user_id";
-	private StdScheduler scheduler;
-	
-	@Override
-	public void mayProceed() throws InsufficientPermissionException {
 
+	@Override
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        //
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
 
 		String action = request.getParameter("action");// action sent by user
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		StudyDAO sdao = new StudyDAO(getDataSource());
+		UserAccountDAO udao = new UserAccountDAO(getDataSource());
 		UserAccountBean userBean1 = (UserAccountBean) udao.findByUserName(ub.getName());
 
 		ArrayList studies = (ArrayList) sdao.findAllByUser(ub.getName());
 
 		if (StringUtils.isBlank(action)) {
 			request.setAttribute("studies", studies);
-			session.setAttribute("userBean1", userBean1);
-			forwardPage(Page.UPDATE_PROFILE);
+			request.getSession().setAttribute("userBean1", userBean1);
+			forwardPage(Page.UPDATE_PROFILE, request, response);
 		} else {
 			if ("back".equalsIgnoreCase(action)) {
 				request.setAttribute("studies", studies);
-				session.setAttribute("userBean1", userBean1);
-				forwardPage(Page.UPDATE_PROFILE);
+                request.getSession().setAttribute("userBean1", userBean1);
+				forwardPage(Page.UPDATE_PROFILE, request, response);
 			}
 			if ("confirm".equalsIgnoreCase(action)) {
 				logger.info("confirm");
 				request.setAttribute("studies", studies);
-				confirmProfile(userBean1, udao);
+				confirmProfile(request, response, userBean1, udao);
 
 			} else if ("submit".equalsIgnoreCase(action)) {
 				logger.info("submit");
-				submitProfile(udao);
+				submitProfile(udao, request);
 
-				addPageMessage(respage.getString("profile_updated_succesfully"));
+				addPageMessage(respage.getString("profile_updated_succesfully"), request);
 				ub.incNumVisitsToMainMenu();
-				forwardPage(Page.MENU_SERVLET);
+				forwardPage(Page.MENU_SERVLET, request, response);
 			}
 		}
 
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void confirmProfile(UserAccountBean userBean1, UserAccountDAO udao) throws Exception {
+	private void confirmProfile(HttpServletRequest request, HttpServletResponse response, UserAccountBean userBean1, UserAccountDAO udao) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
@@ -120,11 +127,9 @@ public class UpdateProfileServlet extends SecureController {
 		v.addValidation("oldPasswd", Validator.NO_BLANKS);// old password
 		String password = fp.getString("passwd").trim();
 
-		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(context).getBean(
-				ConfigurationDao.class);
+		ConfigurationDao configurationDao = getConfigurationDao();
 
-		org.akaza.openclinica.core.SecurityManager sm = (org.akaza.openclinica.core.SecurityManager) SpringServletAccess
-				.getApplicationContext(context).getBean("securityManager");
+		org.akaza.openclinica.core.SecurityManager sm = getSecurityManager();
 
 		String newDigestPass = sm.encrytPassword(password, getUserDetails());
 		List<String> pwdErrors = new ArrayList<String>();
@@ -142,7 +147,7 @@ public class UpdateProfileServlet extends SecureController {
 					newDigestPass, resexception);
 		}
 		v.addValidation("phone", Validator.NO_BLANKS);
-		errors = v.validate();
+		HashMap errors = v.validate();
 		for (String err : pwdErrors) {
 			Validator.addError(errors, "passwd", err);
 		}
@@ -155,7 +160,7 @@ public class UpdateProfileServlet extends SecureController {
 		userBean1.setPasswdChallengeAnswer(fp.getString("passwdChallengeAnswer"));
 		userBean1.setPhone(fp.getString("phone"));
 		userBean1.setActiveStudyId(fp.getInt("activeStudyId"));
-		StudyDAO sdao = new StudyDAO(this.sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 
 		StudyBean newActiveStudy = (StudyBean) sdao.findByPK(userBean1.getActiveStudyId());
 		request.setAttribute("newActiveStudy", newActiveStudy);
@@ -163,27 +168,27 @@ public class UpdateProfileServlet extends SecureController {
 		if (errors.isEmpty()) {
 			logger.info("no errors");
 
-			session.setAttribute("userBean1", userBean1);
+			request.getSession().setAttribute("userBean1", userBean1);
 			String oldPass = fp.getString("oldPasswd").trim();
 
 			if (!sm.isPasswordValid(ub.getPasswd(), oldPass, getUserDetails())) {
 				Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
 				request.setAttribute("formMessages", errors);
-				forwardPage(Page.UPDATE_PROFILE);
+				forwardPage(Page.UPDATE_PROFILE, request, response);
 			} else {
 				if (!StringUtils.isBlank(fp.getString("passwd"))) {
 					userBean1.setPasswd(newDigestPass);
 					userBean1.setPasswdTimestamp(new Date());
 				}
-				session.setAttribute("userBean1", userBean1);
-				forwardPage(Page.UPDATE_PROFILE_CONFIRM);
+                request.getSession().setAttribute("userBean1", userBean1);
+				forwardPage(Page.UPDATE_PROFILE_CONFIRM, request, response);
 			}
 
 		} else {
 			logger.info("has validation errors");
-			session.setAttribute("userBean1", userBean1);
+            request.getSession().setAttribute("userBean1", userBean1);
 			request.setAttribute("formMessages", errors);
-			forwardPage(Page.UPDATE_PROFILE);
+			forwardPage(Page.UPDATE_PROFILE, request, response);
 		}
 
 	}
@@ -192,26 +197,27 @@ public class UpdateProfileServlet extends SecureController {
 	 * Updates user new profile
 	 * 
 	 */
-	private void submitProfile(UserAccountDAO udao) {
+	private void submitProfile(UserAccountDAO udao, HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
 		logger.info("user bean to be updated:" + ub.getId() + ub.getFirstName());
 
-		UserAccountBean userBean1 = (UserAccountBean) session.getAttribute("userBean1");
+		UserAccountBean userBean1 = (UserAccountBean) request.getSession().getAttribute("userBean1");
 		if (userBean1 != null) {
 			userBean1.setLastVisitDate(new Date());
 			userBean1.setUpdater(ub);
 			updateCalendarEmailJob(userBean1);
 			udao.update(userBean1);
 
-			session.setAttribute("userBean", userBean1);
+			request.getSession().setAttribute("userBean", userBean1);
 			ub = userBean1;
-			session.removeAttribute("userBean1");
+            request.getSession().removeAttribute("userBean1");
 		}
 	}
 	
 	@SuppressWarnings("null")
 	private void updateCalendarEmailJob (UserAccountBean uaBean) {
 		String triggerGroup = "CALENDAR";
-		scheduler = getScheduler();
+        StdScheduler scheduler = getStdScheduler();
 		try {
 			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
 			if (legacyTriggers == null && legacyTriggers.size() == 0) {
@@ -242,11 +248,5 @@ public class UpdateProfileServlet extends SecureController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	private StdScheduler getScheduler() {
-		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
-				context).getBean("schedulerFactoryBean");
-		return scheduler;
 	}
 }

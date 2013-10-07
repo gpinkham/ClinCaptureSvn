@@ -189,9 +189,9 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>PentahoLoginServlet</servlet-name>
+        <servlet-name>pentahoLoginServlet</servlet-name>
         <description>PentahoLoginServlet</description>
-        <servlet-class>org.akaza.openclinica.control.pentaho.LoginServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>SQLInitServlet</servlet-name>
@@ -362,42 +362,42 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-name>logoutServlet</servlet-name>
         <display-name>LogoutServlet</display-name>
         <description>The log out Servlet</description>
-        <servlet-class>org.akaza.openclinica.control.login.LogoutServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
-        <servlet-name>RequestPasswordServlet</servlet-name>
+        <servlet-name>requestPasswordServlet</servlet-name>
         <display-name>RequestPasswordServlet</display-name>
-        <servlet-class>org.akaza.openclinica.control.login.RequestPasswordServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ContactServlet</servlet-name>
+        <servlet-name>contactServlet</servlet-name>
         <display-name>ContactServlet</display-name>
-        <servlet-class>org.akaza.openclinica.control.login.ContactServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
-        <servlet-name>RequestStudyServlet</servlet-name>
+        <servlet-name>requestStudyServlet</servlet-name>
         <display-name>RequestStudyServlet</display-name>
-        <servlet-class>org.akaza.openclinica.control.login.RequestStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ResetPasswordServlet</servlet-name>
+        <servlet-name>resetPasswordServlet</servlet-name>
         <display-name>ResetPassword</display-name>
-        <servlet-class>org.akaza.openclinica.control.login.ResetPasswordServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UpdateProfileServlet</servlet-name>
+        <servlet-name>updateProfileServlet</servlet-name>
         <display-name>UpdateProfile</display-name>
-        <servlet-class>org.akaza.openclinica.control.login.UpdateProfileServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ChangeStudyServlet</servlet-name>
+        <servlet-name>changeStudyServlet</servlet-name>
         <display-name>ChangeStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.login.ChangeStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AccessFileServlet</servlet-name>
@@ -420,14 +420,14 @@
         <servlet-class>org.akaza.openclinica.control.admin.AuditLogUserServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>TechAdminServlet</servlet-name>
+        <servlet-name>techAdminServlet</servlet-name>
         <display-name>TechAdmin</display-name>
-        <servlet-class>org.akaza.openclinica.control.techadmin.TechAdminServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewSchedulerServlet</servlet-name>
+        <servlet-name>viewSchedulerServlet</servlet-name>
         <display-name>ViewScehduler</display-name>
-        <servlet-class>org.akaza.openclinica.control.techadmin.ViewSchedulerServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AuditLogStudyServlet</servlet-name>
@@ -1504,36 +1504,36 @@
         <url-pattern>/ManageStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RequestPasswordServlet</servlet-name>
+        <servlet-name>requestPasswordServlet</servlet-name>
         <url-pattern>/RequestPassword</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>TechAdminServlet</servlet-name>
+        <servlet-name>techAdminServlet</servlet-name>
         <url-pattern>/TechAdmin</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewSchedulerServlet</servlet-name>
+        <servlet-name>viewSchedulerServlet</servlet-name>
         <url-pattern>/ViewScheduler</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>RequestStudyServlet</servlet-name>
+        <servlet-name>requestStudyServlet</servlet-name>
         <url-pattern>/RequestStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ResetPasswordServlet</servlet-name>
+        <servlet-name>resetPasswordServlet</servlet-name>
         <url-pattern>/ResetPassword</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UpdateProfileServlet</servlet-name>
+        <servlet-name>updateProfileServlet</servlet-name>
         <url-pattern>/UpdateProfile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-name>logoutServlet</servlet-name>
         <url-pattern>/Logout</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ContactServlet</servlet-name>
+        <servlet-name>contactServlet</servlet-name>
         <url-pattern>/Contact</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1734,7 +1734,7 @@
         <url-pattern>/UpdateCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ChangeStudyServlet</servlet-name>
+        <servlet-name>changeStudyServlet</servlet-name>
         <url-pattern>/ChangeStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2108,7 +2108,7 @@
         <url-pattern>/AuditDatabase</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>PentahoLoginServlet</servlet-name>
+        <servlet-name>pentahoLoginServlet</servlet-name>
         <url-pattern>/reports</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2159,7 +2159,7 @@
 
 	<servlet>
 		<servlet-name>urlRewriterServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.urlRewrite.UrlRewriteServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

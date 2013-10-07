@@ -24,13 +24,16 @@ import com.clinovo.util.ValidatorHelper;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.SecurityManager;
@@ -41,18 +44,21 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Component;
 
 /**
  * Reset expired password
  * 
  * @author ywang
  */
-public class ResetPasswordServlet extends SecureController {
+@Component
+public class ResetPasswordServlet extends Controller {
 
 	private static final long serialVersionUID = -5259201015824317949L;
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        //
 	}
 
 	/**
@@ -68,13 +74,16 @@ public class ResetPasswordServlet extends SecureController {
 	 * <li>Update ub - UserAccountBean - in session and database
 	 * </ol>
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+
 		logger.info("Change expired password");
 
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO udao = new UserAccountDAO(getDataSource());
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-		errors.clear();
+        HashMap errors = new HashMap();
 		FormProcessor fp = new FormProcessor(request);
 		String mustChangePwd = request.getParameter("mustChangePwd");
 		String newPwd = fp.getString("passwd").trim();
@@ -82,10 +91,10 @@ public class ResetPasswordServlet extends SecureController {
 		String passwdChallengeA = fp.getString("passwdChallengeA");
 
 		if ("yes".equalsIgnoreCase(mustChangePwd)) {
-			addPageMessage(respage.getString("your_password_has_expired_must_change"));
+			addPageMessage(respage.getString("your_password_has_expired_must_change"), request);
 		} else {
 			addPageMessage(respage.getString("password_expired") + " "
-					+ respage.getString("if_you_do_not_want_change_leave_blank"));
+					+ respage.getString("if_you_do_not_want_change_leave_blank"), request);
 		}
 		request.setAttribute("mustChangePass", mustChangePwd);
 
@@ -97,13 +106,12 @@ public class ResetPasswordServlet extends SecureController {
 		ubForm.setPasswdChallengeAnswer(passwdChallengeA);
 		request.setAttribute("userBean1", ubForm);
 
-		SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean(
-				"securityManager"));
+		SecurityManager sm = getSecurityManager();
 		if (!sm.isPasswordValid(ub.getPasswd(), oldPwd, getUserDetails())) {
 			Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
 			request.setAttribute("formMessages", errors);
 
-			forwardPage(Page.RESET_PASSWORD);
+			forwardPage(Page.RESET_PASSWORD, request, response);
 		} else {
 			if (mustChangePwd.equalsIgnoreCase("yes")) {
 				v.addValidation("passwd", Validator.NO_BLANKS);
@@ -121,8 +129,7 @@ public class ResetPasswordServlet extends SecureController {
 				v.addValidation("passwd", Validator.IS_A_PASSWORD);
 				v.addValidation("passwd1", Validator.CHECK_SAME, "passwd");
 
-				ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(context).getBean(
-						ConfigurationDao.class);
+				ConfigurationDao configurationDao = getConfigurationDao();
 
 				PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
 
@@ -141,7 +148,7 @@ public class ResetPasswordServlet extends SecureController {
 			if (!errors.isEmpty()) {
 				logger.info("ResetPassword page has validation errors");
 				request.setAttribute("formMessages", errors);
-				forwardPage(Page.RESET_PASSWORD);
+				forwardPage(Page.RESET_PASSWORD, request, response);
 			} else {
 				logger.info("ResetPassword page has no errors");
 
@@ -159,9 +166,9 @@ public class ResetPasswordServlet extends SecureController {
 
 				ArrayList<String> pageMessages = new ArrayList<String>();
 				request.setAttribute(PAGE_MESSAGE, pageMessages);
-				addPageMessage(respage.getString("your_expired_password_reset_successfully"));
+				addPageMessage(respage.getString("your_expired_password_reset_successfully"), request);
 				ub.incNumVisitsToMainMenu();
-				forwardPage(Page.MENU_SERVLET);
+				forwardPage(Page.MENU_SERVLET, request, response);
 			}
 		}
 

@@ -26,8 +26,9 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.TermType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
@@ -35,22 +36,28 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@SuppressWarnings({ "rawtypes", "serial" })
-public class RequestStudyServlet extends SecureController {
-	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+@SuppressWarnings({ "rawtypes", "serial" })
+@Component
+public class RequestStudyServlet extends Controller {
+
+	@Override
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        //
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		String action = request.getParameter("action");
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		ArrayList studies = sdao.findAllByStatus(Status.AVAILABLE);
 		ArrayList roles = Role.toArrayList();
 		roles.remove(Role.SYSTEM_ADMINISTRATOR); // admin is not a user role, only used for
@@ -72,16 +79,16 @@ public class RequestStudyServlet extends SecureController {
 
 		if (StringUtil.isBlank(action)) {
 			request.setAttribute("newRole", newRole);
-			forwardPage(Page.REQUEST_STUDY);
+			forwardPage(Page.REQUEST_STUDY, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
-				confirm();
+				confirm(request, response);
 
 			} else if ("submit".equalsIgnoreCase(action)) {
-				submit();
+				submit(request, response);
 			} else {
 				logger.info("here...");
-				forwardPage(Page.REQUEST_STUDY);
+				forwardPage(Page.REQUEST_STUDY, request, response);
 			}
 		}
 	}
@@ -91,7 +98,7 @@ public class RequestStudyServlet extends SecureController {
 	 * @param request
 	 * @param response
 	 */
-	private void confirm() throws Exception {
+	private void confirm(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		v.addValidation("studyId", Validator.IS_AN_INTEGER);
 		v.addValidation("studyRoleId", Validator.IS_VALID_TERM, TermType.ROLE);
@@ -103,20 +110,20 @@ public class RequestStudyServlet extends SecureController {
 			newRole.setRole(Role.get(fp.getInt("studyRoleId")));
 		}
 		newRole.setStudyId(fp.getInt("studyId"));
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		StudyBean studyRequested = (StudyBean) sdao.findByPK(newRole.getStudyId());
 		newRole.setStudyName(studyRequested.getName());
-		session.setAttribute("newRole", newRole);
+        request.getSession().setAttribute("newRole", newRole);
 		if (!errors.isEmpty()) {
 			logger.info("after processing form,error is not empty");
 			request.setAttribute("formMessages", errors);
 
-			forwardPage(Page.REQUEST_STUDY);
+			forwardPage(Page.REQUEST_STUDY, request, response);
 
 		} else {
 			logger.info("after processing form,no errors");
 
-			forwardPage(Page.REQUEST_STUDY_CONFIRM);
+			forwardPage(Page.REQUEST_STUDY_CONFIRM, request, response);
 		}
 
 	}
@@ -127,8 +134,9 @@ public class RequestStudyServlet extends SecureController {
 	 * @param request
 	 * @param response
 	 */
-	private void submit() throws Exception {
-		StudyUserRoleBean newRole = (StudyUserRoleBean) session.getAttribute("newRole");
+	private void submit(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean newRole = (StudyUserRoleBean) request.getSession().getAttribute("newRole");
 
 		logger.info("Sending email...");
 		StringBuffer email = new StringBuffer(restext.getString("dear_openclinica_administrator") + ", <br>");
@@ -142,10 +150,10 @@ public class RequestStudyServlet extends SecureController {
 		String emailBody = email.toString();
 		logger.info("Sending email...begin" + emailBody);
 
-		sendEmail(EmailEngine.getAdminEmail(), ub.getEmail().trim(), "request study access", emailBody, false);
+		sendEmail(EmailEngine.getAdminEmail(), ub.getEmail().trim(), "request study access", emailBody, false, request);
 
-		session.removeAttribute("newRole");
-		forwardPage(Page.MENU);
+		request.getSession().removeAttribute("newRole");
+		forwardPage(Page.MENU, request, response);
 	}
 
 }

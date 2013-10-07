@@ -27,7 +27,7 @@ import org.akaza.openclinica.bean.core.TermType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
@@ -42,6 +42,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Processes request of 'request a user account'
  * 
@@ -49,19 +52,18 @@ import java.util.HashMap;
  * 
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class RequestAccountServlet extends SecureController {
+public class RequestAccountServlet extends Controller {
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        //
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String action = request.getParameter("action");
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		ArrayList studies = (ArrayList) sdao.findAll();
 		ArrayList roles = Role.toArrayList();
 		roles.remove(Role.SYSTEM_ADMINISTRATOR); // admin is not a user role, only used for
@@ -72,18 +74,18 @@ public class RequestAccountServlet extends SecureController {
 
 		if (StringUtil.isBlank(action)) {
 
-			session.setAttribute("newUserBean", new UserAccountBean());
+			request.getSession().setAttribute("newUserBean", new UserAccountBean());
 
-			forwardPage(Page.REQUEST_ACCOUNT);
+			forwardPage(Page.REQUEST_ACCOUNT, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
-				confirmAccount();
+				confirmAccount(request, response);
 
 			} else if ("submit".equalsIgnoreCase(action)) {
-				submitAccount();
+				submitAccount(request, response);
 			} else {
 				logger.info("here...");
-				forwardPage(Page.REQUEST_ACCOUNT);
+				forwardPage(Page.REQUEST_ACCOUNT, request, response);
 			}
 		}
 
@@ -94,7 +96,7 @@ public class RequestAccountServlet extends SecureController {
 	 * @param request
 	 * @param response
 	 */
-	private void confirmAccount() throws Exception {
+	private void confirmAccount(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("firstName", Validator.NO_BLANKS);
@@ -109,32 +111,33 @@ public class RequestAccountServlet extends SecureController {
 
 		FormProcessor fp = new FormProcessor(request);
 
-		UserAccountBean ubForm = getUserBean();
+		UserAccountBean ubForm = getUserBean(request);
 		request.setAttribute("otherStudy", fp.getString("otherStudy"));
-		session.setAttribute("newUserBean", ubForm);
+		request.getSession().setAttribute("newUserBean", ubForm);
 
 		if (!errors.isEmpty()) {
 			logger.info("after processing form,error is not empty");
 			request.setAttribute("formMessages", errors);
-			forwardPage(Page.REQUEST_ACCOUNT);
+			forwardPage(Page.REQUEST_ACCOUNT, request, response);
 
 		} else {
 			logger.info("after processing form,no errors");
 
-			sm = new SessionManager(null, ubForm.getName());
+            SessionManager sm = new SessionManager(null, ubForm.getName());
+            request.setAttribute(SESSION_MANAGER, sm);
 			// see whether this user already in the DB
 			UserAccountBean ubDB = sm.getUserBean();
 
 			if (StringUtil.isBlank(ubDB.getName())) {
-				StudyDAO sdao = new StudyDAO(sm.getDataSource());
+				StudyDAO sdao = getStudyDAO();
 				StudyBean study = (StudyBean) sdao.findByPK(ubForm.getActiveStudyId());
 				String studyName = study.getName();
 				request.setAttribute("studyName", studyName);
-				forwardPage(Page.REQUEST_ACCOUNT_CONFIRM);
+				forwardPage(Page.REQUEST_ACCOUNT_CONFIRM, request, response);
 			} else {
 
-				addPageMessage(respage.getString("your_user_name_used_by_other_try_another"));
-				forwardPage(Page.REQUEST_ACCOUNT);
+				addPageMessage(respage.getString("your_user_name_used_by_other_try_another"), request);
+				forwardPage(Page.REQUEST_ACCOUNT, request, response);
 			}
 
 		}
@@ -147,10 +150,10 @@ public class RequestAccountServlet extends SecureController {
 	 * @param request
 	 * @param response
 	 */
-	private void submitAccount() throws Exception {
+	private void submitAccount(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String otherStudy = request.getParameter("otherStudy");
 		String studyName = request.getParameter("studyName");
-		UserAccountBean ubForm = (UserAccountBean) session.getAttribute("newUserBean");
+		UserAccountBean ubForm = (UserAccountBean) request.getSession().getAttribute("newUserBean");
 		logger.info("Sending email...");
 		// YW << <<
 		StringBuffer email = new StringBuffer("From: " + ubForm.getEmail() + "<br>");
@@ -173,9 +176,9 @@ public class RequestAccountServlet extends SecureController {
 		String emailBody = email.toString();
 		// YW >>
 		logger.info("Sending email...begin" + emailBody);
-		sendEmail(EmailEngine.getAdminEmail(), ubForm.getEmail().trim(), "request account", emailBody, false);
-		session.removeAttribute("newUserBean");
-		forwardPage(Page.LOGIN);
+		sendEmail(EmailEngine.getAdminEmail(), ubForm.getEmail().trim(), "request account", emailBody, false, request);
+		request.getSession().removeAttribute("newUserBean");
+		forwardPage(Page.LOGIN, request, response);
 	}
 
 	/**
@@ -184,7 +187,7 @@ public class RequestAccountServlet extends SecureController {
 	 * @param request
 	 * @return
 	 */
-	private UserAccountBean getUserBean() {
+	private UserAccountBean getUserBean(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 
 		UserAccountBean ubForm = new UserAccountBean();

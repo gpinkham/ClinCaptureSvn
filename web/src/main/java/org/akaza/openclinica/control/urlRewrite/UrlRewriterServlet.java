@@ -32,7 +32,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.control.core.CoreSecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -46,25 +46,27 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Servlet to call appropriate application pages corresponding to supported RESTful URLs
  * 
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class UrlRewriteServlet extends CoreSecureController {
+@Component
+public class UrlRewriterServlet extends Controller {
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-
+        //
 	}
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+        //
 	}
 
 	/**
@@ -95,7 +97,7 @@ public class UrlRewriteServlet extends CoreSecureController {
 			if (null != ocResource) {
 				if (ocResource.isInValid()) {
 					response.sendError(HttpServletResponse.SC_NOT_FOUND);
-					errors = new HashMap();
+					HashMap errors = getErrorsHolder(request);
 					Validator.addError(errors, "error:", ocResource.getMessages().get(0));
 					request.setAttribute("formMessages", errors);
 				}
@@ -112,7 +114,7 @@ public class UrlRewriteServlet extends CoreSecureController {
 						request.setAttribute("eventDefinitionCRFId", ocResource.getEventDefinitionCrfId());
 					}
 					if (null != ocResource.getEventCrfId()) {
-						request.setAttribute("eventCRFId", ocResource.getEventCrfId().toString());
+						request.setAttribute("ecId", ocResource.getEventCrfId().toString());
 					}
 					if (null != ocResource.getStudyEventId()) {
 						request.setAttribute("eventId", ocResource.getStudyEventId().toString());
@@ -131,7 +133,7 @@ public class UrlRewriteServlet extends CoreSecureController {
 						if ((null != ocResource.getStudySubjectID()) && (mapQueryParams.containsKey("exitTo"))) {
 							//request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());
 						}
-						SectionDAO sdao = new SectionDAO(getDataSource());
+						SectionDAO sdao = getSectionDAO();
 						if (mapQueryParams.containsKey("tabId")) {
 							HashMap sectionIdMap = sdao.getSectionIdForTabId(ocResource.getFormVersionID(),
 									Integer.parseInt(mapQueryParams.get("tabId")));
@@ -199,12 +201,12 @@ public class UrlRewriteServlet extends CoreSecureController {
 				String[] tokens = URLPath.split("/");
 				if (tokens.length != 0) {
 					String URLParamValue = "";
-					StudyDAO stdao = new StudyDAO(getDataSource());
-					StudySubjectDAO ssubdao = new StudySubjectDAO(getDataSource());
-					StudyEventDefinitionDAO sedefdao = new StudyEventDefinitionDAO(getDataSource());
-					CRFVersionDAO crfvdao = new CRFVersionDAO(getDataSource());
-					ItemGroupDAO igdao = new ItemGroupDAO(getDataSource());
-					StudyEventDAO sedao = new StudyEventDAO(getDataSource());
+					StudyDAO stdao = getStudyDAO();
+					StudySubjectDAO ssubdao = getStudySubjectDAO();
+					StudyEventDefinitionDAO sedefdao = getStudyEventDefinitionDAO();
+					CRFVersionDAO crfvdao = getCRFVersionDAO();
+					ItemGroupDAO igdao = getItemGroupDAO();
+					StudyEventDAO sedao = getStudyEventDAO();
 
 					StudyBean study = null;
 					StudySubjectBean subject = null;

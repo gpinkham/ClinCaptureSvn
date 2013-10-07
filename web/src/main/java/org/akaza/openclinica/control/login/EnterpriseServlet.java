@@ -18,8 +18,12 @@
  */
 package org.akaza.openclinica.control.login;
 
-import org.akaza.openclinica.control.core.SecureController;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 /**
@@ -28,20 +32,21 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings("serial")
-public class EnterpriseServlet extends SecureController {
+public class EnterpriseServlet extends Controller {
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        //
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		resetPanel();
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
-		setToPanel("", "");
-		forwardPage(Page.ENTERPRISE);
+		setToPanel("", "", request);
+		forwardPage(Page.ENTERPRISE, request, response);
 	}
 
 }

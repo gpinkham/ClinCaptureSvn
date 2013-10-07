@@ -23,41 +23,33 @@ package org.akaza.openclinica.control.login;
 import com.clinovo.util.ValidatorHelper;
 
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.SiteStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudyStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFactory;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.table.sdv.SDVUtil;
+import org.springframework.stereotype.Component;
 
 /**
  * Processes the request of changing current study
@@ -66,33 +58,21 @@ import org.akaza.openclinica.web.table.sdv.SDVUtil;
  * 
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class ChangeStudyServlet extends SecureController {
-
-	Locale locale;
-	private StudyEventDefinitionDAO studyEventDefinitionDAO;
-	private SubjectDAO subjectDAO;
-	private StudySubjectDAO studySubjectDAO;
-	private StudyEventDAO studyEventDAO;
-	private StudyGroupClassDAO studyGroupClassDAO;
-	private SubjectGroupMapDAO subjectGroupMapDAO;
-	private StudyDAO studyDAO;
-	private EventCRFDAO eventCRFDAO;
-	private EventDefinitionCRFDAO eventDefintionCRFDAO;
-	private StudyGroupDAO studyGroupDAO;
-	private DynamicEventDao dynamicEventDao;
-	private DiscrepancyNoteDAO discrepancyNoteDAO;
+@Component
+public class ChangeStudyServlet extends Controller {
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        //
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+
         String action = request.getParameter("action");// action sent by user
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		UserAccountDAO udao = getUserAccountDAO();
+		StudyDAO sdao = getStudyDAO();
 
 		ArrayList studies = udao.findStudyByUser(ub, (ArrayList) sdao.findAll());
         request.setAttribute("roleMap", Role.roleMap);
@@ -117,31 +97,33 @@ public class ChangeStudyServlet extends SecureController {
 		if (StringUtil.isBlank(action)) {
 			request.setAttribute("studies", validStudies);
 
-			forwardPage(Page.CHANGE_STUDY);
+			forwardPage(Page.CHANGE_STUDY, request, response);
 		} else {
 
 			if ("confirm".equalsIgnoreCase(action)) {
 				logger.info("confirm");
-				confirmChangeStudy(studies);
+				confirmChangeStudy(request, response, studies);
 
 			} else if ("submit".equalsIgnoreCase(action)) {
 				logger.info("submit");
-				changeStudy();
+				changeStudy(request, response);
 			}
 		}
 
 	}
 
-	private void confirmChangeStudy(ArrayList studies) throws Exception {
+	private void confirmChangeStudy(HttpServletRequest request, HttpServletResponse response, ArrayList studies) throws Exception {
+        StudyBean currentStudy = getCurrentStudy(request);
+
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		v.addValidation("studyId", Validator.IS_AN_INTEGER);
 
-		errors = v.validate();
+		HashMap errors = v.validate();
 
 		if (!errors.isEmpty()) {
 			request.setAttribute("studies", studies);
-			forwardPage(Page.CHANGE_STUDY);
+			forwardPage(Page.CHANGE_STUDY, request, response);
 		} else {
 			int studyId = fp.getInt("studyId");
 			logger.info("new study id:" + studyId);
@@ -149,30 +131,33 @@ public class ChangeStudyServlet extends SecureController {
 				StudyUserRoleBean studyWithRole = (StudyUserRoleBean) studies.get(i);
 				if (studyWithRole.getStudyId() == studyId) {
 					request.setAttribute("studyId", new Integer(studyId));
-					session.setAttribute("studyWithRole", studyWithRole);
+					request.getSession().setAttribute("studyWithRole", studyWithRole);
 					request.setAttribute("currentStudy", currentStudy);
-					forwardPage(Page.CHANGE_STUDY_CONFIRM);
+					forwardPage(Page.CHANGE_STUDY_CONFIRM, request, response);
 					return;
 				}
 			}
-			addPageMessage(restext.getString("no_study_selected"));
+			addPageMessage(restext.getString("no_study_selected"), request);
 
-			forwardPage(Page.CHANGE_STUDY);
+			forwardPage(Page.CHANGE_STUDY, request, response);
 		}
 	}
 
-	private void changeStudy() throws Exception {
-		
+	private void changeStudy(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		int studyId = fp.getInt("studyId");
 		int prevStudyId = currentStudy.getId();
 
         ub.updateSysAdminRole(studyId, prevStudyId);
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		StudyBean current = (StudyBean) sdao.findByPK(studyId);
 
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+		StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 
 		ArrayList studyParameters = spvdao.findParamConfigByStudy(current);
 		current.setStudyParameters(studyParameters);
@@ -186,7 +171,7 @@ public class ChangeStudyServlet extends SecureController {
 			request.setAttribute("label", new Integer(nextLabel).toString());
 		}
 
-		StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+		StudyConfigService scs = getStudyConfigService();
 		if (current.getParentStudyId() <= 0) {// top study
 			scs.setParametersForStudy(current);
 
@@ -201,28 +186,28 @@ public class ChangeStudyServlet extends SecureController {
 
 		}
 		if (current.getStatus().equals(Status.DELETED) || current.getStatus().equals(Status.AUTO_DELETED)) {
-			session.removeAttribute("studyWithRole");
-			addPageMessage(restext.getString("study_choosed_removed_restore_first"));
+			request.getSession().removeAttribute("studyWithRole");
+			addPageMessage(restext.getString("study_choosed_removed_restore_first"), request);
 		} else {
-			session.setAttribute("study", current);
+            request.getSession().setAttribute("study", current);
 			currentStudy = current;
 			// change user's active study id
-			UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+			UserAccountDAO udao = getUserAccountDAO();
 			ub.setActiveStudyId(current.getId());
 			ub.setUpdater(ub);
 			ub.setUpdatedDate(new java.util.Date());
 			udao.update(ub);
 
-			currentRole = (StudyUserRoleBean) session.getAttribute("studyWithRole");
-			session.setAttribute("userRole", currentRole);
-			session.removeAttribute("studyWithRole");
-			addPageMessage(restext.getString("current_study_changed_succesfully"));
+			currentRole = (StudyUserRoleBean) request.getSession().getAttribute("studyWithRole");
+            request.getSession().setAttribute("userRole", currentRole);
+            request.getSession().removeAttribute("studyWithRole");
+			addPageMessage(restext.getString("current_study_changed_succesfully"), request);
 		}
 		ub.incNumVisitsToMainMenu();
 		// YW 2-18-2008, if study has been really changed <<
 		if (prevStudyId != studyId) {
-			session.removeAttribute("eventsForCreateDataset");
-			session.setAttribute("tableFacadeRestore", "false");
+            request.getSession().removeAttribute("eventsForCreateDataset");
+            request.getSession().setAttribute("tableFacadeRestore", "false");
 		}
 		request.setAttribute("studyJustChanged", "yes");
 		// YW >>
@@ -235,37 +220,37 @@ public class ChangeStudyServlet extends SecureController {
 		request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
 		if (currentRole.isInvestigator() || currentRole.isClinicalResearchCoordinator()) {
-			setupListStudySubjectTable();
+			setupListStudySubjectTable(request, response);
 		}
 		if (currentRole.isMonitor()) {
-			setupSubjectSDVTable();
+			setupSubjectSDVTable(request);
 		} else if (currentRole.isStudyAdministrator() || currentRole.isStudyDirector()) {
 			if (currentStudy.getStatus().isPending()) {
 				response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
 				return;
 			}
-			setupStudySiteStatisticsTable();
-			setupSubjectEventStatusStatisticsTable();
-			setupStudySubjectStatusStatisticsTable();
+			setupStudySiteStatisticsTable(request, response);
+			setupSubjectEventStatusStatisticsTable(request, response);
+			setupStudySubjectStatusStatisticsTable(request, response);
 			if (currentStudy.getParentStudyId() == 0) {
-				setupStudyStatisticsTable();
+				setupStudyStatisticsTable(request, response);
 			}
 
 		}
 
 		// forwardPage(Page.MENU);
-		response.sendRedirect("/" + getContextPath() + Page.MENU_SERVLET.getFileName());
+		response.sendRedirect("/" + getContextPath(request) + Page.MENU_SERVLET.getFileName());
 	}
 
-	private void setupSubjectSDVTable() {
-
+	private void setupSubjectSDVTable(HttpServletRequest request) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		request.setAttribute("studyId", currentStudy.getId());
 		String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
 		request.setAttribute("sdvMatrix", sdvMatrix);
 	}
 
-	private void setupStudySubjectStatusStatisticsTable() {
-
+	private void setupStudySubjectStatusStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		StudySubjectStatusStatisticsTableFactory factory = new StudySubjectStatusStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -274,8 +259,8 @@ public class ChangeStudyServlet extends SecureController {
 		request.setAttribute("studySubjectStatusStatistics", studySubjectStatusStatistics);
 	}
 
-	private void setupSubjectEventStatusStatisticsTable() {
-
+	private void setupSubjectEventStatusStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		EventStatusStatisticsTableFactory factory = new EventStatusStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -285,8 +270,8 @@ public class ChangeStudyServlet extends SecureController {
 		request.setAttribute("subjectEventStatusStatistics", subjectEventStatusStatistics);
 	}
 
-	private void setupStudySiteStatisticsTable() {
-
+	private void setupStudySiteStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		SiteStatisticsTableFactory factory = new SiteStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -296,21 +281,22 @@ public class ChangeStudyServlet extends SecureController {
 
 	}
 
-	private void setupStudyStatisticsTable() {
-
+	private void setupStudyStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		StudyStatisticsTableFactory factory = new StudyStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
 		factory.setStudyDao(getStudyDAO());
 		String studyStatistics = factory.createTable(request, response).render();
 		request.setAttribute("studyStatistics", studyStatistics);
-
 	}
 
-	private void setupListStudySubjectTable() {
-
+	private void setupListStudySubjectTable(HttpServletRequest request, HttpServletResponse response) {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 		ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(true);
-		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
+		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDAO());
 		factory.setSubjectDAO(getSubjectDAO());
 		factory.setStudySubjectDAO(getStudySubjectDAO());
 		factory.setStudyEventDAO(getStudyEventDAO());
@@ -328,74 +314,4 @@ public class ChangeStudyServlet extends SecureController {
 		String findSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("findSubjectsHtml", findSubjectsHtml);
 	}
-	
-	public DynamicEventDao getDynamicEventDao() {
-		dynamicEventDao = this.dynamicEventDao == null ? new DynamicEventDao(sm.getDataSource()) : dynamicEventDao;
-		return dynamicEventDao;
-	}
-
-	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-		studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource())
-				: studyEventDefinitionDAO;
-		return studyEventDefinitionDAO;
-	}
-
-	public SubjectDAO getSubjectDAO() {
-		subjectDAO = this.subjectDAO == null ? new SubjectDAO(sm.getDataSource()) : subjectDAO;
-		return subjectDAO;
-	}
-
-	public StudySubjectDAO getStudySubjectDAO() {
-		studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
-		return studySubjectDAO;
-	}
-
-	public StudyGroupClassDAO getStudyGroupClassDAO() {
-		studyGroupClassDAO = this.studyGroupClassDAO == null ? new StudyGroupClassDAO(sm.getDataSource())
-				: studyGroupClassDAO;
-		return studyGroupClassDAO;
-	}
-
-	public SubjectGroupMapDAO getSubjectGroupMapDAO() {
-		subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource())
-				: subjectGroupMapDAO;
-		return subjectGroupMapDAO;
-	}
-
-	public StudyEventDAO getStudyEventDAO() {
-		studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
-		return studyEventDAO;
-	}
-
-	public StudyDAO getStudyDAO() {
-		studyDAO = this.studyDAO == null ? new StudyDAO(sm.getDataSource()) : studyDAO;
-		return studyDAO;
-	}
-
-	public EventCRFDAO getEventCRFDAO() {
-		eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
-		return eventCRFDAO;
-	}
-
-	public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
-		eventDefintionCRFDAO = this.eventDefintionCRFDAO == null ? new EventDefinitionCRFDAO(sm.getDataSource())
-				: eventDefintionCRFDAO;
-		return eventDefintionCRFDAO;
-	}
-
-	public StudyGroupDAO getStudyGroupDAO() {
-		studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
-		return studyGroupDAO;
-	}
-
-	public DiscrepancyNoteDAO getDiscrepancyNoteDAO() {
-		discrepancyNoteDAO = this.discrepancyNoteDAO == null ? new DiscrepancyNoteDAO(sm.getDataSource())
-				: discrepancyNoteDAO;
-		return discrepancyNoteDAO;
-	}
-
-	public SDVUtil getSDVUtil() {
-		return (SDVUtil) SpringServletAccess.getApplicationContext(context).getBean("sdvUtil");
-	}
-
 }

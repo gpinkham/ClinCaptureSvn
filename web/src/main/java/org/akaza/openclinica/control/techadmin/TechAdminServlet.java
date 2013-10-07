@@ -16,55 +16,63 @@
  */
 package org.akaza.openclinica.control.techadmin;
 
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @SuppressWarnings({ "rawtypes", "serial" })
-public class TechAdminServlet extends SecureController {
+@Component
+public class TechAdminServlet extends Controller {
 
 	@Override
-	protected void processRequest() throws Exception {
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyDAO sdao = getStudyDAO();
 		ArrayList allStudies = (ArrayList) sdao.findAll();
 
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO udao = getUserAccountDAO();
 		ArrayList allUsers = (ArrayList) udao.findAll();
 
-		SubjectDAO subdao = new SubjectDAO(sm.getDataSource());
+		SubjectDAO subdao = getSubjectDAO();
 		ArrayList allSubjects = (ArrayList) subdao.findAll();
 
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
+		CRFDAO cdao = getCRFDAO();
 		ArrayList allCrfs = (ArrayList) cdao.findAll();
 
-		resetPanel();
-
+        StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
-		setToPanel(resword.getString("in_the_application"), "");
+		setToPanel(resword.getString("in_the_application"), "", request);
 		if (allSubjects.size() > 0) {
-			setToPanel(resword.getString("subjects"), new Integer(allSubjects.size()).toString());
+			setToPanel(resword.getString("subjects"), new Integer(allSubjects.size()).toString(), request);
 		}
 		if (allUsers.size() > 0) {
-			setToPanel(resword.getString("users"), new Integer(allUsers.size()).toString());
+			setToPanel(resword.getString("users"), new Integer(allUsers.size()).toString(), request);
 		}
 		if (allStudies.size() > 0) {
-			setToPanel(resword.getString("studies"), new Integer(allStudies.size()).toString());
+			setToPanel(resword.getString("studies"), new Integer(allStudies.size()).toString(), request);
 		}
 		if (allCrfs.size() > 0) {
-			setToPanel(resword.getString("CRFs"), new Integer(allCrfs.size()).toString());
+			setToPanel(resword.getString("CRFs"), new Integer(allCrfs.size()).toString(), request);
 		}
-		forwardPage(Page.TECH_ADMIN_SYSTEM);
+		forwardPage(Page.TECH_ADMIN_SYSTEM, request, response);
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isTechAdmin()) {
 			throw new InsufficientPermissionException(Page.MENU,
@@ -75,7 +83,7 @@ public class TechAdminServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 }

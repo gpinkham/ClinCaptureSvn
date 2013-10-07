@@ -22,12 +22,19 @@ package org.akaza.openclinica.control.login;
 
 import com.clinovo.util.ValidatorHelper;
 
-import org.akaza.openclinica.control.core.SecureController;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Sends user message to the administrator
@@ -36,14 +43,18 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings({ "serial" })
-public class ContactServlet extends SecureController {
+@Component
+public class ContactServlet extends Controller {
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        //
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+
 		String action = request.getParameter("action");
 
 		if (StringUtil.isBlank(action)) {
@@ -51,7 +62,7 @@ public class ContactServlet extends SecureController {
 				request.setAttribute("name", ub.getName());
 				request.setAttribute("email", ub.getEmail());
 			}
-			forwardPage(Page.CONTACT);
+			forwardPage(Page.CONTACT, request, response);
 		} else {
 			if ("submit".equalsIgnoreCase(action)) {
 				Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
@@ -60,7 +71,7 @@ public class ContactServlet extends SecureController {
 				v.addValidation("subject", Validator.NO_BLANKS);
 				v.addValidation("message", Validator.NO_BLANKS);
 
-				errors = v.validate();
+				HashMap errors = v.validate();
 
 				FormProcessor fp = new FormProcessor(request);
 				if (!errors.isEmpty()) {
@@ -69,23 +80,25 @@ public class ContactServlet extends SecureController {
 					request.setAttribute("subject", fp.getString("subject"));
 					request.setAttribute("message", fp.getString("message"));
 					request.setAttribute("formMessages", errors);
-					forwardPage(Page.CONTACT);
+					forwardPage(Page.CONTACT, request, response);
 				} else {
-					sendEmail();
+					sendEmail(request, response);
 				}
 			} else {
 				if (ub != null && ub.getId() > 0) {
 					request.setAttribute("name", ub.getName());
 					request.setAttribute("email", ub.getEmail());
 				}
-				forwardPage(Page.CONTACT);
+				forwardPage(Page.CONTACT, request, response);
 			}
 
 		}
 
 	}
 
-	private void sendEmail() throws Exception {
+	private void sendEmail(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		String name = fp.getString("name");
 		String email = fp.getString("email");
@@ -99,12 +112,12 @@ public class ContactServlet extends SecureController {
 		emailBody.append("<br>" + resword.getString("subject") + ": " + subject);
 		emailBody.append("<br>" + resword.getString("message") + ": " + message);
 
-		sendEmail(email, subject, emailBody.toString(), true);
+		sendEmail(email, subject, emailBody.toString(), true, request);
 
 		if (ub != null && ub.getId() > 0) {
-			forwardPage(Page.MENU_SERVLET);
+			forwardPage(Page.MENU_SERVLET, request, response);
 		} else {
-			forwardPage(Page.LOGIN);
+			forwardPage(Page.LOGIN, request, response);
 		}
 	}
 

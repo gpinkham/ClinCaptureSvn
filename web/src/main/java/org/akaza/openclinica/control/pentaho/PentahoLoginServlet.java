@@ -14,18 +14,23 @@
 package org.akaza.openclinica.control.pentaho;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.pentaho.platform.web.http.security.CryptUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @SuppressWarnings("serial")
-public class LoginServlet extends SecureController {
+@Component
+public class PentahoLoginServlet extends Controller {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -33,10 +38,10 @@ public class LoginServlet extends SecureController {
 	public static final String PENTAHO_URL = "pentaho.url";
 
 	@Override
-	protected void processRequest() throws Exception {
-		UserAccountBean ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 		if (ub != null) {
-			UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+			UserAccountDAO udao = new UserAccountDAO(getDataSource());
 			ub.setPentahoUserSession(request.getSession().getId());
 			ub.setPentahoTokenDate(new Date());
 			udao.updatePentahoAutoLoginParams(ub);
@@ -46,7 +51,7 @@ public class LoginServlet extends SecureController {
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		//
 	}
 }

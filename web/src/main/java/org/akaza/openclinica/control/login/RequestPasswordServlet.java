@@ -23,12 +23,16 @@ package org.akaza.openclinica.control.login;
 import com.clinovo.util.ValidatorHelper;
 
 import java.util.Date;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.login.PwdChallengeQuestion;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
@@ -41,6 +45,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
+import org.springframework.stereotype.Component;
 
 /**
  * @author jxu
@@ -49,29 +54,30 @@ import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
  *          Servlet of requesting password
  */
 @SuppressWarnings("serial")
-public class RequestPasswordServlet extends SecureController {
+@Component
+public class RequestPasswordServlet extends Controller {
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        //
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		String action = request.getParameter("action");
-		session.setAttribute("challengeQuestions", PwdChallengeQuestion.toArrayList());
+		request.getSession().setAttribute("challengeQuestions", PwdChallengeQuestion.toArrayList());
 
 		if (StringUtil.isBlank(action)) {
 			request.setAttribute("userBean1", new UserAccountBean());
-			forwardPage(Page.REQUEST_PWD);
+			forwardPage(Page.REQUEST_PWD, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
-				confirmPassword();
+				confirmPassword(request, response);
 
 			} else {
 				request.setAttribute("userBean1", new UserAccountBean());
-				forwardPage(Page.REQUEST_PWD);
+				forwardPage(Page.REQUEST_PWD, request, response);
 			}
 		}
 
@@ -82,7 +88,8 @@ public class RequestPasswordServlet extends SecureController {
 	 * @param request
 	 * @param response
 	 */
-	private void confirmPassword() throws Exception {
+	@SuppressWarnings("rawtypes")
+	private void confirmPassword(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		v.addValidation("name", Validator.NO_BLANKS);
@@ -90,7 +97,7 @@ public class RequestPasswordServlet extends SecureController {
 		v.addValidation("passwdChallengeQuestion", Validator.NO_BLANKS);
 		v.addValidation("passwdChallengeAnswer", Validator.NO_BLANKS);
 
-		errors = v.validate();
+		HashMap errors = v.validate();
 
 		UserAccountBean ubForm = new UserAccountBean(); // user bean from web
 		// form
@@ -99,9 +106,10 @@ public class RequestPasswordServlet extends SecureController {
 		ubForm.setPasswdChallengeQuestion(fp.getString("passwdChallengeQuestion"));
 		ubForm.setPasswdChallengeAnswer(fp.getString("passwdChallengeAnswer"));
 
-		sm = new SessionManager(null, ubForm.getName(), SpringServletAccess.getApplicationContext(context));
+        SessionManager sm = new SessionManager(null, ubForm.getName(), SpringServletAccess.getApplicationContext(getServletContext()));
+        request.setAttribute(SESSION_MANAGER, sm);
 
-		UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO uDAO = getUserAccountDAO();
 		// see whether this user in the DB
 		UserAccountBean ubDB = (UserAccountBean) uDAO.findByUserName(ubForm.getName());
 
@@ -111,7 +119,7 @@ public class RequestPasswordServlet extends SecureController {
 		if (!errors.isEmpty()) {
 			logger.info("after processing form,has errors");
 			request.setAttribute("formMessages", errors);
-			forwardPage(Page.REQUEST_PWD);
+			forwardPage(Page.REQUEST_PWD, request, response);
 		} else {
 			logger.info("after processing form,no errors");
 			// whether this user's email is in the DB
@@ -125,12 +133,10 @@ public class RequestPasswordServlet extends SecureController {
 				if (ubDB.getPasswdChallengeQuestion().equals(ubForm.getPasswdChallengeQuestion())
 						&& ubDB.getPasswdChallengeAnswer().equalsIgnoreCase(ubForm.getPasswdChallengeAnswer())) {
 
-					SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean(
-							"securityManager"));
-					String newPass = sm.genPassword();
-					OpenClinicaJdbcService ocService = ((OpenClinicaJdbcService) SpringServletAccess
-							.getApplicationContext(context).getBean("ocUserDetailsService"));
-					String newDigestPass = sm.encrytPassword(newPass, ocService.loadUserByUsername(ubForm.getName()));
+					SecurityManager scm = getSecurityManager();
+					String newPass = scm.genPassword();
+					OpenClinicaJdbcService ocService = getOpenClinicaJdbcService();
+					String newDigestPass = scm.encrytPassword(newPass, ocService.loadUserByUsername(ubForm.getName()));
 					ubDB.setPasswd(newDigestPass);
 
 					ubDB.setPasswdTimestamp(null);
@@ -140,15 +146,15 @@ public class RequestPasswordServlet extends SecureController {
 					logger.info("user bean to be updated:" + ubDB.getId() + ubDB.getName() + ubDB.getActiveStudyId());
 
 					uDAO.update(ubDB);
-					sendPassword(newPass, ubDB);
+					sendPassword(newPass, ubDB, request, response);
 				} else {
-					addPageMessage(respage.getString("your_password_not_verified_try_again"));
-					forwardPage(Page.REQUEST_PWD);
+					addPageMessage(respage.getString("your_password_not_verified_try_again"), request);
+					forwardPage(Page.REQUEST_PWD, request, response);
 				}
 
 			} else {
-				addPageMessage(respage.getString("your_email_address_not_found_try_again"));
-				forwardPage(Page.REQUEST_PWD);
+				addPageMessage(respage.getString("your_email_address_not_found_try_again"), request);
+				forwardPage(Page.REQUEST_PWD, request, response);
 			}
 
 		}
@@ -162,9 +168,9 @@ public class RequestPasswordServlet extends SecureController {
 	 * @param response
 	 */
 	@SuppressWarnings("rawtypes")
-	private void sendPassword(String passwd, UserAccountBean ubDB) throws Exception {
+	private void sendPassword(String passwd, UserAccountBean ubDB, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		StudyBean sBean = (StudyBean) sdao.findByPK(ubDB.getActiveStudyId());
 		logger.info("Sending email...");
 		
@@ -186,10 +192,10 @@ public class RequestPasswordServlet extends SecureController {
 		emailBody = emailBody.replace("{0}", emailParentStudy.getName());
 		sendEmail(ubDB.getEmail().trim(), EmailEngine.getAdminEmail(), restext.getString("your_openclinica_password"),
 				emailBody, true, respage.getString("your_password_reset_new_password_emailed"),
-				respage.getString("your_password_not_send_due_mail_server_problem"), true);
+				respage.getString("your_password_not_send_due_mail_server_problem"), true, request);
 
-		session.removeAttribute("challengeQuestions");
-		forwardPage(Page.LOGIN);
+		request.getSession().removeAttribute("challengeQuestions");
+		forwardPage(Page.LOGIN, request, response);
 
 	}
 }
