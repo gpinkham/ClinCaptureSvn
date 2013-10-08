@@ -146,6 +146,7 @@ public class CreateUserAccountServlet extends SecureController {
 			fp.addPresetValue(USER_ACCOUNT_NOTIFICATION, sendPwd);
 			//
 			setPresetValues(presetValues);
+            request.setAttribute("pageIsChanged", changeRoles);
 			forwardPage(Page.CREATE_ACCOUNT);
 		} else {
             UserType type = UserType.get(fp.getInt("type"));

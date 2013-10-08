@@ -107,40 +107,7 @@
 </c:forEach>
 
 <script type="text/JavaScript" language="JavaScript">
-  <!--
- function myCancel() {
-
-    cancelButton=document.getElementById('cancel');
-    if ( cancelButton != null) {
-      if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-        window.location.href="ListUserAccounts";
-       return true;
-      } else {
-        return false;
-       }
-     }
-     return true;
-
-  }
-  function checkGoToEntryStatusMod1(Message, Adress) {
-	    closing = false;        
-		objFlag = MM_findObj('pageIsChanged');
-	    if (objFlag != null && objFlag.value=='true') {
-	        return confirmGoTo(Message, Adress);
-	    } else {
-	        window.location.href=(Adress);
-	    }
-	    return true;
-  }
-
-  function changeFlag(){
-	  objFlag = MM_findObj('pageIsChanged');
-	  objFlag.value='true';
-  }
-   //-->
  function sendUrl() {
-	objFlag = MM_findObj('pageIsChanged');
-	objFlag.value='true';
     document.getElementById('changeRoles').value = 'true';
     document.forms[1].submit();
  }
@@ -176,7 +143,7 @@ int selectedValue;
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
-						<input type="text" id="userName" onchange="javascript:changeFlag();" name="userName" value="<c:out value="${userName}"/>" size="20" class="formfieldM" />
+						<input type="text" id="userName" onchange="javascript:changeIcon();" name="userName" value="<c:out value="${userName}"/>" size="20" class="formfieldM" />
 					</div></td>
 					<td>*</td>
 				</tr>
@@ -193,7 +160,7 @@ int selectedValue;
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
-						<input type="text" id="firstName" name="firstName" onchange="javascript:changeFlag();" value="<c:out value="${firstName}"/>" size="20" class="formfieldM" />
+						<input type="text" id="firstName" name="firstName" onchange="javascript:changeIcon();" value="<c:out value="${firstName}"/>" size="20" class="formfieldM" />
 					</div></td>
 					<td>*</td>
 				</tr>
@@ -210,7 +177,7 @@ int selectedValue;
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
-					<input type="text" id="lastName" name="lastName" onchange="javascript:changeFlag();" value="<c:out value="${lastName}"/>" size="20" class="formfieldM" />
+					<input type="text" id="lastName" name="lastName" onchange="javascript:changeIcon();" value="<c:out value="${lastName}"/>" size="20" class="formfieldM" />
 					</div></td>
 					<td>*</td>
 				</tr>
@@ -228,7 +195,7 @@ int selectedValue;
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
-						<input type="text" id="email" name="email" onchange="javascript:changeFlag();" value="<c:out value="${email}"/>" size="20" class="formfieldM" />
+						<input type="text" id="email" name="email" onchange="javascript:changeIcon();" value="<c:out value="${email}"/>" size="20" class="formfieldM" />
 					</div></td>
 					<td>(<fmt:message key="username@institution" bundle="${resword}"/>) *</td>
 				</tr>
@@ -246,7 +213,7 @@ int selectedValue;
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
-						<input type="text" id="institutionalAffiliation" name="institutionalAffiliation" onchange="javascript:changeFlag();" value="<c:out value="${institutionalAffiliation}"/>" size="20" class="formfieldM" />
+						<input type="text" id="institutionalAffiliation" name="institutionalAffiliation" onchange="javascript:changeIcon();" value="<c:out value="${institutionalAffiliation}"/>" size="20" class="formfieldM" />
 					</div></td>
 					<td>*</td>
 				</tr>
@@ -310,7 +277,7 @@ int selectedValue;
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
-						<select name="role" id="role" onchange="javascript:changeFlag();" class="formfieldM">
+						<select name="role" id="role" onchange="javascript:changeIcon();" class="formfieldM">
 							<option value="0">-<fmt:message key="select" bundle="${resword}"/>-</option>
 							<c:forEach var="currRole" items="${roles}">
                                 <c:if test="${currRole.key == inclRoleCode1 || currRole.key == inclRoleCode2 || currRole.key == inclRoleCode3}">	
@@ -333,7 +300,7 @@ int selectedValue;
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
-						<select name="type" id="type" onchange="javascript:changeFlag();" class="formfieldM">
+						<select name="type" id="type" onchange="javascript:changeIcon();" class="formfieldM">
 						<c:forEach var="currType" items="${types}">
 								<c:choose>
 									<c:when test="${userTypeId == currType.id}">
@@ -357,7 +324,7 @@ int selectedValue;
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td valign="top">
-                        <br><input type="checkbox" name="runWebServices" onchange="javascript:changeFlag();" id="runWebServices" value="1"
+                        <br><input type="checkbox" name="runWebServices" onchange="javascript:changeIcon();" id="runWebServices" value="1"
                             <c:if test="${runWebServices != 0}">checked</c:if>
                         >
                     </td>
@@ -374,12 +341,12 @@ int selectedValue;
 	  	<td>
 	  	<c:choose>
          <c:when test="${notifyPassword eq 'email'}">
-            <input type="radio" id="displayPwd0" checked name="displayPwd" onchange="javascript:changeFlag();" value="no"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>
-            <br><input type="radio" id="displayPwd1" name="displayPwd" onchange="javascript:changeFlag();" value="yes"><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
+            <input type="radio" id="displayPwd0" checked name="displayPwd" onchange="javascript:changeIcon();" value="no"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>
+            <br><input type="radio" id="displayPwd1" name="displayPwd" onchange="javascript:changeIcon();" value="yes"><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
          </c:when>
          <c:otherwise>
          
-            <br><input type="radio" checked id="displayPwd1" checked name="displayPwd" onchange="javascript:changeFlag();" value="yes"><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
+            <br><input type="radio" checked id="displayPwd1" checked name="displayPwd" onchange="javascript:changeIcon();" value="yes"><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
          </c:otherwise>
        </c:choose>
       </td>
@@ -398,10 +365,17 @@ int selectedValue;
 					value="<fmt:message key="back" bundle="${resword}"/>" 
 					class="button_medium" 
 					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
-  <input type="hidden" id="pageIsChanged" name="pageIsChanged" value="${pageIsChanged}">
 </td>
 <td>
   <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" />
+</td>
+<td>
+  <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
+  <c:if test="${pageIsChanged ne null && pageIsChanged eq true}">
+    <script>
+      $("img[name=DataStatus_bottom]").attr("src", "images/icon_UnsavedData.gif");
+    </script>
+  </c:if>
 </td>
 </tr>
 </table>
