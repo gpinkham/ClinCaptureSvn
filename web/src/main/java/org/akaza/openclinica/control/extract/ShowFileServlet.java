@@ -21,7 +21,9 @@ package org.akaza.openclinica.control.extract;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -29,10 +31,13 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.ArchivedDatasetFileRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * purpose of this servlet is to respond with a file listing after we've outlasted the 'please wait' message.
@@ -41,23 +46,22 @@ import java.util.Locale;
  * 
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class ShowFileServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class ShowFileServlet extends Controller {
 
 	public static String getLink(int fId, int dId) {
 		return "ShowFile?fileId=" + fId + "&datasetId=" + dId;
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		int fileId = fp.getInt("fileId");
 		int dsId = fp.getInt("datasetId");
-		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
+		DatasetDAO dsdao = getDatasetDAO();
 		DatasetBean db = (DatasetBean) dsdao.findByPK(dsId);
 
-		ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
+		ArchivedDatasetFileDAO asdfdao = getArchivedDatasetFileDAO();
 		ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);
 
 		ArrayList newFileList = new ArrayList();
@@ -85,13 +89,13 @@ public class ShowFileServlet extends SecureController {
 
 		finalTarget.setFileName("/WEB-INF/jsp/extract/generateMetadataFile.jsp");
 
-		forwardPage(finalTarget);
+		forwardPage(finalTarget, request, response);
 	}
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -102,7 +106,7 @@ public class ShowFileServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 

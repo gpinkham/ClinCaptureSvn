@@ -28,13 +28,18 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -43,6 +48,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * @author thickerson
@@ -50,46 +56,51 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings({"rawtypes","unchecked", "serial"})
-public class EditDatasetServlet extends SecureController {
+@Component
+public class EditDatasetServlet extends Controller {
 
 	public static String getLink(int dsId) {
 		return "EditDataset?dsId=" + dsId;
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		FormProcessor fp = new FormProcessor(request);
 
 		int dsId = fp.getInt("dsId");
-		DatasetBean dataset = initializeAttributes(dsId);
+		DatasetBean dataset = initializeAttributes(request, dsId);
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		StudyBean study = (StudyBean) sdao.findByPK(dataset.getStudyId());
 		// Checking if user has permission to access the current study/site
-		checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
+		checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 
 		// Checking the dataset belongs to current study or a site of current study
 		if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
 			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"));
-			forwardPage(Page.MENU_SERVLET);
+					+ respage.getString("change_active_study_or_contact"), request);
+			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
 
 		if ((currentRole.getRole() == Role.STUDY_MONITOR || currentRole.getRole() == Role.INVESTIGATOR)
 				&& (dataset.getOwnerId() != ub.getId())) {
 			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"));
-			forwardPage(Page.MENU_SERVLET);
+					+ respage.getString("change_active_study_or_contact"), request);
+			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
 
-		HashMap events = (LinkedHashMap) session.getAttribute("eventsForCreateDataset");
-		CRFDAO crfdao = new CRFDAO(sm.getDataSource());
+		HashMap events = (LinkedHashMap) request.getSession().getAttribute("eventsForCreateDataset");
+		CRFDAO crfdao = getCRFDAO();
 
 		if (events == null || events.isEmpty()) {
 			events = new LinkedHashMap();
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 
 			StudyBean studyWithEventDefinitions = currentStudy;
 			if (currentStudy.getParentStudyId() > 0) {
@@ -106,20 +117,22 @@ public class EditDatasetServlet extends SecureController {
 				}
 			}
 			if (events.isEmpty()) {
-				addPageMessage(respage.getString("not_have_study_definitions_assigned"));
-				forwardPage(Page.VIEW_DATASETS);
+				addPageMessage(respage.getString("not_have_study_definitions_assigned"), request);
+				forwardPage(Page.VIEW_DATASETS, request, response);
 			} else {
 				request.setAttribute("eventlist", events);
-				session.setAttribute("eventsForCreateDataset", events);
+				request.getSession().setAttribute("eventsForCreateDataset", events);
 			}
 		}
 		request.setAttribute("dataset", dataset);
 		request.setAttribute("statuses", getStatuses());
-		forwardPage(Page.EDIT_DATASET);
+		forwardPage(Page.EDIT_DATASET, request, response);
 	}
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -131,7 +144,7 @@ public class EditDatasetServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
@@ -146,13 +159,15 @@ public class EditDatasetServlet extends SecureController {
 	/**
 	 * Initialize data of a DatasetBean and set session attributes for displaying selected data of this DatasetBean
 	 * 
-	 * @param db
+	 * @param request
+     * @param datasetId
 	 * @return
 	 * 
 	 * @author ywang (Feb, 2008)
 	 */
-	public DatasetBean initializeAttributes(int datasetId) {
-		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
+	public DatasetBean initializeAttributes(HttpServletRequest request, int datasetId) {
+        UserAccountBean ub = getUserAccountBean(request);
+		DatasetDAO dsdao = getDatasetDAO();
 		DatasetBean db = dsdao.initialDatasetData(datasetId);
         Calendar calendar = GregorianCalendar.getInstance();
         if (db.getDateStart() != null) {
@@ -165,10 +180,10 @@ public class EditDatasetServlet extends SecureController {
             db.setLastMonth(calendar.get(Calendar.MONTH) + 1);
             db.setLastYear(calendar.get(Calendar.YEAR));
         }
-		session.setAttribute("newDataset", db);
-		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-		StudyDAO studydao = new StudyDAO(sm.getDataSource());
-		StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
+		request.getSession().setAttribute("newDataset", db);
+		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
+		StudyDAO studydao = getStudyDAO();
+		StudyBean theStudy = (StudyBean) studydao.findByPK(ub.getActiveStudyId());
 		ArrayList<StudyGroupClassBean> allSelectedGroups = sgcdao.findAllActiveByStudy(theStudy);
 		ArrayList<Integer> selectedSubjectGroupIds = db.getSubjectGroupIds();
 		if (selectedSubjectGroupIds != null && allSelectedGroups != null) {

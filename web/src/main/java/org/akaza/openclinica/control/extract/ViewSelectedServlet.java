@@ -22,18 +22,23 @@ package org.akaza.openclinica.control.extract;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Views selected items for creating dataset, aslo allow user to de-select or select all items in a study
@@ -42,14 +47,13 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings({"rawtypes", "serial"})
-public class ViewSelectedServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class ViewSelectedServlet extends Controller {
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -60,7 +64,7 @@ public class ViewSelectedServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
@@ -70,26 +74,29 @@ public class ViewSelectedServlet extends SecureController {
 	 * setup study groups, tbh, added july 2007 FIXME in general a repeated set of code -- need to create a superclass
 	 * which will contain this class, tbh
 	 */
-	public void setUpStudyGroups(DatasetBean db) {
+	public void setUpStudyGroups(UserAccountBean ub, DatasetBean db) {
 		ArrayList sgclasses = db.getAllSelectedGroups();
 		if (sgclasses == null || sgclasses.size() == 0) {
-			StudyDAO studydao = new StudyDAO(sm.getDataSource());
-			StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
-			StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
+			StudyDAO studydao = getStudyDAO();
+			StudyGroupClassDAO sgclassdao = getStudyGroupClassDAO();
+			StudyBean theStudy = (StudyBean) studydao.findByPK(ub.getActiveStudyId());
 			sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
 		}
         db.setAllSelectedGroups(sgclasses);
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		HashMap events = (HashMap) session.getAttribute(CreateDatasetServlet.EVENTS_FOR_CREATE_DATASET);
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+
+		HashMap events = (HashMap) request.getSession().getAttribute(CreateDatasetServlet.EVENTS_FOR_CREATE_DATASET);
 		if (events == null) {
 			events = new HashMap();
 		}
 		request.setAttribute("eventlist", events);
 
-        DatasetBean db = (DatasetBean) session.getAttribute("newDataset");
+        DatasetBean db = (DatasetBean) request.getSession().getAttribute("newDataset");
 
 		request.setAttribute("numberOfStudyItems", new Integer(db.getItemIds().size()).toString());
 		request.setAttribute("subjectAgeAtEvent",
@@ -98,10 +105,10 @@ public class ViewSelectedServlet extends SecureController {
 		FormProcessor fp = new FormProcessor(request);
 		String status = fp.getString("status");
 		if (!StringUtil.isBlank(status) && "html".equalsIgnoreCase(status)) {
-			forwardPage(Page.CREATE_DATASET_VIEW_SELECTED_HTML);
+			forwardPage(Page.CREATE_DATASET_VIEW_SELECTED_HTML, request, response);
 		} else {
-			setUpStudyGroups(db);
-			forwardPage(Page.CREATE_DATASET_VIEW_SELECTED);
+			setUpStudyGroups(ub, db);
+			forwardPage(Page.CREATE_DATASET_VIEW_SELECTED, request, response);
 		}
 
 	}

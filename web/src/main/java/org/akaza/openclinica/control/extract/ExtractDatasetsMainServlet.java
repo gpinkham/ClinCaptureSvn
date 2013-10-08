@@ -21,17 +21,25 @@
 package org.akaza.openclinica.control.extract;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DatasetRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * <P>
@@ -43,7 +51,8 @@ import java.util.HashMap;
  * 
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class ExtractDatasetsMainServlet extends SecureController {
+@Component
+public class ExtractDatasetsMainServlet extends Controller {
 
 	public static final String PATH = "ExtractDatasetsMain";
 	public static final String ARG_USER_ID = "userId";
@@ -53,9 +62,12 @@ public class ExtractDatasetsMainServlet extends SecureController {
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+
 		FormProcessor fp = new FormProcessor(request);
-		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
+		DatasetDAO dsdao = getDatasetDAO();
 		EntityBeanTable table = fp.getEntityBeanTable();
 
 		ArrayList datasets = (ArrayList) dsdao.findTopFive(currentStudy);
@@ -75,15 +87,18 @@ public class ExtractDatasetsMainServlet extends SecureController {
 		table.computeDisplay();
 
 		request.setAttribute("table", table);
-		resetPanel();
 
-		request.setAttribute(STUDY_INFO_PANEL, panel);
+        StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 
-		forwardPage(Page.EXTRACT_DATASETS_MAIN);
+		forwardPage(Page.EXTRACT_DATASETS_MAIN, request, response);
 	}
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -94,7 +109,7 @@ public class ExtractDatasetsMainServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 

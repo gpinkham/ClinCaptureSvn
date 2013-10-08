@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote;
@@ -33,7 +36,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -52,6 +55,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * A servlet that sends via HTTP a file containing Discrepancy-Note related data.
@@ -61,7 +65,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @see org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class DiscrepancyNoteOutputServlet extends SecureController {
+@Component
+public class DiscrepancyNoteOutputServlet extends Controller {
 	// These are the headers that must appear in the HTTP response, when sending a
 	// file back to the user
 	public static String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
@@ -69,10 +74,11 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
 	/* Handle the HTTP Get or Post request. */
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        StudyBean currentStudy = getCurrentStudy(request);
 
 		String studyIdentifier = "";
-		if (this.currentStudy != null) {
+		if (currentStudy != null) {
 			studyIdentifier = currentStudy.getIdentifier();
 		}
 		FormProcessor fp = new FormProcessor(request);
@@ -104,9 +110,9 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 		response.addHeader(CONTENT_DISPOSITION_HEADER, CONTENT_DISPOSITION_VALUE + fileName);
 		// Are we downloading a List of discrepancy notes or just one?
 		// Not needed now: boolean isList = ("y".equalsIgnoreCase(isAList));
-		StudyBean studyBean = (StudyBean) session.getAttribute("study");
+		StudyBean studyBean = (StudyBean) request.getSession().getAttribute("study");
 
-		Set<Integer> resolutionStatusIds = (HashSet) session.getAttribute("resolutionStatus");
+		Set<Integer> resolutionStatusIds = (HashSet) request.getSession().getAttribute("resolutionStatus");
 
 		// It will also change any resolution status IDs among parents of children that have a different
 		// id value (last boolean parameter; 'true' to perform the latter task)
@@ -125,22 +131,22 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
 		ListNotesSort listNotesSort = new ListNotesSort();
 		listNotesSort.addSort("", "");
-		ArrayList<DiscrepancyNoteBean> allDiscNotes = new DiscrepancyNoteDAO(sm.getDataSource())
+		ArrayList<DiscrepancyNoteBean> allDiscNotes = getDiscrepancyNoteDAO()
 				.getNotesWithFilterAndSort(studyBean, listNotesFilter);
 
 		// Downloaded notes will contain only filtered notes.
-		ArrayList sessionNotes = (ArrayList) session.getAttribute("allNotes");
+		ArrayList sessionNotes = (ArrayList) request.getSession().getAttribute("allNotes");
 		if (sessionNotes != null) {
 			allDiscNotes = sessionNotes;
 		}
-		allDiscNotes = populateRowsWithAttachedData(allDiscNotes);
+		allDiscNotes = populateRowsWithAttachedData(allDiscNotes, request);
 
 		// Now we have to package all the discrepancy notes in DiscrepancyNoteThread objects
 		// Do the filtering for type or status here
 		DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
 
-		List<DiscrepancyNoteThread> discrepancyNoteThreads = discNoteUtil.createThreads(allDiscNotes,
-				sm.getDataSource(), studyBean, resolutionStatusIds, discNoteType);
+		List<DiscrepancyNoteThread> discrepancyNoteThreads = discNoteUtil.createThreads(allDiscNotes, getDataSource(),
+				studyBean, resolutionStatusIds, discNoteType);
 
 		if ("csv".equalsIgnoreCase(format)) {
 			int contentLen = downLoader.getThreadListContentLength(discrepancyNoteThreads);
@@ -156,22 +162,23 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
 	}
 
-	private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows) {
+	private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows, HttpServletRequest request) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		Locale l = request.getLocale();
 		resword = ResourceBundleProvider.getWordsBundle(l);
 		resformat = ResourceBundleProvider.getFormatBundle(l);
 		SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"),
 				ResourceBundleProvider.getLocale());
-		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
-		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(sm.getDataSource());
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-		ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-		ItemDAO idao = new ItemDAO(sm.getDataSource());
-		StudyDAO studyDao = new StudyDAO(sm.getDataSource());
+		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
+		StudySubjectDAO studySubjectDAO = getStudySubjectDAO();
+		StudyEventDAO sedao = getStudyEventDAO();
+		CRFVersionDAO cvdao = getCRFVersionDAO();
+		CRFDAO cdao = getCRFDAO();
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+		EventCRFDAO ecdao = getEventCRFDAO();
+		ItemDataDAO iddao = getItemDataDAO();
+		ItemDAO idao = getItemDAO();
+		StudyDAO studyDao = getStudyDAO();
 
 		ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
 
@@ -371,7 +378,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        //
 	}
 }

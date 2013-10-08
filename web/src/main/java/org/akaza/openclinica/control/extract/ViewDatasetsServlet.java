@@ -24,14 +24,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.control.RememberLastPage;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -40,9 +44,11 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DatasetRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.stereotype.Component;
 
 /**
  * ViewDatasetsServlet.java, the view datasets function accessed from the extract datasets main page.
@@ -51,9 +57,8 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
  * 
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@Component
 public class ViewDatasetsServlet extends RememberLastPage {
-
-	Locale locale;
 
     public static final String SAVED_VIEW_DATASETS_URL = "savedViewDatasetsUrl";
 
@@ -62,15 +67,21 @@ public class ViewDatasetsServlet extends RememberLastPage {
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-        analyzeUrl();
-		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String action = request.getParameter("action");
-		resetPanel();
-		request.setAttribute(STUDY_INFO_PANEL, panel);
-		session.removeAttribute("newDataset");
+		if (!(action != null && action.equalsIgnoreCase("details")) && shouldRedirect(request, response)) {
+			return;
+		}
+
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+
+		DatasetDAO dsdao = getDatasetDAO();
+        StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
+		request.getSession().removeAttribute("newDataset");
 		if (StringUtil.isBlank(action)) {
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			StudyBean studyWithEventDefinitions = currentStudy;
 			if (currentStudy.getParentStudyId() > 0) {
 				studyWithEventDefinitions = new StudyBean();
@@ -78,7 +89,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 
 			}
 			ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
-			CRFDAO crfdao = new CRFDAO(sm.getDataSource());
+			CRFDAO crfdao = getCRFDAO();
 			HashMap events = new LinkedHashMap();
 			for (int i = 0; i < seds.size(); i++) {
 				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seds.get(i);
@@ -87,7 +98,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 					events.put(sed, crfs);
 				}
 			}
-			session.setAttribute("eventsForCreateDataset", events);
+            request.getSession().setAttribute("eventsForCreateDataset", events);
 			// YW >>
 
 			FormProcessor fp = new FormProcessor(request);
@@ -117,7 +128,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			// this is the old code that the tabling code replaced:
 			// ArrayList datasets = (ArrayList)dsdao.findAll();
 			// request.setAttribute("datasets", datasets);
-            analyzeForward(Page.VIEW_DATASETS);
+            forward(Page.VIEW_DATASETS, request, response);
 		} else {
 			if ("owner".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
@@ -146,20 +157,20 @@ public class ViewDatasetsServlet extends RememberLastPage {
 
 				// ArrayList datasets = (ArrayList)dsdao.findByOwnerId(ownerId);
 				// request.setAttribute("datasets", datasets);
-                analyzeForward(Page.VIEW_DATASETS);
+                forward(Page.VIEW_DATASETS, request, response);
 				// }
 			} else if ("details".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
 				int datasetId = fp.getInt("datasetId");
 
-				DatasetBean db = initializeAttributes(datasetId);
-				StudyDAO sdao = new StudyDAO(sm.getDataSource());
+				DatasetBean db = initializeAttributes(datasetId, request);
+				StudyDAO sdao = getStudyDAO();
 				StudyBean study = (StudyBean) sdao.findByPK(db.getStudyId());
 
 				if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
 					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"));
-					forwardPage(Page.MENU_SERVLET);
+							+ respage.getString("change_active_study_or_contact"), request);
+					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				}
 
@@ -172,16 +183,16 @@ public class ViewDatasetsServlet extends RememberLastPage {
 				 */
 				request.setAttribute("dataset", db);
 
-				forwardPage(Page.VIEW_DATASET_DETAILS);
+				forwardPage(Page.VIEW_DATASET_DETAILS, request, response);
 			}
 		}
 
 	}
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -192,7 +203,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
@@ -201,18 +212,20 @@ public class ViewDatasetsServlet extends RememberLastPage {
 	/**
 	 * Initialize data of a DatasetBean and set session attributes for displaying selected data of this DatasetBean
 	 * 
-	 * @param db
+	 * @param datasetId
+     * @param request
 	 * @return
 	 * 
 	 * @author ywang (Feb, 2008)
 	 */
-	public DatasetBean initializeAttributes(int datasetId) {
-		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
+	public DatasetBean initializeAttributes(int datasetId, HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
+		DatasetDAO dsdao = getDatasetDAO();
 		DatasetBean db = dsdao.initialDatasetData(datasetId);
-		session.setAttribute("newDataset", db);
-		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-		StudyDAO studydao = new StudyDAO(sm.getDataSource());
-		StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
+		request.getSession().setAttribute("newDataset", db);
+		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
+		StudyDAO studydao = getStudyDAO();
+		StudyBean theStudy = (StudyBean) studydao.findByPK(ub.getActiveStudyId());
 		ArrayList<StudyGroupClassBean> allSelectedGroups = sgcdao.findAllActiveByStudy(theStudy);
 		ArrayList<Integer> selectedSubjectGroupIds = db.getSubjectGroupIds();
 		if (selectedSubjectGroupIds != null && allSelectedGroups != null) {
@@ -236,7 +249,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
     }
 
     @Override
-    protected String getDefaultUrl() {
+    protected String getDefaultUrl(HttpServletRequest request) {
         FormProcessor fp = new FormProcessor(request);
         String eblFiltered = fp.getString("ebl_filtered");
         String eblFilterKeyword = fp.getString("ebl_filterKeyword");
@@ -250,7 +263,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
     }
 
     @Override
-    protected boolean userDoesNotUseJmesaTableForNavigation() {
+    protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
         return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
     }
 }

@@ -505,6 +505,7 @@ public class Page {
 	/**
 	 * Page for view all datasets, tbh
 	 */
+    public final static Page VIEW_DATASETS_SERVLET = new Page("/ViewDatasets", "View Datasets Servlet");
 	public final static Page VIEW_DATASETS = new Page("/WEB-INF/jsp/extract/viewDatasets.jsp", "View Datasets");
 	public final static Page VIEW_EMPTY_DATASETS = new Page("/WEB-INF/jsp/extract/viewEmptyDatasets.jsp",
 			"View Datasets");

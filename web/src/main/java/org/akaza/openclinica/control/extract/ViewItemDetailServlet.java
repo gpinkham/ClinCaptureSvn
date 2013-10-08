@@ -21,11 +21,13 @@
 package org.akaza.openclinica.control.extract;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -36,9 +38,12 @@ import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * View all related metadata for an item
@@ -47,9 +52,8 @@ import java.util.Locale;
  * 
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class ViewItemDetailServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class ViewItemDetailServlet extends Controller {
 
 	public static String ITEM_ID = "itemId";
 	public static String ITEM_OID = "itemOid";
@@ -57,35 +61,36 @@ public class ViewItemDetailServlet extends SecureController {
 	public static String VERSION_ITEMS = "versionItems";
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        // StudyBean currentStudy = getCurrentStudy(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		locale = request.getLocale();
-
-		if (currentStudy.getParentStudyId() == 0 && SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
 			return;
 		}
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		int itemId = fp.getInt(ITEM_ID);
 		String itemOid = fp.getString(ITEM_OID);
-		ItemDAO idao = new ItemDAO(sm.getDataSource());
-		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(sm.getDataSource());
-		ItemGroupMetadataDAO igmdao = new ItemGroupMetadataDAO(sm.getDataSource());
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
-		SectionDAO sectionDao = new SectionDAO(sm.getDataSource());
+		ItemDAO idao = getItemDAO();
+		ItemFormMetadataDAO ifmdao = getItemFormMetadataDAO();
+		ItemGroupMetadataDAO igmdao = getItemGroupMetadataDAO();
+		CRFVersionDAO cvdao = getCRFVersionDAO();
+		CRFDAO cdao = getCRFDAO();
+		SectionDAO sectionDao = getSectionDAO();
 
 		if (itemId == 0 && itemOid == null) {
-			addPageMessage(respage.getString("please_choose_an_item_first"));
-			forwardPage(Page.ITEM_DETAIL);
+			addPageMessage(respage.getString("please_choose_an_item_first"), request);
+			forwardPage(Page.ITEM_DETAIL, request, response);
 			return;
 		}
 		ItemBean item = itemId > 0 ? (ItemBean) idao.findByPK(itemId) : (ItemBean) idao.findByOid(itemOid).get(0);
@@ -121,7 +126,7 @@ public class ViewItemDetailServlet extends SecureController {
 		request.setAttribute("crf", crf);
 		request.setAttribute("section", section);
 		request.setAttribute("ifmdBean", imfBean);
-		forwardPage(Page.ITEM_DETAIL);
+		forwardPage(Page.ITEM_DETAIL, request, response);
 
 	}
 

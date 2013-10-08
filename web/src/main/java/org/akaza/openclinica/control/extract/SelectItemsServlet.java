@@ -23,12 +23,14 @@ package org.akaza.openclinica.control.extract;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -39,11 +41,14 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author jxu
@@ -51,16 +56,15 @@ import java.util.Locale;
  * 
  */
 @SuppressWarnings({"rawtypes","unchecked", "serial"})
-public class SelectItemsServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class SelectItemsServlet extends Controller {
 
 	public static String CURRENT_DEF_ID = "currentDefId";
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -71,21 +75,21 @@ public class SelectItemsServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
 	}
 
-	public void setUpStudyGroupPage(DatasetBean db) {
+	public void setUpStudyGroupPage(UserAccountBean ub, DatasetBean db) {
 		ArrayList sgclasses = db.getAllSelectedGroups();
 		if (sgclasses == null || sgclasses.size() == 0) {
-			StudyDAO studydao = new StudyDAO(sm.getDataSource());
-			StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
-			StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
+			StudyDAO studydao = getStudyDAO();
+			StudyGroupClassDAO sgclassdao = getStudyGroupClassDAO();
+			StudyBean theStudy = (StudyBean) studydao.findByPK(ub.getActiveStudyId());
 			sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
 
-			StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
+			StudyGroupDAO sgdao = getStudyGroupDAO();
 
 			for (int i = 0; i < sgclasses.size(); i++) {
 				StudyGroupClassBean sgclass = (StudyGroupClassBean) sgclasses.get(i);
@@ -98,7 +102,10 @@ public class SelectItemsServlet extends SecureController {
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		int crfId = fp.getInt("crfId");
 		int defId = fp.getInt("defId");
@@ -107,12 +114,12 @@ public class SelectItemsServlet extends SecureController {
 		int CRFAttr = fp.getInt("CRFAttr");
 		int groupAttr = fp.getInt("groupAttr");
 		int discAttr = fp.getInt("discAttr");
-		CRFDAO crfdao = new CRFDAO(sm.getDataSource());
-		ItemDAO idao = new ItemDAO(sm.getDataSource());
-		ItemFormMetadataDAO imfdao = new ItemFormMetadataDAO(sm.getDataSource());
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
-		HashMap events = (HashMap) session.getAttribute(CreateDatasetServlet.EVENTS_FOR_CREATE_DATASET);
+		CRFDAO crfdao = getCRFDAO();
+		ItemDAO idao = getItemDAO();
+		ItemFormMetadataDAO imfdao = getItemFormMetadataDAO();
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+		DatasetBean dsb = (DatasetBean) request.getSession().getAttribute("newDataset");
+		HashMap events = (HashMap) request.getSession().getAttribute(CreateDatasetServlet.EVENTS_FOR_CREATE_DATASET);
 		if (events == null) {
 			events = new HashMap();
 		}
@@ -122,26 +129,26 @@ public class SelectItemsServlet extends SecureController {
 		if (crfId == 0) {// no crf selected
 			if (eventAttr == 0 && subAttr == 0 && CRFAttr == 0 && groupAttr == 0 && discAttr == 0) {
 
-				forwardPage(Page.CREATE_DATASET_2);
+				forwardPage(Page.CREATE_DATASET_2, request, response);
 			} else if (eventAttr > 0) {
 				request.setAttribute("subjectAgeAtEvent", "1");
 				if (currentStudy.getStudyParameterConfig().getCollectDob().equals("3")) {
 					request.setAttribute("subjectAgeAtEvent", "0");
 					logger.info("dob not collected, setting age at event to 0");
 				}
-				forwardPage(Page.CREATE_DATASET_EVENT_ATTR);
+				forwardPage(Page.CREATE_DATASET_EVENT_ATTR, request, response);
 			} else if (subAttr > 0) {
 				if (currentStudy.getStudyParameterConfig().getCollectDob().equals("3")) {
 					logger.info("dob not collected, setting age at event to 0");
 				}
-				forwardPage(Page.CREATE_DATASET_SUB_ATTR);
+				forwardPage(Page.CREATE_DATASET_SUB_ATTR, request, response);
 			} else if (CRFAttr > 0) {
-				forwardPage(Page.CREATE_DATASET_CRF_ATTR);
+				forwardPage(Page.CREATE_DATASET_CRF_ATTR, request, response);
 			} else if (groupAttr > 0) {
-				setUpStudyGroupPage(dsb);
-				forwardPage(Page.CREATE_DATASET_GROUP_ATTR);
+				setUpStudyGroupPage(ub, dsb);
+				forwardPage(Page.CREATE_DATASET_GROUP_ATTR, request, response);
 			} else {
-				forwardPage(Page.CREATE_DATASET_2);
+				forwardPage(Page.CREATE_DATASET_2, request, response);
 			}
 			return;
 		}
@@ -149,10 +156,10 @@ public class SelectItemsServlet extends SecureController {
 		CRFBean crf = (CRFBean) crfdao.findByPK(crfId);
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(defId);
 
-		session.setAttribute("crf", crf);
-		session.setAttribute("definition", sed);
+        request.getSession().setAttribute("crf", crf);
+        request.getSession().setAttribute("definition", sed);
 
-		DatasetBean db = (DatasetBean) session.getAttribute("newDataset");
+		DatasetBean db = (DatasetBean) request.getSession().getAttribute("newDataset");
 
 		ArrayList items = idao.findAllActiveByCRF(crf);
 		for (int i = 0; i < items.size(); i++) {
@@ -178,9 +185,9 @@ public class SelectItemsServlet extends SecureController {
 		ArrayList allCrfItems = new ArrayList(itemMap.values());
         // now sort them by ordinal/name
         Collections.sort(allCrfItems, new ItemBean.ItemBeanComparator(0));
-        session.setAttribute("allCrfItems", allCrfItems);
+        request.getSession().setAttribute("allCrfItems", allCrfItems);
 
-		forwardPage(Page.CREATE_DATASET_2);
+		forwardPage(Page.CREATE_DATASET_2, request, response);
 	}
 
 }

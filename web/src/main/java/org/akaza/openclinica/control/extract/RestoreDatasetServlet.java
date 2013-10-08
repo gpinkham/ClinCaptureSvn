@@ -23,56 +23,61 @@ package org.akaza.openclinica.control.extract;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DatasetRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class RestoreDatasetServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class RestoreDatasetServlet extends Controller {
 
 	public static String getLink(int dsId) {
 		return "RestoreDataset?dsId=" + dsId;
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		int dsId = fp.getInt("dsId");
-		DatasetDAO dsDAO = new DatasetDAO(sm.getDataSource());
+		DatasetDAO dsDAO = getDatasetDAO();
 		DatasetBean dataset = (DatasetBean) dsDAO.findByPK(dsId);
 
 		String action = request.getParameter("action");
 		if (resword.getString("restore_this_dataset").equalsIgnoreCase(action)) {
 			dataset.setStatus(Status.AVAILABLE);
 			dsDAO.update(dataset);
-			addPageMessage(respage.getString("dataset_has_been_succesfully_reinstated"));
-			request.setAttribute("table", getDatasetTable());
-			forwardPage(Page.VIEW_DATASETS);
+			addPageMessage(respage.getString("dataset_has_been_succesfully_reinstated"), request);
+			request.setAttribute("table", getDatasetTable(request));
+			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
 		} else if (resword.getString("cancel").equalsIgnoreCase(action)) {
 
-			request.setAttribute("table", getDatasetTable());
-			forwardPage(Page.VIEW_DATASETS);
+			request.setAttribute("table", getDatasetTable(request));
+			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
 		} else {
 			request.setAttribute("dataset", dataset);
-			forwardPage(Page.RESTORE_DATASET);
+			forwardPage(Page.RESTORE_DATASET, request, response);
 		}
 	}
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;// TODO limit to owner only?
@@ -83,17 +88,20 @@ public class RestoreDatasetServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_restore_dataset"), "1");
 
 	}
 
-	private EntityBeanTable getDatasetTable() {
+	private EntityBeanTable getDatasetTable(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+
 		FormProcessor fp = new FormProcessor(request);
 
 		EntityBeanTable table = fp.getEntityBeanTable();
-		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
+		DatasetDAO dsdao = getDatasetDAO();
 		ArrayList datasets = new ArrayList();
 		datasets = dsdao.findAllByStudyId(currentStudy.getId());
 

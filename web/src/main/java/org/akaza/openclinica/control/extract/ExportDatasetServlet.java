@@ -29,20 +29,24 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.*;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
-import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.ArchivedDatasetFileRow;
@@ -52,6 +56,7 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
+import org.springframework.stereotype.Component;
 
 /**
  * Take a dataset and show it in different formats,<BR/>
@@ -66,44 +71,32 @@ import org.quartz.impl.triggers.SimpleTriggerImpl;
  * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
-public class ExportDatasetServlet extends SecureController {
+@Component
+public class ExportDatasetServlet extends Controller {
 
 	public static String getLink(int dsId) {
 		return "ExportDataset?datasetId=" + dsId;
 	}
 
-	private StdScheduler scheduler;
-
-	private static String SCHEDULER = "schedulerFactoryBean";
 	private static final String DATASET_DIR = SQLInitServlet.getField("filePath") + "datasets" + File.separator;
 
-	// may not use the above, security issue
-	public File SASFile;
-	public String SASFilePath;
-	public File SPSSFile;
-	public String SPSSFilePath;
-	public File TXTFile;
-	public String TXTFilePath;
-	public File CSVFile;
-	public String CSVFilePath;
-	public ArrayList fileList;
-
 	@Override
-	public void processRequest() throws Exception {
-		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
-		ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+
+		DatasetDAO dsdao = getDatasetDAO();
+		ArchivedDatasetFileDAO asdfdao = getArchivedDatasetFileDAO();
 		FormProcessor fp = new FormProcessor(request);
 
-		GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(), request,
-				sm.getUserBean(), (CoreResources) SpringServletAccess.getApplicationContext(context).getBean(
-						"coreResources"), (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean(
-						"ruleSetRuleDao"));
+		GenerateExtractFileService generateFileService = new GenerateExtractFileService(getDataSource(), request,
+				ub, getCoreResources(), getRuleSetRuleDao());
 		String action = fp.getString("action");
 		int datasetId = fp.getInt("datasetId");
 		int adfId = fp.getInt("adfId");
 		if (datasetId == 0) {
 			try {
-				DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
+				DatasetBean dsb = (DatasetBean) request.getSession().getAttribute("newDataset");
 				datasetId = dsb.getId();
 				logger.info("dataset id was zero, trying session: " + datasetId);
 			} catch (NullPointerException e) {
@@ -113,15 +106,15 @@ public class ExportDatasetServlet extends SecureController {
 			}
 		}
 		DatasetBean db = (DatasetBean) dsdao.findByPK(datasetId);
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		StudyBean study = (StudyBean) sdao.findByPK(db.getStudyId());
-		checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
+		checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 
 		// Checks if the study is current study or child of current study
 		if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
 			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"));
-			forwardPage(Page.MENU_SERVLET);
+					+ respage.getString("change_active_study_or_contact"), request);
+			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
 
@@ -137,24 +130,24 @@ public class ExportDatasetServlet extends SecureController {
 
 		if (StringUtil.isBlank(action)) {
 			loadList(db, asdfdao, datasetId, fp, eb);
-			forwardPage(Page.EXPORT_DATASETS);
+			forwardPage(Page.EXPORT_DATASETS, request, response);
 		} else if ("delete".equalsIgnoreCase(action) && adfId > 0) {
 			boolean success = false;
 			ArchivedDatasetFileBean adfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(adfId);
 			File file = new File(adfBean.getFileReference());
 			if (!file.canWrite()) {
-				addPageMessage(respage.getString("write_protected"));
+				addPageMessage(respage.getString("write_protected"), request);
 			} else {
 				success = file.delete();
 				if (success) {
 					asdfdao.deleteArchiveDataset(adfBean);
-					addPageMessage(respage.getString("file_removed"));
+					addPageMessage(respage.getString("file_removed"), request);
 				} else {
-					addPageMessage(respage.getString("error_removing_file"));
+					addPageMessage(respage.getString("error_removing_file"), request);
 				}
 			}
 			loadList(db, asdfdao, datasetId, fp, eb);
-			forwardPage(Page.EXPORT_DATASETS);
+			forwardPage(Page.EXPORT_DATASETS, request, response);
 		} else {
 			logger.info("**** found action ****: " + action);
 			String generateReport = "";
@@ -183,7 +176,7 @@ public class ExportDatasetServlet extends SecureController {
 				String odmVersion = fp.getString("odmVersion");
 				String ODMXMLFileName = "";
 				HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db,
-						this.currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true,
+						currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true,
 						true, true, null);
 
 				for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
@@ -213,7 +206,7 @@ public class ExportDatasetServlet extends SecureController {
 					// the generalFileDir
 					SimpleTriggerImpl simpleTrigger = xts.generateXalanTrigger(propertiesPath + File.separator
 							+ "ODMReportStylesheet.xsl", ODMXMLFileName, generalFileDir + "output.sql", db.getId());
-					scheduler = getScheduler();
+                    StdScheduler scheduler = getStdScheduler();
 
 					JobDetailImpl jobDetailBean = new JobDetailImpl();
 					jobDetailBean.setGroup(XalanTriggerService.TRIGGER_GROUP_NAME);
@@ -308,7 +301,7 @@ public class ExportDatasetServlet extends SecureController {
 
 				finalTarget.setFileName("" + "/WEB-INF/jsp/extract/generateMetadataCore.jsp");
 				// also set up table here???
-				asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
+				asdfdao = getArchivedDatasetFileDAO();
 
 				ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fId);
 				ArrayList newFileList = new ArrayList();
@@ -339,12 +332,15 @@ public class ExportDatasetServlet extends SecureController {
 			logger.info("set first part of 'generate' to :" + generalFileDir);
 			logger.info("found file name: " + finalTarget.getFileName());
 
-			forwardPage(finalTarget);
+			forwardPage(finalTarget, request, response);
 		}
 	}
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -354,7 +350,7 @@ public class ExportDatasetServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
@@ -411,12 +407,12 @@ public class ExportDatasetServlet extends SecureController {
 
 	public void loadList(DatasetBean db, ArchivedDatasetFileDAO asdfdao, int datasetId, FormProcessor fp, ExtractBean eb) {
 		logger.info("action is blank");
-		request.setAttribute("dataset", db);
+        fp.getRequest().setAttribute("dataset", db);
 		logger.info("just set dataset to request");
-		request.setAttribute("extractProperties", CoreResources.getExtractProperties());
+        fp.getRequest().setAttribute("extractProperties", CoreResources.getExtractProperties());
 		ArrayList fileListRaw = new ArrayList();
 		fileListRaw = asdfdao.findByDatasetId(datasetId);
-		fileList = new ArrayList();
+        ArrayList fileList = new ArrayList();
 		Iterator fileIterator = fileListRaw.iterator();
 		while (fileIterator.hasNext()) {
 
@@ -432,7 +428,7 @@ public class ExportDatasetServlet extends SecureController {
 
 		logger.warn("");
 		logger.warn("file list length: " + fileList.size());
-		request.setAttribute("filelist", fileList);
+        fp.getRequest().setAttribute("filelist", fileList);
 
 		ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(fileList);
 		EntityBeanTable table = fp.getEntityBeanTable();
@@ -450,34 +446,31 @@ public class ExportDatasetServlet extends SecureController {
 
 		table.setQuery("ExportDataset?datasetId=" + db.getId(), new HashMap());
 		// trying to continue...
-		session.setAttribute("newDataset", db);
+        fp.getRequest().getSession().setAttribute("newDataset", db);
 		table.setRows(filterRows);
 		table.computeDisplay();
 
-		request.setAttribute("table", table);
-		resetPanel();
+        SimpleDateFormat local_df = getLocalDf(fp.getRequest());
+
+        fp.getRequest().setAttribute("table", table);
+        StudyInfoPanel panel = getStudyInfoPanel(fp.getRequest());
+        panel.reset();
 		panel.setStudyInfoShown(false);
-		setToPanel(resword.getString("study_name"), eb.getStudy().getName());
-		setToPanel(resword.getString("protocol_ID"), eb.getStudy().getIdentifier());
-		setToPanel(resword.getString("dataset_name"), db.getName());
-		setToPanel(resword.getString("created_date"), local_df.format(db.getCreatedDate()));
-		setToPanel(resword.getString("dataset_owner"), db.getOwner().getName());
+		setToPanel(resword.getString("study_name"), eb.getStudy().getName(), fp.getRequest());
+		setToPanel(resword.getString("protocol_ID"), eb.getStudy().getIdentifier(), fp.getRequest());
+		setToPanel(resword.getString("dataset_name"), db.getName(), fp.getRequest());
+		setToPanel(resword.getString("created_date"), local_df.format(db.getCreatedDate()), fp.getRequest());
+		setToPanel(resword.getString("dataset_owner"), db.getOwner().getName(), fp.getRequest());
 		try {
 			// do we not set this or is it null b/c we come to the page with no
 			// session?
-			setToPanel(resword.getString("date_last_run"), local_df.format(db.getDateLastRun()));
+			setToPanel(resword.getString("date_last_run"), local_df.format(db.getDateLastRun()), fp.getRequest());
 		} catch (NullPointerException npe) {
 			System.out.println("exception: " + npe.getMessage());
 		}
 
 		logger.warn("just set file list to request, sending to page");
 
-	}
-
-	private StdScheduler getScheduler() {
-		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
-				context).getBean(SCHEDULER);
-		return scheduler;
 	}
 
 	private static final void copyInputStream(InputStream in, OutputStream out) throws IOException {

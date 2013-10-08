@@ -201,9 +201,9 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet>
-        <servlet-name>ChooseDownloadFormat</servlet-name>
+        <servlet-name>chooseDownloadFormat</servlet-name>
         <description>ChooseDownloadFormat</description>
-        <servlet-class>org.akaza.openclinica.control.extract.ChooseDownloadFormat</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewLogMessage</servlet-name>
@@ -268,9 +268,9 @@
     </servlet>
 
     <servlet>
-        <servlet-name>DiscrepancyNoteOutputServlet</servlet-name>
+        <servlet-name>discrepancyNoteOutputServlet</servlet-name>
         <description>DiscrepancyNoteOutputServlet</description>
-        <servlet-class>org.akaza.openclinica.control.extract.DiscrepancyNoteOutputServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -400,14 +400,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>AccessFileServlet</servlet-name>
+        <servlet-name>accessFileServlet</servlet-name>
         <display-name>AccessFile</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.AccessFileServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ShowFileServlet</servlet-name>
+        <servlet-name>showFileServlet</servlet-name>
         <display-name>ShowFile</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.ShowFileServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
      <servlet>
         <servlet-name>studyAuditLogServlet</servlet-name>
@@ -595,24 +595,24 @@
         <servlet-class>org.akaza.openclinica.control.admin.InitCreateCRFVersionServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ExtractDatasetsMainServlet</servlet-name>
+        <servlet-name>extractDatasetsMainServlet</servlet-name>
         <display-name>ExtractDatasetsMain</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.ExtractDatasetsMainServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewDatasetsServlet</servlet-name>
+        <servlet-name>viewDatasetsServlet</servlet-name>
         <display-name>ViewDatasets</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.ViewDatasetsServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CreateDatasetServlet</servlet-name>
+        <servlet-name>createDatasetServlet</servlet-name>
         <display-name>CreateDataset</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.CreateDatasetServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ExportDatasetServlet</servlet-name>
+        <servlet-name>exportDatasetServlet</servlet-name>
         <display-name>ExportDataset</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.ExportDatasetServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewCRFServlet</servlet-name>
@@ -838,19 +838,19 @@
     </servlet>
 
     <servlet>
-        <servlet-name>RemoveDatasetServlet</servlet-name>
+        <servlet-name>removeDatasetServlet</servlet-name>
         <display-name>RemoveDataset</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.RemoveDatasetServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RestoreDatasetServlet</servlet-name>
+        <servlet-name>restoreDatasetServlet</servlet-name>
         <display-name>RestoreDataset</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.RestoreDatasetServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>EditDatasetServlet</servlet-name>
+        <servlet-name>editDatasetServlet</servlet-name>
         <display-name>EditDataset</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.EditDatasetServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RemoveStudyServlet</servlet-name>
@@ -1013,24 +1013,24 @@
         <servlet-class>org.akaza.openclinica.control.admin.DeleteEventCRFServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewItemDetailServlet</servlet-name>
+        <servlet-name>viewItemDetailServlet</servlet-name>
         <display-name>ViewItemDetail</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.ViewItemDetailServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>SelectItemsServlet</servlet-name>
+        <servlet-name>selectItemsServlet</servlet-name>
         <display-name>SelectItems</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.SelectItemsServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewSelectedServlet</servlet-name>
+        <servlet-name>viewSelectedServlet</servlet-name>
         <display-name>ViewSelected</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.ViewSelectedServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>EditSelectedServlet</servlet-name>
+        <servlet-name>editSelectedServlet</servlet-name>
         <display-name>EditSelected</display-name>
-        <servlet-class>org.akaza.openclinica.control.extract.EditSelectedServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ListSubjectGroupClassServlet</servlet-name>
@@ -1464,26 +1464,26 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>EditDatasetServlet</servlet-name>
+        <servlet-name>editDatasetServlet</servlet-name>
         <url-pattern>/EditDataset</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>RemoveDatasetServlet</servlet-name>
+        <servlet-name>removeDatasetServlet</servlet-name>
         <url-pattern>/RemoveDataset</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestoreDatasetServlet</servlet-name>
+        <servlet-name>restoreDatasetServlet</servlet-name>
         <url-pattern>/RestoreDataset</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>AccessFileServlet</servlet-name>
+        <servlet-name>accessFileServlet</servlet-name>
         <url-pattern>/AccessFile</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>ShowFileServlet</servlet-name>
+        <servlet-name>showFileServlet</servlet-name>
         <url-pattern>/ShowFile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1706,19 +1706,19 @@
         <url-pattern>/InitCreateCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ExtractDatasetsMainServlet</servlet-name>
+        <servlet-name>extractDatasetsMainServlet</servlet-name>
         <url-pattern>/ExtractDatasetsMain</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewDatasetsServlet</servlet-name>
+        <servlet-name>viewDatasetsServlet</servlet-name>
         <url-pattern>/ViewDatasets</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ExportDatasetServlet</servlet-name>
+        <servlet-name>exportDatasetServlet</servlet-name>
         <url-pattern>/ExportDataset</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>CreateDatasetServlet</servlet-name>
+        <servlet-name>createDatasetServlet</servlet-name>
         <url-pattern>/CreateDataset</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1996,19 +1996,19 @@
         <url-pattern>/DeleteEventCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewItemDetailServlet</servlet-name>
+        <servlet-name>viewItemDetailServlet</servlet-name>
         <url-pattern>/ViewItemDetail</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>SelectItemsServlet</servlet-name>
+        <servlet-name>selectItemsServlet</servlet-name>
         <url-pattern>/SelectItems</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewSelectedServlet</servlet-name>
+        <servlet-name>viewSelectedServlet</servlet-name>
         <url-pattern>/ViewSelected</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>EditSelectedServlet</servlet-name>
+        <servlet-name>editSelectedServlet</servlet-name>
         <url-pattern>/EditSelected</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2084,7 +2084,7 @@
         <url-pattern>/MatchPassword</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>DiscrepancyNoteOutputServlet</servlet-name>
+        <servlet-name>discrepancyNoteOutputServlet</servlet-name>
         <url-pattern>/DiscrepancyNoteOutputServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2112,7 +2112,7 @@
         <url-pattern>/reports</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ChooseDownloadFormat</servlet-name>
+        <servlet-name>chooseDownloadFormat</servlet-name>
         <url-pattern>/ChooseDownloadFormat</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
