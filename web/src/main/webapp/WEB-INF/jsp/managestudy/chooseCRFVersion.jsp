@@ -130,15 +130,15 @@ $.noConflict();
 
 <!-- crf table here -->
 <br><br>
-
-<table cellpadding="0" cellspacing="0" border="1" class="shaded_table" >
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR"><div class="tablebox_center">
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
 <tr>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="version_name" bundle="${resword}"/></td>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="version_oid" bundle="${resword}"/></td>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="date_created" bundle="${resword}"/></td>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="owner" bundle="${resword}"/></td>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="default_version" bundle="${resword}"/></td>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="action" bundle="${resword}"/></td>
+<td class="table_header_row_left"><fmt:message key="version_name" bundle="${resword}"/></td>
+<td class="table_header_row"><fmt:message key="version_oid" bundle="${resword}"/></td>
+<td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
+<td class="table_header_row"><fmt:message key="owner" bundle="${resword}"/></td>
+<td class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
+<td class="table_header_row"><fmt:message key="action" bundle="${resword}"/></td>
 </tr>
 
 <!-- versions data -->
@@ -146,7 +146,7 @@ $.noConflict();
 <c:forEach var="version" items="${crfBean.versions}">
 <tr>
 <c:if test="${version.status.id == 1}" >
-<td  class="table_cell"  > <c:out value="${version.name}" />&nbsp;</td>
+<td  class="table_cell_left"  > <c:out value="${version.name}" />&nbsp;</td>
 <td  class="table_cell"  > <c:out value="${version.oid}" />&nbsp;</td>
 <td  class="table_cell"  > <fmt:formatDate value="${version.createdDate}" pattern="${dteFormat}"/>&nbsp;</td>
 <td  class="table_cell"  > <c:out value="${crfBean.owner.name}" />&nbsp;</td>
@@ -155,12 +155,11 @@ $.noConflict();
 <td  class="table_cell"  > &nbsp;
 <a onmouseup="javascript:setImage('bt_View1','../../images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');" 
 href="#" onclick="window.location.href='../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes'">
-<img hspace="6" border="0" align="left" title="View" alt="View" src="../../images/bt_View.gif" name="bt_View1">
+<img hspace="6" border="0" title="View" alt="View" src="../../images/bt_View.gif" name="bt_View1">
 </a>
-&nbsp;
 <a onmouseup="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" onmousedown="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" 
 href="#" onclick="window.location.href='../../ViewCRFVersion?id=<c:out value="${version.id}"/>'">
-<img hspace="6" border="0" align="left" title="Metadata" alt="Metadata" src="../../images/bt_Metadata.gif" name="bt_Metadata">
+<img hspace="6" border="0" title="Metadata" alt="Metadata" src="../../images/bt_Metadata.gif" name="bt_Metadata">
 </a>
 
 
@@ -172,6 +171,7 @@ href="#" onclick="window.location.href='../../ViewCRFVersion?id=<c:out value="${
 
 
 </table>
+</div></div></div></div></div></div></div></div></div>
 
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
