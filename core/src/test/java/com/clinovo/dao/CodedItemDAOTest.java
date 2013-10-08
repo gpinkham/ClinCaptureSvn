@@ -184,12 +184,29 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	public void testThatFindByItemDataReturnsCodedItemWithCorrectItemId() {
 		assertEquals(4, codedItemDAO.findByItemData(4).getItemId());
 	}
+	
+	@Test
+	public void testThatFindByScopeDoesNotReturnNull() {
+		assertNotNull(codedItemDAO.findByStudyAndSite(1, 3));
+	}
 
+	@Test
+	public void testThatFindByScopeDoesReturnsCorrectNumberOfItems() {
+		assertEquals(2, codedItemDAO.findByStudyAndSite(1, 3).size());
+	}
+	
 	@Test
 	public void testThatSaveOrUpdatePersistsANewCodedItem() {
 
-		CodedItem item = new CodedItem();
-		codedItemDAO.saveOrUpdate(item);
+		CodedItem codedItem = new CodedItem();
+		
+		codedItem.setSiteId(3);
+		codedItem.setStudyId(1);
+		codedItem.setItemId(31);
+		codedItem.setEventCrfId(2);
+		codedItem.setVerbatimTerm("verbatim-term");
+		
+		codedItemDAO.saveOrUpdate(codedItem);
 
 		assertEquals(5, codedItemDAO.findAll().size());
 	}

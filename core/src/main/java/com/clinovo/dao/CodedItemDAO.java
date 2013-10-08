@@ -183,7 +183,7 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 	/**
 	 * Retrieves the coded item that belong to the specified item data. 
 	 * <p>
-	 * Note that this is the only member that returns a unique coded item.
+	 * Note that apart from findById, this is the only other member that returns a unique coded item.
 	 * 
 	 * @param itemDataId The itemData id to filter on.
 	 * 
@@ -196,6 +196,40 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 		q.setInteger("itemDataId", itemDataId);
 		
 		return (CodedItem) q.uniqueResult();
+	}
+	
+	/**
+	 * Retrieves the coded item that belong to the specified study. 
+	 * 
+	 * @param studyId The study id to filter on.
+	 * 
+	 * @return List of coded items belonging to the specified study.
+	 */
+	public List<CodedItem> findByStudy(int studyId) {
+		
+		String query = "from " + getDomainClassName() + " do  where do.studyId = :studyId";
+		Query q = getCurrentSession().createQuery(query);
+		q.setInteger("studyId", studyId);
+
+		return q.list();
+	}
+	
+	/**
+	 * Retrieves the coded item that belong to the scope (study/site). 
+	 * 
+	 * @param studyId The study id to filter on.
+	 * @param siteId The site id to filter on
+	 * 
+	 * @return List of coded items belonging to the specified scope.
+	 */
+	public List<CodedItem> findByStudyAndSite(int studyId, int siteId) {
+		
+		String query = "from " + getDomainClassName() + " do  where do.studyId = :studyId and siteId = :siteId";
+		Query q = getCurrentSession().createQuery(query);
+		q.setInteger("studyId", studyId);
+		q.setInteger("siteId", siteId);
+
+		return q.list();
 	}
 	
 	/**

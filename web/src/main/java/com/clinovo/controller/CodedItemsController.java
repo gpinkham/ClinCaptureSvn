@@ -14,13 +14,14 @@
  *******************************************************************************/
 package com.clinovo.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import com.clinovo.model.CodedItemsTableFactory;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -39,6 +40,7 @@ import com.clinovo.coding.Search;
 import com.clinovo.coding.model.Classification;
 import com.clinovo.coding.source.impl.BioPortalSearchInterface;
 import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemsTableFactory;
 import com.clinovo.model.Status.CodeStatus;
 import com.clinovo.service.CodedItemService;
 
@@ -66,7 +68,7 @@ public class CodedItemsController {
 	 * @param request The incoming request
 	 * @param response The response to redirect to
 	 * 
-	 * @return Map with coded item attributes that will be placed on the UX.
+	 * @return Map The map with coded item attributes that will be placed on the UX.
 	 * 
 	 * @throws Exception For all exceptions
 	 */
@@ -79,7 +81,16 @@ public class CodedItemsController {
 		
 		String studyId = request.getParameter("study");
 		
-		List<CodedItem> items = codedItemService.findAll();
+		StudyDAO dao = new StudyDAO(datasource);
+		StudyBean study = (StudyBean) dao.findByPK(Integer.parseInt(studyId));
+		
+		List<CodedItem> items = new ArrayList<CodedItem>();
+		if (study.isSite(study.getParentStudyId())) {
+			items = codedItemService.findByStudyAndSite(study.getParentStudyId(), Integer.parseInt(studyId));
+		} else {
+			items = codedItemService.findByStudy(Integer.parseInt(studyId));
+		}
+		
 		List<CodedItem> codedItems = codedItemService.findCodedItemsByStatus(CodeStatus.CODED);
 		List<CodedItem> unCodedItems = codedItemService.findCodedItemsByStatus(CodeStatus.NOT_CODED);
 		CodedItemsTableFactory factory = new CodedItemsTableFactory();

@@ -34,6 +34,8 @@ import com.clinovo.model.Status.CodeStatus;
 public class CodedItem extends AbstractMutableDomainObject {
 
 	private int itemId = -1;
+	private int siteId = -1;
+	private int studyId = -1;
 	private int subjectId = -1;
 	private int itemDataId = -1;
 	private int eventCrfId = -1;
@@ -125,5 +127,21 @@ public class CodedItem extends AbstractMutableDomainObject {
 
 	public void setItemDataId(int itemDataId) {
 		this.itemDataId = itemDataId;
+	}
+
+	public int getStudyId() {
+		return studyId;
+	}
+
+	public void setStudyId(int studyId) {
+		this.studyId = studyId;
+	}
+
+	public int getSiteId() {
+		return siteId;
+	}
+
+	public void setSiteId(int siteId) {
+		this.siteId = siteId;
 	}
 }

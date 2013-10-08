@@ -2906,7 +2906,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				
 				// create coded items for event/crf
 				if (getCodedItemService() != null) {
-					codedItemService.createCodedItem(ecb, dib.getItem(), idb);
+					codedItemService.createCodedItem(ecb, dib.getItem(), idb, currentStudy.getId());
 				}
 				
 			} else {
@@ -2929,7 +2929,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				idb = (ItemDataBean) iddao.upsert(idb);
 				
 				if (getCodedItemService() != null) {
-					codedItemService.createCodedItem(ecb, dib.getItem(), idb);
+					codedItemService.createCodedItem(ecb, dib.getItem(), idb, currentStudy.getId());
 				}
 				
 			} else if ("edit".equalsIgnoreCase(dib.getEditFlag())) {

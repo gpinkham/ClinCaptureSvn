@@ -167,12 +167,25 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 	}
 	
 	@Test
+	public void testThatFindByScopeDoesNotReturnNull() {
+		assertNotNull(codedItemService.findByStudyAndSite(2, 4));
+	}
+
+	@Test
+	public void testThatFindByScopeDoesReturnsCorrectNumberOfItems() {
+		assertEquals(2, codedItemService.findByStudyAndSite(2, 4).size());
+	}
+	
+	@Test
 	public void testThatSaveCodedItemDoesNotReturnNull() throws Exception {
 		
 		CodedItem codedItem = new CodedItem();
+		
+		codedItem.setStudyId(1);
+		codedItem.setSiteId(3);
 		codedItem.setItemId(31);
 		codedItem.setEventCrfId(2);
-		codedItem.setCodedTerm("modified-coded-term");
+		codedItem.setVerbatimTerm("verbatim-term");
 		
 		assertNotNull(codedItemService.saveCodedItem(codedItem));
 	}
@@ -182,9 +195,12 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 
 		// Valid due to Id
 		CodedItem codedItem = new CodedItem();
+		
+		codedItem.setStudyId(1);
+		codedItem.setSiteId(3);
 		codedItem.setItemId(32);
 		codedItem.setEventCrfId(2);
-		codedItem.setCodedTerm("modified-coded-term");
+		codedItem.setVerbatimTerm("verbatim-term");
 
 		assertNotNull(codedItemService.saveCodedItem(codedItem).getId());
 	}

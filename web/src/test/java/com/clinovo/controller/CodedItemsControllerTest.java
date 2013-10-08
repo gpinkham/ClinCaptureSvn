@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import org.junit.Test;
-import org.springframework.http.MediaType;
 
 import com.clinovo.BaseControllerTest;
 
@@ -15,7 +14,8 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatGetRequestResolvesWith200Status() throws Exception {
 		
-		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER).accept(MediaType.ALL))
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER)
+				.param("study", "1"))
 			.andExpect(status().isOk());
 	}
 
@@ -29,7 +29,8 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatGetRequestReturnsCorrectViewName() throws Exception {
 
-		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER)
+				.param("study", "1"))
 			.andExpect(status().isOk())
 			.andExpect(view().name("codedItems"));
 	}
@@ -37,7 +38,9 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatGetRequestReturnsRequestWithHtmlAttribute() throws Exception {
 
-		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER)
+				.param("study", "1"))
+		
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("codedQuestionsHtml"));
 	}
@@ -45,7 +48,8 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatGetRequestReturnsRequestWithValidHtmlAttribute() throws Exception {
 
-		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER)
+				.param("study", "1"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("codedQuestionsHtml"));
 	}
@@ -53,7 +57,8 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatGetRequestReturnsRequestWithAllItemsAttribute() throws Exception {
 
-		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER)
+				.param("study", "1"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("allItems"));
 	}
@@ -61,7 +66,8 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatGetRequestReturnsRequestWithCodedItemsAttribute() throws Exception {
 
-		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER)
+				.param("study", "1"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("codedItems"));
 	}
@@ -69,7 +75,8 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatGetRequestReturnsRequestWithUnCodedItemsAttribute() throws Exception {
 
-		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER)
+				.param("study", "1"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("unCodedItems"));
 	}
@@ -77,7 +84,8 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatGetRequestReturnsRequestWithCodedItemsHtmlAttribute() throws Exception {
 
-		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER)
+				.param("study", "1"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("codedQuestionsHtml"));
 	}
@@ -85,7 +93,8 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatGetRequestReturnsRequestWithPanelAttribute() throws Exception {
 
-		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER))
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER)
+				.param("study", "1"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("panel"));
 	}

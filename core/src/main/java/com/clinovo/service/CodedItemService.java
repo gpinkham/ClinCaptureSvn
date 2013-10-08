@@ -25,32 +25,162 @@ import com.clinovo.model.Status.CodeStatus;
 
 public interface CodedItemService {
 	
-	List<CodedItem> findAll() throws Exception;
+	/**
+	 * Retrieves all the coded items from storage
+	 * 
+	 * @return List of all coded items
+	 */
+	List<CodedItem> findAll();
 
-	CodedItem findCodedItem(int codedItemId);
+	/**
+	 * Returns all the coded items that belong to the specified study.
+	 * 
+	 * @param studyId The study to which the coded items were created
+	 * 
+	 * @return List of coded items that belong to the specified study
+	 */
+	List<CodedItem> findByStudy(int studyId);
 	
-	void deleteCodedItem(CodedItem codedItem);
-
-	List<CodedItem> findByItem(int codedItemItemId);
-
-	List<CodedItem> findCodedItemsByVerbatimTerm(String verbatimTerm);
-
-	List<CodedItem> findCodedItemsByCodedTerm(String codedTerm);
-
-	List<CodedItem> findCodedItemsByDictionary(String dictionary);
-
-	List<CodedItem> findCodedItemsByStatus(CodeStatus coded);
-
-	CodedItem saveCodedItem(CodedItem codedItem) throws Exception;
-
+	/**
+	 * Returns all the coded items that belong to the specified scope.
+	 * 
+	 * @param studyId The study to which the coded items were created
+	 * @param siteId The site in the study (above) to which the coded items were created
+	 * 
+	 * @return List of coded items that belong to the specified scope
+	 */
+	List<CodedItem> findByStudyAndSite(int studyId, int siteId);
+	
+	/**
+	 * Retrieves all the coded items that belong to the specified item. 
+	 * <p>
+	 * The coded item must have been created using the specified item to qualify
+	 * 
+	 * @param itemId The itemId on which to search items
+	 * 
+	 * @return List of coded items that belong to the specified item
+	 */
+	List<CodedItem> findByItem(int itemId);
+	
+	/**
+	 * Retrieves all coded items that belong to the specified event-crf
+	 * 
+	 * @param eventCRFId The eventCRF to filter on
+	 * 
+	 * @return List of coded items belonging to the specified event-crf
+	 */
 	List<CodedItem> findByEventCRF(int eventCRFId);
 
+	/**
+	 * Retrieves all coded items that belong to the specified crf-version
+	 * 
+	 * @param crfVersion The crf-version to filter on
+	 * 
+	 * @return List of coded items belonging to the specified crf-version
+	 */
 	List<CodedItem> findByCRFVersion(int crfVersion);
 	
+	/**
+	 * Retrieves all coded items that belong to the specified subject. 
+	 * <p>
+	 * The coded items should have been created for the specified subject to qualify.
+	 * 
+	 * @param crfVersion The crf-version to filter on
+	 * 
+	 * @return List of coded items belonging to the specified crf-version
+	 */
 	List<CodedItem> findBySubject(int subject);
-	
-	CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean itemBean, ItemDataBean itemData) throws Exception;
 
+	/**
+	 * Retrieves all the coded items that have a verbatim term matching the specified verbatim term
+	 * 
+	 * @param verbatimTerm The verbatim term to filter on.
+	 * 
+	 * @return List of coded items that have a matching verbatim term to the specified verbatim term.
+	 */
+	List<CodedItem> findCodedItemsByVerbatimTerm(String verbatimTerm);
+
+	/**
+	 * Retrieves all the coded items that have a verbatim term matching the specified coded term
+	 * 
+	 * @param codedTerm The verbatim term to filter on.
+	 * 
+	 * @return List of coded items that have a matching coded term to the specified coded term.
+	 */
+	List<CodedItem> findCodedItemsByCodedTerm(String codedTerm);
+
+	/**
+	 * Retrieves all the coded items that were coded using the same dictionary.
+	 * 
+	 * <p>
+	 * The coded items should have been coded with the specified dictionary to qualify.
+	 * 
+	 * @param dictionary The dictionary to filter on.
+	 * 
+	 * @return List of coded items that were coded with a dictionary matching the specified dictionary.
+	 */
+	List<CodedItem> findCodedItemsByDictionary(String dictionary);
+
+	/**
+	 * Retrieves all the coded items that have the specified status
+	 * 
+	 * @param status The status to filter on.
+	 * 
+	 * @return List of coded items that have the specified status.
+	 */
+	List<CodedItem> findCodedItemsByStatus(CodeStatus status);
+
+	/**
+	 * Creates and prepares a coded item for saving -
+	 * 
+	 * @param eventCRF The event-crf the coded item belongs to
+	 * @param item The reference CRF-item for the coded item
+	 * @param itemData The data that contains the verbatim term
+	 * @param studyId The study to which the coded item should be scoped
+	 * 
+	 * @return The coded item
+	 * 
+	 * @throws Exception For any errors during persistence.
+ 	 */
+	CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item, ItemDataBean itemData, int studyId) throws Exception;
+	
+	/**
+	 * Save the given coded item to storage.
+	 * <p>
+	 * Note that this method also updates the referenced CRF item with the coded item value.
+	 * 
+	 * @param codedItem The coded item to save
+	 * 
+	 * @return The saved coded item
+	 * 
+	 * @throws Exception If the item data for the coded item does not exist, or any other exception during persistence routines.
+	 */
+	CodedItem saveCodedItem(CodedItem codedItem) throws Exception;
+	
+	/**
+	 * Retrieves a coded item given a unique id
+	 * 
+	 * @param codedItemId The id of the coded item to retrieve
+	 * 
+	 * @return The coded item, if it exists, otherwise null.
+	 */
+	CodedItem findCodedItem(int codedItemId);
+
+	/**
+	 * Retrieves a unique coded item given the item data that was used to create it.
+	 * 
+	 * @param itemDataId The item data to filter on.
+	 * 
+	 * @return The coded item.
+	 */
 	CodedItem findByItemData(int itemDataId);
+	
+	/**
+	 * Deletes the given coded item from storage
+	 * 
+	 * @param codedItem The coded item to delete.
+	 */
+	void deleteCodedItem(CodedItem codedItem);
+	
 
 }
