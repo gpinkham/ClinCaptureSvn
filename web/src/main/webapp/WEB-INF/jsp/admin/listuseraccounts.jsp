@@ -39,13 +39,6 @@
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
 <h1><span class="title_manage"><fmt:message key="administer_users" bundle="${resword}"/> <a href="javascript:openDocWindow('help/6_2_administerUsers_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
-<%-- 
-<div class="homebox_bullets"><a href="CreateUserAccount"><fmt:message key="create_a_new_user" bundle="${resword}"/></a></div><br/>
-<div class="homebox_bullets"><a href="AuditUserActivity?restore=true"><fmt:message key="audit_user_activity" bundle="${resword}"/></a></div><br/>
-<div class="homebox_bullets"><a href="Configure"><fmt:message key="lock_out_configuration" bundle="${resword}"/></a></div><br/>
-<div class="homebox_bullets"><a href="ConfigurePasswordRequirements"><fmt:message key="configure_password_requirements" bundle="${resword}"/></a></div>
-<p></p>
---%>
 
 <style>
     div.tablebox_center > table {

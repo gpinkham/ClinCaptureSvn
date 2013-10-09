@@ -40,10 +40,6 @@
 	 <tr>
 		<c:choose>
 		<c:when test='${(currRow.bean.techAdmin && !(userBean.techAdmin))}'>
-			<%-- put in grayed-out buttons here? --%>
-				<%--<td><img src="images/bt_Remove_i.gif" alt="Access denied" title="Access denied"></img></td>
-				<td><img src="images/bt_Remove_i.gif" alt="Access denied" title="Access denied"></img></td>
-				<td><img src="images/bt_Remove_i.gif" alt="Access denied" title="Access denied"></img></td> --%>
 			</c:when>
 			<c:otherwise>
 				<c:choose>
@@ -113,11 +109,6 @@
 		</table>
 	</td>
 </tr>
-<%--<c:choose>
-		<c:when test='${(currRow.bean.techAdmin && !(userBean.techAdmin))}'>
-		</c:when>
-		<c:otherwise>--%>
-<%-- start test for tech admin above here --%>
 <c:choose>
 	<c:when test="${empty currRow.bean.roles}">
 		<tr valign="top">
@@ -241,7 +232,4 @@
 			</tr>
 		</c:forEach>
 	</c:otherwise>
-	<%-- end test of tech admin below here --%>
 </c:choose>
-<%--</c:otherwise>
-</c:choose> --%>

@@ -1,8 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%-- calling syntax:
-	(assuming showTable.jsp and userRow.jsp are in the same directory)
-	<c:import url="../include/showTable.jsp"><c:param name="rowURL" value="userRow.jsp" /></c:import>
---%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 

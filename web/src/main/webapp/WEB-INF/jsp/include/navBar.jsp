@@ -5,7 +5,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <script language="JavaScript">
         function reportBug() {
             var bugtrack = "https://www.openclinica.com/ClinCapture/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
