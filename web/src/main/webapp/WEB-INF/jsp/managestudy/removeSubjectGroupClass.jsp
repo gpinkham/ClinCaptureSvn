@@ -100,9 +100,9 @@
 		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 		<div class="tablebox_center">
-			<table border="1" cellpadding="0" cellspacing="0" width="100%">
+			<table border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tr valign="top">
-					<td class="table_header_row">&nbsp;</td>
+					<td class="table_header_row_left">&nbsp;</td>
 					<td class="table_header_row"><fmt:message key="name" bundle="${resword}"/></td>
 					<td class="table_header_row"><fmt:message key="OID" bundle="${resword}"/></td>
 					<td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
