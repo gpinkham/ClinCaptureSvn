@@ -110,21 +110,23 @@
 <br><br>
 <!-- crf table here -->
 
-<table cellpadding="2" cellspacing="2" border="1"   class="shaded_table" >
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR"><div class="tablebox_center">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
 <tr><td>
-<table cellpadding="2" cellspacing="2" border="0" >
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
 <tr>
-<td class="table_header_row" style="color: #789EC5;" colspan="3"><fmt:message key="confirm_CRF_version_current_version" bundle="${resword}"/>: '
+<td class="table_header_row_left" style="" colspan="3"><fmt:message key="confirm_CRF_version_current_version" bundle="${resword}"/>: '
 <c:out value="${crfVersionName}"/>'</td></tr>
 <tr>
-<td class="table_header_row"><fmt:message key="confirm_CRF_version_field_name" bundle="${resword}"/></td>
+<td class="table_header_row_left"><fmt:message key="confirm_CRF_version_field_name" bundle="${resword}"/></td>
 <td class="table_header_row"><fmt:message key="confirm_CRF_version_field_oid" bundle="${resword}"/></td>
 <td class="table_header_row"><fmt:message key="confirm_CRF_version_field_value" bundle="${resword}"/></td>
 </tr>
 <c:forEach items="${rows}" var="row" varStatus="rowLoop" begin="0" step="1">
 
 <tr>
-<td  class="table_cell" > ${row[0]}&nbsp;</td>
+<td  class="table_cell_left" > ${row[0]}&nbsp;</td>
 <td  class="table_cell"  > 
 <c:choose>
 <c:when test="${empty row[1]}" >
@@ -143,9 +145,9 @@
 </c:forEach>
 </table></td>
 <td>
-<table cellpadding="2" cellspacing="2" border="0"  >
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
 <tr>
-<td class="table_header_row" style="color: #789EC5;"  colspan="3"><fmt:message key="confirm_CRF_version_new_version" bundle="${resword}"/>: '
+<td class="table_header_row" style=""  colspan="3"><fmt:message key="confirm_CRF_version_new_version" bundle="${resword}"/>: '
 <c:out value="${selectedVersionName}"/>'</td>
 </tr>
 <tr>
@@ -173,6 +175,7 @@
 </c:forEach>
 </table>
 </td></tr></table>
+</div></div></div></div></div></div></div></div></div>
 
 <table border="0" colspan="2"><tr><td>
 <form method="POST" action="${pageContext.request.contextPath}/pages/managestudy/changeCRFVersion" >
