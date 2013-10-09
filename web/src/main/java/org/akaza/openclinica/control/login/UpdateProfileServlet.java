@@ -92,7 +92,6 @@ public class UpdateProfileServlet extends Controller {
 		} else {
 			if ("back".equalsIgnoreCase(action)) {
 				request.setAttribute("studies", studies);
-                request.getSession().setAttribute("userBean1", userBean1);
 				forwardPage(Page.UPDATE_PROFILE, request, response);
 			}
 			if ("confirm".equalsIgnoreCase(action)) {
