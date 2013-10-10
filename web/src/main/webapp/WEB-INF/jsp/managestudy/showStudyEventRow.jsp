@@ -254,6 +254,7 @@
 
     </c:when>
     <c:when test="${dedc.class.name eq 'org.akaza.openclinica.bean.submit.DisplayEventCRFBean'}">
+    <c:set scope="request" var="hideCaseBookButton" value="false"/>
     <c:set var="dec" value="${dedc}"/>
 	<tr>
 		<td class="table_cell" width="180"><c:out value="${dec.eventCRF.crf.name}"/> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
