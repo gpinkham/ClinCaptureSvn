@@ -89,13 +89,13 @@ public class DeleteCRFVersionServlet extends SecureController {
 			if (!definitions.isEmpty()) {// used in definition
 				canDelete = false;
 				request.setAttribute("definitions", definitions);
-				addPageMessage(respage.getString("this_CRF_version") + version.getName()
+				addPageMessage(respage.getString("this_CRF_version") + " " + version.getName() + " "
 						+ respage.getString("has_associated_study_events_definitions_cannot_delete"));
 
 			} else if (!eventCRFs.isEmpty()) {
 				canDelete = false;
 				request.setAttribute("eventsForVersion", eventCRFs);
-				addPageMessage(respage.getString("this_CRF_version") + version.getName()
+				addPageMessage(respage.getString("this_CRF_version") + " " + version.getName() + " "
 						+ respage.getString("has_associated_study_events_cannot_delete"));
 			}
 			if ("confirm".equalsIgnoreCase(action)) {
