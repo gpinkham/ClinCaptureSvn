@@ -80,7 +80,8 @@
     <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
            value="<fmt:message key="back" bundle="${resword}"/>"
            class="button_medium"
-           onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+           onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
+    <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
 </td>
 <td>
     <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
