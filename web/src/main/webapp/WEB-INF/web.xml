@@ -686,9 +686,9 @@
         <servlet-class>org.akaza.openclinica.control.submit.DoubleDataEntryServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListSiteServlet</servlet-name>
+        <servlet-name>listSiteServlet</servlet-name>
         <display-name>ListSite</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListSiteServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewSiteServlet</servlet-name>
@@ -1738,7 +1738,7 @@
         <url-pattern>/ChangeStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListSiteServlet</servlet-name>
+        <servlet-name>listSiteServlet</servlet-name>
         <url-pattern>/ListSite</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

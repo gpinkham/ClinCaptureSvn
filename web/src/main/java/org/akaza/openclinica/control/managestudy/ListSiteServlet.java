@@ -23,32 +23,39 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.RememberLastPage;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyRow;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@Component
 public class ListSiteServlet extends RememberLastPage {
 
 	public static final String SAVED_LIST_SITES_URL = "savedListSitesUrl";
-	Locale locale;
 
 	/**
      *
+     * @param request
+     * @param response
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -59,7 +66,7 @@ public class ListSiteServlet extends RememberLastPage {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MANAGE_STUDY_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -67,17 +74,24 @@ public class ListSiteServlet extends RememberLastPage {
 
 	/**
 	 * Finds all the studies, processes the request
-	 */
+     * @param request
+     * @param response
+     */
 	@Override
-	public void processRequest() throws Exception {
-		analyzeUrl();
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if (shouldRedirect(request, response)) {
+			return;
+		}
+
 		FormProcessor fp = new FormProcessor(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
 		if (currentStudy.getParentStudyId() > 0) {
-			addPageMessage(respage.getString("no_sites_available_study_is_a_site"));
-			forwardPage(Page.MENU_SERVLET);
+			addPageMessage(respage.getString("no_sites_available_study_is_a_site"), request);
+			forwardPage(Page.MENU_SERVLET, request, response);
 		} else {
 
-			StudyDAO sdao = new StudyDAO(sm.getDataSource());
+			StudyDAO sdao = getStudyDAO();
 			ArrayList studies = (ArrayList) sdao.findAllByParent(currentStudy.getId());
 
 			Map<Integer, Map<String, Integer>> infoMap = sdao.analyzeEvents(studies);
@@ -118,8 +132,8 @@ public class ListSiteServlet extends RememberLastPage {
 			if (request.getParameter("read") != null && request.getParameter("read").equals("true")) {
 				request.setAttribute("readOnly", true);
 			}
-			session.setAttribute("fromListSite", "yes");
-			analyzeForward(Page.SITE_LIST);
+			request.getSession().setAttribute("fromListSite", "yes");
+			forward(Page.SITE_LIST, request, response);
 		}
 
 	}
@@ -130,7 +144,7 @@ public class ListSiteServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getDefaultUrl() {
+	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		String eblFiltered = fp.getString("ebl_filtered");
 		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
@@ -144,7 +158,7 @@ public class ListSiteServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected boolean userDoesNotUseJmesaTableForNavigation() {
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 	}
 }

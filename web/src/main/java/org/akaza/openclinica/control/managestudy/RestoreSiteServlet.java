@@ -243,17 +243,12 @@ public class RestoreSiteServlet extends SecureController {
 
 				addPageMessage(respage.getString("this_site_has_been_restored_succesfully"));
 				String fromListSite = (String) session.getAttribute("fromListSite");
-				if (fromListSite != null && fromListSite.equals("yes")
-						&& currentRole.getRole().equals(Role.STUDY_DIRECTOR)) {
+				if (fromListSite != null && fromListSite.equals("yes")) {
 					session.removeAttribute("fromListSite");
 					forwardPage(Page.SITE_LIST_SERVLET);
 				} else {
 					session.removeAttribute("fromListSite");
-					if (currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR)) {
-						forwardPage(Page.STUDY_LIST_SERVLET);
-					} else {
-						forwardPage(Page.SITE_LIST_SERVLET);
-					}
+					forwardPage(Page.STUDY_LIST_SERVLET);
 				}
 
 			}
