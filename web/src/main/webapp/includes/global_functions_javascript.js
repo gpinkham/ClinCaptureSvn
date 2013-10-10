@@ -2697,6 +2697,8 @@ function updateCRFHeaderFunction(parametersHolder) {
 			cache : false,
 			success : function(data) {
 				if (data.indexOf("dnShortcutsTable") >= 0) {
+          $('#dnShortcutsTable').removeClass("hidden");
+          $('#dnShortcutsTableHeader').removeClass("hidden");
 					$('#dnShortcutsTable')[0].outerHTML = $.trim(data);
           for (var i = 0; i < dnShortcutLinks.length; i++) {
             if (parseInt($.trim($("#" + dnShortcutLinks[i]).text())) == 0) {

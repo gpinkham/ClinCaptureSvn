@@ -493,9 +493,11 @@ function callTip(html)
     </c:if>
 </c:forEach>
 
-<tr>
+<c:set var="showPreDnShortcutsTr" value=""/>
+<tr id="preDnShortcutsTr">
 <td class="table_cell_left" nowrap>
     <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
+    <c:set var="showPreDnShortcutsTr" value="true"/>
     <c:choose>
         <c:when test="${isInError_Int}">
             <fmt:message key="interviewer_name" bundle="${resword}"/>: <span class="aka_exclaim_error">! </span> &nbsp;
@@ -514,6 +516,7 @@ function callTip(html)
 </td>
 <td class="table_cell_left">
     <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
+    <c:set var="showPreDnShortcutsTr" value="true"/>
     <table border="0" cellpadding="0" cellspacing="0">
         <tr>
 
@@ -603,6 +606,7 @@ function callTip(html)
 
 <td class="table_cell" nowrap>
     <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
+    <c:set var="showPreDnShortcutsTr" value="true"/>
     <c:choose>
         <c:when test="${isInError_Dat}">
             <fmt:message key="interview_date" bundle="${resword}"/>: <span class="aka_exclaim_error">! </span>&nbsp;<br />
@@ -618,6 +622,7 @@ function callTip(html)
 </td>
 <td class="table_cell_left"> 
     <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
+    <c:set var="showPreDnShortcutsTr" value="true"/>
     <table border="0" cellpadding="0" cellspacing="0">
 
         <tr>
@@ -708,9 +713,15 @@ function callTip(html)
 </td>
 </tr>
 
+<c:if test="${showPreDnShortcutsTr ne 'true'}">
+  <script>
+    $("#preDnShortcutsTr").addClass("hidden");
+  </script>
+</c:if>
+
 <tr>
 
-  <td colspan="5" valign="top" class="table_cell_left"  ><b>Discrepancy Notes on this CRF:</b></td>
+  <td colspan="5" valign="top" class="table_cell_left" id="dnShortcutsTableHeader"><b>Discrepancy Notes on this CRF:</b></td>
  
 </tr>
 
@@ -731,6 +742,12 @@ function callTip(html)
   <td valign="top" align="center" class="table_cell_left"  style="border-right:1px solid #E6E6E6;color:black" width="20%"><a class="dnShortcut" href="${discrepancyShortcutsAnalyzer.firstAnnotationLink}" onclick="highlightFieldForDNShortcutAnchor('firstAnnotation');"><div style="width: 100%; text-align: center;" id="dnShortcutTotalAnnotations">&nbsp;${discrepancyShortcutsAnalyzer.totalAnnotations}&nbsp;</div></a></td>
   </tr>
   </table>
+  <c:if test="${discrepancyShortcutsAnalyzer.totalNew == 0 && discrepancyShortcutsAnalyzer.totalUpdated == 0 && discrepancyShortcutsAnalyzer.totalResolutionProposed == 0 && discrepancyShortcutsAnalyzer.totalClosed == 0 && discrepancyShortcutsAnalyzer.totalAnnotations == 0}">
+    <script>
+      $("#dnShortcutsTable").addClass("hidden");
+      $("#dnShortcutsTableHeader").addClass("hidden");
+    </script>
+  </c:if>
 </tr>
 
 </table>
