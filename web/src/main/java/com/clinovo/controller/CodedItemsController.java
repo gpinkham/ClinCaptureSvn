@@ -202,9 +202,9 @@ public class CodedItemsController {
 
         ResourceBundleProvider.updateLocale(request.getLocale());
 
-        String codedItemDataId = request.getParameter("item");
+        String codedItemItemDataId = request.getParameter("item");
 
-        CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemDataId));
+        CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
         codedItem.setCodedTerm("");
         codedItem.setStatus("NOT_CODED");
 

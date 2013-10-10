@@ -2899,9 +2899,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					return true;
 				}
 			} else {
+				
+				// We should skip coded items
 				if (!dib.getMetadata().isShowItem() && idb.getValue().equals("")
 						&& !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())
-						&& !(dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0)) {
+						&& !(dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0)
+						&& !(dib.getItem().getItemDataTypeId() == 12)) {
+					
 					logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id "
 							+ dib.getItem().getId());
 					return true;
@@ -2937,7 +2941,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				
 				// create coded items for event/crf
 				if (getCodedItemService() != null) {
-					codedItemService.createCodedItem(ecb, dib.getItem(), idb, currentStudy.getId());
+					codedItemService.createCodedItem(ecb, dib.getItem(), idb, currentStudy);
 				}
 				
 			} else {
@@ -2960,7 +2964,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				idb = (ItemDataBean) iddao.upsert(idb);
 				
 				if (getCodedItemService() != null) {
-					codedItemService.createCodedItem(ecb, dib.getItem(), idb, currentStudy.getId());
+					codedItemService.createCodedItem(ecb, dib.getItem(), idb, currentStudy);
 				}
 				
 			} else if ("edit".equalsIgnoreCase(dib.getEditFlag())) {

@@ -13,7 +13,6 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
@@ -34,11 +33,14 @@ import com.clinovo.service.CodedItemService;
 @SuppressWarnings("rawtypes")
 public class CodedItemServiceImpl implements CodedItemService {
 
+	private ItemDataDAO itemDataDAO;
+	
 	@Autowired
 	private DataSource dataSource;
 
 	@Autowired
 	private CodedItemDAO codeItemDAO;
+
 
 	public List<CodedItem> findAll() {
 
@@ -97,13 +99,11 @@ public class CodedItemServiceImpl implements CodedItemService {
 		return codeItemDAO.findBySubject(subject);
 	}
 
-	public CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item, ItemDataBean itemData, int studyId) throws Exception {
+	public CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item, ItemDataBean itemData, StudyBean study) throws Exception {
 
 		CodedItem cItem = new CodedItem();
 
 		ItemDAO itemDAO = new ItemDAO(dataSource);
-		StudyDAO studyDAO = new StudyDAO(dataSource);
-		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
 		ItemFormMetadataDAO itemMetaDAO = new ItemFormMetadataDAO(dataSource);
 
 		if (item.getDataType().equals(ItemDataType.CODE)) {
@@ -114,12 +114,10 @@ public class CodedItemServiceImpl implements CodedItemService {
 					eventCRF.getCRFVersionId());
 			
 			// We use the ordinal to cater for repeat items
-			ItemDataBean refItemData = itemDataDAO.findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), eventCRF.getId(), itemData.getOrdinal());
+			ItemDataBean refItemData = getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), eventCRF.getId(), itemData.getOrdinal());
 
 			// Now the item
 			if (refItemData.getValue() != null && !refItemData.getValue().isEmpty()) {
-				
-				StudyBean study = (StudyBean) studyDAO.findByPK(studyId);
 				
 				// Fucking study/site assholery
 				if (study.isSite(study.getParentStudyId())) {
@@ -133,7 +131,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 				}
 				
 				cItem.setItemId(item.getId());
-				cItem.setItemDataId(refItemData.getId());
+				cItem.setItemDataId(itemData.getId());
 				cItem.setEventCrfId(eventCRF.getId());
 				cItem.setVerbatimTerm(refItemData.getValue());
 				cItem.setSubjectId(eventCRF.getStudySubjectId());
@@ -152,9 +150,8 @@ public class CodedItemServiceImpl implements CodedItemService {
 		UserAccountDAO userDAO = new UserAccountDAO(dataSource);
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		ItemDataBean itemData = (ItemDataBean) getItemDataDAO().findByPK(codedItem.getItemDataId());
 		UserAccountBean loggedInUser = (UserAccountBean) userDAO.findByUserName(authentication.getName());
-		ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByItemIdAndEventCRFId(codedItem.getItemId(),
-				codedItem.getEventCrfId());
 
 		if (itemData.getId() > 0) {
 
@@ -175,5 +172,14 @@ public class CodedItemServiceImpl implements CodedItemService {
 
 	public void deleteCodedItem(CodedItem codedItem) {
 		codeItemDAO.deleteCodedItem(codedItem);
+	}
+	
+	private ItemDataDAO getItemDataDAO() {
+		
+		if(itemDataDAO == null) {
+			itemDataDAO = new ItemDataDAO(dataSource);
+		}
+		
+		return itemDataDAO;
 	}
 }

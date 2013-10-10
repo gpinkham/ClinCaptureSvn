@@ -1,7 +1,7 @@
 package com.clinovo.service;
 
 import org.akaza.openclinica.DefaultAppContextTest;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -179,28 +179,29 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 	@Test
 	public void testThatSaveCodedItemDoesNotReturnNull() throws Exception {
 		
+		ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByPK(1);
+		
 		CodedItem codedItem = new CodedItem();
 		
-		codedItem.setStudyId(1);
-		codedItem.setSiteId(3);
-		codedItem.setItemId(31);
-		codedItem.setEventCrfId(2);
-		codedItem.setVerbatimTerm("verbatim-term");
+		codedItem.setItemId(itemData.getItemId());
+		codedItem.setItemDataId(itemData.getId());
+		codedItem.setCodedTerm("modified-coded-term");
+		codedItem.setEventCrfId(itemData.getEventCRFId());
 		
 		assertNotNull(codedItemService.saveCodedItem(codedItem));
 	}
 
 	@Test
 	public void testThatSaveCodedItemReturnsValidCodedItem() throws Exception {
-
-		// Valid due to Id
+		
+		ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByPK(1);
+		
 		CodedItem codedItem = new CodedItem();
 		
-		codedItem.setStudyId(1);
-		codedItem.setSiteId(3);
-		codedItem.setItemId(32);
-		codedItem.setEventCrfId(2);
-		codedItem.setVerbatimTerm("verbatim-term");
+		codedItem.setItemId(itemData.getItemId());
+		codedItem.setItemDataId(itemData.getId());
+		codedItem.setCodedTerm("modified-coded-term");
+		codedItem.setEventCrfId(itemData.getEventCRFId());
 
 		assertNotNull(codedItemService.saveCodedItem(codedItem).getId());
 	}
@@ -208,27 +209,33 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 	@Test
 	public void testThatSaveCodedItemUpdatesItemDataValue() throws Exception {
 		
-		// Valid due to Id
+		ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByPK(1);
+		
 		CodedItem codedItem = new CodedItem();
-		codedItem.setItemId(32);
-		codedItem.setEventCrfId(2);
+		
+		codedItem.setItemId(itemData.getItemId());
+		codedItem.setItemDataId(itemData.getId());
 		codedItem.setCodedTerm("modified-coded-term");
+		codedItem.setEventCrfId(itemData.getEventCRFId());
 		
 		// Simulate save
 		codedItemService.saveCodedItem(codedItem);
 		
-		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
-		
-		assertEquals("modified-coded-term", itemDataDAO.findByItemIdAndEventCRFId(32, 2).getValue());
+		// Item data value should match coded item codedTerm
+		assertEquals("modified-coded-term", ((ItemDataBean)itemDataDAO.findByPK(1)).getValue());
 	}
 	
 	@Test
 	public void testThatSaveCodedItemPersistsNewCodedItemToDB() throws Exception {
 
+		ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByPK(1);
+		
 		CodedItem codedItem = new CodedItem();
-		codedItem.setItemId(33);
-		codedItem.setEventCrfId(2);
+		
+		codedItem.setItemId(itemData.getItemId());
+		codedItem.setItemDataId(itemData.getId());
 		codedItem.setCodedTerm("modified-coded-term");
+		codedItem.setEventCrfId(itemData.getEventCRFId());
 
 		codedItemService.saveCodedItem(codedItem);
 		assertEquals(5, codedItemService.findAll().size());

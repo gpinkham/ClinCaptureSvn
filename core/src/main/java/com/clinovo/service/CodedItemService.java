@@ -16,6 +16,7 @@ package com.clinovo.service;
 
 import java.util.List;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -136,13 +137,13 @@ public interface CodedItemService {
 	 * @param eventCRF The event-crf the coded item belongs to
 	 * @param item The reference CRF-item for the coded item
 	 * @param itemData The data that contains the verbatim term
-	 * @param studyId The study to which the coded item should be scoped
+	 * @param currentStudy The study to which the coded item should be scoped
 	 * 
 	 * @return The coded item
 	 * 
 	 * @throws Exception For any errors during persistence.
  	 */
-	CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item, ItemDataBean itemData, int studyId) throws Exception;
+	CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item, ItemDataBean itemData, StudyBean currentStudy) throws Exception;
 	
 	/**
 	 * Save the given coded item to storage.
