@@ -85,14 +85,17 @@ public class CodedItemsController {
 		StudyBean study = (StudyBean) dao.findByPK(Integer.parseInt(studyId));
 		
 		List<CodedItem> items = new ArrayList<CodedItem>();
+		
+		// Scope the items
 		if (study.isSite(study.getParentStudyId())) {
 			items = codedItemService.findByStudyAndSite(study.getParentStudyId(), Integer.parseInt(studyId));
 		} else {
 			items = codedItemService.findByStudy(Integer.parseInt(studyId));
 		}
 		
-		List<CodedItem> codedItems = codedItemService.findCodedItemsByStatus(CodeStatus.CODED);
-		List<CodedItem> unCodedItems = codedItemService.findCodedItemsByStatus(CodeStatus.NOT_CODED);
+		List<CodedItem> codedItems = getItems(items, CodeStatus.CODED);
+		List<CodedItem> unCodedItems = getItems(items, CodeStatus.NOT_CODED);
+		
 		CodedItemsTableFactory factory = new CodedItemsTableFactory();
 
 		factory.setStudyId(studyId);
@@ -213,4 +216,18 @@ public class CodedItemsController {
         // Redirect to main
         return "codedItems";
     }
+    
+	private List<CodedItem> getItems(List<CodedItem> items, CodeStatus status) {
+		
+		List<CodedItem> matchingItems = new ArrayList<CodedItem>();
+		
+		for(CodedItem item : items) {
+			
+			if(item.getStatus().equals(String.valueOf(status))) {
+				matchingItems.add(item);
+			}
+		}
+		
+		return matchingItems;
+	}
 }

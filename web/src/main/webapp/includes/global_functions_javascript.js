@@ -431,18 +431,63 @@ function setNewIconInParentWin(idOfImageElement, imageLocation){
     }
 }
 
-function showSummaryBox(divObject,parentLinkObj,showText,hideText){
-    
+function showSummaryBox(divObject, parentLinkObj, showText, hideText) {
+
     var sumBox = document.getElementById(divObject);
-    if(sumBox && sumBox.style.display == "none") {
+    var pathname = window.location.pathname;
+    var color = $('*').find('a').css('color');
 
-        sumBox.style.display = "block"
-        parentLinkObj.innerHTML= '<img name="ExpandGroup1" src="images/bt_Collapse.gif" border="0"> ' + hideText;
-    }  else {
-        if(sumBox){
-            sumBox.style.display = "none"
+    if (sumBox && sumBox.style.display == "none") {
 
-            parentLinkObj.innerHTML= '<img name="ExpandGroup1" src="images/bt_Expand.gif" border="0"> ' + showText;
+        sumBox.style.display = "block";
+
+        if (pathname.indexOf("pages") > 0) {
+
+            if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
+                parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="../images/violet/bt_Collapse.gif" border="0"> ' + hideText;
+            } else if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
+                parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="../images/green/bt_Collapse.gif" border="0"> ' + hideText;
+            } else {
+                parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="../images/bt_Collapse.gif" border="0"> ' + hideText;
+            }
+
+        } else {
+
+            if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
+                parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="images/violet/bt_Collapse.gif" border="0"> ' + hideText;
+            } else if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
+                parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="images/green/bt_Collapse.gif" border="0"> ' + hideText;
+            } else {
+                parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="images/bt_Collapse.gif" border="0"> ' + hideText;
+            }
+        }
+
+    } else {
+
+        if (sumBox) {
+
+            sumBox.style.display = "none";
+
+            if (pathname.indexOf("pages") > 0) {
+
+                if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
+                    parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="../images/violet/bt_Expand.gif" border="0"> ' + showText;
+                } else if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
+                    parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="../images/green/bt_Expand.gif" border="0"> ' + showText;
+                } else {
+                    parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="../images/bt_Expand.gif" border="0"> ' + showText;
+                }
+
+            } else {
+                
+                if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
+                    parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="images/violet/bt_Expand.gif" border="0"> ' + showText;
+                } else if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
+                    parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="images/green/bt_Expand.gif" border="0"> ' + showText;
+                } else {
+                    parentLinkObj.innerHTML = '<img name="ExpandGroup1" src="images/bt_Expand.gif" border="0"> ' + showText;
+                }
+            }
 
         }
     }
