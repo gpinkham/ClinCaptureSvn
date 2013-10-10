@@ -112,6 +112,15 @@ function datasetConfirmBack(message, formId, address, action) {
 	}
 }
 
+function goBackSmartCheckEntryStatus(formId, message, servletURL, defaultURL) {
+  var newFormState = $("#" + formId).serialize();
+  var confirm1 = newFormState != firstFormState ? confirm(message) : true;
+  if (confirm1) {
+    goBackSmart(servletURL, defaultURL);
+  }
+  return true;
+}
+
 function hideCols(tableId,columnNumArray,showTable){
     var theStyle;
     if (showTable) {
@@ -2399,6 +2408,9 @@ $(function() {
     bindRadioButtons();
     if ($("#datasetForm").length > 0) {
       firstFormState = $("#datasetForm").serialize();
+    } else
+    if ($("#UpdateSubStudy").length > 0) {
+      firstFormState = $("#UpdateSubStudy").serialize();
     }
 });
 

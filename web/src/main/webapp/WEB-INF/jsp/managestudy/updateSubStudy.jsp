@@ -91,7 +91,7 @@ function updateThis(multiSelEle, count) {
 <br><br>
 
 <jsp:include page="../include/alertbox.jsp" />
-<form action="UpdateSubStudy" method="post">
+<form id="UpdateSubStudy" action="UpdateSubStudy" method="post">
 <input type="hidden" name="action" value="confirm">
 
  <div class="table_title_Manage"><a href="javascript:leftnavExpand('siteProperties');">
@@ -753,7 +753,7 @@ function updateThis(multiSelEle, count) {
       <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
              value="<fmt:message key="back" bundle="${resword}"/>"
              class="button_medium"
-             onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+             onClick="javascript: goBackSmartCheckEntryStatus('UpdateSubStudy', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
       <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
       <%--input type="button" onclick="confirmCancel('ListSite');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/--%>
 	</table>
