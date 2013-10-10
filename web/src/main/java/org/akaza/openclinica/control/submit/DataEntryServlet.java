@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import com.clinovo.model.CodedItem;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -1451,7 +1452,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 				allItems = section.getDisplayItemGroups();
 
-				logger.debug("all items before saving into DB" + allItems.size());
+                logger.debug("all items before saving into DB" + allItems.size());
 				this.output(allItems);
 				// TODO:Seems longer here, check this
 				logMe("DisplayItemWithGroupBean allitems4 " + System.currentTimeMillis());
@@ -1568,6 +1569,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					}
 				}
 
+                if (this.isAdministrativeEditing()) {
+                    resetCodedItemTerms(changedItemsList, iddao, ub);
+                }
 				logMe("DisplayItemWithGroupBean allitems4 end " + System.currentTimeMillis());
 				List<Integer> prevShownDynItemDataIds = shouldRunRules ? this.getItemMetadataService()
 						.getDynamicsItemFormMetadataDao()
@@ -1926,7 +1930,34 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		}
 	}
 
-	protected void setReasonForChangeError(ItemDataBean idb, String formName, String error, HttpServletRequest request) {
+    private void resetCodedItemTerms(ArrayList<DisplayItemBean> changedItemsList, ItemDataDAO iddao, UserAccountBean ub) throws Exception {
+
+        for (DisplayItemBean displayItem : changedItemsList) {
+
+            ItemDataBean idb = displayItem.getData();
+            CodedItem codedItem = getCodedItemService().findByItemData(idb.getId());
+
+            if (codedItem != null) {
+
+                ItemDataBean questionCodedItem = iddao.findByItemIdAndEventCRFIdAndOrdinal(codedItem.getItemId(), codedItem.getEventCrfId(), idb.getOrdinal());
+
+                if (questionCodedItem.getItemId() > 0) {
+                    codedItem.setVerbatimTerm(idb.getValue());
+                    codedItem.setDictionary("");
+                    codedItem.setCodedTerm("");
+                    codedItem.setStatus("NOT_CODED");
+                    getCodedItemService().saveCodedItem(codedItem);
+
+                    questionCodedItem.setValue("");
+                    questionCodedItem.setUpdatedDate(new Date());
+                    questionCodedItem.setUpdater(ub);
+                    iddao.update(questionCodedItem);
+                }
+            }
+        }
+    }
+
+    protected void setReasonForChangeError(ItemDataBean idb, String formName, String error, HttpServletRequest request) {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		HttpSession session = request.getSession();
 		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session
