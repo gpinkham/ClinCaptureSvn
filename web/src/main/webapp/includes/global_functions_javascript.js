@@ -92,31 +92,41 @@ function confirmBackSmart(Message, servletURL, defaultURL){
     }
 }
 
-function datasetConfirmGoTo(message, formId, address) {
-	var newFormState = $("#" + formId).serialize();
-	var confirm1 = newFormState != firstFormState ? confirm(message) : true;
-	if (confirm1) {
-		window.location.href = address;
-	}
-}
-
 function datasetConfirmBack(message, formId, address, action) {
-	var newFormState = $("#" + formId).serialize();
-	var confirm1 = $("#" + formId).length != 0
-			&& newFormState != firstFormState ? confirm(message) : true;
-	if (confirm1) {
+  var newFormState = $("#" + formId).serialize();
+  var confirm1 = $("#" + formId).length != 0
+      && newFormState != firstFormState ? confirm(message) : true;
+  if (confirm1) {
     $("#" + formId)[0].setAttribute("action", address);
-		$("#" + formId + " input[name=action]").val(action);
+    $("#" + formId + " input[name=action]").val(action);
     $("#" + formId + " input[id=btnSubmit]")[0].setAttribute("onclick", "");
-		$("#" + formId + " input[id=btnSubmit]").click();
-	}
+    $("#" + formId + " input[id=btnSubmit]").click();
+  }
 }
 
-function goBackSmartCheckEntryStatus(formId, message, servletURL, defaultURL) {
-  var newFormState = $("#" + formId).serialize();
-  var confirm1 = newFormState != firstFormState ? confirm(message) : true;
+function formWithStateGoBackSmart(message, servletURL, defaultURL) {
+  var newFormState = $("#formWithStateFlag").parent("form").serialize();
+  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed" ? confirm(message) : true;
   if (confirm1) {
     goBackSmart(servletURL, defaultURL);
+  }
+  return true;
+}
+
+function formWithStateCancelSmart(message, servletURL, defaultURL) {
+  var newFormState = $("#formWithStateFlag").parent("form").serialize();
+  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed" ? confirm(message) : true;
+  if (confirm1) {
+    goBackSmart(servletURL, defaultURL);
+  }
+  return true;
+}
+
+function formWithStateConfirmGoTo(message, address) {
+  var newFormState = $("#formWithStateFlag").parent("form").serialize();
+  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed" ? confirm(message) : true;
+  if (confirm1) {
+    window.location.href = address;
   }
   return true;
 }
@@ -2409,8 +2419,8 @@ $(function() {
     if ($("#datasetForm").length > 0) {
       firstFormState = $("#datasetForm").serialize();
     } else
-    if ($("#UpdateSubStudy").length > 0) {
-      firstFormState = $("#UpdateSubStudy").serialize();
+    if ($("#formWithStateFlag").length > 0) {
+      firstFormState = $("#formWithStateFlag").parent("form").serialize();
     }
 });
 

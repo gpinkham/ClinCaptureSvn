@@ -9,12 +9,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<link rel="stylesheet" href="../../includes/style_shaded_table.css" type="text/css">
-
-
 <jsp:include page="../include/managestudy_top_pages_new.jsp"/>
-	
-	
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -72,8 +67,7 @@ $.noConflict();
 <input type="hidden" name="eventName" value="${eventName}">
 <input type="hidden" name="eventCreateDate" value="${eventCreateDate}">
 <input type="hidden" name="eventOrdinal" value="${eventOrdinal}">
-        	
-
+<input type="hidden" id="formWithStateFlag" value=""/>
 
 <table cellpadding="2" cellspacing="2" border="0" class="dataTable" >
 
@@ -90,14 +84,14 @@ $.noConflict();
 <c:if test="${! empty eventOrdinal}">
 <tr><td><fmt:message key="occurrence_number" bundle="${resword}"/>:</td>
 <td><c:out value="${eventOrdinal}" /></td></tr>
-</c:if>     
-	
+</c:if>
+
 
 <!-- <tr><td>
 <fmt:message key="study" bundle="${resword}"/>:</td>
 <td><c:out value="${studySubjectLabel}"/></td></tr>
  -->
- 
+
 <tr><td>
 <fmt:message key="choose_CRF_version_crf_name" bundle="${resword}"/></td>
 <td>
@@ -117,10 +111,17 @@ $.noConflict();
 <option value="-1" >-Select-</option>
 <c:forEach var="version" items="${crfBean.versions}">
 <c:if test="${version.id != crfversionId}">
-<option value="<c:out value="${version.id}" />" >&nbsp;<c:out value="${version.name}" />&nbsp;</option>
+<option value="<c:out value="${version.id}"/>">&nbsp;<c:out value="${version.name}" />&nbsp;</option>
 </c:if>
 </c:forEach>
 </select>
+<script>
+  $(function() {
+    if ($("#selectedVersion").val() != undefined && $("#selectedVersion").val() != "-1") {
+      $("#formWithStateFlag").val("changed");
+    }
+  });
+</script>
 <input type='hidden' id='selectedVersionName' name='selectedVersionName' value='zzz'>
 
 </td></tr>
@@ -153,11 +154,11 @@ $.noConflict();
 <!-- <td  class="table_cell"  > <c:out value="${version.status.name}" />&nbsp;</td>-->
 <td  class="table_cell"  style="text-align:center;" ><c:if test="${version.id == crfversionId}">X</c:if>&nbsp;</td>
 <td  class="table_cell"  > &nbsp;
-<a onmouseup="javascript:setImage('bt_View1','../../images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');" 
+<a onmouseup="javascript:setImage('bt_View1','../../images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');"
 href="#" onclick="window.location.href='../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes'">
 <img hspace="6" border="0" title="View" alt="View" src="../../images/bt_View.gif" name="bt_View1">
 </a>
-<a onmouseup="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" onmousedown="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" 
+<a onmouseup="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" onmousedown="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');"
 href="#" onclick="window.location.href='../../ViewCRFVersion?id=<c:out value="${version.id}"/>'">
 <img hspace="6" border="0" title="Metadata" alt="Metadata" src="../../images/bt_Metadata.gif" name="bt_Metadata">
 </a>
@@ -173,31 +174,29 @@ href="#" onclick="window.location.href='../../ViewCRFVersion?id=<c:out value="${
 </table>
 </div></div></div></div></div></div></div></div></div>
 
-<table border="0" cellpadding="0" cellspacing="0">
-<tr>
+<table border="0" cellpadding="0" cellspacing="0"><tr>
  <td VALIGN="top">
   <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-
-   
+				 value="<fmt:message key="back" bundle="${resword}"/>"
+				 class="button_long"
+				 onClick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" />
  </td >
-
  <td VALIGN="top">
-
    <input type="submit" name="confirmCRFVersionSubmit" class="button_long" 
-     value="<fmt:message key="continue" bundle="${resword}"/>" >
+          value="<fmt:message key="continue" bundle="${resword}"/>" >
  </td >
-</form>
-<td VALIGN="top">
-<form id="fr_cancel_button" method="get">
-<input type="hidden" name="id" value="<c:out value="${studySubjectId}"/>" />
-<input type="button" name="Cancel" id="cancel" 
-value="<fmt:message key="cancel" bundle="${resword}"/>" 
-class="button_long" onClick="confirmCancelAction('ViewStudySubject', '${pageContext.request.contextPath}');" />
-</form>
-</td>
+ <td VALIGN="top">
+    <input type="button" name="customCancel" id="customCancel"
+           value="<fmt:message key="cancel" bundle="${resword}"/>"
+           class="button_long" onClick="$('#fr_cancel_button #cancel').click();"/>
+ </td>
 </tr></table>
+</form>
+<form id="fr_cancel_button" method="get" style="display: none;">
+  <input type="hidden" name="id" value="<c:out value="${studySubjectId}"/>" />
+  <input type="button" name="Cancel" id="cancel"
+         value="<fmt:message key="cancel" bundle="${resword}"/>"
+         class="button_long" onClick="formWithStateConfirmGoTo('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${pageContext.request.contextPath}/ViewStudySubject?id=<c:out value="${studySubjectId}"/>');" />
+</form>
 <jsp:include page="../include/footer.jsp"/>
 

@@ -8,10 +8,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <jsp:include page="../include/managestudy_top_pages_new.jsp"/>
-	
-	<link rel="stylesheet" href="../../includes/style_shaded_table.css" type="text/css">
-
-
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -193,12 +189,17 @@
 <input type="hidden" name="eventCreateDate" value="${eventCreateDate}">
 <input type="hidden" name="eventOrdinal" value="${eventOrdinal}">
 
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+       value="<fmt:message key="back" bundle="${resword}"/>"
+       class="button_long"
+       onClick="history.go(-1);" />
+
 <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long">
 </form></td><td>
 
 <form id="fr_cancel_button" method="get">
 <input type="hidden" name="id" value="<c:out value="${studySubjectId}"/>" />
-<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="confirmCancelAction('ViewStudySubject?id=<c:out value="${studySubjectId}"/>', '${pageContext.request.contextPath}');" >
+<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="confirmGoTo('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${pageContext.request.contextPath}/ViewStudySubject?id=<c:out value="${studySubjectId}"/>');" >
 
 
 </form>
