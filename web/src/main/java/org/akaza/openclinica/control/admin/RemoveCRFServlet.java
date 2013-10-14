@@ -115,7 +115,9 @@ public class RemoveCRFServlet extends SecureController {
 				request.setAttribute("crfToRemove", crf);
 				request.setAttribute("eventCRFs", eventCRFs);
 				forwardPage(Page.REMOVE_CRF);
+				
 			} else {
+				
 				logger.info("submit to remove the crf");
 				crf.setStatus(Status.DELETED);
 				crf.setUpdater(ub);
@@ -140,6 +142,9 @@ public class RemoveCRFServlet extends SecureController {
 								secdao.update(section);
 							}
 						}
+						
+						// Remove coded items
+						getCodedItemService().removeByCRFVersion(version.getId());
 					}
 				}
 

@@ -118,6 +118,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.clinovo.service.CodedItemService;
+
 /**
  * This class enhances the Controller in several ways.
  * 
@@ -160,6 +162,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public abstract class SecureController extends HttpServlet {
 
+	private CodedItemService codedItemService;
+	
 	public static final String BR = "<br/>";
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
 
@@ -1195,5 +1199,15 @@ public abstract class SecureController extends HttpServlet {
 
 	public ConfigurationDao getConfigurationDao() {
 		return (ConfigurationDao) SpringServletAccess.getApplicationContext(context).getBean("configurationDao");
+	}
+	
+	protected CodedItemService getCodedItemService() {
+
+		if (codedItemService == null) {
+			codedItemService = SpringServletAccess.getApplicationContext(getServletContext()).getBean(
+					CodedItemService.class);
+		}
+
+		return codedItemService;
 	}
 }

@@ -51,9 +51,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  */
 @SuppressWarnings({ "rawtypes", "serial" })
 public class RemoveCRFVersionServlet extends SecureController {
-	/**
-     *
-     */
+	
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
 		if (ub.isSysAdmin()) {
@@ -105,18 +103,20 @@ public class RemoveCRFVersionServlet extends SecureController {
 			// find all event crfs by version id
 			ArrayList eventCRFs = evdao.findUndeletedWithStudySubjectsByCRFVersion(versionId);
 			if ("confirm".equalsIgnoreCase(action)) {
+				
 				request.setAttribute("versionToRemove", version);
 				request.setAttribute("eventCRFs", eventCRFs);
 				forwardPage(Page.REMOVE_CRF_VERSION);
+				
 			} else {
+				
 				logger.info("submit to remove the crf version");
 				// version
 				version.setStatus(Status.DELETED);
 				version.setUpdater(ub);
 				version.setUpdatedDate(new Date());
 				cvdao.update(version);
-				// added below tbh 092007, seems that we don't remove the event
-				// crfs in the second pass
+				
 				for (int ii = 0; ii < eventCRFs.size(); ii++) {
 					EventCRFBean ecbean = (EventCRFBean) eventCRFs.get(ii);
 					ecbean.setStatus(Status.AUTO_DELETED);
@@ -124,8 +124,7 @@ public class RemoveCRFVersionServlet extends SecureController {
 					ecbean.setUpdatedDate(new Date());
 					evdao.update(ecbean);
 				}
-				// added above tbh 092007, to fix task
-				// all sections
+				
 				ArrayList sections = secdao.findAllByCRFVersionId(version.getId());
 				for (int j = 0; j < sections.size(); j++) {
 					SectionBean section = (SectionBean) sections.get(j);
@@ -172,6 +171,10 @@ public class RemoveCRFVersionServlet extends SecureController {
 
 				addPageMessage(respage.getString("the_CRF") + version.getName() + " "
 						+ respage.getString("has_been_removed_succesfully"));
+				
+				// Remove coded items
+				getCodedItemService().removeByCRFVersion(versionId);
+				
                 if (keyValue != null) {
                     Map storedAttributes = new HashMap();
                     storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));

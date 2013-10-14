@@ -183,5 +183,29 @@ public interface CodedItemService {
 	 */
 	void deleteCodedItem(CodedItem codedItem);
 	
+	/**
+	 * Sets the status of the coded items belong to the specified CRF-Version to deleted! 
+	 * <p>
+	 * This means they will not show up when querying by scope
+	 * 
+	 * @param versionId The crf version for which to remove coded items
+	 */
+	void removeByCRFVersion(int versionId);
+
+	/**
+	 * Restores the deleted coded items that belong to the specified crf-version 
+	 * 
+	 * @param versionId The crf version for which to restore coded items
+	 */
+	void restoreByCRFVersion(int versionId);
+
+	/**
+	 * Purges from the database all coded items belonging to the specified crf-version 
+	 * <p>
+	 * This means they will not show up when querying by scope
+	 * 
+	 * @param versionId The crf version for which to purge coded items
+	 */
+	void deleteByCRFVersion(int versionId);
 
 }

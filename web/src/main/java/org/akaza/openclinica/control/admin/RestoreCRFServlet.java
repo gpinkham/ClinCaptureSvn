@@ -97,7 +97,9 @@ public class RestoreCRFServlet extends SecureController {
 				request.setAttribute("crfToRestore", crf);
 				request.setAttribute("eventCRFs", eventCRFs);
 				forwardPage(Page.RESTORE_CRF);
+				
 			} else {
+				
 				logger.info("submit to restore the crf");
 				crf.setStatus(Status.AVAILABLE);
 				crf.setUpdater(ub);
@@ -105,13 +107,14 @@ public class RestoreCRFServlet extends SecureController {
 				cdao.update(crf);
 
 				for (int i = 0; i < versions.size(); i++) {
+					
 					CRFVersionBean version = (CRFVersionBean) versions.get(i);
 					if (version.getStatus().equals(Status.AUTO_DELETED)) {
 						version.setStatus(Status.AVAILABLE);
 						version.setUpdater(ub);
 						version.setUpdatedDate(new Date());
 						cvdao.update(version);
-
+						
 						ArrayList sections = secdao.findAllByCRFVersionId(version.getId());
 						for (int j = 0; j < sections.size(); j++) {
 							SectionBean section = (SectionBean) sections.get(j);
@@ -122,6 +125,9 @@ public class RestoreCRFServlet extends SecureController {
 								secdao.update(section);
 							}
 						}
+						
+						// Restore coded items
+						getCodedItemService().restoreByCRFVersion(version.getId());
 					}
 				}
 

@@ -39,8 +39,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 
 @SuppressWarnings({ "rawtypes", "serial" })
 public class DeleteCRFVersionServlet extends SecureController {
+	
 	public static final String VERSION_ID = "verId";
-
 	public static final String VERSION_TO_DELETE = "version";
 
 	/**
@@ -104,11 +104,18 @@ public class DeleteCRFVersionServlet extends SecureController {
 			} else {
 				// submit
 				if (canDelete) {
+					
 					ArrayList items = cvdao.findNotSharedItemsByVersion(versionId);
 					NewCRFBean nib = new NewCRFBean(sm.getDataSource(), version.getCrfId());
 					nib.setDeleteQueries(cvdao.generateDeleteQueries(versionId, items));
 					nib.deleteFromDB();
+					
+					// Purge coded items
+					getCodedItemService().deleteByCRFVersion(versionId);
+					
+					
 					addPageMessage(respage.getString("the_CRF_version_has_been_deleted_succesfully"));
+					
 				} else {
 					addPageMessage(respage.getString("the_CRF_version_cannot_be_deleted"));
 				}
@@ -121,9 +128,7 @@ public class DeleteCRFVersionServlet extends SecureController {
                     forwardPage(Page.CRF_LIST_SERVLET);
                 }
 			}
-
 		}
-
 	}
 
 }

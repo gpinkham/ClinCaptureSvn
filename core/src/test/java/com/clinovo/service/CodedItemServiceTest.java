@@ -1,5 +1,7 @@
 package com.clinovo.service;
 
+import java.util.List;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.junit.Before;
@@ -176,6 +178,29 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 		assertEquals(2, codedItemService.findByStudyAndSite(2, 4).size());
 	}
 	
+  	@Test
+ 	public void testThatDeleteByVersionRemovesTheCodedItemsFromTheDB() {
+ 		
+ 		codedItemService.deleteByCRFVersion(2);
+ 		assertEquals(0, codedItemService.findByStudyAndSite(1, 3).size());
+ 	}
+ 	
+ 	@Test
+ 	public void testThatRemoveByVersionRemovesTheCodedItemsFromReturnedList() {
+ 		
+ 		codedItemService.removeByCRFVersion(1);
+ 		assertEquals(0, codedItemService.findByStudyAndSite(2, 4).size());
+ 	}
+ 	
+ 	@Test
+ 	public void testThatRemoveByVersionUpdatedCodedItemStatusToDeleted() {
+ 		
+ 		codedItemService.removeByCRFVersion(2);
+ 		
+ 		List<CodedItem> removeCodedItems = codedItemService.findCodedItemsByStatus(CodeStatus.REMOVED);
+ 		assertEquals(2, removeCodedItems.size());
+ 	}
+ 	
 	@Test
 	public void testThatSaveCodedItemDoesNotReturnNull() throws Exception {
 		

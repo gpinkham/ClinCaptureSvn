@@ -20,6 +20,11 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -36,16 +41,9 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 @SuppressWarnings({ "rawtypes", "serial" })
 public class RestoreCRFVersionServlet extends SecureController {
-	/**
-     *
-     */
+	
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
 		if (ub.isSysAdmin()) {
@@ -97,6 +95,7 @@ public class RestoreCRFVersionServlet extends SecureController {
 				request.setAttribute("eventCRFs", eventCRFs);
 				forwardPage(Page.RESTORE_CRF_VERSION);
 			} else {
+				
 				logger.info("submit to restore the crf version");
 				// version
 				version.setStatus(Status.AVAILABLE);
@@ -150,6 +149,10 @@ public class RestoreCRFVersionServlet extends SecureController {
 
 					}
 				}
+				
+				// Restore coded items
+				getCodedItemService().restoreByCRFVersion(versionId);
+				
 				addPageMessage(respage.getString("the_CRF_version") + version.getName() + " "
 						+ respage.getString("has_been_restored_succesfully"));
                 if (keyValue != null) {
@@ -173,5 +176,4 @@ public class RestoreCRFVersionServlet extends SecureController {
 			return "";
 		}
 	}
-
 }

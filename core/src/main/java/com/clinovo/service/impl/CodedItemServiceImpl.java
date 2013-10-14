@@ -1,5 +1,6 @@
 package com.clinovo.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -45,14 +46,21 @@ public class CodedItemServiceImpl implements CodedItemService {
 	public List<CodedItem> findAll() {
 
 		return codeItemDAO.findAll();
+
 	}
 
 	public List<CodedItem> findByStudy(int studyId) {
-		return codeItemDAO.findByStudy(studyId);
+		
+		List<CodedItem> codedItems = codeItemDAO.findByStudy(studyId);
+		
+		return retrieveAvailableItems(codedItems);
 	}
 	
 	public List<CodedItem> findByStudyAndSite(int studyId, int siteId) {
-		return codeItemDAO.findByStudyAndSite(studyId, siteId);
+		
+		List<CodedItem> codedItems = codeItemDAO.findByStudyAndSite(studyId, siteId);
+		
+		return retrieveAvailableItems(codedItems);
 	}
 	
 	public CodedItem findByItemData(int itemDataId) {
@@ -181,5 +189,59 @@ public class CodedItemServiceImpl implements CodedItemService {
 		}
 		
 		return itemDataDAO;
+	}
+
+	public void removeByCRFVersion(int versionId) {
+
+		List<CodedItem> codedItems = findByCRFVersion(versionId);
+
+		for (CodedItem item : codedItems) {
+
+			item.setStatus(String.valueOf(CodeStatus.REMOVED));
+			codeItemDAO.saveOrUpdate(item);
+		}
+	}
+	
+	public void deleteByCRFVersion(int versionId) {
+		
+		List<CodedItem> codedItems = findByCRFVersion(versionId);
+
+		for (CodedItem item : codedItems) {
+			codeItemDAO.deleteCodedItem(item);
+		}
+	}
+
+	public void restoreByCRFVersion(int versionId) {
+		
+		List<CodedItem> codedItems = findByCRFVersion(versionId);
+
+		for (CodedItem item : codedItems) {
+			
+			// Had coded status before removal
+			if(item.getCodedTerm() != null && !item.getCodedTerm().isEmpty()) {
+				
+				item.setStatus(String.valueOf(CodeStatus.CODED));
+				
+			} else {
+				
+				item.setStatus(String.valueOf(CodeStatus.NOT_CODED));
+			}
+			
+			codeItemDAO.saveOrUpdate(item);
+		}
+		
+	}
+	
+	private List<CodedItem> retrieveAvailableItems(List<CodedItem> items) {
+		
+		List<CodedItem> validItems = new ArrayList<CodedItem>();
+
+		for (CodedItem item : items) {
+			if (!item.getStatus().equals(String.valueOf(CodeStatus.REMOVED))) {
+				validItems.add(item);
+			}
+		}
+
+		return validItems;
 	}
 }
