@@ -254,11 +254,6 @@ $(document).ready(function() {
 
 <div class="textbox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-<tr>
-    <td class="table_cell" colspan="4" align="right">
-        <a href="AddCRFToDefinition"><fmt:message key="add_a_new_CRF" bundle="${resword}"/></a>
-    </td>
-</tr>
 <c:set var="count" value="0"/>
 
 
@@ -598,9 +593,12 @@ $(document).ready(function() {
 					value="<fmt:message key="back" bundle="${resword}"/>" 
 					class="button_medium" 
 					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
-        </td>
+        </td>        
         <td>
             <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+        </td>
+        <td>
+        	<input type="button" name="<fmt:message key="add_a_new_CRF" bundle="${resword}"/>" value="<fmt:message key="add_a_new_CRF" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='AddCRFToDefinition'">
         </td>
         <td>
             <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
