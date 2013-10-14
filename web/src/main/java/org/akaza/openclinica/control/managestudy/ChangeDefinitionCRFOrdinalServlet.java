@@ -72,16 +72,25 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 			EventDefinitionCRFDAO dao) {
 		EventDefinitionCRFBean current = (EventDefinitionCRFBean) dao.findByPK(idCurrent);
 		EventDefinitionCRFBean previous = (EventDefinitionCRFBean) dao.findByPK(idPrevious);
+        ArrayList allEventDefCRFBeans = dao.findAllActiveByEventDefinitionId(current.getStudyEventDefinitionId());
+
+        int maxOrder = 1;
+        for(Object tmpBean : allEventDefCRFBeans) {
+          EventDefinitionCRFBean edCRFBean = (EventDefinitionCRFBean) tmpBean;
+            if(edCRFBean.getOrdinal() > maxOrder) {
+                maxOrder = edCRFBean.getOrdinal();
+            }
+        }
 
 		if (current.getOrdinal() == currOrdinal && previous.getOrdinal() == prevOrdinal) {
-			if (idCurrent > 0) {
-				int currentOrdinal = current.getOrdinal();
+            int currentOrdinal = current.getOrdinal();
+            if (idCurrent > 0 && currentOrdinal != 1) {
 				current.setOrdinal(currentOrdinal - 1);
 				current.setUpdater((UserAccountBean) session.getAttribute("userBean"));
 				dao.update(current);
 			}
-			if (idPrevious > 0) {
-				int previousOrdinal = previous.getOrdinal();
+            int previousOrdinal = previous.getOrdinal();
+			if (idPrevious > 0 && previousOrdinal != maxOrder) {
 				previous.setOrdinal(previousOrdinal + 1);
 				previous.setUpdater((UserAccountBean) session.getAttribute("userBean"));
 				dao.update(previous);
