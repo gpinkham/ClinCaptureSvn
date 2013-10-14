@@ -14,7 +14,7 @@
   <c:when test="${currRow.bean.status.name eq 'available'}">
     <c:set var="className" value="aka_green_highlight"/>
   </c:when>
-  <c:when test="${currRow.bean.status.name eq 'removed'}">
+  <c:when test="${currRow.bean.status.name eq 'removed' || currRow.bean.status.name eq 'auto-removed'}">
     <c:set var="className" value="aka_red_highlight"/>
   </c:when>
 </c:choose>
@@ -80,7 +80,7 @@
     <c:when test="${version.status.name eq 'available'}">
       <c:set var="className" value="aka_green_highlight"/>
     </c:when>
-    <c:when test="${version.status.name eq 'removed'}">
+    <c:when test="${version.status.name eq 'removed' || version.status.name eq 'auto-removed'}">
       <c:set var="className" value="aka_red_highlight"/>
     </c:when>
   </c:choose>
