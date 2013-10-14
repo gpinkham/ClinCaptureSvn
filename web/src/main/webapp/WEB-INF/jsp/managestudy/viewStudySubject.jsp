@@ -575,11 +575,11 @@
 		</td>
 		<c:if test="${userRole.role.id != 4 && userRole.role.id != 5}">
 		<td> 
-			<input id="ViewAuditLog" class="button_medium" type="submit" name="BTN_View" value="<fmt:message key="subjects_audit_log" bundle="${resword}"/>" onclick="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>');"/>
+			<input id="ViewAuditLog" class="button_long" type="submit" name="BTN_View" value="<fmt:message key="subjects_audit_log" bundle="${resword}"/>" onclick="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>');"/>
 		</td>
 		</c:if>
 		<td>
-			<input class="button_medium" type="submit" name="CaseBook" value="<fmt:message key="subjects_case_book" bundle="${resword}"/>" onclick="javascript:openDocWindow('PrintSubjectCaseBook?subjectId=<c:out value="${studySub.id}"/>');"/>
+			<input class="button_long" type="submit" name="CaseBook" value="<fmt:message key="subjects_case_book" bundle="${resword}"/>" onclick="javascript:openDocWindow('PrintSubjectCaseBook?subjectId=<c:out value="${studySub.id}"/>');"/>
 		</td>
 	</tr>
 </table> 
