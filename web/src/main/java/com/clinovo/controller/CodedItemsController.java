@@ -118,6 +118,7 @@ public class CodedItemsController {
 		map.addAttribute("codedItems", codedItems.size());
 		map.addAttribute("unCodedItems", unCodedItems.size());
 		map.addAttribute("codedQuestionsHtml", codedItemsTable);
+        map.addAttribute("studyId", Integer.valueOf(studyId));
 
 		return map;
 	}

@@ -71,15 +71,16 @@
         </tr>
         <tr>
         	<td align="center">Medical Terms</td>
-        	<td align="center">${unCodedItems}</td>
-        	<td align="center">0</td>
-        	<td align="center">${codedItems}</td>
+        	<td align="center" name="tdToBeCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_codedItem.isCoded=Available">${unCodedItems}</a></td>
+            <td align="center">0</td>
+        	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_codedItem.isCoded=Completed">${codedItems}</a></td>
         </tr>
     </table> 
 </div>
 
 <form action="${pageContext.request.contextPath}/pages/codedItems" style="clear:left; float:left;">
     ${codedQuestionsHtml}
+    <input type="hidden" name="study" value="${studyId}">
 </form>
 
 <div style="clear:left; float:left">

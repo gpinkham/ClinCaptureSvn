@@ -2450,7 +2450,7 @@ codeItem = function(item) {
 
             item: $(item).attr("itemid"),
             dictionary: $(item).parent().siblings("td").find("select option:selected").val(),
-            verbatimTerm: $(item).parent().siblings("td").find("input").val().trim()
+            verbatimTerm: $.trim($(item).parent().siblings("td").find("input").val())
         },
 
         success: function(data) {
@@ -2478,13 +2478,13 @@ saveCodedItem = function(item) {
 
             item: $(item).children('div').attr("id"),
             dictionary:  $(item).parents('tr').find("select option:selected").val(),
-            code: $(item).children('div').text().trim()
+            code: $.trim($(item).children('div').text())
         },
 
         success: function(data) {
 
             /* update code item version */
-            var versionNumber = parseInt($(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text().trim());
+            var versionNumber = parseInt($.trim($(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text()));
             $(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text(versionNumber + 1);
             /* update code icon from available to code completed */
             $(item).parents('td').find("a[name='Code'][itemid=" + $(item).children('div').attr("id") + "]").children('img').attr('src', '../images/code_confirm.png');
@@ -2492,9 +2492,14 @@ saveCodedItem = function(item) {
             $(item).parents('td').siblings("td").filter(function () {
                 return $(this).text() == 'Available';}).text("Completed");
             /* update coding box from verbatim term to coded term */
-            $(item).parents('div').siblings("input").val($(item).children('div').text().trim()).attr('disabled', true);
+            $(item).parents('div').siblings("input").val($.trim($(item).children('div').text())).attr('disabled', true);
             /* display unCode icon */
             $(item).parents('td').find("a[name='unCode'][itemid=" + $(item).children('div').attr("id") + "]").css("display", "");
+            /* increase 'Coded' value & decrease 'To Be Coded' value */
+            var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
+            var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
+            $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
+            $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
 
             console.log("Medical coding executed successfully")
         },
@@ -2534,7 +2539,7 @@ uncodeCodeItem = function(item) {
                 /* change completed code icon to available */
                 $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc)
                 /* change code item version */
-                var versionNumber = parseInt($(item).parent('td').siblings("td").find("div[name='codedItemVersion']").text().trim());
+                var versionNumber = parseInt($.trim($(item).parent('td').siblings("td").find("div[name='codedItemVersion']").text()));
                 $(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text(versionNumber + 1);
                 /* change status from completed to available */
                 $(item).parent().siblings("td").filter(function () {
@@ -2543,6 +2548,11 @@ uncodeCodeItem = function(item) {
                 $(item).parent().siblings("td").find("input:first").val($(item).parent().siblings("td:first").text()).attr("disabled", false);
                 /* hide unCode icon */
                 $(item).css("display", "none");
+                /* increase 'To be coded' value & decrease 'Coded' value */
+                var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
+                var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
+                $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded - 1);
+                $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded + 1);
 
                 console.log("Medical uncoding executed successfully");
             },
