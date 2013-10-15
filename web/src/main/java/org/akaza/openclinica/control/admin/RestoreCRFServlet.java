@@ -30,6 +30,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -49,72 +50,92 @@ public class RestoreCRFServlet extends SecureController {
 	/**
      *
      */
+	
+	private static final String CRF_ID_PARAMETER = "id";
+
+	private static final String ACTION_PARAMETER = "action";
+
+	private static final String CONFIRM_PAGE_PASSED_PARAMETER = "confirmPagePassed";
+
+	private static final String MODULE_ADMIN = "admin";
+
+	private static final String MODULE_MANAGE = "manage";
+
+	private static final String ACTION_CONFIRM = "confirm";
+
+	private static final String ACTION_SUBMIT = "submit";
+	
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
-		if (ub.isSysAdmin()) {
-			return;
-		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 				+ respage.getString("change_study_contact_sysadmin"));
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
-
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void processRequest() throws Exception {
 
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 		FormProcessor fp = new FormProcessor(request);
 		// checks which module the requests are from
 		String module = fp.getString(MODULE);
+		int crfId = fp.getInt(CRF_ID_PARAMETER, true);
+		String action = fp.getString(ACTION_PARAMETER);
+		String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
+
+		CRFDAO cdao = new CRFDAO(sm.getDataSource());
+		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+		CRFBean crf = (CRFBean) cdao.findByPK(crfId);
+		ArrayList versions;
+		ArrayList edcs;
+		ArrayList eventCRFs;
+		SectionDAO secdao;
+		EventDefinitionCRFDAO edcdao;
+		EventCRFDAO evdao;
+
 		request.setAttribute(MODULE, module);
-        String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
+		
+		if (crf.getId() != 0 && !StringUtil.isBlank(action)
+				&& (MODULE_ADMIN.equalsIgnoreCase(module) || MODULE_MANAGE.equalsIgnoreCase(module))) {
 
-		int crfId = fp.getInt("id", true);
-
-		String action = request.getParameter("action");
-		if (crfId == 0) {
-			addPageMessage(respage.getString("please_choose_a_CRF_to_restore"));
-			forwardPage(Page.CRF_LIST_SERVLET);
-		} else {
-			CRFBean crf = (CRFBean) cdao.findByPK(crfId);
-			ArrayList versions = cvdao.findAllByCRFId(crfId);
+			versions = cvdao.findAllByCRFId(crfId);
 			crf.setVersions(versions);
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-			ArrayList edcs = (ArrayList) edcdao.findAllByCRF(crfId);
+			evdao = new EventCRFDAO(sm.getDataSource());
+			eventCRFs = evdao.findAllByCRF(crfId);
 
-			SectionDAO secdao = new SectionDAO(sm.getDataSource());
+			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
 
-			EventCRFDAO evdao = new EventCRFDAO(sm.getDataSource());
-			ArrayList eventCRFs = evdao.findAllByCRF(crfId);
-			if ("confirm".equalsIgnoreCase(action)) {
+				if (!ub.isSysAdmin() && (crf.getOwnerId() != ub.getId())) {
+					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+							+ respage.getString("change_active_study_or_contact"));
+					forwardPage(Page.MENU_SERVLET);
+				}
+
 				request.setAttribute("crfToRestore", crf);
 				request.setAttribute("eventCRFs", eventCRFs);
 				forwardPage(Page.RESTORE_CRF);
-				
-			} else {
-				
+			} else if (ACTION_SUBMIT.equalsIgnoreCase(action)
+					&& !fp.getString(CONFIRM_PAGE_PASSED_PARAMETER).equals(FormProcessor.DEFAULT_STRING)) {
+
 				logger.info("submit to restore the crf");
 				crf.setStatus(Status.AVAILABLE);
 				crf.setUpdater(ub);
 				crf.setUpdatedDate(new Date());
 				cdao.update(crf);
 
+				secdao = new SectionDAO(sm.getDataSource());
 				for (int i = 0; i < versions.size(); i++) {
-					
 					CRFVersionBean version = (CRFVersionBean) versions.get(i);
 					if (version.getStatus().equals(Status.AUTO_DELETED)) {
 						version.setStatus(Status.AVAILABLE);
 						version.setUpdater(ub);
 						version.setUpdatedDate(new Date());
 						cvdao.update(version);
-						
+
 						ArrayList sections = secdao.findAllByCRFVersionId(version.getId());
 						for (int j = 0; j < sections.size(); j++) {
 							SectionBean section = (SectionBean) sections.get(j);
@@ -131,6 +152,8 @@ public class RestoreCRFServlet extends SecureController {
 					}
 				}
 
+				edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+				edcs = (ArrayList) edcdao.findAllByCRF(crfId);
 				for (int i = 0; i < edcs.size(); i++) {
 					EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcs.get(i);
 					if (edc.getStatus().equals(Status.AUTO_DELETED)) {
@@ -165,15 +188,20 @@ public class RestoreCRFServlet extends SecureController {
 
 				addPageMessage(respage.getString("the_CRF") + crf.getName() + " "
 						+ respage.getString("has_been_restored_succesfully"));
-                if (keyValue != null) {
-                    Map storedAttributes = new HashMap();
-                    storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
-                    request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
-                    response.sendRedirect(response.encodeRedirectURL(keyValue));
-                } else {
-                    forwardPage(Page.CRF_LIST_SERVLET);
-                }
+			} else {
+				addPageMessage(respage.getString("invalid_http_request_parameters"));
 			}
+		} else {
+			addPageMessage(respage.getString("invalid_http_request_parameters"));
+		}
+
+		if (keyValue != null) {
+			Map storedAttributes = new HashMap();
+			storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+			request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+			response.sendRedirect(response.encodeRedirectURL(keyValue));
+		} else {
+			forwardPage(Page.CRF_LIST_SERVLET);
 		}
 	}
 

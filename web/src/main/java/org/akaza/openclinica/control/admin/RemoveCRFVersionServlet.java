@@ -52,63 +52,68 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 @SuppressWarnings({ "rawtypes", "serial" })
 public class RemoveCRFVersionServlet extends SecureController {
 	
+	private static final String CRF_VERSION_ID_PARAMETER = "id";
+
+	private static final String ACTION_PARAMETER = "action";
+	
+	private static final String CONFIRM_PAGE_PASSED_PARAMETER = "confirmPagePassed";
+
+	private static final String MODULE_ADMIN = "admin";
+
+	private static final String MODULE_MANAGE = "manage";
+
+	private static final String ACTION_CONFIRM = "confirm";
+
+	private static final String ACTION_SUBMIT = "submit";
+	
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
-		if (ub.isSysAdmin()) {
-			return;
-		}
-
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 				+ respage.getString("change_study_contact_sysadmin"));
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_admin"), "1");
-
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void processRequest() throws Exception {
 
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 		FormProcessor fp = new FormProcessor(request);
-		int versionId = fp.getInt("id", true);
-		String module = fp.getString("module");
-		request.setAttribute("module", module);
-        String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
+		int versionId = fp.getInt(CRF_VERSION_ID_PARAMETER, true);
+		String module = fp.getString(MODULE);
+		String action = fp.getString(ACTION_PARAMETER);
+		String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
 
-		String action = fp.getString("action");
-		if (versionId == 0) {
-			addPageMessage(respage.getString("please_choose_a_CRF_version_to_remove"));
-			forwardPage(Page.CRF_LIST_SERVLET);
-		} else {
-			if (StringUtil.isBlank(action)) {
-				addPageMessage(respage.getString("no_action_specified"));
-				forwardPage(Page.CRF_LIST_SERVLET);
-				return;
-			}
-			CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(versionId);
-			if (!ub.isSysAdmin() && (version.getOwnerId() != ub.getId())) {
-				addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_active_study_or_contact"));
-				forwardPage(Page.MENU_SERVLET);
-				return;
-			}
+		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+		CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(versionId);
+		ArrayList eventCRFs;
+		EventCRFDAO evdao;
+		SectionDAO secdao;
 
-			SectionDAO secdao = new SectionDAO(sm.getDataSource());
+		request.setAttribute(MODULE, module);
+		
+		if (version.getId() != 0 && !StringUtil.isBlank(action)
+				&& (MODULE_ADMIN.equalsIgnoreCase(module) || MODULE_MANAGE.equalsIgnoreCase(module))) {
 
-			EventCRFDAO evdao = new EventCRFDAO(sm.getDataSource());
+			evdao = new EventCRFDAO(sm.getDataSource());
 			// find all event crfs by version id
-			ArrayList eventCRFs = evdao.findUndeletedWithStudySubjectsByCRFVersion(versionId);
-			if ("confirm".equalsIgnoreCase(action)) {
-				
+			eventCRFs = evdao.findUndeletedWithStudySubjectsByCRFVersion(versionId);
+
+			if (ACTION_CONFIRM.equalsIgnoreCase(action)) {
+				if (!ub.isSysAdmin() && (version.getOwnerId() != ub.getId())) {
+					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
+							+ respage.getString("change_active_study_or_contact"));
+					forwardPage(Page.MENU_SERVLET);
+				}
+
 				request.setAttribute("versionToRemove", version);
 				request.setAttribute("eventCRFs", eventCRFs);
 				forwardPage(Page.REMOVE_CRF_VERSION);
-				
-			} else {
+			} else if (ACTION_SUBMIT.equalsIgnoreCase(action)
+					&& !fp.getString(CONFIRM_PAGE_PASSED_PARAMETER).equals(FormProcessor.DEFAULT_STRING)) {
 				
 				logger.info("submit to remove the crf version");
 				// version
@@ -116,7 +121,8 @@ public class RemoveCRFVersionServlet extends SecureController {
 				version.setUpdater(ub);
 				version.setUpdatedDate(new Date());
 				cvdao.update(version);
-				
+				// added below tbh 092007, seems that we don't remove the event
+				// crfs in the second pass
 				for (int ii = 0; ii < eventCRFs.size(); ii++) {
 					EventCRFBean ecbean = (EventCRFBean) eventCRFs.get(ii);
 					ecbean.setStatus(Status.AUTO_DELETED);
@@ -124,7 +130,9 @@ public class RemoveCRFVersionServlet extends SecureController {
 					ecbean.setUpdatedDate(new Date());
 					evdao.update(ecbean);
 				}
-				
+				// added above tbh 092007, to fix task
+				// all sections
+				secdao = new SectionDAO(sm.getDataSource());
 				ArrayList sections = secdao.findAllByCRFVersionId(version.getId());
 				for (int j = 0; j < sections.size(); j++) {
 					SectionBean section = (SectionBean) sections.get(j);
@@ -169,21 +177,26 @@ public class RemoveCRFVersionServlet extends SecureController {
 					}
 				}
 
-				addPageMessage(respage.getString("the_CRF") + version.getName() + " "
-						+ respage.getString("has_been_removed_succesfully"));
-				
 				// Remove coded items
 				getCodedItemService().removeByCRFVersion(versionId);
 				
-                if (keyValue != null) {
-                    Map storedAttributes = new HashMap();
-                    storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
-                    request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
-                    response.sendRedirect(response.encodeRedirectURL(keyValue));
-                } else {
-                    forwardPage(Page.CRF_LIST_SERVLET);
-                }
+				addPageMessage(respage.getString("the_CRF") + version.getName() + " "
+						+ respage.getString("has_been_removed_succesfully"));
+
+			} else {
+				addPageMessage(respage.getString("invalid_http_request_parameters"));
 			}
+		} else {
+			addPageMessage(respage.getString("invalid_http_request_parameters"));
+		}
+
+		if (keyValue != null) {
+			Map storedAttributes = new HashMap();
+			storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+			request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+			response.sendRedirect(response.encodeRedirectURL(keyValue));
+		} else {
+			forwardPage(Page.CRF_LIST_SERVLET);
 		}
 
 	}

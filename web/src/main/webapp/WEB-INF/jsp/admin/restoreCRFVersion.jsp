@@ -102,6 +102,7 @@
 <br/>
 <form action='RestoreCRFVersion?module=<c:out value="${module}"/>&action=submit&id=<c:out value="${versionToRestore.id}"/>' method="POST">
  <input type="submit" name="submit" value="<fmt:message key="restore_CRF_version" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="if_you_restore_this_CRF_version" bundle="${restext}"/>");'>
+ <input type = "hidden" name = "confirmPagePassed" value = "true" />
 </form>
 
 <c:choose>

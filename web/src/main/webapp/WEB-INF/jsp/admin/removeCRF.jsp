@@ -136,13 +136,14 @@
 
 </div>
 <br>
-<form action='RemoveCRF?action=submit&id=<c:out value="${crfToRemove.id}"/>' method="POST">
+<form action='RemoveCRF?module=<c:out value="${module}"/>&action=submit&id=<c:out value="${crfToRemove.id}"/>' method="POST">
   <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
   <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="if_you_remove_this_CRF" bundle="${restext}"/>");'>
   <%-- <input type="button" onclick="confirmCancel('ListCRF');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>--%>
+  <input type = "hidden" name = "confirmPagePassed" value = "true" />
 </form>
 
 <jsp:include page="../include/footer.jsp"/>
