@@ -80,8 +80,17 @@ function notSelectAll() {
 </c:otherwise>
 </c:choose>
 
+<c:choose>
+  <c:when test="${empty newDataset.itemDefCrf}">
+    <p><fmt:message key="please_select_one_CRF_from_the" bundle="${restext}"/> <b><fmt:message key="left_side_info_panel" bundle="${restext}"/></b><fmt:message key="select_items_in_CRF_include_dataset" bundle="${restext}"/></p>
+    <p><fmt:message key="click_event_subject_attributes_specify" bundle="${restext}"/></p>
+  </c:when>
+  <c:otherwise>
+    <p><fmt:message key="can_view_items_selected_inclusion" bundle="${restext}"/><fmt:message key="select_all_items_inclusion_clicking" bundle="${restext}"/></p>
+  </c:otherwise>
+</c:choose>
+
 <c:if test="${empty newDataset.itemDefCrf}">
-<p><fmt:message key="can_view_items_selected_inclusion" bundle="${restext}"/><fmt:message key="select_all_items_inclusion_clicking" bundle="${restext}"/></p>
 <form id="datasetForm" action="EditSelected" method="post" name="cl">
  <input type="hidden" name="all" value="1">
  <input type="button" name="BTN_Back" id="PreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" size="50" onclick="datasetConfirmBack('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'datasetForm', 'CreateDataset', 'back_to_begin');"/>

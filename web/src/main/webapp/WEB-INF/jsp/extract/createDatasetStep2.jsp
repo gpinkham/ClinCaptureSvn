@@ -103,8 +103,16 @@ function notSelectAll() {
 </jsp:include>
 --%>
 
-<p><fmt:message key="please_select_one_CRF_from_the" bundle="${restext}"/> <b><fmt:message key="left_side_info_panel" bundle="${restext}"/></b><fmt:message key="select_items_in_CRF_include_dataset" bundle="${restext}"/></p>
-<p><fmt:message key="click_event_subject_attributes_specify" bundle="${restext}"/></p>
+<c:choose>
+  <c:when test="${empty newDataset.itemDefCrf}">
+    <p><fmt:message key="please_select_one_CRF_from_the" bundle="${restext}"/> <b><fmt:message key="left_side_info_panel" bundle="${restext}"/></b><fmt:message key="select_items_in_CRF_include_dataset" bundle="${restext}"/></p>
+    <p><fmt:message key="click_event_subject_attributes_specify" bundle="${restext}"/></p>
+  </c:when>
+  <c:otherwise>
+    <p><fmt:message key="can_view_items_selected_inclusion" bundle="${restext}"/><fmt:message key="select_all_items_inclusion_clicking" bundle="${restext}"/></p>
+  </c:otherwise>
+</c:choose>
+
 <table border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td><img src="images/arrow_left.gif" alt="<fmt:message key="select_CRF_on_the_left" bundle="${restext}"/>" title="<fmt:message key="select_CRF_on_the_left" bundle="${restext}"/>"></td>
