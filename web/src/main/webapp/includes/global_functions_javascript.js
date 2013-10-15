@@ -2721,6 +2721,7 @@ function resetHighlightedFieldsForDNShortcutAnchors(idToHighlight) {
     var id = dnShortcutAnchors[i];
     var inputHolderElement = $("#itemHolderId_" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel"));
     var inputElement = inputHolderElement.find("input[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]");
+    inputElement = inputElement.length == 0 ? inputHolderElement.find("select[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]") : inputElement;
     if (inputElement.attr("type") != undefined && (inputElement.attr("type").toLowerCase() == "radio" || inputElement.attr("type").toLowerCase() == "checkbox")) {
       inputElement = inputElement.parent();
     }
@@ -2775,12 +2776,12 @@ function updateCRFHeaderFunction(parametersHolder) {
 			success : function(data) {
 				if (data.indexOf("dnShortcutsTable") >= 0) {
           $('#dnShortcutsTable').removeClass("hidden");
-          $('#dnShortcutsTableHeader').removeClass("hidden");
 					$('#dnShortcutsTable')[0].outerHTML = $.trim(data);
           for (var i = 0; i < dnShortcutLinks.length; i++) {
             if (parseInt($.trim($("#" + dnShortcutLinks[i]).text())) == 0) {
               var inputHolderElement = $("#itemHolderId_" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel"));
-              var inputElement =  inputHolderElement.find("input[id*=" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel") + "]");
+              var inputElement = inputHolderElement.find("input[id*=" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel") + "]");
+              inputElement = inputElement.length == 0 ? inputHolderElement.find("select[id*=" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel") + "]") : inputElement;
               if (inputElement.attr("type") != undefined && (inputElement.attr("type").toLowerCase() == "radio" || inputElement.attr("type").toLowerCase() == "checkbox")) {
                 inputElement =  inputElement.parent();
               }
