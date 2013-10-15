@@ -2464,8 +2464,6 @@ codeItem = function(item) {
     })
 }
 
-
-
 saveCodedItem = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]

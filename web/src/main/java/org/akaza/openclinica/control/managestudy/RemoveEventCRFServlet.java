@@ -47,7 +47,6 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -162,9 +161,6 @@ public class RemoveEventCRFServlet extends SecureController {
 				eventCRF.setUpdatedDate(new Date());
 				ecdao.update(eventCRF);
 
-				// clinovo - ticket #111
-				SubjectEventStatusUtil.checkForRemovedStatus(ub, sed, studySub, sedao, ecdao);
-
 				// remove all the item data
 				for (int a = 0; a < itemData.size(); a++) {
 					ItemDataBean item = (ItemDataBean) itemData.get(a);
@@ -191,8 +187,7 @@ public class RemoveEventCRFServlet extends SecureController {
 	/**
 	 * Send email to director and administrator
 	 * 
-	 * @param request
-	 * @param response
+	 * @param emailBody
 	 */
 	private void sendEmail(String emailBody) throws Exception {
 

@@ -14,7 +14,6 @@
 package org.akaza.openclinica.util;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -22,15 +21,12 @@ import java.util.ResourceBundle;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
 // be careful when you change the logic of this class (talk with Marc or Sergey) !
@@ -160,32 +156,6 @@ public final class SubjectEventStatusUtil {
 		}
 		if (countOfStarted == 0 || countOfDeleted < countOfStarted) {
 			statuses.remove(SubjectEventStatus.REMOVED);
-		}
-	}
-
-	public static void checkForRemovedStatus(UserAccountBean ub, StudyEventDefinitionBean sed, StudySubjectBean ss,
-			StudyEventDAO studyEventDAO, EventCRFDAO eventCRFDAO) {
-		List<StudyEventBean> studyEvents = studyEventDAO.findAllByDefinitionAndSubject(sed, ss);
-		for (StudyEventBean studyEventBean : studyEvents) {
-			int countOfStartedEventCRFs = 0;
-			int countOfDeletedEventCRFs = 0;
-			ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEventBean);
-			for (EventCRFBean eventCRFBean : eventCRFs) {
-				if (!eventCRFBean.isNotStarted()) {
-					countOfStartedEventCRFs++;
-					if (eventCRFBean.getStatus() == Status.DELETED) {
-						countOfDeletedEventCRFs++;
-					}
-				}
-			}
-			if (countOfDeletedEventCRFs == countOfStartedEventCRFs && countOfStartedEventCRFs > 0) {
-				studyEventBean.setStatus(Status.DELETED);
-				studyEventBean.setSubjectEventStatus(SubjectEventStatus.REMOVED);
-				studyEventBean.setUpdater(ub);
-				studyEventBean.setUpdatedDate(new Date());
-
-				studyEventDAO.update(studyEventBean);
-			}
 		}
 	}
 

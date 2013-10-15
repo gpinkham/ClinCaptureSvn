@@ -212,8 +212,7 @@ public class RestoreEventCRFServlet extends SecureController {
 	/**
 	 * Send email to director and administrator
 	 * 
-	 * @param request
-	 * @param response
+	 * @param emailBody
 	 */
 	private void sendEmail(String emailBody) throws Exception {
 
