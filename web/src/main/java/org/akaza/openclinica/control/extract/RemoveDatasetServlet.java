@@ -79,13 +79,13 @@ public class RemoveDatasetServlet extends Controller {
 		}
 
 		String action = request.getParameter("action");
-		if (resword.getString("remove_this_dataset").equalsIgnoreCase(action)) {
+		if (resword.getString("submit").equalsIgnoreCase(action)) {
 			dataset.setStatus(Status.DELETED);
 			dsDAO.update(dataset);
 			addPageMessage(respage.getString("dataset_removed"), request);// +
 			request.setAttribute("table", getDatasetTable(request));
 			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
-		} else if (resword.getString("cancel").equalsIgnoreCase(action)) {
+		} else if (resword.getString("back").equalsIgnoreCase(action)) {
 
 			request.setAttribute("table", getDatasetTable(request));
 			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);

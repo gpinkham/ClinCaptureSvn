@@ -65,15 +65,12 @@
 </div>
 <br>
 
-
-
 <form action="RestoreDataset" method="post">
 
 	<input type="hidden" name="dsId" value="<c:out value="${dataset.id}"/>"/>
-	
-	
-	<input type="submit" name="action" value="<fmt:message key="restore_this_dataset" bundle="${resword}"/>" class="button_xlong"/>
-	&nbsp;<input type="submit" name="action" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_xlong"/>
+		
+	<input type="submit" name="action" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/>
+	<input type="submit" name="action" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"/>
 
 </form>
 

@@ -58,14 +58,13 @@ public class RestoreDatasetServlet extends Controller {
 		DatasetBean dataset = (DatasetBean) dsDAO.findByPK(dsId);
 
 		String action = request.getParameter("action");
-		if (resword.getString("restore_this_dataset").equalsIgnoreCase(action)) {
+		if (resword.getString("submit").equalsIgnoreCase(action)) {
 			dataset.setStatus(Status.AVAILABLE);
 			dsDAO.update(dataset);
 			addPageMessage(respage.getString("dataset_has_been_succesfully_reinstated"), request);
 			request.setAttribute("table", getDatasetTable(request));
 			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
-		} else if (resword.getString("cancel").equalsIgnoreCase(action)) {
-
+		} else if (resword.getString("back").equalsIgnoreCase(action)) {
 			request.setAttribute("table", getDatasetTable(request));
 			forwardPage(Page.VIEW_DATASETS_SERVLET, request, response);
 		} else {
