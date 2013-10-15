@@ -1071,15 +1071,6 @@
 		description="This is a second test dictionary" type="2" date_created="2013-08-19"
 		date_updated="2013-08-19" version="0"/>
 		
-	<synonym id="1" name="some synonym"
-		code="SOME-CODE" dictionary_id="1" date_created="2013-08-19" version="0"/>
-		
-	<synonym id="2" name="some synonym 2"
-		code="SOME-CODE-2" dictionary_id="2" date_created="2013-08-19" version="0"/>
-		
-	<synonym id="3" name="some synonym 3"
-		code="SOME-CODE-3" dictionary_id="2" date_created="2013-08-19" version="0"/>
-		
 	<term id="1" preferred_name="some preferred name"
 		code="SOME-CODE" dictionary_id="1" date_created="2013-08-19" version="0"/>
 		

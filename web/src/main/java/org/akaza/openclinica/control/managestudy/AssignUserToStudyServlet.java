@@ -255,6 +255,9 @@ public class AssignUserToStudyServlet extends SecureController {
 		ArrayList userAvailable = new ArrayList();
 		for (int i = 0; i < userList.size(); i++) {
 			UserAccountBean u = (UserAccountBean) userList.get(i);
+			if (u.getEnabled() == null || !u.getEnabled()) {
+				continue;
+			}
 			int activeStudyId = currentStudy.getId();
 			StudyUserRoleBean sub = udao.findRoleByUserNameAndStudyId(u.getName(), activeStudyId);
 			if (!sub.isActive()) {// doesn't have a role in the current study
