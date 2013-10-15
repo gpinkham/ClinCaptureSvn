@@ -2866,3 +2866,15 @@ function addDNShortcutAnchor(parametersHolder) {
     updateCRFHeaderFunction(parametersHolder);
   }
 }
+
+function viewCrfByVersion(eventDefinitionCRFId, studySubjectId, crfVersionId, eventId, tabId,  exitTo) {
+  $("body").append("<form id='viewSectionDataEntryForm' style='display: none;' method='GET' action='ViewSectionDataEntry'>" +
+      "<input type='hidden' name='eventDefinitionCRFId' value='" + eventDefinitionCRFId + "'/>" +
+      "<input type='hidden' name='studySubjectId' value='" + studySubjectId + "'/>" +
+      "<input type='hidden' name='crfVersionId' value='" + crfVersionId + "'/>" +
+      "<input type='hidden' name='eventId' value='" + eventId + "'/>" +
+      "<input type='hidden' name='tabId' value='" + tabId + "'/>" +
+      (exitTo != undefined ? "<input type='hidden' name='exitTo' value='" + exitTo + "'/>" : "") +
+      "</form>");
+  $("#viewSectionDataEntryForm").submit();
+}

@@ -276,19 +276,24 @@
 											</c:if>
                                             <c:set var="versionCount" value="${versionCount+1}"/>
                                         </c:forEach>
-										
+
+                    <c:set var="crfVersionInputId" value="crfVersionId${firstVersionId}"/>
 										<c:choose>
 											<c:when test="${dedc.eventCRF.notStarted && dedc.eventCRF.id == 0}">
-												<input type="hidden" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
+												<input type="hidden" id="crfVersionId${firstVersionId}" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
+                        <c:set var="crfVersionInputId" value="crfVersionId${firstVersionId}"/>
 											</c:when>
 											<c:when test="${versionCount > 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
-												<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.eventCRF.crfVersion.id}"/>">
+												<input type="hidden" id="crfVersionId${dedc.eventCRF.crfVersion.id}" name="crfVersionId" value="<c:out value="${dedc.eventCRF.crfVersion.id}"/>">
+                        <c:set var="crfVersionInputId" value="crfVersionId${dedc.eventCRF.crfVersion.id}"/>
 											</c:when>
 											<c:when test="${versionCount == 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
-												<input type="hidden" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
+												<input type="hidden" id="crfVersionId${firstVersionId}" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
+                        <c:set var="crfVersionInputId" value="crfVersionId${dedc.eventCRF.crfVersion.id}"/>
 											</c:when>
 											<c:otherwise>
-												<input type="hidden" name="crfVersionId" value="<c:out value="${defaultVersionId}"/>">
+												<input type="hidden" id="crfVersionId${defaultVersionId}" name="crfVersionId" value="<c:out value="${defaultVersionId}"/>">
+                        <c:set var="crfVersionInputId" value="crfVersionId${defaultVersionId}"/>
 											</c:otherwise>
 										</c:choose>
 										
@@ -310,6 +315,7 @@
 
                                                         <c:choose>
                                                             <c:when test="${(dedc.edc.defaultVersionId == version.id && dedc.eventCRF.id == 0) || (dedc.eventCRF.CRFVersionId == version.id && dedc.eventCRF.notStarted)}">
+                                                                <script>$('#${crfVersionInputId}').val('${version.id}');</script>
                                                                 <option value="<c:out value="${version.id}"/>" selected>
                                                                     <c:out value="${version.name}"/>
                                                                 </option>
@@ -326,7 +332,6 @@
                                                     function changeQuery<c:out value="${dedc.edc.crf.id}"/>() {
                                                         var qer = document.startForm<c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${dedc.edc.crf.id}"/>.value;
                                                         document.startForm<c:out value="${dedc.edc.crf.id}"/>.crfVersionId.value=qer;
-
                                                     }
                                                 </SCRIPT>
                                             </c:when>
@@ -396,10 +401,11 @@
                                         </c:otherwise>
                                     </c:choose>
 
-                                    <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&crfVersionId=<c:out value="${dedc.edc.defaultVersionId}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
-                                           onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                                           onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-                                           name="bt_View1" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="4"></a>
+                                    <a href="#" onclick="viewCrfByVersion('${dedc.edc.id}', '${studySubject.id}', $('#${crfVersionInputId}').val(), '${eventId}', 1);"
+                                       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+                                       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');">
+                                           <img name="bt_View111" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="4">
+                                    </a>
 
                                     <c:if test="${not empty crfNDsMap[dedc.edc.crf.id]}">
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
