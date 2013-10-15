@@ -46,7 +46,11 @@ View
                 <td>&nbsp;<img src="images/icon_DEcomplete.gif"></td>
                 <td><fmt:message key="completed" bundle="${reswords}"/></td>
             </tr>
-			<tr>
+            <tr>
+              <td>&nbsp;<img src="images/icon_InitialDEcomplete.gif"></td>
+              <td><fmt:message key="ideCompleted" bundle="${reswords}"/></td>
+            </tr>
+			      <tr>
                 <td>&nbsp;<img src="images/icon_DoubleCheck.gif"></td>
                 <td><fmt:message key="SDV" bundle="${reswords}"/></td>
             </tr>
