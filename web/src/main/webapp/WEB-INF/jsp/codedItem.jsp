@@ -46,7 +46,7 @@
                                 <c:if test="${(color == 'green')}">
                                      <c:set var="codeButtonColor" value="../images/green/loginbutton_BG.gif"/>
                                 </c:if>
-                            <input type="button" name="codeItemBtn" class="loginbutton" value="code" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="saveCodedItem($(this).parent().prev(  ))" />
+                            <input type="button" name="codeItemBtn" class="loginbutton" value="Code" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="saveCodedItem($(this).parent().prev(  ))" />
                         </td>
                     </tr>
                     <tr>

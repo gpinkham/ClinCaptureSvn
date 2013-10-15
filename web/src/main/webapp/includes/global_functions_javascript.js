@@ -2490,7 +2490,7 @@ saveCodedItem = function(item) {
             $(item).parents('td').find("a[name='Code'][itemid=" + $(item).children('div').attr("id") + "]").children('img').attr('src', '../images/code_confirm.png');
             /* update status from Available to Completed */
             $(item).parents('td').siblings("td").filter(function () {
-                return $(this).text() == 'Available';}).text("Completed");
+                return $(this).text() == 'To be Coded';}).text("Completed");
             /* update coding box from verbatim term to coded term */
             $(item).parents('div').siblings("input").val($.trim($(item).children('div').text())).attr('disabled', true);
             /* display unCode icon */
@@ -2543,7 +2543,7 @@ uncodeCodeItem = function(item) {
                 $(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text(versionNumber + 1);
                 /* change status from completed to available */
                 $(item).parent().siblings("td").filter(function () {
-                    return $(this).text() == 'Completed'; }).text("Available");
+                    return $(this).text() == 'Completed'; }).text("To be Coded");
                 /* change input box value from coded term to verbatim term */
                 $(item).parent().siblings("td").find("input:first").val($(item).parent().siblings("td:first").text()).attr("disabled", false);
                 /* hide unCode icon */

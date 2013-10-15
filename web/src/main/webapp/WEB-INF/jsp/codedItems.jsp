@@ -65,13 +65,13 @@
 	<table cellspacing="0" class="summaryTable" style="width:600px;">
         <tr>
         	<td>&nbsp;</td>
-        	<td align="center">To be coded</td>
+        	<td align="center">To be Coded</td>
         	<td align="center">To be Approved</td>
-        	<td align="center">Coded</td>
+        	<td align="center">Completed</td>
         </tr>
         <tr>
         	<td align="center">Medical Terms</td>
-        	<td align="center" name="tdToBeCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_codedItem.isCoded=Available">${unCodedItems}</a></td>
+        	<td align="center" name="tdToBeCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_codedItem.isCoded=To be Coded">${unCodedItems}</a></td>
             <td align="center">0</td>
         	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_codedItem.isCoded=Completed">${codedItems}</a></td>
         </tr>

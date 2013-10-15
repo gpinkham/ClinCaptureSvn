@@ -77,8 +77,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private final String GOTO_CRF_EVENTID = "&tabId=1&eventId=";
     private final String GOTO_CRF_SUFIX = "&amp;viewFull=yes\"><img border=\"0\" title=\"Open CRF\" alt=\"GoToCRF\" height=\"17px\" src=\"../images/icon_DEcomplete.gif\" name=\"GOTO\"/></a>";
     public final static String AJAX_UNCODE_ITEM_PREFIX = "&nbsp;&nbsp;<a onClick=\"uncodeCodeItem(this)\" name=\"unCode\" itemId=\"";
-    public final static String AJAX_UNCODE_ITEM_SUFFIX = "\"><img width=\"17\" height=\"17\" border=\"0\" title=\"UnCode\" src=\"../images/bt_Delete.gif\" name=\"codeBtn\"/></a>";
-    public final static String AJAX_UNCODE_ITEM_SUFFIX_HIDDEN = "\" style=\"display:none\"><img width=\"17\" height=\"17\" border=\"0\" alt=\"UnCode\" src=\"../images/bt_Delete.gif\" name=\"codeBtn\"/></a>";
+    public final static String AJAX_UNCODE_ITEM_SUFFIX = "\"><img height=\"17\" border=\"0\" title=\"UnCode\" src=\"../images/bt_Delete.gif\" name=\"codeBtn\"/></a>";
+    public final static String AJAX_UNCODE_ITEM_SUFFIX_HIDDEN = "\" style=\"display:none\"><img height=\"17\" border=\"0\" alt=\"UnCode\" src=\"../images/bt_Delete.gif\" name=\"codeBtn\"/></a>";
     public final static String DIV_VERSION_PREFIX = "<div name=\"codedItemVersion\">";
     public final static String DIV_VERSION_SUFIX = "</div>";
 
@@ -126,7 +126,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             h.put("codedItem.version", codedItem.getVersion());
             h.put("codedItem.subjectName", getSubjectBean(codedItem.getSubjectId()).getLabel());
             h.put("codedItem.eventName", getStudyEventDefinitionBean(codedItem.getEventCrfId(), codedItem.getCrfVersionId()).getName());
-            h.put("codedItem.isCoded", codedItem.isCoded() ? "Completed" : "Available");
+            h.put("codedItem.isCoded", codedItem.isCoded() ? "Completed" : "To be Coded");
 
             codedItemsResult.add(h);
         }
@@ -390,8 +390,9 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         protected List<Option> getOptions() {
         	
             List<Option> options = new ArrayList<Option>();
+            options.add(new Option("To be Coded", "To be Coded"));
+            options.add(new Option(" To be Approved", " To be Approved"));
             options.add(new Option("Completed", "Completed"));
-            options.add(new Option("Available", "Available"));
             return options;
         }
     }
