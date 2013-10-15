@@ -61,7 +61,7 @@ public final class SubjectEventStatusUtil {
 	}
 
 	public static void determineSubjectEventIconOnTheSubjectMatrix(StringBuilder url,
-			HashMap<Integer, String> imageIconPaths, StudySubjectBean studySubjectBean,
+			HashMap<Integer, String> imageIconPaths, StudyBean currentStudy, StudySubjectBean studySubjectBean,
 			List<StudyEventBean> studyEvents, SubjectEventStatus subjectEventStatus, ResourceBundle resword, boolean permission_for_dynamic) {
 		if (studyEvents.size() <= 1) {
 			if (studySubjectBean.getStatus().isLocked() && subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
@@ -83,10 +83,17 @@ public final class SubjectEventStatusUtil {
 						+ "' alt='"
 						+ txt
 						+ "' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative;'>");
-			} else {
+			} else {                
 				if (!subjectEventStatus.isNotScheduled() || permission_for_dynamic) {
-				url.append("<img src='" + imageIconPaths.get(subjectEventStatus.getId())
-						+ "' border='0' style='position: relative;'>");
+					url.append("<img src='"
+							+ imageIconPaths.get(subjectEventStatus.getId())
+							+ "' border='0' style='position: relative;' title=\""
+							+ (currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled() ? resword
+									.getString("message_for_not_scheduled_event_if_study_is_not_available") : "")
+							+ "\" alt=\""
+							+ (currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled() ? resword
+									.getString("message_for_not_scheduled_event_if_study_is_not_available") : "")
+							+ "\">");
 				} else {
 					url.append("<img src='' border='0' style='position: relative; display: none;'>");
 				}	

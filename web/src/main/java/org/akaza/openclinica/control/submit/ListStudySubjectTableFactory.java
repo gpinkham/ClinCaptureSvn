@@ -831,6 +831,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 		public Object getValue(Object item, String property, int rowcount) {
 
+            StudyBean currentStudy = ListStudySubjectTableFactory.this.getStudyBean();
 			studyEvents = (List<StudyEventBean>) ((HashMap<Object, Object>) item).get(property + "_studyEvents");
 			studyEventDefinition = (StudyEventDefinitionBean) ((HashMap<Object, Object>) item)
 					.get(property + "_object");
@@ -843,8 +844,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			StringBuilder url = new StringBuilder();
 			url.append(eventDivBuilder(subject, rowcount, studyEvents, studyEventDefinition, studySubjectBean));
 
-			SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, imageIconPaths, studySubjectBean,
-					studyEvents, subjectEventStatus, resword, permission_for_dynamic);
+			SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, imageIconPaths, currentStudy,
+					studySubjectBean, studyEvents, subjectEventStatus, resword, permission_for_dynamic);
 
 			url.append(getCount());
 			url.append("</a></td></tr></table>");
