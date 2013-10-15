@@ -527,7 +527,7 @@
 
                                 <c:set var="crfSpacersCount" value="0"/>
                                 <c:choose>
-                                    <c:when test='${actionQuery == "" && dec.stage.name =="invalid" }'>
+                                    <c:when test='${actionQuery == "" && dec.stage.name == "invalid" }'>
                                         <c:set var="hideCol2" value="false"/>
                                         <c:set var="crfSpacersCount" value="5"/>
                                         <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
@@ -538,11 +538,16 @@
 
                                         <c:if test="${currentRole.id ne 4 and currentRole.id ne 5 and (studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed') && (study.status.available)}">
                                             <c:set var="hideCol3" value="false"/>
+                                            <c:set var="hideCol4" value="false"/>
                                             <c:set var="crfSpacersCount" value="4"/>
                                             <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                                                onMouseDown="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
                                                onMouseUp="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
                                               ><img name="bt_Restore<c:out value="${rowCount}"/>" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="4"></a>
+                                            <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
+                                               onMouseDown="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
+                                               onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
+                                              ><img name="bt_Remove<c:out value="${rowCount}"/>" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="4"></a>
                                         </c:if>
                                     </c:when>
 

@@ -6,6 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
+<jsp:useBean scope="session" id="currentRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean" />
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.DisplayStudyEventRow" />
 <jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
    <tr>
@@ -383,7 +384,7 @@
 		 </c:if>
 		</c:when>
 		<c:otherwise>
-		 <c:if test="${(userRole.manageStudy && currRow.bean.studyEvent.status.name!='auto-removed' && dec.eventCRF.status.name != 'auto-removed') && (study.status.available)}">
+		 <c:if test="${currentRole.id ne 4 and currentRole.id ne 5 && (studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available)}">
 		  <td><a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
 			onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
 			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img
@@ -392,12 +393,7 @@
 		 </c:if>
 		</c:otherwise>
 		</c:choose>
-         <c:if test="${(!(currRow.bean.studyEvent.status.name!='auto-removed' && dec.eventCRF.status.name != 'auto-removed') && (study.status.available))}">
-		 <td>
-		<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="6">
-		</td>
-		</c:if>
-		<c:if test="${(userBean.sysAdmin) && (study.status.available) && (dec.eventCRF.status.name != 'completed')}">
+		<c:if test="${currentRole.id ne 4 and currentRole.id ne 5 and (studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available)}">
 		<td>
 		 <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
 			onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
