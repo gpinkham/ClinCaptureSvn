@@ -12,10 +12,9 @@ import org.junit.Test;
 
 import com.clinovo.BaseTest;
 import com.clinovo.context.SubmissionContext;
-import com.clinovo.context.impl.XMLSubmissionContext;
+import com.clinovo.context.impl.JSONSubmissionContext;
 import com.clinovo.model.Randomization;
 import com.clinovo.model.RandomizationResult;
-import com.clinovo.util.XMLUtil;
 
 public class HttpTransportProtocolTest extends BaseTest {
 
@@ -25,14 +24,17 @@ public class HttpTransportProtocolTest extends BaseTest {
 
 	@Before
 	public void setUp() throws Exception {
-
-		context = new XMLSubmissionContext();
-
+		
 		Randomization randomization = createRandomization();
-
+		
+		context = new JSONSubmissionContext();
+		
+		HttpClient authClient = createMockHttpClient(authenticationToken.toString(), HttpStatus.SC_OK);
+		context.setHttpClient(authClient);
+		
 		context.setRandomization(randomization);
-
-		client = createMockHttpClient(XMLUtil.docToString(xmlRandomiationResult), HttpStatus.SC_OK);
+		
+		client = createMockHttpClient("{TreatmentID:\"some-treatment\", PatientID: \"subject2\",RandomizationResult:\"some-result\"}", HttpStatus.SC_OK);
 
 		protocol = new HttpTransportProtocol();
 		protocol.setHttpClient(client);
@@ -52,7 +54,7 @@ public class HttpTransportProtocolTest extends BaseTest {
 	@Test(expected = WebServiceException.class)
 	public void testThatFailedHttpCallRaisesWebServiceException() throws Exception {
 
-		String failureMessage = "<result><message>Respect other people's security you tard</message></result>";
+		String failureMessage = "{message:Respect other people's security you tard}";
 		HttpClient client = createMockHttpClient(failureMessage, HttpStatus.SC_FORBIDDEN);
 		
 		protocol.setHttpClient(client);
@@ -91,7 +93,7 @@ public class HttpTransportProtocolTest extends BaseTest {
 
 		RandomizationResult result = protocol.call();
 
-		assertEquals("Should have a correct Treatment specified", "2", result.getTreatment());
+		assertEquals("Should have a correct Treatment specified", "some-treatment", result.getTreatment());
 	}
 
 	@Test
@@ -123,7 +125,7 @@ public class HttpTransportProtocolTest extends BaseTest {
 
 		RandomizationResult result = protocol.call();
 
-		assertEquals("Should have a correct Randomization result specified", "radiotherapy",
+		assertEquals("Should have a correct Randomization result specified", "some-result",
 				result.getRandomizationResult());
 	}
 }

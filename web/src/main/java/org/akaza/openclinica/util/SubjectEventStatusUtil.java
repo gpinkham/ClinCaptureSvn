@@ -30,7 +30,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
 // be careful when you change the logic of this class (talk with Marc or Sergey) !
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked" })
 public final class SubjectEventStatusUtil {
 
 	final static HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>();
