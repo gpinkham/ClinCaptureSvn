@@ -96,6 +96,7 @@ public class StudyParameterConfig {
     // Medical coding parameters
     private String allowCodingVerification = "no";
     private String defaultMedicalCodingDictionary = "";
+    private String autoCodeDictionaryName = "";
     
 
 	public StudyParameterConfig() {
@@ -491,5 +492,13 @@ public class StudyParameterConfig {
 
 	public void setDefaultMedicalCodingDictionary(String defaultMedicalCodingDictionary) {
 		this.defaultMedicalCodingDictionary = defaultMedicalCodingDictionary;
+	}
+
+	public String getAutoCodeDictionaryName() {
+		return autoCodeDictionaryName;
+	}
+
+	public void setAutoCodeDictionaryName(String autoCodeDictionaryName) {
+		this.autoCodeDictionaryName = autoCodeDictionaryName;
 	}
 }

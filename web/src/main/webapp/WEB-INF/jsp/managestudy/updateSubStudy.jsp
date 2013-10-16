@@ -214,24 +214,6 @@ function updateThis(multiSelEle, count) {
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facCountry"/></jsp:include>
   </td></tr>
 
- <!-- <tr valign="top"><td class="formlabel"><fmt:message key="facility_recruitment_status" bundle="${resword}"/>:</td><td>
-  <c:set var="facStatus" value="${newStudy.facilityRecruitmentStatus}"/>
-  <select name="facRecStatus">
-    <option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-   <c:forEach var="recStatus" items="${facRecruitStatusMap}">
-       <c:choose>
-        <c:when test="${facStatus == recStatus.key}">
-         <option value="<c:out value="${recStatus.key}"/>" selected><c:out value="${recStatus.value}"/>
-        </c:when>
-        <c:otherwise>
-         <option value="<c:out value="${recStatus.key}"/>"><c:out value="${recStatus.value}"/>
-        </c:otherwise>
-       </c:choose>
-    </c:forEach>
-  </select>
-
-  </div></td></tr>
-  -->
   <tr valign="top"><td class="formlabel"><fmt:message key="facility_contact_name" bundle="${resword}"/>:</td><td>
   <div class="formfieldXL_BG"><input type="text" name="facConName" value="<c:out value="${newStudy.facilityContactName}"/>"  class="formfieldXL">
   </div>
@@ -528,23 +510,39 @@ function updateThis(multiSelEle, count) {
               <c:when test="${config.value.value == ''}">
                 <select id="dictionaries" name="defaultMedicalCodingDictionary">
                   <option value="0"></option>
-                    <c:forTokens items="${dictionaries}" delims="," var="dictionary">
-                      <option value="${dictionary}">${dictionary}</option>
-                    </c:forTokens>
-                  </select>
-                </c:when>
-                <c:otherwise>
-                  <select id="dictionaries" name="defaultMedicalCodingDictionary">
-                    <option value="0"></option>
-                    <c:forTokens items="${dictionaries}" delims="," var="dictionary">
-                      <option value="${dictionary}" ${dictionary == selectedDictionary ? 'selected' : ''}>${dictionary}</option>
-                    </c:forTokens>
-                  </select>
-                </c:otherwise>
-              </c:choose>
-           </td>
-       </tr>
+                  <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+                    <option value="${dictionary}">${dictionary}</option>
+                  </c:forTokens>
+                </select>
+              </c:when>
+              <c:otherwise>
+                <select id="dictionaries" name="defaultMedicalCodingDictionary">
+                  <option value="0"></option>
+                  <c:forTokens items="${dictionaries}" delims="," var="dictionary">
+                    <option value="${dictionary}" ${dictionary == selectedDictionary ? 'selected' : ''}>${dictionary}</option>
+                  </c:forTokens>
+                </select>
+              </c:otherwise>
+            </c:choose>
+        </td>
+      </tr>
    </c:when>
+
+  <c:when test="${config.parameter.handle=='autoCodeDictionaryName'}">
+    <tr valign="top">
+      <td class="formlabel">
+        <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
+      </td>
+      <td>
+        <input type="text" name="autoCodeDictionaryName" value="${newStudy.studyParameterConfig.autoCodeDictionaryName}" maxlength="255" size="35">
+        <c:set var="autoCodeDictionaryName" value="${newStudy.studyParameterConfig.autoCodeDictionaryName}"/>
+        <jsp:include page="../showMessage.jsp">
+          <jsp:param name="key" value="autoCodeDictionaryName"/>
+        </jsp:include>
+      </td>
+    </tr>
+   </c:when>
+
    <c:when test="${config.parameter.handle=='allowCodingVerification'}">
        <tr valign="top">
            <td class="formlabel"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>

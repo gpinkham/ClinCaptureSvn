@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="markg" id="2013-10-10-TICKET421">
+		<comment>Insert the default custom medical coding study configuration option record in the studyParameter table</comment>
+		<insert tableName="study_parameter">
+			<column name="study_parameter_id" valueNumeric="34" />
+			<column name="handle" value="autoCodeDictionaryName" />
+			<column name="name" value="autoCodeDictionaryName" />
+			<column name="description" value="Auto code dictionary name configuration" />
+			<column name="default_value" value="" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+		</insert>
+	</changeSet>
+
+	<changeSet author="markg" id="2013-10-10-TICKET421-1">
+		<addColumn tableName="dictionary">
+			<column name="study" type="INT" />
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>

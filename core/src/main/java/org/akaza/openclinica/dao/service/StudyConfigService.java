@@ -183,6 +183,8 @@ public class StudyConfigService {
 					spc.setAllowCodingVerification(spv.getValue());
 				} else if (handle.equalsIgnoreCase("defaultMedicalCodingDictionary")) {
 					spc.setDefaultMedicalCodingDictionary(spv.getValue());
+				} else if (handle.equalsIgnoreCase("autoCodeDictionaryName")) {
+					spc.setAutoCodeDictionaryName(spv.getValue());
 				}
 			}
 		}
@@ -280,6 +282,8 @@ public class StudyConfigService {
 				study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("defaultMedicalCodingDictionary")) {
 				study.getStudyParameterConfig().setDefaultMedicalCodingDictionary(spvb.getValue());
+			} else if (parameter.equalsIgnoreCase("autoCodeDictionaryName")) {
+				study.getStudyParameterConfig().setAutoCodeDictionaryName(spvb.getValue());
 			}
 		}
 		return study;
@@ -337,9 +341,7 @@ public class StudyConfigService {
 
 			} else if (parameter.equalsIgnoreCase("adminForcedReasonForChange")) {
 				site.getStudyParameterConfig().setAdminForcedReasonForChange(spvb.getValue());
-			}
-
-			else if (parameter.equalsIgnoreCase("secondaryIdRequired")) {
+			} else if (parameter.equalsIgnoreCase("secondaryIdRequired")) {
 				site.getStudyParameterConfig().setSecondaryIdRequired(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("dateOfEnrollmentForStudyRequired")) {
 				site.getStudyParameterConfig().setDateOfEnrollmentForStudyRequired(spvb.getValue());
@@ -351,8 +353,7 @@ public class StudyConfigService {
 				site.getStudyParameterConfig().setDateOfEnrollmentForStudyLabel(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("genderLabel")) {
 				site.getStudyParameterConfig().setGenderLabel(spvb.getValue());
-			}
-			else if (parameter.equalsIgnoreCase("startDateTimeRequired")) {
+			} else if (parameter.equalsIgnoreCase("startDateTimeRequired")) {
 				site.getStudyParameterConfig().setStartDateTimeRequired(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("useStartTime")) {
 				site.getStudyParameterConfig().setUseStartTime(spvb.getValue());
@@ -374,6 +375,8 @@ public class StudyConfigService {
 				site.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("defaultMedicalCodingDictionary")) {
 				site.getStudyParameterConfig().setDefaultMedicalCodingDictionary(spvb.getValue());
+			} else if (parameter.equalsIgnoreCase("autoCodeDictionaryName")) {
+				site.getStudyParameterConfig().setAutoCodeDictionaryName(spvb.getValue());
 			}
 		}
 		return site;

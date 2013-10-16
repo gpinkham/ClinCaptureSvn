@@ -319,6 +319,7 @@ public class UpdateSubStudyServlet extends SecureController {
         study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
         study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
         study.getStudyParameterConfig().setDefaultMedicalCodingDictionary(fp.getString("defaultMedicalCodingDictionary"));
+        study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 
 		ArrayList parameters = study.getStudyParameters();
 

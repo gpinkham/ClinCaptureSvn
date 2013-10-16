@@ -1789,6 +1789,18 @@
             </td>
         </tr>
         <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top">
+		    <td class="formlabel">
+		        <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>:
+		    </td>
+		    <td>
+		        <input type="text" name="autoCodeDictionaryName" value="${studyToView.studyParameterConfig.autoCodeDictionaryName}" maxlength="255" size="35">
+		        <br/><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="autoCodeDictionaryName"/></jsp:include>
+		    </td>
+		</tr>
+        <tr><td>&nbsp;</td></tr>
+
         <tr valign="top">
             <td class="formlabel">
                 <fmt:message key="allowCodingVerification" bundle="${resword}"/>

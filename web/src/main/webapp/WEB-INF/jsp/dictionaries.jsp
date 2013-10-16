@@ -45,8 +45,8 @@
 	</span>
 </h1>
 
-<form action="${pageContext.request.contextPath}/pages/codedItems" style="clear:left; float:left;">
-    
+<form action="${pageContext.request.contextPath}/pages/dictionaries" style="clear:left; float:left;">
+    ${dictionaryTable}
 </form>
 
 <div style="clear:left; float:left">

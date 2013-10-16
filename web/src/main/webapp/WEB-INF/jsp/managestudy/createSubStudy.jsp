@@ -62,54 +62,59 @@
 </c:forEach>
 <script type="text/JavaScript" language="JavaScript">
   
-function updateVersionSelection(vsIds, index, count) {
-	var s = "vs"+count;
-	var mvs = document.getElementById(s);
-	if(vsIds.length>0) {
-		for(i=0; i<mvs.length; ++i) {
-			var t = "," + mvs.options[i].value + ",";
-			if(vsIds.indexOf(t)>= 0 ) {
-				mvs.options[i].selected = true;
-			} else {
-				mvs.options[i].selected = false;
-			}
-		}
-		mvs.options[index].selected = true;
-	} else {
-		for(i=0; i<mvs.length; ++i) {
-			mvs.options[i].selected = true;
-		}
-	}
-}
-//make sure current chosen default version among those selected versions.
-function updateThis(multiSelEle, count) {
-	var s = "dv"+count;
-	var currentDefault = document.getElementById(s);
-	for(i=0; i<multiSelEle.length; ++i) {
-		if(multiSelEle.options[i].value == currentDefault.options[currentDefault.selectedIndex].value) {
-			multiSelEle.options[i].selected = true;
-		}
-	}
-}
-
-      function leftnavExpand(strLeftNavRowElementName){
-        var objLeftNavRowElement;
-
-        objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-        if (objLeftNavRowElement != null) {
-          if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-            objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
-            objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-            if(objLeftNavRowElement.display == "none"){
-                objExCl.src = "images/bt_Expand.gif";
-            }else{
-                objExCl.src = "images/bt_Collapse.gif";
-            }
-          }
+  function updateVersionSelection(vsIds, index, count) {
+    var s = "vs" + count;
+    var mvs = document.getElementById(s);
+    if (vsIds.length > 0) {
+      for (i = 0; i < mvs.length; ++i) {
+        var t = "," + mvs.options[i].value + ",";
+        if (vsIds.indexOf(t) >= 0) {
+          mvs.options[i].selected = true;
+        } else {
+          mvs.options[i].selected = false;
         }
+      }
+      mvs.options[index].selected = true;
+    } else {
+      for (i = 0; i < mvs.length; ++i) {
+        mvs.options[i].selected = true;
+      }
+    }
+  }
+
+  //make sure current chosen default version among those selected versions.
+  function updateThis(multiSelEle, count) {
+    var s = "dv" + count;
+    var currentDefault = document.getElementById(s);
+    for (i = 0; i < multiSelEle.length; ++i) {
+      if (multiSelEle.options[i].value == currentDefault.options[currentDefault.selectedIndex].value) {
+        multiSelEle.options[i].selected = true;
+      }
+    }
+  }
+
+  function leftnavExpand(strLeftNavRowElementName) {
+    var objLeftNavRowElement;
+
+    objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+    if (objLeftNavRowElement != null) {
+      if (objLeftNavRowElement.style) {
+        objLeftNavRowElement = objLeftNavRowElement.style;
+      }
+      objLeftNavRowElement.display = (objLeftNavRowElement.display == "none") ? "" : "none";
+      objExCl = MM_findObj("excl_" + strLeftNavRowElementName);
+      if (objLeftNavRowElement.display == "none") {
+        objExCl.src = "images/bt_Expand.gif";
+      } else {
+        objExCl.src = "images/bt_Collapse.gif";
+      }
+    }
+  }
 </script>
 
-<h1><span class="title_manage"><fmt:message key="create_a_new_site" bundle="${resword}"/> <%-- <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> --%></span></h1>
+<h1>
+  <span class="title_manage"><fmt:message key="create_a_new_site" bundle="${resword}"/></span>
+</h1>
 
 <form action="CreateSubStudy" method="post">
 * <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
@@ -494,9 +499,27 @@ function updateThis(multiSelEle, count) {
            </td>
        </tr>
    </c:when>
+
+   <c:when test="${config.parameter.handle=='autoCodeDictionaryName'}">
+      <tr valign="top">
+        <td class="formlabel">
+            <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
+          </td>
+          <td>
+            <input type="text" name="autoCodeDictionaryName" value="${newStudy.studyParameterConfig.autoCodeDictionaryName}" maxlength="255" size="35">
+            <c:set var="autoCodeDictionaryName" value="${newStudy.studyParameterConfig.autoCodeDictionaryName}"/>
+            <jsp:include page="../showMessage.jsp">
+              <jsp:param name="key" value="autoCodeDictionaryName"/>
+            </jsp:include>
+          </td>
+      </tr>
+   </c:when>
+
    <c:when test="${config.parameter.handle=='allowCodingVerification'}">
        <tr valign="top">
-           <td class="formlabel"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
+           <td class="formlabel">
+            <fmt:message key="allowCodingVerification" bundle="${resword}"/>
+          </td>
            <td>
                <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowCodingVerification== 'yes'}">checked</c:if> name="allowCodingVerification" value="yes"><fmt:message key="yes" bundle="${resword}"/>
                <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowCodingVerification== 'no'}">checked</c:if> name="allowCodingVerification" value="no"><fmt:message key="no" bundle="${resword}"/>

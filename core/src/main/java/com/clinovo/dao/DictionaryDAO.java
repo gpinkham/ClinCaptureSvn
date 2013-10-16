@@ -74,4 +74,13 @@ public class DictionaryDAO extends AbstractDomainDao<Dictionary> {
 	public void deleteDictionary(Dictionary dictionary) {
 		this.getCurrentSession().delete(dictionary);
 	}
+
+	public Dictionary findByStudy(int study) {
+		
+		String query = "from " + getDomainClassName() + " do  where do.study = :study";
+		Query q = getCurrentSession().createQuery(query);
+		q.setInteger("study", study);
+		
+		return (Dictionary) q.uniqueResult();
+	}
 }

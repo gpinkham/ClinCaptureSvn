@@ -249,10 +249,6 @@
   <c:out value="${newStudy.facilityCountry}"/>&nbsp;
   </td></tr>
 
-  <!--<tr valign="top"><td class="table_header_column"><fmt:message key="facility_recruitment_status" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${newStudy.facilityRecruitmentStatus}"/>&nbsp;
- </td></tr>  -->
-
   <tr valign="top"><td class="table_header_column"><fmt:message key="facility_contact_name" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${newStudy.facilityContactName}"/>&nbsp;
   </td></tr>
@@ -714,21 +710,7 @@
           </c:choose>
       </td>
   </tr>
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="allowCodingVerification" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.allowCodingVerification == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
+
   <tr valign="top">
       <td class="table_header_column">
           <fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/>
@@ -752,6 +734,31 @@
             </select>
           </c:otherwise>
         </c:choose>
+      </td>
+  </tr>
+
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>:
+    </td>
+    <td class="table_cell">
+      <c:out value="${newStudy.autoCodeDictionaryName}"/>&nbsp;
+    </td>
+  </tr>
+
+  <tr valign="top">
+      <td class="table_header_column">
+          <fmt:message key="allowCodingVerification" bundle="${resword}"/>
+      </td>
+      <td class="table_cell">
+          <c:choose>
+              <c:when test="${studyToView.studyParameterConfig.allowCodingVerification == 'yes'}">
+                  <fmt:message key="yes" bundle="${resword}"/>
+              </c:when>
+              <c:otherwise>
+                  <fmt:message key="no" bundle="${resword}"/>
+              </c:otherwise>
+          </c:choose>
       </td>
   </tr>
 

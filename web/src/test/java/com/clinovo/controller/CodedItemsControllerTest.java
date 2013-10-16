@@ -22,7 +22,7 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 	@Test
 	public void testThatGetRequestOnWrongUrlRedirectsToErrorPage() throws Exception {
 		
-		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER + "brian"))
+		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER + "/brian"))
 			.andExpect(status().isNotFound());
 	}
 
@@ -42,7 +42,7 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 				.param("study", "1"))
 		
 			.andExpect(status().isOk())
-			.andExpect(model().attributeExists("codedQuestionsHtml"));
+			.andExpect(model().attributeExists("codedItemsTable"));
 	}
 
 	@Test
@@ -51,7 +51,7 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER)
 				.param("study", "1"))
 			.andExpect(status().isOk())
-			.andExpect(model().attributeExists("codedQuestionsHtml"));
+			.andExpect(model().attributeExists("codedItemsTable"));
 	}
 	
 	@Test
@@ -87,7 +87,7 @@ public class CodedItemsControllerTest extends BaseControllerTest {
 		this.mockMvc.perform(get(CODED_ITEM_CONTROLLER)
 				.param("study", "1"))
 			.andExpect(status().isOk())
-			.andExpect(model().attributeExists("codedQuestionsHtml"));
+			.andExpect(model().attributeExists("codedItemsTable"));
 	}
 	
 	@Test

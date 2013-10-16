@@ -79,7 +79,7 @@
 </div>
 
 <form action="${pageContext.request.contextPath}/pages/codedItems" style="clear:left; float:left;">
-    ${codedQuestionsHtml}
+    ${codedItemsTable}
     <input type="hidden" name="study" value="${studyId}">
 </form>
 

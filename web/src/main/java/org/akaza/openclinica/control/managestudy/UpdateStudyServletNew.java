@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.exception.CodeException;
 import com.clinovo.util.ValidatorHelper;
 
 import java.text.ParseException;
@@ -398,7 +399,7 @@ public class UpdateStudyServletNew extends SecureController {
 	}
 	
 	private void validateStudy7(FormProcessor fp, Validator v, ArrayList<DnDescription> newRfcDescriptions) {
-		//newRfcDescriptions = new ArrayList<DnDescription>();
+		
 		newRfcDescriptions.clear();
 		for (int i = 0; i < 25; i++){
 			v.addValidation("dnRfcName" + i, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
@@ -476,6 +477,20 @@ public class UpdateStudyServletNew extends SecureController {
         study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
         study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
         study.getStudyParameterConfig().setDefaultMedicalCodingDictionary(fp.getString("defaultMedicalCodingDictionary"));
+        study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
+        
+		try {
+
+			// Create custom dictionary
+			if (study.getStudyParameterConfig().getAutoCodeDictionaryName() != null
+					&& !study.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
+				getDictionaryService().createDictionary(study.getStudyParameterConfig().getAutoCodeDictionaryName(),
+						study);
+			}
+		} catch (CodeException e) {
+
+			logger.info("Custom dictionary with similar name exists");
+		}
         
 		if (!errors.isEmpty()) {
 			request.setAttribute("formMessages", errors);
@@ -604,7 +619,8 @@ public class UpdateStudyServletNew extends SecureController {
 		}
 	}
 
-	private void submitStudy(StudyBean newStudy, ArrayList<DnDescription> newRfcDescriptions) {
+	private void submitStudy(StudyBean newStudy, ArrayList<DnDescription> newRfcDescriptions) throws CodeException {
+		
 		StudyDAO sdao = new StudyDAO(sm.getDataSource());
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
 		DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(sm.getDataSource());
@@ -616,7 +632,6 @@ public class UpdateStudyServletNew extends SecureController {
 		sdao.update(study1);
 		logger.debug("about to create dn descripts");
 		Map<Integer, DnDescription> idToDnDescriptionMap = new HashMap<Integer, DnDescription>();
-		//ArrayList<DnDescription> oldRfcDescriptions = (ArrayList<DnDescription>) ;
 		
 		for (DnDescription dnDescription: dnDescriptionDao.findAllByStudyId(study.getId())){
 			idToDnDescriptionMap.put(dnDescription.getId(), dnDescription);
@@ -792,6 +807,23 @@ public class UpdateStudyServletNew extends SecureController {
         spv.setParameter("defaultMedicalCodingDictionary");
         spv.setValue(newStudy.getStudyParameterConfig().getDefaultMedicalCodingDictionary());
         updateParameter(spvdao, spv);
+        
+        spv.setParameter("autoCodeDictionaryName");
+        spv.setValue(newStudy.getStudyParameterConfig().getAutoCodeDictionaryName());
+        updateParameter(spvdao, spv);
+        
+		try {
+
+			// Create custom dictionary
+			if (study1.getStudyParameterConfig().getAutoCodeDictionaryName() != null
+					&& !study1.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
+				getDictionaryService().createDictionary(study1.getStudyParameterConfig().getAutoCodeDictionaryName(),
+						study1);
+			}
+		} catch (CodeException e) {
+
+			logger.info("Custom dictionary with similar name exists");
+		}
 
 		StudyBean curStudy = (StudyBean) session.getAttribute("study");
 		if (curStudy != null && study1.getId() == curStudy.getId()) {
@@ -921,6 +953,22 @@ public class UpdateStudyServletNew extends SecureController {
             childspv.setParameter("defaultMedicalCodingDictionary");
             childspv.setValue(newStudy.getStudyParameterConfig().getDefaultMedicalCodingDictionary());
             updateParameter(spvdao, childspv);
+            
+            childspv.setParameter("autoCodeDictionaryName");
+            childspv.setValue(newStudy.getStudyParameterConfig().getAutoCodeDictionaryName());
+            updateParameter(spvdao, childspv);
+            
+    		try {
+
+    			// Create custom dictionary
+    			if (child.getStudyParameterConfig().getAutoCodeDictionaryName() != null
+    					&& !child.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
+    				getDictionaryService().createDictionary(child.getStudyParameterConfig().getAutoCodeDictionaryName(),
+    						child);
+    			}
+    		} catch (CodeException e) {
+    			logger.info("Custom dictionary with similar name exists");
+    		}
 		}
 	}
 

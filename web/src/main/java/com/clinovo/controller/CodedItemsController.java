@@ -74,9 +74,9 @@ public class CodedItemsController {
 	 */
 	@SuppressWarnings("rawtypes")
 	@RequestMapping("/codedItems")
-	public ModelMap dictionaryHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ModelMap codedItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		ModelMap map = new ModelMap();
+		ModelMap model = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		
 		String studyId = request.getParameter("study");
@@ -113,14 +113,14 @@ public class CodedItemsController {
 		panel.reset();
 
 		// probably a bad idea?
-		map.addAttribute("panel", panel);
-		map.addAttribute("allItems", items);
-		map.addAttribute("codedItems", codedItems.size());
-		map.addAttribute("unCodedItems", unCodedItems.size());
-		map.addAttribute("codedQuestionsHtml", codedItemsTable);
-        map.addAttribute("studyId", Integer.valueOf(studyId));
+		model.addAttribute("panel", panel);
+		model.addAttribute("allItems", items);
+		model.addAttribute("codedItems", codedItems.size());
+		model.addAttribute("codedItemsTable", codedItemsTable);
+		model.addAttribute("unCodedItems", unCodedItems.size());
+		model.addAttribute("studyId", Integer.valueOf(studyId));
 
-		return map;
+		return model;
 	}
 
 	/**

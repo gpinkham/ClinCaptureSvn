@@ -53,8 +53,6 @@
 <jsp:useBean scope='request' id='definitionsToView' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='dnDefinitions' class='java.util.ArrayList'/>
 
-
-
 <script language = "JavaScript" >
   function leftnavExpand(strLeftNavRowElementName) {
     var objLeftNavRowElement;
@@ -539,21 +537,6 @@
   </td>
   </tr>
 
-  <!--
-   <tr valign="top"><td class="table_header_column"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/></td>
-   <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.subjectIdPrefixSuffix == 'true'}">
-    Yes
-   </c:when>
-   <c:otherwise>
-     No
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-  -->
-
   <tr valign="top"><td class="table_header_column"><fmt:message key="show_person_id_on_crf_header" bundle="${resword}"/></td>
    <td class="table_cell">
    <c:choose>
@@ -885,7 +868,30 @@
       <fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/>
     </td>
     <td class="table_cell">
-        ${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}
+      <c:choose>
+        <c:when test="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary== ''}">
+          <fmt:message key="blank" bundle="${resword}"/>
+        </c:when>
+        <c:otherwise>
+          ${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}
+        </c:otherwise>
+      </c:choose>
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
+    </td>
+    <td class="table_cell">
+      <c:choose>
+        <c:when test="${studyToView.studyParameterConfig.autoCodeDictionaryName== ''}">
+          <fmt:message key="blank" bundle="${resword}"/>
+        </c:when>
+        <c:otherwise>
+          ${studyToView.studyParameterConfig.autoCodeDictionaryName}
+        </c:otherwise>
+      </c:choose>
     </td>
   </tr>
 

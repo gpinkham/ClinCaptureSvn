@@ -1065,11 +1065,11 @@
 		 
 	<dictionary id="1" name="Test Dictionary"
 		description="This is a test dictionary" type="1" date_created="2013-08-19"
-		date_updated="2013-08-19" version="0"/>
+		date_updated="2013-08-19" version="0" study='1'/>
 		
 	<dictionary id="2" name="Test Dictionary 2"
 		description="This is a second test dictionary" type="2" date_created="2013-08-19"
-		date_updated="2013-08-19" version="0"/>
+		date_updated="2013-08-19" version="0" study='2'/>
 		
 	<synonym id="1" name="some synonym"
 		code="SOME-CODE" dictionary_id="1" date_created="2013-08-19" version="0"/>

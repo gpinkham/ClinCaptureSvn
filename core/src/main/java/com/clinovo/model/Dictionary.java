@@ -34,6 +34,7 @@ import com.clinovo.model.Status.DictionaryType;
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "dictionary_id_seq") })
 public class Dictionary extends AbstractMutableDomainObject {
 
+	private int study = -1;
 	private String name = "";
 	private Date dateCreated;
 	private Date dateUpdated;
@@ -78,5 +79,13 @@ public class Dictionary extends AbstractMutableDomainObject {
 
 	public void setDateUpdated(Date dateUpdated) {
 		this.dateUpdated = dateUpdated;
+	}
+
+	public int getStudy() {
+		return study;
+	}
+
+	public void setStudy(int study) {
+		this.study = study;
 	}
 }

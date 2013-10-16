@@ -134,6 +134,8 @@ public class CreateSubStudyServlet extends SecureController {
 								scg.getValue().setValue(fp.getString("allowCodingVerification"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("defaultMedicalCodingDictionary")) {
 								scg.getValue().setValue(fp.getString("defaultMedicalCodingDictionary"));
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCodeDictionaryName")) {
+								scg.getValue().setValue(fp.getString("autoCodeDictionaryName"));
 							}
 							configs.add(scg);
 						}
@@ -417,6 +419,11 @@ public class CreateSubStudyServlet extends SecureController {
 					scg.getValue().setValue(fp.getString("defaultMedicalCodingDictionary"));
 					study.getStudyParameterConfig().setDefaultMedicalCodingDictionary(
 							fp.getString("defaultMedicalCodingDictionary"));
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCodeDictionaryName")
+						&& !fp.getString("autoCodeDictionaryName").isEmpty()) {
+					scg.getValue().setValue(fp.getString("autoCodeDictionaryName"));
+					study.getStudyParameterConfig().setAutoCodeDictionaryName(
+							fp.getString("autoCodeDictionaryName"));
 				}
 			}
 		}

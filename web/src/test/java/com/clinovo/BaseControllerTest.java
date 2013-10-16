@@ -26,6 +26,7 @@ public class BaseControllerTest extends AbstractContextSentiveTest{
 
 	// Managed controllers
 	protected final String CODED_ITEM_CONTROLLER = "/codedItems";
+	protected final String DICTIONARY_CONTROLLER = "/dictionaries";
 
 	@Autowired
 	protected WebApplicationContext wac;

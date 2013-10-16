@@ -782,6 +782,9 @@ public class CreateStudyServlet extends SecureController {
         newStudy.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
         newStudy.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
         newStudy.getStudyParameterConfig().setAllowCodingVerification(fp.getString("defaultMedicalCodingDictionary"));
+        
+        // Probably create custom dictionary from here
+        newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 
 		session.setAttribute("newStudy", newStudy);
 
@@ -944,6 +947,10 @@ public class CreateStudyServlet extends SecureController {
         
         spv.setParameter("defaultMedicalCodingDictionary");
         spv.setValue(newStudy.getStudyParameterConfig().getDefaultMedicalCodingDictionary());
+        spvdao.create(spv);
+        
+        spv.setParameter("autoCodeDictionaryName");
+        spv.setValue(newStudy.getStudyParameterConfig().getAutoCodeDictionaryName());
         spvdao.create(spv);
 
 		logger.info("study parameters created done");

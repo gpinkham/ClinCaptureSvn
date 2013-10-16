@@ -61,6 +61,27 @@ public class DictionaryDAOTest extends DefaultAppContextTest {
 	}
 	
 	@Test
+	public void testThatFindByStudyDoesNotReturnNull() {
+		assertNotNull(dictionaryDAO.findByStudy(1));
+	}
+	
+	@Test
+	public void testThatFindByStudyReturnsStudyWithCorrectStudy() {
+		
+		Dictionary dictionary = dictionaryDAO.findByStudy(2);
+		
+		assertEquals(2, dictionary.getStudy());
+	}
+	
+	@Test
+	public void testThatFindByStudyReturnsStudyWithCorrectName() {
+		
+		Dictionary dictionary = dictionaryDAO.findByStudy(2);
+		
+		assertEquals("Test Dictionary 2", dictionary.getName());
+	}
+	
+	@Test
 	public void testThatSaveOrUpdateDoeNotReturnNull() {
 		
 		assertNotNull(dictionaryDAO.saveOrUpdate(new Dictionary()));

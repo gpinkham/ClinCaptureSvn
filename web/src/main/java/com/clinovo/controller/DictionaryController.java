@@ -16,32 +16,48 @@ package com.clinovo.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.clinovo.model.Dictionary;
+import com.clinovo.model.DictionaryTableFactory;
 import com.clinovo.service.DictionaryService;
 
 /**
  * The controller for managing dictionaries. Acts as the glue between the service layer and the UI -
- * 
  */
 @Controller
-@RequestMapping("/dictionary")
 public class DictionaryController {
 	
 	@Autowired
 	private DictionaryService dictionaryService;
 	
-	@RequestMapping(method = RequestMethod.GET)
-	public String dictionaryHandler(ModelMap model) {
+	@RequestMapping("/dictionaries")
+	public ModelMap dictionaryHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		ModelMap model = new ModelMap();
+		ResourceBundleProvider.updateLocale(request.getLocale());
+		StudyInfoPanel panel = new StudyInfoPanel();
+		panel.reset();
 		
 		List<Dictionary> dictionaries = dictionaryService.findAll();
-		model.addAttribute("dictionaries", dictionaries);
 		
-		return "dictionary";
+		DictionaryTableFactory factory = new DictionaryTableFactory();
+		factory.setDictionaries(dictionaries);
+		
+		String dictionaryTable = factory.createTable(request, response).render();
+		
+		model.addAttribute("panel", panel);
+		model.addAttribute("dictionaries", dictionaries);
+		model.addAttribute("dictionaryTable", dictionaryTable);
+		
+		return model;
 	}
 }

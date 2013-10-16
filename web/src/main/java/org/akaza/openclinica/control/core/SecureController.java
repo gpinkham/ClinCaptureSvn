@@ -120,6 +120,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.clinovo.service.CodedItemService;
 
+import com.clinovo.service.DictionaryService;
+
 /**
  * This class enhances the Controller in several ways.
  * 
@@ -163,6 +165,7 @@ import com.clinovo.service.CodedItemService;
 public abstract class SecureController extends HttpServlet {
 
 	private CodedItemService codedItemService;
+	private DictionaryService dictionaryService;
 	
 	public static final String BR = "<br/>";
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
@@ -1209,5 +1212,15 @@ public abstract class SecureController extends HttpServlet {
 		}
 
 		return codedItemService;
+	}
+	
+	protected DictionaryService getDictionaryService() {
+
+		if (dictionaryService == null) {
+			dictionaryService = SpringServletAccess.getApplicationContext(getServletContext()).getBean(
+					DictionaryService.class);
+		}
+
+		return dictionaryService;
 	}
 }

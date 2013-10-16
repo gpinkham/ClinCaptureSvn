@@ -16,6 +16,9 @@ package com.clinovo.service;
 
 import java.util.List;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+
+import com.clinovo.exception.CodeException;
 import com.clinovo.model.Dictionary;
 
 /**
@@ -30,6 +33,15 @@ public interface DictionaryService {
 	 * @return List of dictionaries
 	 */
 	public List<Dictionary> findAll();
+	
+	/**
+	 * Retrieves the custom dictionary configured for the specified study.
+	 * 
+	 * @param study The study for which to extract the custom dictionary for.
+	 * 
+	 * @return The custom dictionary, if it has been configured.
+	 */
+	public Dictionary findByStudy(int study);
 	
 	/**
 	 * Retrieve a dictionary given a valid id.
@@ -64,5 +76,18 @@ public interface DictionaryService {
 	 * @param dictionary Dictionary to delete
 	 */
 	public void deleteDictionary(Dictionary dictionary);
+
+	/**
+	 * Creates a custom dictionary for a particular study.
+	 * 
+	 * @param dictionaryName The name for the custom dictionary.
+	 * @param study The study to which the custom dictionary is bound
+	 * 
+	 * @return The created custom dictionary
+	 * 
+	 * @throws CodeException If the dictionary exists
+	 */
+	public Dictionary createDictionary(String dictionaryName, StudyBean study) throws CodeException;
+
 
 }
