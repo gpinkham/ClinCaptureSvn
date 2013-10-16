@@ -2624,10 +2624,10 @@ function Pager(tableName, itemsPerPage) {
         }
 
         var oldPageAnchor = document.getElementById('pg' + this.currentPage);
-        oldPageAnchor.className = 'pg-normal';
+        oldPageAnchor.className = 'pg-normal pointed-span';
         this.currentPage = pageNumber;
         var newPageAnchor = document.getElementById('pg' + this.currentPage);
-        newPageAnchor.className = 'pg-selected';
+        newPageAnchor.className = 'pg-selected pointed-span';
         var from = (pageNumber - 1) * itemsPerPage;
         var to = from + itemsPerPage - 1;
         this.showRecords(from, to);
@@ -2666,13 +2666,13 @@ function Pager(tableName, itemsPerPage) {
         }
 
         var element = document.getElementById(positionId);
-        var pagerHtml = '<span onclick="' + pagerName + '.prev();" class="pg-normal"> « Prev </span> ';
+        var pagerHtml = '<span onclick="' + pagerName + '.prev();" class="pg-normal pointed-span"> « Prev </span> ';
 
         for (var page = 1; page <= this.pages; page++) {
-            pagerHtml += '<span id="pg' + page + '" class="pg-normal" onclick="' + pagerName + '.showPage(' + page + ');">' + page + '</span> ';
+            pagerHtml += '<span id="pg' + page + '" class="pg-normal pointed-span" onclick="' + pagerName + '.showPage(' + page + ');">' + page + '</span> ';
         }
 
-        pagerHtml += '<span onclick="' + pagerName + '.next();" class="pg-normal"> Next »</span>';
+        pagerHtml += '<span onclick="' + pagerName + '.next();" class="pg-normal pointed-span"> Next »</span>';
         element.innerHTML = pagerHtml;
 
     }

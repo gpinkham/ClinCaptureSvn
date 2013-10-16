@@ -1,8 +1,3 @@
-/*.sdvCheck{
-
-    margin-right:10px;
-}*/
-
 #studiesDiv {
     margin-top: 5px;
     margin-bottom: 5px;
@@ -2153,4 +2148,8 @@ a.dnShortcut:active {
 
 a.dnShortcut:hover {
     text-decoration: underline !important;
+}
+
+.pointed-span {
+    cursor: pointer;
 }
