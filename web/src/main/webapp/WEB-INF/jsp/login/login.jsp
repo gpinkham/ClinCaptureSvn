@@ -37,6 +37,7 @@
 				jQuery('H1').css('color', '#AA62C6');
 				jQuery("input").each(function() {
 					var newSrc = jQuery(this).css('background-image');
+          if (newSrc.indexOf('/violet/') >= 0) return;
 					newSrc = newSrc.replace('images/', 'images/violet/');
 					jQuery(this).css('background-image', newSrc);
 				});
@@ -45,6 +46,7 @@
 				jQuery('H1').css('color', '#75b894');
 				jQuery("input").each(function() {
 					var newSrc = jQuery(this).css('background-image');
+          if (newSrc.indexOf('/green/') >= 0) return;
 					newSrc = newSrc.replace('images/', 'images/green/');
 					jQuery(this).css('background-image', newSrc);
 				});

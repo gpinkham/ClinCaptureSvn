@@ -61,6 +61,7 @@
 				$('H1').css('color', '#AA62C6');
 				$("input").each(function() {
 					var newSrc = $(this).css('background-image');
+          if (newSrc.indexOf('/violet/') >= 0) return;
 					newSrc = newSrc.replace('images/','images/violet/');
 					$(this).css('background-image', newSrc);
 				});
@@ -70,6 +71,7 @@
 				$('H1').css('color', '#75b894');
 				$("input").each(function() {
 					var newSrc = $(this).css('background-image');
+          if (newSrc.indexOf('/green/') >= 0) return;
 					newSrc = newSrc.replace('images/','images/green/');
 					$(this).css('background-image', newSrc);
 				});
