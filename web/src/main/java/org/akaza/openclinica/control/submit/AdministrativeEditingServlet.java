@@ -155,7 +155,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 			session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
 			session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
 			checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-			checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+			//checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
 		}
 		request.setAttribute("fromResolvingNotes", fromResolvingNotes);
 		DataEntryStage stage = ecb.getStage();

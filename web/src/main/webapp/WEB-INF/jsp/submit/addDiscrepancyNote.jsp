@@ -38,7 +38,6 @@
 </style>
 
 <script language="JavaScript">
-<!--
 function leftnavExpand(strLeftNavRowElementName){
  
     var objLeftNavRowElement;
@@ -221,7 +220,7 @@ $(document).ready(function() {
             <td class="table_cell_noborder">
             <c:choose>
             <c:when test="${name eq 'itemData' ||name eq 'ItemData'}">
-                <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')">
+                <a href="javascript: openDocWindow('ViewItemDetail?itemId=${item.id}')">
                 <fmt:message key="Data_Dictionary" bundle="${resword}"/></a>
             </c:when>
             <c:otherwise>
@@ -400,7 +399,7 @@ $(document).ready(function() {
 	<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
         <c:choose>
             <c:when test="${writeToDB eq '1'}">
-                <div class="dnBoxCol2"><input type="button" name="SubmitExit" onclick="javascript:this.form.submit();" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></div>
+                <div class="dnBoxCol2"><input type="button" name="SubmitExit" onclick="javascript:$('#typeId option').removeAttr('disabled');this.form.submit();" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></div>
             </c:when>
             <c:otherwise>
                 <div class="dnBoxCol2"><input type="button" name="Submit" onclick="javascript:this.form.submit();" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></div>

@@ -389,7 +389,7 @@
                                             <%--<c:when test="${dedc.status.name=='locked'}">--%>
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         </c:when>
-                                        <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && userRole.role.id ne 6}">
+                                        <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && (study.status.available) && !studyEvent.status.deleted && userRole.role.id ne 6}">
                                                 <c:set var="hideCol1" value="false"/>
                                                 <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>',document.startForm<c:out value="${dedc.edc.crf.id}"/>);"
                                                    onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
@@ -507,22 +507,20 @@
 
                             <td class="table_cell_left" style="vertical-align: middle;">
                                 <c:set var="actionQuery" value="" />
-                                <c:if test="${study.status.available}">
-                                    <c:if test="${dec.continueInitialDataEntryPermitted}">
-                                        <c:set var="actionQuery" value="InitialDataEntry?eventCRFId=${dec.eventCRF.id}" />
-                                    </c:if>
+                                <c:if test="${(study.status.available) && dec.continueInitialDataEntryPermitted}">
+                                  <c:set var="actionQuery" value="InitialDataEntry?eventCRFId=${dec.eventCRF.id}" />
+                                </c:if>
 
-                                    <c:if test="${dec.startDoubleDataEntryPermitted}">
-                                        <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
-                                    </c:if>
+                                <c:if test="${(study.status.available) && dec.startDoubleDataEntryPermitted}">
+                                  <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
+                                </c:if>
 
-                                    <c:if test="${dec.continueDoubleDataEntryPermitted}">
-                                        <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
-                                    </c:if>
+                                <c:if test="${(study.status.available) && dec.continueDoubleDataEntryPermitted}">
+                                  <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
+                                </c:if>
 
-                                    <c:if test="${dec.performAdministrativeEditingPermitted}">
-                                        <c:set var="actionQuery" value="AdministrativeEditing?eventCRFId=${dec.eventCRF.id}" />
-                                    </c:if>
+                                <c:if test="${(study.status.available || study.status.frozen) && dec.performAdministrativeEditingPermitted}">
+                                  <c:set var="actionQuery" value="AdministrativeEditing?eventCRFId=${dec.eventCRF.id}" />
                                 </c:if>
 
                                 <c:set var="crfSpacersCount" value="0"/>

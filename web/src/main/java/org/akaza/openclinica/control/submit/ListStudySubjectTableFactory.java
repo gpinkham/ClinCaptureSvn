@@ -922,7 +922,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				if (getCurrentRole().getRole() != Role.STUDY_MONITOR) {
 					url.append(calendaredEventsBuilder(studySubjectBean));
 				}
-                if (flagColour != null && getStudyBean().getStatus() == Status.AVAILABLE) {
+                if (flagColour != null && (getStudyBean().getStatus() == Status.AVAILABLE || getStudyBean().getStatus() == Status.FROZEN)) {
                     // Make sure this is the last icon
                     url.append(createNotesAndDiscrepanciesIcon(studySubjectBean, flagColour));
                 }

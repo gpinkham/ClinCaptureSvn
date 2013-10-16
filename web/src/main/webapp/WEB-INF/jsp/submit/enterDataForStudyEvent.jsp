@@ -520,23 +520,22 @@
 </td>
 <td class="table_cell" style="width:215px;text-align:center;">
     <c:set var="actionQuery" value="" />
-    <c:if test="${study.status.available}">
-        <c:if test="${dec.continueInitialDataEntryPermitted}">
-            <c:set var="actionQuery" value="InitialDataEntry?eventCRFId=${dec.eventCRF.id}" />
-        </c:if>
-
-        <c:if test="${dec.startDoubleDataEntryPermitted}">
-            <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
-        </c:if>
-
-        <c:if test="${dec.continueDoubleDataEntryPermitted}">
-            <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
-        </c:if>
-
-        <c:if test="${dec.performAdministrativeEditingPermitted}">
-            <c:set var="actionQuery" value="AdministrativeEditing?eventCRFId=${dec.eventCRF.id}" />
-        </c:if>
+    <c:if test="${(study.status.available) && dec.continueInitialDataEntryPermitted}">
+      <c:set var="actionQuery" value="InitialDataEntry?eventCRFId=${dec.eventCRF.id}" />
     </c:if>
+
+    <c:if test="${(study.status.available) && dec.startDoubleDataEntryPermitted}">
+      <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
+    </c:if>
+
+    <c:if test="${(study.status.available) && dec.continueDoubleDataEntryPermitted}">
+      <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
+    </c:if>
+
+    <c:if test="${(study.status.available || study.status.frozen) && dec.performAdministrativeEditingPermitted}">
+      <c:set var="actionQuery" value="AdministrativeEditing?eventCRFId=${dec.eventCRF.id}" />
+    </c:if>
+
     <c:choose>
         <c:when test='${actionQuery == "" && dec.stage.name == "invalid" }'>
 			<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4">
