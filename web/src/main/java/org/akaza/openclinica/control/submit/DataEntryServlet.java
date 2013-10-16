@@ -1455,6 +1455,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				allItems = section.getDisplayItemGroups();
 
                 logger.debug("all items before saving into DB" + allItems.size());
+
+                resetCodedItemTerms(allItems, iddao, ecb, changedItemsList);
+
 				this.output(allItems);
 				// TODO:Seems longer here, check this
 				logMe("DisplayItemWithGroupBean allitems4 " + System.currentTimeMillis());
@@ -1571,9 +1574,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					}
 				}
 
-                if (this.isAdministrativeEditing()) {
-                    resetCodedItemTerms(changedItemsList, iddao, ub);
-                }
 				logMe("DisplayItemWithGroupBean allitems4 end " + System.currentTimeMillis());
 				List<Integer> prevShownDynItemDataIds = shouldRunRules ? this.getItemMetadataService()
 						.getDynamicsItemFormMetadataDao()
@@ -1932,31 +1932,62 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		}
 	}
 
-    private void resetCodedItemTerms(ArrayList<DisplayItemBean> changedItemsList, ItemDataDAO iddao, UserAccountBean ub) throws Exception {
+    private void resetCodedItemTerms(List<DisplayItemWithGroupBean> allItems, ItemDataDAO iddao, EventCRFBean ecrfBean, ArrayList<DisplayItemBean> changedItemsList) throws Exception {
 
-        for (DisplayItemBean displayItem : changedItemsList) {
-
-            ItemDataBean idb = displayItem.getData();
-            CodedItem codedItem = getCodedItemService().findByItemData(idb.getId());
-
-            if (codedItem != null) {
-
-                ItemDataBean questionCodedItem = iddao.findByItemIdAndEventCRFIdAndOrdinal(codedItem.getItemId(), codedItem.getEventCrfId(), idb.getOrdinal());
-
-                if (questionCodedItem.getItemId() > 0) {
-                    codedItem.setVerbatimTerm(idb.getValue());
-                    codedItem.setDictionary("");
-                    codedItem.setCodedTerm("");
-                    codedItem.setStatus("NOT_CODED");
-                    getCodedItemService().saveCodedItem(codedItem);
-
-                    questionCodedItem.setValue("");
-                    questionCodedItem.setUpdatedDate(new Date());
-                    questionCodedItem.setUpdater(ub);
-                    iddao.update(questionCodedItem);
+        for (int i = 0; i < allItems.size(); i++) {
+            DisplayItemWithGroupBean diwb = allItems.get(i);
+            if (diwb.isInGroup()) {
+                List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
+                for (int j = 0; j < dgbs.size(); j++) {
+                    DisplayItemGroupBean displayGroup = dgbs.get(j);
+                    List<DisplayItemBean> items = displayGroup.getItems();
+                    for (DisplayItemBean item : items) {
+                        if (item.getItem().getDataType().equals(ItemDataType.CODE)) {
+                            codedTermValidation(changedItemsList, item, ecrfBean, iddao);
+                        }
+                    }
+                }
+            } else {
+                DisplayItemBean dib = diwb.getSingleItem();
+                if (dib.getItem().getDataType().equals(ItemDataType.CODE)) {
+                    codedTermValidation(changedItemsList, dib, ecrfBean, iddao);
                 }
             }
         }
+    }
+
+
+    private void codedTermValidation(ArrayList<DisplayItemBean> changedItemsList, DisplayItemBean item, EventCRFBean ecrfBean, ItemDataDAO iddao) throws Exception {
+
+        ItemFormMetadataDAO itemMetaDAO = new ItemFormMetadataDAO(dataSource);
+        ItemDAO itemDAO = new ItemDAO(dataSource);
+
+        ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getItem().getId(),
+                ecrfBean.getCRFVersionId());
+        ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(),
+                ecrfBean.getCRFVersionId());
+        ItemDataBean refItemData = iddao.findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), ecrfBean.getId(), item.getData().getOrdinal());
+
+        if (refItemData.getId() > 0) {
+            for (DisplayItemBean displayItemBean : changedItemsList) {
+                if (refItemData.getId() == displayItemBean.getData().getId() &&
+                        !refItemData.getValue().equalsIgnoreCase(displayItemBean.getData().getValue())) {
+                    CodedItem codedItem = (CodedItem) getCodedItemService().findByItemData(item.getData().getId());
+                    if (codedItem.getId() > 0 && codedItem.getStatus().equals("CODED")) {
+                        resetCodedItem(codedItem, displayItemBean.getData().getValue());
+                        item.getData().setValue("");
+                    }
+                }
+            }
+        }
+    }
+
+    private void resetCodedItem(CodedItem codedItem, String newTerm) throws Exception {
+        codedItem.setVerbatimTerm(newTerm);
+        codedItem.setDictionary("");
+        codedItem.setCodedTerm("");
+        codedItem.setStatus("NOT_CODED");
+        getCodedItemService().saveCodedItem(codedItem);
     }
 
     protected void setReasonForChangeError(ItemDataBean idb, String formName, String error, HttpServletRequest request) {
