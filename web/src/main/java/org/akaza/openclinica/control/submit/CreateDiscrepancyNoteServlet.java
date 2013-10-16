@@ -160,8 +160,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 		
 		Map<String, String> additionalParameters = getMapWithParameters(field, request);
 		
-		boolean isInError = "1".equals(additionalParameters.get("isInError"));
-		boolean isRFC = calculateIsRFC(field, additionalParameters, request, sm);
+		boolean isInError = additionalParameters.isEmpty()? false : "1".equals(additionalParameters.get("isInError"));
+		boolean isRFC = additionalParameters.isEmpty()? false : calculateIsRFC(field, additionalParameters, request, sm);
 		String originJSP = request.getParameter("originJSP") == null? "" : request.getParameter("originJSP");
 		request.setAttribute("originJSP", originJSP);
 		request.setAttribute(IS_REASON_FOR_CHANGE, isRFC);

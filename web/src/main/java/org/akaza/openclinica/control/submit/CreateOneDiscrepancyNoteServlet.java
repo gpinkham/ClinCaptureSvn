@@ -137,8 +137,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		
 		Map<String, String> additionalParameters = CreateDiscrepancyNoteServlet.getMapWithParameters(field, request);
 		
-		boolean isInFVCError = "1".equals(additionalParameters.get("isInFVCError"));
-		boolean isRFC = CreateDiscrepancyNoteServlet.calculateIsRFC(field, additionalParameters, request, sm);
+		boolean isInFVCError = additionalParameters.isEmpty()? false : "1".equals(additionalParameters.get("isInFVCError"));
+		boolean isRFC = additionalParameters.isEmpty()? false : CreateDiscrepancyNoteServlet.calculateIsRFC(field, additionalParameters, request, sm);
 		
 		String description = "";
 		int typeId = 0;

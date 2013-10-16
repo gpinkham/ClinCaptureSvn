@@ -777,8 +777,8 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 	private void manageStatuses(List<DiscrepancyNoteBean> notes, String field) {
 		Map<String, String> additionalParameters = CreateDiscrepancyNoteServlet.getMapWithParameters(field, request);
 		
-		boolean isInError = "1".equals(additionalParameters.get("isInError"));
-		boolean isRFC = CreateDiscrepancyNoteServlet.calculateIsRFC(field, additionalParameters, request, sm);
+		boolean isInError = additionalParameters.isEmpty()? false : "1".equals(additionalParameters.get("isInError"));
+		boolean isRFC = additionalParameters.isEmpty()? false : CreateDiscrepancyNoteServlet.calculateIsRFC(field, additionalParameters, request, sm);
 		String originJSP = request.getParameter("originJSP") == null? "" : request.getParameter("originJSP");
 		request.setAttribute("originJSP", originJSP);
 		request.setAttribute("isRFC", isRFC);
