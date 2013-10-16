@@ -664,6 +664,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			}
 			logMe("Entering Checks !submitted entered end forwarding page " + System.currentTimeMillis());
 			logMe("Time Took for this block" + (System.currentTimeMillis() - t));
+			request.getSession().setAttribute("dnAdditionalCreatingParameters", createDNParametersMap(request, section));
 			forwardPage(getJSPPage(), request, response);
 			return;
 		} else {
@@ -1367,6 +1368,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				request.setAttribute("hasError", "true");
 				session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 				setUpPanel(section);
+				request.getSession().setAttribute("dnAdditionalCreatingParameters", createDNParametersMap(request, section));
 				forwardPage(getJSPPage(), request, response);
 			} else {
 				logger.debug("Do we hit this in save ?????");
@@ -1963,6 +1965,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session
 				.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 		HashMap fieldNotes = fdn.getFieldNotes();
+		Set<String> setOfItemNamesWithRFCErrors = request.getAttribute("setOfItemNamesWithRFCErrors") == null? new TreeSet<String>() : (TreeSet<String>)request.getAttribute("setOfItemNamesWithRFCErrors");
 		int existingNotes = dndao.findNumExistingNotesForItem(idb.getId());
 		if (existingNotes > 0) {
 
@@ -1978,7 +1981,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					&& (noteSubmitted == null || noteSubmitted.get(idb.getId()) == null || !(Boolean) noteSubmitted
 							.get(idb.getId()))) {
 				errors.put(formName, error);
-				// }
+				setOfItemNamesWithRFCErrors.add(formName);
 			} else {
 				logger.debug("found note in session");
 				logger.debug("has a note in db: entered an error here: " + formName + ": " + errors.toString());
@@ -1989,7 +1992,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		} else {
 			logger.debug("setting an error for " + formName);
 			errors.put(formName, error);
+			setOfItemNamesWithRFCErrors.add(formName);
 		}
+		request.setAttribute("setOfItemNamesWithRFCErrors", setOfItemNamesWithRFCErrors);
 	}
 
 	/**
@@ -5169,4 +5174,70 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 		return codedItemService;
 	}
+	
+	private Map<String, HashMap<String, String>> createDNParametersMap(HttpServletRequest request, DisplaySectionBean section) {
+		//we create map with parameters for creating DNs for each field in CRF
+		Map<String, HashMap<String, String>> dnCreatingParameters = new HashMap<String, HashMap<String, String>>();
+		for (int i = 0; i < section.getDisplayItemGroups().size(); i++) {
+			DisplayItemWithGroupBean diwgb = (DisplayItemWithGroupBean) section.getDisplayItemGroups().get(i);
+			String inputName;
+			if (diwgb.isInGroup()) {
+				List<DisplayItemGroupBean> dbGroups = diwgb.getDbItemGroups();
+				for (int j = 0; j < dbGroups.size(); j++) {
+					DisplayItemGroupBean displayGroup = dbGroups.get(j);
+					for (DisplayItemBean displayItem : displayGroup.getItems()) {
+						// DisplayItemBean from repeating Group
+						if (j == 0) {
+							inputName = getGroupItemInputName(displayGroup, j, displayItem);
+						} else {
+							inputName = getGroupItemManualInputName(displayGroup, j, displayItem);
+						}						
+						dnCreatingParameters.put(inputName, calculateDNParametersForOneItem(displayItem, inputName, request));
+					}
+				}
+			} else {
+				DisplayItemBean displayItem = diwgb.getSingleItem();
+				inputName = getInputName(displayItem);
+				dnCreatingParameters.put(inputName, calculateDNParametersForOneItem(displayItem, inputName, request));
+			}
+				
+		}
+		return dnCreatingParameters;
+	}
+	
+	private HashMap<String, String> calculateDNParametersForOneItem(
+			DisplayItemBean dib, String field, HttpServletRequest request) {
+		HashMap<String, String> result = new HashMap<String, String>();
+		// calculate parameters block
+		
+		String isInError = "0";
+		HashMap formMessages = (HashMap) request.getAttribute("formMessages");
+		if (formMessages != null) {
+			if (formMessages.keySet().contains(field)) {
+				isInError = "1";
+			}
+		}
+		
+		String isInRFCError = "0";
+		Set<String> setOfItemNamesWithRFCErrors = (Set<String>) request.getAttribute("setOfItemNamesWithRFCErrors");
+		if (setOfItemNamesWithRFCErrors != null) {
+			if (setOfItemNamesWithRFCErrors.contains(field)) {
+				isInRFCError = "1";
+			}
+		}
+		
+		String isInFVCError = "0";
+		if ("1".equals(isInError) && "0".equals(isInRFCError)) {
+			isInFVCError = "1";
+		}
+		
+		result.put("isInError", isInError);
+		result.put("isInRFCError", isInRFCError);
+		result.put("isInFVCError", isInFVCError);
+		result.put("isDataChanged", "0");
+		result.put("field", field);
+		
+		return result;
+	}
+	
 }

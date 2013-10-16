@@ -832,6 +832,11 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventCRFServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ChangeParametersForDNoteServlet</servlet-name>
+        <display-name>ChangeParametersForDNote</display-name>
+        <servlet-class>org.akaza.openclinica.control.submit.ChangeParametersForDNoteServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ReassignStudySubjectServlet</servlet-name>
         <display-name>ReassignStudySubject</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ReassignStudySubjectServlet</servlet-class>
@@ -1840,6 +1845,10 @@
     <servlet-mapping>
         <servlet-name>ViewEventCRFServlet</servlet-name>
         <url-pattern>/ViewEventCRF</url-pattern>
+    </servlet-mapping>
+     <servlet-mapping>
+        <servlet-name>ChangeParametersForDNoteServlet</servlet-name>
+        <url-pattern>/ChangeParametersForDNote</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ReassignStudySubjectServlet</servlet-name>

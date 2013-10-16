@@ -250,6 +250,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 				itemData = (ItemDataBean) iddao.findByPK(entityId);
 				request.setAttribute("entityValue", itemData.getValue());
 				request.setAttribute("entityName", item.getName());
+				request.setAttribute("strErrMsg", request.getParameter("strErrMsg"));
 
 				EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 				EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
@@ -448,13 +449,13 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 		request.setAttribute(ENTITY_TYPE, name);
 		request.setAttribute(ENTITY_FIELD, field);
 		request.setAttribute(ENTITY_COLUMN, column);
-
+ 
 		request.setAttribute(CreateDiscrepancyNoteServlet.WRITE_TO_DB, writeToDB ? "1" : "0");
 
 		ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(name, entityId, column);
 
 		if (notes.size() > 0) {
-			manageStatuses(notes);
+			manageStatuses(notes, field);
 
 			StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
 			int parentStudyForNoteSub = 0;
@@ -480,7 +481,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
 		if (newNotes != null && !newNotes.getNotes(field).isEmpty()) {
 			ArrayList newFieldNotes = newNotes.getNotes(field);
-			manageReasonForChangeState(session, field);
+			
 			for (int i = 0; i < newFieldNotes.size(); i++) {
 				DiscrepancyNoteBean note = (DiscrepancyNoteBean) newFieldNotes.get(i);
 				note.setLastUpdator(ub);
@@ -499,6 +500,10 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 				if (pId == 0) {// we can only keep one unsaved note because
 					// note.id == 0
 					noteTree.put(note.getId(), note);
+				}
+				if (note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId() 
+						|| note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId()) {
+					manageReasonForChangeState(session, field);
 				}
 			}
 			for (int i = 0; i < newFieldNotes.size(); i++) {
@@ -569,7 +574,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 						parent.setLastDateUpdated(note.getCreatedDate());
 					}
 
-					if (note.getDiscrepancyNoteTypeId() == 1 && note.getAssignedUserId() > 0) {
+					if (note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId() && note.getAssignedUserId() > 0) {
 						int ownerId = note.getOwnerId();
 						if (fvcInitAssigns.containsKey(pId)) {
 							String f = fvcInitAssigns.get(pId);
@@ -769,12 +774,15 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 		session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
 	}
 
-	private void manageStatuses(List<DiscrepancyNoteBean> notes) {
+	private void manageStatuses(List<DiscrepancyNoteBean> notes, String field) {
+		Map<String, String> additionalParameters = CreateDiscrepancyNoteServlet.getMapWithParameters(field, request);
 		
+		boolean isInError = "1".equals(additionalParameters.get("isInError"));
+		boolean isRFC = CreateDiscrepancyNoteServlet.calculateIsRFC(field, additionalParameters, request, sm);
 		String originJSP = request.getParameter("originJSP") == null? "" : request.getParameter("originJSP");
-		boolean isRFC = originJSP.equals("administrativeEditing")? true : false;
-		
+		request.setAttribute("originJSP", originJSP);
 		request.setAttribute("isRFC", isRFC);
+		request.setAttribute("isInError", isInError);
 		
 		ArrayList<DnDescription> siteVisibleDescs = new ArrayList<DnDescription>();
 		ArrayList<DnDescription> studyVisibleDescs = new ArrayList<DnDescription>();
@@ -813,6 +821,8 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 			request.setAttribute(CAN_CLOSE, true);
 			
 			request.setAttribute(RES_STATUSES, Arrays.asList(ResolutionStatus.UPDATED, ResolutionStatus.CLOSED));
+			request.setAttribute(DIS_TYPES, DiscrepancyNoteType.simpleList);
+			request.setAttribute(DIS_TYPES2, DiscrepancyNoteType.simpleList);
 			if (isRFC){
 				request.setAttribute(DIS_TYPES, Arrays.asList(DiscrepancyNoteType.ANNOTATION));
 				request.setAttribute(DIS_TYPES2, Arrays.asList(DiscrepancyNoteType.ANNOTATION));

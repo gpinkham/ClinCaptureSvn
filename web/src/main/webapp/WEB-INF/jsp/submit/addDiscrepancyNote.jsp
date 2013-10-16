@@ -4,7 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <jsp:useBean scope='request' id='strResStatus' class='java.lang.String' />
 <jsp:useBean scope='request' id='strUserAccountId' class='java.lang.String' />
-<jsp:useBean scope='request' id='writeToDB' class='java.lang.String' />
+<jsp:useBean scope='request' id='writeToDB' class='java.lang.String' /> 
 <jsp:useBean scope='request' id='unlock' class='java.lang.String' />
 <jsp:useBean scope='request' id='autoView' class='java.lang.String' />
 <jsp:useBean scope='request' id='dnDescriptions' class='java.util.ArrayList' />
@@ -14,7 +14,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<html>
+<html>   
 <head>
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 <title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="add_discrepancy_note" bundle="${resword}"/></title>
@@ -40,7 +40,7 @@
 <script language="JavaScript">
 <!--
 function leftnavExpand(strLeftNavRowElementName){
-
+ 
     var objLeftNavRowElement;
 
     objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
@@ -109,20 +109,37 @@ function setResStatus(resStatusId, destinationUserId) {
 		objtr1.disabled = true;
 	}
 }
-
-
-function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
+		
+function setElements(typeId,user1,user2,filter1,nw,ud,rs,cl,na,isRFC) {
 	setStatus(typeId,filter1,nw,ud,rs,cl,na);
 	if(typeId == 3) {//query
-		leftnavExpand(user1);
-		leftnavExpand(user2);	
-	}else {
-		hide(user1);
-		hide(user2);
+		showElement(user1);
+		showElement(user2);	
+		showElement('input');
+		switchOnElement('inputDescription');
+		hideElement('select');
+		switchOffElement('selectDescription');
+		
+	} else {
+		hideElement(user1);
+		hideElement(user2);
+		if (isRFC) {
+			hideElement('input');
+			switchOffElement('inputDescription');
+			showElement('select');
+			switchOnElement('selectDescription');
+		} else {
+			showElement('input');
+			switchOnElement('inputDescription');
+		}
 	}
 }
-//-->
-</script>
+
+$(document).ready(function() {
+		$( "select[id*=typeId]" ).change();
+	})
+
+</script> 
 </head>
 <body style="margin: 0px 12px 0px 12px;" onload="javascript:setStatus('<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
 <%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%>
@@ -138,7 +155,6 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 <form name="noteForm" method="POST" action="CreateDiscrepancyNote">
 <jsp:include page="../include/showSubmitted.jsp" />
 <input type="hidden" name="name" value="<c:out value="${discrepancyNote.entityType}"/>">
-<input type="hidden" name="itemId" value="<c:out value="${discrepancyNote.itemId}"/>">
 <input type="hidden" name="column" value="<c:out value="${discrepancyNote.column}"/>">
 <input type="hidden" name="parentId" value="<c:out value="${discrepancyNote.parentDnId}"/>">
 <input type="hidden" name="id" value="<c:out value="${discrepancyNote.entityId}"/>">
@@ -151,6 +167,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 <input type="hidden" name="eventCRFId" value="<c:out value="${eventCRFId}"/>">
 <input type="hidden" name="errorFlag" value="<c:out value="${errorFlag}"/>">
 <input type="hidden" name="isRFC" value="<c:out value="${isRFC}"/>">
+<input type="hidden" name="originJSP" value="<c:out value="${originJSP}"/>">
 
 <c:set var="name" value="${discrepancyNote.entityType}"/>
 <!-- Entity box -->
@@ -229,24 +246,22 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 
 	<div class="dnBoxCol1 dnBoxText"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
 	<div class="dnBoxCol2 dnBoxText">
-	<c:choose>
-		<c:when test="${isRFC}">
-			<div class="formfieldL_BG">
-			<select name="description" id="description" class="formFieldL">
-				<c:forEach var="rfcTerm" items="${dnDescriptions}">
-					<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
-				</c:forEach>
-				<option value="Other"><fmt:message key="other" bundle="${resword}"/>
-			</select>
+		<c:if test="${isRFC}">
+			<div class="formfieldL_BG" id="select" style="display:none" >
+				<select name="description" id="selectDescription" class="formFieldL" disabled>
+					<c:forEach var="rfcTerm" items="${dnDescriptions}">
+						<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
+					</c:forEach>
+					<option value="Other"><fmt:message key="other" bundle="${resword}"/>
+				</select>
 			</div>
-		</c:when>
-		<c:otherwise>
-		<span id="description">
-			<div class="formfieldXL_BG"><input type="text" name="description" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
-			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
-		</span>
-		</c:otherwise>
-	</c:choose>
+		</c:if>
+			<div id="input" style="display:none"> 
+				<div class="formfieldXL_BG" >
+					<input type="text" name="description" id="inputDescription" disabled value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL">
+				</div>
+				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
+			</div>
 	</div>
 	
 	<div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
@@ -276,7 +291,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
                             '<fmt:message key="Updated" bundle="${resterm}"/>',
                             '<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>',
                             '<fmt:message key="Closed" bundle="${resterm}"/>',
-                            '<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
+                            '<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC});">
 
                 <c:forEach var="type" items="${discrepancyTypes}">
 				<c:choose>
@@ -385,10 +400,10 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 	<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
         <c:choose>
             <c:when test="${writeToDB eq '1'}">
-                <div class="dnBoxCol2"><input type="submit" name="SubmitExit" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></div>
+                <div class="dnBoxCol2"><input type="button" name="SubmitExit" onclick="javascript:this.form.submit();" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></div>
             </c:when>
             <c:otherwise>
-                <div class="dnBoxCol2"><input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></div>
+                <div class="dnBoxCol2"><input type="button" name="Submit" onclick="javascript:this.form.submit();" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></div>
             </c:otherwise>
         </c:choose>
     </c:if>

@@ -5,11 +5,11 @@
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-
+ 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
@@ -67,7 +67,7 @@
   "document.getElementById('centralContainer').style.display='none'; new Effect.Appear('centralContainer', {duration:1});<jsp:include page="../include/showPopUp2.jsp"/>"
   TabsForwardByNum(<c:out value="${tabId}"/>); alert(self.screen.availWidth);
 margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
-<c:set var="prevItemHolderId" value="0"/>
+
 <c:set var="markCRFMethodName" value="displayMessageFromCheckbox(this, undefined)"/>
 
 <div id="centralContainer" style=
@@ -82,7 +82,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     </c:when>
     <c:otherwise>
         <c:set var="buttonAction" value="Confirm values" />
-        <c:set var="checkInputsValue" value="0" />
+        <c:set var="checkInputsValue" value="0" /> 
     </c:otherwise>
 </c:choose>
 <table width="75%"><tr><td>
@@ -249,7 +249,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         TabID=1;
 
         while (TabID<=TabsNumber)
-
         {
             sectionId = TabSectionId[TabID-1];
             url = "AdministrativeEditing?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tabId=" + TabID <c:if test="${exitTo ne null && !empty exitTo}"> + "&exitTo=${exitTo}"</c:if>;
@@ -269,11 +268,8 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                 document.write('<div id="Tab' + TabID + 'Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">' + TabLabel[(TabID-1)] + '</span></div></div></div></div>');
                 document.write('</td>');
             }
-
             TabID++;
-
         }
-
         reverseRowsOrder();
     }
 
@@ -323,9 +319,11 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             window.location = document.crfForm.sectionName.options[OptionIndex].value;
         }
     }
+	
+	function setParameterForDN(field, parameterName, value) { 
+		setParameterForDNWithPath(field, parameterName, value, '${pageContext.request.contextPath}');
+	};
 
-
-    //-->
 </script>
 <%--
 <td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
@@ -518,7 +516,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         </table>
                     </td>
                 </tr>
-            </table>
+            </table> 
         </td>
     </tr>
     <!-- end of page number and buttons-->
@@ -1129,7 +1127,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 </c:choose>
     <td class="table_cell_left">
         <table border="0" class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}">
-            <c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/>
             <tr>
                 	</c:if>
 
@@ -1159,11 +1156,11 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 						<%-- put in highlighting here, tbh --%>
                         <c:choose>
                     		<c:when test="${displayItem.singleItem.metadata.highlighted}">
-								<table border="0" cellspacing="0" cellpadding="1" class="aka_group_show <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">itemHolderClass</c:if>" <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>>
+								<table border="0" cellspacing="0" cellpadding="1" class="aka_group_show">
                     			<tr>
                     		</c:when>
                     		<c:otherwise>
-								<table border="0" cellspacing="0" cellpadding="1" <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>>
+								<table border="0" cellspacing="0" cellpadding="1">
                     			<tr>
                     		</c:otherwise>
                     	</c:choose><%-- end of highlighting block, tbh --%>
@@ -1278,7 +1275,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
                     <td valign="top">
                         <table border="0" class="itemHolderClass" id="itemHolderId_input${childItem.item.id}">
-                            <c:set var="prevItemHolderId" value="${childItem.item.id}"/>
                             <tr>
 
                                 <td valign="top" class="aka_ques_block"><c:out value="${childItem.metadata.questionNumberLabel}" escapeXml="false"/></td>

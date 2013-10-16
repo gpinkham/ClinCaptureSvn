@@ -5,16 +5,16 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-
+ 
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope="request" id="responseOptionBean" class="org.akaza.openclinica.bean.submit.ResponseOptionBean" />
-<jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
+<jsp:useBean scope="request" id="formMessages" class="java.util.HashMap"/>
 <script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
 <!-- *JSP* submit/showGroupItemInput.jsp -->
 <script lang="Javascript">
 function genToolTips(itemId){
-	var resStatus = new Array();
+	var resStatus = new Array(); 
 	var detailedNotes= new Array();
 	var discrepancyType = new Array();
 	var updatedDates = new Array();
@@ -375,7 +375,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
         </c:when>
         <c:otherwise>
             <input id="show<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
-                    "this.className='changedField'; manualChange('<c:out value="${inputName}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif','<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');"
+                    "this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); manualChange('<c:out value="${inputName}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif','<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');"
                    type="text" name="show<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
         </c:otherwise>
     </c:choose>
@@ -392,7 +392,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
     </c:when>
     <c:otherwise>
       <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-             onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
+             onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
@@ -417,7 +417,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
     </c:when>
     <c:otherwise>
       <textarea id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-                onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');  javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+                onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');  javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:otherwise>
   </c:choose>
 </c:if>
@@ -444,7 +444,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
         </c:when>
         <c:otherwise>
           <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-                 onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
+                 onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
         </c:otherwise>
       </c:choose>
     </c:forEach>
@@ -471,7 +471,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
       </c:when>
       <c:otherwise>
         <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-               onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
+               onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:otherwise>
     </c:choose>
 
@@ -518,7 +518,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
       </c:when>
       <c:otherwise>
         <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'horizontal');} radioButtonOnClick(event);"
-               onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';} sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
+               onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';}; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:otherwise>
     </c:choose>
   </c:if>
@@ -579,7 +579,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
         <c:set var="count" value="${count+1}"/>
       </c:forEach>
       <select id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-              onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" class="formfield">
+              onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" class="formfield">
         <c:choose>
           <c:when test="${printDefault == 'true'}">
             <c:set var="count" value="0"/>
@@ -618,7 +618,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
     </c:when>
     <c:otherwise>
       <select id="<c:out value="${inputName}"/>" multiple  tabindex=
-      "<c:out value="${tabNum}"/>" name="<c:out value="${inputName}"/>" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
+      "<c:out value="${tabNum}"/>" name="<c:out value="${inputName}"/>" onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
     </c:otherwise>
   </c:choose>
   <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
@@ -626,7 +626,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
       <c:when test="${option.selected}"><c:set var="checked" value="selected" /></c:when>
       <c:otherwise><c:set var="checked" value="" /></c:otherwise>
     </c:choose>
-    <%-- handle multiple values --%>
+    <%-- handle multiple values --%> 
     <c:forTokens items="${inputTxtValue}" delims=","  var="_item">
       <c:if test="${(option.text eq _item) || (option.value eq _item)}"><c:set var="checked" value="selected" />
       </c:if>
@@ -697,7 +697,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 		        </c:when>
 		        <c:otherwise>
 		            <input class="aka_input_readonly" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" readonly="readonly" onChange=
-		              "this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}" />" value="<c:out value="${inputTxtValue}"/>" />
+		              "this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); javascript:turnOnIsDataChangedParamOfDN(this.name); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}" />" value="<c:out value="${inputTxtValue}"/>" />
 		        </c:otherwise>
 		    </c:choose>
 		</c:when>
@@ -710,7 +710,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 				</c:when>
 				<c:otherwise>
 					<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
-							"this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+							"this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); javascript:turnOnIsDataChangedParamOfDN(this.name); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
     			</c:otherwise>
 			</c:choose>
 		</c:otherwise>
@@ -764,10 +764,10 @@ function switchStr(itemId, id,attribute,str1,str2) {
 		<c:when test="${displayItem.numDiscrepancyNotes > 0}">
 			<a class="dnLink"
 						tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip();"
-						onClick="openDNoteWindow('ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&originJSP=<c:out value="${param.originJSP}"/>','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
+						onClick="openDNoteWindow('ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&originJSP=<c:out value="${param.originJSP}"/>','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
 				<img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}" />"
 						src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-				<input type="hidden" value="ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&originJSP=<c:out value="${param.originJSP}"/>"/>
+				<input type="hidden" value="ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&originJSP=<c:out value="${param.originJSP}"/>"/>
 			</a>
 		</c:when>
 		<c:otherwise>
@@ -778,10 +778,10 @@ function switchStr(itemId, id,attribute,str1,str2) {
 				<c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
 				<a class="dnLink"
 							tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}));" onmouseout="UnTip();"
-							onClick="openDNWindow('CreateDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupOid=<c:out value="${repeatParentId}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=${writeToDB}&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}&originJSP=<c:out value="${param.originJSP}"/>&enterData=1','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
+							onClick="openDNWindow('CreateDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupOid=<c:out value="${repeatParentId}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=${writeToDB}&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}&originJSP=<c:out value="${param.originJSP}"/>&enterData=1','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>', event); return false;">
 					<img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>"
 							src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-					<input type="hidden" value="ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${dataId}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&originJSP=<c:out value="${param.originJSP}"/>&writeToDB=${writeToDB}"/>
+					<input type="hidden" value="ViewDiscrepancyNote?eventCRFId=<c:out value="${section.eventCRF.id}"/>&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${dataId}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&isLocked=<c:out value="${isLocked}"/>&order=<c:out value="${orderForDN}"/>&originJSP=<c:out value="${param.originJSP}"/>&writeToDB=${writeToDB}"/>
 				</a>
 			</c:if>
 		</c:otherwise>

@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-
+ 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
@@ -144,7 +144,7 @@
                         </c:otherwise>
                     </c:choose></b>
                 </td>
-            	</tr>
+            	</tr> 
             	<tr>
             	<td class="table_cell_noborder"><fmt:message key="Current_Value" bundle="${resword}"/>:&nbsp;&nbsp;</td>
                 <td class="table_cell_noborder"><b><c:out value="${entityValue}"/>&nbsp;</b></td>
@@ -192,6 +192,9 @@
 <c:set var="count" value="${1}"/>
 <!-- Thread Heading -->
 <c:forEach var="note" items="${discrepancyNotes}">
+<c:if test="${note.value.saved==false}">
+	<c:set var="disableBeginNewThread" value="${true}"/>
+</c:if>
 <table border="0" cellpadding="0" cellspacing="0">
     <tbody>
         <tr>
@@ -212,8 +215,6 @@
                                         </a>
 
                                         <!-- Thread title -->
-
-
                                         <b><c:out value="${note.value.description}"/>
                                             <c:if test="${note.value.saved==false}">
                                                 <span class="alert">[<fmt:message key="not_saved" bundle="${resword}"/>]</span>
@@ -310,7 +311,6 @@
             </td>
         </tr>
              
-        
 		<c:if test="${showDNBox eq 'y'}">
 			<c:import url="./discrepancyNote.jsp">
         		<c:param name="parentId" value="${note.value.id}"/>
@@ -319,7 +319,6 @@
 				<c:param name="field" value="${field}"/>				
 				<c:param name="column" value="${column}"/>
 				<c:param name="boxId" value="box${note.value.id}"/>
-                <c:param name="itemId" value="${itemId}"/>
 				<c:param name="typeId" value="${note.value.discrepancyNoteTypeId}"/>
 				<c:param name="typeName" value="${note.value.disType.name}"/>
 			</c:import>
@@ -332,7 +331,7 @@
 <c:if test="${!study.status.locked}">
 	<div style="clear:both;"></div>
 	<c:choose>
-    <c:when test="${id == 0}">
+    <c:when test="${id == 0 || disableBeginNewThread}">
     	<p id="p">
 			<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>
 		</p>
@@ -350,11 +349,12 @@
 		<c:param name="field" value="${field}"/>				
 		<c:param name="column" value="${column}"/>
 		<c:param name="boxId" value="box${0}New"/>
-        <c:param name="itemId" value="${itemId}"/>
 		<c:param name="isRFC" value="${isRFC}"/>
-	</c:import>
+		<c:param name="isInError" value="${isInError}"/>
+		<c:param name="strErrMsg" value="${strErrMsg}"/>
+	</c:import> 
 </c:if>  
-
+ 
 <div style="clear:both;"></div>
 <div id="audit">
 <h3 class="title_manage"><fmt:message key="Audit_History" bundle="${resword}"/></h3>
@@ -363,9 +363,6 @@
 </c:import>
 </div>
 <div style="clear:both;"></div>
-<script type="text/javascript" language="javascript">
-    setImageInParentWin('flag_<c:out value="${updatedDiscrepancyNote.field}"/>', '<c:out value="${updatedDiscrepancyNote.resStatus.iconFilePath}"/>', '${updatedDiscrepancyNote.resStatus.id}');
-</script>
 </body>
 
 <input type="button" name="BTN_Close" id="CloseWindow" value="<fmt:message key="close_window" bundle="${resword}"/>" class="button_medium" onClick="javascript:window.close();"/>

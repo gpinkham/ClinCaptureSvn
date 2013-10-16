@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -84,6 +85,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 	public static final String BOX_DN_MAP = "boxDNMap";
 	public static final String BOX_TO_SHOW = "boxToShow";
 	public static final String IS_REASON_FOR_CHANGE = "isRFC";
+	public static final String ERROR_FLAG = "errorFlag";// use to determine
 
 	@Override
 	protected void mayProceed() throws InsufficientPermissionException {
@@ -131,7 +133,13 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		String ypos = fp.getString("ypos" + parentId);
 		int refresh = 0;
 		
-		boolean isReasonForChange = Boolean.valueOf(fp.getString(IS_REASON_FOR_CHANGE));
+		String field = fp.getString(ENTITY_FIELD);
+		
+		Map<String, String> additionalParameters = CreateDiscrepancyNoteServlet.getMapWithParameters(field, request);
+		
+		boolean isInFVCError = "1".equals(additionalParameters.get("isInFVCError"));
+		boolean isRFC = CreateDiscrepancyNoteServlet.calculateIsRFC(field, additionalParameters, request, sm);
+		
 		String description = "";
 		int typeId = 0;
 		
@@ -141,14 +149,18 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		String viewNoteLink = fp.getString("viewDNLink" + parentId);
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "fromBox", "1");
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
+		typeId = fp.getInt("typeId" + parentId);
 		
-		if (isReasonForChange) {
+		if (isRFC && typeId == DiscrepancyNoteType.ANNOTATION.getId()) {
 			typeId = DiscrepancyNoteType.REASON_FOR_CHANGE.getId();
 			dn.setDisType(DiscrepancyNoteType.REASON_FOR_CHANGE);
 			description = fp.getString("description");
 		} else {
+			if (isInFVCError) {
+				typeId = DiscrepancyNoteType.FAILEDVAL.getId();
+				resStatusId = ResolutionStatus.OPEN.getId();
+			}
 			description = fp.getString("description" + parentId);
-			typeId = fp.getInt("typeId" + parentId);
 			v.addValidation("description" + parentId, Validator.NO_BLANKS);
 			v.addValidation("description" + parentId, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
@@ -182,14 +194,12 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 				Validator.addError(errors, RES_STATUS_ID + parentId, restext.getString("not_valid_res_status"));
 			}
 		}
-		//
 
 		if (errors.isEmpty()) {
 			HashMap<String, ArrayList<String>> results = new HashMap<String, ArrayList<String>>();
 			ArrayList<String> mess = new ArrayList<String>();
 
 			String column = fp.getString(ENTITY_COLUMN, true);
-			String field = fp.getString(ENTITY_FIELD, true);
 
 			dn.setOwner(ub);
 			dn.setStudyId(currentStudy.getId());
@@ -266,7 +276,16 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 				 * edited data. This is needed to make sure the system flags error while changing data for items which
 				 * already has a DiscrepanyNote
 				 */
-				manageReasonForChangeState(session, entityId);
+				
+				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
+					CreateDiscrepancyNoteServlet.turnOffIsDataChangedParamOfDN(field, request);
+					CreateDiscrepancyNoteServlet.turnOffIsInRFCErrorParamOfDN(field, request);
+					CreateDiscrepancyNoteServlet.turnOffIsInErrorParamOfDN(field, request);
+					manageReasonForChangeState(session, entityId);
+				} else if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId()) {
+					manageReasonForChangeState(session, entityId);
+				}
+		
 				String email = fp.getString(EMAIL_USER_ACCOUNT + parentId);
 				if (dn.getAssignedUserId() > 0 && "1".equals(email.trim())) {
 					logger.info("++++++ found our way here");
@@ -329,15 +348,11 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 
 					/*
 					 * 
-					 * 
-					 * 
 					 * Please select the link below to view the information provided. You may need to login to
 					 * OpenClinica_testbed with your user name and password after selecting the link. If you receive a
 					 * page cannot be displayed message, please make sure to select the Change Study/Site link in the
 					 * upper right table of the page, select the study referenced above, and select the link again.
 					 * 
-					 * https://openclinica.s-3.com/OpenClinica_testbed/ ViewSectionDataEntry
-					 * ?ecId=117&sectionId=142&tabId=2
 					 */
 
 					String emailBodyString = message.toString();

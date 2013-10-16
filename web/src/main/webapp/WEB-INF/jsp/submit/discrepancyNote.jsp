@@ -77,31 +77,27 @@ function addText(id,text) {
 	}
 }
 
-function hideElement(elementName){
-	        hide(elementName, "none");
-		}
-		
-function showElement(elementName){
-	        hide(elementName, "");
-		}
-		
-function hide(elementName, propertyValue){
-	        var objElement;
-	        objElement = MM_findObj(elementName);
-	        if (objElement != null) {
-	            if (objElement.style) { objElement = objElement.style; }
-	            objElement.display = propertyValue;
-	        }
-	    }
-	    
-function setElements(typeId,user1,user2,id,filter1,nw,ud,rs,cl,na) {
+function setElements(typeId,user1,user2,id,filter1,nw,ud,rs,cl,na,isRFC,parentId) {
 	setStatusWithId(typeId,id,filter1,nw,ud,rs,cl,na);
 	if(typeId == 3) {//query
 		showElement(user1+id);
 		showElement(user2+id);	
+		showElement('input'+parentId);
+		switchOnElement('inputDescription'+parentId);
+		hideElement('select'+parentId);
+		switchOffElement('selectDescription'+parentId);
 	} else {
 		hideElement(user1+id);
 		hideElement(user2+id);
+		if (isRFC) {
+			hideElement('input'+parentId);
+			switchOffElement('inputDescription'+parentId);
+			showElement('select'+parentId);
+			switchOnElement('selectDescription'+parentId);
+		} else {
+			showElement('input'+parentId);
+			switchOnElement('inputDescription'+parentId);
+		}
 	}
 }
 
@@ -187,13 +183,14 @@ function setYPos(id) {
 	<input type="hidden" name="parentId" value="${parentId}"/>
 	<input type="hidden" name="viewDNLink${parentId}" value="${viewDNLink}"/>
 	<input type="hidden" name="id" value="${param.entityId}"/>
-    <input type="hidden" name="itemId" value="${param.itemId}"/>
 	<input type="hidden" name="name" value="${param.entityType}"/>
 	<input type="hidden" name="field" value="${param.field}"/>
 	<input type="hidden" name="column" value="${param.column}"/>
 	<input type="hidden" name="close${parentId}" value=""/>
 	<input type="hidden" name="ypos${parentId}" value="0"/>
 	<input type="hidden" name="isRFC" value="${param.isRFC}"/>
+	<input type="hidden" name="originJSP" value="${originJSP}"/>
+
 	<!-- *JSP* submit/discrepancyNote.jsp -->
 	<td valign="top">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -216,31 +213,47 @@ function setYPos(id) {
 		<div style="clear:both;"></div> 
 		<div class="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
 		<div class="dnBoxCol2-1"> 
-		<c:choose>
-			<c:when test="${param.isRFC}">  
-				<div class="formfieldL_BG">
-				 
-					<select name="description" id="description" class="formFieldL">
-						<c:forEach var="rfcTerm" items="${dnDescriptions}">
-							<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
-						</c:forEach>
-						<option value="Other"><fmt:message key="other" bundle="${resword}"/>
-					</select>
-				</div>
-			</c:when>
-			<c:otherwise>
-				<span id="description${parentId}">
-					<div class="formfieldXL_BG"><input type="text" id="description${parentId}id" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
+			<c:choose>
+				<c:when test="${parentId == 0}">
+					<c:if test="${isRFC}">
+						<div class="formfieldL_BG" id="select${parentId}" style="display:none" >
+							<select name="description${parentId}" id="selectDescription${parentId}" class="formFieldL" disabled>
+								<c:forEach var="rfcTerm" items="${dnDescriptions}">
+									<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
+								</c:forEach>
+								<option value="Other"><fmt:message key="other" bundle="${resword}"/>
+							</select>
+						</div>
+					</c:if>
+					<div id="input${parentId}" style="display:none"> 
+						<div class="formfieldXL_BG">
+							<input type="text" name="description${parentId}" id="inputDescription${parentId}" disabled value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL">
+						</div>
+						<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
+					</div>	
+				</c:when>
+				<c:otherwise>
+					<div class="formfieldXL_BG">
+						<input type="text" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL">
+					</div>
 					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
-				</span>
-			</c:otherwise>
-		</c:choose>
+				</c:otherwise>
+			</c:choose>
 		</div>
 		<div class="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
 		<div class="dnBoxCol2">
-			<div class="formtextareaXL4_BG">
-		  		<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
-			</div>
+			<c:choose>
+				<c:when test="${parentId == 0 && param.isInError}">
+					<div class="formtextareaXL4_BG">
+						<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${param.strErrMsg}"/></textarea>
+					</div>
+				</c:when>
+				<c:otherwise>
+					<div class="formtextareaXL4_BG">
+						<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
+					</div> 
+				</c:otherwise>
+			</c:choose>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes${parentId}"/></jsp:include>
 		</div>
     <c:if test="${not showStatus}"> <div style="display: none;" id="statusBox"> </c:if>
@@ -254,7 +267,7 @@ function setYPos(id) {
 				<c:set var="typeIdl" value="${discrepancyNote.discrepancyNoteTypeId}"/>
 				<c:choose>
 				<c:when test="${whichResStatus == 22 || whichResStatus == 1}">
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
+					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
 						<c:forEach var="type" items="${discrepancyTypes2}">
 						<c:choose>
 						<c:when test="${typeIdl == type.id}">
@@ -282,7 +295,7 @@ function setYPos(id) {
 					</select>
 				</c:when>
 				<c:otherwise>
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
+					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
 						<c:forEach var="type" items="${discrepancyTypes}">
 						<c:choose>
 						<c:when test="${typeIdl == type.id}">
@@ -333,7 +346,7 @@ function setYPos(id) {
 					<c:forEach var="status" items="${resStatuses}">
 						<c:choose>
 						<c:when test="${resStatusIdl == status.id}">
-							   <option value="<c:out value="${status.id}"/>" selected ><c:out value="${status.name}"/>
+								<option value="<c:out value="${status.id}"/>" selected ><c:out value="${status.name}"/>
 						</c:when>
 						<c:otherwise>
 								<option value="<c:out value="${status.id}"/>" ><c:out value="${status.name}"/>
@@ -392,16 +405,16 @@ function setYPos(id) {
 		<c:otherwise>
 			<span id="user2${parentId}" style="display:block">
 		</c:otherwise>
-		</c:choose>
+		</c:choose>  
 			<div class="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>:</div>
 			<div class="dnBoxCol2"><input name="sendEmail${parentId}" value="1" type="checkbox"/></div>
 		</span>
 	<c:if test="${not showStatus}"> </div> </c:if>
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
-		<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
+		<c:if test="${(enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData')}">
 			<div class="dnBoxCol3">
 				<input type="submit" id="submitBtn${parentId}" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');">
-				<input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');javascript:setYPos('<c:out value="${parentId}"/>');">
+				<input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');setYPos('<c:out value="${parentId}"/>');">
 			</div>
 		</c:if>
 		<c:if test="${parentId==0}">

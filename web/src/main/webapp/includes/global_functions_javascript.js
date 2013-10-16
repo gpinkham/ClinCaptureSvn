@@ -2864,6 +2864,67 @@ function addDNShortcutAnchor(parametersHolder) {
     updateCRFHeaderFunction(parametersHolder);
   }
 }
+function hideElement(elementName){
+	setDisplayProperty(elementName, "none");
+}
+		
+function showElement(elementName){
+	setDisplayProperty(elementName, "");
+}
+		
+function setDisplayProperty(elementName, propertyValue){
+	var objElement;
+	objElement = MM_findObj(elementName);
+	if (objElement != null) {
+		if (objElement.style) { objElement = objElement.style; }
+	    	objElement.display = propertyValue;
+		}
+	}
+	    
+function setElements(typeId,user1,user2,id,filter1,nw,ud,rs,cl,na) {
+	setStatusWithId(typeId,id,filter1,nw,ud,rs,cl,na);
+	if(typeId == 3) {//query
+		showElement(user1+id);
+		showElement(user2+id);	
+	} else {
+		hideElement(user1+id);
+		hideElement(user2+id);
+	}
+}
+		
+function setDisabledProperty(elementName, propertyValue){
+	var objElement;
+	objElement = document.getElementById(elementName);
+	if (objElement != null) {
+		objElement.disabled = propertyValue;
+	}
+}
+		
+function switchOnElement(elementName){
+	setDisabledProperty(elementName, '');
+}
+		
+function switchOffElement(elementName){
+	setDisabledProperty(elementName, 'disabled');
+}
+		
+function setParameterForDNWithPath(field, parameterName, value, contextPath) {
+	$.ajax({
+		url: contextPath+'/ChangeParametersForDNote',
+		type: 'GET',
+		data: 'field='+field+'&parameterName='+parameterName+'&value='+value,
+		dataType: 'text'
+	});
+}
+
+function turnOffIsInRFCErrorParamOfDN(field) {
+	setParameterForDN(field, "isInRFCError", "0");
+}
+
+function turnOnIsDataChangedParamOfDN(field) {
+	setParameterForDN(field, "isDataChanged", "1");
+}
+	
 
 function viewCrfByVersion(eventDefinitionCRFId, studySubjectId, crfVersionId, eventId, tabId,  exitTo) {
   $("body").append("<form id='viewSectionDataEntryForm' style='display: none;' method='GET' action='ViewSectionDataEntry'>" +

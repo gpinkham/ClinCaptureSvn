@@ -68,7 +68,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <div id="centralContainer" style=
   "padding-left:3em; margin-top:1em;background-color: white; color:black;">
 
-<c:set var="prevItemHolderId" value="0"/>
+
 <%-- set button text depending on whether or not the user is confirming values --%>
 <c:choose>
     <c:when test="${section.checkInputs}">
@@ -183,6 +183,11 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
         if (seh != undefined) seh.disabled = true;
         if (sel != undefined) sel.disabled = true;
 	}
+	
+	function setParameterForDN(field, parameterName, value) { 
+		setParameterForDNWithPath(field, parameterName, value, '${pageContext.request.contextPath}');
+	};
+
 </script>
 
 <c:import url="interviewer.jsp">
@@ -1314,7 +1319,6 @@ but the custom tag uses that, not this jstl code--%>
 </c:choose>
     <td class="table_cell_left">
         <table border="0" class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}">
-            <c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/>
             <tr>
                     </c:if>
 
@@ -1352,11 +1356,11 @@ but the custom tag uses that, not this jstl code--%>
 						</c:forEach>
                     	<c:choose>
                     		<c:when test="${isItemShown && hasShown}">
-                    			<table border="0" cellspacing="0" cellpadding="1" <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>>
+                    			<table border="0" cellspacing="0" cellpadding="1" class="aka_group_show">
                     			<tr>
                     		</c:when>
                     		<c:otherwise>
-                    			<table border="0" cellspacing="0" cellpadding="1" <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>>
+                    			<table border="0" cellspacing="0" cellpadding="1">
                     			<tr>
                     		</c:otherwise>
                     	</c:choose>
@@ -1376,7 +1380,7 @@ but the custom tag uses that, not this jstl code--%>
                                     </c:import>
                                 </td>
 
-                            <td valign="top" nowrap="nowrap" rel="yo">
+                            <td valign="top" nowrap="nowrap">
                                     <%-- display the HTML input tag --%>
                                 <c:set var="displayItem" scope="request" value="${displayItem.singleItem}" />
                                 <c:import url="../submit/showItemInput.jsp">
@@ -1478,7 +1482,6 @@ but the custom tag uses that, not this jstl code--%>
 
                     <td valign="top">
                         <table border="0" class="itemHolderClass" id="itemHolderId_input${childItem.item.id}">
-                          <c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/>
                         	<%-- this is where we need to set the block for shown items (children), tbh --%>
                      		<tr>
                                     <%--          <td valign="top" class="text_block">
