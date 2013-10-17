@@ -3590,9 +3590,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 							inputName = getGroupItemManualInputName(displayGroup, i, dib);
 						}
 
-						int itemDataId = dib.getData().getId();
+						int itemDataId = 0;
 						if (i <= itemWithGroup.getDbItemGroups().size() - 1) {
-							dndao.findNumExistingNotesForItem(itemDataId);
+							itemDataId = dib.getData().getId();
 						} else {
 							dib.getData().setId(0);
 						}

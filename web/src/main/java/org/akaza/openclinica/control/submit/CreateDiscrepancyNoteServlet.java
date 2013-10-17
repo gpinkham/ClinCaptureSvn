@@ -929,10 +929,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 	public static Map<String, String> getMapWithParameters(String field, HttpServletRequest request) {
 		if (request.getSession().getAttribute("dnAdditionalCreatingParameters") != null) {
 			Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request.getSession().getAttribute("dnAdditionalCreatingParameters");
-			return dnAdditionalCreatingParameters.get(field);
+			return dnAdditionalCreatingParameters.containsKey(field)? dnAdditionalCreatingParameters.get(field) : new HashMap<String, String>();
 		} else {
-			HashMap<String, String> parameters = new HashMap<String, String>();
-			return parameters;
+			return new HashMap<String, String>();
 		}
 	}
 
