@@ -2551,6 +2551,8 @@ uncodeCodeItem = function(item) {
                 var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
                 $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded - 1);
                 $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded + 1);
+                /*clean up coding resuts*/
+                $("#tablepaging").parent().html('');
 
                 console.log("Medical uncoding executed successfully");
             },
