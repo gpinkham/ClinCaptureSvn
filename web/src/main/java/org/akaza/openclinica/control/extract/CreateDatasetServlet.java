@@ -448,7 +448,9 @@ public class CreateDatasetServlet extends Controller {
 				} else {
 					DatasetDAO ddao = getDatasetDAO();
 
-					dsb.setStudyId(currentStudy.getId());
+					if (dsb.getStudyId() == 0) {
+						dsb.setStudyId(currentStudy.getId());
+					}
 
 					dsb.setOwner(ub);
 					// dsb.setOwnerId(ub.getId());
