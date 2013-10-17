@@ -22,10 +22,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.StudyInfoPanel;
@@ -39,10 +41,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.clinovo.coding.Search;
 import com.clinovo.coding.model.Classification;
 import com.clinovo.coding.source.impl.BioPortalSearchInterface;
+import com.clinovo.exception.CodeException;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemsTableFactory;
+import com.clinovo.model.Dictionary;
 import com.clinovo.model.Status.CodeStatus;
+import com.clinovo.model.Term;
 import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DictionaryService;
+import com.clinovo.service.TermService;
 
 
 /**
@@ -50,16 +57,27 @@ import com.clinovo.service.CodedItemService;
  * 
  */
 @Controller
+@SuppressWarnings("rawtypes")
 public class CodedItemsController {
 
+	private StudyDAO studyDAO;
+	
 	@Autowired
     private DataSource datasource;
 	
 	private Search search = new Search();
 
 	@Autowired
+	private TermService termService;
+	
+	@Autowired
 	private CodedItemService codedItemService;
+	
+	@Autowired
+	private DictionaryService dictionaryService;
 
+	private StudyParameterValueDAO studyParamDAO;
+	
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
 	/**
@@ -72,7 +90,6 @@ public class CodedItemsController {
 	 * 
 	 * @throws Exception For all exceptions
 	 */
-	@SuppressWarnings("rawtypes")
 	@RequestMapping("/codedItems")
 	public ModelMap codedItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -81,8 +98,7 @@ public class CodedItemsController {
 		
 		String studyId = request.getParameter("study");
 		
-		StudyDAO dao = new StudyDAO(datasource);
-		StudyBean study = (StudyBean) dao.findByPK(Integer.parseInt(studyId));
+		StudyBean study = (StudyBean) getStudyDAO().findByPK(Integer.parseInt(studyId));
 		
 		List<CodedItem> items = new ArrayList<CodedItem>();
 		
@@ -101,7 +117,7 @@ public class CodedItemsController {
 		factory.setStudyId(studyId);
 		factory.setCodedItems(items);
 		factory.setDataSource(datasource);
-		factory.setStudyDAO(new StudyDAO(datasource));
+		factory.setStudyDAO(getStudyDAO());
 		factory.setEventCRFDAO(new EventCRFDAO(datasource));
 		factory.setEventDefinitionCRFDAO(new EventDefinitionCRFDAO(datasource));
 		factory.setStudySubjectDAO(new StudySubjectDAO(datasource));
@@ -132,34 +148,58 @@ public class CodedItemsController {
 	 * 
 	 * @throws Exception For all exceptions
 	 */
-	@RequestMapping("/codedItem")
+	@RequestMapping("/codeItem")
 	public ModelMap codeItemHandler(HttpServletRequest request) throws Exception {
 
-		ModelMap map = new ModelMap();
+		ModelMap model = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
+		String studyId = request.getParameter("study");
+		String dictionary = request.getParameter("dictionary");
 		String codedItemItemDataId = request.getParameter("item");
 		String verbatimTerm = request.getParameter("verbatimTerm");
-        String dictionary = request.getParameter("dictionary");
 
 		CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
-
-		search.setSearchInterface(new BioPortalSearchInterface());
+		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(Integer.parseInt(studyId), "autoCodeDictionaryName");
 
 		try {
 
-			List<Classification> classifications = search.getClassifications(verbatimTerm, dictionary);
+			Term term = null;
+			List<Classification> classifications = new ArrayList<Classification>();
+
+			// Attempt to get the term from the local [custom] dictionary
+			if (configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
+
+				term = termService.findTerm(codedItem.getVerbatimTerm());
+			}
 			
-			map.addAttribute("classification", classifications);
-			map.addAttribute("itemDataId", codedItem.getItemDataId());
-			map.addAttribute("itemDictionary", dictionary);
+			if(term != null) {
+				
+				Classification classification = new Classification();
+				
+				classification.setCode(term.getCode());
+				classification.setId(term.getId().toString());
+				classification.setTerm(term.getPreferredName());
+				classification.setDictionary(configuredDictionary.getValue());
+				
+				classifications.add(classification);
+				
+			} else {
+				
+				search.setSearchInterface(new BioPortalSearchInterface());
+				classifications = search.getClassifications(verbatimTerm, dictionary);
+			}
+
+			model.addAttribute("itemDictionary", dictionary);
+			model.addAttribute("classification", classifications);
+			model.addAttribute("itemDataId", codedItem.getItemDataId());
 
 		} catch (Exception e) {
 
 			log.error(e.getMessage());
 		}
 
-		return map;
+		return model;
 
 	}
 	
@@ -182,9 +222,10 @@ public class CodedItemsController {
         String codedItemSelectedDictionary = request.getParameter("dictionary");
 		
 		CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
+		
 		codedItem.setCodedTerm(code);
         codedItem.setDictionary(codedItemSelectedDictionary);
-		codedItem.setStatus("CODED");
+        codedItem.setStatus(String.valueOf(CodeStatus.CODED));
 		
 		codedItemService.saveCodedItem(codedItem);
 		
@@ -218,6 +259,59 @@ public class CodedItemsController {
         return "codedItems";
     }
     
+	/**
+	 * Handle for coding and aliasing a given coded item.
+	 * 
+	 * @param request
+	 *            The request containing the item to code and alias.
+	 * 
+	 * @return Redirects to coded items.
+	 * 
+	 * @throws Exception
+	 *             For all exceptions
+	 */
+	@RequestMapping("/codeAndAlias")
+	public String codeAndAliasHandler(HttpServletRequest request) throws Exception {
+
+		ResourceBundleProvider.updateLocale(request.getLocale());
+
+		String code = request.getParameter("code");
+		String studyId = request.getParameter("study");
+		String codedItemItemDataId = request.getParameter("item");
+		String codedItemSelectedDictionary = request.getParameter("dictionary");
+		
+		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(Integer.parseInt(studyId), "autoCodeDictionaryName");
+		
+		CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
+		
+		codedItem.setCodedTerm(code);
+		codedItem.setDictionary(codedItemSelectedDictionary);
+		codedItem.setStatus(String.valueOf(CodeStatus.CODED));
+		
+		// Alias the term
+		if(configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
+			
+			Dictionary dictionary = dictionaryService.findDictionary(configuredDictionary.getValue());
+			
+			Term term = new Term();
+			
+			term.setDictionary(dictionary);
+			term.setCode(codedItem.getCodedTerm());
+			term.setPreferredName(codedItem.getVerbatimTerm());
+			
+			try {
+				termService.saveTerm(term);
+			} catch (CodeException ex) {
+				log.error(ex.getMessage());
+			}
+		}
+
+		codedItemService.saveCodedItem(codedItem);
+
+		// Redirect to main
+		return "codedItems";
+	}
+    
 	private List<CodedItem> getItems(List<CodedItem> items, CodeStatus status) {
 		
 		List<CodedItem> matchingItems = new ArrayList<CodedItem>();
@@ -230,5 +324,23 @@ public class CodedItemsController {
 		}
 		
 		return matchingItems;
+	}
+	
+	private StudyDAO getStudyDAO() {
+
+		if (studyDAO == null) {
+			studyDAO = new StudyDAO(datasource);
+		}
+
+		return studyDAO;
+	}
+
+	private StudyParameterValueDAO getStudyParameterValueDAO() {
+
+		if (studyParamDAO == null) {
+			studyParamDAO = new StudyParameterValueDAO(datasource);
+		}
+		
+		return studyParamDAO;
 	}
 }

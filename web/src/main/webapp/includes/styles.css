@@ -2118,7 +2118,7 @@ span.asterisk {
 .wrapText {
     word-wrap: break-word;
     display: inline-block;
-    width: 280px;
+    width: 100px;
 }
 
 .itemsTable {

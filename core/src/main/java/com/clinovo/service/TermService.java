@@ -16,6 +16,7 @@ package com.clinovo.service;
 
 import java.util.List;
 
+import com.clinovo.exception.CodeException;
 import com.clinovo.model.Dictionary;
 import com.clinovo.model.Term;
 
@@ -74,8 +75,9 @@ public interface TermService {
 	 * @param term Term to persist.
 	 * 
 	 * @return The persisted term if valid, otherwise null.
+	 * @throws CodeException If the term already exists in storage
 	 */
-	Term saveTerm(Term term);
+	Term saveTerm(Term term) throws CodeException;
 
 	/**
 	 * Delete the specified term from the database.

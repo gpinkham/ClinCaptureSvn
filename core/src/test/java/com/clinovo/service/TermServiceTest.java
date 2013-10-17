@@ -3,6 +3,7 @@ package com.clinovo.service;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.junit.Test;
 
+import com.clinovo.exception.CodeException;
 import com.clinovo.model.Term;
 
 public class TermServiceTest extends DefaultAppContextTest {
@@ -84,7 +85,7 @@ public class TermServiceTest extends DefaultAppContextTest {
 	}
 	
 	@Test
-	public void testThatSaveTermDoesNotReturnNull() {
+	public void testThatSaveTermDoesNotReturnNull() throws CodeException {
 		
 		Term term = new Term();
 		term.setDictionary(dictionaryService.findDictionary(2));
@@ -93,7 +94,7 @@ public class TermServiceTest extends DefaultAppContextTest {
 	}
 	
 	@Test
-	public void testThatSaveTermAddsTermToDB() {
+	public void testThatSaveTermAddsTermToDB() throws CodeException {
 		
 		Term term = new Term();
 		term.setDictionary(dictionaryService.findDictionary(2));
@@ -101,6 +102,13 @@ public class TermServiceTest extends DefaultAppContextTest {
 		termService.saveTerm(term);
 		
 		assertEquals(4, termService.findAll().size());
+	}
+	
+	@Test(expected=CodeException.class)
+	public void testThatSaveTermThrowsExceptionIfTermExists() throws CodeException {
+		
+		Term term = termService.findTerm(1);
+		termService.saveTerm(term);
 	}
 	
 	@Test

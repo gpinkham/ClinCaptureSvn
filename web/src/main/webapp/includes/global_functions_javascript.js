@@ -2441,16 +2441,18 @@ disableRandomizeCRFButtons = function(flag) {
 codeItem = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var study = new RegExp("study=(\\d+)").exec(window.location.href.toString())[1]
 
     $.ajax({
 
         type: "POST",
-        url: url + "/codedItem",
+        url: url + "/codeItem",
         data: {
 
+            study: study,
             item: $(item).attr("itemid"),
-            dictionary: $(item).parent().siblings("td").find("select option:selected").val(),
-            verbatimTerm: $.trim($(item).parent().siblings("td").find("input").val())
+            verbatimTerm: $.trim($(item).parent().siblings("td").find("input").val()),
+            dictionary: $(item).parent().siblings("td").find("select option:selected").val()
         },
 
         success: function(data) {
@@ -2475,8 +2477,8 @@ saveCodedItem = function(item) {
         data: {
 
             item: $(item).children('div').attr("id"),
+            code: $.trim($(item).children('div').text()),
             dictionary:  $(item).parents('tr').find("select option:selected").val(),
-            code: $.trim($(item).children('div').text())
         },
 
         success: function(data) {
@@ -2678,6 +2680,49 @@ function Pager(tableName, itemsPerPage) {
         element.innerHTML = pagerHtml;
 
     }
+}
+
+function codeAndAlias(item) {
+
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var study = new RegExp("study=(\\d+)").exec(window.location.href.toString())[1]
+
+    $.ajax({
+
+        type: "POST",
+        url: url + "/codeAndAlias",
+        data: {
+
+            study: study,
+            item: $(item).children('div').attr("id"),
+            code: $.trim($(item).children('div').text()),
+            dictionary: $(item).parents('tr').find("select option:selected").val()
+        },
+
+        success: function(data) {
+
+            var versionNumber = parseInt($.trim($(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text()));
+            $(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text(versionNumber + 1);
+
+            $(item).parents('td').find("a[name='Code'][itemid=" + $(item).children('div').attr("id") + "]").children('img').attr('src', '../images/code_confirm.png');
+            $(item).parents('td').siblings("td").filter(function() {
+                return $(this).text() == 'Available';
+            }).text("Completed");
+
+            $(item).parents('div').siblings("input").val($.trim($(item).children('div').text())).attr('disabled', true);
+            $(item).parents('td').find("a[name='unCode'][itemid=" + $(item).children('div').attr("id") + "]").css("display", "");
+
+            var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
+            var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
+            $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
+            $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
+
+            console.log("Medical coding executed successfully")
+        },
+        error: function(e) {
+            console.log("Error:" + e);
+        }
+    })
 }
 
 function getBrowserClientWidth() {

@@ -30,10 +30,10 @@ import org.hibernate.annotations.Parameter;
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "term_id_seq") })
 public class Term extends AbstractMutableDomainObject {
 
-	private Date dateCreated;
 	private String code = "";
 	private Dictionary dictionary;
 	private String preferredName = "";
+	private Date dateCreated = new Date();
 
 	public String getCode() {
 		return code;

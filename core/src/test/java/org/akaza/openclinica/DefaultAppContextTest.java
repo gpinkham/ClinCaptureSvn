@@ -35,11 +35,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.clinovo.dao.CodedItemDAO;
 import com.clinovo.dao.DictionaryDAO;
-import com.clinovo.dao.SynonymDAO;
 import com.clinovo.dao.TermDAO;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
-import com.clinovo.service.SynonymService;
 import com.clinovo.service.TermService;
 
 /**
@@ -83,13 +81,11 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	@Autowired protected DatabaseChangeLogDao databaseChangeLogDao;
 	
 	@Autowired protected TermDAO termDAO;
-	@Autowired protected SynonymDAO synonymDAO;
 	@Autowired protected CodedItemDAO codedItemDAO;
 	@Autowired protected DictionaryDAO dictionaryDAO;
 	
 	// Services
 	@Autowired protected TermService termService;
-	@Autowired protected SynonymService synonymService;
 	@Autowired protected CodedItemService codedItemService;
 	@Autowired protected DictionaryService dictionaryService;
 	@Autowired protected RuleSetServiceInterface ruleSetService;

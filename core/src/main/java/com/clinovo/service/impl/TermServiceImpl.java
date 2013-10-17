@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.clinovo.dao.TermDAO;
+import com.clinovo.exception.CodeException;
 import com.clinovo.model.Dictionary;
 import com.clinovo.model.Term;
 import com.clinovo.service.TermService;
@@ -36,12 +37,37 @@ public class TermServiceImpl implements TermService {
 		return termDAO.findByDictionary(dictionary);
 	}
 
-	public Term saveTerm(Term term) {
+	public Term saveTerm(Term term) throws CodeException {
+		
+		if(doesTermExist(term)) {
+			
+			throw new CodeException("Term already exists in the dictionary");
+			
+		} else {
+			
+		}
+		
 		return termDAO.saveOrUpdate(term);
 	}
 
 	public void deleteTerm(Term term) {
 		termDAO.deleteTerm(term);
+	}
+	
+	private boolean doesTermExist(Term term) {
+
+		List<Term> terms = findAll();
+
+		for (Term x : terms) {
+
+			if (x.getCode().equals(term.getCode()) && x.getPreferredName().equals(term.getPreferredName())
+					&& x.getDictionary().equals(term.getDictionary())) {
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

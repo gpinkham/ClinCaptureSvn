@@ -20,13 +20,13 @@
                     <tr>
                         <td><c:out value="${counter}"/>.</td>
                         <td width=90px><fmt:message key="id" bundle="${resword}"/>:</td>
-                        <td width=360px><c:out value="${obj.id}"/></td>
+                        <td width=360px colspan="2"><c:out value="${obj.id}"/></td>
                         <td></td>
                     </tr>
                     <tr>
                         <td></td>
                         <td>Term:</td>
-                        <td>
+                        <td colspan="2">
                             <c:out value="${obj.term}"/></td>
                         <td></td>
                     </tr>
@@ -38,21 +38,29 @@
                                 <c:out value="${obj.code}"/>
                             </div>
                         </td>
-                        <td>
+                        <td align="right">
+                            <c:set var="codeAndAliasBtnColor" value="../images/button_BG.gif"/>
+                            <c:if test="${(color == 'violet')}">
+                                <c:set var="codeAndAliasBtnColor" value="../images/violet/button_BG.gif"/>
+                            </c:if>
+                            <c:if test="${(color == 'green')}">
+                                <c:set var="codeAndAliasBtnColor" value="../images/green/button_BG.gif"/>
+                            </c:if>
+                            <input type="button" name="codeAndAliasBtn" class="button" value="Code & Alias" style="background-image: url(<c:out value="${codeAndAliasBtnColor}"/>);" onclick="codeAndAlias($(this).parent().prev())" />
                             <c:set var="codeButtonColor" value="../images/loginbutton_BG.gif"/>
-                                <c:if test="${(color == 'violet')}">
-                                     <c:set var="codeButtonColor" value="../images/violet/loginbutton_BG.gif"/>
-                                </c:if>
-                                <c:if test="${(color == 'green')}">
-                                     <c:set var="codeButtonColor" value="../images/green/loginbutton_BG.gif"/>
-                                </c:if>
+                            <c:if test="${(color == 'violet')}">
+                                <c:set var="codeButtonColor" value="../images/violet/loginbutton_BG.gif"/>
+                            </c:if>
+                            <c:if test="${(color == 'green')}">
+                                <c:set var="codeButtonColor" value="../images/green/loginbutton_BG.gif"/>
+                            </c:if>
                             <input type="button" name="codeItemBtn" class="loginbutton" value="Code" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="saveCodedItem($(this).parent().prev(  ))" />
                         </td>
                     </tr>
                     <tr>
                         <td></td>
                         <td>Dictionary:</td>
-                        <td>
+                        <td colspan="2">
                             <c:out value="${obj.dictionary}"/>
                         </td>
                         <td></td>

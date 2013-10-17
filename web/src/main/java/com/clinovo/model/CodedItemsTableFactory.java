@@ -230,7 +230,6 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		}
     }
     
-	
     @SuppressWarnings({ "unchecked"})
     private class VersionCellEditor implements CellEditor {
 
@@ -431,7 +430,6 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		UserAccountDAO userDAO = new UserAccountDAO(datasource);
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		// Really type coding for root
 		UserAccountBean loggedInUser = (UserAccountBean) userDAO.findByUserName(authentication.getName());
 
 		return loggedInUser.getRoleByStudy(studyId).getName().equalsIgnoreCase("study monitor");
@@ -446,15 +444,16 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 	}
 		
     private StudySubjectBean getSubjectBean(int subjectId) {
-        StudySubjectBean subjectBean = (StudySubjectBean) studySubjectDAO.findByPK(subjectId);
-        return subjectBean;
+    	
+        return  (StudySubjectBean) studySubjectDAO.findByPK(subjectId);
     }
 
     private StudyEventDefinitionBean getStudyEventDefinitionBean(int eventCrfId, int crfVersionId) {
+    	
         EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(eventCrfId);
         StudyBean studyBean = (StudyBean) studyDAO.findByStudySubjectId(eventCRFBean.getStudySubjectId());
         EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(), crfVersionId);
-        StudyEventDefinitionBean studyEventDefBean = studyEventDefDao.findByEventDefinitionCRFId(eventDefCRFBean.getId());
-        return studyEventDefBean;
+        
+        return studyEventDefDao.findByEventDefinitionCRFId(eventDefCRFBean.getId());
     }
 }
