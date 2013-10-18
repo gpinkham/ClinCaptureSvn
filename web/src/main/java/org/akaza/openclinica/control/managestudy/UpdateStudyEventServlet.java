@@ -53,6 +53,8 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.calendar.CalendarLogic;
+import org.akaza.openclinica.util.DAOWrapper;
+import org.akaza.openclinica.util.SignUtil;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -177,30 +179,22 @@ public class UpdateStudyEventServlet extends SecureController {
 		StudyDAO sdao = new StudyDAO(this.sm.getDataSource());
 		StudyBean studyBean = (StudyBean) sdao.findByPK(ssub.getStudyId());
 		checkRoleByUserAndStudy(ub, studyBean.getParentStudyId(), studyBean.getId());
+		
+		
 		// To remove signed status from the list
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-		boolean removeSign = false;
-		ArrayList eventCrfs = studyEvent.getEventCRFs();
-		for (int i = 0; i < eventCrfs.size(); i++) {
-			EventCRFBean ecrf = (EventCRFBean) eventCrfs.get(i);
-			EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(studyBean, studyEventId,
-					ecrf.getCRFVersionId());
-			if (ecrf.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)
-					|| ecrf.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-					&& edcBean.isDoubleEntry() == true) {
-				removeSign = true;
-				break;
-			}
-		}
-
-		if (currentRole.isClinicalResearchCoordinator()) {
-			removeSign = true;
-		}
-
-		if (removeSign == true || !currentRole.isInvestigator()) {
+		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+		DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(sm.getDataSource());
+		DAOWrapper daoWrapper = new DAOWrapper(null, null, null, ecdao, edcdao, null, discDao);
+		ssdao = new StudySubjectDAO(sm.getDataSource());
+		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+		StudyBean study = (StudyBean) sdao.findByPK(ssb.getStudyId());
+		if (!SignUtil.permitSign(studyEvent, study, daoWrapper) || !currentRole.isInvestigator()
+				|| study.getStatus().isPending()) {
 			statuses.remove(SubjectEventStatus.SIGNED);
 		}
 
+		
 		if (!studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.NOT_SCHEDULED)) {
 			statuses.remove(SubjectEventStatus.NOT_SCHEDULED);
 		}
@@ -285,7 +279,6 @@ public class UpdateStudyEventServlet extends SecureController {
 				studyEvent.setSubjectEventStatus(ses);
 			}
 
-			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 			ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
 			if (ses.equals(SubjectEventStatus.SKIPPED) || ses.equals(SubjectEventStatus.STOPPED)) {
 				studyEvent.setStatus(Status.UNAVAILABLE);
@@ -384,11 +377,11 @@ public class UpdateStudyEventServlet extends SecureController {
 				studyEvent.setStudyEventDefinition(sed);
 
 				ssdao = new StudySubjectDAO(sm.getDataSource());
-				StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+				ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 
 				ecdao = new EventCRFDAO(sm.getDataSource());
 				eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
-				StudyBean study = (StudyBean) sdao.findByPK(ssb.getStudyId());
+				study = (StudyBean) sdao.findByPK(ssb.getStudyId());
 				ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
 						studyEvent.getStudyEventDefinitionId());
 
@@ -550,12 +543,12 @@ public class UpdateStudyEventServlet extends SecureController {
 				request.setAttribute("studyEvent", seb);
 				// -------------------
 				ssdao = new StudySubjectDAO(sm.getDataSource());
-				StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+				ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 
 				// prepare to figure out what the display should look like
-				EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+				ecdao = new EventCRFDAO(sm.getDataSource());
 				ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
-				StudyBean study = (StudyBean) sdao.findByPK(ssb.getStudyId());
+				study = (StudyBean) sdao.findByPK(ssb.getStudyId());
 				ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
 						studyEvent.getStudyEventDefinitionId());
 

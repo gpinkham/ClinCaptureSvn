@@ -59,7 +59,7 @@ public final class SignUtil {
 		if (sign) {
 			List<EventCRFBean> eventCrfs = daoWrapper.getEcdao().findAllStartedByStudyEvent(studyEventBean);
 			if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.NOT_SCHEDULED
-					|| (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED && eventCrfs.size() == 0)
+					|| (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED)
 					|| studyEventBean.getSubjectEventStatus() == SubjectEventStatus.STOPPED
 					|| studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SKIPPED) {
 				sign = true;
