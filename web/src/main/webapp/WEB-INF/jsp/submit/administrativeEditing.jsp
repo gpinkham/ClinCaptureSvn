@@ -319,11 +319,10 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             window.location = document.crfForm.sectionName.options[OptionIndex].value;
         }
     }
-	
-	function setParameterForDN(field, parameterName, value) { 
-		setParameterForDNWithPath(field, parameterName, value, '${pageContext.request.contextPath}');
-	};
-
+  //-->
+  function setParameterForDN(field, parameterName, value) {
+    setParameterForDNWithPath(field, parameterName, value, '${pageContext.request.contextPath}');
+  };
 </script>
 <%--
 <td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
@@ -1393,10 +1392,11 @@ table-->
 
 <!-- End Table Contents -->
 
-</form>
+</table>
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
+</form>
 </div>
 <div id="testdiv1" style=
   "position:absolute;visibility:hidden;background-color:white"></div>

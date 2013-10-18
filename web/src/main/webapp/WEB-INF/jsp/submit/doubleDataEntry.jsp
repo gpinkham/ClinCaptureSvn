@@ -370,10 +370,6 @@ function gotoLink() {
     }
 }
 
-function setParameterForDN(field, parameterName, value) { 
-	setParameterForDNWithPath(field, parameterName, value, '${pageContext.request.contextPath}');
-};
-
 function pageWidth() {return window.innerWidth != null? window.innerWidth: document.documentElement && document.documentElement.clientWidth ? document.documentElement.clientWidth:document.body != null? document.body.clientWidth:null;}
 function pageHeight() {return window.innerHeight != null? window.innerHeight: document.documentElement && document.documentElement.clientHeight ? document.documentElement.clientHeight:document.body != null? document.body.clientHeight:null;}
 function posLeft() {return typeof window.pageXOffset != 'undefined' ? window.pageXOffset:document.documentElement && document.documentElement.scrollLeft? document.documentElement.scrollLeft:document.body.scrollLeft? document.body.scrollLeft:0;}
@@ -390,6 +386,9 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
 window.onload = initmb;
 
 //-->
+function setParameterForDN(field, parameterName, value) {
+  setParameterForDNWithPath(field, parameterName, value, '${pageContext.request.contextPath}');
+};
 </script>
 <%--
 <td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
