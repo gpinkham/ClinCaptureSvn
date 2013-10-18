@@ -322,17 +322,17 @@
       <tr valign="top">
         <td class="table_header_column"><fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/></td>
         <td class="table_cell">
-            ${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}
+            ${config.value.value}
         </td>
       </tr>
    </c:when>
    <c:when test="${config.parameter.handle=='autoCodeDictionaryName'}">
     <tr valign="top">
-      <td class="formlabel">
+      <td class="table_header_column">
         <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
       </td>
-      <td>
-        <c:out value="${siteToView.autoCodeDictionaryName}"/>&nbsp;
+      <td class="table_cell">
+        <c:out value="${config.value.value}"/>&nbsp;
       </td>
     </tr>
    </c:when>
@@ -341,7 +341,7 @@
            <td class="table_header_column"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
            <td class="table_cell">
                <c:choose>
-                   <c:when test="${config.value.value== 'yes'}">
+                   <c:when test="${config.value.value == 'yes'}">
                        <fmt:message key="yes" bundle="${resword}"/>
                    </c:when>
                    <c:otherwise>
