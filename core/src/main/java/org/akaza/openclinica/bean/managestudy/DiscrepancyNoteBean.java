@@ -139,6 +139,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 		resStatus = ResolutionStatus.OPEN;
 		children = new ArrayList();
 		lastUpdator = new UserAccountBean();
+		updatedDate = null;
 	}
 
 	/**
