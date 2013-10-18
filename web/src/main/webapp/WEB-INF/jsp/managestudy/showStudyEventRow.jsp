@@ -207,7 +207,7 @@
 				<table cellspacing="0" cellpadding="0" border="0">
 				<tr>
 				<c:choose>
-				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6}">
+				 <c:when test="${currRow.bean.studyEvent.subjectEventStatus.name != 'locked' && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6}">
                     <td>
                     <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>', document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>);"
                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"

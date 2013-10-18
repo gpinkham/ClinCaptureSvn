@@ -163,7 +163,7 @@
         <td class="table_header_row" style="white-space: nowrap;">
 
             <c:choose>
-                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id ne 6 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not (studyEvent.subjectEventStatus.id eq 7 and currentRole.id eq 5) and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id ne 6 and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol1" value="false"/>
                     <a href="UpdateStudyEvent?event_id=${studyEvent.id}&ss_id=${studySubject.id}"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_event" bundle="${resword}"/>" title="<fmt:message key="edit_study_event" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
