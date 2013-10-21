@@ -178,8 +178,8 @@ public class RequestPasswordServlet extends Controller {
 		email.append(restext.getString("this_email_is_from_openclinica_admin") + "<br>")
 				.append(restext.getString("your_password_has_been_reset_as") + ": " + passwd)
 				.append("<br><br>" + restext.getString("you_will_be_required_to_change"))
-				.append(restext.getString("time_you_login_to_the_system"))
-				.append(restext.getString("use_the_following_link_to_log") + ":<br>")
+				.append(" " + restext.getString("time_you_login_to_the_system"))
+				.append(" " + restext.getString("use_the_following_link_to_log") + ":<br>")
 				.append(SQLInitServlet.getSystemURL() + "<br><br>")
 				.append(respage.getString("best_system_administrator"));
 		StudyBean emailParentStudy = new StudyBean();

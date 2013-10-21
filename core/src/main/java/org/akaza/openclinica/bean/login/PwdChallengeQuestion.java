@@ -40,11 +40,11 @@ public class PwdChallengeQuestion extends Term {
 
 	public static final PwdChallengeQuestion MAIDEN_NAME = new PwdChallengeQuestion(1, "Mother_Maiden_Name");
 
-	public static final PwdChallengeQuestion FARORITE_PET = new PwdChallengeQuestion(2, "Favorite_Pet");
+	public static final PwdChallengeQuestion FARORITE_ANIMAL = new PwdChallengeQuestion(2, "Favorite_Animal");
 
 	public static final PwdChallengeQuestion CITY_OF_BIRTH = new PwdChallengeQuestion(3, "City_of_Birth");
 
-	private static final PwdChallengeQuestion[] members = { MAIDEN_NAME, FARORITE_PET, CITY_OF_BIRTH };
+	private static final PwdChallengeQuestion[] members = { MAIDEN_NAME, FARORITE_ANIMAL, CITY_OF_BIRTH };
 
 	public static final List<PwdChallengeQuestion> list = Arrays.asList(members);
 
