@@ -874,6 +874,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				url.append(viewStudySubjectLinkBuilder(studySubjectBean));
 				if (getStudyBean().getStatus() == Status.AVAILABLE
 						&& !(studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)
+						&& studySubjectBean.getStatus() != Status.SIGNED
 						&& getCurrentRole().getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
 						&& getCurrentRole().getRole() != Role.STUDY_MONITOR) {
 					url.append(removeStudySubjectLinkBuilder(studySubjectBean));

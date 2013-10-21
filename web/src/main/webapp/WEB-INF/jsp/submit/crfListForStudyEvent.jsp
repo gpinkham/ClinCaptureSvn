@@ -82,7 +82,7 @@
             <a href="ViewStudySubject?id=${studySubject.id}"><img src="images/bt_View.gif" border="0" align="left" alt="<fmt:message key="view_subject_record" bundle="${resword}"/>" title="<fmt:message key="view_subject_record" bundle="${resword}"/>" hspace="4"/></a>
 
             <c:choose>
-                <c:when test="${currentRole.id ne 4 and currentRole.id ne 5 and currentRole.id ne 6 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${currentRole.id ne 4 and currentRole.id ne 5 and currentRole.id ne 6 and not study.status.frozen and not study.status.locked and not studySubject.status.signed}">
                     <c:set var="insertBlankCell" value="true"/>
                     <c:choose>
                         <c:when test="${not studySubject.status.deleted}">
