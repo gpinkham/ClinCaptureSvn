@@ -259,7 +259,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 -->
 
 <script type="text/JavaScript" language="JavaScript">
-<!--
+window.onload = initmb;
 
 // Total number of tabs (one for each CRF)
 var TabsNumber = <c:out value="${sectionNum}"/>;
@@ -287,7 +287,9 @@ TabLabel[<c:out value="${count}"/>]="<c:out value="${section.label}"/> " + "<spa
 
 <c:set var="count" value="${count+1}"/>
 </c:forEach>
+
 DisplaySectionTabs();
+
 //selectTabs(${tabId},${sectionNum},'crfHeaderTabs');
 
 function DisplaySectionTabs()
@@ -383,9 +385,7 @@ function hm(){var v='visible';var n='none';document.getElementById('ol').style.d
 function initmb(){var ab='absolute';var n='none';var obody=document.getElementsByTagName('body')[0];var frag=document.createDocumentFragment();var obol=document.createElement('div');obol.setAttribute('id','ol');obol.style.display=n;obol.style.position=ab;obol.style.top=0;obol.style.left=0;obol.style.zIndex=998;obol.style.width='100%';frag.appendChild(obol);var obbx=document.createElement('div');obbx.setAttribute('id','mbox');obbx.style.display=n;obbx.style.position=ab;obbx.style.zIndex=999;var obl=document.createElement('span');obbx.appendChild(obl);var obbxd=document.createElement('div');obbxd.setAttribute('id','mbd');obl.appendChild(obbxd);frag.insertBefore(obbx,obol.nextSibling);obody.insertBefore(frag,obody.firstChild);
     window.onscroll = scrollFix; window.onresize = sizeFix;
 }
-window.onload = initmb;
 
-//-->
 function setParameterForDN(field, parameterName, value) {
   setParameterForDNWithPath(field, parameterName, value, '${pageContext.request.contextPath}');
 };
@@ -1532,10 +1532,10 @@ table-->
 
 <!-- End Table Contents -->
 
-</form>
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
+</form>
 </div>
 <div id="testdiv1" style=
   "position:absolute;visibility:hidden;background-color:white"></div>

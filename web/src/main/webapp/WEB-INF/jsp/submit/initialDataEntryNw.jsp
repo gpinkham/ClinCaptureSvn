@@ -279,7 +279,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
     <%--<img src="images/arrow_back_dis.gif" border="0"/></td>--%>
 
 <script type="text/JavaScript" language="JavaScript">
-<!--
+window.onload = initmb;
 
 // Total number of tabs (one for each CRF)
 var TabsNumber = <c:out value="${sectionNum}"/>;
@@ -320,10 +320,10 @@ TabLabel[<c:out value="${count}"/>]="<c:out value="${section.label}"/>" + "<span
 
 <c:set var="count" value="${count+1}"/>
 </c:forEach>
+
 DisplaySectionTabs()
 
 //selectTabs(${tabId},${sectionNum},'crfHeaderTabs');
-
 
 function DisplaySectionTabs()
 {
@@ -420,9 +420,6 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
     window.onscroll = scrollFix; window.onresize = sizeFix;
 //    closing = true;
 }
-window.onload = initmb;
-
-//-->
 </script>
 <%--
 <td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
@@ -1618,10 +1615,10 @@ table-->
 
 <!-- End Table Contents -->
 
-</form>
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
+</form>
 </div>
 <div id="testdiv1" style=
   "position:absolute;visibility:hidden;background-color:white"></div>
