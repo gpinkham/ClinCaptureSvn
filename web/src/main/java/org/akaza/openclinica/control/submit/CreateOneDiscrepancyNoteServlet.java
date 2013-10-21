@@ -394,6 +394,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "y", ypos != null && ypos.length() > 0 ? ypos : "0");
         request.setAttribute(REFRESH_PARENT_WINDOW, true);
         dn.setItemId(fp.getInt(ITEM_ID));
+		ArrayList notes = dndao.findExistingNotesForItemData(entityId);
+		dn.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));        
         request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn);
 		forwardPage(forwardTo == null ? Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()) : forwardTo);
 	}

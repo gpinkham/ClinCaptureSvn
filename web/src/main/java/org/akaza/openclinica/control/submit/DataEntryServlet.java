@@ -3603,7 +3603,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
                         discNotes.setNumExistingFieldNotes(inputName, dbNotes.size());
                         dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
-						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, discNotes.getNotes(inputName)));
+						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, itemDataId, discNotes.getNotes(inputName)));
 						dib = setTotals(dib, itemDataId, notes, ecb.getId());
                         DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
 						logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId()
@@ -3634,7 +3634,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 notes.addAll(dbNotes);
                 discNotes.setNumExistingFieldNotes(inputFieldName, dbNotes.size());
 				dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
-				dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId,
+				dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, itemDataId,
 						discNotes.getNotes(inputFieldName)));
 				dib = setTotals(dib, itemDataId, discNotes.getNotes(inputFieldName), ecb.getId());
                 noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
@@ -3655,7 +3655,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
                     discNotes.setNumExistingFieldNotes(childInputFieldName, dbChildNotes.size());
 					child.setNumDiscrepancyNotes(dbChildNotes.size() + childNotes.size());
-					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(childItemDataId,
+					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, childItemDataId,
 							discNotes.getNotes(childInputFieldName)));
 					child = setTotals(child, childItemDataId, discNotes.getNotes(childInputFieldName), ecb.getId());
                     DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, child, noteThreads);
@@ -5015,10 +5015,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 	}
 
 	/* Determining the resolution status that will be shown in color flag for an item. */
-	private int getDiscrepancyNoteResolutionStatus(int itemDataId, ArrayList formNotes) {
+	public static int getDiscrepancyNoteResolutionStatus(DiscrepancyNoteDAO dndao, int itemDataId, ArrayList formNotes) {
 		int resolutionStatus = 0;
 		boolean hasOtherThread = false;
-		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		ArrayList existingNotes = dndao.findExistingNotesForItemData(itemDataId);
 		for (Object obj : existingNotes) {
 			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
