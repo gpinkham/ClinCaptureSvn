@@ -184,7 +184,7 @@ public class SignStudySubjectServlet extends SecureController {
 
 		if (!SignUtil.permitSign(studySub, new DAOWrapper(studyDao, sedao, subdao, ecdao, edcdao, dndao))) {
 			addPageMessage(respage.getString("subject_event_cannot_signed"));
-			//for navigation purpose (to brake double url in stack)
+			//for navigation purpose (to avoid double url in stack)
 			session.setAttribute("skipURL", "true");
 			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
 			return;
@@ -240,20 +240,6 @@ public class SignStudySubjectServlet extends SecureController {
 
 		request.setAttribute("subject", subject);
 
-		if (subject.getFatherId() > 0) {
-			SubjectBean father = (SubjectBean) sdao.findByPK(subject.getFatherId());
-			request.setAttribute("father", father);
-		} else {
-			request.setAttribute("father", new SubjectBean());
-		}
-
-		if (subject.getMotherId() > 0) {
-			SubjectBean mother = (SubjectBean) sdao.findByPK(subject.getMotherId());
-			request.setAttribute("mother", mother);
-		} else {
-			request.setAttribute("mother", new SubjectBean());
-		}
-
 		StudyDAO studydao = new StudyDAO(sm.getDataSource());
 		StudyBean study = (StudyBean) studydao.findByPK(studyId);
 
@@ -267,10 +253,6 @@ public class SignStudySubjectServlet extends SecureController {
 		} else {
 			request.setAttribute("parentStudy", new StudyBean());
 		}
-
-		ArrayList children = (ArrayList) sdao.findAllChildrenByPK(subjectId);
-
-		request.setAttribute("children", children);
 
 		ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(study, studySub,
 				sm.getDataSource(), ub, currentRole);

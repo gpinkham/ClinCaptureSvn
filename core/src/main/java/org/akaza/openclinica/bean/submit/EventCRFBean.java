@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 
 import java.util.Date;
 
@@ -46,6 +47,7 @@ public class EventCRFBean extends AuditableEntityBean {
 	private String annotations = "";
 	private Date dateCompleted;
 	private int validatorId = 0;
+	private UserAccountBean doubleDataOwner = new UserAccountBean(); // not in db
 	private Date dateValidate;
 	private Date dateValidateCompleted;
 	private String validatorAnnotations = "";
@@ -513,5 +515,13 @@ public class EventCRFBean extends AuditableEntityBean {
 
 	public void setNotStarted(boolean notStarted) {
 		this.notStarted = notStarted;
+	}
+
+	public UserAccountBean getDoubleDataOwner() {
+		return doubleDataOwner;
+	}
+
+	public void setDoubleDataOwner(UserAccountBean doubleDataOwner) {
+		this.doubleDataOwner = doubleDataOwner;
 	}
 }

@@ -21,12 +21,15 @@ import java.util.ResourceBundle;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.core.SessionManager;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
 // be careful when you change the logic of this class (talk with Marc or Sergey) !
@@ -307,5 +310,15 @@ public final class SubjectEventStatusUtil {
 			}
 		}
 		setSubjectEventState(studyEventBean, studyBean, daoWrapper, state);
+	}
+	
+	public static void fillDoubleDataOwner(ArrayList<EventCRFBean> eventCRFs, SessionManager sm) {
+		// validatorId field was used for another purpose in the past, but now it is used for DoubleDataEntry 
+		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		for (EventCRFBean eventCRF: eventCRFs){
+			if (eventCRF.getValidatorId() > 0) {
+				eventCRF.setDoubleDataOwner((UserAccountBean) udao.findByPK(eventCRF.getValidatorId()));
+			}
+		}
 	}
 }

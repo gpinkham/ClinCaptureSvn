@@ -12,7 +12,6 @@
 
 <jsp:include page="../include/submit-header.jsp"/>
 
-<!--script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script-->
 <!-- *JSP* submit/enterDataForStudyEvent.jsp -->
 <script type="text/javascript" language="javascript">
     function checkCRFLocked(ecId, url){
@@ -71,11 +70,8 @@
 <h1><span class="title_manage"><fmt:message key="view_event" bundle="${resword}"/>:<c:out value="${studyEvent.studyEventDefinition.name}" />
 <fmt:message key="for_subject" bundle="${resword}"/> <c:out value="${studySubject.label}"/>
 
-<%-- <h1><span class="title_manage"><fmt:message key="enter_or_validate_data" bundle="${resword}"/><c:out value="${studyEvent.studyEventDefinition.name}" />--%>
  <a href="javascript:openDocWindow('help/2_2_enrollSubject_Help.html#step2a')">
  <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> </span></h1>
-
-
 
 <a name="global"><a href="javascript:leftnavExpand('globalRecord');javascript:setImage('ExpandGroup5','images/bt_Collapse.gif');"><img
   name="ExpandGroup5" src="images/bt_Expand.gif" border="0"></a></a></div>
@@ -250,7 +246,7 @@
 
 </div>
 
-<p><div class="table_title_submit"><fmt:message key="CRFs_in_this_study_event" bundle="${resword}"/>:</div>
+<p><div class="title_manage"><fmt:message key="CRFs_in_this_study_event" bundle="${resword}"/>:</div>
 
 <div style="width: 650px">
 <!-- These DIVs define shaded box borders -->
@@ -508,7 +504,7 @@
             <c:set var="showDDEColumn" value="true"/>
             <c:choose>
                 <c:when test="${dec.stage.doubleDE || dec.stage.doubleDE_Complete || dec.stage.admin_Editing || dec.stage.locked}">
-                    <c:out value="${dec.eventCRF.updater.name}" />&nbsp;
+                    <c:out value="${dec.eventCRF.doubleDataOwner.name}" />&nbsp;
                 </c:when>
                 <c:otherwise>
                     &nbsp;
@@ -516,7 +512,6 @@
             </c:choose>
         </c:otherwise>
     </c:choose>
-
 </td>
 <td class="table_cell" style="width:215px;text-align:center;">
     <c:set var="actionQuery" value="" />
@@ -668,7 +663,7 @@
 
 </div>
 </div></div></div></div></div></div></div></div>
-</div>
+</div> 
 <br>
 <form method="POST" action="ViewStudySubject">
     <input type="hidden" name="id" value="<c:out value="${studySubject.id}"/>" />

@@ -59,6 +59,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.util.CrfComparator;
+import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -176,7 +177,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
 
 				allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(currentStudy,
 						study, studySubjectBean.getId());
-
 			}
 
 		}
@@ -188,7 +188,8 @@ public class EnterDataForStudyEventServlet extends SecureController {
 		// prepare to figure out what the display should look like
 		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 		ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(seb);
-
+		SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
+		
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 		ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
 				seb.getStudyEventDefinitionId());

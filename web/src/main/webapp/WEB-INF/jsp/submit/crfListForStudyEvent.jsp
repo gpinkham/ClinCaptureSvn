@@ -1,5 +1,5 @@
 <%@ page import="org.akaza.openclinica.bean.core.Role" %>
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean'/>
@@ -113,7 +113,7 @@
             </c:choose>
 
             <c:choose>
-                <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 1 or studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${showSubjectSignButton and (studyEvent.subjectEventStatus.id eq 1 or studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 8 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4 and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol6" value="false"/>
                     <a href="SignStudySubject?id=${studySubject.id}"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign_subject" bundle="${resword}"/>" title="<fmt:message key="sign_subject" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -163,7 +163,7 @@
         <td class="table_header_row" style="white-space: nowrap;">
 
             <c:choose>
-                <c:when test="${not (studyEvent.subjectEventStatus.id eq 7 and currentRole.id eq 5) and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id ne 6 and not study.status.frozen and not study.status.locked}">
+                <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and currentRole.id ne 6 and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol1" value="false"/>
                     <a href="UpdateStudyEvent?event_id=${studyEvent.id}&ss_id=${studySubject.id}"><img src="images/bt_Edit.gif" border="0" align="left" alt="<fmt:message key="edit_study_event" bundle="${resword}"/>" title="<fmt:message key="edit_study_event" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -205,7 +205,7 @@
             </c:choose>
 
             <c:choose>
-                <c:when test="${showSignButton and studyEvent.subjectEventStatus.id ne 8 and currentRole.id eq 4 and not study.status.frozen and not study.status.locked and not study.status.pending}">
+                <c:when test="${showSignButton and (studyEvent.subjectEventStatus.id eq 4 or studyEvent.subjectEventStatus.id eq 9) and currentRole.id eq 4 and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol6" value="false"/>
                     <a href="UpdateStudyEvent?action=submit&event_id=${studyEvent.id}&ss_id=${studySubject.id}&changeDate=&startDate=20-Jan-2012&startHour=-1&startMinute=-1&startHalf=&endDate=&endHour=-1&endMinute=-1&endHalf=&statusId=8&Submit=Submit+Changes"><img src="images/icon_SignedBlue.gif" border="0" align="left" alt="<fmt:message key="sign" bundle="${resword}"/>" title="<fmt:message key="sign" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>
@@ -238,7 +238,7 @@
         </tr>
     </c:when>
 
-    <c:otherwise>
+    <c:otherwise> 
     <tr>
         <td class="table_header_row_left" style="width: auto; min-width: 170px;"><fmt:message key="CRF_name" bundle="${resword}"/></td>
         <td class="table_header_row_left" style="width: auto;"><fmt:message key="version" bundle="${resword}"/></td>
@@ -404,7 +404,7 @@
                                     <a href="#" onclick="viewCrfByVersion('${dedc.edc.id}', '${studySubject.id}', $('#${crfVersionInputId}').val(), '${eventId}', 1);"
                                        onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                                        onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');">
-                                           <img name="bt_View111" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="4">
+                                           <img name="bt_View" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="4">
                                     </a>
 
                                     <c:if test="${not empty crfNDsMap[dedc.edc.crf.id]}">
@@ -441,7 +441,6 @@
                         <tr>
                             <td class="table_cell_left"><c:out value="${dec.eventCRF.crf.name}" /> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
                             <td class="table_cell_left"><c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;</td>
-
                             <td class="table_cell_left"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
                             <td class="table_cell_left ddeColumn">
                                 <c:choose>
@@ -452,7 +451,7 @@
                                         <c:set var="showDDEColumn" value="true"/>
                                         <c:choose>
                                             <c:when test="${dec.stage.doubleDE || dec.stage.doubleDE_Complete || dec.stage.admin_Editing || dec.stage.locked}">
-                                                <c:out value="${dec.eventCRF.updater.name}" />&nbsp;
+                                                <c:out value="${dec.eventCRF.doubleDataOwner.name}" />&nbsp;
                                             </c:when>
                                             <c:otherwise>
                                                 &nbsp;

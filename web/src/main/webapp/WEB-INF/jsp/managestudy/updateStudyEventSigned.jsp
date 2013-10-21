@@ -2,11 +2,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
+<jsp:useBean id="date" class="java.util.Date"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<c:set var="dteFormat"><fmt:message key="date_time_format_short" bundle="${resformat}"/></c:set>
 
 <c:choose>
  <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
@@ -211,7 +212,7 @@
 
   </div>
 
-<p><font style="color: #789EC5;"><div class="table_title_Admin"><fmt:message key="CRFs_in_this_study_event" bundle="${resword}"/>:</div></font>
+<p><div class="title_manage"><fmt:message key="CRFs_in_this_study_event" bundle="${resword}"/>:</div>
 
 <div style="width: 600px">
 <!-- These DIVs define shaded box borders -->
@@ -428,7 +429,24 @@
                   </c:choose>
                 </td>
                 <td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
-                <td class="table_cell"><c:out value="${dec.eventCRF.updater.name}" />&nbsp;</td>
+                <td class="table_cell ddeColumn">
+					<c:choose>
+						<c:when test="${!dec.eventDefinitionCRF.doubleEntry}">
+							n/a
+						</c:when>
+						<c:otherwise>
+							<c:set var="showDDEColumn" value="true"/>
+							<c:choose>
+								<c:when test="${dec.stage.doubleDE || dec.stage.doubleDE_Complete || dec.stage.admin_Editing || dec.stage.locked}">
+									<c:out value="${dec.eventCRF.doubleDataOwner.name}"/>&nbsp;
+								</c:when>
+								<c:otherwise>
+									&nbsp;
+								</c:otherwise>
+							</c:choose>
+						</c:otherwise>
+					</c:choose>
+				</td>
                 <td class="table_cell" width='100px'>
                     <c:set var="actionQuery" value="" />
 
@@ -447,13 +465,6 @@
                     <c:if test="${dec.performAdministrativeEditingPermitted}">
                         <c:set var="actionQuery" value="AdministrativeEditing?eventCRFId=${dec.eventCRF.id}" />
                     </c:if>
-
-<%--
-                    <c:if test="${dec.locked}">
-                        locked
-                    </c:if>
-
---%>
 
                     <c:choose>
                         <c:when test='${actionQuery == "" && dec.stage.name =="invalid" }'>
@@ -561,7 +572,7 @@
                 </tr>
             </table>
         </td></tr>
-        <tr valign="top"><td class="formlabel"><fmt:message key="password" bundle="${resword}"/></td>
+        <tr valign="top"><td class="formlabel"><fmt:message key="password" bundle="${resword}"/>:</td>
         <td>
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr><td>
@@ -666,7 +677,7 @@
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
                                     </c:if>
-                                </td><%-- N/A --%>
+                                </td><%-- N/A --%> 
                                 <td class="table_cell">
                                     <a onmouseup="javascript:setImage('bt_View1','images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','images/bt_View_d.gif');" href="EnterDataForStudyEvent?eventId=${studyEvent.id}">
                                         <img hspace="6" border="0" align="left" title="View" alt="View" src="images/bt_View.gif" name="bt_View1"/>
@@ -679,8 +690,5 @@
         </tbody>
     </table>
 </div>
-
-
-
 
 <jsp:include page="../include/footer.jsp"/>

@@ -176,7 +176,6 @@ public class CRFListForStudyEventServlet extends SecureController {
 				allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(currentStudy,
 						study, studySubjectBean.getId());
 			}
-
 		}
 
 		if (!allNotesforSubjectAndEvent.isEmpty()) {
@@ -185,7 +184,8 @@ public class CRFListForStudyEventServlet extends SecureController {
 
 		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 		ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(seb);
-
+		SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
+		
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 		ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
 				seb.getStudyEventDefinitionId());
@@ -206,7 +206,7 @@ public class CRFListForStudyEventServlet extends SecureController {
 
 			displayEventCRFs = hideCRFManager.removeHiddenEventCRFBeans(displayEventCRFs);
 		}
-
+		
 		request.setAttribute(STUDY_ID, currentStudy.getId());
 		request.setAttribute(BEAN_STUDY_EVENT, seb);
 		request.setAttribute(STUDY_EVENT_NAME, seb.getStudyEventDefinition().getName());

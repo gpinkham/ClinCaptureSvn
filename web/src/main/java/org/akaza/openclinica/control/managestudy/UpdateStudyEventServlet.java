@@ -381,6 +381,8 @@ public class UpdateStudyEventServlet extends SecureController {
 
 				ecdao = new EventCRFDAO(sm.getDataSource());
 				eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
+				SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
+				
 				study = (StudyBean) sdao.findByPK(ssb.getStudyId());
 				ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
 						studyEvent.getStudyEventDefinitionId());
