@@ -70,12 +70,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private final String COLUMN_WIDTH_PREFIX = "<div style=\"width:";
 	private final String COLUMN_WIDTH_SUFFIX = "px\"/>";
 	private String AJAX_REQUEST_PREFIX = "";
-	private final String AJAX_REQUEST_MIDDLE = "\"><img style=\"float:left;\" width=\"17\" border=\"0\" title=\"Code\" alt=\"Code\" src=\"../images/";
+	private final String AJAX_REQUEST_MIDDLE = "\"><img style=\"float:left;\" height=\"17\" border=\"0\" title=\"Code\" alt=\"Code\" src=\"../images/";
     private final String AJAX_REQUEST_SUFIX =  "\"/></a>";
-    private final String GOTO_CRF_EVENTCRFID = "&nbsp;&nbsp;<a onmouseup=\"javascript:setImage('Complete','../images/icon_DEcomplete.gif');\" href=\"../ViewSectionDataEntry?eventCRFId=";
+    private final String GOTO_CRF_EVENTCRFID = "&nbsp;&nbsp;<a onmouseup=\"javascript:setImage('Complete','../images/icon_DEcomplete_long.gif');\" href=\"../ViewSectionDataEntry?eventCRFId=";
     private final String GOTO_CRF_EVENTDEFCRFID = "&eventDefinitionCRFId=";
     private final String GOTO_CRF_EVENTID = "&tabId=1&eventId=";
-    private final String GOTO_CRF_SUFIX = "&amp;viewFull=yes\"><img border=\"0\" title=\"Open CRF\" alt=\"GoToCRF\" height=\"17px\" src=\"../images/icon_DEcomplete.gif\" name=\"GOTO\"/></a>";
+    private final String GOTO_CRF_SUFIX = "&amp;viewFull=yes\"><img border=\"0\" title=\"Open CRF\" alt=\"GoToCRF\" height=\"17px\" src=\"../images/icon_DEcomplete_long.gif\" name=\"GOTO\"/></a>";
     public final static String AJAX_UNCODE_ITEM_PREFIX = "&nbsp;&nbsp;<a onClick=\"uncodeCodeItem(this)\" name=\"unCode\" itemId=\"";
     public final static String AJAX_UNCODE_ITEM_SUFFIX = "\"><img height=\"17\" border=\"0\" title=\"UnCode\" src=\"../images/bt_Delete.gif\" name=\"codeBtn\"/></a>";
     public final static String AJAX_UNCODE_ITEM_SUFFIX_HIDDEN = "\" style=\"display:none\"><img height=\"17\" border=\"0\" alt=\"UnCode\" src=\"../images/bt_Delete.gif\" name=\"codeBtn\"/></a>";
