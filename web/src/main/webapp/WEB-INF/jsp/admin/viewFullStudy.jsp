@@ -862,54 +862,6 @@
             <fmt:message key="${studyToView.studyParameterConfig.eventLocationRequired}" bundle="${resword}"/>
        </td>
     </tr>
-
-  <tr valign="top">
-    <td class="table_header_column">
-      <fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/>
-    </td>
-    <td class="table_cell">
-      <c:choose>
-        <c:when test="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary== ''}">
-          <fmt:message key="blank" bundle="${resword}"/>
-        </c:when>
-        <c:otherwise>
-          ${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}
-        </c:otherwise>
-      </c:choose>
-    </td>
-  </tr>
-
-  <tr valign="top">
-    <td class="table_header_column">
-      <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
-    </td>
-    <td class="table_cell">
-      <c:choose>
-        <c:when test="${studyToView.studyParameterConfig.autoCodeDictionaryName== ''}">
-          <fmt:message key="blank" bundle="${resword}"/>
-        </c:when>
-        <c:otherwise>
-          ${studyToView.studyParameterConfig.autoCodeDictionaryName}
-        </c:otherwise>
-      </c:choose>
-    </td>
-  </tr>
-
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="allowCodingVerification" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.allowCodingVerification == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
     
 </table>
 
