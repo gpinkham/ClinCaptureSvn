@@ -124,7 +124,7 @@
 <a name="global"><a href="javascript:leftnavExpand('globalRecord');javascript:setImage('ExpandGroup5','images/bt_Collapse.gif');">
     <img name="ExpandGroup5" src="images/bt_Expand.gif" border="0">&nbsp;Study Event </a></a></div>
 
- <div id="globalRecord" style="display:">
+ <div id="globalRecord" style="">
   <div style="width: 350px">
     <!-- These DIVs define shaded box borders -->
         <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -370,7 +370,7 @@
                       name="bt_View1" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></a>
                     
 					
-                     <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${dedc.edc.defaultVersionId}"/>')"
+                     <a href="javascript:openDocWindow('PrintCRF?id=${dedc.edc.defaultVersionId}')"
                       onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                       onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
                       name="bt_Print1" align="left" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>"  hspace="2"></a>
@@ -468,12 +468,12 @@
 
                     <c:choose>
                         <c:when test='${actionQuery == "" && dec.stage.name =="invalid" }'>
-                            <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+                            <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&eventCRFId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                                 onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                 onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                 ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" hspace="2"></a>
 
-                            <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
+                            <a href="javascript:openDocWindow('PrintDataEntry?ecId=dec.eventCRF.id')"
                                 onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                                 onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                                 ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" hspace="2"></a>
@@ -487,12 +487,12 @@
                         </c:when>
 
                         <c:when test='${actionQuery == ""}'>
-                            <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+                            <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&eventCRFId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                                 onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                                 onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
                                 ><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></a>
 
-                            <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
+                            <a href="javascript:openDocWindow('PrintDataEntry?ecId=${dec.eventCRF.id}')"
                                 onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                                 onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                                 ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>
@@ -505,12 +505,12 @@
                                 onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');"
                                 ><img name="bt_EnterData<c:out value="${rowCount}"/>" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></a>
                             </c:if>
-                            <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+                            <a href="ViewSectionDataEntry?eventDefinitionCRFId=${dedc.edc.id}&eventCRFId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                                 onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                 onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                 ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="1"></a>
 							
-                            <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
+                            <a href="javascript:openDocWindow('PrintDataEntry?ecId=${dec.eventCRF.id}')"
                                 onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                                 onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                                 ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="1"></a>

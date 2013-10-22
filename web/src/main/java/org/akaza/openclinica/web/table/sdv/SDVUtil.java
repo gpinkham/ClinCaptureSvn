@@ -841,7 +841,7 @@ public class SDVUtil {
 
 		HtmlBuilder html = new HtmlBuilder();
 		html.a().onclick(
-				"openDocWindow('" + request.getContextPath() + "/ViewSectionDataEntry?cw=1&eventDefinitionCRFId=&ecId="
+				"openDocWindow('" + request.getContextPath() + "/ViewSectionDataEntry?cw=1&eventDefinitionCRFId=&eventCRFId="
 						+ eventDefinitionCRFId + "&tabId=1&studySubjectId=" + studySubjectId + "');");
 		html.href("#").close();
 

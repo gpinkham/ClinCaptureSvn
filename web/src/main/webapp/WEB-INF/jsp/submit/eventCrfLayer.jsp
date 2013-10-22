@@ -231,7 +231,7 @@
 							   <c:choose>
 							    <c:when test="${crfStatus ==data_entry_completei18n ||  crfStatus =='administrative editing'}">
 						    	      <tr valign="top"><td class="table_cell_left"><a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
-							          <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
+							          <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&eventCRFId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								      <tr valign="top"><td class="table_cell_left"><a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')"><img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp;
 								      <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')"><fmt:message key="print" bundle="${resword}"/></a></td></tr>
                                     <!-- New Statement for locked or frozen study -->
@@ -257,7 +257,7 @@
 							    </c:when>
 							    <c:when test="${crfStatus ==lockedi18n}">
 							        <tr valign="top"><td class="table_cell_left"><a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-							         <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
+							         <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&eventCRFId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								  
 									<tr valign="top"><td class="table_cell_left"><a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><fmt:message key="print" bundle="${resword}"/></a></td></tr>
 							        <c:if test="${(userRole.studyDirector || userBean.sysAdmin) && (study.status.available)}">
@@ -275,7 +275,7 @@
 						 	    </c:when>
 						 	    <c:when test="${crfStatus =='invalid' }">
 						 	           <tr valign="top"><td class="table_cell_left"><a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
-							           <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
+							           <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&eventCRFId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								       <tr valign="top"><td class="table_cell_left"><a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')"><img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp;
 								       <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')"><fmt:message key="print" bundle="${resword}"/></a></td></tr>
 								    <c:if test="${studySubjectStatusId != 5 && studySubjectStatusId != 7}">
@@ -308,7 +308,7 @@
 									<%--<tr valign="top"><td class="table_cell_left"><a href="MarkEventCRFComplete?eventCRFId=<c:out value="${eventCrfId}" />"><img src="images/icon_DEcomplete.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="MarkEventCRFComplete?eventCRFId=<c:out value="${eventCrfId}" />" onClick="javascript:return confirm('Click OK to mark the <c:out value="${crfName}"/> completed for Subject <c:out value="${subjectName}"/>.');">Mark Complete</a></td></tr>--%>
 									
 									<tr valign="top"><td class="table_cell_left"><a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
-							         <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
+							         <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&eventCRFId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								  
 									<tr valign="top"><td class="table_cell_left"><a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')"><img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; 
 									<a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')"><fmt:message key="print" bundle="${resword}"/></a></td></tr>

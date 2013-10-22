@@ -148,6 +148,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 				StudyEventDAO sedao = new StudyEventDAO(ds);
 				StudyEventBean seb = (StudyEventBean) sedao.findByPK(id);
 				request.setAttribute(EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
+                request.setAttribute(ViewSectionDataEntryServlet.EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
 				request.setAttribute(STUDY_SUB_ID, String.valueOf(seb.getStudySubjectId()));
 
 			} else {

@@ -912,7 +912,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					url.append(transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif")
 							.border("0").append("hspace=\"4\"").end());
 				}
-				if (getCurrentRole().getRole() == Role.INVESTIGATOR && getStudyBean().getStatus() == Status.AVAILABLE
+				if (getCurrentRole().getRole() == Role.INVESTIGATOR
+						&& (getStudyBean().getStatus() == Status.AVAILABLE || getStudyBean().getStatus() == Status.FROZEN)
 						&& studySubjectBean.getStatus() != Status.DELETED) {
 					url.append(signStudySubjectLinkBuilder(studySubjectBean, isSignable));
 				}

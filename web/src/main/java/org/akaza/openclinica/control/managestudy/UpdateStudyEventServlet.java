@@ -132,7 +132,9 @@ public class UpdateStudyEventServlet extends SecureController {
 			session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
 			session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
 			checkStudyLocked(Page.MANAGE_STUDY, respage.getString("current_study_locked"));
-			checkStudyFrozen(Page.MANAGE_STUDY, respage.getString("current_study_frozen"));
+			if (currentRole.getRole() != Role.INVESTIGATOR) {
+				checkStudyFrozen(Page.MANAGE_STUDY, respage.getString("current_study_frozen"));
+			}
 		}
 
 		if (studyEventId == 0 || studySubjectId == 0) {

@@ -32,7 +32,6 @@
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <script type="text/JavaScript" language="JavaScript">
-    <!--
     function myCancel() {
 
         cancelButton=document.getElementById('cancel');

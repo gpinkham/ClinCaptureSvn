@@ -25,7 +25,7 @@
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
-<div id="sidebar_Instructions_open" class="sidebar_tab" style="display: all">
+<div id="sidebar_Instructions_open" class="sidebar_tab" style="width: 145px !important; display: all">
 
 
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
@@ -56,8 +56,8 @@
     <c:set var="studySubjectIDLabel" value="${study.studyParameterConfig.studySubjectIdLabel}"/>
 </c:if>
 
-<h1 style="margin-left: 185px;"><span class="title_manage"><fmt:message key="manage_study" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('help/4_0_manageStudy_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
-<div style="padding-left: 185px; float: left;">
+<h1 style=""><span class="title_manage"><fmt:message key="manage_study" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('help/4_0_manageStudy_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<div style="float: left;">
 <%-- 3057 removed this: <span style="font-size:12px"><fmt:message key="select_to_manage" bundle="${restext}"/></span>--%>
 <h2><fmt:message key="recent_activity" bundle="${restext}"/> ${studyIdentifier}</h2>
 
@@ -78,10 +78,9 @@
 	</div>
 
 	<!-- These DIVs define shaded box borders -->
-	<div class="tablebox">
-		<div><div><div><div><div><div><div><div>
 
-
+    <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+      <div class="tablebox_center">
 				<table border="0" cellpadding="0" cellspacing="0" width="100%">
 					<tr valign="top">
 						<td class="table_header_row_left">${studySubjectIDLabel}</td>
@@ -106,22 +105,19 @@
 					</c:forEach>
 					<tr valign="top">
 					 <td class="table_cell" align="right" colspan="3">
-					   <c:if test="${subsCount>0}">
-					    <a href="ListStudySubjects"><fmt:message key="show_all" bundle="${resword}"/></a>
-					   </c:if>
-<%--
-					     <c:if test="${study.status.available}">
-                             | <a href="AddNewSubject"><fmt:message key="add_new" bundle="${resword}"/></a>
-                         </c:if>
---%>
-                     </td>
+             <c:choose>
+					    <c:when test="${subsCount>0}">
+					      <a href="ListStudySubjects"><fmt:message key="show_all" bundle="${resword}"/></a>
+					    </c:when>
+              <c:otherwise>&nbsp;</c:otherwise>
+             </c:choose>
+           </td>
 					</tr>
 				</table>
-
-
+      </div>
 
 		</div></div></div></div></div></div></div></div>
-	</div>
+
 			</td>
 			<td valign="top" width="330" style="padding-right: 20px">
 

@@ -133,7 +133,7 @@
 	</tr>
 	<c:set var="rowCount" value="${0}" />
 	<c:forEach var="section" items="${toc.sections}">
-		<c:set var="actionLink" value="ViewSectionDataEntry?sectionId=${section.id}&ecId=${toc.eventCRF.id}" />
+		<c:set var="actionLink" value="ViewSectionDataEntry?sectionId=${section.id}&eventCRFId=${toc.eventCRF.id}" />
 
 		<%-- set the action label --%>
 
@@ -157,7 +157,7 @@
 					<img name="bt_View<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data_entry" bundle="${resword}"/>" title="<fmt:message key="view_data_entry" bundle="${resword}"/>" align="left" hspace="6"></a>
 			  </td>
 			  <td>
-			    <a href="javascript:openDocWindow('ViewSectionDataEntry?sectionId=<c:out value="${section.id}"/>&ecId=<c:out value="${toc.eventCRF.id}"/>&print=yes')"
+			    <a href="javascript:openDocWindow('ViewSectionDataEntry?sectionId=<c:out value="${section.id}"/>&eventCRFId=<c:out value="${toc.eventCRF.id}"/>&print=yes')"
 					onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print_d.gif');"
 					onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');">
 					<img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_out_form" bundle="${resword}"/>" title="<fmt:message key="print_out_form" bundle="${resword}"/>" align="left" hspace="6"></a>

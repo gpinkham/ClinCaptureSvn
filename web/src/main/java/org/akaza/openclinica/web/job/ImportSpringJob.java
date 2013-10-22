@@ -234,6 +234,36 @@ public class ImportSpringJob extends QuartzJobBean {
 				studyBean = (StudyBean) sdao.findByName(studyName);
 			}
             studyBean = scs.setParametersForStudy(studyBean);
+			if (studyBean.getStatus().isFrozen()) {
+				try {
+					String message = respage.getString("import_study_frozen");
+					auditEventDAO.createRowForExtractDataJobFailure(triggerBean, message);
+					if (contactEmail != null && !"".equals(contactEmail)) {
+						StudyBean emailParentStudy = new StudyBean();
+						if (studyBean.getParentStudyId() > 0) {
+							emailParentStudy = (StudyBean) sdao.findByPK(studyBean.getParentStudyId());
+						} else {
+							emailParentStudy = studyBean;
+						}
+						String body = respage.getString("html_email_header_1")
+								+ " "
+								+ contactEmail
+								+ ",<br>"
+								+ respage.getString("your_job_ran_html")
+								+ "  "
+								+ respage.getString("please_review_the_data_html")
+								+ message
+								+ "<br/>"
+								+ respage.getString("best_system_administrator").replace("{0}",
+										emailParentStudy.getName());
+						mailSender.sendEmail(contactEmail,
+								respage.getString("job_ran_for") + " " + triggerBean.getFullName(), body, true);
+					}
+				} catch (OpenClinicaSystemException ose) {
+					logger.error("=== throw an ocse: " + ose.getMessage());
+				}
+				return;
+			}
 			File fileDirectory = new File(SQLInitServlet.getField("filePath") + DIR_PATH + File.separator);
 			if ("".equals(directory)) { // avoid NPEs
 			} else {
@@ -306,7 +336,6 @@ public class ImportSpringJob extends QuartzJobBean {
 				auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, respage.getString("job_ran_but_no_files"));
 				// no email here, tbh
 			}
-
 		} catch (Exception e) {
 			// more detailed reporting here
 			logger.error("found a fail exception: " + e.getMessage());
