@@ -91,7 +91,6 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 	public static final String END_DATE = "end_date";
 	public static final String SHOW_STATUS = "showStatus";
 	public static final String CAN_CLOSE = "canClose";
-    Locale locale;
 
 	public static final String ENTITY_ID = "id";
 	public static final String PARENT_ID = "parentId";
@@ -117,19 +116,15 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 	public static final String ERROR_FLAG = "errorFlag";
 	public static final String FROM_BOX = "fromBox";
 
-	public String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
-	public String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note")
-			+ respage.getString("change_study_contact_sysadmin");
-    public String subjectIdNotFound = respage.getString("subject_id_not_found");
-
 	@Override
 	protected void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
-
 		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
 			return;
 		}
+
+		String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
+		String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note")
+				+ respage.getString("change_study_contact_sysadmin");
 
 		addPageMessage(noAccessMessage);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
@@ -199,6 +194,11 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
 		request.setAttribute("y", ypos);
 
+		String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
+		String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note")
+				+ respage.getString("change_study_contact_sysadmin");
+		String subjectIdNotFound = respage.getString("subject_id_not_found");
+
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
 		int entityId = fp.getInt(ENTITY_ID, true);
 		String name = fp.getString(ENTITY_TYPE, true);
@@ -216,6 +216,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 			request.setAttribute(LOCKED_FLAG, "no");
 		}
 
+		Locale locale = request.getLocale();
 		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
 
         int subjectId = fp.getInt(CreateDiscrepancyNoteServlet.SUBJECT_ID, true);
