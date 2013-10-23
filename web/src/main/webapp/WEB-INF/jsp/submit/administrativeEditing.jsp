@@ -1138,6 +1138,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 </c:choose>
     <td class="table_cell_left">
         <table border="0" class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}">
+            <c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/>
             <tr>
                 	</c:if>
 
@@ -1167,11 +1168,11 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 						<%-- put in highlighting here, tbh --%>
                         <c:choose>
                     		<c:when test="${displayItem.singleItem.metadata.highlighted}">
-								<table border="0" cellspacing="0" cellpadding="1" class="aka_group_show">
+								<table border="0" cellspacing="0" cellpadding="1" class='aka_group_show <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}"> itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>'>
                     			<tr>
                     		</c:when>
                     		<c:otherwise>
-								<table border="0" cellspacing="0" cellpadding="1">
+								<table border="0" cellspacing="0" cellpadding="1" <c:if test="${prevItemHolderId != displayItem.singleItem.item.id}">class="itemHolderClass" id="itemHolderId_input${displayItem.singleItem.item.id}"<c:set var="prevItemHolderId" value="${displayItem.singleItem.item.id}"/></c:if>>
                     			<tr>
                     		</c:otherwise>
                     	</c:choose><%-- end of highlighting block, tbh --%>
