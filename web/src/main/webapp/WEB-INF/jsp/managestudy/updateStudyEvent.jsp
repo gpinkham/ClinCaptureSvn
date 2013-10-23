@@ -140,18 +140,28 @@
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.startDateTimeRequired == 'yes'}"> *</c:if>
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-                    <c:choose>
-                        <c:when test="${hasStartDateNote eq 'yes'}">
-                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg','spanAlert-start_date'); return false;"
-                                    ><img id="flag_start_date" name="flag_start_date" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
-                        </c:when>
-                        <c:otherwise>
-                            <c:if test="${!study.status.locked}">
-                                <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg=','spanAlert-start'); return false;"><img id="flag_start_date" name="flag_start_date" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
-                            </c:if>
-                        </c:otherwise>
-                    </c:choose>
-                </c:if></td>
+							<c:set var="imageFileName" value="${imageFileNameForStartDate}"/>
+							<c:choose>
+								<c:when test="${numberOfStartDateDNotes > 0}">
+									<span style="float:right">
+										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg','spanAlert-start_date', '', event); return false;">
+											<img id="flag_start_date" name="flag_start_date" 
+												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+										</a>
+									</span>
+								</c:when>
+								<c:otherwise>
+									<span style="float:right">
+										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg=','spanAlert-start_date', '', event); return false;">
+											<img id="flag_start_date" name="flag_start_date" 
+												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
+											<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg"/>
+										</a>
+									</span>
+								</c:otherwise>
+							</c:choose>	
+					</c:if>
+				</td>
 			</tr>
 			<tr>
 				<td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="start"/></jsp:include></td>
@@ -181,18 +191,28 @@
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.endDateTimeRequired == 'yes'}"> *</c:if>
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-                    <c:choose>
-                        <c:when test="${hasEndDateNote eq 'yes'}">
-                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg','spanAlert-start_date'); return false;"
-                                    ><img id="flag_end_date" name="flag_end_date" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
-                        </c:when>
-                        <c:otherwise>
-                            <c:if test="${!study.status.locked}">
-                                <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg=','spanAlert-start'); return false;"><img id="flag_end_date" name="flag_end_date" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
-                            </c:if>
-                        </c:otherwise>
-                    </c:choose>
-                    </c:if></td>
+							<c:set var="imageFileName" value="${imageFileNameForEndDate}"/>
+							<c:choose>
+								<c:when test="${numberOfEndDateDNotes > 0}">
+									<span style="float:right">
+										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg','spanAlert-end_date', '', event); return false;">
+											<img id="flag_end_date" name="flag_end_date" 
+												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+										</a>
+									</span>
+								</c:when>
+								<c:otherwise>
+									<span style="float:right">
+										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg=','spanAlert-end_date', '', event); return false;">
+											<img id="flag_end_date" name="flag_end_date" 
+												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
+											<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg"/>
+										</a>
+									</span>
+								</c:otherwise>
+							</c:choose>	
+                    </c:if>
+				</td>
 			</tr>
 			<tr>
 				<td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="end"/></jsp:include></td>
@@ -201,33 +221,46 @@
 		</td>
 	</tr>
     <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
-    <tr valign="top"><td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
-    <td>
-        <table border="0" cellpadding="0" cellspacing="0">
-        <tr><td>
-        <div class="formfieldXL_BG">
-      <input type="text" name="location" value="<c:out value="${studyEvent.location}"/>" class="formfieldXL"></div>
-       <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include>
-      </td>
-      <td><c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-          <c:choose>
-              <c:when test="${hasLocationNote eq 'yes'}">
-                  <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg','spanAlert-start_date'); return false;"
-                          ><img id="flag_location" name="flag_location" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
-              </c:when>
-              <c:otherwise>
-                  <c:if test="${!study.status.locked}">
-                      <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-start'); return false;"><img id="flag_location" name="flag_start" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
-                  </c:if>
-              </c:otherwise>
-          </c:choose>
-      </c:if>
-      </td></tr>
-     </table>
-    </td>
-    </tr>
+		<tr valign="top"><td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
+			<td>
+				<table border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td>
+							<div class="formfieldXL_BG">
+								<input type="text" name="location" value="<c:out value="${studyEvent.location}"/>" class="formfieldXL">
+							</div>
+							<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include>
+						</td>
+						<td>
+							<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+								<c:set var="imageFileName" value="${imageFileNameForLocation}"/>
+								<c:choose>
+									<c:when test="${numberOfLocationDNotes > 0}">
+										<span style="float:right">
+											<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg','spanAlert-location', '', event); return false;">
+												<img id="flag_location" name="flag_location" 
+													src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+											</a>
+										</span>
+									</c:when>
+									<c:otherwise>
+										<span style="float:right">
+											<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-location', '', event); return false;">
+												<img id="flag_location" name="flag_location" 
+													src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
+												<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg"/>
+											</a>
+										</span>
+									</c:otherwise>
+								</c:choose>	
+							</c:if>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
     </c:if>
-  <tr valign="top">
+	<tr valign="top">
     <td class="formlabel"><fmt:message key="status" bundle="${resword}"/>:</td>
     <td>
      <div class="formfieldM_BG">

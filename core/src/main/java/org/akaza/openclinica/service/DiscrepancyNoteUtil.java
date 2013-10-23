@@ -35,6 +35,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -1468,14 +1469,89 @@ public class DiscrepancyNoteUtil {
 			tempDNThread.setLatestResolutionStatus(this.getResolutionStatusName(resolutionStatusId));
 
 			if (!childDiscBeans.isEmpty()) {
-
 				for (DiscrepancyNoteBean childBean : childDiscBeans) {
 					tempDNThread.getLinkedNoteList().offer(childBean);
 				}
 			}
 			dnThreads.add(tempDNThread);
-
 		}
 		return dnThreads;
 	}
+	
+	public static List<DiscrepancyNoteBean> getAllNotesforSubjectAndEvent(StudySubjectBean studySubjectBean, StudyBean currentStudy, SessionManager sm) {
+		int studyId = studySubjectBean.getStudyId();
+		StudyDAO studydao = new StudyDAO(sm.getDataSource());
+		StudyBean study = (StudyBean) studydao.findByPK(studyId);
+		// If the study subject derives from a site, and is being viewed from a
+		// parent study,
+		// then the study IDs will be different. However, since each note is
+		// saved with the specific
+		// study ID, then its study ID may be different than the study subject's
+		// ID.
+		boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
+		boolean isParentStudy = study.getParentStudyId() < 1;
+
+		// Get any disc notes for this study event
+		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
+		ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent = new ArrayList<DiscrepancyNoteBean>();
+
+		// These methods return only parent disc notes
+		if (subjectStudyIsCurrentStudy && isParentStudy) {
+			allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudyAndId(currentStudy,
+					studySubjectBean.getId());
+		} else { // findAllStudyEventByStudiesAndSubjectId
+			if (!isParentStudy) {
+				StudyBean stParent = (StudyBean) studydao.findByPK(study.getParentStudyId());
+				allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(stParent, study,
+					studySubjectBean.getId());
+			} else {
+				allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(currentStudy,
+						study, studySubjectBean.getId());
+			}
+		}
+		return allNotesforSubjectAndEvent;
+	}
+	
+	public static String getImageFileNameForFlagByResolutionStatusId(int resolutionStatusId) {
+		String result = "icon_noNote";
+		switch (resolutionStatusId) {
+        case 1:  result = "icon_Note";
+                 break;
+        case 2:  result = "icon_flagYellow";
+                 break;
+        case 3:  result = "icon_flagBlack";
+                 break;
+        case 4:  result = "icon_flagGreen";
+                 break;
+        case 5:  result = "icon_flagWhite";
+                 break;
+        default: result = "icon_noNote";
+                 break;
+		}
+		return result;
+	}
+	
+	public static int getDiscrepancyNoteResolutionStatus(List existingNotes) {
+		int resolutionStatus = 0;
+		boolean hasOtherThread = false;
+		for (Object obj : existingNotes) {
+			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
+			/*
+			 * We would only take the resolution status of the parent note of any note thread. If there are more than
+			 * one note thread, the thread with the worst resolution status will be taken.
+			 */
+			if (note.getParentDnId() == 0) {
+				if (hasOtherThread) {
+					if (resolutionStatus > note.getResolutionStatusId()) {
+						resolutionStatus = note.getResolutionStatusId();
+					}
+				} else {
+					resolutionStatus = note.getResolutionStatusId();
+				}
+				hasOtherThread = true;
+			}
+		}
+		return resolutionStatus;
+	}
+	
 }

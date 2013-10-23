@@ -43,6 +43,7 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
+import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -573,33 +574,11 @@ public class UpdateStudyEventServlet extends SecureController {
 			}
 		} else {
 			logger.info("no action, go to update page");
-
-			DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
+			
 			StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
-			int studyId = studySubjectBean.getStudyId();
-			boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
-			boolean isParentStudy = studyBean.getParentStudyId() < 1;
-
-			ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent = new ArrayList<DiscrepancyNoteBean>();
-
-			if (subjectStudyIsCurrentStudy && isParentStudy) {
-				allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudyAndId(currentStudy,
-						studySubjectBean.getId());
-				if (!isParentStudy) {
-					StudyBean stParent = (StudyBean) sdao.findByPK(studyBean.getParentStudyId());
-					allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(stParent,
-							studyBean, studySubjectBean.getId());
-				} else {
-
-					allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(
-							currentStudy, studyBean, studySubjectBean.getId());
-				}
-
-			}
-
-			if (!allNotesforSubjectAndEvent.isEmpty()) {
-				setRequestAttributesForNotes(allNotesforSubjectAndEvent);
-			}
+			List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil.getAllNotesforSubjectAndEvent(studySubjectBean, currentStudy, sm);
+			
+			EnterDataForStudyEventServlet.setRequestAttributesForNotes(allNotesforSubjectAndEvent, studyEvent, sm, request);
 
 			HashMap presetValues = new HashMap();
 			if (studyEvent.getStartTimeFlag() == true) {
@@ -774,19 +753,6 @@ public class UpdateStudyEventServlet extends SecureController {
 			return SecureController.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
-		}
-	}
-
-	private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans) {
-		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
-			if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-				request.setAttribute(HAS_LOCATION_NOTE, "yes");
-			} else if ("date_start".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-				request.setAttribute(HAS_START_DATE_NOTE, "yes");
-
-			} else if ("date_end".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-				request.setAttribute(HAS_END_DATE_NOTE, "yes");
-			}
 		}
 	}
 

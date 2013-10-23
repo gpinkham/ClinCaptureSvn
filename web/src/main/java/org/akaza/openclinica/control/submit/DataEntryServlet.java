@@ -3559,8 +3559,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				+ "time took:" + (System.currentTimeMillis() - t));
 		setToolTipEventNotes(request);
 
-		request.setAttribute("nameNoteResStatus", getDiscrepancyNoteResolutionStatus(existingNameNotes));
-		request.setAttribute("IntrvDateNoteResStatus", getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
+		request.setAttribute("nameNoteResStatus", DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(existingNameNotes));
+		request.setAttribute("IntrvDateNoteResStatus", DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
 
 		request.setAttribute("existingNameNotes", existingNameNotes);
 
@@ -5055,29 +5055,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			}
 		}
 
-		return resolutionStatus;
-	}
-
-	private int getDiscrepancyNoteResolutionStatus(List existingNotes) {
-		int resolutionStatus = 0;
-		boolean hasOtherThread = false;
-		for (Object obj : existingNotes) {
-			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
-			/*
-			 * We would only take the resolution status of the parent note of any note thread. If there are more than
-			 * one note thread, the thread with the worst resolution status will be taken.
-			 */
-			if (note.getParentDnId() == 0) {
-				if (hasOtherThread) {
-					if (resolutionStatus > note.getResolutionStatusId()) {
-						resolutionStatus = note.getResolutionStatusId();
-					}
-				} else {
-					resolutionStatus = note.getResolutionStatusId();
-				}
-				hasOtherThread = true;
-			}
-		}
 		return resolutionStatus;
 	}
 

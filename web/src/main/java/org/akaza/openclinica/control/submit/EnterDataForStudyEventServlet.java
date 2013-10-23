@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -46,9 +48,9 @@ import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
+import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -57,6 +59,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.util.CrfComparator;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
@@ -142,49 +145,12 @@ public class EnterDataForStudyEventServlet extends SecureController {
 		// so we can display the subject's label
 		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
 		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
-		int studyId = studySubjectBean.getStudyId();
-
 		StudyDAO studydao = new StudyDAO(sm.getDataSource());
-		StudyBean study = (StudyBean) studydao.findByPK(studyId);
-		// If the study subject derives from a site, and is being viewed from a
-		// parent study,
-		// then the study IDs will be different. However, since each note is
-		// saved with the specific
-		// study ID, then its study ID may be different than the study subject's
-		// ID.
-		boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
-		boolean isParentStudy = study.getParentStudyId() < 1;
-
-		// Get any disc notes for this study event
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
-		ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent = new ArrayList<DiscrepancyNoteBean>();
-
-		/*
-		 * allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudyAndId(currentStudy,
-		 * studySubjectBean.getId());
-		 */
-
-		// These methods return only parent disc notes
-		if (subjectStudyIsCurrentStudy && isParentStudy) {
-			allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudyAndId(currentStudy,
-					studySubjectBean.getId());
-		} else { // findAllStudyEventByStudiesAndSubjectId
-			if (!isParentStudy) {
-				StudyBean stParent = (StudyBean) studydao.findByPK(study.getParentStudyId());
-				allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(stParent, study,
-						studySubjectBean.getId());
-			} else {
-
-				allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(currentStudy,
-						study, studySubjectBean.getId());
-			}
-
-		}
-
-		if (!allNotesforSubjectAndEvent.isEmpty()) {
-			setRequestAttributesForNotes(allNotesforSubjectAndEvent, seb);
-		}
-
+		StudyBean study = (StudyBean) studydao.findByPK(studySubjectBean.getStudyId());
+		
+		List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil.getAllNotesforSubjectAndEvent(studySubjectBean, currentStudy, sm);
+		setRequestAttributesForNotes(allNotesforSubjectAndEvent, seb, sm, request);
+		
 		// prepare to figure out what the display should look like
 		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 		ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(seb);
@@ -360,9 +326,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
 					eventCRFBean.setOwner(userAccountBean);
 				}
 			}
-
 		}
-
 	}
 
 	private void populateUncompletedCRFsWithCRFAndVersions(ArrayList uncompletedEventDefinitionCRFs) {
@@ -519,33 +483,33 @@ public class EnterDataForStudyEventServlet extends SecureController {
 	 * @param discBeans
 	 *            A List of DiscrepancyNoteBeans.
 	 */
-	private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans, StudyEventBean seb) {
+	public static void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans, StudyEventBean seb, SessionManager sm, HttpServletRequest request) {
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 		StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
+		List<DiscrepancyNoteBean> locationDNotes = new ArrayList<DiscrepancyNoteBean>();
+		List<DiscrepancyNoteBean> startDateDNotes = new ArrayList<DiscrepancyNoteBean>();
+		List<DiscrepancyNoteBean> endDateDNotes = new ArrayList<DiscrepancyNoteBean>();
 		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
 			//method discrepancyNoteBean.getEvent.getId() return 0 for all DNs
 			if (discrepancyNoteBean.getEventName().equalsIgnoreCase(sedBean.getName())) {
 				if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-					if (discrepancyNoteBean.getResolutionStatusId() == 4) {
-						request.setAttribute(HAS_LOCATION_NOTE, "no");
-					} else {
-						request.setAttribute(HAS_LOCATION_NOTE, "yes");
-					}
+					locationDNotes.add(discrepancyNoteBean);
 				} else if ("start_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-					if (discrepancyNoteBean.getResolutionStatusId() == 4) {
-						request.setAttribute(HAS_START_DATE_NOTE, "no");
-					} else {
-						request.setAttribute(HAS_START_DATE_NOTE, "yes");
-					}
-
+					startDateDNotes.add(discrepancyNoteBean);
 				} else if ("end_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-					if (discrepancyNoteBean.getResolutionStatusId() == 4) {
-						request.setAttribute(HAS_END_DATE_NOTE, "no");
-					} else {
-						request.setAttribute(HAS_END_DATE_NOTE, "yes");
-					}
+					endDateDNotes.add(discrepancyNoteBean);
 				}
 			}
 		}
+		request.setAttribute("numberOfLocationDNotes", locationDNotes.size());
+		request.setAttribute("numberOfStartDateDNotes", startDateDNotes.size());
+		request.setAttribute("numberOfEndDateDNotes", endDateDNotes.size());
+		
+		request.setAttribute("imageFileNameForLocation", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
+				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(locationDNotes)));
+		request.setAttribute("imageFileNameForStartDate", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId( 
+				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(startDateDNotes)));
+		request.setAttribute("imageFileNameForEndDate", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId( 
+				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(endDateDNotes)));
 	}
 }
