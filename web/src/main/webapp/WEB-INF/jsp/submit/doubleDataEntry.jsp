@@ -603,6 +603,16 @@ function setParameterForDN(field, parameterName, value) {
 
 <c:choose>
 <c:when test="${displayItem.inGroup == true}">
+
+<c:if test="${(not empty lastItemWasSingle) && lastItemWasSingle}">
+</tr>
+</table>
+</td>
+</tr>
+</c:if>
+
+<c:set var="lastItemWasSingle" value="false" />
+
 <c:set var="currPage" value="${displayItem.pageNumberLabel}" />
 
 <tr>
@@ -691,11 +701,11 @@ function setParameterForDN(field, parameterName, value) {
         <c:choose>
             <c:when test="${thItem.metadata.header == ''}">
                 <c:if test="${! (empty questionNumber)}">
-                    <span style="margin-right:1em"><c:out value="${questionNumber}"/></span></c:if><c:out value="${thItem.metadata.leftItemText}"/>
+                    <span style="margin-right:1em"><c:out value="${questionNumber}"/></span></c:if><c:out value="${thItem.metadata.leftItemText}" escapeXml="false"/>
             </c:when>
             <c:otherwise>
                 <c:if test="${! (empty questionNumber)}">
-                    <span style="margin-right:1em"><c:out value="${questionNumber}"/></span></c:if><c:out value="${thItem.metadata.header}"/>
+                    <span style="margin-right:1em"><c:out value="${questionNumber}"/></span></c:if><c:out value="${thItem.metadata.header}" escapeXml="false"/>
             </c:otherwise>
         </c:choose>
         </th>
@@ -1171,14 +1181,16 @@ function setParameterForDN(field, parameterName, value) {
 <!--ACCORDING TO COLUMN NUMBER, ARRANGE QUESTIONS IN THE SAME LINE-->
 
 <c:if test="${displayItem.singleItem.metadata.columnNumber <=1}">
-<c:if test="${numOfTr > 0 }">
+
+<c:if test="${(not empty lastItemWasSingle) && lastItemWasSingle}">
 </tr>
 </table>
 </td>
-
 </tr>
-
 </c:if>
+
+<c:set var="lastItemWasSingle" value="true" />
+
 <c:set var="numOfTr" value="${numOfTr+1}"/>
 <c:if test="${!empty displayItem.singleItem.metadata.header}">
 	<c:choose>
@@ -1343,15 +1355,10 @@ function setParameterForDN(field, parameterName, value) {
                             </tr>--%>
                     </table>
                 </td>
-                <c:if test="${itemStatus.last}">
-            </tr>
-        </table>
-    </td>
-
-</tr>
-</c:if>
+ 
 
 <c:if test="${displayItem.singleItem.numChildren > 0}">
+	</tr>
     <tr>
             <%-- indentation --%>
         <!--<td class="table_cell">&nbsp;</td>-->
@@ -1460,8 +1467,15 @@ function setParameterForDN(field, parameterName, value) {
                 </tr>
             </table>
         </td>
-    </tr>
 </c:if>
+
+<c:if test="${itemStatus.last}">
+</tr>
+</table>
+</td>
+</tr>
+</c:if>
+
 </c:if>
 </c:if>
 </c:otherwise>

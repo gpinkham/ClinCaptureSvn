@@ -524,6 +524,16 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
 <c:choose>
 <c:when test="${displayItem.inGroup == true}">
+
+<c:if test="${(not empty lastItemWasSingle) && lastItemWasSingle}">
+</tr>
+</table>
+</td>
+</tr>
+</c:if>
+
+<c:set var="lastItemWasSingle" value="false" />
+
 <c:set var="currPage" value="${displayItem.pageNumberLabel}" />
 
 <tr>
@@ -1047,14 +1057,16 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <!--ACCORDING TO COLUMN NUMBER, ARRANGE QUESTIONS IN THE SAME LINE-->
 
 <c:if test="${displayItem.singleItem.metadata.columnNumber <=1}">
-<c:if test="${numOfTr > 0 }">
+
+<c:if test="${(not empty lastItemWasSingle) && lastItemWasSingle}">
 </tr>
 </table>
 </td>
-
 </tr>
-
 </c:if>
+
+<c:set var="lastItemWasSingle" value="true" />
+
 <c:set var="numOfTr" value="${numOfTr+1}"/>
 <c:if test="${!empty displayItem.singleItem.metadata.header}">
 	<c:choose>
@@ -1213,15 +1225,10 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                             </tr>--%>
                     </table>
                 </td>
-                <c:if test="${itemStatus.last}">
-            </tr>
-        </table>
-    </td>
-
-</tr>
-</c:if>
+               
 
 <c:if test="${displayItem.singleItem.numChildren > 0}">
+	</tr>
     <tr>
             <%-- indentation --%>
         <!--<td class="table_cell">&nbsp;</td>-->
@@ -1325,8 +1332,15 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                 </tr>
             </table>
         </td>
-    </tr>
 </c:if>
+
+<c:if test="${itemStatus.last}">
+</tr>
+</table>
+</td>
+</tr>
+</c:if>
+
 </c:if>
 </c:if>
 </c:otherwise>
