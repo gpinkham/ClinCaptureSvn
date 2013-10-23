@@ -225,18 +225,22 @@
 			<td>
 			<div class="formfieldM_BG">
 				<select name="dynamicGroupClassId" class="formfieldM" onChange="setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. '); showDynamicEventsSection(${defaultDynGroupClassId});">
-					<option value="0"><fmt:message key="default_group" bundle="${resword}"/></option>
 					<c:forEach var="dynGroup" items="${dynamicGroups}">
-					<c:if test="${dynGroup.id != defaultDynGroupClassId}">
-					<c:choose>
-						<c:when test="${dynGroup.id == selectedDynGroupClassId}">
-							<option value="<c:out value="${dynGroup.id}" />" selected><c:out value="${dynGroup.name}"/></option>
-						</c:when>
-						<c:otherwise>
-							<option value="<c:out value="${dynGroup.id}"/>"><c:out value="${dynGroup.name}"/></option>
-						</c:otherwise>
-					</c:choose>
-					</c:if>
+            <c:choose>
+					    <c:when test="${dynGroup.id == defaultDynGroupClassId}">
+                <option value="${dynGroup.id}"><fmt:message key="default_group" bundle="${resword}"/></option>
+					    </c:when>
+              <c:otherwise>
+                <c:choose>
+                  <c:when test="${dynGroup.id == selectedDynGroupClassId}">
+                    <option value="<c:out value="${dynGroup.id}" />" selected><c:out value="${dynGroup.name}"/></option>
+                  </c:when>
+                  <c:otherwise>
+                    <option value="<c:out value="${dynGroup.id}"/>"><c:out value="${dynGroup.name}"/></option>
+                  </c:otherwise>
+                </c:choose>
+              </c:otherwise>
+            </c:choose>
 					</c:forEach>
 				</select>
 			</div>

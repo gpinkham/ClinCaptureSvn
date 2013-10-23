@@ -434,109 +434,123 @@
 </div>
 
 <!-- DynamicGroup table begin -->
+<c:if test="${!subjDynGroupIsDefault || (subjDynGroupIsDefault && !defaultGroupNotExist)}">
+  <div id="dynamicGroups" style="display:none;">
+        <div style="width: 600px">
+            <!-- These DIVs define shaded box borders -->
+            <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+                <div class="tablebox_center">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                            <td valign="top">
 
-<div id="dynamicGroups" style="display:none;">
-    <div style="width: 600px">
-        <!-- These DIVs define shaded box borders -->
-        <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-            <div class="tablebox_center">
-                <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                    <tr>
-                        <td valign="top">
-
-                            <!-- Table Contents -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td class="table_header_row_left"><fmt:message key="dynamic_group_class" bundle="${resword}"/></td>
-                                    <td class="table_header_row"><fmt:message key="events" bundle="${resword}"/></td>
-									<td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
-								</tr>                                
-								<tr> 
-									<c:choose>
-										<c:when test="${subjDynGroupIsDefault}">     
-											<c:choose>
-												<c:when test="${defaultGroupNotExist}">                                                 
-													<td class="table_cell_left">&nbsp;&nbsp;<fmt:message key="default_group" bundle="${resword}"/>&nbsp;(<fmt:message key="none" bundle="${resword}"/>)</td>                                 
-												</c:when>
-												<c:otherwise>
-													<td class="table_cell_left">&nbsp;&nbsp;<fmt:message key="default_group" bundle="${resword}"/>&nbsp;(<c:out value="${subjDynGroup.name}"/>)</td>              
-												</c:otherwise>
-											</c:choose>                                                                    
-										</c:when>
-										<c:otherwise>
-											<td class="table_cell">&nbsp;&nbsp;<c:out value="${subjDynGroup.name}"/></td>                                        
-										</c:otherwise>
-									</c:choose>
-									<td class="table_cell"><c:out value="${studyEventDefinitionsString}"/></td>
-									<c:choose>					
-										<c:when test="${subjDynGroup.status.available}">       
-											<td class="table_cell aka_green_highlight"><c:out value="${subjDynGroup.status.name}"/></td>                                                                                
-										</c:when>
-										<c:when test="${subjDynGroup.status.deleted}">       
-											<td class="table_cell aka_red_highlight"><c:out value="${subjDynGroup.status.name}"/></td>                                                                                
-										</c:when>
-										<c:otherwise>
-											<td class="table_cell"><c:out value="${subjDynGroup.status.name}"/></td>                                        
-										</c:otherwise>
-									</c:choose>									
-								</tr>
-                            </table>
-
-                            <!-- End Table Contents -->
-                        </td>
+                                <!-- Table Contents -->
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td class="table_header_row_left"><fmt:message key="dynamic_group_class" bundle="${resword}"/></td>
+                                        <td class="table_header_row"><fmt:message key="events" bundle="${resword}"/></td>
+                      <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
                     </tr>
-                </table>
-            </div>
-        </div></div></div></div></div></div></div></div>
-    </div>
-    <br><br>
-</div>
+                    <tr>
+                      <c:choose>
+                        <c:when test="${subjDynGroupIsDefault}">
+                          <c:choose>
+                            <c:when test="${defaultGroupNotExist}">
+                              <td class="table_cell_left">&nbsp;&nbsp;<fmt:message key="default_group" bundle="${resword}"/>&nbsp;(<fmt:message key="none" bundle="${resword}"/>)</td>
+                            </c:when>
+                            <c:otherwise>
+                              <td class="table_cell_left">&nbsp;&nbsp;<fmt:message key="default_group" bundle="${resword}"/>&nbsp;(<c:out value="${subjDynGroup.name}"/>)</td>
+                            </c:otherwise>
+                          </c:choose>
+                        </c:when>
+                        <c:otherwise>
+                          <td class="table_cell">&nbsp;&nbsp;<c:out value="${subjDynGroup.name}"/></td>
+                        </c:otherwise>
+                      </c:choose>
+                      <td class="table_cell"><c:out value="${studyEventDefinitionsString}"/></td>
+                      <c:choose>
+                        <c:when test="${subjDynGroup.status.available}">
+                          <td class="table_cell aka_green_highlight"><c:out value="${subjDynGroup.status.name}"/></td>
+                        </c:when>
+                        <c:when test="${subjDynGroup.status.deleted}">
+                          <td class="table_cell aka_red_highlight"><c:out value="${subjDynGroup.status.name}"/></td>
+                        </c:when>
+                        <c:otherwise>
+                          <td class="table_cell"><c:out value="${subjDynGroup.status.name}"/></td>
+                        </c:otherwise>
+                      </c:choose>
+                    </tr>
+                                </table>
+
+                                <!-- End Table Contents -->
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div></div></div></div></div></div></div></div>
+        </div>
+        <br><br>
+  </div>
+</c:if>
 <!-- DynamicGroup table end -->
 <!-- Group table begin -->
-<div id="groups" style="display:none;">
-    <div style="width: 600px">
-        <!-- These DIVs define shaded box borders -->
-        <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-            <div class="tablebox_center">
-                <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                    <tr>
-                        <td valign="top">
+<c:if test="${!empty groups}">
+  <div id="groups" style="display:none;">
+      <div style="width: 600px">
+          <!-- These DIVs define shaded box borders -->
+          <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+              <div class="tablebox_center">
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                          <td valign="top">
 
-                            <!-- Table Contents -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td class="table_header_row_left"><fmt:message key="subject_group_class" bundle="${resword}"/></td>
-                                    <td class="table_header_row"><fmt:message key="study_group" bundle="${resword}"/></td>
-                                    <td class="table_header_row"><fmt:message key="notes" bundle="${resword}"/></td>
-                                </tr>
-                                <c:choose>
-                                    <c:when test="${!empty groups}">
-                                        <c:forEach var="group" items="${groups}">
-                                            <tr>
-                                                <td class="table_cell_left">&nbsp;&nbsp;<c:out value="${group.groupClassName}"/></td>
-                                                <td class="table_cell"><c:out value="${group.studyGroupName}"/></td>
-                                                <td class="table_cell"><c:out value="${group.notes}"/>&nbsp;</td>
-                                            </tr>
-                                        </c:forEach>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <tr>
-                                            <td class="table_cell" colspan="2"><fmt:message key="currently_no_groups" bundle="${resword}"/></td>
-                                        </tr>
-                                    </c:otherwise>
-                                </c:choose>
-                            </table>
+                              <!-- Table Contents -->
+                              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                  <tr>
+                                      <td class="table_header_row_left"><fmt:message key="subject_group_class" bundle="${resword}"/></td>
+                                      <td class="table_header_row"><fmt:message key="study_group" bundle="${resword}"/></td>
+                                      <td class="table_header_row"><fmt:message key="notes" bundle="${resword}"/></td>
+                                      <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
+                                  </tr>
+                                  <c:choose>
+                                      <c:when test="${!empty groups}">
+                                          <c:forEach var="group" items="${groups}">
+                                              <tr>
+                                                  <td class="table_cell_left">&nbsp;&nbsp;<c:out value="${group.groupClassName}"/></td>
+                                                  <td class="table_cell"><c:out value="${group.studyGroupName}"/></td>
+                                                  <td class="table_cell"><c:out value="${group.notes}"/>&nbsp;</td>
+                                                  <c:choose>
+                                                    <c:when test="${group.status.available}">
+                                                      <td class="table_cell aka_green_highlight"><c:out value="${group.status.name}"/></td>
+                                                    </c:when>
+                                                    <c:when test="${group.status.deleted}">
+                                                      <td class="table_cell aka_red_highlight"><c:out value="${group.status.name}"/></td>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                      <td class="table_cell"><c:out value="${group.status.name}"/></td>
+                                                    </c:otherwise>
+                                                  </c:choose>
+                                              </tr>
+                                          </c:forEach>
+                                      </c:when>
+                                      <c:otherwise>
+                                          <tr>
+                                              <td class="table_cell" colspan="3"><fmt:message key="currently_no_groups" bundle="${resword}"/></td>
+                                          </tr>
+                                      </c:otherwise>
+                                  </c:choose>
+                              </table>
 
-                            <!-- End Table Contents -->
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div></div></div></div></div></div></div></div>
-    </div>
-    <br><br>
-</div>
-
+                              <!-- End Table Contents -->
+                          </td>
+                      </tr>
+                  </table>
+              </div>
+          </div></div></div></div></div></div></div></div>
+      </div>
+      <br><br>
+  </div>
+</c:if>
 <!-- Group table end -->
 
 <c:choose>
