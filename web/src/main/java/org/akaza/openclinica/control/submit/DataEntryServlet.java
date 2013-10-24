@@ -801,7 +801,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 							// dib has to loadFormValue first. Here loadFormValue has been done in
 							section.setShowSCDItemIds(SimpleConditionalDisplayService.conditionalDisplayToBeShown(dib,
 									section.getShowSCDItemIds()));
-						} else if (dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0) {
+						}
+                        if (dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0) {
 							// for scd item
 							// a control item is always before its scd item
 							dib.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(dib.getMetadata().getItemId()));
