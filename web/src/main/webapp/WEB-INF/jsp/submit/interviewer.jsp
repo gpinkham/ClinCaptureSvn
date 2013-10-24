@@ -759,7 +759,7 @@ function callTip(html)
       </tr>
     </table>
   </div></div></div></div></div></div></div></div></div>
-  <c:if test="${discrepancyShortcutsAnalyzer.totalNew == 0 && discrepancyShortcutsAnalyzer.totalUpdated == 0 && discrepancyShortcutsAnalyzer.totalResolutionProposed == 0 && discrepancyShortcutsAnalyzer.totalClosed == 0 && discrepancyShortcutsAnalyzer.totalAnnotations == 0}">
+  <c:if test="${discrepancyShortcutsAnalyzer eq null || (discrepancyShortcutsAnalyzer.totalNew == 0 && discrepancyShortcutsAnalyzer.totalUpdated == 0 && discrepancyShortcutsAnalyzer.totalResolutionProposed == 0 && discrepancyShortcutsAnalyzer.totalClosed == 0 && discrepancyShortcutsAnalyzer.totalAnnotations == 0)}">
     <script>
       $("#dnShortcutsTable").addClass("hidden");
     </script>
@@ -797,18 +797,18 @@ function callTip(html)
     window.updateCRFHeader = function(itemId, rowCount, resolutionStatusId) {
         var parametersHolder = {
             servletPath: document.location.pathname.replace("<%=request.getContextPath()%>", ""),
-            tabId: "<%=request.getParameter("tabId")%>",
-            sectionId: "<%=request.getParameter("sectionId")%>",
+            tabId: "<%=request.getParameter("tabId") == null ? request.getAttribute("tabId") : request.getParameter("tabId")%>",
+            sectionId: "<%=request.getParameter("sectionId") == null ? request.getAttribute("sectionId") : request.getParameter("sectionId")%>",
             itemId: parseInt(itemId),
             rowCount: rowCount,
             resolutionStatusId: parseInt(resolutionStatusId),
-            eventCRFId: parseInt("<%=request.getParameter("eventCRFId")%>"),
-            eventDefinitionCRFId: parseInt("<%=request.getParameter("eventDefinitionCRFId")%>"),
-            studyEventId: parseInt("<%=request.getParameter("studyEventId")%>"),
-            subjectId: parseInt("<%=request.getParameter("subjectId")%>"),
-            action: "<%=request.getParameter("action")%>",
-            exitTo: "<%=request.getParameter("exitTo")%>",
-            crfVersionId: parseInt("<%=request.getParameter("crfVersionId")%>")
+            eventCRFId: parseInt("<%=request.getParameter("eventCRFId") == null ? request.getAttribute("eventCRFId") : request.getParameter("eventCRFId")%>"),
+            eventDefinitionCRFId: parseInt("<%=request.getParameter("eventDefinitionCRFId") == null ? request.getAttribute("eventDefinitionCRFId") : request.getParameter("eventDefinitionCRFId")%>"),
+            studyEventId: parseInt("<%=request.getParameter("studyEventId") == null ? request.getAttribute("studyEventId") : request.getParameter("studyEventId")%>"),
+            subjectId: parseInt("<%=request.getParameter("subjectId") == null ? request.getAttribute("subjectId") : request.getParameter("subjectId")%>"),
+            action: "<%=request.getParameter("action") == null ? request.getAttribute("action") : request.getParameter("action")%>",
+            exitTo: "<%=request.getParameter("exitTo") == null ? request.getAttribute("exitTo") : request.getParameter("exitTo")%>",
+            crfVersionId: parseInt("<%=request.getParameter("crfVersionId") == null ? request.getAttribute("crfVersionId") : request.getParameter("crfVersionId")%>")
         }
         if (parametersHolder.exitTo.toLowerCase() == "null") {
             parametersHolder.exitTo = "";

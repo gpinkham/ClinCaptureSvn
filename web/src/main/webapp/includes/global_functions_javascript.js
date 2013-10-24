@@ -2767,6 +2767,7 @@ function resetHighlightedFieldsForDNShortcutAnchors(idToHighlight) {
     var inputHolderElement = $("#itemHolderId_" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel"));
     var inputElement = inputHolderElement.find("input[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]");
     inputElement = inputElement.length == 0 ? inputHolderElement.find("select[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]") : inputElement;
+    inputElement = inputElement.length == 0 ? inputHolderElement.find("textarea[id*=" + $("#" + id).attr("alt") + "input" + $("#" + id).attr("rel") + "]") : inputElement;
     if (inputElement.attr("type") != undefined && (inputElement.attr("type").toLowerCase() == "radio" || inputElement.attr("type").toLowerCase() == "checkbox")) {
       inputElement = inputElement.parent();
     }
@@ -2827,6 +2828,7 @@ function updateCRFHeaderFunction(parametersHolder) {
               var inputHolderElement = $("#itemHolderId_" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel"));
               var inputElement = inputHolderElement.find("input[id*=" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel") + "]");
               inputElement = inputElement.length == 0 ? inputHolderElement.find("select[id*=" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel") + "]") : inputElement;
+              inputElement = inputElement.length == 0 ? inputHolderElement.find("textarea[id*=" + $("#" + dnShortcutAnchors[i]).attr("alt") + "input" + $("#" + dnShortcutAnchors[i]).attr("rel") + "]") : inputElement;
               if (inputElement.attr("type") != undefined && (inputElement.attr("type").toLowerCase() == "radio" || inputElement.attr("type").toLowerCase() == "checkbox")) {
                 inputElement =  inputElement.parent();
               }

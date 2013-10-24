@@ -40,6 +40,8 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
+import org.akaza.openclinica.control.submit.DataEntryServlet;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
@@ -289,10 +291,16 @@ public abstract class CoreSecureController extends HttpServlet {
 		return scheduler;
 	}
 
+	private void clearDNs(HttpServletRequest request) {
+		if (!(this instanceof DataEntryServlet)) {
+			request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+		}
+	}
+    
 	private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
 			UnsupportedEncodingException {
-
-		request.setCharacterEncoding("UTF-8");
+		clearDNs(request);
+        request.setCharacterEncoding("UTF-8");
 		response.setHeader("Content-Encoding", "gzip");
 		HttpSession session = request.getSession();
 		SecureController.reloadUserBean(session, new UserAccountDAO(dataSource));

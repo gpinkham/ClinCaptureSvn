@@ -73,6 +73,10 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
+import org.akaza.openclinica.control.submit.CreateDiscrepancyNoteServlet;
+import org.akaza.openclinica.control.submit.CreateOneDiscrepancyNoteServlet;
+import org.akaza.openclinica.control.submit.ViewDiscrepancyNoteServlet;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -392,10 +396,17 @@ public abstract class SecureController extends HttpServlet {
 			session.removeAttribute("reloadUserBean");
 		}
 	}
+
+	private void clearDNs(HttpServletRequest request) {
+		if (!(this instanceof CreateDiscrepancyNoteServlet) && !(this instanceof CreateOneDiscrepancyNoteServlet)
+				&& !(this instanceof ViewDiscrepancyNoteServlet)) {
+			request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+		}
+	}
     
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
 			UnsupportedEncodingException {
-       
+		clearDNs(request);
 		request.setCharacterEncoding("UTF-8");
 		session = request.getSession();
 		reloadUserBean(session, new UserAccountDAO((DataSource) SpringServletAccess.getApplicationContext(context)

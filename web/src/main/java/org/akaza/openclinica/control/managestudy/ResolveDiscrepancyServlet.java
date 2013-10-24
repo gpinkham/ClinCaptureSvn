@@ -24,6 +24,7 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -41,6 +42,8 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateDiscrepancyNoteServlet;
@@ -53,7 +56,10 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -61,11 +67,16 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 @SuppressWarnings({"rawtypes", "serial"})
 public class ResolveDiscrepancyServlet extends SecureController {
 
-	private static final String INPUT_NOTE_ID = "noteId";
+    private static final String INPUT_NOTE_ID = "noteId";
 	private static final String EVENT_CRF_ID = "ecId";
 	private static final String STUDY_SUB_ID = "studySubjectId";
+    public static final String REFERER = "referer";
+    public static final String EXIT_TO = "exitTo";
+    public static final String TAB_ID = "tabId";
+    public static final String SECTION_ID = "sectionId";
+    public static final String FIELD = "field";
 
-	public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
+    public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
 		String entityType = note.getEntityType().toLowerCase();
 		request.setAttribute("fromResolvingNotes", "yes");
 
@@ -134,15 +145,21 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
 		// this is for item data
 		else if ("itemdata".equalsIgnoreCase(entityType)) {
+			SectionDAO sdao = new SectionDAO(ds);
 			ItemDataDAO iddao = new ItemDataDAO(ds);
-			ItemDataBean idb = (ItemDataBean) iddao.findByPK(id);
+            ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
 
-			EventCRFDAO ecdao = new EventCRFDAO(ds);
+            ItemDataBean idb = (ItemDataBean) iddao.findByPK(id);
+
+            EventCRFDAO ecdao = new EventCRFDAO(ds);
 
 			EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
 
-			ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
 			ItemFormMetadataBean ifmb = ifmdao.findByItemIdAndCRFVersionId(idb.getItemId(), ecb.getCRFVersionId());
+			List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
+			int tabNum = DiscrepancyShortcutsAnalyzer.getTabNum(allSections, ifmb.getSectionId());
+			request.setAttribute(TAB_ID, "" + tabNum);
+			request.setAttribute(SECTION_ID, "" + ifmb.getSectionId());
 
 			if (currentRole.getRole().equals(Role.STUDY_MONITOR) || !isCompleted) {
 				StudyEventDAO sedao = new StudyEventDAO(ds);
@@ -165,7 +182,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
 	@Override
 	protected void processRequest() throws Exception {
-
+        prepareExitTo(request);
 		FormProcessor fp = new FormProcessor(request);
 		int noteId = fp.getInt(INPUT_NOTE_ID);
 		String module = (String) session.getAttribute("module");
@@ -191,6 +208,36 @@ public class ResolveDiscrepancyServlet extends SecureController {
 		String entityType = discrepancyNoteBean.getEntityType().toLowerCase();
 		discrepancyNoteBean.setResStatus(ResolutionStatus.get(discrepancyNoteBean.getResolutionStatusId()));
 		discrepancyNoteBean.setDisType(DiscrepancyNoteType.get(discrepancyNoteBean.getDiscrepancyNoteTypeId()));
+
+		boolean isCompleted = false;
+		if ("itemdata".equalsIgnoreCase(entityType)) {
+			ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+			ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
+
+			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+
+			EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
+
+			discrepancyNoteBean.setSubjectId(ecb.getStudySubjectId());
+			discrepancyNoteBean.setItemId(idb.getItemId());
+
+			if (ecb.getStatus().equals(Status.UNAVAILABLE)) {
+				isCompleted = true;
+			}
+		} else if ("studySub".equalsIgnoreCase(entityType)) {
+			discrepancyNoteBean.setSubjectId(discrepancyNoteBean.getEntityId());
+		} else if ("subject".equalsIgnoreCase(entityType)) {
+			discrepancyNoteBean.setSubjectId(discrepancyNoteBean.getEntityId());
+		} else if ("studyevent".equalsIgnoreCase(entityType)) {
+			StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+			StudyEventBean seb = (StudyEventBean) sedao.findByPK(discrepancyNoteBean.getEntityId());
+			discrepancyNoteBean.setSubjectId(seb.getStudySubjectId());
+		} else if ("eventCrf".equalsIgnoreCase(entityType)) {
+			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+			EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(discrepancyNoteBean.getEntityId());
+			discrepancyNoteBean.setSubjectId(ecb.getStudySubjectId());
+		}
+
 		// If it's not an ItemData type note, redirect
 		// Monitors to View Subject or
 		// View Study Events <<
@@ -206,23 +253,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
 			return;
 		}
 
-		boolean isCompleted = false;
-		if ("itemdata".equalsIgnoreCase(entityType)) {
-			ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-			ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
-
-			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-
-			EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
-			StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(ecb.getStudySubjectId());
-
-			discrepancyNoteBean.setSubjectId(studySubjectBean.getId());
-			discrepancyNoteBean.setItemId(idb.getItemId());
-
-			if (ecb.getStatus().equals(Status.UNAVAILABLE)) {
-				isCompleted = true;
-			}
-		}
 		boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean,
 				isCompleted);
 
@@ -252,6 +282,18 @@ public class ResolveDiscrepancyServlet extends SecureController {
 		}
 
 		forwardPage(p);
+	}
+
+	private void prepareExitTo(HttpServletRequest request) {
+		if (request.getHeader(REFERER) != null
+				&& request.getHeader(REFERER).contains(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET.getFileName())) {
+			request.setAttribute(
+					EXIT_TO,
+					request.getRequestURL()
+							.toString()
+							.replace(request.getServletPath(),
+                                    Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET.getFileName()));
+		}
 	}
 
 	/**
@@ -343,7 +385,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
 					discrepancyNoteBean.setSubjectId(studySubId);
 				} else if ("studyevent".equalsIgnoreCase(entityType)) {
 					dispatcher = request.getRequestDispatcher("/EnterDataForStudyEvent?eventId=" + entityId);
-
 				}
 
 				// This code creates the URL for a popup window, which the

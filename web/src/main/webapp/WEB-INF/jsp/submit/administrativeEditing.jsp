@@ -216,7 +216,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 -->
 
 <script type="text/JavaScript" language="JavaScript">
-    <!--
 
     // Total number of tabs (one for each CRF)
     var TabsNumber = <c:out value="${sectionNum}"/>;
@@ -319,7 +318,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             window.location = document.crfForm.sectionName.options[OptionIndex].value;
         }
     }
-  //-->
+
   function setParameterForDN(field, parameterName, value) {
     setParameterForDNWithPath(field, parameterName, value, '${pageContext.request.contextPath}');
   };

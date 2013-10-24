@@ -65,6 +65,11 @@
 
 <body class="popup_BG" style="margin: 0px 12px 0px 12px;" onload="window.scrollTo(0,'<c:out value="${y}"/>');javascript:setStatusWithId('<c:out value="${typeID0}"/>','0','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');javascript:refreshSource('<c:out value="${refresh}"/>', '/ViewNotes?');">
 
+<c:if test="${updatedDiscrepancyNote ne null}">
+  <script type="text/javascript" language="javascript">
+    setImageInParentWin('flag_<c:out value="${updatedDiscrepancyNote.field}"/>', '<c:out value="${updatedDiscrepancyNote.resStatus.iconFilePath}"/>', '${updatedDiscrepancyNote.resStatus.id}');
+  </script>
+</c:if>
 
 <!-- Alert Box -->
 <!-- *JSP* submit/viewDiscrepancyNote.jsp -->

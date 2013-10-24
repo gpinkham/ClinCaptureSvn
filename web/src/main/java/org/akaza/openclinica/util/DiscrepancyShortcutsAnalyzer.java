@@ -14,7 +14,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
-import org.akaza.openclinica.view.Page;
 
 public class DiscrepancyShortcutsAnalyzer {
 
@@ -217,7 +216,7 @@ public class DiscrepancyShortcutsAnalyzer {
 		this.hasNotes = hasNotes;
 	}
 
-	private static int getTabNum(List<SectionBean> sections, int sectionId) {
+	public static int getTabNum(List<SectionBean> sections, int sectionId) {
 		int tabNum = 1;
 		if (sections != null && sections.size() > 0) {
 			for (SectionBean sectionBean : sections) {
@@ -244,13 +243,14 @@ public class DiscrepancyShortcutsAnalyzer {
 			currentTabId = getTabNum(sections, currentSectionId);
 		} else {
 			currentTabId = fp.getInt(TAB_ID) == 0 ? 1 : fp.getInt(TAB_ID);
-			currentSectionId = fp.getInt(SECTION_ID) == 0 ? (sections != null && sections.size() > 0 ? sections.get(0)
-					.getId() : 0) : fp.getInt(SECTION_ID);
+			currentSectionId = fp.getInt(SECTION_ID, true) == 0 ? (sections != null && sections.size() > 0 ? sections
+					.get(0).getId() : 0) : fp.getInt(SECTION_ID, true);
 		}
-		if (servletPath.equalsIgnoreCase(Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName())
-				|| servletPath.equalsIgnoreCase(Page.VIEW_SECTION_DATA_ENTRY_SERVLET_REST_URL.getFileName())) {
+		if (servletPath.equalsIgnoreCase("/ResolveDiscrepancy")
+				|| servletPath.equalsIgnoreCase("/ViewSectionDataEntry")
+				|| servletPath.equalsIgnoreCase("/ViewSectionDataEntryRESTUrlServlet")) {
 			link = currentSectionId == ifmbean.getSectionId() ? "" : fp.getRequest().getRequestURL().toString()
-					.replaceAll(fp.getRequest().getServletPath(), Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName())
+					.replaceAll(fp.getRequest().getServletPath(), "/ViewSectionDataEntry")
 					+ "?eventCRFId="
 					+ eventCrfBean.getId()
 					+ "&crfVersionId="

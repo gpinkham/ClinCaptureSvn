@@ -167,7 +167,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			request.setAttribute("exitTo", fp.getString("exitTo"));
 		}
 		int crfVersionId = fp.getInt("crfVersionId", true);
-		int sectionId = fp.getInt("sectionId");
+		int sectionId = fp.getInt("sectionId", true);
 		int eventCRFId = fp.getInt(EVENT_CRF_ID, true);
 		int studySubjectId = fp.getInt("studySubjectId", true);
 		String action = fp.getString("action");
@@ -488,10 +488,10 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			request.setAttribute("EventCRFBean", ecb);
 
 			int tabNum = 1;
-			if ("".equalsIgnoreCase(fp.getString("tabId"))) {
+			if ("".equalsIgnoreCase(fp.getString("tabId", true))) {
 				tabNum = 1;
 			} else {
-				tabNum = fp.getInt("tabId");
+				tabNum = fp.getInt("tabId", true);
 			}
 			request.setAttribute("tabId", new Integer(tabNum).toString());
 

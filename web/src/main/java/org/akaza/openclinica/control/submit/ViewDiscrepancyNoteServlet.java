@@ -54,6 +54,8 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -72,6 +74,8 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -258,6 +262,20 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 				preUserId = ec.getOwnerId() > 0 ? ec.getOwnerId() : 0;
 				request.setAttribute("entityCreatedDate", sdf.format(ec.getCreatedDate()));
 
+				if (field.isEmpty()) {
+					ItemGroupDAO igdao = new ItemGroupDAO(sm.getDataSource());
+					ItemGroupMetadataDAO igmdao = new ItemGroupMetadataDAO(sm.getDataSource());
+					ItemGroupMetadataBean igmBean = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(
+							itemData.getItemId(), ec.getCRFVersionId());
+					ItemGroupBean igBean = (ItemGroupBean) igdao.findByPK(igmBean.getItemGroupId());
+					if (igmBean.isRepeatingGroup()) {
+						field = igBean.getOid() + "_" + (itemData.getOrdinal() == 1 ? "" : "manual")
+								+ ((itemData.getOrdinal() - 1) + "input") + itemData.getItemId();
+					} else {
+						field = "input" + itemData.getItemId();
+					}
+				}
+
 				StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
 				StudyEventBean se = (StudyEventBean) sed.findByPK(ec.getStudyEventId());
 
@@ -375,13 +393,13 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 					if ("location".equalsIgnoreCase(column)) {
 						request.setAttribute("entityValue", se.getLocation());
 						request.setAttribute("entityName", resword.getString("location"));
-					} else if ("date_start".equalsIgnoreCase(column)) {
+					} else if ("start_date".equalsIgnoreCase(column)) {
 						if (se.getDateStarted() != null) {
 							request.setAttribute("entityValue", dateFormatter.format(se.getDateStarted()));
 						}
 						request.setAttribute("entityName", resword.getString("start_date"));
 
-					} else if ("date_end".equalsIgnoreCase(column)) {
+					} else if ("end_date".equalsIgnoreCase(column)) {
 						if (se.getDateEnded() != null) {
 							request.setAttribute("entityValue", dateFormatter.format(se.getDateEnded()));
 						}

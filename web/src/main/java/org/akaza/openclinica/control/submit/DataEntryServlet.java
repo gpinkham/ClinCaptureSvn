@@ -314,9 +314,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
         FormProcessor fp = new FormProcessor(request);
 
         String action = fp.getString(ACTION);
-        if (request.getMethod().equalsIgnoreCase("POST") && action.equalsIgnoreCase("ide_s")) {
-            request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-        }
 
 		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(
 				request.getSession().getServletContext()).getBean(ConfigurationDao.class);
