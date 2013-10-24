@@ -325,14 +325,14 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 								(se.getLocation().equals("") || se.getLocation() == null) ? resword.getString("N/A")
 										: se.getLocation());
 						request.setAttribute("entityName", resword.getString("location"));
-					} else if ("start_date".equalsIgnoreCase(column)) {
+					} else if ("date_start".equalsIgnoreCase(column)) {
 						if (se.getDateStarted() != null) {
 							request.setAttribute("entityValue", dateFormatter.format(se.getDateStarted()));
 						} else {
 							request.setAttribute("entityValue", resword.getString("N/A"));
 						}
 						request.setAttribute("entityName", resword.getString("start_date"));
-					} else if ("end_date".equalsIgnoreCase(column)) {
+					} else if ("date_end".equalsIgnoreCase(column)) {
 						if (se.getDateEnded() != null) {
 							request.setAttribute("entityValue", dateFormatter.format(se.getDateEnded()));
 						} else {
@@ -494,9 +494,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 					}
 				}
 
-			}
-
-			else if (parent.getDiscrepancyNoteTypeId() > 0) {
+			} else if (parent.getDiscrepancyNoteTypeId() > 0) {
 				dnb.setDiscrepancyNoteTypeId(parent.getDiscrepancyNoteTypeId());
 
 				// if it is a CRC then we should automatically propose a

@@ -250,7 +250,7 @@
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.startDateTimeRequired == 'yes'}"> *</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=start&column=start_date','spanAlert-start'); return false;">
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=start&column=date_start','spanAlert-start'); return false;">
 				    <img name="flag_start" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>
@@ -282,7 +282,7 @@
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.endDateTimeRequired == 'yes'}"> *</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=end&column=end_date','spanAlert-end'); return false;">
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=end&column=date_end','spanAlert-end'); return false;">
 				    <img name="flag_end" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>
@@ -426,7 +426,7 @@
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.startDateTimeRequired == 'yes'}"> *</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled0&column=start_date','spanAlert-startScheduled0'); return false;">
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled0&column=date_start','spanAlert-startScheduled0'); return false;">
 				    <img name="flag_startScheduled0" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>
@@ -456,7 +456,7 @@
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.endDateTimeRequired == 'yes'}"> *</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled0&column=end_date','spanAlert-endScheduled0'); return false;">
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled0&column=date_end','spanAlert-endScheduled0'); return false;">
 				    <img name="flag_endScheduled0" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>
@@ -577,7 +577,7 @@
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.startDateTimeRequired == 'yes'}"> *</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled1&column=start_date','spanAlert-startScheduled1'); return false;">
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled1&column=date_start','spanAlert-startScheduled1'); return false;">
 				    <img name="flag_startScheduled1" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>
@@ -607,7 +607,7 @@
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.endDateTimeRequired == 'yes'}"> *</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled1&column=end_date','spanAlert-endScheduled1'); return false;">
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled1&column=date_end','spanAlert-endScheduled1'); return false;">
 				    <img name="flag_endScheduled1" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>
@@ -730,7 +730,7 @@
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.startDateTimeRequired == 'yes'}"> *</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled2&column=start_date','spanAlert-startScheduled2'); return false;">
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled2&column=date_start','spanAlert-startScheduled2'); return false;">
 				    <img name="flag_startScheduled2" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>
@@ -760,7 +760,7 @@
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.endDateTimeRequired == 'yes'}"> *</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled2&column=end_date','spanAlert-endScheduled2'); return false;">
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled2&column=date_end','spanAlert-endScheduled2'); return false;">
 				    <img name="flag_endScheduled2" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>
@@ -884,7 +884,7 @@
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.startDateTimeRequired == 'yes'}"> *</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled3&column=start_date','spanAlert-startScheduled3'); return false;">
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled3&column=date_start','spanAlert-startScheduled3'); return false;">
 				    <img name="flag_startScheduled3" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>
@@ -914,7 +914,7 @@
                         <c:otherwise>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</c:otherwise>
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.endDateTimeRequired == 'yes'}"> *</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled3&column=end_date','spanAlert-endScheduled3'); return false;">
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled3&column=date_end','spanAlert-endScheduled3'); return false;">
 				    <img name="flag_endScheduled3" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>

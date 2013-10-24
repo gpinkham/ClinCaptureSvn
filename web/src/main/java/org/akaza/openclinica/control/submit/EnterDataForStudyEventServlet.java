@@ -487,29 +487,29 @@ public class EnterDataForStudyEventServlet extends SecureController {
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 		StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
 		List<DiscrepancyNoteBean> locationDNotes = new ArrayList<DiscrepancyNoteBean>();
-		List<DiscrepancyNoteBean> startDateDNotes = new ArrayList<DiscrepancyNoteBean>();
-		List<DiscrepancyNoteBean> endDateDNotes = new ArrayList<DiscrepancyNoteBean>();
+		List<DiscrepancyNoteBean> dateStartDNotes = new ArrayList<DiscrepancyNoteBean>();
+		List<DiscrepancyNoteBean> dateEndDNotes = new ArrayList<DiscrepancyNoteBean>();
 		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
 			//method discrepancyNoteBean.getEvent.getId() return 0 for all DNs
 			if (discrepancyNoteBean.getEventName().equalsIgnoreCase(sedBean.getName())) {
 				if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
 					locationDNotes.add(discrepancyNoteBean);
-				} else if ("start_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-					startDateDNotes.add(discrepancyNoteBean);
-				} else if ("end_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
-					endDateDNotes.add(discrepancyNoteBean);
+				} else if ("date_start".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+					dateStartDNotes.add(discrepancyNoteBean);
+				} else if ("date_end".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+					dateEndDNotes.add(discrepancyNoteBean);
 				}
 			}
 		}
 		request.setAttribute("numberOfLocationDNotes", locationDNotes.size());
-		request.setAttribute("numberOfStartDateDNotes", startDateDNotes.size());
-		request.setAttribute("numberOfEndDateDNotes", endDateDNotes.size());
+		request.setAttribute("numberOfDateStartDNotes", dateStartDNotes.size());
+		request.setAttribute("numberOfDateEndDNotes", dateEndDNotes.size());
 		
 		request.setAttribute("imageFileNameForLocation", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId(
 				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(locationDNotes)));
-		request.setAttribute("imageFileNameForStartDate", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId( 
-				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(startDateDNotes)));
-		request.setAttribute("imageFileNameForEndDate", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId( 
-				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(endDateDNotes)));
+		request.setAttribute("imageFileNameForDateStart", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId( 
+				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(dateStartDNotes)));
+		request.setAttribute("imageFileNameForDateEnd", DiscrepancyNoteUtil.getImageFileNameForFlagByResolutionStatusId( 
+				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(dateEndDNotes)));
 	}
 }

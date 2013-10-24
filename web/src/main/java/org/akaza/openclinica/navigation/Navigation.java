@@ -15,7 +15,7 @@ public class Navigation {
 			"/CRFListForStudyEvent", "/InitialDataEntry", "/VerifyImportedCRFData", "/AdministrativeEditing",
 			"/UpdateStudySubject", "/RemoveStudySubject", "/ResolveDiscrepancy", "/RestoreStudySubject",
 			"/UpdateStudyEvent", "/RemoveStudyEvent", "/RestoreStudyEvent", "/DeleteEventCRF", "/RemoveEventCRF",
-			"/RestoreEventCRF", "/CreateOneDiscrepancyNote", "/InitUpdateSubStudy", "/UpdateSubStudy",
+			"/RestoreEventCRF", "/InitUpdateSubStudy", "/UpdateSubStudy",
 			"/EditStudyUserRole", "/RemoveStudyUserRole", "/ViewSectionDataEntry", "/CreateSubjectGroupClass",
 			"/SetStudyUserRole", "/UpdateProfile", "/SectionPreview", "/DefineStudyEvent",
 			"/InitUpdateEventDefinition", "/UpdateEventDefinition", "/RemoveEventDefinition", "/RemoveSubject",
@@ -36,7 +36,7 @@ public class Navigation {
 			"/CreateDiscrepancyNote", "/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile", "/help",
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
-			"/ChangeDefinitionCRFOrdinal", "/DoubleDataEntry"));
+			"/ChangeDefinitionCRFOrdinal", "/DoubleDataEntry", "/CreateOneDiscrepancyNote"));
 	private static String defaultShortURL = "/MainMenu";
 
 	public static void removeUrl(HttpServletRequest request, String excludeUrl) throws Exception {

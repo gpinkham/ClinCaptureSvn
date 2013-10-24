@@ -87,8 +87,8 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 	public static final String INTERVIEWER = "interviewer";
 	public static final String INTERVIEW_DATE = "interviewDate";
 	public static final String LOCATION = "location";
-	public static final String START_DATE = "start_date";
-	public static final String END_DATE = "end_date";
+	public static final String DATE_START = "date_start";
+	public static final String DATE_END = "date_end";
 	public static final String SHOW_STATUS = "showStatus";
 	public static final String CAN_CLOSE = "canClose";
 
@@ -676,7 +676,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 		request.setAttribute(VIEW_DN_LINK, this.getPageServletFileName());
 
 		if (!INTERVIEWER.equals(field) && !INTERVIEW_DATE.equals(field) && !LOCATION.equals(field)
-				&& !START_DATE.equals(field) && !END_DATE.equals(field)) {
+				&& !DATE_START.equals(field) && !DATE_END.equals(field)) {
 
 			AuditDAO adao = new AuditDAO(sm.getDataSource());
 			if (name.equalsIgnoreCase("studysub")) {

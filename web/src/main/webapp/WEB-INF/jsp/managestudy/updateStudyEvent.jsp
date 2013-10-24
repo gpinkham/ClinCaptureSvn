@@ -140,22 +140,22 @@
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.startDateTimeRequired == 'yes'}"> *</c:if>
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-							<c:set var="imageFileName" value="${imageFileNameForStartDate}"/>
+							<c:set var="imageFileName" value="${imageFileNameForDateStart}"/>
 							<c:choose>
-								<c:when test="${numberOfStartDateDNotes > 0}">
+								<c:when test="${numberOfDateStartDNotes > 0}">
 									<span style="float:right">
-										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg','spanAlert-start_date', '', event); return false;">
-											<img id="flag_start_date" name="flag_start_date" 
+										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_start&column=date_start&strErrMsg','spanAlert-date_start', '', event); return false;">
+											<img id="flag_date_start" name="flag_start_date" 
 												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 										</a>
 									</span>
 								</c:when>
 								<c:otherwise>
 									<span style="float:right">
-										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg=','spanAlert-start_date', '', event); return false;">
-											<img id="flag_start_date" name="flag_start_date" 
+										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_start&column=date_start&strErrMsg=','spanAlert-date_start', '', event); return false;">
+											<img id="flag_date_start" name="flag_start_date" 
 												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-											<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg"/>
+											<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_start&column=date_start&strErrMsg"/>
 										</a>
 									</span>
 								</c:otherwise>
@@ -191,22 +191,22 @@
                     </c:choose>
                     <c:if test="${study.studyParameterConfig.endDateTimeRequired == 'yes'}"> *</c:if>
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-							<c:set var="imageFileName" value="${imageFileNameForEndDate}"/>
+							<c:set var="imageFileName" value="${imageFileNameForDateEnd}"/>
 							<c:choose>
-								<c:when test="${numberOfEndDateDNotes > 0}">
+								<c:when test="${numberOfDateEndDNotes > 0}">
 									<span style="float:right">
-										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg','spanAlert-end_date', '', event); return false;">
-											<img id="flag_end_date" name="flag_end_date" 
+										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_end&column=date_end&strErrMsg','spanAlert-date_end', '', event); return false;">
+											<img id="flag_date_end" name="flag_date_end" 
 												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 										</a>
 									</span>
 								</c:when>
 								<c:otherwise>
 									<span style="float:right">
-										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg=','spanAlert-end_date', '', event); return false;">
-											<img id="flag_end_date" name="flag_end_date" 
+										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_end&column=date_end&strErrMsg=','spanAlert-date_end', '', event); return false;">
+											<img id="flag_date_end" name="flag_date_end" 
 												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-											<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg"/>
+											<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_end&column=date_end&strErrMsg"/>
 										</a>
 									</span>
 								</c:otherwise>

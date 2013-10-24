@@ -443,12 +443,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					// dnb.setCrfName(cb.getName());
 					String column = dnb.getColumn().trim();
 					if (!StringUtil.isBlank(column)) {
-						if ("start_date".equals(column)) {
+						if ("date_start".equals(column)) {
 							if (se.getDateStarted() != null) {
 								dnb.setEntityValue(se.getDateStarted().toString());
 							}
 							dnb.setEntityName(resword.getString("start_date"));
-						} else if ("end_date".equals(column)) {
+						} else if ("date_end".equals(column)) {
 							if (se.getDateEnded() != null) {
 								dnb.setEntityValue(se.getDateEnded().toString());
 							}
