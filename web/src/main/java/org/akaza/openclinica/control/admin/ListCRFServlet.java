@@ -22,23 +22,30 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.RememberLastPage;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.ListCRFRow;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Lists all the CRF and their CRF versions
@@ -46,16 +53,15 @@ import java.util.Locale;
  * @author jxu
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@Component
 public class ListCRFServlet extends RememberLastPage {
-
-	Locale locale;
 
 	public static final String SAVED_LIST_CRFS_URL = "savedListCRFsUrl";
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
@@ -66,7 +72,7 @@ public class ListCRFServlet extends RememberLastPage {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MANAGE_STUDY_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -74,26 +80,34 @@ public class ListCRFServlet extends RememberLastPage {
 
 	/**
 	 * Finds all the crfs
-	 * 
-	 */
+	 *
+     * @param request
+     * @param response
+     */
 	@Override
-	public void processRequest() throws Exception {
-		analyzeUrl();
-		if (currentStudy.getParentStudyId() > 0) {
-			addPageMessage(respage.getString("no_crf_available_study_is_a_site"));
-			forwardPage(Page.MENU_SERVLET);
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if (shouldRedirect(request, response)) {
 			return;
 		}
 
-		session.removeAttribute("version");
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		if (currentStudy.getParentStudyId() > 0) {
+			addPageMessage(respage.getString("no_crf_available_study_is_a_site"), request);
+			forwardPage(Page.MENU_SERVLET, request, response);
+			return;
+		}
+
+		request.getSession().removeAttribute("version");
 		FormProcessor fp = new FormProcessor(request);
 		// checks which module the requests are from
 		String module = fp.getString(MODULE);
 
 		if (module.equalsIgnoreCase("admin") && !(ub.isSysAdmin() || ub.isTechAdmin())) {
 			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"));
-			forwardPage(Page.MENU_SERVLET);
+					+ respage.getString("change_active_study_or_contact"), request);
+			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
 		request.setAttribute(MODULE, module);
@@ -104,8 +118,8 @@ public class ListCRFServlet extends RememberLastPage {
 		// spreadsheet
 		logger.info("found directory: " + dir);
 
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
-		CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
+		CRFDAO cdao = getCRFDAO();
+		CRFVersionDAO vdao = getCRFVersionDAO();
 		ArrayList crfs = (ArrayList) cdao.findAll();
 		for (int i = 0; i < crfs.size(); i++) {
 			CRFBean eb = (CRFBean) crfs.get(i);
@@ -152,7 +166,8 @@ public class ListCRFServlet extends RememberLastPage {
 
 		request.setAttribute("table", table);
 
-		resetPanel();
+        StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 		panel.setSubmitDataModule(false);
@@ -160,36 +175,39 @@ public class ListCRFServlet extends RememberLastPage {
 		panel.setCreateDataset(false);
 
 		if (crfs.size() > 0) {
-			setToPanel("CRFs", new Integer(crfs.size()).toString());
+			setToPanel("CRFs", new Integer(crfs.size()).toString(), request);
 		}
 
-		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"));
+		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
 
-		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"));
-		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"));
+		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"), request);
+		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"), request);
 		setToPanel(resword.getString("CRF_spreadsheet_template"),
-				respage.getString("br_download_blank_CRF_spreadsheet_from"));
+				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
 		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
-				respage.getString("br_download_example_CRF_instructions_from"));
-		analyzeForward(Page.CRF_LIST);
+				respage.getString("br_download_example_CRF_instructions_from"), request);
+		forward(Page.CRF_LIST, request, response);
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}
 	}
 
 	@Override
-	protected String getUrlKey() {
-		return SAVED_LIST_CRFS_URL;
+	protected String getUrlKey(HttpServletRequest request) {
+		FormProcessor fp = new FormProcessor(request);
+		String module = fp.getString("module");
+		return module.isEmpty() ? SAVED_LIST_CRFS_URL : (SAVED_LIST_CRFS_URL + "_" + module);
 	}
 
 	@Override
-	protected String getDefaultUrl() {
+	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		String eblFiltered = fp.getString("ebl_filtered");
 		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
@@ -203,7 +221,7 @@ public class ListCRFServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected boolean userDoesNotUseJmesaTableForNavigation() {
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 	}
 }

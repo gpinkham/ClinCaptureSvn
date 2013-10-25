@@ -159,7 +159,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getUrlKey() {
+	protected String getUrlKey(HttpServletRequest request) {
 		return SAVED_USER_LIST_URL;
 	}
 

@@ -530,9 +530,9 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.AssignUserToStudyServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListCRFServlet</servlet-name>
+        <servlet-name>listCRFServlet</servlet-name>
         <display-name>ListCRF</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.ListCRFServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DefineStudyEventServlet</servlet-name>
@@ -1606,7 +1606,7 @@
         <url-pattern>/AssignUserToStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListCRFServlet</servlet-name>
+        <servlet-name>listCRFServlet</servlet-name>
         <url-pattern>/ListCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

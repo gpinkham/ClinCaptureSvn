@@ -166,7 +166,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getUrlKey() {
+	protected String getUrlKey(HttpServletRequest request) {
 		return SAVED_SUBJECT_MATRIX_URL;
 	}
 

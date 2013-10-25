@@ -22,7 +22,7 @@ import org.akaza.openclinica.view.Page;
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public abstract class RememberLastPage extends Controller {
 
-    protected abstract String getUrlKey();
+    protected abstract String getUrlKey(HttpServletRequest request);
 
 	protected abstract String getDefaultUrl(HttpServletRequest request);
 
@@ -32,13 +32,13 @@ public abstract class RememberLastPage extends Controller {
 		storeAttributes(request);
 		// for navigation purpose (to brake double url in stack)
 		request.getSession().setAttribute("skipURL", "true");
-		response.sendRedirect(response.encodeRedirectURL((String) request.getSession().getAttribute(getUrlKey())));
+		response.sendRedirect(response.encodeRedirectURL((String) request.getSession().getAttribute(getUrlKey(request))));
 		return true;
 	}
 
 	protected boolean shouldRedirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		boolean result = false;
-		String key = getUrlKey();
+		String key = getUrlKey(request);
 		String defaultUrl = getDefaultUrl(request);
 		String keyValue = (String) request.getSession().getAttribute(key);
 		if (keyValue == null && defaultUrl != null) {

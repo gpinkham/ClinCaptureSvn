@@ -244,7 +244,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 	}
 
     @Override
-    protected String getUrlKey() {
+    protected String getUrlKey(HttpServletRequest request) {
         return SAVED_VIEW_DATASETS_URL;
     }
 

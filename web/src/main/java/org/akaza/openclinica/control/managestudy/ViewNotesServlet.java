@@ -285,7 +285,7 @@ public class ViewNotesServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected String getUrlKey() {
+	protected String getUrlKey(HttpServletRequest request) {
 		return DN_LIST_URL;
 	}
 
