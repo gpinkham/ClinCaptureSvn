@@ -232,7 +232,12 @@ public final class SubjectEventStatusUtil {
 			break;
 		}
 		case DEC: {
-			studyEventBean.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
+			SubjectEventStatus status = SubjectEventStatus.COMPLETED;
+			if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SIGNED) {
+				status = SignUtil.permitSign(studyEventBean, studyBean, daoWrapper) ? SubjectEventStatus.SIGNED
+						: status;
+			}
+			studyEventBean.setSubjectEventStatus(status);
 			break;
 		}
 		case SDV: {
