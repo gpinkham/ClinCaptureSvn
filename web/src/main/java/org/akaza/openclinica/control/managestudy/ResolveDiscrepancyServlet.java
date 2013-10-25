@@ -114,6 +114,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy,
 			DiscrepancyNoteBean note, boolean isCompleted) {
         StudyUserRoleBean currentRole = getCurrentRole(request);
@@ -196,8 +197,6 @@ public class ResolveDiscrepancyServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		int noteId = fp.getInt(INPUT_NOTE_ID);
 		String module = (String) request.getSession().getAttribute("module");
-
-		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(getDataSource());
 
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		dndao.setFetchMapping(true);

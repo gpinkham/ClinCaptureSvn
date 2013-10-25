@@ -48,12 +48,13 @@
 
 <script language="JavaScript" type="text/JavaScript">
     function showOrHideSubjects(count,showLink,hideLink){
-        if ($("tr"+count).style.display == ''){
-        $("tr"+count).style.display='none';
-        $("a"+count).innerHTML= showLink ;
+		
+        if ($("tr[id=tr"+(count)+"]").css('display') == 'none'){
+			$("tr[id=tr"+(count)+"]").css('display','');
+			$("a"+count).innerHTML= hideLink ;			
         }else{
-        $("tr"+count).style.display='';
-        $("a"+count).innerHTML= hideLink ;
+			$("tr[id=tr"+(count)+"]").css('display','none');
+			$("a"+count).innerHTML= showLink ;
         }
     }
 
@@ -127,7 +128,11 @@
     <td class="table_cell"><c:out value="${result.executeOn}"/></td>
     <td class="table_cell"><c:out value="${result.actionType}"/></td>
     <td class="table_cell"><c:out value="${result.actionSummary}"/></td>
-    <td class="table_cell"><span id="a${status.count}" style="color: BLUE; text-decoration: underline;" onClick="showOrHideSubjects(${status.count},'<fmt:message key="rule_show_subjects" bundle="${resword}" />','<fmt:message key="rule_hide_subjects" bundle="${resword}" />')"><u><fmt:message key="rule_show_subjects" bundle="${resword}" /></u></span></td>
+    <td class="table_cell">
+		<span id="a${status.count}" onClick="showOrHideSubjects(${status.count},'<fmt:message key="rule_show_subjects" bundle="${resword}" />','<fmt:message key="rule_hide_subjects" bundle="${resword}" />')">
+			<img src="images/bt_Details.gif" border="0" alt="<fmt:message key="rule_show_subjects" bundle="${resword}" />" title="<fmt:message key="rule_show_subjects" bundle="${resword}" />"/>		
+		</span>
+	</td>
 </tr>
     <tr id="tr${status.count}" style="display: none;">
         <td class="table_cell" colspan="7">
@@ -147,17 +152,17 @@
 </c:if>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
-<c:if test="${fn:length(ruleSetResult) > 0}">
-<td>
-<input type="button" name="Submit" id="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRuleSet?ruleSetId=${ruleSet.id}&dryRun=no';"/></td>
-</td>
-</c:if>
 <td>
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
+<c:if test="${fn:length(ruleSetResult) > 0}">
+<td>
+	<input type="button" name="Submit" id="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='RunRuleSet?ruleSetId=${ruleSet.id}&dryRun=no';"/></td>
+</td>
+</c:if>
 </tr></table>
 
 <c:choose>
