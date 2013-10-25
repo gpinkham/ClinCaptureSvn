@@ -54,13 +54,12 @@
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
   </td>
   <td>
-    <c:if test="${study.parentStudyId == 0}"><%-- is not a site --%>
-		
+    
 	<%-- <a href="pages/studymodule"><fmt:message key="go_back_build_study_page" bundle="${resword}"/></a> --%>
 	<%-- <input type="button" name="BTN_Build" id="GoToBuildStudyPage" value="<fmt:message key="build_study" bundle="${resword}"/>" class="button_medium" size="50" onclick="window.location.href=('pages/studymodule');"/> --%>
     
     <input type="button" name="BTN_Assign" id="GoToAssignUser" value="<fmt:message key="assign_users" bundle="${resword}"/>" class="button_medium" size="50" onclick="window.location.href=('AssignUserToStudy');"/>
-    </c:if>
+    
   </td>  
 </table>
 <jsp:include page="../include/footer.jsp"/>

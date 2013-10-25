@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -55,13 +56,10 @@ public class AssignUserToStudyServlet extends SecureController {
 	/**
      *
      */
+	
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
-		if (ub.isSysAdmin()) {
-			return;
-		}
-
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -250,58 +248,61 @@ public class AssignUserToStudyServlet extends SecureController {
 	 * @return
 	 */
 	private ArrayList findUsers() {
+		
 		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-		ArrayList userList = (ArrayList) udao.findAll();
-		ArrayList userAvailable = new ArrayList();
-		for (int i = 0; i < userList.size(); i++) {
-			UserAccountBean u = (UserAccountBean) userList.get(i);
-			if (u.getEnabled() == null || !u.getEnabled()) {
+		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyBean site;
+		StudyBean study;
+		List <UserAccountBean> userAvailable = new ArrayList <UserAccountBean>();
+		List <UserAccountBean> userListbyRoles;
+		String notes;
+		boolean hasRoleInCurrentStudy;
+		
+	
+		if (currentStudy.getParentStudyId() > 0) {
+			userListbyRoles = (ArrayList <UserAccountBean>) udao.findAllByRole(Role.CLINICAL_RESEARCH_COORDINATOR.getName(), Role.INVESTIGATOR.getName());
+		} else {
+			userListbyRoles = (ArrayList <UserAccountBean>) udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getName(), Role.STUDY_MONITOR.getName());
+		}
+		
+		for (UserAccountBean accountBean : userListbyRoles) {
+			
+			if (accountBean.getEnabled() == null || !accountBean.getEnabled()) {
 				continue;
 			}
-			int activeStudyId = currentStudy.getId();
-			StudyUserRoleBean sub = udao.findRoleByUserNameAndStudyId(u.getName(), activeStudyId);
-			if (!sub.isActive()) {// doesn't have a role in the current study
-				sub.setRole(Role.CLINICAL_RESEARCH_COORDINATOR);
-				sub.setStudyId(activeStudyId);
-				u.setActiveStudyId(activeStudyId);
-				u.addRole(sub);
-				u.setStatus(Status.AVAILABLE);
-
-				// try to find whether this user has role in site or parent
-				if (currentStudy.getParentStudyId() > 0) {// this is a site
-					StudyUserRoleBean subParent = udao.findRoleByUserNameAndStudyId(u.getName(),
-							currentStudy.getParentStudyId());
-					if (subParent.isActive()) {
-						u.setNotes(subParent.getRole().getDescription() + " " + respage.getString("in_parent_study"));
-					}
-
+			
+			hasRoleInCurrentStudy = false;
+			notes = "";
+			for(StudyUserRoleBean roleBean : accountBean.getRoles()) {
+				
+				if(currentStudy.getId() == roleBean.getStudyId()) {
+					hasRoleInCurrentStudy = true;
+				} else if (currentStudy.getParentStudyId() > 0) {
+					site = (StudyBean) sdao.findByPK(roleBean.getStudyId());
+					study = (StudyBean) sdao.findByPK(site.getParentStudyId());
+					notes = notes + roleBean.getRole().getDescription() + respage.getString("in_site") + ": " + site.getName() 
+							+ "," + respage.getString("in_the_study") + ": " + study.getName() + "; ";
 				} else {
-					// find all the sites for this top study
-					StudyDAO sdao = new StudyDAO(sm.getDataSource());
-					ArrayList sites = (ArrayList) sdao.findAllByParent(currentStudy.getId());
-					String notes = "";
-					for (int j = 0; j < sites.size(); j++) {
-						StudyBean site = (StudyBean) sites.get(j);
-						StudyUserRoleBean subSite = udao.findRoleByUserNameAndStudyId(u.getName(), site.getId());
-						if (subSite.isActive()) {
-							notes = notes + subSite.getRole().getDescription() + respage.getString("in_site") + ":"
-									+ site.getName() + "; ";
-						}
-					}
-					u.setNotes(notes);
+					study = (StudyBean) sdao.findByPK(roleBean.getStudyId());
+					notes = notes + roleBean.getRole().getDescription() + respage.getString("in_the_study") + ": " + study.getName() + "; ";
 				}
-
-			} else {
-				// already have a role in the current study
-				sub.setStudyId(activeStudyId);
-				u.setActiveStudyId(activeStudyId);
-				u.addRole(sub);
-				u.setStatus(Status.UNAVAILABLE);
+				
 			}
-			userAvailable.add(u);
+			
+			accountBean.setNotes(notes);
+			
+			if (hasRoleInCurrentStudy) {
+				accountBean.setStatus(Status.UNAVAILABLE);
+				accountBean.setActiveStudyId(currentStudy.getId());
+			} else {
+				accountBean.setStatus(Status.AVAILABLE);
+			}
+			
+			userAvailable.add(accountBean);
+			
 		}
-		return userAvailable;
-
+		
+		return (ArrayList <UserAccountBean>) userAvailable;
 	}
 
 	private String sendEmail(UserAccountBean u, StudyUserRoleBean sub) throws Exception {

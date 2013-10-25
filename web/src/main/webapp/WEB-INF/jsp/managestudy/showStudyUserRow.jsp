@@ -22,7 +22,7 @@
       <td class="table_cell"><c:out value="${currRow.bean.firstName}"/></td>
       <td class="table_cell"><c:out value="${currRow.bean.lastName}"/></td>  
       <td class="table_cell">
-       <c:set var="role1" value="${currRow.bean.activeStudyRole.id}"/>
+       <c:set var="role1" value="${roles[0].id}"/>
        <c:if test="${not empty tmpSelectedUsersMap[currRow.bean.id]}">
            <c:set var="role1" value="${tmpSelectedUsersMap[currRow.bean.id]}"/>
        </c:if>
