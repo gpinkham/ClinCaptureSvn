@@ -144,11 +144,11 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 					auditBean.setNewValue(Status.get(Integer.parseInt(auditBean.getNewValue())).getName());
 				}
 			}
-			studySubjectAudits.addAll(studySubjectAuditEvents);
+			
 
 			// Global subject value changed
 			studySubjectAudits.addAll(adao.findSubjectAuditEvents(subject.getId()));
-
+			studySubjectAudits.addAll(studySubjectAuditEvents);
 			studySubjectAudits.addAll(adao.findStudySubjectGroupAssignmentAuditEvents(studySubject.getId()));
 			request.setAttribute("studySubjectAudits", studySubjectAudits);
 
