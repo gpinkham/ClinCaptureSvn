@@ -73,7 +73,6 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -398,7 +397,6 @@ public abstract class SecureController extends HttpServlet {
 			UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
 		session = request.getSession();
-		request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 		reloadUserBean(session, new UserAccountDAO((DataSource) SpringServletAccess.getApplicationContext(context)
 				.getBean("dataSource")));
 		String newThemeColor = CoreResources.getField("themeColor");
