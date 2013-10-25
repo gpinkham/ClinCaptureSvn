@@ -114,7 +114,7 @@ public class UrlRewriterServlet extends Controller {
 						request.setAttribute("eventDefinitionCRFId", ocResource.getEventDefinitionCrfId());
 					}
 					if (null != ocResource.getEventCrfId()) {
-						request.setAttribute("ecId", ocResource.getEventCrfId().toString());
+						request.setAttribute("eventCRFId", ocResource.getEventCrfId().toString());
 					}
 					if (null != ocResource.getStudyEventId()) {
 						request.setAttribute("eventId", ocResource.getStudyEventId().toString());
