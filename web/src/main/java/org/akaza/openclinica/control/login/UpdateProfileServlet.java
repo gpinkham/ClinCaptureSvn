@@ -33,6 +33,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -77,13 +79,15 @@ public class UpdateProfileServlet extends Controller {
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String action = request.getParameter("action");// action sent by user
 		StudyDAO sdao = new StudyDAO(getDataSource());
 		UserAccountDAO udao = new UserAccountDAO(getDataSource());
 		UserAccountBean userBean1 = (UserAccountBean) udao.findByUserName(ub.getName());
 
-		ArrayList studies = (ArrayList) sdao.findAllByUser(ub.getName());
+		ArrayList studies = currentRole.getRole() == Role.SYSTEM_ADMINISTRATOR ? (ArrayList) sdao.findAllParents()
+				: (ArrayList) sdao.findAllByUser(ub.getName());
 
 		if (StringUtils.isBlank(action)) {
 			request.setAttribute("studies", studies);
@@ -197,7 +201,7 @@ public class UpdateProfileServlet extends Controller {
 	 * 
 	 */
 	private void submitProfile(UserAccountDAO udao, HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 		logger.info("user bean to be updated:" + ub.getId() + ub.getFirstName());
 
 		UserAccountBean userBean1 = (UserAccountBean) request.getSession().getAttribute("userBean1");
@@ -207,9 +211,9 @@ public class UpdateProfileServlet extends Controller {
 			updateCalendarEmailJob(userBean1);
 			udao.update(userBean1);
 
+            request.getSession().setAttribute("reloadUserBean", true);
 			request.getSession().setAttribute("userBean", userBean1);
-			ub = userBean1;
-            request.getSession().removeAttribute("userBean1");
+			request.getSession().removeAttribute("userBean1");
 		}
 	}
 	
