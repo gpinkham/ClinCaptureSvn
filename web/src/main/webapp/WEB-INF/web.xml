@@ -1068,19 +1068,19 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreSubjectGroupClassServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CreateDiscrepancyNoteServlet</servlet-name>
+        <servlet-name>createDiscrepancyNoteServlet</servlet-name>
         <display-name>CreateDiscrepancyNote</display-name>
-        <servlet-class>org.akaza.openclinica.control.submit.CreateDiscrepancyNoteServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewDiscrepancyNoteServlet</servlet-name>
+        <servlet-name>viewDiscrepancyNoteServlet</servlet-name>
         <display-name>ViewDiscrepancyNote</display-name>
-        <servlet-class>org.akaza.openclinica.control.submit.ViewDiscrepancyNoteServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CreateOneDiscrepancyNoteServlet</servlet-name>
+        <servlet-name>createOneDiscrepancyNoteServlet</servlet-name>
         <display-name>CreateOneDiscrepancyNote</display-name>
-        <servlet-class>org.akaza.openclinica.control.submit.CreateOneDiscrepancyNoteServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DownloadStudyMetadataServlet</servlet-name>
@@ -1108,9 +1108,9 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewNoteServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ResolveDiscrepancyServlet</servlet-name>
+        <servlet-name>resolveDiscrepancyServlet</servlet-name>
         <display-name>ResolveDiscrepancy</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ResolveDiscrepancyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ListEventsForSubjectServlet</servlet-name>
@@ -2045,15 +2045,15 @@
         <url-pattern>/RestoreSubjectGroupClass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>CreateDiscrepancyNoteServlet</servlet-name>
+        <servlet-name>createDiscrepancyNoteServlet</servlet-name>
         <url-pattern>/CreateDiscrepancyNote</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewDiscrepancyNoteServlet</servlet-name>
+        <servlet-name>viewDiscrepancyNoteServlet</servlet-name>
         <url-pattern>/ViewDiscrepancyNote</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>CreateOneDiscrepancyNoteServlet</servlet-name>
+        <servlet-name>createOneDiscrepancyNoteServlet</servlet-name>
         <url-pattern>/CreateOneDiscrepancyNote</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2077,7 +2077,7 @@
         <url-pattern>/ViewNote</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ResolveDiscrepancyServlet</servlet-name>
+        <servlet-name>resolveDiscrepancyServlet</servlet-name>
         <url-pattern>/ResolveDiscrepancy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

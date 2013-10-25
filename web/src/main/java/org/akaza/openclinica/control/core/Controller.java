@@ -52,9 +52,12 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
+import org.akaza.openclinica.control.submit.CreateDiscrepancyNoteServlet;
+import org.akaza.openclinica.control.submit.CreateOneDiscrepancyNoteServlet;
 import org.akaza.openclinica.control.submit.ListStudySubjectsServlet;
 import org.akaza.openclinica.control.submit.UpdateCRFHeaderServlet;
 import org.akaza.openclinica.control.submit.UpdateDNShortcutAnchorsServlet;
+import org.akaza.openclinica.control.submit.ViewDiscrepancyNoteServlet;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -272,7 +275,9 @@ public abstract class Controller extends BaseController {
 	}
     
 	private void clearDNs(HttpServletRequest request) {
-		if (!(this instanceof UpdateDNShortcutAnchorsServlet) && !(this instanceof UpdateCRFHeaderServlet)) {
+		if (!(this instanceof CreateDiscrepancyNoteServlet) && !(this instanceof CreateOneDiscrepancyNoteServlet)
+				&& !(this instanceof ViewDiscrepancyNoteServlet) && !(this instanceof UpdateDNShortcutAnchorsServlet)
+				&& !(this instanceof UpdateCRFHeaderServlet)) {
 			request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 		}
 	}

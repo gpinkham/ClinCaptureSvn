@@ -25,9 +25,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -35,6 +36,7 @@ import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -43,11 +45,12 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
+import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -59,16 +62,17 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.springframework.stereotype.Component;
 
 /**
  * Create a discrepancy note
  * 
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class CreateOneDiscrepancyNoteServlet extends SecureController {
+@Component
+public class CreateOneDiscrepancyNoteServlet extends Controller {
 
     public static final String UPDATED_DISCREPANCY_NOTE = "updatedDiscrepancyNote";
-    Locale locale;
     public static final String REFRESH_PARENT_WINDOW = "refreshParentWindow";
 	public static final String ENTITY_ID = "id";
 	public static final String SUBJECT_ID = "subjectId";
@@ -88,9 +92,11 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 	public static final String ERROR_FLAG = "errorFlag";// use to determine
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"));
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"), request, response);
 
 		String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
 		String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note")
@@ -100,20 +106,24 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(noAccessMessage);
+		addPageMessage(noAccessMessage, request);
 		throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+
         Page forwardTo = null;
 		FormProcessor fp = new FormProcessor(request);
-		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
+		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 
+        HashMap errors = getErrorsHolder(request);
 		int parentId = fp.getInt(PARENT_ID);
 		DiscrepancyNoteBean parent = parentId > 0 ? (DiscrepancyNoteBean) dndao.findByPK(parentId)
 				: new DiscrepancyNoteBean();
-		HashMap<Integer, DiscrepancyNoteBean> boxDNMap = (HashMap<Integer, DiscrepancyNoteBean>) session
+		HashMap<Integer, DiscrepancyNoteBean> boxDNMap = (HashMap<Integer, DiscrepancyNoteBean>) request.getSession()
 				.getAttribute(BOX_DN_MAP);
 		boxDNMap = boxDNMap == null ? new HashMap<Integer, DiscrepancyNoteBean>() : boxDNMap;
 		DiscrepancyNoteBean dn = boxDNMap.size() > 0 && boxDNMap.containsKey(Integer.valueOf(parentId)) ? boxDNMap
@@ -126,7 +136,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		}
 		String entityType = fp.getString(ENTITY_TYPE, true);
 
-		FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
+		FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) request.getSession().getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 		if (noteTree == null) {
 			noteTree = new FormDiscrepancyNotes();
 		}
@@ -134,9 +144,9 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		int refresh = 0;
 		
 		String field = fp.getString(ENTITY_FIELD);
-		
+
+        SessionManager sm = getSessionManager(request);
 		Map<String, String> additionalParameters = CreateDiscrepancyNoteServlet.getMapWithParameters(field, request);
-		
 		boolean isInFVCError = additionalParameters.isEmpty()? false : "1".equals(additionalParameters.get("isInFVCError"));
 		boolean isRFC = additionalParameters.isEmpty()? false : CreateDiscrepancyNoteServlet.calculateIsRFC(field, additionalParameters, request, sm);
 		
@@ -169,7 +179,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		v.addValidation("detailedDes" + parentId, Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1000);
 		v.addValidation("typeId" + parentId, Validator.NO_BLANKS);
-		HashMap errors = v.validate();
+		errors = v.validate();
 
 		dn.setParentDnId(parentId);
 		dn.setDescription(description);
@@ -180,8 +190,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 			dn.setAssignedUserId(assignedUserAccountId);
 		}
 		if (DiscrepancyNoteType.ANNOTATION.getId() == dn.getDiscrepancyNoteTypeId()) {
-			updateStudyEvent(entityType, entityId);
-			updateStudySubjectStatus(entityType, entityId);
+			updateStudyEvent(ub, entityType, entityId);
+			updateStudySubjectStatus(ub, entityType, entityId);
 		}
 		if (DiscrepancyNoteType.ANNOTATION.getId() == dn.getDiscrepancyNoteTypeId()
 				|| DiscrepancyNoteType.REASON_FOR_CHANGE.getId() == dn.getDiscrepancyNoteTypeId()) {
@@ -242,7 +252,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 				}
 				noteTree.addNote(field, dn);
 				noteTree.addIdNote(dn.getEntityId(), field);
-				session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
+				request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
 				if (dn.getParentDnId() == 0) {
 					// see issue 2659 this is a new thread, we will create
 					// two notes in this case,
@@ -257,7 +267,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 						}
 						noteTree.addNote(field, dn);
 						noteTree.addIdNote(dn.getEntityId(), field);
-						session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
+                        request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
 					} else {
 						mess.add(restext.getString("failed_create_child_dn_for_new_parent_dnId") + dn.getId() + ". ");
 					}
@@ -270,7 +280,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 				if (boxDNMap.size() > 0 && boxDNMap.containsKey(parentId)) {
 					boxDNMap.remove(parentId);
 				}
-				session.removeAttribute(BOX_TO_SHOW);
+                request.getSession().removeAttribute(BOX_TO_SHOW);
 				/*
 				 * Copied from CreateDiscrepancyNoteServlet Setting a marker to check later while saving administrative
 				 * edited data. This is needed to make sure the system flags error while changing data for items which
@@ -281,9 +291,9 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 					CreateDiscrepancyNoteServlet.turnOffIsDataChangedParamOfDN(field, request);
 					CreateDiscrepancyNoteServlet.turnOffIsInRFCErrorParamOfDN(field, request);
 					CreateDiscrepancyNoteServlet.turnOffIsInErrorParamOfDN(field, request);
-					manageReasonForChangeState(session, entityId);
+					manageReasonForChangeState(request.getSession(), entityId);
 				} else if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId()) {
-					manageReasonForChangeState(session, entityId);
+					manageReasonForChangeState(request.getSession(), entityId);
 				}
 		
 				String email = fp.getString(EMAIL_USER_ACCOUNT + parentId);
@@ -292,7 +302,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 					// generate email for user here
 					StringBuffer message = new StringBuffer();
 
-					dn = getNoteInfo(dn);
+					dn = getNoteInfo(request, dn);
 
 					UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
 					ItemDAO itemDAO = new ItemDAO(sm.getDataSource());
@@ -360,36 +370,36 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 							alertEmail.trim(),
 							EmailEngine.getAdminEmail(),
 							MessageFormat.format(respage.getString("mailDNSubject"), study.getName(),
-									dn.getEntityName()), emailBodyString, true, null, null, true);
+									dn.getEntityName()), emailBodyString, true, null, null, true, request);
 				}
 
 				String close = fp.getString("close" + parentId);
 				// session.setAttribute(CLOSE_WINDOW, "true".equals(close)?"true":"");
 				if ("true".equals(close)) {
-					addPageMessage(respage.getString("note_saved_into_db"));
-					addPageMessage(respage.getString("page_close_automatically"));
+					addPageMessage(respage.getString("note_saved_into_db"), request);
+					addPageMessage(respage.getString("page_close_automatically"), request);
                     forwardTo = Page.ADD_DISCREPANCY_NOTE_SAVE_DONE;
 					logger.info("Should forwardPage to ADD_DISCREPANCY_NOTE_SAVE_DONE.");
 				} else {
 					if (parentId == dn.getParentDnId()) {
 						mess.add(restext.getString("a_new_child_dn_added"));
 						results.put("newChildAdded" + parentId, mess);
-						setInputMessages(results);
+						setInputMessages(results, request);
 					} else {
-						addPageMessage(restext.getString("a_new_dn_thread_added"));
+						addPageMessage(restext.getString("a_new_dn_thread_added"), request);
 					}
 				}
 
 			} else {
-				session.setAttribute(BOX_TO_SHOW, parentId + "");
+                request.getSession().setAttribute(BOX_TO_SHOW, parentId + "");
 			}
 
 		} else {
-			setInputMessages(errors);
+			setInputMessages(errors, request);
 			boxDNMap.put(Integer.valueOf(parentId), dn);
-			session.setAttribute(BOX_TO_SHOW, parentId + "");
+            request.getSession().setAttribute(BOX_TO_SHOW, parentId + "");
 		}
-		session.setAttribute(BOX_DN_MAP, boxDNMap);
+        request.getSession().setAttribute(BOX_DN_MAP, boxDNMap);
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "refresh", refresh + "");
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "y", ypos != null && ypos.length() > 0 ? ypos : "0");
         request.setAttribute(REFRESH_PARENT_WINDOW, true);
@@ -397,17 +407,17 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		ArrayList notes = dndao.findExistingNotesForItemData(entityId);
 		dn.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));        
         request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn);
-		forwardPage(forwardTo == null ? Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()) : forwardTo);
+		forwardPage(forwardTo == null ? Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()) : forwardTo, request, response);
 	}
 
-	private void updateStudySubjectStatus(String entityType, int entityId) {
+	private void updateStudySubjectStatus(UserAccountBean ub, String entityType, int entityId) {
 		if ("itemData".equalsIgnoreCase(entityType)) {
 			int itemDataId = entityId;
-			ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+			ItemDataDAO iddao = new ItemDataDAO(getDataSource());
 			ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
-			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-			StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
-			StudySubjectDAO studySubjectDAO = new StudySubjectDAO(sm.getDataSource());
+			EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+			StudyEventDAO svdao = new StudyEventDAO(getDataSource());
+			StudySubjectDAO studySubjectDAO = new StudySubjectDAO(getDataSource());
 			EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
 			StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
 			StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(event.getStudySubjectId());
@@ -429,13 +439,13 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 		}
 	}
 
-	private void updateStudyEvent(String entityType, int entityId) {
+	private void updateStudyEvent(UserAccountBean ub, String entityType, int entityId) {
 		if ("itemData".equalsIgnoreCase(entityType)) {
 			int itemDataId = entityId;
-			ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+			ItemDataDAO iddao = new ItemDataDAO(getDataSource());
 			ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
-			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-			StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+			EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+			StudyEventDAO svdao = new StudyEventDAO(getDataSource());
 			EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
 			StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
 			if (event.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
@@ -446,8 +456,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 			}
 		} else if ("eventCrf".equalsIgnoreCase(entityType)) {
 			int eventCRFId = entityId;
-			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-			StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+			EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+			StudyEventDAO svdao = new StudyEventDAO(getDataSource());
 
 			EventCRFBean ec = (EventCRFBean) ecdao.findByPK(eventCRFId);
 			StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());

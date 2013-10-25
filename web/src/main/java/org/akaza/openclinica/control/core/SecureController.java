@@ -396,19 +396,12 @@ public abstract class SecureController extends HttpServlet {
 			session.removeAttribute("reloadUserBean");
 		}
 	}
-
-	private void clearDNs(HttpServletRequest request) {
-		if (!(this instanceof CreateDiscrepancyNoteServlet) && !(this instanceof CreateOneDiscrepancyNoteServlet)
-				&& !(this instanceof ViewDiscrepancyNoteServlet)) {
-			request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-		}
-	}
     
-    private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
+	private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
 			UnsupportedEncodingException {
-		clearDNs(request);
 		request.setCharacterEncoding("UTF-8");
 		session = request.getSession();
+		request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 		reloadUserBean(session, new UserAccountDAO((DataSource) SpringServletAccess.getApplicationContext(context)
 				.getBean("dataSource")));
 		String newThemeColor = CoreResources.getField("themeColor");
