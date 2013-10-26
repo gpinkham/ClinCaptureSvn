@@ -155,6 +155,7 @@ $(document).ready(function() {
 <jsp:include page="../include/showSubmitted.jsp" />
 <input type="hidden" name="name" value="<c:out value="${discrepancyNote.entityType}"/>">
 <input type="hidden" name="column" value="<c:out value="${discrepancyNote.column}"/>">
+<input type="hidden" name="itemId" value="<c:out value="${discrepancyNote.itemId}"/>">
 <input type="hidden" name="parentId" value="<c:out value="${discrepancyNote.parentDnId}"/>">
 <input type="hidden" name="id" value="<c:out value="${discrepancyNote.entityId}"/>">
 <input type="hidden" name="subjectId" value="<c:out value="${param.subjectId}"/>">

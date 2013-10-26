@@ -3596,7 +3596,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 						}
 
                         ArrayList dbNotes = dndao.findExistingNotesForItemData(itemDataId);
-                        ArrayList notes = discNotes.getNotes(inputName);
+						ArrayList notes = new ArrayList(discNotes.getNotes(inputName));
                         notes.addAll(dbNotes);
                         noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
                         discNotes.setNumExistingFieldNotes(inputName, dbNotes.size());
@@ -3628,7 +3628,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				String inputFieldName = "input" + itemId;
 
                 ArrayList dbNotes = dndao.findExistingNotesForItemData(itemDataId);
-                ArrayList notes = discNotes.getNotes(inputFieldName);
+				ArrayList notes = new ArrayList(discNotes.getNotes(inputFieldName));
                 notes.addAll(dbNotes);
                 discNotes.setNumExistingFieldNotes(inputFieldName, dbNotes.size());
 				dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
@@ -3648,7 +3648,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 					logger.debug("*** setting " + childInputFieldName);
                     ArrayList dbChildNotes = dndao.findExistingNotesForItemData(childItemId);
-                    ArrayList childNotes = discNotes.getNotes(inputFieldName);
+					ArrayList childNotes = new ArrayList(discNotes.getNotes(inputFieldName));
                     childNotes.addAll(dbNotes);
                     noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
                     discNotes.setNumExistingFieldNotes(childInputFieldName, dbChildNotes.size());
