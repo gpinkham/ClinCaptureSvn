@@ -155,11 +155,7 @@
 <table border="0" cellpadding="0" cellspacing="0">
    <tr>
    		<td>
-   			<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
-					value="<fmt:message key="back" bundle="${resword}"/>" 
-					class="button_medium" 
-					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
-
+   			<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'UpdateEventDefinition');"/>
    		</td>
         <td>
             <form action="UpdateEventDefinition" method="POST">

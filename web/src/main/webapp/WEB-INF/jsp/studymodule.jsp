@@ -297,7 +297,7 @@ END --%>
                 </c:choose>
 
             </td>
-            <c:url var="eventUrl" value="/DefineStudyEvent"/>
+            <c:url var="eventUrl" value="/DefineStudyEvent?actionName=init"/>
             <c:url var="edListUrl" value="/ListEventDefinition"/>
             <td>
                 <c:choose>

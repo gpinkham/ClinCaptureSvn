@@ -52,6 +52,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 @SuppressWarnings({ "rawtypes", "serial" })
 public class UpdateEventDefinitionServlet extends SecureController {
 
@@ -86,9 +88,15 @@ public class UpdateEventDefinitionServlet extends SecureController {
 			} else if ("submit".equalsIgnoreCase(action)) {
 				submitDefinition();
 
+			} else if("addCrfs".equalsIgnoreCase(action)) {
+					FormProcessor fp = new FormProcessor(request);
+					StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
+					saveEventDefinitionToSession(sed, fp);
+					saveEventDefinitionCRFsToSession(fp);
+					response.sendRedirect(request.getContextPath() + "/AddCRFToDefinition");				
 			} else {
-				addPageMessage(respage.getString("updating_ED_is_cancelled"));
-				session.removeAttribute("definition");
+				addPageMessage(respage.getString("updating_ED_is_cancelled"));				
+				clearSession(session);
 				forwardPage(Page.LIST_DEFINITION_SERVLET);
 			}
 		}
@@ -189,105 +197,14 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		} else {
 			logger.info("no errors");
 			//request will show values for error messages instead of session for sed
-			sed.setName(fp.getString("name"));
-			sed.setRepeating(fp.getBoolean("repeating"));
-			sed.setCategory(fp.getString("category"));
-			sed.setDescription(fp.getString("description"));
-			sed.setType(fp.getString("type"));
 			//Clinovo start
-			sed.setMaxDay(fp.getInt("maxDay"));
-			sed.setMinDay(fp.getInt("minDay"));
-			sed.setScheduleDay(fp.getInt("schDay"));
-			int userId = getIdByUserName(fp.getString("emailUser"));
-			if(userId != 0) {
-				sed.setUserEmailId(userId);
-			} else {
-				sed.setUserEmailId(1);
-			}
-			sed.setEmailDay(fp.getInt("emailDay"));
-			String referenceVisitValue = fp.getString("isReference");
-			if ("true".equalsIgnoreCase(referenceVisitValue)) {
-				sed.setReferenceVisit(true);
-			} else {
-				sed.setReferenceVisit(false);
-			}
-		}
-			// end
+			saveEventDefinitionToSession(sed, fp);
 			
-			session.setAttribute("definition", sed);
-			ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
-			CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-			for (int i = 0; i < edcs.size(); i++) {
-				EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.get(i);
-				if (!edcBean.getStatus().equals(Status.DELETED) && !edcBean.getStatus().equals(Status.AUTO_DELETED)) {
-					// only get inputs from web page if AVAILABLE
-					int defaultVersionId = fp.getInt("defaultVersionId" + i);
-					edcBean.setDefaultVersionId(defaultVersionId);
-					CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
-					edcBean.setDefaultVersionName(defaultVersion.getName());
-
-					String requiredCRF = fp.getString("requiredCRF" + i);
-					String doubleEntry = fp.getString("doubleEntry" + i);
-					String decisionCondition = fp.getString("decisionCondition" + i);
-					String electronicSignature = fp.getString("electronicSignature" + i);
-					String hideCRF = fp.getString("hideCRF" + i);
-					int sdvId = fp.getInt("sdvOption" + i);
-
-					if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
-						edcBean.setHideCrf(true);
-					} else {
-						edcBean.setHideCrf(false);
-					}
-
-					if (!StringUtil.isBlank(requiredCRF) && "yes".equalsIgnoreCase(requiredCRF.trim())) {
-						edcBean.setRequiredCRF(true);
-					} else {
-						edcBean.setRequiredCRF(false);
-					}
-					if (!StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
-						edcBean.setDoubleEntry(true);
-					} else {
-						edcBean.setDoubleEntry(false);
-					}
-
-					if (!StringUtil.isBlank(electronicSignature) && "yes".equalsIgnoreCase(electronicSignature.trim())) {
-						edcBean.setElectronicSignature(true);
-					} else {
-						edcBean.setElectronicSignature(false);
-					}
-
-					if (!StringUtil.isBlank(decisionCondition) && "yes".equalsIgnoreCase(decisionCondition.trim())) {
-						edcBean.setDecisionCondition(true);
-					} else {
-						edcBean.setDecisionCondition(false);
-					}
-					String nullString = "";
-					// process null values
-					ArrayList nulls = NullValue.toArrayList();
-					for (int a = 0; a < nulls.size(); a++) {
-						NullValue n = (NullValue) nulls.get(a);
-						String myNull = fp.getString(n.getName().toLowerCase() + i);
-						if (!StringUtil.isBlank(myNull) && "yes".equalsIgnoreCase(myNull.trim())) {
-							nullString = nullString + n.getName().toUpperCase() + ",";
-						}
-
-					}
-
-					if (sdvId > 0
-							&& (edcBean.getSourceDataVerification() == null || sdvId != edcBean
-									.getSourceDataVerification().getCode())) {
-						edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
-					}
-
-					edcBean.setNullValues(nullString);
-					logger.info("found null values: " + nullString);
-				}
-
-			}
-
-			session.setAttribute("eventDefinitionCRFs", edcs);
+		}
+			// end			
+			saveEventDefinitionCRFsToSession(fp);			
+			
 			forwardPage(Page.UPDATE_EVENT_DEFINITION_CONFIRM);
-
 	}
 
 	/**
@@ -332,14 +249,8 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
 			}
 		}
-		session.removeAttribute("definition");
-		session.removeAttribute("eventDefinitionCRFs");
-		session.removeAttribute("tmpCRFIdMap");
-		session.removeAttribute("crfsWithVersion");
-		session.removeAttribute("eventDefinitionCRFs");
-		session.removeAttribute("showCalendaredVisitBox");
-		session.removeAttribute("changedReference");
-		session.removeAttribute("userNameInsteadEmail");
+		
+		clearSession(session);		
 		
 		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"));
 		forwardPage(Page.LIST_DEFINITION_SERVLET);
@@ -480,5 +391,118 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		UserAccountBean userBean = (UserAccountBean) uadao.findByUserName(userName);
 		return userBean.getId();
 	}
+	
+	private void saveEventDefinitionCRFsToSession(FormProcessor fp) {
+		ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
+		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+		for (int i = 0; i < edcs.size(); i++) {
+			EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.get(i);
+			if (!edcBean.getStatus().equals(Status.DELETED) && !edcBean.getStatus().equals(Status.AUTO_DELETED)) {
+				// only get inputs from web page if AVAILABLE
+				int defaultVersionId = fp.getInt("defaultVersionId" + i);
+				edcBean.setDefaultVersionId(defaultVersionId);
+				CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
+				edcBean.setDefaultVersionName(defaultVersion.getName());
+
+				String requiredCRF = fp.getString("requiredCRF" + i);
+				String doubleEntry = fp.getString("doubleEntry" + i);
+				String decisionCondition = fp.getString("decisionCondition" + i);
+				String electronicSignature = fp.getString("electronicSignature" + i);
+				String hideCRF = fp.getString("hideCRF" + i);
+				int sdvId = fp.getInt("sdvOption" + i);
+
+				if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
+					edcBean.setHideCrf(true);
+				} else {
+					edcBean.setHideCrf(false);
+				}
+
+				if (!StringUtil.isBlank(requiredCRF) && "yes".equalsIgnoreCase(requiredCRF.trim())) {
+					edcBean.setRequiredCRF(true);
+				} else {
+					edcBean.setRequiredCRF(false);
+				}
+				if (!StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
+					edcBean.setDoubleEntry(true);
+				} else {
+					edcBean.setDoubleEntry(false);
+				}
+
+				if (!StringUtil.isBlank(electronicSignature) && "yes".equalsIgnoreCase(electronicSignature.trim())) {
+					edcBean.setElectronicSignature(true);
+				} else {
+					edcBean.setElectronicSignature(false);
+				}
+
+				if (!StringUtil.isBlank(decisionCondition) && "yes".equalsIgnoreCase(decisionCondition.trim())) {
+					edcBean.setDecisionCondition(true);
+				} else {
+					edcBean.setDecisionCondition(false);
+				}
+				String nullString = "";
+				// process null values
+				ArrayList nulls = NullValue.toArrayList();
+				for (int a = 0; a < nulls.size(); a++) {
+					NullValue n = (NullValue) nulls.get(a);
+					String myNull = fp.getString(n.getName().toLowerCase() + i);
+					if (!StringUtil.isBlank(myNull) && "yes".equalsIgnoreCase(myNull.trim())) {
+						nullString = nullString + n.getName().toUpperCase() + ",";
+					}
+
+				}
+
+				if (sdvId > 0
+						&& (edcBean.getSourceDataVerification() == null || sdvId != edcBean
+								.getSourceDataVerification().getCode())) {
+					edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
+				}
+
+				edcBean.setNullValues(nullString);
+				logger.info("found null values: " + nullString);
+			}
+
+		}
+		session.setAttribute("eventDefinitionCRFs", edcs);			
+	}
+	
+	private void saveEventDefinitionToSession(StudyEventDefinitionBean sed, FormProcessor fp) {
+		sed.setName(fp.getString("name"));
+		sed.setRepeating(fp.getBoolean("repeating"));
+		sed.setCategory(fp.getString("category"));
+		sed.setDescription(fp.getString("description"));
+		sed.setType(fp.getString("type"));
+		sed.setMaxDay(fp.getInt("maxDay"));
+		sed.setMinDay(fp.getInt("minDay"));
+		sed.setScheduleDay(fp.getInt("schDay"));
+		int userId = getIdByUserName(fp.getString("emailUser"));
+		if(userId != 0) {
+			sed.setUserEmailId(userId);
+		} else {
+			sed.setUserEmailId(1);
+		}
+		sed.setEmailDay(fp.getInt("emailDay"));
+		String referenceVisitValue = fp.getString("isReference");
+		if ("true".equalsIgnoreCase(referenceVisitValue)) {
+			sed.setReferenceVisit(true);
+		} else {
+			sed.setReferenceVisit(false);
+		}
+		session.setAttribute("definition", sed);
+	}
+	
+	
+	
+	public static void clearSession(HttpSession session){
+		session.removeAttribute("definition");
+		session.removeAttribute("eventDefinitionCRFs");
+		session.removeAttribute("tmpCRFIdMap");
+		session.removeAttribute("crfsWithVersion");
+		session.removeAttribute("eventDefinitionCRFs");
+		session.removeAttribute("showCalendaredVisitBox");
+		session.removeAttribute("changedReference");
+		session.removeAttribute("userNameInsteadEmail");
+		session.removeAttribute("sdvOptions");
+	}
+	
 	
 }

@@ -149,12 +149,7 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 			session.setAttribute("eventDefinitionCRFs", newEventDefinitionCRFs);
 			// changed above to new list because static, in-place updating is updating all EDCs
 
-			ArrayList<String> sdvOptions = new ArrayList<String>();
-			sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
-			sdvOptions.add(SourceDataVerification.PARTIALREQUIRED.toString());
-			sdvOptions.add(SourceDataVerification.NOTREQUIRED.toString());
-			sdvOptions.add(SourceDataVerification.NOTAPPLICABLE.toString());
-			request.setAttribute("sdvOptions", sdvOptions);
+			addSDVstatuses();
 
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
 		}
@@ -206,5 +201,14 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 		} else {
 			session.setAttribute("userNameInsteadEmail", "Not found in the db");	
 		}
+	}
+	
+	private void addSDVstatuses(){
+		ArrayList<String> sdvOptions = new ArrayList<String>();
+		sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
+		sdvOptions.add(SourceDataVerification.PARTIALREQUIRED.toString());
+		sdvOptions.add(SourceDataVerification.NOTREQUIRED.toString());
+		sdvOptions.add(SourceDataVerification.NOTAPPLICABLE.toString());
+		session.setAttribute("sdvOptions", sdvOptions);
 	}
 }

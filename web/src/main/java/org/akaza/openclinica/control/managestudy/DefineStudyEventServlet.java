@@ -123,67 +123,72 @@ public class DefineStudyEventServlet extends SecureController {
 			setOrGetDefinition();
 			forwardPage(Page.DEFINE_STUDY_EVENT1);
 		} else {
-			if ("confirm".equalsIgnoreCase(actionName)) {
-				confirmWholeDefinition();
-
-			} else if ("submit".equalsIgnoreCase(actionName)) {
-				try {
-					Integer nextAction = Integer.valueOf(request.getParameter("nextAction"));
-					if (nextAction != null) {
-						if (nextAction.intValue() == 1) {
-							session.removeAttribute("definition");
-							addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"));
-							forwardPage(Page.LIST_DEFINITION_SERVLET);
-						} else if (nextAction.intValue() == 2) {
-							submitDefinition();
-							ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
-							session.setAttribute("pageMessages", pageMessages);
-							forwardPage(Page.DEFINE_STUDY_EVENT1);
-						} else {
-							logger.info("actionName ==> 3");
-							submitDefinition();
-							StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
-							sed.setStudyId(currentStudy.getId());
-							session.setAttribute("definition", sed);
-							forwardPage(Page.DEFINE_STUDY_EVENT1);
+			//When this page is called first time - session need to be cleaned
+			if ("init".equalsIgnoreCase(actionName)) {
+				UpdateEventDefinitionServlet.clearSession(session);
+				forwardPage(Page.DEFINE_STUDY_EVENT1);
+			} else {
+				if ("confirm".equalsIgnoreCase(actionName)) {
+					confirmWholeDefinition();	
+				} else if ("submit".equalsIgnoreCase(actionName)) {
+					try {
+						Integer nextAction = Integer.valueOf(request.getParameter("nextAction"));
+						if (nextAction != null) {
+							if (nextAction.intValue() == 1) {
+								session.removeAttribute("definition");
+								addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"));
+								forwardPage(Page.LIST_DEFINITION_SERVLET);
+							} else if (nextAction.intValue() == 2) {
+								submitDefinition();
+								ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
+								session.setAttribute("pageMessages", pageMessages);
+								forwardPage(Page.DEFINE_STUDY_EVENT1);
+							} else {
+								logger.info("actionName ==> 3");
+								submitDefinition();
+								StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
+								sed.setStudyId(currentStudy.getId());
+								session.setAttribute("definition", sed);
+								forwardPage(Page.DEFINE_STUDY_EVENT1);
+							}
 						}
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+						addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"));
+						forwardPage(Page.LIST_DEFINITION_SERVLET);
+					} catch (NullPointerException e) {
+						e.printStackTrace();
+						addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"));
+						forwardPage(Page.LIST_DEFINITION_SERVLET);
 					}
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
-					addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"));
-					forwardPage(Page.LIST_DEFINITION_SERVLET);
-				} catch (NullPointerException e) {
-					e.printStackTrace();
-					addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"));
-					forwardPage(Page.LIST_DEFINITION_SERVLET);
-				}
-
-			} else if ("next".equalsIgnoreCase(actionName)) {
-				Integer pageNumber = Integer.valueOf(request.getParameter("pageNum"));
-				if (pageNumber != null) {
-					if (pageNumber.intValue() == 2) {
-						String nextListPage = request.getParameter("next_list_page");
-						if (nextListPage != null && nextListPage.equalsIgnoreCase("true")) {
-							logger.trace("+++ step 1");
-							confirmDefinition1();
+	
+				} else if ("next".equalsIgnoreCase(actionName)) {
+					Integer pageNumber = Integer.valueOf(request.getParameter("pageNum"));
+					if (pageNumber != null) {
+						if (pageNumber.intValue() == 2) {
+							String nextListPage = request.getParameter("next_list_page");
+							if (nextListPage != null && nextListPage.equalsIgnoreCase("true")) {
+								logger.trace("+++ step 1");
+								confirmDefinition1();
+							} else {
+								logger.trace("+++ step 2");
+								confirmDefinition2(false);
+							}
 						} else {
-							logger.trace("+++ step 2");
-							confirmDefinition2(false);
+							logger.trace("+++ step 3");
+							confirmDefinition1();
 						}
 					} else {
-						logger.trace("+++ step 3");
-						confirmDefinition1();
+						logger.trace("+++ step 4");
+						setOrGetDefinition();
+						forwardPage(Page.DEFINE_STUDY_EVENT1);
 					}
-				} else {
-					logger.trace("+++ step 4");
-					setOrGetDefinition();
-					forwardPage(Page.DEFINE_STUDY_EVENT1);
+				} else if ("back1".equalsIgnoreCase(actionName)) {
+					FormProcessor fp = new FormProcessor(request);
+					prepareServletForStepTwo(fp, false);
+				} else if ("back2".equalsIgnoreCase(actionName)) {
+					confirmDefinition2(true);
 				}
-			} else if ("back1".equalsIgnoreCase(actionName)) {
-				FormProcessor fp = new FormProcessor(request);
-				prepareServletForStepTwo(fp, false);
-			} else if ("back2".equalsIgnoreCase(actionName)) {
-				confirmDefinition2(true);
 			}
 		}
 	}

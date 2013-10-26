@@ -77,7 +77,7 @@
 					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
 	</td>
 	<td>
-		<input type="button" name="<fmt:message key="create_event" bundle="${resword}"/>" value="<fmt:message key="create_event" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.location.href='DefineStudyEvent'"/>
+		<input type="button" name="<fmt:message key="create_event" bundle="${resword}"/>" value="<fmt:message key="create_event" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.location.href='DefineStudyEvent?actionName=init'"/>
 	</td>
 	<td>
 		<input type="button" name="<fmt:message key="calendared_events" bundle="${resword}"/>" value="<fmt:message key="calendared_events" bundle="${resword}"/>" class="button_medium" onclick="javascript:openDocWindow('ShowCalendarFunc?id=<c:out value="${study.id}"/>')"/>

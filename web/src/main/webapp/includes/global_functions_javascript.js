@@ -2986,3 +2986,8 @@ function viewCrfByVersion(eventDefinitionCRFId, studySubjectId, crfVersionId, ev
       "</form>");
   $("#viewSectionDataEntryForm").submit();
 }
+
+function upateEventDefinitionAddCRF(){
+	$("input[type=hidden]").attr("value","addCrfs");
+	document.forms["UpdateEventDefinition"].submit();
+}

@@ -43,7 +43,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='definition' class='org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean'/>
 <jsp:useBean scope='session' id='eventDefinitionCRFs' class='java.util.ArrayList'/>
-<jsp:useBean scope='request' id='sdvOptions' class='java.util.ArrayList'/>
+<jsp:useBean scope='session' id='sdvOptions' class='java.util.ArrayList'/>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript">
     <!--
@@ -133,7 +133,7 @@ $(document).ready(function() {
 </ol>
 <P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 
-<form action="UpdateEventDefinition" method="post">
+<form action="UpdateEventDefinition" method="post" name="UpdateEventDefinition">
 <input type="hidden" name="action" value="confirm">
 <div style="width: 600px">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -589,23 +589,20 @@ $(document).ready(function() {
 <table border="0" cellpadding="0" cellspacing="0">
     <tr>
     	<td>
-    		<input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" 
-					value="<fmt:message key="back" bundle="${resword}"/>" 
-					class="button_medium" 
-					onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
+    		<input id="GoBack" class="button_medium" type="button" name="BTN_Back" title="<fmt:message key="back" bundle="${resword}"/>" value="<fmt:message key="back" bundle="${resword}"/>" onclick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>','UpdateEventDefinition?action=cancel');"/></td>
         </td>        
         <td>
             <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
         </td>
-        <td>
-        	<input type="button" name="<fmt:message key="add_a_new_CRF" bundle="${resword}"/>" value="<fmt:message key="add_a_new_CRF" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='AddCRFToDefinition'">
-        </td>
+	    <td>
+			<input type="button" name="<fmt:message key="add_a_new_CRF" bundle="${resword}"/>" value="<fmt:message key="add_a_new_CRF" bundle="${resword}"/>" class="button_medium" onclick="javascript:upateEventDefinitionAddCRF()">
+		</td>    
         <td>
             <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
-        </td>
-        
+        </td>        
     </tr></table>
 </form>
+
 <br><br>
 
 <!-- EXPANDING WORKFLOW BOX -->

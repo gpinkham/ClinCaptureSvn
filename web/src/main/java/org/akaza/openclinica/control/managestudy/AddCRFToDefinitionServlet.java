@@ -258,13 +258,7 @@ public class AddCRFToDefinitionServlet extends SecureController {
 				ordinalForNewCRF++;
 				edcs.add(edcBean);
 			}
-			session.setAttribute("eventDefinitionCRFs", edcs);
-			ArrayList<String> sdvOptions = new ArrayList<String>();
-			sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
-			sdvOptions.add(SourceDataVerification.PARTIALREQUIRED.toString());
-			sdvOptions.add(SourceDataVerification.NOTREQUIRED.toString());
-			sdvOptions.add(SourceDataVerification.NOTAPPLICABLE.toString());
-			request.setAttribute("sdvOptions", sdvOptions);
+			session.setAttribute("eventDefinitionCRFs", edcs);			
 			addPageMessage(respage.getString("has_have_been_added_need_confirmation"));
 			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
 		}
