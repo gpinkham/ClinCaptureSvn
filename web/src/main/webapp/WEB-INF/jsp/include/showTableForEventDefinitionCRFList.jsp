@@ -47,7 +47,6 @@
 		<td>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
-
 	<table border="0" cellpadding="0" cellspacing="0">
 
 <!-- Table Actions row (pagination, search, tools) -->
@@ -133,20 +132,11 @@
 				<tr>
 					<td valign="top">
 						<div class="formfieldM_BG">
-						<input name="ebl_filterKeyword" type="text" class="formfieldM" value="<c:out value="${table.keywordFilter}"/>" />
+						<input name="ebl_filterKeyword" type="text" class="formfieldM" value="<c:out value="${table.keywordFilter}"/>"/>
 						</div>
 					</td>
 					<td valign="top">
-						<input type="submit" class="button_search" value="<fmt:message key="find" bundle="${resword}"/>"
-							<c:choose>
-								<c:when test="${searchFormDisplayed == 0}">
-									onClick="if (document.<c:out value="${outerFormName}"/>.ebl_filterKeyword.value == '') return false; document.<c:out value="${outerFormName}"/>.elements['submitted'].value=0;document.<c:out value="${outerFormName}"/>.elements['actionName'].value='';<c:out value="${searchFormOnClickJS}" escapeXml="false" />"
-								</c:when>
-								<c:otherwise>
-									onClick="if (document.forms[0].ebl_filterKeyword.value == '') return false;"
-								</c:otherwise>
-							</c:choose>
-						/>
+						<input type="submit" name="FindButton" class="button_search" value="<fmt:message key="find" bundle="${resword}"/>"/>
 					</td>
 				</tr>
 			</table>

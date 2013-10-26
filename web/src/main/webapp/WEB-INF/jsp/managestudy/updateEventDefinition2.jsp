@@ -60,8 +60,8 @@
 </script>
 <h1><span class="title_manage"><fmt:message key="update_SED" bundle="${resword}"/> - <fmt:message key="add_CRFs" bundle="${resword}"/></span></h1>
 
-<form name="crfForm" action="AddCRFToDefinition"  method="post">
-    <input type="hidden" name="actionName" value="next">
+<form id="addCRFToDefinition" name="crfForm" action="AddCRFToDefinition"  method="post">
+    <input type="hidden" name="actionName" value="">
     <input type="hidden" name="pageNum" value="2">
 
     <c:import url="../include/showTableForEventDefinitionCRFList.jsp">
@@ -84,7 +84,7 @@
     <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
 </td>
 <td>
-    <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+    <input type="button" name="SubmitButton" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" onclick="$('input[name=actionName]').val('next'); $('#addCRFToDefinition').append('<input type=\'hidden\' name=\'Submit\'/>'); $('#addCRFToDefinition').submit();">
 </tr></table>
 </form>
 <br><br>
