@@ -94,6 +94,7 @@
 			) ale
 			LEFT JOIN item_data id ON ale.audit_log_event_type_id IN (1,12,13,30) and ale.entity_id = id.item_data_id
 			LEFT JOIN item ON id.item_id = item.item_id and ale.entity_name = item.name
+			ORDER BY ale.audit_date
     	</sql>
     </query>
     <query>
