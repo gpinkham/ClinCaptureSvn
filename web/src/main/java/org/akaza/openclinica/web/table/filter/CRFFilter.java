@@ -60,7 +60,8 @@ public class CRFFilter extends DroplistFilterEditor {
 		log.trace("Extracting crfs");
 
 		CRFDAO crfDAO = new CRFDAO(dataSource);
-		List<CRFBean> crfs = (List<CRFBean>) crfDAO.findAllByStudy(study.getId());
+		List<CRFBean> crfs = (List<CRFBean>) crfDAO.findAllByStudy(study.getParentStudyId() == 0 ? study.getId()
+				: study.getParentStudyId());
 
 		return crfs;
 	}
