@@ -232,7 +232,7 @@ public class ViewStudyEventsServlet extends SecureController {
 				if (se.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)) {
 					subjectScheduled++;
 					if (se.getDateStarted().before(new Date())) {
-						ArrayList eventCRFs = ecdao.findAllByStudyEvent(se);
+						ArrayList eventCRFs = ecdao.findAllStartedByStudyEvent(se);
 						if (eventCRFs.isEmpty()) {
 							se.setScheduledDatePast(true);
 						}
@@ -366,7 +366,7 @@ public class ViewStudyEventsServlet extends SecureController {
 				if (se.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)) {
 					subjectScheduled++;
 					if (se.getDateStarted().before(new Date())) {
-						ArrayList eventCRFs = ecdao.findAllByStudyEvent(se);
+						ArrayList eventCRFs = ecdao.findAllStartedByStudyEvent(se);
 						if (eventCRFs.isEmpty()) {
 							se.setScheduledDatePast(true);
 						}
