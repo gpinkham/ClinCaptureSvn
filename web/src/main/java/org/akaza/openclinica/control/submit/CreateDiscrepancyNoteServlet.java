@@ -569,7 +569,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				// the end case
 
 			}
-
+			request.getSession().setAttribute("cdn_eventCRFId", fp.getString("eventCRFId"));
 			request.getSession().setAttribute("cdn_groupOid", fp.getString("groupOid"));
             request.getSession().setAttribute("cdn_itemId", itemId);
             request.getSession().setAttribute("cdn_order", fp.getString("order"));

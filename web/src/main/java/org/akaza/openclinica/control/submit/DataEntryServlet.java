@@ -5187,7 +5187,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			DisplayItemWithGroupBean diwgb = (DisplayItemWithGroupBean) section.getDisplayItemGroups().get(i);
 			String inputName;
 			if (diwgb.isInGroup()) {
-				List<DisplayItemGroupBean> dbGroups = diwgb.getDbItemGroups();
+				List<DisplayItemGroupBean> dbGroups = diwgb.getItemGroups();
 				for (int j = 0; j < dbGroups.size(); j++) {
 					DisplayItemGroupBean displayGroup = dbGroups.get(j);
 					for (DisplayItemBean displayItem : displayGroup.getItems()) {
