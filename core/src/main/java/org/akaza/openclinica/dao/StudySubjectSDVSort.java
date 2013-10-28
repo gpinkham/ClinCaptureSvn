@@ -24,6 +24,7 @@ public class StudySubjectSDVSort implements CriteriaCommand {
 	HashMap<String, String> columnMapping = new HashMap<String, String>();
 
 	public StudySubjectSDVSort() {
+		columnMapping.put("studySubject.createdDate", "mss.date_created");
 		columnMapping.put("studySubject.label", "ss.label");
 		columnMapping.put("studySubject.status", "ss.status_id");
 		columnMapping.put("studySubject.oid", "ss.oc_oid");

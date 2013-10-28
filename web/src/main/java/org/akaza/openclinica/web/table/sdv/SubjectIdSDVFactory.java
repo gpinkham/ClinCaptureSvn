@@ -239,6 +239,9 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 			StudySubjectSDVFilter filterSet, StudySubjectSDVSort sortSet, int rowStart, int rowEnd) {
 		List<SubjectAggregateContainer> rows = new ArrayList<SubjectAggregateContainer>();
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
+		if (sortSet.getSorts().size() == 0) {
+			sortSet.addSort("studySubject.createdDate", "desc");
+		}
 		List<StudySubjectBean> studySubjectBeans = studySubjectDAO.findAllByStudySDV(studyId, studyId, filterSet,
 				sortSet, rowStart, rowEnd);
 
