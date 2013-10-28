@@ -3,12 +3,18 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     <changeSet author="skirpichenok" id="2013-09-16-TICKET357-01">
+        <validCheckSum>f2fd107e965ec8e140a7faa9e153c2</validCheckSum>
         <comment>Fix user types for existing users</comment>
         <sql splitStatements="false">
-            update user_account set user_type_id = 2 where user_name != 'root';
             update user_account set user_type_id = 1 where user_name = 'root';
-            delete from study_user_role where user_name != 'root' and role_name = 'system administrator';
             delete from study_user_role where user_name = 'root' and role_name != 'system administrator';
+        </sql>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2013-09-16-TICKET357-02">
+        <comment>Fix user types for existing users</comment>
+        <sql splitStatements="false">
+            update study_user_role set role_name = 'study administrator' where user_name != 'root' and role_name = 'system administrator';
+            update study_user_role set study_id = 1 where user_name != 'root' and study_id IS NULL;
         </sql>
     </changeSet>
 </databaseChangeLog>
