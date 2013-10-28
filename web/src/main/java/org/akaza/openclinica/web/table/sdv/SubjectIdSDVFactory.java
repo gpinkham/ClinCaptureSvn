@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -367,7 +368,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 				continue;
 			}
 			// get number of completed event crfs
-			if (eventBean.getStatus().getId() == Status.UNAVAILABLE.getId() && eventBean.getDateCompleted() != null) {
+			if (eventBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
 				numberOfCompletedEventCRFs++;
 			}
 			// get number of completed event SDVd eventeventDefinitionCrfDAOs
