@@ -753,6 +753,18 @@ and column_name='interviewer_name'
             AND dn.resolution_status_id in (0,1,2,3)
         </sql>
     </query>
+	<query>
+        <name>countOfOutstandingDNsForStudyEventFromStudyEventMap</name>
+        <sql>
+            select count(dn.resolution_status_id) from discrepancy_note dn, dn_study_event_map dsem, study_event se
+            where
+            se.study_event_id = dsem.study_event_id 
+            AND dsem.discrepancy_note_id = dn.discrepancy_note_id
+            AND se.study_event_id = ?
+            AND dn.parent_dn_id is null
+            AND dn.resolution_status_id in (0,1,2,3)
+        </sql>
+    </query>
     <query>
     	<name>countBySubjectTypeAndStudyEvent</name>
     	<sql>
