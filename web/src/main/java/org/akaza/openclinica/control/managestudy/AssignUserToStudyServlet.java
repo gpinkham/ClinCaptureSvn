@@ -34,11 +34,13 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
@@ -123,12 +125,19 @@ public class AssignUserToStudyServlet extends SecureController {
 			table.setRows(allRows);
 			table.computeDisplay();
 
+			StudyParameterValueDAO dao = new StudyParameterValueDAO(sm.getDataSource());
+			StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(), "allowCodingVerification");
+			
 			request.setAttribute("table", table);
 			ArrayList roles = Role.toArrayList();
 			if (currentStudy.getParentStudyId() > 0) {
 				roles.remove(Role.STUDY_ADMINISTRATOR);
                 roles.remove(Role.STUDY_MONITOR);
+                roles.remove(Role.STUDY_CODER);
 			} else {
+				if(!allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
+					roles.remove(Role.STUDY_CODER);
+				}
                 roles.remove(Role.INVESTIGATOR);
                 roles.remove(Role.CLINICAL_RESEARCH_COORDINATOR);
             }
@@ -257,6 +266,7 @@ public class AssignUserToStudyServlet extends SecureController {
 		List <UserAccountBean> userListbyRoles;
 		String notes;
 		boolean hasRoleInCurrentStudy;
+		boolean hasRoleWithStatusRemovedInCurrentStudy;
 		
 	
 		if (currentStudy.getParentStudyId() > 0) {
@@ -272,33 +282,40 @@ public class AssignUserToStudyServlet extends SecureController {
 			}
 			
 			hasRoleInCurrentStudy = false;
+			hasRoleWithStatusRemovedInCurrentStudy = false;
 			notes = "";
-			for(StudyUserRoleBean roleBean : accountBean.getRoles()) {
+			for (StudyUserRoleBean roleBean : accountBean.getRoles()) {
 				
-				if(currentStudy.getId() == roleBean.getStudyId()) {
+				if (currentStudy.getId() == roleBean.getStudyId() && roleBean.getStatus().equals(Status.DELETED)) {
+					hasRoleWithStatusRemovedInCurrentStudy = true;
+					break;
+				} else if (currentStudy.getId() == roleBean.getStudyId()) {
 					hasRoleInCurrentStudy = true;
-				} else if (currentStudy.getParentStudyId() > 0) {
+				} else if (currentStudy.getParentStudyId() > 0 && !roleBean.getStatus().equals(Status.DELETED)) {
 					site = (StudyBean) sdao.findByPK(roleBean.getStudyId());
 					study = (StudyBean) sdao.findByPK(site.getParentStudyId());
 					notes = notes + roleBean.getRole().getDescription() + respage.getString("in_site") + ": " + site.getName() 
 							+ "," + respage.getString("in_the_study") + ": " + study.getName() + "; ";
-				} else {
+				} else if (currentStudy.getParentStudyId() == 0 && !roleBean.getStatus().equals(Status.DELETED)) {
 					study = (StudyBean) sdao.findByPK(roleBean.getStudyId());
 					notes = notes + roleBean.getRole().getDescription() + respage.getString("in_the_study") + ": " + study.getName() + "; ";
 				}
 				
 			}
 			
-			accountBean.setNotes(notes);
+			if (!hasRoleWithStatusRemovedInCurrentStudy) {
+				
+				accountBean.setNotes(notes);
 			
-			if (hasRoleInCurrentStudy) {
-				accountBean.setStatus(Status.UNAVAILABLE);
-				accountBean.setActiveStudyId(currentStudy.getId());
-			} else {
-				accountBean.setStatus(Status.AVAILABLE);
+				if (hasRoleInCurrentStudy) {
+					accountBean.setStatus(Status.UNAVAILABLE);
+					accountBean.setActiveStudyId(currentStudy.getId());
+				} else {
+					accountBean.setStatus(Status.AVAILABLE);
+				}
+			
+				userAvailable.add(accountBean);
 			}
-			
-			userAvailable.add(accountBean);
 			
 		}
 		

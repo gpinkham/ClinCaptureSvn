@@ -21,6 +21,8 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -32,6 +34,8 @@ import org.akaza.openclinica.web.bean.StudyUserRoleRow;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Lists all the users in a study
@@ -48,11 +52,7 @@ public class ListStudyUserServlet extends SecureController {
      */
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
-		if (ub.isSysAdmin()) {
-			return;
-		}
-
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -67,7 +67,26 @@ public class ListStudyUserServlet extends SecureController {
 	public void processRequest() throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-		ArrayList users = udao.findAllUsersByStudy(currentStudy.getId());
+		ArrayList users = udao.findAllRolesByStudy(currentStudy.getId());
+		Map<String, Integer> userRolesAvailableCountMap = new HashMap<String, Integer> ();
+		List<StudyUserRoleBean> userRoleList;
+		String userAccountName;
+		int removedRolesCount;
+		
+		for (Object userRoleBean: users) {
+			StudyUserRoleBean urb = (StudyUserRoleBean) userRoleBean;
+			userAccountName = urb.getUserName();
+			if (!userRolesAvailableCountMap.containsKey(userAccountName)) {
+				removedRolesCount = 0;
+				userRoleList = (ArrayList)udao.findAllRolesByUserName(userAccountName);
+				for (StudyUserRoleBean roleBean: userRoleList) {
+					if (roleBean.getStatus() == Status.DELETED) {
+						removedRolesCount += 1;
+					}
+				}
+				userRolesAvailableCountMap.put(userAccountName, userRoleList.size() - removedRolesCount);
+			}
+		}
 
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allStudyUserRows = StudyUserRoleRow.generateRowsFromBeans(users);
@@ -82,6 +101,7 @@ public class ListStudyUserServlet extends SecureController {
 		table.computeDisplay();
 
 		request.setAttribute("table", table);
+		request.setAttribute("userRolesAvailableCountMap", userRolesAvailableCountMap);
         request.setAttribute("roleMap", Role.roleMap);
 		request.setAttribute("study", currentStudy);
 		forwardPage(Page.LIST_USER_IN_STUDY);

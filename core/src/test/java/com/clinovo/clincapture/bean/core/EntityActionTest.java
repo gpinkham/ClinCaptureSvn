@@ -87,7 +87,7 @@ public class EntityActionTest {
 
 	@Test
 	public void testGet() {
-		assertNull(EntityAction.get(6));
+		assertNull(EntityAction.get(7));
 		assertNull(EntityAction.get(-1));
 		assertNull(EntityAction.get(100));
 	}
@@ -97,7 +97,8 @@ public class EntityActionTest {
 		assertFalse(EntityAction.contains(0));
 		assertTrue(EntityAction.contains(1));
 		assertTrue(EntityAction.contains(5));
-		assertFalse(EntityAction.contains(6));
+		assertTrue(EntityAction.contains(6));
+		assertFalse(EntityAction.contains(7));
 		assertFalse(EntityAction.contains(100));
 	}
 }

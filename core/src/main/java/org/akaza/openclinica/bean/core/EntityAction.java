@@ -31,8 +31,9 @@ public class EntityAction extends Term {
 	public static final EntityAction DELETE = new EntityAction(3, "delete");
 	public static final EntityAction RESTORE = new EntityAction(4, "restore");
 	public static final EntityAction DEPLOY = new EntityAction(5, "deploy");
+	public static final EntityAction REMOVE = new EntityAction(6, "remove");
 
-	private static final EntityAction[] members = { VIEW, EDIT, DELETE, RESTORE, DEPLOY };
+	private static final EntityAction[] members = { VIEW, EDIT, DELETE, RESTORE, DEPLOY, REMOVE };
 	public static final List list = Arrays.asList(members);
 
 	private EntityAction(int id, String name) {

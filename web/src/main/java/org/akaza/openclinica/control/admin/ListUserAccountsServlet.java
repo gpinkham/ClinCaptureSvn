@@ -23,11 +23,13 @@ package org.akaza.openclinica.control.admin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -81,6 +83,20 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		for (int i = 0; i < allUsers.size(); i++) {
 			InactiveAnalyzer.analyze((UserAccountBean) allUsers.get(i), udao, restext);
 		}
+		
+		Map<String, Integer> userRolesRemovedCountMap = new HashMap<String, Integer> ();
+		int removedRolesCount;
+		
+		for (Object userBean: allUsers) {
+			UserAccountBean uab = (UserAccountBean) userBean;
+			removedRolesCount = 0;
+			for (StudyUserRoleBean urb: uab.getRoles()) {
+				if (urb.getStatus() == Status.DELETED) {
+					removedRolesCount += 1;
+				}
+			}
+			userRolesRemovedCountMap.put(uab.getName(), removedRolesCount);
+		}
 
 		ArrayList allUserRows = UserAccountRow.generateRowsFromBeans(allUsers);
 
@@ -99,6 +115,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		String message = fp.getString(ARG_MESSAGE, true);
 		request.setAttribute(ARG_MESSAGE, message);
         request.setAttribute("roleMap", Role.roleMap);
+        request.setAttribute("userRolesRemovedCountMap", userRolesRemovedCountMap);
 
         StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();
