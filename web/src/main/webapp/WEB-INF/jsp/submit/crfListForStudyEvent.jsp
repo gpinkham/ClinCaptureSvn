@@ -252,11 +252,6 @@
     <c:forEach var="dedc" items="${fullCrfList}">
         <c:choose>
             <c:when test="${dedc.class.name eq 'org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean'}">
-                <c:choose>
-                    <c:when test="${dedc.status.name=='locked'}">
-                    &nbsp;
-                    </c:when>
-                    <c:otherwise>
                         <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
                             <tr valign="top">
                                 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" />
@@ -269,44 +264,49 @@
                                 <td class="table_cell_left">
                                     <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
                                         <c:set var="versionCount" value="0"/>
-										<c:set var="firstVersionId" value="0"/>
+										                    <c:set var="firstVersionId" value="0"/>
                                         <c:forEach var="version" items="${dedc.edc.versions}">
-											<c:if test="${versionCount == 0}">
-												<c:set var="firstVersionId" value="${version.id}"/>
-											</c:if>
+                                            <c:if test="${versionCount == 0}">
+                                              <c:set var="firstVersionId" value="${version.id}"/>
+                                            </c:if>
                                             <c:set var="versionCount" value="${versionCount+1}"/>
                                         </c:forEach>
 
-                    <c:set var="crfVersionInputId" value="crfVersionId${firstVersionId}"/>
-										<c:choose>
-											<c:when test="${dedc.eventCRF.notStarted && dedc.eventCRF.id == 0}">
-												<input type="hidden" id="crfVersionId${firstVersionId}" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
-                        <c:set var="crfVersionInputId" value="crfVersionId${firstVersionId}"/>
-											</c:when>
-											<c:when test="${versionCount > 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
-												<input type="hidden" id="crfVersionId${dedc.eventCRF.crfVersion.id}" name="crfVersionId" value="<c:out value="${dedc.eventCRF.crfVersion.id}"/>">
-                        <c:set var="crfVersionInputId" value="crfVersionId${dedc.eventCRF.crfVersion.id}"/>
-											</c:when>
-											<c:when test="${versionCount == 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
-												<input type="hidden" id="crfVersionId${firstVersionId}" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
-                        <c:set var="crfVersionInputId" value="crfVersionId${dedc.eventCRF.crfVersion.id}"/>
-											</c:when>
-											<c:otherwise>
-												<input type="hidden" id="crfVersionId${defaultVersionId}" name="crfVersionId" value="<c:out value="${defaultVersionId}"/>">
-                        <c:set var="crfVersionInputId" value="crfVersionId${defaultVersionId}"/>
-											</c:otherwise>
-										</c:choose>
+                                        <c:set var="crfVersionInputId" value="crfVersionId${firstVersionId}"/>
+                                        <c:choose>
+                                          <c:when test="${dedc.eventCRF.notStarted && dedc.eventCRF.id == 0}">
+                                            <input type="hidden" id="crfVersionId${firstVersionId}" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
+                                            <c:set var="crfVersionInputId" value="crfVersionId${firstVersionId}"/>
+                                          </c:when>
+                                          <c:when test="${versionCount > 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
+                                            <input type="hidden" id="crfVersionId${dedc.eventCRF.crfVersion.id}" name="crfVersionId" value="<c:out value="${dedc.eventCRF.crfVersion.id}"/>">
+                                            <c:set var="crfVersionInputId" value="crfVersionId${dedc.eventCRF.crfVersion.id}"/>
+                                          </c:when>
+                                          <c:when test="${versionCount == 1 && dedc.eventCRF.notStarted && dedc.eventCRF.id > 0}">
+                                            <input type="hidden" id="crfVersionId${firstVersionId}" name="crfVersionId" value="<c:out value="${firstVersionId}"/>">
+                                            <c:set var="crfVersionInputId" value="crfVersionId${dedc.eventCRF.crfVersion.id}"/>
+                                          </c:when>
+                                          <c:otherwise>
+                                            <input type="hidden" id="crfVersionId${defaultVersionId}" name="crfVersionId" value="<c:out value="${defaultVersionId}"/>">
+                                            <c:set var="crfVersionInputId" value="crfVersionId${defaultVersionId}"/>
+                                          </c:otherwise>
+                                        </c:choose>
 										
                                         <c:choose>
                                             <c:when test="${versionCount<=1}">
-
-                                                <c:forEach var="version" items="${dedc.edc.versions}">
-                                                    <c:out value="${version.name}"/>
-                                                </c:forEach>
-
+                                                <c:choose>
+                                                  <c:when test="${dedc.status.locked}">
+                                                    ${dedc.eventCRF.crfVersion.name}
+                                                    <script>$('#${crfVersionInputId}').val('${dedc.eventCRF.crfVersion.id}')</script>
+                                                  </c:when>
+                                                  <c:otherwise>
+                                                    <c:forEach var="version" items="${dedc.edc.versions}">
+                                                      <c:out value="${version.name}"/>
+                                                    </c:forEach>
+                                                  </c:otherwise>
+                                                </c:choose>
                                             </c:when>
                                             <c:when test="${dedc.eventCRF.notStarted || dedc.eventCRF.id == 0}">
-
                                                 <select name="versionId<c:out value="${dedc.edc.crf.id}"/>" onchange="javascript:changeQuery<c:out value="${dedc.edc.crf.id}"/>();">
 
                                                     <c:forEach var="version" items="${dedc.edc.versions}">
@@ -357,8 +357,7 @@
                                 </td>
 
                                 <c:choose>
-
-                                    <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
+                                    <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.name=='locked'}">
                                         <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
                                             <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
                                         </td>
@@ -385,7 +384,7 @@
 
                                 <td class="table_cell_left" style="vertical-align: middle;">
                                     <c:choose>
-                                        <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
+                                        <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.name=='locked'}">
                                             <%--<c:when test="${dedc.status.name=='locked'}">--%>
                                             <img src="images/bt_Transparent.gif" class="crfBlankCellImg" border="0" align="left" hspace="4"/>
                                         </c:when>
@@ -430,8 +429,6 @@
                             </tr>
 
                         <c:set var="rowCount" value="${rowCount + 1}" />
-                    </c:otherwise>
-                </c:choose>
 
                 <!-- end of for each for dedc, uncompleted event crfs, started CRFs below -->
                 </c:when>

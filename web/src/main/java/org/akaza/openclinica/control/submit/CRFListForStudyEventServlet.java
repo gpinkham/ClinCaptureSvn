@@ -20,9 +20,7 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.*;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -30,15 +28,12 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.util.*;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -143,7 +138,7 @@ public class CRFListForStudyEventServlet extends SecureController {
 		// so we can display the event for which we're entering data
 		StudyEventBean seb = getStudyEvent(eventId);
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = new StudyDAO(sm.getDataSource());        
 		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 		DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(sm.getDataSource());
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
@@ -191,9 +186,11 @@ public class CRFListForStudyEventServlet extends SecureController {
 				seb.getStudyEventDefinitionId());
 
 		ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
-		populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
+		EnterDataForStudyEventServlet.populateUncompletedCRFsWithCRFAndVersions(sm.getDataSource(), logger,
+				uncompletedEventDefinitionCRFs);
 
-		populateUncompletedCRFsWithAnOwner(uncompletedEventDefinitionCRFs);
+		EnterDataForStudyEventServlet.populateUncompletedCRFsWithAnOwner(sm.getDataSource(),
+				uncompletedEventDefinitionCRFs);
 
 		ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs,
 				eventDefinitionCRFs, ub, currentRole, seb.getSubjectEventStatus(), study);
@@ -360,107 +357,6 @@ public class CRFListForStudyEventServlet extends SecureController {
 		}
 
 		return answer;
-	}
-
-	private void populateUncompletedCRFsWithAnOwner(List<DisplayEventDefinitionCRFBean> displayEventDefinitionCRFBeans) {
-		if (displayEventDefinitionCRFBeans == null || displayEventDefinitionCRFBeans.isEmpty()) {
-			return;
-		}
-		UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
-		UserAccountBean userAccountBean;
-		EventCRFBean eventCRFBean;
-		for (DisplayEventDefinitionCRFBean dedcBean : displayEventDefinitionCRFBeans) {
-
-			eventCRFBean = dedcBean.getEventCRF();
-			if (eventCRFBean != null && eventCRFBean.getOwner() == null && eventCRFBean.getOwnerId() > 0) {
-				userAccountBean = (UserAccountBean) userAccountDAO.findByPK(eventCRFBean.getOwnerId());
-
-				eventCRFBean.setOwner(userAccountBean);
-			}
-
-			// Failing the above, obtain the owner from the
-			// EventDefinitionCRFBean
-			if (eventCRFBean != null && eventCRFBean.getOwner() == null) {
-				int ownerId = dedcBean.getEdc().getOwnerId();
-				if (ownerId > 0) {
-					userAccountBean = (UserAccountBean) userAccountDAO.findByPK(ownerId);
-
-					eventCRFBean.setOwner(userAccountBean);
-				}
-			}
-
-		}
-
-	}
-
-	private void populateUncompletedCRFsWithCRFAndVersions(ArrayList uncompletedEventDefinitionCRFs) {
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-
-		int size = uncompletedEventDefinitionCRFs.size();
-		for (int i = 0; i < size; i++) {
-			DisplayEventDefinitionCRFBean dedcrf = (DisplayEventDefinitionCRFBean) uncompletedEventDefinitionCRFs
-					.get(i);
-			CRFBean cb = (CRFBean) cdao.findByPK(dedcrf.getEdc().getCrfId());
-			// note that we do not check status in the above query, so let's
-			// check it here,
-			if (cb.getStatus().equals(Status.AVAILABLE)) {
-				// the above does not allow us to show the CRF as a thing with
-				// status of 'invalid' so we have to
-				// go to the JSP for this one, I think
-				dedcrf.getEdc().setCrf(cb);
-
-				ArrayList theVersions = (ArrayList) cvdao.findAllActiveByCRF(dedcrf.getEdc().getCrfId());
-				ArrayList versions = new ArrayList();
-				HashMap<String, CRFVersionBean> crfVersionIds = new HashMap<String, CRFVersionBean>();
-
-				for (int j = 0; j < theVersions.size(); j++) {
-					CRFVersionBean crfVersion = (CRFVersionBean) theVersions.get(j);
-					crfVersionIds.put(String.valueOf(crfVersion.getId()), crfVersion);
-				}
-
-				if (!dedcrf.getEdc().getSelectedVersionIds().equals("")) {
-					String[] kk = dedcrf.getEdc().getSelectedVersionIds().split(",");
-					for (String string : kk) {
-						if (crfVersionIds.get(string) != null) {
-							versions.add(crfVersionIds.get(string));
-						}
-					}
-				} else {
-					versions = theVersions;
-				}
-
-				dedcrf.getEdc().setVersions(versions);
-				if (versions != null && versions.size() != 0) {
-					boolean isLocked = false;
-					for (int ii = 0; ii < versions.size(); ii++) {
-						CRFVersionBean crfvb = (CRFVersionBean) versions.get(ii);
-						logger.info("...checking versions..." + crfvb.getName());
-						if (!crfvb.getStatus().equals(Status.AVAILABLE)) {
-							logger.info("found a non active crf version");
-							isLocked = true;
-						}
-					}
-					logger.info("re-set event def, line 240: " + isLocked);
-					if (isLocked) {
-						dedcrf.setStatus(Status.LOCKED);
-						dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
-					}
-					uncompletedEventDefinitionCRFs.set(i, dedcrf);
-				} else {
-					dedcrf.setStatus(Status.LOCKED);
-					dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
-					uncompletedEventDefinitionCRFs.set(i, dedcrf);
-				}
-			} else {
-				dedcrf.getEdc().setCrf(cb);
-				logger.info("_found a non active crf _");
-				dedcrf.setStatus(Status.LOCKED);
-				dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
-				dedcrf.getEdc().getCrf().setStatus(Status.LOCKED);
-				uncompletedEventDefinitionCRFs.set(i, dedcrf);
-			}
-		}
 	}
 
 	private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans) {

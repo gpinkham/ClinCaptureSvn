@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -65,6 +66,7 @@ import org.akaza.openclinica.util.CrfComparator;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.slf4j.Logger;
 
 /**
  * @author ssachs
@@ -143,10 +145,11 @@ public class EnterDataForStudyEventServlet extends SecureController {
 		StudyEventBean seb = getStudyEvent(eventId);
 
 		// so we can display the subject's label
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
 		StudyDAO studydao = new StudyDAO(sm.getDataSource());
-		StudyBean study = (StudyBean) studydao.findByPK(studySubjectBean.getStudyId());
+        CRFVersionDAO crfvdao = new CRFVersionDAO(sm.getDataSource());
+        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+        StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
+        StudyBean study = (StudyBean) studydao.findByPK(studySubjectBean.getStudyId());
 		
 		List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil.getAllNotesforSubjectAndEvent(studySubjectBean, currentStudy, sm);
 		setRequestAttributesForNotes(allNotesforSubjectAndEvent, seb, sm, request);
@@ -166,12 +169,12 @@ public class EnterDataForStudyEventServlet extends SecureController {
 		// However, this method seems to be returning DisplayEventDefinitionCRFs
 		// that contain valid eventCRFs??
 		ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
-		populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
+		populateUncompletedCRFsWithCRFAndVersions(sm.getDataSource(), logger, uncompletedEventDefinitionCRFs);
 
 		// Attempt to provide the DisplayEventDefinitionCRF with a
 		// valid owner
 		// only if its container eventCRf has a valid id
-		populateUncompletedCRFsWithAnOwner(uncompletedEventDefinitionCRFs);
+		populateUncompletedCRFsWithAnOwner(sm.getDataSource(), uncompletedEventDefinitionCRFs);
 
 		// for the event definition CRFs for which event CRFs exist, get
 		// DisplayEventCRFBeans, which the JSP will use to determine what
@@ -210,6 +213,8 @@ public class EnterDataForStudyEventServlet extends SecureController {
 		Collections.sort(fullCrfList, new CrfComparator());
 		request.setAttribute(FULL_CRF_LIST, fullCrfList);
 
+        prepareCRFVersionForLockedCRFs(fullCrfList, crfvdao, logger);
+
 		// this is for generating side info panel
 		ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySubjectBean,
 				sm.getDataSource(), ub, currentRole);
@@ -222,6 +227,24 @@ public class EnterDataForStudyEventServlet extends SecureController {
 
 		forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT);
 	}
+
+    public static void prepareCRFVersionForLockedCRFs(List<Object> fullCrfList, CRFVersionDAO crfvdao, Logger logger) {
+        try {
+            for (Object object : fullCrfList) {
+                if (object instanceof DisplayEventDefinitionCRFBean) {
+                    DisplayEventDefinitionCRFBean dedCrfBean = (DisplayEventDefinitionCRFBean) object;
+                    if (dedCrfBean.getStatus() == Status.LOCKED
+                            && (dedCrfBean.getEventCRF().getCrfVersion() == null || dedCrfBean.getEventCRF()
+                            .getCrfVersion().getId() == 0)) {
+                        dedCrfBean.getEventCRF().setCrfVersion(
+                                (CRFVersionBean) crfvdao.findByPK(dedCrfBean.getEdc().getDefaultVersionId()));
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+        }
+    }
 
 	@Override
 	protected void mayProceed() throws InsufficientPermissionException {
@@ -300,11 +323,11 @@ public class EnterDataForStudyEventServlet extends SecureController {
 		return answer;
 	}
 
-	private void populateUncompletedCRFsWithAnOwner(List<DisplayEventDefinitionCRFBean> displayEventDefinitionCRFBeans) {
+    public static void populateUncompletedCRFsWithAnOwner(DataSource ds, List<DisplayEventDefinitionCRFBean> displayEventDefinitionCRFBeans) {
 		if (displayEventDefinitionCRFBeans == null || displayEventDefinitionCRFBeans.isEmpty()) {
 			return;
 		}
-		UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO userAccountDAO = new UserAccountDAO(ds);
 		UserAccountBean userAccountBean;
 		EventCRFBean eventCRFBean;
 		for (DisplayEventDefinitionCRFBean dedcBean : displayEventDefinitionCRFBeans) {
@@ -329,9 +352,9 @@ public class EnterDataForStudyEventServlet extends SecureController {
 		}
 	}
 
-	private void populateUncompletedCRFsWithCRFAndVersions(ArrayList uncompletedEventDefinitionCRFs) {
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+	public static void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, Logger logger, ArrayList uncompletedEventDefinitionCRFs) {
+		CRFDAO cdao = new CRFDAO(ds);
+		CRFVersionDAO cvdao = new CRFVersionDAO(ds);
 
 		int size = uncompletedEventDefinitionCRFs.size();
 		for (int i = 0; i < size; i++) {
@@ -395,6 +418,11 @@ public class EnterDataForStudyEventServlet extends SecureController {
 				dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
 				dedcrf.getEdc().getCrf().setStatus(Status.LOCKED);
 				uncompletedEventDefinitionCRFs.set(i, dedcrf);
+			}
+			if (dedcrf.getStatus() == Status.LOCKED
+					&& (dedcrf.getEventCRF().getCrfVersion() == null || dedcrf.getEventCRF().getCrfVersion().getId() == 0)) {
+				dedcrf.getEventCRF().setCrfVersion(
+						(CRFVersionBean) cvdao.findByPK(dedcrf.getEdc().getDefaultVersionId()));
 			}
 		}
 	}

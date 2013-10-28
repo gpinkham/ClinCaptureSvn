@@ -57,6 +57,7 @@ import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
+import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
@@ -80,6 +81,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jxu
@@ -88,6 +91,8 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
  */
 @SuppressWarnings({"rawtypes", "unchecked",  "serial"})
 public class ViewStudySubjectServlet extends RememberLastPage {
+
+    public static final Logger logger = LoggerFactory.getLogger(ViewStudySubjectServlet.class);
 
 	// The study subject has an existing discrepancy note related to their
 	// unique identifier; this
@@ -170,7 +175,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole,
 					event.getSubjectEventStatus(), study));
 			ArrayList al = getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus());
-			populateUncompletedCRFsWithCRFAndVersions(ds, al);
+			EnterDataForStudyEventServlet.populateUncompletedCRFsWithCRFAndVersions(ds, logger, al);
 			de.setUncompletedCRFs(al);
 
 			de.setMaximumSampleOrdinal(sedao.getMaxSampleOrdinal(sed, studySubject));
@@ -595,41 +600,6 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			}
 		}
 		return answer;
-	}
-
-	public static void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, ArrayList uncompletedEventDefinitionCRFs) {
-		CRFDAO cdao = new CRFDAO(ds);
-		CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-
-		int size = uncompletedEventDefinitionCRFs.size();
-		for (int i = 0; i < size; i++) {
-			DisplayEventDefinitionCRFBean dedcrf = (DisplayEventDefinitionCRFBean) uncompletedEventDefinitionCRFs
-					.get(i);
-			CRFBean cb = (CRFBean) cdao.findByPK(dedcrf.getEdc().getCrfId());
-			dedcrf.getEdc().setCrf(cb);
-
-			ArrayList theVersions = (ArrayList) cvdao.findAllActiveByCRF(dedcrf.getEdc().getCrfId());
-			ArrayList versions = new ArrayList();
-			HashMap<String, CRFVersionBean> crfVersionIds = new HashMap<String, CRFVersionBean>();
-
-			for (int j = 0; j < theVersions.size(); j++) {
-				CRFVersionBean crfVersion = (CRFVersionBean) theVersions.get(j);
-				crfVersionIds.put(String.valueOf(crfVersion.getId()), crfVersion);
-			}
-
-			if (!dedcrf.getEdc().getSelectedVersionIds().equals("")) {
-				String[] kk = dedcrf.getEdc().getSelectedVersionIds().split(",");
-				for (String string : kk) {
-					if (crfVersionIds.get(string) != null) {
-						versions.add(crfVersionIds.get(string));
-					}
-				}
-			} else {
-				versions = theVersions;
-			}
-			dedcrf.getEdc().setVersions(versions);
-			uncompletedEventDefinitionCRFs.set(i, dedcrf);
-		}
 	}
 
 	@Override

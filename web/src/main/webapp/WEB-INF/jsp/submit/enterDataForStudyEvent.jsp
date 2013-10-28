@@ -267,10 +267,6 @@
 <c:choose>
 <c:when test="${dedc.class.name eq 'org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean'}">
 
-<c:choose>
-<c:when test="${dedc.status.name=='locked'}">
-</c:when>
-<c:otherwise>
 <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
 <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
 <tr valign="top">
@@ -315,9 +311,17 @@
         
         <c:choose>
         <c:when test="${versionCount<=1}">
-			<c:forEach var="version" items="${dedc.edc.versions}">
-				<c:out value="${version.name}"/>
-			</c:forEach>
+          <c:choose>
+            <c:when test="${dedc.status.locked}">
+              ${dedc.eventCRF.crfVersion.name}
+              <script>$('#${crfVersionInputId}').val('${dedc.eventCRF.crfVersion.id}')</script>
+            </c:when>
+            <c:otherwise>
+              <c:forEach var="version" items="${dedc.edc.versions}">
+                <c:out value="${version.name}"/>
+              </c:forEach>
+            </c:otherwise>
+          </c:choose>
         </c:when>
         <c:when test="${dedc.eventCRF.notStarted || dedc.eventCRF.id == 0}">
         <select name="versionId<c:out value="${dedc.edc.crf.id}"/>" onchange="javascript:changeQuery<c:out value="${dedc.edc.crf.id}"/>();">
@@ -352,7 +356,7 @@
 </td>
 
 <c:choose>
-    <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
+    <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.name=='locked'}">
         <%--<c:when test="${dedc.status.name=='locked'}">--%>
         <td class="table_cell" bgcolor="#F5F5F5" align="center" style="vertical-align: middle;">
             <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
@@ -387,7 +391,7 @@
 <td class="table_cell" style="vertical-align: middle; width:200px;">
             <c:choose>
 
-                <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
+                <c:when test="${dedc.status.locked || studyEvent.subjectEventStatus.name=='locked'}">
                     <%--<c:when test="${dedc.status.name=='locked'}">--%>
 					<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="4"/>
                 </c:when>
@@ -431,8 +435,6 @@
 </form>
 
 <c:set var="rowCount" value="${rowCount + 1}" />
-</c:otherwise>
-</c:choose>
 
 <!-- end of for each for dedc, uncompleted event crfs, started CRFs below -->
 </c:when>
