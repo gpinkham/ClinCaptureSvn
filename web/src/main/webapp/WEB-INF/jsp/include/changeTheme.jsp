@@ -33,6 +33,7 @@
 		$('.table_cell_top').css('color', "#AA62C6");
 		$('.table_header_column_top').css('color', "#AA62C6");
 		$('.table_title_manage').css('color', "#AA62C6");
+		$('.table_title_Admin').css('color', "#AA62C6");
 		$('.title_manage').css('color', '#AA62C6');
 
 		$("img[src*='bt_']").each(
@@ -188,6 +189,7 @@
 		$('.table_cell_top').css('color', "#75b894");
 		$('.table_header_column_top').css('color', "#75b894");
 		$('.table_title_manage').css('color', "#75b894");
+		$('.table_title_Admin').css('color', "#75b894");
 		$('.title_manage').css('color', '#75b894');
 
 		$("img[src*='bt_']").each(function() {
