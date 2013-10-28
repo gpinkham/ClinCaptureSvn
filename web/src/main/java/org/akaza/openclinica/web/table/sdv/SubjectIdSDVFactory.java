@@ -263,16 +263,15 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		row.setStudySubjectId(studySubjectBean.getLabel());
 		row.setPersonId(studySubjectBean.getUniqueIdentifier());
 		row.setStudySubjectStatus(studySubjectBean.getStatus().getName());
-		int numberEventCRFs = eventCRFDAO.countEventCRFsByStudySubject(studySubjectBean.getId(),
-				studySubjectBean.getStudyId(), studySubjectBean.getStudyId());
-		row.setTotalEventCRF(numberEventCRFs + "");
 
 		StudyBean studyBean = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
 		row.setSiteId(studyBean.getIdentifier());
 
-		List<EventCRFBean> eventCRFBeans = eventCRFDAO.getEventCRFsByStudySubject(studySubjectBean.getId(),
-				studySubjectBean.getStudyId(), studySubjectBean.getStudyId());
-
+		List<EventCRFBean> eventCRFBeans = eventCRFDAO.getEventCRFsWithNonLockedCRFsByStudySubject(
+				studySubjectBean.getId(), studySubjectBean.getStudyId(), studySubjectBean.getStudyId());
+		int numberEventCRFs = eventCRFBeans.size();
+		row.setTotalEventCRF(numberEventCRFs + "");
+        
 		HashMap<String, Integer> stats = getEventCRFStats(eventCRFBeans, studyBean, studySubjectBean);
 
 		int numberOfCompletedEventCRFs = stats.get("numberOfCompletedEventCRFs");
@@ -286,7 +285,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         row.setNumberOfCRFsSDV(numberOfSDVdEventCRFs + "");
 
 		StringBuilder sdvStatus = new StringBuilder("");
-		if (studySubjectSDVd) {
+		if (studySubjectSDVd || (numberOfSDVdEventCRFs > 0 && numberOfCompletedEventCRFs == numberOfSDVdEventCRFs)) {
 			sdvStatus.append("<center><a href='javascript:void(0)' onclick='prompt(document.sdvForm,");
 			sdvStatus.append(studySubjectBean.getId());
 			sdvStatus.append(")'>");
@@ -356,8 +355,19 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 				continue;
 			}
 			CRFBean crfBean = crfDAO.findByVersionId(eventBean.getCRFVersionId());
+			EventDefinitionCRFBean eventDefinitionCrf = eventDefinitionCrfDAO
+					.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventBean.getStudyEventDefinitionId(),
+							crfBean.getId(), studySubject.getStudyId());
+			if (eventDefinitionCrf.getId() == 0) {
+				eventDefinitionCrf = eventDefinitionCrfDAO.findForStudyByStudyEventDefinitionIdAndCRFId(
+						studyEventBean.getStudyEventDefinitionId(), crfBean.getId());
+			}            
+			if (!(eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED || eventDefinitionCrf
+					.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)) {
+				continue;
+			}
 			// get number of completed event crfs
-			if (eventBean.getStatus().getId() >= Status.UNAVAILABLE.getId() && eventBean.getDateCompleted() != null) {
+			if (eventBean.getStatus().getId() == Status.UNAVAILABLE.getId() && eventBean.getDateCompleted() != null) {
 				numberOfCompletedEventCRFs++;
 			}
 			// get number of completed event SDVd eventeventDefinitionCrfDAOs
@@ -365,20 +375,13 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 				numberOfSDVdEventCRFs++;
 			}
 			// get number of all non SDVd events that are 100% or partial required
-			EventDefinitionCRFBean eventDefinitionCrf = eventDefinitionCrfDAO
-					.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventBean.getStudyEventDefinitionId(),
-							crfBean.getId(), studySubject.getStudyId());
-			if (eventDefinitionCrf.getId() == 0) {
-				eventDefinitionCrf = eventDefinitionCrfDAO.findForStudyByStudyEventDefinitionIdAndCRFId(
-						studyEventBean.getStudyEventDefinitionId(), crfBean.getId());
-			}
 			if (eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
 					|| eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) {
 				if (eventBean.isSdvStatus()) {
 					eventCRFDefIds.remove((Integer) eventDefinitionCrf.getId());
 					eventCRFDefIdsCopy.remove((Integer) eventDefinitionCrf.getId());
 				}
-				if (eventBean.getStatus().getId() >= Status.UNAVAILABLE.getId() && eventBean.getDateCompleted() != null) {
+				if (eventBean.getStatus().getId() == Status.UNAVAILABLE.getId() && eventBean.getDateCompleted() != null) {
 					eventCRFDefIdsCopy.remove((Integer) eventDefinitionCrf.getId());
 				} else {
 					canNotMarkAsSDVd = true;

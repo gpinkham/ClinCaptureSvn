@@ -236,7 +236,7 @@ public class SDVUtil {
 	public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId) {
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		return eventCRFDAO.getCountWithFilter(studyId, studyId, eventCRFSDVFilter);
+		return eventCRFDAO.getCountOfAvailableWithFilter(studyId, studyId, eventCRFSDVFilter);
 
 	}
 
@@ -268,10 +268,9 @@ public class SDVUtil {
 
 	private Collection<SubjectSDVContainer> getFilteredItems(EventCRFSDVFilter filterSet, EventCRFSDVSort sortSet,
 			int rowStart, int rowEnd, int studyId, HttpServletRequest request) {
-
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
-		eventCRFBeans = eventCRFDAO.getWithFilterAndSort(studyId, studyId, filterSet, sortSet, rowStart, rowEnd);
+		List<EventCRFBean> eventCRFBeans = eventCRFDAO.getAvailableWithFilterAndSort(studyId, studyId, filterSet,
+				sortSet, rowStart, rowEnd);
 		return getSubjectRows(eventCRFBeans, request);
 	}
 

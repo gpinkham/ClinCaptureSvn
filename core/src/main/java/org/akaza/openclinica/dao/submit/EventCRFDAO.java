@@ -612,6 +612,16 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		return executeFindAllQuery("getEventCRFsByStudySubject", variables);
 	}
 
+	public ArrayList getEventCRFsWithNonLockedCRFsByStudySubject(int studySubjectId, int studyId, int parentStudyId) {
+
+		HashMap variables = new HashMap();
+		variables.put(1, studySubjectId);
+		variables.put(2, studyId);
+		variables.put(3, parentStudyId);
+
+		return executeFindAllQuery("getEventCRFsWithNonLockedCRFsByStudySubject", variables);
+	}
+
 	public ArrayList getGroupByStudySubject(int studySubjectId, int studyId, int parentStudyId) {
 
 		HashMap variables = new HashMap();
@@ -656,6 +666,27 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		}
 	}
 
+	public Integer getCountOfAvailableWithFilter(int studyId, int parentStudyId, EventCRFSDVFilter filter) {
+
+		setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(1, studyId);
+		variables.put(2, parentStudyId);
+		String sql = digester.getQuery("getCountOfAvailableWithFilter");
+		sql += filter.execute("");
+
+		ArrayList rows = this.select(sql, variables);
+		Iterator it = rows.iterator();
+
+		if (it.hasNext()) {
+			Integer count = (Integer) ((HashMap) it.next()).get("count");
+			return count;
+		} else {
+			return null;
+		}
+	}
+
 	public ArrayList<EventCRFBean> getWithFilterAndSort(int studyId, int parentStudyId, EventCRFSDVFilter filter,
 			EventCRFSDVSort sort, int rowStart, int rowEnd) {
 		ArrayList<EventCRFBean> eventCRFs = new ArrayList<EventCRFBean>();
@@ -665,6 +696,33 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		variables.put(1, studyId);
 		variables.put(2, parentStudyId);
 		String sql = digester.getQuery("getWithFilterAndSort");
+		sql = sql + filter.execute("");
+		sql = sql + " order By  ec.date_created ASC "; // major hack
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+			sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
+		} else {
+			sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+		}
+
+		ArrayList rows = this.select(sql, variables);
+		Iterator it = rows.iterator();
+
+		while (it.hasNext()) {
+			EventCRFBean eventCRF = (EventCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+			eventCRFs.add(eventCRF);
+		}
+		return eventCRFs;
+	}
+
+	public ArrayList<EventCRFBean> getAvailableWithFilterAndSort(int studyId, int parentStudyId,
+			EventCRFSDVFilter filter, EventCRFSDVSort sort, int rowStart, int rowEnd) {
+		ArrayList<EventCRFBean> eventCRFs = new ArrayList<EventCRFBean>();
+		setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(1, studyId);
+		variables.put(2, parentStudyId);
+		String sql = digester.getQuery("getAvailableWithFilterAndSort");
 		sql = sql + filter.execute("");
 		sql = sql + " order By  ec.date_created ASC "; // major hack
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
