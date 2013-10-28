@@ -185,12 +185,15 @@ public class MetaDataReportBean extends OdmXmlReportBean {
 	public void addStudyGlobalVariables() {
 		StringBuffer xml = this.getXmlOutput();
 		String indent = this.getIndent();
+		String themeColor = CoreResources.getField("themeColor");
 		String currentIndent = indent + indent;
 		GlobalVariablesBean gv = odmstudy.getGlobalVariables();
 		xml.append(currentIndent + "<GlobalVariables>");
 		xml.append(nls);
 		xml.append(currentIndent + indent + "<StudyName>" + StringEscapeUtils.escapeXml(gv.getStudyName())
 				+ "</StudyName>");
+		xml.append(currentIndent + indent + "<CurrentColor>" + themeColor
+				+ "</CurrentColor>");
 		xml.append(nls);
 		xml.append(currentIndent + indent + "<StudyDescription>");
 		xml.append(nls);

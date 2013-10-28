@@ -13,6 +13,7 @@
 	<xsl:variable name="study" select="/odm:ODM/odm:Study[1]"/>
 	<xsl:variable name="protocolNameStudy" select="$study/odm:GlobalVariables/odm:ProtocolName"/>
 	<xsl:variable name="studyName" select="$study/odm:GlobalVariables/odm:StudyName"/>
+	<xsl:variable name="color" select="$study/odm:GlobalVariables/odm:CurrentColor"/>
 	<xsl:variable name="crfDetails" select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:FormDef"/>
 	<xsl:variable name="groupDetails" select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemGroupDef"/>
 	<xsl:variable name="itemDef" select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef"/>
@@ -192,7 +193,7 @@
 				<!--tokenizedcrfAndDataItemsHeaders: <xsl:value-of select="$tokenizedcrfAndDataItemsHeaders"/>-->
 				
 				<!-- Main Table Starting -->
-				<div class="tablebox_center" align="center">
+				<div class="tablebox_center" align="left">
 					<table border="1" cellpadding="0" cellspacing="0">
 						<tr valign="top">
 							<td class="table_header_row">
@@ -2912,10 +2913,20 @@
                                                     color: #4D4D4D;font-weight: bold;
                                                     }
                                                     H1 { font-family: Tahoma, Arial, Helvetica, sans-serif;
+                                                    <xsl:choose>
+												        <xsl:when test="$study/odm:GlobalVariables/odm:CurrentColor = 'violet'">
+												        	color: #AA62C6;
+												        </xsl:when>
+												        <xsl:when test="$study/odm:GlobalVariables/odm:CurrentColor = 'green'">
+												        	color: #75b894;
+												        </xsl:when>
+												        <xsl:otherwise>
+												        	color: #789EC5;
+												        </xsl:otherwise>
+											        </xsl:choose>
                                                     font-size: 18px;
                                                     line-height: 24px;
                                                     font-weight: bold;
-                                                    color: #789EC5;
                                                     }
 
                                                     td { font-family: Tahoma, Arial, Helvetica, Sans-Serif;
@@ -2924,12 +2935,34 @@
                                                     color: #4D4D4D;
                                                     }
 
-                                                    a:link, a:visited { color: #789EC5;
+                                                    a:link, a:visited { 
+                                                    <xsl:choose>
+												        <xsl:when test="$study/odm:GlobalVariables/odm:CurrentColor = 'violet'">
+												        	color: #AA62C6;
+												        </xsl:when>
+												        <xsl:when test="$study/odm:GlobalVariables/odm:CurrentColor = 'green'">
+												        	color: #75b894;
+												        </xsl:when>
+												        <xsl:otherwise>
+												        	color: #789EC5;
+												        </xsl:otherwise>
+											        </xsl:choose>
                                                     text-decoration: none;
                                                     }
 
 
-                                                    a:hover, a:active { color: #789EC5;
+                                                    a:hover, a:active { color: 
+                                                    <xsl:choose>
+												        <xsl:when test="$study/odm:GlobalVariables/odm:CurrentColor = 'violet'">
+												        	color: #AA62C6;
+												        </xsl:when>
+												        <xsl:when test="$study/odm:GlobalVariables/odm:CurrentColor = 'green'">
+												        	color: #75b894;
+												        </xsl:when>
+												        <xsl:otherwise>
+												        	color: #789EC5;
+												        </xsl:otherwise>
+											        </xsl:choose>
                                                     text-decoration: underline;
                                                     }
 
