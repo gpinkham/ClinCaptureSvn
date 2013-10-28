@@ -16,6 +16,7 @@ package org.akaza.openclinica.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -100,40 +101,56 @@ public final class SubjectEventStatusUtil {
 		} else {
 			boolean des = false;
 			int countOfSDVd = 0;
+			int countOfSkipped = 0;
+			int countOfStopped = 0;
 			int countOfLocked = 0;
 			int countOfRemoved = 0;
 			SubjectEventStatus minNotDESStatus = null;
-			SubjectEventStatus status = subjectEventStatus;
+			SubjectEventStatus status = SubjectEventStatus.SCHEDULED;
+			Map<SubjectEventStatus, Integer> scoreMap = new HashMap<SubjectEventStatus, Integer>();
+			scoreMap.put(SubjectEventStatus.COMPLETED, 1);
+			scoreMap.put(SubjectEventStatus.SOURCE_DATA_VERIFIED, 2);
+			scoreMap.put(SubjectEventStatus.SIGNED, 3);
 			for (StudyEventBean studyEventBean : studyEvents) {
-				if (studyEventBean.getSubjectEventStatus().getId() > SubjectEventStatus.DATA_ENTRY_STARTED.getId()
-						&& (minNotDESStatus == null || studyEventBean.getSubjectEventStatus().getId() < minNotDESStatus
-								.getId())) {
+				Integer minNotDESStatusScore = scoreMap.get(minNotDESStatus);
+				Integer studyEventBeanScore = scoreMap.get(studyEventBean.getSubjectEventStatus());
+				if (studyEventBeanScore != null
+						&& (minNotDESStatus == null || (minNotDESStatusScore != null && studyEventBeanScore < minNotDESStatusScore))) {
 					minNotDESStatus = studyEventBean.getSubjectEventStatus();
 				}
-
-				if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED) {
-					des = true;
-				} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
-					countOfLocked++;
-				} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.REMOVED) {
-					countOfRemoved++;
-				} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SOURCE_DATA_VERIFIED) {
-					countOfSDVd++;
+				if (studyEventBean.getSubjectEventStatus().getId() >= SubjectEventStatus.DATA_ENTRY_STARTED.getId()) {
+					status = SubjectEventStatus.DATA_ENTRY_STARTED;
+					if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED) {
+						des = true;
+					} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.STOPPED) {
+						countOfStopped++;
+					} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SKIPPED) {
+						countOfSkipped++;
+					} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.REMOVED) {
+						countOfRemoved++;
+					} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
+						countOfLocked++;
+					} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SOURCE_DATA_VERIFIED) {
+						countOfSDVd++;
+					}
 				}
 			}
 			if (des) {
 				status = SubjectEventStatus.DATA_ENTRY_STARTED;
-			} else if (countOfLocked == studyEvents.size()) {
-				status = SubjectEventStatus.LOCKED;
+			} else if (countOfStopped == studyEvents.size()) {
+				status = SubjectEventStatus.STOPPED;
+			} else if (countOfSkipped == studyEvents.size()) {
+				status = SubjectEventStatus.SKIPPED;
 			} else if (countOfRemoved == studyEvents.size()) {
 				status = SubjectEventStatus.REMOVED;
+			} else if (countOfLocked == studyEvents.size()) {
+				status = SubjectEventStatus.LOCKED;
 			} else if (countOfSDVd == studyEvents.size()) {
 				status = SubjectEventStatus.SOURCE_DATA_VERIFIED;
 			} else if (!des && minNotDESStatus != null) {
 				status = minNotDESStatus;
 			}
-			url.append("<img src='" + imageIconPaths.get(status.getId())
-					+ "' border='0' style='position: relative;'>");
+			url.append("<img src='" + imageIconPaths.get(status.getId()) + "' border='0' style='position: relative;'>");
 		}
 	}
 
