@@ -77,11 +77,11 @@
       </tr>
 	  <tr>
         <td class="left"><b>Sex:</b></td>
-        <td>This cell indicates the sex of each subject.<p></p></td>
+        <td>This cell indicates the sex of each subject.  Note that it might be a different text, set in the Study Parameters section.<p></p></td>
       </tr>
 	  <tr>
         <td class="left"><b>Secondary Label:</b></td>
-        <td>This cell indicates the Secondary Label of each subject.<p></p></td>
+        <td>This cell indicates the Secondary Label of each subject.  Note that it might be a different text, set in the Study Parameters section.<p></p></td>
       </tr>
 	  	  <tr>
         <td class="left"><b>Group Assignment:</b></td>
@@ -91,7 +91,6 @@
 	<p>To collapse the table click the <em><b>Hide</b></em> link, you will see instead of the <em><b>Show More</b></em> link, in the top of the table if it is expanded.</p>
 	<p>With the drop-down menu, <em><b>Select An Event</b></em> in the top of the subject list, you can filter the subjects by an event. You can also filter by entering free text or by selecting a pre-defined choice from the drop-down menu, in the grey boxes underneath each column title. To apply the filter select the <em><b>Apply Filter</b></em> link.<br />
 	To reset the filter click on the <em><b>Clear Filter</b></em> link next to it.</p>
-	<p>In addition to viewing all the Study Subjects, you are also presented with a link to <em><b>Add New Subject</b></em> in the upper right of the table.</p>
 	<p>The subject matrix provides you with the following columns by default:</p>
 	<table>
       <tr>
@@ -100,7 +99,9 @@
       </tr>
       <tr>
         <td class="left"><b>2. Study Events</b></td>
-        <td >For each subject, you will see the Study Events with their status icon and next to it the number of occurrence in parenthesis. If you click of one of these icons you can schedule the event, view or enter data as well as edit or remove the event from the subject.<p></p></td>
+        <td >For each subject, you will see the Study Events with their status icon and next to it the number of occurrences if it is a Repeating Event. 
+        If you click of one of these icons you can schedule the event, view or enter data as well as edit or remove the event from the subject.  You can also 
+        see Discrepancy Notes for the Subject, Event, or individual CRF.<p></p></td>
       </tr>
       <tr>
         <td class="left"><b>3. Actions (depending on role)</b></td>
@@ -112,8 +113,20 @@
 			<p>If a subject has a status of inactive, which means that it was removed, you can restore it to the study by clicking on the <em>Restore</em> icon.</p>
 			<img src="../images/bt_Reassign.gif" alt="Reassign" /> <em>Reassign</em>
 			<p>If you want to reassign the Study Subject to another study or site you can click on the <em>Reassign</em> icon and you will be brought to the 'Reassign Study Subject' page.</p>
-			<img src="../images/icon_Signed.gif" alt="Sign" /> <em>Sign</em>
-			<p>If you want to sign the Study Subject you can click on the <em>Sign</em> icon and the Subjects Event Status changes to signed.</p>
+			<img src="../images/icon_SignedBlue.gif" alt="Sign" /> <em>Sign</em>
+			<p>If you want to sign the Study Subject you can click on the <em>Sign</em> icon and the Subjects Event Status changes to signed.  
+			Note this option is typically only open to <em>Investigators.</em></p>
+			<img src="../images/icon_DoubleCheck_Action.gif" alt="Perform SDV" /> <em>Perform SDV</em>
+			<p>If you want to perform Source Data Verification on the Study Subject you can click on the <em>SDV</em> icon and be taken to the SDV page for that Study Subject.</p>
+			<img src="../images/bt_Lock.gif" alt="Lock" /> <em>Lock</em>
+			<p>If you want to lock the Study Subject you can click on the <em>Lock</em> icon and the Subjects Event Status changes to locked.</p>
+			<img src="../images/bt_Calendar.gif" alt="Calendared Events" /> <em>Calendared Events</em>
+			<p>If your Study Subject has any Calendared Events scheduled or assigned, the <em>Calendared Event</em> icon will appear.  Note that if there is a Event 
+			which is out of scope for that Subject, it will be changed to a <em>red</em> icon: <img src="../images/bt_Calendar_red.gif" alt="Calendared Events" /></p>
+			<img src="../images/icon_Note.gif" alt="Notes and Discrepancies" /> <em>Discrepancies</em>
+			<p>At this part of the Subject Matrix you can also look at the <em>Notes and Discrepancies</em> for an entire Subject.  
+			Note that this flag changes to yellow: <img src="../images/icon_flagYellow.gif" alt="Updated Notes only" /> when all Notes for the Subject are set to Updated.  
+			If all notes are Closed or do not exist, the flag will not show.</p>
 		</td>
       </tr>
     </table>

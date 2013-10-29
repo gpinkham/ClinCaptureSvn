@@ -62,22 +62,31 @@
 <!--content container, on the right side-->
 <div id="content">
 	<h1>2.1.1 View Subject Help</h1>
-	<p>You can minimize and maximize each section within the 'View Subject' page. The sections available to view are <em><a href="#subrec">Subjects Record</a></em>, <em><a href="#events">Events</a></em>, <em><a href="#group">Group</a></em>, and <em><a href="#global">Global Subject Record</a></em>. You can also view the audit logs by clicking on the <em><a href="#audit">Audit Logs</a></em> link in the top.</p>
+	<p>You can minimize and maximize each section within the 'View Subject' page. 
+	The sections available to view are <em><a href="#subrec">Study Subject Record</a></em> and <em><a href="#events">Events</a></em>. 
+	You can view the audit logs by clicking on the <input type="submit" value="Subject's Audit Log" class="button_long" /> button at the bottom.</p>
+	<P>Also at the bottom are the buttons for all Subject Discrepancy Notes via the <input type="submit" value="Subject's Discrepancies" class="button_long" /> button and their
+	Case Books via the <input type="submit" value="Subject's Case Book" class="button_long" /> button.</P>
 
-	<p><b><em><a name='subrec'></a>Subjects Record</em></b></p>
-	<p>This matrix provides you with general information about the Subject, e.g. Study Subject ID, Study name, or Unique Protocol ID. Other fields depend on the settings of your study, e.g. Date of birth or Year of birth.</p>
+	<p><b><em><a name='subrec'></a>Study Subject Record</em></b></p>
+	<p>This section provides you with general information about the Subject, e.g. Study Subject ID, Study name, or Unique Protocol ID. 
+	Other fields depend on the settings of your study, e.g. Date of Birth or Year of Birth.  
+	Under this section you can also find the buttons to <em>Edit</em> or <em>Lock</em> a Study Subject.</p>
+	<p>Beneath this part you will see a list of all the <em>Dynamic Group Classes</em> and <b>Subject Group Classes</b> that this Subject is a part of, 
+	if they exist in your study.
+	</p>
 	<p><a href="#top">Back to Top</a></p>
 
 	<p><b><em><a name='events'></a>Events</em></b></p>
-	<p>In the Event Section you can see a list of all events assigned to this subject. All Events are ordered by their Start Date, with the latest on top. You can choose to reorder the list of events by toggling the ascending or descending arrow located next to the Start Date.</p>
+	<p>In the Event Section you can see a list of all events assigned to this subject. All Events are ordered by their Start Date, with the latest on top. 
+	You can choose to reorder the list of events by toggling the ascending or descending arrow located next to the Start Date.</p>
 	<p>Similarly, you can also reorder the event list using the event name, Location, or Status, and toggle their respective ascending or descending arrows.</p>
 	<p>The <b>Find</b> function, located at the top of the event list, allows you to search for a set of events based on their Event name or the Location.</p>
-	<p>In addition to viewing all the Events, you are also presented with a link to <em><b>Add New Event</b></em>, which will direct you to the <a href="2_4_scheduleEvent_Help.html"><b>Schedule Event</b></a> page.</p>
 	<p>The Event matrix provides you with the following columns:</p>
 	<table>
       <tr>
         <td class="left"><b>Event (Occurrence Number):</b></td>
-        <td>This cell indicates the name of the Event and in parenthesis the number of occurrence.<p></p></td>
+        <td>This cell indicates the name of the Event and in parenthesis the number of its occurrence if it is a Repeating Event.<p></p></td>
       </tr>
       <tr>
         <td class="left"><b>Start Date:</b></td>
@@ -89,7 +98,8 @@
       </tr>
 	  <tr>
         <td class="left"><b>Status:</b></td>
-        <td>This cell presents the status of the event. It can be <em>scheduled</em>, <em>data entry started</em>, <em>completed</em>, and <em>signed</em>.<br /><em>Not scheduled</em> events will not be displayed in this matrix.<p></p></td>
+        <td>This cell presents the status of the event. It can be <em>scheduled</em>, <em>data entry started</em>, 
+        <em>completed</em>, <em>source data verified</em>, and <em>signed</em>.<br /><em>Not scheduled</em> events will not be displayed in this matrix.<p></p></td>
       </tr>
 	  <tr>
         <td class="left"><b>Actions: (depending on role)</b></td>
@@ -100,7 +110,7 @@
 			<img src="../images/bt_Remove.gif" alt="Remove" /> <em>Remove</em>
 			<p>To remove an event from the Subject Record you can click on the particular <em>Remove</em> icon. The event and all data associated with it in this Study/Site will be removed. It may be restored by a system administrator.</p>
 			<img src="../images/bt_Restore.gif" alt="Restore" /> <em>Restore</em>
-			<p>If an Event was removed a system adminitrator can restore it to the study by clicking on the <em>Restore</em> icon. The event and all data associated with it in this Study/Site will be restored.</p>
+			<p>If an Event was removed a system administrator can restore it to the study by clicking on the <em>Restore</em> icon. The event and all data associated with it in this Study/Site will be restored.</p>
 		<p></p>
 		</td>
 	  </tr>
@@ -112,15 +122,12 @@
 	<p><a href="#top">Back to Top</a></p>
 
 	<p><b><em><a name='group'></a>Group</em></b></p>
-	<p>You can expand the Group matrix under the event matrix by clicking on the <img src="../images/bt_Expand.gif" alt="Expand" /> icon. You will then see a list of all containing groups in this study with information about the <b>Subject Group Class</b> name, the <b>Study Group</b> as well as some <b>Notes</b>.<br />Additionally you are provided with a link to <em><b>Assign Subject to Group</b></em>.</p>
+	
 	<p><a href="#top">Back to Top</a></p>
 
-	<p><b><em><a name='global'></a>Global Subject Record</em></b></p>
-	<p>Also, by expanding the Global Subject Record matrix you can see general information about the subject. In the top of the table you are provided with a link to <em><b>Edit Record</b></em>.</p> 
-	<p><a href="#top">Back to Top</a></p>
-
-	<p><b><em><a name='audit'></a>Audit Logs</em></b></p>
-	<p>The <b><em>Audit Logs</em></b> link, above all matrixes, will open in a popup window and displayes all captured transactions concerning this particular subject.</p> 
+	<p><b><em><a name='audit'></a>Subject Record Buttons</em></b></p>
+	<p>The <input type="submit" value="Subject's Audit Log" class="button_long" /> button, at the bottom of the page, 
+	will open in a popup window displaying all captured transactions concerning this particular subject.  You will also see links to the <em>Discrepancy Notes</em> for this subject and the subject's <em>Case Book</em>, allowing you to print out the entire set of completed CRFs.</p> 
 	<p><a href="#top">Back to Top</a></p>
 </div>
 <!--end content-->

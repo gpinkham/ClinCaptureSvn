@@ -62,10 +62,23 @@
 <!--content container, on the right side-->
 <div id="content">
 	<h1>4.6 CDISC File Specifications</h1>
-	<p>The Operational Data Model (ODM) of Clinical Data Interchange Standards Consortium (CDISC) is a vendor neutral, platform independent format for interchange and archive of data collected in clinical trials. The model represents study metadata, data and administrative data associated with a clinical trial. The ODM has been designed to be compliant with guidance and regulations published by the FDA for computer systems used in clinical trials.</p>
-	<p>The ODM model categorize a clinical study's data into several kinds of entities including subjects, study events, forms, item groups, items, and annotations. The metadata of a study describes the types of study events, forms, item groups, and items that allowed in the study. The clinical data of a study will typically have many actual entities corresponding to their definitions described in the metadata.</p>
-	<p>Like any XML file, an ODM file consists of a tree of elements which correspond to entities. Each element consists of required attributes and optional attributes. An ODM file type must be either Snapshot or Transactional. A Snapshot file shows the current state of the included data. A Transactional file shows both latest state and (optionally) some prior states of an included entity. An ODM file has Granularity attribute which describes the coverage information of the ODM file.</p>
-	<p>For more details about ODM specification, see <b><a href="http://www.cdisc.org/models/odm/v1.3/final/ODM1-3-0-Final.htm" rel="external">Specification For The Operational Data Model (ODM)</a></b></p>
+	<p>The Operational Data Model (ODM) of Clinical Data Interchange Standards Consortium (CDISC) is a vendor neutral, 
+	platform independent format for interchange and archive of data collected in clinical trials. 
+	The model represents study metadata, data and administrative data associated with a clinical trial. 
+	The ODM has been designed to be compliant with guidance and regulations published by the FDA for computer systems used in clinical trials.</p>
+	<p>The ODM model categorizes a clinical study's data into several kinds of entities including subjects, study events, forms, item groups, items, and annotations. 
+	The metadata of a study describes the types of study events, forms, item groups, and items that allowed in the study. 
+	The clinical data of a study will typically have many actual entities corresponding to their definitions described in the metadata.</p>
+	<p>Like any XML file, an ODM file consists of a tree of elements which correspond to entities. 
+	Each element consists of required attributes and optional attributes. 
+	An ODM file type must be either Snapshot or Transactional. 
+	A Snapshot file shows the current state of the included data. 
+	A Transactional file shows both latest state and (optionally) some prior states of an included entity. 
+	Also, an ODM file has a Granularity attribute which describes the coverage information of the ODM file.</p>
+	<p>For more details about the ODM specification, 
+	see <b><a href="http://www.cdisc.org/models/odm/v1.3/final/ODM1-3-0-Final.htm" rel="external">Specification For The Operational Data Model (ODM)</a></b></p>
+	<P>Keep in mind that Clinovo hosts <a href="http://www.clinovo.com/techtrainings/overview">tech trainings about CDISC in general</a>, 
+	and also supports the open-source <a href="http://www.clinovo.com/cdisc-express">CDISC Express</a>, so please feel free to review those pages as resources as well.</P>
 </div>
 <!--end content-->
 

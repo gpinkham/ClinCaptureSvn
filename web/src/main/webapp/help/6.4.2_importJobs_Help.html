@@ -43,6 +43,7 @@
 	&nbsp;&nbsp;&nbsp;<a href="6.2.1_createUser_Help.html"><em>6.2.1 Create New User</em></a><br />
 	&nbsp;&nbsp;&nbsp;<a href="6.2.2_auditUser_Help.html"><em>6.2.2 Audit User Activity</em></a><br />
 	&nbsp;&nbsp;&nbsp;<a href="6.2.3_lockout_Help.html"><em>6.2.3 Lockout Configuration</em></a><br />
+	&nbsp;&nbsp;&nbsp;<a href="6.2.4_passwordPolicyHelp.html"><em>6.2.4 Password Policy</em></a><br />
 	&nbsp;<a href="6_3_administerCRF_Help.html"><em>6.3 CRFs</em></a><br />
 	&nbsp;&nbsp;&nbsp;<a href="6.3.1_archiveCRF_Help.html"><em>6.3.1 Archive CRF</em></a><br />
 	&nbsp;&nbsp;&nbsp;<a href="6.3.2_removeCRF_Help.html"><em>6.3.2 Remove CRF</em></a><br />
@@ -67,11 +68,14 @@
 <!--content container, on the right side-->
 <div id="content">
 	<h1>6.4.2 Scheduled Import Jobs</h1>
-	<p>Here you can view all your existing jobs to import data. Above the matrix you will find a link <b><em>Create a new Import Data Job</em></b>.
+	<p>Here you can view all your existing jobs to import data. Below the list you will find a button entitled <b><em>Create a new Import Data Job</em></b>.
 	This link will direct you to the 'Create Scheduled Job: Import Dataset' page, where you can configure a new job to import data.<br />
-	Please fill out the fields named Import Job Name and Import Job Description. The default path to import data is displayed. If you want to provide another path write it down in the field underneath. After this, please define the start date and time as well as the frequency the job should be executed.<br />
+	Please fill out the fields named Import Job Name and Import Job Description. 
+	The default path to import data is displayed. If you want to provide another path, please enter it in the field next to it. 
+	After this, please define the start date and time as well as the frequency the job should be executed.<br />
 	Please provide an Email Contact address in the last field.</p>
-	<p>The <b>Find</b> function, located at the top of the job list, allows you to search for a specific job based on the Name, Previous Fire Time, Next Fire Time, Description, or Study.</p>
+	<p>The <b>Find</b> function, located at the top of the job list, allows you to search for a specific job based on the Name, 
+	Previous Fire Time, Next Fire Time, Description, or Study.</p>
 	<p>The View Scheduled Import Data Jobs matrix consists of the following columns:</p>
 	<table>
       <tr>
@@ -92,7 +96,7 @@
       </tr>
 	  <tr>
         <td class="left"><b>Study:</b></td>
-        <td>Indicates the study the job belongs to.<p></p></td>
+        <td>Indicates the study (or site) the job belongs to.  Note that XML assigned to another Study or Site will not import correctly.<p></p></td>
       </tr>
 	  <tr>
         <td class="left"><b>Action:</b></td>
@@ -105,7 +109,8 @@
 			<img src="../images/bt_Restore.gif" alt="Restore" /> <em>Restore</em>
 			<p>If a subject has a status of inactive, which means that it was removed, you can restore it to the study by clicking on the <em>Restore</em> icon.</p>
 			<img src="../images/bt_Delete.gif" alt="Delete" /> <em>Delete</em>
-			<p>If you finally want to delete a job you can click on the <em>Delete</em> icon and the job will be wiped from the system, and the delete cannot be undone.</p>
+			<p>If you finally want to delete a job you can click on the <em>Delete</em> icon and the job will be wiped from the system.
+			Keep in mind that this delete cannot be undone.</p>
 		</td>
 		</tr>
     </table>

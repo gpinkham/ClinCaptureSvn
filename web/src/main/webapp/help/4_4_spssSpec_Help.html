@@ -64,8 +64,11 @@
 	<h1>4.4 SPSS File Specifications</h1>
 	<p><b>Created and tested using SPSS 13.0 for Windows</b></p>
 	<p>SPSS Data Definitions cover 10 main attributes for any variable: Name, Type, Width, Decimals, Label, Values, Missing, Columns, Align, and Measure.</p>
-	<p>SPSS is able to read most any ASCII file and deduce parameters for some of these variable attributes. However, any other attributes must be typed in by hand, which is tedious for large datasets.</p>
-	<p>ClinCapture instead can generate an SPSS Syntax file (*.sps) that, in association with the data file, will automatically load in the data with the proper variable definitions/attributes. ClinCapture currently supports automated definition of Name, Type, Width, Decimals, Label, Values, Missing, Columns, Align, and Measure</p>
+	<p>SPSS is able to read most any ASCII file and deduce parameters for some of these variable attributes. 
+	However, any other attributes must be typed in by hand, which is tedious for large datasets.</p>
+	<p>ClinCapture instead can generate an SPSS Syntax file (*.sps) that, in association with the data file, 
+	will automatically load in the data with the proper variable definitions/attributes. 
+	ClinCapture currently supports automated definition of Name, Type, Width, Decimals, Label, Values, Missing, Columns, Align, and Measure</p>
 	<p>This document describes the structure and syntax of the .sps file.</p>
 	<p><b>Conceptual Mapping</b></p>
 	<p>The conceptual mapping of ClinCapture data element metadata to SPSS Data Definitions is as follows:</p>
@@ -206,7 +209,7 @@
     <tr>
         <td class="td">Type</td>
         <td class="td">Date</td>
-        <td class="td">????</td>
+        <td class="td">&nbsp;</td>
     </tr>
     <tr>
         <td class="td">Width</td>
@@ -514,13 +517,15 @@
 	</p><br />
 
 	<p>Rules for automatically converting an invalid SPSS variable name to valid SPSS variable name:</p>
- 	- Replace any invalid character with the symbol #<br />
- 	- If the first character is not a letter, letter V will be used as first letter<br />
- 	- If the last character is a period or underscore, it will replaced by #<br />
- 	- If a name is longer than 64 characters, it will be truncated to 64 characters.<br />
-    - If it results in non-unique name in a data file, sequential numbers are used to replace its letters at the end. By default, the size of sequential numbers is 3.<br />
-    - If a reserved keyword has been used as a variable name, squential numbers are apended to its end.<br />
-
+	<ul>
+ 	<li>Replace any invalid character with the symbol #</li>
+ 	<li>If the first character is not a letter, letter V will be used as first letter</li>
+ 	<li>If the last character is a period or underscore, it will replaced by #</li>
+ 	<li>If a name is longer than 64 characters, it will be truncated to 64 characters.</li>
+    <li>If it results in non-unique name in a data file, sequential numbers are used to replace its letters at the end. 
+    By default, the size of sequential numbers is 3.</li>
+   	<li>If a reserved keyword has been used as a variable name, squential numbers are apended to its end.</li>
+	</ul>
 	<p><b>Syntax</b><br />
 	The syntax file uses the GET DATA command. The formal syntax (as taken from SPSS help documentation) is as follows:<br /><br />
 	------------------------------------------<br />

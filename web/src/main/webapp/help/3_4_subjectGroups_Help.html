@@ -62,14 +62,30 @@
 <!--content container, on the right side-->
 <div id="content">
 	<h1>3.4 Groups Help</h1>
-	<p>This section allows you to explore all the Subject Group Classes that you have made to categorize groups of Subjects within a particular Study.</p>
-	<p>A Subject Group Class is a class of group categories that are related and mutually exclusive. For instance, when creating a group class you may create a Group Class called 'Trial Arm' with the groups 'Treatment A', 'Treatment B', and 'Placebo'. You may then assign the subject to one of these groups. If you specify the Subject Assignment as 'Required', you must assign the subject to one of these groups upon creating the subject record. You can have multiple Group Classes within a study.</p>
-	<p>You can choose to view the groups in any order by clicking on the arrow located next to each column title, which is in blue and bold. With a click on the Action icons <img src="../images/bt_View.gif" alt="View" />, <img src="../images/bt_Edit.gif" alt="Edit" /> or <img src="../images/bt_Remove.gif" alt="Remove" /> you can <em>View</em>, <em>Edit</em>, or <em>Remove</em> a specific Subject Group Class, depending on your role in the study.</p>
-	<b>Create a Subject Group Class</b>
-	<p>You can also create a Subject Group Class by clicking on the <em><b>Create a Subject Group Class</b></em> link at the top of the table.</p>
+	<p>This section allows you to explore all the <em>Subject Group Classes</em> and <em>Dynamic Group Classes</em> that you have made to 
+	categorize groups of Subjects within a particular Study.</p>
+	<p>A Subject Group Class is a class of group categories that are related and mutually exclusive. 
+	For instance, when creating a group class you may create a Group Class called 'Trial Arm' 
+	with the groups 'Treatment A', 'Treatment B', and 'Placebo'. 
+	You may then assign the subject to one of these groups. 
+	If you specify the Subject Assignment as 'Required', you must assign the subject to one of these groups 
+	upon creating the subject record. You can have multiple Group Classes within a study.</p>
+	<p>A Dynamic Group Class is much like a Subject Group Class, but instead of categories it contains Events from the Subject Matrix.  You can assign a Subject
+	to one class, and the Events in that class will be visible on the Subject Matrix.  Events in Dynamic Group Classes not assigned to a Subject will not show up
+	on the Subject Matrix.  Dynamic Group Classes can be assigned manually when updating a Subject, or through an API call to randomize the Subject, such as through
+	<em>Randomize.net</em>.</p>
+	<p>You can choose to view these groups in any order by clicking on the arrow located next to each column title, 
+	which is in blue and bold. With a click on the Action icons <img src="../images/bt_View.gif" alt="View" />, 
+	<img src="../images/bt_Edit.gif" alt="Edit" /> or <img src="../images/bt_Remove.gif" alt="Remove" /> 
+	you can <em>View</em>, <em>Edit</em>, or <em>Remove</em> a specific Group Class, depending on your role in the study.</p>
+	<p>Also note that there is a second table on this page to cover ordering of the Dynamic Groups.  Typically, the Default Dynamic Group is shown first, 
+	and then other Dynamic Groups and their Events are shown, and then Events without Groups are shown last, or to the far right, in the Subject Matrix.</p>
+	<b>Create a Group Class</b>
+	<p>You can also create a Subject Group Class or Dynamic Group Class by clicking on the <em><b>Create Group</b></em> button at the bottom of the page.</p>
 	<p>Required fields are Name, Type, whether enrollment in the group is required or not, and the name and description of the Subject Group(s) in the class.</p>
 	<p><b>Note:</b> You can create more than one group at this screen.</p>
-	<p>&nbsp;</p>
+	<p>If you pick Dynamic Group from the drop-down of Types, you can then pick Events from a list and you can pick if a Group will be Default.  The Default Group will 
+	always be assigned to every Subject upon creation, and will always show on the left-hand side of the Subject Matrix.</p>
 	<p>&nbsp;</p>
 </div>
 <!--end content-->

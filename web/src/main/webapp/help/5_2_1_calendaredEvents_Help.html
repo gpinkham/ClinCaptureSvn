@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<link rel="icon" href="../images/favicon.ico" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+
+<title>ClinCapture Help</title>
+
+<link rel="stylesheet" href="../includes/styles_hf.css" type="text/css" media="screen" />
+<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="colorTheme.js"></script>
+
+</head>
+
+<body>
+
+<!--main container-->
+<div id="main">
+<a name="top" />
+<!--header container-->
+<div id="header">
+	<img src="../images/popup_OC.gif" alt="ClinCapture" style="float: left"/><img src="../images/popup_Help.gif" alt="Help" style="float: right" />
+</div>
+<!--end header-->
+
+<!--container for navigation on the left side-->
+<div id="navi">
+	<div class="bullets">
+	<a href="index.html">Table of Contents</a>
+	<br />
+	<div class="contTable">
+	<p>
+	<a href="1_0_myOpenClinica_Help.html">1. My ClinCapture</a><br />
+	<a href="2_0_submitData_Help.html">2. Submit Data</a><br />
+	<a href="3_0_manageStudy_Help.html">3. Monitor and Manage Data</a><br />
+	<a href="4_0_extractData_Help.html">4. Extract Data</a><br />
+	<a href="5_0_studySetup_Help.html">5. Study Setup</a><br />
+	&nbsp;<a href="5_1_buildStudy_Help.html"><em>5.1 Build Study</em></a><br />
+	&nbsp;<a href="5_2_eventDefinitions_Help.html"><em>5.2 Event Definitions</em></a><br />
+	&nbsp;&nbsp;<a href="#"><em>5.2.1 Calendared Event Definitions</em></a><br />
+	&nbsp;<a href="5_3_users_Help.html"><em>5.3 Users</em></a><br />
+	&nbsp;<a href="5_4_sites_Help.html"><em>5.4 Sites</em></a><br />
+	<a href="6_0_administerSystem_Help.html">6. Administration</a><br />
+	</p>
+	</div>
+	</div>
+
+	<div class="bullets">
+	<a href="glossary.html">Glossary</a>
+	</div><br />
+
+	<div class="bullets">
+	<a href="iconkey.html">Icon Key</a>
+	</div><br />
+</div>
+<!--end navigation-->
+
+<!--content container, on the right side-->
+<div id="content">
+	<h1>5.2.1 Calendared Event Definitions Help</h1>
+	<p>This pop-up page allows you to view all the Study Event Parameters that are a part of your current study, especially Calendared Events. 
+	Note that there are a number of parameters that appear when your Event is Calendared.  They are the following:</p>
+	<table>
+      <tr>
+        <td class="left"><b>Event Name:</b></td>
+        <td>This cell displays the Study Event Name.<p></p></td>
+      </tr>
+      <tr>
+        <td class="left"><b>Event Type:</b></td>
+        <td>This cell indicates the Study Event Type, Calendared, Scheduled, Common or Unscheduled.<p></p></td>
+      </tr>
+      <tr>
+        <td class="left"><b>Reference:</b></td>
+        <td>This cell indicates whether or not a Calendared Event is a <i>reference visit</i>.  Typically a reference visit is a baseline event which triggers other events to be scheduled.  Completing a reference visit will result in the non-reference Calendared Events to be scheduled for a Subject, according to the rest of the parameters.<p></p></td>
+      </tr>
+      <tr>
+        <td class="left"><b>Day Min:</b></td>
+        <td>This cell indicates the minimum number of days that should pass before a Calendared Event is completed.  This is calculated as the Date a reference visit is completed + number of days in Day Min.
+        If an Event is completed before its Day Min, a Query will be generated and the Calendared Icon next to the Subject in the Subject Matrix will turn red.<p></p></td>
+      </tr>
+      <tr>
+        <td class="left"><b>Day Max:</b></td>
+        <td>This cell indicates the maximum number of days that can pass until a Calendared Event should be completed.  This is also calculated as the Date a reference visit is completed + number of days in Day Min.
+        If an Event is completed after its Day Max, a Query will be generated and the Calendared Icon next to the Subject in the Subject Matrix will turn red.<p></p></td>
+      </tr>
+      <tr>
+        <td class="left"><b>Day Schedule:</b></td>
+        <td>This cell indicates the day an Event will be auto-scheduled after the completion of a reference event.  Naturally, the Day Scheduled needs to be between Day Min and Day Max.<p></p></td>
+      </tr>
+      <tr>
+        <td class="left"><b>Day Email:</b></td>
+        <td>This cell indicates the day that a reminder email will be sent out about the Event.  This is calculated in the same way as Day Min and Day Max.  The Day Email should come before Day Scheduled.<p></p></td>
+      </tr>
+    </table>
+	<p>&nbsp;</p>
+	
+<a href='#top'>Back to Top</a>
+</div>
+<!--end content-->
+
+<!--container for footer-->
+<div id="footer">
+	<a href="javascript:window.close()">Exit Help</a> 
+</div>
+<!--end footer-->
+
+</div>
+<!--end main container-->
+
+</body>
+</html>

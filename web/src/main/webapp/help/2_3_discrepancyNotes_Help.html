@@ -70,27 +70,56 @@
 	<a href="#resolvedn"><em>Updating and Resolving Discrepancy Notes</em></a><br />
 	
 	<p><a name="about"></a><em><b>About Discrepancy Notes</b></em><br />
-	ClinCapture provides discrepancy management capabilities to verifying the accuracy and completeness of data in a clinical trial, to address incomplete or inaccurate data, provide tracking and auditing on changes to the data, and track accuracy and completeness for studies, sites, users, and CRFs. Discrepancy Management may be turned on or off for each study as part of the study configuration.</p>
-	<p>A discrepancy note is always associated with a particular subject-specific data element (or item). This may be an element that is entered when adding the subject record, such as date of birth, or elements created when recording a patient encounter, such as the date of a study event or an item in a CRF.</p>
-	<p>Discrepancy Notes can be 'threaded' with a parent and child notes linked to the parent - this allows recording of annotations and review actions on a single note over time, ending with creation of a 'Closed/Resolved' note. Nested (multi-level) threading is not currently supported. Multiple discrepancy note threads may exist for a single data element.</p>
+	ClinCapture provides discrepancy management capabilities for verifying the accuracy and completeness of data in a clinical trial, 
+	to address incomplete or inaccurate data, provide tracking and auditing on changes to the data, and to track accuracy and 
+	completeness for studies, sites, users, and CRFs. Discrepancy Management may be turned on or off for each study as part of the study configuration.</p>
+	<p>A discrepancy note is always associated with a particular subject-specific data element (or item). 
+	This may be an element that is entered when adding the subject record, such as date of birth, or elements created 
+	when recording a patient encounter, such as the date of a study event or an item in a CRF.</p>
+	<p>Discrepancy Notes can be 'threaded' with a parent and child notes linked to the parent - this allows 
+	recording of queries and review actions on a single note over time, ending with the creation of a 'Closed' note. 
+	Nested (multi-level) threading is not currently supported. Multiple discrepancy note threads may exist for a single data element.</p>
 	
 	<p><a href="#top">Back to Top</a></p>
-	<p><a name="dm"></a><em><b>Notes &amp; Discrepancy Manager</b></em><br />
-	The Discrepancy Manager allows a Study Manager to view and resolve discrepancy notes that are generated during the course of data capture and verification. The screen will list all discrepancy notes for a given Study, and can take you to a more detailed view for each note or through a workflow to resolve open notes. Where relevant, entity names will link to data dictionary popups to provide more information on which data element the note refers to.<br />
-	You can use the <em><b>Filter by status</b></em> or the <em><b>Filter by note type</b></em> to search for specific notes &amp; discrepancies. Just klick on the flag(s) and/or the note type(s) you want to filter. You can reset the filter by clicking on <em><b>Clear status filter</b></em> and/or <b><em>Clear type filter</em></b> which will appear if you have set a filter.</p>
-	<p>In the top of the table you can use the <em>green arrows</em> to navigate through the pages. If you have less than 15 subjects in your study the arrows are greyed out, which means that there is only one page to display.<br />
-	With the <em>drop-down menu</em> next to the arrows you can choose how many subjects should be displayed on one page (15, 25, or 50).</p>
-	<p>With the drop-down menu, <em><b>Select An Event</b></em> in the top of the subject list, you can filter the subjects by an event. You can also filter by entering free text or by selecting a pre-defined choice from the drop-down menu, in the grey boxes underneath each name header. To apply the filter select the <em><b>Apply Filter</b></em> link.<br />
+	<p><a name="dm"></a><em><b>Notes &amp; Discrepancies Page</b></em><br />
+	The Discrepancy Page allows a Study Manager to view and resolve discrepancy notes that are generated during the 
+	course of data capture and verification. The screen will list all discrepancy notes for a given Study, 
+	and can take you to a more detailed view for each note, or through a workflow to resolve open notes. 
+	Where relevant, entity names will link to data dictionary popups to provide more information on which data element the note refers to.<br />
+	You can use the <em><b>Filter by status</b></em> or the <em><b>Filter by note type</b></em> to search for specific notes &amp; discrepancies. 
+	Just click on the flag(s) and/or the note type(s) you want to filter. You can reset the filter by clicking on the links
+	<em><b>Clear status filter</b></em> and/or <b><em>Clear type filter</em></b> which will appear if you have set a filter.</p>
+	<p>In the top of the table you can use the <em>green arrows</em> to navigate through the pages. If you have less than 15 notes 
+	in your study the arrows are greyed out, which means that there is only one page to display.<br />
+	With the <em>drop-down menu</em> next to the arrows you can choose how many notes should be displayed on one page (15, 25, or 50).</p>
+	<p>With the drop-down menu, <em><b>Select An Event</b></em> in the top of the subject list, you can filter the subjects by an event. 
+	You can also filter by entering free text or by selecting a pre-defined choice from the drop-down menu, 
+	in the grey boxes underneath each name header. To apply the filter select the <em><b>Apply Filter</b></em> link.<br />
 	To reset the filter click on the <em><b>Clear Filter</b></em> link next to it.</p>
-	<p><b>Note:</b> You may click the <img src="../images/bt_Download.gif" alt="Download discrepancy notes" /> <em>Download discrepancy notes for all subjects</em> icon at the top of the table to download all notes in comma seperated values format or in portable document format (to be choosen in popup window). This report will show all discrepancy nots (will not be paginated) and will be formatted for printing.<br />You can also download all notes of a specific Study subject. Therefore, click on the appropriated symbol under Actions next to the subject.</p>
-	<p>To view a list of all discrepancy notes with more details click on the <img src="../images/bt_Reassign.gif" alt="List of Notes and Discrepancies" /> <em>List of Notes and Dispcrepancy</em> icon located in the upper right corner of the table.</p>
-	<p>You are also provieded with the link <em><b>Show summary statistics</b></em> (above the matrix) to get an overview about all notes and discrepancies in your current study.</p>
+	<p><b>Note:</b> You may click the <img src="../images/bt_Download.gif" alt="Download discrepancy notes" /> <em>Download Discrepancy Notes for all Subjects</em> 
+	icon at the top of the table to download all notes in comma separated values format or in portable document format (to be chosen in a popup window). 
+	This report will show all discrepancy notes, will not be paginated, and will be formatted for printing.<br />
+	You can also download all notes of a specific Study Subject. Therefore, click on the appropriate symbol under Actions next to the subject.</p>
+	<p>To view a list of all discrepancy notes with more details 
+	click on the <img src="../images/bt_Reassign.gif" alt="List of Notes and Discrepancies" /> <em>List of Notes and Discrepancies</em> icon 
+	located in the upper right corner of the table.</p>
+	<p>You are also provided with the link <em><b>Show summary statistics</b></em> (above the matrix) to get an overview 
+	about all notes and discrepancies in your current study.  Note that each number is a hotlink to those types of Notes in the table, so you can click
+	on the link and immediately go to all New Queries, for example.</p>
 	
 	<p><a href="#top">Back to Top</a></p>
   	<p><a name="createdn"></a><b><em>Creating Discrepancy Notes</em></b><br />
-	Discrepancy Notes are created by clicking on a flag icon next to the corresponding data element in a form such as an 'Enroll Subject' form or a CRF. Anywhere you see this flag, you may add a discrepancy note to that item. If a discrepancy note already exists, you may view the existing note(s) or add an additional one. <b>Javascript must be enabled and popup blockers should be disabled for discrepancy notes to work correctly.</b> Clicking the flag icon will call a popup window in which you can enter information about the discrepancy or ambiguity related to the particular item. For notes created during CRF data entry, for failed validation checks, the system will automatically include the validation error message in the Discrepancy Note.</p>
+	Discrepancy Notes are created by clicking on a flag icon next to the corresponding data element 
+	in a form such as an 'Enroll Subject' form or a CRF. Anywhere you see this flag, you may add a 
+	discrepancy note to that item. If a discrepancy note already exists, you may view the existing note(s) 
+	or add an additional one. <b>Javascript must be enabled and popup blockers should be disabled for 
+	discrepancy notes to work correctly.</b> Clicking the flag icon will call a popup window, in 
+	which you can enter information about the discrepancy or ambiguity related to the particular item. 
+	For notes created during CRF data entry, for failed validation checks, the system will 
+	automatically include the validation error message in the Discrepancy Note.</p>
 	<p>Discrepancy types include: <em>Annotation</em>, <em>Failed Validation Check</em>, <em>Query</em> and <em>Reason for Change</em>.</p>
-	<p><b>Note:</b> When adding a new discrepancy note to a form, be sure to submit the form before doing anything else, otherwise, your discrepancy note may not be saved to the database.</p>
+	<p><b>Note:</b> When adding a new discrepancy note to a form, be sure to submit the form before doing anything else, otherwise, 
+	your discrepancy note may not be saved to the database.</p>
 	
 	<p><a href="#top">Back to Top</a></p>
   	<p><a name="viewdn"></a><b><em>Viewing Discrepancy Notes</em></b><br />
@@ -101,13 +130,19 @@
 	<p>The Note Description (title), Last Updated Date, Last Updated By, Type, Resolution Status, # of Notes.</p>
   	<p>If a Parent Note exists: Description, Date Created, Created By, Type, Detailed Note.</p>
     <p>For each Child Note: Description, Date Created, Created By, Type, Detailed Note.</p>
+    <p>There is also an Audit Trail at the bottom of the Note's Description.</p>
 	
 	<p><a href="#top">Back to Top</a></p>
 	<p><a name="resolvedn"></a><b><em>Updating and Resolving Discrepancy Notes</em></b><br />
-	Resolving a Discrepancy Note merely means adding a child note with a Resolution Status of 'Closed'. You may do this by clicking on the <em><b>Reply to thread</b></em> link down to the right of the popup window.</p> 
+	Resolving a Discrepancy Note merely means adding a child note with a Resolution Status of 'Closed'. You may do this by clicking on the 
+	<em><b>Reply to thread</b></em> link down to the right of the popup window.</p> 
 	<p>Resolution Statuses include: <em>New</em>, <em>Updated</em>, <em>Resolution Proposed</em>, <em>Closed</em> and <em>Not Applicable</em>.</p>
-	<p><b>Note:</b> You may get an error such as "You may not perform administrative editing on this CRF, so you cannot resolve this note." This will occur if the CRF has not been completed by the user doing data entry, or because your role does not have sufficient privileges to perform administrative editing on this CRF. Please have the user mark the CRF complete to be able to resolve the note.</p>
-	<p>Once a note has been closed, you may not add additional child notes to that parent note. However, you may create a new parent Discrepancy Note for the same item, allowing you to re-open an old issue as necessary or open a new, unrelated issue on the same data element. Therefore you can click on the <em><b>Begin New Thread</b></em> link down left of the popup window.</p>
+	<p><b>Note:</b> You may get an error such as "You may not perform administrative editing on this CRF, so you cannot resolve this note." 
+	This will occur if the CRF has not been completed by the user doing data entry, or because your role does not have sufficient 
+	privileges to perform administrative editing on this CRF. Please have the user mark the CRF complete to be able to resolve the note.</p>
+	<p>Once a note has been closed, you may not add additional child notes to that parent note. 
+	However, you may create a new parent Discrepancy Note for the same item, allowing you to re-open an old issue as necessary or open a new, 
+	unrelated issue on the same data element. Therefore you can click on the <em><b>Begin New Thread</b></em> link down left of the popup window.</p>
 	<a href="#top">Back to Top</a>
 </div>
 <!--end content-->

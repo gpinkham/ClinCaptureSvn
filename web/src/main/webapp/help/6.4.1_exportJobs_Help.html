@@ -43,6 +43,7 @@
 	&nbsp;&nbsp;&nbsp;<a href="6.2.1_createUser_Help.html"><em>6.2.1 Create New User</em></a><br />
 	&nbsp;&nbsp;&nbsp;<a href="6.2.2_auditUser_Help.html"><em>6.2.2 Audit User Activity</em></a><br />
 	&nbsp;&nbsp;&nbsp;<a href="6.2.3_lockout_Help.html"><em>6.2.3 Lockout Configuration</em></a><br />
+	&nbsp;&nbsp;&nbsp;<a href="6.2.4_passwordPolicyHelp.html"><em>6.2.4 Password Policy</em></a><br />
 	&nbsp;<a href="6_3_administerCRF_Help.html"><em>6.3 CRFs</em></a><br />
 	&nbsp;&nbsp;&nbsp;<a href="6.3.1_archiveCRF_Help.html"><em>6.3.1 Archive CRF</em></a><br />
 	&nbsp;&nbsp;&nbsp;<a href="6.3.2_removeCRF_Help.html"><em>6.3.2 Remove CRF</em></a><br />
@@ -67,11 +68,13 @@
 <!--content container, on the right side-->
 <div id="content">
 	<h1>6.4.1 Scheduled Export Jobs</h1>
-	<p>Here you can view all your existing jobs to export data. Above the matrix you will find a link <b><em>Create a new Export Data Job</em></b>.
-	This link will direct you to the 'Create Scheduled Job: Export Dataset' page. Where you can configure a new job to export your data.<br />
-	Please fill in the fields named Job Name and Job Description, choose an existing dataset from the drop-down menu and select a period of run. After this, please define the start date and time as well as the format.<br />
-	The exported file in your choosen format will be emailed to the Email Address provided in the last field.</p>
-	<p>The <b>Find</b> function, located at the top of the job list, allows you to search for a specific job based on the Name, Previous Fire Time, Next Fire Time, Description, Periode To Run, Dataset, or Study.</p>
+	<p>Here you can view all your existing jobs to export data. Below the list you will find a button to <b><em>Create a new Export Data Job</em></b>.
+	This link will direct you to the 'Create Scheduled Job: Export Dataset' page, where you can configure a new job to export your data.</p>
+	<P>To create a new Export Job, please fill in the fields named Job Name and Job Description, choose an existing dataset from the drop-down menu and select 
+	the period of time that your Job should run. After this, please define the start date and time as well as the export format (CDISC, CSV, etc).<br />
+	The exported file in your chosen format will be emailed to the Email Address provided in the last field.</p>
+	<p>The <b>Find</b> function, located at the top of the job list, allows you to search for a specific job based on the Name, 
+	Previous Fire Time, Next Fire Time, Description, Period To Run, Dataset, or Study.</p>
 	<p>The View Scheduled Job matrix consists of the following columns:</p>
 	<table>
       <tr>
@@ -100,7 +103,7 @@
       </tr>
 	  <tr>
         <td class="left"><b>Study:</b></td>
-        <td>Indicates the study the job belongs to.<p></p></td>
+        <td>Indicates the study (or site) the job belongs to.<p></p></td>
       </tr>
 	  <tr>
         <td class="left"><b>Action:</b></td>
@@ -109,11 +112,13 @@
 			<img src="../images/bt_Edit.gif" alt="Edit" /> <em>Edit</em>
 			<p>Clicking on the <em>Edit</em> icon will bring you to the Update Scheduled Job: Export Dataset page where you can edit the job details.</p>
 			<img src="../images/bt_Remove.gif" alt="Remove" /> <em>Remove</em>
-			<p>To remove a job means to pause it by clicking on the <em>Remove</em> icon. The job will remain in the database and can still be restored and modified or deleted at any time. It will not run until it is restored.</p>
+			<p>To remove a job means to pause it by clicking on the <em>Remove</em> icon. 
+			The job will remain in the database and can still be restored and modified or deleted at any time. It will not run until it is restored.</p>
 			<img src="../images/bt_Restore.gif" alt="Restore" /> <em>Restore</em>
 			<p>To restore a job click on the <em>Restore</em> icon. Thereafter you can modify the job.</p>
 			<img src="../images/bt_Delete.gif" alt="Delete" /> <em>Delete</em>
-			<p>If you finally want to delete a job you can click on the <em>Delete</em> icon and the job will be wiped from the system, and the delete cannot be undone.</p>
+			<p>If you finally want to delete a job you can click on the <em>Delete</em> icon and the 
+			job will be wiped from the system. Keep in mind that this delete cannot be undone.</p>
 		</td>
 		</tr>
     </table>

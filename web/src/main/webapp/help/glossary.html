@@ -55,9 +55,12 @@
 <!--content container, on the right side-->
 <div id="content">
 	<h1>Glossary</h1>
+	<P>For a full list of terms, you can download the User Guide for ClinCapture <a href="http://www.clinovo.com/clincapture/community/downloads">here</a>.</P>
 	<p>
 		<a href="#A">A</a> |
 		<a href="#C">C</a> |
+		<a href="#D">D</a> |
+		<a href="#E">E</a> |
 		<a href="#J">J</a> |
 		<a href="#N">N</a> |
         <a href="#P">P</a> | 
@@ -69,43 +72,77 @@
 	<table>
 		<tr>
 			<td class="td_small"><b><a name ='A'></a>Audit Log</b></td>
-			<td>Is a file that capture every single transaction that runs on the ClinCapture database (<b>21 CFR Part 11</b> compliance).<p></p></td>
+			<td>System feature that maintains a historical record of key actions related to a Study Subject that have run on the ClinCapture database 
+			(this is part of <b>21 CFR Part 11</b> compliance).<p></p></td>
 		</tr>
 		<tr>
 			<td class="td_small"><b><a name ='C'></a>CRF</b></td>
-			<td>CRF is the abbreviation for Case Report Form. It is a special form to collect study related information of a study subject.<p></p></td>
+			<td>A form that collects and contains Study Event information for a Study Subject.  
+			CRFs are defined using Excel spreadsheets and are presented in a web interface that is easy to complete.<p></p></td>
+		</tr>
+		<tr>
+			<td class="td_small"><b><a name ='D'></a>Dataset Definition</b></td>
+			<td>Criteria (metadata) specified to create a dataset.<p></p></td>
+		</tr>
+		<tr>
+			<td class="td_small"><b>Datasets</b></td>
+			<td>A collection of data and metadata from records such as CRFs, Study Events, etc.  that matches a Dataset Definition and is exported to a file--whose format can be selected—for use in other applications.<p></p></td>
+		</tr>
+		<tr>
+			<td class="td_small"><b>Defined CRF</b></td>
+			<td>An Excel spreadsheet composed of Sections, Item Groups, and Items that you create for use in ClinCapture.  A Defined CRF can have multiple versions.  You assign it to one or more Study Event(s) in one or more Study(ies).<p></p></td>
+		</tr>
+		<tr>
+			<td class="td_small"><b>Delete</b></td>
+			<td>A delete action completely removes the information from the ClinCapture system.  Deleted information cannot be restored, although the audit log tracks the deletion action.  
+			Nearly all information in ClinCapture is removed rather than deleted because removed information can be restored.<p></p></td>
+		</tr>
+		<tr>
+			<td class="td_small"><b>Discrepancy Notes</b></td>
+			<td>Means of conveying clarifying questions about CRF Item(s) whose value, condition, level of detail, etc. do not conform to expectations.  Also called a Query.<p></p></td>
+		</tr>
+		
+		<tr>
+			<td class="td_small"><b><a name ='E'></a>Enrollment</b></td>
+			<td>Adding a Subject to a Study.  The ClinCapture Enrollment Date is when the Subject is added to a ClinCapture Study.<p></p></td>
+		</tr>
+		
+		<tr>
+			<td class="td_small"><b><a name ='J'></a>Job</b></td>
+			<td>In ClinCapture you can specify either a <a href="6.4.1_exportJobs_Help.html"><b>Export Data Job</b></a> or a 
+			<a href="6.4.2_importJobs_Help.html"><b>Import Data Job</b></a> to run automatically.<p></p></td>
 		</tr>
 		<tr>
 			<td class="td_small"><b><a name ='N'></a>Null Values</b></td>
-			<td>When creating an Event Definition, the user can choose to apply certain sets of letters to represent null values. Any null values selected will be considered reserved words for that specific CRF. A user entering data can not use those codes as string literals; eg - if \'NA\' is a selected null, a user cannot input \'Na\' to indicate sodium. For a complete list <a href="#nullValues" onclick="document.getElementById('nulls').style.visibility = 'visible';">click here</a>.<p></p></td>
-		</tr>
-		<tr>
-			<td class="td_small"><b><a name ='J'></a>Job</b></td>
-			<td>In ClinCapture we decide between <a href="6.4.1_exportJobs_Help.html"><b>Export Data Job</b></a> and <a href="6.4.2_importJobs_Help.html"><b>Import Data Job</b></a>. As admin you can create different jobs which will be run automatically and in your choosen frequncy.<p></p></td>
+			<td>The string that represents null values for an Event Definition—for example, N/A for Not Applicable.  The string is considered as a reserved word for the CRF.  For a complete list <a href="#nullValues" onclick="document.getElementById('nulls').style.visibility = 'visible';">click here</a>.<p></p></td>
 		</tr>
 		<tr>
 			<td class="td_small"><b><a name ='P'></a>Person ID</b></td>
-			<td>The person ID is a field that can be required or optional, depending on the way the study is set up. This is the unique identifier for a subject that can be used across all studies. It is a way of keeping track and reporting on where one person is within mutliple studies.<p></p></td>
+			<td>The unique identifier for a Subject that references the Subject across all Studies in the ClinCapture system.  It can be required or optional, depending on the way the Study was set up.<p></p></td>
 		</tr>
 		<tr>
 			<td class="td_small"><b><a name ='S'></a>Site</b></td>
-			<td>Location where the study is taking place.<p></p></td>
+			<td>Locations where the Study has been taking place, although they do not have to be physical locations.  You can work with ClinCapture at the Site level, which limits the view of the Study to a specific Site.<p></p></td>
+		</tr>
+		<tr>
+			<td class="td_small"><b>Study</b></td>
+			<td>In ClinCapture, a clinical trial or clinical research project, including all the metadata and data for it.<p></p></td>
 		</tr>
 		<tr>
 			<td class="td_small"><b>Study Event</b></td>
-			<td>A visit of a study subject at a <a href="#S">site</a> during the study is called a Study Event. Each Study Event can contain one or more <a href="#C">CRFs</a>. Before you can assign a Study Event to a study subject you need to define it (see <a href="#SED">Study Event Definition</a>).<p></p></td>
+			<td>A visit or encounter in the Study where data is captured or created.  A Study Event packages one or more case report forms (CRFs).  It is also referred to as an Event.<p></p></td>
 		</tr>
 		<tr>
 			<td class="td_small"><b><a name ='SED'></a>Study Event Definition</b></td>
-			<td>A Study Event Definition describes a type of study event that takes place during a study.<p></p></td>
+			<td>Information that describes a type of Study Event, and includes specifying the CRFs to be used for it.<p></p></td>
 		</tr>
 		<tr>
 			<td class="td_small"><b>Subject Group Class</b></td>
-			<td>Is a class of group categories that are related and mutually exclusive. For instance, when creating a group class you may create a Group Class called 'Trial Arm' with the groups 'Treatment A', 'Treatment B', and 'Placebo'. You may then assign the subject to one of these groups. If you specify the Subject Assignment as 'Required', you must assign the subject to one of these groups upon creating the subject record. You can have multiple Group Classes within a study.<p></p></td>
+			<td>An optional feature used to categorize Subjects in a Study.  Often, Subject Group Classes are used for different treatment arms or options.  This is especially relevant for ClinCapture's newest features of Randomization and Dynamic Groups.<p></p></td>
 		</tr>
 		<tr>
 			<td class="td_small"><b><a name ='U'></a>User</b></td>
-			<td>Person using the software.<p></p></td>
+			<td>Person using the ClinCapture software.  A User can have one or more Roles in one or more Studies or Sites.  For some automated processes, the User can be an automated system.<p></p></td>
 		</tr>
     </table>
 <br />
