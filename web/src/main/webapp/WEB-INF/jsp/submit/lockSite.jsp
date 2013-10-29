@@ -250,6 +250,39 @@
         </td>
         </tr>
     </c:when>
+    <c:when test="${config.parameter.handle == 'defaultMedicalCodingDictionary'}">
+        <tr valign="top">
+            <td class="table_header_column"><fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/></td>
+            <td class="table_cell">
+                <c:out value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>&nbsp;
+            </td>
+        </tr>
+    </c:when>
+    <c:when test="${config.parameter.handle=='autoCodeDictionaryName'}">
+    <tr valign="top">
+      <td class="formlabel">
+        <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
+      </td>
+      <td>
+        <c:out value="${studyToView.studyParameterConfig.autoCodeDictionaryName}"/>
+      </td>
+    </tr>
+   </c:when>
+    <c:when test="${config.parameter.handle=='allowCodingVerification'}">
+        <tr valign="top">
+            <td class="table_header_column"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
+            <td class="table_cell">
+                <c:choose>
+                    <c:when test="${config.value.value== 'yes'}">
+                        <fmt:message key="yes" bundle="${resword}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <fmt:message key="no" bundle="${resword}"/>
+                    </c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
+    </c:when>
 </c:choose>
 
 </c:forEach>
