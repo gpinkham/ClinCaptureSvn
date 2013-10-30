@@ -4,7 +4,7 @@
     <groupId>com.clinovo.clincapture</groupId>
     <artifactId>clincapture</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.3.7-SNAPSHOT</version>
+    <version>1.0.3.6-SNAPSHOT</version>
     <name>ClinCapture</name>
     <description>Electronic Data Capture Application for Clinical Trials</description>
 
