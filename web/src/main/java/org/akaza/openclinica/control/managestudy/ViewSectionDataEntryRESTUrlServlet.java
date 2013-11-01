@@ -79,6 +79,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		if (sectionId == null || sectionId == 0) {
 			sectionId = new Integer(1);
 		}
+		request.setAttribute("sectionId", "" + sectionId);
 		int eventCRFId = fp.getInt(EVENT_CRF_ID, true);
 		int studySubjectId = fp.getInt("studySubjectId", true);
 		String action = fp.getString("action");

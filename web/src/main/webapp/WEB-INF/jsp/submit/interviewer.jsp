@@ -796,7 +796,9 @@ function callTip(html)
     });
     window.updateCRFHeader = function(itemId, rowCount, resolutionStatusId) {
         var parametersHolder = {
+            contextPath: "<%=request.getContextPath()%>",
             servletPath: document.location.pathname.replace("<%=request.getContextPath()%>", ""),
+            restfulUrl: document.location.pathname.toString().indexOf("/ClinicalData/html/view") >= 0,
             tabId: "<%=request.getParameter("tabId") == null ? request.getAttribute("tabId") : request.getParameter("tabId")%>",
             sectionId: "<%=request.getParameter("sectionId") == null ? request.getAttribute("sectionId") : request.getParameter("sectionId")%>",
             itemId: parseInt(itemId),

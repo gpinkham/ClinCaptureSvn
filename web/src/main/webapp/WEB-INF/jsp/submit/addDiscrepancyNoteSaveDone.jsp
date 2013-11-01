@@ -32,7 +32,7 @@
 </style>
 
 <script type="text/javascript" language="javascript">
-    setImageInParentWin('flag_<c:out value="${updatedDiscrepancyNote.field}"/>', '<c:out value="${updatedDiscrepancyNote.resStatus.iconFilePath}"/>', '${updatedDiscrepancyNote.resStatus.id}');
+    setImageInParentWin('flag_<c:out value="${updatedDiscrepancyNote.field}"/>', '<%=request.getContextPath()%>/<c:out value="${updatedDiscrepancyNote.resStatus.iconFilePath}"/>', '${updatedDiscrepancyNote.resStatus.id}');
 </script>
 
 </head>

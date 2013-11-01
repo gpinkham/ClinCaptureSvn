@@ -2818,7 +2818,7 @@ function getDNShortcutAnchorId(resolutionStatusId) {
 function updateCRFHeaderFunction(parametersHolder) {
 	try {
 		jQuery.ajax({
-	    url : "UpdateCRFHeader",
+	    url : parametersHolder.contextPath + "/UpdateCRFHeader",
 		  type : "GET",
 			data : parametersHolder,
 			cache : false,
@@ -2862,7 +2862,7 @@ function addMissedDNShortcutAnchors() {
 function addDNShortcutAnchorsForItem(parametersHolder) {
   try {
     jQuery.ajax({
-      url : "UpdateDNShortcutAnchors",
+      url : parametersHolder.contextPath + "/UpdateDNShortcutAnchors",
       type : "GET",
       data : parametersHolder,
       cache : false,
