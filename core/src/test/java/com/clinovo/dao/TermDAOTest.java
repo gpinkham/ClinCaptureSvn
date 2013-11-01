@@ -110,6 +110,39 @@ public class TermDAOTest extends DefaultAppContextTest {
 	}
 	
 	@Test
+	public void testThatFindByTermAndExternalDictionaryDoesNotReturnNull() {
+		
+		assertNotNull(termDAO.findByTermAndExternalDictionary("some preferred name", "icd10"));
+	}
+	
+	@Test
+	public void testThatFindByTermAndExternalDictionaryReturnsTermWithCorrectName() {
+		
+		assertEquals("some preferred name" ,termDAO.findByTermAndExternalDictionary("some preferred name", "icd10").getPreferredName());
+	}
+	
+	@Test
+	public void testThatFindByTermAndExternalDictionaryReturnsTermWithCorrectExtDictionary() {
+		
+		assertEquals("icd10", termDAO.findByTermAndExternalDictionary("some preferred name", "icd10").getExternalDictionaryName());
+	}
+	
+	@Test
+	public void testThatFindByTermAndExternalDictionaryReturnsTermWithCode() {
+		assertNotNull(termDAO.findByTermAndExternalDictionary("some preferred name", "icd10").getCode());
+	}
+	
+	@Test
+	public void testThatFindByExternalDictionaryDoesNotReturnNull() {
+		assertNotNull(termDAO.findByExternalDictionary("1cd9"));
+	}
+	
+	@Test
+	public void testThatFindByExternalDictionaryReturnsCorrectNumberOfItems() {
+		assertEquals(1, termDAO.findByExternalDictionary("icd10").size());
+	}
+	
+	@Test
 	public void testThatSaveOrUpdateDoeNotReturnNull() {
 		
 		Term term = new Term();

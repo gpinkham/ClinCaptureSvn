@@ -111,4 +111,38 @@ public class TermDAO extends AbstractDomainDao<Term> {
 		
 		this.getCurrentSession().delete(term);
 	}
+
+	/**
+	 * Find a coded term given a verbatim term and an external dictionary to which it belongs.
+	 * 
+	 * @param verbatimTerm The verbatim term matching the candidate term's preferred name
+	 * @param externalDictionaryName The external dictionary this term was picked from
+	 * 
+	 * @return Return Term only and only if both the verbatim term and dictionary match, null otherwise.
+	 */
+	public Term findByTermAndExternalDictionary(String verbatimTerm, String externalDictionaryName) {
+		
+		String query = "from " + getDomainClassName() + " t  where t.preferredName = :preferredName and externalDictionaryName = :externalDictionaryName";
+		Query q = getCurrentSession().createQuery(query);
+		q.setString("preferredName", verbatimTerm);
+		q.setString("externalDictionaryName", externalDictionaryName);
+
+		return (Term) q.uniqueResult();
+	}
+
+	/**
+	 * Find all terms that were created using the specified external dictionary (from the specified external dictionary)
+	 * 
+	 * @param externalDictionaryName The external dictionary to filter on.
+	 * 
+	 * @return List of terms that were created from the external dictionary
+	 */
+	public List<Term> findByExternalDictionary(String externalDictionaryName) {
+		
+		String query = "from " + getDomainClassName() + " t  where t.externalDictionaryName = :externalDictionaryName";
+		Query q = getCurrentSession().createQuery(query);
+		q.setString("externalDictionaryName", externalDictionaryName);
+
+		return (List<Term>) q.list();
+	}
 }

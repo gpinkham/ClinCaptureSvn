@@ -34,6 +34,7 @@ public class Term extends AbstractMutableDomainObject {
 	private Dictionary dictionary;
 	private String preferredName = "";
 	private Date dateCreated = new Date();
+	private String externalDictionaryName = "";
 
 	public String getCode() {
 		return code;
@@ -67,5 +68,13 @@ public class Term extends AbstractMutableDomainObject {
 
 	public void setDictionary(Dictionary dictionary) {
 		this.dictionary = dictionary;
+	}
+
+	public String getExternalDictionaryName() {
+		return externalDictionaryName;
+	}
+
+	public void setExternalDictionaryName(String externDictionaryName) {
+		this.externalDictionaryName = externDictionaryName;
 	}
 }

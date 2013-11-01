@@ -68,7 +68,35 @@ public interface TermService {
 	 * @return List of terms
 	 */
 	List<Term> findTerm(Dictionary dictionary);
+	
+	/**
+	 * Find a coded term given a verbatim term and an external dictionary to which it belongs.
+	 * 
+	 * @param verbatimTerm The verbatim term matching the candidate term's preferred name
+	 * @param externalDictionaryName The external dictionary this term was picked from
+	 * 
+	 * @return Return Term only and only if both the verbatim term and dictionary match, null otherwise.
+	 */
+	Term findByTermAndExternalDictionary(String verbatimTerm, String externalDictionaryName);
+	
+	/**
+	 * Find at least a coded term given a verbatim term and an external dictionary to which it belongs - this method is case insensitive.
+	 * 
+	 * @param verbatimTerm The verbatim term matching the candidate term's preferred name
+	 * @param externalDictionaryName The external dictionary this term was picked from
+	 * 
+	 * @return Return Term if there is one that matches (ignoring case), otherwise, null -
+	 */
+	Term findByNonUniqueTermAndExternalDictionary(String verbatimTerm, String externalDictionaryName);
 
+	/**
+	 * Find all terms that were created using the specified external dictionary.
+	 * 
+	 * @param externalDictionaryName External dictionary name to filter on
+	 * @return List of terms if found
+	 */
+	List<Term> findByExternalDictionary(String externalDictionaryName);
+	
 	/**
 	 * Persist the given term to the database.
 	 * 

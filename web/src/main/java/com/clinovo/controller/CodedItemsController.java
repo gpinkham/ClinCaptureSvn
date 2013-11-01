@@ -167,25 +167,35 @@ public class CodedItemsController {
 			Term term = null;
 			List<Classification> classifications = new ArrayList<Classification>();
 
-			// Attempt to get the term from the local [custom] dictionary
+			// Attempt to get the term from the local [custom] dictionary - this is auto-coding!
 			if (configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
 
-				term = termService.findTerm(codedItem.getVerbatimTerm());
+				// Ignore case - (until Marc changes his mind)
+				term = termService.findByNonUniqueTermAndExternalDictionary(verbatimTerm, dictionary);
+				
 			}
-			
-			if(term != null) {
-				
+
+			if (term != null) {
+
+				// Auto code
+				request.getSession().setAttribute("code", term.getCode());
+
+				// Redirect to the save code item handler
+				saveCodedItemHandler(request);
+
 				Classification classification = new Classification();
-				
+
 				classification.setCode(term.getCode());
 				classification.setId(term.getId().toString());
 				classification.setTerm(term.getPreferredName());
-				classification.setDictionary(configuredDictionary.getValue());
-				
+				classification.setDictionary(term.getExternalDictionaryName());
+
 				classifications.add(classification);
-				
+
+				model.addAttribute("autoCoded", true);
+
 			} else {
-				
+
 				search.setSearchInterface(new BioPortalSearchInterface());
 				classifications = search.getClassifications(verbatimTerm, dictionary);
 			}
@@ -217,15 +227,23 @@ public class CodedItemsController {
 		
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		
-		String code = request.getParameter("code");
 		String codedItemItemDataId = request.getParameter("item");
         String codedItemSelectedDictionary = request.getParameter("dictionary");
+        
+        // The initial request attributes are unmodifiable - use the session! Be careful with the session attribute, it denotes auto coding
+        String code = request.getParameter("code") != null ? request.getParameter("code") : request.getSession().getAttribute("code").toString();
 		
 		CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
 		
 		codedItem.setCodedTerm(code);
         codedItem.setDictionary(codedItemSelectedDictionary);
         codedItem.setStatus(String.valueOf(CodeStatus.CODED));
+        
+        // If set in the session, it should be auto coded! You have been warned
+        if(request.getSession().getAttribute("code") != null && !request.getSession().getAttribute("code").toString().isEmpty()) {
+        	
+        	codedItem.setAutoCoded(true);
+        }
 		
 		codedItemService.saveCodedItem(codedItem);
 		
@@ -251,7 +269,7 @@ public class CodedItemsController {
 
         CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
         codedItem.setCodedTerm("");
-        codedItem.setStatus("NOT_CODED");
+        codedItem.setStatus(String.valueOf(CodeStatus.NOT_CODED));
 
         codedItemService.saveCodedItem(codedItem);
 
@@ -298,6 +316,7 @@ public class CodedItemsController {
 			term.setDictionary(dictionary);
 			term.setCode(codedItem.getCodedTerm());
 			term.setPreferredName(codedItem.getVerbatimTerm());
+			term.setExternalDictionaryName(codedItemSelectedDictionary);
 			
 			try {
 				termService.saveTerm(term);

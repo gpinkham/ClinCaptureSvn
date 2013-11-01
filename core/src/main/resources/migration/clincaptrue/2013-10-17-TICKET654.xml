@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="markg" id="2013-10-17-TICKET654">
+		<addColumn tableName="term">
+			<column name="external_dictionary_name" type="VARCHAR(255)" />
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="markg" id="2013-10-18-TICKET654-1">
+		<addColumn tableName="coded_item">
+			<column name="auto_coded" type="boolean" />
+		</addColumn>
+	</changeSet>
+
+</databaseChangeLog>

@@ -37,6 +37,30 @@ public class TermServiceImpl implements TermService {
 		return termDAO.findByDictionary(dictionary);
 	}
 
+	public Term findByTermAndExternalDictionary(String verbatimTerm, String externalDictionaryName) {
+		return termDAO.findByTermAndExternalDictionary(verbatimTerm, externalDictionaryName);
+	}
+	
+	public List<Term> findByExternalDictionary(String externalDictionaryName) {
+		return termDAO.findByExternalDictionary(externalDictionaryName);
+	}
+
+	public Term findByNonUniqueTermAndExternalDictionary(String verbatimTerm, String dictionary) {
+
+		List<Term> terms = termDAO.findAll();
+
+		for (Term term : terms) {
+			
+			if (term.getPreferredName().equalsIgnoreCase(verbatimTerm)
+					&& term.getExternalDictionaryName().equalsIgnoreCase(dictionary)) {
+				
+				return term;
+			}
+		}
+
+		return null;
+	}
+	
 	public Term saveTerm(Term term) throws CodeException {
 		
 		if(doesTermExist(term)) {

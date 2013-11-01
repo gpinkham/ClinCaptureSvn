@@ -44,6 +44,7 @@ public class CodedItem extends AbstractMutableDomainObject {
 	private String codedTerm = "";
 	private String dictionary = "";
 	private String verbatimTerm = "";
+	private Boolean autoCoded = Boolean.FALSE;
 	private String status = String.valueOf(CodeStatus.NOT_CODED);
 
 	public String getCodedTerm() {
@@ -143,5 +144,13 @@ public class CodedItem extends AbstractMutableDomainObject {
 
 	public void setSiteId(int siteId) {
 		this.siteId = siteId;
+	}
+
+	public boolean isAutoCoded() {
+		return autoCoded;
+	}
+
+	public void setAutoCoded(Boolean autoCoded) {
+		this.autoCoded = autoCoded;
 	}
 }

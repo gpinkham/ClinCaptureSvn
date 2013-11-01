@@ -39,22 +39,27 @@
                             </div>
                         </td>
                         <td align="right">
-                            <c:set var="codeAndAliasBtnColor" value="../images/button_BG.gif"/>
+
+                            <c:set var="codeButtonColor" value="../images/button_BG.gif"/>
                             <c:if test="${(color == 'violet')}">
-                                <c:set var="codeAndAliasBtnColor" value="../images/violet/button_BG.gif"/>
+                                <c:set var="codeButtonColor" value="../images/violet/button_BG.gif"/>
                             </c:if>
                             <c:if test="${(color == 'green')}">
-                                <c:set var="codeAndAliasBtnColor" value="../images/green/button_BG.gif"/>
+                                <c:set var="codeButtonColor" value="../images/green/button_BG.gif"/>
                             </c:if>
-                            <input type="button" name="codeAndAliasBtn" class="button" value="Code & Alias" style="background-image: url(<c:out value="${codeAndAliasBtnColor}"/>);" onclick="codeAndAlias($(this).parent().prev())" />
-                            <c:set var="codeButtonColor" value="../images/loginbutton_BG.gif"/>
-                            <c:if test="${(color == 'violet')}">
-                                <c:set var="codeButtonColor" value="../images/violet/loginbutton_BG.gif"/>
-                            </c:if>
-                            <c:if test="${(color == 'green')}">
-                                <c:set var="codeButtonColor" value="../images/green/loginbutton_BG.gif"/>
-                            </c:if>
-                            <input type="button" name="codeItemBtn" class="loginbutton" value="Code" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="saveCodedItem($(this).parent().prev(  ))" />
+
+                            <c:choose>
+                                <c:when test="${autoCoded}">
+
+                                    <input type="hidden" id="autoCode" />
+
+                                </c:when>
+                                <c:otherwise>
+                                    <input type="button" name="codeAndAliasBtn" class="button" value="Code & Alias" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="codeAndAlias($(this).parent().prev())" />
+
+                                    <input type="button" name="codeItemBtn" class="button" value="Code" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="saveCodedItem($(this).parent().prev(  ))" />
+                                </c:otherwise>
+                            </c:choose>
                         </td>
                     </tr>
                     <tr>

@@ -65,7 +65,7 @@ public class HttpTransportProtocolTest extends BaseTest {
 	@Test(expected = WebServiceException.class)
 	public void testThatUnVailableHttpReturnCodeHttpCallRaisesWebServiceException() throws Exception {
 		
-		String failureMessage = "<result><message>The randomization service is down</message></result>";
+		String failureMessage = "{message:Respect other people's security you tard}";
 		
 		HttpClient client = createMockHttpClient(failureMessage, HttpStatus.SC_SERVICE_UNAVAILABLE);
 		protocol.setHttpClient(client);

@@ -2458,9 +2458,17 @@ codeItem = function(item) {
         success: function(data) {
 
             $("#tablepaging").parent().html('');
-            $("div[id="+($(item).attr("itemid"))+"]").html(data);
+            $("div[id=" + ($(item).attr("itemid")) + "]").html(data);
+
+            // The item is created in codeItem.jsp
+            if ($("#autoCode").size() === 1) {
+
+                updateCodingUX($(item).parents("td").siblings("td").find("div.wrapText").parent());
+
+                $("#autoCode").remove();
+            }
         },
-        error: function (e) {
+        error: function(e) {
             console.log("Error:" + e);
         }
     })
@@ -2469,7 +2477,7 @@ codeItem = function(item) {
 saveCodedItem = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-    
+
     $.ajax({
 
         type: "POST",
@@ -2478,28 +2486,12 @@ saveCodedItem = function(item) {
 
             item: $(item).children('div').attr("id"),
             code: $.trim($(item).children('div').text()),
-            dictionary:  $(item).parents('tr').find("select option:selected").val(),
+            dictionary: $(item).parents('tr').find("select option:selected").val()
         },
 
         success: function(data) {
 
-            /* update code item version */
-            var versionNumber = parseInt($.trim($(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text()));
-            $(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text(versionNumber + 1);
-            /* update code icon from available to code completed */
-            $(item).parents('td').find("a[name='Code'][itemid=" + $(item).children('div').attr("id") + "]").children('img').attr('src', '../images/code_confirm.png');
-            /* update status from Available to Completed */
-            $(item).parents('td').siblings("td").filter(function () {
-                return $(this).text() == 'To be Coded';}).text("Completed");
-            /* update coding box from verbatim term to coded term */
-            $(item).parents('div').siblings("input").val($.trim($(item).children('div').text())).attr('disabled', true);
-            /* display unCode icon */
-            $(item).parents('td').find("a[name='unCode'][itemid=" + $(item).children('div').attr("id") + "]").css("display", "");
-            /* increase 'Coded' value & decrease 'To Be Coded' value */
-            var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
-            var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
-            $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
-            $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
+            updateCodingUX(item)
 
             console.log("Medical coding executed successfully")
         },
@@ -2566,6 +2558,35 @@ uncodeCodeItem = function(item) {
     return false;
 }
 
+function codeAndAlias(item) {
+
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var study = new RegExp("study=(\\d+)").exec(window.location.href.toString())[1]
+
+    $.ajax({
+
+        type: "POST",
+        url: url + "/codeAndAlias",
+        data: {
+
+            study: study,
+            item: $(item).children('div').attr("id"),
+            code: $.trim($(item).children('div').text()),
+            dictionary: $(item).parents('tr').find("select option:selected").val()
+        },
+
+        success: function(data) {
+
+            updateCodingUX(item)
+
+            console.log("Medical coding executed successfully")
+        },
+        error: function(e) {
+            console.log("Error:" + e);
+        }
+    })
+}
+
 function initCrfMoreInfo() {
   if (window.expandCrfInfo != undefined && window.expandCrfInfo == 'true' && $('#CRF_infobox_open').css('display') == 'none') {
     $('#CRF_infobox_closed').css('display', '');
@@ -2578,6 +2599,7 @@ function initCrfMoreInfo() {
     $('img[id=moreInfoCollapsedImg]').css('display', 'none');
   }
 }
+
 function processCrfMoreInfo() {
   var displayValue = $('#CRF_infobox_open').css('display');
   $('#CRF_infobox_open').css('display', displayValue == 'none' ? '' : 'none');
@@ -2682,47 +2704,28 @@ function Pager(tableName, itemsPerPage) {
     }
 }
 
-function codeAndAlias(item) {
+updateCodingUX = function(item) {
 
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-    var study = new RegExp("study=(\\d+)").exec(window.location.href.toString())[1]
+    /* update code item version */
+    var versionNumber = parseInt($.trim($(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text()));
 
-    $.ajax({
+    $(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text(versionNumber + 1);
+    /* update code icon from available to code completed */
+    $(item).parents('td').find("a[name='Code'][itemid=" + $(item).children('div').attr("id") + "]").children('img').attr('src', '../images/code_confirm.png');
+    /* update status from Available to Completed */
+    $(item).parents('td').siblings("td").filter(function() {
+        return $(this).text() == 'To be Coded' || $(this).text() == 'Available';
+    }).text("Completed");
+    /* update coding box from verbatim term to coded term */
+    $(item).parents('div').siblings("input").val($.trim($(item).children('div').text())).attr('disabled', true);
+    /* display unCode icon */
+    $(item).parents('td').find("a[name='unCode'][itemid=" + $(item).children('div').attr("id") + "]").css("display", "");
+    /* increase 'Coded' value & decrease 'To Be Coded' value */
+    var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
+    var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
 
-        type: "POST",
-        url: url + "/codeAndAlias",
-        data: {
-
-            study: study,
-            item: $(item).children('div').attr("id"),
-            code: $.trim($(item).children('div').text()),
-            dictionary: $(item).parents('tr').find("select option:selected").val()
-        },
-
-        success: function(data) {
-
-            var versionNumber = parseInt($.trim($(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text()));
-            $(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text(versionNumber + 1);
-
-            $(item).parents('td').find("a[name='Code'][itemid=" + $(item).children('div').attr("id") + "]").children('img').attr('src', '../images/code_confirm.png');
-            $(item).parents('td').siblings("td").filter(function() {
-                return $(this).text() == 'Available';
-            }).text("Completed");
-
-            $(item).parents('div').siblings("input").val($.trim($(item).children('div').text())).attr('disabled', true);
-            $(item).parents('td').find("a[name='unCode'][itemid=" + $(item).children('div').attr("id") + "]").css("display", "");
-
-            var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
-            var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
-            $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
-            $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
-
-            console.log("Medical coding executed successfully")
-        },
-        error: function(e) {
-            console.log("Error:" + e);
-        }
-    })
+    $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
+    $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
 }
 
 function getBrowserClientWidth() {

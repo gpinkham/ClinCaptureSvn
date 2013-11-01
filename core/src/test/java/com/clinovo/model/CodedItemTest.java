@@ -37,4 +37,13 @@ public class CodedItemTest {
 		
 		assertTrue(item.isCoded());
 	}
+	
+	@Test
+	public void testThatChangingAutoCodedIsMutable() {
+		
+		CodedItem item = new CodedItem();
+		item.setAutoCoded(true);
+		
+		assertTrue(item.isAutoCoded());
+	}
 }

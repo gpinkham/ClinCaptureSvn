@@ -194,7 +194,7 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	public void testThatFindByScopeDoesReturnsCorrectNumberOfItems() {
 		assertEquals(2, codedItemDAO.findByStudyAndSite(1, 3).size());
 	}
-	
+		
 	@Test
 	public void testThatSaveOrUpdatePersistsANewCodedItem() {
 
