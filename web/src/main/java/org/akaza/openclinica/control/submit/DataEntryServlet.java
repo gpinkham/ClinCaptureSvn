@@ -1971,7 +1971,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 if (refItemData.getId() == displayItemBean.getData().getId() &&
                         !refItemData.getValue().equalsIgnoreCase(displayItemBean.getData().getValue())) {
                     CodedItem codedItem = (CodedItem) getCodedItemService().findByItemData(item.getData().getId());
-                    if (codedItem.getId() > 0 && codedItem.getStatus().equals("CODED")) {
+                    if (codedItem != null) {
                         resetCodedItem(codedItem, displayItemBean.getData().getValue());
                         item.getData().setValue("");
                     }
@@ -1981,11 +1981,17 @@ public abstract class DataEntryServlet extends CoreSecureController {
     }
 
     private void resetCodedItem(CodedItem codedItem, String newTerm) throws Exception {
-        codedItem.setVerbatimTerm(newTerm);
-        codedItem.setDictionary("");
-        codedItem.setCodedTerm("");
-        codedItem.setStatus("NOT_CODED");
-        getCodedItemService().saveCodedItem(codedItem);
+        if (codedItem.getId() > 0) {
+            if (codedItem.getStatus().equals("CODED")) {
+                codedItem.setVerbatimTerm(newTerm);
+                codedItem.setDictionary("");
+                codedItem.setCodedTerm("");
+                codedItem.setStatus("NOT_CODED");
+            } else if (codedItem.getStatus().equals("NOT_CODED")) {
+                codedItem.setVerbatimTerm(newTerm);
+            }
+            getCodedItemService().saveCodedItem(codedItem);
+        }
     }
 
     protected void setReasonForChangeError(ItemDataBean idb, String formName, String error, HttpServletRequest request) {
@@ -4595,26 +4601,34 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		return false;
 	}
 
-	protected boolean isChanged(DisplayItemBean dib, HashMap<Integer, String> oldItemdata, String attachedFilePath) {
-		ItemDataBean idb = dib.getData();
-		String value = idb.getValue();
-		if (!oldItemdata.containsKey(idb.getId()))
-			return true;
-		else {
-			String oldValue = oldItemdata.get(idb.getId());
-			if (oldValue != null) {
-				if (value == null)
-					return true;
-				else if (dib.getItem().getDataType().getId() == 11) {
-					String theOldValue = oldValue.split("(/|\\\\)")[oldValue.split("(/|\\\\)").length - 1].trim();
-					return !value.equals(theOldValue);
-				} else if (!oldValue.equals(value))
-					return true;
-			} else if (value != null)
-				return true;
-		}
-		return false;
-	}
+    protected boolean isChanged(DisplayItemBean dib, HashMap<Integer, String> oldItemdata, String attachedFilePath) {
+        ItemDataBean idb = dib.getData();
+        String value = idb.getValue();
+        if (!dib.getItem().getDataType().equals(ItemDataType.CODE)) {
+            if (!oldItemdata.containsKey(idb.getId())) {
+                return true;
+            } else {
+                String oldValue = oldItemdata.get(idb.getId());
+                if (oldValue != null) {
+                    if (value == null)
+                        return true;
+                    else if (dib.getItem().getDataType().getId() == 11) {
+                        String theOldValue = oldValue.split("(/|\\\\)")[oldValue.split("(/|\\\\)").length - 1].trim();
+                        return !value.equals(theOldValue);
+                    } else if (!oldValue.equals(value))
+                        return true;
+                } else if (value != null)
+                    return true;
+            }
+        } else {
+          ItemDataDAO itdao = new ItemDataDAO(getDataSource());
+          ItemDataBean itemDataBean = (ItemDataBean) itdao.findByPK(dib.getData().getId());
+            if(itemDataBean != null) {
+                dib.getData().setValue(itemDataBean.getValue());
+            }
+        }
+        return false;
+    }
 
 	protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata, DisplayItemBean dib,
 			String attachedFilePath) {
