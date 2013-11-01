@@ -257,7 +257,7 @@
                                 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" />
                                     <c:if test="${dedc.edc.requiredCRF}"><span style="color: orange">*</span>
                                     </c:if> 
-                                    <c:if test="${dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2}">
+                                    <c:if test="${(dedc.edc.sourceDataVerification.code eq 1 or dedc.edc.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6)}">
                                         <img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/>
                                     </c:if>
                                 </td>
@@ -436,7 +436,7 @@
                         <c:set var="dec" value="${dedc}"/>
 
                         <tr>
-                            <td class="table_cell_left"><c:out value="${dec.eventCRF.crf.name}" /> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
+                            <td class="table_cell_left"><c:out value="${dec.eventCRF.crf.name}" /> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${(dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6)}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
                             <td class="table_cell_left"><c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;</td>
                             <td class="table_cell_left"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
                             <td class="table_cell_left ddeColumn">
