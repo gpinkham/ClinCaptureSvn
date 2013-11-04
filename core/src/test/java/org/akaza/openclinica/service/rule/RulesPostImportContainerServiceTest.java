@@ -17,7 +17,6 @@ import java.util.ArrayList;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -27,7 +26,6 @@ import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.junit.Test;
 
-@SuppressWarnings({ "rawtypes" })
 public class RulesPostImportContainerServiceTest extends DefaultAppContextTest {
 
 	@Test
