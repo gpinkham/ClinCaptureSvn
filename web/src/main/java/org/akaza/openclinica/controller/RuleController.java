@@ -104,7 +104,6 @@ public class RuleController {
 	private BasicDataSource dataSource;
 	private RuleSetRuleDao ruleSetRuleDao;
 	private RuleSetServiceInterface ruleSetService;
-	private RulesPostImportContainerService rulesPostImportContainerService;
 	private MessageSource messageSource;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	@Autowired

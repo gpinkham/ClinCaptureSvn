@@ -132,6 +132,7 @@ public class RunRuleSetServlet extends Controller {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private RuleSetService getRuleSetService(HttpServletRequest request) {
         RuleSetService ruleSetService = getRuleSetService();
 		ruleSetService.setContextPath(getContextPath(request));

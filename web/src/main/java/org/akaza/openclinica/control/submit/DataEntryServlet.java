@@ -2167,7 +2167,7 @@ public abstract class DataEntryServlet extends Controller {
 	 * @throws Exception
 	 */
 	private EventCRFBean createEventCRF(HttpServletRequest request, FormProcessor fp) throws InconsistentStateException {
-        Locale locale = request.getLocale();
+
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		EventCRFBean ecb;
@@ -3759,7 +3759,7 @@ public abstract class DataEntryServlet extends Controller {
 
 	@SuppressWarnings("deprecation")
 	protected boolean markCRFComplete(HttpServletRequest request) throws Exception {
-        Locale locale = request.getLocale();
+
 		HttpSession session = request.getSession();
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);

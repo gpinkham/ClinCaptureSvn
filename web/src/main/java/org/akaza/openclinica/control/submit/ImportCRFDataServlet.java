@@ -101,6 +101,7 @@ public class ImportCRFDataServlet extends Controller {
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         UserAccountBean ub = getUserAccountBean(request);
@@ -298,6 +299,7 @@ public class ImportCRFDataServlet extends Controller {
 	/*
 	 * Given the MultipartRequest extract the first File validate that it is an xml file and then return it.
 	 */
+	@SuppressWarnings("rawtypes")
 	private File getFirstFile(HttpServletRequest request, HashMap errorsMap) {
 		File f = null;
         FileUploadHelper uploadHelper = new FileUploadHelper();
@@ -323,6 +325,7 @@ public class ImportCRFDataServlet extends Controller {
 	 * @param version
 	 * @throws Exception
 	 */
+	@SuppressWarnings("rawtypes")
 	public File uploadFile(HttpServletRequest request, HashMap errorsMap, String theDir, CRFVersionBean version) throws Exception {
 		return getFirstFile(request, errorsMap);
 	}

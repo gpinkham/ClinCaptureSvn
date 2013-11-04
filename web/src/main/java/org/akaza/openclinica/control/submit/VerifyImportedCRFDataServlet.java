@@ -151,7 +151,6 @@ public class VerifyImportedCRFDataServlet extends Controller {
             boolean runRulesOptimisation = true;
             UserAccountBean ub = getUserAccountBean(request);
             StudyBean currentStudy = getCurrentStudy(request);
-            StudyUserRoleBean currentRole = getCurrentRole(request);
 
             ImportSummaryInfo summary = new ImportSummaryInfo();
 			request.getSession().setMaxInactiveInterval(10800);

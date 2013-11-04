@@ -103,7 +103,6 @@ public class CRFListForStudyEventServlet extends Controller {
 	public static final String STUDY_EVENT_NAME = "studyEventName";
 
 	private StudyEventBean getStudyEvent(HttpServletRequest request, int eventId) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
         StudyBean currentStudy = getCurrentStudy(request);
         StudyUserRoleBean currentRole = getCurrentRole(request);
 

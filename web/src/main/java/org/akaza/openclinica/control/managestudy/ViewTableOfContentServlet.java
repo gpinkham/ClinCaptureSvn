@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author jxu
  */
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+@SuppressWarnings({"serial"})
 @Component
 public class ViewTableOfContentServlet extends Controller {
 	/**

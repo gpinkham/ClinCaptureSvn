@@ -101,7 +101,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 	public static final String FULL_CRF_LIST = "fullCrfList";
 
 	private StudyEventBean getStudyEvent(HttpServletRequest request, int eventId) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
+
         StudyBean currentStudy = getCurrentStudy(request);
         StudyUserRoleBean currentRole = getCurrentRole(request);
 

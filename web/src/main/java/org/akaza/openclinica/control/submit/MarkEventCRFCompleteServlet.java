@@ -33,7 +33,6 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -89,7 +88,6 @@ public class MarkEventCRFCompleteServlet extends Controller {
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
 
         FormProcessor fp = new FormProcessor(request);
 
@@ -211,8 +209,6 @@ public class MarkEventCRFCompleteServlet extends Controller {
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
         UserAccountBean ub = getUserAccountBean(request);
         StudyUserRoleBean currentRole = getCurrentRole(request);
-
-        FormProcessor fp = new FormProcessor(request);
 
 		if (currentRole.equals(Role.SYSTEM_ADMINISTRATOR) || currentRole.equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.equals(Role.STUDY_DIRECTOR)) {
