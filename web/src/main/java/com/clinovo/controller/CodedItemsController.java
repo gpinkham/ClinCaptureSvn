@@ -116,6 +116,7 @@ public class CodedItemsController {
 
 		factory.setStudyId(studyId);
 		factory.setCodedItems(items);
+        factory.setTerms(termService.findAll());
 		factory.setDataSource(datasource);
 		factory.setStudyDAO(getStudyDAO());
 		factory.setEventCRFDAO(new EventCRFDAO(datasource));
@@ -330,7 +331,7 @@ public class CodedItemsController {
 		// Redirect to main
 		return "codedItems";
 	}
-    
+	
 	private List<CodedItem> getItems(List<CodedItem> items, CodeStatus status) {
 		
 		List<CodedItem> matchingItems = new ArrayList<CodedItem>();

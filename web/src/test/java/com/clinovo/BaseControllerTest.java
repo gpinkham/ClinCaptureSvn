@@ -4,8 +4,6 @@ import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,13 +23,11 @@ public class BaseControllerTest extends AbstractContextSentiveTest{
 	protected MockMvc mockMvc;
 
 	// Managed controllers
+	protected final String TERM_CONTROLLER = "/deleteTerm";
 	protected final String CODED_ITEM_CONTROLLER = "/codedItems";
-	protected final String DICTIONARY_CONTROLLER = "/dictionaries";
 
 	@Autowired
 	protected WebApplicationContext wac;
-
-	protected static final Logger logger = LoggerFactory.getLogger(BaseControllerTest.class);
 
 	@Before
 	public void setup() throws Exception {

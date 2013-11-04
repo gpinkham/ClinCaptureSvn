@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.clinovo.dao.TermDAO;
 import com.clinovo.exception.CodeException;
@@ -11,6 +12,7 @@ import com.clinovo.model.Dictionary;
 import com.clinovo.model.Term;
 import com.clinovo.service.TermService;
 
+@Transactional
 @Service("termService")
 public class TermServiceImpl implements TermService {
 	

@@ -60,6 +60,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 	private DataSource datasource;
 	private EventCRFDAO eventCRFDAO;
 	private List<CodedItem> codedItems;
+    private List<Term> terms;
 	private EventDefinitionCRFDAO eventDefCRFDAO;
 	private StudySubjectDAO studySubjectDAO;
 	private StudyEventDefinitionDAO studyEventDefDao;
@@ -77,8 +78,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private final String GOTO_CRF_EVENTID = "&tabId=1&eventId=";
     private final String GOTO_CRF_SUFIX = "&amp;viewFull=yes\"><img border=\"0\" title=\"Open CRF\" alt=\"GoToCRF\" height=\"17px\" src=\"../images/icon_DEcomplete_long.gif\" name=\"GOTO\"/></a>";
     public final static String AJAX_UNCODE_ITEM_PREFIX = "&nbsp;&nbsp;<a onClick=\"uncodeCodeItem(this)\" name=\"unCode\" itemId=\"";
-    public final static String AJAX_UNCODE_ITEM_SUFFIX = "\"><img height=\"17\" border=\"0\" title=\"UnCode\" src=\"../images/bt_Delete.gif\" name=\"codeBtn\"/></a>";
-    public final static String AJAX_UNCODE_ITEM_SUFFIX_HIDDEN = "\" style=\"display:none\"><img height=\"17\" border=\"0\" alt=\"UnCode\" src=\"../images/bt_Delete.gif\" name=\"codeBtn\"/></a>";
+    public final static String AJAX_UNCODE_ITEM_SUFFIX = "\"><img height=\"17\" border=\"0\" title=\"UnCode\" src=\"../images/code_uncode.png\" name=\"codeBtn\"/></a>";
+    public final static String AJAX_UNCODE_ITEM_SUFFIX_HIDDEN = "\" style=\"visibility:hidden\"><img height=\"17\" border=\"0\" alt=\"UnCode\" src=\"../images/code_uncode.png\" name=\"codeBtn\"/></a>";
+    public final static String AJAX_DELETE_TERM_PREFIX = "&nbsp;&nbsp;<a onClick=\"deleteTerm(this)\" name=\"deleteTerm\" itemId=\"";
+    public final static String AJAX_DELETE_TERM_MIDDLE ="\" term=\"";
+    public final static String AJAX_DELETE_TERM_SUFFIX ="\"><img height=\"17\" border=\"0\" title=\"deleteTerm\" src=\"../images/bt_Delete.gif\" name=\"deleteTermBtn\"/></a>";
+    public final static String AJAX_DELETE_TERM_SUFFIX_HIDDEN = "\" style=\"visibility:hidden\"><img height=\"17\" border=\"0\" src=\"../images/bt_Delete.gif\" name=\"deleteTermBtn\"/></a>";
     public final static String DIV_VERSION_PREFIX = "<div name=\"codedItemVersion\">";
     public final static String DIV_VERSION_SUFIX = "</div>";
 
@@ -300,6 +305,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(), codedItem.getCrfVersionId());
             String codedItemButton = codedItem.isCoded() ? "code_confirm.png" : "code_blue.png";
             String uncodedItemButton = "";
+            String deleteTermButton = "";
 
             if (codedItem != null) {
             	
@@ -309,10 +315,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
  				if (isLoggedInUserMonitor()) {
  					
  					AJAX_REQUEST_PREFIX = "<a itemId=\"";
+                    deleteTermButton = AJAX_DELETE_TERM_PREFIX + AJAX_DELETE_TERM_SUFFIX_HIDDEN;
  				} else {
 
                     AJAX_REQUEST_PREFIX = "<a onClick=\"codeItem(this)\" name=\"Code\" itemId=\"";
                     uncodedItemButton = (AJAX_UNCODE_ITEM_PREFIX) + codedItem.getItemDataId() + (codedItem.isCoded() ? (AJAX_UNCODE_ITEM_SUFFIX) : AJAX_UNCODE_ITEM_SUFFIX_HIDDEN);
+                    deleteTermButton = (AJAX_DELETE_TERM_PREFIX) + codedItem.getItemDataId() + AJAX_DELETE_TERM_MIDDLE + codedItem.getVerbatimTerm().toLowerCase() + (isDeleteable(codedItem) ? AJAX_DELETE_TERM_SUFFIX : AJAX_DELETE_TERM_SUFFIX_HIDDEN);
                 }
  				
                 url.append(AJAX_REQUEST_PREFIX)
@@ -320,13 +328,14 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                     .append(AJAX_REQUEST_MIDDLE)
                     .append(codedItemButton)
                     .append(AJAX_REQUEST_SUFIX)
+                    .append(uncodedItemButton)
+                    .append(deleteTermButton)
                     .append(GOTO_CRF_EVENTCRFID)
                     .append(eventCRFBean.getId())
                     .append(GOTO_CRF_EVENTDEFCRFID)
                     .append(eventDefCRFBean.getId())
                     .append(GOTO_CRF_EVENTID)
                     .append(eventCRFBean.getStudyEventId()).append(GOTO_CRF_SUFIX)
-                    .append(uncodedItemButton)
                     .append(COLUMN_WIDTH_PREFIX)
                     .append("150")
                     .append(COLUMN_WIDTH_SUFFIX);
@@ -335,6 +344,19 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             return value;
         }
     }
+
+    private boolean isDeleteable(CodedItem codedItem) {
+            for (Term term : terms) {
+
+            	if(term.getPreferredName().equals(codedItem.getVerbatimTerm()) &&
+            			term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
+
+            		return true;
+            	}
+            }
+
+            return false;
+        }
 
     @SuppressWarnings("unchecked")
     private class StatusCellEditor implements CellEditor {
@@ -410,6 +432,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     public void setEventDefinitionCRFDAO(EventDefinitionCRFDAO eventDefenitionCRFDAO) {
         this.eventDefCRFDAO = eventDefenitionCRFDAO;
+    }
+
+    public void setTerms(List<Term> terms) {
+        this.terms = terms;
     }
 
 	public void setStudyId(String studyId) {
