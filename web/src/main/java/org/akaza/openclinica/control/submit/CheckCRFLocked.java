@@ -13,24 +13,28 @@
 
 package org.akaza.openclinica.control.submit;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.CoreSecureController;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by IntelliJ IDEA. User: A. Hamid Date: Apr 12, 2010 Time: 3:32:44 PM
  */
 @SuppressWarnings("serial")
-public class CheckCRFLocked extends SecureController {
-	protected void processRequest() throws Exception {
+@Component
+public class CheckCRFLocked extends Controller {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		int userId;
 		String ecId = request.getParameter("ecId");
 		if (ecId != null && !ecId.equals("")) {
 			if (getUnavailableCRFList().containsKey(Integer.parseInt(ecId))) {
 				userId = (Integer) getUnavailableCRFList().get(Integer.parseInt(ecId));
-				UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+				UserAccountDAO udao = getUserAccountDAO();
 				UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
 				response.getWriter().print(
 						resword.getString("CRF_unavailable") + "\n" + ubean.getName() + " "
@@ -42,7 +46,7 @@ public class CheckCRFLocked extends SecureController {
 			return;
 		} else if (request.getParameter("userId") != null) {
 			removeLockedCRF(Integer.parseInt(request.getParameter("userId")));
-			CoreSecureController.removeLockedCRF(Integer.parseInt(request.getParameter("userId")));
+			removeLockedCRF(Integer.parseInt(request.getParameter("userId")));
 			if (request.getParameter("exitTo") != null) {
 				response.sendRedirect(request.getParameter("exitTo"));
 			} else {
@@ -53,7 +57,7 @@ public class CheckCRFLocked extends SecureController {
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		return;
 	}
 }

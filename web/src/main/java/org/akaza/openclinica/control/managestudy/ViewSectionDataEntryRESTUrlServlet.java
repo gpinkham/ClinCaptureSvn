@@ -27,7 +27,6 @@ import org.akaza.openclinica.bean.submit.*;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
-import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.*;
@@ -39,6 +38,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,6 +57,7 @@ import java.util.List;
  *         
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@Component
 public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServlet {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ViewSectionDataEntryServlet.class);
@@ -99,7 +100,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		request.setAttribute("sedId", sedId + "");
 		int crfId = fp.getInt("crfId");
 		if (crfId == 0 && crfVersionId > 0) {
-			CRFVersionDAO crfVDao = new CRFVersionDAO(getDataSource());
+			CRFVersionDAO crfVDao = getCRFVersionDAO();
 			CRFVersionBean crvVBean = (CRFVersionBean) crfVDao.findByPK(crfVersionId);
 			if (crvVBean != null) {
 				crfId = crvVBean.getCrfId();
@@ -108,7 +109,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
 		Integer eventDefinitionCRFId = (Integer) (request.getAttribute("eventDefinitionCRFId"));
 
-		EventDefinitionCRFDAO eventCrfDao = new EventDefinitionCRFDAO(getDataSource());
+		EventDefinitionCRFDAO eventCrfDao = getEventDefinitionCRFDAO();
 		edcb = (EventDefinitionCRFBean) eventCrfDao.findByPK(eventDefinitionCRFId);
 		if (eventCRFId == 0 && edcb.getStudyId() != currentStudy.getParentStudyId()
 				&& edcb.getStudyId() != currentStudy.getId()) {
@@ -140,7 +141,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			return;
 		}
 		if (studySubjectId > 0) {
-			StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
+			StudySubjectDAO ssdao = getStudySubjectDAO();
 			StudySubjectBean sub = (StudySubjectBean) ssdao.findByPK(studySubjectId);
 			request.setAttribute("studySubject", sub);
 		}
@@ -153,7 +154,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			// for event crf, the input crfVersionId from url =0
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
-			StudyEventDAO sedao = new StudyEventDAO(getDataSource());
+			StudyEventDAO sedao = getStudyEventDAO();
 			StudyEventBean event = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 			if (event.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)) {
 				request.setAttribute("isLocked", "yes");
@@ -185,8 +186,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, eventDefinitionCRFId, allSections,
 					noteThreads);
 
-			DisplayTableOfContentsBean displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(),
-					currentStudy);
+			DisplayTableOfContentsBean displayBean = getDisplayBean(ecb);
 			
 			Date tmpDate = displayBean.getEventCRF().getDateInterviewed();
 			String formattedInterviewerDate;
@@ -219,8 +219,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 				return;
 			}
 		} else if (crfVersionId > 0) {// for viewing blank CRF
-			DisplayTableOfContentsBean displayBean = ViewTableOfContentServlet.getDisplayBean(getDataSource(),
-					crfVersionId);
+			DisplayTableOfContentsBean displayBean = getDisplayBeanByCrfVersionId(crfVersionId);
 			request.setAttribute("toc", displayBean);
 			ArrayList sections = displayBean.getSections();
 
@@ -248,7 +247,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			ecb.setCRFVersionId(sb.getCRFVersionId());
 			if (currentStudy.getParentStudyId() > 0) {
 				// this is a site,find parent
-				StudyDAO studydao = new StudyDAO(getDataSource());
+				StudyDAO studydao = getStudyDAO();
 				StudyBean parentStudy = (StudyBean) studydao.findByPK(currentStudy.getParentStudyId());
 				request.setAttribute("studyTitle", parentStudy.getName());
 				request.setAttribute("siteTitle", currentStudy.getName());
@@ -263,19 +262,19 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			request.setAttribute(SECTION_BEAN, sb);
 
 			// This is the StudySubjectBean
-			StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
+			StudySubjectDAO ssdao = getStudySubjectDAO();
 			StudySubjectBean sub = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
 			// This is the SubjectBean
-			SubjectDAO subjectDao = new SubjectDAO(getDataSource());
+			SubjectDAO subjectDao = getSubjectDAO();
 			int subjectId = sub.getSubjectId();
 			int studyId = sub.getStudyId();
 			SubjectBean subject = (SubjectBean) subjectDao.findByPK(subjectId);
 			// Check for a null currentStudy
 			// Let us process the age
 			if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
-				StudyEventDAO sedao = new StudyEventDAO(getDataSource());
+				StudyEventDAO sedao = getStudyEventDAO();
 				StudyEventBean se = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
-				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
+				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se
 						.getStudyEventDefinitionId());
 				se.setStudyEventDefinition(sed);
@@ -285,7 +284,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 				age = Utils.getInstance().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
 			}
 			// Get the study then the parent study
-			StudyDAO studydao = new StudyDAO(getDataSource());
+			StudyDAO studydao = getStudyDAO();
 			StudyBean study = (StudyBean) studydao.findByPK(studyId);
 
 			if (study.getParentStudyId() > 0) {
@@ -306,7 +305,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 		boolean hasItemGroup = false;
 		// we will look into db to see if any repeating items for this CRF
 		// section
-		ItemGroupDAO igdao = new ItemGroupDAO(getDataSource());
+		ItemGroupDAO igdao = getItemGroupDAO();
 		List<ItemGroupBean> itemGroups = igdao.findLegitGroupBySectionId(sectionId);
 		if (!itemGroups.isEmpty()) {
 			hasItemGroup = true;
@@ -347,7 +346,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			LOGGER.info("33333how many group rows:" + dsb.getDisplayItemGroups().size());
 
 			// let's save notes for the blank items
-			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
+			DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
 			for (int i = 0; i < dsb.getDisplayItemGroups().size(); i++) {

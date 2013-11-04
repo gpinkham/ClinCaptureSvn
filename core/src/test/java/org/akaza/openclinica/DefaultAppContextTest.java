@@ -66,7 +66,8 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
     protected DiscrepancyNoteDAO discrepancyNoteDAO;
     protected EventDefinitionCRFDAO eventDefinitionCRFDAO;
 	protected StudyEventDefinitionDAO studyEventDefinitionDAO;
-	
+    protected RulesPostImportContainerService postImportContainerService;
+
 	// DAOS
 	@Autowired protected RuleDao ruleDao;
 	@Autowired protected RuleSetDao ruleSetDao;
@@ -89,8 +90,6 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	@Autowired protected CodedItemService codedItemService;
 	@Autowired protected DictionaryService dictionaryService;
 	@Autowired protected RuleSetServiceInterface ruleSetService;
-	@Autowired protected RulesPostImportContainerService postImportContainerService;
-	
 
 	@Before
 	public void initializeDAOs() throws Exception {
@@ -114,5 +113,9 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		studyGroupClassDAO = new StudyGroupClassDAO(dataSource);
         eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
+
+        postImportContainerService = new RulesPostImportContainerService(dataSource);
+        postImportContainerService.setRuleDao(ruleDao);
+        postImportContainerService.setRuleSetDao(ruleSetDao);
 	}
 }

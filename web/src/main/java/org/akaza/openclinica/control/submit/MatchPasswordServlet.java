@@ -20,11 +20,14 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Checks user's password with the one int the session
@@ -33,15 +36,15 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings({ "serial" })
-public class MatchPasswordServlet extends SecureController {
+@Component
+public class MatchPasswordServlet extends Controller {
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String password = request.getParameter("password");
 		logger.info("password [" + password + "]");
 		if (password != null && !password.equals("")) {
-			SecurityManager securityManager = ((SecurityManager) SpringServletAccess.getApplicationContext(context)
-					.getBean("securityManager"));
-			UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
+			SecurityManager securityManager = getSecurityManager();
+			UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
 			if (securityManager.isPasswordValid(ub.getPasswd(), password, getUserDetails())) {
 				response.getWriter().print("true");
 			} else {
@@ -52,7 +55,7 @@ public class MatchPasswordServlet extends SecureController {
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		return;
 	}
 }

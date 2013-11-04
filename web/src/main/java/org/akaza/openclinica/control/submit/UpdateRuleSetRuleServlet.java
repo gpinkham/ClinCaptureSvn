@@ -20,35 +20,35 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
-public class UpdateRuleSetRuleServlet extends SecureController {
+@Component
+public class UpdateRuleSetRuleServlet extends Controller {
 
 	private static final long serialVersionUID = 1L;
-	RuleSetDao ruleSetDao;
-	RuleSetServiceInterface ruleSetService;
-	RuleSetRuleDao ruleSetRuleDao;
-	RuleSetRuleAuditDao ruleSetRuleAuditDao;
 
 	private static String RULESET_ID = "ruleSetId";
 	private static String RULESETRULE_ID = "ruleSetRuleId";
 	private static String ACTION = "action";
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -58,14 +58,16 @@ public class UpdateRuleSetRuleServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+
 		String ruleSetId = request.getParameter(RULESET_ID);
 		String ruleSetRuleId = request.getParameter(RULESETRULE_ID);
 		String source = request.getParameter("source");
@@ -76,12 +78,12 @@ public class UpdateRuleSetRuleServlet extends SecureController {
 			RuleSetRuleBean ruleSetRule = getRuleSetRuleDao().findById(Integer.valueOf(ruleSetRuleId));
 			if (ruleSetRuleId != null && action.equals("remove")) {
 				status = Status.DELETED;
-				updateRuleSetRule(ruleSetRule, status);
+				updateRuleSetRule(ub, ruleSetRule, status);
 				pageMessage = "view_rules_remove_confirmation";
 			} else if (ruleSetRuleId != null && action.equals("restore")) {
 				status = Status.AVAILABLE;
 				ruleSetRule.getRuleSetBean().setStatus(Status.AVAILABLE);
-				updateRuleSetRule(ruleSetRule, status);
+				updateRuleSetRule(ub, ruleSetRule, status);
 				pageMessage = "view_rules_restore_confirmation";
 			}
 		}
@@ -90,22 +92,22 @@ public class UpdateRuleSetRuleServlet extends SecureController {
 			for (RuleSetRuleBean theRuleSetRule : rs.getRuleSetRules()) {
 				if (theRuleSetRule.getStatus() != Status.DELETED) {
 					status = Status.DELETED;
-					updateRuleSetRule(theRuleSetRule, status);
+					updateRuleSetRule(ub, theRuleSetRule, status);
 					pageMessage = "view_rules_remove_confirmation";
 				}
 			}
 		}
 
-		addPageMessage(resword.getString(pageMessage));
+		addPageMessage(resword.getString(pageMessage), request);
 		if (source != null && source.equals("ViewRuleSet")) {
 
-			context.getRequestDispatcher("/ViewRuleSet?ruleSetId=" + ruleSetId).forward(request, response);
+			getServletContext().getRequestDispatcher("/ViewRuleSet?ruleSetId=" + ruleSetId).forward(request, response);
 		} else {
-			forwardPage(Page.LIST_RULE_SETS_SERVLET);
+			forwardPage(Page.LIST_RULE_SETS_SERVLET, request, response);
 		}
 	}
 
-	private void updateRuleSetRule(RuleSetRuleBean ruleSetRule, Status status) {
+	private void updateRuleSetRule(UserAccountBean ub, RuleSetRuleBean ruleSetRule, Status status) {
 		ruleSetRule.setStatus(status);
 		ruleSetRule.setUpdater(ub);
 		ruleSetRule = getRuleSetRuleDao().saveOrUpdate(ruleSetRule);
@@ -119,24 +121,5 @@ public class UpdateRuleSetRuleServlet extends SecureController {
 		ruleSetRuleAuditBean.setUpdater(ub);
 		ruleSetRuleAuditBean.setStatus(status);
 		getRuleSetRuleAuditDao().saveOrUpdate(ruleSetRuleAuditBean);
-	}
-
-	private RuleSetDao getRuleSetDao() {
-		ruleSetDao = this.ruleSetDao != null ? ruleSetDao : (RuleSetDao) SpringServletAccess.getApplicationContext(
-				context).getBean("ruleSetDao");
-		return ruleSetDao;
-	}
-
-	private RuleSetRuleDao getRuleSetRuleDao() {
-		ruleSetRuleDao = this.ruleSetRuleDao != null ? ruleSetRuleDao : (RuleSetRuleDao) SpringServletAccess
-				.getApplicationContext(context).getBean("ruleSetRuleDao");
-		return ruleSetRuleDao;
-	}
-
-	private RuleSetRuleAuditDao getRuleSetRuleAuditDao() {
-		ruleSetRuleAuditDao = this.ruleSetRuleAuditDao != null ? ruleSetRuleAuditDao
-				: (RuleSetRuleAuditDao) SpringServletAccess.getApplicationContext(context).getBean(
-						"ruleSetRuleAuditDao");
-		return ruleSetRuleAuditDao;
 	}
 }

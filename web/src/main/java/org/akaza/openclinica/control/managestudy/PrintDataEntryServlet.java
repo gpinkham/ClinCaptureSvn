@@ -62,6 +62,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * View a CRF version section data entry
@@ -70,9 +71,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@Component
 public class PrintDataEntryServlet extends DataEntryServlet {
-
-	Locale locale;
 
 	/**
 	 * Checks whether the user has the correct privilege
@@ -81,7 +81,6 @@ public class PrintDataEntryServlet extends DataEntryServlet {
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
-		locale = request.getLocale();
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 
 		if (ub.isSysAdmin()) {

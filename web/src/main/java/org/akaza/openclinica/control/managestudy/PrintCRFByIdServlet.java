@@ -29,6 +29,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Builds on top of PrintCRFServlet
@@ -36,6 +37,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @author Krikor Krumlian
  */
 @SuppressWarnings({ "rawtypes" })
+@Component
 public class PrintCRFByIdServlet extends PrintCRFServlet {
 
 	private static final long serialVersionUID = 1L;

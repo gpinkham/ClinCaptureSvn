@@ -2,8 +2,13 @@ package org.akaza.openclinica.control.submit;
 
 import java.util.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -11,7 +16,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.RememberLastPage;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -21,9 +26,11 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
-public class LockStudySubjectServlet extends SecureController {
+@Component
+public class LockStudySubjectServlet extends Controller {
 
 	public static final String REFERER_URL = "refererUrl";
 	public static final String REFERER = "referer";
@@ -39,8 +46,9 @@ public class LockStudySubjectServlet extends SecureController {
 	public final static String ENROLLMENT_NOTE = "enrollmentNote";
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-		request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -51,18 +59,21 @@ public class LockStudySubjectServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-		SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
-		StudyDAO studyDao = new StudyDAO(sm.getDataSource());
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+
+		StudySubjectDAO ssdao = getStudySubjectDAO();
+		SubjectDAO sdao = getSubjectDAO();
+		StudyDAO studyDao = getStudyDAO();
+		StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
+		StudyEventDAO sedao = getStudyEventDAO();
+		EventCRFDAO ecdao = getEventCRFDAO();
 
 		String referer = request.getHeader(REFERER);
 		if (referer != null && !referer.contains(LOCK_STUDY_SUBJECT)) {
@@ -84,7 +95,7 @@ public class LockStudySubjectServlet extends SecureController {
 		boolean isParentStudy = studyBean.getParentStudyId() < 1;
 
 		// Get any disc notes for this subject : studySubId
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
+		DiscrepancyNoteDAO discrepancyNoteDAO = getDiscrepancyNoteDAO();
 		List<DiscrepancyNoteBean> allNotesforSubject = new ArrayList<DiscrepancyNoteBean>();
 
 		// These methods return only parent disc notes
@@ -113,7 +124,7 @@ public class LockStudySubjectServlet extends SecureController {
 		}
 
 		if (!allNotesforSubject.isEmpty()) {
-			setRequestAttributesForNotes(allNotesforSubject);
+			setRequestAttributesForNotes(request, allNotesforSubject);
 		}
 
 		SubjectBean subject = (SubjectBean) sdao.findByPK(studySubjectBean.getSubjectId());
@@ -177,14 +188,14 @@ public class LockStudySubjectServlet extends SecureController {
 				studySubjectBean.setStatus(Status.AVAILABLE);
 				ssdao.update(studySubjectBean);
 			}
-			showResultMessage(studySubjectBean, message);
+			showResultMessage(request, studySubjectBean, message);
 			response.sendRedirect((String) request.getSession().getAttribute(REFERER_URL));
 		} else {
-			forwardPage(Page.LOCK_STUDY_SUBJECT);
+			forwardPage(Page.LOCK_STUDY_SUBJECT, request, response);
 		}
 	}
 
-	private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans) {
+	private void setRequestAttributesForNotes(HttpServletRequest request, List<DiscrepancyNoteBean> discBeans) {
 		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
 			if ("unique_identifier".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
 				request.setAttribute(HAS_UNIQUE_ID_NOTE, "yes");
@@ -202,10 +213,10 @@ public class LockStudySubjectServlet extends SecureController {
 		}
 	}
 
-	private void showResultMessage(StudySubjectBean studySubjectBean, String message) {
-		addPageMessage(message.replace("{0}", studySubjectBean.getName()));
+	private void showResultMessage(HttpServletRequest request, StudySubjectBean studySubjectBean, String message) {
+		addPageMessage(message.replace("{0}", studySubjectBean.getName()), request);
 		Map storedAttributes = new HashMap();
-		storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+		storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
 		request.getSession().setAttribute(RememberLastPage.STORED_ATTRIBUTES, storedAttributes);
 	}
 }

@@ -33,7 +33,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
@@ -56,29 +56,28 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 /**
  * @author jxu
  */
 @SuppressWarnings({"rawtypes", "unchecked",  "serial"})
-public abstract class ListStudySubjectServlet extends SecureController {
+public abstract class ListStudySubjectServlet extends Controller {
 
-	Locale locale;
 	public static String SUBJECT_PAGE_NUMBER = "ebl_page";
 	public static String PAGINATING_QUERY = "paginatingQuery";
 	public static String FILTER_KEYWORD = "ebl_filterKeyword";
 	public static String SEARCH_SUBMITTED = "submitted";
 
-	private StudySubjectDAO studySubjectDAO;
-
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        StudyBean currentStudy = getCurrentStudy(request);
+
 		FormProcessor fp = new FormProcessor(request);
-		locale = request.getLocale();
-		
+
 		request.setAttribute("closeInfoShowIcons", true);
 
 		String pageNumber = fp.getString(SUBJECT_PAGE_NUMBER);
@@ -114,13 +113,13 @@ public abstract class ListStudySubjectServlet extends SecureController {
 
 		request.setAttribute(PAGINATING_QUERY, paginatingQuery.toString());
 
-		StudyDAO stdao = new StudyDAO(sm.getDataSource());
-		StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
-		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-		StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
+		StudyDAO stdao = new StudyDAO(getDataSource());
+		StudySubjectDAO sdao = new StudySubjectDAO(getDataSource());
+		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
+		SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(getDataSource());
+		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(getDataSource());
+		StudyGroupDAO sgdao = new StudyGroupDAO(getDataSource());
 		// Update study parameters of current study.
 		// "collectDob" and "genderRequired" are set as the same as the parent
 		// study
@@ -140,7 +139,7 @@ public abstract class ListStudySubjectServlet extends SecureController {
 			studyGroupClasses = sgcdao.findAllActiveByStudy(currentStudy);
 			allDefs = seddao.findAllActiveByStudy(currentStudy);
 		}
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(getDataSource());
 		StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "collectDob");
 		currentStudy.getStudyParameterConfig().setCollectDob(parentSPV.getValue());
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "genderRequired");
@@ -205,9 +204,9 @@ public abstract class ListStudySubjectServlet extends SecureController {
 		request.setAttribute("studyGroupClasses", studyGroupClasses);
 
 		// information for the event tabs
-		session.setAttribute("allDefsArray", allDefs);
-		session.setAttribute("allDefsNumber", new Integer(allDefs.size()));
-		session.setAttribute("groupSize", new Integer(studyGroupClasses.size()));
+		request.getSession().setAttribute("allDefsArray", allDefs);
+        request.getSession().setAttribute("allDefsNumber", new Integer(allDefs.size()));
+        request.getSession().setAttribute("groupSize", new Integer(studyGroupClasses.size()));
 
 		// find all the subjects in current study
 		ArrayList subjects = sdao.findAllByStudyId(currentStudy.getId());
@@ -383,9 +382,9 @@ public abstract class ListStudySubjectServlet extends SecureController {
 		}
 
 		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
-		session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+        request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
-		forwardPage(getJSP());
+		forwardPage(getJSP(), request, response);
 	}
 
 	protected abstract String getBaseURL();
@@ -397,8 +396,8 @@ public abstract class ListStudySubjectServlet extends SecureController {
 		if (studyEvent == null)
 			return false;
 
-		EventCRFDAO eventCRFDAO = new EventCRFDAO(sm.getDataSource());
-		EventDefinitionCRFDAO eventDefinitionDAO = new EventDefinitionCRFDAO(sm.getDataSource());
+		EventCRFDAO eventCRFDAO = new EventCRFDAO(getDataSource());
+		EventDefinitionCRFDAO eventDefinitionDAO = new EventDefinitionCRFDAO(getDataSource());
 		List<EventCRFBean> crfBeans = new ArrayList<EventCRFBean>();
 
 		crfBeans.addAll(eventCRFDAO.findAllByStudyEvent(studyEvent));
@@ -442,10 +441,5 @@ public abstract class ListStudySubjectServlet extends SecureController {
 		de.setUncompletedCRFs(al);
 
 		return de;
-	}
-
-	public StudySubjectDAO getStudySubjectDAO() {
-		studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
-		return studySubjectDAO;
 	}
 }

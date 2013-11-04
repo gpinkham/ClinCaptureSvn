@@ -21,32 +21,42 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.domain.rule.RuleSetBasedViewContainer;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @SuppressWarnings({"serial"})
-public class RunRuleSetServlet extends SecureController {
+@Component
+public class RunRuleSetServlet extends Controller {
 
 	private static String RULESET_ID = "ruleSetId";
 	private static String RULE_ID = "ruleId";
 	private static String RULESET = "ruleSet";
 	private static String RULESET_RESULT = "ruleSetResult";
-	private RuleSetServiceInterface ruleSetService;
 
 	/**
-     * 
+     *
+     * @param request
+     * @param response
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -55,27 +65,30 @@ public class RunRuleSetServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	@SuppressWarnings("unused")
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+        StudyBean currentStudy = getCurrentStudy(request);
 
 		String ruleSetId = request.getParameter(RULESET_ID);
 		String ruleId = request.getParameter(RULE_ID);
 		String dryRun = request.getParameter("dryRun");
 
-		RuleSetBean ruleSetBean = getRuleSetBean(ruleSetId, ruleId);
+		RuleSetBean ruleSetBean = getRuleSetBean(currentStudy, ruleSetId, ruleId);
 		if (ruleSetBean != null) {
 			List<RuleSetBean> ruleSets = new ArrayList<RuleSetBean>();
 			ruleSets.add(ruleSetBean);
 			if (dryRun != null && dryRun.equals("no")) {
 				List<RuleSetBasedViewContainer> resultOfRunningRules = getRuleSetService().runRulesInBulk(ruleSets, false, currentStudy, ub);
-				addPageMessage(respage.getString("actions_successfully_taken"));
-				forwardPage(Page.LIST_RULE_SETS_SERVLET);
+				addPageMessage(respage.getString("actions_successfully_taken"), request);
+				forwardPage(Page.LIST_RULE_SETS_SERVLET, request, response);
 
 			} else {
 				List<RuleSetBasedViewContainer> resultOfRunningRules = getRuleSetService().runRulesInBulk(ruleSets,
@@ -83,26 +96,26 @@ public class RunRuleSetServlet extends SecureController {
 				request.setAttribute(RULESET, ruleSetBean);
 				request.setAttribute(RULESET_RESULT, resultOfRunningRules);
 				if (resultOfRunningRules.size() > 0) {
-					addPageMessage(resword.getString("view_executed_rules_affected_subjects"));
+					addPageMessage(resword.getString("view_executed_rules_affected_subjects"), request);
 				} else {
-					addPageMessage(resword.getString("view_executed_rules_no_affected_subjects"));
+					addPageMessage(resword.getString("view_executed_rules_no_affected_subjects"), request);
 				}
 
-				forwardPage(Page.VIEW_EXECUTED_RULES);
+				forwardPage(Page.VIEW_EXECUTED_RULES, request, response);
 
 			}
 
 		} else {
-			addPageMessage("RuleSet not found");
-			forwardPage(Page.LIST_RULE_SETS_SERVLET);
+			addPageMessage("RuleSet not found", request);
+			forwardPage(Page.LIST_RULE_SETS_SERVLET, request, response);
 		}
 	}
 
-	private RuleSetBean getRuleSetBean(String ruleSetId, String ruleId) {
+	private RuleSetBean getRuleSetBean(StudyBean currentStudy, String ruleSetId, String ruleId) {
 		RuleSetBean ruleSetBean = null;
 		if (ruleId != null && ruleSetId != null && ruleId.length() > 0 && ruleSetId.length() > 0) {
 			ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
-			ruleSetBean = ruleSetService.filterByRules(ruleSetBean, Integer.valueOf(ruleId));
+			ruleSetBean = getRuleSetService().filterByRules(ruleSetBean, Integer.valueOf(ruleId));
 		} else if (ruleSetId != null && ruleSetId.length() > 0) {
 			ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
 		}
@@ -110,21 +123,20 @@ public class RunRuleSetServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}
 	}
 
-	private RuleSetServiceInterface getRuleSetService() {
-		ruleSetService = this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
-				.getApplicationContext(context).getBean("ruleSetService");
-		ruleSetService.setContextPath(getContextPath());
-		ruleSetService.setMailSender((JavaMailSenderImpl) SpringServletAccess.getApplicationContext(context).getBean(
-				"mailSender"));
-		ruleSetService.setRequestURLMinusServletPath(getRequestURLMinusServletPath());
+	private RuleSetService getRuleSetService(HttpServletRequest request) {
+        RuleSetService ruleSetService = getRuleSetService();
+		ruleSetService.setContextPath(getContextPath(request));
+		ruleSetService.setMailSender(getMailSender());
+		ruleSetService.setRequestURLMinusServletPath(getRequestURLMinusServletPath(request));
 		return ruleSetService;
 	}
 

@@ -6,14 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.RememberLastPage;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -21,17 +26,20 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"rawtypes", "unchecked",  "serial"})
-public class LockSiteServlet extends SecureController {
+@Component
+public class LockSiteServlet extends Controller {
 
 	public static final String REFERER_URL = "refererUrl";
 	public static final String REFERER = "referer";
 	public static final String LOCK_SITE = "LockSite";
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-		request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -42,16 +50,18 @@ public class LockSiteServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+
+		StudyDAO sdao = getStudyDAO();
+		StudyEventDAO sedao = getStudyEventDAO();
+		StudySubjectDAO ssdao = getStudySubjectDAO();
+		EventCRFDAO ecdao = getEventCRFDAO();
 
 		String referer = request.getHeader(REFERER);
 		if (referer != null && !referer.contains(LOCK_SITE)) {
@@ -62,9 +72,9 @@ public class LockSiteServlet extends SecureController {
 		int siteId = Integer.parseInt(request.getParameter("id"));
 		StudyBean studyBean = (StudyBean) sdao.findByPK(siteId);
 
-		checkRoleByUserAndStudy(ub, studyBean.getParentStudyId(), studyBean.getId());
+		checkRoleByUserAndStudy(request, response, ub, studyBean.getParentStudyId(), studyBean.getId());
 
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+		StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 		ArrayList configs = spvdao.findParamConfigByStudy(studyBean);
 		studyBean.setStudyParameters(configs);
 
@@ -126,17 +136,17 @@ public class LockSiteServlet extends SecureController {
 					ssdao.update(studySubjectBean);
 				}
 			}
-			showResultMessage(studyBean, message);
+			showResultMessage(request, studyBean, message);
 			response.sendRedirect((String) request.getSession().getAttribute(REFERER_URL));
 		} else {
-			forwardPage(Page.LOCK_SITE);
+			forwardPage(Page.LOCK_SITE, request, response);
 		}
 	}
 
-	private void showResultMessage(StudyBean studyBean, String message) {
-		addPageMessage(message.replace("{0}", studyBean.getName()));
+	private void showResultMessage(HttpServletRequest request, StudyBean studyBean, String message) {
+		addPageMessage(message.replace("{0}", studyBean.getName()), request);
 		Map storedAttributes = new HashMap();
-		storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+		storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
 		request.getSession().setAttribute(RememberLastPage.STORED_ATTRIBUTES, storedAttributes);
 	}
 }

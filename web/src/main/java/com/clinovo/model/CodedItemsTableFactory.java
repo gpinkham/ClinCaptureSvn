@@ -348,7 +348,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private boolean isDeleteable(CodedItem codedItem) {
             for (Term term : terms) {
 
-            	if(term.getPreferredName().equals(codedItem.getVerbatimTerm()) &&
+            	if(term.getPreferredName().equalsIgnoreCase(codedItem.getVerbatimTerm()) &&
             			term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
 
             		return true;

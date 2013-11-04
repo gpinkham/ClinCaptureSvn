@@ -26,38 +26,48 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class DownloadAttachedFileServlet extends SecureController {
+@Component
+public class DownloadAttachedFileServlet extends Controller {
 
 	/**
 	 * Checks whether the user has the correct privilege
-	 */
+     * @param request
+     * @param response
+     */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		int eventCRFId = fp.getInt("eventCRFId");
-		EventCRFDAO edao = new EventCRFDAO(sm.getDataSource());
+		EventCRFDAO edao = getEventCRFDAO();
 
 		if (eventCRFId > 0) {
-			if (!entityIncluded(eventCRFId, ub.getName(), edao, sm.getDataSource())) {
+			if (!entityIncluded(eventCRFId, ub.getName(), edao)) {
 				request.setAttribute("downloadStatus", "false");
-				addPageMessage(respage.getString("you_not_have_permission_download_attached_file"));
+				addPageMessage(respage.getString("you_not_have_permission_download_attached_file"), request);
 				throw new InsufficientPermissionException(Page.DOWNLOAD_ATTACHED_FILE,
 						resexception.getString("no_permission"), "1");
 			}
 		} else {
 			request.setAttribute("downloadStatus", "false");
-			addPageMessage(respage.getString("you_not_have_permission_download_attached_file"));
+			addPageMessage(respage.getString("you_not_have_permission_download_attached_file"), request);
 			throw new InsufficientPermissionException(Page.DOWNLOAD_ATTACHED_FILE,
 					resexception.getString("no_permission"), "1");
 		}
@@ -70,13 +80,15 @@ public class DownloadAttachedFileServlet extends SecureController {
 		}
 
 		request.setAttribute("downloadStatus", "false");
-		addPageMessage(respage.getString("you_not_have_permission_download_attached_file"));
+		addPageMessage(respage.getString("you_not_have_permission_download_attached_file"), request);
 		throw new InsufficientPermissionException(Page.DOWNLOAD_ATTACHED_FILE, resexception.getString("no_permission"),
 				"1");
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        StudyBean currentStudy = getCurrentStudy(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		String filePathName = "";
 		String fileName = fp.getString("fileName");
@@ -93,14 +105,14 @@ public class DownloadAttachedFileServlet extends SecureController {
 			} else {
 				if (currentStudy.isSite(parentStudyId)) {
 					testName = testPath
-							+ ((StudyBean) new StudyDAO(sm.getDataSource()).findByPK(parentStudyId)).getOid() + tail;
+							+ ((StudyBean) getStudyDAO().findByPK(parentStudyId)).getOid() + tail;
 					temp = new File(testName);
 					if (temp.exists()) {
 						filePathName = testName;
 						logger.info("parent existing filePathName=" + filePathName);
 					}
 				} else {
-					ArrayList<StudyBean> sites = (ArrayList<StudyBean>) new StudyDAO(sm.getDataSource())
+					ArrayList<StudyBean> sites = (ArrayList<StudyBean>) getStudyDAO()
 							.findAllByParent(currentStudy.getId());
 					for (StudyBean s : sites) {
 						testPath = Utils.getAttachedFilePath(s);
@@ -118,7 +130,7 @@ public class DownloadAttachedFileServlet extends SecureController {
 		logger.info("filePathName=" + filePathName + " fileName=" + fileName);
 		File file = new File(filePathName);
 		if (!file.exists() || file.length() <= 0) {
-			addPageMessage("File " + filePathName + " " + respage.getString("not_exist"));
+			addPageMessage("File " + filePathName + " " + respage.getString("not_exist"), request);
 		} else {
 			// response.setContentType("application/octet-stream");
 			response.setHeader("Content-disposition", "attachment; filename=\"" + fileName + "\";");

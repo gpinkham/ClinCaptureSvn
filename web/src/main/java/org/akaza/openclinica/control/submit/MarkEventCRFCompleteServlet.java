@@ -22,18 +22,23 @@ package org.akaza.openclinica.control.submit;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -41,13 +46,14 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "rawtypes", "serial" })
-public class MarkEventCRFCompleteServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class MarkEventCRFCompleteServlet extends Controller {
 
 	public static final String INPUT_EVENT_CRF_ID = "eventCRFId";
 
@@ -59,42 +65,36 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 
 	public static final String BEAN_DISPLAY = "toc";
 
-	private FormProcessor fp;
-
-	private EventCRFDAO ecdao;
-
-	private EventCRFBean ecb;
-
-	private EventDefinitionCRFDAO edcdao;
-
-	private EventDefinitionCRFBean edcb;
-
-	private void getEventCRFBean() {
-
-		fp = new FormProcessor(request);
+	private EventCRFBean getEventCRFBean(HttpServletRequest request) {
+        FormProcessor fp = new FormProcessor(request);
 		int eventCRFId = fp.getInt(INPUT_EVENT_CRF_ID);
 
-		ecdao = new EventCRFDAO(sm.getDataSource());
-		ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
+        EventCRFDAO ecdao = getEventCRFDAO();
+		return (EventCRFBean) ecdao.findByPK(eventCRFId);
 	}
 
-	private boolean isEachRequiredFieldFillout() {
-		ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+	private boolean isEachRequiredFieldFillout(EventCRFBean ecb) {
+		ItemDataDAO iddao = getItemDataDAO();
 		ArrayList dataList = iddao.findAllBlankRequiredByEventCRFId(ecb.getId(), ecb.getCRFVersionId());
 		// empty means all required fields got filled out,return true-jxu
 		return dataList.isEmpty();
 	}
 
-	private void getEventDefinitionCRFBean() {
-		edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-		edcb = edcdao.findForStudyByStudyEventIdAndCRFVersionId(ecb.getStudyEventId(), ecb.getCRFVersionId());
+	private EventDefinitionCRFBean getEventDefinitionCRFBean(EventCRFBean ecb) {
+        EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
+		return edcdao.findForStudyByStudyEventIdAndCRFVersionId(ecb.getStudyEventId(), ecb.getCRFVersionId());
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	protected void processRequest() throws Exception {
-		getEventCRFBean();
-		getEventDefinitionCRFBean();
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+
+        FormProcessor fp = new FormProcessor(request);
+
+        EventCRFBean ecb = getEventCRFBean(request);
+        EventDefinitionCRFBean edcb = getEventDefinitionCRFBean(ecb);
 		DataEntryStage stage = ecb.getStage();
 
 		request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
@@ -112,7 +112,7 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 			}
 		}
 
-		if (!isEachRequiredFieldFillout()) {
+		if (!isEachRequiredFieldFillout(ecb)) {
 			throw new InconsistentStateException(errorPage, respage.getString("not_mark_CRF_complete4"));
 		}
 
@@ -121,30 +121,27 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 		}
 
 		if (!fp.isSubmitted()) {
-			DisplayTableOfContentsBean toc = TableOfContentsServlet.getDisplayBean(ecb, sm.getDataSource(),
-					currentStudy);
-			toc = TableOfContentsServlet.getDisplayBeanWithShownSections(
-					sm.getDataSource(),
-					toc,
-					(DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
-							"dynamicsMetadataService"));
+			DisplayTableOfContentsBean toc = getDisplayBean(ecb);
+			toc = getDisplayBeanWithShownSections(toc, (DynamicsMetadataService) SpringServletAccess
+					.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService"));
 			request.setAttribute(BEAN_DISPLAY, toc);
 
-			resetPanel();
+            StudyInfoPanel panel = getStudyInfoPanel(request);
+            panel.reset();
 			panel.setStudyInfoShown(false);
 			panel.setOrderedData(true);
-			setToPanel(resword.getString("subject"), toc.getStudySubject().getLabel());
-			setToPanel(resword.getString("study_event_definition"), toc.getStudyEventDefinition().getName());
+			setToPanel(resword.getString("subject"), toc.getStudySubject().getLabel(), request);
+			setToPanel(resword.getString("study_event_definition"), toc.getStudyEventDefinition().getName(), request);
 
 			StudyEventBean seb = toc.getStudyEvent();
-			setToPanel(resword.getString("location"), seb.getLocation());
-			setToPanel(resword.getString("start_date"), seb.getDateStarted().toString());
-			setToPanel(resword.getString("end_date"), seb.getDateEnded().toString());
+			setToPanel(resword.getString("location"), seb.getLocation(), request);
+			setToPanel(resword.getString("start_date"), seb.getDateStarted().toString(), request);
+			setToPanel(resword.getString("end_date"), seb.getDateEnded().toString(), request);
 
-			setToPanel(resword.getString("CRF"), toc.getCrf().getName());
-			setToPanel(resword.getString("CRF_version"), toc.getCrfVersion().getName());
+			setToPanel(resword.getString("CRF"), toc.getCrf().getName(), request);
+			setToPanel(resword.getString("CRF_version"), toc.getCrfVersion().getName(), request);
 
-			forwardPage(Page.MARK_EVENT_CRF_COMPLETE);
+			forwardPage(Page.MARK_EVENT_CRF_COMPLETE, request, response);
 		} else {
 			boolean markComplete = fp.getString(INPUT_MARK_COMPLETE).equals(VALUE_YES);
 			if (markComplete) {
@@ -167,20 +164,21 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 					ecb.setDateValidateCompleted(new Date());
 					ide = false;
 				}
+                EventCRFDAO ecdao = getEventCRFDAO();
 				ecb.setStatus(newStatus);
 				ecb = (EventCRFBean) ecdao.update(ecb);
 				ecdao.markComplete(ecb, ide);
 
-				ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+				ItemDataDAO iddao = getItemDataDAO();
 				iddao.updateStatusByEventCRF(ecb, newStatus);
 
 				// change status for event
-				StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+				StudyEventDAO sedao = getStudyEventDAO();
 				StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 				seb.setUpdatedDate(new Date());
 				seb.setUpdater(ub);
 
-				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 				ArrayList allCRFs = ecdao.findAllByStudyEvent(seb);
 				ArrayList allEDCs = edcdao.findAllActiveByEventDefinitionId(seb.getStudyEventDefinitionId());
 				boolean eventCompleted = true;
@@ -197,44 +195,44 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 
 				seb = (StudyEventBean) sedao.update(seb);
 
-				addPageMessage(respage.getString("event_CRF_marked_complete"));
+				addPageMessage(respage.getString("event_CRF_marked_complete"), request);
 				request.setAttribute(EnterDataForStudyEventServlet.INPUT_EVENT_ID,
 						String.valueOf(ecb.getStudyEventId()));
-				forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET);
+				forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET, request, response);
 			} else {
 				request.setAttribute(DataEntryServlet.INPUT_IGNORE_PARAMETERS, Boolean.TRUE);
-				addPageMessage(respage.getString("event_CRF_not_marked_complete"));
-				forwardPage(errorPage);
+				addPageMessage(respage.getString("event_CRF_not_marked_complete"), request);
+				forwardPage(errorPage, request, response);
 			}
 		}
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		locale = request.getLocale();
-
-		fp = new FormProcessor(request);
+        FormProcessor fp = new FormProcessor(request);
 
 		if (currentRole.equals(Role.SYSTEM_ADMINISTRATOR) || currentRole.equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.equals(Role.STUDY_DIRECTOR)) {
 			return;
 		}
 
-		getEventCRFBean();
+        EventCRFBean ecb = getEventCRFBean(request);
 
 		Role r = currentRole.getRole();
 		if (ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
 			if (ecb.getOwnerId() != ub.getId() && !r.equals(Role.STUDY_ADMINISTRATOR) && !r.equals(Role.STUDY_DIRECTOR)) {
 				request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
-				addPageMessage(respage.getString("not_mark_CRF_complete6"));
+				addPageMessage(respage.getString("not_mark_CRF_complete6"), request);
 				throw new InsufficientPermissionException(Page.TABLE_OF_CONTENTS_SERVLET,
 						resexception.getString("not_study_owner"), "1");
 			}
 		} else if (ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
 			if (ecb.getValidatorId() != ub.getId() && !r.equals(Role.STUDY_ADMINISTRATOR) && !r.equals(Role.STUDY_DIRECTOR)) {
 				request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
-				addPageMessage(respage.getString("not_mark_CRF_complete7"));
+				addPageMessage(respage.getString("not_mark_CRF_complete7"), request);
 				throw new InsufficientPermissionException(Page.TABLE_OF_CONTENTS_SERVLET,
 						resexception.getString("not_study_owner"), "1");
 			}

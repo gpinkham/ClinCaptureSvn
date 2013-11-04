@@ -20,26 +20,18 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.submit.TableOfContentsServlet;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * To view the table of content of an event CRF
@@ -47,12 +39,16 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @author jxu
  */
 @SuppressWarnings({"rawtypes", "unchecked",  "serial"})
-public class ViewTableOfContentServlet extends SecureController {
+@Component
+public class ViewTableOfContentServlet extends Controller {
 	/**
 	 * Checks whether the user has the correct privilege
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -63,61 +59,21 @@ public class ViewTableOfContentServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		int crfVersionId = fp.getInt("crfVersionId");
 		// YW <<
 		int sedId = fp.getInt("sedId");
 		request.setAttribute("sedId", new Integer(sedId) + "");
 		// YW >>
-		DisplayTableOfContentsBean displayBean = getDisplayBean(sm.getDataSource(), crfVersionId);
+		DisplayTableOfContentsBean displayBean = getDisplayBeanByCrfVersionId(crfVersionId);
 		request.setAttribute("toc", displayBean);
-		forwardPage(Page.VIEW_TABLE_OF_CONTENT);
+		forwardPage(Page.VIEW_TABLE_OF_CONTENT, request, response);
 	}
-
-	public static DisplayTableOfContentsBean getDisplayBean(DataSource ds, int crfVersionId) {
-		DisplayTableOfContentsBean answer = new DisplayTableOfContentsBean();
-
-		ArrayList sections = getSections(crfVersionId, ds);
-		answer.setSections(sections);
-
-		CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-		CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
-		answer.setCrfVersion(cvb);
-
-		CRFDAO cdao = new CRFDAO(ds);
-		CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
-		answer.setCrf(cb);
-
-		answer.setEventCRF(new EventCRFBean());
-
-		answer.setStudyEventDefinition(new StudyEventDefinitionBean());
-
-		return answer;
-	}
-
-	public static ArrayList getSections(int crfVersionId, DataSource ds) {
-		SectionDAO sdao = new SectionDAO(ds);
-
-		HashMap numItemsBySectionId = sdao.getNumItemsBySectionId();
-		ArrayList sections = sdao.findAllByCRFVersionId(crfVersionId);
-
-		for (int i = 0; i < sections.size(); i++) {
-			SectionBean sb = (SectionBean) sections.get(i);
-
-			int sectionId = sb.getId();
-			Integer key = new Integer(sectionId);
-			sb.setNumItems(TableOfContentsServlet.getIntById(numItemsBySectionId, key));
-			sections.set(i, sb);
-		}
-
-		return sections;
-	}
-
 }

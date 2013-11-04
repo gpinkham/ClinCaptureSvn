@@ -67,7 +67,7 @@ import javax.sql.DataSource;
 public class RulesPostImportContainerService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	DataSource ds;
+    DataSource ds;
 	private RuleDao ruleDao;
 	private RuleSetDao ruleSetDao;
 	private final OidGenerator oidGenerator;
@@ -82,12 +82,6 @@ public class RulesPostImportContainerService {
 		oidGenerator = new GenericOidGenerator();
 	}
 	
-	public RulesPostImportContainerService(DataSource ds, StudyBean currentStudy) {
-		oidGenerator = new GenericOidGenerator();
-		this.ds = ds;
-		this.currentStudy = currentStudy;
-	}
-
 	public RulesPostImportContainerService(DataSource ds) {
 		oidGenerator = new GenericOidGenerator();
 		this.ds = ds;
@@ -514,7 +508,7 @@ public class RulesPostImportContainerService {
 		this.ruleSetDao = ruleSetDao;
 	}
 
-	/**
+    /**
 	 * @return the currentStudy
 	 */
 	public StudyBean getCurrentStudy() {

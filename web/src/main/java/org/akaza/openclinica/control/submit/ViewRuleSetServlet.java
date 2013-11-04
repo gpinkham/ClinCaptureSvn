@@ -21,30 +21,40 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @SuppressWarnings({ "serial" })
-public class ViewRuleSetServlet extends SecureController {
+@Component
+public class ViewRuleSetServlet extends Controller {
 
 	private static String RULESET_ID = "ruleSetId";
 	private static String RULESET = "ruleSet";
-	private RuleSetServiceInterface ruleSetService;
 
 	/**
-     * 
+     *
+     * @param request
+     * @param response
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -53,18 +63,19 @@ public class ViewRuleSetServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        StudyBean currentStudy = getCurrentStudy(request);
 
 		String ruleSetId = request.getParameter(RULESET_ID);
 		if (ruleSetId == null) {
-			addPageMessage(respage.getString("please_choose_a_CRF_to_view"));
-			forwardPage(Page.CRF_LIST);
+			addPageMessage(respage.getString("please_choose_a_CRF_to_view"), request);
+			forwardPage(Page.CRF_LIST, request, response);
 		} else {
 			RuleSetBean ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
 			Boolean firstTime = true;
@@ -84,7 +95,7 @@ public class ViewRuleSetServlet extends SecureController {
 			request.setAttribute("validRuleSetRuleIds", validRuleSetRuleIds);
 			request.setAttribute("ruleSetRuleBeans", orderRuleSetRulesByStatus(ruleSetBean));
 			request.setAttribute(RULESET, ruleSetBean);
-			forwardPage(Page.VIEW_RULES);
+			forwardPage(Page.VIEW_RULES, request, response);
 		}
 	}
 
@@ -105,19 +116,12 @@ public class ViewRuleSetServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}
 	}
-
-	private RuleSetServiceInterface getRuleSetService() {
-		ruleSetService = this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
-				.getApplicationContext(context).getBean("ruleSetService");
-		// TODO: Add getRequestURLMinusServletPath(),getContextPath()
-		return ruleSetService;
-	}
-
 }

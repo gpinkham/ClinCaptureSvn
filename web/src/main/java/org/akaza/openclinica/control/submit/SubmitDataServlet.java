@@ -23,20 +23,21 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
-import java.util.Locale;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings({ "serial" })
-public class SubmitDataServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class SubmitDataServlet extends Controller {
 
 	@Override
-	protected void processRequest() throws Exception {
-		forwardPage(Page.SUBMIT_DATA);
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		forwardPage(Page.SUBMIT_DATA, request, response);
 	}
 
 	public static boolean mayViewData(UserAccountBean ub, StudyUserRoleBean currentRole) {
@@ -68,9 +69,9 @@ public class SubmitDataServlet extends SecureController {
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String exceptionName = resexception.getString("no_permission_to_submit_data");
 		String noAccessMessage = respage.getString("may_not_enter_data_for_this_study")
@@ -80,7 +81,7 @@ public class SubmitDataServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(noAccessMessage);
+		addPageMessage(noAccessMessage, request);
 		throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
 	}
 

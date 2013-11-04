@@ -23,7 +23,6 @@ package org.akaza.openclinica.control.submit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,6 +45,7 @@ import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Performs 'administrative editing' action for study director/study coordinator
@@ -54,9 +54,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings({ "serial" })
+@Component
 public class AdministrativeEditingServlet extends DataEntryServlet {
-
-	Locale locale;
 
 	@Override
 	protected Page getServletPage(HttpServletRequest request) {
@@ -141,7 +140,6 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
 		mayAccess(request);
-		locale = request.getLocale();
 		HttpSession session = request.getSession();
 		FormProcessor fp = new FormProcessor(request);
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
@@ -373,7 +371,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 	@Override
 	protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
 		// StudyParameterValueDAO spvdao = new
-		// StudyParameterValueDAO(sm.getDataSource());
+		// StudyParameterValueDAO();
 		// ArrayList studyParameters =
 		// spvdao.findParamConfigByStudy(currentStudy);
 

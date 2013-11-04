@@ -21,6 +21,8 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.core.*;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -30,10 +32,10 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.core.CoreSecureController;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
+import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.util.*;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -42,8 +44,12 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * copy of the EnterDataForStudyEventServlet
@@ -51,9 +57,8 @@ import java.util.*;
  * @author ssachs
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class CRFListForStudyEventServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class CRFListForStudyEventServlet extends Controller {
 
 	public static final String SUBJECT_FLAG_COLOR = "subjectFlagColor";
 
@@ -97,8 +102,12 @@ public class CRFListForStudyEventServlet extends SecureController {
 	public static final String EVENT_FLAG_COLOR = "eventFlagColor";
 	public static final String STUDY_EVENT_NAME = "studyEventName";
 
-	private StudyEventBean getStudyEvent(int eventId) throws Exception {
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+	private StudyEventBean getStudyEvent(HttpServletRequest request, int eventId) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		StudyEventDAO sedao = getStudyEventDAO();
 
 		StudyBean studyWithSED = currentStudy;
 		if (currentStudy.getParentStudyId() > 0) {
@@ -111,14 +120,14 @@ public class CRFListForStudyEventServlet extends SecureController {
 		AuditableEntityBean aeb = sedao.findByPKAndStudy(eventId, studyWithSED);
 
 		if (!aeb.isActive()) {
-			addPageMessage(respage.getString("study_event_to_enter_data_not_belong_study"));
+			addPageMessage(respage.getString("study_event_to_enter_data_not_belong_study"), request);
 			throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 					resexception.getString("study_event_not_belong_study"), "1");
 		}
 
 		StudyEventBean seb = (StudyEventBean) aeb;
 
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
 		seb.setStudyEventDefinition(sedb);
 		if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator()) && seb.getSubjectEventStatus().isLocked()) {
@@ -128,34 +137,38 @@ public class CRFListForStudyEventServlet extends SecureController {
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-		CoreSecureController.removeLockedCRF(ub.getId());
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		removeLockedCRF(ub.getId());
 		FormProcessor fp = new FormProcessor(request);
 
 		int eventId = fp.getInt(INPUT_EVENT_ID, true);
 		request.setAttribute("eventId", eventId + "");
 
 		// so we can display the event for which we're entering data
-		StudyEventBean seb = getStudyEvent(eventId);
+		StudyEventBean seb = getStudyEvent(request, eventId);
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());        
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(sm.getDataSource());
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
+		StudyEventDAO sedao = getStudyEventDAO();
+		DiscrepancyNoteDAO discDao = getDiscrepancyNoteDAO();
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 
 		// so we can display the subject's label
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+		StudySubjectDAO ssdao = getStudySubjectDAO();
 		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
 		int studyId = studySubjectBean.getStudyId();
 
-		StudyDAO studydao = new StudyDAO(sm.getDataSource());
+		StudyDAO studydao = getStudyDAO();
 		StudyBean study = (StudyBean) studydao.findByPK(studyId);
 
 		boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
 		boolean isParentStudy = study.getParentStudyId() < 1;
 
 		// Get any disc notes for this study event
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
+		DiscrepancyNoteDAO discrepancyNoteDAO = getDiscrepancyNoteDAO();
 		ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent = new ArrayList<DiscrepancyNoteBean>();
 
 		// These methods return only parent disc notes
@@ -174,14 +187,15 @@ public class CRFListForStudyEventServlet extends SecureController {
 		}
 
 		if (!allNotesforSubjectAndEvent.isEmpty()) {
-			setRequestAttributesForNotes(allNotesforSubjectAndEvent);
+			setRequestAttributesForNotes(request, allNotesforSubjectAndEvent);
 		}
 
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+        SessionManager sm = getSessionManager(request);
+		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(seb);
 		SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
 		
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 		ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
 				seb.getStudyEventDefinitionId());
 
@@ -192,7 +206,7 @@ public class CRFListForStudyEventServlet extends SecureController {
 		EnterDataForStudyEventServlet.populateUncompletedCRFsWithAnOwner(sm.getDataSource(),
 				uncompletedEventDefinitionCRFs);
 
-		ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs,
+		ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(getDataSource(), eventCRFs,
 				eventDefinitionCRFs, ub, currentRole, seb.getSubjectEventStatus(), study);
 
 		if (currentStudy.getParentStudyId() > 0) {
@@ -301,12 +315,13 @@ public class CRFListForStudyEventServlet extends SecureController {
 		}
 		request.setAttribute("allLocked", allLocked);
 
-		forwardPage(Page.CRF_LIST_FOR_STUDY_EVENT);
+		forwardPage(Page.CRF_LIST_FOR_STUDY_EVENT, request, response);
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String exceptionName = resexception.getString("no_permission_to_submit_data");
 		String noAccessMessage = respage.getString("may_not_enter_data_for_this_study");
@@ -315,7 +330,7 @@ public class CRFListForStudyEventServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(noAccessMessage);
+		addPageMessage(noAccessMessage, request);
 		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, exceptionName, "1");
 	}
 
@@ -331,8 +346,8 @@ public class CRFListForStudyEventServlet extends SecureController {
 			startedButIncompleted.put(new Integer(edcrf.getCrfId()), new EventCRFBean());
 		}
 
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-		ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+		CRFVersionDAO cvdao = getCRFVersionDAO();
+		ItemDataDAO iddao = getItemDataDAO();
 		for (i = 0; i < eventCRFs.size(); i++) {
 			EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
 			int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
@@ -359,7 +374,7 @@ public class CRFListForStudyEventServlet extends SecureController {
 		return answer;
 	}
 
-	private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans) {
+	private void setRequestAttributesForNotes(HttpServletRequest request, List<DiscrepancyNoteBean> discBeans) {
 		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
 			if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
 				request.setAttribute(HAS_LOCATION_NOTE, "yes");

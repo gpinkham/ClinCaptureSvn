@@ -22,15 +22,18 @@ package org.akaza.openclinica.control.submit;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.
@@ -38,24 +41,21 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @author Krikor Krumlian
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class VerifyImportedRuleServlet extends SecureController {
-
-	Locale locale;
-	RuleSetServiceInterface ruleSetService;
+@Component
+public class VerifyImportedRuleServlet extends Controller {
 
 	@Override
-	public void processRequest() throws Exception {
-
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String action = request.getParameter("action");
 		if ("confirm".equalsIgnoreCase(action)) {
-			RulesPostImportContainer rulesContainer = (RulesPostImportContainer) session.getAttribute("importedData");
+			RulesPostImportContainer rulesContainer = (RulesPostImportContainer) request.getSession().getAttribute("importedData");
 			logger.info("Size of ruleDefs : " + rulesContainer.getRuleDefs().size());
 			logger.info("Size of ruleSets : " + rulesContainer.getRuleSets().size());
-			forwardPage(Page.VERIFY_RULES_IMPORT);
+			forwardPage(Page.VERIFY_RULES_IMPORT, request, response);
 		}
 
 		if ("save".equalsIgnoreCase(action)) {
-			RulesPostImportContainer rulesContainer = (RulesPostImportContainer) session.getAttribute("importedData");
+			RulesPostImportContainer rulesContainer = (RulesPostImportContainer) request.getSession().getAttribute("importedData");
 			getRuleSetService().saveImport(rulesContainer);
 			MessageFormat mf = new MessageFormat("");
 			mf.applyPattern(resword.getString("successful_rule_upload"));
@@ -63,23 +63,17 @@ public class VerifyImportedRuleServlet extends SecureController {
 			Object[] arguments = {
 					rulesContainer.getValidRuleDefs().size() + rulesContainer.getDuplicateRuleDefs().size(),
 					rulesContainer.getValidRuleSetDefs().size() + rulesContainer.getDuplicateRuleSetDefs().size() };
-			addPageMessage(mf.format(arguments));
+			addPageMessage(mf.format(arguments), request);
 			ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
-			session.setAttribute("pageMessages", pageMessages);
+            request.getSession().setAttribute("pageMessages", pageMessages);
 			response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
 		}
 	}
-
-	private RuleSetServiceInterface getRuleSetService() {
-		ruleSetService = this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
-				.getApplicationContext(context).getBean("ruleSetService");
-		return ruleSetService;
-	}
-
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		locale = request.getLocale();
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -91,7 +85,7 @@ public class VerifyImportedRuleServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 }

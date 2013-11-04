@@ -27,26 +27,25 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
@@ -57,7 +56,6 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.domain.rule.expression.ExpressionProcessor;
 import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -67,6 +65,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
@@ -74,52 +73,46 @@ import org.slf4j.LoggerFactory;
  * @author Krikor krumlian
  */
 @SuppressWarnings({"rawtypes","unchecked"})
-public class TestRuleServlet extends SecureController {
+@Component
+public class TestRuleServlet extends Controller {
 
 	private static final long serialVersionUID = 9116068126651934226L;
 	protected final Logger log = LoggerFactory.getLogger(TestRuleServlet.class);
 
-	Locale locale;
-	XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
-	RuleSetRuleDao ruleSetRuleDao;
-	RuleSetDao ruleSetDao;
-	ItemDAO itemDAO;
-	ItemFormMetadataDAO itemFormMetadataDAO;
-	RulesPostImportContainerService rulesPostImportContainerService;
-	private ExpressionService expressionService;
 	private final String TARGET = "target";
 	private final String RULE = "rule";
 	private final String RULE_SET_RULE_ID = "ruleSetRuleId";
 	
-	void putDummyActionInSession() {
+	void putDummyActionInSession(HttpServletRequest request) {
 		ArrayList<RuleActionBean> actions = new ArrayList<RuleActionBean>();
 		DiscrepancyNoteActionBean discNoteAction = new DiscrepancyNoteActionBean();
 		discNoteAction.setExpressionEvaluatesTo(true);
 		discNoteAction.setMessage("TEST DISCREPANCY");
 		actions.add(discNoteAction);
-		session.setAttribute("testRuleActions", actions);
+		request.getSession().setAttribute("testRuleActions", actions);
 	}
 
 	void populteFormFields(FormProcessor fp) {
-
 		String targetForm = fp.getString(TARGET).trim().replaceAll("(\n|\t|\r)", "");
-		String testRulesTarget = (String) session.getAttribute("testRulesTarget");
+		String testRulesTarget = (String) fp.getRequest().getSession().getAttribute("testRulesTarget");
 		if (testRulesTarget != null) {
 			String targetSess = testRulesTarget.trim().replaceAll("(\n|\t|\r)", "");
 			if (!targetForm.equals(targetSess)) {
-				putDummyActionInSession();
-				session.removeAttribute("testRulesTarget");
+				putDummyActionInSession(fp.getRequest());
+                fp.getRequest().getSession().removeAttribute("testRulesTarget");
 			}
 		}
 		String textFields[] = { TARGET, RULE, RULE_SET_RULE_ID };
 		fp.setCurrentStringValuesAsPreset(textFields);
 		HashMap presetValues = fp.getPresetValues();
-		setPresetValues(presetValues);
+		setPresetValues(presetValues, fp.getRequest());
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        StudyBean currentStudy = getCurrentStudy(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		String action = request.getParameter("action");
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
@@ -136,33 +129,33 @@ public class TestRuleServlet extends SecureController {
 				presetValues.put(RULE, rsr.getRuleBean().getExpression().getValue());
 				presetValues.put(RULE_SET_RULE_ID, String.valueOf(ruleSetRuleId));
 				fp.setPresetValues(presetValues);
-				setPresetValues(presetValues);
-				session.setAttribute("testRuleActions", rsr.getActions());
-				session.setAttribute("testRulesTarget", rsr.getRuleSetBean().getTarget().getValue());
+				setPresetValues(presetValues, request);
+				request.getSession().setAttribute("testRuleActions", rsr.getActions());
+                request.getSession().setAttribute("testRulesTarget", rsr.getRuleSetBean().getTarget().getValue());
 				System.out.println("trying to set: " + rsr.getRuleSetBean().getTarget().getValue());
 				request.setAttribute("ruleSetRuleId", ruleSetRuleId);
 				request.setAttribute("ruleSetId", rsr.getRuleSetBean().getId());
-				ItemBean item = getExpressionService().getItemBeanFromExpression(
+				ItemBean item = getExpressionService(currentStudy).getItemBeanFromExpression(
 						rsr.getRuleSetBean().getTarget().getValue());
 				request.setAttribute("itemName", item.getName());
 				request.setAttribute("itemDefinition", item.getDescription());
 				request.setAttribute("ruleSetRuleAvailable", true);
 
 			} else { // free form testing
-				putDummyActionInSession();
+				putDummyActionInSession(request);
 			}
-			session.removeAttribute("testValues");
+			request.getSession().removeAttribute("testValues");
 			request.setAttribute("action", "validate");
-			forwardPage(Page.TEST_RULES);
+			forwardPage(Page.TEST_RULES, request, response);
 
 		} else if (action.equals("validate")) {
 
-			HashMap<String, String> result = validate(v);
+			HashMap<String, String> result = validate(request, v);
 
 			if (result.get("ruleValidation").equals("rule_valid")) {
-				addPageMessage(resword.getString("test_rules_message_valid"));
+				addPageMessage(resword.getString("test_rules_message_valid"), request);
 			} else {
-				addPageMessage(resword.getString("test_rules_message_invalid"));
+				addPageMessage(resword.getString("test_rules_message_invalid"), request);
 			}
 			request.setAttribute("ruleValidation", result.get("ruleValidation"));
 			request.setAttribute("validate", "on");
@@ -173,23 +166,23 @@ public class TestRuleServlet extends SecureController {
 			result.remove("ruleValidation");
 			result.remove("ruleEvaluatesTo");
 			result.remove("ruleValidationFailMessage");
-			populateTooltip(result);
-			session.setAttribute("testValues", result);
+			populateTooltip(request, result);
+			request.getSession().setAttribute("testValues", result);
 			populteFormFields(fp);
 
-			forwardPage(Page.TEST_RULES);
+			forwardPage(Page.TEST_RULES, request, response);
 
 		} else if (action.equals("test")) {
 
-			HashMap<String, String> result = validate(v);
+			HashMap<String, String> result = validate(request, v);
 			HashMap errors = v.validate();
 
 			if (!errors.isEmpty()) {
-				setInputMessages(errors);
+				setInputMessages(errors, request);
 				if (result.get("ruleValidation").equals("rule_valid")) {
-					addPageMessage(resword.getString("test_rules_message_valid"));
+					addPageMessage(resword.getString("test_rules_message_valid"), request);
 				} else {
-					addPageMessage(resword.getString("test_rules_message_invalid"));
+					addPageMessage(resword.getString("test_rules_message_invalid"), request);
 				}
 				request.setAttribute("ruleValidation", result.get("ruleValidation"));
 				request.setAttribute("validate", "on");
@@ -201,9 +194,9 @@ public class TestRuleServlet extends SecureController {
 			} else {
 
 				if (result.get("ruleValidation").equals("rule_valid")) {
-					addPageMessage(resword.getString("test_rules_message_valid"));
+					addPageMessage(resword.getString("test_rules_message_valid"), request);
 				} else {
-					addPageMessage(resword.getString("test_rules_message_invalid"));
+					addPageMessage(resword.getString("test_rules_message_invalid"), request);
 				}
 				request.setAttribute("action", result.get("ruleValidation").equals("rule_valid") ? "test" : "validate");
 				request.setAttribute("ruleValidation", result.get("ruleValidation"));
@@ -212,20 +205,20 @@ public class TestRuleServlet extends SecureController {
 			}
 
 			if (result.get("ruleValidation").equals("rule_invalid")) {
-				session.setAttribute("testValues", new HashMap<String, String>());
+				request.getSession().setAttribute("testValues", new HashMap<String, String>());
 			} else {
-				session.setAttribute("testValues", result);
+                request.getSession().setAttribute("testValues", result);
 			}
 
 			result.remove("result");
 			result.remove("ruleValidation");
 			result.remove("ruleEvaluatesTo");
 			result.remove("ruleValidationFailMessage");
-			populateTooltip(result);
+			populateTooltip(request, result);
 
 			populteFormFields(fp);
 
-			forwardPage(Page.TEST_RULES);
+			forwardPage(Page.TEST_RULES, request, response);
 		}
 	}
 
@@ -246,11 +239,11 @@ public class TestRuleServlet extends SecureController {
 		}
 	}
 
-	private void populateTooltip(HashMap<String, String> testVariablesAndValues) {
-
+	private void populateTooltip(HttpServletRequest request, HashMap<String, String> testVariablesAndValues) {
+        StudyBean currentStudy = getCurrentStudy(request);
 		if (testVariablesAndValues != null) {
 			for (Map.Entry<String, String> entry : testVariablesAndValues.entrySet()) {
-				ItemBean item = getExpressionService().getItemBeanFromExpression(entry.getKey());
+				ItemBean item = getExpressionService(currentStudy).getItemBeanFromExpression(entry.getKey());
 				DisplayItemBean dib = new DisplayItemBean();
 				dib.setItem(item);
 				request.setAttribute(entry.getKey() + "-tooltip",
@@ -274,7 +267,8 @@ public class TestRuleServlet extends SecureController {
 
 	}
 
-	private HashMap<String, String> validate(Validator v) {
+	private HashMap<String, String> validate(HttpServletRequest request, Validator v) {
+        StudyBean currentStudy = getCurrentStudy(request);
 
 		FormProcessor fp = new FormProcessor(request);
 
@@ -283,13 +277,13 @@ public class TestRuleServlet extends SecureController {
 		ruleString = ruleString.trim().replaceAll("(\n|\t|\r)", " ");
 		targetString = targetString.trim().replaceAll("(\n|\t|\r)", "");
 
-		HashMap<String, String> p = session.getAttribute("testValues") != null ? (HashMap<String, String>) session
+		HashMap<String, String> p = request.getSession().getAttribute("testValues") != null ? (HashMap<String, String>) request.getSession()
 				.getAttribute("testValues") : new HashMap<String, String>();
 
 		if (p != null) {
 			for (Map.Entry<String, String> entry : p.entrySet()) {
 				entry.setValue(fp.getString(entry.getKey()));
-				ItemBean item = getExpressionService().getItemBeanFromExpression(entry.getKey());
+				ItemBean item = getExpressionService(currentStudy).getItemBeanFromExpression(entry.getKey());
 				List<ItemFormMetadataBean> itemFormMetadataBeans = getItemFormMetadataDAO().findAllByItemId(
 						item.getId());
 				ItemFormMetadataBean itemFormMetadataBean = itemFormMetadataBeans.size() > 0 ? itemFormMetadataBeans
@@ -326,7 +320,7 @@ public class TestRuleServlet extends SecureController {
 			}
 		}
 
-		List<RuleActionBean> actions = session.getAttribute("testRuleActions") != null ? (List<RuleActionBean>) session
+		List<RuleActionBean> actions = request.getSession().getAttribute("testRuleActions") != null ? (List<RuleActionBean>) request.getSession()
 				.getAttribute("testRuleActions") : new ArrayList<RuleActionBean>();
 
 		if (actions != null) {
@@ -337,7 +331,7 @@ public class TestRuleServlet extends SecureController {
 
 		// Check Target if not valid report and return
 		try {
-			getExpressionService().ruleSetExpressionChecker(targetString);
+			getExpressionService(currentStudy).ruleSetExpressionChecker(targetString);
 		} catch (OpenClinicaSystemException e) {
 			HashMap<String, String> result = new HashMap<String, String>();
 			MessageFormat mf = new MessageFormat("");
@@ -352,7 +346,7 @@ public class TestRuleServlet extends SecureController {
 		}
 
 		// Auto update itemName & itemDefinition based on target
-		ItemBean item = getExpressionService().getItemBeanFromExpression(targetString);
+		ItemBean item = getExpressionService(currentStudy).getItemBeanFromExpression(targetString);
 		if (item != null) {
 			request.setAttribute("itemName", item.getName());
 			request.setAttribute("itemDefinition", item.getDescription());
@@ -376,7 +370,7 @@ public class TestRuleServlet extends SecureController {
 		rule.setContext(Context.OC_RULES_V1);
 		rule.setValue(ruleString);
 
-		ExpressionObjectWrapper eow = new ExpressionObjectWrapper(sm.getDataSource(), currentStudy, rule, ruleSet);
+		ExpressionObjectWrapper eow = new ExpressionObjectWrapper(getDataSource(), currentStudy, rule, ruleSet);
 		ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
 		ep.setRespage(respage);
 
@@ -407,17 +401,20 @@ public class TestRuleServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}
 	}
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -426,35 +423,14 @@ public class TestRuleServlet extends SecureController {
 			return;
 		}
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
-	private RuleSetRuleDao getRuleSetRuleDao() {
-		ruleSetRuleDao = this.ruleSetRuleDao != null ? ruleSetRuleDao : (RuleSetRuleDao) SpringServletAccess
-				.getApplicationContext(context).getBean("ruleSetRuleDao");
-		return ruleSetRuleDao;
-	}
-
-	private RuleSetDao getRuleSetDao() {
-		ruleSetDao = this.ruleSetDao != null ? ruleSetDao : (RuleSetDao) SpringServletAccess.getApplicationContext(
-				context).getBean("ruleSetDao");
-		return ruleSetDao;
-	}
-
-	private ItemFormMetadataDAO getItemFormMetadataDAO() {
-		itemFormMetadataDAO = this.itemFormMetadataDAO != null ? itemFormMetadataDAO : new ItemFormMetadataDAO(
-				sm.getDataSource());
-		return itemFormMetadataDAO;
-	}
-
-	private ExpressionService getExpressionService() {
-		expressionService = this.expressionService != null ? expressionService : new ExpressionService(
-				new ExpressionObjectWrapper(sm.getDataSource(), currentStudy, null, null));
-		expressionService
-				.setExpressionWrapper(new ExpressionObjectWrapper(sm.getDataSource(), currentStudy, null, null));
-
-		return expressionService;
+	private ExpressionService getExpressionService(StudyBean currentStudy) {
+        ExpressionService expressionService = new ExpressionService(new ExpressionObjectWrapper(getDataSource(), currentStudy, null, null));
+        expressionService.setExpressionWrapper(new ExpressionObjectWrapper(getDataSource(), currentStudy, null, null));
+        return expressionService;
 	}
 
 }

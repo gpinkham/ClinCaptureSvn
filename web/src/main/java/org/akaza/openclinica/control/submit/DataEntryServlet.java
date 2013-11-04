@@ -21,6 +21,7 @@
 package org.akaza.openclinica.control.submit;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -33,13 +34,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
 import com.clinovo.model.CodedItem;
 import org.akaza.openclinica.bean.admin.AuditBean;
@@ -80,7 +77,7 @@ import org.akaza.openclinica.bean.submit.SCDItemDisplayInfo;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.CoreSecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -131,23 +128,20 @@ import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.DiscrepancyShortcutsAnalyzer;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.quartz.impl.StdScheduler;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import com.clinovo.service.CodedItemService;
 import com.clinovo.util.ValidatorHelper;
 
 /**
  * @author ssachs
  */
 @SuppressWarnings({"unchecked", "rawtypes", "serial"})
-public abstract class DataEntryServlet extends CoreSecureController {
-
-    Locale locale;
-    protected CodedItemService codedItemService;
+public abstract class DataEntryServlet extends Controller {
 
 	public static final String DATA_ENTRY_CURRENT_CRF_VERSION_OID = "dataEntryCurrentCrfVersionOid";
 	public static final String DATA_ENTRY_CURRENT_CRF_OID = "dataEntryCurrentCrfOid";
@@ -250,24 +244,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 	public static final String CV_INSTANT_META = "cvInstantMeta";
 
-	private DataSource dataSource;
-
-	@Override
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-		try {
-			ServletContext context = getServletContext();
-			SessionManager sm = new SessionManager(SpringServletAccess.getApplicationContext(context));
-			dataSource = sm.getDataSource();
-		} catch (Exception ne) {
-			ne.printStackTrace();
-		}
-	}
-
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
 	@Override
 	protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException;
@@ -311,8 +287,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 	@SuppressWarnings("unused")
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Locale locale = request.getLocale();
         FormProcessor fp = new FormProcessor(request);
-
         String action = fp.getString(ACTION);
 
 		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(
@@ -345,10 +321,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 		logMe("Enterting DataEntry Servlet" + System.currentTimeMillis());
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
-		locale = request.getLocale();
 
 		FormDiscrepancyNotes discNotes;
 
+        StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.setStudyInfoShown(false);
 		String age = "";
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
@@ -552,8 +528,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(),
 				ecb);
 		section.setDisplayItemGroups(displayItemWithGroups);
-		DisplayTableOfContentsBean toc = TableOfContentsServlet.getDisplayBeanWithShownSections(
-				getDataSource(),
+		DisplayTableOfContentsBean toc = getDisplayBeanWithShownSections(
 				(DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY),
 				(DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
 						"dynamicsMetadataService"));
@@ -606,6 +581,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		// set up interviewer name and date
 		fp.addPresetValue(INPUT_INTERVIEWER, ecb.getInterviewerName());
 
+        SimpleDateFormat local_df = getLocalDf(request);
+
 		if (ecb.getDateInterviewed() != null) {
 			String idateFormatted = local_df.format(ecb.getDateInterviewed());
 			fp.addPresetValue(INPUT_INTERVIEW_DATE, idateFormatted);
@@ -645,7 +622,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			int keyId = ecb.getId();
 			session.removeAttribute(DoubleDataEntryServlet.COUNT_VALIDATE + keyId);
 
-			setUpPanel(section);
+			setUpPanel(request, section);
 			if (newUploadedFiles.size() > 0) {
 				if (this.unloadFiles(newUploadedFiles)) {
 
@@ -694,7 +671,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			// TODO: find a better, less random place for this
 			// session.setAttribute(HAS_DATA_FLAG, true);
 
-			errors = new HashMap();
+            HashMap errors = new HashMap();
 
 			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 			if (discNotes == null) {
@@ -1049,7 +1026,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			// and write the result in DisplayItemBean's ItemDateBean - data
 			ScoreItemValidator sv = new ScoreItemValidator(validatorHelper, discNotes);
 			// *** doing calc here, load it where? ***
-			SessionManager sm = (SessionManager) request.getSession().getAttribute("sm");
+			SessionManager sm = getSessionManager(request);
 			ScoreCalculator sc = new ScoreCalculator(sm, ecb, ub);
 			logMe("allItems 3 Loop begin  " + System.currentTimeMillis());
 			for (int i = 0; i < allItems.size(); i++) {
@@ -1262,10 +1239,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
 								&& !ifmb.getGroupLabel().equalsIgnoreCase("")) {
 							DisplayItemGroupBean digb = changedItemsMap.remove(formName);
 							if (digb != null) {
-								this.setReasonForChangeError(idb, formName, error, request);
+								this.setReasonForChangeError(errors, idb, formName, error, request);
 							}
 						} else {
-							this.setReasonForChangeError(idb, formName, error, request);
+							this.setReasonForChangeError(errors, idb, formName, error, request);
 							logger.debug("form name added: " + formName);
 						}
 					}
@@ -1365,7 +1342,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				addPageMessage(respage.getString("errors_in_submission_see_below"), request);
 				request.setAttribute("hasError", "true");
 				session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
-				setUpPanel(section);
+				setUpPanel(request, section);
 				request.getSession().setAttribute("dnAdditionalCreatingParameters", createDNParametersMap(request, section));
 				forwardPage(getJSPPage(), request, response);
 			} else {
@@ -1704,7 +1681,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 					//
 					this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups,
 							section.getSection().getId(), ecb);
-					toc = TableOfContentsServlet.getDisplayBeanWithShownSections(getDataSource(),
+					toc = getDisplayBeanWithShownSections(
 							(DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY),
 							(DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext())
 									.getBean("dynamicsMetadataService"));
@@ -1735,7 +1712,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 						request.setAttribute("hasShown", "true");
 
 						session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
-						setUpPanel(section);
+						setUpPanel(request, section);
 						forwardPage(getJSPPage(), request, response);
 					}
 				}
@@ -1758,7 +1735,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 						if (!markSuccessfully) {
 							request.setAttribute(BEAN_DISPLAY, section);
 							request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
-							setUpPanel(section);
+							setUpPanel(request, section);
 							forwardPage(getJSPPage(), request, response);
 							return;
 						}
@@ -1957,8 +1934,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     private void codedTermValidation(ArrayList<DisplayItemBean> changedItemsList, DisplayItemBean item, EventCRFBean ecrfBean, ItemDataDAO iddao) throws Exception {
 
-        ItemFormMetadataDAO itemMetaDAO = new ItemFormMetadataDAO(dataSource);
-        ItemDAO itemDAO = new ItemDAO(dataSource);
+        ItemFormMetadataDAO itemMetaDAO = new ItemFormMetadataDAO(getDataSource());
+        ItemDAO itemDAO = new ItemDAO(getDataSource());
 
         ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getItem().getId(),
                 ecrfBean.getCRFVersionId());
@@ -1994,7 +1971,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
     }
 
-    protected void setReasonForChangeError(ItemDataBean idb, String formName, String error, HttpServletRequest request) {
+    protected void setReasonForChangeError(HashMap errors, ItemDataBean idb, String formName, String error, HttpServletRequest request) {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		HttpSession session = request.getSession();
 		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session
@@ -2108,7 +2085,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		}
 		// added to allow sections shown on this page
 		DisplayTableOfContentsBean displayBean = new DisplayTableOfContentsBean();
-		displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(), currentStudy);
+		displayBean = getDisplayBean(ecb);
 		request.setAttribute(TOC_DISPLAY, displayBean);
 
 		int sectionId = fp.getInt(INPUT_SECTION_ID, true);
@@ -2190,7 +2167,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 	 * @throws Exception
 	 */
 	private EventCRFBean createEventCRF(HttpServletRequest request, FormProcessor fp) throws InconsistentStateException {
-		locale = request.getLocale();
+        Locale locale = request.getLocale();
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		EventCRFBean ecb;
@@ -2981,7 +2958,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				
 				// create coded items for event/crf
 				if (getCodedItemService() != null) {
-					codedItemService.createCodedItem(ecb, dib.getItem(), idb, currentStudy);
+                    getCodedItemService().createCodedItem(ecb, dib.getItem(), idb, currentStudy);
 				}
 				
 			} else {
@@ -3004,7 +2981,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 				idb = (ItemDataBean) iddao.upsert(idb);
 				
 				if (getCodedItemService() != null) {
-					codedItemService.createCodedItem(ecb, dib.getItem(), idb, currentStudy);
+                    getCodedItemService().createCodedItem(ecb, dib.getItem(), idb, currentStudy);
 				}
 				
 			} else if ("edit".equalsIgnoreCase(dib.getEditFlag())) {
@@ -3149,7 +3126,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		FormProcessor fp = new FormProcessor(request);
 		HttpSession session = request.getSession();
 		StudyBean study = (StudyBean) session.getAttribute("study");
-		SessionManager sm = (SessionManager) request.getSession().getAttribute("sm");
+		SessionManager sm = getSessionManager(request);
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
@@ -3519,8 +3496,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 	protected abstract boolean shouldLoadDBValues(DisplayItemBean dib);
 
-	protected void setUpPanel(DisplaySectionBean section) {
-		resetPanel();
+	protected void setUpPanel(HttpServletRequest request, DisplaySectionBean section) {
+        StudyInfoPanel panel = getStudyInfoPanel(request);
+        panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 
@@ -3781,7 +3759,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 	@SuppressWarnings("deprecation")
 	protected boolean markCRFComplete(HttpServletRequest request) throws Exception {
-		locale = request.getLocale();
+        Locale locale = request.getLocale();
 		HttpSession session = request.getSession();
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
@@ -4034,10 +4012,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 		Integer key = new Integer(sb.getId());
 
-		int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
-		int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
-		int numItemsCompleted = TableOfContentsServlet.getIntById(numItemsCompletedHM, key);
-		int numItemsBlank = TableOfContentsServlet.getIntById(numItemsBlankHM, key);
+		int numItems = getIntById(numItemsHM, key);
+		int numItemsPending = getIntById(numItemsPendingHM, key);
+		int numItemsCompleted = getIntById(numItemsCompletedHM, key);
+		int numItemsBlank = getIntById(numItemsBlankHM, key);
 		System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank
 				+ " num items pending " + numItemsPending + " completed " + numItemsCompleted);
 
@@ -4072,10 +4050,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 		Integer key = new Integer(sb.getId());
 
-		int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
-		int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
-		int numItemsCompleted = TableOfContentsServlet.getIntById(numItemsCompletedHM, key);
-		int numItemsBlank = TableOfContentsServlet.getIntById(numItemsBlankHM, key);
+		int numItems = getIntById(numItemsHM, key);
+		int numItemsPending = getIntById(numItemsPendingHM, key);
+		int numItemsCompleted = getIntById(numItemsCompletedHM, key);
+		int numItemsBlank = getIntById(numItemsBlankHM, key);
 		System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank
 				+ " num items pending " + numItemsPending + " completed " + numItemsCompleted);
 
@@ -4120,9 +4098,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 			SectionBean sb = sections.get(i);
 			Integer key = new Integer(sb.getId());
 
-			int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
-			int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
-			int numItemsCompleted = TableOfContentsServlet.getIntById(numItemsCompletedHM, key);
+			int numItems = getIntById(numItemsHM, key);
+			int numItemsPending = getIntById(numItemsPendingHM, key);
+			int numItemsCompleted = getIntById(numItemsCompletedHM, key);
 
 			if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) {
 				if (numItemsPending == 0 && numItems > 0) {
@@ -5121,7 +5099,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 		}
 
 		if (eventCRFId > 0) {
-			if (!entityIncluded(eventCRFId, ub.getName(), edao, getDataSource())) {
+			if (!entityIncluded(eventCRFId, ub.getName(), edao)) {
 				addPageMessage(respage.getString("required_event_CRF_belong"), request);
 				throw new InsufficientPermissionException(Page.MENU_SERVLET,
 						resexception.getString("entity_not_belong_studies"), "1");
@@ -5184,16 +5162,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return false;
     }
     
-	protected CodedItemService getCodedItemService() {
-
-		if (codedItemService == null) {
-			codedItemService = SpringServletAccess.getApplicationContext(getServletContext()).getBean(
-					CodedItemService.class);
-		}
-
-		return codedItemService;
-	}
-	
 	private Map<String, HashMap<String, String>> createDNParametersMap(HttpServletRequest request, DisplaySectionBean section) {
 		//we create map with parameters for creating DNs for each field in CRF
 		Map<String, HashMap<String, String>> dnCreatingParameters = new HashMap<String, HashMap<String, String>>();

@@ -20,13 +20,13 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -38,6 +38,7 @@ import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -49,18 +50,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-public class DownloadRuleSetXmlServlet extends SecureController {
+@Component
+public class DownloadRuleSetXmlServlet extends Controller {
 
 	protected final Logger log = LoggerFactory.getLogger(DownloadRuleSetXmlServlet.class);
 	private static final long serialVersionUID = 5381321212952389008L;
-	RuleSetServiceInterface ruleSetService;
 
 	/**
      *
+     * @param request
+     * @param response
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -70,7 +78,7 @@ public class DownloadRuleSetXmlServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MANAGE_STUDY_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -125,7 +133,8 @@ public class DownloadRuleSetXmlServlet extends SecureController {
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        StudyBean currentStudy = getCurrentStudy(request);
 
 		// String ruleSetId = request.getParameter("ruleSetId");
 		String ruleSetRuleIds = request.getParameter("ruleSetRuleIds");
@@ -170,16 +179,5 @@ public class DownloadRuleSetXmlServlet extends SecureController {
 			}
 		}
 
-	}
-
-	private RuleSetServiceInterface getRuleSetService() {
-		ruleSetService = this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
-				.getApplicationContext(context).getBean("ruleSetService");
-		// TODO: Add getRequestURLMinusServletPath(),getContextPath()
-		return ruleSetService;
-	}
-
-	private CoreResources getCoreResources() {
-		return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
 	}
 }

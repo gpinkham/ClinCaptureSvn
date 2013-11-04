@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -36,6 +38,7 @@ import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -49,8 +52,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -68,7 +70,9 @@ import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.ImportSummaryInfo;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.
@@ -76,15 +80,15 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @author Krikor Krumlian
  */
 @SuppressWarnings({ "rawtypes" })
-public class VerifyImportedCRFDataServlet extends SecureController {
-	
-	private Connection con;
-	private Boolean runRulesOptimisation = true;
-	
-	private static final long serialVersionUID = 1L;
+@Component
+public class VerifyImportedCRFDataServlet extends Controller {
 
+	private static final long serialVersionUID = 1L;
+	
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -97,7 +101,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
@@ -141,20 +145,26 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 
 	@Override
 	@SuppressWarnings(value = { "unchecked", "deprecation" })
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Connection con = null;
 		try {
+            boolean runRulesOptimisation = true;
+            UserAccountBean ub = getUserAccountBean(request);
+            StudyBean currentStudy = getCurrentStudy(request);
+            StudyUserRoleBean currentRole = getCurrentRole(request);
+
             ImportSummaryInfo summary = new ImportSummaryInfo();
-			session.setMaxInactiveInterval(10800);
-			con = sm.getDataSource().getConnection();
+			request.getSession().setMaxInactiveInterval(10800);
+            con = getDataSource().getConnection();
             con.setAutoCommit(false);
 			System.out.println("JDBC open connection for transaction");
-			StudyDAO sdao = new StudyDAO(sm.getDataSource());
-			EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource(), con);
-			StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-			StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource(), con);
-			ItemDataDAO itemDataDao = new ItemDataDAO(sm.getDataSource(), con);
-			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource(), con);
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+			StudyDAO sdao = new StudyDAO(getDataSource());
+			EventCRFDAO ecdao = new EventCRFDAO(getDataSource(), con);
+			StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
+			StudyEventDAO sedao = new StudyEventDAO(getDataSource(), con);
+			ItemDataDAO itemDataDao = new ItemDataDAO(getDataSource(), con);
+			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource(), con);
+			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 			String action = request.getParameter("action");
             StringBuffer skippedItemsSql = new StringBuffer();
 			FormProcessor fp = new FormProcessor(request);
@@ -163,41 +173,41 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 			String module = fp.getString(MODULE);
 			request.setAttribute(MODULE, module);
 
-			resetPanel();
+            request.getSession().removeAttribute(STUDY_INFO_PANEL);
+            StudyInfoPanel panel  = getStudyInfoPanel(request);
+            panel.reset();
 			panel.setStudyInfoShown(false);
 			panel.setOrderedData(true);
 
 			setToPanel(resword.getString("create_CRF"),
-                    respage.getString("br_create_new_CRF_entering"));
+                    respage.getString("br_create_new_CRF_entering"), request);
 
 			setToPanel(resword.getString("create_CRF_version"),
-                    respage.getString("br_create_new_CRF_uploading"));
+                    respage.getString("br_create_new_CRF_uploading"), request);
 			setToPanel(resword.getString("revise_CRF_version"),
-                    respage.getString("br_if_you_owner_CRF_version"));
+                    respage.getString("br_if_you_owner_CRF_version"), request);
 			setToPanel(resword.getString("CRF_spreadsheet_template"),
-					respage.getString("br_download_blank_CRF_spreadsheet_from"));
+					respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
 			setToPanel(
 					resword.getString("example_CRF_br_spreadsheets"),
-					respage.getString("br_download_example_CRF_instructions_from"));
+					respage.getString("br_download_example_CRF_instructions_from"), request);
 
 			if ("confirm".equalsIgnoreCase(action)) {
-				List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) session
+				List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) request.getSession()
 						.getAttribute("importedData");
 				logger.debug("Size of displayItemBeanWrappers : "
 						+ displayItemBeanWrappers.size());
-				forwardPage(Page.VERIFY_IMPORT_CRF_DATA);
+				forwardPage(Page.VERIFY_IMPORT_CRF_DATA, request, response);
 			}
 
 			if ("save".equalsIgnoreCase(action)) {
 				// setup ruleSets to run if applicable
-				RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) SpringServletAccess
-						.getApplicationContext(context).getBean(
-								"ruleSetService");
+				RuleSetServiceInterface ruleSetService = getRuleSetService();
 				logger.debug("=== about to generate rule containers ===");
 				List<ImportDataRuleRunnerContainer> containers = this
-						.ruleRunSetup(runRulesOptimisation, con, sm.getDataSource(), currentStudy,
+						.ruleRunSetup(request, runRulesOptimisation, con, getDataSource(), currentStudy,
 								ub, ruleSetService);
-				List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) session
+				List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) request.getSession()
 						.getAttribute("importedData");
 				Set<Integer> studyEventIds = new HashSet<Integer>();
 				Set<Integer> skippedItemIds = new HashSet<Integer>();
@@ -249,7 +259,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 											+ eventCrfBean.getCRFVersionId());
 									displayItemBean.getData().setId(itemDataBean.getId());
 								}
-								ItemDAO idao = new ItemDAO(sm.getDataSource());
+								ItemDAO idao = getItemDAO();
 								ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
 								String itemOid = displayItemBean.getItem().getOid() + "_"
 										+ wrapper.getStudyEventRepeatKey() + "_"
@@ -260,10 +270,10 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 									for (int iter = 0; iter < messageList.size(); iter++) {
 										String message = (String) messageList.get(iter);
 										DiscrepancyNoteBean parentDn = createDiscrepancyNote(ibean, message,
-												eventCrfBean, displayItemBean, null, ub, sm.getDataSource(),
+												eventCrfBean, displayItemBean, null, ub, getDataSource(),
 												currentStudy, con);
 										createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean,
-												parentDn.getId(), ub, sm.getDataSource(), currentStudy, con);
+												parentDn.getId(), ub, getDataSource(), currentStudy, con);
 									}
 								}
 							} else {
@@ -327,41 +337,43 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 					}
 				}
 
-				addPageMessage(respage.getString("data_has_been_successfully_import"));
+				addPageMessage(respage.getString("data_has_been_successfully_import"), request);
 				System.out.println("Data is committed");
 
-				addPageMessage(summary.prepareSummaryMessage(currentStudy, resword));
-
+				addPageMessage(summary.prepareSummaryMessage(currentStudy, resword), request);
+				
 				con.close();
-				if (!skippedItemsSql.toString().isEmpty()) {
-					new AuditDAO(sm.getDataSource()).execute(skippedItemsSql.toString());
-				}
+                if (!skippedItemsSql.toString().isEmpty()) {
+                    new AuditDAO(getDataSource()).execute(skippedItemsSql.toString());
+                }
 				try {
-					con = sm.getDataSource().getConnection();
+					con = getDataSource().getConnection();
 					con.setAutoCommit(false);
 					logger.debug("=== about to run rules ===");
 					addPageMessage(this.ruleActionWarnings(this.runRules(runRulesOptimisation, con, skippedItemIds,
-							currentStudy, ub, containers, ruleSetService, ExecutionMode.SAVE)));
+							currentStudy, ub, containers, ruleSetService, ExecutionMode.SAVE)), request);
 					con.commit();
 					con.close();
 				} catch (SQLException sqle) {
 					con.rollback();
 					con.close();
 				}
-				session.setMaxInactiveInterval(3600);
-				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+				request.getSession().setMaxInactiveInterval(3600);
+				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			}
 
 		} catch (SQLException sqle) {
-			con.rollback();
-			con.close();
+            if (con != null) {
+			    con.rollback();
+			    con.close();
+            }
 		}
 	}
 
-	private List<ImportDataRuleRunnerContainer> ruleRunSetup(Boolean runRulesOptimisation, Connection connection, DataSource dataSource, StudyBean studyBean,
+	private List<ImportDataRuleRunnerContainer> ruleRunSetup(HttpServletRequest request, Boolean runRulesOptimisation, Connection connection, DataSource dataSource, StudyBean studyBean,
 			UserAccountBean userBean, RuleSetServiceInterface ruleSetService) {
 		List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
-		ODMContainer odmContainer = (ODMContainer) session.getAttribute("odmContainer");
+		ODMContainer odmContainer = (ODMContainer) request.getSession().getAttribute("odmContainer");
 		logger.debug("=== about to check if odm container is null ===");
 		if (odmContainer != null) {
 			ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();

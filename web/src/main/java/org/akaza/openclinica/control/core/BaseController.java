@@ -1,5 +1,7 @@
 package org.akaza.openclinica.control.core;
 
+import com.clinovo.service.CodedItemService;
+
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -26,6 +28,7 @@ import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
 import org.akaza.openclinica.dao.hibernate.MeasurementUnitDao;
+import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
@@ -55,7 +58,6 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.RuleSetService;
-import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
@@ -69,6 +71,12 @@ import org.springframework.web.context.ServletContextAware;
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
 
     public static final String REFERER = "referer";
+
+    public static final String ACTION_START_INITIAL_DATA_ENTRY = "ide_s";
+    public static final String ACTION_CONTINUE_INITIAL_DATA_ENTRY = "ide_c";
+    public static final String ACTION_START_DOUBLE_DATA_ENTRY = "dde_s";
+    public static final String ACTION_CONTINUE_DOUBLE_DATA_ENTRY = "dde_c";
+    public static final String ACTION_ADMINISTRATIVE_EDITING = "ae";
 
 	public static final String STUDY = "study";
 	public static final String USER_ROLE = "userRole";
@@ -132,6 +140,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private ConfigurationDao configurationDao;
 	@Autowired
 	private MeasurementUnitDao measurementUnitDao;
+    @Autowired
+    private RuleDao ruleDao;
 	@Autowired
 	private RuleSetDao ruleSetDao;
 	@Autowired
@@ -143,9 +153,7 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	@Autowired
 	private RuleSetService ruleSetService;
     @Autowired
-    private StudyConfigService studyConfigService;    
-	@Autowired
-	private RulesPostImportContainerService rulesPostImportContainerService;
+    private StudyConfigService studyConfigService;
 	@Autowired
 	private DynamicsMetadataService dynamicsMetadataService;
 	@Autowired
@@ -160,6 +168,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
     private SecurityManager securityManager;
     @Autowired
     private JavaMailSenderImpl mailSender;
+    @Autowired
+    private CodedItemService codedItemService;
 
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
@@ -233,10 +243,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return coreResources;
 	}
 
-	public RulesPostImportContainerService getRulesPostImportContainerService() {
-		return rulesPostImportContainerService;
-	}
-
 	public DynamicsMetadataService getDynamicsMetadataService() {
 		return dynamicsMetadataService;
 	}
@@ -264,6 +270,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public RuleSetRuleAuditDao getRuleSetRuleAuditDao() {
 		return ruleSetRuleAuditDao;
 	}
+
+    public RuleDao getRuleDao() {
+        return ruleDao;
+    }
 
 	public RuleSetDao getRuleSetDao() {
 		return ruleSetDao;
@@ -411,4 +421,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public ItemGroupMetadataDAO getItemGroupMetadataDAO() {
 		return new ItemGroupMetadataDAO(getDataSource());
 	}
+
+    public CodedItemService getCodedItemService() {
+        return codedItemService;
+    }
 }

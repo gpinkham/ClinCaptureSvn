@@ -200,7 +200,7 @@ public class DiscNotesSubjectStatisticsFactory extends AbstractTableFactory {
 		this.discrepancyMap = discrepancyMap;
 	}
 
-	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
+	public StudyEventDefinitionDAO getStudyEventDefinitionDAO() {
 		return studyEventDefinitionDao;
 	}
 

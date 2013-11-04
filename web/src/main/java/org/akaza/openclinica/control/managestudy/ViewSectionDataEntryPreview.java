@@ -60,6 +60,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Preview a CRF version section data entry. This class is based almost entirely on ViewSectionDataEntryServlet 
@@ -69,6 +70,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@Component
 public class ViewSectionDataEntryPreview extends DataEntryServlet {
 	public static String SECTION_TITLE = "section_title";
 	public static String SECTION_LABEL = "section_label";

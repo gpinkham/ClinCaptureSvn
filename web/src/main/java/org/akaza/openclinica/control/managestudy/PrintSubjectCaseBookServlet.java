@@ -59,16 +59,16 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+@Component
 public class PrintSubjectCaseBookServlet extends DataEntryServlet {
-	Locale locale;
 
 	@Override
 	public void mayProceed(HttpServletRequest request,
 			HttpServletResponse response)
 			throws InsufficientPermissionException {
-		locale = request.getLocale();
 
 		UserAccountBean ub = (UserAccountBean) request.getSession()
 				.getAttribute(USER_BEAN_NAME);
@@ -100,7 +100,7 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 
 		System.out.println("Printing casebook for subject #" + subjectId);
 
-		SessionManager sm = (SessionManager) request.getSession().getAttribute("sm");
+        SessionManager sm = (SessionManager) getSessionManager(request);
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 		String age = "";

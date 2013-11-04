@@ -32,6 +32,8 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.RuleDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -94,6 +96,10 @@ import org.springframework.web.servlet.ModelAndView;
 @SuppressWarnings({ "rawtypes" })
 public class RuleController {
 
+    @Autowired
+    private RuleDao ruleDao;
+    @Autowired
+    private RuleSetDao ruleSetDao;
 	@Autowired
 	private BasicDataSource dataSource;
 	private RuleSetRuleDao ruleSetRuleDao;
@@ -318,9 +324,9 @@ public class RuleController {
 		UserAccountBean userAccount = getUserAccount();
 		mayProceed(userAccount, currentStudy);
 
-		getRulePostImportContainerService(currentStudy, userAccount);
-		rpic = getRulePostImportContainerService(currentStudy, userAccount).validateRuleDefs(rpic);
-		rpic = getRulePostImportContainerService(currentStudy, userAccount).validateRuleSetDefs(rpic);
+        RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(currentStudy, userAccount);
+		rpic = rulesPostImportContainerService.validateRuleDefs(rpic);
+		rpic = rulesPostImportContainerService.validateRuleSetDefs(rpic);
 		Response response = new Response();
 		response.setValid(Boolean.TRUE);
 		if (rpic.getInValidRuleDefs().size() > 0 || rpic.getInValidRuleSetDefs().size() > 0) {
@@ -358,9 +364,9 @@ public class RuleController {
 		UserAccountBean userAccount = getUserAccount();
 		mayProceed(userAccount, currentStudy);
 
-		getRulePostImportContainerService(currentStudy, userAccount);
-		rpic = getRulePostImportContainerService(currentStudy, userAccount).validateRuleDefs(rpic);
-		rpic = getRulePostImportContainerService(currentStudy, userAccount).validateRuleSetDefs(rpic);
+        RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(currentStudy, userAccount);
+		rpic = rulesPostImportContainerService.validateRuleDefs(rpic);
+		rpic = rulesPostImportContainerService.validateRuleSetDefs(rpic);
 		Response response = new Response();
 		response.setValid(Boolean.TRUE);
 		if (rpic.getInValidRuleDefs().size() > 0 || rpic.getInValidRuleSetDefs().size() > 0) {
@@ -406,9 +412,9 @@ public class RuleController {
 		UserAccountBean userAccount = getUserAccount();
 		mayProceed(userAccount, currentStudy);
 
-		getRulePostImportContainerService(currentStudy, userAccount);
-		rpic = getRulePostImportContainerService(currentStudy, userAccount).validateRuleDefs(rpic);
-		rpic = getRulePostImportContainerService(currentStudy, userAccount).validateRuleSetDefs(rpic);
+        RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(currentStudy, userAccount);
+		rpic = rulesPostImportContainerService.validateRuleDefs(rpic);
+		rpic = rulesPostImportContainerService.validateRuleSetDefs(rpic);
 		Response response = new Response();
 		response.setValid(Boolean.TRUE);
 		if (rpic.getInValidRuleDefs().size() > 0 || rpic.getInValidRuleSetDefs().size() > 0) {
@@ -499,23 +505,17 @@ public class RuleController {
 		this.ruleSetRuleDao = ruleSetRuleDao;
 	}
 
-	public RulesPostImportContainerService getRulesPostImportContainerService() {
-		return rulesPostImportContainerService;
-	}
-
 	// TODO: fix locale
-	public RulesPostImportContainerService getRulePostImportContainerService(StudyBean currentStudy,
+	public RulesPostImportContainerService getRulesPostImportContainerService(StudyBean currentStudy,
 			UserAccountBean userAccount) {
 		Locale l = new Locale("en_US");
-		this.rulesPostImportContainerService.setCurrentStudy(currentStudy);
-		this.rulesPostImportContainerService.setRespage(ResourceBundleProvider.getPageMessagesBundle(l));
-		this.rulesPostImportContainerService.setUserAccount(userAccount);
+        RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService();
+        rulesPostImportContainerService.setRuleDao(ruleDao);
+        rulesPostImportContainerService.setRuleSetDao(ruleSetDao);
+		rulesPostImportContainerService.setCurrentStudy(currentStudy);
+		rulesPostImportContainerService.setRespage(ResourceBundleProvider.getPageMessagesBundle(l));
+		rulesPostImportContainerService.setUserAccount(userAccount);
 		return rulesPostImportContainerService;
-	}
-
-	@Autowired
-	public void setRulesPostImportContainerService(RulesPostImportContainerService rulesPostImportContainerService) {
-		this.rulesPostImportContainerService = rulesPostImportContainerService;
 	}
 
 	public MessageSource getMessageSource() {

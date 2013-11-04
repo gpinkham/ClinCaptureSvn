@@ -30,11 +30,16 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -45,7 +50,7 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -63,9 +68,11 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 // import javax.servlet.http.*;
 
@@ -76,11 +83,13 @@ import org.slf4j.LoggerFactory;
  * @version CVS: $Id: AddNewSubjectServlet.java,v 1.15 2005/07/05 17:20:43 jxu Exp $
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class AddNewSubjectServlet extends SecureController {
+@Component
+public class AddNewSubjectServlet extends Controller {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private final Object simpleLockObj = new Object();
+
 	public static final String INPUT_UNIQUE_IDENTIFIER = "uniqueIdentifier";// global
 
 	public static final String INPUT_DOB = "dob";
@@ -129,29 +138,34 @@ public class AddNewSubjectServlet extends SecureController {
 	public static final String DEFAULT_DYN_GROUP_CLASS_ID = "defaultDynGroupClassId";
 	public static final String DEFAULT_DYN_GROUP_CLASS_NAME = "defaultDynGroupClassName";
 
-	String DOB = "";
-	String YOB = "";
-	String GENDER = "";
 	public static final String G_WARNING = "gWarning";
 	public static final String D_WARNING = "dWarning";
 	public static final String Y_WARNING = "yWarning";
-	boolean needUpdate;
-	SubjectBean updateSubject = new SubjectBean();
 
 	@SuppressWarnings("deprecation")
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
 
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
+        String DOB = "";
+        String YOB = "";
+        String GENDER = "";
+        boolean needUpdate = false;
+        SubjectBean updateSubject = null;
+        SimpleDateFormat local_df = getLocalDf(request);
 
-		StudySubjectDAO ssd = new StudySubjectDAO(sm.getDataSource());
-		StudyDAO stdao = new StudyDAO(sm.getDataSource());
-		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
+        checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+
+		StudySubjectDAO ssd = getStudySubjectDAO();
+		StudyDAO stdao = getStudyDAO();
+		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
 		ArrayList classes = new ArrayList();
 		ArrayList dynamicClasses = new ArrayList();
 		int defaultDynGroupClassId = 0;
 		String defaultDynGroupClassName = "";
+        StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.setStudyInfoShown(false);
 		FormProcessor fp = new FormProcessor(request);
 		FormDiscrepancyNotes discNotes;
@@ -168,11 +182,11 @@ public class AddNewSubjectServlet extends SecureController {
 		if (parentStudyId <= 0) {
 			parentStudyId = currentStudy.getId();
 			classes = sgcdao.findAllActiveByStudy(currentStudy, true);
-			dynamicClasses = getDynamicGroupClassesByStudyId(currentStudy.getId());
+			dynamicClasses = getDynamicGroupClassesByStudyId(request, currentStudy.getId());
 		} else {
 			StudyBean parentStudy = (StudyBean) stdao.findByPK(parentStudyId);
 			classes = sgcdao.findAllActiveByStudy(parentStudy, true);
-			dynamicClasses = getDynamicGroupClassesByStudyId(parentStudyId);
+			dynamicClasses = getDynamicGroupClassesByStudyId(request, parentStudyId);
 		}
 		
 		if (dynamicClasses.size() > 0) {
@@ -184,7 +198,7 @@ public class AddNewSubjectServlet extends SecureController {
 		fp.addPresetValue(DEFAULT_DYN_GROUP_CLASS_ID, defaultDynGroupClassId);
 		fp.addPresetValue(DEFAULT_DYN_GROUP_CLASS_NAME, defaultDynGroupClassName);
 		
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+		StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 		StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "collectDob");
 		currentStudy.getStudyParameterConfig().setCollectDob(parentSPV.getValue());
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "genderRequired");
@@ -195,11 +209,11 @@ public class AddNewSubjectServlet extends SecureController {
 
 		if (!fp.isSubmitted()) {
 			if (fp.getBoolean("instr")) {
-				session.removeAttribute(FORM_DISCREPANCY_NOTES_NAME);
-				forwardPage(Page.INSTRUCTIONS_ENROLL_SUBJECT);
+				request.getSession().removeAttribute(FORM_DISCREPANCY_NOTES_NAME);
+				forwardPage(Page.INSTRUCTIONS_ENROLL_SUBJECT, request, response);
 			} else {
 
-				setUpBeans(classes);
+				setUpBeans(classes, request);
 				request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 				
 				Date today = new Date(System.currentTimeMillis());
@@ -223,10 +237,10 @@ public class AddNewSubjectServlet extends SecureController {
 
 				}
 
-				setPresetValues(fp.getPresetValues());
+				setPresetValues(fp.getPresetValues(), request);
 				discNotes = new FormDiscrepancyNotes();
-				session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
-				forwardPage(Page.ADD_NEW_SUBJECT);
+                request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
+				forwardPage(Page.ADD_NEW_SUBJECT, request, response);
 
 			}
 		} else {// submitted
@@ -240,7 +254,7 @@ public class AddNewSubjectServlet extends SecureController {
 				GENDER = fp.getString(INPUT_GENDER);
 			}
 			
-			discNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
+			discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 			if (discNotes == null) {
 				discNotes = new FormDiscrepancyNotes();
 			}
@@ -325,7 +339,7 @@ public class AddNewSubjectServlet extends SecureController {
 
 			HashMap errors = v.validate();
 
-			SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
+			SubjectDAO sdao = getSubjectDAO();
 			String uniqueIdentifier = fp.getString(INPUT_UNIQUE_IDENTIFIER);// global
 			// Id
 			SubjectBean subjectWithSameId = new SubjectBean();
@@ -466,12 +480,12 @@ public class AddNewSubjectServlet extends SecureController {
 
 			if (!errors.isEmpty()) {
 
-				addPageMessage(respage.getString("there_were_some_errors_submission"));
+				addPageMessage(respage.getString("there_were_some_errors_submission"), request);
 				if (locationError) {
-					addPageMessage(respage.getString("location_blank_error"));
+					addPageMessage(respage.getString("location_blank_error"), request);
 				}
 
-				setInputMessages(errors);
+				setInputMessages(errors, request);
 				fp.addPresetValue(INPUT_DOB, fp.getString(INPUT_DOB));
 				fp.addPresetValue(INPUT_YOB, fp.getString(INPUT_YOB));
 				fp.addPresetValue(INPUT_GENDER, fp.getString(INPUT_GENDER));
@@ -489,9 +503,9 @@ public class AddNewSubjectServlet extends SecureController {
 					fp.setCurrentIntValuesAsPreset(intFields);
 				}
 				fp.addPresetValue(EDIT_DOB, fp.getString(EDIT_DOB));
-				setPresetValues(fp.getPresetValues());
+				setPresetValues(fp.getPresetValues(), request);
 
-				setUpBeans(classes);
+				setUpBeans(classes, request);
 				request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 				boolean existingSubShown = fp.getBoolean(EXISTING_SUB_SHOWN);
 
@@ -508,12 +522,12 @@ public class AddNewSubjectServlet extends SecureController {
 							Validator.addError(errors, LOCATION, resexception.getString("field_not_blank"));
 						}
 						request.setAttribute("showOverlay", true);
-						forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+						forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 					} else {
-						forwardPage(Page.ADD_NEW_SUBJECT);
+						forwardPage(Page.ADD_NEW_SUBJECT, request, response);
 					}
 				} else {
-					forwardPage(Page.ADD_EXISTING_SUBJECT);
+					forwardPage(Page.ADD_EXISTING_SUBJECT, request, response);
 				}
 			} else {
 				// no errors
@@ -566,8 +580,8 @@ public class AddNewSubjectServlet extends SecureController {
 					fp.addPresetValue(INPUT_FATHER, subject.getFatherId());
 					fp.addPresetValue(INPUT_MOTHER, subject.getMotherId());
 
-					setPresetValues(fp.getPresetValues());
-					setUpBeans(classes);
+					setPresetValues(fp.getPresetValues(), request);
+					setUpBeans(classes, request);
 					request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 
 					// YW <<
@@ -577,7 +591,7 @@ public class AddNewSubjectServlet extends SecureController {
 							fp.addPresetValue(G_WARNING, "emptytrue");
 							fp.addPresetValue(INPUT_GENDER, GENDER);
 							needUpdate = true;
-							updateSubject = subjectWithSameId;
+                            updateSubject = subjectWithSameId;
 							updateSubject.setGender(GENDER.toCharArray()[0]);
 							warningCount++;
 						} else if (!String.valueOf(subjectWithSameId.getGender()).equals(GENDER)) {
@@ -675,10 +689,10 @@ public class AddNewSubjectServlet extends SecureController {
 
 					if (warningCount > 0) {
 						warningCount = 0;
-						forwardPage(Page.ADD_EXISTING_SUBJECT);
+						forwardPage(Page.ADD_EXISTING_SUBJECT, request, response);
 						return;
 					}
-					// forwardPage(Page.ADD_EXISTING_SUBJECT);
+					// forwardPage(Page.ADD_EXISTING_SUBJECT, request, response);
 					// return;
 					// YW >>
 				}
@@ -728,7 +742,7 @@ public class AddNewSubjectServlet extends SecureController {
 							subject.setDateOfBirth(fakeDOB);
 						} catch (ParseException pe) {
 							subject.setDateOfBirth(new Date());
-							addPageMessage(respage.getString("problem_happened_saving_year"));
+							addPageMessage(respage.getString("problem_happened_saving_year"), request);
 						}
 
 					}
@@ -802,7 +816,7 @@ public class AddNewSubjectServlet extends SecureController {
 					}
 				}
 				if (!classes.isEmpty() && studySubject.isActive()) {
-					SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
+					SubjectGroupMapDAO sgmdao = getSubjectGroupMapDAO();
 					for (int i = 0; i < classes.size(); i++) {
 						StudyGroupClassBean group = (StudyGroupClassBean) classes.get(i);
 						group.getStudyGroupId();
@@ -825,8 +839,8 @@ public class AddNewSubjectServlet extends SecureController {
 				}
 
 				// save discrepancy notes into DB
-				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
-				DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
+				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(FORM_DISCREPANCY_NOTES_NAME);
+				DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 
 				String[] subjectFields = { INPUT_DOB, INPUT_YOB, INPUT_GENDER };
 				for (String element : subjectFields) {
@@ -840,14 +854,14 @@ public class AddNewSubjectServlet extends SecureController {
 				request.setAttribute(FormProcessor.FIELD_SUBMITTED, "0");
 
 				addPageMessage(respage.getString("subject_with_unique_identifier") + studySubject.getLabel()
-						+ respage.getString("X_was_created_succesfully"));
+						+ respage.getString("X_was_created_succesfully"), request);
 
 				if (fp.getBoolean("addWithEvent")) {
 					createStudyEvent(fp, studySubject);
 					// YW <<
 					request.setAttribute("id", studySubject.getId() + "");
 					response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
-					forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+					forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 					// YW >>
 					// we want to get the url of viewing study subject in
 					// browser to avoid page expired problem
@@ -862,12 +876,12 @@ public class AddNewSubjectServlet extends SecureController {
 				String submitEnroll = fp.getString(SUBMIT_ENROLL_BUTTON);
 				fp.getString(SUBMIT_DONE_BUTTON);
 
-				session.removeAttribute(FORM_DISCREPANCY_NOTES_NAME);
+				request.getSession().removeAttribute(FORM_DISCREPANCY_NOTES_NAME);
 				if (!StringUtil.isBlank(submitEvent)) {
-					forwardPage(Page.CREATE_NEW_STUDY_EVENT_SERVLET);
+					forwardPage(Page.CREATE_NEW_STUDY_EVENT_SERVLET, request, response);
 				} else if (!StringUtil.isBlank(submitEnroll)) {
 					// NEW MANTIS ISSUE 4770
-					setUpBeans(classes);
+					setUpBeans(classes, request);
 					request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 					Date today = new Date(System.currentTimeMillis());
 					String todayFormatted = local_df.format(today);
@@ -892,13 +906,13 @@ public class AddNewSubjectServlet extends SecureController {
 						fp.addPresetValue(INPUT_LABEL, nextLabel);
 					}
 
-					setPresetValues(fp.getPresetValues());
+					setPresetValues(fp.getPresetValues(), request);
 					discNotes = new FormDiscrepancyNotes();
-					session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
+                    request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
 					// End of 4770
-					forwardPage(Page.ADD_NEW_SUBJECT);
+					forwardPage(Page.ADD_NEW_SUBJECT, request, response);
 				} else {
-					// forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+					// forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 
 					// clinovo - ticket #39
 					/*
@@ -907,11 +921,11 @@ public class AddNewSubjectServlet extends SecureController {
 					 * "&findSubjects_s_0_studySubject.label=asc";
 					 */
 
-					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 					// tbh clinovo 10/30/2012, change
 					// request.setAttribute("id", studySubject.getId() + "");
 					// response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
-					// forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+					// forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 					// end clinovo 10/30/2012
 
 					return;
@@ -921,6 +935,7 @@ public class AddNewSubjectServlet extends SecureController {
 	}
 
 	protected void createStudyEvent(FormProcessor fp, StudySubjectBean s) {
+        UserAccountBean ub = getUserAccountBean(fp.getRequest());
 		int studyEventDefinitionId = fp.getInt("studyEventDefinition");
 		String location = fp.getString("location");
 		Date startDate = s.getEventStartDate();
@@ -930,11 +945,11 @@ public class AddNewSubjectServlet extends SecureController {
 			// location
 			// is a required field
 			if (location.equalsIgnoreCase(locationTerm)) {
-				addPageMessage(restext.getString("not_a_valid_location"));
+				addPageMessage(restext.getString("not_a_valid_location"), fp.getRequest());
 			} else {
 				logger.info("will create event with new subject");
-				StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+				StudyEventDAO sedao = getStudyEventDAO();
+				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 				StudyEventBean se = new StudyEventBean();
 				se.setLocation(location);
 				se.setDateStarted(startDate);
@@ -951,7 +966,7 @@ public class AddNewSubjectServlet extends SecureController {
 			}
 
 		} else {
-			addPageMessage(respage.getString("no_event_sheduled_for_subject"));
+			addPageMessage(respage.getString("no_event_sheduled_for_subject"), fp.getRequest());
 
 		}
 
@@ -960,10 +975,12 @@ public class AddNewSubjectServlet extends SecureController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
+	 * @see org.akaza.openclinica.control.core.Controller#mayProceed()
 	 */
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String exceptionName = resexception.getString("no_permission_to_add_new_subject");
 		String noAccessMessage = respage.getString("may_not_add_new_subject") + " "
@@ -973,22 +990,22 @@ public class AddNewSubjectServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(noAccessMessage);
+		addPageMessage(noAccessMessage, request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
 	}
 
-	protected void setUpBeans(ArrayList classes) throws Exception {
-		StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
+	protected void setUpBeans(ArrayList classes, HttpServletRequest request) throws Exception {
+		StudyGroupDAO sgdao = getStudyGroupDAO();
 
-		SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
+		SubjectDAO sdao = getSubjectDAO();
 		ArrayList fathers = sdao.findAllByGender('m');
 		ArrayList mothers = sdao.findAllByGender('f');
 
 		ArrayList dsFathers = new ArrayList();
 		ArrayList dsMothers = new ArrayList();
 
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-		StudyDAO stdao = new StudyDAO(sm.getDataSource());
+		StudySubjectDAO ssdao = getStudySubjectDAO();
+		StudyDAO stdao = getStudyDAO();
 
 		displaySubjects(dsFathers, fathers, ssdao, stdao);
 		displaySubjects(dsMothers, mothers, ssdao, stdao);

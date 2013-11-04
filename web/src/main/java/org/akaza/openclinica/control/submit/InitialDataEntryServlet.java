@@ -23,7 +23,6 @@ package org.akaza.openclinica.control.submit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,18 +41,18 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author ssachs
  */
-@Controller
+@Component
 @RequestMapping(value = "/InitialDataEntry")
 @SuppressWarnings({"serial"})
 public class InitialDataEntryServlet extends DataEntryServlet {
 	
-	Locale locale;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 
@@ -64,7 +63,6 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
 		HttpSession session = request.getSession();
-		locale = request.getLocale();
 
 		session.setAttribute("mayProcessUploading", "true");
 

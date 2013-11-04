@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -39,7 +40,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -54,6 +55,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,11 +64,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.text.MessageFormat;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @author ssachs
  */
 @SuppressWarnings({"rawtypes","unchecked", "serial"})
-public class InitialDataEntryServletOld extends SecureController {
+public class InitialDataEntryServletOld extends Controller {
 	// these inputs are used when other servlets redirect you here
 	// this is most typically the case when the user enters data and clicks the
 	// "Previous" or "Next" button
@@ -87,64 +92,63 @@ public class InitialDataEntryServletOld extends SecureController {
 
 	public static final String BEAN_DISPLAY = "section";
 
-	private FormProcessor fp;
-	private EventCRFDAO ecdao;
-	private EventCRFBean ecb;
+    private class ObjectPairs {
+        private EventCRFBean ecb;
+        private SectionBean sb;
+        private EventDefinitionCRFBean edcb;
+        public ObjectPairs(EventCRFBean ecb, SectionBean sb) {
+            this.ecb = ecb;
+            this.sb = sb;
+        }
+    }
 
-	private SectionDAO sdao;
-	private SectionBean sb;
+	private ObjectPairs getInputBeans(HttpServletRequest request) {
+        FormProcessor fp = new FormProcessor(request);
+        EventCRFDAO ecdao = getEventCRFDAO();
+        SectionDAO sdao = getSectionDAO();
 
-	private EventDefinitionCRFDAO edcdao;
-	private EventDefinitionCRFBean edcb;
-
-	private ItemDAO idao;
-	private ItemFormMetadataDAO ifmdao;
-	private ItemDataDAO iddao;
-
-	private void getInputBeans() {
-
-		fp = new FormProcessor(request);
-		ecdao = new EventCRFDAO(sm.getDataSource());
-		sdao = new SectionDAO(sm.getDataSource());
-
-		ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
+        EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		if (ecb == null) {
 			int eventCRFId = fp.getInt(INPUT_EVENT_CRF_ID, true);
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 		}
 
-		sb = (SectionBean) request.getAttribute(INPUT_SECTION);
+        SectionBean sb = (SectionBean) request.getAttribute(INPUT_SECTION);
 		if (sb == null) {
 			int sectionId = fp.getInt(INPUT_SECTION_ID, true);
 			sb = (SectionBean) sdao.findByPK(sectionId);
 		}
 
-		return;
+		return new ObjectPairs(ecb, sb);
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-		getInputBeans();
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
 
-		if (!ecb.isActive()) {
+        ObjectPairs objectPairs = getInputBeans(request);
+
+		if (!objectPairs.ecb.isActive()) {
 			throw new InconsistentStateException(Page.SUBMIT_DATA, resexception.getString("event_not_exists"));
 		}
 
-		DisplaySectionBean section = getDisplayBean();
-		SectionBean previousSec = sdao.findPrevious(ecb, sb);
-		SectionBean nextSec = sdao.findNext(ecb, sb);
+        SectionDAO sdao = getSectionDAO();
+		DisplaySectionBean section = getDisplayBean(request, objectPairs);
+		SectionBean previousSec = sdao.findPrevious(objectPairs.ecb, objectPairs.sb);
+		SectionBean nextSec = sdao.findNext(objectPairs.ecb, objectPairs.sb);
 		section.setFirstSection(!previousSec.isActive());
 		section.setLastSection(!nextSec.isActive());
 
 		Boolean b = (Boolean) request.getAttribute(INPUT_IGNORE_PARAMETERS);
 
+        FormProcessor fp = new FormProcessor(request);
 		if (!fp.isSubmitted() || b != null) {
 			// TODO: prevent data enterer from seeing results of first round of
 			// data entry, if this is second round
 			request.setAttribute(BEAN_DISPLAY, section);
-			forwardPage(Page.INITIAL_DATA_ENTRY);
+			forwardPage(Page.INITIAL_DATA_ENTRY, request, response);
 		} else {
-			errors = new HashMap();
+            HashMap errors = new HashMap();
 			ArrayList items = section.getItems();
 
 			if (fp.getBoolean(INPUT_CHECK_INPUTS)) {
@@ -153,12 +157,12 @@ public class InitialDataEntryServletOld extends SecureController {
 				// TODO: always validate null values
 				for (int i = 0; i < items.size(); i++) {
 					DisplayItemBean dib = (DisplayItemBean) items.get(i);
-					dib = validateDisplayItemBean(v, dib);
+					dib = validateDisplayItemBean(fp, objectPairs.edcb, v, dib);
 
 					ArrayList children = dib.getChildren();
 					for (int j = 0; j < children.size(); j++) {
 						DisplayItemBean child = (DisplayItemBean) children.get(j);
-						child = validateDisplayItemBean(v, child);
+						child = validateDisplayItemBean(fp, objectPairs.edcb, v, child);
 						children.set(j, child);
 					}
 
@@ -174,12 +178,12 @@ public class InitialDataEntryServletOld extends SecureController {
 			} else {
 				for (int i = 0; i < items.size(); i++) {
 					DisplayItemBean dib = (DisplayItemBean) items.get(i);
-					dib = loadFormValue(dib);
+					dib = loadFormValue(fp, dib);
 
 					ArrayList children = dib.getChildren();
 					for (int j = 0; j < children.size(); j++) {
 						DisplayItemBean child = (DisplayItemBean) children.get(j);
-						child = loadFormValue(child);
+						child = loadFormValue(fp, child);
 						children.set(j, child);
 					}
 
@@ -195,64 +199,64 @@ public class InitialDataEntryServletOld extends SecureController {
 			if (!errors.isEmpty()) {
 
 				request.setAttribute(BEAN_DISPLAY, section);
-				setInputMessages(errors);
-				addPageMessage(respage.getString("errors_in_submission_see_below_details"));
-				addPageMessage(respage.getString("to_override_these_errors"));
-				forwardPage(Page.INITIAL_DATA_ENTRY);
+				setInputMessages(errors, request);
+				addPageMessage(respage.getString("errors_in_submission_see_below_details"), request);
+				addPageMessage(respage.getString("to_override_these_errors"), request);
+				forwardPage(Page.INITIAL_DATA_ENTRY, request, response);
 			} else {
-				ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+				ItemDataDAO iddao = getItemDataDAO();
 				boolean success = true;
 				boolean temp = true;
 
 				items = section.getItems();
 				for (int i = 0; i < items.size(); i++) {
 					DisplayItemBean dib = (DisplayItemBean) items.get(i);
-					temp = writeToDB(dib, iddao);
+					temp = writeToDB(ub, dib, iddao, objectPairs);
 					success = success && temp;
 
 					ArrayList childItems = dib.getChildren();
 					for (int j = 0; j < childItems.size(); j++) {
 						DisplayItemBean child = (DisplayItemBean) childItems.get(j);
-						temp = writeToDB(child, iddao);
+						temp = writeToDB(ub, child, iddao, objectPairs);
 						success = success && temp;
 					}
 				}
 
 				request.setAttribute(INPUT_IGNORE_PARAMETERS, Boolean.TRUE);
 				if (!success) {
-					addPageMessage(resexception.getString("database_error"));
+					addPageMessage(resexception.getString("database_error"), request);
 					request.setAttribute(BEAN_DISPLAY, section);
-					forwardPage(Page.TABLE_OF_CONTENTS_SERVLET);
+					forwardPage(Page.TABLE_OF_CONTENTS_SERVLET, request, response);
 				} else {
 					boolean forwardingSucceeded = false;
 
 					if (!fp.getString(GO_PREVIOUS).equals("")) {
 						if (previousSec.isActive()) {
 							forwardingSucceeded = true;
-							request.setAttribute(INPUT_EVENT_CRF, ecb);
+							request.setAttribute(INPUT_EVENT_CRF, objectPairs.ecb);
 							request.setAttribute(INPUT_SECTION, previousSec);
-							forwardPage(Page.INITIAL_DATA_ENTRY_SERVLET);
+							forwardPage(Page.INITIAL_DATA_ENTRY_SERVLET, request, response);
 						}
 					} else if (!fp.getString(GO_NEXT).equals("")) {
 						if (nextSec.isActive()) {
 							forwardingSucceeded = true;
-							request.setAttribute(INPUT_EVENT_CRF, ecb);
+							request.setAttribute(INPUT_EVENT_CRF, objectPairs.ecb);
 							request.setAttribute(INPUT_SECTION, nextSec);
-							forwardPage(Page.INITIAL_DATA_ENTRY_SERVLET);
+							forwardPage(Page.INITIAL_DATA_ENTRY_SERVLET, request, response);
 						}
 					}
 
 					if (!forwardingSucceeded) {
-						request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
-						addPageMessage(respage.getString("data_saved_continue_later"));
-						forwardPage(Page.TABLE_OF_CONTENTS_SERVLET);
+						request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, objectPairs.ecb);
+						addPageMessage(respage.getString("data_saved_continue_later"), request);
+						forwardPage(Page.TABLE_OF_CONTENTS_SERVLET, request, response);
 					}
 				}
 			}
 		}
 	}
 
-	private DisplayItemBean loadFormValue(DisplayItemBean dib) {
+	private DisplayItemBean loadFormValue(FormProcessor fp, DisplayItemBean dib) {
 		String inputName = "input" + dib.getItem().getId();
 		org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
 
@@ -267,10 +271,13 @@ public class InitialDataEntryServletOld extends SecureController {
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-		getInputBeans();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		DataEntryStage stage = ecb.getStage();
+		ObjectPairs objectPairs = getInputBeans(request);
+
+		DataEntryStage stage = objectPairs.ecb.getStage();
 		Role r = currentRole.getRole();
 
 		if (stage.equals(DataEntryStage.UNCOMPLETED)) {
@@ -279,24 +286,24 @@ public class InitialDataEntryServletOld extends SecureController {
 				String noAccessMessage = respage.getString("you_may_not_perform_data_entry_on_a_CRF") + " "
 						+ respage.getString("change_study_contact_study_coordinator");
 
-				addPageMessage(noAccessMessage);
+				addPageMessage(noAccessMessage, request);
 				throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
 			}
 		} else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
-			if (ub.getId() != ecb.getOwnerId() && !r.equals(Role.STUDY_DIRECTOR) && !r.equals(Role.STUDY_ADMINISTRATOR)
+			if (ub.getId() != objectPairs.ecb.getOwnerId() && !r.equals(Role.STUDY_DIRECTOR) && !r.equals(Role.STUDY_ADMINISTRATOR)
 					&& !r.equals(Role.SYSTEM_ADMINISTRATOR)) {
-				UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-				String ownerName = ((UserAccountBean) udao.findByPK(ecb.getOwnerId())).getName();
+				UserAccountDAO udao = getUserAccountDAO();
+				String ownerName = ((UserAccountBean) udao.findByPK(objectPairs.ecb.getOwnerId())).getName();
 				MessageFormat mf = new MessageFormat("");
 				mf.applyPattern(respage.getString("you_may_not_perform_data_entry_on_event_CRF_because_not_owner"));
 				Object[] arguments = { ownerName };
-				addPageMessage(mf.format(arguments));
+				addPageMessage(mf.format(arguments), request);
 
 				throw new InsufficientPermissionException(Page.SUBMIT_DATA,
 						resexception.getString("non_owner_attempting_DE_on_event"), "1");
 			}
 		} else {
-			addPageMessage(respage.getString("you_not_enter_data_initial_DE_completed"));
+			addPageMessage(respage.getString("you_not_enter_data_initial_DE_completed"), request);
 			throw new InsufficientPermissionException(Page.SUBMIT_DATA,
 					resexception.getString("using_IDE_event_CRF_completed"), "1");
 		}
@@ -304,38 +311,39 @@ public class InitialDataEntryServletOld extends SecureController {
 		return;
 	}
 
-	private DisplaySectionBean getDisplayBean() throws Exception {
+	private DisplaySectionBean getDisplayBean(HttpServletRequest request, ObjectPairs objectPairs) throws Exception {
 		DisplaySectionBean section = new DisplaySectionBean();
 
-		section.setEventCRF(ecb);
+		section.setEventCRF(objectPairs.ecb);
 
-		if (sb.getParentId() > 0) {
-			SectionBean parent = (SectionBean) sdao.findByPK(sb.getParentId());
-			sb.setParent(parent);
+        SectionDAO sdao = getSectionDAO();
+		if (objectPairs.sb.getParentId() > 0) {
+			SectionBean parent = (SectionBean) sdao.findByPK(objectPairs.sb.getParentId());
+            objectPairs.sb.setParent(parent);
 		}
 
-		section.setSection(sb);
+		section.setSection(objectPairs.sb);
 
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-		CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
+		CRFVersionDAO cvdao = getCRFVersionDAO();
+		CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(objectPairs.ecb.getCRFVersionId());
 		section.setCrfVersion(cvb);
 
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
+		CRFDAO cdao = getCRFDAO();
 		CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
 		section.setCrf(cb);
 
-		edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-		StudyBean study = (StudyBean) session.getAttribute("study");
-		edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), cvb.getId());
-		section.setEventDefinitionCRF(edcb);
+        EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
+		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
+        objectPairs.edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, objectPairs.ecb.getStudyEventId(), cvb.getId());
+		section.setEventDefinitionCRF(objectPairs.edcb);
 
 		// setup DAO's here to avoid creating too many objects
-		idao = new ItemDAO(sm.getDataSource());
-		ifmdao = new ItemFormMetadataDAO(sm.getDataSource());
-		iddao = new ItemDataDAO(sm.getDataSource());
+        ItemDAO idao = getItemDAO();
+        ItemFormMetadataDAO ifmdao = getItemFormMetadataDAO();
+        ItemDataDAO iddao = getItemDataDAO();
 
 		// get all the display item beans
-		ArrayList displayItems = getParentDisplayItems(sb, edcb, idao, ifmdao, iddao);
+		ArrayList displayItems = getParentDisplayItems(objectPairs, idao, ifmdao, iddao);
 
 		// now sort them by ordinal
 		Collections.sort(displayItems);
@@ -343,7 +351,7 @@ public class InitialDataEntryServletOld extends SecureController {
 		// now get the child DisplayItemBeans
 		for (int i = 0; i < displayItems.size(); i++) {
 			DisplayItemBean dib = (DisplayItemBean) displayItems.get(i);
-			dib.setChildren(getChildrenDisplayItems(dib, edcb));
+			dib.setChildren(getChildrenDisplayItems(dib, objectPairs));
 			dib.loadDBValue();
 			displayItems.set(i, dib);
 		}
@@ -357,13 +365,13 @@ public class InitialDataEntryServletOld extends SecureController {
 	 * For each item in this section which is a parent, get a DisplayItemBean corresponding to that item. Note that an
 	 * item is a parent iff its parentId == 0.
 	 * 
-	 * @param sb
+	 * @param objectPairs
 	 *            The section whose items we are retrieving.
 	 * @return An array of DisplayItemBean objects, one per parent item in the section. Note that there is no guarantee
 	 *         on the ordering of the objects.
 	 * @throws Exception
 	 */
-	private ArrayList getParentDisplayItems(SectionBean sb, EventDefinitionCRFBean edcb, ItemDAO idao,
+	private ArrayList getParentDisplayItems(ObjectPairs objectPairs, ItemDAO idao,
 			ItemFormMetadataDAO ifmdao, ItemDataDAO iddao) throws Exception {
 		ArrayList answer = new ArrayList();
 
@@ -376,16 +384,16 @@ public class InitialDataEntryServletOld extends SecureController {
 		// while hitting the database only three times
 		HashMap displayItems = new HashMap();
 
-		ArrayList items = idao.findAllParentsBySectionId(sb.getId());
+		ArrayList items = idao.findAllParentsBySectionId(objectPairs.sb.getId());
 		for (int i = 0; i < items.size(); i++) {
 			DisplayItemBean dib = new DisplayItemBean();
-			dib.setEventDefinitionCRF(edcb);
+			dib.setEventDefinitionCRF(objectPairs.edcb);
 			ItemBean ib = (ItemBean) items.get(i);
 			dib.setItem(ib);
 			displayItems.put(new Integer(dib.getItem().getId()), dib);
 		}
 
-		ArrayList metadata = ifmdao.findAllBySectionId(sb.getId());
+		ArrayList metadata = ifmdao.findAllBySectionId(objectPairs.sb.getId());
 		for (int i = 0; i < metadata.size(); i++) {
 			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) metadata.get(i);
 			DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(ifmb.getItemId()));
@@ -395,7 +403,7 @@ public class InitialDataEntryServletOld extends SecureController {
 			}
 		}
 
-		ArrayList data = iddao.findAllBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
+		ArrayList data = iddao.findAllBySectionIdAndEventCRFId(objectPairs.sb.getId(), objectPairs.ecb.getId());
 		for (int i = 0; i < data.size(); i++) {
 			ItemDataBean idb = (ItemDataBean) data.get(i);
 			DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(idb.getItemId()));
@@ -423,20 +431,24 @@ public class InitialDataEntryServletOld extends SecureController {
 	 * @return An array of DisplayItemBean objects corresponding to the items which are children of parent, and are
 	 *         sorted by column number (ascending), then ordinal (ascending).
 	 */
-	private ArrayList getChildrenDisplayItems(DisplayItemBean parent, EventDefinitionCRFBean edcb) {
+	private ArrayList getChildrenDisplayItems(DisplayItemBean parent, ObjectPairs objectPairs) {
 		ArrayList answer = new ArrayList();
 
+        ItemDAO idao = getItemDAO();
+        ItemDataDAO iddao = getItemDataDAO();
+        ItemFormMetadataDAO ifmdao = getItemFormMetadataDAO();
+
 		int parentId = parent.getItem().getId();
-		ArrayList childItemBeans = idao.findAllByParentIdAndCRFVersionId(parentId, ecb.getCRFVersionId());
+		ArrayList childItemBeans = idao.findAllByParentIdAndCRFVersionId(parentId, objectPairs.ecb.getCRFVersionId());
 
 		for (int i = 0; i < childItemBeans.size(); i++) {
 			ItemBean child = (ItemBean) childItemBeans.get(i);
-			ItemDataBean data = iddao.findByItemIdAndEventCRFId(child.getId(), ecb.getId());
-			ItemFormMetadataBean metadata = ifmdao.findByItemIdAndCRFVersionId(child.getId(), ecb.getCRFVersionId());
+			ItemDataBean data = iddao.findByItemIdAndEventCRFId(child.getId(), objectPairs.ecb.getId());
+			ItemFormMetadataBean metadata = ifmdao.findByItemIdAndCRFVersionId(child.getId(), objectPairs.ecb.getCRFVersionId());
 
-			// DisplayItemBean dib = new DisplayItemBean(edcb);
+			// DisplayItemBean dib = new DisplayItemBean(objectPairs.edcb);
 			DisplayItemBean dib = new DisplayItemBean();
-			dib.setEventDefinitionCRF(edcb);
+			dib.setEventDefinitionCRF(objectPairs.edcb);
 			dib.setItem(child);
 			dib.setData(data);
 			dib.setMetadata(metadata);
@@ -455,7 +467,7 @@ public class InitialDataEntryServletOld extends SecureController {
 		return answer;
 	}
 
-	private DisplayItemBean validateDisplayItemBean(Validator v, DisplayItemBean dib) {
+	private DisplayItemBean validateDisplayItemBean(FormProcessor fp, EventDefinitionCRFBean edcb, Validator v, DisplayItemBean dib) {
 		ItemBean ib = dib.getItem();
 		ItemDataType idt = ib.getDataType();
 		org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
@@ -465,7 +477,7 @@ public class InitialDataEntryServletOld extends SecureController {
 		// note that this step sets us up both for
 		// displaying the data on the form again, in the event of an error
 		// and sending the data to the database, in the event of no error
-		dib = loadFormValue(dib);
+		dib = loadFormValue(fp, dib);
 
 		// types TEL and ED are not supported yet
 		if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT)
@@ -516,14 +528,14 @@ public class InitialDataEntryServletOld extends SecureController {
 		return dib;
 	}
 
-	private boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao) {
+	private boolean writeToDB(UserAccountBean ub, DisplayItemBean dib, ItemDataDAO iddao, ObjectPairs objectPairs) {
 		ItemDataBean idb = dib.getData();
 
 		if (idb.getValue().equals("")) {
 			idb.setStatus(Status.AVAILABLE);
 		} else {
 			Status newStatus;
-			newStatus = edcb.isDoubleEntry() ? Status.PENDING : Status.UNAVAILABLE;
+			newStatus = objectPairs.edcb.isDoubleEntry() ? Status.PENDING : Status.UNAVAILABLE;
 			idb.setStatus(newStatus);
 		}
 
@@ -531,7 +543,7 @@ public class InitialDataEntryServletOld extends SecureController {
 			idb.setCreatedDate(new Date());
 			idb.setOwner(ub);
 			idb.setItemId(dib.getItem().getId());
-			idb.setEventCRFId(ecb.getId());
+			idb.setEventCRFId(objectPairs.ecb.getId());
 
 			idb = (ItemDataBean) iddao.create(idb);
 		} else {

@@ -23,77 +23,66 @@ package org.akaza.openclinica.control.submit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
-import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
  * 
  * @author Krikor krumlian
  */
-public class ViewRuleAssignmentNewServlet extends SecureController {
+@Component
+public class ViewRuleAssignmentNewServlet extends Controller {
 
 	private static final long serialVersionUID = 9116068126651934226L;
 	protected final Logger log = LoggerFactory.getLogger(ViewRuleAssignmentNewServlet.class);
 
-	Locale locale;
-	XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
-	RuleSetServiceInterface ruleSetService;
-	RulesPostImportContainerService rulesPostImportContainerService;
-
-	@SuppressWarnings("rawtypes")
-	ItemFormMetadataDAO itemFormMetadataDAO;
-
-	private boolean showMoreLink;
-	private boolean isDesigner;
-
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
-		isDesigner = false;
+		boolean isDesigner = false;
+        boolean showMoreLink;
 		if (fp.getString("showMoreLink").equals("")) {
 			showMoreLink = true;
 		} else {
 			showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
 		}
-		createTable();
+		createTable(request, response, showMoreLink, isDesigner);
 
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void createStudyEventForInfoPanel() {
+	private void createStudyEventForInfoPanel(HttpServletRequest request) {
+        StudyBean currentStudy = getCurrentStudy(request);
 
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		ItemDAO itemdao = new ItemDAO(sm.getDataSource());
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+		ItemDAO itemdao = getItemDAO();
 		StudyBean studyWithEventDefinitions = currentStudy;
 		if (currentStudy.getParentStudyId() > 0) {
 			studyWithEventDefinitions = new StudyBean();
 			studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
 
 		}
-		CRFDAO crfdao = new CRFDAO(sm.getDataSource());
+		CRFDAO crfdao = getCRFDAO();
 		ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
 
 		HashMap events = new LinkedHashMap();
@@ -104,7 +93,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 			if (currentStudy.getParentStudyId() > 0) {
 				// sift through these CRFs and see which ones are hidden
 				HideCRFManager hideCRFs = HideCRFManager.createHideCRFManager();
-				crfs = hideCRFs.removeHiddenCRFBeans(studyWithEventDefinitions, sed, crfs, sm.getDataSource());
+				crfs = hideCRFs.removeHiddenCRFBeans(studyWithEventDefinitions, sed, crfs, getDataSource());
 			}
 
 			if (!crfs.isEmpty()) {
@@ -118,7 +107,8 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 
 	}
 
-	private void createTable() {
+	private void createTable(HttpServletRequest request, HttpServletResponse response, boolean showMoreLink, boolean isDesigner) {
+        StudyBean currentStudy = getCurrentStudy(request);
 
 		log.debug("Creating table");
 
@@ -129,15 +119,15 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 		factory.setCurrentStudy(currentStudy);
 
 		// Datasource needed for pulling extra model objects from db
-		factory.setDataSource(sm.getDataSource());
+		factory.setDataSource(getDataSource());
 
 		factory.setCurrentUser(((UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME)));
 
 		String ruleAssignmentsHtml = factory.createTable(request, response).render();
 		request.setAttribute("ruleAssignmentsHtml", ruleAssignmentsHtml);
-		createStudyEventForInfoPanel();
+		createStudyEventForInfoPanel(request);
 		if (ruleAssignmentsHtml != null) {
-			forwardPage(Page.VIEW_RULE_SETS2);	
+			forwardPage(Page.VIEW_RULE_SETS2, request, response);
 		}
 
 	}
@@ -163,17 +153,20 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}
 	}
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -182,22 +175,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 			return;
 		}
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
-
-	private RuleSetServiceInterface getRuleSetService() {
-		ruleSetService = this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
-				.getApplicationContext(context).getBean("ruleSetService");
-		// TODO: Add getRequestURLMinusServletPath(),getContextPath()
-		return ruleSetService;
-	}
-
-	@SuppressWarnings("rawtypes")
-	public ItemFormMetadataDAO getItemFormMetadataDAO() {
-		itemFormMetadataDAO = this.itemFormMetadataDAO == null ? new ItemFormMetadataDAO(sm.getDataSource())
-				: itemFormMetadataDAO;
-		return itemFormMetadataDAO;
-	}
-
 }

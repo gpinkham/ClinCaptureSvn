@@ -20,8 +20,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -31,8 +41,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -40,15 +50,20 @@ import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListStudySubjectsServlet;
@@ -68,12 +83,16 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.navigation.Navigation;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.BreadcrumbTrail;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
@@ -96,8 +115,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * Abstract class for creating a controller servlet and extending capabilities of Controller. However, not using
- * the SingleThreadModel.
+ * Abstract class for creating a controller servlet and extending capabilities of Controller. However, not using the
+ * SingleThreadModel.
  * 
  * @author jnyayapathi
  * 
@@ -234,7 +253,7 @@ public abstract class Controller extends BaseController {
 							request.getSession().removeAttribute("datasetId");
 						}
 					}
-				} 
+				}
 			}
 		} catch (SchedulerException se) {
 			se.printStackTrace();
@@ -756,7 +775,7 @@ public abstract class Controller extends BaseController {
 	}
 
 	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(HttpServletRequest request, int studyId) {
-		
+
 		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
 		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
 		ArrayList<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO
@@ -926,7 +945,7 @@ public abstract class Controller extends BaseController {
 	}
 
 	public DiscrepancyNoteBean getNoteInfo(HttpServletRequest request, DiscrepancyNoteBean note) {
-		
+
 		StudySubjectDAO ssdao = getStudySubjectDAO();
 		if ("itemData".equalsIgnoreCase(note.getEntityType())) {
 			int itemDataId = note.getEntityId();
@@ -1087,5 +1106,194 @@ public abstract class Controller extends BaseController {
 			request.setAttribute("isStartDateUsed", !NOT_USED.equals(config.getStartDateTimeRequired()));
 			request.setAttribute("startDateLabel", config.getStartDateTimeLabel());
 		}
+	}
+
+	public int getIntById(HashMap h, Integer key) {
+		Integer value = (Integer) h.get(key);
+		if (value == null) {
+			return 0;
+		} else {
+			return value.intValue();
+		}
+	}
+
+	public String getActionForStage(DataEntryStage stage) {
+		if (stage.equals(DataEntryStage.UNCOMPLETED)) {
+		}
+
+		else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
+			return ACTION_CONTINUE_INITIAL_DATA_ENTRY;
+		}
+
+		else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
+			return ACTION_START_DOUBLE_DATA_ENTRY;
+		}
+
+		else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+			return ACTION_CONTINUE_DOUBLE_DATA_ENTRY;
+		}
+
+		else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)) {
+			return ACTION_ADMINISTRATIVE_EDITING;
+		}
+
+		return "";
+	}
+
+	public ArrayList getSections(EventCRFBean ecb, SectionDAO sdao, ItemGroupDAO igdao) {
+		HashMap numItemsBySectionId = sdao.getNumItemsBySectionId();
+		HashMap numItemsPlusRepeatBySectionId = sdao.getNumItemsPlusRepeatBySectionId(ecb);
+		HashMap numItemsCompletedBySectionId = sdao.getNumItemsCompletedBySectionId(ecb);
+		HashMap numItemsPendingBySectionId = sdao.getNumItemsPendingBySectionId(ecb);
+
+		ArrayList sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
+
+		for (int i = 0; i < sections.size(); i++) {
+			SectionBean sb = (SectionBean) sections.get(i);
+
+			int sectionId = sb.getId();
+			Integer key = new Integer(sectionId);
+			int numItems = getIntById(numItemsBySectionId, key);
+			List<ItemGroupBean> itemGroups = igdao.findLegitGroupBySectionId(sectionId);
+			if (!itemGroups.isEmpty()) {
+				// this section has repeating rows-jxu
+				int numItemsPlusRepeat = getIntById(numItemsPlusRepeatBySectionId, key);
+				if (numItemsPlusRepeat > numItems) {
+					sb.setNumItems(numItemsPlusRepeat);
+				} else {
+					sb.setNumItems(numItems);
+				}
+			} else {
+				sb.setNumItems(numItems);
+			}
+
+			// According to logic that I searched from code of this package by
+			// this time,
+			// for double data entry and stage.initial_data_entry,
+			// pending should be the status in query.
+			int numItemsCompleted = getIntById(numItemsCompletedBySectionId, key);
+
+			sb.setNumItemsCompleted(numItemsCompleted);
+			sb.setNumItemsNeedingValidation(getIntById(numItemsPendingBySectionId, key));
+			sections.set(i, sb);
+		}
+
+		return sections;
+	}
+
+	public ArrayList getSectionsByCrfVersionId(int crfVersionId) {
+		SectionDAO sdao = getSectionDAO();
+
+		HashMap numItemsBySectionId = sdao.getNumItemsBySectionId();
+		ArrayList sections = sdao.findAllByCRFVersionId(crfVersionId);
+
+		for (int i = 0; i < sections.size(); i++) {
+			SectionBean sb = (SectionBean) sections.get(i);
+
+			int sectionId = sb.getId();
+			Integer key = new Integer(sectionId);
+			sb.setNumItems(getIntById(numItemsBySectionId, key));
+			sections.set(i, sb);
+		}
+
+		return sections;
+	}
+
+	public DisplayTableOfContentsBean getDisplayBeanByCrfVersionId(int crfVersionId) {
+		DisplayTableOfContentsBean answer = new DisplayTableOfContentsBean();
+
+		ArrayList sections = getSectionsByCrfVersionId(crfVersionId);
+		answer.setSections(sections);
+
+		CRFVersionDAO cvdao = getCRFVersionDAO();
+		CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
+		answer.setCrfVersion(cvb);
+
+		CRFDAO cdao = getCRFDAO();
+		CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
+		answer.setCrf(cb);
+
+		answer.setEventCRF(new EventCRFBean());
+
+		answer.setStudyEventDefinition(new StudyEventDefinitionBean());
+
+		return answer;
+	}
+
+	public DisplayTableOfContentsBean getDisplayBean(EventCRFBean ecb) {
+		DisplayTableOfContentsBean answer = new DisplayTableOfContentsBean();
+
+		answer.setEventCRF(ecb);
+
+		// get data
+		StudySubjectBean ssb = (StudySubjectBean) getStudySubjectDAO().findByPK(ecb.getStudySubjectId());
+		answer.setStudySubject(ssb);
+
+		StudyEventBean seb = (StudyEventBean) getStudyEventDAO().findByPK(ecb.getStudyEventId());
+		answer.setStudyEvent(seb);
+
+		ArrayList sections = getSections(ecb, getSectionDAO(), getItemGroupDAO());
+		answer.setSections(sections);
+
+		// get metadata
+		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(
+				seb.getStudyEventDefinitionId());
+		answer.setStudyEventDefinition(sedb);
+
+		CRFVersionBean cvb = (CRFVersionBean) getCRFVersionDAO().findByPK(ecb.getCRFVersionId());
+		answer.setCrfVersion(cvb);
+
+		CRFBean cb = (CRFBean) getCRFDAO().findByPK(cvb.getCrfId());
+		answer.setCrf(cb);
+
+		StudyBean studyForStudySubject = getStudyDAO().findByStudySubjectId(ssb.getId());
+		EventDefinitionCRFBean edcb = getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFId(
+				studyForStudySubject, sedb.getId(), cb.getId());
+		answer.setEventDefinitionCRF(edcb);
+
+		answer.setAction(getActionForStage(ecb.getStage()));
+
+		return answer;
+	}
+
+	/**
+	 * A section contains all hidden dynamics will be removed from data entry tab and jump box.
+	 * 
+	 * @param displayTableOfContentsBean
+	 * @param dynamicsMetadataService
+	 * @return
+	 */
+	public DisplayTableOfContentsBean getDisplayBeanWithShownSections(
+			DisplayTableOfContentsBean displayTableOfContentsBean, DynamicsMetadataService dynamicsMetadataService) {
+		if (displayTableOfContentsBean == null) {
+			return displayTableOfContentsBean;
+		}
+
+		SectionDAO sdao = getSectionDAO();
+		ItemGroupDAO igdao = getItemGroupDAO();
+
+		EventCRFBean ecb = displayTableOfContentsBean.getEventCRF();
+		ArrayList<SectionBean> sectionBeans = getSections(ecb, sdao, igdao);
+		ArrayList<SectionBean> showSections = new ArrayList<SectionBean>();
+		if (sectionBeans != null && sectionBeans.size() > 0) {
+			for (SectionBean s : sectionBeans) {
+				if (sdao.containNormalItem(s.getCRFVersionId(), s.getId())) {
+					showSections.add(s);
+				} else {
+					// for section contains dynamics, does it contain showing item_group/item?
+					if (dynamicsMetadataService
+							.hasShowingDynGroupInSection(s.getId(), s.getCRFVersionId(), ecb.getId())) {
+						showSections.add(s);
+					} else {
+						if (dynamicsMetadataService.hasShowingDynItemInSection(s.getId(), s.getCRFVersionId(),
+								ecb.getId())) {
+							showSections.add(s);
+						}
+					}
+				}
+			}
+			displayTableOfContentsBean.setSections(showSections);
+		}
+		return displayTableOfContentsBean;
 	}
 }

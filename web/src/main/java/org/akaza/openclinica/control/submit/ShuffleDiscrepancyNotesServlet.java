@@ -13,20 +13,26 @@
 
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @SuppressWarnings({"unchecked", "serial"})
-public class ShuffleDiscrepancyNotesServlet extends SecureController {
+@Component
+public class ShuffleDiscrepancyNotesServlet extends Controller {
 
 	public static final String ROW_PREFIX = "rp";
 	public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		boolean shuffle = false;
 		String rowPrefix = request.getParameter(ROW_PREFIX);
 		int index = Integer.parseInt(rowPrefix.replaceAll(".*_manual", "").replaceAll("input.*", ""));
@@ -66,11 +72,11 @@ public class ShuffleDiscrepancyNotesServlet extends SecureController {
 			}
 		}
 
-		forwardPage(Page.SHUFFLE_DNS_PAGE);
+		forwardPage(Page.SHUFFLE_DNS_PAGE, request, response);
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		//
 	}
 }

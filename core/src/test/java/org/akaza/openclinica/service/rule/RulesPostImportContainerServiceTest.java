@@ -32,9 +32,7 @@ public class RulesPostImportContainerServiceTest extends DefaultAppContextTest {
 
 	@Test
 	public void testThatGetDuplicationRuleSetDefsReturnsZeroOnNoDuplicates() {
-
-		StudyDAO studyDao = new StudyDAO(dataSource);
-		StudyBean study = (StudyBean) studyDao.findByPK(1);
+		StudyBean study = (StudyBean) studyDAO.findByPK(1);
 		postImportContainerService.setCurrentStudy(study);
 
 		RulesPostImportContainer container = prepareContainer();
@@ -47,9 +45,7 @@ public class RulesPostImportContainerServiceTest extends DefaultAppContextTest {
 	
 	@Test
 	public void testThatGetDuplicationRuleSetDefsReturnsZeroOnNoInvalidRuleDefs() {
-
-		StudyDAO studyDao = new StudyDAO(dataSource);
-		StudyBean study = (StudyBean) studyDao.findByPK(1);
+		StudyBean study = (StudyBean) studyDAO.findByPK(1);
 		postImportContainerService.setCurrentStudy(study);
 
 		RulesPostImportContainer container = prepareContainer();
@@ -61,9 +57,7 @@ public class RulesPostImportContainerServiceTest extends DefaultAppContextTest {
 	}
 
 	public void testThatGetDuplicationRuleSetDefsReturnsCorrectDuplicateSize() {
-
-		StudyDAO studyDao = new StudyDAO(dataSource);
-		StudyBean study = (StudyBean) studyDao.findByPK(1);
+		StudyBean study = (StudyBean) studyDAO.findByPK(1);
 		postImportContainerService.setCurrentStudy(study);
 
 		RulesPostImportContainer container = prepareContainer();

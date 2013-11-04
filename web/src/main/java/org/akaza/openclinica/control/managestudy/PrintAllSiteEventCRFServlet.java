@@ -52,10 +52,11 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+@Component
 public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
-	Locale locale;
 
 	/**
 	 * Checks whether the user has the correct privilege
@@ -63,7 +64,6 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		locale = request.getLocale();
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
 		if (ub.isSysAdmin()) {

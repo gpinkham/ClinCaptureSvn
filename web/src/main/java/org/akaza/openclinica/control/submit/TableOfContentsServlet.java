@@ -22,13 +22,14 @@ package org.akaza.openclinica.control.submit;
 
 import com.clinovo.util.ValidatorHelper;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -40,7 +41,7 @@ import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -59,20 +60,22 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
+import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
-import javax.sql.DataSource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author ssachs
@@ -81,7 +84,8 @@ import javax.sql.DataSource;
 // TODO: make it possible to input an event crf bean to this servlet rather than
 // an int
 @SuppressWarnings({"rawtypes", "unchecked",  "serial"})
-public class TableOfContentsServlet extends SecureController {
+@Component
+public class TableOfContentsServlet extends Controller {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	public static final String BEAN_DISPLAY = "toc";
 
@@ -112,46 +116,36 @@ public class TableOfContentsServlet extends SecureController {
 
 	public static final String INPUT_INTERVIEW_DATE = "interviewDate";
 
-	public static final String ACTION_START_INITIAL_DATA_ENTRY = "ide_s";
-
-	public static final String ACTION_CONTINUE_INITIAL_DATA_ENTRY = "ide_c";
-
-	public static final String ACTION_START_DOUBLE_DATA_ENTRY = "dde_s";
-
-	public static final String ACTION_CONTINUE_DOUBLE_DATA_ENTRY = "dde_c";
-
-	public static final String ACTION_ADMINISTRATIVE_EDITING = "ae";
-
 	public static final String[] ACTIONS = { ACTION_START_INITIAL_DATA_ENTRY, ACTION_CONTINUE_INITIAL_DATA_ENTRY,
 			ACTION_START_DOUBLE_DATA_ENTRY, ACTION_CONTINUE_DOUBLE_DATA_ENTRY, ACTION_ADMINISTRATIVE_EDITING };
 
-	private FormProcessor fp;
+    private class ObjectPairs {
+        private String action;
+        private EventCRFBean ecb;
+    }
 
-	private EventCRFDAO ecdao;
+	private ObjectPairs getEventCRFAndAction(HttpServletRequest request) {
+        ObjectPairs objectPairs = new ObjectPairs();
+        EventCRFDAO ecdao = getEventCRFDAO();
+        StudyBean currentStudy = getCurrentStudy(request);
+        EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF_BEAN);
 
-	private EventCRFBean ecb;
-
-	private String action;
-
-	private void getEventCRFAndAction() {
-		ecdao = new EventCRFDAO(sm.getDataSource());
-
-		ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF_BEAN);
-
+        FormProcessor fp = new FormProcessor(request);
 		if (ecb == null) {
 			int ecid = fp.getInt(INPUT_ID, true);
 			AuditableEntityBean aeb = ecdao.findByPKAndStudy(ecid, currentStudy);
 
 			if (!aeb.isActive()) {
-				ecb = new EventCRFBean();
+                objectPairs.ecb = new EventCRFBean();
 			} else {
-				ecb = (EventCRFBean) aeb;
+                objectPairs.ecb = (EventCRFBean) aeb;
 			}
 
-			action = fp.getString(INPUT_ACTION, true);
+            objectPairs.action = fp.getString(INPUT_ACTION, true);
 		} else {
-			action = getActionForStage(ecb.getStage());
+            objectPairs.action = getActionForStage(ecb.getStage());
 		}
+        return objectPairs;
 	}
 
 	/**
@@ -205,10 +199,14 @@ public class TableOfContentsServlet extends SecureController {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("deprecation")
-	private EventCRFBean createEventCRF() throws Exception {
-		EventCRFBean ecb;
-		ecdao = new EventCRFDAO(sm.getDataSource());
+	private EventCRFBean createEventCRF(HttpServletRequest request) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
 
+		EventCRFBean ecb;
+        EventCRFDAO ecdao = getEventCRFDAO();
+
+        FormProcessor fp= new FormProcessor(request);
 		int crfVersionId = fp.getInt(INPUT_CRF_VERSION_ID);
 		int studyEventId = fp.getInt(INPUT_STUDY_EVENT_ID);
 		int eventDefinitionCRFId = fp.getInt(INPUT_EVENT_DEFINITION_CRF_ID);
@@ -219,7 +217,7 @@ public class TableOfContentsServlet extends SecureController {
 				+ "; CRF Version id: " + crfVersionId + "; Study Event id: " + studyEventId
 				+ "; Event Definition CRF id: " + eventDefinitionCRFId + "; Subject: " + subjectId);
 
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+		StudySubjectDAO ssdao = getStudySubjectDAO();
 		StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
 
 		if (!ssb.isActive()) {
@@ -227,7 +225,7 @@ public class TableOfContentsServlet extends SecureController {
 					resexception.getString("trying_to_begin_DE1"));
 		}
 
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDefinitionBean sedb = seddao.findByEventDefinitionCRFId(eventDefinitionCRFId);
 
 		if (!ssb.isActive() || !sedb.isActive()) {
@@ -235,7 +233,7 @@ public class TableOfContentsServlet extends SecureController {
 					resexception.getString("trying_to_begin_DE2"));
 		}
 
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+		CRFVersionDAO cvdao = getCRFVersionDAO();
 		EntityBean eb = cvdao.findByPK(crfVersionId);
 
 		if (!eb.isActive()) {
@@ -243,7 +241,7 @@ public class TableOfContentsServlet extends SecureController {
 					resexception.getString("trying_to_begin_DE3"));
 		}
 
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+		StudyEventDAO sedao = getStudyEventDAO();
 		StudyEventBean sEvent = (StudyEventBean) sedao.findByPK(studyEventId);
 
 		StudyBean studyWithSED = currentStudy;
@@ -304,20 +302,22 @@ public class TableOfContentsServlet extends SecureController {
 		return ecb;
 	}
 
-	private void validateEventCRFAndAction() throws Exception {
-		if (invalidAction(action)) {
+	private void validateEventCRFAndAction(HttpServletRequest request, ObjectPairs objectPairs) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+
+		if (invalidAction(objectPairs.action)) {
 			throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 					resexception.getString("no_action_specified_or_invalid"));
 		}
 
-		if (!isConsistentAction(action, ecb)) {
+		if (!isConsistentAction(objectPairs.action, objectPairs.ecb)) {
 			HashMap verbs = new HashMap();
 			verbs.put(ACTION_START_INITIAL_DATA_ENTRY, resword.getString("start_initial_data_entry"));
 			verbs.put(ACTION_CONTINUE_INITIAL_DATA_ENTRY, resword.getString("continue_initial_data_entry"));
 			verbs.put(ACTION_START_DOUBLE_DATA_ENTRY, resword.getString("start_double_data_entry"));
 			verbs.put(ACTION_CONTINUE_DOUBLE_DATA_ENTRY, resword.getString("continue_double_data_entry"));
 			verbs.put(ACTION_ADMINISTRATIVE_EDITING, resword.getString("perform_administrative_editing"));
-			String verb = (String) verbs.get(action);
+			String verb = (String) verbs.get(objectPairs.action);
 
 			if (verb == null) {
 				verb = "start initial data entry";
@@ -328,43 +328,51 @@ public class TableOfContentsServlet extends SecureController {
 							+ resexception.getString("on_event_CRF_inappropiate_action"));
 		}
 
-		if (action.equals(ACTION_START_DOUBLE_DATA_ENTRY)) {
-			ecb.setValidatorId(ub.getId());
-			ecb.setDateValidate(new Date());
+		if (objectPairs.action.equals(ACTION_START_DOUBLE_DATA_ENTRY)) {
+            objectPairs.ecb.setValidatorId(ub.getId());
+            objectPairs.ecb.setDateValidate(new Date());
 
-			ecb = (EventCRFBean) ecdao.update(ecb);
+            objectPairs.ecb = (EventCRFBean) getEventCRFDAO().update(objectPairs.ecb);
 		}
 	}
 
-	private void updatePresetValues(EventCRFBean ecb) {
+	private void updatePresetValues(FormProcessor fp,  EventCRFBean ecb) {
 		fp.addPresetValue(INPUT_INTERVIEWER, ecb.getInterviewerName());
 		if (ecb.getDateInterviewed() != null) {
-			String idateFormatted = local_df.format(ecb.getDateInterviewed());
+			String idateFormatted = getLocalDf(fp.getRequest()).format(ecb.getDateInterviewed());
 			fp.addPresetValue(INPUT_INTERVIEW_DATE, idateFormatted);
 		} else {
 			fp.addPresetValue(INPUT_INTERVIEW_DATE, "");
 		}
-		setPresetValues(fp.getPresetValues());
+		setPresetValues(fp.getPresetValues(), fp.getRequest());
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-		FormDiscrepancyNotes discNotes;
-		if (action.equals(ACTION_START_INITIAL_DATA_ENTRY)) {
-			ecb = createEventCRF();
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
+        FormDiscrepancyNotes discNotes;
+        ObjectPairs objectPairs = getEventCRFAndAction(request);
+
+		if (objectPairs.action.equals(ACTION_START_INITIAL_DATA_ENTRY)) {
+            objectPairs.ecb = createEventCRF(request);
 		} else {
-			validateEventCRFAndAction();
+            validateEventCRFAndAction(request, objectPairs);
 		}
 
-		updatePresetValues(ecb);
+        FormProcessor fp = new FormProcessor(request);
+        HashMap errors = getErrorsHolder(request);
+		updatePresetValues(fp, objectPairs.ecb);
 
 		Boolean b = (Boolean) request.getAttribute(DataEntryServlet.INPUT_IGNORE_PARAMETERS);
 
 		if (fp.isSubmitted() && b == null) {
-			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+			discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 			if (discNotes == null) {
 				discNotes = new FormDiscrepancyNotes();
-				session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+                request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
 			}
 			DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()),
@@ -375,65 +383,66 @@ public class TableOfContentsServlet extends SecureController {
 			v.alwaysExecuteLastValidation(INPUT_INTERVIEW_DATE);
 
 			errors = v.validate();
+            EventCRFDAO ecdao = getEventCRFDAO();
 
 			if (errors.isEmpty()) {
 
-				ecb.setInterviewerName(fp.getString(INPUT_INTERVIEWER));
-				ecb.setDateInterviewed(fp.getDate(INPUT_INTERVIEW_DATE));
+                objectPairs.ecb.setInterviewerName(fp.getString(INPUT_INTERVIEWER));
+                objectPairs.ecb.setDateInterviewed(fp.getDate(INPUT_INTERVIEW_DATE));
 
 				if (ecdao == null) {
-					ecdao = new EventCRFDAO(sm.getDataSource());
+					ecdao = getEventCRFDAO();
 				}
 
-				ecb = (EventCRFBean) ecdao.update(ecb);
+                objectPairs.ecb = (EventCRFBean) ecdao.update(objectPairs.ecb);
 
 				// save discrepancy notes into DB
-				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session
+				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession()
 						.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-				DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
+				DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 
-				AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEWER, fdn, dndao, ecb.getId(), "EventCRF",
+				AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEWER, fdn, dndao, objectPairs.ecb.getId(), "EventCRF",
 						currentStudy);
-				AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEW_DATE, fdn, dndao, ecb.getId(), "EventCRF",
+				AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEW_DATE, fdn, dndao, objectPairs.ecb.getId(), "EventCRF",
 						currentStudy);
 
 				if (ecdao.isQuerySuccessful()) {
-					updatePresetValues(ecb);
+					updatePresetValues(fp, objectPairs.ecb);
 					if (!fp.getBoolean("editInterview", true)) {
 						// editing completed
-						addPageMessage(respage.getString("interviewer_name_date_updated"));
+						addPageMessage(respage.getString("interviewer_name_date_updated"), request);
 					}
 				} else {
-					addPageMessage(respage.getString("database_error_interviewer_name_date_not_updated"));
+					addPageMessage(respage.getString("database_error_interviewer_name_date_not_updated"), request);
 				}
 
 			} else {
 				String[] textFields = { INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE };
 				fp.setCurrentStringValuesAsPreset(textFields);
 
-				setInputMessages(errors);
-				setPresetValues(fp.getPresetValues());
+				setInputMessages(errors, request);
+				setPresetValues(fp.getPresetValues(), request);
 			}
 		} else {
 			discNotes = new FormDiscrepancyNotes();
-			session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+			request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
 		}
 
-		DisplayTableOfContentsBean displayBean = getDisplayBean(ecb, sm.getDataSource(), currentStudy);
+		DisplayTableOfContentsBean displayBean = getDisplayBean(objectPairs.ecb);
 
 		// this is for generating side info panel
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
-		ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(ssb, sm.getDataSource(), ub,
+		StudySubjectDAO ssdao = getStudySubjectDAO();
+		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(objectPairs.ecb.getStudySubjectId());
+		ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub,
 				currentRole);
 		request.setAttribute("studySubject", ssb);
 		request.setAttribute("beans", beans);
-		request.setAttribute("eventCRF", ecb);
+		request.setAttribute("eventCRF", objectPairs.ecb);
 
 		StudyEventBean seb = null;
-		if (ecb != null) {
-			seb = (StudyEventBean) new StudyEventDAO(sm.getDataSource()).findByPK(ecb.getStudyEventId());
+		if (objectPairs.ecb != null) {
+			seb = (StudyEventBean) getStudyEventDAO().findByPK(objectPairs.ecb.getStudyEventId());
 			if (seb != null && seb.getId() > 0) {
 				request.setAttribute("studyEvent", seb);
 			}
@@ -442,13 +451,13 @@ public class TableOfContentsServlet extends SecureController {
 		request.setAttribute(BEAN_DISPLAY, displayBean);
 
 		boolean allowEnterData = true;
-		if (StringUtil.isBlank(ecb.getInterviewerName())) {
+		if (StringUtil.isBlank(objectPairs.ecb.getInterviewerName())) {
 			if (discNotes == null || discNotes.getNotes(TableOfContentsServlet.INPUT_INTERVIEWER).isEmpty()) {
 				allowEnterData = false;
 			}
 		}
 
-		if (ecb.getDateInterviewed() == null) {
+		if (objectPairs.ecb.getDateInterviewed() == null) {
 			if (discNotes == null || discNotes.getNotes(TableOfContentsServlet.INPUT_INTERVIEW_DATE).isEmpty()) {
 				allowEnterData = false;
 			}
@@ -456,22 +465,22 @@ public class TableOfContentsServlet extends SecureController {
 
 		if (!allowEnterData) {
 			request.setAttribute("allowEnterData", "no");
-			forwardPage(Page.INTERVIEWER_ENTIRE_PAGE);
+			forwardPage(Page.INTERVIEWER_ENTIRE_PAGE, request, response);
 		} else {
 
 			if (fp.getBoolean("editInterview", true)) {
 				// user wants to edit interview info
 				request.setAttribute("allowEnterData", "yes");
-				forwardPage(Page.INTERVIEWER);
+				forwardPage(Page.INTERVIEWER, request, response);
 			} else {
 				if (fp.isSubmitted() && !errors.isEmpty()) {
 					// interview form submitted, but has blank field or
 					// validation error
 					request.setAttribute("allowEnterData", "no");
-					forwardPage(Page.INTERVIEWER);
+					forwardPage(Page.INTERVIEWER, request, response);
 				} else {
 					request.setAttribute("allowEnterData", "yes");
-					forwardPage(Page.TABLE_OF_CONTENTS);
+					forwardPage(Page.TABLE_OF_CONTENTS, request, response);
 				}
 			}
 		}
@@ -479,9 +488,12 @@ public class TableOfContentsServlet extends SecureController {
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-		fp = new FormProcessor(request);
-		getEventCRFAndAction();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
+        FormProcessor fp = new FormProcessor(request);
+        ObjectPairs objectPairs = getEventCRFAndAction(request);
 
 		Role r = currentRole.getRole();
 		boolean isSuper = DisplayEventCRFBean.isSuper(ub, r);
@@ -491,70 +503,61 @@ public class TableOfContentsServlet extends SecureController {
 			String noAccessMessage = respage.getString("you_may_not_perform_data_entry_on_a_CRF") + " "
 					+ respage.getString("change_study_contact_study_coordinator");
 
-			addPageMessage(noAccessMessage);
+			addPageMessage(noAccessMessage, request);
 			throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
 		}
 
 		// we're creating an event crf
-		if (action.equals(ACTION_START_INITIAL_DATA_ENTRY)) {
+		if (objectPairs.action.equals(ACTION_START_INITIAL_DATA_ENTRY)) {
 			return;
 		}
 		// we're editing an existing event crf
 		else {
-			if (!ecb.isActive()) {
-				addPageMessage(respage.getString("event_CRF_not_exist_contact_study_coordinator"));
+			if (!objectPairs.ecb.isActive()) {
+				addPageMessage(respage.getString("event_CRF_not_exist_contact_study_coordinator"), request);
 				throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 						resexception.getString("event_CRF_not_belong_current_study"), "1");
 			}
 
-			if (action.equals(ACTION_CONTINUE_INITIAL_DATA_ENTRY)) {
-				if (ecb.getOwnerId() == ub.getId() || isSuper) {
+			if (objectPairs.action.equals(ACTION_CONTINUE_INITIAL_DATA_ENTRY)) {
+				if (objectPairs.ecb.getOwnerId() == ub.getId() || isSuper) {
 					return;
 				} else {
-					addPageMessage(respage.getString("not_begin_DE_on_CRF_not_resume_DE"));
+					addPageMessage(respage.getString("not_begin_DE_on_CRF_not_resume_DE"), request);
 					throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 							resexception.getString("event_CRF_not_belong_current_user"), "1");
 				}
-			} else if (action.equals(ACTION_START_DOUBLE_DATA_ENTRY)) {
-				if (ecb.getOwnerId() != ub.getId()) {
+			} else if (objectPairs.action.equals(ACTION_START_DOUBLE_DATA_ENTRY)) {
+				if (objectPairs.ecb.getOwnerId() != ub.getId()) {
 					return;
 				} else {
-					if (!DisplayEventCRFBean.initialDataEntryCompletedMoreThanTwelveHoursAgo(ecb) && !isSuper) {
-						addPageMessage(respage.getString("began_DE_on_CRF_marked_complete_less_12_not_begin_DE"));
+					if (!DisplayEventCRFBean.initialDataEntryCompletedMoreThanTwelveHoursAgo(objectPairs.ecb) && !isSuper) {
+						addPageMessage(respage.getString("began_DE_on_CRF_marked_complete_less_12_not_begin_DE"), request);
 						throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 								resexception.getString("owner_attempting_DDE_12_hours"), "1");
 					} else {
 						return;
 					}
 				}
-			} else if (action.equals(ACTION_CONTINUE_INITIAL_DATA_ENTRY)) {
-				if (ecb.getValidatorId() == ub.getId() || isSuper) {
+			} else if (objectPairs.action.equals(ACTION_CONTINUE_INITIAL_DATA_ENTRY)) {
+				if (objectPairs.ecb.getValidatorId() == ub.getId() || isSuper) {
 					return;
 				} else {
-					addPageMessage(respage.getString("not_begin_DDE_on_CRF_not_resume_DE"));
+					addPageMessage(respage.getString("not_begin_DDE_on_CRF_not_resume_DE"), request);
 					throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 							resexception.getString("validation_event_CRF_not_begun_user"), "1");
 				}
-			} else if (action.equals(ACTION_ADMINISTRATIVE_EDITING)) {
+			} else if (objectPairs.action.equals(ACTION_ADMINISTRATIVE_EDITING)) {
 				if (isSuper) {
 					return;
 				} else {
 					addPageMessage(respage.getString("you_may_not_perform_administrative_editing") + " "
-							+ respage.getString("change_study_contact_study_coordinator"));
+							+ respage.getString("change_study_contact_study_coordinator"), request);
 					throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 							resexception.getString("no_permission_to_perform_administrative_editing"), "1");
 				}
 			} 
 		} 
-	} 
-
-	public static int getIntById(HashMap h, Integer key) {
-		Integer value = (Integer) h.get(key);
-		if (value == null) {
-			return 0;
-		} else {
-			return value.intValue();
-		}
 	}
 
 	/**
@@ -564,161 +567,11 @@ public class TableOfContentsServlet extends SecureController {
 	 *            An Event CRF which should be displayed in the table of contents.
 	 * @return A text link to the Table of Contents servlet for the bean.
 	 */
-	public static String getLink(EventCRFBean ecb) {
-		String answer = Page.TABLE_OF_CONTENTS_SERVLET.getFileName();
-
-		answer = Page.TABLE_OF_CONTENTS_SERVLET.getFileName();
+	public String getLink(EventCRFBean ecb) {
+        String answer = Page.TABLE_OF_CONTENTS_SERVLET.getFileName();
 		answer += "?action=" + getActionForStage(ecb.getStage());
 		answer += "&" + INPUT_ID + "=" + ecb.getId();
-
 		return answer;
-	}
-
-	public static String getActionForStage(DataEntryStage stage) {
-		if (stage.equals(DataEntryStage.UNCOMPLETED)) {
-		}
-
-		else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
-			return ACTION_CONTINUE_INITIAL_DATA_ENTRY;
-		}
-
-		else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
-			return ACTION_START_DOUBLE_DATA_ENTRY;
-		}
-
-		else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-			return ACTION_CONTINUE_DOUBLE_DATA_ENTRY;
-		}
-
-		else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)) {
-			return ACTION_ADMINISTRATIVE_EDITING;
-		}
-
-		return "";
-	}
-
-	public static ArrayList getSections(EventCRFBean ecb, DataSource ds) {
-		SectionDAO sdao = new SectionDAO(ds);
-		ItemGroupDAO igdao = new ItemGroupDAO(ds);
-
-		HashMap numItemsBySectionId = sdao.getNumItemsBySectionId();
-		HashMap numItemsPlusRepeatBySectionId = sdao.getNumItemsPlusRepeatBySectionId(ecb);
-		HashMap numItemsCompletedBySectionId = sdao.getNumItemsCompletedBySectionId(ecb);
-		HashMap numItemsPendingBySectionId = sdao.getNumItemsPendingBySectionId(ecb);
-
-		ArrayList sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-
-		for (int i = 0; i < sections.size(); i++) {
-			SectionBean sb = (SectionBean) sections.get(i);
-
-			int sectionId = sb.getId();
-			Integer key = new Integer(sectionId);
-			int numItems = getIntById(numItemsBySectionId, key);
-			List<ItemGroupBean> itemGroups = igdao.findLegitGroupBySectionId(sectionId);
-			if (!itemGroups.isEmpty()) {
-				// this section has repeating rows-jxu
-				int numItemsPlusRepeat = getIntById(numItemsPlusRepeatBySectionId, key);
-				if (numItemsPlusRepeat > numItems) {
-					sb.setNumItems(numItemsPlusRepeat);
-				} else {
-					sb.setNumItems(numItems);
-				}
-			} else {
-				sb.setNumItems(numItems);
-			}
-
-			// According to logic that I searched from code of this package by
-			// this time,
-			// for double data entry and stage.initial_data_entry,
-			// pending should be the status in query.
-			int numItemsCompleted = getIntById(numItemsCompletedBySectionId, key);
-			
-			sb.setNumItemsCompleted(numItemsCompleted);
-			sb.setNumItemsNeedingValidation(getIntById(numItemsPendingBySectionId, key));
-			sections.set(i, sb);
-		}
-
-		return sections;
-	}
-
-	public static DisplayTableOfContentsBean getDisplayBean(EventCRFBean ecb, DataSource ds, StudyBean currentStudy) {
-		DisplayTableOfContentsBean answer = new DisplayTableOfContentsBean();
-
-		answer.setEventCRF(ecb);
-
-		// get data
-		StudySubjectDAO ssdao = new StudySubjectDAO(ds);
-		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
-		answer.setStudySubject(ssb);
-
-		StudyEventDAO sedao = new StudyEventDAO(ds);
-		StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
-		answer.setStudyEvent(seb);
-
-		ArrayList sections = getSections(ecb, ds);
-		answer.setSections(sections);
-
-		// get metadata
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
-		answer.setStudyEventDefinition(sedb);
-
-		CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-		CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
-		answer.setCrfVersion(cvb);
-
-		CRFDAO cdao = new CRFDAO(ds);
-		CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
-		answer.setCrf(cb);
-
-		StudyBean studyForStudySubject = new StudyDAO(ds).findByStudySubjectId(ssb.getId());
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
-		EventDefinitionCRFBean edcb = edcdao.findByStudyEventDefinitionIdAndCRFId(studyForStudySubject, sedb.getId(),
-				cb.getId());
-		answer.setEventDefinitionCRF(edcb);
-
-		answer.setAction(getActionForStage(ecb.getStage()));
-
-		return answer;
-	}
-
-	/**
-	 * A section contains all hidden dynamics will be removed from data entry tab and jump box.
-	 * 
-	 * @param ds
-	 * @param displayTableOfContentsBean
-	 * @param dynamicsMetadataService
-	 * @return
-	 */
-	public static DisplayTableOfContentsBean getDisplayBeanWithShownSections(DataSource ds,
-			DisplayTableOfContentsBean displayTableOfContentsBean, DynamicsMetadataService dynamicsMetadataService) {
-		if (displayTableOfContentsBean == null) {
-			return displayTableOfContentsBean;
-		}
-		EventCRFBean ecb = displayTableOfContentsBean.getEventCRF();
-		SectionDAO sectionDAO = new SectionDAO(ds);
-		ArrayList<SectionBean> sectionBeans = getSections(ecb, ds);
-		ArrayList<SectionBean> showSections = new ArrayList<SectionBean>();
-		if (sectionBeans != null && sectionBeans.size() > 0) {
-			for (SectionBean s : sectionBeans) {
-				if (sectionDAO.containNormalItem(s.getCRFVersionId(), s.getId())) {
-					showSections.add(s);
-				} else {
-					// for section contains dynamics, does it contain showing item_group/item?
-					if (dynamicsMetadataService
-							.hasShowingDynGroupInSection(s.getId(), s.getCRFVersionId(), ecb.getId())) {
-						showSections.add(s);
-					} else {
-						if (dynamicsMetadataService.hasShowingDynItemInSection(s.getId(), s.getCRFVersionId(),
-								ecb.getId())) {
-							showSections.add(s);
-						}
-					}
-				}
-			}
-			displayTableOfContentsBean.setSections(showSections);
-		}
-		return displayTableOfContentsBean;
 	}
 
 	public static LinkedList<Integer> sectionIdsInToc(DisplayTableOfContentsBean toc) {

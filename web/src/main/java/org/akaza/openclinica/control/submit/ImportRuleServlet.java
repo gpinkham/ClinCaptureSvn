@@ -26,16 +26,20 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.rule.FileProperties;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
@@ -50,63 +54,67 @@ import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
  * 
  * @author Krikor krumlian
  */
-public class ImportRuleServlet extends SecureController {
+@Component
+public class ImportRuleServlet extends Controller {
 	private static final long serialVersionUID = 9116068126651934226L;
 	protected final Logger log = LoggerFactory.getLogger(ImportRuleServlet.class);
 
-	Locale locale;
-	FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties("xml"));
-	XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
-	RulesPostImportContainerService rulesPostImportContainerService;
-
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+        
 		String action = request.getParameter("action");
-		request.setAttribute("contextPath", getContextPath());
-		request.setAttribute("hostPath", getHostPath());
+		request.setAttribute("contextPath", getContextPath(request));
+		request.setAttribute("hostPath", getHostPath(request));
 		copyFiles();
 
 		if (StringUtil.isBlank(action)) {
-			forwardPage(Page.IMPORT_RULES);
+			forwardPage(Page.IMPORT_RULES, request, response);
 
 		}
 		if ("downloadrulesxsd".equalsIgnoreCase(action)) {
 			// File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
 			File xsdFile = getCoreResources().getFile("rules.xsd", "rules" + File.separator);
-			dowloadFile(xsdFile, "text/xml");
+			dowloadFile(xsdFile, "text/xml", request, response);
 		}
 		if ("downloadtemplate".equalsIgnoreCase(action)) {
 			// File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template.xml");
 			File file = getCoreResources().getFile("rules_template.xml", "rules" + File.separator);
-			dowloadFile(file, "text/xml");
+			dowloadFile(file, "text/xml", request, response);
 		}
 		if ("downloadtemplateWithNotes".equalsIgnoreCase(action)) {
 			// File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template_with_notes.xml");
 			File file = getCoreResources().getFile("rules_template_with_notes.xml", "rules" + File.separator);
-			dowloadFile(file, "text/xml");
+			dowloadFile(file, "text/xml", request, response);
 		}
 		if ("confirm".equalsIgnoreCase(action)) {
 
 			try {
-				File f = uploadHelper.returnFiles(request, context, getDirToSaveUploadedFileIn()).get(0);
+                FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties("xml"));
+				File f = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn()).get(0);
 				// File xsdFile = new File(getServletContext().getInitParameter("propertiesDir") + "rules.xsd");
 				// File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
 				InputStream xsdFile = getCoreResources().getInputStream("rules.xsd");
 
+                XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
 				schemaValidator.validateAgainstSchema(f, xsdFile);
 				RulesPostImportContainer importedRules = handleLoadCastor(f);
 				logger.info(ub.getFirstName());
-				importedRules = getRulesPostImportContainerService().validateRuleDefs(importedRules);
-				importedRules = getRulesPostImportContainerService().validateRuleSetDefs(importedRules);
-				session.setAttribute("importedData", importedRules);
-				provideMessage(importedRules);
-				forwardPage(Page.VERIFY_RULES_IMPORT_SERVLET);
+				RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
+						currentStudy, ub);
+				importedRules = rulesPostImportContainerService.validateRuleDefs(importedRules);
+				importedRules = rulesPostImportContainerService.validateRuleSetDefs(importedRules);
+				request.getSession().setAttribute("importedData", importedRules);
+				provideMessage(importedRules, request);
+				forwardPage(Page.VERIFY_RULES_IMPORT_SERVLET, request, response);
 			} catch (OpenClinicaSystemException re) {
 				// re.printStackTrace();
 				MessageFormat mf = new MessageFormat("");
@@ -116,8 +124,8 @@ public class ImportRuleServlet extends SecureController {
 				if (re.getErrorCode() != null) {
 					arguments = re.getErrorParams();
 				}
-				addPageMessage(mf.format(arguments));
-				forwardPage(Page.IMPORT_RULES);
+				addPageMessage(mf.format(arguments), request);
+				forwardPage(Page.IMPORT_RULES, request, response);
 			}
 		}
 	}
@@ -126,7 +134,7 @@ public class ImportRuleServlet extends SecureController {
 
 	}
 
-	private void provideMessage(RulesPostImportContainer rulesContainer) {
+	private void provideMessage(RulesPostImportContainer rulesContainer, HttpServletRequest request) {
 		int validRuleSetDefs = rulesContainer.getValidRuleSetDefs().size();
 		int duplicateRuleSetDefs = rulesContainer.getDuplicateRuleSetDefs().size();
 		int invalidRuleSetDefs = rulesContainer.getInValidRuleSetDefs().size();
@@ -136,13 +144,13 @@ public class ImportRuleServlet extends SecureController {
 
 		if (validRuleSetDefs > 0 && duplicateRuleSetDefs == 0 && invalidRuleSetDefs == 0 && duplicateRuleDefs == 0
 				&& invalidRuleDefs == 0) {
-			addPageMessage(respage.getString("rules_Import_message1"));
+			addPageMessage(respage.getString("rules_Import_message1"), request);
 		}
 		if (duplicateRuleSetDefs > 0 && invalidRuleSetDefs == 0 && duplicateRuleDefs >= 0 && invalidRuleDefs == 0) {
-			addPageMessage(respage.getString("rules_Import_message2"));
+			addPageMessage(respage.getString("rules_Import_message2"), request);
 		}
 		if (invalidRuleSetDefs > 0 && invalidRuleDefs >= 0) {
-			addPageMessage(respage.getString("rules_Import_message3"));
+			addPageMessage(respage.getString("rules_Import_message3"), request);
 		}
 	}
 
@@ -195,32 +203,33 @@ public class ImportRuleServlet extends SecureController {
 		logger.info("Total Number of RuleAssignments Being imported : {} ", ruleImport.getRuleSets().size());
 	}
 
-	private RulesPostImportContainerService getRulesPostImportContainerService() {
-		rulesPostImportContainerService = this.rulesPostImportContainerService != null ? rulesPostImportContainerService
-				: (RulesPostImportContainerService) SpringServletAccess.getApplicationContext(context).getBean(
-						"rulesPostImportContainerService");
+	private RulesPostImportContainerService getRulesPostImportContainerService(StudyBean currentStudy,
+			UserAccountBean ub) {
+		RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService(
+				getDataSource());
+        rulesPostImportContainerService.setRuleDao(getRuleDao());
+        rulesPostImportContainerService.setRuleSetDao(getRuleSetDao());
 		rulesPostImportContainerService.setCurrentStudy(currentStudy);
 		rulesPostImportContainerService.setRespage(respage);
 		rulesPostImportContainerService.setUserAccount(ub);
 		return rulesPostImportContainerService;
 	}
 
-	private CoreResources getCoreResources() {
-		return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
-	}
-
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}
 	}
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -229,7 +238,7 @@ public class ImportRuleServlet extends SecureController {
 			return;
 		}
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 }

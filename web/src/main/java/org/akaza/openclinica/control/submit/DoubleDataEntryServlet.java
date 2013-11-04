@@ -48,11 +48,11 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"rawtypes", "serial"})
+@Component
 public class DoubleDataEntryServlet extends DataEntryServlet {
-
-	Locale locale;
 
 	public static final String COUNT_VALIDATE = "countValidate";
 	public static final String DDE_ENTERED = "ddeEntered";
@@ -64,7 +64,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
 		HttpSession session = request.getSession();
-		locale = request.getLocale();
+        Locale locale = request.getLocale();
 
 		getInputBeans(request);
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
@@ -92,7 +92,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 				tabNumber = fp.getInt("tab");
 			}
 		}
-		SectionDAO sectionDao = new SectionDAO(getDataSource());
+		SectionDAO sectionDao = getSectionDAO();
 		int crfVersionId = ecb.getCRFVersionId();
 		int eventCRFId = ecb.getId();
 		ArrayList sections = sectionDao.findAllByCRFVersionId(crfVersionId);
@@ -296,7 +296,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 			String inputName, HttpServletRequest request) {
 
 		org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
-		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+		ItemDataDAO iddao = getItemDataDAO();
 		boolean isSingleItem = false;
 		if (StringUtil.isBlank(inputName)) {// for single items
 			inputName = getInputName(dib);

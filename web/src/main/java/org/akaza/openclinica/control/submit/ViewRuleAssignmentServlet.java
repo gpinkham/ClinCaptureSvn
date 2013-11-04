@@ -21,24 +21,26 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
-import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.domain.EntityBeanTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
@@ -46,18 +48,16 @@ import java.util.Locale;
  * @author Krikor krumlian
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class ViewRuleAssignmentServlet extends SecureController {
+@Component
+public class ViewRuleAssignmentServlet extends Controller {
 
 	private static final long serialVersionUID = 9116068126651934226L;
 	protected final Logger log = LoggerFactory.getLogger(ViewRuleAssignmentServlet.class);
 
-	Locale locale;
-	XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
-	RuleSetServiceInterface ruleSetService;
-	RulesPostImportContainerService rulesPostImportContainerService;
-
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        StudyBean currentStudy = getCurrentStudy(request);
+
 		FormProcessor fp = new FormProcessor(request);
 
 		List<RuleSetBean> ruleSets = getRuleSetService().getRuleSetsByStudy(currentStudy);
@@ -86,21 +86,24 @@ public class ViewRuleAssignmentServlet extends SecureController {
 			request.setAttribute("readOnly", true);
 		}
 
-		forwardPage(Page.VIEW_RULE_SETS);
+		forwardPage(Page.VIEW_RULE_SETS, request, response);
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}
 	}
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -110,14 +113,7 @@ public class ViewRuleAssignmentServlet extends SecureController {
 			return;
 		}
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
-
-	private RuleSetServiceInterface getRuleSetService() {
-		ruleSetService = this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
-				.getApplicationContext(context).getBean("ruleSetService");
-		return ruleSetService;
-	}
-
 }
