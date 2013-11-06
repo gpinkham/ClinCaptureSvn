@@ -50,7 +50,6 @@ public class LogoutServlet extends Controller {
         request.setAttribute(SESSION_MANAGER, null);
 		logger.info("User  : {} , email address : {} Logged Out ", ub.getName(), ub.getEmail());
 		removeLockedCRF(ub.getId());
-		Controller.removeLockedCRF(ub.getId());
         request.getSession().removeAttribute("userBean");
         request.getSession().removeAttribute("study");
         request.getSession().removeAttribute("userRole");

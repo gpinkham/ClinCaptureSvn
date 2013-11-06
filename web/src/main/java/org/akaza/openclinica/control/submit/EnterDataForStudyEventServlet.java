@@ -141,7 +141,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 		 //ClinCapture custom attributes
 		populateCustomElementsConfig(request);
 
-		CoreSecureController.removeLockedCRF(ub.getId());
+		removeLockedCRF(ub.getId());
 		FormProcessor fp = new FormProcessor(request);
 
 		int eventId = fp.getInt(INPUT_EVENT_ID, true);

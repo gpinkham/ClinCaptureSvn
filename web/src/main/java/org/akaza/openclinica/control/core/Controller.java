@@ -126,8 +126,6 @@ public abstract class Controller extends BaseController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-	private static HashMap unavailableCRFList = new HashMap();
-
 	protected void addPageMessage(String message, HttpServletRequest request) {
 		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 
@@ -882,7 +880,7 @@ public abstract class Controller extends BaseController {
 	}
 
 	public synchronized static HashMap getUnavailableCRFList() {
-		return unavailableCRFList;
+		return CoreSecureController.getUnavailableCRFList();
 	}
 
 	public void dowloadFile(File f, String contentType, HttpServletRequest request, HttpServletResponse response)

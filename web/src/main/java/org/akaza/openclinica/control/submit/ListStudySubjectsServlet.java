@@ -79,7 +79,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 
-		Controller.removeLockedCRF(ub.getId());
+		removeLockedCRF(ub.getId());
 		FormProcessor fp = new FormProcessor(request);
 
 		boolean showMoreLink;

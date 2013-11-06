@@ -129,7 +129,6 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 		// belong to user's studies, it can not be viewed
 		// mayAccess();
 		removeLockedCRF(ub.getId());
-		CoreSecureController.removeLockedCRF(ub.getId());
 		if (ub.isSysAdmin()) {
 			return;
 		}

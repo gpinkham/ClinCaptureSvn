@@ -46,7 +46,6 @@ public class CheckCRFLocked extends Controller {
 			return;
 		} else if (request.getParameter("userId") != null) {
 			removeLockedCRF(Integer.parseInt(request.getParameter("userId")));
-			removeLockedCRF(Integer.parseInt(request.getParameter("userId")));
 			if (request.getParameter("exitTo") != null) {
 				response.sendRedirect(request.getParameter("exitTo"));
 			} else {
