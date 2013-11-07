@@ -19,6 +19,7 @@ import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteStatisticBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesSort;
 import org.junit.Before;
@@ -263,6 +264,13 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 2, 1)));
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 1)));
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 2)));
+	}
+
+	@Test
+	public void testThatStudyEventDoesNotHaveDNs() {
+		StudyEventBean seb = new StudyEventBean();
+		seb.setId(1);
+		assertFalse(discrepancyNoteDAO.doesNotHaveOutstandingDNs(seb));
 	}
 
 	private void assertDNBeansInList(List<DiscrepancyNoteBean> dns, List<Integer> ids) {

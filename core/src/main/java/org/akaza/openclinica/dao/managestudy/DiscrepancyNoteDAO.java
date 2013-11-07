@@ -2139,7 +2139,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList rows = select(digester.getQuery("countOfOutstandingDNsForStudySubject"), variables);
 		Iterator it = rows.iterator();
 		if (it.hasNext()) {
-			count = (Integer) ((HashMap) it.next()).get("count");
+			count = (Integer) ((HashMap) it.next()).get("count");         
 		}
 
 		return count != null && count == 0 ? true : false;
@@ -2158,6 +2158,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		Iterator it = rows.iterator();
 		while (it.hasNext()) {
 			count = (Integer) ((HashMap) it.next()).get("count");
+			if (count != null && count > 0) {
+				break;
+			}
 		}
 
 		return count != null && count == 0 ? true : false;
