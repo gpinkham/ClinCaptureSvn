@@ -77,13 +77,18 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn("studySubject.label"),
 				currentStudy == null ? resword.getString("study_subject_ID") : currentStudy.getStudyParameterConfig()
 						.getStudySubjectIdLabel(), null, null);
-		if (currentStudy == null
-				|| !currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used")) {
-			configureColumn(row.getColumn("studySubject.secondaryLabel"),
-					currentStudy == null ? resword.getString("secondary_subject_ID") : currentStudy
-							.getStudyParameterConfig().getSecondaryIdLabel(), null, null);
-		}
-		configureColumn(row.getColumn("studySubject.oid"), resword.getString("study_subject_oid"), null, null);
+
+        if (currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used")) {
+            configureColumn(row.getColumn("studySubject.secondaryLabel"), resword.getString("secondary_subject_ID"), null, null);
+        } else {
+            if (currentStudy != null) {
+                configureColumn(row.getColumn("studySubject.secondaryLabel"), currentStudy.getStudyParameterConfig().getSecondaryIdLabel(), null, null);
+            } else {
+                configureColumn(row.getColumn("studySubject.secondaryLabel"), resword.getString("secondary_subject_ID"), null, null);
+            }
+        }
+
+        configureColumn(row.getColumn("studySubject.oid"), resword.getString("study_subject_oid"), null, null);
 		configureColumn(row.getColumn("subject.dateOfBirth"), resword.getString("date_of_birth"), new DateCellEditor(
 				getDateFormat()), null);
 		configureColumn(row.getColumn("subject.uniqueIdentifier"), resword.getString("person_ID"), null, null);
