@@ -844,8 +844,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			StringBuilder url = new StringBuilder();
 			url.append(eventDivBuilder(subject, rowcount, studyEvents, studyEventDefinition, studySubjectBean));
 
-			SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, imageIconPaths, currentStudy,
-					studySubjectBean, studyEvents, subjectEventStatus, resword, permission_for_dynamic);
+			SubjectEventStatusUtil.determineSubjectEventIconOnTheSubjectMatrix(url, currentStudy, studySubjectBean,
+					studyEvents, subjectEventStatus, resword, permission_for_dynamic);
 
 			url.append(getCount());
 			url.append("</a></td></tr></table>");

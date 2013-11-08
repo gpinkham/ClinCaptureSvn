@@ -60,9 +60,9 @@ public final class SubjectEventStatusUtil {
 		return iconUrl == null ? "" : iconUrl;
 	}
 
-	public static void determineSubjectEventIconOnTheSubjectMatrix(StringBuilder url,
-			HashMap<Integer, String> imageIconPaths, StudyBean currentStudy, StudySubjectBean studySubjectBean,
-			List<StudyEventBean> studyEvents, SubjectEventStatus subjectEventStatus, ResourceBundle resword, boolean permission_for_dynamic) {
+	public static void determineSubjectEventIconOnTheSubjectMatrix(StringBuilder url, StudyBean currentStudy,
+			StudySubjectBean studySubjectBean, List<StudyEventBean> studyEvents, SubjectEventStatus subjectEventStatus,
+			ResourceBundle resword, boolean permission_for_dynamic) {
 		if (studyEvents.size() <= 1) {
 			if (studySubjectBean.getStatus().isLocked() && subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
 				String txt = resword.getString("locked");
@@ -99,58 +99,29 @@ public final class SubjectEventStatusUtil {
 				}	
 			}
 		} else {
-			boolean des = false;
-			int countOfSDVd = 0;
-			int countOfSkipped = 0;
-			int countOfStopped = 0;
-			int countOfLocked = 0;
-			int countOfRemoved = 0;
-			SubjectEventStatus minNotDESStatus = null;
-			SubjectEventStatus status = SubjectEventStatus.SCHEDULED;
+			SubjectEventStatus status = null;
 			Map<SubjectEventStatus, Integer> scoreMap = new HashMap<SubjectEventStatus, Integer>();
-			scoreMap.put(SubjectEventStatus.COMPLETED, 1);
-			scoreMap.put(SubjectEventStatus.SOURCE_DATA_VERIFIED, 2);
-			scoreMap.put(SubjectEventStatus.SIGNED, 3);
+			scoreMap.put(SubjectEventStatus.INVALID, 0);
+			scoreMap.put(SubjectEventStatus.SCHEDULED, 1);
+			scoreMap.put(SubjectEventStatus.DATA_ENTRY_STARTED, 2);
+			scoreMap.put(SubjectEventStatus.COMPLETED, 3);
+			scoreMap.put(SubjectEventStatus.SOURCE_DATA_VERIFIED, 4);
+			scoreMap.put(SubjectEventStatus.SIGNED, 5);
+			scoreMap.put(SubjectEventStatus.REMOVED, 6);
+			scoreMap.put(SubjectEventStatus.STOPPED, 7);
+			scoreMap.put(SubjectEventStatus.SKIPPED, 8);
+			scoreMap.put(SubjectEventStatus.LOCKED, 9);
 			for (StudyEventBean studyEventBean : studyEvents) {
-				Integer minNotDESStatusScore = scoreMap.get(minNotDESStatus);
+				Integer statusScore = scoreMap.get(status);
 				Integer studyEventBeanScore = scoreMap.get(studyEventBean.getSubjectEventStatus());
-				if (studyEventBeanScore != null
-						&& (minNotDESStatus == null || (minNotDESStatusScore != null && studyEventBeanScore < minNotDESStatusScore))) {
-					minNotDESStatus = studyEventBean.getSubjectEventStatus();
-				}
-				if (studyEventBean.getSubjectEventStatus().getId() >= SubjectEventStatus.DATA_ENTRY_STARTED.getId()) {
-					status = SubjectEventStatus.DATA_ENTRY_STARTED;
-					if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED) {
-						des = true;
-					} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.STOPPED) {
-						countOfStopped++;
-					} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SKIPPED) {
-						countOfSkipped++;
-					} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.REMOVED) {
-						countOfRemoved++;
-					} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED) {
-						countOfLocked++;
-					} else if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SOURCE_DATA_VERIFIED) {
-						countOfSDVd++;
-					}
+				if (status == null
+						|| (studyEventBeanScore != null && statusScore != null && studyEventBeanScore < statusScore)) {
+					status = studyEventBean.getSubjectEventStatus();
 				}
 			}
-			if (des) {
-				status = SubjectEventStatus.DATA_ENTRY_STARTED;
-			} else if (countOfStopped == studyEvents.size()) {
-				status = SubjectEventStatus.STOPPED;
-			} else if (countOfSkipped == studyEvents.size()) {
-				status = SubjectEventStatus.SKIPPED;
-			} else if (countOfRemoved == studyEvents.size()) {
-				status = SubjectEventStatus.REMOVED;
-			} else if (countOfLocked == studyEvents.size()) {
-				status = SubjectEventStatus.LOCKED;
-			} else if (countOfSDVd == studyEvents.size()) {
-				status = SubjectEventStatus.SOURCE_DATA_VERIFIED;
-			} else if (!des && minNotDESStatus != null) {
-				status = minNotDESStatus;
-			}
-			url.append("<img src='" + imageIconPaths.get(status.getId()) + "' border='0' style='position: relative;'>");
+			url.append("<img src='"
+					+ imageIconPaths.get((status == null ? SubjectEventStatus.SCHEDULED : status).getId())
+					+ "' border='0' style='position: relative;'>");
 		}
 	}
 
