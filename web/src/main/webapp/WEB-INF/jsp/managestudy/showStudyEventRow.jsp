@@ -246,10 +246,8 @@
 		         name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a></td>
 
 				<!-- added 12/2012 #121 clinovo -->
-				<c:if test="${(dedc.eventCRF.id > 0 and !dedc.eventCRF.notStarted) && 
- (userBean.sysAdmin || (userRole.studyDirector || userRole.studyAdministrator)) &&
- (study.status.available || study.status.pending) 
-&& !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped)}">
+				<c:if test="${(dedc.eventCRF.id > 0 and !dedc.eventCRF.notStarted) && (userBean.sysAdmin || (userRole.studyDirector || userRole.studyAdministrator)) 
+						&& (study.status.available || study.status.pending) && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped)}">
    				<td>
 				<a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dedc.eventCRF.crf.id}" />&crfName=<c:out value="${dedc.eventCRF.crf.name}" />&crfversionId=<c:out value="${dedc.eventCRF.crfVersion.id}" />&crfVersionName=<c:out value="${dedc.eventCRF.crfVersion.name}" />&studySubjectLabel=<c:out value="${studySub.label}"/>&studySubjectId=<c:out value="${studySub.id}"/>&eventCRFId=<c:out value="${dedc.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>"
    					onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
@@ -383,7 +381,7 @@
 		 </td>
 		<c:choose>
 		<c:when test="${!dec.eventCRF.status.deleted}">
-		 <c:if test="${userRole.manageStudy && study.status.available}">
+		 <c:if test="${userRole.manageStudy && study.status.available && (!dec.locked) && (!dec.stage.locked)}">
 		  <td><a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
 			onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
 			onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><img
@@ -401,7 +399,7 @@
 		 </c:if>
 		</c:otherwise>
 		</c:choose>
-		<c:if test="${currentRole.id ne 4 and currentRole.id ne 5 and (studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available)}">
+		<c:if test="${currentRole.id ne 4 and currentRole.id ne 5 and (studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available) && (!dec.locked) && (!dec.stage.locked)}">
 		<td>
 		 <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
 			onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
@@ -411,7 +409,7 @@
 		 </c:if>
 		 <c:if test="${(dedc.eventCRF.id>0 and !dedc.eventCRF.notStarted) && (userBean.sysAdmin || (userRole.studyDirector || userRole.studyAdministrator)) && (dec.eventCRF.status.name != 'not_started') &&
  (study.status.available || study.status.pending)
- && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped) }">
+ && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped) && (!dec.locked) && (!dec.stage.locked)}">
    		<td>
    		
     	<a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&crfversionId=<c:out value="${dec.eventCRF.crfVersion.id}" />&crfVersionName=<c:out value="${dec.eventCRF.crfVersion.name}" />&studySubjectLabel=<c:out value="${studySub.label}"/>&studySubjectId=<c:out value="${studySub.id}"/>&eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>"
