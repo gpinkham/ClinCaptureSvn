@@ -69,6 +69,8 @@
 <td> 
  <input id="PasswordPolicies" class="button_medium" type="button" name="BTN_Password" value="<fmt:message key="password_policies" bundle="${resword}"/>" onclick="window.location.href=('ConfigurePasswordRequirements');"/>
 </td>
-</table> 
+</table>
+
+<script>$("#contentTable td.table_header_row:last").css("width", "200px");</script>
 
 <jsp:include page="../include/footer.jsp"/>

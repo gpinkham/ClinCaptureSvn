@@ -32,7 +32,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 	private final String CONCEPT_ID = "conceptId";
 	private final String PREFERRED_NAME = "preferredName";
 	private final String CONCEPT_ID_SHORT = "conceptIdShort";
-	private final Object DICTIONARY_NAME = "ontologyDisplayLabel";
+	private final String DICTIONARY_NAME = "ontologyDisplayLabel";
 
 	public static final String URL = "http://rest.bioontology.org";
 	public static final String API_KEY = "b32c11a0-04e7-4120-975e-525819283996";

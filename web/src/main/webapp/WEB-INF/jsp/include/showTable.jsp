@@ -168,7 +168,7 @@
 		
 		<!-- Table Contents -->
 	
-			<table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<table id="contentTable" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<!-- Column Headers -->
 				<c:choose>
 				<c:when test="${empty table.columns}">
