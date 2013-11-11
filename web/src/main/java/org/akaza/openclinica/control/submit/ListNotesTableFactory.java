@@ -83,6 +83,8 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class ListNotesTableFactory extends AbstractTableFactory {
 
@@ -251,11 +253,20 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		RowSelect rowSelect = limit.getRowSelect();
 		int offset = rowSelect.getRowStart();
 		int count = rowSelect.getRowEnd() - rowSelect.getRowStart();
-		ArrayList<DiscrepancyNoteBean> customItems = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(
+		List<DiscrepancyNoteBean> customItems = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(
 				getCurrentStudy(), listNotesFilter, listNotesSort, offset, count);
+		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+		UserAccountBean loggedInUser = (UserAccountBean) userAccountDao.findByUserName(authentication.getName());
+		
+		if (isCoder(loggedInUser)) {
+			
+			customItems = filterAccordingToMedicalCodingRole(customItems);
+			tableFacade.setTotalRows(customItems.size());
+		}
+		
 		this.setAllNotes(populateRowsWithAttachedData(customItems));
-		// this.setAllNotes(DiscrepancyNoteUtil.customFilter(allNotes, listNotesFilter));
 
 		if (!limit.isComplete()) {
 			tableFacade.setTotalRows(allNotes.size());
@@ -264,6 +275,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
 		for (DiscrepancyNoteBean discrepancyNoteBean : allNotes) {
+			
 			UserAccountBean owner = (UserAccountBean) getUserAccountDao().findByPK(discrepancyNoteBean.getOwnerId());
 
 			HashMap<Object, Object> h = new HashMap<Object, Object>();
@@ -301,12 +313,39 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	}
 
-	private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows) {
+	private List<DiscrepancyNoteBean> filterAccordingToMedicalCodingRole(List<DiscrepancyNoteBean> customItems) {
+
+		List<DiscrepancyNoteBean> filteredDiscrepancyNotes = new ArrayList<DiscrepancyNoteBean>();
+
+		List<DiscrepancyNoteBean> allDiscrepancyNotes = (List<DiscrepancyNoteBean>) discrepancyNoteDao
+				.getViewNotesWithFilterAndSort(getCurrentStudy(), new ListNotesFilter(), new ListNotesSort());
+
+		for (DiscrepancyNoteBean discrepancyNote : allDiscrepancyNotes) {
+
+			UserAccountBean owner = (UserAccountBean) userAccountDao.findByPK(discrepancyNote.getOwnerId());
+			UserAccountBean assignedUser = (UserAccountBean) userAccountDao.findByPK(discrepancyNote
+					.getAssignedUserId());
+
+			if (isCoder(assignedUser) || isCoder(owner)) {
+
+				filteredDiscrepancyNotes.add(discrepancyNote);
+			}
+		}
+
+		return filteredDiscrepancyNotes;
+	}
+
+	private boolean isCoder(UserAccountBean loggedInUser) {
+		return loggedInUser.getRoleByStudy(getCurrentStudy().getId()).getName().equalsIgnoreCase("study coder");
+	}
+
+	private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(List<DiscrepancyNoteBean> customItems) {
+		
 		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDao();
 		ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
 
-		for (int i = 0; i < noteRows.size(); i++) {
-			DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) noteRows.get(i);
+		for (int i = 0; i < customItems.size(); i++) {
+			DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) customItems.get(i);
 			dnb.setAssignedUser((UserAccountBean) getUserAccountDao().findByPK(dnb.getAssignedUserId()));
 			if (dnb.getParentDnId() == 0) {
 				ArrayList<?> children = dndao.findAllByStudyAndParent(currentStudy, dnb.getId());
@@ -362,7 +401,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 						}
 					}
 				} else if (entityType.equalsIgnoreCase("studySub")) {
-					// allNotes.add(dnb);
+					
 					StudySubjectBean ssb = (StudySubjectBean) aeb;
 					dnb.setStudySub(ssb);
 					String column = dnb.getColumn().trim();
@@ -386,9 +425,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
 					CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
 
-					// if (currentStudy.getParentStudyId() > 0 &&
-					// hiddenCrfIds.contains(cb.getId())) {
-					// } else {
 					dnb.setStageId(ecb.getStage().getId());
 					dnb.setEntityName(cb.getName() + " (" + cvb.getName() + ")");
 
@@ -420,17 +456,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 							dnb.setEntityName(resword.getString("interviewer_name"));
 						}
 					}
-					// }
 				} else if (entityType.equalsIgnoreCase("studyEvent")) {
-					// allNotes.add(dnb);
+					
 					StudyEventDAO sed = getStudyEventDao();
 					StudyEventBean se = (StudyEventBean) sed.findByPK(dnb.getEntityId());
-					// EventCRFBean ecb = eventCRFDao.findBy;
-					// CRFVersionDAO cvdao = getCrfVersionDao();
-					// CRFDAO cdao = getCrfDao();
-					// CRFVersionBean cvb = (CRFVersionBean)
-					// cvdao.findByPK(ecb.getCRFVersionId());
-					// CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
 					StudyEventDefinitionDAO<?, ?> seddao = getStudyEventDefinitionDao();
 					StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se
 							.getStudyEventDefinitionId());
@@ -440,7 +469,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					dnb.setStudySub(ssub);
 					dnb.setEventStart(se.getDateStarted());
 					dnb.setEventName(se.getName());
-					// dnb.setCrfName(cb.getName());
 					String column = dnb.getColumn().trim();
 					if (!StringUtil.isBlank(column)) {
 						if ("date_start".equals(column)) {
@@ -473,10 +501,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ec.getCRFVersionId());
 					CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
 
-					// if (currentStudy.getParentStudyId() > 0 &&
-					// hiddenCrfIds.contains(cb.getId())) {
-					// } else {
-					// allNotes.add(dnb);
 					dnb.setStageId(ec.getStage().getId());
 					dnb.setEntityName(ib.getName());
 					dnb.setEntityValue(idb.getValue());
@@ -579,9 +603,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		this.auditUserLoginDao = auditUserLoginDao;
 	}
 
-	/*
-	 * ClinCapture #43 Generate statistic for Discrepancy Notes summary table from the list of statistic beans
-	 */
 	@SuppressWarnings("unchecked")
 	public static Map<String, Map<String, String>> getNotesStatistics(List<DiscrepancyNoteStatisticBean> statisticBeans) {
 
@@ -594,7 +615,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		for (ResolutionStatus resolutionStatus : ResolutionStatus.getMembers()) {
 			statuses.put(resolutionStatus.getId(), resolutionStatus.getName());
 		}
-
+		
 		Map<String, Map<String, String>> summaryMap = new HashMap<String, Map<String, String>>();
 		for (Integer statusKey : statuses.keySet()) {
 			Map<String, String> tempMap = new HashMap<String, String>();
@@ -616,9 +637,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		return summaryMap;
 	}
 
-	/*
-	 * ClinCapture #43 Generate statistic by types for Discrepancy Notes summary table from the list of statistic beans
-	 */
 	@SuppressWarnings("unchecked")
 	public static Map<String, String> getNotesTypesStatistics(List<DiscrepancyNoteStatisticBean> statisticBeans) {
 
@@ -753,31 +771,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			return value;
 		}
 	}
-
-	// private class AgeCellEditor implements CellEditor {
-	// @SuppressWarnings("unchecked")
-	// public Object getValue(Object item, String property, int rowcount) {
-	// String value = "";
-	// int age = (Integer) ((HashMap<Object, Object>) item).get("age");
-	//
-	// if (age != 0) {
-	// value = age + "";
-	// }
-	// return value;
-	// }
-	// }
-	// private class DaysCellEditor implements CellEditor {
-	// @SuppressWarnings("unchecked")
-	// public Object getValue(Object item, String property, int rowcount) {
-	// String value = "";
-	// int days = (Integer) ((HashMap<Object, Object>) item).get("days");
-	//
-	// if (days != 0) {
-	// value = days + "";
-	// }
-	// return value;
-	// }
-	// }
 
 	private class AssignedUserCellEditor implements CellEditor {
 		@SuppressWarnings("unchecked")
@@ -1039,5 +1032,30 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	public void setDataSource(DataSource dataSource) {
 
 		this.dataSource = dataSource;
+	}
+
+	public List<DiscrepancyNoteStatisticBean> getFilteredNotesStatistics() {
+
+		List<DiscrepancyNoteStatisticBean> filteredDiscrepancyNotes = new ArrayList<DiscrepancyNoteStatisticBean>();
+		List<DiscrepancyNoteBean> allDiscrepancyNotes = (List<DiscrepancyNoteBean>) discrepancyNoteDao.getViewNotesWithFilterAndSort(getCurrentStudy(), new ListNotesFilter(), new ListNotesSort());
+
+		List<DiscrepancyNoteBean> coderNotes = filterAccordingToMedicalCodingRole(allDiscrepancyNotes);
+		for (DiscrepancyNoteBean discrepancyNote : coderNotes) {
+
+			filteredDiscrepancyNotes.add(createDiscrepancyStatistic(discrepancyNote, coderNotes.size()));
+		}
+		
+		return filteredDiscrepancyNotes;
+	}
+
+	private DiscrepancyNoteStatisticBean createDiscrepancyStatistic(DiscrepancyNoteBean discrepancyNote, int count) {
+		
+		DiscrepancyNoteStatisticBean statisticBean = new DiscrepancyNoteStatisticBean();
+
+		statisticBean.setDiscrepancyNotesCount(count);
+		statisticBean.setDiscrepancyNoteTypeId(discrepancyNote.getId());
+		statisticBean.setResolutionStatusId(discrepancyNote.getResolutionStatusId());
+
+		return statisticBean;
 	}
 }

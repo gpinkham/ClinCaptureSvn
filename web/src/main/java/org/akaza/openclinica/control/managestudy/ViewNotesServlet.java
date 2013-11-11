@@ -60,6 +60,8 @@ import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.jmesa.facade.TableFacade;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -229,6 +231,15 @@ public class ViewNotesServlet extends RememberLastPage {
         request.getSession().setAttribute("viewNotesPageFileName", viewNotesPageFileName);
 
 		List<DiscrepancyNoteStatisticBean> statisticBeans = dndao.countNotesStatistic(currentStudy);
+		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserAccountBean loggedInUser = (UserAccountBean) uadao.findByUserName(authentication.getName());
+		
+		if (loggedInUser.getRoleByStudy(currentStudy.getId()).getName().equalsIgnoreCase("study coder")) {
+
+			statisticBeans = factory.getFilteredNotesStatistics();
+		}
+
 		Map<String, Map<String, String>> customStat = ListNotesTableFactory.getNotesStatistics(statisticBeans);
 		Map<String, String> customTotalMap = ListNotesTableFactory.getNotesTypesStatistics(statisticBeans);
 
@@ -236,7 +247,16 @@ public class ViewNotesServlet extends RememberLastPage {
 		request.setAttribute("mapKeys", ResolutionStatus.getMembers());
 		request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames(resterm));
 		request.setAttribute("typeKeys", customTotalMap);
-		request.setAttribute("grandTotal", customTotalMap.get("Total"));
+		
+		if (loggedInUser.getRoleByStudy(currentStudy.getId()).getName().equalsIgnoreCase("study coder")) {
+			
+			request.setAttribute("grandTotal", statisticBeans.size());
+			
+		} else {
+			
+			request.setAttribute("grandTotal", customTotalMap.get("Total"));
+		}
+			
 
         forward(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY, request, response);
 	}

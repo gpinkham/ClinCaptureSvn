@@ -10,7 +10,6 @@
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
-
 package org.akaza.openclinica.dao.managestudy;
 
 import java.text.ParseException;
