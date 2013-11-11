@@ -1822,6 +1822,29 @@
 		<tr>
 			<td>&nbsp;</td>
 		</tr>
+
+		<tr valign="top">
+            <td class="formlabel">
+                <fmt:message key="medicalCodingApprovalNeeded" bundle="${resword}"/>
+            </td>
+            <td>
+                <c:choose>
+                    <c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == 'yes'}">
+                        <input type="radio" checked name="medicalCodingApprovalNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" name="medicalCodingApprovalNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="radio" name="medicalCodingApprovalNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" checked name="medicalCodingApprovalNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                    </c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
+
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+
 	</table>
 </div>
 </div></div></div></div></div></div></div></div>

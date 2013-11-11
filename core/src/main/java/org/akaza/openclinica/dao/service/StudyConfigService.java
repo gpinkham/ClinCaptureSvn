@@ -185,6 +185,8 @@ public class StudyConfigService {
 					spc.setDefaultMedicalCodingDictionary(spv.getValue());
 				} else if (handle.equalsIgnoreCase("autoCodeDictionaryName")) {
 					spc.setAutoCodeDictionaryName(spv.getValue());
+				} else if (handle.equalsIgnoreCase("medicalCodingApprovalNeeded")) {
+					spc.setMedicalCodingApprovalNeeded(spv.getValue());
 				}
 			}
 		}
@@ -284,6 +286,8 @@ public class StudyConfigService {
 				study.getStudyParameterConfig().setDefaultMedicalCodingDictionary(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("autoCodeDictionaryName")) {
 				study.getStudyParameterConfig().setAutoCodeDictionaryName(spvb.getValue());
+			} else if (parameter.equalsIgnoreCase("medicalCodingApprovalNeeded")) {
+				study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(spvb.getValue());
 			}
 		}
 		return study;
@@ -371,13 +375,7 @@ public class StudyConfigService {
                 site.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
             } else if (parameter.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
                 site.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
-			} else if (parameter.equalsIgnoreCase("allowCodingVerification")) {
-				site.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
-			} else if (parameter.equalsIgnoreCase("defaultMedicalCodingDictionary")) {
-				site.getStudyParameterConfig().setDefaultMedicalCodingDictionary(spvb.getValue());
-			} else if (parameter.equalsIgnoreCase("autoCodeDictionaryName")) {
-				site.getStudyParameterConfig().setAutoCodeDictionaryName(spvb.getValue());
-			}
+			} 
 		}
 		return site;
 	}

@@ -478,6 +478,7 @@ public class UpdateStudyServletNew extends SecureController {
         study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
         study.getStudyParameterConfig().setDefaultMedicalCodingDictionary(fp.getString("defaultMedicalCodingDictionary"));
         study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
+        study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded"));
         
 		try {
 
@@ -810,6 +811,10 @@ public class UpdateStudyServletNew extends SecureController {
         
         spv.setParameter("autoCodeDictionaryName");
         spv.setValue(newStudy.getStudyParameterConfig().getAutoCodeDictionaryName());
+        updateParameter(spvdao, spv);
+        
+        spv.setParameter("medicalCodingApprovalNeeded");
+        spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingApprovalNeeded());
         updateParameter(spvdao, spv);
         
 		try {

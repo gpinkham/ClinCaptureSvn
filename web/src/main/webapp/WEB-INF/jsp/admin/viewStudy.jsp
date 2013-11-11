@@ -733,6 +733,22 @@
 
   <tr valign="top">
     <td class="table_header_column">
+      <fmt:message key="medicalCodingApprovalNeeded" bundle="${resword}"/>
+    </td>
+    <td class="table_cell">
+      <c:choose>
+        <c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded== ''}">
+          <fmt:message key="blank" bundle="${resword}"/>
+        </c:when>
+        <c:otherwise>
+          ${studyToView.studyParameterConfig.medicalCodingApprovalNeeded}
+        </c:otherwise>
+      </c:choose>
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td class="table_header_column">
         <fmt:message key="allowCodingVerification" bundle="${resword}"/>
     </td>
     <td class="table_cell">

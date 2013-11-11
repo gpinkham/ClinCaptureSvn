@@ -784,7 +784,9 @@ public class CreateStudyServlet extends SecureController {
         newStudy.getStudyParameterConfig().setAllowCodingVerification(fp.getString("defaultMedicalCodingDictionary"));
         
         // Probably create custom dictionary from here
-        newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
+        newStudy.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("autoCodeDictionaryName"));
+        
+        newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("medicalCodingApprovalNeeded"));
 
 		session.setAttribute("newStudy", newStudy);
 
@@ -951,6 +953,10 @@ public class CreateStudyServlet extends SecureController {
         
         spv.setParameter("autoCodeDictionaryName");
         spv.setValue(newStudy.getStudyParameterConfig().getAutoCodeDictionaryName());
+        spvdao.create(spv);
+        
+        spv.setParameter("medicalCodingApprovalNeeded");
+        spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingApprovalNeeded());
         spvdao.create(spv);
 
 		logger.info("study parameters created done");

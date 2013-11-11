@@ -598,23 +598,22 @@
   </td>
   </tr>
 
-  <%-- clinovo - start (ticket #11) --%>
   <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="studySubjectIdLabel" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          ${studyToView.studyParameterConfig.studySubjectIdLabel}
-      </td>
+    <td class="table_header_column">
+        <fmt:message key="studySubjectIdLabel" bundle="${resword}"/>
+    </td>
+    <td class="table_cell">
+        ${studyToView.studyParameterConfig.studySubjectIdLabel}
+    </td>
   </tr>
 
   <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="secondaryIdLabel" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          ${studyToView.studyParameterConfig.secondaryIdLabel}
-      </td>
+    <td class="table_header_column">
+        <fmt:message key="secondaryIdLabel" bundle="${resword}"/>
+    </td>
+    <td class="table_cell">
+        ${studyToView.studyParameterConfig.secondaryIdLabel}
+    </td>
   </tr>
 
   <tr valign="top">
@@ -909,6 +908,22 @@
               </c:otherwise>
           </c:choose>
       </td>
+  </tr>
+
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="medicalCodingApprovalNeeded" bundle="${resword}"/>
+    </td>
+    <td class="table_cell">
+      <c:choose>
+        <c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == ''}">
+          <fmt:message key="blank" bundle="${resword}"/>
+        </c:when>
+        <c:otherwise>
+          ${studyToView.studyParameterConfig.medicalCodingApprovalNeeded}
+        </c:otherwise>
+      </c:choose>
+    </td>
   </tr>
     
 </table>

@@ -194,6 +194,9 @@ public abstract class ListStudySubjectServlet extends Controller {
         
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "autoCodeDictionaryName");
         currentStudy.getStudyParameterConfig().setAutoCodeDictionaryName(parentSPV.getValue());
+        
+        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "medicalCodingApprovalNeeded");
+        currentStudy.getStudyParameterConfig().setMedicalCodingApprovalNeeded(parentSPV.getValue());
 
 		// for all the study groups for each group class
 		for (int i = 0; i < studyGroupClasses.size(); i++) {

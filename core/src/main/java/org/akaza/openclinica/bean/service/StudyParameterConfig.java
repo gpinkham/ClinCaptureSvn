@@ -97,6 +97,7 @@ public class StudyParameterConfig {
     private String allowCodingVerification = "no";
     private String defaultMedicalCodingDictionary = "";
     private String autoCodeDictionaryName = "";
+    private String medicalCodingApprovalNeeded = "no";
     
 
 	public StudyParameterConfig() {
@@ -500,5 +501,13 @@ public class StudyParameterConfig {
 
 	public void setAutoCodeDictionaryName(String autoCodeDictionaryName) {
 		this.autoCodeDictionaryName = autoCodeDictionaryName;
+	}
+
+	public String getMedicalCodingApprovalNeeded() {
+		return medicalCodingApprovalNeeded;
+	}
+
+	public void setMedicalCodingApprovalNeeded(String medicalCodingApprovalNeeded) {
+		this.medicalCodingApprovalNeeded = medicalCodingApprovalNeeded;
 	}
 }
