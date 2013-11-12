@@ -13,14 +13,12 @@
 
 package org.akaza.openclinica.control;
 
-import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.control.core.CoreSecureController;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import javax.servlet.http.HttpSession;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.CoreSecureController;
 
 /**
  * Created by A. Hamid. Date: Apr 20, 2010 Time: 7:35:04 PM

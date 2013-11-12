@@ -81,11 +81,7 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
         if (currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used")) {
             configureColumn(row.getColumn("studySubject.secondaryLabel"), resword.getString("secondary_subject_ID"), null, null);
         } else {
-            if (currentStudy != null) {
-                configureColumn(row.getColumn("studySubject.secondaryLabel"), currentStudy.getStudyParameterConfig().getSecondaryIdLabel(), null, null);
-            } else {
-                configureColumn(row.getColumn("studySubject.secondaryLabel"), resword.getString("secondary_subject_ID"), null, null);
-            }
+            configureColumn(row.getColumn("studySubject.secondaryLabel"), currentStudy.getStudyParameterConfig().getSecondaryIdLabel(), null, null);
         }
 
         configureColumn(row.getColumn("studySubject.oid"), resword.getString("study_subject_oid"), null, null);

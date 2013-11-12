@@ -308,17 +308,17 @@ public class CodedItemsController {
 		codedItem.setStatus(String.valueOf(CodeStatus.CODED));
 		
 		// Alias the term
-		if(configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
-			
+		if (configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
+
 			Dictionary dictionary = dictionaryService.findDictionary(configuredDictionary.getValue());
-			
+
 			Term term = new Term();
-			
+
 			term.setDictionary(dictionary);
 			term.setCode(codedItem.getCodedTerm());
 			term.setPreferredName(codedItem.getVerbatimTerm());
 			term.setExternalDictionaryName(codedItemSelectedDictionary);
-			
+
 			try {
 				termService.saveTerm(term);
 			} catch (CodeException ex) {
