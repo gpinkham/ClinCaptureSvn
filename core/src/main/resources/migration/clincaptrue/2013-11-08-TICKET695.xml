@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="markg" id="2013-1-11-08-TICKET695">
+		<addColumn tableName="coded_item">
+			<column name="creator" type="INT" />
+			<column name="approver" type="INT" />
+		</addColumn>
+	</changeSet>
+
+</databaseChangeLog>

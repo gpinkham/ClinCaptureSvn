@@ -61,6 +61,7 @@
 <c:set var="firstName" value="" />
 <c:set var="lastName" value="" />
 <c:set var="email" value="" />
+<c:set var="phone" value="" />
 <c:set var="institutionalAffiliation" value="" />
 <c:set var="activeStudyId" value="${0}" />
 <c:set var="roleId" value="${0}" />
@@ -80,6 +81,9 @@
 	<c:if test='${presetValue.key == "email"}'>
 		<c:set var="email" value="${presetValue.value}" />
 	</c:if>
+  <c:if test='${presetValue.key == "phone"}'>
+    <c:set var="phone" value="${presetValue.value}" />
+  </c:if>
 	<c:if test='${presetValue.key == "institutionalAffiliation"}'>
 		<c:set var="institutionalAffiliation" value="${presetValue.value}" />
 	</c:if>
@@ -116,7 +120,7 @@
 <h1><span class="title_manage"><fmt:message key="create_a_user_account" bundle="${resword}"/></span></h1>
 
 <fmt:message key="field_required" bundle="${resword}"/>
-<form action="CreateUserAccount" method="post">
+<form action="CreateUserAccount" method="post" onsubmit="return isPhoneNumberValid('phone', '<fmt:message key="invalid_phone_number_format" bundle="${resword}"/>');">
 <jsp:include page="../include/showSubmitted.jsp" />
 
 <%
@@ -206,6 +210,22 @@ int selectedValue;
 		</td>
 	</tr>
 
+  <tr valign="top">
+    <td class="formlabel"><fmt:message key="phone" bundle="${resword}"/>:</td>
+    <td valign="top">
+      <table border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td valign="top"><div class="formfieldM_BG">
+            <input type="text" id="phone" name="phone" maxlength="20" onchange="javascript:changeIcon();" value="<c:out value="${phone}"/>" size="20" class="formfieldM" />
+          </div></td>
+          <td><span style="white-space: nowrap;">(<fmt:message key="phone_number_format_ex" bundle="${resword}"/>)</span><br/>*</td>
+        </tr>
+        <tr>
+          <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="phone" /></jsp:include></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
 
 	<tr valign="top">
 		<td class="formlabel"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td>

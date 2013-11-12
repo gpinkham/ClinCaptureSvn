@@ -40,6 +40,7 @@
 <c:set var="firstName" value="" />
 <c:set var="lastName" value="" />
 <c:set var="email" value="" />
+<c:set var="phone" value="" />
 <c:set var="institutionalAffiliation" value="" />
 <c:set var="userTypeId" value="${0}" />
 <c:set var="resetPassword" value="${0}" />
@@ -60,6 +61,9 @@
     </c:if>
     <c:if test='${presetValue.key == "email"}'>
         <c:set var="email" value="${presetValue.value}" />
+    </c:if>
+    <c:if test='${presetValue.key == "phone"}'>
+      <c:set var="phone" value="${presetValue.value}" />
     </c:if>
     <c:if test='${presetValue.key == "institutionalAffiliation"}'>
         <c:set var="institutionalAffiliation" value="${presetValue.value}" />
@@ -105,6 +109,7 @@
 <input type="hidden" name="firstName" value='<c:out value="${firstName}"/>'/>
 <input type="hidden" name="lastName" value='<c:out value="${lastName}"/>'/>
 <input type="hidden" name="email" value='<c:out value="${email}"/>'/>
+<input type="hidden" name="phone" value='<c:out value="${phone}"/>'/>
 <input type="hidden" name="institutionalAffiliation" value='<c:out value="${institutionalAffiliation}"/>'/>
 <input type="hidden" name="userType" value='<c:out value="${userType}"/>'/>
 <input type="hidden" name="resetPassword" value='<c:out value="${resetPassword}"/>'/>
@@ -141,6 +146,11 @@
   <tr valign="bottom">
     <td class="table_header_column"><fmt:message key="email" bundle="${resword}"/>:</td>
     <td class="table_cell"><c:out value="${email}" /></td>
+  </tr>
+
+  <tr valign="bottom">
+    <td class="table_header_column"><fmt:message key="phone" bundle="${resword}"/>:</td>
+    <td class="table_cell"><c:out value="${phone}" /></td>
   </tr>
 
   <tr valign="bottom">

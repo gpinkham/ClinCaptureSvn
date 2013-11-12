@@ -43,6 +43,7 @@
 <c:set var="firstName" value="" />
 <c:set var="lastName" value="" />
 <c:set var="email" value="" />
+<c:set var="phone" value="" />
 <c:set var="institutionalAffiliation" value="" />
 <c:set var="userTypeId" value="${0}" />
 <c:set var="resetPassword" value="${0}" />
@@ -57,6 +58,9 @@
     </c:if>
     <c:if test='${presetValue.key == "email"}'>
         <c:set var="email" value="${presetValue.value}" />
+    </c:if>
+    <c:if test='${presetValue.key == "phone"}'>
+      <c:set var="phone" value="${presetValue.value}" />
     </c:if>
     <c:if test='${presetValue.key == "institutionalAffiliation"}'>
         <c:set var="institutionalAffiliation" value="${presetValue.value}" />
@@ -98,7 +102,7 @@
 <h1><span class="title_manage"><fmt:message key="edit_a_user_account" bundle="${resword}"/></span></h1>
 
 
-<form action="EditUserAccount" method="post">
+<form action="EditUserAccount" method="post" onsubmit="return isPhoneNumberValid('phone', '<fmt:message key="invalid_phone_number_format" bundle="${resword}"/>');">
 <jsp:include page="../include/showSubmitted.jsp" />
 <jsp:include page="../include/showHiddenInput.jsp"><jsp:param name="fieldName" value="userId" /></jsp:include>
 <jsp:include page="../include/showHiddenInput.jsp"><jsp:param name="fieldName" value="stepNum" /></jsp:include>
@@ -180,6 +184,22 @@
         </td>
     </tr>
 
+    <tr valign="top">
+      <td class="table_header_column"><fmt:message key="phone" bundle="${resword}"/>:</td>
+      <td valign="top">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr>
+            <td valign="top"><div class="formfieldM_BG">
+              <input type="text" id="phone" name="phone" maxlength="20" onchange="javascript:changeIcon();" value="<c:out value="${phone}"/>" size="20" class="formfieldM" />
+            </div></td>
+            <td><span style="white-space: nowrap;">(<fmt:message key="phone_number_format_ex" bundle="${resword}"/>)</span><br/>*</td>
+          </tr>
+          <tr>
+            <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="phone" /></jsp:include></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
 
     <tr valign="top">
         <td class="table_header_column"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td>
@@ -271,6 +291,7 @@
          stateHolder.firstName = jQuery("input[name=firstName]").val();
          stateHolder.lastName = jQuery("input[name=lastName]").val();
          stateHolder.email = jQuery("input[name=email]").val();
+         stateHolder.phone = jQuery("input[name=phone]").val();
          stateHolder.institutionalAffiliation = jQuery("input[name=institutionalAffiliation]").val();
          stateHolder.userType = jQuery("select[name=userType]").val();
          stateHolder.runWebServices = jQuery("input[name=runWebServices]").val();
@@ -281,7 +302,7 @@
          var ok = undefined;
          var newState = {};
          saveEditUserFormState(newState);
-         if (editUserFormState.firstName != newState.firstName || editUserFormState.lastName != newState.lastName || editUserFormState.email != newState.email ||
+         if (editUserFormState.firstName != newState.firstName || editUserFormState.lastName != newState.lastName || editUserFormState.phone != newState.phone || editUserFormState.email != newState.email ||
                  editUserFormState.institutionalAffiliation != newState.institutionalAffiliation || editUserFormState.userType != newState.userType || editUserFormState.runWebServices != newState.runWebServices ||
                  editUserFormState.resetPassword != newState.resetPassword) {
              ok = confirm('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');

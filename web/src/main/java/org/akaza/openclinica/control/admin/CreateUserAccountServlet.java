@@ -65,6 +65,7 @@ public class CreateUserAccountServlet extends SecureController {
 	public static final String INPUT_FIRST_NAME = "firstName";
 	public static final String INPUT_LAST_NAME = "lastName";
 	public static final String INPUT_EMAIL = "email";
+    public static final String INPUT_PHONE = "phone";
 	public static final String INPUT_INSTITUTION = "institutionalAffiliation";
 	public static final String INPUT_STUDY = "activeStudy";
 	public static final String INPUT_ROLE = "role";
@@ -134,7 +135,7 @@ public class CreateUserAccountServlet extends SecureController {
         request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
 
 		if (!fp.isSubmitted() || changeRoles) {
-			String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL, INPUT_INSTITUTION,
+			String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL, INPUT_INSTITUTION,
 					INPUT_DISPLAY_PWD };
 			fp.setCurrentStringValuesAsPreset(textFields);
 
@@ -171,6 +172,7 @@ public class CreateUserAccountServlet extends SecureController {
 			v.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 50);
 
+            v.addValidation(INPUT_PHONE, Validator.NO_BLANKS);
 			v.addValidation(INPUT_EMAIL, Validator.NO_BLANKS);
 			v.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 120);
@@ -191,6 +193,7 @@ public class CreateUserAccountServlet extends SecureController {
 				createdUserAccountBean.setFirstName(fp.getString(INPUT_FIRST_NAME));
 				createdUserAccountBean.setLastName(fp.getString(INPUT_LAST_NAME));
 				createdUserAccountBean.setEmail(fp.getString(INPUT_EMAIL));
+                createdUserAccountBean.setPhone(fp.getString(INPUT_PHONE));
 				createdUserAccountBean.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
 
 				SecurityManager secm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean(
@@ -206,7 +209,6 @@ public class CreateUserAccountServlet extends SecureController {
 				createdUserAccountBean.setStatus(Status.AVAILABLE);
 				createdUserAccountBean.setPasswdChallengeQuestion("");
 				createdUserAccountBean.setPasswdChallengeAnswer("");
-				createdUserAccountBean.setPhone("");
 				createdUserAccountBean.setOwner(ub);
 				createdUserAccountBean.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
 
@@ -256,7 +258,7 @@ public class CreateUserAccountServlet extends SecureController {
 					forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
 				}
 			} else {
-				String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL,
+				String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
 						INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
 				fp.setCurrentStringValuesAsPreset(textFields);
 

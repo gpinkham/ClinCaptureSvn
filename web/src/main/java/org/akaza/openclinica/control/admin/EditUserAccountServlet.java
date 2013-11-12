@@ -64,6 +64,8 @@ public class EditUserAccountServlet extends SecureController {
 
 	public static final String INPUT_EMAIL = "email";
 
+    public static final String INPUT_PHONE = "phone";
+
 	public static final String INPUT_INSTITUTION = "institutionalAffiliation";
 
 	public static final String INPUT_RESET_PASSWORD = "resetPassword";
@@ -157,6 +159,8 @@ public class EditUserAccountServlet extends SecureController {
 			v.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 50);
 
+            v.addValidation(INPUT_PHONE, Validator.NO_BLANKS);
+
 			v.addValidation(INPUT_EMAIL, Validator.NO_BLANKS);
 			v.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 120);
@@ -206,6 +210,7 @@ public class EditUserAccountServlet extends SecureController {
 				user.setFirstName(fp.getString(INPUT_FIRST_NAME));
 				user.setLastName(fp.getString(INPUT_LAST_NAME));
 				user.setEmail(fp.getString(INPUT_EMAIL));
+                user.setPhone(fp.getString(INPUT_PHONE));
 				user.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
 				user.setUpdater(ub);
 				user.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
@@ -306,6 +311,7 @@ public class EditUserAccountServlet extends SecureController {
 		fp.addPresetValue(INPUT_FIRST_NAME, user.getFirstName());
 		fp.addPresetValue(INPUT_LAST_NAME, user.getLastName());
 		fp.addPresetValue(INPUT_EMAIL, user.getEmail());
+        fp.addPresetValue(INPUT_PHONE, user.getPhone());
 		fp.addPresetValue(INPUT_INSTITUTION, user.getInstitutionalAffiliation());
 		int userTypeId = UserType.USER.getId();
 		if (user.isTechAdmin()) {
@@ -326,7 +332,7 @@ public class EditUserAccountServlet extends SecureController {
 	private void loadPresetValuesFromForm(FormProcessor fp) {
 		fp.clearPresetValues();
 
-		String textFields[] = { ARG_USERID, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL, INPUT_INSTITUTION,
+		String textFields[] = { ARG_USERID, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL, INPUT_INSTITUTION,
 				INPUT_DISPLAY_PWD };
 		fp.setCurrentStringValuesAsPreset(textFields);
 

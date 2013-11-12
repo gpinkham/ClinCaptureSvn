@@ -57,6 +57,8 @@ public class BaseTest extends SeleneseTestBase {
 
 	public static final String LOGIN_URL = CC_CONTEXT;
 
+    public static final String LIST_USER_ACCOUNTS_URL = CC_CONTEXT + "/ListUserAccounts";
+
 	public static final String SUBJECT_MATRIX_URL = CC_CONTEXT + "/ListStudySubjects";
 
 	public static final String DISC_NOTES_URL = CC_CONTEXT + "/ViewNotes?module=submit";
@@ -244,6 +246,11 @@ public class BaseTest extends SeleneseTestBase {
 
 		Thread.sleep(5000);
 	}
+
+    protected void openListUserAccountsPage() {
+        selenium.open(LIST_USER_ACCOUNTS_URL, PAGE_TIME_OUT);
+        selenium.waitForPageToLoad(PAGE_TIME_OUT);
+    }
 
 	protected void openSubjectMatrixPage() {
 		selenium.open(SUBJECT_MATRIX_URL, PAGE_TIME_OUT);

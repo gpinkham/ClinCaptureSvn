@@ -58,7 +58,7 @@
     </c:if>
     &nbsp;<fmt:message key="language" bundle="${resword}"/></strong>
 <br><br>
-<form action="UpdateProfile" method="post">
+<form action="UpdateProfile" method="post" onsubmit="return isPhoneNumberValid('phone', '<fmt:message key="invalid_phone_number_format" bundle="${resword}"/>');">
     <fmt:message key="field_required" bundle="${resword}"/><br>
     <input type="hidden" name="action" value="confirm">
     <!-- These DIVs define shaded box borders -->
@@ -134,7 +134,7 @@
                         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd"/></jsp:include></td></tr>
                     <tr><td class="formlabel"><fmt:message key="confirm_new_password" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" type="password" name="passwd1" value="" class="formfieldXL"></div>
                         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd1"/></jsp:include></td></tr>
-                    <tr><td class="formlabel"><fmt:message key="phone" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" type="text" name="phone" value="<c:out value="${userBean1.phone}"/>" class="formfieldXL"></div>
+                    <tr><td class="formlabel"><fmt:message key="phone" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');" type="text" id="phone" name="phone" maxlength="20" value="<c:out value="${userBean1.phone}"/>" class="formfieldXL"></div><span style="white-space: nowrap;">(<fmt:message key="phone_number_format_ex" bundle="${resword}"/>)</span><br/>
                         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="phone"/></jsp:include></td><td class="formlabel">*</td></tr>
 
                 </table>
