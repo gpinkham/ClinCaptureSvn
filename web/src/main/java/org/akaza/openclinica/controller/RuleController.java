@@ -508,9 +508,10 @@ public class RuleController {
 	public RulesPostImportContainerService getRulesPostImportContainerService(StudyBean currentStudy,
 			UserAccountBean userAccount) {
 		Locale l = new Locale("en_US");
-        RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService();
-        rulesPostImportContainerService.setRuleDao(ruleDao);
-        rulesPostImportContainerService.setRuleSetDao(ruleSetDao);
+		RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService(
+				dataSource);
+		rulesPostImportContainerService.setRuleDao(ruleDao);
+		rulesPostImportContainerService.setRuleSetDao(ruleSetDao);
 		rulesPostImportContainerService.setCurrentStudy(currentStudy);
 		rulesPostImportContainerService.setRespage(ResourceBundleProvider.getPageMessagesBundle(l));
 		rulesPostImportContainerService.setUserAccount(userAccount);
