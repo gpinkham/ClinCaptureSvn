@@ -149,7 +149,6 @@ public class UpdateProfileServlet extends Controller {
 			pwdErrors = PasswordValidator.validatePassword(passwordRequirementsDao, udao, userBean1.getId(), password,
 					newDigestPass, resexception);
 		}
-		v.addValidation("phone", Validator.NO_BLANKS);
 		HashMap errors = v.validate();
 		for (String err : pwdErrors) {
 			Validator.addError(errors, "passwd", err);

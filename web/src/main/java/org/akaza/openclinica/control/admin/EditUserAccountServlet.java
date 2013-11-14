@@ -159,8 +159,6 @@ public class EditUserAccountServlet extends SecureController {
 			v.addValidation(INPUT_LAST_NAME, Validator.LENGTH_NUMERIC_COMPARISON,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 50);
 
-            v.addValidation(INPUT_PHONE, Validator.NO_BLANKS);
-
 			v.addValidation(INPUT_EMAIL, Validator.NO_BLANKS);
 			v.addValidation(INPUT_EMAIL, Validator.LENGTH_NUMERIC_COMPARISON,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 120);

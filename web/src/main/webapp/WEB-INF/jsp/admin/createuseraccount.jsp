@@ -218,7 +218,7 @@ int selectedValue;
           <td valign="top"><div class="formfieldM_BG">
             <input type="text" id="phone" name="phone" maxlength="20" onchange="javascript:changeIcon();" value="<c:out value="${phone}"/>" size="20" class="formfieldM" />
           </div></td>
-          <td><span style="white-space: nowrap;">(<fmt:message key="phone_number_format_ex" bundle="${resword}"/>)</span><br/>*</td>
+          <td><span style="white-space: nowrap;">(<fmt:message key="phone_number_format_ex" bundle="${resword}"/>)</span><br/>&nbsp;</td>
         </tr>
         <tr>
           <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="phone" /></jsp:include></td>
