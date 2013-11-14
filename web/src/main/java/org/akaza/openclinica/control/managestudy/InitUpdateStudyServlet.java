@@ -20,14 +20,20 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Prepares to process request of updating a study object
@@ -35,10 +41,12 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @author jxu
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class InitUpdateStudyServlet extends SecureController {
+@Component
+public class InitUpdateStudyServlet extends Controller {
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -46,30 +54,32 @@ public class InitUpdateStudyServlet extends SecureController {
 
 	/**
 	 * Processes the request
-	 */
+     * @param request
+     * @param response
+     */
 	@Override
-	public void processRequest() throws Exception {
-
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyDAO sdao = getStudyDAO();
 		String idString = request.getParameter("id");
 		logger.info("study id:" + idString);
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_study_to_edit"));
-			forwardPage(Page.STUDY_LIST_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_study_to_edit"), request);
+			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 		} else {
 			int studyId = Integer.valueOf(idString.trim()).intValue();
 			StudyBean study = (StudyBean) sdao.findByPK(studyId);
-			StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+			StudyConfigService scs = getStudyConfigService();
 			study = scs.setParametersForStudy(study);
 
 			logger.info("date created:" + study.getCreatedDate());
 			logger.info("protocol Type:" + study.getProtocolType());
 
-			session.setAttribute("newStudy", study);
+			request.getSession().setAttribute("newStudy", study);
 			request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
 			request.setAttribute("statuses", Status.toActiveArrayList());
 
-			resetPanel();
+            StudyInfoPanel panel = getStudyInfoPanel(request);
+            panel.reset();
 			panel.setStudyInfoShown(false);
 			panel.setOrderedData(true);
 			panel.setExtractData(false);
@@ -78,14 +88,14 @@ public class InitUpdateStudyServlet extends SecureController {
 			panel.setIconInfoShown(true);
 			panel.setManageSubject(false);
 
-			forwardPage(Page.UPDATE_STUDY1);
+			forwardPage(Page.UPDATE_STUDY1, request, response);
 		}
 
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 
 }

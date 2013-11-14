@@ -490,34 +490,34 @@
         <servlet-class>org.akaza.openclinica.control.admin.UnLockUserServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CreateStudyServlet</servlet-name>
+        <servlet-name>createStudyServlet</servlet-name>
         <display-name>CreateStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.CreateStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>InitUpdateStudyServlet</servlet-name>
+        <servlet-name>initUpdateStudyServlet</servlet-name>
         <display-name>InitUpdateStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.InitUpdateStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UpdateStudyServlet</servlet-name>
+        <servlet-name>updateStudyServlet</servlet-name>
         <display-name>UpdateStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UpdateStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CreateSubStudyServlet</servlet-name>
+        <servlet-name>createSubStudyServlet</servlet-name>
         <display-name>CreateSubStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.CreateSubStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>InitUpdateSubStudyServlet</servlet-name>
+        <servlet-name>initUpdateSubStudyServlet</servlet-name>
         <display-name>InitUpdateSubStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.InitUpdateSubStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UpdateSubStudyServlet</servlet-name>
+        <servlet-name>updateSubStudyServlet</servlet-name>
         <display-name>UpdateSubStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UpdateSubStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ListStudyServlet</servlet-name>
@@ -1233,9 +1233,9 @@
     </servlet>
 
     <servlet>
-        <servlet-name>UpdateStudyServletNew</servlet-name>
+        <servlet-name>updateStudyServletNew</servlet-name>
         <display-name>UpdateStudyNew</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UpdateStudyServletNew</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -1307,7 +1307,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>UpdateStudyServletNew</servlet-name>
+        <servlet-name>updateStudyServletNew</servlet-name>
         <url-pattern>/UpdateStudyNew</url-pattern>
     </servlet-mapping>
 
@@ -1574,27 +1574,27 @@
         <url-pattern>/EditUserAccount</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>CreateStudyServlet</servlet-name>
+        <servlet-name>createStudyServlet</servlet-name>
         <url-pattern>/CreateStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>CreateSubStudyServlet</servlet-name>
+        <servlet-name>createSubStudyServlet</servlet-name>
         <url-pattern>/CreateSubStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>InitUpdateStudyServlet</servlet-name>
+        <servlet-name>initUpdateStudyServlet</servlet-name>
         <url-pattern>/InitUpdateStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UpdateStudyServlet</servlet-name>
+        <servlet-name>updateStudyServlet</servlet-name>
         <url-pattern>/UpdateStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UpdateSubStudyServlet</servlet-name>
+        <servlet-name>updateSubStudyServlet</servlet-name>
         <url-pattern>/UpdateSubStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>InitUpdateSubStudyServlet</servlet-name>
+        <servlet-name>initUpdateSubStudyServlet</servlet-name>
         <url-pattern>/InitUpdateSubStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

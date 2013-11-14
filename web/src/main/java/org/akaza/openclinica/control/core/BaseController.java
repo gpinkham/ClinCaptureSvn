@@ -1,9 +1,11 @@
 package org.akaza.openclinica.control.core;
 
 import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DictionaryService;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 
 import javax.servlet.ServletContext;
@@ -124,6 +126,30 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	protected static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword,
 			resworkflow;
 
+    protected static HashMap<String, String> facRecruitStatusMap = new LinkedHashMap<String, String>();
+
+    protected static HashMap<String, String> studyPhaseMap = new LinkedHashMap<String, String>();
+
+    protected static  HashMap<String, String> interPurposeMap = new LinkedHashMap<String, String>();
+
+    protected static HashMap<String, String> allocationMap = new LinkedHashMap<String, String>();
+
+    protected static HashMap<String, String> maskingMap = new LinkedHashMap<String, String>();
+
+    protected static HashMap<String, String> controlMap = new LinkedHashMap<String, String>();
+
+    protected static HashMap<String, String> assignmentMap = new LinkedHashMap<String, String>();
+
+    protected static HashMap<String, String> endpointMap = new LinkedHashMap<String, String>();
+
+    protected static HashMap<String, String> interTypeMap = new LinkedHashMap<String, String>();
+
+    protected static HashMap<String, String> obserPurposeMap = new LinkedHashMap<String, String>();
+
+    protected static HashMap<String, String> selectionMap = new LinkedHashMap<String, String>();
+
+    protected static HashMap<String, String> timingMap = new LinkedHashMap<String, String>();
+
     private ServletContext servletContext;
 
 	@Autowired
@@ -170,6 +196,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
     private JavaMailSenderImpl mailSender;
     @Autowired
     private CodedItemService codedItemService;
+    @Autowired
+    private DictionaryService dictionaryService;
 
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
@@ -424,5 +452,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
     public CodedItemService getCodedItemService() {
         return codedItemService;
+    }
+
+    public DictionaryService getDictionaryService() {
+        return dictionaryService;
     }
 }

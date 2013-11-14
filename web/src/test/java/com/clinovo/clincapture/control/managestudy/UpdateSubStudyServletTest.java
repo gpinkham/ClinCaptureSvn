@@ -18,9 +18,8 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.managestudy.UpdateSubStudyServlet;
-import org.akaza.openclinica.dao.managestudy.IStudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.IStudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.ICRFVersionDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -28,23 +27,24 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.internal.util.reflection.Whitebox;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
-/**
- * User: Pavel Date: 06.11.12
- */
 public class UpdateSubStudyServletTest {
 
 	public static final int ID = 1;
 	private Mockery context = new Mockery();
 
-	private IStudyDAO studyDAO;
-	private IStudyParameterValueDAO studyParameterValueDAO;
-	private ICRFVersionDAO crfVersionDAO;
-	private HttpSession session;
+	private StudyDAO<?, ?> studyDAO;
+	private HttpServletRequest request;
+    private HttpSession session;
 
 	private StudyBean studyFromSession;
 	private StudyBean studyFromDb;
@@ -52,15 +52,16 @@ public class UpdateSubStudyServletTest {
 	private UpdateSubStudyServlet updateSubStudyServlet;
 	private StudyParameterValueBean studyParameterValueBean;
 	private UserAccountBean userAccountBean;
-
-	@Before
+	
+    @Before
 	public void setUp() throws Exception {
 		ResourceBundleProvider.updateLocale(Locale.getDefault());
 
-		studyDAO = context.mock(IStudyDAO.class);
-		studyParameterValueDAO = context.mock(IStudyParameterValueDAO.class);
-		crfVersionDAO = context.mock(ICRFVersionDAO.class);
-		session = context.mock(HttpSession.class);
+        context.mock(DataSource.class);
+		context.mock(IStudyParameterValueDAO.class);
+		context.mock(ICRFVersionDAO.class);
+        request = context.mock(HttpServletRequest.class);
+        session = context.mock(HttpSession.class);
 
 		studyFromSession = new StudyBean();
 		studyFromSession.setId(ID);
@@ -73,12 +74,16 @@ public class UpdateSubStudyServletTest {
 		userAccountBean = new UserAccountBean();
 		userAccountBean.setId(ID);
 
-		updateSubStudyServlet = new UpdateSubStudyServlet();
-		updateSubStudyServlet.setSdao(studyDAO);
-		updateSubStudyServlet.setSpvdao(studyParameterValueDAO);
-		updateSubStudyServlet.setUserBean(userAccountBean);
-		updateSubStudyServlet.setCvdao(crfVersionDAO);
-		SecureController.resword = ResourceBundleProvider.getWordsBundle();
+        studyDAO = Mockito.mock(StudyDAO.class);
+        Mockito.doReturn(studyFromDb).when(studyDAO).findByPK(ID);
+        Mockito.doReturn(studyFromDb).when(studyDAO).update(studyFromSession);
+
+        updateSubStudyServlet = Mockito.mock(UpdateSubStudyServlet.class);
+        Mockito.doCallRealMethod().when(updateSubStudyServlet).submitStudy(request);
+        Mockito.doReturn(userAccountBean).when(updateSubStudyServlet).getUserAccountBean(request);
+        Mockito.doReturn(studyDAO).when(updateSubStudyServlet).getStudyDAO();
+
+        Whitebox.setInternalState(updateSubStudyServlet, "resword", ResourceBundleProvider.getWordsBundle());
 
 		studyParameterValueBean = new StudyParameterValueBean();
 		studyParameterValueBean.setId(ID);
@@ -90,12 +95,11 @@ public class UpdateSubStudyServletTest {
 
 		context.checking(new Expectations() {
 			{
-				one(session).getAttribute(UpdateSubStudyServlet.NEW_STUDY);
+                allowing(request).getSession();
+                will(returnValue(session));
+                allowing(session).getAttribute(UpdateSubStudyServlet.NEW_STUDY);
 				will(returnValue(studyFromSession));
-				one(studyDAO).findByPK(ID);
-				will(returnValue(studyFromDb));
-				one(studyDAO).update(studyFromSession);
-				one(session).getAttribute(UpdateSubStudyServlet.DEFINITIONS);
+                allowing(session).getAttribute(UpdateSubStudyServlet.DEFINITIONS);
 				will(returnValue(new ArrayList<StudyEventDefinitionBean>()));
 				one(session).removeAttribute(UpdateSubStudyServlet.NEW_STUDY);
 				one(session).removeAttribute(UpdateSubStudyServlet.PARENT_NAME);
@@ -104,7 +108,7 @@ public class UpdateSubStudyServletTest {
 			}
 		});
 
-		updateSubStudyServlet.submitStudy(session);
+		updateSubStudyServlet.submitStudy(request);
 		context.assertIsSatisfied();
 	}
 }

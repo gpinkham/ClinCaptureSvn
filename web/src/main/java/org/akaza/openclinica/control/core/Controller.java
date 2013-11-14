@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -41,6 +42,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -322,6 +324,7 @@ public abstract class Controller extends BaseController {
 		respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
+        initMaps();
 		getErrorsHolder(request);
 
 		try {
@@ -463,6 +466,85 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
+	private void initMaps() {
+        facRecruitStatusMap.put("not_yet_recruiting", resadmin.getString("not_yet_recruiting"));
+        facRecruitStatusMap.put("recruiting", resadmin.getString("recruiting"));
+        facRecruitStatusMap.put("no_longer_recruiting", resadmin.getString("no_longer_recruiting"));
+        facRecruitStatusMap.put("completed", resadmin.getString("completed"));
+        facRecruitStatusMap.put("suspended", resadmin.getString("suspended"));
+        facRecruitStatusMap.put("terminated", resadmin.getString("terminated"));
+
+        studyPhaseMap.put("n_a", resadmin.getString("n_a"));
+        studyPhaseMap.put("phaseI", resadmin.getString("phaseI"));
+        studyPhaseMap.put("phaseI_II", resadmin.getString("phaseI_II"));
+        studyPhaseMap.put("phaseII", resadmin.getString("phaseII"));
+        studyPhaseMap.put("phaseII_III", resadmin.getString("phaseII_III"));
+        studyPhaseMap.put("phaseIII", resadmin.getString("phaseIII"));
+        studyPhaseMap.put("phaseIII_IV", resadmin.getString("phaseIII_IV"));
+        studyPhaseMap.put("phaseIV", resadmin.getString("phaseIV"));
+
+        interPurposeMap.put("treatment", resadmin.getString("treatment"));
+        interPurposeMap.put("prevention", resadmin.getString("prevention"));
+        interPurposeMap.put("diagnosis", resadmin.getString("diagnosis"));
+        // interPurposeMap.put("educ_couns_train",
+        // resadmin.getString("educ_couns_train"));
+        interPurposeMap.put("supportive_care", resadmin.getString("supportive_care"));
+        interPurposeMap.put("screening", resadmin.getString("screening"));
+        interPurposeMap.put("health_services_research", resadmin.getString("health_services_research"));
+        interPurposeMap.put("basic_science", resadmin.getString("basic_science"));
+        interPurposeMap.put("other", resadmin.getString("other"));
+
+        allocationMap.put("randomized", resadmin.getString("randomized"));
+        allocationMap.put("non_randomized", resadmin.getString("non_randomized"));
+        allocationMap.put("n_a", resadmin.getString("n_a"));
+
+        maskingMap.put("open", resadmin.getString("open"));
+        maskingMap.put("single_blind", resadmin.getString("single_blind"));
+        maskingMap.put("double_blind", resadmin.getString("double_blind"));
+
+        controlMap.put("placebo", resadmin.getString("placebo"));
+        controlMap.put("active", resadmin.getString("active"));
+        controlMap.put("uncontrolled", resadmin.getString("uncontrolled"));
+        controlMap.put("historical", resadmin.getString("historical"));
+        controlMap.put("dose_comparison", resadmin.getString("dose_comparison"));
+
+        assignmentMap.put("single_group", resadmin.getString("single_group"));
+        assignmentMap.put("parallel", resadmin.getString("parallel"));
+        assignmentMap.put("cross_over", resadmin.getString("cross_over"));
+        assignmentMap.put("factorial", resadmin.getString("factorial"));
+        assignmentMap.put("expanded_access", resadmin.getString("expanded_access"));
+
+        endpointMap.put("safety", resadmin.getString("safety"));
+        endpointMap.put("efficacy", resadmin.getString("efficacy"));
+        endpointMap.put("safety_efficacy", resadmin.getString("safety_efficacy"));
+        endpointMap.put("bio_equivalence", resadmin.getString("bio_equivalence"));
+        endpointMap.put("bio_availability", resadmin.getString("bio_availability"));
+        endpointMap.put("pharmacokinetics", resadmin.getString("pharmacokinetics"));
+        endpointMap.put("pharmacodynamics", resadmin.getString("pharmacodynamics"));
+        endpointMap.put("pharmacokinetics_pharmacodynamics",
+                resadmin.getString("pharmacokinetics_pharmacodynamics"));
+
+        interTypeMap.put("drug", resadmin.getString("drug"));
+        interTypeMap.put("gene_transfer", resadmin.getString("gene_transfer"));
+        interTypeMap.put("vaccine", resadmin.getString("vaccine"));
+        interTypeMap.put("behavior", resadmin.getString("behavior"));
+        interTypeMap.put("device", resadmin.getString("device"));
+        interTypeMap.put("procedure", resadmin.getString("procedure"));
+        interTypeMap.put("other", resadmin.getString("other"));
+
+        obserPurposeMap.put("natural_history", resadmin.getString("natural_history"));
+        obserPurposeMap.put("screening", resadmin.getString("screening"));
+        obserPurposeMap.put("psychosocial", resadmin.getString("psychosocial"));
+
+        selectionMap.put("convenience_sample", resadmin.getString("convenience_sample"));
+        selectionMap.put("defined_population", resadmin.getString("defined_population"));
+        selectionMap.put("random_sample", resadmin.getString("random_sample"));
+        selectionMap.put("case_control", resadmin.getString("case_control"));
+
+        timingMap.put("retrospective", resadmin.getString("retrospective"));
+        timingMap.put("prospective", resadmin.getString("prospective"));
+	}
+    
 	public static String getStackTrace(Throwable t) {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw, true);

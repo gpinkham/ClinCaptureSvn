@@ -20,18 +20,24 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -43,16 +49,22 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class InitUpdateSubStudyServlet extends SecureController {
+@Component
+public class InitUpdateSubStudyServlet extends Controller {
 
 	/**
      * 
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"));
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -61,24 +73,26 @@ public class InitUpdateSubStudyServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		String idString = request.getParameter("id");
 		logger.info("study id:" + idString);
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_study_to_edit"));
-			forwardPage(Page.STUDY_LIST_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_study_to_edit"), request);
+			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 		} else {
 			int studyId = Integer.valueOf(idString.trim()).intValue();
 			StudyBean study = (StudyBean) sdao.findByPK(studyId);
 
-			checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
+			checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 
 			String parentStudyName = "";
 			StudyBean parent = new StudyBean();
@@ -86,13 +100,13 @@ public class InitUpdateSubStudyServlet extends SecureController {
 				parent = (StudyBean) sdao.findByPK(study.getParentStudyId());
 				parentStudyName = parent.getName();
 				// at this time, this feature is only available for site
-				createEventDefinitions(parent);
+				createEventDefinitions(request, parent);
 			}
 
 			if (currentStudy.getId() != study.getId()) {
 				ArrayList parentConfigs = currentStudy.getStudyParameters();
 				ArrayList configs = new ArrayList();
-				StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+				StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 				for (int i = 0; i < parentConfigs.size(); i++) {
 					StudyParamsConfig scg = (StudyParamsConfig) parentConfigs.get(i);
 					if (scg != null) {
@@ -112,11 +126,12 @@ public class InitUpdateSubStudyServlet extends SecureController {
 				study.setStudyParameters(configs);
 			}
 			request.setAttribute("parentStudy", parent);
-			session.setAttribute("parentName", parentStudyName);
-			session.setAttribute("newStudy", study);
+			request.getSession().setAttribute("parentName", parentStudyName);
+            request.getSession().setAttribute("newStudy", study);
 			request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
 			request.setAttribute("statuses", Status.toStudyUpdateMembersList());
 
+            SimpleDateFormat local_df = getLocalDf(request);
 			FormProcessor fp = new FormProcessor(request);
 			logger.info("start date:" + study.getDatePlannedEnd());
 			if (study.getDatePlannedEnd() != null) {
@@ -125,24 +140,24 @@ public class InitUpdateSubStudyServlet extends SecureController {
 			if (study.getDatePlannedStart() != null) {
 				fp.addPresetValue(UpdateSubStudyServlet.INPUT_START_DATE, local_df.format(study.getDatePlannedStart()));
 			}
-			setPresetValues(fp.getPresetValues());
+			setPresetValues(fp.getPresetValues(), request);
 			if (study.getProtocolDateVerification() != null) {
 				fp.addPresetValue(UpdateSubStudyServlet.INPUT_VER_DATE,
 						local_df.format(study.getProtocolDateVerification()));
 			}
 
-			forwardPage(Page.UPDATE_SUB_STUDY);
+			forwardPage(Page.UPDATE_SUB_STUDY, request, response);
 		}
 
 	}
 
-	private void createEventDefinitions(StudyBean parentStudy) {
+	private void createEventDefinitions(HttpServletRequest request, StudyBean parentStudy) {
 		int siteId = Integer.valueOf(request.getParameter("id").trim());
 		ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
-		StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
+		StudyEventDefinitionDAO sedDao = getStudyEventDefinitionDAO();
+		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
+		CRFVersionDAO cvdao = getCRFVersionDAO();
+		CRFDAO cdao = getCRFDAO();
 		seds = sedDao.findAllByStudy(parentStudy);
 		for (StudyEventDefinitionBean sed : seds) {
 			int defId = sed.getId();
@@ -179,8 +194,8 @@ public class InitUpdateSubStudyServlet extends SecureController {
 		}
 		// not sure if request is better, since not sure if there is another
 		// process using this.
-		session.setAttribute("definitions", seds);
-		session.setAttribute("sdvOptions", this.setSDVOptions());
+		request.getSession().setAttribute("definitions", seds);
+        request.getSession().setAttribute("sdvOptions", this.setSDVOptions());
 	}
 
 	private ArrayList<String> setSDVOptions() {
@@ -193,9 +208,10 @@ public class InitUpdateSubStudyServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

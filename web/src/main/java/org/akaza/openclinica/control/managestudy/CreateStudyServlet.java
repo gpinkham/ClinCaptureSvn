@@ -24,11 +24,14 @@ import com.clinovo.util.ValidatorHelper;
 
 import java.text.MessageFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -38,6 +41,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.InterventionBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -46,8 +50,10 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.springframework.stereotype.Component;
 
 /**
  * Processes request to create a new study
@@ -56,7 +62,9 @@ import org.akaza.openclinica.web.SQLInitServlet;
  * 
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class CreateStudyServlet extends SecureController {
+@Component
+public class CreateStudyServlet extends Controller {
+
 	public static final String INPUT_START_DATE = "startDate";
 
 	public static final String INPUT_END_DATE = "endDate";
@@ -81,123 +89,19 @@ public class CreateStudyServlet extends SecureController {
 
 	public static final String FAC_CONTACT_EMAIL = "FacContactEmail";
 
-	static HashMap<String, String> facRecruitStatusMap = new LinkedHashMap<String, String>();
-
-	static HashMap<String, String> studyPhaseMap = new LinkedHashMap<String, String>();
-
-	static HashMap<String, String> interPurposeMap = new LinkedHashMap<String, String>();
-
-	static HashMap<String, String> allocationMap = new LinkedHashMap<String, String>();
-
-	static HashMap<String, String> maskingMap = new LinkedHashMap<String, String>();
-
-	static HashMap<String, String> controlMap = new LinkedHashMap<String, String>();
-
-	static HashMap<String, String> assignmentMap = new LinkedHashMap<String, String>();
-
-	static HashMap<String, String> endpointMap = new LinkedHashMap<String, String>();
-
-	static HashMap<String, String> interTypeMap = new LinkedHashMap<String, String>();
-
-	static HashMap<String, String> obserPurposeMap = new LinkedHashMap<String, String>();
-
-	static HashMap<String, String> selectionMap = new LinkedHashMap<String, String>();
-
-	static HashMap<String, String> timingMap = new LinkedHashMap<String, String>();
-
-	static {
-		// problem here -- if you go directly to the servlet, the resource
-		// bundles are not initialized
-		// and the servlet throws a fatal error.
-		// try {
-		facRecruitStatusMap.put("not_yet_recruiting", resadmin.getString("not_yet_recruiting"));
-		facRecruitStatusMap.put("recruiting", resadmin.getString("recruiting"));
-		facRecruitStatusMap.put("no_longer_recruiting", resadmin.getString("no_longer_recruiting"));
-		facRecruitStatusMap.put("completed", resadmin.getString("completed"));
-		facRecruitStatusMap.put("suspended", resadmin.getString("suspended"));
-		facRecruitStatusMap.put("terminated", resadmin.getString("terminated"));
-
-		studyPhaseMap.put("n_a", resadmin.getString("n_a"));
-		studyPhaseMap.put("phaseI", resadmin.getString("phaseI"));
-		studyPhaseMap.put("phaseI_II", resadmin.getString("phaseI_II"));
-		studyPhaseMap.put("phaseII", resadmin.getString("phaseII"));
-		studyPhaseMap.put("phaseII_III", resadmin.getString("phaseII_III"));
-		studyPhaseMap.put("phaseIII", resadmin.getString("phaseIII"));
-		studyPhaseMap.put("phaseIII_IV", resadmin.getString("phaseIII_IV"));
-		studyPhaseMap.put("phaseIV", resadmin.getString("phaseIV"));
-
-		interPurposeMap.put("treatment", resadmin.getString("treatment"));
-		interPurposeMap.put("prevention", resadmin.getString("prevention"));
-		interPurposeMap.put("diagnosis", resadmin.getString("diagnosis"));
-		// interPurposeMap.put("educ_couns_train",
-		// resadmin.getString("educ_couns_train"));
-		interPurposeMap.put("supportive_care", resadmin.getString("supportive_care"));
-		interPurposeMap.put("screening", resadmin.getString("screening"));
-		interPurposeMap.put("health_services_research", resadmin.getString("health_services_research"));
-		interPurposeMap.put("basic_science", resadmin.getString("basic_science"));
-		interPurposeMap.put("other", resadmin.getString("other"));
-
-		allocationMap.put("randomized", resadmin.getString("randomized"));
-		allocationMap.put("non_randomized", resadmin.getString("non_randomized"));
-		allocationMap.put("n_a", resadmin.getString("n_a"));
-
-		maskingMap.put("open", resadmin.getString("open"));
-		maskingMap.put("single_blind", resadmin.getString("single_blind"));
-		maskingMap.put("double_blind", resadmin.getString("double_blind"));
-
-		controlMap.put("placebo", resadmin.getString("placebo"));
-		controlMap.put("active", resadmin.getString("active"));
-		controlMap.put("uncontrolled", resadmin.getString("uncontrolled"));
-		controlMap.put("historical", resadmin.getString("historical"));
-		controlMap.put("dose_comparison", resadmin.getString("dose_comparison"));
-
-		assignmentMap.put("single_group", resadmin.getString("single_group"));
-		assignmentMap.put("parallel", resadmin.getString("parallel"));
-		assignmentMap.put("cross_over", resadmin.getString("cross_over"));
-		assignmentMap.put("factorial", resadmin.getString("factorial"));
-		assignmentMap.put("expanded_access", resadmin.getString("expanded_access"));
-
-		endpointMap.put("safety", resadmin.getString("safety"));
-		endpointMap.put("efficacy", resadmin.getString("efficacy"));
-		endpointMap.put("safety_efficacy", resadmin.getString("safety_efficacy"));
-		endpointMap.put("bio_equivalence", resadmin.getString("bio_equivalence"));
-		endpointMap.put("bio_availability", resadmin.getString("bio_availability"));
-		endpointMap.put("pharmacokinetics", resadmin.getString("pharmacokinetics"));
-		endpointMap.put("pharmacodynamics", resadmin.getString("pharmacodynamics"));
-		endpointMap.put("pharmacokinetics_pharmacodynamics", resadmin.getString("pharmacokinetics_pharmacodynamics"));
-
-		interTypeMap.put("drug", resadmin.getString("drug"));
-		interTypeMap.put("gene_transfer", resadmin.getString("gene_transfer"));
-		interTypeMap.put("vaccine", resadmin.getString("vaccine"));
-		interTypeMap.put("behavior", resadmin.getString("behavior"));
-		interTypeMap.put("device", resadmin.getString("device"));
-		interTypeMap.put("procedure", resadmin.getString("procedure"));
-		interTypeMap.put("other", resadmin.getString("other"));
-
-		obserPurposeMap.put("natural_history", resadmin.getString("natural_history"));
-		obserPurposeMap.put("screening", resadmin.getString("screening"));
-		obserPurposeMap.put("psychosocial", resadmin.getString("psychosocial"));
-
-		selectionMap.put("convenience_sample", resadmin.getString("convenience_sample"));
-		selectionMap.put("defined_population", resadmin.getString("defined_population"));
-		selectionMap.put("random_sample", resadmin.getString("random_sample"));
-		selectionMap.put("case_control", resadmin.getString("case_control"));
-
-		timingMap.put("retrospective", resadmin.getString("retrospective"));
-		timingMap.put("prospective", resadmin.getString("prospective"));
-	}
-
-	/**
+    /**
      *
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
@@ -206,9 +110,13 @@ public class CreateStudyServlet extends SecureController {
 	 * Processes user request
 	 */
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyBean currentStudy = getCurrentStudy(request);
+
 		String action = request.getParameter("action");
-		resetPanel();
+        StudyInfoPanel panel = getStudyInfoPanel(request);
+        panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 		panel.setExtractData(false);
@@ -218,36 +126,35 @@ public class CreateStudyServlet extends SecureController {
 		panel.setManageSubject(false);
 
 		if (StringUtil.isBlank(action)) {
-			session.setAttribute("newStudy", new StudyBean());
+			request.getSession().setAttribute("newStudy", new StudyBean());
 
-			UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-			Collection users = udao.findAllByRole("study_administrator", "study_director");
+			UserAccountDAO udao = new UserAccountDAO(getDataSource());
+			Collection users = udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getName(), Role.STUDY_DIRECTOR.getName());
 			request.setAttribute("users", users);
 
-			forwardPage(Page.CREATE_STUDY1);
+			forwardPage(Page.CREATE_STUDY1, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
-				confirmWholeStudy();
+				confirmWholeStudy(request, response);
 
 			} else if ("cancel".equalsIgnoreCase(action)) {
-				addPageMessage(respage.getString("study_creation_cancelled"));
-				forwardPage(Page.STUDY_LIST_SERVLET);
+				addPageMessage(respage.getString("study_creation_cancelled"), request);
+				forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 				return;
 			} else if ("submit".equalsIgnoreCase(action)) {
 
-				submitStudy();
+				submitStudy(request);
 
-				session.removeAttribute("interventions");
-				session.removeAttribute("isInterventionalFlag");
-				session.removeAttribute("interventionArray");
+                request.getSession().removeAttribute("interventions");
+                request.getSession().removeAttribute("isInterventionalFlag");
+                request.getSession().removeAttribute("interventionArray");
 
 				// swith user to the newly created study
 
-				session.setAttribute("study", session.getAttribute("newStudy"));
-				session.removeAttribute("newStudy");
-				currentStudy = (StudyBean) session.getAttribute("study");
+                request.getSession().setAttribute("study", request.getSession().getAttribute("newStudy"));
+                request.getSession().removeAttribute("newStudy");
 
-				UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+				UserAccountDAO udao = new UserAccountDAO(getDataSource());
 				if (!ub.isSysAdmin()) {
 					StudyUserRoleBean sub = new StudyUserRoleBean();
 					sub.setRole(Role.STUDY_ADMINISTRATOR);
@@ -255,42 +162,41 @@ public class CreateStudyServlet extends SecureController {
 					sub.setStatus(Status.AVAILABLE);
 					sub.setOwner(ub);
 					udao.createStudyUserRole(ub, sub);
-					currentRole = ub.getRoleByStudy(currentStudy.getId());
-					session.setAttribute("userRole", sub);
+                    request.getSession().setAttribute("userRole", sub);
 				}
 
-				addPageMessage(respage.getString("the_new_study_created_succesfully_current"));
+				addPageMessage(respage.getString("the_new_study_created_succesfully_current"), request);
 
 				ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
-				session.setAttribute("pageMessages", pageMessages);
+                request.getSession().setAttribute("pageMessages", pageMessages);
 				response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
 			} else if ("next".equalsIgnoreCase(action)) {
 				Integer pageNumber = Integer.valueOf(request.getParameter("pageNum"));
 				if (pageNumber != null) {
 					if (pageNumber.intValue() == 6) {
-						confirmStudy6();
+						confirmStudy6(request, response);
 					} else if (pageNumber.intValue() == 5) {
-						confirmStudy5();
+						confirmStudy5(request, response);
 					} else if (pageNumber.intValue() == 4) {
-						confirmStudy4();
+						confirmStudy4(request, response);
 					} else if (pageNumber.intValue() == 3) {
-						confirmStudy3();
+						confirmStudy3(request, response);
 					} else if (pageNumber.intValue() == 2) {
-						confirmStudy2();
+						confirmStudy2(request, response);
 					} else {
 						System.out.println("confirm study 1 " + pageNumber.intValue());
-						confirmStudy1();
+						confirmStudy1(request, response);
 					}
 				} else {
-					if (session.getAttribute("newStudy") == null) {
-						session.setAttribute("newStudy", new StudyBean());
+					if (request.getSession().getAttribute("newStudy") == null) {
+                        request.getSession().setAttribute("newStudy", new StudyBean());
 					}
 
-					UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-					Collection users = udao.findAllByRole("study_administrator", "study_director");
+					UserAccountDAO udao = new UserAccountDAO(getDataSource());
+					Collection users = udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getName(), Role.STUDY_DIRECTOR.getName());
 					request.setAttribute("users", users);
 
-					forwardPage(Page.CREATE_STUDY1);
+					forwardPage(Page.CREATE_STUDY1, request, response);
 				}
 			}
 		}
@@ -303,7 +209,9 @@ public class CreateStudyServlet extends SecureController {
 	 * @param response
 	 * @throws Exception
 	 */
-	private void confirmStudy1() throws Exception {
+	private void confirmStudy1(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
@@ -321,16 +229,16 @@ public class CreateStudyServlet extends SecureController {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1000);
 
 		// check param presents before validation
-		addValidatorIfParamPresented("studySubjectIdLabel", v, Validator.NO_BLANKS);
-		addValidatorIfParamPresented("secondaryIdLabel", v, Validator.NO_BLANKS);
-		addValidatorIfParamPresented("dateOfEnrollmentForStudyLabel", v, Validator.NO_BLANKS);
-		addValidatorIfParamPresented("genderLabel", v, Validator.NO_BLANKS);
-		addValidatorIfParamPresented("startDateTimeLabel", v, Validator.NO_BLANKS);
-		addValidatorIfParamPresented("endDateTimeLabel", v, Validator.NO_BLANKS);
+		addValidatorIfParamPresented(request, "studySubjectIdLabel", v, Validator.NO_BLANKS);
+		addValidatorIfParamPresented(request, "secondaryIdLabel", v, Validator.NO_BLANKS);
+		addValidatorIfParamPresented(request, "dateOfEnrollmentForStudyLabel", v, Validator.NO_BLANKS);
+		addValidatorIfParamPresented(request, "genderLabel", v, Validator.NO_BLANKS);
+		addValidatorIfParamPresented(request, "startDateTimeLabel", v, Validator.NO_BLANKS);
+		addValidatorIfParamPresented(request, "endDateTimeLabel", v, Validator.NO_BLANKS);
 
-		errors = v.validate();
+		HashMap errors = v.validate();
 		// check to see if name and uniqueProId are unique, tbh
-		StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+		StudyDAO studyDAO = new StudyDAO(getDataSource());
 		ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
 		for (StudyBean thisBean : allStudies) {
 			if (fp.getString("name").trim().equals(thisBean.getName())) {
@@ -387,7 +295,7 @@ public class CreateStudyServlet extends SecureController {
 					resexception.getString("maximum_lenght_endDateTimeLabel_255"));
 		}
 
-		StudyBean studyBean = createStudyBean();
+		StudyBean studyBean = createStudyBean(request);
 
 		if (errors.isEmpty()) {
 			logger.info("no errors in the first section");
@@ -395,14 +303,14 @@ public class CreateStudyServlet extends SecureController {
 			request.setAttribute("statuses", Status.toActiveArrayList());
 			logger.info("setting arrays to request, size of list: " + Status.toArrayList().size());
 			if (request.getParameter("Save") != null && request.getParameter("Save").length() > 0) {
-				StudyDAO sdao = new StudyDAO(sm.getDataSource());
+				StudyDAO sdao = new StudyDAO(getDataSource());
 				studyBean.setOwner(ub);
 				studyBean.setCreatedDate(new Date());
 				studyBean.setStatus(Status.PENDING);
 				studyBean = (StudyBean) sdao.create(studyBean);
 				StudyBean newstudyBean = (StudyBean) sdao.findByName(studyBean.getName());
 
-				UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+				UserAccountDAO udao = new UserAccountDAO(getDataSource());
 				String selectedUserIdStr = fp.getString("selectedUser");
 				int selectedUserId = 0;
 				if (selectedUserIdStr != null && selectedUserIdStr.length() > 0) {
@@ -432,27 +340,27 @@ public class CreateStudyServlet extends SecureController {
 					sub.setOwner(ub);
 					udao.createStudyUserRole(ub, sub);
 				}
-				addPageMessage(respage.getString("the_new_study_created_succesfully_current"));
-				forwardPage(Page.STUDY_LIST_SERVLET);
+				addPageMessage(respage.getString("the_new_study_created_succesfully_current"), request);
+				forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 			} else {
-				session.setAttribute("newStudy", studyBean);
-				forwardPage(Page.CREATE_STUDY2);
+				request.getSession().setAttribute("newStudy", studyBean);
+				forwardPage(Page.CREATE_STUDY2, request, response);
 			}
 
 		} else {
-			session.setAttribute("newStudy", studyBean);
+            request.getSession().setAttribute("newStudy", studyBean);
 			logger.info("has validation errors in the first section");
 			request.setAttribute("formMessages", errors);
-			UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-			Collection users = udao.findAllByRole("study_administrator", "study_director");
+			UserAccountDAO udao = new UserAccountDAO(getDataSource());
+			Collection users = udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getName(), Role.STUDY_DIRECTOR.getName());
 			request.setAttribute("users", users);
 
-			forwardPage(Page.CREATE_STUDY1);
+			forwardPage(Page.CREATE_STUDY1, request, response);
 		}
 
 	}
 
-	private void addValidatorIfParamPresented(String paramName, Validator v, int validatorType) {
+	private void addValidatorIfParamPresented(HttpServletRequest request, String paramName, Validator v, int validatorType) {
 		if (request.getParameter(paramName) != null) {
 			v.addValidation(paramName, validatorType);
 		}
@@ -463,7 +371,7 @@ public class CreateStudyServlet extends SecureController {
 	 * 
 	 * @throws Exception
 	 */
-	private void confirmStudy2() throws Exception {
+	private void confirmStudy2(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
@@ -477,17 +385,19 @@ public class CreateStudyServlet extends SecureController {
 			v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE_WITHOUT_REQUIRED_CHECK);
 		}
 
-		errors = v.validate();
-		boolean isInterventional = updateStudy2();
-		session.setAttribute("isInterventionalFlag", new Boolean(isInterventional));
+		HashMap errors = v.validate();
+		boolean isInterventional = updateStudy2(request);
+		request.getSession().setAttribute("isInterventionalFlag", new Boolean(isInterventional));
+
+        SimpleDateFormat local_df = getLocalDf(request);
 
 		if (errors.isEmpty()) {
 			logger.info("no errors");
-			setMaps(isInterventional);
+			setMaps(request, isInterventional);
 			if (isInterventional) {
-				forwardPage(Page.CREATE_STUDY3);
+				forwardPage(Page.CREATE_STUDY3, request, response);
 			} else {
-				forwardPage(Page.CREATE_STUDY4);
+				forwardPage(Page.CREATE_STUDY4, request, response);
 			}
 
 		} else {
@@ -510,11 +420,11 @@ public class CreateStudyServlet extends SecureController {
 			} catch (ParseException pe) {
 				fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 			}
-			setPresetValues(fp.getPresetValues());
+			setPresetValues(fp.getPresetValues(), request);
 			request.setAttribute("formMessages", errors);
 			request.setAttribute("studyPhaseMap", studyPhaseMap);
 			request.setAttribute("statuses", Status.toActiveArrayList());
-			forwardPage(Page.CREATE_STUDY2);
+			forwardPage(Page.CREATE_STUDY2, request, response);
 		}
 
 	}
@@ -524,7 +434,7 @@ public class CreateStudyServlet extends SecureController {
 	 * 
 	 * @throws Exception
 	 */
-	private void confirmStudy3() throws Exception {
+	private void confirmStudy3(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
@@ -544,32 +454,32 @@ public class CreateStudyServlet extends SecureController {
 			}
 		}
 
-		errors = v.validate();
+		HashMap errors = v.validate();
 
 		boolean isInterventional = true;
-		if (session.getAttribute("isInterventionalFlag") != null) {
-			isInterventional = ((Boolean) session.getAttribute("isInterventionalFlag")).booleanValue();
+		if (request.getSession().getAttribute("isInterventionalFlag") != null) {
+			isInterventional = ((Boolean) request.getSession().getAttribute("isInterventionalFlag")).booleanValue();
 		}
-		updateStudy3(isInterventional);
+		updateStudy3(request, isInterventional);
 
 		if (errors.isEmpty()) {
 			logger.info("no errors");
-			if (session.getAttribute("interventionArray") == null) {
+			if (request.getSession().getAttribute("interventionArray") == null) {
 				request.setAttribute("interventions", new ArrayList());
 			} else {
-				request.setAttribute("interventions", session.getAttribute("interventionArray"));
+				request.setAttribute("interventions", request.getSession().getAttribute("interventionArray"));
 			}
-			forwardPage(Page.CREATE_STUDY5);
+			forwardPage(Page.CREATE_STUDY5, request, response);
 
 		} else {
 			logger.info("has validation errors");
 
 			request.setAttribute("formMessages", errors);
-			setMaps(isInterventional);
+			setMaps(request, isInterventional);
 			if (isInterventional) {
-				forwardPage(Page.CREATE_STUDY3);
+				forwardPage(Page.CREATE_STUDY3, request, response);
 			} else {
-				forwardPage(Page.CREATE_STUDY4);
+				forwardPage(Page.CREATE_STUDY4, request, response);
 			}
 		}
 
@@ -582,7 +492,7 @@ public class CreateStudyServlet extends SecureController {
 	 * @param response
 	 * @throws Exception
 	 */
-	private void confirmStudy4() throws Exception {
+	private void confirmStudy4(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
@@ -594,13 +504,13 @@ public class CreateStudyServlet extends SecureController {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
 
 		logger.info("expectedTotalEnrollment:" + fp.getInt("expectedTotalEnrollment"));
-		errors = v.validate();
+		HashMap errors = v.validate();
 		if (fp.getInt("expectedTotalEnrollment") <= 0) {
 			Validator.addError(errors, "expectedTotalEnrollment",
 					respage.getString("expected_total_enrollment_must_be_a_positive_number"));
 		}
 
-		StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+		StudyBean newStudy = (StudyBean) request.getSession().getAttribute("newStudy");
 		newStudy.setConditions(fp.getString("conditions"));
 		newStudy.setKeywords(fp.getString("keywords"));
 		newStudy.setEligibility(fp.getString("eligibility"));
@@ -610,7 +520,7 @@ public class CreateStudyServlet extends SecureController {
 		newStudy.setAgeMin(fp.getString("ageMin"));
 		newStudy.setHealthyVolunteerAccepted(fp.getBoolean("healthyVolunteerAccepted"));
 		newStudy.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
-		session.setAttribute("newStudy", newStudy);
+		request.getSession().setAttribute("newStudy", newStudy);
 		request.setAttribute("facRecruitStatusMap", facRecruitStatusMap);
 		if (errors.isEmpty()) {
 			// get default facility info from property file
@@ -624,12 +534,12 @@ public class CreateStudyServlet extends SecureController {
 			newStudy.setFacilityContactPhone(SQLInitServlet.getField(FAC_CONTACT_PHONE));
 			newStudy.setFacilityZip(SQLInitServlet.getField(FAC_ZIP));
 
-			session.setAttribute("newStudy", newStudy);
-			forwardPage(Page.CREATE_STUDY6);
+            request.getSession().setAttribute("newStudy", newStudy);
+			forwardPage(Page.CREATE_STUDY6, request, response);
 
 		} else {
 			request.setAttribute("formMessages", errors);
-			forwardPage(Page.CREATE_STUDY5);
+			forwardPage(Page.CREATE_STUDY5, request, response);
 		}
 	}
 
@@ -640,7 +550,7 @@ public class CreateStudyServlet extends SecureController {
 	 * @param response
 	 * @throws Exception
 	 */
-	private void confirmStudy5() throws Exception {
+	private void confirmStudy5(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
@@ -664,9 +574,9 @@ public class CreateStudyServlet extends SecureController {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		errors = v.validate();
+		HashMap errors = v.validate();
 
-		StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+		StudyBean newStudy = (StudyBean) request.getSession().getAttribute("newStudy");
 
 		newStudy.setFacilityCity(fp.getString("facCity"));
 		newStudy.setFacilityContactDegree(fp.getString("facConDrgree"));
@@ -679,13 +589,13 @@ public class CreateStudyServlet extends SecureController {
 		newStudy.setFacilityState(fp.getString("facState"));
 		newStudy.setFacilityZip(fp.getString("facZip"));
 
-		session.setAttribute("newStudy", newStudy);
+        request.getSession().setAttribute("newStudy", newStudy);
 		if (errors.isEmpty()) {
-			forwardPage(Page.CREATE_STUDY7);
+			forwardPage(Page.CREATE_STUDY7, request, response);
 		} else {
 			request.setAttribute("formMessages", errors);
 			request.setAttribute("facRecruitStatusMap", facRecruitStatusMap);
-			forwardPage(Page.CREATE_STUDY6);
+			forwardPage(Page.CREATE_STUDY6, request, response);
 		}
 
 	}
@@ -695,7 +605,7 @@ public class CreateStudyServlet extends SecureController {
 	 * 
 	 * @throws Exception
 	 */
-	private void confirmStudy6() throws Exception {
+	private void confirmStudy6(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		FormProcessor fp = new FormProcessor(request);
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
@@ -706,27 +616,27 @@ public class CreateStudyServlet extends SecureController {
 		v.addValidation("urlDescription", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
-		errors = v.validate();
+		HashMap errors = v.validate();
 
-		StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+		StudyBean newStudy = (StudyBean) request.getSession().getAttribute("newStudy");
 		newStudy.setMedlineIdentifier(fp.getString("medlineIdentifier"));
 		newStudy.setResultsReference(fp.getBoolean("resultsReference"));
 		newStudy.setUrl(fp.getString("url"));
 		newStudy.setUrlDescription(fp.getString("urlDescription"));
 
-		session.setAttribute("newStudy", newStudy);
+        request.getSession().setAttribute("newStudy", newStudy);
 
 		if (errors.isEmpty()) {
-			if (session.getAttribute("interventionArray") == null) {
+			if (request.getSession().getAttribute("interventionArray") == null) {
 				request.setAttribute("interventions", new ArrayList());
 			} else {
-				request.setAttribute("interventions", session.getAttribute("interventionArray"));
+				request.setAttribute("interventions", request.getSession().getAttribute("interventionArray"));
 			}
 
-			forwardPage(Page.CREATE_STUDY8);
+			forwardPage(Page.CREATE_STUDY8, request, response);
 		} else {
 			request.setAttribute("formMessages", errors);
-			forwardPage(Page.CREATE_STUDY7);
+			forwardPage(Page.CREATE_STUDY7, request, response);
 		}
 
 	}
@@ -736,13 +646,13 @@ public class CreateStudyServlet extends SecureController {
 	 * 
 	 * @throws Exception
 	 */
-	private void confirmWholeStudy() throws Exception {
+	private void confirmWholeStudy(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		FormProcessor fp = new FormProcessor(request);
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-		errors = v.validate();
+		HashMap errors = v.validate();
 
-		StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+		StudyBean newStudy = (StudyBean) request.getSession().getAttribute("newStudy");
 		newStudy.getStudyParameterConfig().setCollectDob(fp.getString("collectDob"));
 		newStudy.getStudyParameterConfig().setDiscrepancyManagement(fp.getString("discrepancyManagement"));
 		newStudy.getStudyParameterConfig().setGenderRequired(fp.getString("genderRequired"));
@@ -788,20 +698,20 @@ public class CreateStudyServlet extends SecureController {
         
         newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("medicalCodingApprovalNeeded"));
 
-		session.setAttribute("newStudy", newStudy);
+		request.getSession().setAttribute("newStudy", newStudy);
 
 		if (errors.isEmpty()) {
-			if (session.getAttribute("interventionArray") == null) {
+			if (request.getSession().getAttribute("interventionArray") == null) {
 				request.setAttribute("interventions", new ArrayList());
 			} else {
-				request.setAttribute("interventions", session.getAttribute("interventionArray"));
+				request.setAttribute("interventions", request.getSession().getAttribute("interventionArray"));
 			}
 
-			forwardPage(Page.STUDY_CREATE_CONFIRM);
+			forwardPage(Page.STUDY_CREATE_CONFIRM, request, response);
 
 		} else {
 			request.setAttribute("formMessages", errors);
-			forwardPage(Page.CREATE_STUDY8);
+			forwardPage(Page.CREATE_STUDY8, request, response);
 		}
 
 	}
@@ -810,10 +720,12 @@ public class CreateStudyServlet extends SecureController {
 	 * Inserts the new study into database
 	 * 
 	 */
-	private void submitStudy() {
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-		StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+	private void submitStudy(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
+
+		StudyDAO sdao = new StudyDAO(getDataSource());
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(getDataSource());
+		StudyBean newStudy = (StudyBean) request.getSession().getAttribute("newStudy");
 
 		logger.info("study bean to be created:" + newStudy.getName() + newStudy.getProtocolDateVerification());
 		newStudy.setOwner(ub);
@@ -969,7 +881,7 @@ public class CreateStudyServlet extends SecureController {
 	 * @param request
 	 * @return
 	 */
-	private StudyBean createStudyBean() {
+	private StudyBean createStudyBean(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		StudyBean newStudy = new StudyBean();
 		newStudy.setName(fp.getString("name"));
@@ -995,9 +907,9 @@ public class CreateStudyServlet extends SecureController {
 	 * @param request
 	 * @return true if study type is Interventional, otherwise false
 	 */
-	private boolean updateStudy2() {
+	private boolean updateStudy2(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
-		StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+		StudyBean newStudy = (StudyBean) request.getSession().getAttribute("newStudy");
 		newStudy.setProtocolType(fp.getString("protocolType"));// protocolType
 
 		// this is not fully supported yet, because the system will not handle
@@ -1026,7 +938,7 @@ public class CreateStudyServlet extends SecureController {
 			newStudy.setGenetic(false);
 		}
 
-		session.setAttribute("newStudy", newStudy);
+        request.getSession().setAttribute("newStudy", newStudy);
 
 		String interventional = resadmin.getString("interventional");
 		return interventional.equalsIgnoreCase(newStudy.getProtocolType());
@@ -1039,9 +951,9 @@ public class CreateStudyServlet extends SecureController {
 	 * @param isInterventional
 	 *            if the study type is internventional
 	 */
-	private void updateStudy3(boolean isInterventional) {
+	private void updateStudy3(HttpServletRequest request, boolean isInterventional) {
 		FormProcessor fp = new FormProcessor(request);
-		StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+		StudyBean newStudy = (StudyBean) request.getSession().getAttribute("newStudy");
 		newStudy.setPurpose(fp.getString("purpose"));
 		if (isInterventional) {
 			newStudy.setAllocation(fp.getString("allocation"));
@@ -1067,14 +979,14 @@ public class CreateStudyServlet extends SecureController {
 				}
 			}
 			newStudy.setInterventions(interventions.toString());
-			session.setAttribute("interventionArray", interventionArray);
+            request.getSession().setAttribute("interventionArray", interventionArray);
 
 		} else {// type = observational
 			newStudy.setDuration(fp.getString("duration"));
 			newStudy.setSelection(fp.getString("selection"));
 			newStudy.setTiming(fp.getString("timing"));
 		}
-		session.setAttribute("newStudy", newStudy);
+        request.getSession().setAttribute("newStudy", newStudy);
 
 	}
 
@@ -1084,7 +996,7 @@ public class CreateStudyServlet extends SecureController {
 	 * @param request
 	 * @param isInterventional
 	 */
-	private void setMaps(boolean isInterventional) {
+	private void setMaps(HttpServletRequest request, boolean isInterventional) {
 		if (isInterventional) {
 			request.setAttribute("interPurposeMap", interPurposeMap);
 			request.setAttribute("allocationMap", allocationMap);
@@ -1093,10 +1005,10 @@ public class CreateStudyServlet extends SecureController {
 			request.setAttribute("assignmentMap", assignmentMap);
 			request.setAttribute("endpointMap", endpointMap);
 			request.setAttribute("interTypeMap", interTypeMap);
-			if (session.getAttribute("interventionArray") == null) {
-				session.setAttribute("interventions", new ArrayList());
+			if (request.getSession().getAttribute("interventionArray") == null) {
+                request.getSession().setAttribute("interventions", new ArrayList());
 			} else {
-				session.setAttribute("interventions", session.getAttribute("interventionArray"));
+                request.getSession().setAttribute("interventions", request.getSession().getAttribute("interventionArray"));
 			}
 		} else {
 			request.setAttribute("obserPurposeMap", obserPurposeMap);
@@ -1107,7 +1019,7 @@ public class CreateStudyServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
 		return SecureController.ADMIN_SERVLET_CODE;
 	}
 

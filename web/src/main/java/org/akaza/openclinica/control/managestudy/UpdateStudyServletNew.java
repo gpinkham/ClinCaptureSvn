@@ -24,6 +24,7 @@ import com.clinovo.exception.CodeException;
 import com.clinovo.util.ValidatorHelper;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,15 +33,19 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.DnDescription;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.InterventionBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -49,20 +54,27 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class UpdateStudyServletNew extends SecureController {
+@Component
+public class UpdateStudyServletNew extends Controller {
+
 	public static final String INPUT_START_DATE = "startDate";
 	public static final String INPUT_END_DATE = "endDate";
 	public static final String INPUT_VER_DATE = "protocolDateVerification";
-	public static StudyBean study;
 
 	/**
      *
+     * @param request
+     * @param response
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -72,32 +84,38 @@ public class UpdateStudyServletNew extends SecureController {
 			return;
 		}
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		resetPanel();
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+        StudyBean currentStudy = getCurrentStudy(request);
+
+        HashMap errors = getErrorsHolder(request);
+        StudyInfoPanel panel = getStudyInfoPanel(request);
+        panel.reset();
+
 		FormProcessor fp = new FormProcessor(request);
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		int studyId = fp.getInt("id");
 		studyId = studyId == 0 ? fp.getInt("studyId") : studyId;
 		String action = fp.getString("action");
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(sm.getDataSource());
+		StudyDAO sdao = new StudyDAO(getDataSource());
+		DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(getDataSource());
 		boolean isInterventional = false;
 		ArrayList<DnDescription> newRfcDescriptions = new ArrayList<DnDescription>();
 
-		study = (StudyBean) sdao.findByPK(studyId);
+        StudyBean study = (StudyBean) sdao.findByPK(studyId);
 		if (study.getId() != currentStudy.getId()) {
-			addPageMessage(respage.getString("not_current_study") + respage.getString("change_study_contact_sysadmin"));
-			forwardPage(Page.MENU_SERVLET);
+			addPageMessage(respage.getString("not_current_study") + respage.getString("change_study_contact_sysadmin"), request);
+			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
 
 		study.setId(studyId);
-		StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+		StudyConfigService scs = new StudyConfigService(getDataSource());
 		study = scs.setParametersForStudy(study);
 		ArrayList dnDescriptions = (ArrayList) dnDescriptionDao.findAllByStudyId(studyId);
 		request.setAttribute("studyToView", study);
@@ -122,10 +140,12 @@ public class UpdateStudyServletNew extends SecureController {
 		ArrayList interventionArray = new ArrayList();
 		if (isInterventional) {
 			interventionArray = parseInterventions((study));
-			setMaps(isInterventional, interventionArray);
+			setMaps(request, isInterventional, interventionArray);
 		} else {
-			setMaps(isInterventional, interventionArray);
+			setMaps(request, isInterventional, interventionArray);
 		}
+
+        SimpleDateFormat local_df = getLocalDf(request);
 
 		if (!action.equals("submit")) {
 
@@ -139,24 +159,19 @@ public class UpdateStudyServletNew extends SecureController {
 			if (study.getProtocolDateVerification() != null) {
 				fp.addPresetValue(INPUT_VER_DATE, local_df.format(study.getProtocolDateVerification()));
 			}
-			setPresetValues(fp.getPresetValues());
+			setPresetValues(fp.getPresetValues(), request);
 			// first load 2nd form
-		}
-		if (study == null) {
-			addPageMessage(respage.getString("please_choose_a_study_to_edit"));
-			forwardPage(Page.STUDY_LIST_SERVLET);
-			return;
 		}
 		if (action.equals("submit")) {
 
-			validateStudy1(fp, v);
-			validateStudy2(fp, v);
-			validateStudy3(isInterventional, v, fp);
-			validateStudy4(fp, v);
-			validateStudy5(fp, v);
-			validateStudy6(fp, v);
-			validateStudy7(fp, v, newRfcDescriptions);
-			confirmWholeStudy(fp, v);
+			validateStudy1(fp, study, v);
+			validateStudy2(fp, study, v);
+			validateStudy3(fp, study, v, isInterventional);
+			validateStudy4(fp, study, v);
+			validateStudy5(fp, study, v);
+			validateStudy6(fp, study, v);
+			validateStudy7(fp, study, v, newRfcDescriptions);
+			confirmWholeStudy(fp, study, v);
 			
 			request.setAttribute("studyToView", study);
 			if (!errors.isEmpty()) {
@@ -164,22 +179,22 @@ public class UpdateStudyServletNew extends SecureController {
 				request.setAttribute("formMessages", errors);
 				request.setAttribute("dnDescriptions", newRfcDescriptions);
 				
-				forwardPage(Page.UPDATE_STUDY_NEW);
+				forwardPage(Page.UPDATE_STUDY_NEW, request, response);
 			} else {
 				study.setProtocolType(protocolType);
-				submitStudy(study, newRfcDescriptions);
-				study.setStudyParameters(new StudyParameterValueDAO(sm.getDataSource()).findParamConfigByStudy(study));
-				addPageMessage(respage.getString("the_study_has_been_updated_succesfully"));
+				submitStudy(request, study, newRfcDescriptions);
+				study.setStudyParameters(getStudyParameterValueDAO().findParamConfigByStudy(study));
+				addPageMessage(respage.getString("the_study_has_been_updated_succesfully"), request);
 				ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
-				session.setAttribute("pageMessages", pageMessages);
+				request.getSession().setAttribute("pageMessages", pageMessages);
 				response.sendRedirect(request.getContextPath() + "/pages/studymodule");
 			}
 		} else {
-			forwardPage(Page.UPDATE_STUDY_NEW);
+			forwardPage(Page.UPDATE_STUDY_NEW, request, response);
 		}
 	}
 
-	private void validateStudy1(FormProcessor fp, Validator v) {
+	private void validateStudy1(FormProcessor fp, StudyBean study, Validator v) {
 
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("uniqueProId", Validator.NO_BLANKS);
@@ -202,7 +217,7 @@ public class UpdateStudyServletNew extends SecureController {
 		v.addValidation("startDateTimeLabel", Validator.NO_BLANKS);
 		v.addValidation("endDateTimeLabel", Validator.NO_BLANKS);
 
-		errors = v.validate();
+		HashMap errors = v.validate();
 		if (fp.getString("name").trim().length() > 100) {
 			Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
 		}
@@ -248,10 +263,10 @@ public class UpdateStudyServletNew extends SecureController {
 					resexception.getString("maximum_lenght_endDateTimeLabel_255"));
 		}
 		
-		study = createStudyBean(fp);
+		study = createStudyBean(fp, study);
 	}
 
-	private void validateStudy2(FormProcessor fp, Validator v) {
+	private void validateStudy2(FormProcessor fp, StudyBean study, Validator v) {
 
 		v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
 		if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
@@ -261,8 +276,8 @@ public class UpdateStudyServletNew extends SecureController {
 			v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
 		}
 
-		errors = v.validate();
 		logger.info("has validation errors");
+        SimpleDateFormat local_df = getLocalDf(fp.getRequest());
 		try {
 			local_df.parse(fp.getString(INPUT_START_DATE));
 			fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
@@ -281,12 +296,12 @@ public class UpdateStudyServletNew extends SecureController {
 		} catch (ParseException pe) {
 			fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 		}
-		updateStudy2(fp);
-		setPresetValues(fp.getPresetValues());
+		updateStudy2(fp, study);
+		setPresetValues(fp.getPresetValues(), fp.getRequest());
 
 	}
 
-	private void validateStudy3(boolean isInterventional, Validator v, FormProcessor fp) {
+	private void validateStudy3(FormProcessor fp, StudyBean study, Validator v, boolean isInterventional) {
 
 		v.addValidation("purpose", Validator.NO_BLANKS);
 		for (int i = 0; i < 10; i++) {
@@ -294,20 +309,20 @@ public class UpdateStudyServletNew extends SecureController {
 			String name = fp.getString("interName" + i);
 			if (!StringUtil.isBlank(type) && StringUtil.isBlank(name)) {
 				v.addValidation("interName", Validator.NO_BLANKS);
-				request.setAttribute("interventionError", respage.getString("name_cannot_be_blank_if_type"));
+				fp.getRequest().setAttribute("interventionError", respage.getString("name_cannot_be_blank_if_type"));
 				break;
 			}
 			if (!StringUtil.isBlank(name) && StringUtil.isBlank(type)) {
 				v.addValidation("interType", Validator.NO_BLANKS);
-				request.setAttribute("interventionError", respage.getString("name_cannot_be_blank_if_name"));
+                fp.getRequest().setAttribute("interventionError", respage.getString("name_cannot_be_blank_if_name"));
 				break;
 			}
 		}
-		updateStudy3(isInterventional, fp);
+		updateStudy3(study, isInterventional, fp);
 
 	}
 
-	private void validateStudy4(FormProcessor fp, Validator v) {
+	private void validateStudy4(FormProcessor fp, StudyBean study, Validator v) {
 
 		v.addValidation("conditions", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
@@ -315,7 +330,7 @@ public class UpdateStudyServletNew extends SecureController {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 		v.addValidation("eligibility", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
-		errors = v.validate();
+		HashMap errors = v.validate();
 		if (fp.getInt("expectedTotalEnrollment") <= 0) {
 			Validator.addError(errors, "expectedTotalEnrollment",
 					respage.getString("expected_total_enrollment_must_be_a_positive_number"));
@@ -333,10 +348,10 @@ public class UpdateStudyServletNew extends SecureController {
 		study.setAgeMin(fp.getString("ageMin"));
 		study.setHealthyVolunteerAccepted(fp.getBoolean("healthyVolunteerAccepted"));
 		study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
-		request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+        fp.getRequest().setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
 	}
 
-	private void validateStudy5(FormProcessor fp, Validator v) {
+	private void validateStudy5(FormProcessor fp, StudyBean study, Validator v) {
 
 		if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
 			v.addValidation("facConEmail", Validator.IS_A_EMAIL);
@@ -359,7 +374,7 @@ public class UpdateStudyServletNew extends SecureController {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-		errors = v.validate();
+		HashMap errors = v.validate();
 
 		study.setFacilityCity(fp.getString("facCity"));
 		study.setFacilityContactDegree(fp.getString("facConDrgree"));
@@ -374,12 +389,12 @@ public class UpdateStudyServletNew extends SecureController {
 
 		if (errors.isEmpty()) {
 		} else {
-			request.setAttribute("formMessages", errors);
-			request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+			fp.getRequest().setAttribute("formMessages", errors);
+            fp.getRequest().setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
 		}
 	}
 
-	private void validateStudy6(FormProcessor fp, Validator v) {
+	private void validateStudy6(FormProcessor fp, StudyBean study, Validator v) {
 		v.addValidation("medlineIdentifier", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 		v.addValidation("url", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
@@ -387,18 +402,18 @@ public class UpdateStudyServletNew extends SecureController {
 		v.addValidation("urlDescription", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
-		errors = v.validate();
+		HashMap errors = v.validate();
 
 		study.setMedlineIdentifier(fp.getString("medlineIdentifier"));
 		study.setResultsReference(fp.getBoolean("resultsReference"));
 		study.setUrl(fp.getString("url"));
 		study.setUrlDescription(fp.getString("urlDescription"));
 		if (!errors.isEmpty()) {
-			request.setAttribute("formMessages", errors);
+            fp.getRequest().setAttribute("formMessages", errors);
 		}
 	}
 	
-	private void validateStudy7(FormProcessor fp, Validator v, ArrayList<DnDescription> newRfcDescriptions) {
+	private void validateStudy7(FormProcessor fp, StudyBean study, Validator v, ArrayList<DnDescription> newRfcDescriptions) {
 		
 		newRfcDescriptions.clear();
 		for (int i = 0; i < 25; i++){
@@ -419,7 +434,7 @@ public class UpdateStudyServletNew extends SecureController {
 				newRfcDescriptions.add(rfcTerm);
 			}
 		}
-		errors = v.validate();
+		HashMap errors = v.validate();
 		
 		
 		for (int i = 0; i < newRfcDescriptions.size(); i++){
@@ -433,12 +448,12 @@ public class UpdateStudyServletNew extends SecureController {
 		}
 		
 		if (!errors.isEmpty()) {
-			request.setAttribute("formMessages", errors);
+			fp.getRequest().setAttribute("formMessages", errors);
 		}
 	}
 
-	private void confirmWholeStudy(FormProcessor fp, Validator v) {
-		errors = v.validate();
+	private void confirmWholeStudy(FormProcessor fp, StudyBean study, Validator v) {
+		HashMap errors = v.validate();
 		if (study.getStatus().isLocked()) {
 			study.getStudyParameterConfig().setDiscrepancyManagement("false");
 		} else {
@@ -494,11 +509,11 @@ public class UpdateStudyServletNew extends SecureController {
 		}
         
 		if (!errors.isEmpty()) {
-			request.setAttribute("formMessages", errors);
+			fp.getRequest().setAttribute("formMessages", errors);
 		}
 	}
 
-	private StudyBean createStudyBean(FormProcessor fp) {
+	private StudyBean createStudyBean(FormProcessor fp, StudyBean study) {
 		StudyBean newStudy = study;
 		newStudy.setId(fp.getInt("studyId"));
 		newStudy.setName(fp.getString("name"));
@@ -516,7 +531,7 @@ public class UpdateStudyServletNew extends SecureController {
 
 	}
 
-	private boolean updateStudy2(FormProcessor fp) {
+	private boolean updateStudy2(FormProcessor fp, StudyBean study) {
 
 		study.setOldStatus(study.getStatus());
 		study.setStatus(Status.get(fp.getInt("status")));
@@ -547,7 +562,7 @@ public class UpdateStudyServletNew extends SecureController {
 		return interventional.equalsIgnoreCase(study.getProtocolType());
 	}
 
-	private void updateStudy3(boolean isInterventional, FormProcessor fp) {
+	private void updateStudy3(StudyBean study, boolean isInterventional, FormProcessor fp) {
 
 		study.setPurpose(fp.getString("purpose"));
 		ArrayList interventionArray = new ArrayList();
@@ -577,7 +592,7 @@ public class UpdateStudyServletNew extends SecureController {
 			study.setSelection(fp.getString("selection"));
 			study.setTiming(fp.getString("timing"));
 		}
-		request.setAttribute("interventions", interventionArray);
+		fp.getRequest().setAttribute("interventions", interventionArray);
 	}
 
 	private ArrayList parseInterventions(StudyBean sb) {
@@ -603,7 +618,7 @@ public class UpdateStudyServletNew extends SecureController {
 
 	}
 
-	private void setMaps(boolean isInterventional, ArrayList interventionArray) {
+	private void setMaps(HttpServletRequest request, boolean isInterventional, ArrayList interventionArray) {
 		if (isInterventional) {
 			request.setAttribute("interPurposeMap", CreateStudyServlet.interPurposeMap);
 			request.setAttribute("allocationMap", CreateStudyServlet.allocationMap);
@@ -612,7 +627,7 @@ public class UpdateStudyServletNew extends SecureController {
 			request.setAttribute("assignmentMap", CreateStudyServlet.assignmentMap);
 			request.setAttribute("endpointMap", CreateStudyServlet.endpointMap);
 			request.setAttribute("interTypeMap", CreateStudyServlet.interTypeMap);
-			session.setAttribute("interventions", interventionArray);
+			request.getSession().setAttribute("interventions", interventionArray);
 		} else {
 			request.setAttribute("obserPurposeMap", CreateStudyServlet.obserPurposeMap);
 			request.setAttribute("selectionMap", CreateStudyServlet.selectionMap);
@@ -620,43 +635,44 @@ public class UpdateStudyServletNew extends SecureController {
 		}
 	}
 
-	private void submitStudy(StudyBean newStudy, ArrayList<DnDescription> newRfcDescriptions) throws CodeException {
-		
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-		DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(sm.getDataSource());
-		
+	private void submitStudy(HttpServletRequest request, StudyBean newStudy, ArrayList<DnDescription> newRfcDescriptions) throws CodeException {
+        UserAccountBean ub = getUserAccountBean(request);
+
+		StudyDAO sdao = new StudyDAO(getDataSource());
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(getDataSource());
+		DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(getDataSource());
+
 		StudyBean study1 = newStudy;
 		logger.info("study bean to be updated:" + study1.getName());
 		study1.setUpdatedDate(new Date());
-		study1.setUpdater((UserAccountBean) session.getAttribute("userBean"));
+		study1.setUpdater(ub);
 		sdao.update(study1);
 		logger.debug("about to create dn descripts");
 		Map<Integer, DnDescription> idToDnDescriptionMap = new HashMap<Integer, DnDescription>();
-		
-		for (DnDescription dnDescription: dnDescriptionDao.findAllByStudyId(study.getId())){
+
+		for (DnDescription dnDescription: dnDescriptionDao.findAllByStudyId(newStudy.getId())){
 			idToDnDescriptionMap.put(dnDescription.getId(), dnDescription);
 		}
-		
+
 		for (DnDescription dnDescription: newRfcDescriptions){
 			if (idToDnDescriptionMap.keySet().contains(dnDescription.getId())) {
 				DnDescription dnDescriptionOld = idToDnDescriptionMap.get(dnDescription.getId());
-				if (!dnDescription.getName().equals(dnDescriptionOld.getName()) 
+				if (!dnDescription.getName().equals(dnDescriptionOld.getName())
 						|| !dnDescription.getVisibilityLevel().equals(dnDescriptionOld.getVisibilityLevel())) {
 					// description was changed
 					dnDescriptionDao.update(dnDescription);
 					idToDnDescriptionMap.remove(dnDescription.getId());
 				} else {
-					// description wasn't changed  
+					// description wasn't changed
 					idToDnDescriptionMap.remove(dnDescription.getId());
-				} 
+				}
 			} else {
 				// description is new (id=0)
 				dnDescriptionDao.create(dnDescription);
 			}
 		}
 
-		// delete unneeded descriptions 
+		// delete unneeded descriptions
 		for (DnDescription dnDescriptionForDelete: idToDnDescriptionMap.values()){
 			dnDescriptionDao.deleteByPK(dnDescriptionForDelete.getId());
 		}
@@ -728,7 +744,7 @@ public class UpdateStudyServletNew extends SecureController {
 		spv.setParameter("personIdShownOnCRF");
 		spv.setValue(study1.getStudyParameterConfig().getPersonIdShownOnCRF());
 		updateParameter(spvdao, spv);
-		
+
 		spv.setParameter("secondaryLabelViewable");
 		spv.setValue(study1.getStudyParameterConfig().getSecondaryLabelViewable());
 		updateParameter(spvdao, spv);
@@ -800,23 +816,23 @@ public class UpdateStudyServletNew extends SecureController {
         spv.setParameter("replaceExisitingDataDuringImport");
         spv.setValue(newStudy.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
         updateParameter(spvdao, spv);
-        
+
         spv.setParameter("allowCodingVerification");
         spv.setValue(newStudy.getStudyParameterConfig().getAllowCodingVerification());
         updateParameter(spvdao, spv);
-        
+
         spv.setParameter("defaultMedicalCodingDictionary");
         spv.setValue(newStudy.getStudyParameterConfig().getDefaultMedicalCodingDictionary());
         updateParameter(spvdao, spv);
-        
+
         spv.setParameter("autoCodeDictionaryName");
         spv.setValue(newStudy.getStudyParameterConfig().getAutoCodeDictionaryName());
         updateParameter(spvdao, spv);
-        
+
         spv.setParameter("medicalCodingApprovalNeeded");
         spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingApprovalNeeded());
         updateParameter(spvdao, spv);
-        
+
 		try {
 
 			// Create custom dictionary
@@ -830,11 +846,9 @@ public class UpdateStudyServletNew extends SecureController {
 			logger.info("Custom dictionary with similar name exists");
 		}
 
-		StudyBean curStudy = (StudyBean) session.getAttribute("study");
+		StudyBean curStudy = (StudyBean) request.getSession().getAttribute("study");
 		if (curStudy != null && study1.getId() == curStudy.getId()) {
-			super.currentStudy = study1;
-
-			session.setAttribute("study", study1);
+            request.getSession().setAttribute("study", study1);
 		}
 		// update manage_pedigrees for all sites
 		ArrayList children = (ArrayList) sdao.findAllByParent(study1.getId());
@@ -846,15 +860,15 @@ public class UpdateStudyServletNew extends SecureController {
 			sdao.update(child);
 			StudyParameterValueBean childspv = new StudyParameterValueBean();
 			childspv.setStudyId(child.getId());
-			
+
 			childspv.setParameter("collectDob");
 			childspv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
 			updateParameter(spvdao, childspv);
-			
+
 			childspv.setParameter("genderRequired");
 			childspv.setValue(study1.getStudyParameterConfig().getGenderRequired());
 			updateParameter(spvdao, childspv);
-			
+
 			childspv.setParameter("discrepancyManagement");
 			childspv.setValue(study1.getStudyParameterConfig().getDiscrepancyManagement());
 			updateParameter(spvdao, childspv);
@@ -878,7 +892,7 @@ public class UpdateStudyServletNew extends SecureController {
 			childspv.setParameter("personIdShownOnCRF");
 			childspv.setValue(study1.getStudyParameterConfig().getPersonIdShownOnCRF());
 			updateParameter(spvdao, childspv);
-			
+
 			childspv.setParameter("secondaryLabelViewable");
 			childspv.setValue(study1.getStudyParameterConfig().getSecondaryLabelViewable());
 			updateParameter(spvdao, childspv);
@@ -950,19 +964,19 @@ public class UpdateStudyServletNew extends SecureController {
             childspv.setParameter("replaceExisitingDataDuringImport");
             childspv.setValue(newStudy.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
             updateParameter(spvdao, childspv);
-            
+
             childspv.setParameter("allowCodingVerification");
             childspv.setValue(newStudy.getStudyParameterConfig().getAllowCodingVerification());
             updateParameter(spvdao, childspv);
-            
+
             childspv.setParameter("defaultMedicalCodingDictionary");
             childspv.setValue(newStudy.getStudyParameterConfig().getDefaultMedicalCodingDictionary());
             updateParameter(spvdao, childspv);
-            
+
             childspv.setParameter("autoCodeDictionaryName");
             childspv.setValue(newStudy.getStudyParameterConfig().getAutoCodeDictionaryName());
             updateParameter(spvdao, childspv);
-            
+
     		try {
 
     			// Create custom dictionary
@@ -978,8 +992,8 @@ public class UpdateStudyServletNew extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 
 	private void updateParameter(StudyParameterValueDAO spvdao, StudyParameterValueBean spv) {

@@ -23,14 +23,19 @@ package org.akaza.openclinica.control.managestudy;
 import com.clinovo.util.ValidatorHelper;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -38,41 +43,37 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.IStudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.service.IStudyParameterValueDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.ICRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class UpdateSubStudyServlet extends SecureController {
+@Component
+public class UpdateSubStudyServlet extends Controller {
 
 	public static final String INPUT_START_DATE = "startDate";
 	public static final String INPUT_VER_DATE = "protocolDateVerification";
 	public static final String INPUT_END_DATE = "endDate";
-	public static StudyBean parentStudy;
 	public static final String YES = "yes";
 	public static final String NEW_STUDY = "newStudy";
 	public static final String DEFINITIONS = "definitions";
 	public static final String PARENT_NAME = "parentName";
 	public static final String SDV_OPTIONS = "sdvOptions";
 
-	IStudyParameterValueDAO spvdao;
-	IStudyDAO sdao;
-	ICRFVersionDAO cvdao;
-
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"));
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_DIRECTOR)
 				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 
@@ -80,25 +81,23 @@ public class UpdateSubStudyServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.STUDY_LIST, resexception.getString("not_study_director"), "1");
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-
-		sdao = new StudyDAO(sm.getDataSource());
-		spvdao = new StudyParameterValueDAO(sm.getDataSource());
-		cvdao = new CRFVersionDAO(sm.getDataSource());
-
-		StudyBean study = (StudyBean) session.getAttribute(NEW_STUDY);
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+        StudyDAO sdao = getStudyDAO();
+        StudyBean study = (StudyBean) request.getSession().getAttribute(NEW_STUDY);
 
 		if (study == null) {
-			forwardPage(Page.SITE_LIST_SERVLET);
+			forwardPage(Page.SITE_LIST_SERVLET, request, response);
 			return;
 		}
 
-		parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+        SimpleDateFormat local_df = getLocalDf(request);
+        StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
 
 		logger.info("study from session:" + study.getName() + "\n" + study.getCreatedDate() + "\n");
 		String action = request.getParameter("action");
@@ -118,11 +117,11 @@ public class UpdateSubStudyServlet extends SecureController {
 				fp.addPresetValue(INPUT_VER_DATE, local_df.format(study.getProtocolDateVerification()));
 			}
 
-			setPresetValues(fp.getPresetValues());
-			forwardPage(Page.UPDATE_SUB_STUDY);
+			setPresetValues(fp.getPresetValues(), request);
+			forwardPage(Page.UPDATE_SUB_STUDY, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
-				confirmStudy();
+				confirmStudy(request, response, parentStudy);
 			}
 		}
 	}
@@ -132,7 +131,7 @@ public class UpdateSubStudyServlet extends SecureController {
 	 * 
 	 * @throws Exception
 	 */
-	private void confirmStudy() throws Exception {
+	private void confirmStudy(HttpServletRequest request, HttpServletResponse response, StudyBean parentStudy) throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 		v.addValidation("name", Validator.NO_BLANKS);
@@ -172,11 +171,11 @@ public class UpdateSubStudyServlet extends SecureController {
 		v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
-		errors = v.validate();
+		HashMap errors = v.validate();
 
-		StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+		StudyDAO studyDAO = getStudyDAO();
 		ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
-		StudyBean oldStudy = (StudyBean) session.getAttribute(NEW_STUDY);
+		StudyBean oldStudy = (StudyBean) request.getSession().getAttribute(NEW_STUDY);
 		for (StudyBean thisBean : allStudies) {
 			if (fp.getString("uniqueProId").trim().equals(thisBean.getIdentifier())
 					&& !thisBean.getIdentifier().equals(oldStudy.getIdentifier())) {
@@ -208,19 +207,20 @@ public class UpdateSubStudyServlet extends SecureController {
 			}
 		}
 
-		StudyBean study = createStudyBean();
-		session.setAttribute(NEW_STUDY, study);
+        SimpleDateFormat local_df = getLocalDf(request);
+		StudyBean study = createStudyBean(request);
+		request.getSession().setAttribute(NEW_STUDY, study);
 
 		if (errors.isEmpty()) {
 			logger.info("no errors");
-			submitStudy(session);
-			addPageMessage(respage.getString("the_site_has_been_updated_succesfully"));
-			String fromListSite = (String) session.getAttribute("fromListSite");
-			session.removeAttribute("fromListSite");
+			submitStudy(request);
+			addPageMessage(respage.getString("the_site_has_been_updated_succesfully"), request);
+			String fromListSite = (String) request.getSession().getAttribute("fromListSite");
+            request.getSession().removeAttribute("fromListSite");
 			if (fromListSite != null && fromListSite.equals(YES)) {
-				forwardPage(Page.SITE_LIST_SERVLET);
+				forwardPage(Page.SITE_LIST_SERVLET, request, response);
 			} else {
-				forwardPage(Page.STUDY_LIST_SERVLET);
+				forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 			}
 		} else {
 			logger.info("has validation errors");
@@ -244,11 +244,11 @@ public class UpdateSubStudyServlet extends SecureController {
 			} catch (ParseException pe) {
 				fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
 			}
-			setPresetValues(fp.getPresetValues());
+			setPresetValues(fp.getPresetValues(), request);
 			request.setAttribute("formMessages", errors);
 			request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
 			request.setAttribute("statuses", Status.toStudyUpdateMembersList());
-			forwardPage(Page.UPDATE_SUB_STUDY);
+			forwardPage(Page.UPDATE_SUB_STUDY, request, response);
 		}
 
 	}
@@ -256,15 +256,17 @@ public class UpdateSubStudyServlet extends SecureController {
 	/**
 	 * Constructs study bean from request
 	 */
-	private StudyBean createStudyBean() {
+	private StudyBean createStudyBean(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
-		StudyBean study = (StudyBean) session.getAttribute(NEW_STUDY);
+		StudyBean study = (StudyBean) request.getSession().getAttribute(NEW_STUDY);
 		study.setName(fp.getString("name"));
 		study.setIdentifier(fp.getString("uniqueProId"));
 		study.setSecondaryIdentifier(fp.getString("secondProId"));
 		study.setSummary(fp.getString("description"));
 		study.setPrincipalInvestigator(fp.getString("prinInvestigator"));
 		study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
+
+        SimpleDateFormat local_df = getLocalDf(request);
 
 		java.util.Date startDate = null;
 		java.util.Date endDate = null;
@@ -336,12 +338,14 @@ public class UpdateSubStudyServlet extends SecureController {
 
 	}
 
-	private void submitSiteEventDefinitions(StudyBean site, HttpSession httpSession) {
+	private void submitSiteEventDefinitions(HttpServletRequest request, StudyBean site) {
+        UserAccountBean ub = getUserAccountBean(request);
+        HttpSession httpSession = request.getSession();
 		FormProcessor fp = new FormProcessor(request);
 		ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
 		seds = (ArrayList<StudyEventDefinitionBean>) httpSession.getAttribute(DEFINITIONS);
 		for (StudyEventDefinitionBean sed : seds) {
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 			ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
 			int start = 0;
 			for (EventDefinitionCRFBean edcBean : edcs) {
@@ -374,6 +378,7 @@ public class UpdateSubStudyServlet extends SecureController {
 						int dbDefaultVersionId = edcBean.getDefaultVersionId();
 						if (defaultVersionId != dbDefaultVersionId) {
 							changed = true;
+                            CRFVersionDAO cvdao = getCRFVersionDAO();
 							CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultVersionId);
 							edcBean.setDefaultVersionId(defaultVersionId);
 							edcBean.setDefaultVersionName(defaultVersion.getName());
@@ -453,6 +458,7 @@ public class UpdateSubStudyServlet extends SecureController {
 						}
 
 						if (changed) {
+                            CRFVersionDAO cvdao = getCRFVersionDAO();
 							CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultId);
 							edcBean.setDefaultVersionId(defaultId);
 							edcBean.setDefaultVersionName(defaultVersion.getName());
@@ -491,11 +497,16 @@ public class UpdateSubStudyServlet extends SecureController {
 	/**
 	 * Inserts the new study into database
 	 */
-	public void submitStudy(HttpSession httpSession) {
+	public void submitStudy(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
+        HttpSession httpSession = request.getSession();
 		StudyBean study = (StudyBean) httpSession.getAttribute(NEW_STUDY);
 		ArrayList parameters = study.getStudyParameters();
 		study.setUpdatedDate(new Date());
 		study.setUpdater(ub);
+
+        StudyDAO sdao = getStudyDAO();
+        StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 
 		if (study.getStatus() == Status.INVALID) {
 			StudyBean studyInDb = (StudyBean) sdao.findByPK(study.getId());
@@ -515,7 +526,7 @@ public class UpdateSubStudyServlet extends SecureController {
 			}
 		}
 
-		submitSiteEventDefinitions(study, httpSession);
+		submitSiteEventDefinitions(request, study);
 
 		httpSession.removeAttribute(NEW_STUDY);
 		httpSession.removeAttribute(PARENT_NAME);
@@ -524,27 +535,12 @@ public class UpdateSubStudyServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+        UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}
-	}
-
-	public void setSdao(IStudyDAO sdao) {
-		this.sdao = sdao;
-	}
-
-	public void setSpvdao(IStudyParameterValueDAO spvdao) {
-		this.spvdao = spvdao;
-	}
-
-	public void setUserBean(UserAccountBean userBean) {
-		ub = userBean;
-	}
-
-	public void setCvdao(ICRFVersionDAO cvdao) {
-		this.cvdao = cvdao;
 	}
 }
