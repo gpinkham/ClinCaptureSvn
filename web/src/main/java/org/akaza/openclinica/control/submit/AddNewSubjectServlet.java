@@ -1064,7 +1064,6 @@ public class AddNewSubjectServlet extends Controller {
 					dnb.setResStatus(ResolutionStatus.OPEN);
 					dnb.setResolutionStatusId(ResolutionStatus.OPEN.getId());
 				}
-
 			}
 			// << tbh 05/2010 second fix to try out queries
 			// ClinCapture #42
@@ -1084,7 +1083,8 @@ public class AddNewSubjectServlet extends Controller {
 			} else if (dnb.getParentDnId() > 0) {
 				DiscrepancyNoteBean parentNote = (DiscrepancyNoteBean) dndao.findByPK(dnb.getParentDnId());
 				if (dnb.getDiscrepancyNoteTypeId() == parentNote.getDiscrepancyNoteTypeId()
-						&& dnb.getResolutionStatusId() != parentNote.getResolutionStatusId()) {
+						&& dnb.getResolutionStatusId() != parentNote.getResolutionStatusId()
+						&& parentNote.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
 					parentNote.setResolutionStatusId(dnb.getResolutionStatusId());
 					dndao.update(parentNote);
 				}
