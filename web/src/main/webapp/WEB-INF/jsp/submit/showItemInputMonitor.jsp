@@ -440,7 +440,7 @@ form element in red --%>
     </c:when>
     <c:otherwise>
 
-     <c:if test="${isLocked eq 'no'}">
+     <c:if test="${(isLocked eq 'no') && (displayItem.data.id > 0)}">
       <c:set var="imageFileName" value="icon_noNote" />
 
     <td valign="top">
@@ -454,7 +454,5 @@ form element in red --%>
     </c:if>
     </c:otherwise>
   </c:choose>
-
-
 
 </c:if>

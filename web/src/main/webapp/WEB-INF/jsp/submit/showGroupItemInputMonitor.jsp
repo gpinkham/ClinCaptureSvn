@@ -502,7 +502,7 @@
     </c:when>
     <c:otherwise>
     <c:set var="notLocked" value="no"/>
-     <c:if test="${isLocked eq notLocked}">
+     <c:if test="${(isLocked eq notLocked) && (displayItem.data.id > 0)}">
       <c:set var="imageFileName" value="icon_noNote" />
 
          <a class="dnLink"
