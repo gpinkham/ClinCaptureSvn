@@ -1067,7 +1067,7 @@ public class AddNewSubjectServlet extends Controller {
 			}
 			// << tbh 05/2010 second fix to try out queries
 			// ClinCapture #42
-			if (dndao.findByPK(dnb.getId()) == null) {
+			if (dndao.findByPK(dnb.getId()).getId() == 0) {
 				dnb = (DiscrepancyNoteBean) dndao.create(dnb);
 				dndao.createMapping(dnb);
 			}
