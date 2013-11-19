@@ -33,6 +33,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -71,15 +72,27 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		if (shouldRedirect(request, response)) {
-			return;
-		}
+		FormProcessor fp = new FormProcessor(request);
 
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 
-		removeLockedCRF(ub.getId());
-		FormProcessor fp = new FormProcessor(request);
+		if (fp.getString("navBar").equalsIgnoreCase("yes")) {
+			StudySubjectBean studySubject = getStudySubjectDAO().findByLabelAndStudy(
+					fp.getString("findSubjects_f_studySubject.label"), currentStudy);
+			if (studySubject.getId() > 0) {
+				response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
+						+ new Integer(studySubject.getId()).toString());
+				return;
+			} else {
+				request.getSession().removeAttribute(getUrlKey(request));
+			}
+		}
+		if (shouldRedirect(request, response)) {
+			return;
+		}
+
+		Controller.removeLockedCRF(ub.getId());	
 
 		boolean showMoreLink;
 		if (fp.getString("showMoreLink").equals("")) {
@@ -110,20 +123,8 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		}
 
 		request.setAttribute("closeInfoShowIcons", true);
-		if (fp.getString("navBar").equals("yes")
-				&& fp.getString("findSubjects_f_studySubject.label").trim().length() > 0) {
-			StudySubjectBean studySubject = getStudySubjectDAO().findByLabelAndStudy(
-					fp.getString("findSubjects_f_studySubject.label"), currentStudy);
-			if (studySubject.getId() > 0) {
-				request.setAttribute("id", new Integer(studySubject.getId()).toString());
-				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
-			} else {
-				createTable(request, response, showMoreLink);
-			}
-		} else {
-			createTable(request, response, showMoreLink);
-		}
 
+		createTable(request, response, showMoreLink);
 	}
 
 	private void createTable(HttpServletRequest request, HttpServletResponse response, boolean showMoreLink)
@@ -186,7 +187,9 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 						+ fp.getString("module")
 						+ "&maxRows=15&showMoreLink="
 						+ showMoreLink
-						+ "&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=15&findSubjects_s_0_studySubject.createdDate=desc";
+						+ "&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=15&findSubjects_s_0_studySubject.createdDate=desc"
+						+ (fp.getString("navBar").equalsIgnoreCase("yes") ? ("&findSubjects_f_studySubject.label=" + fp
+								.getString("findSubjects_f_studySubject.label")) : "");
 	}
 
 	@Override
