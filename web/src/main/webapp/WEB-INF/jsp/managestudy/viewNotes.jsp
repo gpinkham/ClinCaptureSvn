@@ -31,7 +31,7 @@
         location.href = '${pageContext.request.contextPath}/ViewNotes?'+ parameterString;
     }
     function openPopup() {
-        openDocWindow(window.location.href +'&print=yes')
+        openDocWindow('<%=request.getContextPath()%>/ViewNotes?module=${module}&print=yes');
     }
     function changeValue(elementId, val){
     	var element = document.getElementById(elementId);

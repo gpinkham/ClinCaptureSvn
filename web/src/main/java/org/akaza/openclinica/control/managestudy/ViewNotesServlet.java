@@ -90,11 +90,14 @@ public class ViewNotesServlet extends RememberLastPage {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (shouldRedirect(request, response)) {
-            return;
-        }
+		FormProcessor fp = new FormProcessor(request);
+		String print = fp.getString(PRINT);
 
-        StudyBean currentStudy = getCurrentStudy(request);
+		if (!print.equalsIgnoreCase("yes") && shouldRedirect(request, response)) {
+			return;
+		}
+
+		StudyBean currentStudy = getCurrentStudy(request);
 		String module = request.getParameter("module");
 		String moduleStr = "manage";
 		if (module != null && module.trim().length() > 0) {
@@ -109,8 +112,7 @@ public class ViewNotesServlet extends RememberLastPage {
 			}
 		}
 
-        boolean showMoreLink;
-		FormProcessor fp = new FormProcessor(request);
+        boolean showMoreLink;		
 		if (fp.getString("showMoreLink").equals("")) {
 			showMoreLink = true;
 		} else {
@@ -216,7 +218,7 @@ public class ViewNotesServlet extends RememberLastPage {
 
 		TableFacade tf = factory.createTable(request, response);
 
-		if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
+		if ("yes".equalsIgnoreCase(print)) {
 			request.setAttribute("allNotes", factory.getNotesForPrintPop(tf.getLimit()));
 			forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT, request, response);
 			return;
