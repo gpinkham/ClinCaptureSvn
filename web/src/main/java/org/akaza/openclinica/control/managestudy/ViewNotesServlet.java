@@ -97,6 +97,10 @@ public class ViewNotesServlet extends RememberLastPage {
 			return;
 		}
 
+		UserAccountBean ub = getUserAccountBean(request);
+
+		removeLockedCRF(ub.getId());
+
 		StudyBean currentStudy = getCurrentStudy(request);
 		String module = request.getParameter("module");
 		String moduleStr = "manage";
@@ -111,18 +115,13 @@ public class ViewNotesServlet extends RememberLastPage {
 				request.setAttribute("module", "manage");
 			}
 		}
-
-        boolean showMoreLink;		
-		if (fp.getString("showMoreLink").equals("")) {
-			showMoreLink = true;
-		} else {
-			showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
-		}
+		
+		boolean showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
 
 		int oneSubjectId = fp.getInt("id");
 		request.getSession().setAttribute("subjectId", oneSubjectId);
 
-		int discNoteTypeId = 0;
+		int discNoteTypeId;
 		try {
 			DiscrepancyNoteType discNoteType = DiscrepancyNoteType.getByName(request
 					.getParameter(DISCREPANCY_NOTE_TYPE_PARAM));
@@ -143,7 +142,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		dndao.setFetchMapping(true);
 
-		int resolutionStatusId = 0;
+		int resolutionStatusId;
 		try {
 			ResolutionStatus resolutionStatus = ResolutionStatus.getByName(request
 					.getParameter(DISCREPANCY_NOTE_STATUS_PARAM));
@@ -263,7 +262,7 @@ public class ViewNotesServlet extends RememberLastPage {
         forward(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY, request, response);
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({"rawtypes", "unused"})
 	public ArrayList<DiscrepancyNoteBean> filterForOneSubject(ArrayList<DiscrepancyNoteBean> allNotes, int subjectId,
 			int resolutionStatus) {
 

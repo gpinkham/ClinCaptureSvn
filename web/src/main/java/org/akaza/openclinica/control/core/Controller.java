@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -123,7 +122,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author jnyayapathi
  * 
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({ "unused", "unchecked", "rawtypes", "serial" })
 public abstract class Controller extends BaseController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -181,8 +180,8 @@ public abstract class Controller extends BaseController {
 	 * Process request
 	 * 
 	 * @throws Exception
-	 * @param request
-	 * @param response
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
 	 */
 	protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
@@ -197,7 +196,7 @@ public abstract class Controller extends BaseController {
 		if (lastChangeDate == null) {
 			addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". "
 					+ respage.getString("password_set"), request);
-			int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
+			int pwdChangeRequired = Integer.parseInt(SQLInitServlet.getField("change_passwd_required"));
 			if (pwdChangeRequired == 1) {
 				request.setAttribute("mustChangePass", "yes");
 				forwardPage(Page.RESET_PASSWORD, request, response);
@@ -238,7 +237,7 @@ public abstract class Controller extends BaseController {
 						if (success != null) {
 
 							if (successMsg.contains("$linkURL")) {
-								successMsg = decodeLINKURL(request, successMsg, datasetId);
+								successMsg = decodeLINKURL(request, datasetId);
 							}
 
 							if (successMsg != null && !successMsg.isEmpty()) {
@@ -261,9 +260,9 @@ public abstract class Controller extends BaseController {
 
 	}
 
-	private String decodeLINKURL(HttpServletRequest request, String successMsg, Integer datasetId) {
+	private String decodeLINKURL(HttpServletRequest request, Integer datasetId) {
 
-		successMsg = "";
+        String successMsg = "";
 
 		ArchivedDatasetFileDAO asdfDAO = getArchivedDatasetFileDAO();
 
@@ -357,7 +356,7 @@ public abstract class Controller extends BaseController {
 						scs.setParametersForStudy(currentStudy);
 
 					} else {
-						currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId()))
+						currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId()))
 								.getName());
 						scs.setParametersForSite(currentStudy);
 					}
@@ -371,7 +370,7 @@ public abstract class Controller extends BaseController {
 				session.setAttribute("study", currentStudy);
 			} else if (currentStudy.getId() > 0) {
 				if (currentStudy.getParentStudyId() > 0) {
-					currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId()))
+					currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId()))
 							.getName());
 				}
 			}
@@ -436,7 +435,7 @@ public abstract class Controller extends BaseController {
 			// If the time taken is over 5 seconds, write it to the stats table
 			if (reportTime > 5) {
 				getUsageStatsServiceDAO().savePageLoadTimeToDB(this.getClass().toString(),
-						new Long(reportTime).toString());
+                        Long.toString(reportTime));
 			}
 			// Call the usagestats dao here and record a time in the db
 		} catch (InconsistentStateException ise) {
@@ -566,8 +565,8 @@ public abstract class Controller extends BaseController {
 	/**
 	 * Handles the HTTP <code>GET</code> method.
 	 * 
-	 * @param request
-	 * @param response
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
 	 * @throws ServletException
 	 * @throws java.io.IOException
 	 */
@@ -649,7 +648,7 @@ public abstract class Controller extends BaseController {
 				if (viewNotesURL != null && viewNotesURL.contains("listNotes_p_=")) {
 					String[] ps = viewNotesURL.split("listNotes_p_=");
 					String t = ps[1].split("&")[0];
-					int p = t.length() > 0 ? Integer.valueOf(t).intValue() : -1;
+					int p = t.length() > 0 ? Integer.parseInt(t) : -1;
 					if (p > 1) {
 						viewNotesURL = viewNotesURL.replace("listNotes_p_=" + p, "listNotes_p_=" + (p - 1));
 						forwardPage(Page.setNewPage(viewNotesURL, "View Notes"), request, response);
@@ -697,7 +696,7 @@ public abstract class Controller extends BaseController {
 	/**
 	 * @return A blank String if this servlet is not an Administer System servlet. Controller.ADMIN_SERVLET_CODE
 	 *         otherwise.
-	 * @param request
+	 * @param request HttpServletRequest
 	 */
 	protected String getAdminServlet(HttpServletRequest request) {
 		return "";
@@ -720,8 +719,7 @@ public abstract class Controller extends BaseController {
 	 * Note: This method called AuditableEntityDAO.findByPKAndStudy which required "The subclass must define
 	 * findByPKAndStudyName before calling this method. Otherwise an inactive AuditableEntityBean will be returned."
 	 * </p>
-	 * 
-	 * @author ywang 10-18-2007
+	 *
 	 * @param entityId
 	 *            int
 	 * @param userName
@@ -732,30 +730,29 @@ public abstract class Controller extends BaseController {
 	protected boolean entityIncluded(int entityId, String userName, AuditableEntityDAO adao) {
 		StudyDAO sdao = getStudyDAO();
 		ArrayList<StudyBean> studies = (ArrayList<StudyBean>) sdao.findAllByUserNotRemoved(userName);
-		for (int i = 0; i < studies.size(); ++i) {
-			if (adao.findByPKAndStudy(entityId, studies.get(i)).getId() > 0) {
-				return true;
-			}
-			// Here follow the current logic - study subjects at sites level are
-			// visible to parent studies.
-			if (studies.get(i).getParentStudyId() <= 0) {
-				ArrayList<StudyBean> sites = (ArrayList<StudyBean>) sdao.findAllByParent(studies.get(i).getId());
-				if (sites.size() > 0) {
-					for (int j = 0; j < sites.size(); ++j) {
-						if (adao.findByPKAndStudy(entityId, sites.get(j)).getId() > 0) {
-							return true;
-						}
-					}
-				}
-			}
-		}
+        for (StudyBean study : studies) {
+            if (adao.findByPKAndStudy(entityId, study).getId() > 0) {
+                return true;
+            }
+            // Here follow the current logic - study subjects at sites level are
+            // visible to parent studies.
+            if (study.getParentStudyId() <= 0) {
+                ArrayList<StudyBean> sites = (ArrayList<StudyBean>) sdao.findAllByParent(study.getId());
+                if (sites.size() > 0) {
+                    for (StudyBean site : sites) {
+                        if (adao.findByPKAndStudy(entityId, site).getId() > 0) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
 
 		return false;
 	}
 
 	public String getRequestURLMinusServletPath(HttpServletRequest request) {
-		String requestURLMinusServletPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
-		return requestURLMinusServletPath;
+        return request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
 	}
 
 	public String getHostPath(HttpServletRequest request) {
@@ -764,8 +761,7 @@ public abstract class Controller extends BaseController {
 	}
 
 	public String getContextPath(HttpServletRequest request) {
-		String contextPath = request.getContextPath().replaceAll("/", "");
-		return contextPath;
+        return request.getContextPath().replaceAll("/", "");
 	}
 
 	/*
@@ -817,12 +813,11 @@ public abstract class Controller extends BaseController {
 		StudyDAO studyDAO = getStudyDAO();
 		StudyEventDefinitionDAO studyEventDefinitionDAO = getStudyEventDefinitionDAO();
 		int parentStudyId = currentStudy.getParentStudyId();
-		ArrayList allDefs = new ArrayList();
+		ArrayList allDefs;
 		if (parentStudyId > 0) {
 			StudyBean parentStudy = (StudyBean) studyDAO.findByPK(parentStudyId);
 			allDefs = studyEventDefinitionDAO.findAllActiveByStudy(parentStudy);
 		} else {
-			parentStudyId = currentStudy.getId();
 			allDefs = studyEventDefinitionDAO.findAllActiveByStudy(currentStudy);
 		}
 		return allDefs;
@@ -835,20 +830,19 @@ public abstract class Controller extends BaseController {
 		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
 		StudyGroupDAO studyGroupDAO = getStudyGroupDAO();
 		int parentStudyId = currentStudy.getParentStudyId();
-		ArrayList studyGroupClasses = new ArrayList();
+		ArrayList studyGroupClasses;
 		if (parentStudyId > 0) {
 			StudyBean parentStudy = (StudyBean) studyDAO.findByPK(parentStudyId);
 			studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(parentStudy);
 		} else {
-			parentStudyId = currentStudy.getId();
 			studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(currentStudy);
 		}
 
-		for (int i = 0; i < studyGroupClasses.size(); i++) {
-			StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClasses.get(i);
-			ArrayList groups = studyGroupDAO.findAllByGroupClass(sgc);
-			sgc.setStudyGroups(groups);
-		}
+        for (Object studyGroupClass : studyGroupClasses) {
+            StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
+            ArrayList groups = studyGroupDAO.findAllByGroupClass(sgc);
+            sgc.setStudyGroups(groups);
+        }
 
 		return studyGroupClasses;
 
@@ -942,27 +936,23 @@ public abstract class Controller extends BaseController {
 		int sizeTo = recipientsArray.size();
 		InternetAddress[] addressTo = new InternetAddress[sizeTo];
 		for (int i = 0; i < sizeTo; i++) {
-			addressTo[i] = new InternetAddress(recipientsArray.get(i).toString());
+			addressTo[i] = new InternetAddress(recipientsArray.get(i));
 		}
 		return addressTo;
 
 	}
 
 	public synchronized static void removeLockedCRF(int userId) {
-		for (Iterator iter = getUnavailableCRFList().entrySet().iterator(); iter.hasNext();) {
-			java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
-			int id = (Integer) entry.getValue();
-			if (id == userId)
-				getUnavailableCRFList().remove(entry.getKey());
-		}
+        for (Object o : getUnavailableCRFList().entrySet()) {
+            Map.Entry entry = (Map.Entry) o;
+            int id = (Integer) entry.getValue();
+            if (id == userId)
+                getUnavailableCRFList().remove(entry.getKey());
+        }
 	}
 
 	public synchronized void lockThisEventCRF(int ecb, int ub) {
 		getUnavailableCRFList().put(ecb, ub);
-	}
-
-	public synchronized static HashMap getUnavailableCRFList() {
-		return CoreSecureController.getUnavailableCRFList();
 	}
 
 	public void dowloadFile(File f, String contentType, HttpServletRequest request, HttpServletResponse response)
@@ -983,7 +973,7 @@ public abstract class Controller extends BaseController {
 			byte[] bbuf = new byte[(int) f.length()];
 			in = new DataInputStream(new FileInputStream(f));
 			int length;
-			while (in != null && (length = in.read(bbuf)) != -1) {
+			while ((length = in.read(bbuf)) != -1) {
 				op.write(bbuf, 0, length);
 			}
 
@@ -1018,7 +1008,7 @@ public abstract class Controller extends BaseController {
 	public String getPageURL(HttpServletRequest request) {
 		String url = request.getRequestURL().toString();
 		String query = request.getQueryString();
-		if (url != null && url.length() > 0 && query != null) {
+		if (url.length() > 0 && query != null) {
 			url += "?" + query;
 		}
 		return url;
@@ -1125,27 +1115,6 @@ public abstract class Controller extends BaseController {
 					respage.getString("no_have_correct_privilege_current_study") + " "
 							+ respage.getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
-			return;
-		}
-	}
-
-	/**
-	 * A inner class designed to allow the implementation of a JUnit test case for abstract Controller. The inner class
-	 * allows the test case to call the outer class' private process() method.
-	 * 
-	 * @author Bruce W. Perry 01/2008
-	 * @see org.akaza.openclinica.servlettests.SecureControllerServletTest
-	 * @see org.akaza.openclinica.servlettests.SecureControllerWrapper
-	 */
-	public class SecureControllerTestDelegate {
-
-		public SecureControllerTestDelegate() {
-			super();
-		}
-
-		public void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
-				UnsupportedEncodingException {
-			Controller.this.process(request, response);
 		}
 	}
 
@@ -1193,15 +1162,12 @@ public abstract class Controller extends BaseController {
 		if (value == null) {
 			return 0;
 		} else {
-			return value.intValue();
+			return value;
 		}
 	}
 
 	public String getActionForStage(DataEntryStage stage) {
-		if (stage.equals(DataEntryStage.UNCOMPLETED)) {
-		}
-
-		else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
+		if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
 			return ACTION_CONTINUE_INITIAL_DATA_ENTRY;
 		}
 
@@ -1232,7 +1198,7 @@ public abstract class Controller extends BaseController {
 			SectionBean sb = (SectionBean) sections.get(i);
 
 			int sectionId = sb.getId();
-			Integer key = new Integer(sectionId);
+			Integer key = sectionId;
 			int numItems = getIntById(numItemsBySectionId, key);
 			List<ItemGroupBean> itemGroups = igdao.findLegitGroupBySectionId(sectionId);
 			if (!itemGroups.isEmpty()) {
@@ -1270,8 +1236,7 @@ public abstract class Controller extends BaseController {
 		for (int i = 0; i < sections.size(); i++) {
 			SectionBean sb = (SectionBean) sections.get(i);
 
-			int sectionId = sb.getId();
-			Integer key = new Integer(sectionId);
+			Integer key = sb.getId();
 			sb.setNumItems(getIntById(numItemsBySectionId, key));
 			sections.set(i, sb);
 		}
@@ -1339,9 +1304,9 @@ public abstract class Controller extends BaseController {
 	/**
 	 * A section contains all hidden dynamics will be removed from data entry tab and jump box.
 	 * 
-	 * @param displayTableOfContentsBean
-	 * @param dynamicsMetadataService
-	 * @return
+	 * @param displayTableOfContentsBean DisplayTableOfContentsBean
+	 * @param dynamicsMetadataService DynamicsMetadataService
+	 * @return DisplayTableOfContentsBean
 	 */
 	public DisplayTableOfContentsBean getDisplayBeanWithShownSections(
 			DisplayTableOfContentsBean displayTableOfContentsBean, DynamicsMetadataService dynamicsMetadataService) {

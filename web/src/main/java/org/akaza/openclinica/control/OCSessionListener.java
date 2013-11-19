@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.CoreSecureController;
+import org.akaza.openclinica.control.core.Controller;
 
 /**
  * Created by A. Hamid. Date: Apr 20, 2010 Time: 7:35:04 PM
@@ -36,7 +36,7 @@ public class OCSessionListener implements HttpSessionListener
 		HttpSession session = arg0.getSession();
 		UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
 		if (ub != null) {
-			CoreSecureController.removeLockedCRF(ub.getId());
+			Controller.removeLockedCRF(ub.getId());
 		}
 		// System.out.println("=========================="+ub.getName());
 	}

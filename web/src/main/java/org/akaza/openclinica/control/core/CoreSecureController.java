@@ -83,7 +83,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author jnyayapathi
  * 
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({ "all" })
 public abstract class CoreSecureController extends HttpServlet {
 	public static final String STUDY = "study";
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -127,7 +127,7 @@ public abstract class CoreSecureController extends HttpServlet {
 	public static final String SUPPORT_URL = "supportURL";
 
 	public static final String MODULE = "module";// to determine which module
-	private static HashMap unavailableCRFList = new HashMap();
+
 	private DataSource dataSource = null;
 	private UsageStatsServiceDAO usageStatsServiceDAO;
 
@@ -890,7 +890,7 @@ public abstract class CoreSecureController extends HttpServlet {
 	}
 
 	public synchronized static HashMap getUnavailableCRFList() {
-		return unavailableCRFList;
+		return Controller.getUnavailableCRFList();
 	}
 
 	/**

@@ -161,7 +161,7 @@ import com.clinovo.service.DictionaryService;
  * </ol>
  * 
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({ "all" })
 public abstract class SecureController extends HttpServlet {
 
 	private CodedItemService codedItemService;
@@ -977,7 +977,7 @@ public abstract class SecureController extends HttpServlet {
 	}
 
 	public synchronized static HashMap getUnavailableCRFList() {
-		return CoreSecureController.getUnavailableCRFList();
+		return Controller.getUnavailableCRFList();
 	}
 
 	public void dowloadFile(File f, String contentType) throws Exception {

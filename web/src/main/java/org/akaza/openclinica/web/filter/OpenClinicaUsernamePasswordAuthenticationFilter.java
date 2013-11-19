@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.CoreSecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -64,9 +64,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	public static final String SPRING_SECURITY_FORM_PASSWORD_KEY = "j_password";
 	public static final String SPRING_SECURITY_LAST_USERNAME_KEY = "SPRING_SECURITY_LAST_USERNAME";
 
-	private ResourceBundle restext;
-
-	private String usernameParameter = SPRING_SECURITY_FORM_USERNAME_KEY;
+    private String usernameParameter = SPRING_SECURITY_FORM_USERNAME_KEY;
 	private String passwordParameter = SPRING_SECURITY_FORM_PASSWORD_KEY;
 	private boolean postOnly = true;
 
@@ -119,13 +117,13 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 		// Allow subclasses to set the "details" property
 		setDetails(request, authRequest);
 
-		Authentication authentication = null;
+		Authentication authentication;
 		UserAccountBean userAccountBean = null;
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
 		Locale locale = request.getLocale();
 		ResourceBundleProvider.updateLocale(locale); // Set current language preferences
-		restext = ResourceBundleProvider.getTextsBundle(locale);
+        ResourceBundle restext = ResourceBundleProvider.getTextsBundle(locale);
 		try {
 			EntityBean eb = getUserAccountDao().findByUserName(username);
 			if (eb.getId() != 0) {
@@ -135,7 +133,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 				};
 			}
 
-			if (userAccountBean != null && userAccountBean.getStatus().isLocked()) {
+			if (userAccountBean.getStatus().isLocked()) {
 				throw new LockedException("locked");
 			}
 
@@ -147,19 +145,19 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 
 			authentication = this.getAuthenticationManager().authenticate(authRequest);
 			auditUserLogin(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
-			resetLockCounter(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
+			resetLockCounter(userAccountBean);
 			// To remove the locking of Event CRFs previusly locked by this user.
-			CoreSecureController.removeLockedCRF(userAccountBean.getId());
+			Controller.removeLockedCRF(userAccountBean.getId());
 		} catch (LockedException le) {
 			auditUserLogin(username, LoginStatus.FAILED_LOGIN_LOCKED, userAccountBean);
 			throw le;
 		} catch (BadCredentialsException au) {
 			auditUserLogin(username, LoginStatus.FAILED_LOGIN, userAccountBean);
-			lockAccount(username, LoginStatus.FAILED_LOGIN, userAccountBean);
+			lockAccount(userAccountBean);
 			throw au;
 		} catch (AuthenticationException ae) {
 			auditUserLogin(username, LoginStatus.FAILED_LOGIN, userAccountBean);
-			lockAccount(username, LoginStatus.FAILED_LOGIN, userAccountBean);
+			lockAccount(userAccountBean);
 			throw ae;
 		}
 		return authentication;
@@ -174,13 +172,13 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 		getAuditUserLoginDao().saveOrUpdate(auditUserLogin);
 	}
 
-	private void resetLockCounter(String username, LoginStatus loginStatus, UserAccountBean userAccount) {
+	private void resetLockCounter(UserAccountBean userAccount) {
 		if (userAccount != null) {
 			getUserAccountDao().updateLockCounter(userAccount.getId(), 0);
 		}
 	}
 
-	private void lockAccount(String username, LoginStatus loginStatus, UserAccountBean userAccount) {
+	private void lockAccount(UserAccountBean userAccount) {
 		Boolean lockFeatureActive = Boolean.valueOf(getConfigurationDao().findByKey("user.lock.switch").getValue());
 		if (userAccount != null && lockFeatureActive) {
 			Integer count = userAccount.getLockCounter();
@@ -247,6 +245,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	 * @param usernameParameter
 	 *            the parameter name. Defaults to "j_username".
 	 */
+    @SuppressWarnings("unused")
 	public void setUsernameParameter(String usernameParameter) {
 		Assert.hasText(usernameParameter, "Username parameter must not be empty or null");
 		this.usernameParameter = usernameParameter;
@@ -258,6 +257,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	 * @param passwordParameter
 	 *            the parameter name. Defaults to "j_password".
 	 */
+    @SuppressWarnings("unused")
 	public void setPasswordParameter(String passwordParameter) {
 		Assert.hasText(passwordParameter, "Password parameter must not be empty or null");
 		this.passwordParameter = passwordParameter;
@@ -271,14 +271,17 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	 * <p>
 	 * Defaults to <tt>true</tt> but may be overridden by subclasses.
 	 */
+    @SuppressWarnings("unused")
 	public void setPostOnly(boolean postOnly) {
 		this.postOnly = postOnly;
 	}
 
+    @SuppressWarnings("unused")
 	public final String getUsernameParameter() {
 		return usernameParameter;
 	}
 
+    @SuppressWarnings("unused")
 	public final String getPasswordParameter() {
 		return passwordParameter;
 	}
@@ -308,7 +311,8 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	}
 
 	public UserAccountDAO getUserAccountDao() {
-		return userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
+        userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
+        return userAccountDao;
 	}
 
 }

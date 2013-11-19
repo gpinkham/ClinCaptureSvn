@@ -69,7 +69,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({ "unused", "unchecked", "rawtypes", "serial" })
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
 
     public static final String REFERER = "referer";
@@ -122,6 +122,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public static final String MODULE = "module";// to determine which module
 
 	public static final String NOT_USED = "not_used";
+
+    private static HashMap unavailableCRFList = new HashMap();
 
 	protected static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword,
 			resworkflow;
@@ -198,6 +200,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
     private CodedItemService codedItemService;
     @Autowired
     private DictionaryService dictionaryService;
+
+    public synchronized static HashMap getUnavailableCRFList() {
+        return unavailableCRFList;
+    }
 
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
