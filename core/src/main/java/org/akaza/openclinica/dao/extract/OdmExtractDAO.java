@@ -316,10 +316,11 @@ public class OdmExtractDAO extends DatasetDAO {
 			this.setTypeExpected(23, TypeNames.STRING);// crf_version
 			this.setTypeExpected(24, TypeNames.INT); // cv_status_id
 			this.setTypeExpected(25, TypeNames.INT);// ec_status_id
-			this.setTypeExpected(26, TypeNames.INT);// event_crf_id
-			this.setTypeExpected(27, TypeNames.DATE);// date_interviewed
-			this.setTypeExpected(28, TypeNames.STRING);// interviewer_name
-			this.setTypeExpected(29, TypeNames.INT);// validator_id
+            this.setTypeExpected(26, TypeNames.BOOL);// ec_sdv_status
+			this.setTypeExpected(27, TypeNames.INT);// event_crf_id
+			this.setTypeExpected(28, TypeNames.DATE);// date_interviewed
+			this.setTypeExpected(29, TypeNames.STRING);// interviewer_name
+			this.setTypeExpected(30, TypeNames.INT);// validator_id
 		}
 	}
 
@@ -2360,8 +2361,9 @@ public class OdmExtractDAO extends DatasetDAO {
 					form.setCrfVersion((String) row.get("crf_version"));
 				}
 				if (dataset.isShowCRFstatus()) {
-					form.setStatus(this.getCrfVersionStatus(se.getStatus(), (Integer) row.get("cv_status_id"),
-							(Integer) row.get("ec_status_id"), (Integer) row.get("validator_id")));
+					form.setStatus(this.getCrfVersionStatus(se.getStatus(), (Boolean) row.get("ec_sdv_status"),
+							(Integer) row.get("cv_status_id"), (Integer) row.get("ec_status_id"),
+							(Integer) row.get("validator_id")));
 				}
 				if (dataset.isShowCRFinterviewerName()) {
 					form.setInterviewerName((String) row.get("interviewer_name"));
@@ -2415,7 +2417,7 @@ public class OdmExtractDAO extends DatasetDAO {
 		}
 	}
 
-	private String getCrfVersionStatus(String seSubjectEventStatus, int cvStatusId, int ecStatusId, int validatorId) {
+	private String getCrfVersionStatus(String seSubjectEventStatus, boolean sdvStatus, int cvStatusId, int ecStatusId, int validatorId) {
 		DataEntryStage stage = DataEntryStage.INVALID;
 		Status status = Status.get(ecStatusId);
 
@@ -2456,7 +2458,8 @@ public class OdmExtractDAO extends DatasetDAO {
 
 		logger.debug("returning " + stage.getName());
 
-		return stage.getName();
+		return stage == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE && sdvStatus ? SubjectEventStatus.SOURCE_DATA_VERIFIED
+				.getName() : stage.getName();
 	}
 
 	protected void setStudyParemeterConfig(StudyBean study) {
@@ -2695,7 +2698,7 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ " ss.status_id, ss.sgc_id, ss.sgc_name, ss.sg_name, sed.ordinal as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating,"
 				+ " se.sample_ordinal as sample_ordinal, se.se_location, se.date_start, se.date_end, se.start_time_flag,"
 				+ " se.end_time_flag, se.subject_event_status_id as event_status_id, edc.ordinal as crf_order,"
-				+ " cv.oc_oid as crf_version_oid, cv.name as crf_version, cv.status_id as cv_status_id, ec.status_id as ec_status_id, ec.event_crf_id, ec.date_interviewed,"
+				+ " cv.oc_oid as crf_version_oid, cv.name as crf_version, cv.status_id as cv_status_id, ec.status_id as ec_status_id, ec.sdv_status as ec_sdv_status, ec.event_crf_id, ec.date_interviewed,"
 				+ " ec.interviewer_name, ec.validator_id from (select study_event_id, study_event_definition_id, study_subject_id, location as se_location,"
 				+ " sample_ordinal, date_start, date_end, subject_event_status_id, start_time_flag, end_time_flag from study_event "
 				+ " where study_event_definition_id in "
@@ -2714,9 +2717,9 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ ") and sgm.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = sg.study_group_class_id"
 				+ " and sgm.study_group_id = sg.study_group_id) sb_g on st_sub.study_subject_id = sb_g.study_subject_id) ss, "
 				+ " study_event_definition sed, event_definition_crf edc,"
-				+ " (select event_crf_id, crf_version_id, study_event_id, status_id, date_interviewed, interviewer_name, validator_id from event_crf where event_crf_id in ("
+				+ " (select event_crf_id, crf_version_id, study_event_id, status_id, sdv_status, date_interviewed, interviewer_name, validator_id from event_crf where event_crf_id in ("
 				+ getEventCrfIdsByItemDataSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId,
-						studySubjectIds)
+						studySubjectIds, false)
 				+ ")) ec, crf_version cv"
 				+ " where sed.study_event_definition_id in "
 				+ sedIds
@@ -2818,6 +2821,12 @@ public class OdmExtractDAO extends DatasetDAO {
 
 	protected String getEventCrfIdsByItemDataSqlSS(String studyIds, String sedIds, String itemIds,
 			String dateConstraint, int datasetItemStatusId, String studySubjectIds) {
+		return getEventCrfIdsByItemDataSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId,
+				studySubjectIds, true);
+	}
+
+	protected String getEventCrfIdsByItemDataSqlSS(String studyIds, String sedIds, String itemIds,
+			String dateConstraint, int datasetItemStatusId, String studySubjectIds, boolean skipEmptyValues) {
 		String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
 		String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
 		return "select distinct idata.event_crf_id from item_data idata"
@@ -2834,7 +2843,8 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ " and study_event_id in (select study_event_id from study_event where study_event_definition_id in "
 				+ sedIds
 				+ " and study_subject_id in (select ss.study_subject_id from study_subject ss where ss.study_subject_id in ("
-				+ studySubjectIds + ") " + "))" + " and (status_id " + ecStatusConstraint + ")) and length(value) > 0";
+				+ studySubjectIds + ") " + "))" + " and (status_id " + ecStatusConstraint + ")) "
+				+ (skipEmptyValues ? "and length(value) > 0 " : "");
 	}
 
 	protected String getEventDefinitionCrfCondition(int studyId, int parentStudyId, boolean isIncludedSite) {

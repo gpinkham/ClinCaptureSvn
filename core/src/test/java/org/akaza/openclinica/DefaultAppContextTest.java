@@ -6,6 +6,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.extract.OdmExtractDAO;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
@@ -56,6 +57,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
     protected DatasetDAO datasetDAO;
     protected ItemDataDAO itemDataDAO;
     protected ItemFormMetadataDAO imfdao;
+    protected OdmExtractDAO odmExtractDAO;
     protected CRFVersionDAO crfVersionDao;
 	protected StudyEventDAO studyEventDao;
     protected UserAccountDAO userAccountDAO;
@@ -103,6 +105,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
         datasetDAO = new DatasetDAO(dataSource);
         itemDataDAO = new ItemDataDAO(dataSource);
         imfdao = new ItemFormMetadataDAO(dataSource);
+        odmExtractDAO = new OdmExtractDAO(dataSource);
 		studyEventDao = new StudyEventDAO(dataSource);
 		crfVersionDao = new CRFVersionDAO(dataSource);
         userAccountDAO = new UserAccountDAO(dataSource);
