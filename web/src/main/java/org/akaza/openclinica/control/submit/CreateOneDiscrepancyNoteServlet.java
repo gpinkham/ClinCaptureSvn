@@ -23,7 +23,6 @@ import com.clinovo.util.ValidatorHelper;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,15 +33,10 @@ import javax.servlet.http.HttpSession;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.Controller;
@@ -54,9 +48,6 @@ import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
@@ -84,12 +75,9 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 	public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
 	public static final String RES_STATUS_ID = "resStatusId";
 	public static final String SUBMITTED_USER_ACCOUNT_ID = "userAccountId";
-	public static final String PRESET_USER_ACCOUNT_ID = "preUserAccountId";
 	public static final String EMAIL_USER_ACCOUNT = "sendEmail";
 	public static final String BOX_DN_MAP = "boxDNMap";
 	public static final String BOX_TO_SHOW = "boxToShow";
-	public static final String IS_REASON_FOR_CHANGE = "isRFC";
-	public static final String ERROR_FLAG = "errorFlag";// use to determine
 
 	@Override
 	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
@@ -147,19 +135,17 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 
         SessionManager sm = getSessionManager(request);
 		Map<String, String> additionalParameters = CreateDiscrepancyNoteServlet.getMapWithParameters(field, request);
-		boolean isInFVCError = additionalParameters.isEmpty()? false : "1".equals(additionalParameters.get("isInFVCError"));
-		boolean isRFC = additionalParameters.isEmpty()? false : CreateDiscrepancyNoteServlet.calculateIsRFC(field, additionalParameters, request, sm);
+		boolean isInFVCError = !additionalParameters.isEmpty() && "1".equals(additionalParameters.get("isInFVCError"));
+		boolean isRFC = !additionalParameters.isEmpty() && CreateDiscrepancyNoteServlet.calculateIsRFC(additionalParameters, request, sm);
 		
-		String description = "";
-		int typeId = 0;
-		
+		String description;
 		String detailedDes = fp.getString("detailedDes" + parentId);
 		int resStatusId = fp.getInt(RES_STATUS_ID + parentId);
 		int assignedUserAccountId = fp.getInt(SUBMITTED_USER_ACCOUNT_ID + parentId);
 		String viewNoteLink = fp.getString("viewDNLink" + parentId);
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "fromBox", "1");
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-		typeId = fp.getInt("typeId" + parentId);
+		int typeId = fp.getInt("typeId" + parentId);
 		
 		if (isRFC && typeId == DiscrepancyNoteType.ANNOTATION.getId()) {
 			typeId = DiscrepancyNoteType.REASON_FOR_CHANGE.getId();
@@ -189,10 +175,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		if (typeId != DiscrepancyNoteType.ANNOTATION.getId() && typeId != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
 			dn.setAssignedUserId(assignedUserAccountId);
 		}
-		if (DiscrepancyNoteType.ANNOTATION.getId() == dn.getDiscrepancyNoteTypeId()) {
-			updateStudyEvent(ub, entityType, entityId);
-			updateStudySubjectStatus(ub, entityType, entityId);
-		}
+
 		if (DiscrepancyNoteType.ANNOTATION.getId() == dn.getDiscrepancyNoteTypeId()
 				|| DiscrepancyNoteType.REASON_FOR_CHANGE.getId() == dn.getDiscrepancyNoteTypeId()) {
 			dn.setResStatus(ResolutionStatus.NOT_APPLICABLE);
@@ -242,12 +225,12 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 			}
 
 			dn = (DiscrepancyNoteBean) dndao.create(dn);
-			boolean success = dn.getId() > 0 ? true : false;
+			boolean success = dn.getId() > 0;
 			if (success) {
 				refresh = 1;
 				dndao.createMapping(dn);
 				success = dndao.isQuerySuccessful();
-				if (success == false) {
+				if (!success) {
 					mess.add(restext.getString("failed_create_dn_mapping_for_dnId") + dn.getId() + ". ");
 				}
 				noteTree.addNote(field, dn);
@@ -300,7 +283,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 				if (dn.getAssignedUserId() > 0 && "1".equals(email.trim())) {
 					logger.info("++++++ found our way here");
 					// generate email for user here
-					StringBuffer message = new StringBuffer();
+					StringBuilder message = new StringBuilder();
 
 					dn = getNoteInfo(request, dn);
 
@@ -308,22 +291,18 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 					ItemDAO itemDAO = new ItemDAO(sm.getDataSource());
 					ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
 					ItemBean item = new ItemBean();
-					ItemDataBean itemData = new ItemDataBean();
 
 					StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
 					UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(dn.getAssignedUserId());
 					String alertEmail = assignedUser.getEmail();
 					message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(),
 							assignedUser.getLastName()));
-					message.append("<A HREF='" + SQLInitServlet.getSystemURL()
-							+ "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=" + assignedUser.getName()
-							+ "&listNotes_f_entityName=" + dn.getEntityName() + "'>"
-							+ SQLInitServlet.getField("sysURL") + "</A><BR/>");
+					message.append("<A HREF='").append(SQLInitServlet.getSystemURL()).append("ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=").append(assignedUser.getName()).append("&listNotes_f_entityName=").append(dn.getEntityName()).append("'>").append(SQLInitServlet.getField("sysURL")).append("</A><BR/>");
 					message.append(respage.getString("you_received_this_from"));
 					StudyBean study = (StudyBean) studyDAO.findByPK(dn.getStudyId());
 
 					if ("itemData".equalsIgnoreCase(entityType)) {
-						itemData = (ItemDataBean) iddao.findByPK(dn.getEntityId());
+                        ItemDataBean itemData = (ItemDataBean) iddao.findByPK(dn.getEntityId());
 						item = (ItemBean) itemDAO.findByPK(itemData.getItemId());
 					}
 
@@ -396,7 +375,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 
 		} else {
 			setInputMessages(errors, request);
-			boxDNMap.put(Integer.valueOf(parentId), dn);
+			boxDNMap.put(parentId, dn);
             request.getSession().setAttribute(BOX_TO_SHOW, parentId + "");
 		}
         request.getSession().setAttribute(BOX_DN_MAP, boxDNMap);
@@ -408,66 +387,6 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		dn.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));        
         request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn);
 		forwardPage(forwardTo == null ? Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()) : forwardTo, request, response);
-	}
-
-	private void updateStudySubjectStatus(UserAccountBean ub, String entityType, int entityId) {
-		if ("itemData".equalsIgnoreCase(entityType)) {
-			int itemDataId = entityId;
-			ItemDataDAO iddao = new ItemDataDAO(getDataSource());
-			ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
-			EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-			StudyEventDAO svdao = new StudyEventDAO(getDataSource());
-			StudySubjectDAO studySubjectDAO = new StudySubjectDAO(getDataSource());
-			EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
-			StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
-			StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(event.getStudySubjectId());
-			if (studySubject.getStatus() != null && studySubject.getStatus().equals(Status.SIGNED)) {
-				studySubject.setStatus(Status.AVAILABLE);
-				studySubject.setUpdater(ub);
-				studySubject.setUpdatedDate(new Date());
-				studySubjectDAO.update(studySubject);
-			}
-			if (ec.isSdvStatus()) {
-				studySubject.setStatus(Status.AVAILABLE);
-				studySubject.setUpdater(ub);
-				studySubject.setUpdatedDate(new Date());
-				studySubjectDAO.update(studySubject);
-				ec.setSdvStatus(false);
-				ecdao.update(ec);
-			}
-
-		}
-	}
-
-	private void updateStudyEvent(UserAccountBean ub, String entityType, int entityId) {
-		if ("itemData".equalsIgnoreCase(entityType)) {
-			int itemDataId = entityId;
-			ItemDataDAO iddao = new ItemDataDAO(getDataSource());
-			ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
-			EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-			StudyEventDAO svdao = new StudyEventDAO(getDataSource());
-			EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
-			StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
-			if (event.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
-				event.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
-				event.setUpdater(ub);
-				event.setUpdatedDate(new Date());
-				svdao.update(event);
-			}
-		} else if ("eventCrf".equalsIgnoreCase(entityType)) {
-			int eventCRFId = entityId;
-			EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-			StudyEventDAO svdao = new StudyEventDAO(getDataSource());
-
-			EventCRFBean ec = (EventCRFBean) ecdao.findByPK(eventCRFId);
-			StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
-			if (event.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
-				event.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
-				event.setUpdater(ub);
-				event.setUpdatedDate(new Date());
-				svdao.update(event);
-			}
-		}
 	}
 
 	private void manageReasonForChangeState(HttpSession session, Integer itemDataBeanId) {
