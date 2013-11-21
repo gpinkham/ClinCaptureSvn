@@ -2224,4 +2224,22 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			String subjectLabel, String crfName) {
 		return doesCRFHasSomeNDsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "123");
 	}
+	
+	public Integer countAllByStudyEventTypeAndStudyEvent(StudyEventBean studyEvent) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+		
+		HashMap variables = new HashMap();
+		variables.put(Integer.valueOf(1), Integer.valueOf(studyEvent.getId()));
+		
+		ArrayList rows = select(digester.getQuery("countAllByStudyEventTypeAndStudyEvent"), variables);
+		Iterator it = rows.iterator();
+		
+		if (it.hasNext()) {
+			Integer count = (Integer) ((HashMap) it.next()).get("count");
+			return count == null? 0 : count;
+		} else {
+			return 0;
+		}
+	}
 }

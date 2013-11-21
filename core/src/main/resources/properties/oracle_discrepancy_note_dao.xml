@@ -910,8 +910,16 @@ and column_name='interviewer_name'
 			and dn.parent_dn_id is null 
     	</sql>
     </query>
-    
-    
+    <query>
+    	<name>countAllByStudyEventTypeAndStudyEvent</name>
+    	<sql>
+    	select count(dn.resolution_status_id)
+			from discrepancy_note dn, dn_study_event_map dsem, study_event se
+			where dsem.study_event_id = se.study_event_id
+			and dsem.discrepancy_note_id = dn.discrepancy_note_id
+			and se.study_event_id = ?
+    	</sql>
+    </query>
 	<query>
 		<name>create</name>
 		<sql>

@@ -407,5 +407,14 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 			assertTrue(dns.contains(noteBean));
 		}
 	}
+	
+	@Test
+	public void testCountAllByStudyEventTypeAndStudyEvent() {
+		StudyEventBean studyEvent = new StudyEventBean();
+		studyEvent.setId(1000);
+
+		assertNotNull(discrepancyNoteDAO.countAllByStudyEventTypeAndStudyEvent(studyEvent));
+		assertEquals(new Integer(0), discrepancyNoteDAO.countAllByStudyEventTypeAndStudyEvent(studyEvent));
+	}
 
 }

@@ -1129,5 +1129,10 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		return returnMe;
 	}
-
+	
+	public void deleteByPK(int id) {
+		HashMap variables = new HashMap();
+		variables.put(Integer.valueOf(1), id);
+		this.execute(digester.getQuery("deleteByPK"), variables);
+	}
 }

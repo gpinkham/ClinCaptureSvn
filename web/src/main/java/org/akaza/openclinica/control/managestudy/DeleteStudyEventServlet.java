@@ -13,17 +13,9 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-/**
- * Created by IntelliJ IDEA.
- * User: bads
- * Date: Mar 24, 2010
- * Time: 8:33:54 PM
- * To change this template use File | Settings | File Templates.
- */
-import java.util.Date;
+import java.text.MessageFormat;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -31,6 +23,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -101,16 +94,22 @@ public class DeleteStudyEventServlet extends SecureController {
 			} else {
 				logger.info("submit to delete the event from study");
 				// delete event from study
-
-				event.setSubjectEventStatus(SubjectEventStatus.NOT_SCHEDULED);
-				event.setUpdater(ub);
-				event.setUpdatedDate(new Date());
-				sedao.update(event);
-				String emailBody = respage.getString("the_event") + " " + event.getStudyEventDefinition().getName()
-						+ " " + respage.getString("has_been_removed_from_the_subject_record_for") + " "
-						+ studySub.getLabel() + " " + respage.getString("in_the_study") + " " + study.getName() + ".";
-
-				addPageMessage(emailBody);
+				
+				DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
+				String message = "";
+				
+				if (dndao.countAllByStudyEventTypeAndStudyEvent(event) > 0) {
+					MessageFormat mf = new MessageFormat("");
+					mf.applyPattern(respage.getString("the_event_cannot_be_deleted_as_there_are_discrepancy_notes_attached"));
+					Object[] arguments = {event.getStudyEventDefinition().getName(), studySub.getLabel(), study.getName()};
+					message = mf.format(arguments);
+				} else {
+					sedao.deleteByPK(event.getId());
+					message = respage.getString("the_event") + " " + event.getStudyEventDefinition().getName()
+							+ " " + respage.getString("has_been_removed_from_the_subject_record_for") + " "
+							+ studySub.getLabel() + " " + respage.getString("in_the_study") + " " + study.getName() + ".";
+				}
+				addPageMessage(message);
 				request.setAttribute("id", new Integer(studySubId).toString());
 				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
 			}

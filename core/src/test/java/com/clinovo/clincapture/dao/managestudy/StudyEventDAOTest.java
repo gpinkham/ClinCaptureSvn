@@ -22,4 +22,20 @@ public class StudyEventDAOTest extends DefaultAppContextTest {
         seb = (StudyEventBean)studyEventDao.update(seb);
 		assertEquals(seb.getUpdatedDate(), date);
 	}
+	
+	@Test
+	public void testFindAll() throws OpenClinicaException {
+		assertEquals(5, studyEventDao.findAll().size());
+	}
+	
+	@Test
+	public void testFindByPK() throws OpenClinicaException {
+		assertEquals("test", ((StudyEventBean) studyEventDao.findByPK(4)).getLocation());
+	}
+	
+	@Test
+	public void testDelete() throws OpenClinicaException {
+        studyEventDao.deleteByPK(4);
+        assertEquals("", ((StudyEventBean) studyEventDao.findByPK(4)).getLocation());
+	}
 }

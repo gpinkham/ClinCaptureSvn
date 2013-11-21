@@ -283,4 +283,8 @@
 			and sed.study_event_definition_id = ?
     	</sql>
     </query>
+	<query>
+		<name>deleteByPK</name>
+		<sql>DELETE FROM study_event WHERE study_event_id=?</sql>
+	</query>
 </queries>
