@@ -16,10 +16,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteStatisticBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesSort;
 import org.junit.Before;
@@ -89,11 +93,11 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 	public void testFilterByStatus() {
 		notesFilter = new ListNotesFilter();
 		notesFilter.addFilter("discrepancyNoteBean.resolutionStatus", "1");
-		assertEquals(Integer.valueOf(3), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
+		assertEquals(Integer.valueOf(2), discrepancyNoteDAO.countViewNotesWithFilter(study, notesFilter));
 
 		List<DiscrepancyNoteBean> noteBeans = discrepancyNoteDAO.getViewNotesWithFilterAndSortLimits(study,
 				notesFilter, notesSort, 0, 100);
-		assertDNBeansInList(noteBeans, Arrays.asList(2, 4, 5));
+		assertDNBeansInList(noteBeans, Arrays.asList(4, 5));
 	}
 
 	@Test
@@ -259,11 +263,134 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 	public void testStatistics() {
 		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
 
+		assertEquals(5, statisticBeans.size());
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 1, 1)));
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 1, 4)));
-		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 2, 1)));
+		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 2, 5)));
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 1)));
 		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 2)));
+	}
+	
+	@Test
+	public void testStatisticsOnStudySubjectRemoved() {
+		//change statuses to Removed and save initial statuses
+		UserAccountBean updater = new UserAccountBean();
+		updater.setId(1);
+		
+		StudySubjectBean ssb = (StudySubjectBean) studySubjectDAO.findByPK(1);
+		Status subjectInitStatus = ssb.getStatus();
+		ssb.setStatus(Status.DELETED);
+		ssb.setUpdater(updater);
+		studySubjectDAO.update(ssb);
+		
+		StudyEventBean seb = (StudyEventBean) studyEventDao.findByPK(1);
+		Status eventInitStatus = seb.getStatus();
+		seb.setStatus(Status.AUTO_DELETED);
+		seb.setUpdater(updater);
+		studyEventDao.update(seb);
+		
+		EventCRFBean ecb = (EventCRFBean) EventCRFDAO.findByPK(1);
+		Status eventCRFInitStatus = ecb.getStatus();
+		ecb.setStatus(Status.AUTO_DELETED);
+		EventCRFDAO.update(ecb);
+		//----------------------------------------------------
+		
+		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
+
+		assertTrue(statisticBeans.isEmpty());
+		
+		//restore initial statuses
+		ssb.setStatus(subjectInitStatus);
+		studySubjectDAO.update(ssb);
+		
+		seb.setStatus(eventInitStatus);
+		studyEventDao.update(seb);
+		
+		ecb.setStatus(eventCRFInitStatus);
+		EventCRFDAO.update(ecb);
+	}
+	
+	@Test
+	public void testStatisticsOnStudyEventRemoved() {
+		//change statuses to Removed and save initial statuses
+		UserAccountBean updater = new UserAccountBean();
+		updater.setId(1);
+		
+		StudySubjectBean ssb = (StudySubjectBean) studySubjectDAO.findByPK(1);
+		Status subjectInitStatus = ssb.getStatus();
+		ssb.setStatus(Status.AVAILABLE);
+		ssb.setUpdater(updater);
+		studySubjectDAO.update(ssb);
+			
+		StudyEventBean seb = (StudyEventBean) studyEventDao.findByPK(1);
+		Status eventInitStatus = seb.getStatus();
+		seb.setStatus(Status.DELETED);
+		seb.setUpdater(updater);
+		studyEventDao.update(seb);
+			
+		EventCRFBean ecb = (EventCRFBean) EventCRFDAO.findByPK(1);
+		Status eventCRFInitStatus = ecb.getStatus();
+		ecb.setStatus(Status.AUTO_DELETED);
+		EventCRFDAO.update(ecb);
+		//----------------------------------------------------
+		
+		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
+
+		assertEquals(2, statisticBeans.size());
+		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 2, 5)));
+		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 2)));
+		
+		//restore initial statuses
+		ssb.setStatus(subjectInitStatus);
+		studySubjectDAO.update(ssb);
+			
+		seb.setStatus(eventInitStatus);
+		studyEventDao.update(seb);
+				
+		ecb.setStatus(eventCRFInitStatus);
+		EventCRFDAO.update(ecb);
+	}
+	
+	@Test
+	public void testStatisticsOnEventCRFRemoved() {
+		//change statuses to Removed and save initial statuses
+		UserAccountBean updater = new UserAccountBean();
+		updater.setId(1);
+		
+		StudySubjectBean ssb = (StudySubjectBean) studySubjectDAO.findByPK(1);
+		Status subjectInitStatus = ssb.getStatus();
+		ssb.setStatus(Status.AVAILABLE);
+		ssb.setUpdater(updater);
+		studySubjectDAO.update(ssb);
+				
+		StudyEventBean seb = (StudyEventBean) studyEventDao.findByPK(1);
+		Status eventInitStatus = seb.getStatus();
+		seb.setStatus(Status.AVAILABLE);
+		seb.setUpdater(updater);
+		studyEventDao.update(seb);
+				
+		EventCRFBean ecb = (EventCRFBean) EventCRFDAO.findByPK(1);
+		Status eventCRFInitStatus = ecb.getStatus();
+		ecb.setStatus(Status.DELETED);
+		EventCRFDAO.update(ecb);
+		//----------------------------------------------------
+		
+		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
+
+		assertEquals(3, statisticBeans.size());
+		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 2, 5)));
+		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 1)));
+		assertTrue(statisticBeans.contains(new DiscrepancyNoteStatisticBean(1, 3, 2)));
+		
+		//restore initial statuses
+		ssb.setStatus(subjectInitStatus);
+		studySubjectDAO.update(ssb);
+				
+		seb.setStatus(eventInitStatus);
+		studyEventDao.update(seb);
+				
+		ecb.setStatus(eventCRFInitStatus);
+		EventCRFDAO.update(ecb);
 	}
 
 	@Test

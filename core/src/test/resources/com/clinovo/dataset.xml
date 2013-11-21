@@ -18,10 +18,10 @@
 
 	<subject subject_id="1" status_id="1" date_of_birth="2008-07-01"
 		gender="m" unique_identifier="pID1" date_created="2008-07-02"
-		owner_id="1" dob_collected="true" />
+		owner_id="1" update_id="1" dob_collected="true" />
 	<study_subject study_subject_id="1" label="ssID1"
 		secondary_label="" subject_id="1" study_id="1" status_id="1"
-		enrollment_date="2008-07-01" date_created="2008-07-02" owner_id="1"
+		enrollment_date="2008-07-01" date_created="2008-07-02" owner_id="1" update_id="1"
 		oc_oid="SS_SSID1" />
 
 	<study_event_definition
@@ -991,7 +991,7 @@
 		study_id="1" assigned_user_id="1" />
 	<discrepancy_note discrepancy_note_id="2"
 		description="First office visit " discrepancy_note_type_id="2"
-		resolution_status_id="1" detailed_notes="Subject is unaware of CPAP pressure"
+		resolution_status_id="5" detailed_notes="Subject is unaware of CPAP pressure"
 		date_created="2012-01-10" owner_id="1" parent_dn_id="0" entity_type="subject"
 		study_id="1" />
 	<discrepancy_note discrepancy_note_id="3"
