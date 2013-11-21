@@ -43,7 +43,7 @@
 </script>
 
 <h1>
-	<span class="title_manage">
+	<span class="first_level_header">
 		<fmt:message key="medical_coding" bundle="${resword}"/>
     	<a href="javascript:openDocWindow('../help/3_1_SDV_Help.html')">
         	<img src="../images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>">

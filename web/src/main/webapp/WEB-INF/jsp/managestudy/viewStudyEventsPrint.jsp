@@ -35,16 +35,11 @@
 </c:forEach>
 <!-- the object inside the array is StudySubjectBean-->
 
-<h1><c:choose>
-   <c:when test="${userRole.manageStudy}">
-     <div class="title_manage">
-   </c:when>
-   <c:otherwise>
-    <div class="title_manage">
-   </c:otherwise>
-  </c:choose>
- <fmt:message key="view_all_events_in" bundle="${resword}"/><c:out value="${study.name}"/>
-</div></h1>
+<h1>
+	<div class="first_level_header">
+		<fmt:message key="view_all_events_in" bundle="${resword}"/><c:out value="${study.name}"/>
+	</div>
+</h1>
 
 <jsp:include page="../include/alertbox.jsp"/>
 

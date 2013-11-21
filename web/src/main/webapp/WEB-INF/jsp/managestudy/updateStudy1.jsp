@@ -58,9 +58,11 @@
   }
    //-->
 </script>
-<h1><span class="title_manage">
-<fmt:message key="update_study_details" bundle="${resword}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="update_study_details" bundle="${resword}"/>
+	</span>
+</h1>
 <span class="title_Admin"><p><b><fmt:message key="section_a_study_description" bundle="${resword}"/></b></p></span>
 <P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>
 <form action="UpdateStudy" method="post">

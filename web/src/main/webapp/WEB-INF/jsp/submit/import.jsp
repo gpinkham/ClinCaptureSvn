@@ -48,20 +48,15 @@
 
  <c:out value="${crfName}"/>
 
-<c:choose>
-	<c:when test="${userBean.sysAdmin && module=='admin'}">
-		<h1><span class="title_manage">
-	</c:when>
-	<c:otherwise>
-		<h1>
-		<span class="title_submit">
-	</c:otherwise>
-</c:choose>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="import_crf_data" bundle="${resworkflow}"/>
+		<a href="javascript:openDocWindow('help/2_6_importData_Help.html')">
+		    <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>">
+		</a>
+	</span>
+</h1>
 
-<fmt:message key="import_crf_data" bundle="${resworkflow}"/>
-<a href="javascript:openDocWindow('help/2_6_importData_Help.html')">
-    <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>">
-</a></h1>
 <p><fmt:message key="import_instructions" bundle="${restext}"/></p>
 
 <form action="ImportCRFData?action=confirm&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post" ENCTYPE="multipart/form-data">

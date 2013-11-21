@@ -51,24 +51,12 @@
 
 <jsp:useBean scope="request" id="toc" class="org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean" />
 
-<c:choose>
-<c:when test="${userBean.sysAdmin}">
-  <h1><span class="title_manage">
-</c:when>
-<c:otherwise>
-  <h1>
-  <c:choose>
-   <c:when test="${userRole.manageStudy}">
-     <span class="title_manage">
-   </c:when>
-   <c:otherwise>
-    <span class="title_manage">
-   </c:otherwise>
-  </c:choose>
-</c:otherwise>
-</c:choose>
-<fmt:message key="view_CRF_version_data_entry" bundle="${resword}"/>
-</span></h1>
+
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="view_CRF_version_data_entry" bundle="${resword}"/>
+	</span>
+</h1>
 
 
 <div class="homebox_bullets"><a href="ViewCRFVersion?id=<c:out value="${toc.crfVersion.id}"/>"><fmt:message key="view_CRF_version_metadata" bundle="${resword}"/></a></div>

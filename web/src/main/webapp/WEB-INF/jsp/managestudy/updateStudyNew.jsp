@@ -108,9 +108,11 @@
 
  </script>
 
-<h1><span class="title_manage">
-	<fmt:message key="update_study_details" bundle="${resword}"/> <c:out value="${studyToView.name}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="update_study_details" bundle="${resword}"/> <c:out value="${studyToView.name}"/>
+	</span>
+</h1>
 <c:set var="startDate" value="" />
 <c:set var="endDate" value="" />
 <c:set var="protocolDateVerification" value="" />

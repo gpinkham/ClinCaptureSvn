@@ -41,9 +41,11 @@
 
 <jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope="session" id="parentName" class="java.lang.String"/>
-<h1><span class="title_manage">
-<fmt:message key="confirm_site_details" bundle="${resword}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_site_details" bundle="${resword}"/>
+	</span>
+</h1>
 
 <form action="UpdateSubStudy" method="post">
 <input type="hidden" name="action" value="submit">

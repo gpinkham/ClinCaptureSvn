@@ -55,9 +55,11 @@
   }--%>
    //-->
 </script>
-<h1><span class="title_manage">
-<fmt:message key="create_a_new_study_continue" bundle="${resword}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="create_a_new_study_continue" bundle="${resword}"/>
+	</span>
+</h1>
 
 <form action="CreateStudy" method="post">
 <span class="title_Admin"><p><b><fmt:message key="section_b_study_status" bundle="${resword}"/>- <fmt:message key="design_details" bundle="${resword}"/> - <fmt:message key="observational" bundle="${resadmin}"/></b></p></span>

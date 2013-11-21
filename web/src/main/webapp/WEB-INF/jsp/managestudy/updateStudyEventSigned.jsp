@@ -72,25 +72,11 @@
   }
    //-->
 </script>
-<h1><c:choose>
- <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
-  <div class="title_manage">
-</c:when>
- <c:otherwise>
-
-  <c:choose>
-   <c:when test="${userRole.manageStudy}">
-     <div class="title_manage">
-   </c:when>
-   <c:otherwise>
-    <div class="title_manage">
-   </c:otherwise>
-  </c:choose>
-
- </c:otherwise>
-</c:choose>
+<h1>
+<div class="first_level_header">
 <fmt:message key="sign_study_event_for_subject" bundle="${resword}"/>: <c:out value="${studySubject.label}"/>
-</div></h1>
+</div>
+</h1>
 
 <p><fmt:message key="sure_to_sign_subject" bundle="${resword}"/></p>
 

@@ -59,7 +59,14 @@
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 
-<h1><span class="title_manage"><fmt:message key="administer_subjects" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('help/6_5_administerSubjects_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="administer_subjects" bundle="${resworkflow}"/> 
+		<a href="javascript:openDocWindow('help/6_5_administerSubjects_Help.html')">
+			<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+		</a>
+	</span>
+</h1>
 
 <form  action="${pageContext.request.contextPath}/ListSubject">
         <input type="hidden" name="module" value="submit">

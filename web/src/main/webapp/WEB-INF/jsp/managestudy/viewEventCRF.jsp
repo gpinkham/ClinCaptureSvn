@@ -46,15 +46,13 @@
 
 <jsp:useBean scope='request' id='displayItemData' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='studySubId' type='java.lang.String'/>
-<c:choose>
-<c:when test="${userBean.sysAdmin}">
-  <h1><span class="title_manage">
-</c:when>
-<c:otherwise>
-  <h1><span class="title_manage">
-</c:otherwise>
-</c:choose>
-<fmt:message key="view_event_CRF_properties" bundle="${resworkflow}"/>: <c:out value="${studySub.label}"/> - <c:out value="${crf.name}"/></span></h1>
+
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="view_event_CRF_properties" bundle="${resworkflow}"/>: <c:out value="${studySub.label}"/> - <c:out value="${crf.name}"/>
+	</span>
+</h1>
+
 <c:forEach var="section" items="${sections}">
  <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">

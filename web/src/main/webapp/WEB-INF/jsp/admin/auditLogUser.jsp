@@ -13,10 +13,13 @@
 
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='auditUserBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
- <h1><span class="title_manage">
- <fmt:message key="view_user_log_for" bundle="${resword}"/>
- <c:out value="${auditUserBean.name}"/> (<c:out value="${auditUserBean.firstName}"/>&nbsp;<c:out value="${auditUserBean.lastName}"/>)
- </span></h1>
+ 
+ <h1>
+ 	<span class="first_level_header">
+	 	<fmt:message key="view_user_log_for" bundle="${resword}"/>
+		<c:out value="${auditUserBean.name}"/> (<c:out value="${auditUserBean.firstName}"/>&nbsp;<c:out value="${auditUserBean.lastName}"/>)
+	 </span>
+ </h1>
 
 <jsp:include page="../include/alertbox.jsp" />
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showAuditEventRow.jsp" /></c:import>

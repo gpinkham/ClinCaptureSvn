@@ -1,6 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <jsp:include page="../include/extract-header.jsp"/>
 
@@ -10,7 +10,11 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
 
-<h1><span class="title_manage">Create Dataset: Select Discrepancy Attributes</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_discrepancy_attributes" bundle="${resword}"/>
+	</span>
+</h1>
 
 <P><jsp:include page="../showInfo.jsp"/></P>
 

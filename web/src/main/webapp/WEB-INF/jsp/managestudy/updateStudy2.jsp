@@ -59,9 +59,11 @@
   }
    //-->
 </script>
-<h1><span class="title_manage">
-<fmt:message key="update_study_details_continue" bundle="${resword}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="update_study_details_continue" bundle="${resword}"/>
+	</span>
+</h1>
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
 <span class="title_Admin"><p><b><fmt:message key="section_b_study_status" bundle="${resword}"/> - <fmt:message key="status" bundle="${resword}"/> </b></p></span>
 <P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>

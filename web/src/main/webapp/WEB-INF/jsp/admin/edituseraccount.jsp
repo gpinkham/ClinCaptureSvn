@@ -99,7 +99,11 @@
   }
    //-->
 </script>
-<h1><span class="title_manage"><fmt:message key="edit_a_user_account" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="edit_a_user_account" bundle="${resword}"/>
+	</span>
+</h1>
 
 
 <form action="EditUserAccount" method="post" onsubmit="return isPhoneNumberValid('phone', '<fmt:message key="invalid_phone_number_format" bundle="${resword}"/>');">

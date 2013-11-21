@@ -38,11 +38,19 @@
 </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<c:choose>
-    <c:when test="${action eq 'lock'}"><h1><span class="title_manage"><fmt:message key="lockStudySubject"  bundle="${resword}"/>: ${studySubjectBean.name}</span></h1></c:when>
-    <c:when test="${action eq 'unlock'}"><h1><span class="title_manage"><fmt:message key="unlockStudySubject"  bundle="${resword}"/>: ${studySubjectBean.name}</span></h1></c:when>
-    <c:otherwise> </c:otherwise>
-</c:choose>
+<h1>
+	<span class="first_level_header">
+		<c:choose>
+			<c:when test="${action eq 'lock'}">
+				<fmt:message key="lockStudySubject"  bundle="${resword}"/>: ${studySubjectBean.name}
+			</c:when>
+			<c:when test="${action eq 'unlock'}">
+				<fmt:message key="unlockStudySubject"  bundle="${resword}"/>: ${studySubjectBean.name}
+			</c:when>
+			<c:otherwise> </c:otherwise>
+		</c:choose>
+	</span>
+</h1>
 
 <div id="studySubjectRecord" style="">
 

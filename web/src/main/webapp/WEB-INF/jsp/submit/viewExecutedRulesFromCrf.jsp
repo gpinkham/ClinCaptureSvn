@@ -54,14 +54,11 @@
 <jsp:useBean scope='request' id='ruleSet' class='org.akaza.openclinica.domain.rule.RuleSetBean'/>
 <jsp:useBean scope='request' id='result' class='java.util.HashMap'/>
 
-<h1><c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
-<span class="title_manage">
-</c:when>
-<c:otherwise>
-<span class="title_Manage">
-</c:otherwise>
-</c:choose><fmt:message key="rule_execute_crf_rule_title" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="rule_execute_crf_rule_title" bundle="${resword}"/>
+	</span>
+</h1>
 
 <c:set var="count" value="0"/>
 

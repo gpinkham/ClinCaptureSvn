@@ -39,21 +39,18 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='newDataset' class='org.akaza.openclinica.bean.extract.DatasetBean'/>
 
-<c:choose>
-<c:when test="${newDataset.id>0}">
-<h1><span class="title_manage"><fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="confirm_dataset_properties" bundle="${resword}"/>
-: <c:out value='${newDataset.name}'/></span></h1>
-</c:when>
-<c:otherwise>
-<h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="confirm_dataset_properties" bundle="${resword}"/></span></h1>
-</c:otherwise>
-</c:choose>
-
-<%--
-<jsp:include page="createDatasetBoxes.jsp" flush="true">
-<jsp:param name="saveAndExport" value="1"/>
-</jsp:include>
---%>
+<h1>
+	<span class="first_level_header">
+		<c:choose>
+			<c:when test="${newDataset.id>0}">
+				<fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="confirm_dataset_properties" bundle="${resword}"/>: <c:out value='${newDataset.name}'/>
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="confirm_dataset_properties" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+	</span>
+</h1>
 <p><fmt:message key="confirm_dataset_properties" bundle="${restext}"/></p>
 
 <form id="datasetForm" action="CreateDataset" method="post">
@@ -68,37 +65,6 @@
 		<td class="text" valign="top"><fmt:message key="description" bundle="${resword}"/></td>
 		<td class="text" valign="top"><b><c:out value="${newDataset.description}" /></b></td>
 	</tr>
-	<%--<tr>
-		<td class="text">Events Sample From:</td>
-		<td class="text"><b>
-		   <c:choose>
-		   <c:when test="${defaultStart==newDataset.dateStart}">
-		    Not specified
-		   </c:when>
-		   <c:otherwise>
-		   <fmt:formatDate value="${newDataset.dateStart}" dateStyle="short"/>
-		   </c:otherwise>
-		   </c:choose>
-		</b>
-	</tr>
-	<tr>
-		<td class="text">Events Sample To:</td>
-		<td class="text"><b>
-		<c:choose>
-		   <c:when test="${defaultEnd==newDataset.dateEnd}">
-		   Not specified
-		   </c:when>
-		   <c:otherwise>
-		   <fmt:formatDate value="${newDataset.dateEnd}" dateStyle="short"/>
-
-		   </c:otherwise>
-		   </c:choose>
-		</b>
-	</tr>
-	<tr>
-		<td class="text"><fmt:message key="status" bundle="${resword}"/></td>
-		<td class="text"><b><c:out value="${newDataset.status.name}" /></b>
-	</tr>--%>
 </table>
 <table>
 	<tr>

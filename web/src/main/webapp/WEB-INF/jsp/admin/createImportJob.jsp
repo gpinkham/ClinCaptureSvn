@@ -47,7 +47,11 @@
 <jsp:useBean scope='request' id='minutes' class='java.lang.String'/>
 <jsp:useBean scope="request" id="studies" class="java.util.ArrayList"/>
 
-<h1><span class="title_manage"><fmt:message key="create_an_import_job" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="create_an_import_job" bundle="${resword}"/>
+	</span>
+</h1>
 <p>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 <jsp:useBean id="now" class="java.util.Date" />

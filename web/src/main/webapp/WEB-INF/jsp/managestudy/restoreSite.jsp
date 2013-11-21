@@ -48,15 +48,11 @@
 <jsp:useBean scope='request' id='userRolesToRestore' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectsToRestore' class='java.util.ArrayList'/>
 
-<c:choose>
- <c:when test="${fromListSite=='yes'}">
-  <h1><span class="title_manage">
- </c:when>
- <c:otherwise>
-   <h1><span class="title_manage">
- </c:otherwise>
-</c:choose>
-<fmt:message key="confirm_restore_of_site"  bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_restore_of_site"  bundle="${resword}"/>
+	</span>
+</h1>
 
 <p><fmt:message key="you_choose_to_restore_the_following_site" bundle="${resword}"/></p>
 <div style="width: 600px">

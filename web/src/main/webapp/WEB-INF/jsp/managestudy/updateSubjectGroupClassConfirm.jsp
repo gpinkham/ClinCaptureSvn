@@ -73,7 +73,11 @@
   }
    
 </script>
-<h1><span class="title_manage"><fmt:message key="confirm_a_subject_group_class" bundle="${resword}"/>:</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_a_subject_group_class" bundle="${resword}"/>
+	</span>
+</h1>
 
 <form action="UpdateSubjectGroupClass" method="post">
 <br>

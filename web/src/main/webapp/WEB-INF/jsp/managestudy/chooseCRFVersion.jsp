@@ -37,10 +37,11 @@
 		</td>
   </tr><jsp:include page="../include/sideInfo.jsp"/>
   
-<h1><span class="title_manage">
-<fmt:message key="choose_CRF_version" bundle="${resword}"/>
-
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="choose_CRF_version" bundle="${resword}"/>
+	</span>
+</h1>
 <script type="text/JavaScript" language="JavaScript" src="../../includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" language="javascript">
 $.noConflict();

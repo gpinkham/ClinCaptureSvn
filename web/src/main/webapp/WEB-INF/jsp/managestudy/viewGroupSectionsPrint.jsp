@@ -59,7 +59,7 @@ for ( var i = 0; i < els.length ; i ++ ) {
 <body>
 <div class="headerDiv">
 <%-- This section was cut-and-pasted from the existing print JSP --%>
-<h1><span class="title_manage">
+<h1><span class="first_level_header">
   <c:out value="${crfBean.name}" /> <c:out value="${crfVersionBean.name}" /></span>
   <c:if test="${studySubject != null && studySubject.id>0}">
     <c:choose>

@@ -39,7 +39,11 @@
 
 <jsp:useBean scope="session" id="studyWithRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
 <jsp:useBean scope="request" id="studyId" type="java.lang.Integer"/>
-<h1><span class="title_manage"><fmt:message key="confirm_changing_curr_study_site" bundle="${restext}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_changing_curr_study_site" bundle="${restext}"/>
+	</span>
+</h1>
 
 
 <form action="ChangeStudy" method="post">

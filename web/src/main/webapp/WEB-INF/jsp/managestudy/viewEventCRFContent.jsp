@@ -54,24 +54,11 @@
 
 <jsp:useBean scope="request" id="toc" class="org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean" />
 
-<c:choose>
-<c:when test="${userBean.sysAdmin}">
-  <h1><span class="title_manage">
-</c:when>
-<c:otherwise>
-  <h1>
-    <c:choose>
-      <c:when test="${userRole.manageStudy}">
-       <span class="title_manage">
-      </c:when>
-      <c:otherwise>
-       <span class="title_manage">
-      </c:otherwise>
-    </c:choose>
-</c:otherwise>
-</c:choose>
-<fmt:message key="view_event_CRF" bundle="${resword}"/>: <c:out value="${studySub.label}"/>-<c:out value="${toc.crf.name}"/>
-</span>
+
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="view_event_CRF" bundle="${resword}"/>: <c:out value="${studySub.label}"/>-<c:out value="${toc.crf.name}"/>
+	</span>
 </h1>
 
 <fmt:message key="click_view_icon_for_each_section" bundle="${restext}"/></p>

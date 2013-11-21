@@ -58,7 +58,11 @@
   }--%>
    //-->
 </script>
-<h1><span class="title_manage"><fmt:message key="create_a_new_study_continue" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="create_a_new_study_continue" bundle="${resword}"/>
+	</span>
+</h1>
 
 <span class="title_Admin"><p><b><fmt:message key="section_f_study_parameter_configuration" bundle="${resword}"/> </b></p></span>
 <P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>

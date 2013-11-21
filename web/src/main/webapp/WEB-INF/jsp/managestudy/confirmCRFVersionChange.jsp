@@ -35,21 +35,14 @@
 
 		</td>
   </tr><jsp:include page="../include/sideInfo.jsp"/>
-  
-  
-  
-<h1><span class="title_manage">
-<fmt:message key="confirm_CRF_version" bundle="${resword}"/>
-<!--
- <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/?')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
- -->
-</span></h1>
-
-
+    
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_CRF_version" bundle="${resword}"/>
+	</span>
+</h1>
 
 <table cellpadding="2" cellspacing="2" border="0" >
-
-
 
 
 <!-- header table -->

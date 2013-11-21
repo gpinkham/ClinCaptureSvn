@@ -60,7 +60,11 @@
    //-->
 </script>
 
-<h1><span class="title_manage"><fmt:message key="create_a_new_study" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="create_a_new_study" bundle="${resword}"/>
+	</span>
+</h1>
 
 <p>
 <fmt:message key="ClinicalTrials.gov" bundle="${restext}"/>

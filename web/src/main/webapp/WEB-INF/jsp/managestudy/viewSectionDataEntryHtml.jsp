@@ -32,7 +32,7 @@ for ( var i = 0; i < els.length ; i ++ ) {
 </script>
 <!-- end -->
 <body>
-<h1><span class="title_manage">
+<h1><span class="first_level_header">
 <c:out value="${section.crf.name}" /> <c:out value="${section.crfVersion.name}" /></span>
 <c:if test="${studySubject != null && studySubject.id>0}">
   <c:choose>

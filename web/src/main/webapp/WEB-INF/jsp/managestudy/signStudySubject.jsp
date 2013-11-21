@@ -96,35 +96,12 @@
     //-->
 </script>
 
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-    <tr><td>
-        <h1>
-            <c:choose>
-            <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
-            <div class="title_manage">
-                </c:when>
-                <c:otherwise>
+<h1>
+	<div class=first_level_header>
+		<fmt:message key="sign_subject" bundle="${resword}"/>&nbsp;<c:out value="${studySub.label}"/>
+	</div>
+</h1>
 
-                <c:choose>
-                <c:when test="${userRole.manageStudy}">
-                <div class="title_manage">
-                    </c:when>
-                    <c:otherwise>
-                    <div class="title_manage">
-                        </c:otherwise>
-                        </c:choose>
-
-                        </c:otherwise>
-                        </c:choose>
-
-                        <fmt:message key="sign_subject" bundle="${resword}"/>&nbsp;<c:out value="${studySub.label}"/>
-                    </div>
-    </td>
-        <td align="right">
-            </h1>
-
-        </td></tr>
-</table>
 <p><fmt:message key="sure_to_sign_subject" bundle="${resword}"/></p>
 
 <p><fmt:message key="sure_to_sign_subject1" bundle="${resword}"/></p>

@@ -49,9 +49,11 @@
 <jsp:useBean scope ="session" id="interventions" class="java.util.ArrayList"/>
 <jsp:useBean scope ="request" id="interventionError" class="java.lang.String"/>
 
-<h1><span class="title_manage">
-<fmt:message key="create_a_new_study_continue" bundle="${resword}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="create_a_new_study_continue" bundle="${resword}"/>
+	</span>
+</h1>
 <script type="text/JavaScript" language="JavaScript">
   <!--
  <%--function myCancel() {

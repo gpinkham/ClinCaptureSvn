@@ -79,7 +79,11 @@
     </c:otherwise>
 </c:choose>
 
-<h1><span class="title_manage"><fmt:message key="set_user_role" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="set_user_role" bundle="${resword}"/>
+	</span>
+</h1>
 
 <p><fmt:message key="choose_a_study_from_the_following_study" bundle="${resword}"/></p>
 <form action="SetUserRole" method="post">

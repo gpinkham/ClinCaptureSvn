@@ -40,12 +40,20 @@
 <jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <jsp:useBean scope="request" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 
-<c:choose>
-    <c:when test="${action eq 'lock'}"><h1><span class="title_manage"><fmt:message key="lockSiteStudySubjects"  bundle="${resword}"/>: ${studyBean.name}</span></h1></c:when>
-    <c:when test="${action eq 'unlock'}"><h1><span class="title_manage"><fmt:message key="unlockSiteStudySubjects"  bundle="${resword}"/>: ${studyBean.name}</span></h1></c:when>
-    <c:otherwise> </c:otherwise>
-</c:choose>
-
+<h1>
+	<span class="first_level_header">
+		<c:choose>
+			<c:when test="${action eq 'lock'}">
+				<fmt:message key="lockSiteStudySubjects"  bundle="${resword}"/>: ${studyBean.name}
+			</c:when>
+			<c:when test="${action eq 'unlock'}">
+				<fmt:message key="unlockSiteStudySubjects" bundle="${resword}"/>: ${studyBean.name}
+			</c:when>
+			<c:otherwise> 
+			</c:otherwise>
+		</c:choose>
+	</span>
+</h1>
 
 <div id="siteProperties" style="">
 

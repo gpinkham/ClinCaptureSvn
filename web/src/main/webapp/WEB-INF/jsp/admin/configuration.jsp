@@ -49,7 +49,11 @@
     </c:if>
 </c:forEach>
 
-<h1><span class="title_manage"><fmt:message key="login_lockout" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="login_lockout" bundle="${resword}"/>
+	</span>
+</h1>
 
 <form action="Configure" method="post">
 <jsp:include page="../include/showSubmitted.jsp" />

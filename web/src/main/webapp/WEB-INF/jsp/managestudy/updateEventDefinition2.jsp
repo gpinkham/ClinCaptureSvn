@@ -58,7 +58,11 @@
   }
    //-->
 </script>
-<h1><span class="title_manage"><fmt:message key="update_SED" bundle="${resword}"/> - <fmt:message key="add_CRFs" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="update_SED" bundle="${resword}"/> - <fmt:message key="add_CRFs" bundle="${resword}"/>
+	</span>
+</h1>
 
 <form id="addCRFToDefinition" name="crfForm" action="AddCRFToDefinition"  method="post">
     <input type="hidden" name="actionName" value="">
@@ -67,13 +71,8 @@
     <c:import url="../include/showTableForEventDefinitionCRFList.jsp">
         <c:param name="rowURL" value="showDefineEventCRFRow.jsp" />
         <c:param name="outerFormName" value="crfForm" />
-        <%--<c:param name="searchFormOnClickJS" value="document.crfForm.elements['actionName'].value='next';document.crfForm.elements[1].value='1';" />--%>
     </c:import>
 
-<%--<c:import url="../include/showTable.jsp">--%>
-<%--<c:param name="rowURL" value="showDefineEventCRFRow.jsp" />--%>
-<%--<c:param name="outerFormName" value="crfForm" />--%>
-<%--</c:import>--%>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>

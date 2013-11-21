@@ -45,14 +45,12 @@
 <jsp:useBean scope='request' id='sections' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='crfname' class='java.lang.String'/>
 <jsp:useBean scope='request' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
-<c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
-<h1><span class="title_manage"><fmt:message key="view_CRF_version_details" bundle="${resword}"/>: <c:out value="${crfname}"/> <c:out value="${version.name}"/>  </span></h1>
-</c:when>
-<c:otherwise>
-<h1><span class="title_manage"><fmt:message key="view_CRF_version_details" bundle="${resword}"/>: <c:out value="${crfname}"/> <c:out value="${version.name}"/> </span></h1>
-</c:otherwise>
-</c:choose>
+
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="view_CRF_version_details" bundle="${resword}"/>: <c:out value="${crfname}"/> <c:out value="${version.name}"/>  
+	</span>
+</h1>
 
 <c:forEach var="section" items="${sections}">
 <br>

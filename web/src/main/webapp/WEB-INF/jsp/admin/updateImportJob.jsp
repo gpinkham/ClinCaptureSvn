@@ -51,7 +51,11 @@
 
 <c:set var="activeStudyId" value="${studyId}" />
 
-<h1><span class="title_manage"><fmt:message key="update_import_job" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="update_import_job" bundle="${resword}"/>
+	</span>
+</h1>
 <p>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 <jsp:useBean id="now" class="java.util.Date" />

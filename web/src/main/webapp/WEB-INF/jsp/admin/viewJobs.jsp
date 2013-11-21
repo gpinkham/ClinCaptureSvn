@@ -41,7 +41,14 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
-<h1><span class="title_manage"><fmt:message key="scheduled_export_data_jobs" bundle="${resword}"/>&nbsp;<a href="javascript:openDocWindow('help/6.4.1_exportJobs_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="scheduled_export_data_jobs" bundle="${resword}"/>&nbsp;
+		<a href="javascript:openDocWindow('help/6.4.1_exportJobs_Help.html')">
+			<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+		</a>
+	</span>
+</h1>
 
 <p></p>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>

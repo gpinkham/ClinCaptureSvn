@@ -58,7 +58,8 @@
   }
    //-->
 </script>
-<h1><span class="title_manage">
+<h1>
+	<span class="first_level_header">
     <c:choose>
         <c:when test="${study.parentStudyId > 0}">
             <fmt:message key="assign_users_to_current_site" bundle="${resword}"/>
@@ -67,10 +68,8 @@
             <fmt:message key="assign_users_to_current_study" bundle="${resword}"/>
         </c:otherwise>
     </c:choose>
-    <c:out value="${study.name}"/>
-    <%-- <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/manage-users/manage-user-roles#content-title-4354')">
-	<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> --%>
-</span>
+    <c:out value="${study.name}"/>    
+	</span>
 </h1>
 
 <c:choose>

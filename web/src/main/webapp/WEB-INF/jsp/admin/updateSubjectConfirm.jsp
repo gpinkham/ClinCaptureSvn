@@ -40,7 +40,11 @@
 <jsp:useBean scope="session" id="subjectToUpdate" class="org.akaza.openclinica.bean.submit.SubjectBean" />
 
 
-<h1><span class="title_manage"><fmt:message key="confirm_subject_details" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_subject_details" bundle="${resword}"/>
+	</span>
+</h1>
 <form action="UpdateSubject" method="post">
 <input type="hidden" name="action" value="submit">
 <input type="hidden" name="id" value="<c:out value="${subjectToUpdate.id}"/>">

@@ -44,14 +44,12 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='ruleSet' class='org.akaza.openclinica.domain.rule.RuleSetBean'/>
 
-<h1><c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
-<span class="title_manage">
-</c:when>
-<c:otherwise>
-<span class="title_Manage">
-</c:otherwise>
-</c:choose><fmt:message key="rule_remove_rule_assignments" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="rule_remove_rule_assignments" bundle="${resword}"/>
+	</span>
+</h1>
+
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 

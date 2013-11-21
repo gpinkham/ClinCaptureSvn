@@ -39,7 +39,11 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='presetValues' class='java.util.HashMap' />
 
-<h1><span class="title_manage"><fmt:message key="configure_password_requirements" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="configure_password_requirements" bundle="${resword}"/>
+	</span>
+</h1>
 
 <form action="ConfigurePasswordRequirements" method="post">
     <jsp:include page="../include/showSubmitted.jsp" />

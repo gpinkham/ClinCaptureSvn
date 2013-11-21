@@ -81,19 +81,11 @@
         <c:if test='${popUpURL != ""}'>
 		openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>">
 
-<c:choose>
-<c:when test="${userBean.sysAdmin || userBean.techAdmin || userRole.manageStudy}">
-	<h1><span class="title_manage">
-	<fmt:message key="update_study_subject_details" bundle="${resword}"/>
-	</span></h1>
-</c:when>
-<c:otherwise>
-	<h1><span class="title_manage">
-	<%-- <fmt:message key="assign_subject_to_group" bundle="${resworkflow}"/> --%>
-	<fmt:message key="update_study_subject_details" bundle="${resword}"/>
-	</span></h1>
-</c:otherwise>
-</c:choose>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="update_study_subject_details" bundle="${resword}"/>
+	</span>
+</h1>
 
 <c:set var="secondaryIdShow" value="${true}"/>
 <fmt:message key="secondary_ID" bundle="${resword}" var="secondaryIdLabel"/>

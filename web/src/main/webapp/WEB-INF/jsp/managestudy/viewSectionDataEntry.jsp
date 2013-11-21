@@ -123,9 +123,10 @@
 			<tr>
 				<td>
 					<h1>
-						<span class="title_manage"> <b> <c:out
+						<span class="first_level_header"> <b> <c:out
 									value="${toc.crf.name}" /> <c:out
-									value="${toc.crfVersion.name}" /> <c:choose>
+									value="${toc.crfVersion.name}" /> 
+									<c:choose>
 									<c:when test="${eventCRF.stage.initialDE}">
 										<img src="images/icon_InitialDE.gif"
 											alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"
@@ -185,8 +186,8 @@
 				</td>
 				<td>
 					<h1>
-						<span class="title_manage"> <c:out
-								value="${studySubject.label}" />&nbsp;&nbsp;
+						<span class="first_level_header"> 
+						<c:out value="${studySubject.label}" />&nbsp;&nbsp;
 						</span>
 					</h1>
 				</td>

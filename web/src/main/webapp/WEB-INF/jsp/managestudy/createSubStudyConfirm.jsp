@@ -60,9 +60,11 @@
 <jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='session' id='definitions' class='java.util.ArrayList'/>
 <jsp:useBean scope='session' id='sdvOptions' class='java.util.ArrayList'/>
-<h1><span class="title_manage">
-<fmt:message key="confirm_site" bundle="${resword}"/> 
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_site" bundle="${resword}"/> 
+	</span>
+</h1>
 
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">

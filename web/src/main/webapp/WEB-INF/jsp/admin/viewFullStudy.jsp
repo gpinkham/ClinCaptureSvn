@@ -73,7 +73,11 @@
   }
 </script>
 
-<h1><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<c:out value="${studyToView.name}"/>
+	</span>
+</h1>
 
 <strong><fmt:message key="download_study_meta" bundle="${restext}"/>
 <a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"> 

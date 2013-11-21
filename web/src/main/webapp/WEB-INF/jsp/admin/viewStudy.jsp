@@ -57,8 +57,11 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='request' id='studyToView' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
-<h1><div class="title_manage"><fmt:message key="view_study_metadata" bundle="${resword}"/>
-</div></h1>
+<h1>
+	<div class="first_level_header">
+		<fmt:message key="view_study_metadata" bundle="${resword}"/>
+	</div>
+</h1>
 
 <c:set var="genderShow" value="${true}"/>
 <fmt:message key="gender" bundle="${resword}" var="genderLabel"/>

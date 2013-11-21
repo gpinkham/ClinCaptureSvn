@@ -60,7 +60,11 @@
 
 <c:choose>
 <c:when test="${empty excelErrors}">
- <h1><span class="title_manage"><fmt:message key="preview_CRF" bundle="${resword}"/></span></h1>
+ <h1>
+ 	<span class="first_level_header">
+ 		<fmt:message key="preview_CRF" bundle="${resword}"/>
+ 	</span>
+ </h1>
  <c:if test="${!empty warnings}">
   <p><fmt:message key="warnings" bundle="${resword}"/>:<p>
   <c:forEach var="warning" items="${warnings}">
@@ -116,7 +120,11 @@
 
 </c:when>
 <c:otherwise>
-<h1><span class="title_manage"><fmt:message key="preview_CRF_failed_invalid_data" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="preview_CRF_failed_invalid_data" bundle="${resword}"/>
+	</span>
+</h1>
 <br>
 <fmt:message key="there_were_several_invalid_fields" bundle="${restext}"/> 
 <br>

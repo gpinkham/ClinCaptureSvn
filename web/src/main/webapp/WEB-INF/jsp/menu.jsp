@@ -87,7 +87,7 @@
 
 
 <h1> 
-    <span class="title_manage" style="line-height:5px;">
+    <span class="first_level_header" style="line-height:5px;">
         <fmt:message key="welcome_to" bundle="${restext}"/>
             <c:choose>
                 <c:when test='${study.parentStudyId > 0}'>

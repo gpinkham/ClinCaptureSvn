@@ -45,9 +45,11 @@
 <jsp:useBean scope='request' id='user' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
-<h1><span class="title_manage">
-<fmt:message key="view_user_account" bundle="${resword}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="view_user_account" bundle="${resword}"/>
+	</span>
+</h1>
 
 
 <%--<p><a href="EditUserAccount?userId=<c:out value="${user.id}" />">Edit this user account</a>

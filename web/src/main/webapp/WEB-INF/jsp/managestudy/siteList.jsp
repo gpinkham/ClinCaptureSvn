@@ -44,25 +44,15 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope="session" id="userRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean" />
 
-<h1><span class="title_manage">
-<fmt:message key="manage_all_sites_in_study" bundle="${restext}"/> <c:out value="${study.name}"/> <a href="javascript:openDocWindow('help/5_4_sites_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="manage_all_sites_in_study" bundle="${restext}"/> <c:out value="${study.name}"/> 
+		<a href="javascript:openDocWindow('help/5_4_sites_Help.html')">
+			<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+		</a>
+	</span>
+</h1>
 
-<%-- <div class="homebox_bullets">
- <c:choose>
-   <c:when test="${study.parentStudyId>0}">
-	 <a href="ViewSite?id=<c:out value="${study.id}"/>">
-   </c:when>
-   <c:otherwise>
-	 <a href="ViewStudy?id=<c:out value="${study.id}"/>">
-   </c:otherwise>
-</c:choose>
-<fmt:message key="view_current_study_details" bundle="${restext}"/></a>
-</div>--%>
-<%-- 
-   <c:if test="${!study.status.locked}">
-    <div class="homebox_bullets"><a href="CreateSubStudy"><fmt:message key="create_new_site" bundle="${resworkflow}"/></a></div>
-   </c:if>
-   --%>
 <p></p>
 <c:import url="../include/showTable.jsp">
     <c:param name="rowURL" value="showSiteRow.jsp" />

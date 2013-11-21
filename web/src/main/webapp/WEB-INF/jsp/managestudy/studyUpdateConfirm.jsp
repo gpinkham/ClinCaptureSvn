@@ -50,9 +50,11 @@
     <c:set var="genderLabel" value="${study.studyParameterConfig.genderLabel}"/>
 </c:if>
 
-<h1><span class="title_manage">
-<fmt:message key="confirm_study_details" bundle="${resword}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_study_details" bundle="${resword}"/>
+	</span>
+</h1>
 
 <form action="UpdateStudy" method="post">
 <input type="hidden" name="action" value="submit">

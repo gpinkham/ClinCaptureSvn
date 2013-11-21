@@ -81,23 +81,18 @@
         }
       }
  </script>
-
-<c:choose>
-  <c:when test="${fromListSite=='yes'}">
- <h1><span class="title_manage"><fmt:message key="view_site_details" bundle="${resworkflow}"/>: <c:out value="${siteToView.name}"/></span></h1>
-</c:when>
-<c:otherwise>
-  <c:choose>
-    <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin}">
-      <h1><span class="title_manage"><fmt:message key="view_site_details" bundle="${resworkflow}"/></span></h1>
-    </c:when>
-    <c:otherwise>
-       <h1><span class="title_manage"><fmt:message key="view_site_details" bundle="${resworkflow}"/></span></h1>
-    </c:otherwise>
-   </c:choose>
-</c:otherwise>
-</c:choose>
-
+<h1>
+	<span class="first_level_header">
+		<c:choose>
+			<c:when test="${fromListSite=='yes'}">		
+				<fmt:message key="view_site_details" bundle="${resworkflow}"/>: <c:out value="${siteToView.name}"/>
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="view_site_details" bundle="${resworkflow}"/>
+			</c:otherwise>
+		</c:choose>
+	</span>
+</h1>
 <strong><fmt:message key="download_oid_in_odm_format_by_click" bundle="${restext}"/>
  <a href="DownloadStudyMetadata?studyId=<c:out value="${siteToView.id}"/>"> <fmt:message key="here" bundle="${restext}"/></a>.</strong>
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>

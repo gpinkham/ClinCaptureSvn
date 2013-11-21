@@ -6,25 +6,9 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
-
-<c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
-<h1><span class="title_manage">
-</c:when>
-<c:otherwise>
-  <h1>
-     <c:choose>
-      <c:when test="${userRole.role.name=='coordinator' || userRole.role.name=='director'}">
-       <span class="title_manage">
-      </c:when>
-      <c:otherwise>
-       <span class="title_manage">
-      </c:otherwise>
-    </c:choose>
-</c:otherwise>
-</c:choose>
-
-
+<!-- *JSP* ${pageContext.page['class'].simpleName} -->
+<h1>
+<span class="first_level_header">
 <!-- Preview CRF Version for <c:out value="${section.crf.name}" /> <c:out value="${section.crfVersion.name}" /> -->
 <c:if test="${studySubject != null && studySubject.id>0}">
   <c:choose>
@@ -76,43 +60,9 @@ function getSib(theSibling){
 <p>
 <p>
 <div class="homebox_bullets" style="width:117">
-
-<%--<a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${EventCRFBean.id}"/>')"
-					onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print_d.gif');"
-					onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');">
-					<img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="Print" title="Print CRF" align="right" hspace="10"></a>
-					<a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${EventCRFBean.id}"/>')">Print CRF</a>--%>
-
 </div>
 </c:when>
-<c:otherwise><!--
-<p>
-<div class="homebox_bullets"><a href="ViewCRFVersionPreview?crfId=<c:out value="${crfId}"/>">View CRF Version Metadata</a></div>
-<p>
-<div class="homebox_bullets" style="width:120">
-
-<%--<a href="javascript:openDocWindow('PrintCRFPreview')"
-					onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print_d.gif');"
-					onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');">
-					<img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="Print CRF" title="Print CRF" align="right" hspace="25"></a>
-					<a href="javascript:openDocWindow('PrintCRFPreview')">Print CRF</a>--%>
-
-</div>
-<p>
-	<c:choose>
-		<c:when test="${tabId==0}">
-			<div class="homebox_bullets"><%--<a href="ViewTableOfContent?crfVersionId=<c:out value="${section.crfVersion.id}"/>&sedId=1">Go Back to Section Properties</a>--%></div>
-			<p>
-		</c:when>
-		<c:otherwise>
-			<div class="homebox_bullets"><%--<a href="ViewCRF?crfId=<c:out value="${crfId}"/>">View CRF Details</a>--%></div>
-			<p>
-			<div class="homebox_bullets"><a href="ListCRF">Go Back to CRF List</a></div>
-      <p>
-      <div class="homebox_bullets"><a href="CreateCRFVersion?module=<c:out value="${module}"/>&crfId=<c:out value="${crfId}"/>">Reload CRF Version</a></div>
-      <p>
-    </c:otherwise>
-	</c:choose> -->
+<c:otherwise>
 </c:otherwise>
 </c:choose>
 </span>

@@ -117,7 +117,11 @@
  }
 </script>
 
-<h1><span class="title_manage"><fmt:message key="create_a_user_account" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="create_a_user_account" bundle="${resword}"/>
+	</span>
+</h1>
 
 <fmt:message key="field_required" bundle="${resword}"/>
 <form action="CreateUserAccount" method="post" onsubmit="return isPhoneNumberValid('phone', '<fmt:message key="invalid_phone_number_format" bundle="${resword}"/>');">

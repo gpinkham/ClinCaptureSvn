@@ -14,11 +14,13 @@
 
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 
-<h1><span class="title_manage">
-<fmt:message key="view_study_log_for" bundle="${resword}">
-	<fmt:param value="${study.name}"/>
-</fmt:message> 
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="view_study_log_for" bundle="${resword}">
+		<fmt:param value="${study.name}"/>
+		</fmt:message> 
+	</span>
+</h1>
 
 <jsp:include page="../include/alertbox.jsp" />
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showAuditEventStudyRow.jsp" /></c:import>

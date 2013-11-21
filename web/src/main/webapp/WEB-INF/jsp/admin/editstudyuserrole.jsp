@@ -55,12 +55,14 @@
     </c:otherwise>
 </c:choose>
 
-<h1><span class="title_manage">
-<fmt:message key="modify_role_for" bundle="${restext}">
-	<fmt:param value="${userName}"/>
-	<fmt:param value="${studyUserRole.studyName}"/>
-</fmt:message>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="modify_role_for" bundle="${restext}">
+			<fmt:param value="${userName}"/>
+			<fmt:param value="${studyUserRole.studyName}"/>
+		</fmt:message>
+	</span>
+</h1>
 
 <form action="EditStudyUserRole" method="post">
 <jsp:include page="../include/showSubmitted.jsp" />

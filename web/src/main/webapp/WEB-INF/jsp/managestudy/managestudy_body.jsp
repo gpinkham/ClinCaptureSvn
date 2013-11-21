@@ -43,7 +43,14 @@
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
 </head>
 <body>
-<h1><span class="title_manage"><fmt:message key="manage_study" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('help/3_0_manageStudy_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="manage_study" bundle="${resworkflow}"/> 
+		<a href="javascript:openDocWindow('help/3_0_manageStudy_Help.html')">
+			<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+		</a>
+	</span>
+</h1>
 <noscript class="noscript">
     <ul>
         <li><a href="ListStudySubjects">Subjects</a></li>

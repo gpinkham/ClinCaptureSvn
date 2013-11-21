@@ -13,7 +13,11 @@
 
 <jsp:include page="../include/sidebar.jsp"/>
 <!-- *JSP* submit/markEventCRFComplete.jsp -->
-<h1><span class="title_manage"><fmt:message key="mark_event_CRF_complete" bundle="${resworkflow}"/>: <c:out value="${toc.crf.name}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="mark_event_CRF_complete" bundle="${resworkflow}"/>: <c:out value="${toc.crf.name}"/>
+	</span>
+</h1>
 
 <c:import url="instructionsEnterData.jsp">
 	<c:param name="currStep" value="markComplete" />

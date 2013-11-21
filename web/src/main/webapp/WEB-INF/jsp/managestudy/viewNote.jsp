@@ -27,17 +27,12 @@
 </head>
 <body class="popup_BG" style="margin: 0px 12px 0px 12px;">
 
-
 <!-- Alert Box -->
+<!-- These DIVs define shaded box borders -->
+<jsp:include page="../include/alertbox.jsp"/>
+<!-- End Alert Box -->
 
-		<!-- These DIVs define shaded box borders -->
-
-
- <jsp:include page="../include/alertbox.jsp"/>
-
-	<!-- End Alert Box -->
-
-<div style="float: left;"><h1 class="title_manage"><fmt:message key="view_discrepancy_notes" bundle="${resword}"/></h1></div>
+<div style="float: left;"><h1 class="first_level_header"><fmt:message key="view_discrepancy_notes" bundle="${resword}"/></h1></div>
 <div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
 <br clear="all">
 

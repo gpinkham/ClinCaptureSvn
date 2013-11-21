@@ -83,22 +83,23 @@
 	</c:if>
 </c:forEach>
 
-<h1><span class="title_manage">
-<c:choose>
-	<c:when test="${requestStudySubject == requestStudySubjectFalse}">
-	
-<fmt:message key="schedule_study_event_for" bundle="${resword}"/><b> <c:out value="${chosenSubject.name}" /></b>
-        <a href="javascript:openDocWindow('help/2_2_enrollSubject_Help.html#step2')">
-            <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-	</c:when>
-	<c:otherwise>
-	
-<fmt:message key="schedule_study_event_for" bundle="${resword}"/>
-<a href="javascript:openDocWindow('help/2_4_scheduleEvent_Help.html')">
-<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-	</c:otherwise>
-</c:choose>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<c:choose>
+			<c:when test="${requestStudySubject == requestStudySubjectFalse}">
+				<fmt:message key="schedule_study_event_for" bundle="${resword}"/><b> <c:out value="${chosenSubject.name}" /></b>
+				<a href="javascript:openDocWindow('help/2_2_enrollSubject_Help.html#step2')">
+				<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="schedule_study_event_for" bundle="${resword}"/>
+				<a href="javascript:openDocWindow('help/2_4_scheduleEvent_Help.html')">
+				<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+			</c:otherwise>
+		</c:choose>
+	</span>
+</h1>
+
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
 <script type="text/JavaScript" language="JavaScript">
   <!--

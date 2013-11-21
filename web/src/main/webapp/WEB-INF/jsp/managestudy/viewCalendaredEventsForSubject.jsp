@@ -29,9 +29,11 @@
     </style>
 </head>
 <body>
-<h1><span class="title_manage">
-<fmt:message key="calendared_events_parametrs" bundle="${resword}"/> : <c:out value="${subjectLabel}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="calendared_events_parametrs" bundle="${resword}"/> : <c:out value="${subjectLabel}"/>
+	</span>
+</h1>
 <table style="border:none">
     <tr><td class="table_header_column_top" align="right"><fmt:message key="current_date" bundle="${resword}"/>:</td>
         <td class="table_header_column_top" align="left"><fmt:formatDate value="${currentDate}" dateStyle="medium"/></td>

@@ -48,9 +48,11 @@
 <table>
 <tr>
     <td>
-<h1><span class="title_manage">
-<fmt:message key="confirm_reassign_study_subject" bundle="${restext}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_reassign_study_subject" bundle="${restext}"/>
+	</span>
+</h1>
 
 <form action="ReassignStudySubject" method="post">
 <input type="hidden" name="action" value="submit">

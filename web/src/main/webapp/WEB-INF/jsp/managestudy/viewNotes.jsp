@@ -74,16 +74,14 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
-<h1><c:choose>
-        <c:when test="${module eq 'manage'}"><span class="title_manage"></c:when>
-        <c:otherwise><span class="title_manage"></c:otherwise>
-        </c:choose>
-	<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
-    <a href="javascript:openDocWindow('help/2_3_discrepancyNotes_Help.html')">
-        <c:choose>
-        <c:when test="${module eq 'manage'}"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></c:when>
-        <c:otherwise><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></c:otherwise></c:choose></a>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
+		<a href="javascript:openDocWindow('help/2_3_discrepancyNotes_Help.html')">
+			<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+		</a>
+	</span>
+</h1>
 
 <div><a id="sumBoxParent" href="javascript:void(0)"
         onclick="showSummaryBox('sumBox',document.getElementById('sumBoxParent'),

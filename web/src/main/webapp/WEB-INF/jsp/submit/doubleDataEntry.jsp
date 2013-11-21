@@ -86,7 +86,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 </c:choose>
 
 <table width="75%"><tr><td>
-<h1><span class="title_manage"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
+<h1><span class="first_level_header"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
          <c:choose>
             <c:when test="${eventCRF.stage.initialDE}">
                 <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"
@@ -129,7 +129,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
             </c:otherwise>
         </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
-		<h1><span class="title_manage"><fmt:message key="subject_ID" bundle="${resword}"/>: <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
+		<h1><span class="first_level_header"><fmt:message key="subject_ID" bundle="${resword}"/>: <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
 <%--</div>--%>
 
 <form id="mainForm" name="crfForm" method="POST" action="DoubleDataEntry">

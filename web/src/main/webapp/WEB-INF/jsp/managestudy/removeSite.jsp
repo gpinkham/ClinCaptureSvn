@@ -49,15 +49,18 @@
 <jsp:useBean scope='request' id='userRolesToRemove' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectsToRemove' class='java.util.ArrayList'/>
 
-<c:choose>      
- <c:when test="${fromListSite=='yes'}">
-  <h1><span class="title_manage">
- </c:when>
- <c:otherwise>
-   <h1><span class="title_Admin">
- </c:otherwise>
-</c:choose>
-<fmt:message key="confirm_removal_of_site"  bundle="${resword}"/></span></h1>
+<h1>
+	<c:choose>      
+		<c:when test="${fromListSite=='yes'}">
+			<span class="first_level_header">
+		</c:when>
+		<c:otherwise>
+			<span class="title_Admin">
+		</c:otherwise>
+	</c:choose>
+		<fmt:message key="confirm_removal_of_site"  bundle="${resword}"/>
+	</span>
+</h1>
 
 <p><fmt:message key="you_choose_to_remove_the_following_site"  bundle="${resword}"/>:</p>
 <div style="width: 600px">

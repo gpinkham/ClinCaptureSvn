@@ -39,9 +39,11 @@
 
 <jsp:useBean scope='request' id='subject' class='org.akaza.openclinica.bean.submit.SubjectBean'/>
 <jsp:useBean scope='request' id='studySubs' class='java.util.ArrayList'/>
-<h1><span class="title_manage">
-<fmt:message key="view_subject_details" bundle="${resword}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="view_subject_details" bundle="${resword}"/>
+	</span>
+</h1>
 <table border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td>

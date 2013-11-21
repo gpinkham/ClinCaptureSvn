@@ -79,7 +79,11 @@
 
 <!-- End Alert Box -->
 
-<div style="float: left;"><h1 class="title_manage"><c:out value="${entityName}"/>: <fmt:message key="view_discrepancy_notes" bundle="${resword}"/></h1></div>
+<div style="float: left;">
+	<h1 class="first_level_header">
+		<c:out value="${entityName}"/>: <fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
+	</h1>
+</div>
 <div style="float: right;"><p>
 <%-- <a href="#" onclick="javascript:window.close();"><fmt:message key="exit_window" bundle="${resword}"/></a> --%>
 </p></div>

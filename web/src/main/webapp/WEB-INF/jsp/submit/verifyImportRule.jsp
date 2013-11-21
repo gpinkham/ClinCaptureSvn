@@ -63,18 +63,10 @@
 
  <c:out value="${crfName}"/>
 
-<c:choose>
-    <c:when test="${userBean.sysAdmin && module=='admin'}">
-        <h1><span class="title_manage">
-    </c:when>
-    <c:otherwise>
-        <h1>
-        <span class="title_manage">
-    </c:otherwise>
-</c:choose>
-
-<fmt:message key="import_rule_data" bundle="${resworkflow}"/> ${study.name}
-<%-- <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/rules')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a> --%>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="import_rule_data" bundle="${resworkflow}"/> ${study.name}
+	</span>
 </h1>
 
 <form action="VerifyImportedRule?action=save" name="verifyImportedRule" method="POST">

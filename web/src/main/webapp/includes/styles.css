@@ -391,6 +391,13 @@ a:hover, a:active { color: #789EC5;
     height: 104px;
 }
 
+.first_level_header { font-family: Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: bold;
+    color: #D4A718;
+}
+
 .disabled_header { 
     position: absolute;
     left: 0px;

@@ -35,8 +35,10 @@
 <body>
 <a name="root"></a>
 
-<h1><span class="title_manage">
-    <c:out value="${studySub.label}"/> <fmt:message key="audit_logs" bundle="${resword}"/></span>
+<h1>
+	<span class="first_level_header">
+    <c:out value="${studySub.label}"/> <fmt:message key="audit_logs" bundle="${resword}"/>
+    </span>
 </h1>
 
 <!-- Excel Export Button -->

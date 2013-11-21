@@ -8,7 +8,11 @@
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-1.3.2.min.js'/>"></script>
 <jsp:useBean scope="request" id="mustChangePass" class="java.lang.String"/>
 
-<h1><span class="title_manage"><fmt:message key="reset_password" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="reset_password" bundle="${resword}"/>
+	</span>
+</h1>
 <jsp:include page="../login-include/login-alertbox.jsp"/>
 
 <form action="ResetPassword" method="post">

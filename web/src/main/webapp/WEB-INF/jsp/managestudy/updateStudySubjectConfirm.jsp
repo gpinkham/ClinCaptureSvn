@@ -47,9 +47,11 @@
 
 <jsp:useBean scope="session" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 
-<h1><span class="title_manage">
-<fmt:message key="confirm_study_subject_updates" bundle="${resword}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_study_subject_updates" bundle="${resword}"/>
+	</span>
+</h1>
 
 <form action="UpdateStudySubject" method="post">
 <input type="hidden" name="action" value="submit">

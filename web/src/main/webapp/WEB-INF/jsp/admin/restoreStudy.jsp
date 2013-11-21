@@ -40,9 +40,11 @@
 <jsp:useBean scope='request' id='subjectsToRestore' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='definitionsToRestore' class='java.util.ArrayList'/>
 
-<h1><span class="title_manage">
-<fmt:message key="confirm_restore_of_study" bundle="${resword}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_restore_of_study" bundle="${resword}"/>
+	</span>
+</h1>
 
 <p>
 <fmt:message key="you_choose_to_restore_the_following_study" bundle="${restext}"/>:

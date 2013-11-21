@@ -36,7 +36,11 @@
 
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 
-<h1><span class="title_manage"><fmt:message key="view_a_subject_group_class" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="view_a_subject_group_class" bundle="${resword}"/>
+	</span>
+</h1>
 
 
 <!-- These DIVs define shaded box borders -->

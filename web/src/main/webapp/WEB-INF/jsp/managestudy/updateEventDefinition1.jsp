@@ -125,9 +125,11 @@ $(document).ready(function() {
 		</script>
 	</c:when>
 </c:choose>
-<h1><span class="title_manage">
-<fmt:message key="update_SED" bundle="${resword}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="update_SED" bundle="${resword}"/>
+	</span>
+</h1>
 <ol>
     <fmt:message key="list_create_SED_for"  bundle="${resword}"/>
 </ol>

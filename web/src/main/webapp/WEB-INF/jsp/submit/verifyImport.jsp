@@ -65,17 +65,12 @@
 
 <%-- <c:out value="${crfName}"/> --%>
 
-<c:choose>
-	<c:when test="${userBean.sysAdmin && module=='admin'}">
-		<h1><span class="title_manage">
-	</c:when>
-	<c:otherwise>
-		<h1>
-		<span class="title_manage">
-	</c:otherwise>
-</c:choose>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="import_crf_data" bundle="${resworkflow}"/>
+	</span>
+</h1>
 
-<fmt:message key="import_crf_data" bundle="${resworkflow}"/></h1>
 <p><fmt:message key="import_instructions" bundle="${restext}"/></p>
 
 <!--  summary stats here, tbh -->

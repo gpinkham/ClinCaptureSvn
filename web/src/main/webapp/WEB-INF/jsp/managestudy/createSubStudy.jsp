@@ -113,7 +113,9 @@
 </script>
 
 <h1>
-  <span class="title_manage"><fmt:message key="create_a_new_site" bundle="${resword}"/></span>
+  <span class="first_level_header">
+ 	 <fmt:message key="create_a_new_site" bundle="${resword}"/>
+  </span>
 </h1>
 
 <form action="CreateSubStudy" method="post">

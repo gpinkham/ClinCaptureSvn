@@ -47,8 +47,12 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 
 
-<h1><span class="title_manage"><fmt:message key="confirm_a_new_case_report_form" bundle="${restext}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="confirm_a_new_case_report_form" bundle="${restext}"/>
+	</span>
+</h1>
+
 <jsp:include page="../include/alertbox.jsp"/>
 <fmt:message key="please_look_over_the_information_below_then" bundle="${restext}"/>
 

@@ -67,11 +67,15 @@
 <jsp:useBean scope="request" id="uncompletedEventDefinitionCRFs" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="displayEventCRFs" class="java.util.ArrayList" />
 
-<h1><span class="title_manage"><fmt:message key="view_event" bundle="${resword}"/>:<c:out value="${studyEvent.studyEventDefinition.name}" />
-<fmt:message key="for_subject" bundle="${resword}"/> <c:out value="${studySubject.label}"/>
-
- <a href="javascript:openDocWindow('help/2_2_enrollSubject_Help.html#step2a')">
- <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> </span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="view_event" bundle="${resword}"/>: <c:out value="${studyEvent.studyEventDefinition.name}" />
+		<fmt:message key="for_subject" bundle="${resword}"/> <c:out value="${studySubject.label}"/> 
+		<a href="javascript:openDocWindow('help/2_2_enrollSubject_Help.html#step2a')">
+			<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+		</a> 
+	</span>
+</h1>
 
 <a name="global"><a href="javascript:leftnavExpand('globalRecord');javascript:setImage('ExpandGroup5','images/bt_Collapse.gif');"><img
   name="ExpandGroup5" src="images/bt_Expand.gif" border="0"></a></a></div>

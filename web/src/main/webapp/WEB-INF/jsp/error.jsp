@@ -26,7 +26,11 @@
 	</c:otherwise>
 </c:choose>
 
-<h1><span class="title_manage"><fmt:message key="an_error_has_ocurred" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="an_error_has_ocurred" bundle="${resword}"/>
+	</span>
+</h1>
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <%-- input is needed for Selenium tests --%>
 <input type="hidden" id="error_page" value="true"/>

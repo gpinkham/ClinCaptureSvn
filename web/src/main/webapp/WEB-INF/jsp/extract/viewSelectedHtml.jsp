@@ -31,16 +31,18 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
 
-<h1><span class="title_manage">
-<c:choose>
-<c:when test="${newDataset.id<=0}">
-<fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="view_selected_items" bundle="${resword}"/> <a href="javascript:openDocWindow('help/4_2_createDataset_Help.html#step1')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-</c:when>
-<c:otherwise>
-<fmt:message key="edit_dataset" bundle="${resword}"/>: <fmt:message key="view_selected_items" bundle="${resword}"/> <a href="javascript:openDocWindow('help/4_7_editDataset_Help.html#step1')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-</c:otherwise>
-</c:choose>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<c:choose>
+			<c:when test="${newDataset.id<=0}">
+				<fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="view_selected_items" bundle="${resword}"/> <a href="javascript:openDocWindow('help/4_2_createDataset_Help.html#step1')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="edit_dataset" bundle="${resword}"/>: <fmt:message key="view_selected_items" bundle="${resword}"/> <a href="javascript:openDocWindow('help/4_7_editDataset_Help.html#step1')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+			</c:otherwise>
+		</c:choose>
+	</span>
+</h1>
 
 <P><jsp:include page="../include/alertbox.jsp"/></P>
 

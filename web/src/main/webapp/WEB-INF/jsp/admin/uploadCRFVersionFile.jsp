@@ -45,8 +45,11 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='crfName' class='java.lang.String'/>
 
-<h1><span class="title_manage"><fmt:message key="create_a_CRF_version_for" bundle="${restext}"/> <c:out value="${crfName}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="create_a_CRF_version_for" bundle="${restext}"/> <c:out value="${crfName}"/>
+	</span>
+</h1>
 
 <p>
 <fmt:message key="please_click_browse_button" bundle="${restext}"/>:

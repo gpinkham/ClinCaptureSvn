@@ -68,17 +68,16 @@
 <jsp:useBean scope='request' id='crfName' class='java.lang.String'/>
 
 <h1>
-<span class="title_manage">
- <c:choose>
-     <c:when test="${empty crfName}">
-         <fmt:message key="create_a_new_CRF_case_report_form" bundle="${resworkflow}"/>
-     </c:when>
-     <c:otherwise>
-        <fmt:message key="create_CRF_version" bundle="${resworkflow}"/> <c:out value="${crfName}"/>
-     </c:otherwise>
- </c:choose>
-
-</span>
+	<span class="first_level_header">
+		 <c:choose>
+		     <c:when test="${empty crfName}">
+		         <fmt:message key="create_a_new_CRF_case_report_form" bundle="${resworkflow}"/>
+		     </c:when>
+		     <c:otherwise>
+		        <fmt:message key="create_CRF_version" bundle="${resworkflow}"/> <c:out value="${crfName}"/>
+		     </c:otherwise>
+		 </c:choose>	
+	</span>
 </h1>
 
 <script type="text/JavaScript" language="JavaScript">

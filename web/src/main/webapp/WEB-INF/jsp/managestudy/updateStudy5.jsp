@@ -66,7 +66,11 @@
     <c:set var="genderLabel" value="${study.studyParameterConfig.genderLabel}"/>
 </c:if>
 
-<h1><span class="title_manage"><fmt:message key="update_study_details_continue" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="update_study_details_continue" bundle="${resword}"/>
+	</span>
+</h1>
 
 <span class="title_Admin"><p><b><fmt:message key="section_c_conditions_and_eligibility" bundle="${resword}"/></b></p></span>
 <P>* <fmt:message key="indicates_required_field" bundle="${resword}"/></P>

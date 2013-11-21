@@ -50,7 +50,11 @@
 
 <!-- Main Content Area -->
 
-<h1><span class="title_manage"><fmt:message key="contact_openclinica_administrator" bundle="${restext}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="contact_openclinica_administrator" bundle="${restext}"/>
+	</span>
+</h1>
 <P><fmt:message key="fill_out_form_to_contact" bundle="${restext}"/><p>
 <jsp:include page="../login-include/login-alertbox.jsp"/>
 

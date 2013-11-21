@@ -54,18 +54,29 @@
 
 
 <c:choose>
-<c:when test="${toc.action == 'ae'}">
-<h1><span class="title_manage"><fmt:message key="administrative_editing_on_event_CRF" bundle="${resword}"/></span></h1>
-  <c:import url="instructionsAdminEdit.jsp">
-	<c:param name="currStep" value="eventCRFOverview" />
- </c:import>
-</c:when>
-<c:otherwise>
-<h1><span class="title_submit"><fmt:message key="event_CRF_data_submission" bundle="${resword}"/> <a href="javascript:openDocWindow('help/2_2_enrollSubject_Help.html#step2b')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
- <c:import url="instructionsEnterData.jsp">
-	<c:param name="currStep" value="eventCRFOverview" />
- </c:import>
-</c:otherwise>
+	<c:when test="${toc.action == 'ae'}">
+		<h1>
+			<span class="first_level_header">
+				<fmt:message key="administrative_editing_on_event_CRF" bundle="${resword}"/>
+			</span>
+		</h1>
+		<c:import url="instructionsAdminEdit.jsp">
+			<c:param name="currStep" value="eventCRFOverview" />
+		</c:import>
+	</c:when>
+	<c:otherwise>
+		<h1>
+			<span class="first_level_header">
+				<fmt:message key="event_CRF_data_submission" bundle="${resword}"/> 
+				<a href="javascript:openDocWindow('help/2_2_enrollSubject_Help.html#step2b')">
+					<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+				</a>
+			</span>
+		</h1>
+		<c:import url="instructionsEnterData.jsp">
+			<c:param name="currStep" value="eventCRFOverview" />
+		</c:import>
+	</c:otherwise>
 </c:choose>
 
 

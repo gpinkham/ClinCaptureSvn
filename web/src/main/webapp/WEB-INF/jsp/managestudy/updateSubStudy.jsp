@@ -85,9 +85,11 @@ function updateThis(multiSelEle, count) {
       }
 </script>
 
-<h1><span class="title_manage">
-<fmt:message key="update_site_details" bundle="${resword}"/>: <c:out value="${newStudy.name}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="update_site_details" bundle="${resword}"/>: <c:out value="${newStudy.name}"/>
+	</span>
+</h1>
 <br><br>
 
 <jsp:include page="../include/alertbox.jsp" />

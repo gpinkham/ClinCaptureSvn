@@ -38,7 +38,14 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
-<h1><span class="title_manage"><fmt:message key="administer_users" bundle="${resword}"/> <a href="javascript:openDocWindow('help/6_2_administerUsers_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="administer_users" bundle="${resword}"/> 
+		<a href="javascript:openDocWindow('help/6_2_administerUsers_Help.html')">
+			<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+		</a>
+	</span>
+</h1>
 
 <style>
     div.tablebox_center > table {

@@ -53,7 +53,11 @@
 <jsp:useBean scope='request' id='spss' class='java.lang.String'/>
 <jsp:useBean scope='request' id='contactEmail' class='java.lang.String'/>
 
-<h1><span class="title_manage"><fmt:message key="create_scheduled_job_export_dataset" bundle="${resword}"/></span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="create_scheduled_job_export_dataset" bundle="${resword}"/>
+	</span>
+</h1>
 <p>
 
 <form action="CreateJobExport" method="post">

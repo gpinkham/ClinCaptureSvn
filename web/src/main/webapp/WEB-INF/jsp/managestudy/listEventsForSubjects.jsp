@@ -74,9 +74,11 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 
-<h1><span class="title_manage">
-<fmt:message key="view_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="view_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
+	</span>
+</h1>
 
 <div id="findSubjectsDiv">
     <form  action="${pageContext.request.contextPath}/ListEventsForSubjects">

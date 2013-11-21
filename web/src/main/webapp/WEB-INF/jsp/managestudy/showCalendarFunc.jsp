@@ -21,10 +21,12 @@
 	</title>
 </head>
 
-<h1><span class="title_manage">
-<fmt:message key="calendared_events_parametrs" bundle="${resword}"/> : <c:out value="${studyName}"/>
 <body>
-</span></h1>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="calendared_events_parametrs" bundle="${resword}"/>: <c:out value="${studyName}"/>
+	</span>
+</h1>
 <table border="0" cellpadding="0" cellspacing="0" width="700" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
 
      <tr>
