@@ -182,7 +182,7 @@
 					<table border="0" cellpadding="0" cellspacing="0">
 						<tr>
 							<td class="table_tools">
-								<table width='60'>
+								<table width='70'>
 									<td style="white-space: nowrap;">
 									<c:if test="${study.status.available}">
 										<c:if test="${userRole.role.id ne 6}">
