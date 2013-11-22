@@ -12,7 +12,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.junit.Before;
 import org.junit.Test;
 
-@SuppressWarnings("JUnit4AnnotatedMethodInJUnit3TestCase")
 public class OdmExtractDAOTest extends DefaultAppContextTest {
 
 	private String sedIds;

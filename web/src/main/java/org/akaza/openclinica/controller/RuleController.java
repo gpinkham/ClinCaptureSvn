@@ -93,7 +93,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping(value = "/rule")
-@SuppressWarnings({ "rawtypes" })
 public class RuleController {
 
     @Autowired

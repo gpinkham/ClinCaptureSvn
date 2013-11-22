@@ -262,7 +262,7 @@ public class ViewNotesServlet extends RememberLastPage {
         forward(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY, request, response);
 	}
 
-	@SuppressWarnings({"rawtypes", "unused"})
+	@SuppressWarnings({"rawtypes"})
 	public ArrayList<DiscrepancyNoteBean> filterForOneSubject(ArrayList<DiscrepancyNoteBean> allNotes, int subjectId,
 			int resolutionStatus) {
 

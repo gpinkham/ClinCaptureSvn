@@ -245,8 +245,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	 * @param usernameParameter
 	 *            the parameter name. Defaults to "j_username".
 	 */
-    @SuppressWarnings("unused")
-	public void setUsernameParameter(String usernameParameter) {
+    public void setUsernameParameter(String usernameParameter) {
 		Assert.hasText(usernameParameter, "Username parameter must not be empty or null");
 		this.usernameParameter = usernameParameter;
 	}
@@ -257,8 +256,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	 * @param passwordParameter
 	 *            the parameter name. Defaults to "j_password".
 	 */
-    @SuppressWarnings("unused")
-	public void setPasswordParameter(String passwordParameter) {
+    public void setPasswordParameter(String passwordParameter) {
 		Assert.hasText(passwordParameter, "Password parameter must not be empty or null");
 		this.passwordParameter = passwordParameter;
 	}
@@ -271,18 +269,15 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	 * <p>
 	 * Defaults to <tt>true</tt> but may be overridden by subclasses.
 	 */
-    @SuppressWarnings("unused")
-	public void setPostOnly(boolean postOnly) {
+    public void setPostOnly(boolean postOnly) {
 		this.postOnly = postOnly;
 	}
 
-    @SuppressWarnings("unused")
-	public final String getUsernameParameter() {
+    public final String getUsernameParameter() {
 		return usernameParameter;
 	}
 
-    @SuppressWarnings("unused")
-	public final String getPasswordParameter() {
+    public final String getPasswordParameter() {
 		return passwordParameter;
 	}
 

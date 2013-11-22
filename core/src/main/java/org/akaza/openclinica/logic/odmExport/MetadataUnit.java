@@ -53,7 +53,6 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
  * 
  * @author ywang (May, 2009)
  */
-@SuppressWarnings({"rawtypes"})
 public class MetadataUnit extends OdmUnit {
 	private OdmStudyBean odmStudy;
 	private StudyBean parentStudy;

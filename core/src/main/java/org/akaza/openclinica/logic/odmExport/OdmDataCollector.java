@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author ywang (May, 2008)
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked" })
 public abstract class OdmDataCollector {
 	protected DataSource ds;
 	protected DatasetBean dataset;

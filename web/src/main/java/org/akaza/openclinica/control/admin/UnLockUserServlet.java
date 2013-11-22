@@ -113,7 +113,6 @@ public class UnLockUserServlet extends SecureController {
 		forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
 	}
 
-	@SuppressWarnings("rawtypes")
 	private void sendRestoreEmail(UserAccountBean u, String password) throws Exception {
 		logger.info("Sending restore and password reset notification to " + u.getName());
 

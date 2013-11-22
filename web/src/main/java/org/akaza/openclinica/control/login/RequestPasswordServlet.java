@@ -167,7 +167,6 @@ public class RequestPasswordServlet extends Controller {
 	 * @param request
 	 * @param response
 	 */
-	@SuppressWarnings("rawtypes")
 	private void sendPassword(String passwd, UserAccountBean ubDB, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		StudyDAO sdao = getStudyDAO();

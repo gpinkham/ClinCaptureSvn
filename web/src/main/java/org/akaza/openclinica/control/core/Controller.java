@@ -122,7 +122,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author jnyayapathi
  * 
  */
-@SuppressWarnings({ "unused", "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public abstract class Controller extends BaseController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

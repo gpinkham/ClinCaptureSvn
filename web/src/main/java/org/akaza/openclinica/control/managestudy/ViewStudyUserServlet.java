@@ -32,7 +32,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({ "serial" })
 public class ViewStudyUserServlet extends SecureController {
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {

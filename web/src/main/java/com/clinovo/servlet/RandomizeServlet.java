@@ -243,7 +243,6 @@ public class RandomizeServlet extends SecureController {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	protected int getStudyId() {
 		
 		StudyBean study = null;

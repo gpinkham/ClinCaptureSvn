@@ -1,8 +1,5 @@
 package org.akaza.openclinica.control.core;
 
-import com.clinovo.service.CodedItemService;
-import com.clinovo.service.DictionaryService;
-
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,6 +9,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -69,7 +67,10 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
 
-@SuppressWarnings({ "unused", "unchecked", "rawtypes", "serial" })
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DictionaryService;
+
+@SuppressWarnings({ "rawtypes", "serial" })
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
 
     public static final String REFERER = "referer";
@@ -221,7 +222,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return (SessionManager) request.getAttribute(SESSION_MANAGER);
 	}
 
-	@SuppressWarnings("rawtypes")
 	public HashMap getErrorsHolder(HttpServletRequest request) {
 		HashMap errors = (HashMap) request.getAttribute(ERRORS_HOLDER);
 		if (errors == null) {
@@ -317,7 +317,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return ruleSetAuditDao;
 	}
 
-	@SuppressWarnings("rawtypes")
 	public ItemGroupDAO getItemGroupDAO() {
 		return new ItemGroupDAO(getDataSource());
 	}
@@ -346,7 +345,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new SubjectDAO(getDataSource());
 	}
 
-	@SuppressWarnings("rawtypes")
 	public StudySubjectDAO getStudySubjectDAO() {
 		return new StudySubjectDAO(getDataSource());
 	}
@@ -363,12 +361,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new StudyEventDAO(getDataSource());
 	}
 
-	@SuppressWarnings("rawtypes")
 	public StudyDAO getStudyDAO() {
 		return new StudyDAO(getDataSource());
 	}
 
-	@SuppressWarnings("rawtypes")
 	public EventCRFDAO getEventCRFDAO() {
 		return new EventCRFDAO(getDataSource());
 	}
@@ -385,12 +381,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new StudyGroupDAO(getDataSource());
 	}
 
-	@SuppressWarnings("rawtypes")
 	public DynamicEventDao getDynamicEventDao() {
 		return new DynamicEventDao(getDataSource());
 	}
 
-	@SuppressWarnings("rawtypes")
 	public StudyEventDefinitionDAO getStudyEventDefinitionDAO() {
 		return new StudyEventDefinitionDAO(getDataSource());
 	}
@@ -403,12 +397,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new StudyParameterValueDAO(getDataSource());
 	}
 
-	@SuppressWarnings("rawtypes")
 	public CRFVersionDAO getCRFVersionDAO() {
 		return new CRFVersionDAO(getDataSource());
 	}
 
-	@SuppressWarnings("rawtypes")
 	public CRFDAO getCRFDAO() {
 		return new CRFDAO(getDataSource());
 	}
@@ -425,12 +417,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new ItemDataDAO(getDataSource());
 	}
 
-	@SuppressWarnings("rawtypes")
 	public ItemDAO getItemDAO() {
 		return new ItemDAO(getDataSource());
 	}
 
-	@SuppressWarnings("rawtypes")
 	public ItemFormMetadataDAO getItemFormMetadataDAO() {
 		return new ItemFormMetadataDAO(getDataSource());
 	}
@@ -451,7 +441,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new AuditEventDAO(getDataSource());
 	}
 
-	@SuppressWarnings("rawtypes")
 	public ItemGroupMetadataDAO getItemGroupMetadataDAO() {
 		return new ItemGroupMetadataDAO(getDataSource());
 	}
