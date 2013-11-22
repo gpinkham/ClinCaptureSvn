@@ -42,7 +42,7 @@ public class UpdateSubStudyServletTest {
 	public static final int ID = 1;
 	private Mockery context = new Mockery();
 
-	private StudyDAO<?, ?> studyDAO;
+	private StudyDAO studyDAO;
 	private HttpServletRequest request;
     private HttpSession session;
 

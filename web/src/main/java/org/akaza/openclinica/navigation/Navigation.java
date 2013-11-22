@@ -16,7 +16,7 @@ public class Navigation {
 			"/UpdateStudySubject", "/RemoveStudySubject", "/ResolveDiscrepancy", "/RestoreStudySubject",
 			"/UpdateStudyEvent", "/RemoveStudyEvent", "/RestoreStudyEvent", "/DeleteEventCRF", "/RemoveEventCRF",
 			"/RestoreEventCRF", "/InitUpdateSubStudy", "/UpdateSubStudy", "/DeleteStudyEvent",
-			"/EditStudyUserRole", "/RemoveStudyUserRole", "/ViewSectionDataEntry", "/CreateSubjectGroupClass",
+			"/EditStudyUserRole", "/ViewSectionDataEntry", "/CreateSubjectGroupClass",
 			"/SetStudyUserRole", "/UpdateProfile", "/SectionPreview", "/DefineStudyEvent",
 			"/InitUpdateEventDefinition", "/UpdateEventDefinition", "/RemoveEventDefinition", "/RemoveSubject",
 			"/RemoveStudy", "/ViewUserAccount", "/EditUserAccount", "/SetUserRole", "/ViewUserAccount", "/Configure",

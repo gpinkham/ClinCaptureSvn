@@ -751,16 +751,6 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.SetStudyUserRoleServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RemoveStudyUserRoleServlet</servlet-name>
-        <display-name>RemoveStudyUserRole</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RemoveStudyUserRoleServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>RestoreStudyUserRoleServlet</servlet-name>
-        <display-name>RestoreStudyUserRole</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RestoreStudyUserRoleServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>listStudySubjectsServlet</servlet-name>
         <display-name>ListStudySubject</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -1785,14 +1775,6 @@
     <servlet-mapping>
         <servlet-name>SetStudyUserRoleServlet</servlet-name>
         <url-pattern>/SetStudyUserRole</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RemoveStudyUserRoleServlet</servlet-name>
-        <url-pattern>/RemoveStudyUserRole</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RestoreStudyUserRoleServlet</servlet-name>
-        <url-pattern>/RestoreStudyUserRole</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>listStudySubjectsManageServlet</servlet-name>

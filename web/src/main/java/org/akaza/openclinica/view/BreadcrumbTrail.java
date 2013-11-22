@@ -649,11 +649,6 @@ public class BreadcrumbTrail {
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_users"), "ListStudyUser", Status.AVAILABLE));
 				trail.add(new BreadcrumbBean(resworkflow.getString("view_user_details"), "#", Status.PENDING));
-			} else if (jspPage.equals(Page.REMOVE_USER_ROLE_IN_STUDY)) {
-				trail = new ArrayList();
-				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));
-				trail.add(new BreadcrumbBean(resworkflow.getString("manage_users"), "ListStudyUser", Status.AVAILABLE));
-				trail.add(new BreadcrumbBean(resworkflow.getString("remove_user_role"), "#", Status.PENDING));
 			} else if (jspPage.equals(Page.REMOVE_DEFINITION)) {
 				trail = new ArrayList();
 				trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));

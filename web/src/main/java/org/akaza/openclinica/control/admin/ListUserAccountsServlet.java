@@ -97,6 +97,9 @@ public class ListUserAccountsServlet extends RememberLastPage {
 			}
 			userRolesRemovedCountMap.put(uab.getName(), removedRolesCount);
 		}
+		
+		StudyDAO sdao = getStudyDAO();
+		StudyBean sb = (StudyBean) sdao.findByPK(((UserAccountBean)(request.getSession().getAttribute("userBean"))).getActiveStudyId());
 
 		ArrayList allUserRows = UserAccountRow.generateRowsFromBeans(allUsers);
 
@@ -116,6 +119,8 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		request.setAttribute(ARG_MESSAGE, message);
         request.setAttribute("roleMap", Role.roleMap);
         request.setAttribute("userRolesRemovedCountMap", userRolesRemovedCountMap);
+        request.setAttribute("studyId", sb.getId());
+        request.setAttribute("parentStudyId", sb.getParentStudyId());
 
         StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();

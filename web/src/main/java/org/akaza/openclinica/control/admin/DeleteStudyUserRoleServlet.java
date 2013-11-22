@@ -27,14 +27,17 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-// allows both deletion and restoration of a study user role
+// allows both deletion and remove/restore of a study user role
 @SuppressWarnings({"unchecked", "serial"})
 public class DeleteStudyUserRoleServlet extends SecureController {
 	public static final String PATH = "DeleteStudyUserRole";
@@ -49,14 +52,14 @@ public class DeleteStudyUserRoleServlet extends SecureController {
 
 	@Override
 	protected void mayProceed() throws InsufficientPermissionException {
-		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-					+ respage.getString("change_study_contact_sysadmin"));
-			throw new InsufficientPermissionException(Page.MENU_SERVLET,
-					resexception.getString("you_may_not_perform_administrative_functions"), "1");
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+			return;
 		}
 
-		return;
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"));
+		throw new InsufficientPermissionException(Page.MENU_SERVLET,
+				resexception.getString("you_may_not_perform_administrative_functions"), "1");
 	}
 
 	@Override
@@ -95,13 +98,13 @@ public class DeleteStudyUserRoleServlet extends SecureController {
 			message = respage.getString("the_role_cannot_be_restored_since_user_deleted");
 		} else {
 			EntityAction desiredAction = EntityAction.get(action);
-			if (ub.isSysAdmin() && desiredAction.equals(EntityAction.DELETE)) {
+			if ((ub.isSysAdmin() || ub.getActiveStudyRole().equals(Role.STUDY_ADMINISTRATOR)) && desiredAction.equals(EntityAction.DELETE)) {
                 if (s.getUserName().equalsIgnoreCase("root") && s.isSysAdmin()) {
                     message = respage.getString("you_cannot_remove_the_sysadmin_role_for_the_root_user");
                 } else {
 					if (s.isSysAdmin()) {						
 						message = respage.getString("the_user_role_deleted");
-						if (ub.getId() == user.getId()) {
+						if ((ub.getId() == user.getId()) && (ub.getActiveStudyId() == s.getStudyId())) {
 							forwardTo = Page.MENU_SERVLET;
 							Navigation.removeUrl(request, "/ListUserAccounts");
 							additionalMessage = respage.getString("you_may_not_perform_administrative_functions");
@@ -115,7 +118,7 @@ public class DeleteStudyUserRoleServlet extends SecureController {
 				if ((ub.isSysAdmin() || ub.getActiveStudyRole().equals(Role.STUDY_ADMINISTRATOR)) && desiredAction.equals(EntityAction.REMOVE)) {
 					s.setStatus(Status.DELETED);
 					message = respage.getString("the_study_user_role_removed");
-					if (ub.getId() == user.getId()) {
+					if ((ub.getId() == user.getId()) && (ub.getActiveStudyId() == s.getStudyId())) {
 						forwardTo = Page.MENU_SERVLET;
 						Navigation.removeUrl(request, "/ListUserAccounts");
 						additionalMessage = respage.getString("you_may_not_perform_administrative_functions");
@@ -127,6 +130,8 @@ public class DeleteStudyUserRoleServlet extends SecureController {
 				s.setUpdater(ub);
 				udao.updateStudyUserRole(s, uName);
 			}
+			
+			sendEmail(user, s, desiredAction);
 		}
 		addPageMessage(message);
 		if (!additionalMessage.isEmpty()) {
@@ -137,70 +142,30 @@ public class DeleteStudyUserRoleServlet extends SecureController {
         }
 		forwardPage(forwardTo);
 	}
+	
+	private void sendEmail(UserAccountBean u, StudyUserRoleBean sub, EntityAction action) throws Exception {
 
-	// public void processRequest(HttpServletRequest request,
-	// HttpServletResponse response)
-	// throws OpenClinicaException {
-	// session = request.getSession();
-	// session.setMaxInactiveInterval(60 * 60 * 3);
-	// logger.setLevel(Level.ALL);
-	// UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
-	// try {
-	// String userName = request.getRemoteUser();
-	//
-	// sm = new SessionManager(ub, userName);
-	// ub = sm.getUserBean();
-	// if (logger.isLoggable(Level.INFO)) {
-	// logger.info("user bean from DB" + ub.getName());
-	// }
-	//
-	// SQLFactory factory = SQLFactory.getInstance();
-	// UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-	//
-	// FormProcessor fp = new FormProcessor(request);
-	// int studyId = fp.getInt(ARG_STUDYID);
-	// String uName = fp.getString(ARG_USERNAME);
-	// int action = fp.getInt(ARG_ACTION);
-	//
-	// StudyUserRoleBean s = udao.findRoleByUserNameAndStudyId(uName, studyId);
-	//
-	// String message;
-	// if (!s.isActive()) {
-	// message = "The specified user role does not exist for the specified
-	// study.";
-	// }
-	// else if (!EntityAction.contains(action)) {
-	// message = "The specified action on the study user role is invalid.";
-	// }
-	// else if (!EntityAction.get(action).equals(EntityAction.DELETE)
-	// && !EntityAction.get(action).equals(EntityAction.RESTORE)) {
-	// message = "The specified action is not allowed.";
-	// }
-	// else {
-	// EntityAction desiredAction = EntityAction.get(action);
-	//
-	// if (desiredAction.equals(EntityAction.DELETE)) {
-	// s.setStatus(Status.DELETED);
-	// message = "The study user role has been deleted.";
-	// }
-	// else {
-	// s.setStatus(Status.AVAILABLE);
-	// message = "The study user role has been restored.";
-	// }
-	//
-	// udao.updateStudyUserRole(s, uName);
-	// }
-	//
-	// request.setAttribute("message", message);
-	// forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// logger.warn("OpenClinicaException:: control.deleteStudyUserRole: " +
-	// e.getMessage());
-	//
-	// forwardPage(Page.ERROR, request, response);
-	// }
-	// }
+		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyBean study = (StudyBean) sdao.findByPK(sub.getStudyId());
+		String subject = null;
+		String body = null;
+		logger.info("Sending email...");
+		
+		if (action.equals(EntityAction.DELETE)) {
+			subject =  resword.getString("notification_deleting_role");
+			body = resword.getString("delete_role_email_message_htm");
+		} else if (action.equals(EntityAction.REMOVE)) {
+			subject =  resword.getString("notification_removing_role");
+			body = resword.getString("remove_role_email_message_htm");
+		} else if (action.equals(EntityAction.RESTORE)) {
+			subject =  resword.getString("notification_restoring_role");
+			body = resword.getString("restore_role_email_message_htm");
+		}
+		
+		body = body.replace("{0}", u.getFirstName() + " " + u.getLastName()).replace("{1}", u.getName()).replace("{2}", study.getName()).replace("{3}", sub.getRoleName());
+		sendEmail(u.getEmail().trim(), subject, body, false);
+		
+	}
 
 	@Override
 	protected String getAdminServlet() {

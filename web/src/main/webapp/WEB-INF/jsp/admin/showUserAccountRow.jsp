@@ -184,7 +184,7 @@
                             </c:otherwise>
                         </c:choose>
 					</c:if>
-					<c:if test="${not currRow.bean.status.deleted and not ((currRow.bean.name eq userBean.name) and (sur.studyId eq userBean.activeStudyId))}">
+					<c:if test="${not currRow.bean.status.deleted and not ((currRow.bean.name eq userBean.name) and (sur.studyId eq studyId || sur.studyId eq parentStudyId))}">
 					<div><c:out value="${currentStudy.id}"/></div>
 						<c:choose>
 							<c:when test='${sur.status.deleted}'>

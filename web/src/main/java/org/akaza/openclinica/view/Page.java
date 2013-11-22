@@ -649,10 +649,6 @@ public class Page {
 			"view a user in a study");
 	public final static Page SET_USER_ROLE_IN_STUDY = new Page(path + "managestudy/setUserRoleInStudy.jsp",
 			"set a user role in a study");
-	public final static Page REMOVE_USER_ROLE_IN_STUDY = new Page(path + "managestudy/removeStudyUserRole.jsp",
-			"remove a user role in a study");
-	public final static Page RESTORE_USER_ROLE_IN_STUDY = new Page(path + "managestudy/restoreStudyUserRole.jsp",
-			"restore a user role in a study");
 	public final static Page LIST_USER_IN_STUDY_SERVLET = new Page("/ListStudyUser", "list users in a study");
 
 	public final static Page LIST_SUBJECT = new Page(path + "managestudy/listSubject.jsp", "list subjects in a study");

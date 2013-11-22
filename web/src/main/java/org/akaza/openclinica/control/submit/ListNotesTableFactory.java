@@ -100,7 +100,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	private StudySubjectDAO<?, ?> studySubjectDao;
 	private UserAccountDAO userAccountDao;
 	private DiscrepancyNoteDAO discrepancyNoteDao;
-	private StudyDAO<?, ?> studyDao;
+	private StudyDAO studyDao;
 	private SubjectDAO subjectDao;
 	private CRFVersionDAO<?, ?> crfVersionDao;
 	private CRFDAO<?, ?> crfDao;
@@ -883,11 +883,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		this.subjectDao = subjectDao;
 	}
 
-	public StudyDAO<?, ?> getStudyDao() {
+	public StudyDAO getStudyDao() {
 		return studyDao;
 	}
 
-	public void setStudyDao(StudyDAO<?, ?> studyDao) {
+	public void setStudyDao(StudyDAO studyDao) {
 		this.studyDao = studyDao;
 	}
 

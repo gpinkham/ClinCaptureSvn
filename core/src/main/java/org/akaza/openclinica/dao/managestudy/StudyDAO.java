@@ -42,7 +42,7 @@ import java.util.Date;
 import javax.sql.DataSource;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class StudyDAO<K, V> extends AuditableEntityDAO implements IStudyDAO {
+public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	public StudyDAO(DataSource ds) {
 		super(ds);
