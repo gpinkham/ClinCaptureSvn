@@ -117,7 +117,8 @@
                         <td class="table_header_column"><fmt:message key="SE" bundle="${resword}"/></td>
                         <td class="table_cell"><c:out value="${studyEvent.studyEventDefinition.name}"/>&nbsp;</td>
                     </tr>
-                    <tr>
+                    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
+                      <tr>
                         <td class="table_header_column"><fmt:message key="location" bundle="${resword}"/></td>
                         <td class="table_cell">
                             <c:set var="eventLocation" value="${studyEvent.location}"/>
@@ -128,29 +129,30 @@
                                 <c:out value="${eventLocation}"/>
                             </span>
                             <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-								<c:set var="imageFileName" value="${imageFileNameForLocation}"/>
-								<c:choose>
-									<c:when test="${numberOfLocationDNotes > 0}">
-										<span style="float:right">
-											<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg','spanAlert-location', '', event); return false;">
-												<img id="flag_location" name="flag_location" 
-													src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
-											</a>
-										</span>
-									</c:when>
-									<c:otherwise>
-										<span style="float:right">
-											<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-location', '', event); return false;">
-												<img id="flag_location" name="flag_location" 
-													src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-												<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg"/>
-											</a>
-										</span>
-									</c:otherwise>
-								</c:choose>	
+                              <c:set var="imageFileName" value="${imageFileNameForLocation}"/>
+                              <c:choose>
+                                <c:when test="${numberOfLocationDNotes > 0}">
+                                  <span style="float:right">
+                                    <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg','spanAlert-location', '', event); return false;">
+                                      <img id="flag_location" name="flag_location"
+                                        src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                                    </a>
+                                  </span>
+                                </c:when>
+                                <c:otherwise>
+                                  <span style="float:right">
+                                    <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-location', '', event); return false;">
+                                      <img id="flag_location" name="flag_location"
+                                        src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
+                                      <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg"/>
+                                    </a>
+                                  </span>
+                                </c:otherwise>
+                              </c:choose>
                             </c:if>
-						</td>
-                    </tr>
+						            </td>
+                      </tr>
+                    </c:if>
                     <%-- adding oid here, tbh 06/2008 --%>
                     <tr>
                         <td class="table_header_column"><fmt:message key="study_subject_oid" bundle="${resword}"/></td>
