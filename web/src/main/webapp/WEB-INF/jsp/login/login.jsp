@@ -108,35 +108,11 @@
                                 <div style="display:inline; position:absolute;"><a style="" href="#" id="requestPassword"> <fmt:message key="forgot_password" bundle="${resword}"/></a></div>
                             </form>
                             <br/><jsp:include page="../login-include/login-alertbox.jsp"/>
-                            <%-- <a href="<c:url value="/RequestPassword"/>"> <fmt:message key="forgot_password" bundle="${resword}"/></a> --%>
                         </div>
                         <!-- End Login box contents -->
                     </div>
                 </td>
             </tr>
-			<!-- Clinovo Ticket #178
-            <script type="text/javascript">
-                if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent)){
-                    var ffversion=new Number(RegExp.$1)
-                    if (!(ffversion>=3)){
-                        document.write("<tr> <td align='justify' colspan=2 style='padding-left: 20px; text-indent: 25px;' >"+
-                                " <fmt:message key="choose_browser" bundle="${restext}"/>"+
-                                "</td> </tr>");
-                    }
-                } else if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)){
-                    var ieversion=new Number(RegExp.$1)
-                    if (ieversion!=8 && ieversion!=7){
-                        document.write("<tr> <td align='justify' colspan=2 style='padding-left: 20px;' >"+
-                                "<div style='width: 310px; text-indent: 25px;' align='justify'> <fmt:message key="choose_browser" bundle="${restext}"/> </div>"+
-                                "</td> </tr>");
-                    }
-                }else{
-                    document.write("<tr> <td align='justify' colspan=2 style='padding-left: 20px; text-indent: 25px;' >"+
-                            " <fmt:message key="choose_browser" bundle="${restext}"/>"+
-                            "</td> </tr>");
-                }
-            </script>
-			-->
         </table>
 
     </center>
@@ -146,12 +122,6 @@
         document.getElementById('j_password').setAttribute( 'autocomplete', 'off' );
 
         jQuery(document).ready(function() {
-
-            /*$.get("../../RssReader", function(data){
-                //alert("Data Loaded: " + data);
-                $("#newsBox").html(data);
-            });*/
-
 
             jQuery('#requestPassword').click(function() {
                 jQuery.blockUI({ message: jQuery('#requestPasswordForm'), css:{left: "200px", top:"180px" } });
