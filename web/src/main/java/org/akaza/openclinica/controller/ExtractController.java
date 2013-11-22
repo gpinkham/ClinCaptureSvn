@@ -14,6 +14,7 @@
 package org.akaza.openclinica.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -77,10 +78,11 @@ public class ExtractController {
 	 *            , http request
 	 * @return model map, but more importantly, creates a quartz job which runs right away and generates all output
 	 *         there
+	 * @throws IOException 
 	 */
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelMap processSubmit(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("id") String id, @RequestParam("datasetId") String datasetId) {
+			@RequestParam("id") String id, @RequestParam("datasetId") String datasetId) throws IOException {
 		ModelMap map = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		// String datasetId = (String)request.getAttribute("datasetId");
@@ -203,6 +205,9 @@ public class ExtractController {
 			request.getSession().setAttribute("groupName", ExtractController.TRIGGER_GROUP_NAME);
 
 		request.getSession().setAttribute("datasetId", new Integer(dsBean.getId()));
+		
+		request.getSession().setAttribute("exportStatus", "ongoing");
+		response.sendRedirect(request.getContextPath() + "/ViewDatasets");
 		return map;
 	}
 

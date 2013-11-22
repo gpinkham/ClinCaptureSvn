@@ -72,6 +72,11 @@ public class ViewDatasetsServlet extends RememberLastPage {
 		if (!(action != null && action.equalsIgnoreCase("details")) && shouldRedirect(request, response)) {
 			return;
 		}
+		
+		if("ongoing".equals(request.getSession().getAttribute("exportStatus"))){
+			addPageMessage(respage.getString("extract_is_running"), request);
+			request.getSession().removeAttribute("exportStatus");
+		}
 
         UserAccountBean ub = getUserAccountBean(request);
         StudyBean currentStudy = getCurrentStudy(request);
@@ -128,7 +133,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			// this is the old code that the tabling code replaced:
 			// ArrayList datasets = (ArrayList)dsdao.findAll();
 			// request.setAttribute("datasets", datasets);
-            forward(Page.VIEW_DATASETS, request, response);
+			forwardPage(Page.VIEW_DATASETS, request, response);
 		} else {
 			if ("owner".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
