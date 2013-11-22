@@ -35,7 +35,7 @@
 		</td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
-<jsp:useBean scope="session" id="currentRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean" />
+<jsp:useBean scope="session" id="userRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean" />
 <jsp:useBean scope="request" id="pageMessages" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="formMessages" class="java.util.HashMap" />
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
@@ -992,8 +992,8 @@
 </td>
 </tr></table>
 </form>
-<c:set var="role" value="${currentRole.role}" />
-<c:if test="${currentRole.manageStudy}">
+<c:set var="role" value="${userRole.role}" />
+<c:if test="${userRole.manageStudy}">
 <c:if test="${requestStudySubject == requestStudySubjectFalse}">
 <p>	<form method="POST" action="UpdateStudySubject">
 	<input type="hidden" name="id" value="<c:out value="${chosenSubject.id}"/>" />

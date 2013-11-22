@@ -62,8 +62,6 @@ public class CRFListForStudyEventServlet extends Controller {
 
 	public static final String SUBJECT_FLAG_COLOR = "subjectFlagColor";
 
-	public static final String CURRENT_ROLE = "currentRole";
-
 	public static final String STUDY_ID = "studyId";
 
 	public static final String SES_ICON_URL = "sesIconUrl";
@@ -224,7 +222,6 @@ public class CRFListForStudyEventServlet extends Controller {
 		request.setAttribute(BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS, uncompletedEventDefinitionCRFs);
 		request.setAttribute(BEAN_DISPLAY_EVENT_CRFS, displayEventCRFs);
 		request.setAttribute(SES_ICON_URL, SubjectEventStatusUtil.getSESIconUrl(seb.getSubjectEventStatus()));
-		request.setAttribute(CURRENT_ROLE, currentRole);
 		if (discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(currentStudy, studySubjectBean.getLabel())){
 			String subjectFlagColor = "yellow";
 			if (discrepancyNoteDAO.doesSubjectHasNewNDsInStudy(currentStudy, studySubjectBean.getLabel())){
