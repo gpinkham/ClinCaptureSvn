@@ -291,6 +291,12 @@ public abstract class DataEntryServlet extends Controller {
         FormProcessor fp = new FormProcessor(request);
         String action = fp.getString(ACTION);
 
+		if (request.getMethod().equalsIgnoreCase("POST") && action.equalsIgnoreCase("ide_s")) {
+			// when we start IDE
+			request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME,
+					new FormDiscrepancyNotes());
+		}
+        
 		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(
 				request.getSession().getServletContext()).getBean(ConfigurationDao.class);
 		ValidatorHelper validatorHelper = new ValidatorHelper(request, configurationDao);

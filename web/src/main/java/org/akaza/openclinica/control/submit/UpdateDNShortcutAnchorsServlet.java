@@ -29,6 +29,7 @@ public class UpdateDNShortcutAnchorsServlet extends Controller {
 	public static final String EVENT_CRF_ID = "eventCRFId";
 	public static final String ROW_COUNT = "rowCount";
 	public static final String ITEM_ID = "itemId";
+	public static final String FIELD = "field";
 
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -47,20 +48,19 @@ public class UpdateDNShortcutAnchorsServlet extends Controller {
 		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
 		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-
+        
 		int itemId = fp.getInt(ITEM_ID);
+		String field = fp.getString(FIELD);
 		int rowCount = fp.getInt(ROW_COUNT);
 		int eventCRFId = fp.getInt(EVENT_CRF_ID);
 		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
 				AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 		if (fdn.getFieldNotes() != null) {
-			for (Object list : fdn.getFieldNotes().values()) {
-				for (DiscrepancyNoteBean discrepancyNoteBean : (List<DiscrepancyNoteBean>) list) {
-					if (discrepancyNoteBean.getId() == 0) {
-						allNotes.add(discrepancyNoteBean);
-						if (eventCRFId == 0) {
-							eventCRFId = discrepancyNoteBean.getEventCRFId();
-						}
+			for (DiscrepancyNoteBean discrepancyNoteBean : (List<DiscrepancyNoteBean>) fdn.getNotes(field)) {
+				if (discrepancyNoteBean.getId() == 0) {
+					allNotes.add(discrepancyNoteBean);
+					if (eventCRFId == 0) {
+						eventCRFId = discrepancyNoteBean.getEventCRFId();
 					}
 				}
 			}

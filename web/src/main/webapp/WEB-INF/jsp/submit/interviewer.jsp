@@ -794,7 +794,7 @@ function callTip(html)
     $(document).ready(function () {
         dnShortcutInterval = setInterval(dnShortcutFunction, 1);
     });
-    window.updateCRFHeader = function(itemId, rowCount, resolutionStatusId) {
+    window.updateCRFHeader = function(field, itemId, rowCount, resolutionStatusId) {
         var parametersHolder = {
             contextPath: "<%=request.getContextPath()%>",
             servletPath: document.location.pathname.replace("<%=request.getContextPath()%>", ""),
@@ -802,6 +802,7 @@ function callTip(html)
             tabId: "<%=request.getParameter("tabId") == null ? request.getAttribute("tabId") : request.getParameter("tabId")%>",
             sectionId: "<%=request.getParameter("sectionId") == null ? request.getAttribute("sectionId") : request.getParameter("sectionId")%>",
             itemId: parseInt(itemId),
+            field: field,
             rowCount: rowCount,
             resolutionStatusId: parseInt(resolutionStatusId),
             eventCRFId: parseInt("<%=request.getParameter("eventCRFId") == null ? request.getAttribute("eventCRFId") : request.getParameter("eventCRFId")%>"),

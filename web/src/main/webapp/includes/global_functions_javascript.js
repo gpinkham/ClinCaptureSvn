@@ -1461,7 +1461,7 @@ function setImageInParentWin(strParentWinImageName,strParentWinImageFullPath, re
         }
         if (window.opener.updateCRFHeader != undefined) {
             var v = strParentWinImageName.match(/_(\d*)input\d*/) || strParentWinImageName.match(/_manual(\d*)input\d*/);
-            window.opener.updateCRFHeader(strParentWinImageName.replace(/flag_.*input/, ""), (v != undefined && v.length == 2 ? v[1] : ""), resolutionStatusId);
+            window.opener.updateCRFHeader(strParentWinImageName.replace(/flag_/, ""), strParentWinImageName.replace(/flag_.*input/, ""), (v != undefined && v.length == 2 ? v[1] : ""), resolutionStatusId);
         }
     }
 }
