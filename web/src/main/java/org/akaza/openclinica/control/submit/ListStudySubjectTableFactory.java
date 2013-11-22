@@ -869,15 +869,25 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         flagColour = "red";
                     }
                 }
+                
+                HtmlBuilder transparentButton = new HtmlBuilder();
+                transparentButton = transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif")
+                		.border("0").append("hspace=\"4\"").end();
+                
 				StringBuilder url = new StringBuilder();
 				url.append("<div style=\"padding-top: 3px;\">");
 				url.append(viewStudySubjectLinkBuilder(studySubjectBean));
 				if (getStudyBean().getStatus() == Status.AVAILABLE
 						&& !(studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)
-						&& studySubjectBean.getStatus() != Status.SIGNED
 						&& getCurrentRole().getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
 						&& getCurrentRole().getRole() != Role.STUDY_MONITOR) {
-					url.append(removeStudySubjectLinkBuilder(studySubjectBean));
+					
+					if (studySubjectBean.getStatus() != Status.SIGNED) {
+						url.append(removeStudySubjectLinkBuilder(studySubjectBean));
+					} else {
+						url.append(transparentButton);
+					}
+					
 				}
 				if (getStudyBean().getStatus() == Status.AVAILABLE
 						&& getCurrentRole().getRole() != Role.STUDY_MONITOR
@@ -894,9 +904,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					url.append(sdvStudySubjectLinkBuilder(studySubjectBean, studyBean.getStudyParameterConfig()
 							.getAllowSdvWithOpenQueries(), flagColour));
 				} else if (currentRole.getRole().getId() != 5 && currentRole.getRole().getId() != 4) {
-					HtmlBuilder transparentButton = new HtmlBuilder();
-					url.append(transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif")
-							.border("0").append("hspace=\"4\"").end());
+					url.append(transparentButton);
 				}
 				if (getStudyBean().getStatus() == Status.AVAILABLE
 						&& getCurrentRole().getRole() != Role.CLINICAL_RESEARCH_COORDINATOR
@@ -908,9 +916,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						&& (studySubjectBean.getStatus() != Status.DELETED || studySubjectBean.getStatus() != Status.AUTO_DELETED)
 						&& currentRole.getRole().getId() != 6 && currentRole.getRole().getId() != 5
 						&& currentRole.getRole().getId() != 4) {
-					HtmlBuilder transparentButton = new HtmlBuilder();
-					url.append(transparentButton.img().name("bt_Transparent").src("images/bt_Transparent.gif")
-							.border("0").append("hspace=\"4\"").end());
+					url.append(transparentButton);
 				}
 				if (getCurrentRole().getRole() == Role.INVESTIGATOR
 						&& (getStudyBean().getStatus() == Status.AVAILABLE || getStudyBean().getStatus() == Status.FROZEN)
