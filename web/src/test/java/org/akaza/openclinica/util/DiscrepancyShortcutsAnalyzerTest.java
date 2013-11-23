@@ -18,37 +18,31 @@ import org.springframework.mock.web.MockHttpServletRequest;
 
 public class DiscrepancyShortcutsAnalyzerTest {
 
-	private ItemBean itemBean;
-	private ItemDataBean itemDataBean;
 	private HttpServletRequest request;
 	private DisplayItemBean displayItemBean;
 	private DiscrepancyNoteBean discrepancyNoteBean;
-	private DiscrepancyNoteThread discrepancyNoteThread;
-	@SuppressWarnings("rawtypes")
-	private ArrayList discrepancyNotes;
 	private List<DiscrepancyNoteThread> noteThreads;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Before
 	public void setUp() throws Exception {
 		request = new MockHttpServletRequest();
-		itemDataBean = Mockito.mock(ItemDataBean.class);
+		ItemDataBean itemDataBean = Mockito.mock(ItemDataBean.class);
 		itemDataBean.setId(1);
 		displayItemBean = new DisplayItemBean();
 		displayItemBean.setData(itemDataBean);
 		displayItemBean.setDbData(itemDataBean);
-		itemBean = new ItemBean();
+		ItemBean itemBean = new ItemBean();
 		itemBean.setId(1);
 		displayItemBean.setItem(itemBean);
-		noteThreads = new ArrayList();
-		discrepancyNotes = new ArrayList();
+		noteThreads = new ArrayList<DiscrepancyNoteThread>();
+		ArrayList<DiscrepancyNoteBean> discrepancyNotes = new ArrayList<DiscrepancyNoteBean>();
 		discrepancyNoteBean = new DiscrepancyNoteBean();
 		discrepancyNoteBean.setItemId(1);
 		discrepancyNoteBean.setEntityType("itemData");
 		discrepancyNoteBean.setParentDnId(0);
 		discrepancyNotes.add(discrepancyNoteBean);
-		discrepancyNoteThread = new DiscrepancyNoteThread();
-		discrepancyNoteThread.setLinkedNoteList(new LinkedList(discrepancyNotes));
+		DiscrepancyNoteThread discrepancyNoteThread = new DiscrepancyNoteThread();
+		discrepancyNoteThread.setLinkedNoteList(new LinkedList<DiscrepancyNoteBean>(discrepancyNotes));
 		displayItemBean.setDiscrepancyNotes(discrepancyNotes);
 		noteThreads.add(discrepancyNoteThread);
 		request.setAttribute("discrepancyShortcutsAnalyzer", new DiscrepancyShortcutsAnalyzer());

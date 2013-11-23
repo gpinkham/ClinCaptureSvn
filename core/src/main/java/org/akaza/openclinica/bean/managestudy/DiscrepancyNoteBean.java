@@ -29,7 +29,7 @@ import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 
 @SuppressWarnings({"rawtypes", "serial"})
-public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparable {
+public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparable, Cloneable {
 	public static final String ITEM_DATA = "itemData";
 	private String description = "";
 	private int discrepancyNoteTypeId;
@@ -85,6 +85,11 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 	private int age = 0;
 
 	private StudyBean study = new StudyBean();
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 
 	public String getCreatedDateString() {
 		return createdDateString;
@@ -388,6 +393,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 	/**
 	 * @return Returns the lastUpdator.
 	 */
+    @SuppressWarnings("UnusedDeclaration")
 	public UserAccountBean getLastUpdator() {
 		return lastUpdator;
 	}
@@ -592,10 +598,12 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 		this.siteId = siteId;
 	}
 
-	public String getFieldForDN() {
+	@SuppressWarnings("UnusedDeclaration")
+    public String getFieldForDN() {
 		return fieldForDN;
 	}
 
+    @SuppressWarnings("UnusedDeclaration")
 	public void setFieldForDN(String fieldForDN) {
 		this.fieldForDN = fieldForDN;
 	}

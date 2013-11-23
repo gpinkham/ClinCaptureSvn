@@ -12,12 +12,11 @@ import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 
 public class DiscrepancyShortcutsAnalyzer {
 
-    public static final String DISCREPANCY_SHORTCUTS_ANALYZER = "discrepancyShortcutsAnalyzer";
+	public static final String DISCREPANCY_SHORTCUTS_ANALYZER = "discrepancyShortcutsAnalyzer";
 
 	public static final String FIRST_NEW_DN = "#firstNewDn";
 	public static final String FIRST_UPDATED_DN = "#firstUpdatedDn";
@@ -28,7 +27,7 @@ public class DiscrepancyShortcutsAnalyzer {
 	public static final String SECTION_ID = "sectionId";
 	public static final String TAB_ID = "tabId";
 
-    private boolean hasNotes;
+	private boolean hasNotes;
 
 	private int totalNew;
 	private int totalUpdated;
@@ -56,20 +55,12 @@ public class DiscrepancyShortcutsAnalyzer {
 		totalNew++;
 	}
 
-	public void setTotalNew(int totalNew) {
-		this.totalNew = totalNew;
-	}
-
 	public int getTotalUpdated() {
 		return totalUpdated;
 	}
 
 	public void incTotalUpdated() {
 		totalUpdated++;
-	}
-
-	public void setTotalUpdated(int totalUpdated) {
-		this.totalUpdated = totalUpdated;
 	}
 
 	public int getTotalResolutionProposed() {
@@ -80,20 +71,12 @@ public class DiscrepancyShortcutsAnalyzer {
 		totalResolutionProposed++;
 	}
 
-	public void setTotalResolutionProposed(int totalResolutionProposed) {
-		this.totalResolutionProposed = totalResolutionProposed;
-	}
-
 	public int getTotalClosed() {
 		return totalClosed;
 	}
 
 	public void incTotalClosed() {
 		totalClosed++;
-	}
-
-	public void setTotalClosed(int totalClosed) {
-		this.totalClosed = totalClosed;
 	}
 
 	public int getTotalAnnotations() {
@@ -104,20 +87,12 @@ public class DiscrepancyShortcutsAnalyzer {
 		totalAnnotations++;
 	}
 
-	public void setTotalAnnotations(int totalAnnotations) {
-		this.totalAnnotations = totalAnnotations;
-	}
-
 	public int getSectionTotalNew() {
 		return sectionTotalNew;
 	}
 
 	public void incSectionTotalNew() {
 		sectionTotalNew++;
-	}
-
-	public void setSectionTotalNew(int sectionTotalNew) {
-		this.sectionTotalNew = sectionTotalNew;
 	}
 
 	public int getSectionTotalUpdated() {
@@ -128,20 +103,12 @@ public class DiscrepancyShortcutsAnalyzer {
 		sectionTotalUpdated++;
 	}
 
-	public void setSectionTotalUpdated(int sectionTotalUpdated) {
-		this.sectionTotalUpdated = sectionTotalUpdated;
-	}
-
 	public int getSectionTotalResolutionProposed() {
 		return sectionTotalResolutionProposed;
 	}
 
 	public void incSectionTotalResolutionProposed() {
 		sectionTotalResolutionProposed++;
-	}
-
-	public void setSectionTotalResolutionProposed(int sectionTotalResolutionProposed) {
-		this.sectionTotalResolutionProposed = sectionTotalResolutionProposed;
 	}
 
 	public int getSectionTotalClosed() {
@@ -152,20 +119,12 @@ public class DiscrepancyShortcutsAnalyzer {
 		sectionTotalClosed++;
 	}
 
-	public void setSectionTotalClosed(int sectionTotalClosed) {
-		this.sectionTotalClosed = sectionTotalClosed;
-	}
-
 	public int getSectionTotalAnnotations() {
 		return sectionTotalAnnotations;
 	}
 
 	public void incSectionTotalAnnotations() {
 		sectionTotalAnnotations++;
-	}
-
-	public void setSectionTotalAnnotations(int sectionTotalAnnotations) {
-		this.sectionTotalAnnotations = sectionTotalAnnotations;
 	}
 
 	public String getFirstNewDnLink() {
@@ -208,6 +167,7 @@ public class DiscrepancyShortcutsAnalyzer {
 		this.firstAnnotationLink = firstAnnotationLink;
 	}
 
+	@SuppressWarnings("UnusedDeclaration")
 	public boolean isHasNotes() {
 		return hasNotes;
 	}
@@ -231,7 +191,7 @@ public class DiscrepancyShortcutsAnalyzer {
 
 	private static String buildLink(FormProcessor fp, ItemFormMetadataBean ifmbean, EventCRFBean eventCrfBean,
 			int eventDefinitionCRFId, List<SectionBean> sections) {
-		String link = "";
+		String link;
 		int currentTabId;
 		int currentSectionId;
 		int tabNum = getTabNum(sections, ifmbean.getSectionId());
@@ -278,8 +238,8 @@ public class DiscrepancyShortcutsAnalyzer {
 		return link;
 	}
 
-	@SuppressWarnings({ "rawtypes" })
-	public static void prepareDnShortcutLinks(HttpServletRequest request, EventCRFBean eventCrfBean, SectionDAO sdao,
+	@SuppressWarnings("ConstantConditions")
+	public static void prepareDnShortcutLinks(HttpServletRequest request, EventCRFBean eventCrfBean,
 			ItemFormMetadataDAO ifmdao, int eventDefinitionCRFId, List<SectionBean> sections,
 			List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyNoteBean tempBean;
@@ -289,7 +249,7 @@ public class DiscrepancyShortcutsAnalyzer {
 		request.setAttribute(DISCREPANCY_SHORTCUTS_ANALYZER, discrepancyShortcutsAnalyzer);
 		if (request.getMethod().equalsIgnoreCase("POST") && request.getAttribute("section") == null) {
 			return;
-		}		
+		}
 		for (DiscrepancyNoteThread dnThread : noteThreads) {
 			tempBean = dnThread.getLinkedNoteList().getLast();
 			if (tempBean != null && tempBean.getEntityType().equalsIgnoreCase("itemData")
@@ -339,50 +299,53 @@ public class DiscrepancyShortcutsAnalyzer {
 		}
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	public static void prepareDnShortcutAnchors(HttpServletRequest request, DisplayItemBean dib,
 			List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = (DiscrepancyShortcutsAnalyzer) request
 				.getAttribute(DISCREPANCY_SHORTCUTS_ANALYZER);
-		for (DiscrepancyNoteThread dnThread : noteThreads) {
-			DiscrepancyNoteBean tempBean = dnThread.getLinkedNoteList().getLast();
-			if (tempBean != null && tempBean.getEntityType().equalsIgnoreCase("itemData")
-					&& tempBean.getParentDnId() == 0) {
-				switch (tempBean.getResolutionStatusId()) {
-				case 1: {
-					discrepancyShortcutsAnalyzer.incSectionTotalNew();
-					if (discrepancyShortcutsAnalyzer.getSectionTotalNew() == 1) {
-						dib.setFirstNewDn(true);
+		if (discrepancyShortcutsAnalyzer != null) {
+			for (DiscrepancyNoteThread dnThread : noteThreads) {
+				DiscrepancyNoteBean tempBean = dnThread.getLinkedNoteList().getLast();
+				if (tempBean != null && tempBean.getEntityType().equalsIgnoreCase("itemData")
+						&& tempBean.getParentDnId() == 0) {
+					switch (tempBean.getResolutionStatusId()) {
+					case 1: {
+						discrepancyShortcutsAnalyzer.incSectionTotalNew();
+						if (discrepancyShortcutsAnalyzer.getSectionTotalNew() == 1) {
+							dib.setFirstNewDn(true);
+						}
+						break;
 					}
-					break;
-				}
-				case 2: {
-					discrepancyShortcutsAnalyzer.incSectionTotalUpdated();
-					if (discrepancyShortcutsAnalyzer.getSectionTotalUpdated() == 1) {
-						dib.setFirstUpdatedDn(true);
+					case 2: {
+						discrepancyShortcutsAnalyzer.incSectionTotalUpdated();
+						if (discrepancyShortcutsAnalyzer.getSectionTotalUpdated() == 1) {
+							dib.setFirstUpdatedDn(true);
+						}
+						break;
 					}
-					break;
-				}
-				case 3: {
-					discrepancyShortcutsAnalyzer.incSectionTotalResolutionProposed();
-					if (discrepancyShortcutsAnalyzer.getSectionTotalResolutionProposed() == 1) {
-						dib.setFirstResolutionProposed(true);
+					case 3: {
+						discrepancyShortcutsAnalyzer.incSectionTotalResolutionProposed();
+						if (discrepancyShortcutsAnalyzer.getSectionTotalResolutionProposed() == 1) {
+							dib.setFirstResolutionProposed(true);
+						}
+						break;
 					}
-					break;
-				}
-				case 4: {
-					discrepancyShortcutsAnalyzer.incSectionTotalClosed();
-					if (discrepancyShortcutsAnalyzer.getSectionTotalClosed() == 1) {
-						dib.setFirstClosedDn(true);
+					case 4: {
+						discrepancyShortcutsAnalyzer.incSectionTotalClosed();
+						if (discrepancyShortcutsAnalyzer.getSectionTotalClosed() == 1) {
+							dib.setFirstClosedDn(true);
+						}
+						break;
 					}
-					break;
-				}
-				case 5: {
-					discrepancyShortcutsAnalyzer.incSectionTotalAnnotations();
-					if (discrepancyShortcutsAnalyzer.getSectionTotalAnnotations() == 1) {
-						dib.setFirstAnnotation(true);
+					case 5: {
+						discrepancyShortcutsAnalyzer.incSectionTotalAnnotations();
+						if (discrepancyShortcutsAnalyzer.getSectionTotalAnnotations() == 1) {
+							dib.setFirstAnnotation(true);
+						}
+						break;
 					}
-					break;
-				}
+					}
 				}
 			}
 		}

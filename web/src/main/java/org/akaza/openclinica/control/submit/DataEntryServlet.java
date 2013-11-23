@@ -86,7 +86,6 @@ import org.akaza.openclinica.control.form.ScoreItemValidator;
 import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
-import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -140,7 +139,7 @@ import com.clinovo.util.ValidatorHelper;
 /**
  * @author ssachs
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({"all"})
 public abstract class DataEntryServlet extends Controller {
 
 	public static final String DATA_ENTRY_CURRENT_CRF_VERSION_OID = "dataEntryCurrentCrfVersionOid";
@@ -476,8 +475,8 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
         List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-        DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, eventDefinitionCRFId, allSections,
-                noteThreads);
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId, allSections,
+				noteThreads);
         logMe("Entering DataEntry Create disc note threads out of the various notes DONE" + System.currentTimeMillis());
 
 		logMe("Entering some EVENT DEF CRF CHECK DONE " + System.currentTimeMillis());
@@ -572,7 +571,7 @@ public abstract class DataEntryServlet extends Controller {
 			Date enrollmentDate = ssb.getEnrollmentDate();
 			age = Utils.getInstance().processAge(enrollmentDate, subject.getDateOfBirth());
 		}
-		ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub,
+		ArrayList beans = getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub,
 				currentRole);
 		request.setAttribute("studySubject", ssb);
 		request.setAttribute("subject", subject);
@@ -610,14 +609,13 @@ public abstract class DataEntryServlet extends Controller {
 			session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, null);
 
 			discNotes = new FormDiscrepancyNotes();
-            
+			session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 			section = populateNotesWithDBNoteCounts(discNotes, noteThreads, section, request);
 			populateInstantOnChange(request.getSession(), ecb, section);
 			logger.debug("+++ just ran populateNotes, printing field notes: " + discNotes.getFieldNotes().toString());
 			logger.debug("found disc notes: " + discNotes.getNumExistingFieldNotes().toString());
-			session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
-			if (section.getSection().hasSCDItem()) {
+            if (section.getSection().hasSCDItem()) {
 				section = SCDItemDisplayInfo.generateSCDDisplayInfo(
 						section,
 						this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY)
@@ -3547,12 +3545,15 @@ public abstract class DataEntryServlet extends Controller {
 				+ "time took:" + (System.currentTimeMillis() - t));
 		setToolTipEventNotes(request);
 
-		request.setAttribute("nameNoteResStatus", DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(existingNameNotes));
-		request.setAttribute("IntrvDateNoteResStatus", DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
-
 		request.setAttribute("existingNameNotes", existingNameNotes);
+		request.setAttribute("hasNameNote", existingNameNotes.size() > 0 ? "yes" : "");
+		request.setAttribute("nameNoteResStatus",
+				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(existingNameNotes));
 
 		request.setAttribute("existingIntrvDateNotes", existingIntrvDateNotes);
+		request.setAttribute("hasDateNote", existingIntrvDateNotes.size() > 0 ? "yes" : "");
+		request.setAttribute("IntrvDateNoteResStatus",
+				DiscrepancyNoteUtil.getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
 
 		List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
 		logger.debug("start to populate notes: " + section.getDisplayItemGroups().size());

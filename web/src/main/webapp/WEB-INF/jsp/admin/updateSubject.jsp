@@ -82,8 +82,19 @@
 							<td>
 								 *
 								<c:if test="${parameters['discrepancyManagement']}">
-									<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
-									<img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+                  <c:choose>
+                    <c:when test="${hasUniqueIDNote eq 'yes'}">
+                      <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
+                        <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="${uniqueIDNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                      </a>
+                    </c:when>
+                    <c:otherwise>
+                      <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
+                        <img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                        <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier">
+                      </a>
+                    </c:otherwise>
+                  </c:choose>
 								</c:if>
 							</td>
 						</tr>
@@ -99,8 +110,19 @@
 							</td>
 							<td>
 								<c:if test="${parameters['discrepancyManagement']}">
-									<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
-									<img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+                  <c:choose>
+                    <c:when test="${hasUniqueIDNote eq 'yes'}">
+                      <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
+                        <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="${uniqueIDNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                      </a>
+                    </c:when>
+                    <c:otherwise>
+                      <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
+                        <img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                        <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier">
+                      </a>
+                    </c:otherwise>
+                  </c:choose>
 								</c:if>
 							</td>
 						</tr>
@@ -146,8 +168,19 @@
 							*
 						</c:if>
 						<c:if test="${parameters['discrepancyManagement']}">
-							<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=gender&column=gender','spanAlert-gender'); return false;">
-							<img name="flag_gender" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+              <c:choose>
+                <c:when test="${hasGenderNote eq 'yes'}">
+                  <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=gender&column=gender','spanAlert-gender', '', event); return false;">
+                    <img id="flag_gender" name="flag_gender" src="${genderNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                  </a>
+                </c:when>
+                <c:otherwise>
+                  <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=gender&column=gender','spanAlert-gender', '', event); return false;">
+                    <img name="flag_gender" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                    <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=gender&column=gender">
+                  </a>
+                </c:otherwise>
+              </c:choose>
 						</c:if>
 					</td>
 				</tr>
@@ -180,8 +213,19 @@
 						<td class="formlabel">
 							(<fmt:message key="date_format" bundle="${resformat}"/>)*
 							<c:if test="${parameters['discrepancyManagement']}">
-								<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">
-								<img name="flag_dateOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+                <c:choose>
+                  <c:when test="${hasDOBNote eq 'yes'}">
+                    <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dateOfBirth', '', event); return false;">
+                      <img id="flag_dateOfBirth" name="flag_dateOfBirth" src="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                    </a>
+                  </c:when>
+                  <c:otherwise>
+                    <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=dob&column=date_of_birth','spanAlert-dateOfBirth', '', event); return false;">
+                      <img name="flag_dateOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                      <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth">
+                    </a>
+                  </c:otherwise>
+                </c:choose>
 							</c:if>
 						</td>
 					</tr>
@@ -198,19 +242,30 @@
 					<tr>
 						<td>
 							<div class="formfieldM_BG">
-								<input type="text" name="yearOfBirth" size="15" value="<c:out value="${fields['dateOfBirth']}"/>" class="formfieldM">
+								<input type="text" name="dateOfBirth" size="15" value="<c:out value="${fields['dateOfBirth']}"/>" class="formfieldM">
 							</div>
 						</td>
 						<td class="formlabel">
 							(<fmt:message key="date_format_year" bundle="${resformat}"/>)*
 							<c:if test="${parameters['discrepancyManagement']}">
-								<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=yearOfBirth&column=year_of_birth','spanAlert-yearOfBirth'); return false;">
-								<img name="flag_yearOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+                <c:choose>
+                  <c:when test="${hasDOBNote eq 'yes'}">
+                    <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dateOfBirth', '', event); return false;">
+                      <img id="flag_dateOfBirth" name="flag_dateOfBirth" src="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                    </a>
+                  </c:when>
+                  <c:otherwise>
+                    <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=dob&column=date_of_birth','spanAlert-dateOfBirth', '', event); return false;">
+                      <img name="flag_dateOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                      <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth">
+                    </a>
+                  </c:otherwise>
+                </c:choose>
 							</c:if>
 						</td> 
 					</tr>
 				</table>
-				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yearOfBirth"/></jsp:include>
+				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dateOfBirth"/></jsp:include>
 			</td>
 		</tr>
 	</c:when>

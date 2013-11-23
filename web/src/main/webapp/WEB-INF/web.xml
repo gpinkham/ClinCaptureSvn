@@ -766,24 +766,24 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewStudySubjectServlet</servlet-name>
+        <servlet-name>viewStudySubjectServlet</servlet-name>
         <display-name>ViewStudySubject</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UpdateStudySubjectServlet</servlet-name>
+        <servlet-name>updateStudySubjectServlet</servlet-name>
         <display-name>UpdateStudySubject</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UpdateStudySubjectServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RemoveStudySubjectServlet</servlet-name>
+        <servlet-name>removeStudySubjectServlet</servlet-name>
         <display-name>RemoveStudySubject</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RemoveStudySubjectServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RestoreStudySubjectServlet</servlet-name>
+        <servlet-name>restoreStudySubjectServlet</servlet-name>
         <display-name>RestoreStudySubject</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RestoreStudySubjectServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RemoveStudyEventServlet</servlet-name>
@@ -988,9 +988,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UpdateStudyEventServlet</servlet-name>
+        <servlet-name>updateStudyEventServlet</servlet-name>
         <display-name>UpdateStudyEvent</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UpdateStudyEventServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewStudyEventsServlet</servlet-name>
@@ -1103,9 +1103,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListEventsForSubjectServlet</servlet-name>
+        <servlet-name>listEventsForSubjectServlet</servlet-name>
         <display-name>ListEventsForSubject</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListEventsForSubjectServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -1785,19 +1785,19 @@
         <url-pattern>/ListStudySubjects</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewStudySubjectServlet</servlet-name>
+        <servlet-name>viewStudySubjectServlet</servlet-name>
         <url-pattern>/ViewStudySubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UpdateStudySubjectServlet</servlet-name>
+        <servlet-name>updateStudySubjectServlet</servlet-name>
         <url-pattern>/UpdateStudySubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveStudySubjectServlet</servlet-name>
+        <servlet-name>removeStudySubjectServlet</servlet-name>
         <url-pattern>/RemoveStudySubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestoreStudySubjectServlet</servlet-name>
+        <servlet-name>restoreStudySubjectServlet</servlet-name>
         <url-pattern>/RestoreStudySubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1971,7 +1971,7 @@
         <url-pattern>/AdministrativeEditing</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UpdateStudyEventServlet</servlet-name>
+        <servlet-name>updateStudyEventServlet</servlet-name>
         <url-pattern>/UpdateStudyEvent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2063,7 +2063,7 @@
         <url-pattern>/ResolveDiscrepancy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListEventsForSubjectServlet</servlet-name>
+        <servlet-name>listEventsForSubjectServlet</servlet-name>
         <url-pattern>/ListEventsForSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

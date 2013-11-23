@@ -137,11 +137,12 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
         SimpleDateFormat local_df = getLocalDf(request);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
-		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
+		SectionBean sb;
+        EventCRFBean ecb;
 		boolean isSubmitted = false;
-		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
+		EventDefinitionCRFBean edcb;
+
 		if (!fp.getString("exitTo").equals("")) {
 			request.setAttribute("exitTo", fp.getString("exitTo"));
 		}
@@ -212,8 +213,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			request.setAttribute("studySubject", sub);
 		}
 
-        ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
-        List<DiscrepancyNoteBean> eventCrfNotes = new ArrayList<DiscrepancyNoteBean>();
+        ArrayList<DiscrepancyNoteBean> allNotes;
+        List<DiscrepancyNoteBean> eventCrfNotes;
         List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
 
 		if (eventCRFId > 0) {
@@ -251,8 +252,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
             List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, eventDefinitionCRFId, allSections,
-					noteThreads);
+			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId,
+					allSections, noteThreads);
 
 			DisplayTableOfContentsBean displayBean = getDisplayBean(ecb);
 			
@@ -444,33 +445,32 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 							currentStudy);
 
 					ArrayList childItems = dib.getChildren();
-					for (int j = 0; j < childItems.size(); j++) {
-						DisplayItemBean child = (DisplayItemBean) childItems.get(j);
-						inputName = getInputName(child);
-						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(),
-								"ItemData", currentStudy);
+                    for (Object childItem : childItems) {
+                        DisplayItemBean child = (DisplayItemBean) childItem;
+                        inputName = getInputName(child);
+                        AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(),
+                                "ItemData", currentStudy);
 
-					}
+                    }
 				}
 			}
 
 			addPageMessage("Discrepancy notes are saved successfully.", request);
 			request.setAttribute("id", studySubjectId + "");
 			forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
-			return;
 		} else {
 			request.setAttribute(BEAN_DISPLAY, dsb);
 			request.setAttribute(BEAN_ANNOTATIONS, ecb.getAnnotations());
 			request.setAttribute("sec", sb);
 			request.setAttribute("EventCRFBean", ecb);
 
-			int tabNum = 1;
+			int tabNum;
 			if ("".equalsIgnoreCase(fp.getString("tabId", true))) {
 				tabNum = 1;
 			} else {
 				tabNum = fp.getInt("tabId", true);
 			}
-			request.setAttribute("tabId", new Integer(tabNum).toString());
+			request.setAttribute("tabId", Integer.toString(tabNum));
 
 			// Signal interviewer.jsp that the containing page is
 			// viewSectionData,

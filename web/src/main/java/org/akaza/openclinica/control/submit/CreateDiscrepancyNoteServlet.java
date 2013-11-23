@@ -685,9 +685,13 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				note.setParentDnId(parent.getId());
 			}
 
-			StudySubjectDAO ssdao = getStudySubjectDAO();
-			StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(subjectId);
-			note.setStudyId(ssub.getStudyId());
+			if (subjectId == 0) {
+				note.setStudyId(currentStudy.getId());
+			} else {
+				StudySubjectDAO ssdao = getStudySubjectDAO();
+				StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(subjectId);
+				note.setStudyId(ssub.getStudyId());
+			}
 
 			note = getNoteInfo(request, note);// populate note infos
 
@@ -729,7 +733,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 						manageReasonForChangeState(request.getSession(), field);
 					}
 					
-                    request.setAttribute(UPDATED_DISCREPANCY_NOTE, note);
+                    request.setAttribute(UPDATED_DISCREPANCY_NOTE, note.clone());
 					forwardPage(Page.ADD_DISCREPANCY_NOTE_DONE, request, response);
 				} else {
 					// if not creating a new thread(note), update existing notes

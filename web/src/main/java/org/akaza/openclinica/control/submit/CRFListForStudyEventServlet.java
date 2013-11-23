@@ -34,7 +34,6 @@ import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.util.*;
@@ -166,7 +165,7 @@ public class CRFListForStudyEventServlet extends Controller {
 
 		// Get any disc notes for this study event
 		DiscrepancyNoteDAO discrepancyNoteDAO = getDiscrepancyNoteDAO();
-		ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent = new ArrayList<DiscrepancyNoteBean>();
+		ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent;
 
 		// These methods return only parent disc notes
 		if (subjectStudyIsCurrentStudy && isParentStudy) {
@@ -203,7 +202,7 @@ public class CRFListForStudyEventServlet extends Controller {
 		EnterDataForStudyEventServlet.populateUncompletedCRFsWithAnOwner(sm.getDataSource(),
 				uncompletedEventDefinitionCRFs);
 
-		ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(getDataSource(), eventCRFs,
+		ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs,
 				eventDefinitionCRFs, ub, currentRole, seb.getSubjectEventStatus(), study);
 
 		if (currentStudy.getParentStudyId() > 0) {
@@ -338,8 +337,8 @@ public class CRFListForStudyEventServlet extends Controller {
 
 		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
 			EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-			completed.put(new Integer(edcrf.getCrfId()), Boolean.FALSE);
-			startedButIncompleted.put(new Integer(edcrf.getCrfId()), new EventCRFBean());
+			completed.put(edcrf.getCrfId(), Boolean.FALSE);
+			startedButIncompleted.put(edcrf.getCrfId(), new EventCRFBean());
 		}
 
 		CRFVersionDAO cvdao = getCRFVersionDAO();
@@ -349,9 +348,9 @@ public class CRFListForStudyEventServlet extends Controller {
 			int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
 			ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
 			if (!idata.isEmpty()) {// this crf has data already
-				completed.put(new Integer(crfId), Boolean.TRUE);
+				completed.put(crfId, Boolean.TRUE);
 			} else {// event crf got created, but no data entered
-				startedButIncompleted.put(new Integer(crfId), ecrf);
+				startedButIncompleted.put(crfId, ecrf);
 			}
 		}
 
@@ -361,7 +360,7 @@ public class CRFListForStudyEventServlet extends Controller {
 			dedc.setEdc(edcrf);
 			Boolean b = (Boolean) completed.get(new Integer(edcrf.getCrfId()));
 			EventCRFBean ev = (EventCRFBean) startedButIncompleted.get(new Integer(edcrf.getCrfId()));
-			if (b == null || !b.booleanValue()) {
+			if (b == null || !b) {
 				dedc.setEventCRF(ev);
 				answer.add(dedc);
 			}

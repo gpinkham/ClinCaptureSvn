@@ -66,11 +66,12 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
-		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
+		SectionBean sb;
+        EventCRFBean ecb;
 		boolean isSubmitted = false;
-		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
+		EventDefinitionCRFBean edcb;
+
 		if (!fp.getString("exitTo", true).equals("")) {
 			request.setAttribute("exitTo", request.getContextPath() + "/" + fp.getString("exitTo", true));
 		}
@@ -78,7 +79,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
 		Integer sectionId = (Integer) request.getAttribute("sectionId");
 		if (sectionId == null || sectionId == 0) {
-			sectionId = new Integer(1);
+			sectionId = 1;
 		}
 		request.setAttribute("sectionId", "" + sectionId);
 		int eventCRFId = fp.getInt(EVENT_CRF_ID, true);
@@ -146,8 +147,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			request.setAttribute("studySubject", sub);
 		}
 
-        ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
-        List<DiscrepancyNoteBean> eventCrfNotes = new ArrayList<DiscrepancyNoteBean>();
+        ArrayList<DiscrepancyNoteBean> allNotes;
+        List<DiscrepancyNoteBean> eventCrfNotes;
         List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
 
 		if (eventCRFId > 0) {
@@ -183,8 +184,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 			noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
             List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, eventDefinitionCRFId, allSections,
-					noteThreads);
+			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId,
+					allSections, noteThreads);
 
 			DisplayTableOfContentsBean displayBean = getDisplayBean(ecb);
 			
@@ -378,33 +379,32 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 							DiscrepancyNoteBean.ITEM_DATA, currentStudy);
 
 					ArrayList childItems = dib.getChildren();
-					for (int j = 0; j < childItems.size(); j++) {
-						DisplayItemBean child = (DisplayItemBean) childItems.get(j);
-						inputName = getInputName(child);
-						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(),
-								DiscrepancyNoteBean.ITEM_DATA, currentStudy);
+                    for (Object childItem : childItems) {
+                        DisplayItemBean child = (DisplayItemBean) childItem;
+                        inputName = getInputName(child);
+                        AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(),
+                                DiscrepancyNoteBean.ITEM_DATA, currentStudy);
 
-					}
+                    }
 				}
 			}
 
 			addPageMessage("Discrepancy notes are saved successfully.", request);
 			request.setAttribute("id", studySubjectId + "");
 			forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
-			return;
 		} else {
 			request.setAttribute(BEAN_DISPLAY, dsb);
 			request.setAttribute(BEAN_ANNOTATIONS, ecb.getAnnotations());
 			request.setAttribute("sec", sb);
 			request.setAttribute("EventCRFBean", ecb);
 
-			int tabNum = 1;
+			int tabNum;
 			if ("".equalsIgnoreCase(fp.getString("tabId"))) {
 				tabNum = 1;
 			} else {
 				tabNum = fp.getInt("tabId");
 			}
-			request.setAttribute("tabId", new Integer(tabNum).toString());
+			request.setAttribute("tabId", Integer.toString(tabNum));
 
 			// Signal interviewer.jsp that the containing page is
 			// viewSectionData,
@@ -422,8 +422,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
 	/**
 	 * Current User may access a requested event CRF in the current user's studies
-	 * 
-	 * @author ywang 10-18-2007
+	 *
 	 * @param request
 	 *            TODO
 	 */

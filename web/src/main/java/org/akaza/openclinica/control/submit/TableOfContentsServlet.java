@@ -43,7 +43,6 @@ import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -185,7 +184,7 @@ public class TableOfContentsServlet extends Controller {
 	 * Creates a new Event CRF or update the exsiting one, that is, an event CRF can be created but not item data yet,
 	 * in this case, still consider it is not started(called uncompleted before)
 	 * 
-	 * @return
+	 * @return EventCRFBean
 	 * @throws Exception
 	 */
 	@SuppressWarnings("deprecation")
@@ -424,13 +423,13 @@ public class TableOfContentsServlet extends Controller {
 		// this is for generating side info panel
 		StudySubjectDAO ssdao = getStudySubjectDAO();
 		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(objectPairs.ecb.getStudySubjectId());
-		ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub,
+		ArrayList beans = getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub,
 				currentRole);
 		request.setAttribute("studySubject", ssb);
 		request.setAttribute("beans", beans);
 		request.setAttribute("eventCRF", objectPairs.ecb);
 
-		StudyEventBean seb = null;
+		StudyEventBean seb;
 		if (objectPairs.ecb != null) {
 			seb = (StudyEventBean) getStudyEventDAO().findByPK(objectPairs.ecb.getStudyEventId());
 			if (seb != null && seb.getId() > 0) {
@@ -442,13 +441,13 @@ public class TableOfContentsServlet extends Controller {
 
 		boolean allowEnterData = true;
 		if (StringUtil.isBlank(objectPairs.ecb.getInterviewerName())) {
-			if (discNotes == null || discNotes.getNotes(TableOfContentsServlet.INPUT_INTERVIEWER).isEmpty()) {
+			if (discNotes.getNotes(TableOfContentsServlet.INPUT_INTERVIEWER).isEmpty()) {
 				allowEnterData = false;
 			}
 		}
 
 		if (objectPairs.ecb.getDateInterviewed() == null) {
-			if (discNotes == null || discNotes.getNotes(TableOfContentsServlet.INPUT_INTERVIEW_DATE).isEmpty()) {
+			if (discNotes.getNotes(TableOfContentsServlet.INPUT_INTERVIEW_DATE).isEmpty()) {
 				allowEnterData = false;
 			}
 		}
@@ -497,11 +496,8 @@ public class TableOfContentsServlet extends Controller {
 		}
 
 		// we're creating an event crf
-		if (objectPairs.action.equals(ACTION_START_INITIAL_DATA_ENTRY)) {
-			return;
-		}
-		// we're editing an existing event crf
-		else {
+		if (!objectPairs.action.equals(ACTION_START_INITIAL_DATA_ENTRY)) {
+		    // we're editing an existing event crf
 			if (!objectPairs.ecb.isActive()) {
 				addPageMessage(respage.getString("event_CRF_not_exist_contact_study_coordinator"), request);
 				throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
@@ -509,37 +505,27 @@ public class TableOfContentsServlet extends Controller {
 			}
 
 			if (objectPairs.action.equals(ACTION_CONTINUE_INITIAL_DATA_ENTRY)) {
-				if (objectPairs.ecb.getOwnerId() == ub.getId() || isSuper) {
-					return;
-				} else {
+				if (!(objectPairs.ecb.getOwnerId() == ub.getId() || isSuper)) {
 					addPageMessage(respage.getString("not_begin_DE_on_CRF_not_resume_DE"), request);
 					throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 							resexception.getString("event_CRF_not_belong_current_user"), "1");
 				}
 			} else if (objectPairs.action.equals(ACTION_START_DOUBLE_DATA_ENTRY)) {
-				if (objectPairs.ecb.getOwnerId() != ub.getId()) {
-					return;
-				} else {
+				if (objectPairs.ecb.getOwnerId() == ub.getId()) {
 					if (!DisplayEventCRFBean.initialDataEntryCompletedMoreThanTwelveHoursAgo(objectPairs.ecb) && !isSuper) {
 						addPageMessage(respage.getString("began_DE_on_CRF_marked_complete_less_12_not_begin_DE"), request);
 						throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 								resexception.getString("owner_attempting_DDE_12_hours"), "1");
-					} else {
-						return;
 					}
 				}
 			} else if (objectPairs.action.equals(ACTION_CONTINUE_INITIAL_DATA_ENTRY)) {
-				if (objectPairs.ecb.getValidatorId() == ub.getId() || isSuper) {
-					return;
-				} else {
+				if (!(objectPairs.ecb.getValidatorId() == ub.getId() || isSuper)) {
 					addPageMessage(respage.getString("not_begin_DDE_on_CRF_not_resume_DE"), request);
 					throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 							resexception.getString("validation_event_CRF_not_begun_user"), "1");
 				}
 			} else if (objectPairs.action.equals(ACTION_ADMINISTRATIVE_EDITING)) {
-				if (isSuper) {
-					return;
-				} else {
+				if (!isSuper) {
 					addPageMessage(respage.getString("you_may_not_perform_administrative_editing") + " "
 							+ respage.getString("change_study_contact_study_coordinator"), request);
 					throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
@@ -568,10 +554,9 @@ public class TableOfContentsServlet extends Controller {
 		if (toc != null) {
 			ArrayList<SectionBean> sectionBeans = toc.getSections();
 			if (sectionBeans != null && sectionBeans.size() > 0) {
-				for (int i = 0; i < sectionBeans.size(); ++i) {
-					SectionBean s = sectionBeans.get(i);
-					ids.add(s.getId());
-				}
+                for (SectionBean s : sectionBeans) {
+                    ids.add(s.getId());
+                }
 			}
 		}
 		return ids;
@@ -580,10 +565,10 @@ public class TableOfContentsServlet extends Controller {
 	/**
 	 * Index starts from 0. If not in, return -1.
 	 * 
-	 * @param sb
-	 * @param toc
-	 * @param sectionIdsInToc
-	 * @return
+	 * @param sb SectionBean
+	 * @param toc DisplayTableOfContentsBean
+	 * @param sectionIdsInToc LinkedList<Integer>
+	 * @return int
 	 */
 	public static int sectionIndexInToc(SectionBean sb, DisplayTableOfContentsBean toc,
 			LinkedList<Integer> sectionIdsInToc) {

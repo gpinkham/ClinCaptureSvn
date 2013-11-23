@@ -41,16 +41,20 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -59,6 +63,7 @@ import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -67,6 +72,7 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.ListStudySubjectsServlet;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
@@ -76,6 +82,7 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -122,7 +129,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author jnyayapathi
  * 
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({ "unchecked", "rawtypes", "serial", "UnusedDeclaration" })
 public abstract class Controller extends BaseController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -141,7 +148,7 @@ public abstract class Controller extends BaseController {
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
 	}
 
-	protected void storePageMessages(HttpServletRequest request) {
+    protected void storePageMessages(HttpServletRequest request) {
 		Map storedAttributes = new HashMap();
 		storedAttributes.put(PAGE_MESSAGE, request.getAttribute(PAGE_MESSAGE));
 		request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
@@ -167,7 +174,7 @@ public abstract class Controller extends BaseController {
 		request.setAttribute(PRESET_VALUES, presetValues);
 	}
 
-	protected void setTable(EntityBeanTable table, HttpServletRequest request) {
+    protected void setTable(EntityBeanTable table, HttpServletRequest request) {
 		request.setAttribute(BEAN_TABLE, table);
 	}
 
@@ -237,7 +244,7 @@ public abstract class Controller extends BaseController {
 						if (success != null) {
 
 							if (successMsg.contains("$linkURL")) {
-								successMsg = decodeLINKURL(request, datasetId);
+								successMsg = decodeLINKURL(datasetId);
 							}
 
 							if (successMsg != null && !successMsg.isEmpty()) {
@@ -260,7 +267,7 @@ public abstract class Controller extends BaseController {
 
 	}
 
-	private String decodeLINKURL(HttpServletRequest request, Integer datasetId) {
+	private String decodeLINKURL(Integer datasetId) {
 
         String successMsg = "";
 
@@ -286,7 +293,8 @@ public abstract class Controller extends BaseController {
 		}
 	}
     
-	private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
+	@SuppressWarnings("ConstantConditions")
+    private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
 			UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
 		HttpSession session = request.getSession();
@@ -684,7 +692,8 @@ public abstract class Controller extends BaseController {
 	 *            The Page to go to if the collection is empty.
 	 * @throws InconsistentStateException
 	 */
-	protected void addEntityList(String beanName, Collection list, String messageIfEmpty, Page destinationIfEmpty,
+	@SuppressWarnings("UnusedParameters")
+    protected void addEntityList(String beanName, Collection list, String messageIfEmpty, Page destinationIfEmpty,
 			HttpServletRequest request, HttpServletResponse response) throws InconsistentStateException {
 		if (list.isEmpty()) {
 			throw new InconsistentStateException(destinationIfEmpty, messageIfEmpty);
@@ -848,7 +857,8 @@ public abstract class Controller extends BaseController {
 
 	}
 
-	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(HttpServletRequest request, int studyId) {
+	@SuppressWarnings("UnusedParameters")
+    public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(HttpServletRequest request, int studyId) {
 
 		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
 		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
@@ -863,7 +873,7 @@ public abstract class Controller extends BaseController {
 		return dynamicGroupClasses;
 	}
 
-	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByCurrentStudy(HttpServletRequest request) {
+    public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByCurrentStudy(HttpServletRequest request) {
 		return getDynamicGroupClassesByStudyId(request, getCurrentStudy(request).getId());
 	}
 
@@ -955,7 +965,8 @@ public abstract class Controller extends BaseController {
 		getUnavailableCRFList().put(ecb, ub);
 	}
 
-	public void dowloadFile(File f, String contentType, HttpServletRequest request, HttpServletResponse response)
+	@SuppressWarnings("UnusedParameters")
+    public void dowloadFile(File f, String contentType, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
 		response.setHeader("Content-disposition", "attachment; filename=\"" + f.getName() + "\";");
@@ -1118,7 +1129,7 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
-	protected Date getJobStartTime(HashMap errors, FormProcessor fp) {
+    protected Date getJobStartTime(HashMap errors, FormProcessor fp) {
 		Date currDate = new Date();
 		Calendar currentDateCalendar = new GregorianCalendar();
 		currentDateCalendar.setTime(currDate);
@@ -1341,4 +1352,212 @@ public abstract class Controller extends BaseController {
 		}
 		return displayTableOfContentsBean;
 	}
+
+	/**
+	 * Each of the event CRFs with its corresponding CRFBean. Then generates a list of DisplayEventCRFBeans, one for
+	 * each event CRF.
+	 * 
+	 * @param eventCRFs
+	 *            The list of event CRFs for this study event.
+	 * @param eventDefinitionCRFs
+	 *            The list of event definition CRFs for this study event.
+	 * @return The list of DisplayEventCRFBeans for this study event.
+	 */
+	@SuppressWarnings("UnusedParameters")
+	public ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs,
+			UserAccountBean ub, StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study) {
+		ArrayList answer = new ArrayList();
+
+		StudyEventDAO sedao = getStudyEventDAO();
+		CRFDAO cdao = getCRFDAO();
+		CRFVersionDAO cvdao = getCRFVersionDAO();
+		ItemDataDAO iddao = getItemDataDAO();
+		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
+
+		for (Object eventCRF : eventCRFs) {
+			EventCRFBean ecb = (EventCRFBean) eventCRF;
+
+			// populate the event CRF with its crf bean
+			int crfVersionId = ecb.getCRFVersionId();
+			CRFBean cb = cdao.findByVersionId(crfVersionId);
+			ecb.setCrf(cb);
+
+			CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
+			ecb.setCrfVersion(cvb);
+
+			// then get the definition so we can call
+			// DisplayEventCRFBean.setFlags
+			int studyEventId = ecb.getStudyEventId();
+			int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
+
+			EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId,
+					cb.getId());
+
+			if (status.equals(SubjectEventStatus.LOCKED) || status.equals(SubjectEventStatus.SKIPPED)
+					|| status.equals(SubjectEventStatus.STOPPED)) {
+				ecb.setStage(DataEntryStage.LOCKED);
+
+				// we need to set a SED-wide flag here, because other edcs
+				// in this event can be filled in and change the status, tbh
+			} else if (status.equals(SubjectEventStatus.INVALID)) {
+				ecb.setStage(DataEntryStage.LOCKED);
+			} else if (!cb.getStatus().equals(Status.AVAILABLE)) {
+				ecb.setStage(DataEntryStage.LOCKED);
+			} else if (!cvb.getStatus().equals(Status.AVAILABLE)) {
+				ecb.setStage(DataEntryStage.LOCKED);
+			}
+
+			if (edc != null) {
+				DisplayEventCRFBean dec = new DisplayEventCRFBean();
+				dec.setEventDefinitionCRF(edc);
+				dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
+
+				ArrayList idata = iddao.findAllByEventCRFId(ecb.getId());
+				if (!idata.isEmpty()) {
+					// consider an event crf started only if item data get
+					// created
+					answer.add(dec);
+				}
+			}
+		}
+
+		return answer;
+	}
+
+	/**
+	 * Finds all the event definitions for which no event CRF exists - which is the list of event definitions with
+	 * uncompleted event CRFs.
+	 * 
+	 * @param eventDefinitionCRFs
+	 *            All of the event definition CRFs for this study event.
+	 * @param eventCRFs
+	 *            All of the event CRFs for this study event.
+	 * @return The list of event definitions for which no event CRF exists.
+	 */
+	public ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs,
+			SubjectEventStatus status) {
+		int i;
+		HashMap completed = new HashMap();
+		HashMap startedButIncompleted = new HashMap();
+		ArrayList answer = new ArrayList();
+
+		/**
+		 * A somewhat non-standard algorithm is used here: let answer = empty; foreach event definition ED, set
+		 * isCompleted(ED) = false foreach event crf EC, set isCompleted(EC.getEventDefinition()) = true foreach event
+		 * definition ED, if (!isCompleted(ED)) { answer += ED; } return answer; This algorithm is guaranteed to find
+		 * all the event definitions for which no event CRF exists.
+		 * 
+		 * The motivation for using this algorithm is reducing the number of database hits.
+		 * 
+		 * -jun-we have to add more CRFs here: the event CRF which dones't have item data yet
+		 */
+
+		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
+			EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
+			completed.put(edcrf.getCrfId(), Boolean.FALSE);
+			startedButIncompleted.put(edcrf.getCrfId(), new EventCRFBean());
+		}
+
+		CRFVersionDAO cvdao = getCRFVersionDAO();
+		ItemDataDAO iddao = getItemDataDAO();
+		for (i = 0; i < eventCRFs.size(); i++) {
+			EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
+			int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
+			ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
+			if (!idata.isEmpty()) {// this crf has data already
+				completed.put(crfId, Boolean.TRUE);
+			} else {
+				startedButIncompleted.put(crfId, ecrf);
+			}
+		}
+
+		// TODO possible relation to 1689 here, tbh
+		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
+			DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
+			EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
+
+			dedc.setEdc(edcrf);
+			if (status.equals(SubjectEventStatus.LOCKED)) {
+				dedc.setStatus(Status.LOCKED);
+			}
+			Boolean b = (Boolean) completed.get(new Integer(edcrf.getCrfId()));
+			EventCRFBean ev = (EventCRFBean) startedButIncompleted.get(new Integer(edcrf.getCrfId()));
+			if (b == null || !b) {
+
+				dedc.setEventCRF(ev);
+				answer.add(dedc);
+
+			}
+		}
+		return answer;
+	}
+
+	public ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub,
+			DataSource ds, UserAccountBean ub, StudyUserRoleBean currentRole) {
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+		StudyEventDAO sedao = getStudyEventDAO();
+		EventCRFDAO ecdao = getEventCRFDAO();
+		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
+		StudySubjectDAO ssdao = getStudySubjectDAO();
+		StudyDAO sdao = getStudyDAO();
+
+		ArrayList events = sedao.findAllByStudySubject(studySub);
+
+		ArrayList displayEvents = new ArrayList();
+		for (Object event1 : events) {
+			StudyEventBean event = (StudyEventBean) event1;
+			StudySubjectBean studySubject = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
+
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
+					.findByPK(event.getStudyEventDefinitionId());
+			event.setStudyEventDefinition(sed);
+
+			// find all active crfs in the definition
+			StudyBean study = (StudyBean) sdao.findByPK(studySubject.getStudyId());
+			ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, sed.getId());
+			ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+
+			// construct info needed on view study event page
+			DisplayStudyEventBean de = new DisplayStudyEventBean();
+			de.setStudyEvent(event);
+			de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole,
+					event.getSubjectEventStatus(), study));
+			ArrayList al = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus());
+			EnterDataForStudyEventServlet.populateUncompletedCRFsWithCRFAndVersions(ds, logger, al);
+			de.setUncompletedCRFs(al);
+
+			de.setMaximumSampleOrdinal(sedao.getMaxSampleOrdinal(sed, studySubject));
+
+			displayEvents.add(de);
+
+		}
+
+		return displayEvents;
+	}
+
+	public DisplayStudyEventBean getDisplayStudyEventsForStudySubject(StudyEventBean event, DataSource ds,
+			UserAccountBean ub, StudyUserRoleBean currentRole, StudyBean study) {
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
+        EventCRFDAO ecdao = new EventCRFDAO(ds);
+        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
+
+        StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+        event.setStudyEventDefinition(sed);
+
+        // find all active crfs in the definition
+        ArrayList eventDefinitionCRFs = edcdao.findAllActiveByEventDefinitionId(sed.getId());
+
+        ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+
+        // construct info needed on view study event page
+        DisplayStudyEventBean de = new DisplayStudyEventBean();
+        de.setStudyEvent(event);
+        de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub,
+                currentRole, event.getSubjectEventStatus(), study));
+        ArrayList al = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs,
+                event.getSubjectEventStatus());
+        de.setUncompletedCRFs(al);
+
+        return de;
+    }
 }

@@ -21,9 +21,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -54,12 +51,10 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
 /**
  * @author jxu
@@ -126,8 +121,8 @@ public abstract class ListStudySubjectServlet extends Controller {
 		// tbh, also add the params "subjectPersonIdRequired",
 		// "subjectIdGeneration", "subjectIdPrefixSuffix"
 		int parentStudyId = currentStudy.getParentStudyId();
-		ArrayList studyGroupClasses = new ArrayList();
-		ArrayList allDefs = new ArrayList();
+		ArrayList studyGroupClasses;
+		ArrayList allDefs;
 		// allDefs holds the list of study event definitions used in the table,
 		
 		if (parentStudyId > 0) {
@@ -199,109 +194,109 @@ public abstract class ListStudySubjectServlet extends Controller {
         currentStudy.getStudyParameterConfig().setMedicalCodingApprovalNeeded(parentSPV.getValue());
 
 		// for all the study groups for each group class
-		for (int i = 0; i < studyGroupClasses.size(); i++) {
-			StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClasses.get(i);
-			ArrayList groups = sgdao.findAllByGroupClass(sgc);
-			sgc.setStudyGroups(groups);
-		}
+        for (Object studyGroupClass1 : studyGroupClasses) {
+            StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass1;
+            ArrayList groups = sgdao.findAllByGroupClass(sgc);
+            sgc.setStudyGroups(groups);
+        }
 		request.setAttribute("studyGroupClasses", studyGroupClasses);
 
 		// information for the event tabs
 		request.getSession().setAttribute("allDefsArray", allDefs);
-        request.getSession().setAttribute("allDefsNumber", new Integer(allDefs.size()));
-        request.getSession().setAttribute("groupSize", new Integer(studyGroupClasses.size()));
+        request.getSession().setAttribute("allDefsNumber", allDefs.size());
+        request.getSession().setAttribute("groupSize", studyGroupClasses.size());
 
 		// find all the subjects in current study
 		ArrayList subjects = sdao.findAllByStudyId(currentStudy.getId());
 
 		ArrayList<DisplayStudySubjectBean> displayStudySubs = new ArrayList<DisplayStudySubjectBean>();
-		for (int i = 0; i < subjects.size(); i++) {
-			StudySubjectBean studySub = (StudySubjectBean) subjects.get(i);
+        for (Object subject1 : subjects) {
+            StudySubjectBean studySub = (StudySubjectBean) subject1;
 
-			ArrayList groups = (ArrayList) sgmdao.findAllByStudySubject(studySub.getId());
+            ArrayList groups = (ArrayList) sgmdao.findAllByStudySubject(studySub.getId());
 
-			ArrayList subGClasses = new ArrayList();
-			for (int j = 0; j < studyGroupClasses.size(); j++) {
-				StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClasses.get(j);
-				boolean hasClass = false;
-				for (int k = 0; k < groups.size(); k++) {
-					SubjectGroupMapBean sgmb = (SubjectGroupMapBean) groups.get(k);
-					if (sgmb.getGroupClassName().equalsIgnoreCase(sgc.getName())) {
-						subGClasses.add(sgmb);
-						hasClass = true;
-						break;
-					}
+            ArrayList subGClasses = new ArrayList();
+            for (Object studyGroupClass : studyGroupClasses) {
+                StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
+                boolean hasClass = false;
+                for (Object group : groups) {
+                    SubjectGroupMapBean sgmb = (SubjectGroupMapBean) group;
+                    if (sgmb.getGroupClassName().equalsIgnoreCase(sgc.getName())) {
+                        subGClasses.add(sgmb);
+                        hasClass = true;
+                        break;
+                    }
 
-				}
-				if (!hasClass) {
-					subGClasses.add(new SubjectGroupMapBean());
-				}
+                }
+                if (!hasClass) {
+                    subGClasses.add(new SubjectGroupMapBean());
+                }
 
-			}
+            }
 
-			ArrayList subEvents = new ArrayList();
-			// find all events order by definition ordinal
-			ArrayList events = sedao.findAllByStudySubject(studySub);
+            ArrayList subEvents = new ArrayList();
+            // find all events order by definition ordinal
+            ArrayList events = sedao.findAllByStudySubject(studySub);
 
-			for (int j = 0; j < allDefs.size(); j++) {
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) allDefs.get(j);
-				boolean hasDef = false;
-				for (int k = 0; k < events.size(); k++) {
-					StudyEventBean se = (StudyEventBean) events.get(k);
-					if (se.getStudyEventDefinitionId() == sed.getId()) {
-						se.setStudyEventDefinition(sed);
+            for (Object allDef : allDefs) {
+                StudyEventDefinitionBean sed = (StudyEventDefinitionBean) allDef;
+                boolean hasDef = false;
+                for (Object event : events) {
+                    StudyEventBean se = (StudyEventBean) event;
+                    if (se.getStudyEventDefinitionId() == sed.getId()) {
+                        se.setStudyEventDefinition(sed);
 
-						subEvents.add(se);
-						hasDef = true;
-					}
+                        subEvents.add(se);
+                        hasDef = true;
+                    }
 
-				}
-				if (!hasDef) {
-					StudyEventBean blank = new StudyEventBean();
-					blank.setSubjectEventStatus(SubjectEventStatus.NOT_SCHEDULED);
-					blank.setStudyEventDefinitionId(sed.getId());
-					// how can we set the following:
+                }
+                if (!hasDef) {
+                    StudyEventBean blank = new StudyEventBean();
+                    blank.setSubjectEventStatus(SubjectEventStatus.NOT_SCHEDULED);
+                    blank.setStudyEventDefinitionId(sed.getId());
+                    // how can we set the following:
 
-					blank.setStudyEventDefinition(sed);
-					subEvents.add(blank);
-				}
+                    blank.setStudyEventDefinition(sed);
+                    subEvents.add(blank);
+                }
 
-			}
+            }
 
-			int prevDefId = 0;
-			int currDefId = 0;
-			ArrayList finalEvents = new ArrayList();
-			int repeatingNum = 1;
-			StudyEventBean event = new StudyEventBean();
+            int currDefId;
+            int prevDefId = 0;
+            ArrayList finalEvents = new ArrayList();
+            int repeatingNum = 1;
+            StudyEventBean event = new StudyEventBean();
 
-			for (int j = 0; j < subEvents.size(); j++) {
-				StudyEventBean se = (StudyEventBean) subEvents.get(j);
-				currDefId = se.getStudyEventDefinitionId();
-				if (currDefId != prevDefId) {// find a new event
-					if (repeatingNum > 1) {
-						event.setRepeatingNum(repeatingNum);
-						repeatingNum = 1;
-					}
-					finalEvents.add(se); // add current event to final
-					event = se;
-				} else {
-					repeatingNum++;
-					event.getRepeatEvents().add(se);
-					if (j == subEvents.size() - 1) {
-						event.setRepeatingNum(repeatingNum);
-						repeatingNum = 1;
+            for (int j = 0; j < subEvents.size(); j++) {
+                StudyEventBean se = (StudyEventBean) subEvents.get(j);
+                currDefId = se.getStudyEventDefinitionId();
+                if (currDefId != prevDefId) {// find a new event
+                    if (repeatingNum > 1) {
+                        event.setRepeatingNum(repeatingNum);
+                        repeatingNum = 1;
+                    }
+                    finalEvents.add(se); // add current event to final
+                    event = se;
+                } else {
+                    repeatingNum++;
+                    event.getRepeatEvents().add(se);
+                    if (j == subEvents.size() - 1) {
+                        event.setRepeatingNum(repeatingNum);
+                        repeatingNum = 1;
 
-					}
-				}
-				prevDefId = currDefId;
-			}
+                    }
+                }
+                prevDefId = currDefId;
+            }
 
-			DisplayStudySubjectBean dssb = new DisplayStudySubjectBean();
-			dssb.setStudyEvents(finalEvents);
-			dssb.setStudySubject(studySub);
-			dssb.setStudyGroups(subGClasses);
-			displayStudySubs.add(dssb);
-		}
+            DisplayStudySubjectBean dssb = new DisplayStudySubjectBean();
+            dssb.setStudyEvents(finalEvents);
+            dssb.setStudySubject(studySub);
+            dssb.setStudyGroups(subGClasses);
+            displayStudySubs.add(dssb);
+        }
 
 		// Set a subject property to determine whether to show a signed-type
 		// icon (electronic signature)
@@ -309,24 +304,24 @@ public abstract class ListStudySubjectServlet extends Controller {
 		// Get all event crfs by studyevent id; then use
 		// EventDefinitionCRFDAO.isRequired to
 		// determine whether any uncompleted CRFs are required.
-		boolean isRequiredUncomplete = false;
+		boolean isRequiredUncomplete;
 		for (DisplayStudySubjectBean subject : displayStudySubs) {
-			for (Iterator it = subject.getStudyEvents().iterator(); it.hasNext();) {
-				StudyEventBean event = (StudyEventBean) it.next();
-				if (event.getSubjectEventStatus() != null && event.getSubjectEventStatus().getId() == 3) {
-					// disallow the subject from signing any studies
-					subject.setStudySignable(false);
-					break;
-				} else {
-					// determine whether the subject has any required,
-					// uncompleted event CRFs
-					isRequiredUncomplete = eventHasRequiredUncompleteCRFs(event);
-					if (isRequiredUncomplete) {
-						subject.setStudySignable(false);
-						break;
-					}
-				}
-			}
+            for (Object o : subject.getStudyEvents()) {
+                StudyEventBean event = (StudyEventBean) o;
+                if (event.getSubjectEventStatus() != null && event.getSubjectEventStatus().getId() == 3) {
+                    // disallow the subject from signing any studies
+                    subject.setStudySignable(false);
+                    break;
+                } else {
+                    // determine whether the subject has any required,
+                    // uncompleted event CRFs
+                    isRequiredUncomplete = eventHasRequiredUncompleteCRFs(event);
+                    if (isRequiredUncomplete) {
+                        subject.setStudySignable(false);
+                        break;
+                    }
+                }
+            }
 		}
 
 		fp = new FormProcessor(request);
@@ -351,14 +346,14 @@ public abstract class ListStudySubjectServlet extends Controller {
 					.getStudyParameterConfig().getSecondaryIdLabel());
 		}
 
-		for (int i = 0; i < studyGroupClasses.size(); i++) {
-			StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClasses.get(i);
-			columnArray.add(sgc.getName());
-		}
-		for (int i = 0; i < allDefs.size(); i++) {
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) allDefs.get(i);
-			columnArray.add(sed.getName());
-		}
+        for (Object studyGroupClass : studyGroupClasses) {
+            StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
+            columnArray.add(sgc.getName());
+        }
+        for (Object allDef : allDefs) {
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) allDef;
+            columnArray.add(sed.getName());
+        }
 		columnArray.add(resword.getString("actions"));
 		String columns[] = new String[columnArray.size()];
 		columnArray.toArray(columns);
@@ -418,31 +413,5 @@ public abstract class ListStudySubjectServlet extends Controller {
 
 		return false;
 
-	}
-
-	public static DisplayStudyEventBean getDisplayStudyEventsForStudySubject(StudySubjectBean studySub,
-			StudyEventBean event, DataSource ds, UserAccountBean ub, StudyUserRoleBean currentRole, StudyBean study) {
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-		EventCRFDAO ecdao = new EventCRFDAO(ds);
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
-
-		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
-		event.setStudyEventDefinition(sed);
-
-		// find all active crfs in the definition
-		ArrayList eventDefinitionCRFs = edcdao.findAllActiveByEventDefinitionId(sed.getId());
-
-		ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
-		// construct info needed on view study event page
-		DisplayStudyEventBean de = new DisplayStudyEventBean();
-		de.setStudyEvent(event);
-		de.setDisplayEventCRFs(ViewStudySubjectServlet.getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub,
-				currentRole, event.getSubjectEventStatus(), study));
-		ArrayList al = ViewStudySubjectServlet.getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs,
-				event.getSubjectEventStatus());
-		de.setUncompletedCRFs(al);
-
-		return de;
 	}
 }

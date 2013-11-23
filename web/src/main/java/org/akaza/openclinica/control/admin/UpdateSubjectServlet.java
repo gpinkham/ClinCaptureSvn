@@ -29,10 +29,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -40,6 +40,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
+import org.akaza.openclinica.control.submit.DataEntryServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -57,7 +58,14 @@ public class UpdateSubjectServlet extends SecureController {
 
 	public static final String DATE_DOB = "dateOfBirth";
 
-	/**
+    public final static String HAS_UNIQUE_ID_NOTE = "hasUniqueIDNote";
+    public final static String HAS_DOB_NOTE = "hasDOBNote";
+    public final static String HAS_GENDER_NOTE = "hasGenderNote";
+    public final static String UNIQUE_ID_NOTE = "uniqueIDNote";
+    public final static String DOB_NOTE = "dOBNote";
+    public final static String GENDER_NOTE = "genderNote";
+
+    /**
      *
      */
 	@Override
@@ -77,7 +85,7 @@ public class UpdateSubjectServlet extends SecureController {
 		SubjectDAO subjdao = new SubjectDAO(sm.getDataSource());
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
 		FormProcessor fp = new FormProcessor(request);
-		FormDiscrepancyNotes discNotes = null;
+		FormDiscrepancyNotes discNotes;
 		Map<String, String> fields = new HashMap<String, String>();
 		Map<String, String> parameters;
 		SubjectBean subject;
@@ -96,7 +104,25 @@ public class UpdateSubjectServlet extends SecureController {
 			forwardPage(Page.LIST_SUBJECT_SERVLET);
 		} else {
 			String action = fp.getString("action", true);
-			
+
+            DiscrepancyNoteBean discrepancyNoteBean = new DiscrepancyNoteBean();
+            ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn("subject", subjectId, "unique_identifier");
+            discrepancyNoteBean.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, subjectId, notes));
+            request.setAttribute(HAS_UNIQUE_ID_NOTE, notes.size() > 0 ? "yes" : "");
+            request.setAttribute(UNIQUE_ID_NOTE, discrepancyNoteBean);
+
+            discrepancyNoteBean = new DiscrepancyNoteBean();
+            notes = (ArrayList) dndao.findAllByEntityAndColumn("subject", subjectId, "gender");
+            discrepancyNoteBean.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, subjectId, notes));
+            request.setAttribute(HAS_GENDER_NOTE, notes.size() > 0 ? "yes" : "");
+            request.setAttribute(GENDER_NOTE, discrepancyNoteBean);
+
+            discrepancyNoteBean = new DiscrepancyNoteBean();
+            notes = (ArrayList) dndao.findAllByEntityAndColumn("subject", subjectId, "date_of_birth");
+            discrepancyNoteBean.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, subjectId, notes));
+            request.setAttribute(HAS_DOB_NOTE, notes.size() > 0 ? "yes" : "");
+            request.setAttribute(DOB_NOTE, discrepancyNoteBean);
+
 			if ("show".equalsIgnoreCase(action)) {
 				clearSession();
 				
@@ -105,7 +131,7 @@ public class UpdateSubjectServlet extends SecureController {
 				subject = (SubjectBean) subjdao.findByPK(subjectId);
 				session.setAttribute("subjectToUpdate", subject);
 				
-				ArrayList<StudyParamsConfig> listOfParams = new ArrayList<StudyParamsConfig>();
+				ArrayList<StudyParamsConfig> listOfParams;
 				
 				if (currentStudy.getParentStudyId() > 0){
 					StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
@@ -115,11 +141,10 @@ public class UpdateSubjectServlet extends SecureController {
 				} else {
 					listOfParams = currentStudy.getStudyParameters();
 				}
-				
-				for (int i = 0; i < listOfParams.size(); i++){
-					StudyParamsConfig spc = (StudyParamsConfig) listOfParams.get(i);
-					parameters.put(spc.getParameter().getHandle(), spc.getValue().getValue());
-				}
+
+                for (StudyParamsConfig spc : listOfParams) {
+                    parameters.put(spc.getParameter().getHandle(), spc.getValue().getValue());
+                }
 				session.setAttribute("parameters", parameters);
 				
 				String personId = subject.getUniqueIdentifier() == null? "" : subject.getUniqueIdentifier();
@@ -162,20 +187,6 @@ public class UpdateSubjectServlet extends SecureController {
 				discNotes = new FormDiscrepancyNotes();
 				session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
-				int flagRStatusId = dndao.getResolutionStatusIdForSubjectDNFlag(subjectId, "gender");
-				if (flagRStatusId > 0) {
-					session.setAttribute("genderDNFlag", AbstractTableFactory.getDNFlagIconName(flagRStatusId));
-				} else {
-					session.setAttribute("genderDNFlag", "icon_noNote");
-				}
-				
-				flagRStatusId = dndao.getResolutionStatusIdForSubjectDNFlag(subjectId, "date_of_birth");
-				if (flagRStatusId > 0) {
-					session.setAttribute("birthDNFlag", AbstractTableFactory.getDNFlagIconName(flagRStatusId));
-				} else {
-					session.setAttribute("birthDNFlag", "icon_noNote");
-				}
-
 				forwardPage(Page.UPDATE_SUBJECT);
 			} else if ("confirm".equalsIgnoreCase(action)) {
 				confirm();
@@ -212,7 +223,7 @@ public class UpdateSubjectServlet extends SecureController {
 					}
 				}
 				
-				Date dateOfBirth = new Date();
+				Date dateOfBirth;
 				if ("1".equals(parameters.get("collectDob"))) {
 					try {
 						dateOfBirth = local_df.parse(fields.get("dateOfBirth"));
@@ -224,7 +235,7 @@ public class UpdateSubjectServlet extends SecureController {
 				} else if ("2".equals(parameters.get("collectDob"))) {
 					try {
 						Calendar cal = Calendar.getInstance();
-						cal.set(Integer.valueOf(fields.get("dateOfBirth")), 0, 1);
+						cal.set(Integer.valueOf(fields.get("dateOfBirth")), Calendar.JANUARY, 1);
 						subject.setDateOfBirth(cal.getTime());
 						subject.setDobCollected(false);
 					} catch (NumberFormatException pe) {
@@ -247,7 +258,6 @@ public class UpdateSubjectServlet extends SecureController {
 			} else {
 				addPageMessage(respage.getString("no_action_specified"));
 				forwardPage(Page.LIST_SUBJECT_SERVLET);
-				return;
 			}
 		}
 	}
@@ -310,7 +320,7 @@ public class UpdateSubjectServlet extends SecureController {
 			
 			try {
 				Calendar cal = Calendar.getInstance();
-				cal.set(Integer.valueOf(fields.get("dateOfBirth")), 0, 1);
+				cal.set(Integer.valueOf(fields.get("dateOfBirth")), Calendar.JANUARY, 1);
 			} catch (NumberFormatException pe) {
 				logger.info("Parse exception happened.");
 				Validator.addError(errors, YEAR_DOB, resexception.getString("please_enter_a_valid_year_birth"));
@@ -319,7 +329,7 @@ public class UpdateSubjectServlet extends SecureController {
 		
 		// should be after v.validate()
 		if ("true".equals(parameters.get("genderRequired"))) {
-			fields.put("gender", fp.getString("gender") == ""? "" : String.valueOf(fp.getString("gender").charAt(0)));
+			fields.put("gender", fp.getString("gender").equals("") ? "" : String.valueOf(fp.getString("gender").charAt(0)));
 			if ("".equals(fp.getString("gender"))){
 				Validator.addError(errors, "gender", resexception.getString("please_choose_the_gender_of_the_subject"));
 			}

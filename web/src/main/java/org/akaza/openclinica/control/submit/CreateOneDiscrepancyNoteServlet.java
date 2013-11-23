@@ -378,15 +378,17 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 			boxDNMap.put(parentId, dn);
             request.getSession().setAttribute(BOX_TO_SHOW, parentId + "");
 		}
-        request.getSession().setAttribute(BOX_DN_MAP, boxDNMap);
+		request.getSession().setAttribute(BOX_DN_MAP, boxDNMap);
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "refresh", refresh + "");
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "y", ypos != null && ypos.length() > 0 ? ypos : "0");
-        request.setAttribute(REFRESH_PARENT_WINDOW, true);
-        dn.setItemId(fp.getInt(ITEM_ID));
-		ArrayList notes = dndao.findExistingNotesForItemData(entityId);
-		dn.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));        
-        request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn);
-		forwardPage(forwardTo == null ? Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()) : forwardTo, request, response);
+		request.setAttribute(REFRESH_PARENT_WINDOW, true);
+		dn.setItemId(fp.getInt(ITEM_ID));
+		ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(dn.getEntityType(), dn.getEntityId(),
+				dn.getColumn());
+		dn.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));
+		request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn.clone());
+		forwardPage(forwardTo == null ? Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle())
+				: forwardTo, request, response);
 	}
 
 	private void manageReasonForChangeState(HttpSession session, Integer itemDataBeanId) {

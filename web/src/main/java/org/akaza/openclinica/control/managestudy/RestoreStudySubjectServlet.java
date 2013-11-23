@@ -23,8 +23,13 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -32,7 +37,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -46,6 +51,7 @@ import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Restores a removed subject to a study
@@ -54,12 +60,15 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class RestoreStudySubjectServlet extends SecureController {
+@Component
+public class RestoreStudySubjectServlet extends Controller {
 	
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_locked"));
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"));
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_locked"), request, response);
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"), request, response);
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -70,49 +79,51 @@ public class RestoreStudySubjectServlet extends SecureController {
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		String studySubIdString = request.getParameter("id");
 		String subIdString = request.getParameter("subjectId");
 		String studyIdString = request.getParameter("studyId");
 
-		SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
-		StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-		DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(sm.getDataSource());
+		SubjectDAO sdao = getSubjectDAO();
+		StudySubjectDAO subdao = getStudySubjectDAO();
+		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
+		DiscrepancyNoteDAO discDao = getDiscrepancyNoteDAO();
 
 		if (StringUtil.isBlank(studySubIdString) || StringUtil.isBlank(subIdString)
 				|| StringUtil.isBlank(studyIdString)) {
-			addPageMessage(respage.getString("please_choose_study_subject_to_restore"));
-			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+			addPageMessage(respage.getString("please_choose_study_subject_to_restore"), request);
+			forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 		} else {
-			int studyId = Integer.valueOf(studyIdString.trim()).intValue();
-			int studySubId = Integer.valueOf(studySubIdString.trim()).intValue();
-			int subjectId = Integer.valueOf(subIdString.trim()).intValue();
+			int studyId = Integer.parseInt(studyIdString.trim());
+			int studySubId = Integer.parseInt(studySubIdString.trim());
+			int subjectId = Integer.parseInt(subIdString.trim());
 
 			SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);
 
 			StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 
-			StudyDAO studydao = new StudyDAO(sm.getDataSource());
+			StudyDAO studydao = getStudyDAO();
 			StudyBean study = (StudyBean) studydao.findByPK(studyId);
 
 			// find study events
-			StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-			ArrayList<DisplayStudyEventBean> displayEvents = ViewStudySubjectServlet
-					.getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole);
+			StudyEventDAO sedao = getStudyEventDAO();
+			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, getDataSource(), ub, currentRole);
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (studySub.getStatus().equals(Status.AVAILABLE)) {
 					addPageMessage(respage.getString("this_subject_is_already_available_for_study") + " "
-							+ respage.getString("please_contact_sysadmin_for_more_information"));
-					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 					return;
 				}
 
@@ -121,7 +132,7 @@ public class RestoreStudySubjectServlet extends SecureController {
 				request.setAttribute("studySub", studySub);
 				request.setAttribute("events", displayEvents);
 
-				forwardPage(Page.RESTORE_STUDY_SUBJECT);
+				forwardPage(Page.RESTORE_STUDY_SUBJECT, request, response);
 			} else {
 				logger.info("submit to restore the subject from study");
 				// restore subject from study
@@ -132,51 +143,50 @@ public class RestoreStudySubjectServlet extends SecureController {
 
 				// restore all study events
 				// restore all event crfs
-				EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+				EventCRFDAO ecdao = getEventCRFDAO();
 
-				for (int j = 0; j < displayEvents.size(); j++) {
-					DisplayStudyEventBean dispEvent = displayEvents.get(j);
-					StudyEventBean event = dispEvent.getStudyEvent();
-					if (event.getStatus().equals(Status.AUTO_DELETED)) {
-						event.setStatus(Status.AVAILABLE);
-						event.setUpdater(ub);
-						event.setUpdatedDate(new Date());
-						sedao.update(event);
-					}
+                for (DisplayStudyEventBean dispEvent : displayEvents) {
+                    StudyEventBean event = dispEvent.getStudyEvent();
+                    if (event.getStatus().equals(Status.AUTO_DELETED)) {
+                        event.setStatus(Status.AVAILABLE);
+                        event.setUpdater(ub);
+                        event.setUpdatedDate(new Date());
+                        sedao.update(event);
+                    }
 
-					ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+                    ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
-					SubjectEventStatusUtil.determineSubjectEventState(event, study, eventCRFs, new DAOWrapper(studydao,
-							sedao, subdao, ecdao, edcdao, discDao));
+                    SubjectEventStatusUtil.determineSubjectEventState(event, study, eventCRFs, new DAOWrapper(studydao,
+                            sedao, subdao, ecdao, edcdao, discDao));
 
-					ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-					for (int k = 0; k < eventCRFs.size(); k++) {
-						EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-						if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-							eventCRF.setStatus(Status.AVAILABLE);
-							eventCRF.setUpdater(ub);
-							eventCRF.setUpdatedDate(new Date());
-							ecdao.update(eventCRF);
-							// remove all the item data
-							ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-							for (int a = 0; a < itemDatas.size(); a++) {
-								ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-								if (item.getStatus().equals(Status.AUTO_DELETED)) {
-									item.setStatus(Status.AVAILABLE);
-									item.setUpdater(ub);
-									item.setUpdatedDate(new Date());
-									iddao.update(item);
-								}
-							}
-						}
-					}
-				}
+                    ItemDataDAO iddao = getItemDataDAO();
+                    for (Object eventCRF1 : eventCRFs) {
+                        EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
+                        if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
+                            eventCRF.setStatus(Status.AVAILABLE);
+                            eventCRF.setUpdater(ub);
+                            eventCRF.setUpdatedDate(new Date());
+                            ecdao.update(eventCRF);
+                            // remove all the item data
+                            ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
+                            for (Object itemData : itemDatas) {
+                                ItemDataBean item = (ItemDataBean) itemData;
+                                if (item.getStatus().equals(Status.AUTO_DELETED)) {
+                                    item.setStatus(Status.AVAILABLE);
+                                    item.setUpdater(ub);
+                                    item.setUpdatedDate(new Date());
+                                    iddao.update(item);
+                                }
+                            }
+                        }
+                    }
+                }
 
 				String emailBody = respage.getString("the_subject") + " " + subject.getName() + " "
 						+ respage.getString("has_been_restored_to_the_study") + " " + study.getName() + ".";
-				addPageMessage(emailBody);
+				addPageMessage(emailBody, request);
 				
-				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 			}
 		}
 	}

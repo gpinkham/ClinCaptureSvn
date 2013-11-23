@@ -82,7 +82,7 @@ public class UpdateCRFHeaderServlet extends Controller {
 		List<DiscrepancyNoteThread> noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(),
 				currentStudy, null, -1, true);
 
-		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, sdao, ifmdao, eventDefinitionCRFId, allSections,
+		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId, allSections,
 				noteThreads);
 
 		forwardPage(Page.UPDATE_CRF_HEADER_PAGE, request, response);

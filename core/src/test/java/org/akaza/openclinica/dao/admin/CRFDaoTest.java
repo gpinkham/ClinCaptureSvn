@@ -13,27 +13,6 @@ import org.junit.Test;
 public class CRFDaoTest extends DefaultAppContextTest {
 
 	@Test
-	public void testThatCreateReturnsAnActiveCRF() throws OpenClinicaException {
-		
-		CRFBean crf = new CRFBean();
-		Date currentDate = new Date();
-
-		crf.setOid("F_END");
-		crf.setStudyId(1);
-		crf.setActive(false);
-		crf.setOwner((UserAccountBean) userAccountDAO.findByPK(1));
-		crf.setStatus(Status.AVAILABLE);
-		crf.setUpdater((UserAccountBean) userAccountDAO.findByPK(1));
-		crf.setName("End of Study");
-		crf.setDescription("Test");
-		crf.setCreatedDate(currentDate);
-		crf.setUpdatedDate(currentDate);
-		
-		crf = (CRFBean) crfdao.create(crf);
-		assertTrue(crf.isActive());
-	}
-
-	@Test
 	public void testThatFindByOidReturnsCRFWithCorrectOID() throws OpenClinicaException {
 		CRFBean crf = null;
 		String cfrOid = "F_CONC";
