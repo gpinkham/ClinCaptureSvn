@@ -257,7 +257,7 @@ $(document).ready(function() {
 		<c:if test="${isRFC}">
 			<div class="formfieldL_BG" id="select" style="display:none" >
 				<select name="description" id="selectDescription" class="formFieldL" disabled>
-					<c:forEach var="rfcTerm" items="${dnDescriptions}">
+					<c:forEach var="rfcTerm" items="${dDescriptionsMap['dnRFCDescriptions']}">
 						<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
 					</c:forEach>
 					<option value="Other"><fmt:message key="other" bundle="${resword}"/>

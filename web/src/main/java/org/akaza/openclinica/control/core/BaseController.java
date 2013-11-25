@@ -19,7 +19,6 @@ import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -427,10 +426,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public AuditDAO getAuditDAO() {
 		return new AuditDAO(getDataSource());
-	}
-
-	public DnDescriptionDao getDnDescriptionDao() {
-		return new DnDescriptionDao(getDataSource());
 	}
 
 	public SectionDAO getSectionDAO() {

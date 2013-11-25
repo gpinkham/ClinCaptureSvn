@@ -42,7 +42,6 @@ import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.core.DnDescription;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -59,6 +58,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -66,7 +66,6 @@ import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -83,6 +82,8 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import com.clinovo.service.DiscrepancyDescriptionService;
 
 /**
  * @author jxu
@@ -798,6 +799,8 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 	private void manageStatuses(HttpServletRequest request, String field) {
         StudyBean currentStudy = getCurrentStudy(request);
         StudyUserRoleBean currentRole = getCurrentRole(request);
+        DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess.getApplicationContext(getServletContext())
+				.getBean("discrepancyDescriptionService");
 
 		Map<String, String> additionalParameters = CreateDiscrepancyNoteServlet.getMapWithParameters(field, request);
 
@@ -809,29 +812,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		request.setAttribute("isRFC", isRFC);
 		request.setAttribute("isInError", isInError);
 		
-		ArrayList<DnDescription> siteVisibleDescs = new ArrayList<DnDescription>();
-		ArrayList<DnDescription> studyVisibleDescs = new ArrayList<DnDescription>();
-		DnDescriptionDao descriptionDao = getDnDescriptionDao();
-		int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
-		ArrayList<DnDescription> dnDescriptions;
-		ArrayList<DnDescription> rfcDescriptions = (ArrayList<DnDescription>) descriptionDao.findAllByStudyId(parentStudyId);
-		
-		for (DnDescription rfcTerm : rfcDescriptions) {
-			if ("Site".equals(rfcTerm.getVisibilityLevel())) {
-				siteVisibleDescs.add(rfcTerm);
-			} else if ("Study".equals(rfcTerm.getVisibilityLevel())) {
-				studyVisibleDescs.add(rfcTerm);
-			} else if ("Study and Site".equals(rfcTerm.getVisibilityLevel())) {
-				studyVisibleDescs.add(rfcTerm);
-				siteVisibleDescs.add(rfcTerm);
-			}
-		}
-		if (currentStudy.getParentStudyId() > 0) {
-			dnDescriptions = siteVisibleDescs;
-		} else {
-			dnDescriptions = studyVisibleDescs;
-		}
-		request.setAttribute("dnDescriptions", dnDescriptions);
+		request.setAttribute("dDescriptionsMap", dDescriptionService.getAssignedToStudySortedDescriptions(currentStudy));
 		
 		if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
 			request.setAttribute(SHOW_STATUS, false);

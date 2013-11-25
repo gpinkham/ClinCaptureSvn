@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="igor" id="2013-11-25-TICKET157-01">
+        <comment>Add column description_type_id, rename column dn_rfc_description_id, rename table dn_rfc_description</comment>
+		<addColumn tableName="dn_rfc_description" >
+            <column name="type_id" type="INT"/>
+        </addColumn>
+		<addColumn tableName="dn_rfc_description" >
+            <column name="version" type="INT"/>
+        </addColumn>
+		<renameColumn tableName="dn_rfc_description" newColumnName="id" oldColumnName="dn_rfc_description_id"/>
+		<sql splitStatements="false">
+            UPDATE dn_rfc_description set type_id = 3;
+        </sql>
+		<renameTable newTableName="discrepancy_description" oldTableName="dn_rfc_description"/>
+    </changeSet>
+	<changeSet author="igor" id="2013-11-25-TICKET157-02">
+		<preConditions onFail="MARK_RAN">
+			<dbms type="postgresql"/>
+	 	</preConditions>
+		<sql splitStatements="false">
+			ALTER INDEX pk_dn_rfc_description RENAME TO pk_discrepancy_description_id;
+            ALTER SEQUENCE dn_rfc_description_dn_rfc_description_id_seq RENAME TO discrepancy_description_id_seq;
+		</sql>
+	</changeSet>
+	<changeSet author="igor" id="2013-11-25-TICKET157-03">
+		<preConditions onFail="MARK_RAN">
+			<dbms type="oracle"/>	
+	 	</preConditions>
+		<sql splitStatements="false">
+			ALTER INDEX pk_dn_rfc_description RENAME TO pk_discrepancy_description_id;
+			RENAME dn_rfc_description_dn_rfc_description_id_seq TO discrepancy_description_id_seq
+		</sql>
+	</changeSet>
+</databaseChangeLog>

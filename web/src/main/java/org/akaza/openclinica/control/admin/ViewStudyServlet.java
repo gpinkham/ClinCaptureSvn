@@ -24,10 +24,10 @@ import java.util.ArrayList;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -35,6 +35,8 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import com.clinovo.dao.DiscrepancyDescriptionDAO;
+import com.clinovo.model.DiscrepancyDescriptionType;
 
 /**
  * Processes the reuqest of 'view study details'
@@ -99,10 +101,13 @@ public class ViewStudyServlet extends SecureController {
 				// find all subjects in the study, include ones in sites
 				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-				DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(sm.getDataSource());
+				DiscrepancyDescriptionDAO dDescriptionDao = (DiscrepancyDescriptionDAO) SpringServletAccess.getApplicationContext(context)
+						.getBean("DiscrepancyDescriptionDao");
+				
 				// find all events in the study, include ones in sites
 				ArrayList definitions = seddao.findAllByStudy(study);
-				ArrayList dnDescriptions = (ArrayList) dnDescriptionDao.findAllByStudyId(studyId);
+				ArrayList dRFCDescriptions = (ArrayList) dDescriptionDao.findAllByStudyIdAndTypeId(studyId, 
+						DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
 
 				for (int i = 0; i < definitions.size(); i++) {
 					StudyEventDefinitionBean def = (StudyEventDefinitionBean) definitions.get(i);
@@ -113,7 +118,7 @@ public class ViewStudyServlet extends SecureController {
 
 				request.setAttribute("sitesToView", sites);
 				request.setAttribute("siteNum", sites.size() + "");
-				request.setAttribute("dnDescriptions", dnDescriptions);
+				request.setAttribute("dRFCDescriptions", dRFCDescriptions);
 
 				request.setAttribute("userRolesToView", userRoles);
 				request.setAttribute("userNum", userRoles.size() + "");

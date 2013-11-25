@@ -20,6 +20,7 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.util.ValidatorHelper;
 
 import java.text.DateFormat;
@@ -38,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.core.DnDescription;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
@@ -53,6 +53,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -60,7 +61,6 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -163,6 +163,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 		FormProcessor fp = new FormProcessor(request);
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
+		DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess.getApplicationContext(getServletContext())
+				.getBean("discrepancyDescriptionService");
 		ArrayList types = DiscrepancyNoteType.toArrayList();
 		
 		request.setAttribute(DIS_TYPES, types);
@@ -455,7 +457,6 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 		if (!fp.isSubmitted()) {
 			DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-			ArrayList<DnDescription> dnDescriptions = new ArrayList<DnDescription>();
 			
 			if (subjectId > 0) {
 				// This doesn't seem correct, because the SubjectId should
@@ -496,7 +497,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 					dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId()); // ClinCapture #42
 					dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
 					if (isRFC) {
-						dnDescriptions = findRFCDescriptions(currentStudy);
+						request.setAttribute("dDescriptionsMap", dDescriptionService.getAssignedToStudySortedDescriptions(currentStudy));
 					} 
 					request.setAttribute("autoView", "0");
 					// above set to automatically open up the user panel
@@ -556,7 +557,6 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");// this should go from UI & here
 			ArrayList userAccounts = generateUserAccounts(currentStudy, ub.getActiveStudyId(), subjectId);
 			request.setAttribute(USER_ACCOUNTS, userAccounts);
-			request.setAttribute("dnDescriptions", dnDescriptions);
 
 			// ideally should be only two cases
 			if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
@@ -764,9 +764,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 									dndao.updateAssignedUserToNull(pNote);
 								}
 							}
-
 						}
-
 					}
 
 					int dnTypeId = note.getDiscrepancyNoteTypeId();
@@ -881,7 +879,6 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 								EmailEngine.getAdminEmail(),
 								MessageFormat.format(respage.getString("mailDNSubject"), study.getName(),
 										note.getEntityName()), emailBodyString, true, null, null, true, request);
-
 					} else {
 						logger.debug("did not send email, but did save DN");
 					}
@@ -903,7 +900,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 					}
 				}
 				if (isRFC) {
-					request.setAttribute("dnDescriptions", findRFCDescriptions(currentStudy));
+					request.setAttribute("dDescriptionsMap", dDescriptionService.getAssignedToStudySortedDescriptions(currentStudy));
 				} 
 				
 				setInputMessages(errors, request);
@@ -1094,32 +1091,6 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 		return ordinal;
 
-	}
-	
-	private ArrayList<DnDescription> findRFCDescriptions(StudyBean study) {
-		ArrayList<DnDescription> result;
-		ArrayList<DnDescription> siteVisibleDescs = new ArrayList<DnDescription>();
-		ArrayList<DnDescription> studyVisibleDescs = new ArrayList<DnDescription>();
-		DnDescriptionDao descriptionDao = new DnDescriptionDao(getDataSource());
-		int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
-		ArrayList<DnDescription> rfcDescriptions = (ArrayList<DnDescription>) descriptionDao.findAllByStudyId(parentStudyId);
-		for (DnDescription rfcTerm : rfcDescriptions) {
-			if ("Site".equals(rfcTerm.getVisibilityLevel())) {
-				siteVisibleDescs.add(rfcTerm);
-			} else if ("Study".equals(rfcTerm.getVisibilityLevel())) {
-				studyVisibleDescs.add(rfcTerm);
-			} else if ("Study and Site".equals(rfcTerm.getVisibilityLevel())) {
-				studyVisibleDescs.add(rfcTerm);
-				siteVisibleDescs.add(rfcTerm);
-			}
-		}
-		
-		if (study.getParentStudyId() > 0) {
-			result = siteVisibleDescs;
-		} else {
-			result = studyVisibleDescs;
-		}
-		return result;
 	}
 	
 	public static boolean isStudyParamForRFCSwitchOn(StudyBean study, SessionManager sm) {

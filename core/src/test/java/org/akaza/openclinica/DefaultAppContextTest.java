@@ -3,7 +3,6 @@ package org.akaza.openclinica;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
@@ -37,9 +36,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.clinovo.dao.CodedItemDAO;
 import com.clinovo.dao.DictionaryDAO;
+import com.clinovo.dao.DiscrepancyDescriptionDAO;
 import com.clinovo.dao.TermDAO;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
+import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.TermService;
 
 /**
@@ -65,7 +66,6 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
     protected UserAccountDAO userAccountDAO;
     protected StudySubjectDAO studySubjectDAO;
 	protected DynamicEventDao dynamicEventDao;
-	protected DnDescriptionDao dnDescriptionDao;
 	protected StudyGroupClassDAO studyGroupClassDAO;
     protected DiscrepancyNoteDAO discrepancyNoteDAO;
     protected EventDefinitionCRFDAO eventDefinitionCRFDAO;
@@ -84,12 +84,14 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	@Autowired protected AuditUserLoginDao auditUserLoginDao;
 	@Autowired protected RuleSetRuleAuditDao ruleSetRuleAuditDao;
 	@Autowired protected DatabaseChangeLogDao databaseChangeLogDao;
+	@Autowired protected DiscrepancyDescriptionDAO discrepancyDescriptionDAO;
 	
 	@Autowired protected TermDAO termDAO;
 	@Autowired protected CodedItemDAO codedItemDAO;
 	@Autowired protected DictionaryDAO dictionaryDAO;
 	
 	// Services
+	@Autowired protected DiscrepancyDescriptionService discrepancyDescriptionService;
 	@Autowired protected TermService termService;
 	@Autowired protected CodedItemService codedItemService;
 	@Autowired protected DictionaryService dictionaryService;
@@ -114,7 +116,6 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
         userAccountDAO = new UserAccountDAO(dataSource);
 		dynamicEventDao = new DynamicEventDao(dataSource);
         studySubjectDAO = new StudySubjectDAO(dataSource);
-        dnDescriptionDao = new DnDescriptionDao(dataSource);
 		discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 		studyGroupClassDAO = new StudyGroupClassDAO(dataSource);
         eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);

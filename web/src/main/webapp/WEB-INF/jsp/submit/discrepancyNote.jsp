@@ -101,6 +101,21 @@ function setElements(typeId,user1,user2,id,filter1,nw,ud,rs,cl,na,isRFC,parentId
 	}
 }
 
+function showAnotherDescriptions(selectedValue, parentId) {
+	if (selectedValue == '2'){
+		switchOffElement('selectCloseDescription'+parentId);
+		hideElement('selectCloseDescription'+parentId);
+		switchOnElement('selectUpdateDescription'+parentId);
+		showElement('selectUpdateDescription'+parentId);
+	} else if (selectedValue == '4'){
+		switchOffElement('selectUpdateDescription'+parentId);
+		hideElement('selectUpdateDescription'+parentId);
+		switchOnElement('selectCloseDescription'+parentId);
+		showElement('selectCloseDescription'+parentId);
+	}
+	
+}
+
 function setValue(elementName, value) {
 	var element = MM_findObj(elementName);
 	if(element != null) {
@@ -200,7 +215,6 @@ function setYPos(id) {
 			<div style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
 		</c:if>
 		<div style="float:right">
-			<%-- <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/notes-and-discrepancies')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> --%>
 			<c:choose>
 			<c:when test="${parentId==0}">
 				<a href="javascript:scrollToY('p');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');javascript:addText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a>
@@ -218,7 +232,7 @@ function setYPos(id) {
 					<c:if test="${isRFC}">
 						<div class="formfieldL_BG" id="select${parentId}" style="display:none" >
 							<select name="description${parentId}" id="selectDescription${parentId}" class="formFieldL" disabled>
-								<c:forEach var="rfcTerm" items="${dnDescriptions}">
+								<c:forEach var="rfcTerm" items="${dDescriptionsMap['dnRFCDescriptions']}">
 									<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
 								</c:forEach>
 								<option value="Other"><fmt:message key="other" bundle="${resword}"/>
@@ -233,10 +247,21 @@ function setYPos(id) {
 					</div>	
 				</c:when>
 				<c:otherwise>
-					<div class="formfieldXL_BG">
-						<input type="text" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL">
+					<div class="formfieldL_BG">
+						<select name="description${parentId}" id="selectUpdateDescription${parentId}" class="formFieldL">
+							<c:forEach var="term" items="${dDescriptionsMap['dnUpdateDescriptions']}">
+								<option value="${term.name}"><c:out value="${term.name}"/>
+							</c:forEach>
+							<option value="Other"><fmt:message key="other" bundle="${resword}"/>
+						</select>
+					
+						<select name="description${parentId}" id="selectCloseDescription${parentId}" class="formFieldL" disabled style="display:none">
+							<c:forEach var="term" items="${dDescriptionsMap['dnCloseDescriptions']}">
+								<option value="${term.name}"><c:out value="${term.name}"/>
+							</c:forEach>
+							<option value="Other"><fmt:message key="other" bundle="${resword}"/>
+						</select>
 					</div>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
 				</c:otherwise>
 			</c:choose>
 		</div>
@@ -269,56 +294,28 @@ function setYPos(id) {
 				<c:when test="${whichResStatus == 22 || whichResStatus == 1}">
 					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
 						<c:forEach var="type" items="${discrepancyTypes2}">
-						<c:choose>
-						<c:when test="${typeIdl == type.id}">
-						 	<c:choose>
-						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-								<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
-						    </c:when>
-						    <c:otherwise>
-						   		<option value="<c:out value="${type.id}"/>" selected ><c:out value="${type.name}"/>
-						    </c:otherwise>
-						    </c:choose>
-						 </c:when>
-						 <c:otherwise>
 							<c:choose>
-							<c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-								<option value="<c:out value="${type.id}"/>" disabled="true"><c:out value="${type.name}"/>
-							</c:when>
-							<c:otherwise>
-								<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>
-							</c:otherwise>
+								<c:when test="${typeIdl == type.id}">
+									<option value="<c:out value="${type.id}"/>" selected ><c:out value="${type.name}"/>
+								</c:when>
+								<c:otherwise>
+									<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>	 
+								</c:otherwise>
 							</c:choose>
-						 </c:otherwise>
-						</c:choose>
 						</c:forEach>
 					</select>
 				</c:when>
 				<c:otherwise>
 					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
 						<c:forEach var="type" items="${discrepancyTypes}">
-						<c:choose>
-						<c:when test="${typeIdl == type.id}">
-						 	<c:choose>
-						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-								<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
-						    </c:when>
-						    <c:otherwise>
-						   		<option value="<c:out value="${type.id}"/>" selected ><c:out value="${type.name}"/>
-						    </c:otherwise>
-						    </c:choose>
-						 </c:when>
-						 <c:otherwise>
 							<c:choose>
-							<c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-								<option value="<c:out value="${type.id}"/>" disabled="true"><c:out value="${type.name}"/>
-							</c:when>
-							<c:otherwise>
-								<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>
-							</c:otherwise>
+								<c:when test="${typeIdl == type.id}">
+									<option value="<c:out value="${type.id}"/>" selected ><c:out value="${type.name}"/>
+								</c:when>
+								<c:otherwise>
+									<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>
+								</c:otherwise>
 							</c:choose>
-						 </c:otherwise>
-						</c:choose>
 						</c:forEach>
 					</select>
 				</c:otherwise>
@@ -333,7 +330,7 @@ function setYPos(id) {
 			<div class="dnBoxCol2">
 				<div class="formfieldL_BG">
 				<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
-			    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL">
+			    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL" onchange="javascript:showAnotherDescriptions(this.options[selectedIndex].value, ${parentId});">
 					<c:choose>
 					<c:when test="${(parentId>0 || whichResStatus==2 && discrepancyNote.discrepancyNoteTypeId==3) || whichResStatus==1}">
 						<c:set var="resStatuses" value="${resolutionStatuses}"/>

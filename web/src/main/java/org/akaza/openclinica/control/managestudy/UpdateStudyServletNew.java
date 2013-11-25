@@ -21,7 +21,10 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.exception.CodeException;
-import com.clinovo.util.ValidatorHelper;
+import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.model.DiscrepancyDescriptionType;
+import com.clinovo.service.DiscrepancyDescriptionService;
+ import com.clinovo.util.ValidatorHelper;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -36,7 +39,6 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.akaza.openclinica.bean.core.DnDescription;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -45,11 +47,11 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.InterventionBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.discrepancy.DnDescriptionDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
@@ -103,9 +105,10 @@ public class UpdateStudyServletNew extends Controller {
 		studyId = studyId == 0 ? fp.getInt("studyId") : studyId;
 		String action = fp.getString("action");
 		StudyDAO sdao = new StudyDAO(getDataSource());
-		DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(getDataSource());
+		DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess.getApplicationContext(getServletContext()).getBean("discrepancyDescriptionService");
 		boolean isInterventional = false;
-		ArrayList<DnDescription> newRfcDescriptions = new ArrayList<DnDescription>();
+		
+		Map<String, List<DiscrepancyDescription>> dDescriptionsMap = dDescriptionService.findAllSortedDescriptionsFromStudy(studyId);
 
         StudyBean study = (StudyBean) sdao.findByPK(studyId);
 		if (study.getId() != currentStudy.getId()) {
@@ -117,9 +120,10 @@ public class UpdateStudyServletNew extends Controller {
 		study.setId(studyId);
 		StudyConfigService scs = new StudyConfigService(getDataSource());
 		study = scs.setParametersForStudy(study);
-		ArrayList dnDescriptions = (ArrayList) dnDescriptionDao.findAllByStudyId(studyId);
+		
+		request.setAttribute("dDescriptionsMap", dDescriptionsMap);
+		
 		request.setAttribute("studyToView", study);
-		request.setAttribute("dnDescriptions", dnDescriptions);
 		request.setAttribute("studyId", studyId + "");
 		request.setAttribute("studyPhaseMap", CreateStudyServlet.studyPhaseMap);
 		ArrayList statuses = Status.toStudyUpdateMembersList();
@@ -170,19 +174,19 @@ public class UpdateStudyServletNew extends Controller {
 			validateStudy4(fp, study, v);
 			validateStudy5(fp, study, v);
 			validateStudy6(fp, study, v);
-			validateStudy7(fp, study, v, newRfcDescriptions);
+			validateStudy7(fp, v, study.getId(), dDescriptionsMap);
 			confirmWholeStudy(fp, study, v);
 			
 			request.setAttribute("studyToView", study);
 			if (!errors.isEmpty()) {
 				logger.debug("found errors : " + errors.toString());
 				request.setAttribute("formMessages", errors);
-				request.setAttribute("dnDescriptions", newRfcDescriptions);
+				request.setAttribute("dDescriptions", dDescriptionsMap);
 				
 				forwardPage(Page.UPDATE_STUDY_NEW, request, response);
 			} else {
 				study.setProtocolType(protocolType);
-				submitStudy(request, study, newRfcDescriptions);
+				submitStudy(study, dDescriptionsMap, request);
 				study.setStudyParameters(getStudyParameterValueDAO().findParamConfigByStudy(study));
 				addPageMessage(respage.getString("the_study_has_been_updated_succesfully"), request);
 				ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
@@ -413,45 +417,49 @@ public class UpdateStudyServletNew extends Controller {
 		}
 	}
 	
-	private void validateStudy7(FormProcessor fp, StudyBean study, Validator v, ArrayList<DnDescription> newRfcDescriptions) {
+	private void validateStudy7(FormProcessor fp, Validator v, int studyId, Map<String, List<DiscrepancyDescription>> dDescriptionsMap) {
+		validateSpecifiedDescriptions(fp, v, studyId, dDescriptionsMap.get("dnUpdateDescriptions"), "updateName", "updateVisibilityLevel", 
+			"updateDescriptionId", "updateDescriptionError",  DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId());
+		validateSpecifiedDescriptions(fp, v, studyId, dDescriptionsMap.get("dnCloseDescriptions"), "closeName", "closeVisibilityLevel", 
+			"closeDescriptionId", "closeDescriptionError",  DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId());
+		validateSpecifiedDescriptions(fp, v, studyId, dDescriptionsMap.get("dnRFCDescriptions"), "dnRFCName", "dnRFCVisibilityLevel", 
+			"dnRFCDescriptionId", "dnRFCDescriptionError",  DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
+		}
 		
-		newRfcDescriptions.clear();
-		for (int i = 0; i < 25; i++){
-			v.addValidation("dnRfcName" + i, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-			// set list of dn descriptions for rfc here
-			if (!"".equals(fp.getString("dnRfcName"+i))) {
-				DnDescription rfcTerm = new DnDescription();
-				rfcTerm.setName(fp.getString("dnRfcName"+i));
-				switch (fp.getInt("dnRfcVisibilityLevel"+i)){
-					case 1: rfcTerm.setVisibilityLevel("Study"); break;
-					case 2: rfcTerm.setVisibilityLevel("Site"); break;
-					default: rfcTerm.setVisibilityLevel("Study and Site");
-				}
-				if (fp.getInt("dnRfcDescriptionId"+i) != 0) {
-					rfcTerm.setId(fp.getInt("dnRfcDescriptionId"+i));
-				}
-				rfcTerm.setStudyId(study.getId());
-				newRfcDescriptions.add(rfcTerm);
-			}
+	private void validateSpecifiedDescriptions(FormProcessor fp, Validator v, int studyId, List<DiscrepancyDescription> newDescriptions, 
+		String descriptionName, String visibilityLevel, String descriptionId, String descriptionError, int typeId) {
+		newDescriptions.clear();
+ 		for (int i = 0; i < 25; i++){
+ 			v.addValidation(descriptionName + i, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+ 			// set list of dn descriptions for specified type here
+ 			if (!"".equals(fp.getString(descriptionName+i))) {
+ 				DiscrepancyDescription dDescription = new DiscrepancyDescription();
+ 				dDescription.setTypeId(typeId);
+ 				dDescription.setName(fp.getString(descriptionName+i));
+ 				switch (fp.getInt(visibilityLevel+i)){
+ 					case 1: dDescription.setVisibilityLevel("Study"); break;
+ 					case 2: dDescription.setVisibilityLevel("Site"); break;
+ 					default: dDescription.setVisibilityLevel("Study and Site");
+ 				}
+ 				if (fp.getInt(descriptionId+i) != 0) {
+ 					dDescription.setId(fp.getInt(descriptionId+i));
+ 				}
+ 				dDescription.setStudyId(studyId);
+ 				newDescriptions.add(dDescription);
+ 			}
 		}
 		HashMap errors = v.validate();
-		
-		
-		for (int i = 0; i < newRfcDescriptions.size(); i++){
-			DnDescription rfcTerm1 = newRfcDescriptions.get(i);
+		for (int i = 0; i < newDescriptions.size(); i++){
+			DiscrepancyDescription rfcTerm1 = newDescriptions.get(i);
 			for (int j = 0; j < i; j++){
-				DnDescription rfcTerm2 = newRfcDescriptions.get(j);
-				if (rfcTerm1.getName().equals(rfcTerm2.getName())) {
-					Validator.addError(errors, "dnRfcDescriptionError" + i, respage.getString("please_correct_the_duplicate_description_found_in_row")+" "+ (j+1));
-				}
-			}
-		}
-		
-		if (!errors.isEmpty()) {
-			fp.getRequest().setAttribute("formMessages", errors);
-		}
+				DiscrepancyDescription rfcTerm2 = newDescriptions.get(j);
+ 				if (rfcTerm1.getName().equals(rfcTerm2.getName())) { 				
+ 					Validator.addError(errors, descriptionError + i, respage.getString("please_correct_the_duplicate_description_found_in_row")+" "+ (j+1));
+ 				}
+ 			}
+ 		}		
 	}
-
+		
 	private void confirmWholeStudy(FormProcessor fp, StudyBean study, Validator v) {
 		HashMap errors = v.validate();
 		if (study.getStatus().isLocked()) {
@@ -635,12 +643,52 @@ public class UpdateStudyServletNew extends Controller {
 		}
 	}
 
-	private void submitStudy(HttpServletRequest request, StudyBean newStudy, ArrayList<DnDescription> newRfcDescriptions) throws CodeException {
+	private void submitDescriptions(Map<String, List<DiscrepancyDescription>> dDescriptionsMap, int studyId) {
+		submitSpecifiedDescriptions(dDescriptionsMap.get("dnUpdateDescriptions"), DiscrepancyDescriptionType.DescriptionType.UPDATE_DESCRIPTION.getId(), studyId);
+		submitSpecifiedDescriptions(dDescriptionsMap.get("dnCloseDescriptions"), DiscrepancyDescriptionType.DescriptionType.CLOSE_DESCRIPTION.getId(), studyId);
+		submitSpecifiedDescriptions(dDescriptionsMap.get("dnRFCDescriptions"), DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId(), studyId);
+	}
+	
+	private void submitSpecifiedDescriptions(List<DiscrepancyDescription> newDescriptions, int typeId, int studyId) {	
+		DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess.getApplicationContext(getServletContext())
+			.getBean("discrepancyDescriptionService");
+		
+		//DiscrepancyDescriptions-section start
+		Map<Integer, DiscrepancyDescription> idToDnDescriptionMap = new HashMap<Integer, DiscrepancyDescription>();
+		 		
+		for (DiscrepancyDescription dDescription: dDescriptionService.findAllByStudyIdAndTypeId(studyId, typeId)){
+			idToDnDescriptionMap.put(dDescription.getId(), dDescription);
+		}
+		for (DiscrepancyDescription dDescription: newDescriptions){
+			if (idToDnDescriptionMap.keySet().contains(dDescription.getId())) {
+				DiscrepancyDescription dDescriptionOld = idToDnDescriptionMap.get(dDescription.getId());
+				if (!dDescription.getName().equals(dDescriptionOld.getName()) 
+						|| !dDescription.getVisibilityLevel().equals(dDescriptionOld.getVisibilityLevel())) {
+					// description was changed
+					dDescriptionService.saveDiscrepancyDescription(dDescription);
+					idToDnDescriptionMap.remove(dDescription.getId());
+				} else {
+					// description wasn't changed  
+					idToDnDescriptionMap.remove(dDescription.getId());
+				} 
+			} else {
+				// description is new (id=0)
+				dDescriptionService.saveDiscrepancyDescription(dDescription);
+			}
+		}
+		// delete unneeded descriptions 
+		for (DiscrepancyDescription dDescriptionForDelete: idToDnDescriptionMap.values()){
+			dDescriptionService.deleteDiscrepancyDescription(dDescriptionForDelete);
+		}
+	}
+			
+	
+	private void submitStudy(StudyBean newStudy, Map<String, List<DiscrepancyDescription>> dDescriptionsMap, HttpServletRequest request) throws CodeException {
         UserAccountBean ub = getUserAccountBean(request);
 
 		StudyDAO sdao = new StudyDAO(getDataSource());
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(getDataSource());
-		DnDescriptionDao dnDescriptionDao = new DnDescriptionDao(getDataSource());
+		submitDescriptions(dDescriptionsMap, newStudy.getId());
 
 		StudyBean study1 = newStudy;
 		logger.info("study bean to be updated:" + study1.getName());
@@ -648,35 +696,7 @@ public class UpdateStudyServletNew extends Controller {
 		study1.setUpdater(ub);
 		sdao.update(study1);
 		logger.debug("about to create dn descripts");
-		Map<Integer, DnDescription> idToDnDescriptionMap = new HashMap<Integer, DnDescription>();
-
-		for (DnDescription dnDescription: dnDescriptionDao.findAllByStudyId(newStudy.getId())){
-			idToDnDescriptionMap.put(dnDescription.getId(), dnDescription);
-		}
-
-		for (DnDescription dnDescription: newRfcDescriptions){
-			if (idToDnDescriptionMap.keySet().contains(dnDescription.getId())) {
-				DnDescription dnDescriptionOld = idToDnDescriptionMap.get(dnDescription.getId());
-				if (!dnDescription.getName().equals(dnDescriptionOld.getName())
-						|| !dnDescription.getVisibilityLevel().equals(dnDescriptionOld.getVisibilityLevel())) {
-					// description was changed
-					dnDescriptionDao.update(dnDescription);
-					idToDnDescriptionMap.remove(dnDescription.getId());
-				} else {
-					// description wasn't changed
-					idToDnDescriptionMap.remove(dnDescription.getId());
-				}
-			} else {
-				// description is new (id=0)
-				dnDescriptionDao.create(dnDescription);
-			}
-		}
-
-		// delete unneeded descriptions
-		for (DnDescription dnDescriptionForDelete: idToDnDescriptionMap.values()){
-			dnDescriptionDao.deleteByPK(dnDescriptionForDelete.getId());
-		}
-
+		
 		ArrayList siteList = (ArrayList) sdao.findAllByParent(newStudy.getId());
 		if (siteList.size() > 0) {
 			sdao.updateSitesStatus(study1);
