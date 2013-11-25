@@ -29,6 +29,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.slf4j.Logger;
@@ -38,9 +39,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.clinovo.coding.Search;
-import com.clinovo.coding.model.Classification;
-import com.clinovo.coding.source.impl.BioPortalSearchInterface;
 import com.clinovo.exception.CodeException;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemsTableFactory;
@@ -64,8 +62,6 @@ public class CodedItemsController {
 	
 	@Autowired
     private DataSource datasource;
-	
-	private Search search = new Search();
 
 	@Autowired
 	private TermService termService;
@@ -123,6 +119,7 @@ public class CodedItemsController {
 		factory.setEventDefinitionCRFDAO(new EventDefinitionCRFDAO(datasource));
 		factory.setStudySubjectDAO(new StudySubjectDAO(datasource));
 		factory.setStudyEventDefinitionDAO(new StudyEventDefinitionDAO(datasource));
+        factory.setItemDataDAO(new ItemDataDAO(datasource));
 
 		String codedItemsTable = factory.createTable(request, response).render();
 
@@ -155,64 +152,23 @@ public class CodedItemsController {
 		ModelMap model = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
-		String studyId = request.getParameter("study");
 		String dictionary = request.getParameter("dictionary");
+
 		String codedItemItemDataId = request.getParameter("item");
-		String verbatimTerm = request.getParameter("verbatimTerm");
 
-		CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
-		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(Integer.parseInt(studyId), "autoCodeDictionaryName");
+        CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
 
-		try {
+        if (codedItem != null) {
 
-			Term term = null;
-			List<Classification> classifications = new ArrayList<Classification>();
+            model.addAttribute("elementList", codedItem.getCodedItemElements());
 
-			// Attempt to get the term from the local [custom] dictionary - this is auto-coding!
-			if (configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
+        }
+        model.addAttribute("itemDataId", codedItem.getItemId());
+        model.addAttribute("itemDictionary", dictionary);
 
-				// Ignore case - (until Marc changes his mind)
-				term = termService.findByNonUniqueTermAndExternalDictionary(verbatimTerm, dictionary);
-				
-			}
+        return model;
 
-			if (term != null) {
-
-				// Auto code
-				request.getSession().setAttribute("code", term.getCode());
-
-				// Redirect to the save code item handler
-				saveCodedItemHandler(request);
-
-				Classification classification = new Classification();
-
-				classification.setCode(term.getCode());
-				classification.setId(term.getId().toString());
-				classification.setTerm(term.getPreferredName());
-				classification.setDictionary(term.getExternalDictionaryName());
-
-				classifications.add(classification);
-
-				model.addAttribute("autoCoded", true);
-
-			} else {
-
-				search.setSearchInterface(new BioPortalSearchInterface());
-				classifications = search.getClassifications(verbatimTerm, dictionary);
-			}
-
-			model.addAttribute("itemDictionary", dictionary);
-			model.addAttribute("classification", classifications);
-			model.addAttribute("itemDataId", codedItem.getItemDataId());
-
-		} catch (Exception e) {
-
-			log.error(e.getMessage());
-		}
-
-		return model;
-
-	}
+    }
 	
 	/**
 	 * Handle for saving a coded item
@@ -230,13 +186,10 @@ public class CodedItemsController {
 		
 		String codedItemItemDataId = request.getParameter("item");
         String codedItemSelectedDictionary = request.getParameter("dictionary");
-        
-        // The initial request attributes are unmodifiable - use the session! Be careful with the session attribute, it denotes auto coding
-        String code = request.getParameter("code") != null ? request.getParameter("code") : request.getSession().getAttribute("code").toString();
 		
-		CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
+		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
 		
-		codedItem.setCodedTerm(code);
+		//codedItem.setCodedTerm(code);
         codedItem.setDictionary(codedItemSelectedDictionary);
         codedItem.setStatus(String.valueOf(CodeStatus.CODED));
         
@@ -268,8 +221,8 @@ public class CodedItemsController {
 
         String codedItemItemDataId = request.getParameter("item");
 
-        CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
-        codedItem.setCodedTerm("");
+        CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
+        //codedItem.setCodedTerm("");
         codedItem.setStatus(String.valueOf(CodeStatus.NOT_CODED));
 
         codedItemService.saveCodedItem(codedItem);
@@ -294,16 +247,16 @@ public class CodedItemsController {
 
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
-		String code = request.getParameter("code");
+		//String code = request.getParameter("code");
 		String studyId = request.getParameter("study");
 		String codedItemItemDataId = request.getParameter("item");
 		String codedItemSelectedDictionary = request.getParameter("dictionary");
 		
 		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(Integer.parseInt(studyId), "autoCodeDictionaryName");
 		
-		CodedItem codedItem = codedItemService.findByItemData(Integer.parseInt(codedItemItemDataId));
+		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
 		
-		codedItem.setCodedTerm(code);
+		//codedItem.setCodedTerm(code);
 		codedItem.setDictionary(codedItemSelectedDictionary);
 		codedItem.setStatus(String.valueOf(CodeStatus.CODED));
 		
@@ -315,8 +268,8 @@ public class CodedItemsController {
 			Term term = new Term();
 
 			term.setDictionary(dictionary);
-			term.setCode(codedItem.getCodedTerm());
-			term.setPreferredName(codedItem.getVerbatimTerm());
+			//term.setCode(codedItem.getCodedTerm());
+			//term.setPreferredName(codedItem.getVerbatimTerm());
 			term.setExternalDictionaryName(codedItemSelectedDictionary);
 
 			try {

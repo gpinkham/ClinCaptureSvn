@@ -26,6 +26,7 @@
 			<list>
 				<value>com.clinovo.model.Term</value>
 				<value>com.clinovo.model.CodedItem</value>
+                <value>com.clinovo.model.CodedItemElement</value>
 				<value>com.clinovo.model.Dictionary</value>
 				<value>org.akaza.openclinica.domain.rule.RuleSetBean</value>
 				<value>org.akaza.openclinica.domain.rule.RuleSetAuditBean</value>

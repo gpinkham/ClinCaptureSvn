@@ -51,18 +51,7 @@ public interface CodedItemService {
 	 * @return List of coded items that belong to the specified scope
 	 */
 	List<CodedItem> findByStudyAndSite(int studyId, int siteId);
-	
-	/**
-	 * Retrieves all the coded items that belong to the specified item. 
-	 * <p>
-	 * The coded item must have been created using the specified item to qualify
-	 * 
-	 * @param itemId The itemId on which to search items
-	 * 
-	 * @return List of coded items that belong to the specified item
-	 */
-	List<CodedItem> findByItem(int itemId);
-	
+
 	/**
 	 * Retrieves all coded items that belong to the specified event-crf
 	 * 
@@ -91,24 +80,6 @@ public interface CodedItemService {
 	 * @return List of coded items belonging to the specified crf-version
 	 */
 	List<CodedItem> findBySubject(int subject);
-
-	/**
-	 * Retrieves all the coded items that have a verbatim term matching the specified verbatim term
-	 * 
-	 * @param verbatimTerm The verbatim term to filter on.
-	 * 
-	 * @return List of coded items that have a matching verbatim term to the specified verbatim term.
-	 */
-	List<CodedItem> findCodedItemsByVerbatimTerm(String verbatimTerm);
-
-	/**
-	 * Retrieves all the coded items that have a verbatim term matching the specified coded term
-	 * 
-	 * @param codedTerm The verbatim term to filter on.
-	 * 
-	 * @return List of coded items that have a matching coded term to the specified coded term.
-	 */
-	List<CodedItem> findCodedItemsByCodedTerm(String codedTerm);
 
 	/**
 	 * Retrieves all the coded items that were coded using the same dictionary.
@@ -144,21 +115,21 @@ public interface CodedItemService {
 	 * @throws Exception For any errors during persistence.
  	 */
 	CodedItem createCodedItem(EventCRFBean eventCRF, ItemBean item, ItemDataBean itemData, StudyBean currentStudy) throws Exception;
-	
-	/**
-	 * Save the given coded item to storage.
-	 * <p>
-	 * Note that this method also updates the referenced CRF item with the coded item value.
-	 * 
-	 * @param codedItem The coded item to save
-	 * 
-	 * @return The saved coded item
-	 * 
-	 * @throws Exception If the item data for the coded item does not exist, or any other exception during persistence routines.
-	 */
-	CodedItem saveCodedItem(CodedItem codedItem) throws Exception;
-	
-	/**
+
+    /**
+     * Save the given coded item to storage.
+     * <p>
+     * Note that this method also updates the referenced CRF item with the coded item value.
+     *
+     * @param codedItem The coded item to save
+     *
+     * @return The saved coded item
+     *
+     * @throws Exception If the item data for the coded item does not exist, or any other exception during persistence routines.
+     */
+    CodedItem saveCodedItem(CodedItem codedItem) throws Exception;
+
+    /**
 	 * Retrieves a coded item given a unique id
 	 * 
 	 * @param codedItemId The id of the coded item to retrieve
@@ -167,15 +138,6 @@ public interface CodedItemService {
 	 */
 	CodedItem findCodedItem(int codedItemId);
 
-	/**
-	 * Retrieves a unique coded item given the item data that was used to create it.
-	 * 
-	 * @param itemDataId The item data to filter on.
-	 * 
-	 * @return The coded item.
-	 */
-	CodedItem findByItemData(int itemDataId);
-	
 	/**
 	 * Deletes the given coded item from storage
 	 * 

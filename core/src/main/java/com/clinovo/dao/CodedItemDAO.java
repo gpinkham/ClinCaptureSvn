@@ -46,49 +46,17 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 	 */
 	public List<CodedItem> findAll() {
 
-		String query = "from  " + this.getDomainClassName() + " order by verbatimTerm asc";
+		String query = "from  " + this.getDomainClassName() + " order by itemId asc";
 		Query q = this.getCurrentSession().createQuery(query);
 
 		return (List<CodedItem>) q.list();
 	}
 
 	/**
-	 * Retrieves coded items with similar verbatim term.
-	 * 
-	 * @param verbatimTerm The verbatim term to filter on.
-	 * 
-	 * @return List of coded items that have the given term as a verbatim term.
-	 */
-	public List<CodedItem> findByVerbatimTerm(String verbatimTerm) {
-
-		String query = "from " + getDomainClassName() + " do  where do.verbatimTerm = :term";
-		Query q = getCurrentSession().createQuery(query);
-		q.setString("term", verbatimTerm);
-
-		return (List<CodedItem>) q.list();
-	}
-
-	/**
-	 * Retrieves coded items with similar coded term.
-	 * 
-	 * @param codedTerm The coded term to filter on.
-	 * 
-	 * @return List of coded items that have the given term as a coded term.
-	 */
-	public List<CodedItem> findByCodedTerm(String codedTerm) {
-
-		String query = "from " + getDomainClassName() + " do  where do.codedTerm = :term";
-		Query q = getCurrentSession().createQuery(query);
-		q.setString("term", codedTerm);
-
-		return (List<CodedItem>) q.list();
-	}
-
-	/**
 	 * Retrieves coded items that have been coded with the same dictionary
-	 * 
+	 *
 	 * @param dictionary The dictionary name to filter on.
-	 * 
+	 *
 	 * @return List of coded items that were coded with the specified dictionary
 	 */
 	public List<CodedItem> findByDictionary(String dictionary) {
@@ -102,9 +70,9 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 
 	/**
 	 * Retrieves coded items that have similar status.
-	 * 
+	 *
 	 * @param status The status to filter on.
-	 * 
+	 *
 	 * @return List of coded items that have the specified status
 	 */
 	public List<CodedItem> findByStatus(CodeStatus status) {
@@ -118,29 +86,29 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 
 	/**
 	 * Retrieves all the coded items that belong to a specified item.
-	 * 
+	 *
 	 * @param codedItemItemId The item id to filter on.
-	 * 
+	 *
 	 * @return List of coded items that belong to the specified item.
 	 */
-	public List<CodedItem> findByItemId(int codedItemItemId) {
-		
+	public CodedItem findByItemId(int codedItemItemId) {
+
 		String query = "from " + getDomainClassName() + " do  where do.itemId = :itemId";
 		org.hibernate.Query q = getCurrentSession().createQuery(query);
 		q.setInteger("itemId", codedItemItemId);
-		
-		return q.list();
+
+        return (CodedItem) q.uniqueResult();
 	}
 
 	/**
 	 * Retrieves all the coded items that belong to the specified event crf.
-	 * 
+	 *
 	 * @param eventCRFId The event crf id to filter on.
-	 * 
+	 *
 	 * @return List of coded items that belong to the specified event.
 	 */
 	public List<CodedItem> findByEventCRF(int eventCRFId) {
-		
+
 		String query = "from " + getDomainClassName() + " do  where do.eventCrfId = :eventCrfId";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("eventCrfId", eventCRFId);
@@ -150,13 +118,13 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 
 	/**
 	 * Retrieves all the coded items that belong to the specified crf version.
-	 * 
+	 *
 	 * @param crfVersionId The crf version id to filter on.
-	 * 
+	 *
 	 * @return List of coded items that belong to the specified crf version.
 	 */
 	public List<CodedItem> findByCRFVersion(int crfVersionId) {
-		
+
 		String query = "from " + getDomainClassName() + " do  where do.crfVersionId = :crfVersionId";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("crfVersionId", crfVersionId);
@@ -166,13 +134,13 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 
 	/**
 	 * Retrieves all the coded items that belong to the specified subject.
-	 * 
+	 *
 	 * @param subjectId The subject id to filter on.
-	 * 
+	 *
 	 * @return List of coded items that belong to the specified subject.
 	 */
 	public List<CodedItem> findBySubject(int subjectId) {
-		
+
 		String query = "from " + getDomainClassName() + " do  where do.subjectId = :subjectId";
 		Query q = getCurrentSession().createQuery(query);
 		q.setInteger("subjectId", subjectId);
@@ -180,24 +148,6 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 		return q.list();
 	}
 
-	/**
-	 * Retrieves the coded item that belong to the specified item data. 
-	 * <p>
-	 * Note that apart from findById, this is the only other member that returns a unique coded item.
-	 * 
-	 * @param itemDataId The itemData id to filter on.
-	 * 
-	 * @return The coded item bound to the the specified item data.
-	 */
-	public CodedItem findByItemData(int itemDataId) {
-		
-		String query = "from " + getDomainClassName() + " do  where do.itemDataId = :itemDataId";
-		org.hibernate.Query q = getCurrentSession().createQuery(query);
-		q.setInteger("itemDataId", itemDataId);
-		
-		return (CodedItem) q.uniqueResult();
-	}
-	
 	/**
 	 * Retrieves the coded item that belong to the specified study. 
 	 * 

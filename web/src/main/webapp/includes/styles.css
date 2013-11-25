@@ -2131,15 +2131,14 @@ span.asterisk {
 .itemsTable {
     border-collapse: collapse;
     width: 450px;
-    height: 340px;
+    height: 100px;
+    border-top: 1px #4d4d4d solid;
+    border-bottom: 1px #4d4d4d solid;
 }
 
 .itemsTable td {
     padding: 10px 0;
 }
-
-.itemsTable tr {
-    border-top: 1px #4d4d4d solid;
 }
 
 a.dnShortcut:active {

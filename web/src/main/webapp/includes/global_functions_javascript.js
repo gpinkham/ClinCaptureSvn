@@ -2629,14 +2629,6 @@ function Pager(tableName, itemsPerPage) {
         var rowLength = rows.length;
         var tableObj = document.getElementById(tableName);
 
-        if(rowLength == 4) {
-            tableObj.style.height = "120px";
-        } else if (rowLength == 8) {
-            tableObj.style.height = "240px";
-        } else {
-            tableObj.style.height = "340px";
-        }
-
         for (var i = 0; i < rows.length; i++) {
             if (i < from || i > to)
                 rows[i].style.display = 'none';

@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemElement;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -1951,27 +1952,20 @@ public abstract class DataEntryServlet extends Controller {
             for (DisplayItemBean displayItemBean : changedItemsList) {
                 if (refItemData.getId() == displayItemBean.getData().getId() &&
                         !refItemData.getValue().equalsIgnoreCase(displayItemBean.getData().getValue())) {
-                    CodedItem codedItem = (CodedItem) getCodedItemService().findByItemData(item.getData().getId());
-                    if (codedItem != null) {
-                        resetCodedItem(codedItem, displayItemBean.getData().getValue());
+                    CodedItem codedItem = (CodedItem) getCodedItemService().findCodedItem(refItemData.getId());
+                    if (codedItem != null && codedItem.getId() > 0) {
+                        if (codedItem.getStatus().equals("CODED")) {
+                            codedItem.setDictionary("");
+                            codedItem.setStatus("NOT_CODED");
+                            for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
+                                codedItemElement.setItemCode("");
+                            }
+                            getCodedItemService().saveCodedItem(codedItem);
+                        }
                         item.getData().setValue("");
                     }
                 }
             }
-        }
-    }
-
-    private void resetCodedItem(CodedItem codedItem, String newTerm) throws Exception {
-        if (codedItem.getId() > 0) {
-            if (codedItem.getStatus().equals("CODED")) {
-                codedItem.setVerbatimTerm(newTerm);
-                codedItem.setDictionary("");
-                codedItem.setCodedTerm("");
-                codedItem.setStatus("NOT_CODED");
-            } else if (codedItem.getStatus().equals("NOT_CODED")) {
-                codedItem.setVerbatimTerm(newTerm);
-            }
-            getCodedItemService().saveCodedItem(codedItem);
         }
     }
 

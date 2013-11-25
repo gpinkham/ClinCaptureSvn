@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.clinovo.exception.CodeException;
+import com.clinovo.model.CodedItemElement;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -24,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.clinovo.dao.CodedItemDAO;
-import com.clinovo.exception.CodeException;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.Status.CodeStatus;
 import com.clinovo.service.CodedItemService;
@@ -62,25 +63,13 @@ public class CodedItemServiceImpl implements CodedItemService {
 		
 		return retrieveAvailableItems(codedItems);
 	}
-	
-	public CodedItem findByItemData(int itemDataId) {
-		return codeItemDAO.findByItemData(itemDataId);
-	}
-	
+
 	public CodedItem findById(int codedItemId) {
 		return codeItemDAO.findById(codedItemId);
 	}
 
 	public CodedItem findCodedItem(int codedItemId) {
-		return codeItemDAO.findById(codedItemId);
-	}
-
-	public List<CodedItem> findCodedItemsByVerbatimTerm(String verbatimTerm) {
-		return codeItemDAO.findByVerbatimTerm(verbatimTerm);
-	}
-
-	public List<CodedItem> findCodedItemsByCodedTerm(String codedTerm) {
-		return codeItemDAO.findByCodedTerm(codedTerm);
+		return codeItemDAO.findByItemId(codedItemId);
 	}
 
 	public List<CodedItem> findCodedItemsByDictionary(String dictionary) {
@@ -91,10 +80,6 @@ public class CodedItemServiceImpl implements CodedItemService {
 		return codeItemDAO.findByStatus(status);
 	}
 
-	public List<CodedItem> findByItem(int codedItemItemId) {
-		return codeItemDAO.findByItemId(codedItemItemId);
-	}
-	
 	public List<CodedItem> findByEventCRF(int eventCRFId) {
 		return codeItemDAO.findByEventCRF(eventCRFId);
 	}
@@ -113,70 +98,72 @@ public class CodedItemServiceImpl implements CodedItemService {
 
 		ItemDAO itemDAO = new ItemDAO(dataSource);
 		ItemFormMetadataDAO itemMetaDAO = new ItemFormMetadataDAO(dataSource);
+        ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getId(),
+                eventCRF.getCRFVersionId());
+		if (currentDictionaryIsValid(meta.getCodeRef())) {
 
-		if (item.getDataType().equals(ItemDataType.CODE)) {
+            if (study.isSite(study.getParentStudyId())) {
 
-			ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getId(),
-					eventCRF.getCRFVersionId());
-			ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(),
-					eventCRF.getCRFVersionId());
-			
-			// We use the ordinal to cater for repeat items
-			ItemDataBean refItemData = getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), eventCRF.getId(), itemData.getOrdinal());
+                cItem.setSiteId(study.getId());
+                cItem.setStudyId(study.getParentStudyId());
 
-			// Now the item
-			if (refItemData.getValue() != null && !refItemData.getValue().isEmpty()) {
-				
-				// Fucking study/site assholery
-				if (study.isSite(study.getParentStudyId())) {
+            } else {
 
-					cItem.setSiteId(study.getId());
-					cItem.setStudyId(study.getParentStudyId());
-					
-				} else {
-					
-					cItem.setStudyId(study.getId());
-				}
-				
-				cItem.setItemId(item.getId());
-				cItem.setItemDataId(itemData.getId());
-				cItem.setEventCrfId(eventCRF.getId());
-				cItem.setVerbatimTerm(refItemData.getValue());
-				cItem.setSubjectId(eventCRF.getStudySubjectId());
-				cItem.setCrfVersionId(eventCRF.getCRFVersionId());
+                cItem.setStudyId(study.getId());
+            }
 
-				cItem = saveCodedItem(cItem);
-			}
-		}
+            cItem.setItemId(itemData.getId());
+            cItem.setEventCrfId(eventCRF.getId());
+            cItem.setDictionary(meta.getCodeRef());
+            cItem.setSubjectId(eventCRF.getStudySubjectId());
+            cItem.setCrfVersionId(eventCRF.getCRFVersionId());
+
+            codeItemDAO.saveOrUpdate(cItem);
+            return cItem;
+
+        } else if (item.getDataType().equals(ItemDataType.CODE)) {
+
+            ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(),
+                    eventCRF.getCRFVersionId());
+            ItemDataBean refItemData = getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), eventCRF.getId(), itemData.getOrdinal());
+            CodedItem codedItem = codeItemDAO.findByItemId(refItemData.getId());
+            CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), item.getName());
+
+            codedItem.addCodedItemElements(codedItemElement);
+            codeItemDAO.saveOrUpdate(codedItem);
+            return codedItem;
+        }
 
 		return cItem;
 	}
-	
-	public CodedItem saveCodedItem(CodedItem codedItem) throws Exception {
 
-		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
-		UserAccountDAO userDAO = new UserAccountDAO(dataSource);
+    public CodedItem saveCodedItem(CodedItem codedItem) throws Exception {
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		ItemDataBean itemData = (ItemDataBean) getItemDataDAO().findByPK(codedItem.getItemDataId());
-		UserAccountBean loggedInUser = (UserAccountBean) userDAO.findByUserName(authentication.getName());
+        ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
+        UserAccountDAO userDAO = new UserAccountDAO(dataSource);
 
-		if (itemData.getId() > 0) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        for(CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
+            ItemDataBean itemData = (ItemDataBean) getItemDataDAO().findByPK(codedItemElement.getItemDataId());
+            UserAccountBean loggedInUser = (UserAccountBean) userDAO.findByUserName(authentication.getName());
 
-			itemData.setUpdater(loggedInUser);
-			itemData.setUpdatedDate(new Date());
-			itemData.setValue(codedItem.getCodedTerm());
+            if (itemData.getId() > 0) {
 
-			// persist
-			itemDataDAO.updateValue(itemData);
-			
-		} else {
+                itemData.setUpdater(loggedInUser);
+                itemData.setUpdatedDate(new Date());
+                itemData.setValue(codedItemElement.getItemCode());
 
-			throw new CodeException("ItemData for this Item not found. Has the CRF been completed?");
-		}
+                // persist
+                itemDataDAO.updateValue(itemData);
 
-		return codeItemDAO.saveOrUpdate(codedItem);
-	}
+            } else {
+
+                throw new CodeException("ItemData for this Item not found. Has the CRF been completed?");
+            }
+        }
+
+        return codeItemDAO.saveOrUpdate(codedItem);
+    }
 
 	public void deleteCodedItem(CodedItem codedItem) {
 		codeItemDAO.deleteCodedItem(codedItem);
@@ -217,9 +204,10 @@ public class CodedItemServiceImpl implements CodedItemService {
 
 		for (CodedItem item : codedItems) {
 			
-			// Had coded status before removal
-			if(item.getCodedTerm() != null && !item.getCodedTerm().isEmpty()) {
-				
+			// Had coded status before removal              s
+			//if(item.getCodedTerm() != null && !item.getCodedTerm().isEmpty()) {
+            if(item.getId() > 0) {
+
 				item.setStatus(String.valueOf(CodeStatus.CODED));
 				
 			} else {
@@ -244,4 +232,16 @@ public class CodedItemServiceImpl implements CodedItemService {
 
 		return validItems;
 	}
+
+
+    private boolean currentDictionaryIsValid(String dictionaryName) {
+        if (dictionaryName.equalsIgnoreCase("icd_10") ||
+                dictionaryName.equalsIgnoreCase("icd_9") ||
+                dictionaryName.equalsIgnoreCase("whodrug") ||
+                dictionaryName.equalsIgnoreCase("meddra")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

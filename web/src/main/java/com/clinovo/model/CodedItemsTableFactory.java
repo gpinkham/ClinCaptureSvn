@@ -17,10 +17,8 @@ package com.clinovo.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -29,8 +27,8 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -40,6 +38,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Limit;
 import org.jmesa.view.component.Row;
@@ -59,6 +58,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 	private StudyDAO studyDAO;
 	private DataSource datasource;
 	private EventCRFDAO eventCRFDAO;
+    private ItemDataDAO itemDataDAO;
 	private List<CodedItem> codedItems;
     private List<Term> terms;
 	private EventDefinitionCRFDAO eventDefCRFDAO;
@@ -95,12 +95,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
     	
-        tableFacade.setColumnProperties("codedItem.verbatimTerm", "dictionaryList",
+        tableFacade.setColumnProperties("verbatimTerm", "dictionaryList",
                 "codedItem.version", "codedItem.subjectName", "codedItem.eventName", "codedItem.isCoded", "codedColumn", "actionColumn");
         
         Row row = tableFacade.getTable().getRow();
         
-        configureColumn(row.getColumn("codedItem.verbatimTerm"), "Verbatim Term", new VerbatimTermCellEditor(), null);
+        configureColumn(row.getColumn("verbatimTerm"), "Verbatim Term", new VerbatimTermCellEditor(), null);
         configureColumn(row.getColumn("dictionaryList"), "Dictionary", new DictionaryCellEditor(), null, false, false);
         configureColumn(row.getColumn("codedItem.version"), "Version", new VersionCellEditor(), null, true, true);
         configureColumn(row.getColumn("codedItem.subjectName"), "Study Subject ID", new SubjectCellEditor(), null, true, true);
@@ -126,8 +126,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         	
             HashMap<Object, Object> h = new HashMap<Object, Object>();
             h.put("codedItem", codedItem);
-            h.put("codedItem.itemId", codedItem.getItemDataId());
-            h.put("codedItem.verbatimTerm", codedItem.getVerbatimTerm());
+            h.put("codedItem.itemId", codedItem.getItemId());
+            h.put("verbatimTerm", getVerbatimTerm(codedItem.getItemId()));
             h.put("codedItem.version", codedItem.getVersion());
             h.put("codedItem.subjectName", getSubjectBean(codedItem.getSubjectId()).getLabel());
             h.put("codedItem.eventName", getStudyEventDefinitionBean(codedItem.getEventCrfId(), codedItem.getCrfVersionId()).getName());
@@ -138,12 +138,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
         tableFacade.setItems(codedItemsResult);
     }
-    
+
     @SuppressWarnings("unchecked")
     private class VerbatimTermCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
             String value = "";
-            String verbatimTerm = (String) ((HashMap<Object, Object>) item).get("codedItem.verbatimTerm");
+            String verbatimTerm = (String) ((HashMap<Object, Object>) item).get("verbatimTerm");
             if (!verbatimTerm.isEmpty()) {
                 StringBuilder url = new StringBuilder();
                 url.append(verbatimTerm)
@@ -165,7 +165,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             String value = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
             StringBuilder url = new StringBuilder();
-            url.append(selectItemDictionary(codedItem))
+            url.append(selectItemDictionary(codedItem.getDictionary()))
                     .append(COLUMN_WIDTH_PREFIX)
                     .append("100")
                     .append(COLUMN_WIDTH_SUFFIX);
@@ -173,66 +173,19 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             return value;
         }
 
-        private StringBuilder selectItemDictionary(CodedItem codedItem) {
+        private String selectItemDictionary(String codedItemDictionary) {
 
-            HashMap<String, String> dictionaries = new HashMap<String, String>();
-            
-            dictionaries.put("", "&nbsp;");
-            dictionaries.put("MedDRA", "MedDRA");
-            dictionaries.put("ICD9", "ICD9");
-            dictionaries.put("ICD10", "ICD10");
-            Iterator iterator = dictionaries.entrySet().iterator();
-
-            StringBuilder dictionariesHtml = new StringBuilder("");
-            if (isLoggedInUserMonitor()) {
-                dictionariesHtml.append(codedItem.getDictionary());
-                return dictionariesHtml;
-            } else {
-                dictionariesHtml.append("<select>");
-                while (iterator.hasNext()) {
-                    Map.Entry mapEntry = (Map.Entry) iterator.next();
-                    dictionariesHtml.append("\"<option value=\"")
-                            .append(mapEntry.getKey()).append("\"")
-                            .append(isSelected(mapEntry.getKey(), codedItem.getDictionary()))
-                            .append(">").append(mapEntry.getValue())
-                            .append("</option>");
-                }
-                dictionariesHtml.append("</select>");
+            if(codedItemDictionary.equalsIgnoreCase("ICD_9")) {
+                return "ICD 9";
+            } else if(codedItemDictionary.equalsIgnoreCase("ICD_10")) {
+                return "ICD 10";
+            } else if (codedItemDictionary.equalsIgnoreCase("MEDDRA")) {
+                return "MedDRA";
+            } else if (codedItemDictionary.equalsIgnoreCase("WHODRUG")) {
+                return "WhoDRUG";
             }
-            return dictionariesHtml;
+            return "Dictionary Not Found";
         }
-
-        private String isSelected(Object key, String codeditemDictionary) {
-        	
-        	StudyParameterValueBean defaultMedicalCodingDictionaryParam = getStudyParameterDAO().findByHandleAndStudy(studyId, "defaultMedicalCodingDictionary");
-        	String defaultMedicalCodingDictionary = defaultMedicalCodingDictionaryParam.getValue();
-        	
-            String selected = "";
-			if (key.toString().equalsIgnoreCase(codeditemDictionary)) {
-
-				selected = " selected ";
-			} else {
-
-				// Not selected
-				if (selected.isEmpty()) {
-					if (codeditemDictionary != null && codeditemDictionary.isEmpty()
-							&& key.equals(defaultMedicalCodingDictionary)) {
-						selected = " selected ";
-					}
-				}
-			}
-            
-            return selected;
-        }
-
-		private StudyParameterValueDAO getStudyParameterDAO() {
-			
-			if(studyParameterDAO == null) {
-				studyParameterDAO = new StudyParameterValueDAO(datasource);
-			}
-			
-			return studyParameterDAO;
-		}
     }
     
     @SuppressWarnings({ "unchecked"})
@@ -259,8 +212,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         	
             String value = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
-            String inputTerm = codedItem.isCoded() ? codedItem.getCodedTerm() : codedItem.getVerbatimTerm();
-            
+            String inputTerm = (String) ((HashMap<Object, Object>) item).get("verbatimTerm");
+
             if (codedItem != null) {
             	
                 StringBuilder url = new StringBuilder();
@@ -281,12 +234,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                 }
 				
                 url.append(CODED_DIV_PREFIX).append(inputTerm)
-                        .append(CODED_DIV_MIDDLE)
-                        .append(codedItem.getItemDataId())
-                        .append(CODED_DIV_SUFIX)
-                        .append(COLUMN_WIDTH_PREFIX)
-                        .append("420")
-                        .append(COLUMN_WIDTH_SUFFIX);
+                         .append(CODED_DIV_MIDDLE)
+                         .append(codedItem.getItemId())
+                         .append(CODED_DIV_SUFIX)
+                         .append(COLUMN_WIDTH_PREFIX)
+                         .append("420")
+                         .append(COLUMN_WIDTH_SUFFIX);
                 value = url.toString();
             }
             return value;
@@ -300,6 +253,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 			
             String value = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
+            String inputTerm = (String) ((HashMap<Object, Object>) item).get("verbatimTerm");
             EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(codedItem.getEventCrfId());
             StudyBean studyBean = (StudyBean) studyDAO.findByStudySubjectId(eventCRFBean.getStudySubjectId());
             EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(), codedItem.getCrfVersionId());
@@ -319,12 +273,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
  				} else {
 
                     AJAX_REQUEST_PREFIX = "<a onClick=\"codeItem(this)\" name=\"Code\" itemId=\"";
-                    uncodedItemButton = (AJAX_UNCODE_ITEM_PREFIX) + codedItem.getItemDataId() + (codedItem.isCoded() ? (AJAX_UNCODE_ITEM_SUFFIX) : AJAX_UNCODE_ITEM_SUFFIX_HIDDEN);
-                    deleteTermButton = (AJAX_DELETE_TERM_PREFIX) + codedItem.getItemDataId() + AJAX_DELETE_TERM_MIDDLE + codedItem.getVerbatimTerm().toLowerCase() + (isDeleteable(codedItem) ? AJAX_DELETE_TERM_SUFFIX : AJAX_DELETE_TERM_SUFFIX_HIDDEN);
+                    uncodedItemButton = (AJAX_UNCODE_ITEM_PREFIX) + codedItem.getItemId() + (codedItem.isCoded() ? (AJAX_UNCODE_ITEM_SUFFIX) : AJAX_UNCODE_ITEM_SUFFIX_HIDDEN);
+                    deleteTermButton = (AJAX_DELETE_TERM_PREFIX) + codedItem.getItemId() + AJAX_DELETE_TERM_MIDDLE + inputTerm.toLowerCase() + (isDeleteable(codedItem, inputTerm) ? AJAX_DELETE_TERM_SUFFIX : AJAX_DELETE_TERM_SUFFIX_HIDDEN);
                 }
  				
                 url.append(AJAX_REQUEST_PREFIX)
-                	.append(codedItem.getItemDataId())
+                	.append(codedItem.getItemId())
                     .append(AJAX_REQUEST_MIDDLE)
                     .append(codedItemButton)
                     .append(AJAX_REQUEST_SUFIX)
@@ -345,10 +299,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         }
     }
 
-    private boolean isDeleteable(CodedItem codedItem) {
+    private boolean isDeleteable(CodedItem codedItem, String inputTerm) {
             for (Term term : terms) {
 
-            	if(term.getPreferredName().equalsIgnoreCase(codedItem.getVerbatimTerm()) &&
+            	if(term.getPreferredName().equalsIgnoreCase(inputTerm) &&
             			term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
 
             		return true;
@@ -468,6 +422,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 	public void setStudyEventDefinitionDAO(StudyEventDefinitionDAO studyEventDefDao) {
 		this.studyEventDefDao = studyEventDefDao;
 	}
+
+    public void setItemDataDAO(ItemDataDAO itemDataDAO) {
+        this.itemDataDAO = itemDataDAO;
+    }
 		
     private StudySubjectBean getSubjectBean(int subjectId) {
     	
@@ -481,5 +439,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(), crfVersionId);
         
         return studyEventDefDao.findByEventDefinitionCRFId(eventDefCRFBean.getId());
+    }
+
+    private String getVerbatimTerm(int itemId) {
+        ItemDataBean itemDataBean = (ItemDataBean) itemDataDAO.findByPK(itemId);
+        return itemDataBean.getValue();
     }
 }

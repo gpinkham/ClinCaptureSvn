@@ -1,7 +1,9 @@
 package com.clinovo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.clinovo.model.CodedItemElement;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.junit.Before;
@@ -44,31 +46,6 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatFindCodedItemReturnsCodedItemWithVerbatimTerm() {
-		assertEquals("some-verbatim-term-3", codedItemService.findCodedItem(3).getVerbatimTerm());
-	}
-
-	@Test
-	public void testThatFindCodedItemsByVerbatimTermDoesNotReturnNull() {
-		assertNotNull(codedItemService.findCodedItemsByVerbatimTerm("some-verbatim-term"));
-	}
-
-	@Test
-	public void testThatFindCodedItemsByVerbatimTermReturnsCorrectNumberOfItems() {
-		assertEquals(1, codedItemService.findCodedItemsByVerbatimTerm("some-verbatim-term").size());
-	}
-
-	@Test
-	public void testThatFindCodedItemsByCodedTermDoesNotReturnNull() {
-		assertNotNull(codedItemService.findCodedItemsByCodedTerm("some-coded-term-2"));
-	}
-
-	@Test
-	public void testThatFindCodedItemsByCodedTermReturnAllMappedItems() {
-		assertEquals(1, codedItemService.findCodedItemsByCodedTerm("some-coded-term").size());
-	}
-
-	@Test
 	public void testThatFindCodedItemsByDictionaryDoesNotReturnNull() {
 		assertNotNull(codedItemService.findCodedItemsByDictionary("some-dictionary-2"));
 	}
@@ -84,35 +61,10 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatFindCodedItensByStatusReturnsAllStatusMappedItem() {
+	public void testThatFindCodedItemsByStatusReturnsAllStatusMappedItem() {
 		assertEquals(2, codedItemService.findCodedItemsByStatus(CodeStatus.NOT_CODED).size());
 	}
 
-	@Test
-	public void testThatFindByItemIdDoesNotReturnNull() {
-		assertNotNull(codedItemService.findByItem(1));
-	}
-
-	@Test
-	public void testThatFindByItemIdReturnsCodedItemWithDictionary() {
-		assertEquals(codedItemService.findByItem(2).get(0).getDictionary(), "some-dictionary-2");
-	}
-
-	@Test
-	public void testThatFindByItemIdReturnsCodedItemWithVerbatimTerm() {
-		assertEquals(codedItemService.findByItem(3).get(0).getVerbatimTerm(), "some-verbatim-term-3");
-	}
-
-	@Test
-	public void testThatFindByItemIdReturnsCodedItemWithEventCRFId() {
-		assertNotNull(codedItemService.findByItem(1).get(0).getEventCrfId());
-	}
-	
-	@Test
-	public void testThatFindByItemIdReturnsCodedItemWithValidEventCRFId() {
-		assertEquals(1, codedItemService.findByItem(2).get(0).getEventCrfId());
-	}
-	
 	@Test
 	public void testThatFindByEventCRFDoesNotReturnNull() {
 		assertNotNull(codedItemService.findByEventCRF(1));
@@ -142,32 +94,7 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 	public void testThatFindByCRFVersionReturnsCorrectNumberOfMappedItems() {
 		assertEquals(2, codedItemService.findByCRFVersion(2).size());
 	}
-	
-	@Test
-	public void testThatFindByItemDataDoesNotReturnNull() {
-		assertNotNull(codedItemService.findByItemData(1));
-	}
-	
-	@Test
-	public void testThatFindByItemDataReturnsCodedItemWithCorrectDictionary() {
-		assertEquals("some-dictionary-2", codedItemService.findByItemData(2).getDictionary());
-	}
-	
-	@Test
-	public void testThatFindByItemDataReturnsCodedItemWithCorrectVerbatimTerm() {
-		assertEquals("some-verbatim-term-3", codedItemService.findByItemData(3).getVerbatimTerm());
-	}
-	
-	@Test
-	public void testThatFindByItemDataReturnsCodedItemWithCorrectCodedTerm() {
-		assertEquals("some-coded-term-3", codedItemService.findByItemData(3).getCodedTerm());	
-	}
-	
-	@Test
-	public void testThatFindByItemDataReturnsCodedItemWithCorrectItemId() {
-		assertEquals(4, codedItemService.findByItemData(4).getItemId());
-	}
-	
+
 	@Test
 	public void testThatFindByScopeDoesNotReturnNull() {
 		assertNotNull(codedItemService.findByStudyAndSite(2, 4));
@@ -207,10 +134,12 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 		ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByPK(1);
 		
 		CodedItem codedItem = new CodedItem();
-		
+        List<CodedItemElement> codedItemElementList = new ArrayList<CodedItemElement>();
+
+        codedItemElementList.add(new CodedItemElement(1, "itemName", "itemCode"));
+        codedItemElementList.add(new CodedItemElement(1, "itemName1", "itemCode1"));
+        codedItem.setCodedItemElements(codedItemElementList);
 		codedItem.setItemId(itemData.getItemId());
-		codedItem.setItemDataId(itemData.getId());
-		codedItem.setCodedTerm("modified-coded-term");
 		codedItem.setEventCrfId(itemData.getEventCRFId());
 		
 		assertNotNull(codedItemService.saveCodedItem(codedItem));
@@ -222,10 +151,13 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 		ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByPK(1);
 		
 		CodedItem codedItem = new CodedItem();
-		
+
+        List<CodedItemElement> codedItemElementList = new ArrayList<CodedItemElement>();
+
+        codedItemElementList.add(new CodedItemElement(1, "itemName2", "itemCode2"));
+        codedItemElementList.add(new CodedItemElement(1, "itemName3", "itemCode3"));
+        codedItem.setCodedItemElements(codedItemElementList);
 		codedItem.setItemId(itemData.getItemId());
-		codedItem.setItemDataId(itemData.getId());
-		codedItem.setCodedTerm("modified-coded-term");
 		codedItem.setEventCrfId(itemData.getEventCRFId());
 
 		assertNotNull(codedItemService.saveCodedItem(codedItem).getId());
@@ -237,17 +169,20 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 		ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByPK(1);
 		
 		CodedItem codedItem = new CodedItem();
-		
+        List<CodedItemElement> codedItemElementList = new ArrayList<CodedItemElement>();
+
+        codedItemElementList.add(new CodedItemElement(1, "itemName4", "itemCode4"));
+        codedItemElementList.add(new CodedItemElement(1, "itemName5", "itemCode5"));
+        codedItem.setCodedItemElements(codedItemElementList);
+
 		codedItem.setItemId(itemData.getItemId());
-		codedItem.setItemDataId(itemData.getId());
-		codedItem.setCodedTerm("modified-coded-term");
 		codedItem.setEventCrfId(itemData.getEventCRFId());
 		
 		// Simulate save
 		codedItemService.saveCodedItem(codedItem);
 		
 		// Item data value should match coded item codedTerm
-		assertEquals("modified-coded-term", ((ItemDataBean)itemDataDAO.findByPK(1)).getValue());
+		assertEquals("07/01/2008", ((ItemDataBean)itemDataDAO.findByPK(1)).getValue());
 	}
 	
 	@Test
@@ -256,10 +191,13 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 		ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByPK(1);
 		
 		CodedItem codedItem = new CodedItem();
-		
-		codedItem.setItemId(itemData.getItemId());
-		codedItem.setItemDataId(itemData.getId());
-		codedItem.setCodedTerm("modified-coded-term");
+        List<CodedItemElement> codedItemElementList = new ArrayList<CodedItemElement>();
+
+        codedItemElementList.add(new CodedItemElement(1, "itemName6", "itemCode6"));
+        codedItemElementList.add(new CodedItemElement(1, "itemName7", "itemCode7"));
+
+        codedItem.setCodedItemElements(codedItemElementList);
+        codedItem.setItemId(itemData.getItemId());
 		codedItem.setEventCrfId(itemData.getEventCRFId());
 
 		codedItemService.saveCodedItem(codedItem);
@@ -272,4 +210,24 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 		codedItemService.deleteCodedItem(codedItemService.findCodedItem(1));
 		assertEquals(3, codedItemService.findAll().size());
 	}
+
+    @Test
+    public void testThatSaveCodedItemReturnsValidCodedItemElementsList() throws Exception {
+
+        ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByPK(8);
+
+        CodedItem codedItem = new CodedItem();
+
+        List<CodedItemElement> codedItemElementList = new ArrayList<CodedItemElement>();
+
+        codedItemElementList.add(new CodedItemElement(8, "itemName2", "itemCode2"));
+        codedItemElementList.add(new CodedItemElement(8, "itemName3", "itemCode3"));
+        codedItem.setCodedItemElements(codedItemElementList);
+        codedItem.setItemId(itemData.getId());
+        codedItem.setEventCrfId(itemData.getEventCRFId());
+
+        assertEquals(2,codedItemService.saveCodedItem(codedItem).getCodedItemElements().size());
+    }
+
+
 }

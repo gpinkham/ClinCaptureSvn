@@ -1,10 +1,14 @@
 package com.clinovo.dao;
 
+import com.clinovo.model.CodedItemElement;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.junit.Test;
 
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.Status.CodeStatus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CodedItemDAOTest extends DefaultAppContextTest {
 
@@ -20,16 +24,6 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatFindByIdReturnsCodedItemWithVertbatimTerm() {
-		assertEquals("some-verbatim-term-3", codedItemDAO.findById(3).getVerbatimTerm());
-	}
-
-	@Test
-	public void testThatFindByIdReturnsCodedItemWithCodedTerm() {
-		assertEquals("some-coded-term", codedItemDAO.findById(1).getCodedTerm());
-	}
-
-	@Test
 	public void testThatFindByIdReturnsCodedTermWithStatus() {
 		assertNotNull(codedItemDAO.findById(2).getCodeStatus());
 	}
@@ -42,37 +36,6 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindAllReturnsAllTheItemsFromTheDB() {
 		assertEquals(4, codedItemDAO.findAll().size());
-	}
-
-	@Test
-	public void testThatFindyVerbatimTermDoesNotReturnNull() {
-		assertNotNull(codedItemDAO.findByVerbatimTerm("some-verbatim-term"));
-	}
-
-	@Test
-	public void testThatFindByVerbatimTermReturnsCodedItemWithDictionary() {
-		assertEquals("some-dictionary-2", codedItemDAO.findByVerbatimTerm("some-verbatim-term-2").get(0)
-				.getDictionary());
-	}
-
-	@Test
-	public void testThatFindByVerbatimTermReturnsCodedItemWithCodedTerm() {
-		assertEquals("some-coded-term-3", codedItemDAO.findByVerbatimTerm("some-verbatim-term-3").get(0).getCodedTerm());
-	}
-
-	@Test
-	public void testThatFindByCodedTermDoesNotReturnNull() {
-		assertNotNull(codedItemDAO.findByCodedTerm("some-coded-term"));
-	}
-
-	@Test
-	public void testThatFindByCodedTermReturnsCodedItemWithDictionary() {
-		assertEquals("some-dictionary-2", codedItemDAO.findByCodedTerm("some-coded-term-2").get(0).getDictionary());
-	}
-
-	@Test
-	public void testThatFindByCodedTermReturnsCodedTermWithVerbatimTerm() {
-		assertEquals("some-verbatim-term-3", codedItemDAO.findByCodedTerm("some-coded-term-3").get(0).getVerbatimTerm());
 	}
 
 	@Test
@@ -98,26 +61,6 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindByItemIdDoesNotReturnNull() {
 		assertNotNull(codedItemDAO.findByItemId(1));
-	}
-
-	@Test
-	public void testThatFindByItemIdReturnsCodedItemWithDictionary() {
-		assertEquals(codedItemDAO.findByItemId(2).get(0).getDictionary(), "some-dictionary-2");
-	}
-
-	@Test
-	public void testThatFindByItemIdReturnsCodedItemWithVerbatimTerm() {
-		assertEquals(codedItemDAO.findByItemId(3).get(0).getVerbatimTerm(), "some-verbatim-term-3");
-	}
-
-	@Test
-	public void testThatFindByItemIdReturnsCodedItemWithEventCRFId() {
-		assertNotNull(codedItemDAO.findByItemId(1).get(0).getEventCrfId());
-	}
-
-	@Test
-	public void testThatFindByItemIdReturnsCodedItemWithValidEventCRFId() {
-		assertEquals(1, codedItemDAO.findByItemId(2).get(0).getEventCrfId());
 	}
 
 	@Test
@@ -161,31 +104,6 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	}
 	
 	@Test
-	public void testThatFindByItemDataReturnsCorrectCodedItem() {
-		assertNotNull(codedItemDAO.findByItemData(1));
-	}
-	
-	@Test
-	public void testThatFindByItemDataReturnsCodedItemWithCorrectDictionary() {
-		assertEquals("some-dictionary-2", codedItemDAO.findByItemData(2).getDictionary());
-	}
-	
-	@Test
-	public void testThatFindByItemDataReturnsCodedItemWithCorrectVerbatimTerm() {
-		assertEquals("some-verbatim-term-3", codedItemDAO.findByItemData(3).getVerbatimTerm());
-	}
-	
-	@Test
-	public void testThatFindByItemDataReturnsCodedItemWithCorrectCodedTerm() {
-		assertEquals("some-coded-term-3", codedItemDAO.findByItemData(3).getCodedTerm());	
-	}
-	
-	@Test
-	public void testThatFindByItemDataReturnsCodedItemWithCorrectItemId() {
-		assertEquals(4, codedItemDAO.findByItemData(4).getItemId());
-	}
-	
-	@Test
 	public void testThatFindByScopeDoesNotReturnNull() {
 		assertNotNull(codedItemDAO.findByStudyAndSite(1, 3));
 	}
@@ -199,12 +117,11 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	public void testThatSaveOrUpdatePersistsANewCodedItem() {
 
 		CodedItem codedItem = new CodedItem();
-		
-		codedItem.setSiteId(3);
+
+        codedItem.setSiteId(3);
 		codedItem.setStudyId(1);
 		codedItem.setItemId(31);
 		codedItem.setEventCrfId(2);
-		codedItem.setVerbatimTerm("verbatim-term");
 		
 		codedItemDAO.saveOrUpdate(codedItem);
 
@@ -225,4 +142,5 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 
 		assertNull(codedItemDAO.findById(1));
 	}
+
 }

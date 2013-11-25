@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="vitaly" id="2013-11-13-TICKET744-1">
+
+        <dropColumn columnName="coded_term" tableName="coded_item"/>
+        <dropColumn columnName="item_data_id" tableName="coded_item"/>
+        <dropColumn columnName="verbatim_term" tableName="coded_item"/>
+
+    </changeSet>
+
+    <changeSet author="vitaly" id="2013-11-13-TICKET744-2">
+
+        <createTable tableName="coded_item_element">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="coded_item_id" type="INT" />
+            <column name="item_data_id" type="INT" />
+            <column name="item_name" type="VARCHAR(255)" />
+            <column name="item_code" type="VARCHAR(255)" />
+            <column name="version" type="INT" />
+        </createTable>
+
+    </changeSet>
+
+</databaseChangeLog>
