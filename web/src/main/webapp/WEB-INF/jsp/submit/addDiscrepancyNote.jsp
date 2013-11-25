@@ -27,14 +27,11 @@
 <script language="JavaScript" src="includes/CalendarPopup.js"></script>
 
 <style type="text/css">
-
 .popup_BG { background-image: url(images/main_BG.gif);
 	background-repeat: repeat-x;
 	background-position: top;
 	background-color: #FFFFFF;
 	}
-
-
 </style>
 
 <script language="JavaScript">
@@ -144,8 +141,10 @@ $(document).ready(function() {
 <%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%>
 <!-- *JSP* submit/addDiscrepancyNote.jsp -->
 <div style="float: left;">
-	<h1 class="first_level_header">
-		<c:out value="${entityName}"/>: <fmt:message key="add_discrepancy_note" bundle="${resword}"/>
+	<h1>
+		<span class="first_level_header">
+			<c:out value="${entityName}"/>: <fmt:message key="add_discrepancy_note" bundle="${resword}"/>
+		</span>
 	</h1>
 </div>
 <div style="float: right;">

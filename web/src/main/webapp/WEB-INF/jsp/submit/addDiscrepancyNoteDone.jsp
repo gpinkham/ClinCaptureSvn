@@ -18,14 +18,11 @@
 
 <script language="JavaScript" src="includes/CalendarPopup.js"></script>
 <style type="text/css">
-
 .popup_BG { background-image: url(images/main_BG.gif);
 	background-repeat: repeat-x;
 	background-position: top;
 	background-color: #FFFFFF;
 	}
-
-
 </style>
 
 <script type="text/javascript" language="javascript">
@@ -35,45 +32,49 @@
 </head>
 <body class="popup_BG" style="margin: 25px;">
 <!-- *JSP* submit/addDiscrepancyNoteDone.jsp -->
-<div style="float: left;"><h1 class="first_level_header"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
-<div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
+<h1>
+	<span class="first_level_header">
+		<fmt:message key="add_discrepancy_note" bundle="${resword}"/>
+	</span>
+</h1>
+
 <br clear="all">
 <div class="alert">    
-<c:forEach var="message" items="${pageMessages}">
- <c:out value="${message}" escapeXml="false"/> 
-</c:forEach>
+	<c:forEach var="message" items="${pageMessages}">
+		<c:out value="${message}" escapeXml="false"/> 
+	</c:forEach>
 </div>
 <div class="alert" style="font-size: 12px; margin: 100px 0px">  
- <fmt:message key="attention_must_complete_and_submit" bundle="${restext}"/>
+	<fmt:message key="attention_must_complete_and_submit" bundle="${restext}"/>
 </div>
-    <table border="0"> 
-     <c:if test="${parent.id>0}">
-     <tr valign="top">
-            <td><fmt:message key="discrepancy_thread_id" bundle="${resword}"/></td>
-            <td>
-            <c:out value="${parent.id}"/>
-            </td>
-       </tr>       
-     </c:if>
-        <c:if test="${hasNotes == 'yes'}">        
-        <tr valign="top">
-            <td colspan="2"><a href="ViewDiscrepancyNote?id=<c:out value="${updatedDiscrepancyNote.entityId}"/>&name=<c:out value="${updatedDiscrepancyNote.entityType}"/>&field=<c:out value="${updatedDiscrepancyNote.field}"/>&column=<c:out value="${updatedDiscrepancyNote.column}"/>">
-            <fmt:message key="view_parent_and_related_note" bundle="${resword}"/></a> 
-           </td>         
-        </tr>
-       </c:if> 
-    </table>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <table border="0"> 
-     <tr>     
-      <td><input type="submit" name="B1" value="<fmt:message key="close" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.close();"></td> 
-    </tr>
-    </table> 
-   	<jsp:include page="../include/changeTheme.jsp"/> 
+<table border="0" "> 
+	<c:if test="${parent.id>0}">
+		<tr valign="top">
+			<td>
+				<fmt:message key="discrepancy_thread_id" bundle="${resword}"/>
+			</td>
+			<td>
+				<c:out value="${parent.id}"/>
+			</td>
+		</tr>       
+	</c:if>
+	<c:if test="${hasNotes == 'yes'}">        
+		<tr valign="top">
+			<td colspan="2">
+				<a href="ViewDiscrepancyNote?id=<c:out value="${updatedDiscrepancyNote.entityId}"/>&name=<c:out value="${updatedDiscrepancyNote.entityType}"/>&field=<c:out value="${updatedDiscrepancyNote.field}"/>&column=<c:out value="${updatedDiscrepancyNote.column}"/>">
+					<fmt:message key="view_parent_and_related_note" bundle="${resword}"/>
+				</a> 
+			</td>         
+		</tr>
+	</c:if> 
+</table>
+<table border="0" style="margin-top:60px"> 
+	<tr>     
+		<td>
+			<input type="submit" name="B1" value="<fmt:message key="close" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.close();">
+		</td> 
+	</tr>
+</table> 
+
+<jsp:include page="../include/changeTheme.jsp"/> 
 </html>

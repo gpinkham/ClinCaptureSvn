@@ -21,14 +21,11 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
 
 <style type="text/css">
-
 .popup_BG { background-image: url(images/main_BG.gif);
 	background-repeat: repeat-x;
 	background-position: top;
 	background-color: #FFFFFF;
 	}
-
-
 </style>
 
 <script type="text/javascript" language="javascript">
@@ -38,11 +35,17 @@
 </head>
 <body class="popup_BG" style="margin: 25px;" onload="javascript:refreshSource('true','/ViewNotes?');javascript:window.setTimeout('window.close()',3000);">
 <!-- *JSP* submit/addDiscrepancyNoteSaveDone.jsp -->
-<div style="float: left;"><h1 class="first_level_header"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
+<div style="float: left;">
+	<h1>
+		<span class="first_level_header">
+			<fmt:message key="add_discrepancy_note" bundle="${resword}"/>
+		</span>
+	</h1>
+</div>
 <br clear="all">
-<p class="alert" style="font-size: 14px; margin: 120px 50px;" >
-<c:forEach var="message" items="${pageMessages}">
- <c:out value="${message}" escapeXml="false"/><br><br>
-</c:forEach>
-</p>
+	<p class="alert" style="font-size: 14px; margin: 120px 50px;" >
+		<c:forEach var="message" items="${pageMessages}">
+			<c:out value="${message}" escapeXml="false"/><br><br>
+		</c:forEach>
+	</p>
 </html>

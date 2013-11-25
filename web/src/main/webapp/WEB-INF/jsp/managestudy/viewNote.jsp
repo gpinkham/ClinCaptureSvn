@@ -32,88 +32,95 @@
 <jsp:include page="../include/alertbox.jsp"/>
 <!-- End Alert Box -->
 
-<div style="float: left;"><h1 class="first_level_header"><fmt:message key="view_discrepancy_notes" bundle="${resword}"/></h1></div>
+<!-- *JSP* ${pageContext.page['class'].simpleName} -->
+
+<div style="float: left;">
+	<h1>
+		<span class="first_level_header">
+			<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
+		</span>
+	</h1>
+</div>
 <div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
 <br clear="all">
 
 <!-- Entity box -->
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;">
-<tr>
-  <td valign="bottom">
-    <table border="0" cellpadding="0" cellspacing="0">
-      <tr>
-        <td nowrap style="padding-right: 20px;">
-          <div class="tab_BG_h"><div class="tab_R_h" style="padding-right: 0px;"><div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
-
-            <b> <c:choose>
-      <c:when test="${singleNote.entityType == 'itemData' || singleNote.entityType == 'ItemData' }">
-       <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${singleNote.entityId}"/>')"><c:out value="${singleNote.entityName}"/></a>
-      </c:when>
-      <c:otherwise>
-        <c:out value="${singleNote.entityName}"/>
-      </c:otherwise>
-     </c:choose>  =  <c:out value="${singleNote.entityValue}"/>
-           </b>
-			</div></div></div>
-        </td>
-      </tr>
-    </table>
-  </td>
-</tr>
-<tr>
-
- <td valign="top">
-
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-<div class="textbox_center">
-
-<table border="0" cellpadding="0" cellspacing="0">
-   <tr>
-	<td class="table_cell_noborder" style="color: #789EC5"><b><fmt:message key="subject" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
-	<td class="table_cell_noborder" style="color: #789EC5"><c:out value="${singleNote.studySub.label}"/></td>
-	<td class="table_cell_noborder" style="color: #789EC5; padding-left: 40px;"><b><fmt:message key="event" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
-	<td class="table_cell_noborder" style="color: #789EC5">
-	<c:choose>
-	<c:when test="${singleNote.event.id > 0}">
-	<c:out value="${singleNote.event.name}"/>
-	</c:when>
-	<c:otherwise>N/A
-	</c:otherwise>
-	</c:choose>
-	</td>
-   </tr>
-   <tr>
-	<td class="table_cell_noborder" style="color: #789EC5"><b><fmt:message key="event_date" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
-	<td class="table_cell_noborder" style="color: #789EC5">
-	<c:choose>
-	<c:when test="${singleNote.event.id>0}">
-	<fmt:formatDate value="${singleNote.event.dateStarted}" pattern="${dteFormat}"/>&nbsp;
-	</c:when>
-	<c:otherwise>N/A
-	</c:otherwise>
-	</c:choose>
-	</td>
-	<td class="table_cell_noborder" style="color: #789EC5; padding-left: 40px;"><b><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
-	<td class="table_cell_noborder" style="color: #789EC5">
-	<c:choose>
-	<c:when test="${singleNote.crfName != ''}">
-	<c:out value="${singleNote.crfName}"/>
-	</c:when>
-	<c:otherwise>N/A
-	</c:otherwise>
-	</c:choose>
-	</td>
-   </tr>
-</table>
-
-</div>
-
-</div></div></div></div></div></div></div>
-
-</td>
-</tr>
-
+	<tr><td valign="bottom">
+		<table border="0" cellpadding="0" cellspacing="0">
+			<tr><td nowrap style="padding-right: 20px;">
+				<div class="tab_BG_h"><div class="tab_R_h" style="padding-right: 0px;"><div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
+				<b><c:choose>
+					<c:when test="${singleNote.entityType == 'itemData' || singleNote.entityType == 'ItemData' }">
+						<a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${singleNote.entityId}"/>')">
+							<c:out value="${singleNote.entityName}"/>
+						</a>
+					</c:when>
+					<c:otherwise>
+			     	   <c:out value="${singleNote.entityName}"/>
+					</c:otherwise>
+				</c:choose>  =  <c:out value="${singleNote.entityValue}"/></b>
+				</div></div></div>
+			</td></tr>
+		</table>
+	</td></tr>
+	<tr><td valign="top">
+	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+	<div class="textbox_center">
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td class="table_cell_noborder" style="color: #789EC5">
+				<b><fmt:message key="subject" bundle="${resword}"/>:&nbsp;&nbsp;</b>
+			</td>
+			<td class="table_cell_noborder" style="color: #789EC5">
+				<c:out value="${singleNote.studySub.label}"/>
+			</td>
+			<td class="table_cell_noborder" style="color: #789EC5; padding-left: 40px;">
+				<b><fmt:message key="event" bundle="${resword}"/>:&nbsp;&nbsp;</b>
+			</td>
+			<td class="table_cell_noborder" style="color: #789EC5">
+				<c:choose>
+					<c:when test="${singleNote.event.id > 0}">
+						<c:out value="${singleNote.event.name}"/>
+					</c:when>
+					<c:otherwise>
+						N/A
+					</c:otherwise>
+				</c:choose>
+			</td>
+		</tr>
+		<tr>
+			<td class="table_cell_noborder" style="color: #789EC5">
+				<b><fmt:message key="event_date" bundle="${resword}"/>:&nbsp;&nbsp;</b>
+			</td>
+			<td class="table_cell_noborder" style="color: #789EC5">
+				<c:choose>
+					<c:when test="${singleNote.event.id>0}">
+						<fmt:formatDate value="${singleNote.event.dateStarted}" pattern="${dteFormat}"/>&nbsp;
+					</c:when>
+					<c:otherwise>
+						N/A
+					</c:otherwise>
+				</c:choose>
+			</td>
+			<td class="table_cell_noborder" style="color: #789EC5; padding-left: 40px;">
+				<b><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</b>
+			</td>
+			<td class="table_cell_noborder" style="color: #789EC5">
+				<c:choose>
+					<c:when test="${singleNote.crfName != ''}">
+						<c:out value="${singleNote.crfName}"/>
+					</c:when>
+					<c:otherwise>
+						N/A
+					</c:otherwise>
+				</c:choose>
+			</td>
+		</tr>
+	</table>
+	</div>
+	</div></div></div></div></div></div></div>
+	</td></tr>
 </table>
 
 <div style="width:200px; float:right;">
