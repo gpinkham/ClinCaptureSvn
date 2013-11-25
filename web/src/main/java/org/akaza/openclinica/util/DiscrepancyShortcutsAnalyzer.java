@@ -167,7 +167,6 @@ public class DiscrepancyShortcutsAnalyzer {
 		this.firstAnnotationLink = firstAnnotationLink;
 	}
 
-	@SuppressWarnings("UnusedDeclaration")
 	public boolean isHasNotes() {
 		return hasNotes;
 	}
@@ -238,7 +237,7 @@ public class DiscrepancyShortcutsAnalyzer {
 		return link;
 	}
 
-	@SuppressWarnings("ConstantConditions")
+	@SuppressWarnings("rawtypes")
 	public static void prepareDnShortcutLinks(HttpServletRequest request, EventCRFBean eventCrfBean,
 			ItemFormMetadataDAO ifmdao, int eventDefinitionCRFId, List<SectionBean> sections,
 			List<DiscrepancyNoteThread> noteThreads) {
@@ -299,7 +298,6 @@ public class DiscrepancyShortcutsAnalyzer {
 		}
 	}
 
-	@SuppressWarnings("ConstantConditions")
 	public static void prepareDnShortcutAnchors(HttpServletRequest request, DisplayItemBean dib,
 			List<DiscrepancyNoteThread> noteThreads) {
 		DiscrepancyShortcutsAnalyzer discrepancyShortcutsAnalyzer = (DiscrepancyShortcutsAnalyzer) request

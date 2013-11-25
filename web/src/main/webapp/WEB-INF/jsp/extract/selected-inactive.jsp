@@ -123,7 +123,7 @@
  <td class="table_header_column_top"><fmt:message key="start_date" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="end_date" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="status" bundle="${resword}"/></td>
- <td class="table_header_column_top"><fmt:message key="subject_age_at_event" bundle="${resword}"/></td>
+  <c:if test="${subjectAgeAtEvent == 1}"><td class="table_header_column_top"><fmt:message key="subject_age_at_event" bundle="${resword}"/></td></c:if>
  </tr>
  <tr>
  <td class="table_cell"><c:choose>
@@ -164,17 +164,19 @@
        <input type="checkbox" name="event_status" value="yes" disabled="disabled">
      </c:otherwise>
    </c:choose>  
- </td> 
-   <td class="table_cell"> 
+ </td>
+<c:if test="${subjectAgeAtEvent == 1}">
+   <td class="table_cell">
      <c:choose>
      <c:when test="${newDataset.showSubjectAgeAtEvent}">
-       <input type="checkbox" checked name="age_at_event" value="yes" disabled="disabled">  
+       <input type="checkbox" checked name="age_at_event" value="yes" disabled="disabled">
      </c:when>
      <c:otherwise>
        <input type="checkbox" name="age_at_event" value="yes" disabled="disabled">
      </c:otherwise>
-    </c:choose>   
+    </c:choose>
    </td>
+</c:if>
 </tr>
 </table>
 </div>

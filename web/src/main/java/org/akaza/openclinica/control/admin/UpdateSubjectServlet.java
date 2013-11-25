@@ -79,7 +79,7 @@ public class UpdateSubjectServlet extends SecureController {
 		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void processRequest() throws Exception {
 		SubjectDAO subjdao = new SubjectDAO(sm.getDataSource());

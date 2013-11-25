@@ -36,7 +36,6 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.jmesa.facade.TableFacade;
@@ -159,9 +158,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     @SuppressWarnings("unchecked")
     private class DictionaryCellEditor implements CellEditor {
     	
-        private StudyParameterValueDAO studyParameterDAO = null;
-
-		public Object getValue(Object item, String property, int rowcount) {
+        public Object getValue(Object item, String property, int rowcount) {
             String value = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
             StringBuilder url = new StringBuilder();

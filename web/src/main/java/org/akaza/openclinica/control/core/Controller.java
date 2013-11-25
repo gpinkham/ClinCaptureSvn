@@ -129,7 +129,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author jnyayapathi
  * 
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial", "UnusedDeclaration" })
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public abstract class Controller extends BaseController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -293,8 +293,7 @@ public abstract class Controller extends BaseController {
 		}
 	}
     
-	@SuppressWarnings("ConstantConditions")
-    private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
+	private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
 			UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
 		HttpSession session = request.getSession();
@@ -692,8 +691,7 @@ public abstract class Controller extends BaseController {
 	 *            The Page to go to if the collection is empty.
 	 * @throws InconsistentStateException
 	 */
-	@SuppressWarnings("UnusedParameters")
-    protected void addEntityList(String beanName, Collection list, String messageIfEmpty, Page destinationIfEmpty,
+	protected void addEntityList(String beanName, Collection list, String messageIfEmpty, Page destinationIfEmpty,
 			HttpServletRequest request, HttpServletResponse response) throws InconsistentStateException {
 		if (list.isEmpty()) {
 			throw new InconsistentStateException(destinationIfEmpty, messageIfEmpty);
@@ -857,8 +855,7 @@ public abstract class Controller extends BaseController {
 
 	}
 
-	@SuppressWarnings("UnusedParameters")
-    public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(HttpServletRequest request, int studyId) {
+	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(HttpServletRequest request, int studyId) {
 
 		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
 		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
@@ -965,8 +962,7 @@ public abstract class Controller extends BaseController {
 		getUnavailableCRFList().put(ecb, ub);
 	}
 
-	@SuppressWarnings("UnusedParameters")
-    public void dowloadFile(File f, String contentType, HttpServletRequest request, HttpServletResponse response)
+	public void dowloadFile(File f, String contentType, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
 		response.setHeader("Content-disposition", "attachment; filename=\"" + f.getName() + "\";");
@@ -1363,7 +1359,6 @@ public abstract class Controller extends BaseController {
 	 *            The list of event definition CRFs for this study event.
 	 * @return The list of DisplayEventCRFBeans for this study event.
 	 */
-	@SuppressWarnings("UnusedParameters")
 	public ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs,
 			UserAccountBean ub, StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study) {
 		ArrayList answer = new ArrayList();

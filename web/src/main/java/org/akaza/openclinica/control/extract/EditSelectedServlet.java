@@ -44,7 +44,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -91,7 +90,11 @@ public class EditSelectedServlet extends Controller {
 
     @Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		request.setAttribute("subjectAgeAtEvent",
+				currentStudy.getStudyParameterConfig().getCollectDob().equals("3") ? "0" : "1");
 
         FormProcessor fp = new FormProcessor(request);
 		boolean selectAll = fp.getBoolean("all");
@@ -141,11 +144,11 @@ public class EditSelectedServlet extends Controller {
 			StudyGroupClassDAO sgclassdao = getStudyGroupClassDAO();
 			StudyBean theStudy = (StudyBean) studydao.findByPK(ub.getActiveStudyId());
             ArrayList sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
-			for (int i = 0; i < sgclasses.size(); i++) {
-				StudyGroupClassBean sgclass = (StudyGroupClassBean) sgclasses.get(i);
-				sgclass.setSelected(true);
-				newsgclasses.add(sgclass);
-			}
+            for (Object sgclass1 : sgclasses) {
+                StudyGroupClassBean sgclass = (StudyGroupClassBean) sgclass1;
+                sgclass.setSelected(true);
+                newsgclasses.add(sgclass);
+            }
             db.setAllSelectedGroups(newsgclasses);
 		}
 
@@ -165,13 +168,12 @@ public class EditSelectedServlet extends Controller {
         db.getItemIds().clear();
 		db.getItemDefCrf().clear();
 
-		Iterator it = events.keySet().iterator();
-		while (it.hasNext()) {
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) it.next();
-			if (!db.getEventIds().contains(new Integer(sed.getId()))) {
-				db.getEventIds().add(new Integer(sed.getId()));
-			}
-		}
+        for (Object o : events.keySet()) {
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) o;
+            if (!db.getEventIds().contains(new Integer(sed.getId()))) {
+                db.getEventIds().add(sed.getId());
+            }
+        }
 
         ItemDAO idao = getItemDAO();
         CRFDAO crfdao = getCRFDAO();
@@ -199,32 +201,34 @@ public class EditSelectedServlet extends Controller {
 	/**
 	 * Finds all the items in a study giving all events in the study
 	 * 
-	 * @param events
-	 * @return
+	 * @param events HashMap
+     * @param crfdao CRFDAO
+     * @param idao ItemDAO
+     * @param imfdao ItemFormMetadataDAO
+	 * @return ArrayList
 	 */
 	public static ArrayList selectAll(HashMap events, CRFDAO crfdao, ItemDAO idao, ItemFormMetadataDAO imfdao) {
         ArrayList allItems = new ArrayList();
-		Iterator it = events.keySet().iterator();
-		while (it.hasNext()) {
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) it.next();
-			ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
-			for (int i = 0; i < crfs.size(); i++) {
-				CRFBean crf = (CRFBean) crfs.get(i);
-				ArrayList items = idao.findAllActiveByCRF(crf);
-				for (int j = 0; j < items.size(); j++) {
-					ItemBean item = (ItemBean) items.get(j);
-					item.setCrfName(crf.getName());
-					item.setDefName(sed.getName());
-					item.setDefId(sed.getId());
-					item.setSelected(true);
+        for (Object o : events.keySet()) {
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) o;
+            ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
+            for (Object crf1 : crfs) {
+                CRFBean crf = (CRFBean) crf1;
+                ArrayList items = idao.findAllActiveByCRF(crf);
+                for (Object item1 : items) {
+                    ItemBean item = (ItemBean) item1;
+                    item.setCrfName(crf.getName());
+                    item.setDefName(sed.getName());
+                    item.setDefId(sed.getId());
+                    item.setSelected(true);
                     item.setCrfVersion("" + crf.getId());
-					if (imfdao != null) {
-						item.setItemMetas(imfdao.findAllByItemId(item.getId()));
-					}
-				}
+                    if (imfdao != null) {
+                        item.setItemMetas(imfdao.findAllByItemId(item.getId()));
+                    }
+                }
                 allItems.addAll(items);
-			}
-		}
+            }
+        }
 		Collections.sort(allItems, new ItemBean.ItemBeanComparator(0));
 		return allItems;
 	}

@@ -80,7 +80,10 @@ public class ViewDatasetsServlet extends RememberLastPage {
 
         UserAccountBean ub = getUserAccountBean(request);
         StudyBean currentStudy = getCurrentStudy(request);
-
+        
+		request.setAttribute("subjectAgeAtEvent",
+				currentStudy.getStudyParameterConfig().getCollectDob().equals("3") ? "0" : "1");
+        
 		DatasetDAO dsdao = getDatasetDAO();
         StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();
@@ -96,20 +99,20 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
 			CRFDAO crfdao = getCRFDAO();
 			HashMap events = new LinkedHashMap();
-			for (int i = 0; i < seds.size(); i++) {
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seds.get(i);
-				ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
-				if (!crfs.isEmpty()) {
-					events.put(sed, crfs);
-				}
-			}
+            for (Object sed1 : seds) {
+                StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sed1;
+                ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
+                if (!crfs.isEmpty()) {
+                    events.put(sed, crfs);
+                }
+            }
             request.getSession().setAttribute("eventsForCreateDataset", events);
 			// YW >>
 
 			FormProcessor fp = new FormProcessor(request);
 
 			EntityBeanTable table = fp.getEntityBeanTable();
-			ArrayList datasets = new ArrayList();
+			ArrayList datasets;
 			// if (ub.isSysAdmin()) {
 			// datasets = dsdao.findAllByStudyIdAdmin(currentStudy.getId());
 			// } else {
@@ -217,11 +220,9 @@ public class ViewDatasetsServlet extends RememberLastPage {
 	/**
 	 * Initialize data of a DatasetBean and set session attributes for displaying selected data of this DatasetBean
 	 * 
-	 * @param datasetId
-     * @param request
-	 * @return
-	 * 
-	 * @author ywang (Feb, 2008)
+	 * @param datasetId int
+     * @param request HttpServletRequest
+	 * @return DatasetBean
 	 */
 	public DatasetBean initializeAttributes(int datasetId, HttpServletRequest request) {
         UserAccountBean ub = getUserAccountBean(request);
@@ -235,12 +236,12 @@ public class ViewDatasetsServlet extends RememberLastPage {
 		ArrayList<Integer> selectedSubjectGroupIds = db.getSubjectGroupIds();
 		if (selectedSubjectGroupIds != null && allSelectedGroups != null) {
 			for (Integer id : selectedSubjectGroupIds) {
-				for (int i = 0; i < allSelectedGroups.size(); ++i) {
-					if (allSelectedGroups.get(i).getId() == id) {
-						allSelectedGroups.get(i).setSelected(true);
-						break;
-					}
-				}
+                for (StudyGroupClassBean allSelectedGroup : allSelectedGroups) {
+                    if (allSelectedGroup.getId() == id) {
+                        allSelectedGroup.setSelected(true);
+                        break;
+                    }
+                }
 			}
 		}
         db.setAllSelectedGroups(allSelectedGroups);

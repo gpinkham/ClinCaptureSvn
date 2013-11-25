@@ -71,6 +71,9 @@ public class EditDatasetServlet extends Controller {
 
 		FormProcessor fp = new FormProcessor(request);
 
+		request.setAttribute("subjectAgeAtEvent",
+				currentStudy.getStudyParameterConfig().getCollectDob().equals("3") ? "0" : "1");
+        
 		int dsId = fp.getInt("dsId");
 		DatasetBean dataset = initializeAttributes(request, dsId);
 
@@ -109,13 +112,13 @@ public class EditDatasetServlet extends Controller {
 
 			}
 			ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
-			for (int i = 0; i < seds.size(); i++) {
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seds.get(i);
-				ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
-				if (!crfs.isEmpty()) {
-					events.put(sed, crfs);
-				}
-			}
+            for (Object sed1 : seds) {
+                StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sed1;
+                ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
+                if (!crfs.isEmpty()) {
+                    events.put(sed, crfs);
+                }
+            }
 			if (events.isEmpty()) {
 				addPageMessage(respage.getString("not_have_study_definitions_assigned"), request);
 				forwardPage(Page.VIEW_DATASETS, request, response);
@@ -159,11 +162,9 @@ public class EditDatasetServlet extends Controller {
 	/**
 	 * Initialize data of a DatasetBean and set session attributes for displaying selected data of this DatasetBean
 	 * 
-	 * @param request
-     * @param datasetId
-	 * @return
-	 * 
-	 * @author ywang (Feb, 2008)
+	 * @param request HttpServletRequest
+     * @param datasetId int
+	 * @return DatasetBean
 	 */
 	public DatasetBean initializeAttributes(HttpServletRequest request, int datasetId) {
         UserAccountBean ub = getUserAccountBean(request);
@@ -188,12 +189,12 @@ public class EditDatasetServlet extends Controller {
 		ArrayList<Integer> selectedSubjectGroupIds = db.getSubjectGroupIds();
 		if (selectedSubjectGroupIds != null && allSelectedGroups != null) {
 			for (Integer id : selectedSubjectGroupIds) {
-				for (int i = 0; i < allSelectedGroups.size(); ++i) {
-					if (allSelectedGroups.get(i).getId() == id) {
-						allSelectedGroups.get(i).setSelected(true);
-						break;
-					}
-				}
+                for (StudyGroupClassBean allSelectedGroup : allSelectedGroups) {
+                    if (allSelectedGroup.getId() == id) {
+                        allSelectedGroup.setSelected(true);
+                        break;
+                    }
+                }
 			}
 		}
         db.setAllSelectedGroups(allSelectedGroups);

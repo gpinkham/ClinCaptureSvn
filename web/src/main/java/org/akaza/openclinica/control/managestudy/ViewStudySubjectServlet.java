@@ -430,8 +430,8 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 	 * Current User may access a requested study subject in the current user's studies
 	 *
 	 */
-	@SuppressWarnings("UnusedDeclaration")
-    public void mayAccess(HttpServletRequest request) throws InsufficientPermissionException {
+	@SuppressWarnings("unused")
+	public void mayAccess(HttpServletRequest request) throws InsufficientPermissionException {
         UserAccountBean ub = getUserAccountBean(request);
         StudyBean currentStudy = getCurrentStudy(request);
         StudyUserRoleBean currentRole = getCurrentRole(request);

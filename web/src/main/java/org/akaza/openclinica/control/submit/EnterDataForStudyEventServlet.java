@@ -347,8 +347,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 		}
 	}
 
-	@SuppressWarnings("ConstantConditions")
-    public static void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, Logger logger, ArrayList uncompletedEventDefinitionCRFs) {
+	public static void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, Logger logger, ArrayList uncompletedEventDefinitionCRFs) {
 		CRFDAO cdao = new CRFDAO(ds);
 		CRFVersionDAO cvdao = new CRFVersionDAO(ds);
 
