@@ -1,14 +1,10 @@
 package com.clinovo.dao;
 
-import com.clinovo.model.CodedItemElement;
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.junit.Test;
 
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.Status.CodeStatus;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CodedItemDAOTest extends DefaultAppContextTest {
 

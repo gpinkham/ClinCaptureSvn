@@ -1,11 +1,9 @@
 package org.akaza.openclinica.dao.admin;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;

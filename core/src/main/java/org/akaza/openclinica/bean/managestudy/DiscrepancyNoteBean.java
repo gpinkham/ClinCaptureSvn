@@ -393,8 +393,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 	/**
 	 * @return Returns the lastUpdator.
 	 */
-    @SuppressWarnings("UnusedDeclaration")
-	public UserAccountBean getLastUpdator() {
+    public UserAccountBean getLastUpdator() {
 		return lastUpdator;
 	}
 
@@ -598,13 +597,11 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 		this.siteId = siteId;
 	}
 
-	@SuppressWarnings("UnusedDeclaration")
-    public String getFieldForDN() {
+	public String getFieldForDN() {
 		return fieldForDN;
 	}
 
-    @SuppressWarnings("UnusedDeclaration")
-	public void setFieldForDN(String fieldForDN) {
+    public void setFieldForDN(String fieldForDN) {
 		this.fieldForDN = fieldForDN;
 	}
 }
