@@ -35,8 +35,8 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import com.clinovo.dao.DiscrepancyDescriptionDAO;
 import com.clinovo.model.DiscrepancyDescriptionType;
+import com.clinovo.service.DiscrepancyDescriptionService;
 
 /**
  * Processes the reuqest of 'view study details'
@@ -101,12 +101,12 @@ public class ViewStudyServlet extends SecureController {
 				// find all subjects in the study, include ones in sites
 				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-				DiscrepancyDescriptionDAO dDescriptionDao = (DiscrepancyDescriptionDAO) SpringServletAccess.getApplicationContext(context)
-						.getBean("DiscrepancyDescriptionDao");
+				DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess.getApplicationContext(context)
+						.getBean("discrepancyDescriptionService");
 				
 				// find all events in the study, include ones in sites
 				ArrayList definitions = seddao.findAllByStudy(study);
-				ArrayList dRFCDescriptions = (ArrayList) dDescriptionDao.findAllByStudyIdAndTypeId(studyId, 
+				ArrayList dRFCDescriptions = (ArrayList) dDescriptionService.findAllByStudyIdAndTypeId(studyId, 
 						DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
 
 				for (int i = 0; i < definitions.size(); i++) {
