@@ -29,11 +29,16 @@ public abstract class RememberLastPage extends Controller {
 	protected abstract boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request);
 
 	private boolean redirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		storeAttributes(request);
-		// for navigation purpose (to brake double url in stack)
-		request.getSession().setAttribute("skipURL", "true");
-		response.sendRedirect(response.encodeRedirectURL((String) request.getSession().getAttribute(getUrlKey(request))));
-		return true;
+		boolean result = false;
+		String url = (String) request.getSession().getAttribute(getUrlKey(request));
+		if (url != null) {
+			result = true;
+			storeAttributes(request);
+			// for navigation purpose (to brake double url in stack)
+			request.getSession().setAttribute("skipURL", "true");
+			response.sendRedirect(response.encodeRedirectURL(url));
+		}
+		return result;
 	}
 
 	protected boolean shouldRedirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
