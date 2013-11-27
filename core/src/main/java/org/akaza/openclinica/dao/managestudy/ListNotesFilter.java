@@ -35,6 +35,7 @@ public class ListNotesFilter implements CriteriaCommand {
 	private boolean dateUpdatedCorrect = true;
 
 	public ListNotesFilter() {
+		columnMapping.put("discrepancyNoteBean.id", "dn.discrepancy_note_id");
 		columnMapping.put("studySubject.label", "ss.label");
 		columnMapping.put("siteId", "ss.label");
 		columnMapping.put("studySubject.labelExact", "ss.label");
@@ -77,7 +78,14 @@ public class ListNotesFilter implements CriteriaCommand {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(pgDateFormat, ResourceBundleProvider.getLocale());
 
 		if (value != null) {
-			if (property.equals("studySubject.labelExact")) {
+			if (property.equals("discrepancyNoteBean.id")) {
+				try {
+					Integer.parseInt(value.toString().trim());
+					criteria += " and " + columnMapping.get(property) + " = " + value.toString();
+				} catch (NumberFormatException nFE) {
+					nFE.printStackTrace();
+				}
+			} else if (property.equals("studySubject.labelExact")) {
 				criteria += " and  UPPER(" + columnMapping.get(property) + ") = UPPER('" + value.toString() + "')"
 						+ " ";
 			} else if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description")
@@ -160,7 +168,7 @@ public class ListNotesFilter implements CriteriaCommand {
 		StringBuilder result = new StringBuilder();
 		if (stringValue.length() > 0){
 			result.append(" and (");
-			for (int i = 0; i < stringValue.length(); i++){
+			for (int i = 0; i < stringValue.length(); i++) {
 				result.append(" or " + "dn.resolution_status_id = " + stringValue.charAt(i));
 			}
 			result.append(")");

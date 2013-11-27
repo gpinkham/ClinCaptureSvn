@@ -77,12 +77,12 @@ import org.jmesa.limit.RowSelect;
 import org.jmesa.limit.Sort;
 import org.jmesa.limit.SortSet;
 import org.jmesa.view.component.Row;
+import org.jmesa.view.editor.AbstractFilterEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.HtmlBuilder;
-import org.jmesa.view.html.component.HtmlColumn;
-import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+import org.jmesa.view.html.editor.HtmlFilterEditor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -137,14 +137,18 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		final String CRF_NAME = "crfName";
 		final String EVENT_NAME = "eventName";
 
-		tableFacade.setColumnProperties("studySubject.label", DISCREPANCY_NOTE_BEAN_DIS_TYPE,
+		tableFacade.setColumnProperties("discrepancyNoteBean.id", "studySubject.label", DISCREPANCY_NOTE_BEAN_DIS_TYPE,
 				DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS, "siteId", "discrepancyNoteBean.createdDate",
 				"discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName",
 				"crfStatus", "entityName", "entityValue", "discrepancyNoteBean.entityType",
 				"discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes", "numberOfNotes",
 				"discrepancyNoteBean.user", "discrepancyNoteBean.owner", "actions");
+		
 		Row row = tableFacade.getTable().getRow();
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
+		
+		configureColumn(row.getColumn("discrepancyNoteBean.id"), resword.getString("note_id"), null,
+				null, true, false);
 		configureColumn(row.getColumn("studySubject.label"), currentStudy != null ? currentStudy
 				.getStudyParameterConfig().getStudySubjectIdLabel() : resword.getString("study_subject_ID"), null,
 				null, true, true);
@@ -153,17 +157,19 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 				new DateCellEditor(getDateFormat()), null, false, true);
 		configureColumn(row.getColumn("discrepancyNoteBean.updatedDate"), resword.getString("date_updated"),
 				new DateCellEditor(getDateFormat()), null, false, false);
-		configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"), new DateCellEditor(
-				getDateFormat()), null, false, false);
-		configureColumn(row.getColumn(EVENT_NAME), resword.getString("event_name"), null, null, true, false);
-		configureColumn(row.getColumn(CRF_NAME), resword.getString("CRF"), null, null, true, false);
+		configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"), 
+				new DateCellEditor(getDateFormat()), null, false, false);
+		configureColumn(row.getColumn(EVENT_NAME), resword.getString("event_name"), null, 
+				new StudyEventTableRowFilter(dataSource, currentStudy), true, false);
+		configureColumn(row.getColumn(CRF_NAME), resword.getString("CRF"), null, 
+				new CRFFilter(dataSource, currentStudy), true, false);
 		configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, false, false);
 		configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), null, null, true, false);
 		configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
-		configureColumn(row.getColumn("discrepancyNoteBean.description"), resword.getString("description"), null, null,
-				true, false);
-		configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), resword.getString("detailed_notes"), null,
-				null, false, false);
+		configureColumn(row.getColumn("discrepancyNoteBean.description"), resword.getString("description"), null,
+				new DescriptionFilterEditor(), true, false);
+		configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), resword.getString("detailed_notes"), null, 
+				new DetailedNotesFilterEditor(), true, false);
 		configureColumn(row.getColumn("numberOfNotes"), resword.getString("of_notes"), null, null, false, false);
 		configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"),
 				new AssignedUserCellEditor(), null, true, false);
@@ -175,24 +181,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 				true, false);
 		configureColumn(row.getColumn("discrepancyNoteBean.owner"), resword.getString("owner"), new OwnerCellEditor(),
 				null, false, false);
-		String actionsHeader = resword.getString("actions")
-				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
-		configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(
-				locale), true, false);
+		configureColumn(row.getColumn("actions"), resword.getString("actions"), new ActionsCellEditor(), 
+				new ListNotesActionsEditor(locale), true, false);
 		configureColumn(row.getColumn("age"), resword.getString("days_open"), null, null);
 		configureColumn(row.getColumn("days"), resword.getString("days_since_updated"), null, null);
-
-		// Configure the drop-down for the study event control
-		CRFFilter crfFileter = new CRFFilter(dataSource, currentStudy);
-
-		HtmlColumn crfNameColumn = ((HtmlRow) row).getColumn(CRF_NAME);
-		crfNameColumn.getFilterRenderer().setFilterEditor(crfFileter);
-
-		// Configure the drop-down for the study event control
-		StudyEventTableRowFilter studyEventTableRowFilter = new StudyEventTableRowFilter(dataSource, currentStudy);
-
-		HtmlColumn studyEventColumn = ((HtmlRow) row).getColumn(EVENT_NAME);
-		studyEventColumn.getFilterRenderer().setFilterEditor(studyEventTableRowFilter);
 	}
 
 	@Override
@@ -222,7 +214,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	@Override
 	public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
 		ListNotesTableToolbar toolbar = new ListNotesTableToolbar(showMoreLink);
-		tableFacade.setToolbar(toolbar);
 		toolbar.setStudyHasDiscNotes(studyHasDiscNotes);
 		toolbar.setDiscNoteType(discNoteType);
 		toolbar.setResolutionStatus(resolutionStatus);
@@ -280,6 +271,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 			HashMap<Object, Object> h = new HashMap<Object, Object>();
 
+			h.put("discrepancyNoteBean.id", discrepancyNoteBean.getId());
 			h.put("studySubject", discrepancyNoteBean.getStudySub());
 			h.put("studySubject.label", discrepancyNoteBean.getStudySub().getLabel());
 			h.put(DISCREPANCY_NOTE_BEAN_DIS_TYPE, discrepancyNoteBean.getDisType());
@@ -829,6 +821,42 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			return builder.toString();
 		}
 	}
+	
+	private class DescriptionFilterEditor extends HtmlFilterEditor{
+		@Override
+		public Object getValue() {
+			HtmlBuilder html = new HtmlBuilder();
+			String value;
+			
+			value = (String) super.getValue();
+			html.append(value).div().style("width: 250px;").end().divEnd();
+			return html.toString();
+		}
+	}
+	
+	private class DetailedNotesFilterEditor extends AbstractFilterEditor {
+		public Object getValue() {
+			HtmlBuilder html = new HtmlBuilder();
+			html.div().style("width: 250px;").end().divEnd();
+			return html.toString();
+		}
+	}
+	
+	private class ListNotesActionsEditor extends DefaultActionsEditor {
+		public ListNotesActionsEditor(Locale locale) {
+			super(locale);
+		}
+		
+		@Override
+		public Object getValue() {
+			HtmlBuilder html = new HtmlBuilder();
+			String value;
+			
+			value = (String) super.getValue();
+			html.append(value).div().style("width: 130px;").end().divEnd();
+			return html.toString();
+		}
+	}
 
 	private String downloadNotesLinkBuilder(StudySubjectBean studySubject) {
 		HtmlBuilder actionLink = new HtmlBuilder();
@@ -856,7 +884,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		return actionLink.toString();
 	}
 
-	// Ignore the mathing values with filter
+	// Ignore the matching values with filter
 	public class AgeDaysFilterMatcher implements FilterMatcher {
 		public boolean evaluate(Object itemValue, String filterValue) {
 			return true;

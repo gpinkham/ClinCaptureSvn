@@ -139,7 +139,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 		 * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade, java.util.Locale)
 		 */
 		String getIndexes() {
-			String result = "4, 5, 9, 11, 14, 16, 17, 19";
+			String result = "0, 5, 6, 10, 12, 15, 17, 18, 20";
 			return result;
 		}
 
