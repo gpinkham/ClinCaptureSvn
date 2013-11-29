@@ -403,18 +403,17 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 					if ("location".equalsIgnoreCase(column)) {
 						request.setAttribute("entityValue", se.getLocation());
 						request.setAttribute("entityName", resword.getString("location"));
-					} else if ("start_date".equalsIgnoreCase(column)) {
+					} else if ("date_start".equalsIgnoreCase(column)) {
 						if (se.getDateStarted() != null) {
 							request.setAttribute("entityValue", dateFormatter.format(se.getDateStarted()));
 						}
 						request.setAttribute("entityName", resword.getString("start_date"));
 
-					} else if ("end_date".equalsIgnoreCase(column)) {
+					} else if ("date_end".equalsIgnoreCase(column)) {
 						if (se.getDateEnded() != null) {
 							request.setAttribute("entityValue", dateFormatter.format(se.getDateEnded()));
 						}
 						request.setAttribute("entityName", resword.getString("end_date"));
-
 					}
 				}
 				preUserId = se.getOwnerId() > 0 ? se.getOwnerId() : 0;
