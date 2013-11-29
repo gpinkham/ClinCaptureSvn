@@ -35,6 +35,8 @@
 		$('.table_title_manage').css('color', "#AA62C6");
 		$('.table_title_Admin').css('color', "#AA62C6");
 		$('.title_manage').css('color', '#AA62C6');
+		$('.table_horizontal tr:first-child td').css('color', '#AA62C6');
+		$('.table_vertical tr td:first-child').css('color', '#AA62C6');
 
 		$("img[src*='bt_']").each(
 				function() {
@@ -191,6 +193,8 @@
 		$('.table_title_manage').css('color', "#75b894");
 		$('.table_title_Admin').css('color', "#75b894");
 		$('.title_manage').css('color', '#75b894');
+		$('.table_horizontal tr:first-child td').css('color', '#75b894');
+		$('.table_vertical tr td:first-child').css('color', '#75b894');
 
 		$("img[src*='bt_']").each(function() {
 			var newSrc = $(this).attr('src');

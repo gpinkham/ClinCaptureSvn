@@ -511,6 +511,18 @@ a:hover, a:active { color: #789EC5;
     padding-bottom: 12px;
 }
 
+.textbox_center_admin { padding-left: 0px;
+    padding-right: 6px;
+    padding-top: 0px;
+    padding-bottom: 7px;
+    
+}
+
+.textbox_center_admin table { border: 0px;
+	width:100%;    
+	border-spacing:0px;
+}
+
 .userboxtext_center { padding-left: 11px;
     padding-right: 16px;
     padding-top: 7px;
@@ -687,6 +699,42 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 .title_TechAdmin { color: #CC0000;
 }
 
+.footer { background-image: url(../images/footer_BG.gif);
+    background-repeat: repeat-x;
+    background-position: bottom;
+    vertical-align: bottom;
+    padding-left: 8px;
+    padding-bottom: 9px;
+    line-height: 5px;
+}
+
+.sidebar { background-image: url(../images/dots.gif);
+    background-repeat: repeat-x;
+    background-position: top;
+    width: 120px;
+    padding-left: 12px;
+    padding-right: 16px;
+    padding-top: 8px;
+    padding-bottom: 18px;
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 13px;
+    color: #789EC5
+}
+
+.content { padding-left: 22px;
+    padding-right: 36px;
+    padding-top: 8px;
+    padding-bottom: 18px;
+    width: 615px;
+}
+
+
+.inactive { color: #CCCCCC;
+}
+
+/*table*/
+/*table title*/
 .table_title_Submit { font-family: Tahoma, Arial, Helvetica, sans-serif;
     font-size: 14px;
     line-height: 18px;
@@ -726,40 +774,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     color: #CC0000;
     padding-bottom: 6px;
 }
-
-.footer { background-image: url(../images/footer_BG.gif);
-    background-repeat: repeat-x;
-    background-position: bottom;
-    vertical-align: bottom;
-    padding-left: 8px;
-    padding-bottom: 9px;
-    line-height: 5px;
-}
-
-.sidebar { background-image: url(../images/dots.gif);
-    background-repeat: repeat-x;
-    background-position: top;
-    width: 120px;
-    padding-left: 12px;
-    padding-right: 16px;
-    padding-top: 8px;
-    padding-bottom: 18px;
-    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
-    font-size: 11px;
-    line-height: 13px;
-    color: #789EC5
-}
-
-.content { padding-left: 22px;
-    padding-right: 36px;
-    padding-top: 8px;
-    padding-bottom: 18px;
-    width: 615px;
-}
-
-
-.inactive { color: #CCCCCC;
-}
+/*/table title*/
 
 .table_border {
     border-style: solid;
@@ -848,13 +863,36 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     vertical-align: top;
 }
 
+.table_horizontal  tr td, .table_vertical tr td{
+	padding: 3px 6px;
+    border-style: solid;
+    border-left-width: 0px;
+	border-right-width: 1px;
+	border-top-width:0px;
+	border-bottom-width:1px;
+    border-color: #E6E6E6;
+	border-spacing:1px;
+}
 
-.table_cell_left {/*
- padding-top: 3px;
-	padding-left: 6px;
-	padding-right: 6px;
-	padding-bottom: 3px;
-*/
+.table_horizontal tr:first-child td, .table_vertical tr td:first-child{
+	font-weight: bold;
+	color: #666666;
+    border-color: #CCCCCC; 
+}
+
+.table_vertical tr td:first-child{
+	width:200px;
+}
+	
+.table_horizontal tr, .table_vertical tr{
+	vertical-align:top;
+}
+
+.table_horizontal, .table_vertical{
+    border-color: #CCCCCC; 
+}
+
+.table_cell_left {
     padding: 0.2em;
     border-style: solid;
     border-top-width: 1px;
@@ -923,6 +961,8 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     padding-right: 6px;
     vertical-align: top;
 }
+
+/*/table*/
 
 .homeboxes { width: 200px;
     padding-right: 10px;
@@ -1453,6 +1493,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 	color: #000000;
 	}
 
+/*unused*/
 .table_header_row_shaded { padding-top: 3px;
 	padding-left: 6px;
 	padding-right: 6px;
@@ -1486,7 +1527,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 	vertical-align: top;
 	background-color: #F5F5F5;
 	}
-
+/*/unused*/
 .table_cell_shaded { padding-top: 3px;
 	padding-left: 6px;
 	padding-right: 6px;
@@ -1641,6 +1682,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 	
 }
 
+/*unused*/
 .table_header_row_shaded { padding-top: 3px;
     padding-left: 6px;
     padding-right: 6px;
@@ -1675,6 +1717,8 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     background-color: #F5F5F5;
 }
 
+/*/unused*/
+
 .table_cell_shaded {
     padding: 0.2em;
     border-style: solid;
@@ -1688,6 +1732,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     background-color: #F5F5F5;
 }
 
+/*unused*/
 .table_cell_shaded_left {
     padding: 0.2em;
     border-style: solid;
@@ -1700,6 +1745,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     vertical-align: top;
     background-color: #F5F5F5;
 }
+/*/unused*/
 
 .sidebar_tab { background-image: url(../images/sidebar_tab.gif);
     background-repeat: no-repeat;
