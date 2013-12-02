@@ -20,6 +20,13 @@
  */
 package org.akaza.openclinica.control.extract;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -55,10 +62,10 @@ public class AccessFileServlet extends Controller {
 		ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);
 		StudyDAO studyDao = getStudyDAO();
 		DatasetBean dsBean = (DatasetBean) dsDao.findByPK(asdfBean.getDatasetId());
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		int parentId = currentStudy.getParentStudyId();
-		if (parentId == 0)// Logged in at study level
-		{
+		if (parentId == 0) {
+			// Logged in at study level
 			StudyBean studyBean = (StudyBean) studyDao.findByPK(dsBean.getStudyId());
 			parentId = studyBean.getParentStudyId();// parent id of dataset created
 
@@ -66,14 +73,13 @@ public class AccessFileServlet extends Controller {
 		// logic: is parentId of the dataset created not equal to currentstudy? or is current study
 		if ((parentId) != currentStudy.getId())
 			if (dsBean.getStudyId() != currentStudy.getId()) {
-				addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+				addPageMessage(
+						respage.getString("no_have_correct_privilege_current_study")
+								+ respage.getString("change_study_contact_sysadmin"), request);
 				throw new InsufficientPermissionException(Page.MENU_SERVLET,
 						resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 			}
 
-		Page finalTarget = Page.EXPORT_DATA_CUSTOM;
-		
 		if (asdfBean.getFileReference().endsWith(".zip")) {
 			response.setHeader("Content-disposition", "attachment; filename=\"" + asdfBean.getName() + "\";");
 			response.setContentType("application/zip");
@@ -93,19 +99,81 @@ public class AccessFileServlet extends Controller {
 		} else if (asdfBean.getFileReference().endsWith(".html")) {
 			response.setHeader("Content-disposition", "filename=\"" + asdfBean.getName() + "\";");
 			response.setContentType("text/html; charset=utf-8");
-		} 
+		}
 
 		System.out.println("just set content type: " + response.getContentType());
-		finalTarget.setFileName("/WEB-INF/jsp/extract/generatedFileDataset.jsp");
 		request.setAttribute("generate", asdfBean.getFileReference());
 		response.setHeader("Pragma", "public");
-		forwardPage(finalTarget, request, response);
+		writeFile(request, response);
+	}
+
+	private void writeFile(HttpServletRequest request, HttpServletResponse response) {
+		String path = (String) request.getAttribute("generate");
+		System.out.println("file path found at jsp " + path);
+		if (path != null) {
+			ServletOutputStream sos = null;
+			BufferedOutputStream bos = null;
+			InputStream is = null;
+			BufferedInputStream bis = null;
+			try {
+				if (!path.endsWith(".html")) {
+					response.setContentType("application/download");
+				}
+				response.setHeader("Pragma", "public");
+				sos = response.getOutputStream();
+
+				bos = new BufferedOutputStream(sos);
+				java.io.File local = new java.io.File(path);
+				is = new FileInputStream(local);
+				bis = new BufferedInputStream(is);
+				int length = (int) local.length();
+				int bytesRead;
+				byte[] buff = new byte[length];
+
+				while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+					bos.write(buff, 0, bytesRead);
+				}
+			} catch (Exception ee) {
+				ee.printStackTrace();
+			} finally {
+				if (bis != null) {
+					try {
+						bis.close();
+					} catch (IOException ex) {
+						ex.printStackTrace();
+					}
+				}
+				if (is != null) {
+					try {
+						is.close();
+					} catch (IOException ex) {
+                        ex.printStackTrace();
+					}
+				}
+				if (bos != null) {
+					try {
+						bos.close();
+					} catch (IOException ex) {
+                        ex.printStackTrace();
+					}
+				}
+				if (sos != null) {
+					try {
+						sos.flush();
+						sos.close();
+					} catch (IOException ex) {
+                        ex.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -115,8 +183,9 @@ public class AccessFileServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 
