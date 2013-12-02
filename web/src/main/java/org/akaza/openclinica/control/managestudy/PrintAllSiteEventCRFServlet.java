@@ -237,7 +237,17 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
 		request.setAttribute("sedCrfBeans", sedCrfBeans);
 		request.setAttribute("studyName", studyName);
 		request.setAttribute("site", siteName);
+		checkWasPrintOpenedBefore(request);
 		forwardPage(Page.VIEW_ALL_SITE_DEFAULT_CRF_VERSIONS_PRINT, request, response);
+	}
+
+	private void checkWasPrintOpenedBefore(HttpServletRequest request) {
+		if (request.getSession().getAttribute("firstPrint")!=null){
+			request.getSession().setAttribute("firstPrint", "false");
+		}
+		else{
+			request.getSession().setAttribute("firstPrint", "true");
+		}
 	}
 
 	@Override

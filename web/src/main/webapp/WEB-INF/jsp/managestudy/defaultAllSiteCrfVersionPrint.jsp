@@ -5,6 +5,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <html>
@@ -58,6 +59,11 @@ for ( var i = 0; i < els.length ; i ++ ) {
 }
  });
 </script>
+<c:if test="${sessionScope.firstPrint=='true'}">
+	<script>
+		alert('<fmt:message key="alert_to_print" bundle="${restext}"/>');
+	</script>
+</c:if>
 <!-- end -->
 <body>
 <div style="border:0px #000000 solid;padding-left:0px;width:820px;margin:5px">
