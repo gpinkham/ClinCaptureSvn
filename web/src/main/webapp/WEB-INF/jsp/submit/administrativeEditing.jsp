@@ -139,6 +139,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
 <input type="hidden" name="tabId" value="<c:out value="${tabId}"/>" />
 <input type="hidden" name="fromViewNotes" value="<c:out value="${fromViewNotes}"/>" />
+<input type="hidden" name="occurenceNumber" value="<c:out value="${studyEvent.sampleOrdinal}"/>" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input id="hasPopUp" type="hidden" name="hasPopUp" value="${requestScope['hasPopUp']}" />
