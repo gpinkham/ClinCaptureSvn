@@ -499,13 +499,9 @@ public class CreateSubStudyServlet extends Controller {
 		}
 		
 		this.submitSiteEventDefinitions(request, study);
-
 		request.getSession().removeAttribute("newStudy");
-		addPageMessage(respage.getString("the_new_site_created_succesfully_current"), request);
-		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
-        request.getSession().setAttribute("pageMessages", pageMessages);
-		response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
-
+        request.getSession().setAttribute("new_site_created", "true");
+		forwardPage(Page.SITE_LIST_SERVLET, request, response);
 	}
 
 	private ArrayList<StudyEventDefinitionBean> createSiteEventDefinitions(HttpServletRequest request, StudyBean site) {

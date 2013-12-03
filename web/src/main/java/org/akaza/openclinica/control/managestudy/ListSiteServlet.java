@@ -132,8 +132,9 @@ public class ListSiteServlet extends RememberLastPage {
 			if (request.getParameter("read") != null && request.getParameter("read").equals("true")) {
 				request.setAttribute("readOnly", true);
 			}
+			addNewSiteNotificationMessage(request);
 			request.getSession().setAttribute("fromListSite", "yes");
-			forward(Page.SITE_LIST, request, response);
+			forwardPage(Page.SITE_LIST, request, response);
 		}
 
 	}
@@ -160,5 +161,13 @@ public class ListSiteServlet extends RememberLastPage {
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
+	}
+	
+	private void addNewSiteNotificationMessage(HttpServletRequest request){
+		if (request.getSession().getAttribute("new_site_created")!=null){
+			request.getSession().removeAttribute("new_site_created");
+			addPageMessage(respage.getString("the_new_site_created_succesfully_current"), request);
+		}	
+		return;
 	}
 }

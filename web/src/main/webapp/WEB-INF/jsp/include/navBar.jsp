@@ -91,7 +91,6 @@
             </c:choose>
             (<c:out value="${study.identifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
             <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
-        
       </td>
       <td align="right">
         
@@ -286,12 +285,15 @@
             <div class="taskGroup"><fmt:message key="nav_administration" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudy"><fmt:message key="nav_studies" bundle="${resword}"/></a></div>
+                <c:if test="${study.parentStudyId <= 0}">
+                	<div class="taskLink"><a href="${urlPrefix}ListSite"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
+                </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ListUserAccounts"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
+            </div>
+            <div class="taskRightColumn">
                 <c:if test="${study.parentStudyId <= 0}">
                 	<div class="taskLink"><a href="${urlPrefix}ListCRF?module=admin"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
                 </c:if>
-            </div>
-            <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewAllJobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ListSubject"><fmt:message key="nav_subjects" bundle="${resword}"/></a></div>
             </div>
