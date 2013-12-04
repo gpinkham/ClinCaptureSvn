@@ -116,6 +116,8 @@
 <p class="text">
 <br/><fmt:message key="field_required" bundle="${resword}"/></P>
 <form action="AddNewSubject" method="post">
+<input type="hidden" id="formWithStateFlag" value=""/>
+<input type="hidden" id="openFirstCrf" name="openFirstCrf" value="false"/>
 <jsp:include page="../include/showSubmitted.jsp" />
 
 <script type="text/JavaScript" language="JavaScript">
@@ -627,13 +629,18 @@
 <br>
 <table border="0" cellpadding="0" cellspacing="0">
 	<tr>
-		<td>
-			<input type="submit" name="submitEvent" value="<fmt:message key="save_and_assign_study_event" bundle="${restext}"/>" class="button_long">
-		</td>
-		<td><input type="submit" name="submitEnroll" value="<fmt:message key="save_and_add_next_subject" bundle="${restext}"/>" class="button_long"></td>
-		<td><input type="submit" name="submitDone" value="<fmt:message key="save_and_finish" bundle="${restext}"/>" class="button_long"></td>
-		<td><input type="button" onclick="confirmCancel('ListStudySubjects');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
+    <td><input type="button" name="BTN_Smart_Back_A" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" style="float: left; cursor: pointer;"/></td>
+		<td><input type="submit" name="submitDone" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" style="float: left; cursor: pointer; margin-left: 10px;"></td>
+		<td><input type="button" onclick="confirmCancel('ListStudySubjects');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" style="float: left; cursor: pointer; margin-left: 10px;"/></td>
 	</tr>
+  <tr>
+    <td colspan="3" style="padding-top: 18px; padding-bottom: 10px;"><fmt:message key="perform_one_of_the_operations_below" bundle="${resword}"/>:</td>
+  </tr>
+  <tr>
+    <td><input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=submitDone]').click();" style="float: left; cursor: pointer;"/></td>
+    <td><input type="submit" name="submitEvent" value="<fmt:message key="schedule_events" bundle="${restext}"/>" class="button_medium" style="float: left; cursor: pointer; margin-left: 10px;"></td>
+    <td><input type="submit" name="submitEnroll" value="<fmt:message key="add_next_subject" bundle="${restext}"/>" class="button_medium" style="float: left; cursor: pointer; margin-left: 10px;"></td>
+  </tr>
 </table>
 </form>
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;z-index:10;background-color:white;layer-background-color:white;"></DIV>

@@ -159,6 +159,7 @@
 <P><fmt:message key="field_required" bundle="${resword}"/></P>
 
 <form action="CreateNewStudyEvent" method="post">
+<input type="hidden" id="openFirstCrf" name="openFirstCrf" value="false"/>
 <jsp:include page="../include/showSubmitted.jsp" />
 
 <fmt:message key="study_subject_ID" bundle="${resword}" var="studySubjectLabel"/>

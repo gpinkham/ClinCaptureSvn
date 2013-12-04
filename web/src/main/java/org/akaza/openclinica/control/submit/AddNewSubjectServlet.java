@@ -20,7 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-// import org.akaza.openclinica.bean.core.Role;
 import com.clinovo.util.ValidatorHelper;
 
 import java.text.ParseException;
@@ -29,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -82,10 +82,12 @@ import org.springframework.stereotype.Component;
  * @author ssachs
  * @version CVS: $Id: AddNewSubjectServlet.java,v 1.15 2005/07/05 17:20:43 jxu Exp $
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class AddNewSubjectServlet extends Controller {
 
+	public static final String OPEN_FIRST_CRF = "openFirstCrf";
+	public static final String TRUE = "true";
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private final Object simpleLockObj = new Object();
@@ -113,7 +115,7 @@ public class AddNewSubjectServlet extends Controller {
 	public static final String INPUT_MOTHER = "mother";
 
 	public static final String BEAN_GROUPS = "groups";
-	
+
 	public static final String BEAN_DYNAMIC_GROUPS = "dynamicGroups";
 
 	public static final String BEAN_FATHERS = "fathers";
@@ -145,27 +147,27 @@ public class AddNewSubjectServlet extends Controller {
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
-        String DOB = "";
-        String YOB = "";
-        String GENDER = "";
-        boolean needUpdate = false;
-        SubjectBean updateSubject = null;
-        SimpleDateFormat local_df = getLocalDf(request);
+		String DOB = "";
+		String YOB = "";
+		String GENDER = "";
+		boolean needUpdate = false;
+		SubjectBean updateSubject = null;
+		SimpleDateFormat local_df = getLocalDf(request);
 
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-        checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
 
 		StudySubjectDAO ssd = getStudySubjectDAO();
 		StudyDAO stdao = getStudyDAO();
 		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
-		ArrayList classes = new ArrayList();
-		ArrayList dynamicClasses = new ArrayList();
+		ArrayList classes;
+		ArrayList dynamicClasses;
 		int defaultDynGroupClassId = 0;
 		String defaultDynGroupClassName = "";
-        StudyInfoPanel panel = getStudyInfoPanel(request);
+		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.setStudyInfoShown(false);
 		FormProcessor fp = new FormProcessor(request);
 		FormDiscrepancyNotes discNotes;
@@ -188,22 +190,22 @@ public class AddNewSubjectServlet extends Controller {
 			classes = sgcdao.findAllActiveByStudy(parentStudy, true);
 			dynamicClasses = getDynamicGroupClassesByStudyId(request, parentStudyId);
 		}
-		
+
 		if (dynamicClasses.size() > 0) {
-			if (((StudyGroupClassBean) dynamicClasses.get(0)).isDefault()){
+			if (((StudyGroupClassBean) dynamicClasses.get(0)).isDefault()) {
 				defaultDynGroupClassId = ((StudyGroupClassBean) dynamicClasses.get(0)).getId();
 				defaultDynGroupClassName = ((StudyGroupClassBean) dynamicClasses.get(0)).getName();
 			}
 		}
 		fp.addPresetValue(DEFAULT_DYN_GROUP_CLASS_ID, defaultDynGroupClassId);
 		fp.addPresetValue(DEFAULT_DYN_GROUP_CLASS_NAME, defaultDynGroupClassName);
-		
+
 		StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 		StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "collectDob");
 		currentStudy.getStudyParameterConfig().setCollectDob(parentSPV.getValue());
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "genderRequired");
 		currentStudy.getStudyParameterConfig().setGenderRequired(parentSPV.getValue());
-		
+
 		StudyParameterValueBean checkPersonId = spvdao.findByHandleAndStudy(parentStudyId, "subjectPersonIdRequired");
 		currentStudy.getStudyParameterConfig().setSubjectPersonIdRequired(checkPersonId.getValue());
 
@@ -215,12 +217,12 @@ public class AddNewSubjectServlet extends Controller {
 
 				setUpBeans(classes, request);
 				request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
-				
+
 				Date today = new Date(System.currentTimeMillis());
 				String todayFormatted = local_df.format(today);
 				fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
 
-				String idSetting = "";
+				String idSetting;
 				if (currentStudy.getParentStudyId() > 0) {
 					parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
 					currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
@@ -239,12 +241,12 @@ public class AddNewSubjectServlet extends Controller {
 
 				setPresetValues(fp.getPresetValues(), request);
 				discNotes = new FormDiscrepancyNotes();
-                request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
+				request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
 				forwardPage(Page.ADD_NEW_SUBJECT, request, response);
 
 			}
-		} else {// submitted
-
+		} else {
+			// submitted
 			// Record parameters' values on input page so those values
 			// could be used to compare against
 			// values in database <subject> table for "add existing subject"
@@ -253,7 +255,7 @@ public class AddNewSubjectServlet extends Controller {
 				YOB = fp.getString(INPUT_YOB);
 				GENDER = fp.getString(INPUT_GENDER);
 			}
-			
+
 			discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 			if (discNotes == null) {
 				discNotes = new FormDiscrepancyNotes();
@@ -281,7 +283,8 @@ public class AddNewSubjectServlet extends Controller {
 			}
 
 			String dobSetting = currentStudy.getStudyParameterConfig().getCollectDob();
-			if (dobSetting.equals("1")) {// date of birth
+			if (dobSetting.equals("1")) {
+				// date of birth
 				v.addValidation(INPUT_DOB, Validator.IS_A_DATE);
 				if (!StringUtil.isBlank(fp.getString("INPUT_DOB"))) {
 					v.alwaysExecuteLastValidation(INPUT_DOB);
@@ -340,8 +343,7 @@ public class AddNewSubjectServlet extends Controller {
 			HashMap errors = v.validate();
 
 			SubjectDAO sdao = getSubjectDAO();
-			String uniqueIdentifier = fp.getString(INPUT_UNIQUE_IDENTIFIER);// global
-			// Id
+			String uniqueIdentifier = fp.getString(INPUT_UNIQUE_IDENTIFIER);// global Id
 			SubjectBean subjectWithSameId = new SubjectBean();
 			boolean showExistingRecord = false;
 			if (!uniqueIdentifier.equals("")) {
@@ -349,7 +351,7 @@ public class AddNewSubjectServlet extends Controller {
 				// checks whether there is a subject with same id inside current
 				// study/site
 				subjectWithSameId = sdao.findByUniqueIdentifierAndStudy(uniqueIdentifier, currentStudy.getId());
-				
+
 				if (subjectWithSameId.isActive()) { // ||
 					Validator.addError(errors, INPUT_UNIQUE_IDENTIFIER,
 							resexception.getString("subject_with_person_ID") + " " + uniqueIdentifier + " "
@@ -397,7 +399,6 @@ public class AddNewSubjectServlet extends Controller {
 
 								subjectWithSameIdInCurrentStudyTree = true;
 							}
-							// YW >>
 						}
 					}
 				}
@@ -437,23 +438,10 @@ public class AddNewSubjectServlet extends Controller {
 				StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy);
 
 				StudySubjectBean subjectWithSameLabelInParent = new StudySubjectBean();
-				// tbh
 				if (currentStudy.getParentStudyId() > 0) {
 					subjectWithSameLabelInParent = ssd.findSameByLabelAndStudy(label, currentStudy.getParentStudyId(),
-							0);// <
-					// --
-					// blank
-					// id
-					// since
-					// the
-					// ss
-					// hasn't
-					// been
-					// created
-					// yet,
-					// tbh
+							0); // blank id since the ss hasn't been created yet, tbh
 				}
-				// tbh
 				if (subjectWithSameLabel.isActive() || subjectWithSameLabelInParent.isActive()) {
 					Validator.addError(errors, INPUT_LABEL,
 							resexception.getString("another_assigned_this_ID_choose_unique"));
@@ -497,7 +485,7 @@ public class AddNewSubjectServlet extends Controller {
 				fp.addPresetValue(STUDY_EVENT_DEFINITION, fp.getInt(STUDY_EVENT_DEFINITION));
 				fp.addPresetValue(LOCATION, fp.getString(LOCATION));
 				fp.addPresetValue(SELECTED_DYN_GROUP_CLASS_ID, request.getParameter("dynamicGroupClassId"));
-				
+
 				if (currentStudy.isGenetic()) {
 					String intFields[] = { INPUT_GROUP, INPUT_FATHER, INPUT_MOTHER };
 					fp.setCurrentIntValuesAsPreset(intFields);
@@ -549,14 +537,8 @@ public class AddNewSubjectServlet extends Controller {
 					}
 
 					if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1") && !subject.isDobCollected()) {
-						// fp.addPresetValue(EDIT_DOB, "yes");
 						fp.addPresetValue(INPUT_DOB, fp.getString(INPUT_DOB));
 					}
-					// YW << it has been taken off to solve bug0001125
-					/*
-					 * else { fp.addPresetValue(INPUT_DOB, ""); }
-					 */
-					// YW >>
 					fp.addPresetValue(INPUT_YOB, String.valueOf(year));
 
 					if (!currentStudy.getStudyParameterConfig().getGenderRequired().equals("false")) {
@@ -565,7 +547,6 @@ public class AddNewSubjectServlet extends Controller {
 						fp.addPresetValue(INPUT_GENDER, "");
 					}
 
-					// YW <<
 					// Shaoyu Su: delay setting INPUT_LABEL field
 					if (!label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
 						fp.addPresetValue(INPUT_LABEL, label);
@@ -573,7 +554,6 @@ public class AddNewSubjectServlet extends Controller {
 					fp.addPresetValue(INPUT_SECONDARY_LABEL, fp.getString(INPUT_SECONDARY_LABEL));
 					fp.addPresetValue(INPUT_ENROLLMENT_DATE, fp.getString(INPUT_ENROLLMENT_DATE));
 					fp.addPresetValue(INPUT_EVENT_START_DATE, fp.getString(INPUT_EVENT_START_DATE));
-					// YW >>
 
 					fp.addPresetValue(INPUT_UNIQUE_IDENTIFIER, subject.getUniqueIdentifier());
 
@@ -584,14 +564,13 @@ public class AddNewSubjectServlet extends Controller {
 					setUpBeans(classes, request);
 					request.setAttribute(BEAN_DYNAMIC_GROUPS, dynamicClasses);
 
-					// YW <<
 					int warningCount = 0;
 					if (currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
 						if (String.valueOf(subjectWithSameId.getGender()).equals(" ")) {
 							fp.addPresetValue(G_WARNING, "emptytrue");
 							fp.addPresetValue(INPUT_GENDER, GENDER);
 							needUpdate = true;
-                            updateSubject = subjectWithSameId;
+							updateSubject = subjectWithSameId;
 							updateSubject.setGender(GENDER.toCharArray()[0]);
 							warningCount++;
 						} else if (!String.valueOf(subjectWithSameId.getGender()).equals(GENDER)) {
@@ -607,7 +586,7 @@ public class AddNewSubjectServlet extends Controller {
 					// Current study required DOB
 					if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
 						// date-of-birth in subject table is not completed
-						if (subjectWithSameId.isDobCollected() == false) {
+						if (!subjectWithSameId.isDobCollected()) {
 							needUpdate = true;
 							updateSubject = subjectWithSameId;
 							updateSubject.setDobCollected(true);
@@ -643,10 +622,7 @@ public class AddNewSubjectServlet extends Controller {
 							warningCount++;
 						}
 						// date-of-birth in subject table but doesn't match DOB
-						else if (!local_df.format(subjectWithSameId.getDateOfBirth()).toString().equals(DOB)) {
-							// System.out.println("comparing " +
-							// local_df.format(
-							// subjectWithSameId.getDateOfBirth()).toString());
+						else if (!local_df.format(subjectWithSameId.getDateOfBirth()).equals(DOB)) {
 							fp.addPresetValue(D_WARNING, "currentDOBWrong");
 							warningCount++;
 						}
@@ -688,19 +664,15 @@ public class AddNewSubjectServlet extends Controller {
 					}
 
 					if (warningCount > 0) {
-						warningCount = 0;
 						forwardPage(Page.ADD_EXISTING_SUBJECT, request, response);
 						return;
 					}
-					// forwardPage(Page.ADD_EXISTING_SUBJECT, request, response);
-					// return;
-					// YW >>
 				}
 				// YW << If showExistingRecord, which means there is a record
 				// for the subject
 				// in <subject> table, the subject only needs to be inserted
 				// into <studysubject> table.
-				// In other words, if(!showExistingRecord), the subject needs 
+				// In other words, if(!showExistingRecord), the subject needs
 				// to be inserted into both <subject> and <studysubject> tables
 				if (!showExistingRecord) {
 					// YW >>
@@ -730,11 +702,7 @@ public class AddNewSubjectServlet extends Controller {
 						subject.setDobCollected(false);
 						int yob = fp.getInt(INPUT_YOB);
 						Date fakeDate = new Date("01/01/" + yob);
-						// Calendar fakeCal = Calendar.getInstance();
-						// fakeCal.set(Calendar.YEAR, yob);
-						// fakeCal.set(Calendar.MONTH, 1);
-						// fakeCal.set(Calendar.DAY_OF_MONTH, 1);
-						// String dobString = "01/01/" + yob;
+
 						String dobString = local_df.format(fakeDate);
 
 						try {
@@ -779,10 +747,8 @@ public class AddNewSubjectServlet extends Controller {
 							throw new OpenClinicaException("Could not create subject.", "5");
 						}
 						subject = updateSubject;
-						needUpdate = false;
 					}
 				}
-				// YW >>
 				// enroll the subject in the active study
 				studySubject.setSubjectId(subject.getId());
 				studySubject.setStudyId(currentStudy.getId());
@@ -795,7 +761,7 @@ public class AddNewSubjectServlet extends Controller {
 				}
 
 				studySubject.setOwner(ub);
-				
+
 				if (!"".equals(fp.getString("dynamicGroupClassId"))) {
 					studySubject.setDynamicGroupClassId(Integer.valueOf(fp.getString("dynamicGroupClassId")));
 				} else {
@@ -817,8 +783,8 @@ public class AddNewSubjectServlet extends Controller {
 				}
 				if (!classes.isEmpty() && studySubject.isActive()) {
 					SubjectGroupMapDAO sgmdao = getSubjectGroupMapDAO();
-					for (int i = 0; i < classes.size(); i++) {
-						StudyGroupClassBean group = (StudyGroupClassBean) classes.get(i);
+					for (Object aClass : classes) {
+						StudyGroupClassBean group = (StudyGroupClassBean) aClass;
 						group.getStudyGroupId();
 						group.getGroupNotes();
 						SubjectGroupMapBean map = new SubjectGroupMapBean();
@@ -833,13 +799,14 @@ public class AddNewSubjectServlet extends Controller {
 						}
 					}
 				}
-				
+
 				if (!studySubject.isActive()) {
 					throw new OpenClinicaException(resexception.getString("could_not_create_study_subject"), "4");
 				}
 
 				// save discrepancy notes into DB
-				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(FORM_DISCREPANCY_NOTES_NAME);
+				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
+						FORM_DISCREPANCY_NOTES_NAME);
 				DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 
 				String[] subjectFields = { INPUT_DOB, INPUT_YOB, INPUT_GENDER };
@@ -853,8 +820,9 @@ public class AddNewSubjectServlet extends Controller {
 				request.setAttribute(CreateNewStudyEventServlet.INPUT_REQUEST_STUDY_SUBJECT, "no");
 				request.setAttribute(FormProcessor.FIELD_SUBMITTED, "0");
 
-				addPageMessage(respage.getString("subject_with_unique_identifier") + studySubject.getLabel()
-						+ respage.getString("X_was_created_succesfully"), request);
+				addPageMessage(
+						respage.getString("subject_with_unique_identifier") + studySubject.getLabel()
+								+ respage.getString("X_was_created_succesfully"), request);
 
 				if (fp.getBoolean("addWithEvent")) {
 					createStudyEvent(fp, studySubject);
@@ -862,14 +830,7 @@ public class AddNewSubjectServlet extends Controller {
 					request.setAttribute("id", studySubject.getId() + "");
 					response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
 					forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
-					// YW >>
-					// we want to get the url of viewing study subject in
-					// browser to avoid page expired problem
-					// response.sendRedirect(response.encodeRedirectURL(
-					// "ViewStudySubject?id="
-					// + studySubject.getId()));
 					return;
-
 				}
 
 				String submitEvent = fp.getString(SUBMIT_EVENT_BUTTON);
@@ -887,56 +848,71 @@ public class AddNewSubjectServlet extends Controller {
 					String todayFormatted = local_df.format(today);
 					fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
 
-					// YW 10-07-2007 <<
-					String idSetting = "";
+					String idSetting;
 					if (currentStudy.getParentStudyId() > 0) {
 						parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
 						currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
 					}
 					idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
-					// YW >>
+
 					logger.info("subject id setting :" + idSetting);
 					// set up auto study subject id
 					if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-						// Shaoyu Su
-						// int nextLabel = ssd.findTheGreatestLabel() + 1;
-						// fp.addPresetValue(INPUT_LABEL, new Integer(nextLabel).toString());
-						// fp.addPresetValue(INPUT_LABEL, resword.getString("id_generated_Save_Add"));
 						String nextLabel = ssd.findNextLabel(currentStudy.getIdentifier());
 						fp.addPresetValue(INPUT_LABEL, nextLabel);
 					}
 
 					setPresetValues(fp.getPresetValues(), request);
 					discNotes = new FormDiscrepancyNotes();
-                    request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
-					// End of 4770
+					request.getSession().setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
 					forwardPage(Page.ADD_NEW_SUBJECT, request, response);
 				} else {
-					// forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
+					if (fp.getString(OPEN_FIRST_CRF).equalsIgnoreCase(TRUE)) {
+						try {
+							StudyEventDAO sedao = getStudyEventDAO();
+							StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 
-					// clinovo - ticket #39
-					/*
-					 * String listStudySubject = "/ListStudySubjects?maxRows=15" +
-					 * "&showMoreLink=true&findSubjects_tr_=true" + "&findSubjects_p_=1&findSubjects_mr_=15" +
-					 * "&findSubjects_s_0_studySubject.label=asc";
-					 */
+							StudyBean studyWithEventDefinitions = currentStudy;
+							if (currentStudy.getParentStudyId() > 0) {
+								studyWithEventDefinitions = new StudyBean();
+								studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
+							}
 
+							List<StudyEventDefinitionBean> eventDefinitions;
+							eventDefinitions = CreateNewStudyEventServlet.selectNotStartedOrRepeatingSortedEventDefs(
+									studySubject, studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
+
+							if (studySubject.getEventStartDate() == null) {
+								studySubject.setEventStartDate(new Date());
+							}
+							StudyEventBean seb = createStudyEvent(fp, eventDefinitions.get(0).getId(), studySubject);
+
+							if (seb != null && seb.getId() > 0) {
+								response.sendRedirect(request.getContextPath()
+										+ Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName() + "?eventId="
+										+ seb.getId() + "&openFirstCrf=true");
+								return;
+							}
+						} catch (Exception e) {
+							logger.error(
+									"An error has occured during processing the IDE for first crf of first study event in the study subject.",
+									e);
+						}
+					}
 					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
-					// tbh clinovo 10/30/2012, change
-					// request.setAttribute("id", studySubject.getId() + "");
-					// response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
-					// forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
-					// end clinovo 10/30/2012
-
-					return;
 				}
 			}// end of no error (errors.isEmpty())
 		}// end of fp.isSubmitted()
 	}
 
-	protected void createStudyEvent(FormProcessor fp, StudySubjectBean s) {
-        UserAccountBean ub = getUserAccountBean(fp.getRequest());
-		int studyEventDefinitionId = fp.getInt("studyEventDefinition");
+	protected StudyEventBean createStudyEvent(FormProcessor fp, StudySubjectBean s) {
+		return createStudyEvent(fp, null, s);
+	}
+
+	protected StudyEventBean createStudyEvent(FormProcessor fp, Integer sedId, StudySubjectBean s) {
+		StudyEventBean se = null;
+		UserAccountBean ub = getUserAccountBean(fp.getRequest());
+		int studyEventDefinitionId = sedId == null ? fp.getInt("studyEventDefinition") : sedId;
 		String location = fp.getString("location");
 		Date startDate = s.getEventStartDate();
 		if (studyEventDefinitionId > 0) {
@@ -950,7 +926,7 @@ public class AddNewSubjectServlet extends Controller {
 				logger.info("will create event with new subject");
 				StudyEventDAO sedao = getStudyEventDAO();
 				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
-				StudyEventBean se = new StudyEventBean();
+				se = new StudyEventBean();
 				se.setLocation(location);
 				se.setDateStarted(startDate);
 				se.setDateEnded(startDate);
@@ -967,9 +943,8 @@ public class AddNewSubjectServlet extends Controller {
 
 		} else {
 			addPageMessage(respage.getString("no_event_sheduled_for_subject"), fp.getRequest());
-
 		}
-
+		return se;
 	}
 
 	/*
@@ -978,9 +953,10 @@ public class AddNewSubjectServlet extends Controller {
 	 * @see org.akaza.openclinica.control.core.Controller#mayProceed()
 	 */
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String exceptionName = resexception.getString("no_permission_to_add_new_subject");
 		String noAccessMessage = respage.getString("may_not_add_new_subject") + " "
@@ -1013,8 +989,8 @@ public class AddNewSubjectServlet extends Controller {
 		request.setAttribute(BEAN_FATHERS, dsFathers);
 		request.setAttribute(BEAN_MOTHERS, dsMothers);
 
-		for (int i = 0; i < classes.size(); i++) {
-			StudyGroupClassBean group = (StudyGroupClassBean) classes.get(i);
+		for (Object aClass : classes) {
+			StudyGroupClassBean group = (StudyGroupClassBean) aClass;
 			ArrayList studyGroups = sgdao.findAllByGroupClass(group);
 			group.setStudyGroups(studyGroups);
 		}
@@ -1025,38 +1001,21 @@ public class AddNewSubjectServlet extends Controller {
 	/**
 	 * Save the discrepancy notes of each field into session in the form
 	 * 
-	 * @param field
-	 * @param notes
-	 * @param dndao
-	 * @param entityId
-	 * @param entityType
-	 * @param sb
 	 */
 	public static void saveFieldNotes(String field, FormDiscrepancyNotes notes, DiscrepancyNoteDAO dndao, int entityId,
 			String entityType, StudyBean sb) {
 
 		if (notes == null || dndao == null || sb == null) {
-			// logger.info("AddNewSubjectServlet,saveFieldNotes:parameter is
-			// null, cannot proceed:");
 			return;
 		}
 		ArrayList fieldNotes = notes.getNotes(field);
-		// System.out.println("+++ notes size:" + fieldNotes.size() + " for field " + field);
-		for (int i = 0; i < fieldNotes.size(); i++) {
-			DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) fieldNotes.get(i);
+		for (Object fieldNote : fieldNotes) {
+			DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) fieldNote;
 			dnb.setEntityId(entityId);
 			dnb.setStudyId(sb.getId());
 			dnb.setEntityType(entityType);
 
 			// updating exsiting note if necessary
-			/*
-			 * if ("itemData".equalsIgnoreCase(entityType)) { System.out.println(" **** find parent note for item data:"
-			 * + dnb.getEntityId()); ArrayList parentNotes = dndao.findExistingNotesForItemData(dnb.getEntityId()); for
-			 * (int j = 0; j < parentNotes.size(); j++) { DiscrepancyNoteBean parent = (DiscrepancyNoteBean)
-			 * parentNotes.get(j); if (parent.getParentDnId() == 0) { if (dnb.getDiscrepancyNoteTypeId() ==
-			 * parent.getDiscrepancyNoteTypeId()) { if (dnb.getResolutionStatusId() != parent.getResolutionStatusId()) {
-			 * parent.setResolutionStatusId(dnb.getResolutionStatusId()); dndao.update(parent); } } } } }
-			 */
 			if (dnb.getResolutionStatusId() == 0) {
 				dnb.setResStatus(ResolutionStatus.NOT_APPLICABLE);
 				dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
@@ -1094,14 +1053,11 @@ public class AddNewSubjectServlet extends Controller {
 
 	/**
 	 * Find study subject id for each subject, and construct displaySubjectBean
-	 * 
-	 * @param displayArray
-	 * @param subjects
 	 */
 	public static void displaySubjects(ArrayList displayArray, ArrayList subjects, StudySubjectDAO ssdao, StudyDAO stdao) {
 
-		for (int i = 0; i < subjects.size(); i++) {
-			SubjectBean subject = (SubjectBean) subjects.get(i);
+		for (Object subject1 : subjects) {
+			SubjectBean subject = (SubjectBean) subject1;
 			ArrayList studySubs = ssdao.findAllBySubjectId(subject.getId());
 			String protocolSubjectIds = "";
 			for (int j = 0; j < studySubs.size(); j++) {

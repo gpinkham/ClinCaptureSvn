@@ -140,6 +140,7 @@
 <P><fmt:message key="field_required" bundle="${resword}"/></P>
 
 <form id="CreateNewStudyEvent" action="CreateNewStudyEvent" method="post">
+<input type="hidden" id="openFirstCrf" name="openFirstCrf" value="false"/>
 <jsp:include page="../include/showSubmitted.jsp" />
 
 <fmt:message key="study_subject_ID" bundle="${resword}" var="studySubjectLabel"/>
@@ -940,12 +941,14 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
     <td>
-    <input type="button" name="Schedule" value="<fmt:message key="schedule" bundle="${resword}"/>" class="button_long" onClick="createNewEvent(event);" style="float: left; cursor: pointer;"/>
-    <input type="submit" name="Submit" value="<fmt:message key="proceed_to_enter_data" bundle="${resword}"/>" class="button_long" style="float: left; cursor: pointer; margin-left: 8px;"/>
-    <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="createNewEvent_ClosePopup(event);" style="float: left; cursor: pointer; margin-left: 8px;"/>
+    <input type="submit" name="Submit" value="<fmt:message key="view_event" bundle="${resword}"/>" class="button_medium" style="float: left; cursor: pointer;"/>
+    <input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=Submit]').click();" style="float: left; cursor: pointer; margin-left: 10px;"/>
+    <input type="button" name="Schedule" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_medium" onClick="createNewEvent(event);" style="float: left; cursor: pointer; margin-left: 10px;"/>
+    <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="createNewEvent_ClosePopup(event);" style="float: left; cursor: pointer; margin-left: 10px;"/>
     </td>
 </tr></table>
 </form>
+
 <c:set var="role" value="${userRole.role}" />
 <c:if test="${userRole.manageStudy}">
 <c:if test="${requestStudySubject == requestStudySubjectFalse}">
