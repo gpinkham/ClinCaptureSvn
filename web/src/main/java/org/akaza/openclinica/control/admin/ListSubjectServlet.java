@@ -20,8 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.control.RememberLastPage;
-import org.akaza.openclinica.control.core.SecureController;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -29,8 +33,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.Locale;
+import org.springframework.stereotype.Component;
 
 /**
  * Processes user request and generate subject list
@@ -38,36 +41,46 @@ import java.util.Locale;
  * @author jxu
  */
 @SuppressWarnings({ "rawtypes", "serial" })
+@Component
 public class ListSubjectServlet extends RememberLastPage {
 	public static final String SAVED_LIST_SUBJECTS_URL = "savedListSubjectsUrl";
-	Locale locale;
 
 	/**
-     *
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		if (ub.isSysAdmin()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.ADMIN_SYSTEM_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		analyzeUrl();
-		SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if (shouldRedirect(request, response)) {
+			return;
+		}
 
-		StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-		StudyDAO studyDao = new StudyDAO(sm.getDataSource());
-		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		SubjectDAO sdao = getSubjectDAO();
+
+		StudySubjectDAO subdao = getStudySubjectDAO();
+		StudyDAO studyDao = getStudyDAO();
+		UserAccountDAO uadao = getUserAccountDAO();
 
 		ListSubjectTableFactory factory = new ListSubjectTableFactory();
 		factory.setSubjectDao(sdao);
@@ -79,32 +92,33 @@ public class ListSubjectServlet extends RememberLastPage {
 		String auditLogsHtml = factory.createTable(request, response).render();
 		request.setAttribute("listSubjectsHtml", auditLogsHtml);
 
-		analyzeForward(Page.SUBJECT_LIST);
+		forward(Page.SUBJECT_LIST, request, response);
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}
 	}
 
 	@Override
-	protected String getUrlKey() {
+	protected String getUrlKey(HttpServletRequest request) {
 		return SAVED_LIST_SUBJECTS_URL;
 	}
 
 	@Override
-	protected String getDefaultUrl() {
+	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		return "?module=" + fp.getString("module")
 				+ "&maxRows=15&listSubjects_tr_=true&listSubjects_p_=1&listSubjects_mr_=15";
 	}
 
 	@Override
-	protected boolean userDoesNotUseJmesaTableForNavigation() {
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&listSubjects_p_=");
 	}
 }

@@ -20,7 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -31,7 +36,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -47,46 +52,56 @@ import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "rawtypes", "serial" })
-public class DeleteEventCRFServlet extends SecureController {
+@Component
+public class DeleteEventCRFServlet extends Controller {
 
 	public static final String DELETE_EVENT_CRF_REFERER = "deleteEventCRFReferer";
 	public static final String REFERER = "referer";
 	public static final String DELETE_EVENT_CRF = "DeleteEventCRF";
 	public static final String RESTORE_EVENT_CRF = "RestoreEventCRF";
 	public static String STUDY_SUB_ID = "ssId";
-
 	public static String EVENT_CRF_ID = "ecId";
 
 	/**
-     * 
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS, resexception.getString("not_admin"), "1");
 
 	}
 
-	private void smartForward(Page page) throws Exception {
+	private void smartForward(Page page, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String url = (String) request.getSession().getAttribute(DELETE_EVENT_CRF_REFERER);
 		request.getSession().removeAttribute(DELETE_EVENT_CRF_REFERER);
 		if (url != null) {
 			response.sendRedirect(url);
 		} else {
-			forwardPage(page);
+			forwardPage(page, request, response);
 		}
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		FormProcessor fp = new FormProcessor(request);
 
 		String referer = request.getHeader(REFERER);
@@ -100,15 +115,15 @@ public class DeleteEventCRFServlet extends SecureController {
 
 		String action = request.getParameter("action");
 
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyEventDAO sedao = getStudyEventDAO();
+		StudySubjectDAO subdao = getStudySubjectDAO();
+		EventCRFDAO ecdao = getEventCRFDAO();
+		StudyDAO sdao = getStudyDAO();
 
 		if (eventCRFId == 0) {
-			addPageMessage(respage.getString("please_choose_an_event_CRF_to_delete"));
-			request.setAttribute("id", new Integer(studySubId).toString());
-			smartForward(Page.VIEW_STUDY_SUBJECT_SERVLET);
+			addPageMessage(respage.getString("please_choose_an_event_CRF_to_delete"), request);
+			request.setAttribute("id", Integer.toString(studySubId));
+			smartForward(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 		} else {
 			EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
@@ -116,8 +131,8 @@ public class DeleteEventCRFServlet extends SecureController {
 			request.setAttribute("studySub", studySub);
 
 			// construct info needed on view event crf page
-			CRFDAO cdao = new CRFDAO(sm.getDataSource());
-			CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+			CRFDAO cdao = getCRFDAO();
+			CRFVersionDAO cvdao = getCRFVersionDAO();
 
 			int crfVersionId = eventCRF.getCRFVersionId();
 			CRFBean cb = cdao.findByVersionId(crfVersionId);
@@ -133,12 +148,12 @@ public class DeleteEventCRFServlet extends SecureController {
 			StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
 
 			int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEventDefinitionId);
 			event.setStudyEventDefinition(sed);
 			request.setAttribute("event", event);
 
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 
 			StudyBean study = (StudyBean) sdao.findByPK(studySub.getStudyId());
 			EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId,
@@ -149,8 +164,8 @@ public class DeleteEventCRFServlet extends SecureController {
 			dec.setFlags(eventCRF, ub, currentRole, edc.isDoubleEntry());
 
 			// find all item data
-			ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-			DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
+			ItemDataDAO iddao = getItemDataDAO();
+			DiscrepancyNoteDAO dnDao = getDiscrepancyNoteDAO();
 			ArrayList itemData = iddao.findAllByEventCRFId(eventCRF.getId());
 			request.setAttribute("items", itemData);
 
@@ -158,16 +173,16 @@ public class DeleteEventCRFServlet extends SecureController {
 
 				request.setAttribute("displayEventCRF", dec);
 
-				forwardPage(Page.DELETE_EVENT_CRF);
+				forwardPage(Page.DELETE_EVENT_CRF, request, response);
 			} else {
 				logger.info("submit to delete the event CRF from event");
 				// delete all the item data first
-				for (int a = 0; a < itemData.size(); a++) {
-					ItemDataBean item = (ItemDataBean) itemData.get(a);
+				for (Object anItemData : itemData) {
+					ItemDataBean item = (ItemDataBean) anItemData;
 					ArrayList discrepancyList = dnDao.findExistingNotesForItemData(item.getId());
 					iddao.deleteDnMap(item.getId());
-					for (int b = 0; b < discrepancyList.size(); b++) {
-						DiscrepancyNoteBean noteBean = (DiscrepancyNoteBean) discrepancyList.get(b);
+					for (Object aDiscrepancyList : discrepancyList) {
+						DiscrepancyNoteBean noteBean = (DiscrepancyNoteBean) aDiscrepancyList;
 						dnDao.deleteNotes(noteBean.getId());
 					}
 					item.setUpdater(ub);
@@ -185,10 +200,10 @@ public class DeleteEventCRFServlet extends SecureController {
 						+ respage.getString("has_been_deleted_from_the_event")
 						+ event.getStudyEventDefinition().getName() + ".";
 
-				addPageMessage(emailBody);
+				addPageMessage(emailBody, request);
 				// sendEmail(emailBody);
-				request.setAttribute("id", new Integer(studySubId).toString());
-				smartForward(Page.VIEW_STUDY_SUBJECT_SERVLET);
+				request.setAttribute("id", Integer.toString(studySubId));
+				smartForward(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 			}
 
 		}

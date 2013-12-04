@@ -20,84 +20,85 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.control.core.SecureController;
+import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.Locale;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "rawtypes", "serial" })
-public class AdminSystemServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class AdminSystemServlet extends Controller {
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		// find last 5 modifed studies
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		ArrayList studies = (ArrayList) sdao.findAllByLimit(true);
 		request.setAttribute("studies", studies);
 		ArrayList allStudies = (ArrayList) sdao.findAll();
-		request.setAttribute("allStudyNumber", new Integer(allStudies.size()));
+		request.setAttribute("allStudyNumber", allStudies.size());
 
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO udao = getUserAccountDAO();
 		ArrayList users = (ArrayList) udao.findAllByLimit(true);
 		request.setAttribute("users", users);
 		ArrayList allUsers = (ArrayList) udao.findAll();
-		request.setAttribute("allUserNumber", new Integer(allUsers.size()));
+		request.setAttribute("allUserNumber", allUsers.size());
 
-		SubjectDAO subdao = new SubjectDAO(sm.getDataSource());
+		SubjectDAO subdao = getSubjectDAO();
 		ArrayList subjects = (ArrayList) subdao.findAllByLimit(true);
 		request.setAttribute("subjects", subjects);
 		ArrayList allSubjects = (ArrayList) subdao.findAll();
-		request.setAttribute("allSubjectNumber", new Integer(allSubjects.size()));
+		request.setAttribute("allSubjectNumber", allSubjects.size());
 
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
+		CRFDAO cdao = getCRFDAO();
 		ArrayList crfs = (ArrayList) cdao.findAllByLimit(true);
 		request.setAttribute("crfs", crfs);
 		ArrayList allCrfs = (ArrayList) cdao.findAll();
-		request.setAttribute("allCrfNumber", new Integer(allCrfs.size()));
+		request.setAttribute("allCrfNumber", allCrfs.size());
 
-		resetPanel();
+		StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 		panel.setOrderedData(true);
-		setToPanel(resword.getString("in_the_application"), "");
+		setToPanel(resword.getString("in_the_application"), "", request);
 		if (allSubjects.size() > 0) {
-			setToPanel(resword.getString("subjects"), new Integer(allSubjects.size()).toString());
+			setToPanel(resword.getString("subjects"), Integer.toString(allSubjects.size()), request);
 		}
 		if (allUsers.size() > 0) {
-			setToPanel(resword.getString("users"), new Integer(allUsers.size()).toString());
+			setToPanel(resword.getString("users"), Integer.toString(allUsers.size()), request);
 		}
 		if (allStudies.size() > 0) {
-			setToPanel(resword.getString("studies"), new Integer(allStudies.size()).toString());
+			setToPanel(resword.getString("studies"), Integer.toString(allStudies.size()), request);
 		}
 		if (allCrfs.size() > 0) {
-			setToPanel(resword.getString("CRFs"), new Integer(allCrfs.size()).toString());
+			setToPanel(resword.getString("CRFs"), Integer.toString(allCrfs.size()), request);
 		}
 
 		panel.setStudyInfoShown(false);
-		forwardPage(Page.ADMIN_SYSTEM);
+		forwardPage(Page.ADMIN_SYSTEM, request, response);
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
 			throw new InsufficientPermissionException(Page.MENU, "You may not perform administrative functions", "1");
 		}
-
-		return;
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 }

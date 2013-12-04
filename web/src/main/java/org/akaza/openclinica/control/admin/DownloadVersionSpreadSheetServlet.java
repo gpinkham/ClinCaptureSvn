@@ -19,39 +19,46 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-
-import javax.servlet.ServletOutputStream;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "rawtypes", "serial" })
-public class DownloadVersionSpreadSheetServlet extends SecureController {
+@Component
+public class DownloadVersionSpreadSheetServlet extends Controller {
+
 	public static String CRF_ID = "crfId";
-
-	public static String CRF_VERSION_NAME = "crfVersionName";
-
 	public static String CRF_VERSION_ID = "crfVersionId";
-
 	public static String CRF_VERSION_TEMPLATE = "CRF_Design_Template_v3.1.xls";
 	public static String RANDOMIZATION_CRF_TEMPLATE = "Randomization_Form_v1.0.xls";
 
 	/**
-     *
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -60,27 +67,23 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MANAGE_STUDY_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
 	}
 
-	private CoreResources getCoreResources() {
-		return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
-	}
-
 	@Override
-	public void processRequest() throws Exception {
-		
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;
 		FormProcessor fp = new FormProcessor(request);
 
 		String crfIdString = fp.getString(CRF_ID);
 		int crfVersionId = fp.getInt(CRF_VERSION_ID);
 
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+		CRFVersionDAO cvdao = getCRFVersionDAO();
 
 		CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(crfVersionId);
 
@@ -91,27 +94,27 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 		File excelFile = null;
 		String oldExcelFileName = crfIdString + version.getName() + ".xls";
 		if (isTemplate) {
-			
+
 			String templateId = request.getParameter("template");
-			
+
 			// Blank CRF template
 			if ("1".equals(templateId)) {
-				
+
 				excelFileName = CRF_VERSION_TEMPLATE;
 				excelFile = getCoreResources().getFile(CRF_VERSION_TEMPLATE,
 						"crf" + File.separator + "original" + File.separator);
-				
-			} else if("2".equals(templateId)) {
-				
+
+			} else if ("2".equals(templateId)) {
+
 				// Randomization CRF template
 				excelFileName = RANDOMIZATION_CRF_TEMPLATE;
 				excelFile = getCoreResources().getFile(RANDOMIZATION_CRF_TEMPLATE,
 						"crf" + File.separator + "original" + File.separator);
-				
+
 			}
-			
+
 		} else {
-			
+
 			excelFile = new File(dir + excelFileName);
 			// backwards compat
 			File oldExcelFile = new File(dir + oldExcelFileName);
@@ -124,11 +127,11 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 			}
 
 		}
-		
+
 		logger.info("looking for : " + excelFile.getName());
 		if (!excelFile.exists() || excelFile.length() <= 0) {
-			addPageMessage(respage.getString("the_excel_is_not_available_on_server_contact"));
-			forwardPage(Page.CRF_LIST_SERVLET);
+			addPageMessage(respage.getString("the_excel_is_not_available_on_server_contact"), request);
+			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		} else {
 			response.setHeader("Content-disposition", "attachment; filename=\"" + excelFileName + "\";");
 			response.setContentType("application/vnd.ms-excel");

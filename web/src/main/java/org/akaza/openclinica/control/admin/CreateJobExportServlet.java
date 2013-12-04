@@ -14,20 +14,22 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.servlet.http.HttpServletRequest;
-
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -41,9 +43,9 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
 import org.quartz.impl.JobDetailImpl;
-import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
+import org.springframework.stereotype.Component;
 
 /**
  * 
@@ -51,7 +53,8 @@ import org.quartz.impl.triggers.SimpleTriggerImpl;
  * 
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
-public class CreateJobExportServlet extends SecureController {
+@Component
+public class CreateJobExportServlet extends Controller {
 
 	public static final String PERIOD = "periodToRun";
 	public static final String FORMAT_ID = "formatId";
@@ -61,23 +64,20 @@ public class CreateJobExportServlet extends SecureController {
 	public static final String JOB_NAME = "jobName";
 	public static final String JOB_DESC = "jobDesc";
 	public static final String USER_ID = "user_id";
-	public static final String STUDY_NAME = "study_name";
-	public static final String REFERER = "referer";
 	public static final String DATASETS = "datasets";
 
-	private static String SCHEDULER = "schedulerFactoryBean";
-	// faking out DRY - should we create a super class, Job Servlet, which
-	// captures the scheduler?
-	private StdScheduler scheduler;
-
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 		// above copied from create dataset servlet, needs to be changed to
@@ -85,17 +85,10 @@ public class CreateJobExportServlet extends SecureController {
 
 	}
 
-	private StdScheduler getScheduler() {
-		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
-				context).getBean(SCHEDULER);
-		return scheduler;
-	}
-
-	private void setUpServlet() {
-
+	private void setUpServlet(HttpServletRequest request) {
 		// TODO find all the form items and re-populate them if necessary
 		FormProcessor fp2 = new FormProcessor(request);
-		DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
+		DatasetDAO dsdao = getDatasetDAO();
 		Collection dsList = dsdao.findAllOrderByStudyIdAndName();
 		// TODO will have to dress this up to allow for sites then datasets
 		request.setAttribute(DATASETS, dsList);
@@ -112,49 +105,49 @@ public class CreateJobExportServlet extends SecureController {
 		calendar.setTime(jobDate);
 		presetValues.put(DATE_START_JOB + "Hour", calendar.get(Calendar.HOUR_OF_DAY));
 		presetValues.put(DATE_START_JOB + "Minute", calendar.get(Calendar.MINUTE));
-		presetValues.put(DATE_START_JOB + "Date", local_df.format(jobDate));
+		presetValues.put(DATE_START_JOB + "Date", getLocalDf(request).format(jobDate));
 		fp2.setPresetValues(presetValues);
-		setPresetValues(fp2.getPresetValues());
+		setPresetValues(fp2.getPresetValues(), request);
 		request.setAttribute(DATE_START_JOB, fp2.getDateTime(DATE_START_JOB));
 		// EMAIL, TAB, CDISC, SPSS, PERIOD, DATE_START_JOB
 		// TODO pick out the datasets and the date
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// TODO multi stage servlet which will create export jobs
 		// will accept, create, and return the ViewJob servlet
 		FormProcessor fp = new FormProcessor(request);
-		scheduler = getScheduler();
+
 		String action = fp.getString("action");
 		ExtractUtils extractUtils = new ExtractUtils();
 		if (StringUtil.isBlank(action)) {
 			// set up list of data sets
 			// select by ... active study
-			setUpServlet();
-			forwardPage(Page.CREATE_JOB_EXPORT);
+			setUpServlet(request);
+			forwardPage(Page.CREATE_JOB_EXPORT, request, response);
 		} else if ("confirmall".equalsIgnoreCase(action)) {
 			// collect form information
 			HashMap errors = validateForm(fp, request,
-					scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")), "");
+					getStdScheduler().getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT")), "");
 
 			if (!errors.isEmpty()) {
 				// set errors to request
 				request.setAttribute("formMessages", errors);
 				logger.info("errors found: " + errors.toString());
-				setUpServlet();
-				forwardPage(Page.CREATE_JOB_EXPORT);
+				setUpServlet(request);
+				forwardPage(Page.CREATE_JOB_EXPORT, request, response);
 			} else {
 				logger.info("found no validation errors, continuing");
 
-				DatasetDAO datasetDao = new DatasetDAO(sm.getDataSource());
+				DatasetDAO datasetDao = getDatasetDAO();
 
 				UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 				CoreResources cr = new CoreResources();
 				int datasetId = fp.getInt(DATASET_ID);
 				if (datasetId == 0) {
-					addPageMessage(resexception.getString("please_choose_a_dataset"));
-					forwardPage(Page.CREATE_JOB_EXPORT);
+					addPageMessage(resexception.getString("please_choose_a_dataset"), request);
+					forwardPage(Page.CREATE_JOB_EXPORT, request, response);
 					return;
 				}
 				String period = fp.getString(PERIOD);
@@ -219,7 +212,7 @@ public class CreateJobExportServlet extends SecureController {
 					epBean.setPostProcLocation(prePocLoc);
 				}
 				extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
-				SimpleTriggerImpl trigger = null;
+				SimpleTriggerImpl trigger;
 
 				trigger = xsltService.generateXsltTrigger(xsltPath,
 						generalFileDir, // xml_file_path
@@ -254,23 +247,23 @@ public class CreateJobExportServlet extends SecureController {
 
 				// set to the scheduler
 				try {
-					Date dateStart = scheduler.scheduleJob(jobDetailBean, trigger);
+					Date dateStart = getStdScheduler().scheduleJob(jobDetailBean, trigger);
 					logger.info("== found job date: " + dateStart.toString());
 					// set a success message here
 				} catch (SchedulerException se) {
 					se.printStackTrace();
-					setUpServlet();
-					addPageMessage("Error creating Job.");
-					forwardPage(Page.VIEW_JOB_SERVLET);
+					setUpServlet(request);
+					addPageMessage("Error creating Job.", request);
+					forwardPage(Page.VIEW_JOB_SERVLET, request, response);
 					return;
 				}
-				setUpServlet();
+				setUpServlet(request);
 				addPageMessage("You have successfully created a new job: " + jobName
-						+ " which is now set to run at the time you specified.");
-				forwardPage(Page.VIEW_JOB_SERVLET);
+						+ " which is now set to run at the time you specified.", request);
+				forwardPage(Page.VIEW_JOB_SERVLET, request, response);
 			}
 		} else {
-			forwardPage(Page.ADMIN_SYSTEM);
+			forwardPage(Page.ADMIN_SYSTEM, request, response);
 			// forward to form
 			// should we even get to this part?
 		}
@@ -279,7 +272,7 @@ public class CreateJobExportServlet extends SecureController {
 	public HashMap validateForm(FormProcessor fp, HttpServletRequest request, Set<TriggerKey> triggerKeys,
 			String properName) {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-        v.addValidation(DATASET_ID, Validator.NO_BLANKS_SET);
+		v.addValidation(DATASET_ID, Validator.NO_BLANKS_SET);
 		v.addValidation(JOB_NAME, Validator.NO_BLANKS);
 
 		// need to be unique too
@@ -313,8 +306,7 @@ public class CreateJobExportServlet extends SecureController {
 		Matcher matcher = Pattern.compile("[^\\w_\\d ]").matcher(fp.getString(JOB_NAME));
 		boolean isContainSpecialSymbol = matcher.find();
 		if (isContainSpecialSymbol) {
-			Validator.addError(errors, JOB_NAME, resexception
-					.getString("dataset_should_not_contain_any_special"));
+			Validator.addError(errors, JOB_NAME, resexception.getString("dataset_should_not_contain_any_special"));
 		}
 		return errors;
 	}

@@ -20,11 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -32,15 +33,12 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-
-import java.util.Locale;
+import org.springframework.stereotype.Component;
 
 // allows both deletion and restoration of a study user role
 @SuppressWarnings("serial")
-public class DeleteUserServlet extends SecureController {
-
-	// < ResourceBundle restext;
-	Locale locale;
+@Component
+public class DeleteUserServlet extends Controller {
 
 	public static final String PATH = "DeleteUser";
 	public static final String ARG_USERID = "userId";
@@ -51,23 +49,24 @@ public class DeleteUserServlet extends SecureController {
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-					+ respage.getString("change_study_contact_sysadmin"));
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study")
+							+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
-
-		return;
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+
+		UserAccountDAO udao = getUserAccountDAO();
 
 		FormProcessor fp = new FormProcessor(request);
 		int userId = fp.getInt(ARG_USERID);
@@ -96,8 +95,7 @@ public class DeleteUserServlet extends SecureController {
 					message = respage.getString("the_user_could_not_be_deleted_due_database_error");
 				}
 			} else {
-				SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean(
-						"securityManager"));
+				SecurityManager sm = getSecurityManager();
 				String password = sm.genPassword();
 				String passwordHash = sm.encrytPassword(password, getUserDetails());
 
@@ -110,7 +108,7 @@ public class DeleteUserServlet extends SecureController {
 					message = respage.getString("the_user_has_been_restored");
 
 					try {
-						sendRestoreEmail(u, password);
+						sendRestoreEmail(request, u, password);
 					} catch (Exception e) {
 						message += respage.getString("however_was_error_sending_user_email_regarding");
 					}
@@ -120,11 +118,13 @@ public class DeleteUserServlet extends SecureController {
 			}
 		}
 
-		addPageMessage(message);
-		forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+		addPageMessage(message, request);
+		forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 	}
 
-	private void sendRestoreEmail(UserAccountBean u, String password) throws Exception {
+	private void sendRestoreEmail(HttpServletRequest request, UserAccountBean u, String password) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
+
 		logger.info("Sending restore and password reset notification to " + u.getName());
 
 		String body = resword.getString("dear") + " " + u.getFirstName() + " " + u.getLastName() + ",<br><br>";
@@ -134,8 +134,8 @@ public class DeleteUserServlet extends SecureController {
 		body += restext.getString("please_test_your_login_information_and_let") + "<br>\n";
 		body += SQLInitServlet.getSystemURL();
 		body += " .<br><br>";
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		StudyBean emailParentStudy = new StudyBean();
+		StudyDAO sdao = getStudyDAO();
+		StudyBean emailParentStudy;
 		if (currentStudy.getParentStudyId() > 0) {
 			emailParentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
 		} else {
@@ -143,12 +143,13 @@ public class DeleteUserServlet extends SecureController {
 		}
 		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
 		logger.info("Sending email...begin");
-		sendEmail(u.getEmail().trim(), restext.getString("your_new_openclinica_account_has_been_restored"), body, false);
+		sendEmail(u.getEmail().trim(), restext.getString("your_new_openclinica_account_has_been_restored"), body,
+				false, request);
 		logger.info("Sending email...done");
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 }

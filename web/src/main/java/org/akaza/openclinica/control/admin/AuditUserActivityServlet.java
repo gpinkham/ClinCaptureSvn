@@ -20,58 +20,50 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.util.Locale;
-
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Servlet for creating a table.
  * 
  * @author Krikor Krumlian
  */
-public class AuditUserActivityServlet extends SecureController {
+@Component
+public class AuditUserActivityServlet extends Controller {
 
 	private static final long serialVersionUID = 1L;
-	private AuditUserLoginDao auditUserLoginDao;
-	Locale locale;
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-					+ respage.getString("change_study_contact_sysadmin"));
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study")
+							+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
-
-		return;
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		AuditUserLoginTableFactory factory = new AuditUserLoginTableFactory();
 		factory.setAuditUserLoginDao(getAuditUserLoginDao());
 		String auditUserLoginHtml = factory.createTable(request, response).render();
 		request.setAttribute("auditUserLoginHtml", auditUserLoginHtml);
-		forwardPage(Page.AUDIT_USER_ACTIVITY);
+		forwardPage(Page.AUDIT_USER_ACTIVITY, request, response);
 
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
-	}
-
-	public AuditUserLoginDao getAuditUserLoginDao() {
-		auditUserLoginDao = this.auditUserLoginDao != null ? auditUserLoginDao
-				: (AuditUserLoginDao) SpringServletAccess.getApplicationContext(context).getBean("auditUserLoginDao");
-		return auditUserLoginDao;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 }

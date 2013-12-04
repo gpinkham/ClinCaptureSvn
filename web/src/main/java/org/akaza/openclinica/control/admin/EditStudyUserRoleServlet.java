@@ -21,13 +21,15 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
-
+import java.util.HashMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.TermType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -35,18 +37,18 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.*;
+import org.springframework.stereotype.Component;
 
 /**
  * @author ssachs
  * 
  *         Servlet for creating a user account.
  */
-@SuppressWarnings({"rawtypes", "serial"})
-public class EditStudyUserRoleServlet extends SecureController {
-	public static final String INPUT_ROLE = "role";
+@SuppressWarnings({ "rawtypes", "serial" })
+@Component
+public class EditStudyUserRoleServlet extends Controller {
 
+	public static final String INPUT_ROLE = "role";
 	public static final String PATH = "EditStudyUserRole";
 	public static final String ARG_STUDY_ID = "studyId";
 	public static final String ARG_USER_NAME = "userName";
@@ -57,20 +59,24 @@ public class EditStudyUserRoleServlet extends SecureController {
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-					+ respage.getString("change_study_contact_sysadmin"));
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study")
+							+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
-
-		return;
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+
+		UserAccountDAO udao = getUserAccountDAO();
 
 		FormProcessor fp = new FormProcessor(request);
 
@@ -78,7 +84,7 @@ public class EditStudyUserRoleServlet extends SecureController {
 		String uName = fp.getString(ARG_USER_NAME);
 		StudyUserRoleBean studyUserRole = udao.findRoleByUserNameAndStudyId(uName, studyId);
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		StudyBean sb = (StudyBean) sdao.findByPK(studyUserRole.getStudyId());
 		if (sb != null) {
 			studyUserRole.setStudyName(sb.getName());
@@ -86,18 +92,18 @@ public class EditStudyUserRoleServlet extends SecureController {
 
 		if (!studyUserRole.isActive()) {
 			String message = respage.getString("the_user_has_no_role_in_study");
-			addPageMessage(message);
-			forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+			addPageMessage(message, request);
+			forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 		} else {
 			StudyBean study = (StudyBean) sdao.findByPK(studyUserRole.getStudyId());
-            request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
+			request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
 			// send the user to the right place..
 			if (!fp.isSubmitted()) {
 				request.setAttribute("userName", uName);
 				request.setAttribute("studyUserRole", studyUserRole);
 				request.setAttribute("roles", Role.roleMapWithDescriptions);
-				request.setAttribute("chosenRoleId", new Integer(studyUserRole.getRole().getId()));
-				forwardPage(Page.EDIT_STUDY_USER_ROLE);
+				request.setAttribute("chosenRoleId", studyUserRole.getRole().getId());
+				forwardPage(Page.EDIT_STUDY_USER_ROLE, request, response);
 			}
 
 			// process the form
@@ -107,40 +113,40 @@ public class EditStudyUserRoleServlet extends SecureController {
 				HashMap errors = v.validate();
 
 				if (errors.isEmpty()) {
-                    Page forwardTo = Page.LIST_USER_ACCOUNTS_SERVLET;
+					Page forwardTo = Page.LIST_USER_ACCOUNTS_SERVLET;
 					int roleId = fp.getInt(INPUT_ROLE);
 					Role r = Role.get(roleId);
 					studyUserRole.setRoleName(r.getName());
 					studyUserRole.setUpdater(ub);
 					udao.updateStudyUserRole(studyUserRole, uName);
-					addPageMessage(respage.getString("the_user_in_study_has_been_updated"));
+					addPageMessage(respage.getString("the_user_in_study_has_been_updated"), request);
 					if (ub.getName().equals(studyUserRole.getUserName())) {
-						session.setAttribute("reloadUserBean", true);
+						request.getSession().setAttribute("reloadUserBean", true);
 						if (!ub.isSysAdmin() && !ub.isTechAdmin()
 								&& studyUserRole.getRole() != Role.STUDY_ADMINISTRATOR
 								&& studyUserRole.getRole() != Role.STUDY_DIRECTOR) {
 							forwardTo = Page.MENU_SERVLET;
 							Navigation.removeUrl(request, "/ListUserAccounts");
-							addPageMessage(respage.getString("you_may_not_perform_administrative_functions"));
+							addPageMessage(respage.getString("you_may_not_perform_administrative_functions"), request);
 						}
 					}
-					forwardPage(forwardTo);
+					forwardPage(forwardTo, request, response);
 				} else {
 					String message = respage.getString("the_role_choosen_was_invalid_choose_another");
-					addPageMessage(message);
+					addPageMessage(message, request);
 
 					request.setAttribute("userName", uName);
 					request.setAttribute("studyUserRole", studyUserRole);
-					request.setAttribute("chosenRoleId", new Integer(fp.getInt(INPUT_ROLE)));
+					request.setAttribute("chosenRoleId", fp.getInt(INPUT_ROLE));
 					request.setAttribute("roles", Role.roleMapWithDescriptions);
-					forwardPage(Page.EDIT_STUDY_USER_ROLE);
+					forwardPage(Page.EDIT_STUDY_USER_ROLE, request, response);
 				}
 			}
 		}
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 }

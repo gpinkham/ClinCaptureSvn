@@ -21,15 +21,17 @@ package org.akaza.openclinica.control.admin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -40,33 +42,40 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes","unchecked", "serial"})
-public class AuditLogStudyServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class AuditLogStudyServlet extends Controller {
 
-	Locale locale;
-
-	public static String getLink(int userId) {
+	public static String getLink() {
 		return "AuditLogStudy";
 	}
 
 	/**
-	 * Redo this servlet to run the audits per study subject for the study; need to add a studyId param
-	 * and then use the StudySubjectDAO.findAllByStudyOrderByLabel() method to grab a lot of study subject beans and
-	 * then return them much like in ViewStudySubjectAuditLogServet.process()
+	 * Redo this servlet to run the audits per study subject for the study; need to add a studyId param and then use the
+	 * StudySubjectDAO.findAllByStudyOrderByLabel() method to grab a lot of study subject beans and then return them
+	 * much like in ViewStudySubjectAuditLogServet.process()
 	 * 
 	 * currentStudy instead of studyId?
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
-	protected void processRequest() throws Exception {
-		StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-		SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
-		AuditDAO adao = new AuditDAO(sm.getDataSource());
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
 
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-		StudyDAO studydao = new StudyDAO(sm.getDataSource());
+		StudySubjectDAO subdao = getStudySubjectDAO();
+		SubjectDAO sdao = getSubjectDAO();
+		AuditDAO adao = getAuditDAO();
+
+		StudyEventDAO sedao = getStudyEventDAO();
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+		EventCRFDAO ecdao = getEventCRFDAO();
+		StudyDAO studydao = getStudyDAO();
 		HashMap eventsHashMap = new HashMap();
 		HashMap studySubjectAuditsHashMap = new HashMap();
 		HashMap subjectHashMap = new HashMap();
@@ -75,11 +84,11 @@ public class AuditLogStudyServlet extends SecureController {
 		logger.info("found " + studySubjects.size() + " study subjects");
 		request.setAttribute("studySubjects", studySubjects);
 
-		for (int ss = 0; ss < studySubjects.size(); ss++) {
+		for (Object studySubject1 : studySubjects) {
 			ArrayList studySubjectAudits = new ArrayList();
-			StudySubjectBean studySubject = (StudySubjectBean) studySubjects.get(ss);
+			StudySubjectBean studySubject = (StudySubjectBean) studySubject1;
 			SubjectBean subject = (SubjectBean) sdao.findByPK(studySubject.getSubjectId());
-			subjectHashMap.put(new Integer(studySubject.getId()), subject);
+			subjectHashMap.put(studySubject.getId(), subject);
 			StudyBean study = (StudyBean) studydao.findByPK(studySubject.getStudyId());
 			request.setAttribute("study", study);
 			// hmm, repetitive work?
@@ -91,13 +100,13 @@ public class AuditLogStudyServlet extends SecureController {
 			// changed
 			studySubjectAudits.addAll(adao.findSubjectAuditEvents(subject.getId())); // Global
 
-			studySubjectAuditsHashMap.put(new Integer(studySubject.getId()), studySubjectAudits);
+			studySubjectAuditsHashMap.put(studySubject.getId(), studySubjectAudits);
 
 			// Get the list of events
 			ArrayList events = sedao.findAllByStudySubject(studySubject);
-			for (int i = 0; i < events.size(); i++) {
+			for (Object event : events) {
 				// Link study event definitions
-				StudyEventBean studyEvent = (StudyEventBean) events.get(i);
+				StudyEventBean studyEvent = (StudyEventBean) event;
 				studyEvent.setStudyEventDefinition((StudyEventDefinitionBean) seddao.findByPK(studyEvent
 						.getStudyEventDefinitionId()));
 
@@ -105,7 +114,7 @@ public class AuditLogStudyServlet extends SecureController {
 				studyEvent.setEventCRFs(ecdao.findAllByStudyEvent(studyEvent));
 			}
 
-			eventsHashMap.put(new Integer(studySubject.getId()), events);
+			eventsHashMap.put(studySubject.getId(), events);
 		}
 
 		request.setAttribute("events", eventsHashMap);
@@ -113,20 +122,22 @@ public class AuditLogStudyServlet extends SecureController {
 		request.setAttribute("study", currentStudy);
 		request.setAttribute("subjects", subjectHashMap);
 
-
 		logger.warn("*** found servlet, sending to page ***");
-		String pattn = "";
-		String pattern2 = "";
+		String pattn;
+		String pattern2;
 		pattn = ResourceBundleProvider.getFormatBundle().getString("date_format_string");
 		pattern2 = ResourceBundleProvider.getFormatBundle().getString("date_time_format_string");
 		request.setAttribute("dateFormatPattern", pattn);
 		request.setAttribute("dateTimeFormatPattern", pattern2);
-		forwardPage(Page.AUDIT_LOG_STUDY);
+		forwardPage(Page.AUDIT_LOG_STUDY, request, response);
 
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -137,8 +148,9 @@ public class AuditLogStudyServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 	}
 }

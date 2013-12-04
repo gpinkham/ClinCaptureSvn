@@ -13,8 +13,10 @@
 
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
@@ -22,6 +24,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
+import org.springframework.stereotype.Component;
 
 /**
  * PauseJobServlet, a small servlet to pause/unpause a trigger in the scehduler. The basic premise, you provide a name
@@ -32,21 +35,24 @@ import org.quartz.impl.StdScheduler;
  * 
  */
 @SuppressWarnings({ "serial" })
-public class PauseJobServlet extends SecureController {
+@Component
+public class PauseJobServlet extends Controller {
 
-	private static String SCHEDULER = "schedulerFactoryBean";
-	private static String groupImportName = "importTrigger";
-	private StdScheduler scheduler;
+	private static final String groupImportName = "importTrigger";
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		// TODO copied from CreateJobExport - DRY? tbh
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 		// above copied from create dataset servlet, needs to be changed to
@@ -54,25 +60,21 @@ public class PauseJobServlet extends SecureController {
 
 	}
 
-	private StdScheduler getScheduler() {
-		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
-				context).getBean(SCHEDULER);
-		return scheduler;
-	}// also perhaps DRY, tbh
-
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		String triggerName = fp.getString("tname");
 		String gName = request.getParameter("gname");
-		String finalGroupName = "";
+		String finalGroupName;
 		if ("".equals(gName) || "0".equals(gName)) {
 			finalGroupName = XsltTriggerService.TRIGGER_GROUP_NAME;
 		} else {// should equal 1
 			finalGroupName = groupImportName;
 		}
 		String deleteMe = fp.getString("del");
-		scheduler = getScheduler();
+		StdScheduler scheduler = getStdScheduler();
 		Trigger trigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName, finalGroupName));
 		try {
 			if (("y".equals(deleteMe)) && (ub.isSysAdmin())) {
@@ -80,19 +82,19 @@ public class PauseJobServlet extends SecureController {
 				// set return message here
 				System.out.println("deleted job: " + triggerName);
 				addPageMessage("The following job " + triggerName
-						+ " and its corresponding Trigger have been deleted from the system.");
+						+ " and its corresponding Trigger have been deleted from the system.", request);
 			} else {
 
 				if (scheduler.getTriggerState(trigger.getKey()) == Trigger.TriggerState.PAUSED) {
 					scheduler.resumeTrigger(trigger.getKey());
 					System.out.println("-- resuming trigger! " + triggerName + " " + finalGroupName);
 					addPageMessage("This trigger " + triggerName
-							+ " has been resumed and will continue to run until paused or deleted.");
+							+ " has been resumed and will continue to run until paused or deleted.", request);
 				} else {
 					scheduler.pauseTrigger(trigger.getKey());
 					System.out.println("-- pausing trigger! " + triggerName + " " + finalGroupName);
 					addPageMessage("This trigger " + triggerName
-							+ " has been paused, and will not run again until it is restored.");
+							+ " has been paused, and will not run again until it is restored.", request);
 				}
 			}
 		} catch (NullPointerException e) {
@@ -103,9 +105,9 @@ public class PauseJobServlet extends SecureController {
 		// forward back to view job servlet here
 		// set a message
 		if ("".equals(gName) || "0".equals(gName)) {
-			forwardPage(Page.VIEW_JOB_SERVLET);
+			forwardPage(Page.VIEW_JOB_SERVLET, request, response);
 		} else {
-			forwardPage(Page.VIEW_IMPORT_JOB_SERVLET);
+			forwardPage(Page.VIEW_IMPORT_JOB_SERVLET, request, response);
 		}
 	}
 

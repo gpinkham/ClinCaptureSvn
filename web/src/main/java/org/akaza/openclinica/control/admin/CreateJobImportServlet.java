@@ -14,15 +14,15 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -36,6 +36,7 @@ import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
+import org.springframework.stereotype.Component;
 
 /**
  * Create Job Import Servlet, by Tom Hickerson, 2009
@@ -44,42 +45,38 @@ import org.quartz.impl.triggers.SimpleTriggerImpl;
  *         ImportStatefulJob.
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class CreateJobImportServlet extends SecureController {
+@Component
+public class CreateJobImportServlet extends Controller {
 
-	private static String SCHEDULER = "schedulerFactoryBean";
-	private static String IMPORT_TRIGGER = "importTrigger";
-
-	private StdScheduler scheduler;
+	private static final String IMPORT_TRIGGER = "importTrigger";
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 
 	}
 
-	private StdScheduler getScheduler() {
-		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
-				context).getBean(SCHEDULER);
-		return scheduler;
-	}
-
 	/*
 	 * Find all the form items and re-populate as necessary
 	 */
-	private void setUpServlet() throws Exception {
+	private void setUpServlet(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String directory = SQLInitServlet.getField(ImportSpringJob.FILE_PATH) + ImportSpringJob.DIR_PATH
 				+ File.separator;
 		// find all the form items and re-populate them if necessary
 		FormProcessor fp2 = new FormProcessor(request);
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 
 		ArrayList<StudyBean> all = (ArrayList<StudyBean>) sdao.findAll();
 		ArrayList<StudyBean> finalList = new ArrayList<StudyBean>();
@@ -90,7 +87,7 @@ public class CreateJobImportServlet extends SecureController {
 			}
 		}
 		addEntityList(ImportSpringJob.STUDIES, finalList,
-				respage.getString("a_user_cannot_be_created_no_study_as_active"), Page.ADMIN_SYSTEM);
+				respage.getString("a_user_cannot_be_created_no_study_as_active"), Page.ADMIN_SYSTEM, request, response);
 
 		request.setAttribute(ImportSpringJob.FILE_PATH, directory);
 
@@ -99,26 +96,27 @@ public class CreateJobImportServlet extends SecureController {
 		request.setAttribute(ImportSpringJob.JOB_DESC, fp2.getString(ImportSpringJob.JOB_DESC));
 		request.setAttribute(ImportSpringJob.JOB_HOUR, fp2.getString(ImportSpringJob.JOB_HOUR));
 		request.setAttribute(ImportSpringJob.JOB_MINUTE, fp2.getString(ImportSpringJob.JOB_MINUTE));
-		request.setAttribute(ImportSpringJob.HOURS, new Integer(fp2.getInt(ImportSpringJob.HOURS)).toString());
-		request.setAttribute(ImportSpringJob.MINUTES, new Integer(fp2.getInt(ImportSpringJob.MINUTES)).toString());
+		request.setAttribute(ImportSpringJob.HOURS, Integer.toString(fp2.getInt(ImportSpringJob.HOURS)));
+		request.setAttribute(ImportSpringJob.MINUTES, Integer.toString(fp2.getInt(ImportSpringJob.MINUTES)));
 		request.setAttribute(ImportSpringJob.EMAIL, fp2.getString(ImportSpringJob.EMAIL));
 		request.setAttribute(ImportSpringJob.FILE_PATH_DIR, fp2.getString(ImportSpringJob.FILE_PATH_DIR));
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
 		// TODO multi stage servlet to generate import jobs
 		// validate form, create job and return to view jobs servlet
 		FormProcessor fp = new FormProcessor(request);
 		TriggerService triggerService = new TriggerService();
-		scheduler = getScheduler();
+		StdScheduler scheduler = getStdScheduler();
 		String action = fp.getString("action");
 		if (StringUtil.isBlank(action)) {
 			// set up list of data sets
 			// select by ... active study
-			setUpServlet();
+			setUpServlet(request, response);
 
-			forwardPage(Page.CREATE_JOB_IMPORT);
+			forwardPage(Page.CREATE_JOB_IMPORT, request, response);
 		} else if ("confirmall".equalsIgnoreCase(action)) {
 			// collect form information
 			HashMap errors = triggerService.validateImportJobForm(new ValidatorHelper(request, getConfigurationDao()),
@@ -131,16 +129,16 @@ public class CreateJobImportServlet extends SecureController {
 				request.setAttribute("formMessages", errors);
 				System.out.println("has validation errors in the first section");
 				System.out.println("errors found: " + errors.toString());
-				setUpServlet();
+				setUpServlet(request, response);
 
-				forwardPage(Page.CREATE_JOB_IMPORT);
+				forwardPage(Page.CREATE_JOB_IMPORT, request, response);
 			} else {
 				logger.info("found no validation errors, continuing");
 				int studyId = fp.getInt(ImportSpringJob.STUDY_ID);
-				StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+				StudyDAO studyDAO = getStudyDAO();
 				StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
-				SimpleTriggerImpl trigger = triggerService.generateImportTrigger(fp, sm.getUserBean(), studyBean,
-						request.getLocale().getLanguage(), startTime);
+				SimpleTriggerImpl trigger = triggerService.generateImportTrigger(fp, ub, studyBean, request.getLocale()
+						.getLanguage(), startTime);
 
 				JobDetailImpl jobDetailBean = new JobDetailImpl();
 				jobDetailBean.setGroup(IMPORT_TRIGGER);
@@ -152,22 +150,24 @@ public class CreateJobImportServlet extends SecureController {
 
 				// set to the scheduler
 				try {
-					Date dateStart = scheduler.scheduleJob(jobDetailBean, trigger);
+					Date dateStart = getStdScheduler().scheduleJob(jobDetailBean, trigger);
 					System.out.println("== found job date: " + dateStart.toString());
 					// set a success message here
 					addPageMessage("You have successfully created a new job: " + trigger.getName()
-							+ " which is now set to run at the time you specified.");
-					forwardPage(Page.VIEW_IMPORT_JOB_SERVLET);
+							+ " which is now set to run at the time you specified.", request);
+					forwardPage(Page.VIEW_IMPORT_JOB_SERVLET, request, response);
 				} catch (SchedulerException se) {
 					se.printStackTrace();
 					// set a message here with the exception message
-					setUpServlet();
-					addPageMessage("There was an unspecified error with your creation, please contact an administrator.");
-					forwardPage(Page.CREATE_JOB_IMPORT);
+					setUpServlet(request, response);
+					addPageMessage(
+							"There was an unspecified error with your creation, please contact an administrator.",
+							request);
+					forwardPage(Page.CREATE_JOB_IMPORT, request, response);
 				}
 			}
 		} else {
-			forwardPage(Page.ADMIN_SYSTEM);
+			forwardPage(Page.ADMIN_SYSTEM, request, response);
 		}
 
 	}

@@ -21,44 +21,46 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
-
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import java.util.HashMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.HashMap;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "rawtypes" })
-public class ConfigureServlet extends SecureController {
+@Component
+public class ConfigureServlet extends Controller {
 
 	private static final long serialVersionUID = 2729725318725545575L;
-	private ConfigurationDao configurationDao;
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-					+ respage.getString("change_study_contact_sysadmin"));
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study")
+							+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
-
-		return;
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 
 		if (!fp.isSubmitted()) {
 			loadPresetValuesFromBean(fp);
-			setPresetValues(fp.getPresetValues());
-			forwardPage(Page.CONFIGURATION);
+			setPresetValues(fp.getPresetValues(), request);
+			forwardPage(Page.CONFIGURATION, request, response);
 		} else {
 			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 			v.addValidation("lockcount", Validator.IS_AN_INTEGER);
@@ -70,9 +72,9 @@ public class ConfigureServlet extends SecureController {
 			if (!errors.isEmpty()) {
 				loadPresetValuesFromForm(fp);
 
-				setPresetValues(fp.getPresetValues());
-				setInputMessages(errors);
-				forwardPage(Page.CONFIGURATION);
+				setPresetValues(fp.getPresetValues(), request);
+				setInputMessages(errors, request);
+				forwardPage(Page.CONFIGURATION, request, response);
 
 			} else {
 
@@ -84,8 +86,8 @@ public class ConfigureServlet extends SecureController {
 				userLockAllowedFailedConsecutiveLoginAttempts.setValue(fp.getString("lockcount"));
 				getConfigurationDao().saveOrUpdate(userLockSwitch);
 				getConfigurationDao().saveOrUpdate(userLockAllowedFailedConsecutiveLoginAttempts);
-				addPageMessage(respage.getString("lockout_changes_have_been_saved"));
-				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+				addPageMessage(respage.getString("lockout_changes_have_been_saved"), request);
+				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 			}
 		}
 
@@ -107,14 +109,8 @@ public class ConfigureServlet extends SecureController {
 		fp.setCurrentStringValuesAsPreset(textFields);
 	}
 
-	public ConfigurationDao getConfigurationDao() {
-		configurationDao = this.configurationDao != null ? configurationDao : (ConfigurationDao) SpringServletAccess
-				.getApplicationContext(context).getBean("configurationDao");
-		return configurationDao;
-	}
-
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 }

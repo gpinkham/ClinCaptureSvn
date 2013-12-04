@@ -19,45 +19,61 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "serial" })
-public class DownloadStudyMetadataServlet extends SecureController {
+@Component
+public class DownloadStudyMetadataServlet extends Controller {
+
 	public static String STUDY_ID = "studyId";
 
 	/**
 	 * Checks whether the user has the correct privilege
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
 		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		MetaDataCollector mdc = new MetaDataCollector(sm.getDataSource(), currentStudy, getRuleSetRuleDao());
-		AdminDataCollector adc = new AdminDataCollector(sm.getDataSource(), currentStudy);
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		MetaDataCollector mdc = new MetaDataCollector(getDataSource(), currentStudy, getRuleSetRuleDao());
+		AdminDataCollector adc = new AdminDataCollector(getDataSource(), currentStudy);
 		MetaDataCollector.setTextLength(200);
 
 		ODMBean odmb = mdc.getODMBean();
@@ -85,15 +101,6 @@ public class DownloadStudyMetadataServlet extends SecureController {
 		request.setAttribute("generate", report.getXmlOutput().toString().trim());
 		Page finalTarget = Page.EXPORT_DATA_CUSTOM;
 		finalTarget.setFileName("/WEB-INF/jsp/extract/downloadStudyMetadata.jsp");
-		forwardPage(finalTarget);
+		forwardPage(finalTarget, request, response);
 	}
-
-	private CoreResources getCoreResources() {
-		return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
-	}
-
-	private RuleSetRuleDao getRuleSetRuleDao() {
-		return (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetRuleDao");
-	}
-
 }

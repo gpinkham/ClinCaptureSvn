@@ -20,11 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import com.clinovo.util.ValidatorHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -34,8 +35,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.SecurityManager;
@@ -47,8 +47,7 @@ import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-
-import com.clinovo.util.ValidatorHelper;
+import org.springframework.stereotype.Component;
 
 /**
  * Servlet for creating a user account.
@@ -56,16 +55,15 @@ import com.clinovo.util.ValidatorHelper;
  * @author ssachs
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class CreateUserAccountServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class CreateUserAccountServlet extends Controller {
 
 	public static final String SHOW_EXIT_INSTEAD_OF_BACK = "showExitInsteadOfBack";
 	public static final String INPUT_USERNAME = "userName";
 	public static final String INPUT_FIRST_NAME = "firstName";
 	public static final String INPUT_LAST_NAME = "lastName";
 	public static final String INPUT_EMAIL = "email";
-    public static final String INPUT_PHONE = "phone";
+	public static final String INPUT_PHONE = "phone";
 	public static final String INPUT_INSTITUTION = "institutionalAffiliation";
 	public static final String INPUT_STUDY = "activeStudy";
 	public static final String INPUT_ROLE = "role";
@@ -75,23 +73,24 @@ public class CreateUserAccountServlet extends SecureController {
 	public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
 			throw new InsufficientPermissionException(Page.MENU,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
-
-		return;
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
 		FormProcessor fp = new FormProcessor(request);
 
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		ArrayList<StudyBean> all = (ArrayList<StudyBean>) sdao.findAll();
 		ArrayList<StudyBean> finalList = new ArrayList<StudyBean>();
 		for (StudyBean sb : all) {
@@ -101,42 +100,43 @@ public class CreateUserAccountServlet extends SecureController {
 			}
 		}
 		addEntityList("studies", finalList, respage.getString("a_user_cannot_be_created_no_study_as_active"),
-				Page.ADMIN_SYSTEM);
+				Page.ADMIN_SYSTEM, request, response);
 
 		// for warning window for back button
 		String pageIsChanged = request.getParameter("pageIsChanged");
 		if (pageIsChanged != null) {
 			request.setAttribute("pageIsChanged", pageIsChanged);
 		}
-		
-		StudyParameterValueDAO dao = new StudyParameterValueDAO(sm.getDataSource());
-		StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(), "allowCodingVerification");
-		
-		Map roleMap = null;
-		if(allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
+
+		StudyParameterValueDAO dao = new StudyParameterValueDAO(getDataSource());
+		StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(),
+				"allowCodingVerification");
+
+		Map roleMap;
+		if (allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
 			roleMap = Role.roleMapWithDescriptions;
 		} else {
 			Role.roleMapWithDescriptions.remove(7);
 			roleMap = Role.roleMapWithDescriptions;
 		}
-        
+
 		ArrayList types = UserType.toArrayList();
 		types.remove(UserType.INVALID);
 		types.remove(UserType.TECHADMIN);
 		addEntityList("types", types, respage.getString("a_user_cannot_be_created_no_user_types_for"),
-				Page.ADMIN_SYSTEM);
+				Page.ADMIN_SYSTEM, request, response);
 
-		Boolean changeRoles = request.getParameter("changeRoles") == null ? false : Boolean.parseBoolean(request
-				.getParameter("changeRoles"));
+		Boolean changeRoles = request.getParameter("changeRoles") != null
+				&& Boolean.parseBoolean(request.getParameter("changeRoles"));
 		int activeStudy = fp.getInt(INPUT_STUDY);
-        StudyBean study = (StudyBean)sdao.findByPK(activeStudy);
-        request.setAttribute("roles", roleMap);
-        request.setAttribute("activeStudy", activeStudy);
-        request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
+		StudyBean study = (StudyBean) sdao.findByPK(activeStudy);
+		request.setAttribute("roles", roleMap);
+		request.setAttribute("activeStudy", activeStudy);
+		request.setAttribute("isThisStudy", !(study.getParentStudyId() > 0));
 
 		if (!fp.isSubmitted() || changeRoles) {
-			String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL, INPUT_INSTITUTION,
-					INPUT_DISPLAY_PWD };
+			String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
+					INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
 			fp.setCurrentStringValuesAsPreset(textFields);
 
 			String ddlbFields[] = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
@@ -146,13 +146,13 @@ public class CreateUserAccountServlet extends SecureController {
 			String sendPwd = SQLInitServlet.getField("user_account_notification");
 			fp.addPresetValue(USER_ACCOUNT_NOTIFICATION, sendPwd);
 			//
-			setPresetValues(presetValues);
-            request.setAttribute("pageIsChanged", changeRoles);
-			forwardPage(Page.CREATE_ACCOUNT);
+			setPresetValues(presetValues, request);
+			request.setAttribute("pageIsChanged", changeRoles);
+			forwardPage(Page.CREATE_ACCOUNT, request, response);
 		} else {
-            UserType type = UserType.get(fp.getInt("type"));
+			UserType type = UserType.get(fp.getInt("type"));
 
-			UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+			UserAccountDAO udao = new UserAccountDAO(getDataSource());
 			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 
 			// username must not be blank,
@@ -192,11 +192,10 @@ public class CreateUserAccountServlet extends SecureController {
 				createdUserAccountBean.setFirstName(fp.getString(INPUT_FIRST_NAME));
 				createdUserAccountBean.setLastName(fp.getString(INPUT_LAST_NAME));
 				createdUserAccountBean.setEmail(fp.getString(INPUT_EMAIL));
-                createdUserAccountBean.setPhone(fp.getString(INPUT_PHONE));
+				createdUserAccountBean.setPhone(fp.getString(INPUT_PHONE));
 				createdUserAccountBean.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
 
-				SecurityManager secm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean(
-						"securityManager"));
+				SecurityManager secm = getSecurityManager();
 				String password = secm.genPassword();
 				String passwordHash = secm.encrytPassword(password, getUserDetails());
 
@@ -212,49 +211,50 @@ public class CreateUserAccountServlet extends SecureController {
 				createdUserAccountBean.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
 
 				int studyId = fp.getInt(INPUT_STUDY);
-                int roleId = fp.getInt(INPUT_ROLE);
+				int roleId = fp.getInt(INPUT_ROLE);
 
-                createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyId, Role.get(roleId));
+				createdUserAccountBean = addActiveStudyRole(request, createdUserAccountBean, studyId, Role.get(roleId));
 
 				logger.warn("*** found type: " + fp.getInt("type"));
 				logger.warn("*** setting type: " + type.getDescription());
 				createdUserAccountBean.addUserType(type);
 				createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean);
-				AuthoritiesDao authoritiesDao = (AuthoritiesDao) SpringServletAccess.getApplicationContext(context)
-						.getBean("authoritiesDao");
+				AuthoritiesDao authoritiesDao = getAuthoritiesDao();
 				authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
 				String displayPwd = fp.getString(INPUT_DISPLAY_PWD);
 
 				if (createdUserAccountBean.isActive()) {
 					addPageMessage(respage.getString("the_user_account") + "\"" + createdUserAccountBean.getName()
-							+ "\"" + respage.getString("was_created_succesfully"));
+							+ "\"" + respage.getString("was_created_succesfully"), request);
 					if ("no".equalsIgnoreCase(displayPwd)) {
 						try {
-							StudyBean emailParentStudy = new StudyBean();
+							StudyBean emailParentStudy;
 							if (currentStudy.getParentStudyId() > 0) {
 								emailParentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
 							} else {
 								emailParentStudy = currentStudy;
 							}
-							sendNewAccountEmail(createdUserAccountBean, password, emailParentStudy.getName());
+							sendNewAccountEmail(request, createdUserAccountBean, password, emailParentStudy.getName());
 						} catch (Exception e) {
-							addPageMessage(respage.getString("there_was_an_error_sending_account_creating_mail"));
+							addPageMessage(respage.getString("there_was_an_error_sending_account_creating_mail"),
+									request);
 						}
 					} else {
-						addPageMessage(respage.getString("user_password") + ":<br/>" + password + "<br/> "
-								+ respage.getString("please_write_down_the_password_and_provide"));
+						addPageMessage(
+								respage.getString("user_password") + ":<br/>" + password + "<br/> "
+										+ respage.getString("please_write_down_the_password_and_provide"), request);
 					}
 				} else {
 					addPageMessage(respage.getString("the_user_account") + "\"" + createdUserAccountBean.getName()
-							+ "\"" + respage.getString("could_not_created_due_database_error"));
+							+ "\"" + respage.getString("could_not_created_due_database_error"), request);
 				}
 				if (createdUserAccountBean.isActive()) {
 					request.setAttribute(ViewUserAccountServlet.ARG_USER_ID,
-							new Integer(createdUserAccountBean.getId()).toString());
+							Integer.toString(createdUserAccountBean.getId()));
 					request.setAttribute(SHOW_EXIT_INSTEAD_OF_BACK, true);
-					forwardPage(Page.VIEW_USER_ACCOUNT_SERVLET);
+					forwardPage(Page.VIEW_USER_ACCOUNT_SERVLET, request, response);
 				} else {
-					forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+					forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 				}
 			} else {
 				String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
@@ -265,18 +265,21 @@ public class CreateUserAccountServlet extends SecureController {
 				fp.setCurrentIntValuesAsPreset(ddlbFields);
 
 				HashMap presetValues = fp.getPresetValues();
-				setPresetValues(presetValues);
+				setPresetValues(presetValues, request);
 
-				setInputMessages(errors);
-				addPageMessage(respage.getString("there_were_some_errors_submission")
-						+ respage.getString("see_below_for_details"));
+				setInputMessages(errors, request);
+				addPageMessage(
+						respage.getString("there_were_some_errors_submission")
+								+ respage.getString("see_below_for_details"), request);
 
-				forwardPage(Page.CREATE_ACCOUNT);
+				forwardPage(Page.CREATE_ACCOUNT, request, response);
 			}
 		}
 	}
 
-	private UserAccountBean addActiveStudyRole(UserAccountBean createdUserAccountBean, int studyId, Role r) {
+	private UserAccountBean addActiveStudyRole(HttpServletRequest request, UserAccountBean createdUserAccountBean,
+			int studyId, Role r) {
+		UserAccountBean ub = getUserAccountBean(request);
 		createdUserAccountBean.setActiveStudyId(studyId);
 
 		StudyUserRoleBean activeStudyRole = new StudyUserRoleBean();
@@ -291,9 +294,10 @@ public class CreateUserAccountServlet extends SecureController {
 		return createdUserAccountBean;
 	}
 
-	private void sendNewAccountEmail(UserAccountBean createdUserAccountBean, String password, String studyName) throws Exception {
+	private void sendNewAccountEmail(HttpServletRequest request, UserAccountBean createdUserAccountBean,
+			String password, String studyName) throws Exception {
 		logger.info("Sending account creation notification to " + createdUserAccountBean.getName());
-		String body = "<html><body>"; 
+		String body = "<html><body>";
 		body += resword.getString("dear") + " " + createdUserAccountBean.getFirstName() + " "
 				+ createdUserAccountBean.getLastName() + ",<br><br>";
 		body += restext.getString("a_new_user_account_has_been_created_for_you") + "<br><br>";
@@ -305,11 +309,11 @@ public class CreateUserAccountServlet extends SecureController {
 		body += respage.getString("best_system_administrator").replace("{0}", studyName);
 		body += "</body></html>";
 		sendEmail(createdUserAccountBean.getEmail().trim(), restext.getString("your_new_openclinica_account"), body,
-				false);
+				false, request);
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 }

@@ -23,11 +23,10 @@ package org.akaza.openclinica.control.admin;
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
 import java.util.List;
-import java.util.Locale;
-
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -36,41 +35,38 @@ import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
+import org.springframework.stereotype.Component;
 
 /**
  * Servlet for creating a user account.
  * 
  * @author Krikor Krumlian
  */
-public class AuditDatabaseServlet extends SecureController {
+@Component
+public class AuditDatabaseServlet extends Controller {
 
 	private static final long serialVersionUID = 1L;
 
-	Locale locale;
-	private DatabaseChangeLogDao databaseChangeLogDao;
-
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
 			throw new InsufficientPermissionException(Page.MENU,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
-
-		return;
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-		String auditDatabaseHtml = renderAuditDatabaseTable(getDatabaseChangeLogDao().findAll());
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String auditDatabaseHtml = renderAuditDatabaseTable(getDatabaseChangeLogDao().findAll(), request);
 		request.setAttribute("auditDatabaseHtml", auditDatabaseHtml);
-		forwardPage(Page.AUDIT_DATABASE);
+		forwardPage(Page.AUDIT_DATABASE, request, response);
 
 	}
 
-	private String renderAuditDatabaseTable(List<DatabaseChangeLogBean> databaseChangeLogs) {
+	private String renderAuditDatabaseTable(List<DatabaseChangeLogBean> databaseChangeLogs, HttpServletRequest request) {
 
 		TableFacade tableFacade = createTableFacade("databaseChangeLogs", request);
 		tableFacade.setColumnProperties("id", "author", "fileName", "dataExecuted", "md5Sum", "description",
@@ -115,19 +111,7 @@ public class AuditDatabaseServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
-
-	public DatabaseChangeLogDao getDatabaseChangeLogDao() {
-		databaseChangeLogDao = this.databaseChangeLogDao != null ? databaseChangeLogDao
-				: (DatabaseChangeLogDao) SpringServletAccess.getApplicationContext(context).getBean(
-						"databaseChangeLogDao");
-		return databaseChangeLogDao;
-	}
-
-	public void setDatabaseChangeLogDao(DatabaseChangeLogDao databaseChangeLogDao) {
-		this.databaseChangeLogDao = databaseChangeLogDao;
-	}
-
 }

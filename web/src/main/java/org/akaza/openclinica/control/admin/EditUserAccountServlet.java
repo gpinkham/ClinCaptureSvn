@@ -21,13 +21,16 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.SecurityManager;
@@ -45,10 +48,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
+import org.springframework.stereotype.Component;
 
 /**
  * Servlet for creating a user account.
@@ -57,14 +57,15 @@ import java.util.Set;
  * 
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class EditUserAccountServlet extends SecureController {
+@Component
+public class EditUserAccountServlet extends Controller {
 	public static final String INPUT_FIRST_NAME = "firstName";
 
 	public static final String INPUT_LAST_NAME = "lastName";
 
 	public static final String INPUT_EMAIL = "email";
 
-    public static final String INPUT_PHONE = "phone";
+	public static final String INPUT_PHONE = "phone";
 
 	public static final String INPUT_INSTITUTION = "institutionalAffiliation";
 
@@ -89,19 +90,13 @@ public class EditUserAccountServlet extends SecureController {
 
 	public static final int CONFIRM_STEP = 2;
 
-	// possible values of INPUT_CONFIRM_BUTTON
-	public static final String BUTTON_CONFIRM_VALUE = "Submit";
-
-	public static final String BUTTON_BACK_VALUE = "Back";
-
 	public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
-	
+
 	public static final String EMAIL = "contactEmail";
 	public static final String USER_ID = "user_id";
-	private StdScheduler scheduler;
 
 	private ArrayList getAllStudies() {
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		return (ArrayList) sdao.findAll();
 	}
 
@@ -110,19 +105,22 @@ public class EditUserAccountServlet extends SecureController {
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-					+ respage.getString("change_study_contact_sysadmin"));
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study")
+							+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
-
-		return;
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		FormProcessor fp = new FormProcessor(request);
 
 		// because we need to use this in the confirmation and error parts too
@@ -130,24 +128,25 @@ public class EditUserAccountServlet extends SecureController {
 		request.setAttribute("studies", studies);
 
 		int userId = fp.getInt(ARG_USERID);
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO udao = getUserAccountDAO();
 		UserAccountBean user = (UserAccountBean) udao.findByPK(userId);
-        request.setAttribute("editedUser", user);
+		request.setAttribute("editedUser", user);
 		int stepNum = fp.getInt(ARG_STEPNUM);
 
 		if (!fp.isSubmitted()) {
 			addEntityList("userTypes", getUserTypes(),
-					respage.getString("the_user_could_not_be_edited_because_no_user_types"), Page.ADMIN_SYSTEM);
+					respage.getString("the_user_could_not_be_edited_because_no_user_types"), Page.ADMIN_SYSTEM,
+					request, response);
 			loadPresetValuesFromBean(fp, user);
 			fp.addPresetValue(ARG_STEPNUM, EDIT_STEP);
-			setPresetValues(fp.getPresetValues());
+			setPresetValues(fp.getPresetValues(), request);
 
 			// addEntityList("userTypes", getUserTypes(),
 			// "The user could not be edited because there are no user types
 			// available.",
 			// Page.ADMIN_SYSTEM);
 			request.setAttribute("userName", user.getName());
-			forwardPage(Page.EDIT_ACCOUNT);
+			forwardPage(Page.EDIT_ACCOUNT, request, response);
 		} else if (stepNum == EDIT_STEP) {
 			Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 
@@ -174,22 +173,24 @@ public class EditUserAccountServlet extends SecureController {
 				loadPresetValuesFromForm(fp);
 				fp.addPresetValue(ARG_STEPNUM, CONFIRM_STEP);
 
-				setPresetValues(fp.getPresetValues());
+				setPresetValues(fp.getPresetValues(), request);
 				request.setAttribute("userName", user.getName());
-				forwardPage(Page.EDIT_ACCOUNT_CONFIRM);
+				forwardPage(Page.EDIT_ACCOUNT_CONFIRM, request, response);
 
 			} else {
 				loadPresetValuesFromForm(fp);
 				fp.addPresetValue(ARG_STEPNUM, EDIT_STEP);
-				setInputMessages(errors);
+				setInputMessages(errors, request);
 
-				setPresetValues(fp.getPresetValues());
+				setPresetValues(fp.getPresetValues(), request);
 				addEntityList("userTypes", getUserTypes(),
-						respage.getString("the_user_could_not_be_edited_because_no_user_types"), Page.ADMIN_SYSTEM);
+						respage.getString("the_user_could_not_be_edited_because_no_user_types"), Page.ADMIN_SYSTEM,
+						request, response);
 
-				addPageMessage(respage.getString("there_were_some_errors_submission")
-						+ respage.getString("see_below_for_details"));
-				forwardPage(Page.EDIT_ACCOUNT);
+				addPageMessage(
+						respage.getString("there_were_some_errors_submission")
+								+ respage.getString("see_below_for_details"), request);
+				forwardPage(Page.EDIT_ACCOUNT, request, response);
 			}
 		} else if (stepNum == CONFIRM_STEP) {
 			String button = fp.getString(INPUT_CONFIRM_BUTTON);
@@ -199,20 +200,21 @@ public class EditUserAccountServlet extends SecureController {
 				fp.addPresetValue(ARG_STEPNUM, EDIT_STEP);
 
 				addEntityList("userTypes", getUserTypes(),
-						respage.getString("the_user_could_not_be_edited_because_no_user_types"), Page.ADMIN_SYSTEM);
-				setPresetValues(fp.getPresetValues());
+						respage.getString("the_user_could_not_be_edited_because_no_user_types"), Page.ADMIN_SYSTEM,
+						request, response);
+				setPresetValues(fp.getPresetValues(), request);
 				request.setAttribute("userName", user.getName());
-				forwardPage(Page.EDIT_ACCOUNT);
+				forwardPage(Page.EDIT_ACCOUNT, request, response);
 			} else if (button.equals(resword.getString("submit"))) {
-                Page forwardTo = Page.LIST_USER_ACCOUNTS_SERVLET;
+				Page forwardTo = Page.LIST_USER_ACCOUNTS_SERVLET;
 				user.setFirstName(fp.getString(INPUT_FIRST_NAME));
 				user.setLastName(fp.getString(INPUT_LAST_NAME));
 				user.setEmail(fp.getString(INPUT_EMAIL));
-                user.setPhone(fp.getString(INPUT_PHONE));
+				user.setPhone(fp.getString(INPUT_PHONE));
 				user.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
 				user.setUpdater(ub);
 				user.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
-                boolean wasSysAdmin = user.isSysAdmin();
+				boolean wasSysAdmin = user.isSysAdmin();
 				if (!user.getName().equalsIgnoreCase("root")) {
 					UserType ut = UserType.get(fp.getInt(INPUT_USER_TYPE));
 					if (ut.equals(UserType.SYSADMIN)) {
@@ -223,12 +225,11 @@ public class EditUserAccountServlet extends SecureController {
 						user.addUserType(UserType.USER);
 					}
 				} else {
-                    user.setName("root");
-                    user.addUserType(UserType.SYSADMIN);
-                }
+					user.setName("root");
+					user.addUserType(UserType.SYSADMIN);
+				}
 				if (fp.getBoolean(INPUT_RESET_PASSWORD)) {
-					SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean(
-							"securityManager"));
+					SecurityManager sm = getSecurityManager();
 					String password = sm.genPassword();
 					String passwordHash = sm.encrytPassword(password, getUserDetails());
 
@@ -236,34 +237,36 @@ public class EditUserAccountServlet extends SecureController {
 					user.setPasswdTimestamp(null);
 
 					udao.update(user);
-                    udao.update(user);
-                    
+					udao.update(user);
+
 					if ("no".equalsIgnoreCase(fp.getString(INPUT_DISPLAY_PWD))) {
 						logger.info("displayPwd is no");
 						try {
-							sendResetPasswordEmail(user, password);
+							sendResetPasswordEmail(request, user, password);
 						} catch (Exception e) {
-							addPageMessage(respage.getString("there_was_an_error_sending_reset_email_try_reset"));
+							addPageMessage(respage.getString("there_was_an_error_sending_reset_email_try_reset"),
+									request);
 						}
 					} else {
 						addPageMessage(respage.getString("new_user_password") + ":<br/> " + password + "<br/>"
-								+ respage.getString("please_write_down_the_password_and_provide"));
+								+ respage.getString("please_write_down_the_password_and_provide"), request);
 					}
 				} else {
 					udao.update(user);
 				}
 				updateCalendarEmailJob(user);
-				addPageMessage(respage.getString("the_user_account") + " \"" + user.getName() + "\" "
-						+ respage.getString("was_updated_succesfully"));
+				addPageMessage(
+						respage.getString("the_user_account") + " \"" + user.getName() + "\" "
+								+ respage.getString("was_updated_succesfully"), request);
 				if (ub.getId() == user.getId()) {
-					session.setAttribute("reloadUserBean", true);
+					request.getSession().setAttribute("reloadUserBean", true);
 					if (wasSysAdmin && !user.isSysAdmin()) {
 						forwardTo = Page.MENU_SERVLET;
 						Navigation.removeUrl(request, "/ListUserAccounts");
-						addPageMessage(respage.getString("you_may_not_perform_administrative_functions"));
+						addPageMessage(respage.getString("you_may_not_perform_administrative_functions"), request);
 					}
 				}
-                forwardPage(forwardTo);
+				forwardPage(forwardTo, request, response);
 			} else {
 				throw new InconsistentStateException(Page.ADMIN_SYSTEM,
 						resexception.getString("an_invalid_submit_button_was_clicked"));
@@ -292,7 +295,7 @@ public class EditUserAccountServlet extends SecureController {
 	// }
 	//
 	// SQLFactory factory = SQLFactory.getInstance();
-	// UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+	// UserAccountDAO udao = getUserAccountDAO();
 	//
 	// HashMap presetValues;
 	// } catch (Exception e) {
@@ -309,7 +312,7 @@ public class EditUserAccountServlet extends SecureController {
 		fp.addPresetValue(INPUT_FIRST_NAME, user.getFirstName());
 		fp.addPresetValue(INPUT_LAST_NAME, user.getLastName());
 		fp.addPresetValue(INPUT_EMAIL, user.getEmail());
-        fp.addPresetValue(INPUT_PHONE, user.getPhone());
+		fp.addPresetValue(INPUT_PHONE, user.getPhone());
 		fp.addPresetValue(INPUT_INSTITUTION, user.getInstitutionalAffiliation());
 		int userTypeId = UserType.USER.getId();
 		if (user.isTechAdmin()) {
@@ -321,7 +324,7 @@ public class EditUserAccountServlet extends SecureController {
 		// UserType.USER.getId();
 		fp.addPresetValue(INPUT_USER_TYPE, userTypeId);
 		fp.addPresetValue(ARG_USERID, user.getId());
-		fp.addPresetValue(INPUT_RUN_WEBSERVICES, user.getRunWebservices() == true ? 1 : 0);
+		fp.addPresetValue(INPUT_RUN_WEBSERVICES, user.getRunWebservices() ? 1 : 0);
 
 		String sendPwd = SQLInitServlet.getField("user_account_notification");
 		fp.addPresetValue(USER_ACCOUNT_NOTIFICATION, sendPwd);
@@ -330,8 +333,8 @@ public class EditUserAccountServlet extends SecureController {
 	private void loadPresetValuesFromForm(FormProcessor fp) {
 		fp.clearPresetValues();
 
-		String textFields[] = { ARG_USERID, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL, INPUT_INSTITUTION,
-				INPUT_DISPLAY_PWD };
+		String textFields[] = { ARG_USERID, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_PHONE, INPUT_EMAIL,
+				INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
 		fp.setCurrentStringValuesAsPreset(textFields);
 
 		String ddlbFields[] = { INPUT_USER_TYPE, INPUT_RESET_PASSWORD, INPUT_RUN_WEBSERVICES };
@@ -353,70 +356,68 @@ public class EditUserAccountServlet extends SecureController {
 		return types;
 	}
 
-	private void sendResetPasswordEmail(UserAccountBean user, String password) throws Exception {
+	private void sendResetPasswordEmail(HttpServletRequest request, UserAccountBean user, String password)
+			throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
+
 		logger.info("Sending password reset notification to " + user.getName());
 
-		String body = resword.getString("dear") + " " + user.getFirstName() + " " + user.getLastName() + ",<br/><br/>\n\n";
+		String body = resword.getString("dear") + " " + user.getFirstName() + " " + user.getLastName()
+				+ ",<br/><br/>\n\n";
 		body += restext.getString("your_password_has_been_reset_on_openclinica") + ":<br/><br/>\n\n";
 		body += resword.getString("user_name") + ": " + user.getName() + "<br/>\n";
 		body += resword.getString("password") + ": " + password + "<br/><br/>\n\n";
 		body += restext.getString("please_test_your_login_information_and_let") + "<br/>\n";
-		body += "<a href='" + SQLInitServlet.getSystemURL() + "'>" + SQLInitServlet.getField("sysURL") + "</a><br/><br/>\n\n";
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
-		StudyBean emailParentStudy = new StudyBean();
+		body += "<a href='" + SQLInitServlet.getSystemURL() + "'>" + SQLInitServlet.getField("sysURL")
+				+ "</a><br/><br/>\n\n";
+		StudyDAO sdao = getStudyDAO();
+		StudyBean emailParentStudy;
 		if (currentStudy.getParentStudyId() > 0) {
 			emailParentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
 		} else {
 			emailParentStudy = currentStudy;
 		}
 		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
-		sendEmail(user.getEmail().trim(), restext.getString("your_openclinica_account_password_reset"), body, false);
+		sendEmail(user.getEmail().trim(), restext.getString("your_openclinica_account_password_reset"), body, false,
+                request);
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
-	
-	@SuppressWarnings("null")
-	private void updateCalendarEmailJob (UserAccountBean uaBean) {
+
+	private void updateCalendarEmailJob(UserAccountBean uaBean) {
 		String triggerGroup = "CALENDAR";
-		scheduler = getScheduler();
+		StdScheduler scheduler = getStdScheduler();
 		try {
 			Set<TriggerKey> legacyTriggers = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
-			if (legacyTriggers == null && legacyTriggers.size() == 0) {
-				return;
-			}
-			for (TriggerKey triggerKey : legacyTriggers) {
-				Trigger trigger = scheduler.getTrigger(triggerKey);
-				JobDataMap dataMap = trigger.getJobDataMap();
-				String contactEmail = dataMap.getString(EMAIL).toString();
-				int userId = (Integer) dataMap.getInt(USER_ID);
-				logger.info("contact email from calendared " +contactEmail + " for user userId " +userId);
-				logger.info("Old email " +dataMap.getString(EMAIL).toString());
-				if(uaBean.getId() == userId) {
-					dataMap.put(EMAIL, uaBean.getEmail());
-					JobDetailImpl jobDetailBean = new JobDetailImpl();
-					jobDetailBean.setKey(trigger.getJobKey());
-					jobDetailBean.setDescription(trigger.getDescription());
-					jobDetailBean.setGroup(triggerGroup);
-					jobDetailBean.setName(triggerKey.getName());
-					jobDetailBean.setJobClass(org.akaza.openclinica.service.calendar.EmailStatefulJob.class);
-					jobDetailBean.setJobDataMap(dataMap);
-					logger.info("New email " +dataMap.getString(EMAIL).toString());
-					jobDetailBean.setDurability(true);
-					scheduler.addJob(jobDetailBean, true);
+			if (legacyTriggers != null && legacyTriggers.size() > 0) {
+				for (TriggerKey triggerKey : legacyTriggers) {
+					Trigger trigger = scheduler.getTrigger(triggerKey);
+					JobDataMap dataMap = trigger.getJobDataMap();
+					String contactEmail = dataMap.getString(EMAIL);
+					int userId = dataMap.getInt(USER_ID);
+					logger.info("contact email from calendared " + contactEmail + " for user userId " + userId);
+					logger.info("Old email " + dataMap.getString(EMAIL));
+					if (uaBean.getId() == userId) {
+						dataMap.put(EMAIL, uaBean.getEmail());
+						JobDetailImpl jobDetailBean = new JobDetailImpl();
+						jobDetailBean.setKey(trigger.getJobKey());
+						jobDetailBean.setDescription(trigger.getDescription());
+						jobDetailBean.setGroup(triggerGroup);
+						jobDetailBean.setName(triggerKey.getName());
+						jobDetailBean.setJobClass(org.akaza.openclinica.service.calendar.EmailStatefulJob.class);
+						jobDetailBean.setJobDataMap(dataMap);
+						logger.info("New email " + dataMap.getString(EMAIL));
+						jobDetailBean.setDurability(true);
+						scheduler.addJob(jobDetailBean, true);
+					}
 				}
 			}
 		} catch (SchedulerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	private StdScheduler getScheduler() {
-		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
-				context).getBean("schedulerFactoryBean");
-		return scheduler;
 	}
 }

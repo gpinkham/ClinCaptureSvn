@@ -20,26 +20,40 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "rawtypes", "serial" })
-public class InitUpdateCRFServlet extends SecureController {
+@Component
+public class InitUpdateCRFServlet extends Controller {
 
-	private static String CRF_ID = "crfId";
-
-	private static String CRF = "crf";
+	private static final String CRF_ID = "crfId";
+	private static final String CRF = "crf";
 
 	/**
-     *
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -63,28 +77,31 @@ public class InitUpdateCRFServlet extends SecureController {
 			}
 		}
 
-		addPageMessage(respage.getString("you_not_have_permission_to_update_a_CRF")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("you_not_have_permission_to_update_a_CRF")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_study_director"),
 				"1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
 
-		resetPanel();
+		StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 
-		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"));
+		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
 
-		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"));
-		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"));
+		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"), request);
+		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"), request);
 		setToPanel(resword.getString("CRF_spreadsheet_template"),
-				respage.getString("br_download_blank_CRF_spreadsheet_from"));
+				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
 		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
-				respage.getString("br_download_example_CRF_instructions_from"));
+				respage.getString("br_download_example_CRF_instructions_from"), request);
 
 		FormProcessor fp = new FormProcessor(request);
 
@@ -94,28 +111,29 @@ public class InitUpdateCRFServlet extends SecureController {
 
 		int crfId = fp.getInt(CRF_ID);
 		if (crfId == 0) {
-			addPageMessage(respage.getString("please_choose_a_CRF_version_to_update"));
-			forwardPage(Page.CRF_LIST_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_CRF_version_to_update"), request);
+			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		} else {
-			CRFDAO cdao = new CRFDAO(sm.getDataSource());
+			CRFDAO cdao = getCRFDAO();
 			CRFBean crf = (CRFBean) cdao.findByPK(crfId);
 			if (!ub.isSysAdmin() && (crf.getOwnerId() != ub.getId())) {
-				addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_active_study_or_contact"));
-				forwardPage(Page.MENU_SERVLET);
-				return;
+				addPageMessage(
+						respage.getString("no_have_correct_privilege_current_study") + " "
+								+ respage.getString("change_active_study_or_contact"), request);
+				forwardPage(Page.MENU_SERVLET, request, response);
 			} else {
-				session.setAttribute(CRF, crf);
-				forwardPage(Page.UPDATE_CRF);
+				request.getSession().setAttribute(CRF, crf);
+				forwardPage(Page.UPDATE_CRF, request, response);
 			}
 
 		}
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

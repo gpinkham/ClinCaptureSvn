@@ -21,21 +21,25 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
-
+import java.util.Date;
+import java.util.HashMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.Date;
-import java.util.Locale;
+import org.springframework.stereotype.Component;
 
 /**
  * Creates a new CRF
@@ -43,14 +47,14 @@ import java.util.Locale;
  * @author jxu
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class CreateCRFServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class CreateCRFServlet extends Controller {
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -60,8 +64,9 @@ public class CreateCRFServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("you_not_have_permission_create_CRF")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("you_not_have_permission_create_CRF")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_study_director"),
 				"1");
@@ -69,8 +74,10 @@ public class CreateCRFServlet extends SecureController {
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+
+		CRFDAO cdao = getCRFDAO();
 		String action = request.getParameter("action");
 
 		FormProcessor fp = new FormProcessor(request);
@@ -82,22 +89,23 @@ public class CreateCRFServlet extends SecureController {
 		// add the list here so that users can tell about crf creation
 		// process together with workflow, tbh
 
-		resetPanel();
+		StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 
-		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"));
+		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
 
-		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"));
-		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"));
+		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"), request);
+		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"), request);
 		setToPanel(resword.getString("CRF_spreadsheet_template"),
-				respage.getString("br_download_blank_CRF_spreadsheet_from"));
+				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
 		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
-				respage.getString("br_download_example_CRF_instructions_from"));
+				respage.getString("br_download_example_CRF_instructions_from"), request);
 
 		if (StringUtil.isBlank(action)) {
-			session.setAttribute("crf", new CRFBean());
-			forwardPage(Page.CREATE_CRF);
+			request.getSession().setAttribute("crf", new CRFBean());
+			forwardPage(Page.CREATE_CRF, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 
@@ -109,8 +117,8 @@ public class CreateCRFServlet extends SecureController {
 				CRFBean crf = new CRFBean();
 				crf.setName(name.trim());
 				crf.setDescription(description.trim());
-				session.setAttribute("crf", crf);
-				errors = v.validate();
+				request.getSession().setAttribute("crf", crf);
+				HashMap errors = v.validate();
 				if (fp.getString("name").trim().length() > 255) {
 					Validator.addError(errors, "name", resexception.getString("maximum_length_name_255"));
 				}
@@ -120,7 +128,7 @@ public class CreateCRFServlet extends SecureController {
 				if (!errors.isEmpty()) {
 					logger.info("has validation errors in the first section");
 					request.setAttribute("formMessages", errors);
-					forwardPage(Page.CREATE_CRF);
+					forwardPage(Page.CREATE_CRF, request, response);
 
 				} else {
 
@@ -128,9 +136,9 @@ public class CreateCRFServlet extends SecureController {
 					if (crf1.getId() > 0) {
 						Validator.addError(errors, "name", resexception.getString("CRF_name_used_choose_unique_name"));
 						request.setAttribute("formMessages", errors);
-						forwardPage(Page.CREATE_CRF);
+						forwardPage(Page.CREATE_CRF, request, response);
 					} else {
-						crf = (CRFBean) session.getAttribute("crf");
+						crf = (CRFBean) request.getSession().getAttribute("crf");
 						logger.info("The crf to be saved:" + crf.getName());
 						crf.setOwner(ub);
 						crf.setCreatedDate(new Date());
@@ -140,10 +148,10 @@ public class CreateCRFServlet extends SecureController {
 						crf = (CRFBean) cdao.findByName(crf.getName());
 						CRFVersionBean version = new CRFVersionBean();
 						version.setCrfId(crf.getId());
-						session.setAttribute("version", version);
-						session.setAttribute("crfName", crf.getName());
-						session.removeAttribute("crf");
-						forwardPage(Page.CREATE_CRF_VERSION);
+						request.getSession().setAttribute("version", version);
+						request.getSession().setAttribute("crfName", crf.getName());
+						request.getSession().removeAttribute("crf");
+						forwardPage(Page.CREATE_CRF_VERSION, request, response);
 					}
 				}
 			}
@@ -152,9 +160,10 @@ public class CreateCRFServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
-			return SecureController.ADMIN_SERVLET_CODE;
+			return Controller.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

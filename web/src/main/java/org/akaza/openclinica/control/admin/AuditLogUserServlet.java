@@ -20,8 +20,14 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -29,16 +35,11 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.AuditEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class AuditLogUserServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class AuditLogUserServlet extends Controller {
 
 	public static final String ARG_USERID = "userLogId";
 
@@ -47,16 +48,17 @@ public class AuditLogUserServlet extends SecureController {
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		int userId = fp.getInt(ARG_USERID);
 		if (userId == 0) {
-			Integer userIntId = (Integer) session.getAttribute(ARG_USERID);
-			userId = userIntId.intValue();
+			userId = (Integer) request.getSession().getAttribute(ARG_USERID);
 		} else {
-			session.setAttribute(ARG_USERID, new Integer(userId));
+			request.getSession().setAttribute(ARG_USERID, userId);
 		}
-		AuditEventDAO aeDAO = new AuditEventDAO(sm.getDataSource());
+		AuditEventDAO aeDAO = getAuditEventDAO();
 		ArrayList al = aeDAO.findAllByUserId(userId);
 
 		EntityBeanTable table = fp.getEntityBeanTable();
@@ -81,27 +83,26 @@ public class AuditLogUserServlet extends SecureController {
 		table.computeDisplay();
 
 		request.setAttribute("table", table);
-		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO uadao = getUserAccountDAO();
 		UserAccountBean uabean = (UserAccountBean) uadao.findByPK(userId);
 		request.setAttribute("auditUserBean", uabean);
-		forwardPage(Page.AUDIT_LOG_USER);
+		forwardPage(Page.AUDIT_LOG_USER, request, response);
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
 			throw new InsufficientPermissionException(Page.MENU,
 					resexception.getString("may_not_perform_administrative_functions"), "1");
 		}
-		return;
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 
 }
