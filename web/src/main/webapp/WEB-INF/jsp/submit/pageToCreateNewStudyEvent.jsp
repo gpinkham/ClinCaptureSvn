@@ -938,34 +938,16 @@
 </div><br>
 
 
-<table border="0" cellpadding="0" cellspacing="0">
+<table border="0" cellpadding="0" cellspacing="0" class="popup-box-buttons">
 <tr>
     <td>
-    <input type="submit" name="Submit" value="<fmt:message key="view_event" bundle="${resword}"/>" class="button_medium" style="float: left; cursor: pointer;"/>
-    <input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=Submit]').click();" style="float: left; cursor: pointer; margin-left: 10px;"/>
-    <input type="button" name="Schedule" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_medium" onClick="createNewEvent(event);" style="float: left; cursor: pointer; margin-left: 10px;"/>
-    <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="createNewEvent_ClosePopup(event);" style="float: left; cursor: pointer; margin-left: 10px;"/>
+      <input type="button" name="Schedule" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_medium" onClick="createNewEvent(event);"/>
+      <input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=Submit]').click();"/>
+      <input type="submit" name="Submit" value="<fmt:message key="view_event" bundle="${resword}"/>" class="button_medium"/>
+      <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="createNewEvent_ClosePopup(event);"/>
     </td>
 </tr></table>
 </form>
-
-<c:set var="role" value="${userRole.role}" />
-<c:if test="${userRole.manageStudy}">
-<c:if test="${requestStudySubject == requestStudySubjectFalse}">
-<p>	<form method="POST" action="UpdateStudySubject">
-	<input type="hidden" name="id" value="<c:out value="${chosenSubject.id}"/>" />
-	<input type="hidden" name="action" value="show" />
-	<input type="submit" name="editstudy" value="<fmt:message key="edit_subject_properties1" bundle="${resword}"/>" class="button_xlong" />
-	</form>
-
-<p>	<form method="POST" action="UpdateSubject">
-	<input type="hidden" name="id" value="<c:out value="${chosenSubject.subjectId}"/>" />
-	<input type="hidden" name="studySubjId" value="<c:out value="${chosenSubject.id}"/>" />
-	<input type="hidden" name="action" value="show" />
-	<input type="submit" name="editstudy" value="<fmt:message key="edit_subject_properties2" bundle="${resword}"/>" class="button_xlong" />
-	</form>
-</c:if>
-</c:if>
 
 </td>
 </tr>

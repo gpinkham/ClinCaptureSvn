@@ -2205,3 +2205,20 @@ a.dnShortcut:hover {
 .pointed-span {
     cursor: pointer;
 }
+
+.popup-box-buttons {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.popup-box-buttons input {
+    float: left;
+    cursor: pointer;
+    margin-left: 10px !important;
+}
+
+.popup-box-buttons input:first-child {
+    float: left;
+    cursor: pointer;
+    margin-left: 0px !important;
+}
