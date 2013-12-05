@@ -26,16 +26,20 @@ import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -46,6 +50,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Prepares to update study event definition
@@ -53,20 +58,30 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class InitUpdateEventDefinitionServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class InitUpdateEventDefinitionServlet extends Controller {
 
 	/**
 	 * Checks whether the user has the correct privilege
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"));
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
 		if (ub.isSysAdmin()) {
 			return;
 		}
 
-		StudyEventDAO sdao = new StudyEventDAO(sm.getDataSource());
+		StudyEventDAO sdao = getStudyEventDAO();
 		// get current studyid
 		int studyId = currentStudy.getId();
 
@@ -75,8 +90,9 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 			if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 				return;
 			} else {
-				addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition")
-						+ respage.getString("please_contact_sysadmin_questions"));
+				addPageMessage(
+						respage.getString("no_have_permission_to_update_study_event_definition")
+								+ respage.getString("please_contact_sysadmin_questions"), request);
 				throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 						resexception.getString("not_study_director"), "1");
 
@@ -85,16 +101,16 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 
 		// To Do: the following code doesn't apply to admin for now
 		String idString = request.getParameter("id");
-		int defId = Integer.valueOf(idString.trim()).intValue();
+		int defId = Integer.valueOf(idString.trim());
 		logger.info("defId" + defId);
 		ArrayList events = (ArrayList) sdao.findAllByDefinition(defId);
 		if (events != null && events.size() > 0) {
 			logger.info("has events");
-			for (int i = 0; i < events.size(); i++) {
-				StudyEventBean sb = (StudyEventBean) events.get(i);
+			for (Object event : events) {
+				StudyEventBean sb = (StudyEventBean) event;
 				if (!sb.getStatus().equals(Status.DELETED) && !sb.getStatus().equals(Status.AUTO_DELETED)) {
 					logger.info("found one event");
-					addPageMessage(respage.getString("sorry_but_at_this_time_may_not_modufy_SED"));
+					addPageMessage(respage.getString("sorry_but_at_this_time_may_not_modufy_SED"), request);
 					throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 							resexception.getString("not_unpopulated"), "1");
 				}
@@ -104,34 +120,36 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		setUserNameInsteadEmail();
-		StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(sm.getDataSource());
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
+		setUserNameInsteadEmail(request);
+		StudyEventDefinitionDAO sdao = getStudyEventDefinitionDAO();
 		String idString = request.getParameter("id");
 		logger.info("definition id: " + idString);
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_definition_to_edit"));
-			forwardPage(Page.LIST_DEFINITION_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_definition_to_edit"), request);
+			forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 		} else {
 			// definition id
-			int defId = Integer.valueOf(idString.trim()).intValue();
+			int defId = Integer.valueOf(idString.trim());
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
 
 			if (currentStudy.getId() != sed.getStudyId()) {
-				addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_active_study_or_contact"));
-				forwardPage(Page.MENU_SERVLET);
+				addPageMessage(
+						respage.getString("no_have_correct_privilege_current_study") + " "
+								+ respage.getString("change_active_study_or_contact"), request);
+				forwardPage(Page.MENU_SERVLET, request, response);
 				return;
 			}
 
-			EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
+			EventDefinitionCRFDAO edao = getEventDefinitionCRFDAO();
 			ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllParentsByDefinition(defId);
 
-			CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-			CRFDAO cdao = new CRFDAO(sm.getDataSource());
+			CRFVersionDAO cvdao = getCRFVersionDAO();
+			CRFDAO cdao = getCRFDAO();
 			ArrayList newEventDefinitionCRFs = new ArrayList();
-			for (int i = 0; i < eventDefinitionCRFs.size(); i++) {
-				EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
+			for (Object eventDefinitionCRF : eventDefinitionCRFs) {
+				EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRF;
 				ArrayList versions = (ArrayList) cvdao.findAllActiveByCRF(edc.getCrfId());
 				edc.setVersions(versions);
 				CRFBean crf = (CRFBean) cdao.findByPK(edc.getCrfId());
@@ -145,13 +163,13 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 				newEventDefinitionCRFs.add(edc);
 			}
 
-			session.setAttribute("definition", sed);
-			session.setAttribute("eventDefinitionCRFs", newEventDefinitionCRFs);
+			request.getSession().setAttribute("definition", sed);
+			request.getSession().setAttribute("eventDefinitionCRFs", newEventDefinitionCRFs);
 			// changed above to new list because static, in-place updating is updating all EDCs
 
-			addSDVstatuses();
+			addSDVstatuses(request);
 
-			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
+			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}
 
 	}
@@ -164,51 +182,49 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 			s = s + nv1.getName().toUpperCase() + ",";
 		}
 		logger.info("********:" + s);
-		if (s != null) {
-			for (int i = 1; i <= NullValue.toArrayList().size(); i++) {
-				String nv = NullValue.get(i).getName().toUpperCase();
-				// if (s.indexOf(nv) >= 0) {
-				// indexOf won't save us
-				// because NA and NASK will come back both positive, for example
-				// rather, we need a regexp here
-				Pattern p = Pattern.compile(nv + "\\W");
-				// find our word with a non-word character after it (,)
-				Matcher m = p.matcher(s);
-				if (m.find()) {
-					flags.put(nv, "1");
-					logger.info("********1:" + nv + " found at " + m.start() + ", " + m.end());
-				} else {
-					flags.put(nv, "0");
-					logger.info("********0:" + nv);
-				}
-
+		for (int i = 1; i <= NullValue.toArrayList().size(); i++) {
+			String nv = NullValue.get(i).getName().toUpperCase();
+			// if (s.indexOf(nv) >= 0) {
+			// indexOf won't save us
+			// because NA and NASK will come back both positive, for example
+			// rather, we need a regexp here
+			Pattern p = Pattern.compile(nv + "\\W");
+			// find our word with a non-word character after it (,)
+			Matcher m = p.matcher(s);
+			if (m.find()) {
+				flags.put(nv, "1");
+				logger.info("********1:" + nv + " found at " + m.start() + ", " + m.end());
+			} else {
+				flags.put(nv, "0");
+				logger.info("********0:" + nv);
 			}
+
 		}
 
 		return flags;
 	}
-	
-	private void setUserNameInsteadEmail() {
+
+	private void setUserNameInsteadEmail(HttpServletRequest request) {
 		String sedId = request.getParameter("id");
-		int eventId = Integer.valueOf(sedId).intValue();
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+		int eventId = Integer.valueOf(sedId);
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(eventId);
 		int userId = sedBean.getUserEmailId();
-		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO uadao = getUserAccountDAO();
 		UserAccountBean userBean = (UserAccountBean) uadao.findByPK(userId);
-		if(userBean.getName() != null) {
-			session.setAttribute("userNameInsteadEmail", userBean.getName());	
+		if (userBean.getName() != null) {
+			request.getSession().setAttribute("userNameInsteadEmail", userBean.getName());
 		} else {
-			session.setAttribute("userNameInsteadEmail", "Not found in the db");	
+			request.getSession().setAttribute("userNameInsteadEmail", "Not found in the db");
 		}
 	}
-	
-	private void addSDVstatuses(){
+
+	private void addSDVstatuses(HttpServletRequest request) {
 		ArrayList<String> sdvOptions = new ArrayList<String>();
 		sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
 		sdvOptions.add(SourceDataVerification.PARTIALREQUIRED.toString());
 		sdvOptions.add(SourceDataVerification.NOTREQUIRED.toString());
 		sdvOptions.add(SourceDataVerification.NOTAPPLICABLE.toString());
-		session.setAttribute("sdvOptions", sdvOptions);
+		request.getSession().setAttribute("sdvOptions", sdvOptions);
 	}
 }

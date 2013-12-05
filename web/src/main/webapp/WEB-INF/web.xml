@@ -545,14 +545,14 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.ListEventDefinitionServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>InitUpdateEventDefinitionServlet</servlet-name>
+        <servlet-name>initUpdateEventDefinitionServlet</servlet-name>
         <display-name>InitUpdateEventDefinition</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.InitUpdateEventDefinitionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UpdateEventDefinitionServlet</servlet-name>
+        <servlet-name>updateEventDefinitionServlet</servlet-name>
         <display-name>UpdateEventDefinition</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UpdateEventDefinitionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RemoveCRFFromDefinitionServlet</servlet-name>
@@ -1608,11 +1608,11 @@
         <url-pattern>/ListEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>InitUpdateEventDefinitionServlet</servlet-name>
+        <servlet-name>initUpdateEventDefinitionServlet</servlet-name>
         <url-pattern>/InitUpdateEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UpdateEventDefinitionServlet</servlet-name>
+        <servlet-name>updateEventDefinitionServlet</servlet-name>
         <url-pattern>/UpdateEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

@@ -154,6 +154,19 @@
         </sql>
     </query>
     <query>
+        <name>findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved</name>
+        <sql>
+            SELECT E.*
+            FROM study_event_definition S, study_event E, study st
+            WHERE
+            S.study_event_definition_id = E.study_event_definition_id
+            AND S.study_id = st.study_id
+            AND (st.study_id = ? or st.parent_study_id=?)
+            AND E.subject_event_status_id not in (5,6,7,10)
+            AND S.study_event_definition_id = ?
+        </sql>
+    </query>
+    <query>
         <name>findByPKAndStudy</name>
         <sql>
             SELECT E.*

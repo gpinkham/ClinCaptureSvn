@@ -656,6 +656,29 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
+	public ArrayList findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved(StudyBean study,
+			int eventDefinitionId) {
+		ArrayList answer = new ArrayList();
+
+		this.setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
+		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+		variables.put(Integer.valueOf(3), Integer.valueOf(eventDefinitionId));
+
+		ArrayList alist = this.select(
+				digester.getQuery("findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved"), variables);
+
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+			answer.add(seb);
+		}
+
+		return answer;
+	}
+
 	/**
 	 * Get the maximum sample ordinal over all study events for the provided StudyEventDefinition / StudySubject
 	 * combination. Note that the maximum may be zero but must be non-negative.

@@ -26,78 +26,94 @@ import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.util.DAOWrapper;
+import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@SuppressWarnings({ "rawtypes", "serial" })
-public class UpdateEventDefinitionServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@Component
+public class UpdateEventDefinitionServlet extends Controller {
 
 	/**
      * 
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"));
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
 		if (ub.isSysAdmin()) {
 			return;
 		}
 		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_permission_to_update_study_event_definition") + "<br>"
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		checkReferenceVisit();
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		checkReferenceVisit(request);
 		String action = request.getParameter("action");
 		if (StringUtil.isBlank(action)) {
-			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
+			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
-				confirmDefinition();
+				confirmDefinition(request, response);
 
 			} else if ("submit".equalsIgnoreCase(action)) {
-				submitDefinition();
+				submitDefinition(request, response);
 
-			} else if("addCrfs".equalsIgnoreCase(action)) {
-					FormProcessor fp = new FormProcessor(request);
-					StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-					saveEventDefinitionToSession(sed, fp);
-					saveEventDefinitionCRFsToSession(fp);
-					response.sendRedirect(request.getContextPath() + "/AddCRFToDefinition");				
+			} else if ("addCrfs".equalsIgnoreCase(action)) {
+				FormProcessor fp = new FormProcessor(request);
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute(
+                        "definition");
+				saveEventDefinitionToSession(sed, fp);
+				saveEventDefinitionCRFsToSession(fp);
+				response.sendRedirect(request.getContextPath() + "/AddCRFToDefinition");
 			} else {
-				addPageMessage(respage.getString("updating_ED_is_cancelled"));				
-				clearSession(session);
-				forwardPage(Page.LIST_DEFINITION_SERVLET);
+				addPageMessage(respage.getString("updating_ED_is_cancelled"), request);
+				clearSession(request.getSession());
+				forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 			}
 		}
 
@@ -107,12 +123,12 @@ public class UpdateEventDefinitionServlet extends SecureController {
 	 * 
 	 * @throws Exception
 	 */
-	private void confirmDefinition() throws Exception {
+	private void confirmDefinition(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
-		errors = v.validate();
-		
-		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
+		HashMap errors = v.validate();
+
+		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
 				2000);
@@ -120,33 +136,29 @@ public class UpdateEventDefinitionServlet extends SecureController {
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
 		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-		//Clinovo start
+		// Clinovo start
 		String calendaredVisitType = fp.getString("type");
 		if ("calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
 			v.addValidation("maxDay", Validator.IS_REQUIRED);
-			v.addValidation("maxDay", Validator.IS_A_NUMBER,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("maxDay", Validator.IS_A_NUMBER, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
 			v.addValidation("minDay", Validator.IS_REQUIRED);
-			v.addValidation("minDay", Validator.IS_A_NUMBER,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("minDay", Validator.IS_A_NUMBER, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
 			v.addValidation("schDay", Validator.IS_REQUIRED);
-			v.addValidation("schDay", Validator.IS_A_NUMBER,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
-			if("".equalsIgnoreCase(fp.getString("isReference"))) {
-					v.addValidation("emailUser", Validator.NO_BLANKS);
+			v.addValidation("schDay", Validator.IS_A_NUMBER, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			if ("".equalsIgnoreCase(fp.getString("isReference"))) {
+				v.addValidation("emailUser", Validator.NO_BLANKS);
 			}
 			v.addValidation("emailDay", Validator.IS_REQUIRED);
-			v.addValidation("emailDay", Validator.IS_A_NUMBER,
-					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
+			v.addValidation("emailDay", Validator.IS_A_NUMBER, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
 			String showCalendarBox = fp.getString("type");
 			if ("calendared_visit".equalsIgnoreCase(showCalendarBox)) {
-				session.setAttribute("showCalendaredVisitBox", true);
+				request.getSession().setAttribute("showCalendaredVisitBox", true);
 			}
 			String changedReference = fp.getString("isReference");
 			if ("true".equalsIgnoreCase(changedReference)) {
-				session.setAttribute("changedReference", true);
+				request.getSession().setAttribute("changedReference", true);
 			} else {
-				session.setAttribute("changedReference", false);
+				request.getSession().setAttribute("changedReference", false);
 			}
 		}
 		//
@@ -155,21 +167,22 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		int schDay = fp.getInt("schDay");
 		int emailDay = fp.getInt("emailDay");
 		String emailUser = fp.getString("emailUser");
-		
+
 		if (!(maxDay >= schDay)) {
-			Validator.addError(errors, "maxDay",resexception.getString("daymax_greate_or_equal_dayschedule"));
-		} 
+			Validator.addError(errors, "maxDay", resexception.getString("daymax_greate_or_equal_dayschedule"));
+		}
 		if (!(minDay <= schDay)) {
-			Validator.addError(errors, "minDay",resexception.getString("daymin_less_or_equal_dayschedule"));
-		} 
+			Validator.addError(errors, "minDay", resexception.getString("daymin_less_or_equal_dayschedule"));
+		}
 		if (!(minDay <= maxDay)) {
-			Validator.addError(errors, "minDay",resexception.getString("daymin_less_or_equal_daymax"));
-		} 
+			Validator.addError(errors, "minDay", resexception.getString("daymin_less_or_equal_daymax"));
+		}
 		if (!(emailDay <= schDay)) {
-			Validator.addError(errors, "emailDay",resexception.getString("dayemail_less_or_equal_dayschedule"));
-		} 
-		if (!checkUserName(emailUser) && "calendared_visit".equalsIgnoreCase(calendaredVisitType) && "".equalsIgnoreCase(fp.getString("isReference"))) {
-			Validator.addError(errors, "emailUser",resexception.getString("this_user_name_does_not_exist"));
+			Validator.addError(errors, "emailDay", resexception.getString("dayemail_less_or_equal_dayschedule"));
+		}
+		if (!checkUserName(request, emailUser) && "calendared_visit".equalsIgnoreCase(calendaredVisitType)
+				&& "".equalsIgnoreCase(fp.getString("isReference"))) {
+			Validator.addError(errors, "emailUser", resexception.getString("this_user_name_does_not_exist"));
 		}
 
 		if (!errors.isEmpty()) {
@@ -192,40 +205,54 @@ public class UpdateEventDefinitionServlet extends SecureController {
 			request.setAttribute("definition", sedForErrors);
 			logger.info("has errors");
 			request.setAttribute("formMessages", errors);
-			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
+			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 
 		} else {
 			logger.info("no errors");
-			//request will show values for error messages instead of session for sed
-			//Clinovo start
+			// request will show values for error messages instead of session for sed
+			// Clinovo start
 			saveEventDefinitionToSession(sed, fp);
-			
+
 		}
-			// end			
-			saveEventDefinitionCRFsToSession(fp);			
-			
-			forwardPage(Page.UPDATE_EVENT_DEFINITION_CONFIRM);
+		// end
+		saveEventDefinitionCRFsToSession(fp);
+
+		forwardPage(Page.UPDATE_EVENT_DEFINITION_CONFIRM, request, response);
 	}
 
 	/**
 	 * Updates the definition
 	 * 
 	 */
-	private void submitDefinition() {
-		ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
-		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-		StudyEventDefinitionDAO edao = new StudyEventDefinitionDAO(sm.getDataSource());
+	private void submitDefinition(HttpServletRequest request, HttpServletResponse response) {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		ArrayList edcs = (ArrayList) request.getSession().getAttribute("eventDefinitionCRFs");
+
+		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 		logger.info("Definition bean to be updated:" + sed.getName() + sed.getCategory());
+
+		StudyDAO sdao = new StudyDAO(getDataSource());
+		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
+		EventCRFDAO eventCRFDAO = new EventCRFDAO(getDataSource());
+		StudyEventDefinitionDAO edao = getStudyEventDefinitionDAO();
+		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(getDataSource());
+		EventDefinitionCRFDAO eventDefinitionCrfDAO = new EventDefinitionCRFDAO(getDataSource());
+		DAOWrapper daoWrapper = new DAOWrapper(sdao, sedao, studySubjectDAO, eventCRFDAO, eventDefinitionCrfDAO, dndao);
+
+		StudyBean study = (StudyBean) sdao.findByPK(sed.getStudyId());
 
 		sed.setUpdater(ub);
 		sed.setUpdatedDate(new Date());
 		sed.setStatus(Status.AVAILABLE);
 		edao.update(sed);
 
-		EventDefinitionCRFDAO cdao = new EventDefinitionCRFDAO(sm.getDataSource());
+		EventDefinitionCRFDAO cdao = getEventDefinitionCRFDAO();
 
-		for (int i = 0; i < edcs.size(); i++) {
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcs.get(i);
+		for (Object edc1 : edcs) {
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edc1;
 			if (edc.getId() > 0) {// need to do update
 				edc.setUpdater(ub);
 				edc.setUpdatedDate(new Date());
@@ -235,10 +262,10 @@ public class UpdateEventDefinitionServlet extends SecureController {
 				cdao.update(edc);
 
 				if (edc.getStatus().equals(Status.DELETED) || edc.getStatus().equals(Status.AUTO_DELETED)) {
-					removeAllEventsItems(edc, sed);
+					removeAllEventsItems(currentStudy, ub, edc, sed);
 				}
 				if (edc.getOldStatus() != null && edc.getOldStatus().equals(Status.DELETED)) {
-					restoreAllEventsItems(edc, sed);
+					restoreAllEventsItems(request, edc, sed);
 				}
 
 			} else { // to insert
@@ -249,26 +276,31 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
 			}
 		}
-		
-		clearSession(session);		
-		
-		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"));
-		forwardPage(Page.LIST_DEFINITION_SERVLET);
+
+		ArrayList<StudyEventBean> studyEventList = (ArrayList<StudyEventBean>) sedao
+				.findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved(study, sed.getId());
+		SubjectEventStatusUtil.determineSubjectEventStates(studyEventList, study, daoWrapper);
+
+		clearSession(request.getSession());
+
+		addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"), request);
+		forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 	}
 
-	public void removeAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed) {
-		StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
-		EventCRFDAO ecrfDao = new EventCRFDAO(sm.getDataSource());
-		ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+	public void removeAllEventsItems(StudyBean currentStudy, UserAccountBean ub, EventDefinitionCRFBean edc,
+			StudyEventDefinitionBean sed) {
+		StudyEventDAO seDao = new StudyEventDAO(getDataSource());
+		EventCRFDAO ecrfDao = new EventCRFDAO(getDataSource());
+		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
 
 		// Getting Study Events
 		ArrayList seList = seDao.findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), edc.getCrf().getOid());
-		for (int j = 0; j < seList.size(); j++) {
-			StudyEventBean seBean = (StudyEventBean) seList.get(j);
+		for (Object aSeList : seList) {
+			StudyEventBean seBean = (StudyEventBean) aSeList;
 			// Getting Event CRFs
 			ArrayList ecrfList = ecrfDao.findAllByStudyEventAndCrfOrCrfVersionOid(seBean, edc.getCrf().getOid());
-			for (int k = 0; k < ecrfList.size(); k++) {
-				EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
+			for (Object anEcrfList : ecrfList) {
+				EventCRFBean ecrfBean = (EventCRFBean) anEcrfList;
 				ecrfBean.setOldStatus(ecrfBean.getStatus());
 				ecrfBean.setStatus(Status.AUTO_DELETED);
 				ecrfBean.setUpdater(ub);
@@ -277,15 +309,15 @@ public class UpdateEventDefinitionServlet extends SecureController {
 				// Getting Item Data
 				ArrayList itemData = iddao.findAllByEventCRFId(ecrfBean.getId());
 				// remove all the item data
-				for (int a = 0; a < itemData.size(); a++) {
-					ItemDataBean item = (ItemDataBean) itemData.get(a);
+				for (Object anItemData : itemData) {
+					ItemDataBean item = (ItemDataBean) anItemData;
 					if (!item.getStatus().equals(Status.DELETED)) {
 						item.setOldStatus(item.getStatus());
 						item.setStatus(Status.AUTO_DELETED);
 						item.setUpdater(ub);
 						item.setUpdatedDate(new Date());
 						iddao.update(item);
-						DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
+						DiscrepancyNoteDAO dnDao = getDiscrepancyNoteDAO();
 						List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(item.getId());
 						if (!dnNotesOfRemovedItem.isEmpty()) {
 							DiscrepancyNoteBean itemParentNote = null;
@@ -310,7 +342,9 @@ public class UpdateEventDefinitionServlet extends SecureController {
 							dnb.setDescription("The item has been removed, this Discrepancy Note has been Closed.");
 							dnDao.create(dnb);
 							dnDao.createMapping(dnb);
-							itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+							if (itemParentNote != null) {
+								itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+							}
 							dnDao.update(itemParentNote);
 						}
 					}
@@ -319,19 +353,22 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		}
 	}
 
-	public void restoreAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed) {
-		StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
-		EventCRFDAO ecrfDao = new EventCRFDAO(sm.getDataSource());
-		ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+	public void restoreAllEventsItems(HttpServletRequest request, EventDefinitionCRFBean edc,
+			StudyEventDefinitionBean sed) {
+		UserAccountBean ub = getUserAccountBean(request);
+
+		StudyEventDAO seDao = getStudyEventDAO();
+		EventCRFDAO ecrfDao = getEventCRFDAO();
+		ItemDataDAO iddao = getItemDataDAO();
 
 		// All Study Events
 		ArrayList seList = seDao.findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), edc.getCrf().getOid());
-		for (int j = 0; j < seList.size(); j++) {
-			StudyEventBean seBean = (StudyEventBean) seList.get(j);
+		for (Object aSeList : seList) {
+			StudyEventBean seBean = (StudyEventBean) aSeList;
 			// All Event CRFs
 			ArrayList ecrfList = ecrfDao.findAllByStudyEventAndCrfOrCrfVersionOid(seBean, edc.getCrf().getOid());
-			for (int k = 0; k < ecrfList.size(); k++) {
-				EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
+			for (Object anEcrfList : ecrfList) {
+				EventCRFBean ecrfBean = (EventCRFBean) anEcrfList;
 				ecrfBean.setStatus(ecrfBean.getOldStatus());
 				ecrfBean.setUpdater(ub);
 				ecrfBean.setUpdatedDate(new Date());
@@ -339,8 +376,8 @@ public class UpdateEventDefinitionServlet extends SecureController {
 				// All Item Data
 				ArrayList itemData = iddao.findAllByEventCRFId(ecrfBean.getId());
 				// remove all the item data
-				for (int a = 0; a < itemData.size(); a++) {
-					ItemDataBean item = (ItemDataBean) itemData.get(a);
+				for (Object anItemData : itemData) {
+					ItemDataBean item = (ItemDataBean) anItemData;
 					if (item.getStatus().equals(Status.DELETED) || item.getStatus().equals(Status.AUTO_DELETED)) {
 						item.setStatus(item.getOldStatus());
 						item.setUpdater(ub);
@@ -352,12 +389,10 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		}
 
 	}
-	
-	@SuppressWarnings("unchecked")
-	private void checkReferenceVisit() {
+
+	private void checkReferenceVisit(HttpServletRequest request) {
 		boolean referenceVisitAlredyExist = false;
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(
-				sm.getDataSource());
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		ArrayList<StudyEventDefinitionBean> definitions = seddao.findReferenceVisitBeans();
 		for (StudyEventDefinitionBean studyEventDefinition : definitions) {
 			if (studyEventDefinition.getReferenceVisit()) {
@@ -367,15 +402,14 @@ public class UpdateEventDefinitionServlet extends SecureController {
 			}
 		}
 		if (referenceVisitAlredyExist) {
-			session.setAttribute("referenceVisitAlredyExist",
-					referenceVisitAlredyExist);
+			request.getSession().setAttribute("referenceVisitAlredyExist", referenceVisitAlredyExist);
 		}
 	}
-	
-	@SuppressWarnings("unchecked")
-	private boolean checkUserName(String emailUser) {
+
+	private boolean checkUserName(HttpServletRequest request, String emailUser) {
+		StudyBean currentStudy = getCurrentStudy(request);
 		boolean isValid = false;
-		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO uadao = getUserAccountDAO();
 		ArrayList<StudyUserRoleBean> userBean = uadao.findAllByStudyId(currentStudy.getId());
 		for (StudyUserRoleBean userAccountBean : userBean) {
 			if (emailUser.equals(userAccountBean.getUserName())) {
@@ -387,14 +421,14 @@ public class UpdateEventDefinitionServlet extends SecureController {
 	}
 
 	private int getIdByUserName(String userName) {
-		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO uadao = getUserAccountDAO();
 		UserAccountBean userBean = (UserAccountBean) uadao.findByUserName(userName);
 		return userBean.getId();
 	}
-	
+
 	private void saveEventDefinitionCRFsToSession(FormProcessor fp) {
-		ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+		ArrayList edcs = (ArrayList) fp.getRequest().getSession().getAttribute("eventDefinitionCRFs");
+		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
 		for (int i = 0; i < edcs.size(); i++) {
 			EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.get(i);
 			if (!edcBean.getStatus().equals(Status.DELETED) && !edcBean.getStatus().equals(Status.AUTO_DELETED)) {
@@ -442,8 +476,8 @@ public class UpdateEventDefinitionServlet extends SecureController {
 				String nullString = "";
 				// process null values
 				ArrayList nulls = NullValue.toArrayList();
-				for (int a = 0; a < nulls.size(); a++) {
-					NullValue n = (NullValue) nulls.get(a);
+				for (Object aNull : nulls) {
+					NullValue n = (NullValue) aNull;
 					String myNull = fp.getString(n.getName().toLowerCase() + i);
 					if (!StringUtil.isBlank(myNull) && "yes".equalsIgnoreCase(myNull.trim())) {
 						nullString = nullString + n.getName().toUpperCase() + ",";
@@ -452,8 +486,8 @@ public class UpdateEventDefinitionServlet extends SecureController {
 				}
 
 				if (sdvId > 0
-						&& (edcBean.getSourceDataVerification() == null || sdvId != edcBean
-								.getSourceDataVerification().getCode())) {
+						&& (edcBean.getSourceDataVerification() == null || sdvId != edcBean.getSourceDataVerification()
+								.getCode())) {
 					edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
 				}
 
@@ -462,9 +496,9 @@ public class UpdateEventDefinitionServlet extends SecureController {
 			}
 
 		}
-		session.setAttribute("eventDefinitionCRFs", edcs);			
+		fp.getRequest().getSession().setAttribute("eventDefinitionCRFs", edcs);
 	}
-	
+
 	private void saveEventDefinitionToSession(StudyEventDefinitionBean sed, FormProcessor fp) {
 		sed.setName(fp.getString("name"));
 		sed.setRepeating(fp.getBoolean("repeating"));
@@ -475,7 +509,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		sed.setMinDay(fp.getInt("minDay"));
 		sed.setScheduleDay(fp.getInt("schDay"));
 		int userId = getIdByUserName(fp.getString("emailUser"));
-		if(userId != 0) {
+		if (userId != 0) {
 			sed.setUserEmailId(userId);
 		} else {
 			sed.setUserEmailId(1);
@@ -487,12 +521,10 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		} else {
 			sed.setReferenceVisit(false);
 		}
-		session.setAttribute("definition", sed);
+		fp.getRequest().getSession().setAttribute("definition", sed);
 	}
-	
-	
-	
-	public static void clearSession(HttpSession session){
+
+	public static void clearSession(HttpSession session) {
 		session.removeAttribute("definition");
 		session.removeAttribute("eventDefinitionCRFs");
 		session.removeAttribute("tmpCRFIdMap");
@@ -503,6 +535,5 @@ public class UpdateEventDefinitionServlet extends SecureController {
 		session.removeAttribute("userNameInsteadEmail");
 		session.removeAttribute("sdvOptions");
 	}
-	
-	
+
 }
