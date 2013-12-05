@@ -121,6 +121,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
 		FormProcessor fp = new FormProcessor(request);
 
         request.setAttribute("expandCrfInfo", false);
@@ -213,7 +214,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			request.setAttribute("studySubject", sub);
 		}
 
-        ArrayList<DiscrepancyNoteBean> allNotes;
+        List<DiscrepancyNoteBean> allNotes;
         List<DiscrepancyNoteBean> eventCrfNotes;
         List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
 
@@ -239,6 +240,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 
 			allNotes = dndao.findAllTopNotesByEventCRF(eventCRFId);
+			
+			allNotes = filterStudyCoderNotes(allNotes, request);
+			
 			// add interviewer.jsp related notes to this Collection
 			eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
 			if (!eventCrfNotes.isEmpty()) {

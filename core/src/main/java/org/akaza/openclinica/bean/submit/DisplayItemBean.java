@@ -19,14 +19,15 @@
  */
 package org.akaza.openclinica.bean.submit;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.service.crfdata.SCDData;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
-
-import java.io.File;
-import java.util.ArrayList;
 
 @SuppressWarnings({"rawtypes"})
 public class DisplayItemBean implements Comparable {
@@ -47,7 +48,7 @@ public class DisplayItemBean implements Comparable {
 
 	private boolean skip;
 
-	private ArrayList<DiscrepancyNoteBean> discrepancyNotes;
+	private List<DiscrepancyNoteBean> discrepancyNotes;
 
 	// not in the database
 
@@ -575,11 +576,11 @@ public class DisplayItemBean implements Comparable {
 		this.totNA = totNA;
 	}
 
-	public ArrayList<DiscrepancyNoteBean> getDiscrepancyNotes() {
+	public List<DiscrepancyNoteBean> getDiscrepancyNotes() {
 		return discrepancyNotes;
 	}
 
-	public void setDiscrepancyNotes(ArrayList<DiscrepancyNoteBean> discrepancyNotes) {
+	public void setDiscrepancyNotes(List<DiscrepancyNoteBean> discrepancyNotes) {
 		this.discrepancyNotes = discrepancyNotes;
 	}
 

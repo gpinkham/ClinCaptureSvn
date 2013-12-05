@@ -263,7 +263,7 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	private void prepareSessionNotesIfValidationsWillFail(HttpServletRequest request, boolean hasGroup,
-			boolean isSubmitted, ArrayList<DiscrepancyNoteBean> allNotes) {
+			boolean isSubmitted, List<DiscrepancyNoteBean> allNotes) {
 		try {
 			if (request.getMethod().equalsIgnoreCase("POST") && request.getAttribute("section") == null) {
 				request.setAttribute("section", getDisplayBean(hasGroup, false, request, isSubmitted).getSection());
@@ -366,12 +366,18 @@ public abstract class DataEntryServlet extends Controller {
 		logMe("Enterting DataEntry Get the status/number of item discrepancy notes" + System.currentTimeMillis());
 		// Get the status/number of item discrepancy notes
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-		ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
+		List<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
 		List<DiscrepancyNoteBean> eventCrfNotes = new ArrayList<DiscrepancyNoteBean>();
 		List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
 		dndao = new DiscrepancyNoteDAO(getDataSource());
+		
 		allNotes = dndao.findAllTopNotesByEventCRF(ecb.getId());
 		eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
+		
+		// Filter out coder notes
+		allNotes = filterStudyCoderNotes(allNotes, request);
+		eventCrfNotes = filterStudyCoderNotes(eventCrfNotes, request);
+		
 		if (!eventCrfNotes.isEmpty()) {
 			allNotes.addAll(eventCrfNotes);
 
@@ -3511,10 +3517,14 @@ public abstract class DataEntryServlet extends Controller {
         DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-		ArrayList<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesFromEventCRF(ecb);
-		ArrayList<DiscrepancyNoteBean> existingNameNotes = new ArrayList();
-		ArrayList<DiscrepancyNoteBean> existingIntrvDateNotes = new ArrayList();
+		
+		List<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesFromEventCRF(ecb);
+		List<DiscrepancyNoteBean> existingNameNotes = new ArrayList();
+		List<DiscrepancyNoteBean> existingIntrvDateNotes = new ArrayList();
 		long t = System.currentTimeMillis();
+		
+		ecNotes = filterStudyCoderNotes(ecNotes, request);
+		
 		logMe("Method:populateNotesWithDBNoteCounts" + t);
 		for (int i = 0; i < ecNotes.size(); i++) {
 			DiscrepancyNoteBean dn = ecNotes.get(i);
@@ -3580,14 +3590,17 @@ public abstract class DataEntryServlet extends Controller {
 							dib.getData().setId(0);
 						}
 
-                        ArrayList dbNotes = dndao.findExistingNotesForItemData(itemDataId);
+                        List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
+                        
+                        dbNotes = filterStudyCoderNotes(dbNotes, request);
+                        
 						ArrayList notes = new ArrayList(discNotes.getNotes(inputName));
                         notes.addAll(dbNotes);
                         noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
                         discNotes.setNumExistingFieldNotes(inputName, dbNotes.size());
                         dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
 						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, itemDataId, discNotes.getNotes(inputName)));
-						dib = setTotals(dib, itemDataId, notes, ecb.getId());
+						dib = setTotals(dib, itemDataId, notes, ecb.getId(), request);
                         DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
 						logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId()
 								+ " " + inputName);
@@ -3612,14 +3625,17 @@ public abstract class DataEntryServlet extends Controller {
 				int itemId = dib.getItem().getId();
 				String inputFieldName = "input" + itemId;
 
-                ArrayList dbNotes = dndao.findExistingNotesForItemData(itemDataId);
+                List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
 				ArrayList notes = new ArrayList(discNotes.getNotes(inputFieldName));
+				
+				dbNotes = filterStudyCoderNotes(dbNotes, request);
+				
                 notes.addAll(dbNotes);
                 discNotes.setNumExistingFieldNotes(inputFieldName, dbNotes.size());
 				dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
 				dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, itemDataId,
 						discNotes.getNotes(inputFieldName)));
-				dib = setTotals(dib, itemDataId, discNotes.getNotes(inputFieldName), ecb.getId());
+				dib = setTotals(dib, itemDataId, discNotes.getNotes(inputFieldName), ecb.getId(), request);
                 noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
                 DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
 
@@ -3632,15 +3648,18 @@ public abstract class DataEntryServlet extends Controller {
 					String childInputFieldName = "input" + childItemId;
 
 					logger.debug("*** setting " + childInputFieldName);
-                    ArrayList dbChildNotes = dndao.findExistingNotesForItemData(childItemId);
-					ArrayList childNotes = new ArrayList(discNotes.getNotes(inputFieldName));
+                    List dbChildNotes = dndao.findExistingNotesForItemData(childItemId);
+                    List childNotes = new ArrayList(discNotes.getNotes(inputFieldName));
+
+                    dbChildNotes = filterStudyCoderNotes(dbChildNotes, request);
+
                     childNotes.addAll(dbNotes);
                     noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
                     discNotes.setNumExistingFieldNotes(childInputFieldName, dbChildNotes.size());
 					child.setNumDiscrepancyNotes(dbChildNotes.size() + childNotes.size());
 					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, childItemDataId,
 							discNotes.getNotes(childInputFieldName)));
-					child = setTotals(child, childItemDataId, discNotes.getNotes(childInputFieldName), ecb.getId());
+					child = setTotals(child, childItemDataId, discNotes.getNotes(childInputFieldName), ecb.getId(), request);
                     DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, child, noteThreads);
 					childItems.set(j, child);
 				}
@@ -3660,12 +3679,15 @@ public abstract class DataEntryServlet extends Controller {
 		logMe("Method:setToolTipEventNotes" + t);
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-		ArrayList<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesToolTips(ecb);
+		List<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesToolTips(ecb);
+		
+		ecNotes = filterStudyCoderNotes(ecNotes, request);
+		
 		ArrayList<DiscrepancyNoteBean> nameNotes = new ArrayList();
 		ArrayList<DiscrepancyNoteBean> dateNotes = new ArrayList();
 
-		for (int i = 0; i < ecNotes.size(); i++) {
-			DiscrepancyNoteBean dn = ecNotes.get(i);
+		for (DiscrepancyNoteBean dn : ecNotes) {
+			
 			if (INTERVIEWER_NAME.equalsIgnoreCase(dn.getColumn())) {
 				nameNotes.add(dn);
 			}
@@ -3688,13 +3710,17 @@ public abstract class DataEntryServlet extends Controller {
 	 *            TODO
 	 */
 	private DisplayItemBean setTotals(DisplayItemBean dib, int itemDataId, ArrayList<DiscrepancyNoteBean> notes,
-			int ecbId) {
+			int ecbId, HttpServletRequest request) {
 		long t = System.currentTimeMillis();
 		logMe("Method::::::setTotals" + t);
 		int totNew = 0, totRes = 0, totClosed = 0, totUpdated = 0, totNA = 0;
 		boolean hasOtherThread = false;
+		
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-		ArrayList<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
+		List<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
+		
+		existingNotes = filterStudyCoderNotes(existingNotes, request);
+		
 		dib.setDiscrepancyNotes(existingNotes);
 
 		for (DiscrepancyNoteBean obj : dib.getDiscrepancyNotes()) {
@@ -5009,6 +5035,7 @@ public abstract class DataEntryServlet extends Controller {
 	public static int getDiscrepancyNoteResolutionStatus(DiscrepancyNoteDAO dndao, int itemDataId, ArrayList formNotes) {
 		int resolutionStatus = 0;
 		boolean hasOtherThread = false;
+		
 		ArrayList existingNotes = dndao.findExistingNotesForItemData(itemDataId);
 		for (Object obj : existingNotes) {
 			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
@@ -5226,6 +5253,36 @@ public abstract class DataEntryServlet extends Controller {
 		result.put("field", field);
 		
 		return result;
+	}
+	
+	protected List<DiscrepancyNoteBean> filterStudyCoderNotes(List<DiscrepancyNoteBean> notes, HttpServletRequest request) {
+
+		if (isCoder(getUserAccountBean(request), request)) {
+
+			List<DiscrepancyNoteBean> filteredDiscrepancyNotes = new ArrayList<DiscrepancyNoteBean>();
+			
+			for (DiscrepancyNoteBean discrepancyNote : notes) {
+
+				UserAccountBean owner = (UserAccountBean) getUserAccountDAO().findByPK(discrepancyNote.getOwnerId());
+				UserAccountBean assignedUser = (UserAccountBean) getUserAccountDAO().findByPK(
+						discrepancyNote.getAssignedUserId());
+
+				if (isCoder(assignedUser, request) || isCoder(owner, request)) {
+
+					filteredDiscrepancyNotes.add(discrepancyNote);
+				}
+			}
+			
+			return filteredDiscrepancyNotes;
+			
+		} else {
+			return notes;
+		}
+
+	}
+
+	protected boolean isCoder(UserAccountBean loggedInUser, HttpServletRequest request) {
+		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("study coder");
 	}
 	
 }
