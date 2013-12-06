@@ -2,81 +2,58 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    <changeSet author="skirpichenok" id="2012-11-23-TICKET111-0">
-        <validCheckSum>6e7d32c7d34c4a673ae6d31398433a1d</validCheckSum>
-        <validCheckSum>7f5c6c6fccc2cd345e601ba85fc3fdbd</validCheckSum>
-        <validCheckSum>d41d8cd98f0b24e980998ecf8427e</validCheckSum>
-        <comment>set subject_event_status to 4 (COMPLETED) for all study_event's that do not have CRF's with status != UNAVAILABLE and != LOCKED (this means that the subject_event_status has status 'completed')</comment>
-        <!-- this sql script is not needed! -->
-        <!--sql splitStatements="false">
-            update study_event set subject_event_status_id = 4 where study_event_id in (
-            select se.study_event_id
-
-            from study_event_definition sed
-
-            join study s on (s.study_id = sed.study_id or s.parent_study_id = sed.study_id)
-
-            join (select study_event_id, study_subject_id, study_event_definition_id, subject_event_status_id from study_event where subject_event_status_id in (3)) se on (se.study_event_definition_id = sed.study_event_definition_id)
-
-            join event_definition_crf edc on edc.study_event_definition_id = se.study_event_definition_id and edc.study_id = s.study_id
-
-            join (select event_crf_id, study_event_id, study_subject_id, crf_version_id from event_crf) ec on ec.study_event_id = se.study_event_id and ec.study_subject_id = se.study_subject_id
-
-            join crf_version cv on cv.crf_version_id = ec.crf_version_id and cv.crf_id = edc.crf_id
-
-            where sed.status_id = 1 and edc.status_id = 1 and
-
-            (select count(event_crf_id) from event_crf where not_started = false and status_id not in (2,6) and study_event_id = se.study_event_id and study_subject_id = se.study_subject_id) = 0
-
-            group by se.study_event_id)
-        </sql-->
+    <changeSet author="skirpichenok" id="2012-11-23-TICKET111-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from audit_log_event_type where audit_log_event_type_id = 33 and name = 'study_event_source_data_verified'</sqlCheck>
+        </preConditions>
+        <comment>Set new id for the existing record in the audit_log_event_type table</comment>
+        <update tableName="audit_log_event_type">
+            <column name="audit_log_event_type_id" value="50"/>
+            <where>audit_log_event_type_id=33</where>
+        </update>
+        <update tableName="audit_log_event">
+            <column name="audit_log_event_type_id" value="50"/>
+            <where>audit_log_event_type_id=33</where>
+        </update>
     </changeSet>
-    <changeSet author="skirpichenok" id="2012-11-23-TICKET111-1">
-        <validCheckSum>6e7d32c7d34c4a673ae6d31398433a1d</validCheckSum>
-        <validCheckSum>7f5c6c6fccc2cd345e601ba85fc3fdbd</validCheckSum>
-        <validCheckSum>d41d8cd98f0b24e980998ecf8427e</validCheckSum>
-        <comment>set subject_event_status to 3 (DATA_ENTRY_STARTED) for all study_event's that have minimum one CRF with status AVAILABLE (this means that the CRF has status 'initial data entry')</comment>
-        <!-- this sql script is not needed! -->
-        <!--sql splitStatements="false">
-            update study_event set subject_event_status_id = 3 where study_event_id in (
-            select se.study_event_id
-
-            from study_event_definition sed
-
-            join study s on (s.study_id = sed.study_id or s.parent_study_id = sed.study_id)
-
-            join (select study_event_id, study_subject_id, study_event_definition_id, subject_event_status_id from study_event where subject_event_status_id >= 4) se on (se.study_event_definition_id = sed.study_event_definition_id)
-
-            join event_definition_crf edc on edc.study_event_definition_id = se.study_event_definition_id and edc.study_id = s.study_id
-
-            join (select event_crf_id, study_event_id, study_subject_id, crf_version_id from event_crf) ec on ec.study_event_id = se.study_event_id and ec.study_subject_id = se.study_subject_id
-
-            join crf_version cv on cv.crf_version_id = ec.crf_version_id and cv.crf_id = edc.crf_id
-
-            where sed.status_id = 1 and edc.status_id = 1 and
-
-            (select count(event_crf_id) from event_crf where not_started = false and status_id in (1) and study_event_id = se.study_event_id and study_subject_id = se.study_subject_id) > 0
-
-            group by se.study_event_id)
-        </sql-->
+    <changeSet author="skirpichenok" id="2012-11-23-TICKET111-5">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from audit_log_event_type where audit_log_event_type_id = 34 and name = 'study_event_deleted'</sqlCheck>
+        </preConditions>
+        <comment>Set new id for the existing record in the audit_log_event_type table</comment>
+        <update tableName="audit_log_event_type">
+            <column name="audit_log_event_type_id" value="51"/>
+            <where>audit_log_event_type_id=34</where>
+        </update>
+        <update tableName="audit_log_event">
+            <column name="audit_log_event_type_id" value="51"/>
+            <where>audit_log_event_type_id=34</where>
+        </update>
     </changeSet>
-    <changeSet author="skirpichenok" id="2012-11-23-TICKET111-2">
+    <changeSet author="skirpichenok" id="2012-11-23-TICKET111-6">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from audit_log_event_type where audit_log_event_type_id = 50 and name = 'study_event_source_data_verified'</sqlCheck>
+        </preConditions>
         <comment>Insert a new record into the audit_log_event_type table</comment>
         <insert tableName="audit_log_event_type">
-            <column name="audit_log_event_type_id" valueNumeric="33"/>
+            <column name="audit_log_event_type_id" valueNumeric="50"/>
             <column name="name" value="study_event_source_data_verified"/>
         </insert>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2012-11-23-TICKET111-7">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from audit_log_event_type where audit_log_event_type_id = 51 and name = 'study_event_deleted'</sqlCheck>
+        </preConditions>
         <comment>Insert a new record into the audit_log_event_type table</comment>
         <insert tableName="audit_log_event_type">
-            <column name="audit_log_event_type_id" valueNumeric="34"/>
+            <column name="audit_log_event_type_id" valueNumeric="51"/>
             <column name="name" value="study_event_deleted"/>
         </insert>
     </changeSet>
-    <changeSet author="skirpichenok" id="2012-11-23-TICKET111-3">
-        <validCheckSum>16e935849235a628171c1a4adcfeef7a</validCheckSum>
-        <validCheckSum>19cab930b1ad83abd637ee419ebcf968</validCheckSum>
-        <validCheckSum>d41d8cd98f0b24e980998ecf8427e</validCheckSum>
-        <preConditions onFail="MARK_RAN"><dbms type="postgresql"/></preConditions>
+    <changeSet author="skirpichenok" id="2012-11-23-TICKET111-8">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql" />
+        </preConditions>
         <comment>update study_event_trigger()</comment>
         <sql splitStatements="false">
             CREATE OR REPLACE FUNCTION study_event_trigger()
@@ -118,10 +95,10 @@
             VALUES (pk, ''31'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
             ELSIF(NEW.subject_event_status_id = ''9'') THEN
             INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
-            VALUES (pk, ''33'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            VALUES (pk, ''50'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
             ELSIF(NEW.subject_event_status_id = ''10'') THEN
             INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
-            VALUES (pk, ''34'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            VALUES (pk, ''51'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
             END IF;
             END IF;
             IF(OLD.status_id <![CDATA[<>]]> NEW.status_id) THEN

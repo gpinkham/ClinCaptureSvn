@@ -3,6 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     <changeSet author="skirpichenok" id="2013-08-09-TICKET32-01">
+        <validCheckSum>14b541382a4c7e840fa2ffe1cd2a877</validCheckSum>
         <comment>Insert a new record in the studyParameter table</comment>
         <insert tableName="study_parameter">
             <column name="study_parameter_id" valueNumeric="31"/>
@@ -14,8 +15,28 @@
             <column name="inheritable" valueBoolean="true"/>
             <column name="overridable" valueBoolean="false"/>
         </insert>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2013-08-09-TICKET32-02">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from audit_log_event_type where audit_log_event_type_id = 35 and name = 'item_data_skipped'</sqlCheck>
+        </preConditions>
+        <comment>Set new id for the existing record in the audit_log_event_type table</comment>
+        <update tableName="audit_log_event_type">
+            <column name="audit_log_event_type_id" value="52"/>
+            <where>audit_log_event_type_id=35</where>
+        </update>
+        <update tableName="audit_log_event">
+            <column name="audit_log_event_type_id" value="52"/>
+            <where>audit_log_event_type_id=35</where>
+        </update>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2013-08-09-TICKET32-03">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from audit_log_event_type where audit_log_event_type_id = 52 and name = 'item_data_skipped'</sqlCheck>
+        </preConditions>
+        <comment>Insert a new record into the audit_log_event_type table</comment>
         <insert tableName="audit_log_event_type">
-            <column name="audit_log_event_type_id" valueNumeric="35"/>
+            <column name="audit_log_event_type_id" valueNumeric="52"/>
             <column name="name" value="item_data_skipped"/>
         </insert>
     </changeSet>

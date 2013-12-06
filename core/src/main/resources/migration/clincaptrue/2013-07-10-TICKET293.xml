@@ -2,13 +2,34 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    <changeSet author="skirpichenok" id="2013-07-10-TICKET293-01">
+    <changeSet author="skirpichenok" id="2013-07-10-TICKET293-02" dbms="postgresql">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT 1 FROM pg_constraint WHERE conname = 'dn_discrepancy_note_type_id_fk'</sqlCheck>
+        </preConditions>
         <sql splitStatements="false">
             ALTER TABLE discrepancy_note DROP CONSTRAINT dn_discrepancy_note_type_id_fk;
-
+        </sql>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2013-07-10-TICKET293-03" dbms="oracle">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT 1 FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME = 'DN_DISCREPANCY_NOTE_TYPE_ID_FK'</sqlCheck>
+        </preConditions>
+        <sql splitStatements="false">
+            ALTER TABLE discrepancy_note DROP CONSTRAINT dn_discrepancy_note_type_id_fk;
+        </sql>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2013-07-10-TICKET293-04">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="5">select count(discrepancy_note_type_id) from discrepancy_note_type where (discrepancy_note_type_id = 2 and name = 'Incomplete') or (discrepancy_note_type_id = 3 and name = 'Unclear/Unreadable') or (discrepancy_note_type_id = 4 and name = 'Annotation') or (discrepancy_note_type_id = 6 and name = 'Query') or (discrepancy_note_type_id = 7 and name = 'Reason for Change')</sqlCheck>
+        </preConditions>
+        <sql splitStatements="false">
+            update discrepancy_note set discrepancy_note_type_id = 8 where discrepancy_note_type_id = 2;
+            update discrepancy_note set discrepancy_note_type_id = 9 where discrepancy_note_type_id = 3;
             update discrepancy_note set discrepancy_note_type_id = 2 where discrepancy_note_type_id = 4;
             update discrepancy_note set discrepancy_note_type_id = 3 where discrepancy_note_type_id = 6;
             update discrepancy_note set discrepancy_note_type_id = 4 where discrepancy_note_type_id = 7;
+            update discrepancy_note set discrepancy_note_type_id = 6 where discrepancy_note_type_id = 8;
+            update discrepancy_note set discrepancy_note_type_id = 7 where discrepancy_note_type_id = 9;
 
             update discrepancy_note_type set discrepancy_note_type_id = 8 where name = 'Incomplete';
             update discrepancy_note_type set discrepancy_note_type_id = 9 where name = 'Unclear/Unreadable';
@@ -17,11 +38,14 @@
             update discrepancy_note_type set discrepancy_note_type_id = 4 where name = 'Reason for Change';
             update discrepancy_note_type set discrepancy_note_type_id = 6 where name = 'Incomplete';
             update discrepancy_note_type set discrepancy_note_type_id = 7 where name = 'Unclear/Unreadable';
-
-            ALTER TABLE discrepancy_note
-            ADD CONSTRAINT dn_discrepancy_note_type_id_fk FOREIGN KEY (discrepancy_note_type_id)
-            REFERENCES discrepancy_note_type (discrepancy_note_type_id) MATCH SIMPLE
-            ON UPDATE RESTRICT ON DELETE RESTRICT;
         </sql>
+    </changeSet>
+    <changeSet author="skirpichenok" id="2013-07-10-TICKET293-05">
+        <addForeignKeyConstraint constraintName="dn_discrepancy_note_type_id_fk"
+                                 baseColumnNames="discrepancy_note_type_id"
+                                 baseTableName="discrepancy_note"
+                                 onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="discrepancy_note_type_id"
+                                 referencedTableName="discrepancy_note_type"/>
     </changeSet>
 </databaseChangeLog>

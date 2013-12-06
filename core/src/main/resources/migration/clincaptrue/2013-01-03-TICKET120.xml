@@ -3,72 +3,87 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     <changeSet author="skirpichenok" id="2013-01-03-TICKET120-01">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from configuration where key = 'pwd.chars.min'</sqlCheck>
+        </preConditions>
         <insert tableName="configuration">
             <column name="key" value="pwd.chars.min"/>
             <column name="value" value="8"/>
             <column name="description" value="Password minimum length"/>
             <column name="version" value="0"/>
-
         </insert>
     </changeSet>
     <changeSet author="skirpichenok" id="2013-01-03-TICKET120-02">
-
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from configuration where key = 'pwd.chars.max'</sqlCheck>
+        </preConditions>
         <insert tableName="configuration">
             <column name="key" value="pwd.chars.max"/>
             <column name="value" value="-1"/>
             <column name="description" value="Password maximum length"/>
             <column name="version" value="0"/>
-
         </insert>
     </changeSet>
     <changeSet author="skirpichenok" id="2013-01-03-TICKET120-03">
-
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from configuration where key = 'pwd.chars.case.lower'</sqlCheck>
+        </preConditions>
         <insert tableName="configuration">
             <column name="key" value="pwd.chars.case.lower"/>
             <column name="value" value="false"/>
             <column name="description" value="Whether the password must contain lowercase letters"/>
             <column name="version" value="0"/>
-
         </insert>
     </changeSet>
     <changeSet author="skirpichenok" id="2013-01-03-TICKET120-04">
-
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from configuration where key = 'pwd.chars.case.upper'</sqlCheck>
+        </preConditions>
         <insert tableName="configuration">
             <column name="key" value="pwd.chars.case.upper"/>
             <column name="value" value="false"/>
             <column name="description" value="Whether the password must contain upper case letters"/>
             <column name="version" value="0"/>
-
         </insert>
     </changeSet>
     <changeSet author="skirpichenok" id="2013-01-03-TICKET120-5">
-
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from configuration where key = 'pwd.chars.digits'</sqlCheck>
+        </preConditions>
         <insert tableName="configuration">
             <column name="key" value="pwd.chars.digits"/>
             <column name="value" value="false"/>
             <column name="description" value="Whether the password must contain digits"/>
             <column name="version" value="0"/>
-
         </insert>
     </changeSet>
     <changeSet author="skirpichenok" id="2013-01-03-TICKET120-6">
-
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from configuration where key = 'pwd.chars.specials'</sqlCheck>
+        </preConditions>
         <insert tableName="configuration">
             <column name="key" value="pwd.chars.specials"/>
             <column name="value" value="false"/>
             <column name="description" value="Whether the password must special character"/>
             <column name="version" value="0"/>
-
         </insert>
     </changeSet>
     <changeSet author="skirpichenok" id="2013-01-03-TICKET120-7">
+        <validCheckSum>92b65ac896926402fa9cd24bfec8917</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from configuration where key = 'pwd.expiration.days'</sqlCheck>
+        </preConditions>
         <insert tableName="configuration">
             <column name="key" value="pwd.expiration.days"/>
             <column name="value" value="360"/>
             <column name="description" value="Number of days after a password expires"/>
             <column name="version" value="0"/>
         </insert>
-
+    </changeSet>
+    <changeSet author="skirpichenok" id="2013-01-03-TICKET120-8">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from configuration where key = 'pwd.change.required'</sqlCheck>
+        </preConditions>
         <insert tableName="configuration">
             <column name="key" value="pwd.change.required"/>
             <column name="value" value="1"/>
