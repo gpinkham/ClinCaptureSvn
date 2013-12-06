@@ -82,15 +82,15 @@ public class ExportDatasetServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		DatasetDAO dsdao = getDatasetDAO();
 		ArchivedDatasetFileDAO asdfdao = getArchivedDatasetFileDAO();
 		FormProcessor fp = new FormProcessor(request);
 
-		GenerateExtractFileService generateFileService = new GenerateExtractFileService(getDataSource(), request,
-				ub, getCoreResources(), getRuleSetRuleDao());
+		GenerateExtractFileService generateFileService = new GenerateExtractFileService(getDataSource(), request, ub,
+				getCoreResources(), getRuleSetRuleDao());
 		String action = fp.getString("action");
 		int datasetId = fp.getInt("datasetId");
 		int adfId = fp.getInt("adfId");
@@ -112,14 +112,14 @@ public class ExportDatasetServlet extends Controller {
 
 		// Checks if the study is current study or child of current study
 		if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"), request);
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study") + " "
+							+ respage.getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
 
 		int currentstudyid = currentStudy.getId();
-		int parentstudy = currentstudyid;
 
 		StudyBean parentStudy = new StudyBean();
 		if (currentStudy.getParentStudyId() > 0) {
@@ -132,22 +132,24 @@ public class ExportDatasetServlet extends Controller {
 			loadList(db, asdfdao, datasetId, fp, eb);
 			forwardPage(Page.EXPORT_DATASETS, request, response);
 		} else if ("delete".equalsIgnoreCase(action) && adfId > 0) {
-			boolean success = false;
+			boolean success;
 			ArchivedDatasetFileBean adfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(adfId);
-			File file = new File(adfBean.getFileReference());
-			if (!file.canWrite()) {
-				addPageMessage(respage.getString("write_protected"), request);
-			} else {
-				success = file.delete();
-				if (success) {
-					asdfdao.deleteArchiveDataset(adfBean);
-					addPageMessage(respage.getString("file_removed"), request);
+			if (adfBean.getId() > 0) {
+				File file = new File(adfBean.getFileReference());
+				if (!file.canWrite()) {
+					addPageMessage(respage.getString("write_protected"), request);
 				} else {
-					addPageMessage(respage.getString("error_removing_file"), request);
+					success = file.delete();
+					if (success) {
+						asdfdao.deleteArchiveDataset(adfBean);
+						addPageMessage(respage.getString("file_removed"), request);
+					} else {
+						addPageMessage(respage.getString("error_removing_file"), request);
+					}
 				}
+				loadList(db, asdfdao, datasetId, fp, eb);
 			}
-			loadList(db, asdfdao, datasetId, fp, eb);
-			forwardPage(Page.EXPORT_DATASETS, request, response);
+			response.sendRedirect(request.getContextPath() + "/ExportDataset?datasetId=" + datasetId);
 		} else {
 			logger.info("**** found action ****: " + action);
 			String generateReport = "";
@@ -156,7 +158,7 @@ public class ExportDatasetServlet extends Controller {
 			SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
 			String generalFileDir = DATASET_DIR + db.getId() + File.separator + sdfDir.format(new java.util.Date());
 			db.setName(db.getName().replaceAll(" ", "_"));
-			Page finalTarget = Page.GENERATE_DATASET;
+			Page finalTarget;
 			finalTarget = Page.EXPORT_DATA_CUSTOM;
 
 			// now display report according to format specified
@@ -176,16 +178,15 @@ public class ExportDatasetServlet extends Controller {
 				String odmVersion = fp.getString("odmVersion");
 				String ODMXMLFileName = "";
 				HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db,
-						currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true,
-						true, true, null);
+						currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true, true,
+						true, null);
 
-				for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
-					java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
+				for (Object o : answerMap.entrySet()) {
+					Map.Entry entry = (Map.Entry) o;
 					Object key = entry.getKey();
 					Object value = entry.getValue();
 					ODMXMLFileName = (String) key;
-					Integer fileID = (Integer) value;
-					fId = fileID.intValue();
+					fId = (Integer) value;
 				}
 				request.setAttribute("generate", generalFileDir + ODMXMLFileName);
 				System.out.println("+++ set the following: " + generalFileDir + ODMXMLFileName);
@@ -206,7 +207,7 @@ public class ExportDatasetServlet extends Controller {
 					// the generalFileDir
 					SimpleTriggerImpl simpleTrigger = xts.generateXalanTrigger(propertiesPath + File.separator
 							+ "ODMReportStylesheet.xsl", ODMXMLFileName, generalFileDir + "output.sql", db.getId());
-                    StdScheduler scheduler = getStdScheduler();
+					StdScheduler scheduler = getStdScheduler();
 
 					JobDetailImpl jobDetailBean = new JobDetailImpl();
 					jobDetailBean.setGroup(XalanTriggerService.TRIGGER_GROUP_NAME);
@@ -226,19 +227,18 @@ public class ExportDatasetServlet extends Controller {
 			} else if ("txt".equalsIgnoreCase(action)) {
 				String TXTFileName = "";
 				HashMap answerMap = generateFileService.createTabFile(eb, sysTimeBegin, generalFileDir, db,
-						currentstudyid, parentstudy, "");
+						currentstudyid, currentstudyid, "");
 				// the above gets us the best of both worlds - the file name,
 				// together with the file id which we can then
 				// push out to the browser. Shame that it is a long hack,
 				// though. need to pare it down later, tbh
 				// and of course DRY
-				for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
-					java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
+				for (Object o : answerMap.entrySet()) {
+					Map.Entry entry = (Map.Entry) o;
 					Object key = entry.getKey();
 					Object value = entry.getValue();
 					TXTFileName = (String) key;
-					Integer fileID = (Integer) value;
-					fId = fileID.intValue();
+					fId = (Integer) value;
 				}
 				request.setAttribute("generate", generalFileDir + TXTFileName);
 				System.out.println("+++ set the following: " + generalFileDir + TXTFileName);
@@ -246,7 +246,7 @@ public class ExportDatasetServlet extends Controller {
 				// html based dataset browser
 				TabReportBean answer = new TabReportBean();
 
-				eb = dsdao.getDatasetData(eb, currentstudyid, parentstudy);
+				eb = dsdao.getDatasetData(eb, currentstudyid, currentstudyid);
 				eb.getMetadata();
 				eb.computeReport(answer);
 				request.setAttribute("dataset", db);
@@ -256,7 +256,7 @@ public class ExportDatasetServlet extends Controller {
 			} else if ("spss".equalsIgnoreCase(action)) {
 				SPSSReportBean answer = new SPSSReportBean();
 
-				eb = dsdao.getDatasetData(eb, currentstudyid, parentstudy);
+				eb = dsdao.getDatasetData(eb, currentstudyid, currentstudyid);
 
 				eb.getMetadata();
 
@@ -266,19 +266,18 @@ public class ExportDatasetServlet extends Controller {
 				HashMap answerMap = generateFileService.createSPSSFile(db, eb, currentStudy, parentStudy, sysTimeBegin,
 						generalFileDir, answer, "");
 
-				for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
-					java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
+				for (Object o : answerMap.entrySet()) {
+					Map.Entry entry = (Map.Entry) o;
 					Object key = entry.getKey();
 					Object value = entry.getValue();
 					DDLFileName = (String) key;
-					Integer fileID = (Integer) value;
-					fId = fileID.intValue();
+					fId = (Integer) value;
 				}
 				request.setAttribute("generate", generalFileDir + DDLFileName);
 				System.out.println("+++ set the following: " + generalFileDir + DDLFileName);
 			} else if ("csv".equalsIgnoreCase(action)) {
 				CommaReportBean answer = new CommaReportBean();
-				eb = dsdao.getDatasetData(eb, currentstudyid, parentstudy);
+				eb = dsdao.getDatasetData(eb, currentstudyid, currentstudyid);
 				eb.getMetadata();
 				eb.computeReport(answer);
 				long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
@@ -337,9 +336,10 @@ public class ExportDatasetServlet extends Controller {
 	}
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -349,28 +349,12 @@ public class ExportDatasetServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
-	}
-
-	public ArchivedDatasetFileBean generateFileBean(File datasetFile, String relativePath, int formatId) {
-		ArchivedDatasetFileBean adfb = new ArchivedDatasetFileBean();
-		adfb.setName(datasetFile.getName());
-		if (datasetFile.canRead()) {
-			logger.info("File can be read");
-		} else {
-			logger.info("File CANNOT be read");
-		}
-		logger.info("Found file length: " + datasetFile.length());
-		logger.info("Last Modified: " + datasetFile.lastModified());
-		adfb.setFileSize(new Long(datasetFile.length()).intValue());
-		adfb.setExportFormatId(formatId);
-		adfb.setWebPath(relativePath);
-		adfb.setDateCreated(new java.util.Date(datasetFile.lastModified()));
-		return adfb;
 	}
 
 	private void openZipFile(String fileName) {
@@ -387,6 +371,7 @@ public class ExportDatasetServlet extends Controller {
 					// children.
 					System.out.println("Extracting directory: " + entry.getName());
 					// This is not robust, just for demonstration purposes.
+					// noinspection ResultOfMethodCallIgnored
 					(new File(entry.getName())).mkdir();
 					// no dirs necessary?
 					continue;
@@ -401,22 +386,20 @@ public class ExportDatasetServlet extends Controller {
 		} catch (java.io.IOException ioe) {
 			System.err.println("Unhandled exception:");
 			ioe.printStackTrace();
-			return;
 		}
 	}
 
 	public void loadList(DatasetBean db, ArchivedDatasetFileDAO asdfdao, int datasetId, FormProcessor fp, ExtractBean eb) {
 		logger.info("action is blank");
-        fp.getRequest().setAttribute("dataset", db);
+		fp.getRequest().setAttribute("dataset", db);
 		logger.info("just set dataset to request");
-        fp.getRequest().setAttribute("extractProperties", CoreResources.getExtractProperties());
-		ArrayList fileListRaw = new ArrayList();
+		fp.getRequest().setAttribute("extractProperties", CoreResources.getExtractProperties());
+		ArrayList fileListRaw;
 		fileListRaw = asdfdao.findByDatasetId(datasetId);
-        ArrayList fileList = new ArrayList();
-		Iterator fileIterator = fileListRaw.iterator();
-		while (fileIterator.hasNext()) {
+		ArrayList fileList = new ArrayList();
+		for (Object aFileListRaw : fileListRaw) {
 
-			ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) fileIterator.next();
+			ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) aFileListRaw;
 			asdfBean.setWebPath(asdfBean.getFileReference());
 
 			if (new File(asdfBean.getFileReference()).isFile()) {
@@ -428,7 +411,7 @@ public class ExportDatasetServlet extends Controller {
 
 		logger.warn("");
 		logger.warn("file list length: " + fileList.size());
-        fp.getRequest().setAttribute("filelist", fileList);
+		fp.getRequest().setAttribute("filelist", fileList);
 
 		ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(fileList);
 		EntityBeanTable table = fp.getEntityBeanTable();
@@ -446,15 +429,15 @@ public class ExportDatasetServlet extends Controller {
 
 		table.setQuery("ExportDataset?datasetId=" + db.getId(), new HashMap());
 		// trying to continue...
-        fp.getRequest().getSession().setAttribute("newDataset", db);
+		fp.getRequest().getSession().setAttribute("newDataset", db);
 		table.setRows(filterRows);
 		table.computeDisplay();
 
-        SimpleDateFormat local_df = getLocalDf(fp.getRequest());
+		SimpleDateFormat local_df = getLocalDf(fp.getRequest());
 
-        fp.getRequest().setAttribute("table", table);
-        StudyInfoPanel panel = getStudyInfoPanel(fp.getRequest());
-        panel.reset();
+		fp.getRequest().setAttribute("table", table);
+		StudyInfoPanel panel = getStudyInfoPanel(fp.getRequest());
+		panel.reset();
 		panel.setStudyInfoShown(false);
 		setToPanel(resword.getString("study_name"), eb.getStudy().getName(), fp.getRequest());
 		setToPanel(resword.getString("protocol_ID"), eb.getStudy().getIdentifier(), fp.getRequest());
@@ -473,9 +456,9 @@ public class ExportDatasetServlet extends Controller {
 
 	}
 
-	private static final void copyInputStream(InputStream in, OutputStream out) throws IOException {
+	private static void copyInputStream(InputStream in, OutputStream out) throws IOException {
 		byte[] buffer = new byte[1024];
-		int len = 0;
+		int len;
 
 		while ((len = in.read(buffer)) > 0)
 			out.write(buffer, 0, len);
