@@ -2206,6 +2206,17 @@ a.dnShortcut:hover {
     cursor: pointer;
 }
 
+.rule-table-expression-td {
+    width: 450px;
+}
+
+.rule-table-action-summary-td {
+    width: 350px;
+}
+
+.action-summary-table {
+    width: 350px;
+}
 .popup-box-buttons {
     padding-top: 5px;
     padding-bottom: 5px;

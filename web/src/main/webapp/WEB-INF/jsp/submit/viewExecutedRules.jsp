@@ -69,8 +69,8 @@
 		<fmt:message key="rule_execute_rule_title" bundle="${resword}"/>
 	</span>
 </h1>
-
-<div style="width: 600px">
+<table><tr><td>
+<div>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="tablebox_center">
@@ -94,7 +94,7 @@
 </div>
 </div></div></div></div></div></div></div></div>
 
-</div>
+</div></td></tr></table>
 <br>
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
@@ -105,7 +105,7 @@
 </c:otherwise>
 </c:choose>
 <c:if test="${fn:length(ruleSetResult) > 0}">
-<div style="width: 850px">
+<div>
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -122,10 +122,10 @@
     <tr valign="top">
     <td  class="table_cell_left"><c:out value="${result.ruleName}"/></td>
     <td  class="table_cell"><c:out value="${result.ruleOid}"/></td>
-    <td  class="table_cell"><c:out value="${result.expression}"/></td>
+    <td  class="table_cell rule-table-expression-td"><c:out value="${result.expression}"/></td>
     <td class="table_cell"><c:out value="${result.executeOn}"/></td>
     <td class="table_cell"><c:out value="${result.actionType}"/></td>
-    <td class="table_cell"><c:out value="${result.actionSummary}"/></td>
+    <td class="table_cell rule-table-action-summary-td"><c:out value="${result.actionSummary}"/></td>
     <td class="table_cell">
 		<span id="a${status.count}" onClick="showOrHideSubjects(${status.count},'<fmt:message key="rule_show_subjects" bundle="${resword}" />','<fmt:message key="rule_hide_subjects" bundle="${resword}" />')">
 			<img src="images/bt_Details.gif" border="0" alt="<fmt:message key="rule_show_subjects" bundle="${resword}" />" title="<fmt:message key="rule_show_subjects" bundle="${resword}" />"/>		

@@ -59,8 +59,8 @@ function confirmRemove(){
 		<fmt:message key="rule_manage_rule_title" bundle="${resword}"/> <c:out value="${ruleSet.itemName}"/>
 	</span>
 </h1>
-
-<div style="width: 600px">
+<table><tr><td>
+<div>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="tablebox_center">
@@ -85,7 +85,7 @@ function confirmRemove(){
 </div>
 </div></div></div></div></div></div></div></div>
 
-</div>
+</div></td></tr></table>
 <br>
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
@@ -95,7 +95,7 @@ function confirmRemove(){
 <span class="table_title_Manage">
 </c:otherwise>
 </c:choose>
-<div style="width: 1000px">
+<div>
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="tablebox_center">
@@ -127,7 +127,7 @@ function confirmRemove(){
     <tr valign="top">
     <td rowspan="${count +1}" class="table_cell_left"><c:out value="${ruleSetRule.ruleBean.name}"/></td>
     <td rowspan="${count +1}" class="table_cell"><c:out value="${ruleSetRule.ruleBean.oid}"/></td>
-    <td rowspan="${count +1}" class="table_cell"><c:out value="${ruleSetRule.ruleBean.expression.value}"/></td>
+    <td rowspan="${count +1}" class="table_cell rule-table-expression-td"><c:out value="${ruleSetRule.ruleBean.expression.value}"/></td>
     <td rowspan="${count +1}" class="table_cell <c:out value='${className}'/>">${ruleSetRule.status.description}</td>
     <td class="table_cell"></td>
     <td class="table_cell">&nbsp;</td>
@@ -186,7 +186,7 @@ function confirmRemove(){
         <c:forEach items="${status.current.value}" var="val">
         <tr valign="top">
             <td class="table_cell">
-            <table>
+            <table class="action-summary-table">
                 <c:forEach items="${val.propertiesForDisplay}" var="mapEntry" varStatus="status">
                 <tr valign="top">
                     <td ><i><fmt:message key="${mapEntry.key}" bundle="${resword}" /></i></td>
