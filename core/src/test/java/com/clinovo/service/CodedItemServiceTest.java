@@ -182,7 +182,7 @@ public class CodedItemServiceTest extends DefaultAppContextTest {
 		codedItemService.saveCodedItem(codedItem);
 		
 		// Item data value should match coded item codedTerm
-		assertEquals("07/01/2008", ((ItemDataBean)itemDataDAO.findByPK(1)).getValue());
+		assertEquals("itemCode5", ((ItemDataBean)itemDataDAO.findByPK(1)).getValue());
 	}
 	
 	@Test
