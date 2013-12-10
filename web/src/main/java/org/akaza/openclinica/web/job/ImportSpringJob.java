@@ -384,6 +384,8 @@ public class ImportSpringJob extends QuartzJobBean {
 		File xsdFile2 = new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
 		boolean fail = false;
 		ODMContainer odmContainer = new ODMContainer();
+        BufferedWriter out;
+
 		for (File f : dest) {
 			String regex = "\\s+"; // all whitespace, one or more times
 			String replacement = "_"; // replace with underscores
@@ -398,7 +400,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				logDestDirectory.mkdirs();
 			}
 			File newFile = new File(logDestDirectory, "log.txt");
-			BufferedWriter out = new BufferedWriter(new FileWriter(newFile));
+			out = new BufferedWriter(new FileWriter(newFile));
 
 			// TODO add more info here, like a timestamp
 
@@ -465,7 +467,6 @@ public class ImportSpringJob extends QuartzJobBean {
 					msg.append("You can see the log file <a href='" + SQLInitServlet.getSystemURL()
 							+ "ViewLogMessage?n=" + generalFileDir + f.getName() + "&tn=" + triggerBean.getName()
 							+ "&gn=1'>here</a>.<br/>");
-					out.close();
 					continue;
 				} else {
 					msg.append(respage.getString("passed_study_check") + "<br/>");
@@ -506,7 +507,6 @@ public class ImportSpringJob extends QuartzJobBean {
 						msg.append(mf.format(arguments) + "<br/>");
 						auditMsg.append(mf.format(arguments) + "<br/>");
 						out.write(mf.format(arguments) + "<br/>");
-						out.close();
 						continue;
 					}
 				}
@@ -547,7 +547,6 @@ public class ImportSpringJob extends QuartzJobBean {
 			} else {
 				msg.append(respage.getString("no_event_crfs_matching_the_xml_metadata") + "<br/>");
 				out.write(respage.getString("no_event_crfs_matching_the_xml_metadata") + "<br/>");
-				out.close();
 				continue;
 			}
 
@@ -568,14 +567,12 @@ public class ImportSpringJob extends QuartzJobBean {
                         hasSkippedItems, respage);
 				out.write(validMsgs);
 			}
-			out.close();
 
 			if (fail) {
 				MessageFormat mf = new MessageFormat("");
 				mf.applyPattern(respage.getString("problems_encountered_with_file"));
 				Object[] arguments = { f.getName(), msg.toString() };
 				msg.append(mf.format(arguments) + "<br/>");
-				out.close();
 				continue;
 			} else {
 				msg.append(respage.getString("passing_crf_edit_checks") + "<br/>");
@@ -742,8 +739,11 @@ public class ImportSpringJob extends QuartzJobBean {
 				auditMsg.append(this.runRules(runRulesOptimisation, dataSource.getConnection(), skippedItemIds,
 						studyBean, ub, containers, ruleSetService, ExecutionMode.SAVE));
 			}
-		}// end for loop
-			// is the writer still not closed? try to close it
+
+            if (out != null) {
+                out.close();
+            }
+        }
 
 		ArrayList<String> retList = new ArrayList<String>();
 		retList.add(msg.toString());
