@@ -657,7 +657,7 @@ public class DatasetDAO extends AuditableEntityDAO {
 			}
 		}
 		db.setSubjectGroupIds(getGroupIds(db.getId()));
-		Collections.sort(db.getItemDefCrf(), new ItemBean.ItemBeanComparator(0));
+		Collections.sort(db.getItemDefCrf(), new ItemBean.ItemBeanComparator());
 		return db;
 	}
 

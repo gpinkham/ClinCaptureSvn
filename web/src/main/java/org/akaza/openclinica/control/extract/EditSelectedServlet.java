@@ -229,7 +229,7 @@ public class EditSelectedServlet extends Controller {
                 allItems.addAll(items);
             }
         }
-		Collections.sort(allItems, new ItemBean.ItemBeanComparator(0));
+		Collections.sort(allItems, new ItemBean.ItemBeanComparator());
 		return allItems;
 	}
 }

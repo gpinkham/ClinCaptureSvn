@@ -128,8 +128,8 @@ public class CreateDatasetServlet extends Controller {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
-				|| currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.STUDY_MONITOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR)
+				|| currentRole.getRole().equals(Role.STUDY_MONITOR)) {
 			return;
 		}
 
@@ -565,7 +565,7 @@ public class CreateDatasetServlet extends Controller {
 		db.getItemIds().clear();
 		db.getItemDefCrf().clear();
 		db.getItemDefCrf().addAll(db.getItemMap().values());
-        Collections.sort(db.getItemDefCrf(), new ItemBean.ItemBeanComparator(0));
+        Collections.sort(db.getItemDefCrf(), new ItemBean.ItemBeanComparator());
 		for (ItemBean itemBean : (List<ItemBean>) db.getItemDefCrf()) {
 			if (itemBean.isSelected()) {
 				db.getItemIds().add(itemBean.getId());

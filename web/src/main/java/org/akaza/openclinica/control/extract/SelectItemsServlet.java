@@ -69,8 +69,8 @@ public class SelectItemsServlet extends Controller {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
-				|| currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.STUDY_MONITOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR) 
+				|| currentRole.getRole().equals(Role.STUDY_MONITOR)) {
 			return;
 		}
 
@@ -167,8 +167,7 @@ public class SelectItemsServlet extends Controller {
             item.setDefId(sed.getId());
 			ItemFormMetadataBean meta = imfdao.findByItemIdAndCRFVersionId(item.getId(), item.getItemMeta()
 					.getCrfVersionId());
-			meta.setCrfVersionName(item.getItemMeta().getCrfVersionName());
-			item.getItemMetas().add(meta);
+			item.setItemMeta(meta);
 		}
 		HashMap itemMap = new HashMap();
 		for (int i = 0; i < items.size(); i++) {
@@ -183,8 +182,9 @@ public class SelectItemsServlet extends Controller {
 		}
 
 		ArrayList allCrfItems = new ArrayList(itemMap.values());
-        // now sort them by ordinal/name
-        Collections.sort(allCrfItems, new ItemBean.ItemBeanComparator(0));
+        // now sort them by ordinal/crf version
+		
+        Collections.sort(allCrfItems, new ItemBean.ItemBeanComparator());
         request.getSession().setAttribute("allCrfItems", allCrfItems);
 
 		forwardPage(Page.CREATE_DATASET_2, request, response);

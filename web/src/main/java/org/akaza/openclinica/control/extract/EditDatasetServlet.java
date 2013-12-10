@@ -141,8 +141,8 @@ public class EditDatasetServlet extends Controller {
 			return;
 		}
 		// TODO add a limit so that the owner can edit, no one else?
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
-				|| currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.STUDY_MONITOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR) 
+				|| currentRole.getRole().equals(Role.STUDY_MONITOR)) {
 			return;
 		}
 

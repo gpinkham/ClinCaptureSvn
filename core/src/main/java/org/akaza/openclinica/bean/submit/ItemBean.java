@@ -27,6 +27,7 @@ import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 
 import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -62,29 +63,22 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 
     public static class ItemBeanComparator implements Comparator<ItemBean> {
 
-		private int defId;
-
-		public ItemBeanComparator(int defId) {
-			this.defId = defId;
-		}
-
 		public int compare(ItemBean itemBean1, ItemBean itemBean2) {
 			int result;
-			if (itemBean1.getDefId() == 0) {
-				itemBean1.setDefId(defId);
-			}
-			if (itemBean2.getDefId() == 0) {
-				itemBean2.setDefId(defId);
-			}
+
 			if (itemBean1.getDefId() == itemBean2.getDefId()) {
-				result = ((Integer) itemBean1.getId()).compareTo(itemBean2.getId());
+				if (itemBean1.getItemMeta().getCrfVersionName().equals(itemBean2.getItemMeta().getCrfVersionName())) {
+					result = ((Integer) itemBean1.getId()).compareTo(itemBean2.getId());
+				} else {
+					result = itemBean1.getItemMeta().getCrfVersionName().compareTo(itemBean2.getItemMeta().getCrfVersionName());
+				}
 			} else {
 				result = ((Integer) itemBean1.getDefId()).compareTo(itemBean2.getDefId());
 			}
 			return result;
 		}
 	}
-
+    
     @Override
 	public int hashCode() {
 		final int prime = 31;
