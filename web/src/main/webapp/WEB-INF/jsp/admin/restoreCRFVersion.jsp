@@ -5,7 +5,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <c:choose>
-	<c:when test="${userBean.sysAdmin && module=='admin'}">
+	<c:when test="${userBean.sysAdmin}">
 		<c:import url="../include/admin-header.jsp"/>
 	</c:when>
 	<c:otherwise>
@@ -95,7 +95,7 @@
 </div>
 <br/>
 
-<form action='RestoreCRFVersion?module=<c:out value="${module}"/>&action=submit&id=<c:out value="${versionToRestore.id}"/>' method="POST">
+<form action='RestoreCRFVersion?action=submit&id=<c:out value="${versionToRestore.id}"/>' method="POST">
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
@@ -105,7 +105,7 @@
 </form>
 
 <c:choose>
-	<c:when test="${userBean.sysAdmin && module=='admin'}">
+	<c:when test="${userBean.sysAdmin}">
 		<c:import url="../include/workflow.jsp">
 			<c:param name="module" value="admin"/>
 		</c:import>

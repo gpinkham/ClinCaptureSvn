@@ -133,7 +133,7 @@
                                                 <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             </c:when>
-                                            <c:when test="${userRole.studyAdministrator || userRole.studyDirector}">
+                                            <c:when test="${userRole.studyAdministrator}">
                                                 <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a name="codedItems" href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
@@ -240,7 +240,7 @@
                 <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
                 <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector || userBean.name == 'root')}">
+                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userBean.name == 'root')}">
                     </c:when>
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
@@ -249,11 +249,11 @@
             </div>
             <div class="taskRightColumn">
                 <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector || userBean.name == 'root')}">
+                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userBean.name == 'root')}">
                     </c:when>
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
-                        <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
+                        <div class="taskLink"><a href="${urlPrefix}ListCRF"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
                         <div class="taskLink"><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a></div>
                     </c:otherwise>
                 </c:choose>
@@ -292,7 +292,7 @@
             </div>
             <div class="taskRightColumn">
                 <c:if test="${study.parentStudyId <= 0}">
-                	<div class="taskLink"><a href="${urlPrefix}ListCRF?module=admin"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
+                	<div class="taskLink"><a href="${urlPrefix}ListCRF"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewAllJobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ListSubject"><fmt:message key="nav_subjects" bundle="${resword}"/></a></div>
@@ -368,7 +368,7 @@
                 <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
                 <div class="taskLink"><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a></div>
             </c:when>
-            <c:when test="${userRole.studyAdministrator || userRole.studyDirector}">
+            <c:when test="${userRole.studyAdministrator}">
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
@@ -387,7 +387,7 @@
                 <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
                 <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector) }">
+                    <c:when test="${study.parentStudyId > 0 && userRole.studyAdministrator}">
                     </c:when>
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
@@ -396,11 +396,11 @@
             </div>
             <div class="taskRightColumn">
             <c:choose>
-                <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userRole.studyDirector) }">
+                <c:when test="${study.parentStudyId > 0 && userRole.studyAdministrator}">
                 </c:when>
                 <c:otherwise>
                     <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
-                    <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ListCRF"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
                     <div class="taskLink"><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a></div>
                 </c:otherwise>
             </c:choose>

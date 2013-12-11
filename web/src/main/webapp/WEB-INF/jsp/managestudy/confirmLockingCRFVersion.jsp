@@ -41,26 +41,7 @@
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='crfVersionToLock' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
-  <!-- not used
-<script type="text/JavaScript" language="JavaScript">
 
- function myCancel() {
-
-    cancelButton=document.getElementById('cancel');
-    if ( cancelButton != null) {
-      if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-        window.location.href="ListCRF?module=<c:out value='${module}'/>";
-       return true;
-      } else {
-        return false;
-       }
-     }
-     return true;
-
-  }
-   
-</script>
-//-->
 <h1>
 	<span class="first_level_header">
 		<fmt:message key="confirm_archiving_crf_version"  bundle="${resword}"/> 
@@ -134,7 +115,7 @@
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
 <td>
-<form action='LockCRFVersion?action=confirm&module=admin&id=<c:out value="${crfVersionToLock.id}"/>' method="POST">
+<form action='LockCRFVersion?action=confirm&id=<c:out value="${crfVersionToLock.id}"/>' method="POST">
 <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
 </form>
 </td>
@@ -142,7 +123,7 @@
 </table>
 
 <c:choose>
- <c:when test="${userBean.sysAdmin && module=='admin'}">
+ <c:when test="${userBean.sysAdmin}">
     <c:import url="../include/workflow.jsp">
     <c:param name="module" value="admin"/>
     </c:import>

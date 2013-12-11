@@ -6,7 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
+<c:when test="${userBean.sysAdmin}">
  <c:import url="../include/admin-header.jsp"/>
 </c:when>
 <c:otherwise>
@@ -67,28 +67,10 @@
 <td> 
  <input id="ViewCRFMetadata" class="button_medium" type="button" name="BTN_View_Metadata" title="<fmt:message key="view_CRF_metadata" bundle="${resword}"/>" value="<fmt:message key="view_CRF_metadata" bundle="${resword}"/>" onclick="window.location.href=('ViewCRFVersion?id=${crfVersionId}');"/>
 </td>
-<td> 
- <%-- <input id="BuildStudy" class="button_medium" type="button" name="BTN_Study" title="<fmt:message key="go_back_build_study_page" bundle="${resword}"/>" value="<fmt:message key="build_study" bundle="${resword}"/>" onclick="window.location.href=('pages/studymodule');"/> --%>
-</td>
-</table> 
+</table>
 
-<p>
-<%-- <div class="homebox_bullets"><a href="ListCRF"><fmt:message key="go_back_to_the_CRF_list" bundle="${restext}"/></a></div>
-<p>
-<div class="homebox_bullets"><a href="ViewSectionDataEntry?crfVersionId=<%=request.getAttribute("crfVersionId")%>&tabId=1"><fmt:message key="view_CRF_version_data_entry" bundle="${resword}"/></a></div>
-<p>
-<div class="homebox_bullets"><a href="pages/studymodule"><fmt:message key="go_back_build_study_page" bundle="${resword}"/></a></div>
-<p>
-<div class="homebox_bullets">
-    <a href="ViewCRFVersion?id=<%=request.getAttribute("crfVersionId")%>">CRF Version Metada</a>
-</div>--%>
-<%--<c:forEach var="query" items="${queries}">
-<c:out value="${query}"/></br>
-<hr/>
-</c:forEach>
---%>
 <c:choose>
-  <c:when test="${userBean.sysAdmin && module=='admin'}">
+  <c:when test="${userBean.sysAdmin}">
   <c:import url="../include/workflow.jsp">
    <c:param name="module" value="admin"/>
   </c:import>

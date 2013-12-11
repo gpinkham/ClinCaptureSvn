@@ -5,7 +5,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <c:choose>
-	<c:when test="${userBean.sysAdmin && module=='admin'}">
+	<c:when test="${userBean.sysAdmin}">
 		<c:import url="../include/admin-header.jsp"/>
 	</c:when>
 	<c:otherwise>
@@ -127,7 +127,7 @@
 </div>
 <br>
 
-<form action='RemoveCRF?module=<c:out value="${module}"/>&action=submit&id=<c:out value="${crfToRemove.id}"/>' method="POST">
+<form action='RemoveCRF?action=submit&id=<c:out value="${crfToRemove.id}"/>' method="POST">
   <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"

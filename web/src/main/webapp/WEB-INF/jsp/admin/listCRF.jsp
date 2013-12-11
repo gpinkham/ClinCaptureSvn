@@ -8,7 +8,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
+<c:when test="${userBean.sysAdmin}">
  <c:import url="../include/admin-header.jsp"/>
 </c:when>
 <c:otherwise>
@@ -50,7 +50,7 @@
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
+<c:when test="${userBean.sysAdmin}">
 	<h1>
 		<span class="first_level_header"><fmt:message key="administer_CRFs2" bundle="${resworkflow}"/>
 	        <a href="javascript:openDocWindow('help/3_5_viewCRF_Help.html')">
@@ -76,7 +76,7 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-<input type="button" style="position:relative;" name="<fmt:message key="create_CRF" bundle="${resword}"/>" value="<fmt:message key="create_CRF" bundle="${resword}"/>" class="button_long" onClick="window.location.href='CreateCRFVersion?module=<c:out value="${module}"/>'" />
+<input type="button" style="position:relative;" name="<fmt:message key="create_CRF" bundle="${resword}"/>" value="<fmt:message key="create_CRF" bundle="${resword}"/>" class="button_long" onClick="window.location.href='CreateCRFVersion'" />
 
 
 <jsp:include page="../include/footer.jsp"/>

@@ -57,10 +57,6 @@ public class RestoreCRFServlet extends SecureController {
 
 	private static final String CONFIRM_PAGE_PASSED_PARAMETER = "confirmPagePassed";
 
-	private static final String MODULE_ADMIN = "admin";
-
-	private static final String MODULE_MANAGE = "manage";
-
 	private static final String ACTION_CONFIRM = "confirm";
 
 	private static final String ACTION_SUBMIT = "submit";
@@ -81,8 +77,6 @@ public class RestoreCRFServlet extends SecureController {
 	public void processRequest() throws Exception {
 
 		FormProcessor fp = new FormProcessor(request);
-		// checks which module the requests are from
-		String module = fp.getString(MODULE);
 		int crfId = fp.getInt(CRF_ID_PARAMETER, true);
 		String action = fp.getString(ACTION_PARAMETER);
 		String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
@@ -96,11 +90,8 @@ public class RestoreCRFServlet extends SecureController {
 		SectionDAO secdao;
 		EventDefinitionCRFDAO edcdao;
 		EventCRFDAO evdao;
-
-		request.setAttribute(MODULE, module);
 		
-		if (crf.getId() != 0 && !StringUtil.isBlank(action)
-				&& (MODULE_ADMIN.equalsIgnoreCase(module) || MODULE_MANAGE.equalsIgnoreCase(module))) {
+		if (crf.getId() != 0 && !StringUtil.isBlank(action)) {
 
 			versions = cvdao.findAllByCRFId(crfId);
 			crf.setVersions(versions);

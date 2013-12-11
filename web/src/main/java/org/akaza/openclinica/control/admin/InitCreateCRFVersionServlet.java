@@ -54,13 +54,7 @@ public class InitCreateCRFVersionServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		if (ub.isSysAdmin()) {
-			return;
-		}
-
-		if (!request.getParameter(MODULE).equals("admin")
-				&& (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(
-						Role.STUDY_ADMINISTRATOR))) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -93,10 +87,6 @@ public class InitCreateCRFVersionServlet extends Controller {
 		 */
 		String name = request.getParameter("name");
 		logger.info("*** ^^^ *** crf id:" + idString);
-
-		// checks which module the requests are from
-		String module = request.getParameter(MODULE);
-		request.setAttribute(MODULE, module);
 
 		if (StringUtil.isBlank(idString) || StringUtil.isBlank(name)) {
 			addPageMessage(respage.getString("please_choose_a_CRF_to_add_new_version_for"), request);

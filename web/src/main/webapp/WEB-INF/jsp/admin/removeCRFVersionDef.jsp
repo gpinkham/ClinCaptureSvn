@@ -7,7 +7,7 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
+<c:when test="${userBean.sysAdmin}">
  <c:import url="../include/admin-header.jsp"/>
 </c:when>
 <c:otherwise>
@@ -92,7 +92,7 @@
 </div></div></div></div></div></div></div></div>
 <br>
 <c:choose>
-  <c:when test="${userBean.sysAdmin && module=='admin'}">
+  <c:when test="${userBean.sysAdmin}">
   <c:import url="../include/workflow.jsp">
    <c:param name="module" value="admin"/>
   </c:import>

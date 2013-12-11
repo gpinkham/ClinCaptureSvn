@@ -4,7 +4,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
+<c:when test="${userBean.sysAdmin}">
  <c:import url="../include/admin-header.jsp"/>
 </c:when>
 <c:otherwise>
@@ -63,7 +63,7 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-       <input type="button" name="BTN_Submit" value="<fmt:message key="delete_version" bundle="${resword}"/>" class="button_medium" onClick="window.location.href = 'CreateCRFVersion?module=<c:out value="${module}"/>&action=delete&id=<c:out value="${version.id}"/>&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>';"/>
+       <input type="button" name="BTN_Submit" value="<fmt:message key="delete_version" bundle="${resword}"/>" class="button_medium" onClick="window.location.href = 'CreateCRFVersion?action=delete&id=<c:out value="${version.id}"/>&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>';"/>
     </td>
    </tr>
 </table>
@@ -71,7 +71,7 @@
 <br>
 
 <c:choose>
-  <c:when test="${userBean.sysAdmin && module=='admin'}">
+  <c:when test="${userBean.sysAdmin}">
   <c:import url="../include/workflow.jsp">
    <c:param name="module" value="admin"/>
   </c:import>

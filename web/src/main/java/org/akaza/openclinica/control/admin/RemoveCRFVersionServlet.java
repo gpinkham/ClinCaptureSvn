@@ -58,10 +58,6 @@ public class RemoveCRFVersionServlet extends SecureController {
 	
 	private static final String CONFIRM_PAGE_PASSED_PARAMETER = "confirmPagePassed";
 
-	private static final String MODULE_ADMIN = "admin";
-
-	private static final String MODULE_MANAGE = "manage";
-
 	private static final String ACTION_CONFIRM = "confirm";
 
 	private static final String ACTION_SUBMIT = "submit";
@@ -83,7 +79,6 @@ public class RemoveCRFVersionServlet extends SecureController {
 
 		FormProcessor fp = new FormProcessor(request);
 		int versionId = fp.getInt(CRF_VERSION_ID_PARAMETER, true);
-		String module = fp.getString(MODULE);
 		String action = fp.getString(ACTION_PARAMETER);
 		String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
 
@@ -92,11 +87,8 @@ public class RemoveCRFVersionServlet extends SecureController {
 		ArrayList eventCRFs;
 		EventCRFDAO evdao;
 		SectionDAO secdao;
-
-		request.setAttribute(MODULE, module);
 		
-		if (version.getId() != 0 && !StringUtil.isBlank(action)
-				&& (MODULE_ADMIN.equalsIgnoreCase(module) || MODULE_MANAGE.equalsIgnoreCase(module))) {
+		if (version.getId() != 0 && !StringUtil.isBlank(action)) {
 
 			evdao = new EventCRFDAO(sm.getDataSource());
 			// find all event crfs by version id

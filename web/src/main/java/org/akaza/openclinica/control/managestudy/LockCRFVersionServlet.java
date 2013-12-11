@@ -45,11 +45,7 @@ public class LockCRFVersionServlet extends SecureController {
     */
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
-		if (ub.isSysAdmin()) {
-			return;
-		}
-
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -65,10 +61,6 @@ public class LockCRFVersionServlet extends SecureController {
 
 		int crfVersionId = fp.getInt("id", true);
 		String action = fp.getString("action");
-
-		// checks which module the requests are from
-		String module = fp.getString(MODULE);
-		request.setAttribute(MODULE, module);
 
 		if (crfVersionId == 0) {
 			addPageMessage(respage.getString("choose_valid_crf_version"));

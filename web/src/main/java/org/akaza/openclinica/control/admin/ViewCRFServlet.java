@@ -63,10 +63,7 @@ public class ViewCRFServlet extends SecureController {
 
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
-		if (ub.isSysAdmin()) {
-			return;
-		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -95,10 +92,6 @@ public class ViewCRFServlet extends SecureController {
 
 		FormProcessor fp = new FormProcessor(request);
 
-		// checks which module the requests are from, manage or admin
-		String module = fp.getString(MODULE);
-		request.setAttribute(MODULE, module);
-
 		int crfId = fp.getInt(CRF_ID);
 		List<StudyBean> studyBeans = null;
 		if (crfId == 0) {
@@ -111,7 +104,7 @@ public class ViewCRFServlet extends SecureController {
 			request.setAttribute("crfName", crf.getName());
 			ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) vdao.findAllByCRF(crfId);
 			crf.setVersions(versions);
-			if ("admin".equalsIgnoreCase(module)) {
+			if (ub.isSysAdmin()) {
 				// Generate a table showing a list of studies associated with the CRF>>
 				StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
 

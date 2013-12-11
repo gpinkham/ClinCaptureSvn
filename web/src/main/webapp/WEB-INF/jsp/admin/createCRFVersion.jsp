@@ -8,7 +8,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
 
 <c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
+<c:when test="${userBean.sysAdmin}">
  <c:import url="../include/admin-header.jsp"/>
 </c:when>
 <c:otherwise>
@@ -87,7 +87,7 @@
     cancelButton=document.getElementById('cancel');
     if ( cancelButton != null) {
       if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-       window.location.href="ListCRF?module=" + "<c:out value="${module}"/>";
+       window.location.href="ListCRF";
        return true;
       } else {
         return false;
@@ -164,7 +164,7 @@ function submitform(){
 </form>
 
 <c:choose>
-  <c:when test="${userBean.sysAdmin && module=='admin'}">
+  <c:when test="${userBean.sysAdmin}">
   <c:import url="../include/workflow.jsp">
    <c:param name="module" value="admin"/>
   </c:import>

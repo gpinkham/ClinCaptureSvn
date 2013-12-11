@@ -33,7 +33,7 @@
   <td class="table_cell">
     <table border="0" cellpadding="0" cellspacing="0">
       <tr>
-        <td><a href="ViewCRF?module=<c:out value="${module}"/>&crfId=<c:out value="${currRow.bean.id}"/>"
+        <td><a href="ViewCRF?crfId=<c:out value="${currRow.bean.id}"/>"
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
           name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
@@ -42,18 +42,18 @@
           <c:when test="${currRow.bean.status.available}">
             <c:if test="${userBean.sysAdmin || (userRole.manageStudy && userBean.name==currRow.bean.owner.name)}">
               <td>
-                <a href="InitUpdateCRF?module=<c:out value="${module}"/>&crfId=<c:out value="${currRow.bean.id}"/>"
+                <a href="InitUpdateCRF?crfId=<c:out value="${currRow.bean.id}"/>"
                    onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
                    onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img
                   name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
               </td>
-              <td><a href="RemoveCRF?module=<c:out value="${module}"/>&action=confirm&id=<c:out value="${currRow.bean.id}"/>"
+              <td><a href="RemoveCRF?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
                      onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
                      onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><img
                 name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
               </td>
             </c:if>
-            <td><a href="InitCreateCRFVersion?module=<c:out value="${module}"/>&crfId=<c:out value="${currRow.bean.id}"/>&name=<c:out value="${currRow.bean.name}"/>"
+            <td><a href="InitCreateCRFVersion?crfId=<c:out value="${currRow.bean.id}"/>&name=<c:out value="${currRow.bean.name}"/>"
                    onMouseDown="javascript:setImage('bt_NewVersion1','images/bt_NewVersion_d.gif');"
                    onMouseUp="javascript:setImage('bt_NewVersion1','images/bt_NewVersion.gif');"><img
               name="bt_NewVersion1" src="images/bt_NewVersion.gif" border="0" alt="<fmt:message key="create_new_version" bundle="${resword}"/>" title="<fmt:message key="create_new_version" bundle="${resword}"/>" align="left" hspace="6"></a>
@@ -62,7 +62,7 @@
           <c:otherwise>
 			<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
 			</td>
-            <td><a href="RestoreCRF?module=<c:out value="${module}"/>&action=confirm&id=<c:out value="${currRow.bean.id}"/>"
+            <td><a href="RestoreCRF?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
                    onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
                    onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img
               name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
@@ -108,33 +108,20 @@
       <table border="0" cellpadding="0" cellspacing="0">
         <tr>
           <td>
-            <!--
-        <a href="ViewTableOfContent?crfVersionId=<c:out value="${version.id}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
-			name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-		-->
-            <a href="ViewSectionDataEntry?module=<c:out value="${module}"/>&crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes"
+            <a href="ViewSectionDataEntry?crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes"
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
               name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-          
-          
           </td>
-          <c:if test="${userBean.name != version.owner.name && userRole.manageStudy && userBean.sysAdmin && module !='admin' && version.status.name != 'removed' && version.status.name != 'auto-removed'}">
-          	<td>
-          		<img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6">
-          	</td>
-		  </c:if>
-          <c:if test="${version.status.available && userBean.sysAdmin && module=='admin'}">
-              <td><a href="LockCRFVersion?module=<c:out value="${module}"/>&id=<c:out value="${version.id}"/>"
+          <c:if test="${version.status.available && userBean.sysAdmin}">
+              <td><a href="LockCRFVersion?id=<c:out value="${version.id}"/>"
                 onMouseDown="javascript:setImage('bt_Lock1','images/bt_Lock_d.gif');"
                 onMouseUp="javascript:setImage('bt_Lock1','images/bt_Lock.gif');"><img
                 name="bt_Lock1" src="images/bt_Lock.gif" border="0" alt="<fmt:message key="archive" bundle="${resword}"/>" title="<fmt:message key="archive" bundle="${resword}"/>" align="left" hspace="6"></a>
               </td>
 		  </c:if>
 		  <c:if test="${version.status.name=='locked'}">             
-             <td><a href="UnlockCRFVersion?module=<c:out value="${module}"/>&id=<c:out value="${version.id}"/>"
+             <td><a href="UnlockCRFVersion?id=<c:out value="${version.id}"/>"
 			  onMouseDown="javascript:setImage('bt_Unlock1','images/bt_Unlock_d.gif');"
 			  onMouseUp="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"><img 
 			  name="bt_Unlock1" src="images/bt_Unlock.gif" border="0" alt="<fmt:message key="unarchive" bundle="${resword}"/>" title="<fmt:message key="unarchive" bundle="${resword}"/>" align="left" hspace="6"></a>
@@ -142,12 +129,9 @@
           </c:if>
           <c:if test="${userBean.sysAdmin || (userRole.manageStudy && userBean.name==version.owner.name)}">
             <c:choose>
-              <c:when test="${version.status.available}">
-			  <c:if test="${(userRole.manageStudy && userBean.name==version.owner.name) && module!='admin' }">
-				<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
+              <c:when test="${version.status.available}">			
 				</td>
-			  </c:if>
-                <td><a href="RemoveCRFVersion?module=<c:out value="${module}"/>&action=confirm&id=<c:out value="${version.id}"/>"
+                <td><a href="RemoveCRFVersion?action=confirm&id=<c:out value="${version.id}"/>"
                        onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
                        onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><img
                   name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
@@ -157,7 +141,7 @@
 			  
 			<td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
 			</td>
-                <td><a href="RestoreCRFVersion?module=<c:out value="${module}"/>&action=confirm&id=<c:out value="${version.id}"/>"
+                <td><a href="RestoreCRFVersion?action=confirm&id=<c:out value="${version.id}"/>"
                        onMouseDown="javascript:setImage('bt_Restor1','images/bt_Restore_d.gif');"
                        onMouseUp="javascript:setImage('bt_Restore1','images/bt_Restore.gif');"><img
                   name="bt_Restore1" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
@@ -180,7 +164,7 @@
 			</td>
 		  </c:if>
           <c:if test="${userBean.sysAdmin}">
-            <td><a href="DeleteCRFVersion?module=<c:out value="${module}"/>&action=confirm&verId=<c:out value="${version.id}"/>"
+            <td><a href="DeleteCRFVersion?action=confirm&verId=<c:out value="${version.id}"/>"
                    onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
                    onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"><img
               name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>

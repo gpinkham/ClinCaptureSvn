@@ -7,7 +7,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
+<c:when test="${userBean.sysAdmin}">
  <c:import url="../include/admin-header.jsp"/>
 </c:when>
 <c:otherwise>
@@ -69,7 +69,7 @@
 
 
 <c:choose>
-  <c:when test="${userBean.sysAdmin && module=='admin'}">
+  <c:when test="${userBean.sysAdmin}">
   <c:import url="../include/workflow.jsp">
    <c:param name="module" value="admin"/>
   </c:import>

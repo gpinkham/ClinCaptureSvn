@@ -55,7 +55,7 @@ public class UpdateCRFServlet extends SecureController {
 		if (currentStudy.getParentStudyId() > 0) {
 			logger.info("2222");
 			Role r = ub.getRoleByStudy(currentStudy.getParentStudyId()).getRole();
-			if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.SYSTEM_ADMINISTRATOR)) {
+			if (r.equals(Role.SYSTEM_ADMINISTRATOR)) {
 				isStudyDirectorInParent = true;
 			}
 		}
@@ -65,7 +65,7 @@ public class UpdateCRFServlet extends SecureController {
 
 		if (ub.hasRoleInStudy(studyId)) {
 			Role r = ub.getRoleByStudy(studyId).getRole();
-			if (isStudyDirectorInParent || r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.SYSTEM_ADMINISTRATOR)) {
+			if (isStudyDirectorInParent || r.equals(Role.SYSTEM_ADMINISTRATOR)) {
 				return;
 			}
 		}
@@ -95,10 +95,6 @@ public class UpdateCRFServlet extends SecureController {
 		FormProcessor fp = new FormProcessor(request);
 
 		String action = fp.getString("action");
-
-		// checks which module the requests are from
-		String module = fp.getString(MODULE);
-		request.setAttribute(MODULE, module);
 
 		CRFBean crf = (CRFBean) session.getAttribute(CRF);
 		if (StringUtil.isBlank(action)) {

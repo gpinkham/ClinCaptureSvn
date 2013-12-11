@@ -111,10 +111,6 @@ public class CreateCRFVersionServlet extends Controller {
 		EventDefinitionCRFDAO edao = getEventDefinitionCRFDAO();
 
 		FormProcessor fp = new FormProcessor(request);
-		// checks which module the requests are from
-		String module = fp.getString(MODULE);
-		// keep the module in the session
-		request.getSession().setAttribute(MODULE, module);
 
 		String action = request.getParameter("action");
 		CRFVersionBean version = (CRFVersionBean) request.getSession().getAttribute("version");
@@ -372,7 +368,6 @@ public class CreateCRFVersionServlet extends Controller {
 
 					}
 					request.getSession().removeAttribute("tempFileName");
-					request.getSession().removeAttribute(MODULE);
 					request.getSession().removeAttribute("excelErrors");
 					request.getSession().removeAttribute("htmlTab");
 					forwardPage(Page.CREATE_CRF_VERSION_DONE, request, response);

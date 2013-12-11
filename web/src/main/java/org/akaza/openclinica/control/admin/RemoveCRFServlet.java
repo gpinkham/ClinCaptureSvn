@@ -66,10 +66,6 @@ public class RemoveCRFServlet extends SecureController {
 	
 	private static final String CONFIRM_PAGE_PASSED_PARAMETER = "confirmPagePassed";
 	
-	private static final String MODULE_ADMIN = "admin";
-	
-	private static final String MODULE_MANAGE = "manage";
-	
 	private static final String ACTION_CONFIRM = "confirm";
 	
 	private static final String ACTION_SUBMIT = "submit";
@@ -92,7 +88,6 @@ public class RemoveCRFServlet extends SecureController {
 
 		FormProcessor fp = new FormProcessor(request);
 		int crfId = fp.getInt(CRF_ID_PARAMETER, true);
-		String module = fp.getString(MODULE);
 		String action = fp.getString(ACTION_PARAMETER);
 		String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
 
@@ -107,11 +102,8 @@ public class RemoveCRFServlet extends SecureController {
 		StudyEventDefinitionDAO sedDao;
 		CRFDAO cdao = new CRFDAO(sm.getDataSource());
 		CRFBean crf = (CRFBean) cdao.findByPK(crfId);
-
-		request.setAttribute(MODULE, module);
 		
-		if (crf.getId() != 0 && !StringUtil.isBlank(action) 
-				&& (MODULE_ADMIN.equalsIgnoreCase(module) || MODULE_MANAGE.equalsIgnoreCase(module))) {
+		if (crf.getId() != 0 && !StringUtil.isBlank(action)) {
 
 			cvdao = new CRFVersionDAO(sm.getDataSource());
 			versions = cvdao.findAllByCRFId(crfId);

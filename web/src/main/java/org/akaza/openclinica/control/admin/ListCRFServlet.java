@@ -63,11 +63,7 @@ public class ListCRFServlet extends RememberLastPage {
         UserAccountBean ub = getUserAccountBean(request);
         StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		if (ub.isSysAdmin() || ub.isTechAdmin()) {
-			return;
-		}
-
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -92,6 +88,7 @@ public class ListCRFServlet extends RememberLastPage {
 
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (currentStudy.getParentStudyId() > 0) {
 			addPageMessage(respage.getString("no_crf_available_study_is_a_site"), request);
@@ -101,16 +98,13 @@ public class ListCRFServlet extends RememberLastPage {
 
 		request.getSession().removeAttribute("version");
 		FormProcessor fp = new FormProcessor(request);
-		// checks which module the requests are from
-		String module = fp.getString(MODULE);
 
-		if (module.equalsIgnoreCase("admin") && !(ub.isSysAdmin() || ub.isTechAdmin())) {
+		if (!(ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR))) {
 			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
 					+ respage.getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
-		request.setAttribute(MODULE, module);
 
 		String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;// for
 		// crf
@@ -201,9 +195,7 @@ public class ListCRFServlet extends RememberLastPage {
 
 	@Override
 	protected String getUrlKey(HttpServletRequest request) {
-		FormProcessor fp = new FormProcessor(request);
-		String module = fp.getString("module");
-		return module.isEmpty() ? SAVED_LIST_CRFS_URL : (SAVED_LIST_CRFS_URL + "_" + module);
+		return SAVED_LIST_CRFS_URL;
 	}
 
 	@Override
@@ -213,7 +205,7 @@ public class ListCRFServlet extends RememberLastPage {
 		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
 		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
 		String eblSortAscending = fp.getString("ebl_sortAscending");
-		return "?submitted=1&module=" + fp.getString("module") + "&ebl_page=1&ebl_sortColumnInd="
+		return "?submitted=1&ebl_page=1&ebl_sortColumnInd="
 				+ (!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0") + "&ebl_sortAscending="
 				+ (!eblSortAscending.isEmpty() ? eblSortAscending : "1") + "&ebl_filtered="
 				+ (!eblFiltered.isEmpty() ? eblFiltered : "0") + "&ebl_filterKeyword="

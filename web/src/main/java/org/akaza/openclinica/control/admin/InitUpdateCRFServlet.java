@@ -62,7 +62,7 @@ public class InitUpdateCRFServlet extends Controller {
 		if (currentStudy.getParentStudyId() > 0) {
 			logger.info("2222");
 			Role r = ub.getRoleByStudy(currentStudy.getParentStudyId()).getRole();
-			if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.SYSTEM_ADMINISTRATOR)) {
+			if (r.equals(Role.SYSTEM_ADMINISTRATOR)) {
 				isStudyDirectorInParent = true;
 			}
 		}
@@ -72,7 +72,7 @@ public class InitUpdateCRFServlet extends Controller {
 
 		if (ub.hasRoleInStudy(studyId)) {
 			Role r = ub.getRoleByStudy(studyId).getRole();
-			if (isStudyDirectorInParent || r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.SYSTEM_ADMINISTRATOR)) {
+			if (isStudyDirectorInParent || r.equals(Role.SYSTEM_ADMINISTRATOR)) {
 				return;
 			}
 		}
@@ -104,10 +104,6 @@ public class InitUpdateCRFServlet extends Controller {
 				respage.getString("br_download_example_CRF_instructions_from"), request);
 
 		FormProcessor fp = new FormProcessor(request);
-
-		// checks which module the requests are from
-		String module = fp.getString(MODULE);
-		request.setAttribute(MODULE, module);
 
 		int crfId = fp.getInt(CRF_ID);
 		if (crfId == 0) {

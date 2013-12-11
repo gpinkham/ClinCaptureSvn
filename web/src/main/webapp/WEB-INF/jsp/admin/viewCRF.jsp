@@ -7,7 +7,7 @@
 
 
 <c:choose>
-    <c:when test="${userBean.sysAdmin && module=='admin'}">
+    <c:when test="${userBean.sysAdmin}">
         <c:import url="../include/admin-header.jsp"/>
     </c:when>
     <c:otherwise>
@@ -29,7 +29,7 @@
     }
     function onInvokeExportAction(id) {
         var parameterString = createParameterStringForLimit(id);
-        location.href = '${pageContext.request.contextPath}/ViewCRF?module=manage&crfId=' + '${crf.id}&' + parameterString;
+        location.href = '${pageContext.request.contextPath}/ViewCRF?crfId=' + '${crf.id}&' + parameterString;
     }
 </script>
 
@@ -91,7 +91,7 @@
 </div>
 <br>
 <c:choose>
-    <c:when test="${userBean.sysAdmin && module=='admin'}">
+    <c:when test="${userBean.sysAdmin}">
         <span class="table_title_Admin">
     </c:when>
     <c:otherwise>
@@ -123,13 +123,7 @@
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td>
-                                    <!--
-                                    <a href="ViewTableOfContent?crfVersionId=<c:out value="${version.id}"/>"
-                                    onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-                                    name="bt_View1" src="images/bt_View.gif" border="0" alt="View" title="View" align="left" hspace="6"></a>
-                                    -->
-                                    <a href="ViewSectionDataEntry?module=<c:out value="${module}"/>&crfId=<c:out value="${crf.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1"
+                                    <a href="ViewSectionDataEntry?crfId=<c:out value="${crf.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1"
                                        onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                                        onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                                             name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
@@ -160,25 +154,12 @@
 
 <div id="studiesDiv">
     <form  action="${pageContext.request.contextPath}/ViewCRF">
-        <input type="hidden" name="module" value="admin">
         <input type="hidden" name="crfId" value="${crf.id}">
         ${studiesTableHTML}
     </form>
 </div>
  <br/>
-<!-- 
-<form  action="${pageContext.request.contextPath}/ViewCRF">
-    <input type="hidden" name="module" value="manager">
-    <input type="hidden" name="crfId" value="${crf.id}">
-    ${rules}
-</form>
 
- <span class="table_title_Admin"><fmt:message key="rule_rules" bundle="${resword}"/></span>
-<div>&nbsp;</div>
-<div class="homebox_bullets"><a href="RunRule?crfId=<c:out value="${crf.id}"/>&action=dryRun"><fmt:message key="rule_crf_run_all" bundle="${resword}"/></a></div><br/>
-<div class="homebox_bullets"><a href="ViewRuleAssignment?ruleAssignments_f_crfName=<c:out value="${crfName}"/>"><fmt:message key="rule_crf_view_rules_for_this_crf" bundle="${resword}"/></a></div><br/>
-<br/>
-<input type="button" onclick="confirmExit('ListCRF?module=<c:out value="${module}"/>');"  name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/> -->
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"

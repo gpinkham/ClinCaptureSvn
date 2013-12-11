@@ -40,24 +40,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<!-- not used
-<script type="text/JavaScript" language="JavaScript">
- function myCancel() {
 
-    cancelButton=document.getElementById('cancel');
-    if ( cancelButton != null) {
-      if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-        window.location.href="ListCRF?module=<c:out value='${module}'/>";
-       return true;
-      } else {
-        return false;
-       }
-     }
-     return true;
-
-  }
-</script>
- //-->
 <h1>
 	<span class="first_level_header">
 		<fmt:message key="confirm_unarchiving_crf_version"  bundle="${resword}"/>
@@ -133,7 +116,7 @@
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
 <td>
-<form action='UnlockCRFVersion?action=confirm&module=admin&id=<c:out value="${crfVersionToUnlock.id}"/>' method="POST">
+<form action='UnlockCRFVersion?action=confirm&id=<c:out value="${crfVersionToUnlock.id}"/>' method="POST">
 <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
 </form>
 </td>
