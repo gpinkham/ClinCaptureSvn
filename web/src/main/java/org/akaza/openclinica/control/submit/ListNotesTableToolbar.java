@@ -36,6 +36,8 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 	private ResourceBundle resword;
 
 	private ListNotesFilter listNotesFilter;
+	
+	private final static String INDEXES_OF_COLUMNS_TO_BE_HIDDEN = "0, 5, 6, 10, 12, 15, 17, 18, 20";
 
 	public ListNotesTableToolbar(boolean showMoreLink) {
 		super();
@@ -45,17 +47,15 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 	@Override
 	protected void addToolbarItems() {
 		addToolbarItem(ToolbarItemType.SEPARATOR);
-		addToolbarItem(createCustomItem(new ShowMoreItem()));
+		addToolbarItem(createShowMoreLinkItem(resword, INDEXES_OF_COLUMNS_TO_BE_HIDDEN));
 		if (this.studyHasDiscNotes) {
 			addToolbarItem(createDownloadLinkItem());
 			addToolbarItem(createNotePopupLinkItem());
 		}
-		// addToolbarItem(ToolbarItemType.SEPARATOR);
-		// addToolbarItem(createBackToNotesMatrixListItem());
 		addToolbarItem(createCustomItem(new NewHiddenItem()));
 
 	}
-
+	
 	public ToolbarItem createDownloadLinkItem() {
 		DownloadLinkItem item = new DownloadLinkItem();
 		item.setCode(ToolbarItemType.CLEAR_ITEM.toCode());
@@ -79,7 +79,6 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 		ToolbarItemRenderer renderer = new CustomItemRenderer(item, getCoreContext());
 		renderer.setOnInvokeAction("onInvokeAction");
 		item.setToolbarItemRenderer(renderer);
-
 		return item;
 	}
 
@@ -91,58 +90,6 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 		item.setToolbarItemRenderer(renderer);
 
 		return item;
-	}
-
-	private class ShowMoreItem extends AbstractItem {
-
-		@Override
-		public String disabled() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public String enabled() {
-			HtmlBuilder html = new HtmlBuilder();
-			if (showMoreLink) {
-				html.a().id("showMore").href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
-				html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
-				html.a().id("hide").style("display: none;")
-						.href("javascript:hideCols('listNotes',[" + getIndexes() + "],false);").close();
-				html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
-
-				html.script()
-						.type("text/javascript")
-						.close()
-						.append("$(document).ready(function(){ " + "hideCols('listNotes',["
-								+ getIndexes() + "],false);});").scriptEnd();
-			} else {
-				html.a().id("showMore").style("display:none;")
-						.href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
-				html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
-				html.a().id("hide").href("javascript:hideCols('listNotes',[" + getIndexes() + "],false);").close();
-				html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
-
-				html.script()
-						.type("text/javascript")
-						.close()
-						.append("$(document).ready(function(){ " + "hideCols('listNotes',["
-								+ getIndexes() + "],true);});").scriptEnd();
-			}
-
-			return html.toString();
-		}
-
-		/**
-		 * @return Dynamically generate the indexes of studyGroupClasses. It starts from 4 because there are 4 columns
-		 *         before study group columns that will require to be hidden.
-		 * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade, java.util.Locale)
-		 */
-		String getIndexes() {
-			String result = "0, 5, 6, 10, 12, 15, 17, 18, 20";
-			return result;
-		}
-
 	}
 
 	private class ShowLinkToNotesMatrix extends AbstractItem {
@@ -196,8 +143,6 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 			HtmlBuilder html = new HtmlBuilder();
 			String downloadFilter = "module=" + module + filters.toString();
 
-			// html.a().href("javascript:openDocWindow('ChooseDownloadFormat?module=" + module + filters.toString()
-			// +"')");
 			html.a().href(
 					"javascript:changeValue('filters', '" + downloadFilter
 							+ "'); changeValue('fmt', 'pdf'); formSubmit('downloadForm');");
@@ -209,8 +154,6 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 					.title(resword.getString("download_notes_in_PDF"))
 					.append("class=\"downloadAllDNotes\" width=\"24 \" height=\"15\"").end().aEnd();
 
-			// html.a().href("javascript:openDocWindow('ChooseDownloadFormat?module=" + module + filters.toString()
-			// +"')");
 			html.a().href(
 					"javascript:changeValue('filters', '" + downloadFilter
 							+ "'); changeValue('fmt', 'csv'); formSubmit('downloadForm');");

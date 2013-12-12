@@ -22,6 +22,7 @@ public class ListNotesSort implements CriteriaCommand {
 	HashMap<String, String> columnMapping = new HashMap<String, String>();
 
 	public ListNotesSort() {
+		columnMapping.put("discrepancyNoteBean.id", "discrepancy_note_id");
 		columnMapping.put("studySubject.label", "label");
 		columnMapping.put("discrepancyNoteBean.createdDate", "date_created");
 		columnMapping.put("discrepancyNoteBean.updatedDate", "date_created");

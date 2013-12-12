@@ -13,11 +13,16 @@
 
 package org.akaza.openclinica.control;
 
+import java.util.ResourceBundle;
+
 import org.jmesa.view.ViewUtils;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.toolbar.AbstractItem;
 import org.jmesa.view.html.toolbar.AbstractToolbar;
+import org.jmesa.view.html.toolbar.FilterItemRenderer;
 import org.jmesa.view.html.toolbar.MaxRowsItem;
+import org.jmesa.view.html.toolbar.ToolbarItem;
+import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
 
 public class DefaultToolbar extends AbstractToolbar {
@@ -78,6 +83,61 @@ public class DefaultToolbar extends AbstractToolbar {
 			return html.toString();
 		}
 
+	}
+	
+	public class ShowMoreItem extends AbstractItem {
+
+		private ResourceBundle resword;
+		private String columnIndexes;
+		
+		public ShowMoreItem(ResourceBundle resword, String columnIndexes) {
+			this.resword = resword;
+			this.columnIndexes = columnIndexes;
+		}
+		
+		@Override
+		public String disabled() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String enabled() {
+			HtmlBuilder html = new HtmlBuilder();
+			if (showMoreLink) {
+				html.a().id("showMore").href().quote().append("javascript: document.getElementById('showMoreLink').value='false'; " + getAction()).quote().close();
+				html.div().close().nbsp().append(getResword().getString("show_more")).nbsp().divEnd().aEnd();
+
+				html.script()
+						.type("text/javascript")
+						.close()
+						.append("$(document).ready(function(){ " + "hideCols('listNotes',["
+								+ getColumnIndexes() + "],false);});").scriptEnd();
+			} else {
+				html.a().id("hide").href().quote().append("javascript: document.getElementById('showMoreLink').value='true'; " + getAction()).quote().close();
+				html.div().close().nbsp().append(getResword().getString("hide")).nbsp().divEnd().aEnd();
+			}
+			
+			return html.toString();
+		}
+
+		public String getColumnIndexes(){
+			return columnIndexes;
+		}
+
+		public ResourceBundle getResword(){
+			return resword;
+		}
+		
+	}
+	
+	public ToolbarItem createShowMoreLinkItem(ResourceBundle resword, String columnIndexes) {
+		ShowMoreItem item = new ShowMoreItem(resword, columnIndexes);
+		item.setCode(ToolbarItemType.FILTER_ITEM.toCode());
+		ToolbarItemRenderer renderer = new FilterItemRenderer(item, getCoreContext());
+		renderer.setOnInvokeAction("onInvokeAction");
+		item.setToolbarItemRenderer(renderer);
+		return item;
 	}
 
 	protected void addToolbarItems() {

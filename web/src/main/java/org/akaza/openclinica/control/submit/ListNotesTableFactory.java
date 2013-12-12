@@ -148,7 +148,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
 		
 		configureColumn(row.getColumn("discrepancyNoteBean.id"), resword.getString("note_id"), null,
-				null, true, false);
+				null, true, true);
 		configureColumn(row.getColumn("studySubject.label"), currentStudy != null ? currentStudy
 				.getStudyParameterConfig().getStudySubjectIdLabel() : resword.getString("study_subject_ID"), null,
 				null, true, true);
