@@ -21,6 +21,8 @@
 
 package org.akaza.openclinica.control.core;
 
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DictionaryService;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,13 +37,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
-
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -53,7 +53,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.Role;
@@ -118,10 +117,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.clinovo.service.CodedItemService;
-
-import com.clinovo.service.DictionaryService;
-
 /**
  * This class enhances the Controller in several ways.
  * 
@@ -166,11 +161,11 @@ public abstract class SecureController extends HttpServlet {
 
 	private CodedItemService codedItemService;
 	private DictionaryService dictionaryService;
-	
+
 	public static final String BR = "<br/>";
 	public static final String STUDY_SHOUD_BE_IN_AVAILABLE_MODE = "studyShoudBeInAvailableMode";
 
-    protected ServletContext context;
+	protected ServletContext context;
 	protected SessionManager sm;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	protected String logDir;
@@ -183,7 +178,7 @@ public abstract class SecureController extends HttpServlet {
 	protected StudyUserRoleBean currentRole;
 	protected HashMap errors = new HashMap();
 
-    public static final String STORED_ATTRIBUTES = "RememberLastPage_storedAttributes";
+	public static final String STORED_ATTRIBUTES = "RememberLastPage_storedAttributes";
 	private static String SCHEDULER = "schedulerFactoryBean";
 	UsageStatsServiceDAO usageStatsServiceDAO;
 	public static final String JOB_HOUR = "jobHour";
@@ -237,17 +232,17 @@ public abstract class SecureController extends HttpServlet {
 		}
 
 		if (!pageMessages.contains(message)) {
-            pageMessages.add(message);
-        }
+			pageMessages.add(message);
+		}
 		logger.debug(message);
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
-    }
+	}
 
-    protected void storePageMessages() {
-        Map storedAttributes = new HashMap();
-        storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
-        request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
-    }
+	protected void storePageMessages() {
+		Map storedAttributes = new HashMap();
+		storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+		request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+	}
 
 	protected void resetPanel() {
 		panel.reset();
@@ -353,7 +348,7 @@ public abstract class SecureController extends HttpServlet {
 						}
 					}
 
-				} 
+				}
 			}
 		} catch (SchedulerException se) {
 			se.printStackTrace();
@@ -392,7 +387,7 @@ public abstract class SecureController extends HttpServlet {
 			session.removeAttribute("reloadUserBean");
 		}
 	}
-    
+
 	private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
 			UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
@@ -413,10 +408,10 @@ public abstract class SecureController extends HttpServlet {
 			session.setAttribute(SUPPORT_URL, SQLInitServlet.getSupportURL());
 		}
 
-        ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
-        currentStudy = (StudyBean) session.getAttribute("study");
+		ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
+		currentStudy = (StudyBean) session.getAttribute("study");
 		currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
-        
+
 		// Set current language preferences
 		Locale locale = request.getLocale();
 		ResourceBundleProvider.updateLocale(locale);
@@ -479,7 +474,7 @@ public abstract class SecureController extends HttpServlet {
 				}
 			}
 
-            Role.prepareRoleMapWithDescriptions(resterm);
+			Role.prepareRoleMapWithDescriptions(resterm);
 
 			if (currentRole == null || currentRole.getId() <= 0) {
 				// if current study has been "removed", current role will be
@@ -537,26 +532,29 @@ public abstract class SecureController extends HttpServlet {
 			ise.printStackTrace();
 			logger.warn("InconsistentStateException: org.akaza.openclinica.control.SecureController: "
 					+ ise.getMessage());
-
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			addPageMessage(ise.getOpenClinicaMessage());
 			forwardPage(ise.getGoTo());
 		} catch (InsufficientPermissionException ipe) {
 			ipe.printStackTrace();
 			logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.SecureController: "
 					+ ipe.getMessage());
-
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			forwardPage(ipe.getGoTo());
 		} catch (OutOfMemoryError ome) {
 			ome.printStackTrace();
 			long heapSize = Runtime.getRuntime().totalMemory();
-
 			logger.error("OutOfMemory Exception - " + heapSize);
-
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			session.setAttribute("ome", "yes");
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(SecureController.getStackTrace(e));
-
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			forwardPage(Page.ERROR);
 		}
 	}
@@ -594,6 +592,8 @@ public abstract class SecureController extends HttpServlet {
 			process(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 		}
 	}
 
@@ -614,6 +614,8 @@ public abstract class SecureController extends HttpServlet {
 			process(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 		}
 	}
 
@@ -963,23 +965,6 @@ public abstract class SecureController extends HttpServlet {
 
 	}
 
-	public synchronized static void removeLockedCRF(int userId) {
-		for (Iterator iter = getUnavailableCRFList().entrySet().iterator(); iter.hasNext();) {
-			java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
-			int id = (Integer) entry.getValue();
-			if (id == userId)
-				getUnavailableCRFList().remove(entry.getKey());
-		}
-	}
-
-	public synchronized void lockThisEventCRF(int ecb, int ub) {
-		getUnavailableCRFList().put(ecb, ub);
-	}
-
-	public synchronized static HashMap getUnavailableCRFList() {
-		return Controller.getUnavailableCRFList();
-	}
-
 	public void dowloadFile(File f, String contentType) throws Exception {
 
 		response.setHeader("Content-disposition", "attachment; filename=\"" + f.getName() + "\";");
@@ -1202,7 +1187,7 @@ public abstract class SecureController extends HttpServlet {
 	public ConfigurationDao getConfigurationDao() {
 		return (ConfigurationDao) SpringServletAccess.getApplicationContext(context).getBean("configurationDao");
 	}
-	
+
 	protected CodedItemService getCodedItemService() {
 
 		if (codedItemService == null) {
@@ -1212,7 +1197,7 @@ public abstract class SecureController extends HttpServlet {
 
 		return codedItemService;
 	}
-	
+
 	protected DictionaryService getDictionaryService() {
 
 		if (dictionaryService == null) {

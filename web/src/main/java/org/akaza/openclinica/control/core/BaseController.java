@@ -1,15 +1,16 @@
 package org.akaza.openclinica.control.core;
 
+import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DictionaryService;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -66,19 +67,16 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.ServletContextAware;
 
-import com.clinovo.service.CodedItemService;
-import com.clinovo.service.DictionaryService;
-
 @SuppressWarnings({ "rawtypes", "serial" })
 public abstract class BaseController extends HttpServlet implements HttpRequestHandler, ServletContextAware {
 
-    public static final String REFERER = "referer";
+	public static final String REFERER = "referer";
 
-    public static final String ACTION_START_INITIAL_DATA_ENTRY = "ide_s";
-    public static final String ACTION_CONTINUE_INITIAL_DATA_ENTRY = "ide_c";
-    public static final String ACTION_START_DOUBLE_DATA_ENTRY = "dde_s";
-    public static final String ACTION_CONTINUE_DOUBLE_DATA_ENTRY = "dde_c";
-    public static final String ACTION_ADMINISTRATIVE_EDITING = "ae";
+	public static final String ACTION_START_INITIAL_DATA_ENTRY = "ide_s";
+	public static final String ACTION_CONTINUE_INITIAL_DATA_ENTRY = "ide_c";
+	public static final String ACTION_START_DOUBLE_DATA_ENTRY = "dde_s";
+	public static final String ACTION_CONTINUE_DOUBLE_DATA_ENTRY = "dde_c";
+	public static final String ACTION_ADMINISTRATIVE_EDITING = "ae";
 
 	public static final String STUDY = "study";
 	public static final String USER_ROLE = "userRole";
@@ -112,8 +110,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public static final String STUDY_INFO_PANEL = "panel"; // for setting the
 	// side panel
 
-	public static final String BREADCRUMB_TRAIL = "breadcrumbs";
-
 	public static final String POP_UP_URL = "popUpURL";
 
 	// Use this variable as the key for the support url
@@ -123,36 +119,36 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public static final String NOT_USED = "not_used";
 
-    private static HashMap unavailableCRFList = new HashMap();
+	private static final Map<Integer, Integer> unavailableCRFList = new HashMap<Integer, Integer>();
 
 	protected static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword,
 			resworkflow;
 
-    protected static HashMap<String, String> facRecruitStatusMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> facRecruitStatusMap = new LinkedHashMap<String, String>();
 
-    protected static HashMap<String, String> studyPhaseMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> studyPhaseMap = new LinkedHashMap<String, String>();
 
-    protected static  HashMap<String, String> interPurposeMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> interPurposeMap = new LinkedHashMap<String, String>();
 
-    protected static HashMap<String, String> allocationMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> allocationMap = new LinkedHashMap<String, String>();
 
-    protected static HashMap<String, String> maskingMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> maskingMap = new LinkedHashMap<String, String>();
 
-    protected static HashMap<String, String> controlMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> controlMap = new LinkedHashMap<String, String>();
 
-    protected static HashMap<String, String> assignmentMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> assignmentMap = new LinkedHashMap<String, String>();
 
-    protected static HashMap<String, String> endpointMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> endpointMap = new LinkedHashMap<String, String>();
 
-    protected static HashMap<String, String> interTypeMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> interTypeMap = new LinkedHashMap<String, String>();
 
-    protected static HashMap<String, String> obserPurposeMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> obserPurposeMap = new LinkedHashMap<String, String>();
 
-    protected static HashMap<String, String> selectionMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> selectionMap = new LinkedHashMap<String, String>();
 
-    protected static HashMap<String, String> timingMap = new LinkedHashMap<String, String>();
+	protected static HashMap<String, String> timingMap = new LinkedHashMap<String, String>();
 
-    private ServletContext servletContext;
+	private ServletContext servletContext;
 
 	@Autowired
 	private DataSource dataSource;
@@ -168,8 +164,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private ConfigurationDao configurationDao;
 	@Autowired
 	private MeasurementUnitDao measurementUnitDao;
-    @Autowired
-    private RuleDao ruleDao;
+	@Autowired
+	private RuleDao ruleDao;
 	@Autowired
 	private RuleSetDao ruleSetDao;
 	@Autowired
@@ -180,8 +176,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private RuleSetRuleAuditDao ruleSetRuleAuditDao;
 	@Autowired
 	private RuleSetService ruleSetService;
-    @Autowired
-    private StudyConfigService studyConfigService;
+	@Autowired
+	private StudyConfigService studyConfigService;
 	@Autowired
 	private DynamicsMetadataService dynamicsMetadataService;
 	@Autowired
@@ -189,29 +185,47 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	@Autowired
 	private OpenClinicaSchedulerFactoryBean scheduler;
 	@Autowired
-	private SDVUtil sdvUtil;   
-    @Autowired
-    private CoreResources coreResources;
-    @Autowired
-    private SecurityManager securityManager;
-    @Autowired
-    private JavaMailSenderImpl mailSender;
-    @Autowired
-    private CodedItemService codedItemService;
-    @Autowired
-    private DictionaryService dictionaryService;
+	private SDVUtil sdvUtil;
+	@Autowired
+	private CoreResources coreResources;
+	@Autowired
+	private SecurityManager securityManager;
+	@Autowired
+	private JavaMailSenderImpl mailSender;
+	@Autowired
+	private CodedItemService codedItemService;
+	@Autowired
+	private DictionaryService dictionaryService;
 
-    public synchronized static HashMap getUnavailableCRFList() {
-        return unavailableCRFList;
-    }
+	public static synchronized void removeLockedCRF(int userId) {
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
+		for (Integer key : map.keySet()) {
+			int id = map.get(key);
+			if (id == userId) {
+				unavailableCRFList.remove(key);
+			}
+		}
+	}
 
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
+	public static synchronized void lockThisEventCRF(int ecb, int ub) {
+		unavailableCRFList.put(ecb, ub);
+	}
 
-    public ServletContext getServletContext() {
-        return servletContext;
-    }
+	public static synchronized void justRemoveLockedCRF(int ecb) {
+		unavailableCRFList.remove(ecb);
+	}
+
+	public static Map getUnavailableCRFList() {
+		return unavailableCRFList;
+	}
+
+	public void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
+
+	public ServletContext getServletContext() {
+		return servletContext;
+	}
 
 	public SimpleDateFormat getLocalDf(HttpServletRequest request) {
 		return new SimpleDateFormat(resformat.getString("date_format_string"), request.getLocale());
@@ -304,9 +318,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return ruleSetRuleAuditDao;
 	}
 
-    public RuleDao getRuleDao() {
-        return ruleDao;
-    }
+	public RuleDao getRuleDao() {
+		return ruleDao;
+	}
 
 	public RuleSetDao getRuleSetDao() {
 		return ruleSetDao;
@@ -440,11 +454,11 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 		return new ItemGroupMetadataDAO(getDataSource());
 	}
 
-    public CodedItemService getCodedItemService() {
-        return codedItemService;
-    }
+	public CodedItemService getCodedItemService() {
+		return codedItemService;
+	}
 
-    public DictionaryService getDictionaryService() {
-        return dictionaryService;
-    }
+	public DictionaryService getDictionaryService() {
+		return dictionaryService;
+	}
 }

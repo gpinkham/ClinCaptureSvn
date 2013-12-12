@@ -17,8 +17,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -30,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
@@ -89,7 +93,7 @@ public abstract class CoreSecureController extends HttpServlet {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	protected HashMap errors = new HashMap();
 
-    private static String SCHEDULER = "schedulerFactoryBean";
+	private static String SCHEDULER = "schedulerFactoryBean";
 
 	private StdScheduler scheduler;
 	/**
@@ -143,7 +147,7 @@ public abstract class CoreSecureController extends HttpServlet {
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
 	}
 
-    public void init(ServletConfig config) throws ServletException {
+	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		try {
 			ServletContext context = getServletContext();
@@ -259,7 +263,7 @@ public abstract class CoreSecureController extends HttpServlet {
 					request.getSession().removeAttribute("jobName");
 					request.getSession().removeAttribute("groupName");
 					request.getSession().removeAttribute("datasetId");
-				} 
+				}
 			}
 		} catch (SchedulerException se) {
 			se.printStackTrace();
@@ -291,7 +295,7 @@ public abstract class CoreSecureController extends HttpServlet {
 
 	private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
 			UnsupportedEncodingException {
-        request.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
 		response.setHeader("Content-Encoding", "gzip");
 		HttpSession session = request.getSession();
 		SecureController.reloadUserBean(session, new UserAccountDAO(dataSource));
@@ -308,7 +312,7 @@ public abstract class CoreSecureController extends HttpServlet {
 		}
 
 		UserAccountBean ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
-		StudyBean currentStudy = (StudyBean) session.getAttribute(STUDY);        
+		StudyBean currentStudy = (StudyBean) session.getAttribute(STUDY);
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
 		// Set current language preferences
@@ -382,7 +386,7 @@ public abstract class CoreSecureController extends HttpServlet {
 				}
 			}
 
-            Role.prepareRoleMapWithDescriptions(resterm);
+			Role.prepareRoleMapWithDescriptions(resterm);
 
 			if (currentRole == null || currentRole.getId() <= 0) {
 				// if current study has been "removed", current role will be
@@ -434,7 +438,7 @@ public abstract class CoreSecureController extends HttpServlet {
 			logger.warn("InconsistentStateException: org.akaza.openclinica.control.CoreSecureController: "
 					+ ise.getMessage());
 			if (((EventCRFBean) request.getAttribute("event")) != null)
-				getUnavailableCRFList().remove(((EventCRFBean) request.getAttribute("event")).getId());
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			addPageMessage(ise.getOpenClinicaMessage(), request);
 			forwardPage(ise.getGoTo(), request, response);
 		} catch (InsufficientPermissionException ipe) {
@@ -442,13 +446,13 @@ public abstract class CoreSecureController extends HttpServlet {
 			logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.CoreSecureController: "
 					+ ipe.getMessage());
 			if (((EventCRFBean) request.getAttribute("event")) != null)
-				getUnavailableCRFList().remove(((EventCRFBean) request.getAttribute("event")).getId());
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			forwardPage(ipe.getGoTo(), request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(CoreSecureController.getStackTrace(e));
 			if (((EventCRFBean) request.getAttribute("event")) != null)
-				getUnavailableCRFList().remove(((EventCRFBean) request.getAttribute("event")).getId());
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			forwardPage(Page.ERROR, request, response);
 		}
 
@@ -481,7 +485,7 @@ public abstract class CoreSecureController extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 			if (((EventCRFBean) request.getAttribute("event")) != null)
-				getUnavailableCRFList().remove(((EventCRFBean) request.getAttribute("event")).getId());
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 		}
 	}
 
@@ -502,9 +506,8 @@ public abstract class CoreSecureController extends HttpServlet {
 			process(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
-			// UNLOCK EVENTCRF From the request.
 			if (((EventCRFBean) request.getAttribute("event")) != null)
-				getUnavailableCRFList().remove(((EventCRFBean) request.getAttribute("event")).getId());
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 		}
 	}
 
@@ -861,36 +864,6 @@ public abstract class CoreSecureController extends HttpServlet {
 		}
 		return addressTo;
 
-	}
-
-	// JN:Synchornized in the securecontroller to avoid concurrent modification
-	// exception
-	// JN: this could still throw concurrentModification, coz of remove TODO:
-	// try to do better.
-	public static synchronized void removeLockedCRF(int userId) {
-		try {
-			for (Iterator iter = getUnavailableCRFList().entrySet().iterator(); iter.hasNext();) {
-				java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
-
-				int id = (Integer) entry.getValue();
-				if (id == userId) {
-					getUnavailableCRFList().remove(entry.getKey());
-				}
-			}
-		} catch (ConcurrentModificationException cme) {
-			cme.printStackTrace();// swallowing the exception, not the ideal
-									// thing to do but safer as of now.
-		}
-	}
-
-	public synchronized void lockThisEventCRF(int ecb, int ub) {
-
-		getUnavailableCRFList().put(ecb, ub);
-
-	}
-
-	public synchronized static HashMap getUnavailableCRFList() {
-		return Controller.getUnavailableCRFList();
 	}
 
 	/**

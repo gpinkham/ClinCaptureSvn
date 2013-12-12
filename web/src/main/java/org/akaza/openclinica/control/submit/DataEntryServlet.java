@@ -20,6 +20,9 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemElement;
+import com.clinovo.util.ValidatorHelper;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,13 +36,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import com.clinovo.model.CodedItem;
-import com.clinovo.model.CodedItemElement;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -135,18 +134,16 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.quartz.impl.StdScheduler;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import com.clinovo.util.ValidatorHelper;
-
 /**
  * @author ssachs
  */
-@SuppressWarnings({"all"})
+@SuppressWarnings({ "all" })
 public abstract class DataEntryServlet extends Controller {
 
 	public static final String DATA_ENTRY_CURRENT_CRF_VERSION_OID = "dataEntryCurrentCrfVersionOid";
 	public static final String DATA_ENTRY_CURRENT_CRF_OID = "dataEntryCurrentCrfOid";
-    public static final String ACTION = "action";
-    
+	public static final String ACTION = "action";
+
 	// these inputs come from the form, from another JSP via POST,
 	// or from another JSP via GET
 	// e.g. InitialDataEntry?eventCRFId=123&sectionId=234
@@ -283,20 +280,20 @@ public abstract class DataEntryServlet extends Controller {
 			logger.error("An error has occured in the prepareSessionNotesIfValidationsWillFail method.", e);
 		}
 	}
-    
+
 	@SuppressWarnings("unused")
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Locale locale = request.getLocale();
-        FormProcessor fp = new FormProcessor(request);
-        String action = fp.getString(ACTION);
+		Locale locale = request.getLocale();
+		FormProcessor fp = new FormProcessor(request);
+		String action = fp.getString(ACTION);
 
 		if (request.getMethod().equalsIgnoreCase("POST") && action.equalsIgnoreCase("ide_s")) {
 			// when we start IDE
 			request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME,
 					new FormDiscrepancyNotes());
 		}
-        
+
 		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(
 				request.getSession().getServletContext()).getBean(ConfigurationDao.class);
 		ValidatorHelper validatorHelper = new ValidatorHelper(request, configurationDao);
@@ -304,12 +301,12 @@ public abstract class DataEntryServlet extends Controller {
 		// JN:The following were the the global variables, moved as local.
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
-        
-        ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
-		ItemDataDAO iddao = new ItemDataDAO(getDataSource(), locale);        
-        EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-        SectionDAO sdao = new SectionDAO(getDataSource());
-        
+
+		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
+		ItemDataDAO iddao = new ItemDataDAO(getDataSource(), locale);
+		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+		SectionDAO sdao = new SectionDAO(getDataSource());
+
 		HttpSession session = request.getSession();
 		StudyBean currentStudy = (StudyBean) session.getAttribute("study");
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
@@ -330,7 +327,7 @@ public abstract class DataEntryServlet extends Controller {
 
 		FormDiscrepancyNotes discNotes;
 
-        StudyInfoPanel panel = getStudyInfoPanel(request);
+		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.setStudyInfoShown(false);
 		String age = "";
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
@@ -370,14 +367,14 @@ public abstract class DataEntryServlet extends Controller {
 		List<DiscrepancyNoteBean> eventCrfNotes = new ArrayList<DiscrepancyNoteBean>();
 		List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
 		dndao = new DiscrepancyNoteDAO(getDataSource());
-		
+
 		allNotes = dndao.findAllTopNotesByEventCRF(ecb.getId());
 		eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
-		
+
 		// Filter out coder notes
 		allNotes = filterStudyCoderNotes(allNotes, request);
 		eventCrfNotes = filterStudyCoderNotes(eventCrfNotes, request);
-		
+
 		if (!eventCrfNotes.isEmpty()) {
 			allNotes.addAll(eventCrfNotes);
 
@@ -386,7 +383,7 @@ public abstract class DataEntryServlet extends Controller {
 		// Create disc note threads out of the various notes
 		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		prepareSessionNotesIfValidationsWillFail(request, hasGroup, isSubmitted, allNotes);
-        noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
+		noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
 		String fromViewNotes = fp.getString("fromViewNotes");
 		if (fromViewNotes != null && "1".equals(fromViewNotes)) {
@@ -420,7 +417,7 @@ public abstract class DataEntryServlet extends Controller {
 			session.removeAttribute("to_create_crf");
 			session.removeAttribute("mayProcessUploading");
 			// Removing the user and EventCRF from the locked CRF List
-			getUnavailableCRFList().remove(ecb.getId());
+			justRemoveLockedCRF(ecb.getId());
 			if (newUploadedFiles.size() > 0) {
 				if (this.unloadFiles(newUploadedFiles)) {
 
@@ -481,10 +478,10 @@ public abstract class DataEntryServlet extends Controller {
 			eventDefinitionCRFId = edcBean.getId();
 		}
 
-        List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
+		List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 		DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId, allSections,
 				noteThreads);
-        logMe("Entering DataEntry Create disc note threads out of the various notes DONE" + System.currentTimeMillis());
+		logMe("Entering DataEntry Create disc note threads out of the various notes DONE" + System.currentTimeMillis());
 
 		logMe("Entering some EVENT DEF CRF CHECK DONE " + System.currentTimeMillis());
 		logMe("Entering some Study EVENT DEF CRF CHECK  " + System.currentTimeMillis());
@@ -578,8 +575,7 @@ public abstract class DataEntryServlet extends Controller {
 			Date enrollmentDate = ssb.getEnrollmentDate();
 			age = Utils.getInstance().processAge(enrollmentDate, subject.getDateOfBirth());
 		}
-		ArrayList beans = getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub,
-				currentRole);
+		ArrayList beans = getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub, currentRole);
 		request.setAttribute("studySubject", ssb);
 		request.setAttribute("subject", subject);
 		request.setAttribute("beans", beans);
@@ -593,7 +589,7 @@ public abstract class DataEntryServlet extends Controller {
 		// set up interviewer name and date
 		fp.addPresetValue(INPUT_INTERVIEWER, ecb.getInterviewerName());
 
-        SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat local_df = getLocalDf(request);
 
 		if (ecb.getDateInterviewed() != null) {
 			String idateFormatted = local_df.format(ecb.getDateInterviewed());
@@ -622,7 +618,7 @@ public abstract class DataEntryServlet extends Controller {
 			logger.debug("+++ just ran populateNotes, printing field notes: " + discNotes.getFieldNotes().toString());
 			logger.debug("found disc notes: " + discNotes.getNumExistingFieldNotes().toString());
 
-            if (section.getSection().hasSCDItem()) {
+			if (section.getSection().hasSCDItem()) {
 				section = SCDItemDisplayInfo.generateSCDDisplayInfo(
 						section,
 						this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY)
@@ -649,7 +645,8 @@ public abstract class DataEntryServlet extends Controller {
 			}
 			logMe("Entering Checks !submitted entered end forwarding page " + System.currentTimeMillis());
 			logMe("Time Took for this block" + (System.currentTimeMillis() - t));
-			request.getSession().setAttribute("dnAdditionalCreatingParameters", createDNParametersMap(request, section));
+			request.getSession()
+					.setAttribute("dnAdditionalCreatingParameters", createDNParametersMap(request, section));
 			forwardPage(getJSPPage(), request, response);
 			return;
 		} else {
@@ -682,7 +679,7 @@ public abstract class DataEntryServlet extends Controller {
 			// TODO: find a better, less random place for this
 			// session.setAttribute(HAS_DATA_FLAG, true);
 
-            HashMap errors = new HashMap();
+			HashMap errors = new HashMap();
 
 			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 			if (discNotes == null) {
@@ -726,7 +723,7 @@ public abstract class DataEntryServlet extends Controller {
 
 				} else {// other single items
 					DisplayItemBean dib = diwg.getSingleItem();
-					
+
 					if (validate) {
 						// generate input name here?
 						// DisplayItemGroupBean dgb = diwg.getItemGroup();
@@ -787,7 +784,7 @@ public abstract class DataEntryServlet extends Controller {
 							section.setShowSCDItemIds(SimpleConditionalDisplayService.conditionalDisplayToBeShown(dib,
 									section.getShowSCDItemIds()));
 						}
-                        if (dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0) {
+						if (dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0) {
 							// for scd item
 							// a control item is always before its scd item
 							dib.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(dib.getMetadata().getItemId()));
@@ -1219,11 +1216,11 @@ public abstract class DataEntryServlet extends Controller {
 				}
 			}
 
-            //get hardrules. skip soft if errors > 0
+			// get hardrules. skip soft if errors > 0
 			errors = v.validate();
-            if (errors.size() > 0 && !checkDobleDataEntryErrors(errors)) {
-                request.setAttribute("Hardrules", true);
-            }
+			if (errors.size() > 0 && !checkDobleDataEntryErrors(errors)) {
+				request.setAttribute("Hardrules", true);
+			}
 			reshuffleErrorGroupNamesKK(errors, allItems, request);
 
 			if (this.isAdminForcedReasonForChange(request) && this.isAdministrativeEditing() && errors.isEmpty()) {
@@ -1234,7 +1231,7 @@ public abstract class DataEntryServlet extends Controller {
 				// change everything here from changed items list to changed
 				// items map
 				if (changedItemsMap.size() > 0) {
-                    request.setAttribute("Hardrules", true);
+					request.setAttribute("Hardrules", true);
 					logger.debug("found admin force reason for change: changed items " + changedItems.toString()
 							+ " and changed items list: " + changedItemsList.toString() + " changed items map: "
 							+ changedItemsMap.toString());
@@ -1302,7 +1299,7 @@ public abstract class DataEntryServlet extends Controller {
 					session.setAttribute("shouldRunValidation", null);
 					session.setAttribute("rulesErrors", null);
 				} else {
-                    //get softrules
+					// get softrules
 					errors = ruleValidator.validate();
 					reshuffleErrorGroupNamesKK(errors, allItems, request);
 					if (errors.size() > 0) {
@@ -1316,9 +1313,9 @@ public abstract class DataEntryServlet extends Controller {
 				if (errors.keySet().contains(INPUT_INTERVIEWER) || errors.keySet().contains(INPUT_INTERVIEW_DATE)) {
 					request.setAttribute("expandCrfInfo", true);
 				}
-				
+
 				logger.debug("threw an error with data entry...");
-				
+
 				String[] textFields = { INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE };
 				fp.setCurrentStringValuesAsPreset(textFields);
 				setPresetValues(fp.getPresetValues(), request);
@@ -1345,7 +1342,7 @@ public abstract class DataEntryServlet extends Controller {
 					String fieldName = iter3.next().toString();
 					logger.debug("found error after shuffle " + fieldName);
 				}
-				
+
 				request.setAttribute("markComplete", fp.getString(INPUT_MARK_COMPLETE));
 				request.setAttribute(BEAN_DISPLAY, section);
 				request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
@@ -1354,7 +1351,8 @@ public abstract class DataEntryServlet extends Controller {
 				request.setAttribute("hasError", "true");
 				session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 				setUpPanel(request, section);
-				request.getSession().setAttribute("dnAdditionalCreatingParameters", createDNParametersMap(request, section));
+				request.getSession().setAttribute("dnAdditionalCreatingParameters",
+						createDNParametersMap(request, section));
 				forwardPage(getJSPPage(), request, response);
 			} else {
 				logger.debug("Do we hit this in save ?????");
@@ -1419,9 +1417,9 @@ public abstract class DataEntryServlet extends Controller {
 				}
 				ecb.setNotStarted(false);
 				ecdao.update(ecb);
-				
+
 				request.setAttribute("previousSEStatus", studyEventBean.getSubjectEventStatus());
-				
+
 				StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(studyEventBean
 						.getStudyEventDefinitionId());
 				SubjectEventStatusUtil.determineSubjectEventState(studyEventBean, study, new DAOWrapper(studydao,
@@ -1440,9 +1438,9 @@ public abstract class DataEntryServlet extends Controller {
 
 				allItems = section.getDisplayItemGroups();
 
-                logger.debug("all items before saving into DB" + allItems.size());
+				logger.debug("all items before saving into DB" + allItems.size());
 
-                resetCodedItemTerms(allItems, iddao, ecb, changedItemsList);
+				resetCodedItemTerms(allItems, iddao, ecb, changedItemsList);
 
 				this.output(allItems);
 				// TODO:Seems longer here, check this
@@ -1785,7 +1783,7 @@ public abstract class DataEntryServlet extends Controller {
 						}
 					}
 					if (!success) {
-						
+
 						if (updateFailedItems.size() > 0) {
 							String mess = "";
 							for (String ss : updateFailedItems) {
@@ -1795,7 +1793,7 @@ public abstract class DataEntryServlet extends Controller {
 							addPageMessage(resexception.getString("item_save_failed_because_database_error") + mess,
 									request);
 						} else {
-							
+
 							addPageMessage(resexception.getString("database_error"), request);
 						}
 						request.setAttribute(BEAN_DISPLAY, section);
@@ -1862,7 +1860,7 @@ public abstract class DataEntryServlet extends Controller {
 									request.setAttribute(INPUT_SECTION, nextSec);
 									request.setAttribute(INPUT_SECTION_ID, new Integer(nextSec.getId()).toString());
 									session.removeAttribute("mayProcessUploading");
-								} else if (section.isLastSection()) { 
+								} else if (section.isLastSection()) {
 									// already the last section, should go back to
 									// view event page
 									session.removeAttribute(GROUP_HAS_DATA);
@@ -1918,70 +1916,73 @@ public abstract class DataEntryServlet extends Controller {
 		}
 	}
 
-    private void resetCodedItemTerms(List<DisplayItemWithGroupBean> allItems, ItemDataDAO iddao, EventCRFBean ecrfBean, ArrayList<DisplayItemBean> changedItemsList) throws Exception {
+	private void resetCodedItemTerms(List<DisplayItemWithGroupBean> allItems, ItemDataDAO iddao, EventCRFBean ecrfBean,
+			ArrayList<DisplayItemBean> changedItemsList) throws Exception {
 
-        for (int i = 0; i < allItems.size(); i++) {
-            DisplayItemWithGroupBean diwb = allItems.get(i);
-            if (diwb.isInGroup()) {
-                List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
-                for (int j = 0; j < dgbs.size(); j++) {
-                    DisplayItemGroupBean displayGroup = dgbs.get(j);
-                    List<DisplayItemBean> items = displayGroup.getItems();
-                    for (DisplayItemBean item : items) {
-                        if (item.getItem().getDataType().equals(ItemDataType.CODE)) {
-                            codedTermValidation(changedItemsList, item, ecrfBean, iddao);
-                        }
-                    }
-                }
-            } else {
-                DisplayItemBean dib = diwb.getSingleItem();
-                if (dib.getItem().getDataType().equals(ItemDataType.CODE)) {
-                    codedTermValidation(changedItemsList, dib, ecrfBean, iddao);
-                }
-            }
-        }
-    }
+		for (int i = 0; i < allItems.size(); i++) {
+			DisplayItemWithGroupBean diwb = allItems.get(i);
+			if (diwb.isInGroup()) {
+				List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
+				for (int j = 0; j < dgbs.size(); j++) {
+					DisplayItemGroupBean displayGroup = dgbs.get(j);
+					List<DisplayItemBean> items = displayGroup.getItems();
+					for (DisplayItemBean item : items) {
+						if (item.getItem().getDataType().equals(ItemDataType.CODE)) {
+							codedTermValidation(changedItemsList, item, ecrfBean, iddao);
+						}
+					}
+				}
+			} else {
+				DisplayItemBean dib = diwb.getSingleItem();
+				if (dib.getItem().getDataType().equals(ItemDataType.CODE)) {
+					codedTermValidation(changedItemsList, dib, ecrfBean, iddao);
+				}
+			}
+		}
+	}
 
+	private void codedTermValidation(ArrayList<DisplayItemBean> changedItemsList, DisplayItemBean item,
+			EventCRFBean ecrfBean, ItemDataDAO iddao) throws Exception {
 
-    private void codedTermValidation(ArrayList<DisplayItemBean> changedItemsList, DisplayItemBean item, EventCRFBean ecrfBean, ItemDataDAO iddao) throws Exception {
+		ItemFormMetadataDAO itemMetaDAO = new ItemFormMetadataDAO(getDataSource());
+		ItemDAO itemDAO = new ItemDAO(getDataSource());
 
-        ItemFormMetadataDAO itemMetaDAO = new ItemFormMetadataDAO(getDataSource());
-        ItemDAO itemDAO = new ItemDAO(getDataSource());
+		ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getItem().getId(),
+				ecrfBean.getCRFVersionId());
+		ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(), ecrfBean.getCRFVersionId());
+		ItemDataBean refItemData = iddao.findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), ecrfBean.getId(), item
+				.getData().getOrdinal());
 
-        ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getItem().getId(),
-                ecrfBean.getCRFVersionId());
-        ItemBean refItem = (ItemBean) itemDAO.findByNameAndCRFVersionId(meta.getCodeRef(),
-                ecrfBean.getCRFVersionId());
-        ItemDataBean refItemData = iddao.findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), ecrfBean.getId(), item.getData().getOrdinal());
+		if (refItemData.getId() > 0) {
+			for (DisplayItemBean displayItemBean : changedItemsList) {
+				if (refItemData.getId() == displayItemBean.getData().getId()
+						&& !refItemData.getValue().equalsIgnoreCase(displayItemBean.getData().getValue())) {
+					CodedItem codedItem = (CodedItem) getCodedItemService().findCodedItem(refItemData.getId());
+					if (codedItem != null && codedItem.getId() > 0) {
+						if (codedItem.getStatus().equals("CODED")) {
+							codedItem.setDictionary("");
+							codedItem.setStatus("NOT_CODED");
+							for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
+								codedItemElement.setItemCode("");
+							}
+							getCodedItemService().saveCodedItem(codedItem);
+						}
+						item.getData().setValue("");
+					}
+				}
+			}
+		}
+	}
 
-        if (refItemData.getId() > 0) {
-            for (DisplayItemBean displayItemBean : changedItemsList) {
-                if (refItemData.getId() == displayItemBean.getData().getId() &&
-                        !refItemData.getValue().equalsIgnoreCase(displayItemBean.getData().getValue())) {
-                    CodedItem codedItem = (CodedItem) getCodedItemService().findCodedItem(refItemData.getId());
-                    if (codedItem != null && codedItem.getId() > 0) {
-                        if (codedItem.getStatus().equals("CODED")) {
-                            codedItem.setDictionary("");
-                            codedItem.setStatus("NOT_CODED");
-                            for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
-                                codedItemElement.setItemCode("");
-                            }
-                            getCodedItemService().saveCodedItem(codedItem);
-                        }
-                        item.getData().setValue("");
-                    }
-                }
-            }
-        }
-    }
-
-    protected void setReasonForChangeError(HashMap errors, ItemDataBean idb, String formName, String error, HttpServletRequest request) {
+	protected void setReasonForChangeError(HashMap errors, ItemDataBean idb, String formName, String error,
+			HttpServletRequest request) {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		HttpSession session = request.getSession();
 		FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session
 				.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 		HashMap fieldNotes = fdn.getFieldNotes();
-		Set<String> setOfItemNamesWithRFCErrors = request.getAttribute("setOfItemNamesWithRFCErrors") == null? new TreeSet<String>() : (TreeSet<String>)request.getAttribute("setOfItemNamesWithRFCErrors");
+		Set<String> setOfItemNamesWithRFCErrors = request.getAttribute("setOfItemNamesWithRFCErrors") == null ? new TreeSet<String>()
+				: (TreeSet<String>) request.getAttribute("setOfItemNamesWithRFCErrors");
 		int existingNotes = dndao.findNumExistingNotesForItem(idb.getId());
 		if (existingNotes > 0) {
 
@@ -2040,7 +2041,7 @@ public abstract class DataEntryServlet extends Controller {
 						+ eventCRFId);
 				// there is an event CRF already, only need to update
 				ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
-                int crfVersionId = fp.getInt(INPUT_CRF_VERSION_ID);
+				int crfVersionId = fp.getInt(INPUT_CRF_VERSION_ID);
 				if (ecb.isNotStarted() && crfVersionId > 0 && crfVersionId != ecb.getCRFVersionId()) {
 					ecb.setCRFVersionId(crfVersionId);
 					ecb = (EventCRFBean) ecdao.update(ecb);
@@ -2052,7 +2053,7 @@ public abstract class DataEntryServlet extends Controller {
 					StudyEventBean sEvent = (StudyEventBean) sedao.findByPK(studyEventId);
 					ecb = updateECB(sEvent, request);
 				}
-                session.setAttribute("ecb", ecb);
+				session.setAttribute("ecb", ecb);
 				request.setAttribute(INPUT_EVENT_CRF, ecb);
 			} else {
 				// CRF id <=0, so we need to create a new CRF
@@ -2074,7 +2075,7 @@ public abstract class DataEntryServlet extends Controller {
 					} else {
 						ecb = (EventCRFBean) session.getAttribute("ecb");
 					}
-					
+
 				} catch (InconsistentStateException ie) {
 					ie.printStackTrace();
 					addPageMessage(ie.getOpenClinicaMessage(), request);
@@ -2259,10 +2260,10 @@ public abstract class DataEntryServlet extends Controller {
 				} else {
 					ecb.setDateInterviewed(null);
 				}
-				
+
 				// above depreciated, try without it
 				ecb.setOwner(ub);
-				
+
 				ecb.setNotStarted(true);
 				ecb.setStatus(Status.AVAILABLE);
 				ecb.setCompletionStatusId(1);
@@ -2391,7 +2392,7 @@ public abstract class DataEntryServlet extends Controller {
 
 			// get the values from the manually created rows first- not from the
 			// rep model
-			// second half of the if line is here to protect against looping 
+			// second half of the if line is here to protect against looping
 			// split the if loop into two parts, so that we can get what's existing first
 			// and then get newly created rows later
 			if (fp.getStartsWith(igb.getOid() + "_manual" + i + "input")) {
@@ -2473,7 +2474,7 @@ public abstract class DataEntryServlet extends Controller {
 				secondLoopBreak++;
 			}
 
-		} 
+		}
 		logger.debug("first loop: " + firstLoopBreak);
 		logger.debug("second loop: " + secondLoopBreak);
 		logger.trace("+++ starting to review groups 4: " + repeatMax);
@@ -2664,7 +2665,6 @@ public abstract class DataEntryServlet extends Controller {
 	/*
 	 * Perform validation for calculation and group-calculation type. <br> Pre-condition: passed DisplayItemBean
 	 * parameter has been loaded with value. @param sv
-	 * 
 	 */
 	protected DisplayItemBean validateCalcTypeDisplayItemBean(ScoreItemValidator sv, DisplayItemBean dib,
 			String inputName, HttpServletRequest request) {
@@ -2720,13 +2720,13 @@ public abstract class DataEntryServlet extends Controller {
 					// a string's size could be more than 255, which is more
 					// than
 					// the db field length
-					if(ibMeta.getResponseSet().getResponseType() == org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) {
-                        v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
-                                NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1024);
-                    } else {
-                        v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
-                                NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-                    }
+					if (ibMeta.getResponseSet().getResponseType() == org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) {
+						v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
+								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1024);
+					} else {
+						v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
+								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+					}
 
 				} else if (idt.equals(ItemDataType.INTEGER)) {
 					v.addValidation(inputName, Validator.IS_AN_INTEGER);
@@ -2899,10 +2899,11 @@ public abstract class DataEntryServlet extends Controller {
 	 * @param request
 	 *            TODO
 	 * @return <code>true</code> if the query succeeded, <code>false</code> otherwise.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, HttpServletRequest request) throws Exception {
-		
+	protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, HttpServletRequest request)
+			throws Exception {
+
 		ItemDataBean idb = dib.getData();
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		if (dib.getEditFlag() != null && "remove".equalsIgnoreCase(dib.getEditFlag())
@@ -2914,26 +2915,26 @@ public abstract class DataEntryServlet extends Controller {
 						&& !(dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0)
 						&& idb.getValue().equals("")
 						&& !getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {
-					
+
 					logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id "
 							+ dib.getItem().getId());
 					return true;
 				}
 			} else {
-				
+
 				// We should skip coded items
 				if (!dib.getMetadata().isShowItem() && idb.getValue().equals("")
 						&& !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())
 						&& !(dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0)
 						&& !(dib.getItem().getItemDataTypeId() == 12)) {
-					
+
 					logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id "
 							+ dib.getItem().getId());
 					return true;
 				}
 			}
 		}
-		
+
 		return writeToDB(idb, dib, iddao, ordinal, request);
 	}
 
@@ -2959,37 +2960,37 @@ public abstract class DataEntryServlet extends Controller {
 				idb.setCreatedDate(new Date());
 				idb.setOwner(ub);
 				idb = (ItemDataBean) iddao.create(idb);
-				
+
 				// create coded items for event/crf
 				if (getCodedItemService() != null) {
-                    getCodedItemService().createCodedItem(ecb, dib.getItem(), idb, currentStudy);
+					getCodedItemService().createCodedItem(ecb, dib.getItem(), idb, currentStudy);
 				}
-				
+
 			} else {
-				
+
 				idb.setUpdater(ub);
 				// should we update the logic here for nonrepeats?
 				logger.info("update item update_id " + idb.getUpdater().getId());
 				idb = (ItemDataBean) iddao.updateValue(idb);
 			}
 		} else {
-			
+
 			// for the items in group, they have editFlag
 			if ("add".equalsIgnoreCase(dib.getEditFlag())) {
-				
+
 				idb.setOrdinal(ordinal);
 				idb.setCreatedDate(new Date());
 				idb.setOwner(ub);
 				logger.debug("create a new item data" + idb.getItemId() + idb.getValue());
 				idb.setUpdater(ub);
 				idb = (ItemDataBean) iddao.upsert(idb);
-				
+
 				if (getCodedItemService() != null) {
-                    getCodedItemService().createCodedItem(ecb, dib.getItem(), idb, currentStudy);
+					getCodedItemService().createCodedItem(ecb, dib.getItem(), idb, currentStudy);
 				}
-				
+
 			} else if ("edit".equalsIgnoreCase(dib.getEditFlag())) {
-				
+
 				idb.setUpdater(ub);
 
 				logger.info("update item update_id " + idb.getUpdater().getId());
@@ -2997,12 +2998,12 @@ public abstract class DataEntryServlet extends Controller {
 				// an import data, it won't exist; we need to check on item_data_id
 				// to make sure we are running the correct command on the db
 				if (idb.getId() != 0) {
-					
+
 					idb.setUpdatedDate(new Date());
 					idb = (ItemDataBean) iddao.updateValue(idb);
-					
+
 				} else {
-					
+
 					idb.setCreatedDate(new Date());
 					idb.setOrdinal(ordinal);
 					idb.setOwner(ub);
@@ -3011,7 +3012,7 @@ public abstract class DataEntryServlet extends Controller {
 				}
 
 			} else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
-				
+
 				logger.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
 				idb.setUpdater(ub);
 				idb.setStatus(Status.DELETED);
@@ -3501,8 +3502,8 @@ public abstract class DataEntryServlet extends Controller {
 	protected abstract boolean shouldLoadDBValues(DisplayItemBean dib);
 
 	protected void setUpPanel(HttpServletRequest request, DisplaySectionBean section) {
-        StudyInfoPanel panel = getStudyInfoPanel(request);
-        panel.reset();
+		StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 
@@ -3513,18 +3514,18 @@ public abstract class DataEntryServlet extends Controller {
 	 */
 	protected DisplaySectionBean populateNotesWithDBNoteCounts(FormDiscrepancyNotes discNotes,
 			List<DiscrepancyNoteThread> noteThreads, DisplaySectionBean section, HttpServletRequest request) {
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(STUDY);
-        DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute(STUDY);
+		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-		
+
 		List<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesFromEventCRF(ecb);
 		List<DiscrepancyNoteBean> existingNameNotes = new ArrayList();
 		List<DiscrepancyNoteBean> existingIntrvDateNotes = new ArrayList();
 		long t = System.currentTimeMillis();
-		
+
 		ecNotes = filterStudyCoderNotes(ecNotes, request);
-		
+
 		logMe("Method:populateNotesWithDBNoteCounts" + t);
 		for (int i = 0; i < ecNotes.size(); i++) {
 			DiscrepancyNoteBean dn = ecNotes.get(i);
@@ -3590,18 +3591,20 @@ public abstract class DataEntryServlet extends Controller {
 							dib.getData().setId(0);
 						}
 
-                        List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
-                        
-                        dbNotes = filterStudyCoderNotes(dbNotes, request);
-                        
+						List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
+
+						dbNotes = filterStudyCoderNotes(dbNotes, request);
+
 						ArrayList notes = new ArrayList(discNotes.getNotes(inputName));
-                        notes.addAll(dbNotes);
-                        noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
-                        discNotes.setNumExistingFieldNotes(inputName, dbNotes.size());
-                        dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
-						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, itemDataId, discNotes.getNotes(inputName)));
+						notes.addAll(dbNotes);
+						noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1,
+								true);
+						discNotes.setNumExistingFieldNotes(inputName, dbNotes.size());
+						dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
+						dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, itemDataId,
+								discNotes.getNotes(inputName)));
 						dib = setTotals(dib, itemDataId, notes, ecb.getId(), request);
-                        DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
+						DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
 						logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId()
 								+ " " + inputName);
 						items.set(j, dib);
@@ -3625,19 +3628,19 @@ public abstract class DataEntryServlet extends Controller {
 				int itemId = dib.getItem().getId();
 				String inputFieldName = "input" + itemId;
 
-                List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
+				List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
 				ArrayList notes = new ArrayList(discNotes.getNotes(inputFieldName));
-				
+
 				dbNotes = filterStudyCoderNotes(dbNotes, request);
-				
-                notes.addAll(dbNotes);
-                discNotes.setNumExistingFieldNotes(inputFieldName, dbNotes.size());
+
+				notes.addAll(dbNotes);
+				discNotes.setNumExistingFieldNotes(inputFieldName, dbNotes.size());
 				dib.setNumDiscrepancyNotes(dbNotes.size() + notes.size());
 				dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, itemDataId,
 						discNotes.getNotes(inputFieldName)));
 				dib = setTotals(dib, itemDataId, discNotes.getNotes(inputFieldName), ecb.getId(), request);
-                noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
-                DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
+				noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
+				DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, dib, noteThreads);
 
 				ArrayList childItems = dib.getChildren();
 
@@ -3648,19 +3651,21 @@ public abstract class DataEntryServlet extends Controller {
 					String childInputFieldName = "input" + childItemId;
 
 					logger.debug("*** setting " + childInputFieldName);
-                    List dbChildNotes = dndao.findExistingNotesForItemData(childItemId);
-                    List childNotes = new ArrayList(discNotes.getNotes(inputFieldName));
+					List dbChildNotes = dndao.findExistingNotesForItemData(childItemId);
+					List childNotes = new ArrayList(discNotes.getNotes(inputFieldName));
 
-                    dbChildNotes = filterStudyCoderNotes(dbChildNotes, request);
+					dbChildNotes = filterStudyCoderNotes(dbChildNotes, request);
 
-                    childNotes.addAll(dbNotes);
-                    noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
-                    discNotes.setNumExistingFieldNotes(childInputFieldName, dbChildNotes.size());
+					childNotes.addAll(dbNotes);
+					noteThreads = dNoteUtil
+							.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
+					discNotes.setNumExistingFieldNotes(childInputFieldName, dbChildNotes.size());
 					child.setNumDiscrepancyNotes(dbChildNotes.size() + childNotes.size());
 					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, childItemDataId,
 							discNotes.getNotes(childInputFieldName)));
-					child = setTotals(child, childItemDataId, discNotes.getNotes(childInputFieldName), ecb.getId(), request);
-                    DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, child, noteThreads);
+					child = setTotals(child, childItemDataId, discNotes.getNotes(childInputFieldName), ecb.getId(),
+							request);
+					DiscrepancyShortcutsAnalyzer.prepareDnShortcutAnchors(request, child, noteThreads);
 					childItems.set(j, child);
 				}
 				dib.setChildren(childItems);
@@ -3680,14 +3685,14 @@ public abstract class DataEntryServlet extends Controller {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		List<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesToolTips(ecb);
-		
+
 		ecNotes = filterStudyCoderNotes(ecNotes, request);
-		
+
 		ArrayList<DiscrepancyNoteBean> nameNotes = new ArrayList();
 		ArrayList<DiscrepancyNoteBean> dateNotes = new ArrayList();
 
 		for (DiscrepancyNoteBean dn : ecNotes) {
-			
+
 			if (INTERVIEWER_NAME.equalsIgnoreCase(dn.getColumn())) {
 				nameNotes.add(dn);
 			}
@@ -3715,12 +3720,12 @@ public abstract class DataEntryServlet extends Controller {
 		logMe("Method::::::setTotals" + t);
 		int totNew = 0, totRes = 0, totClosed = 0, totUpdated = 0, totNA = 0;
 		boolean hasOtherThread = false;
-		
+
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		List<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
-		
+
 		existingNotes = filterStudyCoderNotes(existingNotes, request);
-		
+
 		dib.setDiscrepancyNotes(existingNotes);
 
 		for (DiscrepancyNoteBean obj : dib.getDiscrepancyNotes()) {
@@ -3833,7 +3838,7 @@ public abstract class DataEntryServlet extends Controller {
 			ecb.setUpdatedDate(new Date());
 			ecb.setDateCompleted(new Date());
 			ecb.setDateValidateCompleted(new Date());
-			
+
 		} else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && edcb.isDoubleEntry()) {
 			newStatus = Status.UNAVAILABLE;
 			ecb.setUpdaterId(ub.getId());
@@ -3880,9 +3885,9 @@ public abstract class DataEntryServlet extends Controller {
 		StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 		seb.setUpdatedDate(new Date());
 		seb.setUpdater(ub);
-		
+
 		SubjectEventStatus previousSEStatus = (SubjectEventStatus) request.getAttribute("previousSEStatus");
-		
+
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 		DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(getDataSource());
 		StudyBean study = (StudyBean) session.getAttribute("study");
@@ -3890,18 +3895,19 @@ public abstract class DataEntryServlet extends Controller {
 				discDao));
 		seb = (StudyEventBean) sedao.update(seb);
 
-		//Clinovo calendar func
-		if (seb.getSubjectEventStatus() == SubjectEventStatus.COMPLETED && previousSEStatus != SubjectEventStatus.COMPLETED) {
+		// Clinovo calendar func
+		if (seb.getSubjectEventStatus() == SubjectEventStatus.COMPLETED
+				&& previousSEStatus != SubjectEventStatus.COMPLETED) {
 			System.out.println("AutoSchedule");
 			StdScheduler scheduler = getScheduler(request);
-			CalendarLogic calLogic = new CalendarLogic(getDataSource(),scheduler);
+			CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
 			calLogic.ScheduleSubjectEvents(seb);
 			String message = calLogic.MaxMinDaysValidator(seb);
 			if (!"empty".equalsIgnoreCase(message)) {
 				addPageMessage(message, request);
 			}
 		}
-		//end
+		// end
 
 		request.setAttribute(INPUT_EVENT_CRF, ecb);
 		request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);
@@ -4114,7 +4120,7 @@ public abstract class DataEntryServlet extends Controller {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		DataEntryStage stage = ecb.getStage();
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-		
+
 		ArrayList<SectionBean> sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 
 		HashMap numItemsHM = sdao.getNumItemsBySectionId();
@@ -4171,7 +4177,7 @@ public abstract class DataEntryServlet extends Controller {
 		}
 		return items.get(0);
 	}
-    
+
 	/**
 	 * Constructs a list of DisplayItemWithGroupBean, which is used for display a section of items on the UI
 	 * 
@@ -4260,7 +4266,7 @@ public abstract class DataEntryServlet extends Controller {
 						newOne.getDbItemGroups().add(digb);
 					}
 				}
-                
+
 				List<DisplayItemGroupBean> groupRows = newOne.getItemGroups();
 				logger.trace("how many group rows:" + groupRows.size());
 				logger.trace("how big is the data:" + data.size());
@@ -4606,34 +4612,34 @@ public abstract class DataEntryServlet extends Controller {
 		return false;
 	}
 
-    protected boolean isChanged(DisplayItemBean dib, HashMap<Integer, String> oldItemdata, String attachedFilePath) {
-        ItemDataBean idb = dib.getData();
-        String value = idb.getValue();
-        if (!dib.getItem().getDataType().equals(ItemDataType.CODE)) {
-            if (!oldItemdata.containsKey(idb.getId())) {
-                return true;
-            } else {
-                String oldValue = oldItemdata.get(idb.getId());
-                if (oldValue != null) {
-                    if (value == null)
-                        return true;
-                    else if (dib.getItem().getDataType().getId() == 11) {
-                        String theOldValue = oldValue.split("(/|\\\\)")[oldValue.split("(/|\\\\)").length - 1].trim();
-                        return !value.equals(theOldValue);
-                    } else if (!oldValue.equals(value))
-                        return true;
-                } else if (value != null)
-                    return true;
-            }
-        } else {
-          ItemDataDAO itdao = new ItemDataDAO(getDataSource());
-          ItemDataBean itemDataBean = (ItemDataBean) itdao.findByPK(dib.getData().getId());
-            if(itemDataBean != null) {
-                dib.getData().setValue(itemDataBean.getValue());
-            }
-        }
-        return false;
-    }
+	protected boolean isChanged(DisplayItemBean dib, HashMap<Integer, String> oldItemdata, String attachedFilePath) {
+		ItemDataBean idb = dib.getData();
+		String value = idb.getValue();
+		if (!dib.getItem().getDataType().equals(ItemDataType.CODE)) {
+			if (!oldItemdata.containsKey(idb.getId())) {
+				return true;
+			} else {
+				String oldValue = oldItemdata.get(idb.getId());
+				if (oldValue != null) {
+					if (value == null)
+						return true;
+					else if (dib.getItem().getDataType().getId() == 11) {
+						String theOldValue = oldValue.split("(/|\\\\)")[oldValue.split("(/|\\\\)").length - 1].trim();
+						return !value.equals(theOldValue);
+					} else if (!oldValue.equals(value))
+						return true;
+				} else if (value != null)
+					return true;
+			}
+		} else {
+			ItemDataDAO itdao = new ItemDataDAO(getDataSource());
+			ItemDataBean itemDataBean = (ItemDataBean) itdao.findByPK(dib.getData().getId());
+			if (itemDataBean != null) {
+				dib.getData().setValue(itemDataBean.getValue());
+			}
+		}
+		return false;
+	}
 
 	protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata, DisplayItemBean dib,
 			String attachedFilePath) {
@@ -5035,7 +5041,7 @@ public abstract class DataEntryServlet extends Controller {
 	public static int getDiscrepancyNoteResolutionStatus(DiscrepancyNoteDAO dndao, int itemDataId, ArrayList formNotes) {
 		int resolutionStatus = 0;
 		boolean hasOtherThread = false;
-		
+
 		ArrayList existingNotes = dndao.findExistingNotesForItemData(itemDataId);
 		for (Object obj : existingNotes) {
 			DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
@@ -5174,24 +5180,25 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	private StdScheduler getScheduler(HttpServletRequest request) {
-		StdScheduler scheduler = (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession()
-				.getServletContext()).getBean("schedulerFactoryBean");
+		StdScheduler scheduler = (StdScheduler) SpringServletAccess.getApplicationContext(
+				request.getSession().getServletContext()).getBean("schedulerFactoryBean");
 		return scheduler;
 	}
 
-    private static boolean checkDobleDataEntryErrors(HashMap errors) {
-        Iterator iter = errors.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry pairs = (Map.Entry) iter.next();
-            if (pairs.getValue().toString().contains(respage.getString("value_you_specified"))) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-	private Map<String, HashMap<String, String>> createDNParametersMap(HttpServletRequest request, DisplaySectionBean section) {
-		//we create map with parameters for creating DNs for each field in CRF
+	private static boolean checkDobleDataEntryErrors(HashMap errors) {
+		Iterator iter = errors.entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry pairs = (Map.Entry) iter.next();
+			if (pairs.getValue().toString().contains(respage.getString("value_you_specified"))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private Map<String, HashMap<String, String>> createDNParametersMap(HttpServletRequest request,
+			DisplaySectionBean section) {
+		// we create map with parameters for creating DNs for each field in CRF
 		Map<String, HashMap<String, String>> dnCreatingParameters = new HashMap<String, HashMap<String, String>>();
 		for (int i = 0; i < section.getDisplayItemGroups().size(); i++) {
 			DisplayItemWithGroupBean diwgb = (DisplayItemWithGroupBean) section.getDisplayItemGroups().get(i);
@@ -5206,8 +5213,9 @@ public abstract class DataEntryServlet extends Controller {
 							inputName = getGroupItemInputName(displayGroup, j, displayItem);
 						} else {
 							inputName = getGroupItemManualInputName(displayGroup, j, displayItem);
-						}						
-						dnCreatingParameters.put(inputName, calculateDNParametersForOneItem(displayItem, inputName, request));
+						}
+						dnCreatingParameters.put(inputName,
+								calculateDNParametersForOneItem(displayItem, inputName, request));
 					}
 				}
 			} else {
@@ -5215,16 +5223,16 @@ public abstract class DataEntryServlet extends Controller {
 				inputName = getInputName(displayItem);
 				dnCreatingParameters.put(inputName, calculateDNParametersForOneItem(displayItem, inputName, request));
 			}
-				
+
 		}
 		return dnCreatingParameters;
 	}
-	
-	private HashMap<String, String> calculateDNParametersForOneItem(
-			DisplayItemBean dib, String field, HttpServletRequest request) {
+
+	private HashMap<String, String> calculateDNParametersForOneItem(DisplayItemBean dib, String field,
+			HttpServletRequest request) {
 		HashMap<String, String> result = new HashMap<String, String>();
 		// calculate parameters block
-		
+
 		String isInError = "0";
 		HashMap formMessages = (HashMap) request.getAttribute("formMessages");
 		if (formMessages != null) {
@@ -5232,7 +5240,7 @@ public abstract class DataEntryServlet extends Controller {
 				isInError = "1";
 			}
 		}
-		
+
 		String isInRFCError = "0";
 		Set<String> setOfItemNamesWithRFCErrors = (Set<String>) request.getAttribute("setOfItemNamesWithRFCErrors");
 		if (setOfItemNamesWithRFCErrors != null) {
@@ -5240,27 +5248,28 @@ public abstract class DataEntryServlet extends Controller {
 				isInRFCError = "1";
 			}
 		}
-		
+
 		String isInFVCError = "0";
 		if ("1".equals(isInError) && "0".equals(isInRFCError)) {
 			isInFVCError = "1";
 		}
-		
+
 		result.put("isInError", isInError);
 		result.put("isInRFCError", isInRFCError);
 		result.put("isInFVCError", isInFVCError);
 		result.put("isDataChanged", "0");
 		result.put("field", field);
-		
+
 		return result;
 	}
-	
-	protected List<DiscrepancyNoteBean> filterStudyCoderNotes(List<DiscrepancyNoteBean> notes, HttpServletRequest request) {
+
+	protected List<DiscrepancyNoteBean> filterStudyCoderNotes(List<DiscrepancyNoteBean> notes,
+			HttpServletRequest request) {
 
 		if (isCoder(getUserAccountBean(request), request)) {
 
 			List<DiscrepancyNoteBean> filteredDiscrepancyNotes = new ArrayList<DiscrepancyNoteBean>();
-			
+
 			for (DiscrepancyNoteBean discrepancyNote : notes) {
 
 				UserAccountBean owner = (UserAccountBean) getUserAccountDAO().findByPK(discrepancyNote.getOwnerId());
@@ -5272,9 +5281,9 @@ public abstract class DataEntryServlet extends Controller {
 					filteredDiscrepancyNotes.add(discrepancyNote);
 				}
 			}
-			
+
 			return filteredDiscrepancyNotes;
-			
+
 		} else {
 			return notes;
 		}
@@ -5284,5 +5293,5 @@ public abstract class DataEntryServlet extends Controller {
 	protected boolean isCoder(UserAccountBean loggedInUser, HttpServletRequest request) {
 		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("study coder");
 	}
-	
+
 }

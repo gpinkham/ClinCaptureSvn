@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
-
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -42,7 +41,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -148,7 +146,7 @@ public abstract class Controller extends BaseController {
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
 	}
 
-    protected void storePageMessages(HttpServletRequest request) {
+	protected void storePageMessages(HttpServletRequest request) {
 		Map storedAttributes = new HashMap();
 		storedAttributes.put(PAGE_MESSAGE, request.getAttribute(PAGE_MESSAGE));
 		request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
@@ -174,7 +172,7 @@ public abstract class Controller extends BaseController {
 		request.setAttribute(PRESET_VALUES, presetValues);
 	}
 
-    protected void setTable(EntityBeanTable table, HttpServletRequest request) {
+	protected void setTable(EntityBeanTable table, HttpServletRequest request) {
 		request.setAttribute(BEAN_TABLE, table);
 	}
 
@@ -187,8 +185,10 @@ public abstract class Controller extends BaseController {
 	 * Process request
 	 * 
 	 * @throws Exception
-	 * @param request HttpServletRequest
-	 * @param response HttpServletResponse
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
@@ -269,7 +269,7 @@ public abstract class Controller extends BaseController {
 
 	private String decodeLINKURL(Integer datasetId) {
 
-        String successMsg = "";
+		String successMsg = "";
 
 		ArchivedDatasetFileDAO asdfDAO = getArchivedDatasetFileDAO();
 
@@ -292,7 +292,7 @@ public abstract class Controller extends BaseController {
 			session.removeAttribute("reloadUserBean");
 		}
 	}
-    
+
 	private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
 			UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
@@ -312,7 +312,7 @@ public abstract class Controller extends BaseController {
 		if (session.getAttribute(SUPPORT_URL) == null) {
 			session.setAttribute(SUPPORT_URL, SQLInitServlet.getSupportURL());
 		}
-        
+
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
@@ -330,7 +330,7 @@ public abstract class Controller extends BaseController {
 		respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
-        initMaps();
+		initMaps();
 		getErrorsHolder(request);
 
 		try {
@@ -363,8 +363,7 @@ public abstract class Controller extends BaseController {
 						scs.setParametersForStudy(currentStudy);
 
 					} else {
-						currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId()))
-								.getName());
+						currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId())).getName());
 						scs.setParametersForSite(currentStudy);
 					}
 
@@ -377,8 +376,7 @@ public abstract class Controller extends BaseController {
 				session.setAttribute("study", currentStudy);
 			} else if (currentStudy.getId() > 0) {
 				if (currentStudy.getParentStudyId() > 0) {
-					currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId()))
-							.getName());
+					currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId())).getName());
 				}
 			}
 
@@ -399,7 +397,8 @@ public abstract class Controller extends BaseController {
 			if (currentRole == null || currentRole.getId() <= 0) {
 				// if current study has been "removed", current role will be
 				// kept as "invalid"
-				if (ub.getId() > 0 && currentStudy.getId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
+				if (ub.getId() > 0 && currentStudy != null && currentStudy.getId() > 0
+						&& !currentStudy.getStatus().getName().equals("removed")) {
 					currentRole = ub.getRoleByStudy(currentStudy.getId());
 					if (currentStudy.getParentStudyId() > 0) {
 						// Checking if currentStudy has been removed or not will
@@ -417,6 +416,7 @@ public abstract class Controller extends BaseController {
 			// For the case that current role is not "invalid" but current
 			// active study has been removed.
 			else if (currentRole.getId() > 0
+					&& currentStudy != null
 					&& (currentStudy.getStatus().equals(Status.DELETED) || currentStudy.getStatus().equals(
 							Status.AUTO_DELETED))) {
 				currentRole.setRole(Role.INVALID);
@@ -441,116 +441,117 @@ public abstract class Controller extends BaseController {
 			logger.info("Time taken [" + reportTime + " seconds]");
 			// If the time taken is over 5 seconds, write it to the stats table
 			if (reportTime > 5) {
-				getUsageStatsServiceDAO().savePageLoadTimeToDB(this.getClass().toString(),
-                        Long.toString(reportTime));
+				getUsageStatsServiceDAO().savePageLoadTimeToDB(this.getClass().toString(), Long.toString(reportTime));
 			}
 			// Call the usagestats dao here and record a time in the db
 		} catch (InconsistentStateException ise) {
 			ise.printStackTrace();
 			logger.warn("InconsistentStateException: org.akaza.openclinica.control.Controller: " + ise.getMessage());
-
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			addPageMessage(ise.getOpenClinicaMessage(), request);
 			forwardPage(ise.getGoTo(), request, response);
 		} catch (InsufficientPermissionException ipe) {
 			ipe.printStackTrace();
 			logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.Controller: "
 					+ ipe.getMessage());
-
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			forwardPage(ipe.getGoTo(), request, response);
 		} catch (OutOfMemoryError ome) {
 			ome.printStackTrace();
 			long heapSize = Runtime.getRuntime().totalMemory();
-
 			logger.error("OutOfMemory Exception - " + heapSize);
-
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			session.setAttribute("ome", "yes");
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(getStackTrace(e));
-
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 			forwardPage(Page.ERROR, request, response);
 		}
 	}
 
 	private void initMaps() {
-        facRecruitStatusMap.put("not_yet_recruiting", resadmin.getString("not_yet_recruiting"));
-        facRecruitStatusMap.put("recruiting", resadmin.getString("recruiting"));
-        facRecruitStatusMap.put("no_longer_recruiting", resadmin.getString("no_longer_recruiting"));
-        facRecruitStatusMap.put("completed", resadmin.getString("completed"));
-        facRecruitStatusMap.put("suspended", resadmin.getString("suspended"));
-        facRecruitStatusMap.put("terminated", resadmin.getString("terminated"));
+		facRecruitStatusMap.put("not_yet_recruiting", resadmin.getString("not_yet_recruiting"));
+		facRecruitStatusMap.put("recruiting", resadmin.getString("recruiting"));
+		facRecruitStatusMap.put("no_longer_recruiting", resadmin.getString("no_longer_recruiting"));
+		facRecruitStatusMap.put("completed", resadmin.getString("completed"));
+		facRecruitStatusMap.put("suspended", resadmin.getString("suspended"));
+		facRecruitStatusMap.put("terminated", resadmin.getString("terminated"));
 
-        studyPhaseMap.put("n_a", resadmin.getString("n_a"));
-        studyPhaseMap.put("phaseI", resadmin.getString("phaseI"));
-        studyPhaseMap.put("phaseI_II", resadmin.getString("phaseI_II"));
-        studyPhaseMap.put("phaseII", resadmin.getString("phaseII"));
-        studyPhaseMap.put("phaseII_III", resadmin.getString("phaseII_III"));
-        studyPhaseMap.put("phaseIII", resadmin.getString("phaseIII"));
-        studyPhaseMap.put("phaseIII_IV", resadmin.getString("phaseIII_IV"));
-        studyPhaseMap.put("phaseIV", resadmin.getString("phaseIV"));
+		studyPhaseMap.put("n_a", resadmin.getString("n_a"));
+		studyPhaseMap.put("phaseI", resadmin.getString("phaseI"));
+		studyPhaseMap.put("phaseI_II", resadmin.getString("phaseI_II"));
+		studyPhaseMap.put("phaseII", resadmin.getString("phaseII"));
+		studyPhaseMap.put("phaseII_III", resadmin.getString("phaseII_III"));
+		studyPhaseMap.put("phaseIII", resadmin.getString("phaseIII"));
+		studyPhaseMap.put("phaseIII_IV", resadmin.getString("phaseIII_IV"));
+		studyPhaseMap.put("phaseIV", resadmin.getString("phaseIV"));
 
-        interPurposeMap.put("treatment", resadmin.getString("treatment"));
-        interPurposeMap.put("prevention", resadmin.getString("prevention"));
-        interPurposeMap.put("diagnosis", resadmin.getString("diagnosis"));
-        // interPurposeMap.put("educ_couns_train",
-        // resadmin.getString("educ_couns_train"));
-        interPurposeMap.put("supportive_care", resadmin.getString("supportive_care"));
-        interPurposeMap.put("screening", resadmin.getString("screening"));
-        interPurposeMap.put("health_services_research", resadmin.getString("health_services_research"));
-        interPurposeMap.put("basic_science", resadmin.getString("basic_science"));
-        interPurposeMap.put("other", resadmin.getString("other"));
+		interPurposeMap.put("treatment", resadmin.getString("treatment"));
+		interPurposeMap.put("prevention", resadmin.getString("prevention"));
+		interPurposeMap.put("diagnosis", resadmin.getString("diagnosis"));
+		// interPurposeMap.put("educ_couns_train",
+		// resadmin.getString("educ_couns_train"));
+		interPurposeMap.put("supportive_care", resadmin.getString("supportive_care"));
+		interPurposeMap.put("screening", resadmin.getString("screening"));
+		interPurposeMap.put("health_services_research", resadmin.getString("health_services_research"));
+		interPurposeMap.put("basic_science", resadmin.getString("basic_science"));
+		interPurposeMap.put("other", resadmin.getString("other"));
 
-        allocationMap.put("randomized", resadmin.getString("randomized"));
-        allocationMap.put("non_randomized", resadmin.getString("non_randomized"));
-        allocationMap.put("n_a", resadmin.getString("n_a"));
+		allocationMap.put("randomized", resadmin.getString("randomized"));
+		allocationMap.put("non_randomized", resadmin.getString("non_randomized"));
+		allocationMap.put("n_a", resadmin.getString("n_a"));
 
-        maskingMap.put("open", resadmin.getString("open"));
-        maskingMap.put("single_blind", resadmin.getString("single_blind"));
-        maskingMap.put("double_blind", resadmin.getString("double_blind"));
+		maskingMap.put("open", resadmin.getString("open"));
+		maskingMap.put("single_blind", resadmin.getString("single_blind"));
+		maskingMap.put("double_blind", resadmin.getString("double_blind"));
 
-        controlMap.put("placebo", resadmin.getString("placebo"));
-        controlMap.put("active", resadmin.getString("active"));
-        controlMap.put("uncontrolled", resadmin.getString("uncontrolled"));
-        controlMap.put("historical", resadmin.getString("historical"));
-        controlMap.put("dose_comparison", resadmin.getString("dose_comparison"));
+		controlMap.put("placebo", resadmin.getString("placebo"));
+		controlMap.put("active", resadmin.getString("active"));
+		controlMap.put("uncontrolled", resadmin.getString("uncontrolled"));
+		controlMap.put("historical", resadmin.getString("historical"));
+		controlMap.put("dose_comparison", resadmin.getString("dose_comparison"));
 
-        assignmentMap.put("single_group", resadmin.getString("single_group"));
-        assignmentMap.put("parallel", resadmin.getString("parallel"));
-        assignmentMap.put("cross_over", resadmin.getString("cross_over"));
-        assignmentMap.put("factorial", resadmin.getString("factorial"));
-        assignmentMap.put("expanded_access", resadmin.getString("expanded_access"));
+		assignmentMap.put("single_group", resadmin.getString("single_group"));
+		assignmentMap.put("parallel", resadmin.getString("parallel"));
+		assignmentMap.put("cross_over", resadmin.getString("cross_over"));
+		assignmentMap.put("factorial", resadmin.getString("factorial"));
+		assignmentMap.put("expanded_access", resadmin.getString("expanded_access"));
 
-        endpointMap.put("safety", resadmin.getString("safety"));
-        endpointMap.put("efficacy", resadmin.getString("efficacy"));
-        endpointMap.put("safety_efficacy", resadmin.getString("safety_efficacy"));
-        endpointMap.put("bio_equivalence", resadmin.getString("bio_equivalence"));
-        endpointMap.put("bio_availability", resadmin.getString("bio_availability"));
-        endpointMap.put("pharmacokinetics", resadmin.getString("pharmacokinetics"));
-        endpointMap.put("pharmacodynamics", resadmin.getString("pharmacodynamics"));
-        endpointMap.put("pharmacokinetics_pharmacodynamics",
-                resadmin.getString("pharmacokinetics_pharmacodynamics"));
+		endpointMap.put("safety", resadmin.getString("safety"));
+		endpointMap.put("efficacy", resadmin.getString("efficacy"));
+		endpointMap.put("safety_efficacy", resadmin.getString("safety_efficacy"));
+		endpointMap.put("bio_equivalence", resadmin.getString("bio_equivalence"));
+		endpointMap.put("bio_availability", resadmin.getString("bio_availability"));
+		endpointMap.put("pharmacokinetics", resadmin.getString("pharmacokinetics"));
+		endpointMap.put("pharmacodynamics", resadmin.getString("pharmacodynamics"));
+		endpointMap.put("pharmacokinetics_pharmacodynamics", resadmin.getString("pharmacokinetics_pharmacodynamics"));
 
-        interTypeMap.put("drug", resadmin.getString("drug"));
-        interTypeMap.put("gene_transfer", resadmin.getString("gene_transfer"));
-        interTypeMap.put("vaccine", resadmin.getString("vaccine"));
-        interTypeMap.put("behavior", resadmin.getString("behavior"));
-        interTypeMap.put("device", resadmin.getString("device"));
-        interTypeMap.put("procedure", resadmin.getString("procedure"));
-        interTypeMap.put("other", resadmin.getString("other"));
+		interTypeMap.put("drug", resadmin.getString("drug"));
+		interTypeMap.put("gene_transfer", resadmin.getString("gene_transfer"));
+		interTypeMap.put("vaccine", resadmin.getString("vaccine"));
+		interTypeMap.put("behavior", resadmin.getString("behavior"));
+		interTypeMap.put("device", resadmin.getString("device"));
+		interTypeMap.put("procedure", resadmin.getString("procedure"));
+		interTypeMap.put("other", resadmin.getString("other"));
 
-        obserPurposeMap.put("natural_history", resadmin.getString("natural_history"));
-        obserPurposeMap.put("screening", resadmin.getString("screening"));
-        obserPurposeMap.put("psychosocial", resadmin.getString("psychosocial"));
+		obserPurposeMap.put("natural_history", resadmin.getString("natural_history"));
+		obserPurposeMap.put("screening", resadmin.getString("screening"));
+		obserPurposeMap.put("psychosocial", resadmin.getString("psychosocial"));
 
-        selectionMap.put("convenience_sample", resadmin.getString("convenience_sample"));
-        selectionMap.put("defined_population", resadmin.getString("defined_population"));
-        selectionMap.put("random_sample", resadmin.getString("random_sample"));
-        selectionMap.put("case_control", resadmin.getString("case_control"));
+		selectionMap.put("convenience_sample", resadmin.getString("convenience_sample"));
+		selectionMap.put("defined_population", resadmin.getString("defined_population"));
+		selectionMap.put("random_sample", resadmin.getString("random_sample"));
+		selectionMap.put("case_control", resadmin.getString("case_control"));
 
-        timingMap.put("retrospective", resadmin.getString("retrospective"));
-        timingMap.put("prospective", resadmin.getString("prospective"));
+		timingMap.put("retrospective", resadmin.getString("retrospective"));
+		timingMap.put("prospective", resadmin.getString("prospective"));
 	}
-    
+
 	public static String getStackTrace(Throwable t) {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw, true);
@@ -572,8 +573,10 @@ public abstract class Controller extends BaseController {
 	/**
 	 * Handles the HTTP <code>GET</code> method.
 	 * 
-	 * @param request HttpServletRequest
-	 * @param response HttpServletResponse
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 * @throws ServletException
 	 * @throws java.io.IOException
 	 */
@@ -586,6 +589,8 @@ public abstract class Controller extends BaseController {
 			process(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 		}
 	}
 
@@ -606,6 +611,8 @@ public abstract class Controller extends BaseController {
 			process(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
+			if (request.getAttribute("event") != null && request.getAttribute("event") instanceof EventCRFBean)
+				Controller.justRemoveLockedCRF(((EventCRFBean) request.getAttribute("event")).getId());
 		}
 	}
 
@@ -703,7 +710,8 @@ public abstract class Controller extends BaseController {
 	/**
 	 * @return A blank String if this servlet is not an Administer System servlet. Controller.ADMIN_SERVLET_CODE
 	 *         otherwise.
-	 * @param request HttpServletRequest
+	 * @param request
+	 *            HttpServletRequest
 	 */
 	protected String getAdminServlet(HttpServletRequest request) {
 		return "";
@@ -726,7 +734,7 @@ public abstract class Controller extends BaseController {
 	 * Note: This method called AuditableEntityDAO.findByPKAndStudy which required "The subclass must define
 	 * findByPKAndStudyName before calling this method. Otherwise an inactive AuditableEntityBean will be returned."
 	 * </p>
-	 *
+	 * 
 	 * @param entityId
 	 *            int
 	 * @param userName
@@ -737,29 +745,29 @@ public abstract class Controller extends BaseController {
 	protected boolean entityIncluded(int entityId, String userName, AuditableEntityDAO adao) {
 		StudyDAO sdao = getStudyDAO();
 		ArrayList<StudyBean> studies = (ArrayList<StudyBean>) sdao.findAllByUserNotRemoved(userName);
-        for (StudyBean study : studies) {
-            if (adao.findByPKAndStudy(entityId, study).getId() > 0) {
-                return true;
-            }
-            // Here follow the current logic - study subjects at sites level are
-            // visible to parent studies.
-            if (study.getParentStudyId() <= 0) {
-                ArrayList<StudyBean> sites = (ArrayList<StudyBean>) sdao.findAllByParent(study.getId());
-                if (sites.size() > 0) {
-                    for (StudyBean site : sites) {
-                        if (adao.findByPKAndStudy(entityId, site).getId() > 0) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
+		for (StudyBean study : studies) {
+			if (adao.findByPKAndStudy(entityId, study).getId() > 0) {
+				return true;
+			}
+			// Here follow the current logic - study subjects at sites level are
+			// visible to parent studies.
+			if (study.getParentStudyId() <= 0) {
+				ArrayList<StudyBean> sites = (ArrayList<StudyBean>) sdao.findAllByParent(study.getId());
+				if (sites.size() > 0) {
+					for (StudyBean site : sites) {
+						if (adao.findByPKAndStudy(entityId, site).getId() > 0) {
+							return true;
+						}
+					}
+				}
+			}
+		}
 
 		return false;
 	}
 
 	public String getRequestURLMinusServletPath(HttpServletRequest request) {
-        return request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
+		return request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
 	}
 
 	public String getHostPath(HttpServletRequest request) {
@@ -768,7 +776,7 @@ public abstract class Controller extends BaseController {
 	}
 
 	public String getContextPath(HttpServletRequest request) {
-        return request.getContextPath().replaceAll("/", "");
+		return request.getContextPath().replaceAll("/", "");
 	}
 
 	/*
@@ -845,11 +853,11 @@ public abstract class Controller extends BaseController {
 			studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(currentStudy);
 		}
 
-        for (Object studyGroupClass : studyGroupClasses) {
-            StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
-            ArrayList groups = studyGroupDAO.findAllByGroupClass(sgc);
-            sgc.setStudyGroups(groups);
-        }
+		for (Object studyGroupClass : studyGroupClasses) {
+			StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
+			ArrayList groups = studyGroupDAO.findAllByGroupClass(sgc);
+			sgc.setStudyGroups(groups);
+		}
 
 		return studyGroupClasses;
 
@@ -870,7 +878,7 @@ public abstract class Controller extends BaseController {
 		return dynamicGroupClasses;
 	}
 
-    public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByCurrentStudy(HttpServletRequest request) {
+	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByCurrentStudy(HttpServletRequest request) {
 		return getDynamicGroupClassesByStudyId(request, getCurrentStudy(request).getId());
 	}
 
@@ -947,19 +955,6 @@ public abstract class Controller extends BaseController {
 		}
 		return addressTo;
 
-	}
-
-	public synchronized static void removeLockedCRF(int userId) {
-        for (Object o : getUnavailableCRFList().entrySet()) {
-            Map.Entry entry = (Map.Entry) o;
-            int id = (Integer) entry.getValue();
-            if (id == userId)
-                getUnavailableCRFList().remove(entry.getKey());
-        }
-	}
-
-	public synchronized void lockThisEventCRF(int ecb, int ub) {
-		getUnavailableCRFList().put(ecb, ub);
 	}
 
 	public void dowloadFile(File f, String contentType, HttpServletRequest request, HttpServletResponse response)
@@ -1125,7 +1120,7 @@ public abstract class Controller extends BaseController {
 		}
 	}
 
-    protected Date getJobStartTime(HashMap errors, FormProcessor fp) {
+	protected Date getJobStartTime(HashMap errors, FormProcessor fp) {
 		Date currDate = new Date();
 		Calendar currentDateCalendar = new GregorianCalendar();
 		currentDateCalendar.setTime(currDate);
@@ -1311,14 +1306,16 @@ public abstract class Controller extends BaseController {
 	/**
 	 * A section contains all hidden dynamics will be removed from data entry tab and jump box.
 	 * 
-	 * @param displayTableOfContentsBean DisplayTableOfContentsBean
-	 * @param dynamicsMetadataService DynamicsMetadataService
+	 * @param displayTableOfContentsBean
+	 *            DisplayTableOfContentsBean
+	 * @param dynamicsMetadataService
+	 *            DynamicsMetadataService
 	 * @return DisplayTableOfContentsBean
 	 */
 	public DisplayTableOfContentsBean getDisplayBeanWithShownSections(
 			DisplayTableOfContentsBean displayTableOfContentsBean, DynamicsMetadataService dynamicsMetadataService) {
 		if (displayTableOfContentsBean == null) {
-			return displayTableOfContentsBean;
+			return null;
 		}
 
 		SectionDAO sdao = getSectionDAO();
@@ -1429,8 +1426,7 @@ public abstract class Controller extends BaseController {
 	 *            All of the event CRFs for this study event.
 	 * @return The list of event definitions for which no event CRF exists.
 	 */
-	public ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs,
-			SubjectEventStatus status) {
+	public ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs, SubjectEventStatus status) {
 		int i;
 		HashMap completed = new HashMap();
 		HashMap startedButIncompleted = new HashMap();
@@ -1532,27 +1528,26 @@ public abstract class Controller extends BaseController {
 
 	public DisplayStudyEventBean getDisplayStudyEventsForStudySubject(StudyEventBean event, DataSource ds,
 			UserAccountBean ub, StudyUserRoleBean currentRole, StudyBean study) {
-        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-        EventCRFDAO ecdao = new EventCRFDAO(ds);
-        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
+		EventCRFDAO ecdao = new EventCRFDAO(ds);
+		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
 
-        StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
-        event.setStudyEventDefinition(sed);
+		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+		event.setStudyEventDefinition(sed);
 
-        // find all active crfs in the definition
-        ArrayList eventDefinitionCRFs = edcdao.findAllActiveByEventDefinitionId(sed.getId());
+		// find all active crfs in the definition
+		ArrayList eventDefinitionCRFs = edcdao.findAllActiveByEventDefinitionId(sed.getId());
 
-        ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+		ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
-        // construct info needed on view study event page
-        DisplayStudyEventBean de = new DisplayStudyEventBean();
-        de.setStudyEvent(event);
-        de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub,
-                currentRole, event.getSubjectEventStatus(), study));
-        ArrayList al = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs,
-                event.getSubjectEventStatus());
-        de.setUncompletedCRFs(al);
+		// construct info needed on view study event page
+		DisplayStudyEventBean de = new DisplayStudyEventBean();
+		de.setStudyEvent(event);
+		de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole,
+				event.getSubjectEventStatus(), study));
+		ArrayList al = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus());
+		de.setUncompletedCRFs(al);
 
-        return de;
-    }
+		return de;
+	}
 }
