@@ -199,6 +199,10 @@ public class ChangeStudyServlet extends Controller {
 			udao.update(ub);
 
 			currentRole = (StudyUserRoleBean) request.getSession().getAttribute("studyWithRole");
+            if (currentRole == null) {
+                response.sendRedirect(request.getContextPath() + "/ChangeStudy");
+                return;
+            }
             request.getSession().setAttribute("userRole", currentRole);
             request.getSession().removeAttribute("studyWithRole");
 			addPageMessage(restext.getString("current_study_changed_succesfully"), request);
