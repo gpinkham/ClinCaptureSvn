@@ -2734,7 +2734,7 @@ public abstract class DataEntryServlet extends Controller {
 
 				} else if (idt.equals(ItemDataType.REAL)) {
 
-					v.addValidation(inputName, Validator.IS_A_NUMBER);
+					v.addValidation(inputName, Validator.IS_A_FLOAT);
 					v.alwaysExecuteLastValidation(inputName);
 				} else if (idt.equals(ItemDataType.BL)) {
 					// there is no validation here since this data type is

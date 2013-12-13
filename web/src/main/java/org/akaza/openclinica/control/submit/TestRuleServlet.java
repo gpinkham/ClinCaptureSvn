@@ -228,7 +228,7 @@ public class TestRuleServlet extends Controller {
 			v.addValidation(key, Validator.IS_AN_INTEGER);
 			break;
 		case 7:
-			v.addValidation(key, Validator.IS_A_NUMBER);
+			v.addValidation(key, Validator.IS_A_FLOAT);
 			break;
 		case 9:
 			v.addValidation(key, Validator.IS_A_DATE);

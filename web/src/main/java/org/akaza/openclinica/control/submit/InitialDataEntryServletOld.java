@@ -500,7 +500,7 @@ public class InitialDataEntryServletOld extends Controller {
 					v.addValidation(inputName, Validator.IS_AN_INTEGER);
 				} else if (idt.equals(ItemDataType.REAL)) {
 					v.addValidation(inputName, Validator.NO_BLANKS);
-					v.addValidation(inputName, Validator.IS_A_NUMBER);
+					v.addValidation(inputName, Validator.IS_A_FLOAT);
 				} else if (idt.equals(ItemDataType.BL)) {
 					// there is no validation here since this data type is
 					// explicitly allowed to be null

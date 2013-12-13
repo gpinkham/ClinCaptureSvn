@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -341,14 +340,14 @@ import java.util.regex.PatternSyntaxException;
 // and making it more beefy (ie adding a checkIfValidated() type method to that
 // class,
 // so that the work is done there and not in this class)
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
 public class Validator {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	Locale locale;
 	ResourceBundle restext, resexception, resword;
 
-    public static ValidatorRegularExpression getDateRegEx() {
+	public static ValidatorRegularExpression getDateRegEx() {
 		ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 		return new ValidatorRegularExpression(resformat.getString("date_format"), resformat.getString("date_regexp"));
 	}
@@ -371,11 +370,11 @@ public class Validator {
 			"at least 5 alphanumeric or underscore characters", "[A-Za-z0-9_]{5,}");
 
 	public static final int NO_BLANKS = 1;
-	public static final int IS_A_NUMBER = 2;
+	public static final int IS_A_FLOAT = 2;
 	public static final int IS_IN_RANGE = 3;
 	public static final int IS_A_DATE = 4;
 	public static final int IS_A_IMPORT_DATE = 44;
-    public static final int IS_A_IMPORT_PARTIAL_DATE = 45;
+	public static final int IS_A_IMPORT_PARTIAL_DATE = 45;
 	public static final int IS_DATE_TIME = 21;
 	public static final int CHECK_SAME = 5;// this is for matching passwords,
 	// e.g.
@@ -599,7 +598,7 @@ public class Validator {
 		// to ensure that if someone calls idb.setValue()
 		// before we get around to validating, we will still use the original
 		// value
-		v.addArgument(new String(idb.getValue()));
+		v.addArgument(idb.getValue());
 		v.addArgument(isMultiple);
 		lastField = fieldName;
 		// added tbh, 112007
@@ -611,14 +610,13 @@ public class Validator {
 	 */
 	public HashMap validate() {
 		Set keys = validations.keySet();
-		Iterator keysIt = keys.iterator();
 
-		while (keysIt.hasNext()) {
-			String fieldName = (String) keysIt.next();
+		for (Object key : keys) {
+			String fieldName = (String) key;
 
 			ArrayList fieldValidations = getFieldValidations(fieldName);
-			for (int i = 0; i < fieldValidations.size(); i++) {
-				Validation v = (Validation) fieldValidations.get(i);
+			for (Object fieldValidation : fieldValidations) {
+				Validation v = (Validation) fieldValidation;
 				logger.debug("fieldName=" + fieldName);
 				validate(fieldName, v);
 				if (errors.containsKey(fieldName)) {
@@ -640,14 +638,13 @@ public class Validator {
 	 */
 	public HashMap validate(String exceptionTxt) {
 		Set keys = validations.keySet();
-		Iterator keysIt = keys.iterator();
 
-		while (keysIt.hasNext()) {
-			String fieldName = (String) keysIt.next();
+		for (Object key : keys) {
+			String fieldName = (String) key;
 
 			ArrayList fieldValidations = getFieldValidations(fieldName);
-			for (int i = 0; i < fieldValidations.size(); i++) {
-				Validation v = (Validation) fieldValidations.get(i);
+			for (Object fieldValidation : fieldValidations) {
+				Validation v = (Validation) fieldValidation;
 				logger.debug("fieldName=" + fieldName);
 				if (v.getType() != MATCHES_REGULAR_EXPRESSION) {
 					validate(fieldName, v);
@@ -671,10 +668,9 @@ public class Validator {
 	public String getKeySet() {
 		String retMe = "";
 		Set keys = validations.keySet();
-		Iterator keysIt = keys.iterator();
 
-		while (keysIt.hasNext()) {
-			String fieldName = (String) keysIt.next();
+		for (Object key : keys) {
+			String fieldName = (String) key;
 			retMe += fieldName;
 			ArrayList fieldValidations = getFieldValidations(fieldName);
 			retMe += " found " + fieldValidations.size() + " field validations; ";
@@ -697,7 +693,7 @@ public class Validator {
 			case NO_BLANKS:
 				errorMessage = resexception.getString("field_not_blank");
 				break;
-			case IS_A_NUMBER:
+			case IS_A_FLOAT:
 				errorMessage = resexception.getString("field_should_number");
 				break;
 			case IS_IN_RANGE:
@@ -721,9 +717,9 @@ public class Validator {
 						+ resexception.getString("format1") + ".";
 				break;
 			case IS_A_IMPORT_PARTIAL_DATE:
-				errorMessage = resexception.getString("input_not_valid_pdate") + "yyyy, or yyyy-MM, or yyyy-MM-dd" + " "
-						+ resexception.getString("format1") + ".";
-				break;       
+				errorMessage = resexception.getString("input_not_valid_pdate") + "yyyy, or yyyy-MM, or yyyy-MM-dd"
+						+ " " + resexception.getString("format1") + ".";
+				break;
 			case IS_DATE_TIME:
 				errorMessage = resexception.getString("input_not_valid_date_time")
 						+ getDateTimeRegEx().getDescription() + " " + resexception.getString("format2") + ".";
@@ -759,8 +755,8 @@ public class Validator {
 				errorMessage = resexception.getString("input_not_acceptable_option");
 				break;
 			case IS_A_PASSWORD:
-				errorMessage = resexception.getString("password_must_be_at_least") + getPwdMinLen(validatorHelper) + " "
-						+ resword.getString("characters_long") + ".";
+				errorMessage = resexception.getString("password_must_be_at_least") + getPwdMinLen(validatorHelper)
+						+ " " + resword.getString("characters_long") + ".";
 				break;
 			case IS_A_USERNAME:
 				errorMessage = resexception.getString("input_not_valid_username") + USERNAME.getDescription() + " "
@@ -809,8 +805,6 @@ public class Validator {
 				break;
 			case MATCHES_INITIAL_DATA_ENTRY_VALUE:
 				String value = v.getString(0);
-				// errorMessage = v.getErrorMessage();//should be set at the DDE
-				// stage, tbh 112007
 				errorMessage = resexception.getString("value_not_match") + " : " + value;
 				break;
 			case IS_REQUIRED:
@@ -832,15 +826,12 @@ public class Validator {
 			case BARCODE_EAN_13:
 				errorMessage = resexception.getString("input_not_barcode");
 				break;
-			case TO_HIDE_CONDITIONAL_DISPLAY:
-				errorMessage = v.getErrorMessage();
 
 			case NO_SEMI_COLONS_OR_COLONS:
 				errorMessage = resexception.getString("field_not_have_colons_or_semi");
 				break;
 			}
 		}
-		// logger.info("<<<error added: "+errorMessage+" to "+fieldName);
 		addError(fieldName, errorMessage);
 	}
 
@@ -879,19 +870,17 @@ public class Validator {
 		fieldErrors.add(errorMessage);
 
 		existingErrors.put(fieldName, fieldErrors);
-
-		return;
 	}
 
-	protected HashMap validate(String fieldName, Validation v) {     
+	protected HashMap validate(String fieldName, Validation v) {
 		switch (v.getType()) {
 		case NO_BLANKS:
 			if (isBlank(fieldName)) {
 				addError(fieldName, v);
 			}
 			break;
-		case IS_A_NUMBER:
-			if (!isNumber(fieldName)) {
+		case IS_A_FLOAT:
+			if (!isFloat(fieldName)) {
 				addError(fieldName, v);
 			}
 			break;
@@ -942,7 +931,7 @@ public class Validator {
 				addError(fieldName, v);
 			}
 			break;
-        case IS_DATE_TIME:
+		case IS_DATE_TIME:
 			if (!isDateTime(fieldName)) {
 				addError(fieldName, v);
 			}
@@ -991,10 +980,6 @@ public class Validator {
 				addError(fieldName, v);
 			}
 			break;
-		// case IS_A_FILE:
-		// break;
-		// case IS_OF_FILE_TYPE:
-		// break;
 		case IS_IN_SET:
 			ArrayList set = (ArrayList) v.getArg(0);
 
@@ -1115,7 +1100,7 @@ public class Validator {
 			break;
 		case IS_AN_RULE:
 			ArrayList<String> messages = (ArrayList<String>) v.getArg(0);
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < messages.size(); i++) {
 				sb.append(messages.get(i));
 				if (i != messages.size() - 1)
@@ -1157,34 +1142,21 @@ public class Validator {
 	 */
 	protected String getFieldValue(String fieldName) {
 		return validatorHelper.getParameter(fieldName) == null ? validatorHelper.getAttribute(fieldName) == null ? null
-				: validatorHelper.getAttribute(fieldName).toString()
-				: validatorHelper.getParameter(fieldName);
+				: validatorHelper.getAttribute(fieldName).toString() : validatorHelper.getParameter(fieldName);
 	}
 
 	// validation functions that determine whether a field passes validation
 	protected boolean isBlank(String fieldName) {
 		String fieldValue = getFieldValue(fieldName);
-
-		if (fieldValue == null) {
-			return true;
-		}
-
-		if (fieldValue.trim().equals("")) {
-			return true;
-		}
-
-		return false;
+		return fieldValue == null || fieldValue.trim().equals("");
 	}
 
 	protected boolean isColonSemiColon(String fieldName) {
 		String fieldValue = getFieldValue(fieldName);
-		if (fieldValue.indexOf(";") != -1 || fieldValue.indexOf(":") != -1 || fieldValue.indexOf("*") != -1)
-			return true;
-		else
-			return false;
+		return fieldValue.contains(";") || fieldValue.contains(":") || fieldValue.contains("*");
 	}
 
-	protected boolean isNumber(String fieldName) {
+	protected boolean isFloat(String fieldName) {
 		String fieldValue = getFieldValue(fieldName);
 
 		if (fieldValue == null) {
@@ -1194,9 +1166,9 @@ public class Validator {
 		if (fieldValue.equals("")) {
 			return true;
 		}
-		
+
 		try {
-			Float.parseFloat(fieldValue);
+			float f = Float.parseFloat(fieldValue);
 		} catch (Exception e) {
 			return false;
 		}
@@ -1248,24 +1220,24 @@ public class Validator {
 		}
 	}
 
-    protected boolean isImportDate(String fieldName) {
-        String fieldValue = getFieldValue(fieldName);
-        if (StringUtil.isBlank(fieldValue)) {
-            return false;
-        }
-        if (!StringUtil.isFormatDate(fieldValue, "yyyy-MM-dd")) {
-            return false;
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        sdf.setLenient(false);
-        try {
-            java.util.Date date = sdf.parse(fieldValue);
-            return isYearNotFourDigits(date);
-        } catch (ParseException fe) {
-            return false;
-        }
-    }
-   
+	protected boolean isImportDate(String fieldName) {
+		String fieldValue = getFieldValue(fieldName);
+		if (StringUtil.isBlank(fieldValue)) {
+			return false;
+		}
+		if (!StringUtil.isFormatDate(fieldValue, "yyyy-MM-dd")) {
+			return false;
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		sdf.setLenient(false);
+		try {
+			java.util.Date date = sdf.parse(fieldValue);
+			return isYearNotFourDigits(date);
+		} catch (ParseException fe) {
+			return false;
+		}
+	}
+
 	/**
 	 * @param fieldName
 	 *            The name of a field containing some text string.
@@ -1300,7 +1272,7 @@ public class Validator {
 			d = FormProcessor.getDateFromString(getFieldValue(fieldName));
 		}
 		if (d != null) {
-			Date today = new Date();
+			Date today;
 			Calendar cal = Calendar.getInstance();
 			/*
 			 * Adding one day with the current server date to allow validation for date entered form a client in forward
@@ -1325,10 +1297,7 @@ public class Validator {
 	protected boolean isYearNotFourDigits(Date d) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(d);
-		if (c.get(Calendar.YEAR) < 1000 || c.get(Calendar.YEAR) > 9999) { 
-			return false;
-		}
-		return true;
+		return !(c.get(Calendar.YEAR) < 1000 || c.get(Calendar.YEAR) > 9999);
 	}
 
 	/**
@@ -1383,19 +1352,8 @@ public class Validator {
 		String value1 = getFieldValue(field1);
 		String value2 = getFieldValue(field2);
 
-		if (value1 == null && value2 == null) {
-			return true;
-		}
+		return value1 == null && value2 == null || value1 != null && value2 != null && value1.equals(value2);
 
-		if (value1 == null) {
-			return false;
-		}
-
-		if (value2 == null) {
-			return false;
-		}
-
-		return value1.equals(value2);
 	}
 
 	protected boolean isEmail(String fieldName) {
@@ -1429,13 +1387,13 @@ public class Validator {
 		if (fieldValue == null) {
 			return false;
 		}
-		
+
 		if (fieldValue.equals("")) {
 			return true;
 		}
-		
+
 		try {
-			Float.parseFloat(fieldValue);
+			int i = Integer.parseInt(fieldValue);
 		} catch (Exception e) {
 			return false;
 		}
@@ -1446,19 +1404,8 @@ public class Validator {
 	protected boolean isInSet(String fieldName, ArrayList set) {
 		String fieldValue = getFieldValue(fieldName);
 
-		if (fieldValue == null) {
-			return false;
-		}
+		return fieldValue != null && set != null && set.contains(fieldValue);
 
-		if (set == null) {
-			return false;
-		}
-
-		if (set.contains(fieldValue)) {
-			return true;
-		}
-
-		return false;
 	}
 
 	protected boolean isValidTerm(String fieldName, TermType termType) {
@@ -1542,7 +1489,7 @@ public class Validator {
 
 		return compares;
 	}
-    
+
 	private boolean matchesRegex(String fieldName, Validation v) {
 		ValidatorRegularExpression vre = new ValidatorRegularExpression(v.getString(0), v.getString(0));
 		return matchesRegex(fieldName, v, vre);
@@ -1567,11 +1514,8 @@ public class Validator {
 		}
 		Matcher m = p.matcher(fieldValue);
 
-		if (m.matches()) {
-			return true;
-		}
+		return m.matches();
 
-		return false;
 	}
 
 	private String prepareFieldValue(String fieldValue, Validation v) {
@@ -1669,21 +1613,14 @@ public class Validator {
 		Date laterDate = FormProcessor.getDateFromString(laterDateValue);
 		Date earlierDate = FormProcessor.getDateFromString(earlierDateValue);
 
-		if (laterDate.compareTo(earlierDate) >= 0) {
-			return true;
-		} else {
-			return false;
-		}
+		return laterDate.compareTo(earlierDate) >= 0;
 	}
 
 	protected boolean isSetBlank(String fieldName) {
 		String fieldValues[] = validatorHelper.getParameterValues(fieldName);
 
-		if (fieldValues == null || fieldValues.length == 0) {
-			return true;
-		}
+		return fieldValues == null || fieldValues.length == 0;
 
-		return false;
 	}
 
 	protected boolean isInResponseSet(String fieldName, ResponseSetBean set, boolean multValues) {
@@ -1691,8 +1628,8 @@ public class Validator {
 		HashMap values = new HashMap();
 
 		ArrayList options = set.getOptions();
-		for (int i = 0; i < options.size(); i++) {
-			ResponseOptionBean rob = (ResponseOptionBean) options.get(i);
+		for (Object option : options) {
+			ResponseOptionBean rob = (ResponseOptionBean) option;
 			values.put(rob.getValue(), Boolean.TRUE);
 		}
 
@@ -1734,8 +1671,8 @@ public class Validator {
 		HashMap values = new HashMap();
 
 		ArrayList options = set.getOptions();
-		for (int i = 0; i < options.size(); i++) {
-			ResponseOptionBean rob = (ResponseOptionBean) options.get(i);
+		for (Object option : options) {
+			ResponseOptionBean rob = (ResponseOptionBean) option;
 			values.put(rob.getValue(), Boolean.TRUE);
 		}
 
@@ -1747,12 +1684,6 @@ public class Validator {
 			fieldValues = new String[1];
 			String fieldValue = getFieldValue(fieldName);
 			fieldValues[0] = fieldValue == null ? "" : fieldValue;
-		}
-
-		// this means the user didn't fill in anything - and nothing is still,
-		// trivially, in the response set
-		if (fieldValues == null) {
-			return true;
 		}
 
 		for (String value : fieldValues) {
@@ -1811,10 +1742,7 @@ public class Validator {
 			// we have "" as the default value for item data
 			// when the value from page is null, we save "" in DB,so should
 			// consider they match
-			if ("".equals(oldValue)) {
-				return true;
-			}
-			return false;
+			return "".equals(oldValue);
 		}
 		System.out.println("value matches initial: found " + oldValue + " versus " + fieldValue);
 		return fieldValue.equals(oldValue);
@@ -1854,7 +1782,7 @@ public class Validator {
 	public static Validation processCRFValidationFunction(String inputFunction) throws Exception {
 
 		ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle();
-		Validation v = null;
+		Validation v;
 		if (inputFunction.equals("func: barcode(EAN-13)")) {
 			v = new Validation(BARCODE_EAN_13);
 			return v;
@@ -1864,23 +1792,23 @@ public class Validator {
 		ArrayList args;
 
 		HashMap numArgsByFunction = new HashMap();
-		numArgsByFunction.put("range", new Integer(2));
-		numArgsByFunction.put("gt", new Integer(1));
-		numArgsByFunction.put("lt", new Integer(1));
-		numArgsByFunction.put("gte", new Integer(1));
-		numArgsByFunction.put("lte", new Integer(1));
-		numArgsByFunction.put("ne", new Integer(1));
-		numArgsByFunction.put("eq", new Integer(1));
-		numArgsByFunction.put("getExternalValue", new Integer(3));
+		numArgsByFunction.put("range", 2);
+		numArgsByFunction.put("gt", 1);
+		numArgsByFunction.put("lt", 1);
+		numArgsByFunction.put("gte", 1);
+		numArgsByFunction.put("lte", 1);
+		numArgsByFunction.put("ne", 1);
+		numArgsByFunction.put("eq", 1);
+		numArgsByFunction.put("getExternalValue", 3);
 
 		HashMap valTypeByFunction = new HashMap();
-		valTypeByFunction.put("range", new Integer(Validator.IS_IN_RANGE));
-		valTypeByFunction.put("gt", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
-		valTypeByFunction.put("lt", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
-		valTypeByFunction.put("gte", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
-		valTypeByFunction.put("lte", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
-		valTypeByFunction.put("ne", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
-		valTypeByFunction.put("eq", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
+		valTypeByFunction.put("range", Validator.IS_IN_RANGE);
+		valTypeByFunction.put("gt", Validator.COMPARES_TO_STATIC_VALUE);
+		valTypeByFunction.put("lt", Validator.COMPARES_TO_STATIC_VALUE);
+		valTypeByFunction.put("gte", Validator.COMPARES_TO_STATIC_VALUE);
+		valTypeByFunction.put("lte", Validator.COMPARES_TO_STATIC_VALUE);
+		valTypeByFunction.put("ne", Validator.COMPARES_TO_STATIC_VALUE);
+		valTypeByFunction.put("eq", Validator.COMPARES_TO_STATIC_VALUE);
 
 		HashMap compareOpByFunction = new HashMap();
 		compareOpByFunction.put("gt", NumericComparisonOperator.GREATER_THAN);
@@ -1889,7 +1817,7 @@ public class Validator {
 		compareOpByFunction.put("lte", NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO);
 		compareOpByFunction.put("ne", NumericComparisonOperator.NOT_EQUALS);
 		compareOpByFunction.put("eq", NumericComparisonOperator.EQUALS);
-		
+
 		Pattern funcPattern = Pattern.compile("func:\\s*([A-Za-z]+)\\(([^,]*)?(,[^,]*)*\\)");
 		Matcher funcMatcher = funcPattern.matcher(inputFunction);
 
@@ -1926,7 +1854,7 @@ public class Validator {
 		// test that the right number of arguments have been provdided; complain
 		// if not
 		Integer numProperArgsInFunction = (Integer) numArgsByFunction.get(fname);
-		if (args.size() != numProperArgsInFunction.intValue()) {
+		if (args.size() != numProperArgsInFunction) {
 			throw new Exception(resexception.getString("validation_column_invalid_function") + ": "
 					+ resexception.getString("number_of_arguments_incorrect"));
 		}
@@ -1934,25 +1862,25 @@ public class Validator {
 		for (int i = 0; i < args.size(); i++) {
 			int ord = i + 1;
 			try {
-				Float.parseFloat((String) args.get(i));
+				float f = Float.parseFloat((String) args.get(i));
 			} catch (Exception e) {
 				throw new Exception(resexception.getString("validation_column_invalid_function") + ": "
 						+ resexception.getString("argument") + ord + " " + resexception.getString("is_not_a_number"));
 			}
 		}
-		
+
 		// success - all tests have been passed
 		// now we compose the validation object created by this function
 		Integer valType = (Integer) valTypeByFunction.get(fname);
-		v = new Validation(valType.intValue());
+		v = new Validation(valType);
 
 		if (!fname.equalsIgnoreCase("range")) {
 			NumericComparisonOperator operator = (NumericComparisonOperator) compareOpByFunction.get(fname);
 			v.addArgument(operator);
 		}
 
-		for (int i = 0; i < args.size(); i++) {
-			float f = Float.parseFloat((String) args.get(i));
+		for (Object arg : args) {
+			float f = Float.parseFloat((String) arg);
 			v.addArgument(f);
 
 		}
@@ -1988,9 +1916,6 @@ public class Validator {
 	/**
 	 * Return error message of widthDecimal validation. If valid, no message returns.
 	 * 
-	 * @param widthDecimal
-	 * @param dataType
-	 * @return
 	 * 
 	 */
 	public static StringBuffer validateWidthDecimalSetting(String widthDecimal, String dataType,
@@ -2003,39 +1928,42 @@ public class Validator {
 			if (width > 0) {
 				if ("ST".equalsIgnoreCase(dataType)) {
 					if (width > 4000) {
-						message.append(" " + dataType + " " + resException.getString("datatype_maximum_width_is") + " "
-								+ 4000 + ".");
+						message.append(" ").append(dataType).append(" ")
+								.append(resException.getString("datatype_maximum_width_is")).append(" ").append(4000)
+								.append(".");
 					}
 				} else if ("INT".equalsIgnoreCase(dataType)) {
 					if (width > 10) {
-						message.append(" " + dataType + " " + resException.getString("datatype_maximum_width_is") + " "
-								+ 10 + ".");
+						message.append(" ").append(dataType).append(" ")
+								.append(resException.getString("datatype_maximum_width_is")).append(" ").append(10)
+								.append(".");
 					}
 				} else if ("REAL".equalsIgnoreCase(dataType)) {
 					if (width > 26) {
-						message.append(" " + dataType + " " + resException.getString("datatype_maximum_width_is") + " "
-								+ 26 + ".");
+						message.append(" ").append(dataType).append(" ")
+								.append(resException.getString("datatype_maximum_width_is")).append(" ").append(26)
+								.append(".");
 					}
 				}
 			}
 			if (decimal > 0) {
 				if ("ST".equalsIgnoreCase(dataType)) {
-					message.append(" " + dataType + " "
-							+ resException.getString("datatype_decimal_cannot_bigger_than_0"));
+					message.append(" ").append(dataType).append(" ")
+							.append(resException.getString("datatype_decimal_cannot_bigger_than_0"));
 				} else if ("INT".equalsIgnoreCase(dataType)) {
-					message.append(" " + dataType + " "
-							+ resException.getString("datatype_decimal_cannot_bigger_than_0"));
+					message.append(" ").append(dataType).append(" ")
+							.append(resException.getString("datatype_decimal_cannot_bigger_than_0"));
 				} else if ("REAL".equalsIgnoreCase(dataType)) {
 					if (width > 0 && decimal >= width) {
-						message.append(" " + resException.getString("decimal_cannot_larger_than_width"));
+						message.append(" ").append(resException.getString("decimal_cannot_larger_than_width"));
 					}
 					if (decimal > 30) {
-						message.append(" " + resException.getString("decimal_cannot_larger_than_30"));
+						message.append(" ").append(resException.getString("decimal_cannot_larger_than_30"));
 					}
 				}
 			}
 		} else {
-			String s = "";
+			String s;
 			if (isCalculationItem) {
 				s = resException.getString("calculation_correct_width_decimal_pattern");
 			} else {
@@ -2047,24 +1975,20 @@ public class Validator {
 	}
 
 	public static boolean validWidthDecimalPattern(String widthDecimal, boolean isCalculationItem) {
-		String pattern = "";
+		String pattern;
 		if (isCalculationItem) {
 			pattern = "((w[(](d|(\\d)+)[)])|([(](d|(\\d)+)[)]))";
 		} else {
 			pattern = "((w|(\\d)+)[(](d|(\\d)+)[)])|(w|(\\d)+)|([(](d|(\\d)+)[)])";
 		}
 		widthDecimal = widthDecimal.trim();
-		if (Pattern.matches(pattern, widthDecimal)) {
-			return true;
-		}
-		return false;
+		return Pattern.matches(pattern, widthDecimal);
 	}
 
 	public static int parseWidth(String widthDecimal) {
-		String w = "";
+		String w;
 		widthDecimal = widthDecimal.trim();
-		if (widthDecimal.startsWith("(")) {
-		} else if (widthDecimal.contains("(")) {
+		if (widthDecimal.contains("(")) {
 			w = widthDecimal.split("\\(")[0];
 		} else {
 			w = widthDecimal;
@@ -2103,15 +2027,15 @@ public class Validator {
 		if (width > 0) {
 			if ("ST".equalsIgnoreCase(dataType)) {
 				if (fieldValue.length() > width) {
-					message.append(resexception.getString("exceeds_width") + "=" + width + ".");
+					message.append(resexception.getString("exceeds_width")).append("=").append(width).append(".");
 				}
 			} else if ("INT".equalsIgnoreCase(dataType)) {
 				if (fieldValue.length() > width) {
-					message.append(resexception.getString("exceeds_width") + "=" + width + ".");
+					message.append(resexception.getString("exceeds_width")).append("=").append(width).append(".");
 				}
 			} else if ("REAL".equalsIgnoreCase(dataType)) {
 				if (fieldValue.length() > width) {
-					message.append(resexception.getString("exceeds_width") + "=" + width + ".");
+					message.append(resexception.getString("exceeds_width")).append("=").append(width).append(".");
 				}
 			}
 		}
@@ -2120,7 +2044,8 @@ public class Validator {
 				try {
 					Double d = NumberFormat.getInstance().parse(fieldValue).doubleValue();
 					if (BigDecimal.valueOf(d).scale() > decimal) {
-						message.append(resexception.getString("exceeds_decimal") + "=" + decimal + ".");
+						message.append(resexception.getString("exceeds_decimal")).append("=").append(decimal)
+								.append(".");
 					}
 				} catch (ParseException pe) {
 					message.append(resexception.getString("should_be_real_number"));
@@ -2131,7 +2056,6 @@ public class Validator {
 	}
 
 	private int getPwdMinLen(ValidatorHelper validatorHelper) {
-		PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(validatorHelper.getConfigurationDao());
-		return passwordRequirementsDao == null ? 0 : passwordRequirementsDao.minLength();
+		return new PasswordRequirementsDao(validatorHelper.getConfigurationDao()).minLength();
 	}
 }

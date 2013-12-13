@@ -226,19 +226,19 @@ public class DefineStudyEventServlet extends SecureController {
 		String calendaredVisitType = fp.getString("type");
 		if ("calendared_visit".equalsIgnoreCase(calendaredVisitType)) {
 			v.addValidation("maxDay", Validator.IS_REQUIRED);
-			v.addValidation("maxDay", Validator.IS_A_NUMBER,
+			v.addValidation("maxDay", Validator.IS_A_FLOAT,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
 			v.addValidation("minDay", Validator.IS_REQUIRED);
-			v.addValidation("minDay", Validator.IS_A_NUMBER,
+			v.addValidation("minDay", Validator.IS_A_FLOAT,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
 			v.addValidation("schDay", Validator.IS_REQUIRED);
-			v.addValidation("schDay", Validator.IS_A_NUMBER,
+			v.addValidation("schDay", Validator.IS_A_FLOAT,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
 			if("".equalsIgnoreCase(fp.getString("isReference"))) {
 					v.addValidation("emailUser", Validator.NO_BLANKS);
 			}
 			v.addValidation("emailDay", Validator.IS_REQUIRED);
-			v.addValidation("emailDay", Validator.IS_A_NUMBER,
+			v.addValidation("emailDay", Validator.IS_A_FLOAT,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
 			session.setAttribute("maxDay", fp.getString("maxDay"));
 			session.setAttribute("minDay", fp.getString("minDay"));
