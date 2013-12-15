@@ -2452,7 +2452,7 @@ codeItem = function(item) {
             study: study,
             item: $(item).attr("itemid"),
             verbatimTerm: $.trim($(item).parent().siblings("td").find("input").val()),
-            dictionary: $(item).parent().siblings("td").find("select option:selected").val()
+            dictionary: $(item).parent().siblings("td").find("div[name='termDictionary']").text()
         },
 
         success: function(data) {
@@ -2485,9 +2485,8 @@ saveCodedItem = function(item) {
         url: url + "/saveCodedItem",
         data: {
 
-            item: $(item).children('div').attr("id"),
-            code: $.trim($(item).children('div').text()),
-            dictionary: $(item).parents('tr').find("select option:selected").val()
+            item: $(item).parents('div').attr("id"),
+            code: $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
         },
 
         success: function(data) {
@@ -2571,9 +2570,8 @@ function codeAndAlias(item) {
         data: {
 
             study: study,
-            item: $(item).children('div').attr("id"),
-            code: $.trim($(item).children('div').text()),
-            dictionary: $(item).parents('tr').find("select option:selected").val()
+            item: $(item).parents('div').attr("id"),
+            code: $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
         },
 
         success: function(data) {
@@ -2736,7 +2734,6 @@ deleteTerm = function(item) {
 
             item: $(item).attr("itemid"),
             code: $.trim($(item).parent().siblings("td").find("input:first").val()),
-            dictionary: $(item).parents('tr').find("select option:selected").val()
         },
 
         success: function(data) {

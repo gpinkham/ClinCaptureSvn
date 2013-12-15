@@ -52,15 +52,6 @@ public interface TermService {
 	Term findTerm(String preferredName);
 
 	/**
-	 * Retrieve a term given a valid code.
-	 * 
-	 * @param code code of the term to retrieve.
-	 * 
-	 * @return Term if it exists, null otherwise
-	 */
-	Term findTermByCode(String code);
-
-	/**
 	 * Retrieves all the terms that belong to the specified dictionary
 	 * 
 	 * @param dictionary The dictionary to filter on.

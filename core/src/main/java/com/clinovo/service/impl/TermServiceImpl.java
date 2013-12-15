@@ -31,10 +31,6 @@ public class TermServiceImpl implements TermService {
 		return termDAO.findByName(preferredName);
 	}
 
-	public Term findTermByCode(String code) {
-		return termDAO.findByCode(code);
-	}
-
 	public List<Term> findTerm(Dictionary dictionary) {
 		return termDAO.findByDictionary(dictionary);
 	}
@@ -69,8 +65,6 @@ public class TermServiceImpl implements TermService {
 			
 			throw new CodeException("Term already exists in the dictionary");
 			
-		} else {
-			
 		}
 		
 		return termDAO.saveOrUpdate(term);
@@ -86,7 +80,7 @@ public class TermServiceImpl implements TermService {
 
 		for (Term x : terms) {
 
-			if (x.getCode().equals(term.getCode()) && x.getPreferredName().equals(term.getPreferredName())
+			if (x.getPreferredName().equals(term.getPreferredName())
 					&& x.getDictionary().equals(term.getDictionary())) {
 
 				return true;

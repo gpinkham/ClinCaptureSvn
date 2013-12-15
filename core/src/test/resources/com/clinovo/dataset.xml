@@ -1086,14 +1086,20 @@
 		date_updated="2013-08-19" version="0" study='2'/>
 		
 	<term id="1" preferred_name="some preferred name"
-		code="SOME-CODE" dictionary_id="1" date_created="2013-08-19" external_dictionary_name="icd10" version="0"/>
+		dictionary_id="1" date_created="2013-08-19" external_dictionary_name="icd10" http_path="http://path1" version="0"/>
 		
 	<term id="2" preferred_name="some preferred name 2"
-		code="SOME-CODE-2" dictionary_id="1" date_created="2013-08-19" external_dictionary_name="medDra" version="0"/>
+		dictionary_id="1" date_created="2013-08-19" external_dictionary_name="medDra" http_path="http://path2" version="0"/>
 		
 	<term id="3" preferred_name="some preferred name 3"
-		code="SOME-CODE-3" dictionary_id="2" date_created="2013-08-19" external_dictionary_name="icd9" version="0"/>
-		
+		dictionary_id="2" date_created="2013-08-19" external_dictionary_name="icd9" http_path="http://path3" version="0"/>
+
+    <term_element id="1" term_id="1" element_name="element_name_1" term_name="term_name_1" term_code="term_code_1" version="0"/>
+    <term_element id="2" term_id="1" element_name="element_name_2" term_name="term_name_2" term_code="term_code_2" version="0"/>
+    <term_element id="3" term_id="2" element_name="element_name_3" term_name="term_name_3" term_code="term_code_3" version="0"/>
+    <term_element id="4" term_id="2" element_name="element_name_4" term_name="term_name_4" term_code="term_code_4" version="0"/>
+    <term_element id="5" term_id="3" element_name="element_name_5" term_name="term_name_5" term_code="term_code_5" version="0"/>
+
 	<coded_item id="1" dictionary="some-dictionary" status="UNKNOWN" item_id="1" event_crf_id="1" crf_version_id="2" subject_id="1" study_id='1' site_id='3' auto_coded="true" version="0" />
 	<coded_item id="2" dictionary="some-dictionary-2" status="CODED" item_id="2" event_crf_id="1" crf_version_id="2" subject_id="2" study_id='1'  site_id='3' auto_coded="false" version="0" />
 	<coded_item id="3" dictionary="some-dictionary" status="NOT_CODED" item_id="3" event_crf_id="2" crf_version_id="1" subject_id="1" study_id='2' site_id='4' auto_coded="true" version="0" />

@@ -27,13 +27,6 @@ public class TermDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	public void testThatFindByIdReturnsTermWithCorrectCode() {
-
-		Term term = termDAO.findById(1);
-		assertEquals("SOME-CODE", term.getCode());
-	}
-
-	@Test
 	public void testThatFindByIdReturnsTermWithDictionary() {
 
 		Term term = termDAO.findById(1);
@@ -68,18 +61,6 @@ public class TermDAOTest extends DefaultAppContextTest {
 
 		Term term = termDAO.findByName("some preferred name 3");
 		assertEquals(dateFormat.format(date), dateFormat.format(term.getDateCreated()));
-	}
-
-	@Test
-	public void testThatFindByCodeDoesNotReturnNull() {
-
-		assertNotNull(termDAO.findByCode("SOME-CODE-2"));
-	}
-
-	@Test
-	public void testThatFindByCodeReturnsTermWithDictionary() {
-
-		assertEquals("Test Dictionary", termDAO.findByCode("SOME-CODE-2").getDictionary().getName());
 	}
 
 	@Test
@@ -125,11 +106,6 @@ public class TermDAOTest extends DefaultAppContextTest {
 	public void testThatFindByTermAndExternalDictionaryReturnsTermWithCorrectExtDictionary() {
 		
 		assertEquals("icd10", termDAO.findByTermAndExternalDictionary("some preferred name", "icd10").getExternalDictionaryName());
-	}
-	
-	@Test
-	public void testThatFindByTermAndExternalDictionaryReturnsTermWithCode() {
-		assertNotNull(termDAO.findByTermAndExternalDictionary("some preferred name", "icd10").getCode());
 	}
 	
 	@Test

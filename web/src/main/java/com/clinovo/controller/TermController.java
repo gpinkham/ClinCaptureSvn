@@ -37,12 +37,11 @@ public class TermController {
 
         String code = request.getParameter("code");
         String itemId = request.getParameter("item");
-        String dictionary = request.getParameter("dictionary");
 
         CodedItem codedItem = itemService.findCodedItem(Integer.valueOf(itemId));
 
         if(codedItem != null) {
-            Term term = codedItem.isCoded() ? termService.findTermByCode(code) : termService.findByTermAndExternalDictionary(code, dictionary);
+            Term term = codedItem.isCoded() ? termService.findTerm(code.toLowerCase()) : termService.findByTermAndExternalDictionary(code, codedItem.getDictionary());
 
             if (term != null) {
                 termService.deleteTerm(term);

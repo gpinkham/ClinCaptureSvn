@@ -72,22 +72,6 @@ public class TermDAO extends AbstractDomainDao<Term> {
 	}
 
 	/**
-	 * Retrieves a term for the specified code.
-	 * 
-	 * @param code The code of the term to search for.
-	 * 
-	 * @return The term if found, otherwise null.
-	 */
-	public Term findByCode(String code) {
-
-		String query = "from " + getDomainClassName() + " do  where do.code = :code order by do.code asc";
-		Query q = getCurrentSession().createQuery(query);
-		q.setString("code", code);
-
-		return (Term) q.uniqueResult();
-	}
-
-	/**
 	 * Retrieves all the terms that belong to the specified dictionary.
 	 * 
 	 * @param dictionary The dictionary to which the terms belong.

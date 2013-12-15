@@ -14,6 +14,30 @@ public class TermServiceTest extends DefaultAppContextTest {
 		assertNotNull(termService.findTerm(1));
 	}
 
+    @Test
+    public void testThatFindTermDoesNotReturnNullElementList() {
+
+        assertNotNull(termService.findTerm(1).getTermElementList());
+    }
+
+    @Test
+    public void testThatFindTermReturnsAllElementsList() {
+
+        assertEquals(2, termService.findTerm(1).getTermElementList().size());
+    }
+
+    @Test
+    public void testThatFindTermReturnsElementListWithName() {
+
+        assertEquals("element_name_5", termService.findTerm(3).getTermElementList().get(0).getElementName());
+    }
+
+    @Test
+    public void testThatFindTermReturnsTermWithHttpPath() {
+
+        assertEquals("http://path3", termService.findTerm(3).getHttpPath());
+    }
+
 	@Test
 	public void testThatFindTermReturnsTermWithName() {
 		assertEquals("some preferred name 2", termService.findTerm(2).getPreferredName());
@@ -33,37 +57,12 @@ public class TermServiceTest extends DefaultAppContextTest {
 	public void testThatFindTermByNameDoesNotReturnNull() {
 		assertNotNull(termService.findTerm("some preferred name"));
 	}
-	
-	@Test
-	public void testThatFindTermByNameReturnsTermWithCode() {
-		assertEquals("SOME-CODE-2", termService.findTerm("some preferred name 2").getCode());
-	}
-	
+
 	@Test
 	public void testThatFindTermByNameReturnsTermWithDictionary() {
 		assertEquals("Test Dictionary 2", termService.findTerm("some preferred name 3").getDictionary().getName());
 	}
-	
-	@Test
-	public void testThatFindTermByCodeDoesNotReturnNull() {
-		assertNotNull(termService.findTermByCode("SOME-CODE"));
-	}
-	
-	@Test
-	public void testThatFindTermByCodeReturnsTermWithDictionary() {
-		assertNotNull(termService.findTermByCode("SOME-CODE-2").getDictionary());
-	}
-	
-	@Test
-	public void testThatFindTermByCodeReturnsTermWithDictionaryHavingValidId() {
-		assertEquals(new Integer(2), termService.findTermByCode("SOME-CODE-3").getDictionary().getId());
-	}
-	
-	@Test
-	public void testThatFindTermByCodeReturnsCorrectTerm() {
-		assertEquals("some preferred name", termService.findTermByCode("SOME-CODE").getPreferredName());
-	}
-	
+
 	@Test
 	public void testThatFindAllDoesNotReturnNull() {
 		assertNotNull(termService.findAll());
@@ -101,12 +100,7 @@ public class TermServiceTest extends DefaultAppContextTest {
 		
 		assertEquals("icd10", termService.findByTermAndExternalDictionary("some preferred name", "icd10").getExternalDictionaryName());
 	}
-	
-	@Test
-	public void testThatFindByTermAndExternalDictionaryReturnsTermWithCode() {
-		assertNotNull(termService.findByTermAndExternalDictionary("some preferred name", "icd10").getCode());
-	}
-	
+
 	@Test
 	public void testThatFindByExternalDictionaryDoesNotReturnNull() {
 		assertNotNull(termService.findByExternalDictionary("medDra"));

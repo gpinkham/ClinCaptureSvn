@@ -1960,7 +1960,6 @@ public abstract class DataEntryServlet extends Controller {
 					CodedItem codedItem = (CodedItem) getCodedItemService().findCodedItem(refItemData.getId());
 					if (codedItem != null && codedItem.getId() > 0) {
 						if (codedItem.getStatus().equals("CODED")) {
-							codedItem.setDictionary("");
 							codedItem.setStatus("NOT_CODED");
 							for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
 								codedItemElement.setItemCode("");

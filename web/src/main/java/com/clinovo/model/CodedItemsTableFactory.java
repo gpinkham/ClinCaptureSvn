@@ -85,6 +85,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     public final static String AJAX_DELETE_TERM_SUFFIX_HIDDEN = "\" style=\"visibility:hidden\"><img height=\"17\" border=\"0\" src=\"../images/bt_Delete.gif\" name=\"deleteTermBtn\"/></a>";
     public final static String DIV_VERSION_PREFIX = "<div name=\"codedItemVersion\">";
     public final static String DIV_VERSION_SUFIX = "</div>";
+    public final static String DIV_DICITIONARY_PREFIX = "<div name=\"termDictionary\">";
+    public final static String DIV_DICTIONARY_SUFIX = "</div>";
 
     @Override
     protected String getTableName() {
@@ -162,7 +164,9 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             String value = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
             StringBuilder url = new StringBuilder();
-            url.append(selectItemDictionary(codedItem.getDictionary()))
+            url.append(DIV_DICITIONARY_PREFIX)
+            .append(selectItemDictionary(codedItem.getDictionary()))
+                    .append(DIV_DICTIONARY_SUFIX)
                     .append(COLUMN_WIDTH_PREFIX)
                     .append("100")
                     .append(COLUMN_WIDTH_SUFFIX);

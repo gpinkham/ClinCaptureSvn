@@ -14,14 +14,15 @@
  *******************************************************************************/
 package com.clinovo.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -30,19 +31,30 @@ import org.hibernate.annotations.Parameter;
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "term_id_seq") })
 public class Term extends AbstractMutableDomainObject {
 
-	private String code = "";
 	private Dictionary dictionary;
 	private String preferredName = "";
 	private Date dateCreated = new Date();
 	private String externalDictionaryName = "";
+    private String httpPath = "";
+    List<TermElement> termElementList;
 
-	public String getCode() {
-		return code;
-	}
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @JoinColumn(name="term_id", referencedColumnName = "id", nullable=false)
+    public List<TermElement> getTermElementList() {
+        return termElementList;
+    }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+    public void setTermElementList(List<TermElement> termElementList) {
+        this.termElementList = termElementList;
+    }
+
+    public void addTermElement(TermElement termElement) {
+        if (termElementList == null) {
+            termElementList = new ArrayList<TermElement>();
+        }
+        termElementList.add(termElement);
+    }
 
 	public Date getDateCreated() {
 		return dateCreated;
@@ -77,4 +89,12 @@ public class Term extends AbstractMutableDomainObject {
 	public void setExternalDictionaryName(String externDictionaryName) {
 		this.externalDictionaryName = externDictionaryName;
 	}
+
+    public String getHttpPath() {
+        return httpPath;
+    }
+
+    public void setHttpPath(String httpPath) {
+        this.httpPath = httpPath;
+    }
 }

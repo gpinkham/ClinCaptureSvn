@@ -9,19 +9,15 @@ import javax.sql.DataSource;
 import com.clinovo.exception.CodeException;
 import com.clinovo.model.CodedItemElement;
 import org.akaza.openclinica.bean.core.ItemDataType;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -130,6 +126,7 @@ public class CodedItemServiceImpl implements CodedItemService {
             CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), item.getName());
 
             codedItem.addCodedItemElements(codedItemElement);
+
             codeItemDAO.saveOrUpdate(codedItem);
             return codedItem;
         }
@@ -139,22 +136,17 @@ public class CodedItemServiceImpl implements CodedItemService {
 
     public CodedItem saveCodedItem(CodedItem codedItem) throws Exception {
 
-        ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
-        UserAccountDAO userDAO = new UserAccountDAO(dataSource);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         for(CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
             ItemDataBean itemData = (ItemDataBean) getItemDataDAO().findByPK(codedItemElement.getItemDataId());
-            UserAccountBean loggedInUser = (UserAccountBean) userDAO.findByUserName(authentication.getName());
-
+           
             if (itemData.getId() > 0) {
 
-                itemData.setUpdater(loggedInUser);
+                //itemData.setUpdater(loggedInUser);
                 itemData.setUpdatedDate(new Date());
                 itemData.setValue(codedItemElement.getItemCode());
 
                 // persist
-                itemDataDAO.updateValue(itemData);
+                getItemDataDAO().updateValue(itemData);
 
             } else {
 

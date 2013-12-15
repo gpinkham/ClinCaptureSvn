@@ -14,7 +14,6 @@ public class TermControllerTest extends BaseControllerTest {
 		
 		this.mockMvc.perform(get(TERM_CONTROLLER)
 				.param("item", "2")
-                .param("dictionary", "medDra")
                 .param("code", "SOME-CODE-2"))
 			.andExpect(status().isNoContent());
 	}
