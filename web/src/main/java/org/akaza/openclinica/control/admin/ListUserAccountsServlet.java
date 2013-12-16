@@ -24,10 +24,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -46,31 +44,29 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ListUserAccountsServlet extends RememberLastPage {
 
-	public static final String PATH = "ListUserAccounts";
 	public static final String ARG_MESSAGE = "message";
 	public static final String SAVED_USER_LIST_URL = "savedUserListUrl";
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 		if (!ub.isSysAdmin()) {
 			addPageMessage(respage.getString("you_may_not_perform_administrative_functions"), request);
 			throw new InsufficientPermissionException(Page.ADMIN_SYSTEM_SERVLET,
 					respage.getString("you_may_not_perform_administrative_functions"), "1");
 		}
-
-		return;
 	}
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (shouldRedirect(request, response)) {
-            return;
-        }
+		if (shouldRedirect(request, response)) {
+			return;
+		}
 
 		FormProcessor fp = new FormProcessor(request);
 
@@ -80,26 +76,27 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		ArrayList allUsers = getAllUsers(udao);
 		setStudyNamesInStudyUserRoles(allUsers);
 
-		for (int i = 0; i < allUsers.size(); i++) {
-			InactiveAnalyzer.analyze((UserAccountBean) allUsers.get(i), udao, restext);
+		for (Object allUser : allUsers) {
+			InactiveAnalyzer.analyze((UserAccountBean) allUser, udao, restext);
 		}
-		
-		Map<String, Integer> userRolesRemovedCountMap = new HashMap<String, Integer> ();
+
+		Map<String, Integer> userRolesRemovedCountMap = new HashMap<String, Integer>();
 		int removedRolesCount;
-		
-		for (Object userBean: allUsers) {
+
+		for (Object userBean : allUsers) {
 			UserAccountBean uab = (UserAccountBean) userBean;
 			removedRolesCount = 0;
-			for (StudyUserRoleBean urb: uab.getRoles()) {
+			for (StudyUserRoleBean urb : uab.getRoles()) {
 				if (urb.getStatus() == Status.DELETED) {
 					removedRolesCount += 1;
 				}
 			}
 			userRolesRemovedCountMap.put(uab.getName(), removedRolesCount);
 		}
-		
+
 		StudyDAO sdao = getStudyDAO();
-		StudyBean sb = (StudyBean) sdao.findByPK(((UserAccountBean)(request.getSession().getAttribute("userBean"))).getActiveStudyId());
+		StudyBean sb = (StudyBean) sdao.findByPK(((UserAccountBean) (request.getSession().getAttribute("userBean")))
+				.getActiveStudyId());
 
 		ArrayList allUserRows = UserAccountRow.generateRowsFromBeans(allUsers);
 
@@ -117,25 +114,24 @@ public class ListUserAccountsServlet extends RememberLastPage {
 
 		String message = fp.getString(ARG_MESSAGE, true);
 		request.setAttribute(ARG_MESSAGE, message);
-        request.setAttribute("roleMap", Role.roleMap);
-        request.setAttribute("userRolesRemovedCountMap", userRolesRemovedCountMap);
-        request.setAttribute("studyId", sb.getId());
-        request.setAttribute("parentStudyId", sb.getParentStudyId());
+		request.setAttribute("roleMap", Role.roleMap);
+		request.setAttribute("userRolesRemovedCountMap", userRolesRemovedCountMap);
+		request.setAttribute("studyId", sb.getId());
+		request.setAttribute("parentStudyId", sb.getParentStudyId());
 
-        StudyInfoPanel panel = getStudyInfoPanel(request);
+		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 		if (allUsers.size() > 0) {
-			setToPanel(resword.getString("users"), new Integer(allUsers.size()).toString(), request);
+			setToPanel(resword.getString("users"), Integer.toString(allUsers.size()), request);
 		}
 
-		forward(Page.LIST_USER_ACCOUNTS, request, response);
+		forwardPage(Page.LIST_USER_ACCOUNTS, request, response);
 	}
 
 	private ArrayList getAllUsers(UserAccountDAO udao) {
-		ArrayList result = (ArrayList) udao.findAll();
-		return result;
+		return (ArrayList) udao.findAll();
 	}
 
 	/**
@@ -152,7 +148,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		int i;
 		for (i = 0; i < allStudies.size(); i++) {
 			StudyBean sb = (StudyBean) allStudies.get(i);
-			studiesById.put(new Integer(sb.getId()), sb);
+			studiesById.put(sb.getId(), sb);
 		}
 
 		for (i = 0; i < users.size(); i++) {
@@ -171,8 +167,6 @@ public class ListUserAccountsServlet extends RememberLastPage {
 			u.setRoles(roles);
 			users.set(i, u);
 		}
-
-		return;
 	}
 
 	@Override
@@ -185,7 +179,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		return SAVED_USER_LIST_URL;
 	}
 
-    @Override
+	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
 		String eblFiltered = fp.getString("ebl_filtered");

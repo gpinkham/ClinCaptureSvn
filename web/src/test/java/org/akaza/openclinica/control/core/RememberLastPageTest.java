@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Locale;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.view.Page;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -21,20 +20,18 @@ public class RememberLastPageTest {
 	public static final String SAVED_URL = "savedUrl";
 	public static final String DEFAULT_URL = "defUrl?param1=1";
 
-	private Locale locale;
-	private MockHttpSession session;
 	private MockHttpServletRequest request;
 	private MockHttpServletResponse response;
 	private RememberLastPage rememberLastPage;
 
 	@Before
 	public void setUp() throws Exception {
-		locale = new Locale("en");
+		Locale locale = new Locale("en");
 
-		session = new MockHttpSession();
+		MockHttpSession session = new MockHttpSession();
 		request = new MockHttpServletRequest();
-        request.setMethod("GET");
-		request.setPreferredLocales(Arrays.asList(new Locale[] { locale }));
+		request.setMethod("GET");
+		request.setPreferredLocales(Arrays.asList(locale));
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		Whitebox.setInternalState(request, "session", session);
 
@@ -61,10 +58,5 @@ public class RememberLastPageTest {
 		Mockito.when(rememberLastPage.userDoesNotUseJmesaTableForNavigation(request)).thenReturn(false);
 		boolean result = rememberLastPage.shouldRedirect(request, response);
 		assertFalse(result);
-	}
-
-	@Test
-	public void testThatForwardDoesNotThrowAnException() throws Exception {
-		rememberLastPage.forward(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 	}
 }

@@ -221,13 +221,7 @@ public class CodedItemsController {
         String codedItemItemDataId = request.getParameter("item");
         String codedItemVerbatimTerm = request.getParameter("code");
 
-        CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
-
-        // If set in the session, it should be auto coded! You have been warned
-
-
         createCodeItemJob(codedItemItemDataId, codedItemVerbatimTerm, false);
-
 
         // Redirect to main
         return "codedItems";

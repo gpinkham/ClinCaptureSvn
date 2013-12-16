@@ -22,18 +22,16 @@ package org.akaza.openclinica.control.submit;
 
 import java.util.Date;
 import java.util.HashMap;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -82,7 +80,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 					fp.getString("findSubjects_f_studySubject.label"), currentStudy);
 			if (studySubject.getId() > 0) {
 				response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
-						+ new Integer(studySubject.getId()).toString());
+						+ Integer.toString(studySubject.getId()));
 				return;
 			} else {
 				request.getSession().removeAttribute(getUrlKey(request));
@@ -92,14 +90,10 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 			return;
 		}
 
-		Controller.removeLockedCRF(ub.getId());	
+		Controller.removeLockedCRF(ub.getId());
 
 		boolean showMoreLink;
-		if (fp.getString("showMoreLink").equals("")) {
-			showMoreLink = true;
-		} else {
-			showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
-		}
+		showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
 
 		String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
 		// set up auto study subject id
@@ -157,7 +151,7 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
 		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
-		forward(Page.LIST_STUDY_SUBJECTS, request, response);
+		forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
 	}
 
 	@Override
@@ -174,14 +168,10 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	protected String getDefaultUrl(HttpServletRequest request) {
 		boolean showMoreLink;
 		FormProcessor fp = new FormProcessor(request);
-		if (fp.getString("showMoreLink").equals("")) {
-			showMoreLink = true;
-		} else {
-			showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
-		}
+		showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
 		String savedUrl = (String) request.getSession().getAttribute(SAVED_SUBJECT_MATRIX_URL);
 		savedUrl = savedUrl != null ? savedUrl.replaceAll(".*" + request.getContextPath() + "/ListStudySubjects", "")
-				: savedUrl;
+				: null;
 		return request.getMethod().equalsIgnoreCase("POST") && savedUrl != null ? savedUrl
 				: "?module="
 						+ fp.getString("module")

@@ -42,50 +42,46 @@ public class UpdateSubStudyServletTest {
 	public static final int ID = 1;
 	private Mockery context = new Mockery();
 
-	private StudyDAO studyDAO;
 	private HttpServletRequest request;
-    private HttpSession session;
+	private HttpSession session;
 
 	private StudyBean studyFromSession;
-	private StudyBean studyFromDb;
 
 	private UpdateSubStudyServlet updateSubStudyServlet;
-	private StudyParameterValueBean studyParameterValueBean;
-	private UserAccountBean userAccountBean;
-	
-    @Before
+
+	@Before
 	public void setUp() throws Exception {
 		ResourceBundleProvider.updateLocale(Locale.getDefault());
 
-        context.mock(DataSource.class);
+		context.mock(DataSource.class);
 		context.mock(IStudyParameterValueDAO.class);
 		context.mock(ICRFVersionDAO.class);
-        request = context.mock(HttpServletRequest.class);
-        session = context.mock(HttpSession.class);
+		request = context.mock(HttpServletRequest.class);
+		session = context.mock(HttpSession.class);
 
 		studyFromSession = new StudyBean();
 		studyFromSession.setId(ID);
 		studyFromSession.setStatus(Status.INVALID);
 
-		studyFromDb = new StudyBean();
+		StudyBean studyFromDb = new StudyBean();
 		studyFromDb.setId(ID);
 		studyFromDb.setStatus(Status.AVAILABLE);
 
-		userAccountBean = new UserAccountBean();
+		UserAccountBean userAccountBean = new UserAccountBean();
 		userAccountBean.setId(ID);
 
-        studyDAO = Mockito.mock(StudyDAO.class);
-        Mockito.doReturn(studyFromDb).when(studyDAO).findByPK(ID);
-        Mockito.doReturn(studyFromDb).when(studyDAO).update(studyFromSession);
+		StudyDAO studyDAO = Mockito.mock(StudyDAO.class);
+		Mockito.doReturn(studyFromDb).when(studyDAO).findByPK(ID);
+		Mockito.doReturn(studyFromDb).when(studyDAO).update(studyFromSession);
 
-        updateSubStudyServlet = Mockito.mock(UpdateSubStudyServlet.class);
-        Mockito.doCallRealMethod().when(updateSubStudyServlet).submitStudy(request);
-        Mockito.doReturn(userAccountBean).when(updateSubStudyServlet).getUserAccountBean(request);
-        Mockito.doReturn(studyDAO).when(updateSubStudyServlet).getStudyDAO();
+		updateSubStudyServlet = Mockito.mock(UpdateSubStudyServlet.class);
+		Mockito.doCallRealMethod().when(updateSubStudyServlet).submitStudy(request);
+		Mockito.doReturn(userAccountBean).when(updateSubStudyServlet).getUserAccountBean(request);
+		Mockito.doReturn(studyDAO).when(updateSubStudyServlet).getStudyDAO();
 
-        Whitebox.setInternalState(updateSubStudyServlet, "resword", ResourceBundleProvider.getWordsBundle());
+		Whitebox.setInternalState(updateSubStudyServlet, "resword", ResourceBundleProvider.getWordsBundle());
 
-		studyParameterValueBean = new StudyParameterValueBean();
+		StudyParameterValueBean studyParameterValueBean = new StudyParameterValueBean();
 		studyParameterValueBean.setId(ID);
 	}
 
@@ -95,11 +91,11 @@ public class UpdateSubStudyServletTest {
 
 		context.checking(new Expectations() {
 			{
-                allowing(request).getSession();
-                will(returnValue(session));
-                allowing(session).getAttribute(UpdateSubStudyServlet.NEW_STUDY);
+				allowing(request).getSession();
+				will(returnValue(session));
+				allowing(session).getAttribute(UpdateSubStudyServlet.NEW_STUDY);
 				will(returnValue(studyFromSession));
-                allowing(session).getAttribute(UpdateSubStudyServlet.DEFINITIONS);
+				allowing(session).getAttribute(UpdateSubStudyServlet.DEFINITIONS);
 				will(returnValue(new ArrayList<StudyEventDefinitionBean>()));
 				one(session).removeAttribute(UpdateSubStudyServlet.NEW_STUDY);
 				one(session).removeAttribute(UpdateSubStudyServlet.PARENT_NAME);

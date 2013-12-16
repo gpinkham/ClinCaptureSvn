@@ -3,7 +3,7 @@
 <web-app version="2.4"
          xmlns="http://java.sun.com/xml/ns/j2ee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" >
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
     <display-name>ClinCapture Enterprise ${published.version}</display-name>
     <description>
@@ -15,18 +15,18 @@
         <param-value>
             classpath*:org/akaza/openclinica/applicationContext*.xml
         </param-value>
-  </context-param>
-    
+    </context-param>
+
     <context-param>
         <param-name>jmesaMessagesLocation</param-name>
         <param-value>org/akaza/openclinica/jmesaResourceBundle</param-value>
     </context-param>
 
-   <context-param>
+    <context-param>
         <param-name>SQLInitServlet</param-name>
         <param-value>org/</param-value>
     </context-param>
-    
+
     <listener>
         <!--@pgawade 01-DEC-2010 Replaced the listener with the extended class
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
@@ -34,24 +34,24 @@
     </listener>
     <!-- added to properly shut down ehcache -->
     <listener>
-  		<listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
-	</listener>
+        <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
+    </listener>
     <listener>
         <listener-class>org.akaza.openclinica.control.OCSessionListener</listener-class>
     </listener>
     <listener>
-    	<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+        <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
     </listener>
     <listener>
         <listener-class>org.akaza.openclinica.control.OCServletContextListener</listener-class>
     </listener>
-	<listener>
-		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-  	</listener>
+    <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
 
     <filter>
         <filter-name>encodingFilter</filter-name>
-            <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
         <init-param>
             <param-name>encoding</param-name>
             <param-value>UTF-8</param-value>
@@ -61,89 +61,89 @@
             <param-value>true</param-value>
         </init-param>
     </filter>
-	
+
     <filter-mapping>
         <filter-name>encodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-     <filter>
+    <filter>
         <filter-name>compressFilter</filter-name>
-        <filter-class>com.planetj.servlet.filter.compression.CompressingFilter </filter-class>
+        <filter-class>com.planetj.servlet.filter.compression.CompressingFilter</filter-class>
     </filter>
-     <filter-mapping>
+    <filter-mapping>
         <filter-name>compressFilter</filter-name>
         <url-pattern>/InitialDataEntry</url-pattern>
-     </filter-mapping>
-	    <filter-mapping>
+    </filter-mapping>
+    <filter-mapping>
         <filter-name>compressFilter</filter-name>
         <url-pattern>/ViewSectionDataEntry</url-pattern>
-     </filter-mapping>
-	  <filter-mapping>
+    </filter-mapping>
+    <filter-mapping>
         <filter-name>compressFilter</filter-name>
         <url-pattern>/AdministrativeEditing</url-pattern>
-     </filter-mapping>
-	<filter-mapping>
+    </filter-mapping>
+    <filter-mapping>
         <filter-name>compressFilter</filter-name>
-  	  <url-pattern>/DoubleDataEntry</url-pattern>
+        <url-pattern>/DoubleDataEntry</url-pattern>
     </filter-mapping>
-	<filter-mapping>
+    <filter-mapping>
         <filter-name>compressFilter</filter-name>
-  	<url-pattern>/ListStudySubjects</url-pattern>
+        <url-pattern>/ListStudySubjects</url-pattern>
     </filter-mapping>
-		<filter-mapping>
+    <filter-mapping>
         <filter-name>compressFilter</filter-name>
-   <url-pattern>/SectionPreview</url-pattern>
+        <url-pattern>/SectionPreview</url-pattern>
     </filter-mapping>
-		<filter-mapping>
+    <filter-mapping>
         <filter-name>compressFilter</filter-name>
-   <url-pattern>/CreateCRFVersion</url-pattern>
+        <url-pattern>/CreateCRFVersion</url-pattern>
     </filter-mapping>
-	<filter-mapping>
-    <filter-name>compressFilter</filter-name>
-   <url-pattern>/*</url-pattern>
+    <filter-mapping>
+        <filter-name>compressFilter</filter-name>
+        <url-pattern>/*</url-pattern>
     </filter-mapping>
-   <filter>
+    <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-    </filter>      
+    </filter>
     <filter-mapping>
         <filter-name>springSecurityFilterChain</filter-name>
-            <url-pattern>/*</url-pattern>
-   </filter-mapping>
-   <filter>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter>
         <filter-name>hibernateFilter</filter-name>
         <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>hibernateFilter</filter-name>
         <url-pattern>/*</url-pattern>
-   </filter-mapping>
-	<filter>
+    </filter-mapping>
+    <filter>
         <filter-name>logFilter</filter-name>
         <filter-class>org.akaza.openclinica.control.core.OCServletFilter</filter-class>
     </filter>
-     <filter-mapping>
+    <filter-mapping>
         <filter-name>logFilter</filter-name>
-        <url-pattern>/*</url-pattern>       
-   </filter-mapping>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
-   <servlet>
+    <servlet>
         <servlet-name>pages</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>2</load-on-startup>
     </servlet>
-    
+
     <servlet-mapping>
         <servlet-name>pages</servlet-name>
         <url-pattern>/pages/*</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
-    <servlet-name>pages</servlet-name>
-    <url-pattern>/oauth/*</url-pattern>
-  </servlet-mapping>
-   
+        <servlet-name>pages</servlet-name>
+        <url-pattern>/oauth/*</url-pattern>
+    </servlet-mapping>
+
     <servlet>
         <servlet-name>ws</servlet-name>
         <servlet-class>org.springframework.ws.transport.http.MessageDispatcherServlet</servlet-class>
@@ -224,13 +224,13 @@
         <description>AuditUserActivityServlet</description>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>SystemStatusServlet</servlet-name>
         <description>SystemStatusServlet</description>
         <servlet-class>org.akaza.openclinica.control.admin.SystemStatusServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>auditDatabaseServlet</servlet-name>
         <description>AuditDatabaseServlet</description>
@@ -249,17 +249,17 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
-	<servlet> 
- 	    <servlet-name>HelpNavigationServlet</servlet-name> 
- 	    <description>HelpNavigationServlet</description> 
- 	    <servlet-class>org.akaza.openclinica.navigation.HelpNavigationServlet</servlet-class> 
- 	</servlet>
- 	
- 	<servlet> 
- 	    <servlet-name>HelpThemeServlet</servlet-name> 
- 	    <description>HelpThemeServlet</description> 
- 	    <servlet-class>org.akaza.openclinica.control.login.HelpThemeServlet</servlet-class> 
- 	</servlet> 
+    <servlet>
+        <servlet-name>HelpNavigationServlet</servlet-name>
+        <description>HelpNavigationServlet</description>
+        <servlet-class>org.akaza.openclinica.navigation.HelpNavigationServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>HelpThemeServlet</servlet-name>
+        <description>HelpThemeServlet</description>
+        <servlet-class>org.akaza.openclinica.control.login.HelpThemeServlet</servlet-class>
+    </servlet>
 
     <servlet>
         <servlet-name>configurePasswordRequirementsServlet</servlet-name>
@@ -335,7 +335,7 @@
         <description>UpdateJobExportServlet</description>
         <servlet-class>org.akaza.openclinica.control.admin.UpdateJobExportServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>UpdateJobImportServlet</servlet-name>
         <display-name>UpdateJobImportServlet</display-name>
@@ -409,7 +409,7 @@
         <display-name>ShowFile</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
-     <servlet>
+    <servlet>
         <servlet-name>studyAuditLogServlet</servlet-name>
         <display-name>StudyAuditLog</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -574,7 +574,7 @@
         <display-name>ViewEventDefinition</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventDefinitionServlet</servlet-class>
     </servlet>
-     <servlet>
+    <servlet>
         <servlet-name>ViewEventDefinitionReadOnlyServlet</servlet-name>
         <display-name>ViewEventDefinitionReadOnly</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventDefinitionReadOnlyServlet</servlet-class>
@@ -679,7 +679,7 @@
         <display-name>DataEntry</display-name>
         <servlet-class>org.akaza.openclinica.control.submit.DataEntryServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>doubleDataEntryServlet</servlet-name>
         <display-name>DoubleDataEntry</display-name>
@@ -735,16 +735,15 @@
         <display-name>ViewStudyUser</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudyUserServlet</servlet-class>
     </servlet>
-	
-	<!-- Export Excel -->
-	<servlet>
+
+    <!-- Export Excel -->
+    <servlet>
         <servlet-name>ExportExcelStudySubjectAuditLogServlet</servlet-name>
         <display-name>ExportExcelStudySubjectAuditLog</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ExportExcelStudySubjectAuditLogServlet</servlet-class>
     </servlet>
-	
-	
-	
+
+
     <servlet>
         <servlet-name>SetStudyUserRoleServlet</servlet-name>
         <display-name>SetStudyUserRole</display-name>
@@ -796,9 +795,9 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreStudyEventServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>DeleteStudyEventServlet</servlet-name>
+        <servlet-name>deleteStudyEventServlet</servlet-name>
         <display-name>DeleteStudyEvent</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.DeleteStudyEventServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RemoveEventCRFServlet</servlet-name>
@@ -1275,7 +1274,7 @@
         <display-name>ViewItemAuditLogServlet</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewItemAuditLogServlet</servlet-class>
     </servlet>
-       <servlet>
+    <servlet>
         <servlet-name>ViewStudySubjectjsp</servlet-name>
         <display-name>viewStudySubjectjsp</display-name>
         <jsp-file>/WEB-INF/jsp/manageStudy/viewStudySubject.jsp</jsp-file>
@@ -1347,7 +1346,7 @@
         <url-pattern>/UpdateJobExport</url-pattern>
     </servlet-mapping>
 
-	<servlet-mapping>
+    <servlet-mapping>
         <servlet-name>UpdateJobImportServlet</servlet-name>
         <url-pattern>/UpdateJobImport</url-pattern>
     </servlet-mapping>
@@ -1809,7 +1808,7 @@
         <url-pattern>/RestoreStudyEvent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>DeleteStudyEventServlet</servlet-name>
+        <servlet-name>deleteStudyEventServlet</servlet-name>
         <url-pattern>/DeleteStudyEvent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1828,7 +1827,7 @@
         <servlet-name>ViewEventCRFServlet</servlet-name>
         <url-pattern>/ViewEventCRF</url-pattern>
     </servlet-mapping>
-     <servlet-mapping>
+    <servlet-mapping>
         <servlet-name>ChangeParametersForDNoteServlet</servlet-name>
         <url-pattern>/ChangeParametersForDNote</url-pattern>
     </servlet-mapping>
@@ -1900,8 +1899,8 @@
         <servlet-name>ViewStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ViewStudySubjectAuditLog</url-pattern>
     </servlet-mapping>
-	
-	<!--  Export Excel -->
+
+    <!--  Export Excel -->
     <servlet-mapping>
         <servlet-name>ExportExcelStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ExportExcelStudySubjectAuditLog</url-pattern>
@@ -1946,13 +1945,13 @@
         <servlet-name>viewEventCRFContentServlet</servlet-name>
         <url-pattern>/ViewEventCRFContent</url-pattern>
     </servlet-mapping>
-	<servlet-mapping> 
-        <servlet-name>HelpNavigationServlet</servlet-name> 
-        <url-pattern>/HelpNavigation</url-pattern> 
+    <servlet-mapping>
+        <servlet-name>HelpNavigationServlet</servlet-name>
+        <url-pattern>/HelpNavigation</url-pattern>
     </servlet-mapping>
-    	<servlet-mapping> 
-        <servlet-name>HelpThemeServlet</servlet-name> 
-        <url-pattern>/HelpThemeServlet</url-pattern> 
+    <servlet-mapping>
+        <servlet-name>HelpThemeServlet</servlet-name>
+        <url-pattern>/HelpThemeServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ChangeDefinitionOrdinalServlet</servlet-name>
@@ -2047,8 +2046,8 @@
         <url-pattern>/DownloadVersionSpreadSheet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-    	<servlet-name>downloadAttachedFileServlet</servlet-name>
-    	<url-pattern>/DownloadAttachedFile</url-pattern>
+        <servlet-name>downloadAttachedFileServlet</servlet-name>
+        <url-pattern>/DownloadAttachedFile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>viewNotesServlet</servlet-name>
@@ -2148,8 +2147,8 @@
         <url-pattern>/ViewItemAuditLog</url-pattern>
     </servlet-mapping>
 
-	<servlet>
-		<servlet-name>urlRewriterServlet</servlet-name>
+    <servlet>
+        <servlet-name>urlRewriterServlet</servlet-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
@@ -2157,9 +2156,9 @@
         <servlet-name>urlRewriterServlet</servlet-name>
         <url-pattern>/ClinicalData/*</url-pattern>
     </servlet-mapping>
-    
-	<servlet>
-		<servlet-name>randomizeServlet</servlet-name>
+
+    <servlet>
+        <servlet-name>randomizeServlet</servlet-name>
         <servlet-class>com.clinovo.servlet.RandomizeServlet</servlet-class>
     </servlet>
 

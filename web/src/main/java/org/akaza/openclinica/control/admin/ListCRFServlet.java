@@ -20,6 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -39,14 +45,6 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.ListCRFRow;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * Lists all the CRF and their CRF versions
  * 
@@ -59,16 +57,18 @@ public class ListCRFServlet extends RememberLastPage {
 	public static final String SAVED_LIST_CRFS_URL = "savedListCRFsUrl";
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MANAGE_STUDY_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -76,10 +76,12 @@ public class ListCRFServlet extends RememberLastPage {
 
 	/**
 	 * Finds all the crfs
-	 *
-     * @param request
-     * @param response
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if (shouldRedirect(request, response)) {
@@ -100,8 +102,9 @@ public class ListCRFServlet extends RememberLastPage {
 		FormProcessor fp = new FormProcessor(request);
 
 		if (!(ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR))) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"), request);
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study") + " "
+							+ respage.getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
@@ -115,14 +118,14 @@ public class ListCRFServlet extends RememberLastPage {
 		CRFDAO cdao = getCRFDAO();
 		CRFVersionDAO vdao = getCRFVersionDAO();
 		ArrayList crfs = (ArrayList) cdao.findAll();
-		for (int i = 0; i < crfs.size(); i++) {
-			CRFBean eb = (CRFBean) crfs.get(i);
+		for (Object crf : crfs) {
+			CRFBean eb = (CRFBean) crf;
 			logger.info("crf id:" + eb.getId());
 			ArrayList versions = (ArrayList) vdao.findAllByCRF(eb.getId());
 
 			// check whether the speadsheet is available on the server
-			for (int j = 0; j < versions.size(); j++) {
-				CRFVersionBean cv = (CRFVersionBean) versions.get(j);
+			for (Object version : versions) {
+				CRFVersionBean cv = (CRFVersionBean) version;
 				File file = new File(dir + eb.getId() + cv.getOid() + ".xls");
 				logger.info("looking in " + dir + eb.getId() + cv.getOid() + ".xls");
 				if (file.exists()) {
@@ -160,7 +163,7 @@ public class ListCRFServlet extends RememberLastPage {
 
 		request.setAttribute("table", table);
 
-        StudyInfoPanel panel = getStudyInfoPanel(request);
+		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
@@ -169,7 +172,7 @@ public class ListCRFServlet extends RememberLastPage {
 		panel.setCreateDataset(false);
 
 		if (crfs.size() > 0) {
-			setToPanel("CRFs", new Integer(crfs.size()).toString(), request);
+			setToPanel("CRFs", Integer.toString(crfs.size()), request);
 		}
 
 		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
@@ -180,12 +183,12 @@ public class ListCRFServlet extends RememberLastPage {
 				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
 		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
 				respage.getString("br_download_example_CRF_instructions_from"), request);
-		forward(Page.CRF_LIST, request, response);
+		forwardPage(Page.CRF_LIST, request, response);
 	}
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
 			return Controller.ADMIN_SERVLET_CODE;
 		} else {
@@ -205,9 +208,8 @@ public class ListCRFServlet extends RememberLastPage {
 		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
 		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
 		String eblSortAscending = fp.getString("ebl_sortAscending");
-		return "?submitted=1&ebl_page=1&ebl_sortColumnInd="
-				+ (!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0") + "&ebl_sortAscending="
-				+ (!eblSortAscending.isEmpty() ? eblSortAscending : "1") + "&ebl_filtered="
+		return "?submitted=1&ebl_page=1&ebl_sortColumnInd=" + (!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")
+				+ "&ebl_sortAscending=" + (!eblSortAscending.isEmpty() ? eblSortAscending : "1") + "&ebl_filtered="
 				+ (!eblFiltered.isEmpty() ? eblFiltered : "0") + "&ebl_filterKeyword="
 				+ (!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "") + "&ebl_paginated=1";
 	}

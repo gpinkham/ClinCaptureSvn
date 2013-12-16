@@ -17,12 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.akaza.openclinica.view.Page;
 
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public abstract class RememberLastPage extends Controller {
 
-    protected abstract String getUrlKey(HttpServletRequest request);
+	protected abstract String getUrlKey(HttpServletRequest request);
 
 	protected abstract String getDefaultUrl(HttpServletRequest request);
 
@@ -66,12 +65,10 @@ public abstract class RememberLastPage extends Controller {
 				}
 			}
 		}
+		if (!result) {
+			restoreAttributes(request);
+		}
 		return result;
-	}
-
-	protected void forward(Page page, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		restoreAttributes(request);
-		forwardPage(page, request, response);
 	}
 
 	private void storeAttributes(HttpServletRequest request) {

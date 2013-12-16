@@ -1,12 +1,11 @@
 package org.akaza.openclinica.web.job;
 
 
-import com.clinovo.model.CodedItem;
+import java.util.Date;
+
 import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
-
-import java.util.Date;
 
 public class CodingTriggerService {
 

@@ -30,9 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -54,14 +52,14 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public static final String UNION_OP = " UNION ";
 	// if true, we fetch the mapping along with the bean
 	// only applies to functions which return a single bean
 	private boolean fetchMapping = false;
 
-    /**
+	/**
 	 * @return Returns the fetchMapping.
 	 */
 	public boolean isFetchMapping() {
@@ -92,10 +90,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		setQueryNames();
 	}
 
-    public DiscrepancyNoteDAO(DataSource ds, Connection connection) {
-        super(ds, connection);
-        setQueryNames();
-    }
+	public DiscrepancyNoteDAO(DataSource ds, Connection connection) {
+		super(ds, connection);
+		setQueryNames();
+	}
 
 	@Override
 	protected void setDigesterName() {
@@ -104,7 +102,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	@Override
 	public void setTypesExpected() {
-		
+
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.STRING);
@@ -144,12 +142,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		Date dateCreated = (Date) hm.get("date_created");
 		Integer ownerId = (Integer) hm.get("owner_id");
 		eb.setCreatedDate(dateCreated);
-		eb.setOwnerId(ownerId.intValue());
+		eb.setOwnerId(ownerId);
 		eb.setId(selectInt(hm, "discrepancy_note_id"));
 		eb.setDescription((String) hm.get("description"));
-		eb.setDiscrepancyNoteTypeId(((Integer) hm.get("discrepancy_note_type_id")).intValue());
-		eb.setResolutionStatusId(((Integer) hm.get("resolution_status_id")).intValue());
-		eb.setParentDnId(((Integer) hm.get("parent_dn_id")).intValue());
+		eb.setDiscrepancyNoteTypeId((Integer) hm.get("discrepancy_note_type_id"));
+		eb.setResolutionStatusId((Integer) hm.get("resolution_status_id"));
+		eb.setParentDnId((Integer) hm.get("parent_dn_id"));
 		eb.setDetailedNotes((String) hm.get("detailed_notes"));
 		eb.setEntityType((String) hm.get("entity_type"));
 		eb.setDisType(DiscrepancyNoteType.get(eb.getDiscrepancyNoteTypeId()));
@@ -186,8 +184,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findAllParentsByStudy(StudyBean study) {
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
 		ArrayList notes = executeFindAllQuery("findAllParentsByStudy", variables);
 
 		if (fetchMapping) {
@@ -203,23 +201,22 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findAllByStudyAndParent(StudyBean study, int parentId) {
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(parentId));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(4), Integer.valueOf(study.getId()));
+		variables.put(1, parentId);
+		variables.put(2, study.getId());
+		variables.put(3, study.getId());
+		variables.put(4, study.getId());
 		return this.executeFindAllQuery("findAllByStudyAndParent", variables);
 	}
 
 	public ArrayList<DiscrepancyNoteBean> findAllItemNotesByEventCRF(int eventCRFId) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(eventCRFId));
+		variables.put(1, eventCRFId);
 		alist = this.select(digester.getQuery("findAllItemNotesByEventCRF"), variables);
 		ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			al.add(eb);
 		}
@@ -228,14 +225,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList<DiscrepancyNoteBean> findAllParentItemNotesByEventCRF(int eventCRFId) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(eventCRFId));
+		variables.put(1, eventCRFId);
 		alist = this.select(digester.getQuery("findAllParentItemNotesByEventCRF"), variables);
 		ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			al.add(eb);
 		}
@@ -245,17 +241,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public ArrayList<DiscrepancyNoteBean> findAllParentItemNotesByEventCRFWithConstraints(int eventCRFId,
 			StringBuffer constraints) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(eventCRFId));
+		variables.put(1, eventCRFId);
 		String sql = digester.getQuery("findAllParentItemNotesByEventCRF");
 		String[] s = sql.split("order by");
 		sql = s[0] + " " + constraints.toString() + " order by " + s[1];
 		alist = this.select(sql, variables);
 		ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			al.add(eb);
 		}
@@ -266,8 +261,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), currentStudy.getId());
-		variables.put(Integer.valueOf(2), currentStudy.getId());
+		variables.put(1, currentStudy.getId());
+		variables.put(2, currentStudy.getId());
 		String sql = digester.getQuery("getCountWithFilter");
 		sql += filter.execute("");
 
@@ -275,8 +270,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return null;
 		}
@@ -288,8 +282,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), currentStudy.getId());
-		variables.put(Integer.valueOf(2), currentStudy.getId());
+		variables.put(1, currentStudy.getId());
+		variables.put(2, currentStudy.getId());
 		String sql = digester.getQuery("getWithFilterAndSort");
 		sql = sql + filter.execute("");
 
@@ -303,9 +297,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		ArrayList rows = select(sql, variables);
 
-		Iterator it = rows.iterator();
-		while (it.hasNext()) {
-			DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object row : rows) {
+			DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) row);
 			discBean = findSingleMapping(discBean);
 			discNotes.add(discBean);
 		}
@@ -318,16 +311,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), currentStudy.getId());
-		variables.put(Integer.valueOf(2), currentStudy.getId());
-		variables.put(Integer.valueOf(3), currentStudy.getId());
-		variables.put(Integer.valueOf(4), currentStudy.getId());
-		variables.put(Integer.valueOf(5), currentStudy.getId());
-		variables.put(Integer.valueOf(6), currentStudy.getId());
-		variables.put(Integer.valueOf(7), currentStudy.getId());
-		variables.put(Integer.valueOf(8), currentStudy.getId());
-		variables.put(Integer.valueOf(9), currentStudy.getId());
-		variables.put(Integer.valueOf(10), currentStudy.getId());
+		variables.put(1, currentStudy.getId());
+		variables.put(2, currentStudy.getId());
+		variables.put(3, currentStudy.getId());
+		variables.put(4, currentStudy.getId());
+		variables.put(5, currentStudy.getId());
+		variables.put(6, currentStudy.getId());
+		variables.put(7, currentStudy.getId());
+		variables.put(8, currentStudy.getId());
+		variables.put(9, currentStudy.getId());
+		variables.put(10, currentStudy.getId());
 		String sql = "select count(all_dn.discrepancy_note_id) as COUNT from (";
 		sql += digester.getQuery("findAllSubjectDNByStudy");
 		sql += filter.execute("");
@@ -358,8 +351,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList rows = select(sql, variables);
 		Iterator it = rows.iterator();
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return null;
 		}
@@ -387,12 +379,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(filter).append(UNION_OP);
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(filter).append(UNION_OP);
 		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(filter);
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
@@ -404,8 +398,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList rows = select(sql.toString(), variables);
 		Iterator it = rows.iterator();
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return null;
 		}
@@ -421,16 +414,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(15, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), currentStudy.getId());
-		variables.put(Integer.valueOf(2), currentStudy.getId());
-		variables.put(Integer.valueOf(3), currentStudy.getId());
-		variables.put(Integer.valueOf(4), currentStudy.getId());
-		variables.put(Integer.valueOf(5), currentStudy.getId());
-		variables.put(Integer.valueOf(6), currentStudy.getId());
-		variables.put(Integer.valueOf(7), currentStudy.getId());
-		variables.put(Integer.valueOf(8), currentStudy.getId());
-		variables.put(Integer.valueOf(9), currentStudy.getId());
-		variables.put(Integer.valueOf(10), currentStudy.getId());
+		variables.put(1, currentStudy.getId());
+		variables.put(2, currentStudy.getId());
+		variables.put(3, currentStudy.getId());
+		variables.put(4, currentStudy.getId());
+		variables.put(5, currentStudy.getId());
+		variables.put(6, currentStudy.getId());
+		variables.put(7, currentStudy.getId());
+		variables.put(8, currentStudy.getId());
+		variables.put(9, currentStudy.getId());
+		variables.put(10, currentStudy.getId());
 
 		String sql = "";
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
@@ -464,21 +457,17 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			sql += sort.execute("");
 			sql += " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
 		}
-		// System.out.println(sql);
+
 		ArrayList rows = select(sql, variables);
 
-		Iterator it = rows.iterator();
-		while (it.hasNext()) {
-			DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object row : rows) {
+			DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) row);
 			discBean = findSingleMapping(discBean);
 			discNotes.add(discBean);
 		}
 		return discNotes;
 	}
 
-	/*
-	 * ClinCapture #64 Get filtered discrepancy notes with limits
-	 */
 	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortLimits(StudyBean currentStudy,
 			ListNotesFilter filter, ListNotesSort sort, int offset, int limit) {
 		setTypesExpected();
@@ -507,12 +496,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(filterPart).append(filter.getAdditionalStudyEventFilter()).append(UNION_OP);
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(filterPart).append(filter.getAdditionalStudyEventFilter()).append(UNION_OP);
 		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(filterPart).append(filter.getAdditionalStudyEventFilter());
 		sql.append(") dns ");
@@ -539,7 +530,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		Map variables = new HashMap();
 		for (int i = 1; i <= 10; i++) {
-			variables.put(Integer.valueOf(i), currentStudy.getId());
+			variables.put(i, currentStudy.getId());
 		}
 
 		StringBuilder sql = new StringBuilder("select count(*) count from (");
@@ -554,12 +545,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(filterPart);
 
@@ -583,7 +576,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		Map variables = new HashMap();
 		for (int i = 1; i <= 10; i++) {
-			variables.put(Integer.valueOf(i), currentStudy.getId());
+			variables.put(i, currentStudy.getId());
 		}
 
 		StringBuilder sql = new StringBuilder("SELECT dns.* FROM ( ");
@@ -599,12 +592,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(filterPart);
 		sql.append(") dns ");
@@ -614,9 +609,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		ArrayList rows = select(sql.toString(), variables);
 
-		Iterator it = rows.iterator();
-		while (it.hasNext()) {
-			DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object row : rows) {
+			DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) row);
 			discBean = findSingleMapping(discBean);
 			discNotes.add(discBean);
 		}
@@ -631,16 +625,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(14, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), currentStudy.getId());
-		variables.put(Integer.valueOf(2), currentStudy.getId());
-		variables.put(Integer.valueOf(3), currentStudy.getId());
-		variables.put(Integer.valueOf(4), currentStudy.getId());
-		variables.put(Integer.valueOf(5), currentStudy.getId());
-		variables.put(Integer.valueOf(6), currentStudy.getId());
-		variables.put(Integer.valueOf(7), currentStudy.getId());
-		variables.put(Integer.valueOf(8), currentStudy.getId());
-		variables.put(Integer.valueOf(9), currentStudy.getId());
-		variables.put(Integer.valueOf(10), currentStudy.getId());
+		variables.put(1, currentStudy.getId());
+		variables.put(2, currentStudy.getId());
+		variables.put(3, currentStudy.getId());
+		variables.put(4, currentStudy.getId());
+		variables.put(5, currentStudy.getId());
+		variables.put(6, currentStudy.getId());
+		variables.put(7, currentStudy.getId());
+		variables.put(8, currentStudy.getId());
+		variables.put(9, currentStudy.getId());
+		variables.put(10, currentStudy.getId());
 		String sql = digester.getQuery("findAllSubjectDNByStudy");
 		sql += UNION_OP;
 		sql += digester.getQuery("findAllStudySubjectDNByStudy");
@@ -659,9 +653,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		ArrayList rows = select(sql, variables);
 
-		Iterator it = rows.iterator();
-		while (it.hasNext()) {
-			DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object row : rows) {
+			DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) row);
 			discBean = findSingleMapping(discBean);
 			discNotes.add(discBean);
 		}
@@ -673,7 +666,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		Map variables = new HashMap();
 		for (int i = 1; i <= 10; i++) {
-			variables.put(Integer.valueOf(i), currentStudy.getId());
+			variables.put(i, currentStudy.getId());
 		}
 
 		StringBuilder sql = new StringBuilder(
@@ -687,13 +680,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllEventCrfDNByStudyForStat"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
 		sql.append(UNION_OP);
 		sql.append(digester.getQuery("countAllItemDataDNByStudyForStat"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(" GROUP BY dn.discrepancy_note_type_id, dn.resolution_status_id ");
 		sql.append(") types GROUP BY discrepancy_note_type_id, resolution_status_id");
@@ -733,12 +728,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(filterPart).append(UNION_OP);
 		sql.append(digester.getQuery("findAllItemDataDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-			sql.append(" and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ");
+			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
+					.append(" ) ");
 		}
 		sql.append(filterPart);
 		sql.append(") dns ");
@@ -762,8 +759,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		ArrayList alist = new ArrayList();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(entityId));
-		variables.put(Integer.valueOf(2), column);
+		variables.put(1, entityId);
+		variables.put(2, column);
 		if ("subject".equalsIgnoreCase(entityName)) {
 			alist = this.select(digester.getQuery("findAllBySubjectAndColumn"), variables);
 		} else if ("studySub".equalsIgnoreCase(entityName)) {
@@ -786,9 +783,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setSubjectName((String) hm.get("label"));
 			if ("eventCrf".equalsIgnoreCase(entityName) || "itemData".equalsIgnoreCase(entityName)) {
@@ -816,8 +812,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(noteId));
-		variables.put(Integer.valueOf(2), Integer.valueOf(noteId));
+		variables.put(1, noteId);
+		variables.put(2, noteId);
 		if ("subject".equalsIgnoreCase(entityName)) {
 			this.setTypeExpected(13, TypeNames.STRING);// column_name
 			alist = this.select(digester.getQuery("findAllSubjectByPK"), variables);
@@ -847,9 +843,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			if ("subject".equalsIgnoreCase(entityName) || "studySub".equalsIgnoreCase(entityName)) {
 				eb.setSubjectName((String) hm.get("label"));
@@ -868,8 +863,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 				eb.setEntityName((String) hm.get("item_name"));
 				eb.setEntityValue((String) hm.get("value"));
 				// YW <<
-				eb.setEntityId(((Integer) hm.get("item_data_id")).intValue());
-				eb.setItemId(((Integer) hm.get("item_id")).intValue());
+				eb.setEntityId((Integer) hm.get("item_data_id"));
+				eb.setItemId((Integer) hm.get("item_id"));
 				// YW >>
 
 			} else if ("studyEvent".equalsIgnoreCase(entityName)) {
@@ -888,26 +883,25 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findAllSubjectByStudy(StudyBean study) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.STRING);// column_name
 		this.setTypeExpected(14, TypeNames.INT);// subject_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(study.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		variables.put(3, study.getId());
 
 		alist = this.select(digester.getQuery("findAllSubjectByStudy"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setSubjectName((String) hm.get("label"));
 			eb.setColumn((String) hm.get("column_name"));
-			eb.setEntityId(((Integer) hm.get("subject_id")).intValue());
+			eb.setEntityId((Integer) hm.get("subject_id"));
 			al.add(eb);
 		}
 		return al;
@@ -915,27 +909,26 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList<DiscrepancyNoteBean> findAllSubjectByStudyAndId(StudyBean study, int subjectId) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.STRING);// column_name
 		this.setTypeExpected(14, TypeNames.INT);// subject_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(4), Integer.valueOf(subjectId));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		variables.put(3, study.getId());
+		variables.put(4, subjectId);
 
 		alist = this.select(digester.getQuery("findAllSubjectByStudyAndId"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setSubjectName((String) hm.get("label"));
 			eb.setColumn((String) hm.get("column_name"));
-			eb.setEntityId(((Integer) hm.get("subject_id")).intValue());
+			eb.setEntityId((Integer) hm.get("subject_id"));
 			al.add(eb);
 		}
 		return al;
@@ -943,25 +936,24 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findAllStudySubjectByStudy(StudyBean study) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.STRING);// column_name
 		this.setTypeExpected(14, TypeNames.INT);// study_subject_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
 
 		alist = this.select(digester.getQuery("findAllStudySubjectByStudy"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setSubjectName((String) hm.get("label"));
 			eb.setColumn((String) hm.get("column_name"));
-			eb.setEntityId(((Integer) hm.get("study_subject_id")).intValue());
+			eb.setEntityId((Integer) hm.get("study_subject_id"));
 			al.add(eb);
 		}
 		return al;
@@ -969,26 +961,25 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList<DiscrepancyNoteBean> findAllStudySubjectByStudyAndId(StudyBean study, int studySubjectId) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.STRING);// column_name
 		this.setTypeExpected(14, TypeNames.INT);// study_subject_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(studySubjectId));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		variables.put(3, studySubjectId);
 
 		alist = this.select(digester.getQuery("findAllStudySubjectByStudyAndId"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setSubjectName((String) hm.get("label"));
 			eb.setColumn((String) hm.get("column_name"));
-			eb.setEntityId(((Integer) hm.get("study_subject_id")).intValue());
+			eb.setEntityId((Integer) hm.get("study_subject_id"));
 			al.add(eb);
 		}
 		return al;
@@ -997,27 +988,26 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public ArrayList<DiscrepancyNoteBean> findAllStudySubjectByStudiesAndStudySubjectId(StudyBean currentStudy,
 			StudyBean subjectStudy, int studySubjectId) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.STRING);// column_name
 		this.setTypeExpected(14, TypeNames.INT);// study_subject_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(currentStudy.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(subjectStudy.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(subjectStudy.getId()));
-		variables.put(Integer.valueOf(4), Integer.valueOf(studySubjectId));
+		variables.put(1, currentStudy.getId());
+		variables.put(2, subjectStudy.getId());
+		variables.put(3, subjectStudy.getId());
+		variables.put(4, studySubjectId);
 
 		alist = this.select(digester.getQuery("findAllStudySubjectByStudiesAndStudySubjectId"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setSubjectName((String) hm.get("label"));
 			eb.setColumn((String) hm.get("column_name"));
-			eb.setEntityId(((Integer) hm.get("study_subject_id")).intValue());
+			eb.setEntityId((Integer) hm.get("study_subject_id"));
 			al.add(eb);
 		}
 		return al;
@@ -1026,29 +1016,28 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public ArrayList<DiscrepancyNoteBean> findAllSubjectByStudiesAndSubjectId(StudyBean currentStudy,
 			StudyBean subjectStudy, int studySubjectId) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.STRING);// column_name
 		this.setTypeExpected(14, TypeNames.INT);// subject_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(currentStudy.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(subjectStudy.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(subjectStudy.getId()));
-		variables.put(Integer.valueOf(4), Integer.valueOf(currentStudy.getId()));
-		variables.put(Integer.valueOf(5), Integer.valueOf(subjectStudy.getId()));
-		variables.put(Integer.valueOf(6), Integer.valueOf(studySubjectId));
+		variables.put(1, currentStudy.getId());
+		variables.put(2, subjectStudy.getId());
+		variables.put(3, subjectStudy.getId());
+		variables.put(4, currentStudy.getId());
+		variables.put(5, subjectStudy.getId());
+		variables.put(6, studySubjectId);
 
 		alist = this.select(digester.getQuery("findAllSubjectByStudiesAndSubjectId"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setSubjectName((String) hm.get("label"));
 			eb.setColumn((String) hm.get("column_name"));
-			eb.setEntityId(((Integer) hm.get("subject_id")).intValue());
+			eb.setEntityId((Integer) hm.get("subject_id"));
 			al.add(eb);
 		}
 		return al;
@@ -1056,7 +1045,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findAllStudyEventByStudy(StudyBean study) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.DATE);// date_start
 		this.setTypeExpected(14, TypeNames.STRING);// sed_name
@@ -1064,20 +1053,19 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(16, TypeNames.INT);// study_event_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
 		alist = this.select(digester.getQuery("findAllStudyEventByStudy"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setSubjectName((String) hm.get("label"));
 			eb.setEventName((String) hm.get("sed_name"));
 			eb.setEventStart((Date) hm.get("date_start"));
 			eb.setColumn((String) hm.get("column_name"));
-			eb.setEntityId(((Integer) hm.get("study_event_id")).intValue());
+			eb.setEntityId((Integer) hm.get("study_event_id"));
 
 			al.add(eb);
 		}
@@ -1095,7 +1083,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	 */
 	public ArrayList findAllStudyEventByStudyAndId(StudyBean study, int studySubjectId) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.DATE);// date_start
 		this.setTypeExpected(14, TypeNames.STRING);// sed_name
@@ -1103,21 +1091,20 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(16, TypeNames.INT);// study_event_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(studySubjectId));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		variables.put(3, studySubjectId);
 		alist = this.select(digester.getQuery("findAllStudyEventByStudyAndId"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setSubjectName((String) hm.get("label"));
 			eb.setEventName((String) hm.get("sed_name"));
 			eb.setEventStart((Date) hm.get("date_start"));
 			eb.setColumn((String) hm.get("column_name"));
-			eb.setEntityId(((Integer) hm.get("study_event_id")).intValue());
+			eb.setEntityId((Integer) hm.get("study_event_id"));
 
 			al.add(eb);
 		}
@@ -1127,7 +1114,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public ArrayList findAllStudyEventByStudiesAndSubjectId(StudyBean currentStudy, StudyBean subjectStudy,
 			int studySubjectId) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.DATE);// date_start
 		this.setTypeExpected(14, TypeNames.STRING);// sed_name
@@ -1135,22 +1122,21 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(16, TypeNames.INT);// study_event_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(currentStudy.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(subjectStudy.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(currentStudy.getId()));
-		variables.put(Integer.valueOf(4), Integer.valueOf(studySubjectId));
+		variables.put(1, currentStudy.getId());
+		variables.put(2, subjectStudy.getId());
+		variables.put(3, currentStudy.getId());
+		variables.put(4, studySubjectId);
 		alist = this.select(digester.getQuery("findAllStudyEventByStudiesAndSubjectId"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setSubjectName((String) hm.get("label"));
 			eb.setEventName((String) hm.get("sed_name"));
 			eb.setEventStart((Date) hm.get("date_start"));
 			eb.setColumn((String) hm.get("column_name"));
-			eb.setEntityId(((Integer) hm.get("study_event_id")).intValue());
+			eb.setEntityId((Integer) hm.get("study_event_id"));
 
 			al.add(eb);
 		}
@@ -1159,7 +1145,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findAllEventCRFByStudy(StudyBean study) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.DATE);// date_start
 		this.setTypeExpected(14, TypeNames.STRING);// sed_name
@@ -1168,21 +1154,20 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(17, TypeNames.INT);// event_crf_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
 		alist = this.select(digester.getQuery("findAllEventCRFByStudy"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setEventName((String) hm.get("sed_name"));
 			eb.setEventStart((Date) hm.get("date_start"));
 			eb.setCrfName((String) hm.get("crf_name"));
 			eb.setSubjectName((String) hm.get("label"));
 			eb.setColumn((String) hm.get("column_name"));
-			eb.setEntityId(((Integer) hm.get("event_crf_id")).intValue());
+			eb.setEntityId((Integer) hm.get("event_crf_id"));
 			al.add(eb);
 		}
 		return al;
@@ -1190,7 +1175,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findAllEventCRFByStudyAndParent(StudyBean study, DiscrepancyNoteBean parent) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.DATE);// date_start
 		this.setTypeExpected(14, TypeNames.STRING);// sed_name
@@ -1199,23 +1184,22 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(17, TypeNames.INT);// event_crf_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(parent.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		variables.put(3, parent.getId());
 
 		alist = this.select(digester.getQuery("findAllEventCRFByStudyAndParent"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setEventName((String) hm.get("sed_name"));
 			eb.setEventStart((Date) hm.get("date_start"));
 			eb.setCrfName((String) hm.get("crf_name"));
 			eb.setSubjectName((String) hm.get("label"));
 			eb.setColumn((String) hm.get("column_name"));
-			eb.setEntityId(((Integer) hm.get("event_crf_id")).intValue());
+			eb.setEntityId((Integer) hm.get("event_crf_id"));
 			al.add(eb);
 		}
 		return al;
@@ -1224,16 +1208,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public ArrayList<DiscrepancyNoteBean> findItemDataDNotesFromEventCRF(EventCRFBean eventCRFBean) {
 
 		this.setTypesExpected();
-		ArrayList dNotelist = new ArrayList();
+		ArrayList dNotelist;
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(eventCRFBean.getId()));
+		variables.put(1, eventCRFBean.getId());
 		dNotelist = this.select(digester.getQuery("findItemDataDNotesFromEventCRF"), variables);
 
 		ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = dNotelist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object aDNotelist : dNotelist) {
+			HashMap hm = (HashMap) aDNotelist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setEventCRFId(eventCRFBean.getId());
 			returnedNotelist.add(eb);
@@ -1245,16 +1228,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public ArrayList<DiscrepancyNoteBean> findParentItemDataDNotesFromEventCRF(EventCRFBean eventCRFBean) {
 
 		this.setTypesExpected();
-		ArrayList dNotelist = new ArrayList();
+		ArrayList dNotelist;
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(eventCRFBean.getId()));
+		variables.put(1, eventCRFBean.getId());
 		dNotelist = this.select(digester.getQuery("findParentItemDataDNotesFromEventCRF"), variables);
 
 		ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = dNotelist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object aDNotelist : dNotelist) {
+			HashMap hm = (HashMap) aDNotelist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setEventCRFId(eventCRFBean.getId());
 			returnedNotelist.add(eb);
@@ -1267,16 +1249,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		this.setTypesExpected();
 		this.setTypeExpected(12, TypeNames.STRING);
-		ArrayList dNotelist = new ArrayList();
+		ArrayList dNotelist;
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(eventCRFBean.getId()));
+		variables.put(1, eventCRFBean.getId());
 		dNotelist = this.select(digester.getQuery("findEventCRFDNotesFromEventCRF"), variables);
 
 		ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = dNotelist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object aDNotelist : dNotelist) {
+			HashMap hm = (HashMap) aDNotelist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setColumn((String) hm.get("column_name"));
 			eb.setEventCRFId(eventCRFBean.getId());
@@ -1290,26 +1271,25 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		this.setTypesExpected();
 		this.setTypeExpected(12, TypeNames.STRING);
-		ArrayList dNotelist = new ArrayList();
+		ArrayList dNotelist;
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(eventCRFBean.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(eventCRFBean.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(eventCRFBean.getId()));
-		variables.put(Integer.valueOf(4), Integer.valueOf(eventCRFBean.getId()));
-		variables.put(Integer.valueOf(5), Integer.valueOf(eventCRFBean.getId()));
-		variables.put(Integer.valueOf(6), Integer.valueOf(eventCRFBean.getId()));
-		variables.put(Integer.valueOf(7), Integer.valueOf(eventCRFBean.getId()));
-		variables.put(Integer.valueOf(8), Integer.valueOf(eventCRFBean.getId()));
-		variables.put(Integer.valueOf(9), Integer.valueOf(eventCRFBean.getId()));
-		variables.put(Integer.valueOf(10), Integer.valueOf(eventCRFBean.getId()));
+		variables.put(1, eventCRFBean.getId());
+		variables.put(2, eventCRFBean.getId());
+		variables.put(3, eventCRFBean.getId());
+		variables.put(4, eventCRFBean.getId());
+		variables.put(5, eventCRFBean.getId());
+		variables.put(6, eventCRFBean.getId());
+		variables.put(7, eventCRFBean.getId());
+		variables.put(8, eventCRFBean.getId());
+		variables.put(9, eventCRFBean.getId());
+		variables.put(10, eventCRFBean.getId());
 
 		dNotelist = this.select(digester.getQuery("findEventCRFDNotesForToolTips"), variables);
 
 		ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = dNotelist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object aDNotelist : dNotelist) {
+			HashMap hm = (HashMap) aDNotelist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setColumn((String) hm.get("column_name"));
 			eb.setEventCRFId(eventCRFBean.getId());
@@ -1322,16 +1302,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public ArrayList<DiscrepancyNoteBean> findAllDNotesByItemNameAndEventCRF(EventCRFBean eventCRFBean, String itemName) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(eventCRFBean.getId()));
-		variables.put(Integer.valueOf(2), itemName);
-		ArrayList dNotelist = new ArrayList();
+		variables.put(1, eventCRFBean.getId());
+		variables.put(2, itemName);
+		ArrayList dNotelist;
 
 		dNotelist = this.select(digester.getQuery("findAllDNotesByItemNameAndEventCRF"), variables);
 
 		ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = dNotelist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object aDNotelist : dNotelist) {
+			HashMap hm = (HashMap) aDNotelist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			// eb.setColumn((String) hm.get("column_name"));
 			// eb.setEventCRFId(eventCRFBean.getId());
@@ -1343,7 +1322,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findAllItemDataByStudy(StudyBean study) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.DATE);// date_start
 		this.setTypeExpected(14, TypeNames.STRING);// sed_name
@@ -1354,14 +1333,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(19, TypeNames.INT);// item_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
 		alist = this.select(digester.getQuery("findAllItemDataByStudy"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setEventName((String) hm.get("sed_name"));
 			eb.setEventStart((Date) hm.get("date_start"));
@@ -1370,8 +1348,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			eb.setEntityName((String) hm.get("item_name"));
 			eb.setEntityValue((String) hm.get("value"));
 			// YW << change EntityId from item_id to item_data_id.
-			eb.setEntityId(((Integer) hm.get("item_data_id")).intValue());
-			eb.setItemId(((Integer) hm.get("item_id")).intValue());
+			eb.setEntityId((Integer) hm.get("item_data_id"));
+			eb.setItemId((Integer) hm.get("item_id"));
 			// YW >>
 			al.add(eb);
 		}
@@ -1392,8 +1370,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(20, TypeNames.INT);// item_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
 		ArrayList alist = this.select(digester.getQuery("findAllItemDataByStudy"), variables);
 		Iterator it = alist.iterator();
 
@@ -1445,16 +1423,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(19, TypeNames.INT);// item_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(user.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		variables.put(3, user.getId());
 
 		ArrayList rows = this.select(digester.getQuery("countAllItemDataByStudyAndUser"), variables);
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return null;
 		}
@@ -1462,7 +1439,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findAllItemDataByStudyAndParent(StudyBean study, DiscrepancyNoteBean parent) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		this.setTypeExpected(13, TypeNames.DATE);// date_start
 		this.setTypeExpected(14, TypeNames.STRING);// sed_name
@@ -1473,15 +1450,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(19, TypeNames.INT);// item_id
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(parent.getId()));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		variables.put(3, parent.getId());
 		alist = this.select(digester.getQuery("findAllItemDataByStudyAndParent"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setEventName((String) hm.get("sed_name"));
 			eb.setEventStart((Date) hm.get("date_start"));
@@ -1490,8 +1466,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			eb.setEntityName((String) hm.get("item_name"));
 			eb.setEntityValue((String) hm.get("value"));
 			// YW << change EntityId from item_id to item_data_id.
-			eb.setEntityId(((Integer) hm.get("item_data_id")).intValue());
-			eb.setItemId(((Integer) hm.get("item_id")).intValue());
+			eb.setEntityId((Integer) hm.get("item_data_id"));
+			eb.setItemId((Integer) hm.get("item_id"));
 			// YW >>
 			al.add(eb);
 		}
@@ -1499,9 +1475,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public EntityBean findByPK(int ID) {
@@ -1509,7 +1483,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(ID));
+		variables.put(1, ID);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList alist = this.select(sql, variables);
@@ -1529,36 +1503,36 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Creates a new discrepancy note
 	 */
-    public EntityBean create(EntityBean eb) {
-        return create(eb, null);
-    }
+	public EntityBean create(EntityBean eb) {
+		return create(eb, null);
+	}
 
 	public EntityBean create(EntityBean eb, Connection connection) {
 		DiscrepancyNoteBean sb = (DiscrepancyNoteBean) eb;
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
-		variables.put(Integer.valueOf(1), sb.getDescription());
-		variables.put(Integer.valueOf(2), Integer.valueOf(sb.getDiscrepancyNoteTypeId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(sb.getResolutionStatusId()));
-		variables.put(Integer.valueOf(4), sb.getDetailedNotes());
+		variables.put(1, sb.getDescription());
+		variables.put(2, sb.getDiscrepancyNoteTypeId());
+		variables.put(3, sb.getResolutionStatusId());
+		variables.put(4, sb.getDetailedNotes());
 
-		variables.put(Integer.valueOf(5), Integer.valueOf(sb.getOwner().getId()));
+		variables.put(5, sb.getOwner().getId());
 		if (sb.getParentDnId() == 0) {
-			nullVars.put(Integer.valueOf(6), Integer.valueOf(Types.INTEGER));
-			variables.put(Integer.valueOf(6), null);
+			nullVars.put(6, Types.INTEGER);
+			variables.put(6, null);
 		} else {
-			variables.put(Integer.valueOf(6), Integer.valueOf(sb.getParentDnId()));
+			variables.put(6, sb.getParentDnId());
 		}
-		variables.put(Integer.valueOf(7), sb.getEntityType());
-		variables.put(Integer.valueOf(8), Integer.valueOf(sb.getStudyId()));
+		variables.put(7, sb.getEntityType());
+		variables.put(8, sb.getStudyId());
 		if (sb.getAssignedUserId() == 0) {
-			nullVars.put(Integer.valueOf(9), Integer.valueOf(Types.INTEGER));
-			variables.put(Integer.valueOf(9), null);
+			nullVars.put(9, Types.INTEGER);
+			variables.put(9, null);
 		} else {
-			variables.put(Integer.valueOf(9), Integer.valueOf(sb.getAssignedUserId()));
+			variables.put(9, sb.getAssignedUserId());
 		}
 
-        this.executeWithPK(digester.getQuery("create"), variables, nullVars, connection);
+		this.executeWithPK(digester.getQuery("create"), variables, nullVars, connection);
 		if (isQuerySuccessful()) {
 			sb.setId(getLatestPK());
 		}
@@ -1569,15 +1543,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	/**
 	 * Creates a new discrepancy note map
 	 */
-    public void createMapping(DiscrepancyNoteBean eb) {
-        createMapping(eb, null);
-    }
+	public void createMapping(DiscrepancyNoteBean eb) {
+		createMapping(eb, null);
+	}
 
 	public void createMapping(DiscrepancyNoteBean eb, Connection connection) {
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(eb.getEntityId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(eb.getId()));
-		variables.put(Integer.valueOf(3), eb.getColumn());
+		variables.put(1, eb.getEntityId());
+		variables.put(2, eb.getId());
+		variables.put(3, eb.getColumn());
 		String entityType = eb.getEntityType();
 
 		if ("subject".equalsIgnoreCase(entityType)) {
@@ -1603,11 +1577,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		HashMap variables = new HashMap();
 
-		variables.put(Integer.valueOf(1), dnb.getDescription());
-		variables.put(Integer.valueOf(2), Integer.valueOf(dnb.getDiscrepancyNoteTypeId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(dnb.getResolutionStatusId()));
-		variables.put(Integer.valueOf(4), dnb.getDetailedNotes());
-		variables.put(Integer.valueOf(5), Integer.valueOf(dnb.getId()));
+		variables.put(1, dnb.getDescription());
+		variables.put(2, dnb.getDiscrepancyNoteTypeId());
+		variables.put(3, dnb.getResolutionStatusId());
+		variables.put(4, dnb.getDetailedNotes());
+		variables.put(5, dnb.getId());
 		this.execute(digester.getQuery("update"), variables);
 
 		if (isQuerySuccessful()) {
@@ -1623,8 +1597,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		HashMap variables = new HashMap();
 
-		variables.put(Integer.valueOf(1), dnb.getAssignedUserId());
-		variables.put(Integer.valueOf(2), Integer.valueOf(dnb.getId()));
+		variables.put(1, dnb.getAssignedUserId());
+		variables.put(2, dnb.getId());
 		this.execute(digester.getQuery("updateAssignedUser"), variables);
 
 		if (isQuerySuccessful()) {
@@ -1640,7 +1614,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		HashMap variables = new HashMap();
 
-		variables.put(Integer.valueOf(1), Integer.valueOf(dnb.getId()));
+		variables.put(1, dnb.getId());
 		this.execute(digester.getQuery("updateAssignedUserToNull"), variables);
 
 		if (isQuerySuccessful()) {
@@ -1652,23 +1626,17 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public void deleteNotes(int id) {
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(Integer.valueOf(1), Integer.valueOf(id));
+		variables.put(1, id);
 		this.execute(digester.getQuery("deleteNotes"), variables);
-		return;
-
 	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	@Override
@@ -1681,7 +1649,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		if (al.size() > 0) {
 			HashMap h = (HashMap) al.get(0);
-			pk = ((Integer) h.get("key")).intValue();
+			pk = (Integer) h.get("key");
 		}
 
 		return pk;
@@ -1689,28 +1657,39 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findAllByParent(DiscrepancyNoteBean parent) {
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(parent.getId()));
+		variables.put(1, parent.getId());
 
 		return this.executeFindAllQuery("findAllByParent", variables);
 	}
 
 	public ArrayList findAllByStudyEvent(StudyEventBean studyEvent) {
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(studyEvent.getId()));
+		variables.put(1, studyEvent.getId());
 
 		return this.executeFindAllQuery("findByStudyEvent", variables);
+	}
+
+	public List<Integer> findAllDnIdsByStudyEvent(int studyEventId) {
+		List<Integer> result = new ArrayList<Integer>();
+		unsetTypeExpected();
+		setTypeExpected(1, TypeNames.INT);
+		HashMap variables = new HashMap();
+		variables.put(1, studyEventId);
+		for (Object o : select(digester.getQuery("findAllDnIdsByStudyEvent"), variables)) {
+			result.add((Integer) ((HashMap) o).get("discrepancy_note_id"));
+		}
+		return result;
 	}
 
 	public ArrayList findAllByStudyEventWithConstraints(StudyEventBean studyEvent, StringBuffer constraints) {
 		this.setTypesExpected();
 		ArrayList answer = new ArrayList();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(studyEvent.getId()));
+		variables.put(1, studyEvent.getId());
 		String sql = digester.getQuery("findByStudyEvent");
 		sql += constraints.toString();
-		Iterator it = this.select(sql, variables).iterator();
-		while (it.hasNext()) {
-			answer.add(this.getEntityFromHashMap((HashMap) it.next()));
+		for (Object o : this.select(sql, variables)) {
+			answer.add(this.getEntityFromHashMap((HashMap) o));
 		}
 		return answer;
 	}
@@ -1720,9 +1699,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.INT);
-		
+
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(studyEvent.getId()));
+		variables.put(1, studyEvent.getId());
 		String sql = digester.getQuery("findByStudyEvent");
 		sql += constraints.toString();
 		if (isSite) {
@@ -1762,7 +1741,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(2, TypeNames.INT);
 		// ArrayList answer = new ArrayList();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(studyEvent.getId()));
+		variables.put(1, studyEvent.getId());
 		String sql = "";
 		String temp = "";
 		if ("itemData".equalsIgnoreCase(entityType)) {
@@ -1833,7 +1812,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	private DiscrepancyNoteBean findSingleMapping(DiscrepancyNoteBean note) {
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(note.getId()));
+		variables.put(1, note.getId());
 
 		setMapTypesExpected();
 		String entityType = note.getEntityType();
@@ -1894,15 +1873,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public AuditableEntityBean findEntity(DiscrepancyNoteBean note) {
 		AuditableEntityDAO aedao = getAEDAO(note, ds);
-
 		try {
 			if (aedao != null) {
-				AuditableEntityBean aeb = (AuditableEntityBean) aedao.findByPK(note.getEntityId());
-				return aeb;
+				return (AuditableEntityBean) aedao.findByPK(note.getEntityId());
 			}
 		} catch (Exception e) {
+			//
 		}
-
 		return null;
 	}
 
@@ -1928,7 +1905,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		setTypeExpected(1, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(itemDataId));
+		variables.put(1, itemDataId);
 		String sql = digester.getQuery("findNumExistingNotesForItem");
 		ArrayList alist = this.select(sql, variables);
 		Iterator it = alist.iterator();
@@ -1936,9 +1913,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		if (it.hasNext()) {
 			HashMap hm = (HashMap) it.next();
 			try {
-				Integer i = (Integer) hm.get("num");
-				return i.intValue();
+				return (Integer) hm.get("num");
 			} catch (Exception e) {
+				//
 			}
 		}
 
@@ -1947,14 +1924,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findExistingNotesForItemData(int itemDataId) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(itemDataId));
+		variables.put(1, itemDataId);
 		alist = this.select(digester.getQuery("findExistingNotesForItemData"), variables);
 		ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			al.add(eb);
 		}
@@ -1964,17 +1940,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findExistingNotesForToolTip(int itemDataId) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(itemDataId));
-		variables.put(Integer.valueOf(2), Integer.valueOf(itemDataId));
-		variables.put(Integer.valueOf(3), Integer.valueOf(itemDataId));
-		variables.put(Integer.valueOf(4), Integer.valueOf(itemDataId));
+		variables.put(1, itemDataId);
+		variables.put(2, itemDataId);
+		variables.put(3, itemDataId);
+		variables.put(4, itemDataId);
 		alist = this.select(digester.getQuery("findExistingNotesForToolTip"), variables);
 		ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			al.add(eb);
 		}
@@ -1985,16 +1960,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList findParentNotesForToolTip(int itemDataId) {
 		this.setTypesExpected();
-		ArrayList alist = new ArrayList();
+		ArrayList alist;
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(itemDataId));
-		variables.put(Integer.valueOf(2), Integer.valueOf(itemDataId));
+		variables.put(1, itemDataId);
+		variables.put(2, itemDataId);
 
 		alist = this.select(digester.getQuery("findParentNotesForToolTip"), variables);
 		ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			al.add(eb);
 		}
@@ -2004,15 +1978,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList<DiscrepancyNoteBean> findAllTopNotesByEventCRF(int eventCRFId) {
 		this.setTypesExpected();
-        this.setTypeExpected(12, TypeNames.INT);
-		ArrayList alist = new ArrayList();
+		this.setTypeExpected(12, TypeNames.INT);
+		ArrayList alist;
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(eventCRFId));
+		variables.put(1, eventCRFId);
 		alist = this.select(digester.getQuery("findAllTopNotesByEventCRF"), variables);
 		ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			al.add(eb);
 		}
@@ -2022,16 +1995,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public ArrayList<DiscrepancyNoteBean> findOnlyParentEventCRFDNotesFromEventCRF(EventCRFBean eventCRFBean) {
 		this.setTypesExpected();
 		this.setTypeExpected(12, TypeNames.STRING);
-		ArrayList dNotelist = new ArrayList();
+		ArrayList dNotelist;
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(eventCRFBean.getId()));
+		variables.put(1, eventCRFBean.getId());
 		dNotelist = this.select(digester.getQuery("findOnlyParentEventCRFDNotesFromEventCRF"), variables);
 
 		ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
-		Iterator it = dNotelist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object aDNotelist : dNotelist) {
+			HashMap hm = (HashMap) aDNotelist;
 			DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
 			eb.setColumn((String) hm.get("column_name"));
 			eb.setEventCRFId(eventCRFBean.getId());
@@ -2041,7 +2013,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	public String findSiteHiddenEventCrfIdsString(StudyBean site) {
-		String sql = "";
+		String sql;
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
 			sql = "select ec.event_crf_id from event_crf ec, study_event se, crf_version cv, "
 					+ "(select edc.study_event_definition_id, edc.crf_id, crf.name "
@@ -2073,8 +2045,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(parentId));
-		variables.put(Integer.valueOf(2), Integer.valueOf(parentId));
+		variables.put(1, parentId);
+		variables.put(2, parentId);
 
 		String sql = digester.getQuery("findLatestChildByParent");
 		ArrayList alist = this.select(sql, variables);
@@ -2092,8 +2064,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		setTypeExpected(1, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(subjectId));
-		variables.put(Integer.valueOf(2), new String(column));
+		variables.put(1, subjectId);
+		variables.put(2, column);
 
 		String sql = digester.getQuery("getResolutionStatusIdForSubjectDNFlag");
 		ArrayList alist = this.select(sql, variables);
@@ -2101,8 +2073,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		if (it.hasNext()) {
 			HashMap hm = (HashMap) it.next();
 			try {
-				id = ((Integer) hm.get("resolution_status_id")).intValue();
+				id = (Integer) hm.get("resolution_status_id");
 			} catch (Exception e) {
+				//
 			}
 		}
 		return id;
@@ -2113,16 +2086,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), assignedUserId);
-		variables.put(Integer.valueOf(2), studyId);
-		variables.put(Integer.valueOf(3), studyId);
+		variables.put(1, assignedUserId);
+		variables.put(2, studyId);
+		variables.put(3, studyId);
 		String sql = digester.getQuery("countViewNotesForAssignedUserInStudy");
 
 		ArrayList rows = select(sql, variables);
 		Iterator it = rows.iterator();
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return null;
 		}
@@ -2139,10 +2111,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		ArrayList rows = select(digester.getQuery("countOfOutstandingDNsForStudySubject"), variables);
 		Iterator it = rows.iterator();
 		if (it.hasNext()) {
-			count = (Integer) ((HashMap) it.next()).get("count");         
+			count = (Integer) ((HashMap) it.next()).get("count");
 		}
 
-		return count != null && count == 0 ? true : false;
+		return count != null && count == 0;
 	}
 
 	public boolean doesNotHaveOutstandingDNs(StudyEventBean seb) {
@@ -2155,17 +2127,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 		ArrayList rows = select(digester.getQuery("countOfOutstandingDNsForStudyEvent"), variables);
 		rows.addAll(select(digester.getQuery("countOfOutstandingDNsForStudyEventFromStudyEventMap"), variables));
-		Iterator it = rows.iterator();
-		while (it.hasNext()) {
-			count = (Integer) ((HashMap) it.next()).get("count");
+		for (Object row : rows) {
+			count = (Integer) ((HashMap) row).get("count");
 			if (count != null && count > 0) {
 				break;
 			}
 		}
 
-		return count != null && count == 0 ? true : false;
+		return count != null && count == 0;
 	}
-	
+
 	public boolean doesSubjectHasSomeNDsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
@@ -2178,14 +2149,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public boolean doesSubjectHasNewNDsInStudy(StudyBean study, String subjectLabel) {
 		return doesSubjectHasSomeNDsInStudy(study, subjectLabel, "1");
 	}
-	
+
 	public boolean doesSubjectHasUnclosedNDsInStudy(StudyBean study, String subjectLabel) {
 		return doesSubjectHasSomeNDsInStudy(study, subjectLabel, "123");
 	}
-	
-	public boolean doesEventHasSomeNDsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel, String resolutionStatus) {
+
+	public boolean doesEventHasSomeNDsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel,
+			String resolutionStatus) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
-        listNotesFilter.addFilter("eventId", eventId);
+		listNotesFilter.addFilter("eventId", eventId);
 		listNotesFilter.addFilter("eventName", eventLabel);
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
@@ -2197,16 +2169,16 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public boolean doesEventHasNewNDsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel) {
 		return doesEventHasSomeNDsInStudy(study, eventLabel, eventId, subjectLabel, "1");
 	}
-	
+
 	public boolean doesEventHasUnclosedNDsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel) {
 		return doesEventHasSomeNDsInStudy(study, eventLabel, eventId, subjectLabel, "123");
 	}
-	
+
 	public boolean doesCRFHasSomeNDsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
 			String subjectLabel, String crfName, String resolutionStatus) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
-        listNotesFilter.addFilter("eventId", eventId);
-        listNotesFilter.addFilter("crfName", crfName);
+		listNotesFilter.addFilter("eventId", eventId);
+		listNotesFilter.addFilter("crfName", crfName);
 		listNotesFilter.addFilter("eventName", eventLabel);
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
@@ -2224,20 +2196,20 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			String subjectLabel, String crfName) {
 		return doesCRFHasSomeNDsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "123");
 	}
-	
+
 	public Integer countAllByStudyEventTypeAndStudyEvent(StudyEventBean studyEvent) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
-		
+
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(studyEvent.getId()));
-		
+		variables.put(1, studyEvent.getId());
+
 		ArrayList rows = select(digester.getQuery("countAllByStudyEventTypeAndStudyEvent"), variables);
 		Iterator it = rows.iterator();
-		
+
 		if (it.hasNext()) {
 			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count == null? 0 : count;
+			return count == null ? 0 : count;
 		} else {
 			return 0;
 		}

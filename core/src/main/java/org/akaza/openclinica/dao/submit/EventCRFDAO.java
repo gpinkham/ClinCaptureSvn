@@ -37,9 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -63,8 +61,8 @@ import org.akaza.openclinica.dao.core.TypeNames;
  * 
  *         TODO test create and update first thing
  */
-@SuppressWarnings({"rawtypes","unchecked"})
-public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public class EventCRFDAO extends AuditableEntityDAO {
 
 	private void setQueryNames() {
 		this.findByPKAndStudyName = "findByPKAndStudy";
@@ -75,9 +73,9 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		super(ds);
 		setQueryNames();
 	}
-	
+
 	public EventCRFDAO(DataSource ds, Connection con) {
-		super(ds,con);
+		super(ds, con);
 		setQueryNames();
 	}
 
@@ -129,10 +127,9 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		this.setTypeExpected(24, TypeNames.BOOL); // not_started
 
 	}
-	
+
 	public EntityBean update(EntityBean eb) {
-		Connection con = null;
-		return update(eb, con);
+		return update(eb, null);
 	}
 
 	public EntityBean update(EntityBean eb, Connection con) {
@@ -142,59 +139,55 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
-		variables.put(new Integer(1), new Integer(ecb.getStudyEventId()));
-		variables.put(new Integer(2), new Integer(ecb.getCRFVersionId()));
+		variables.put(1, ecb.getStudyEventId());
+		variables.put(2, ecb.getCRFVersionId());
 		if (ecb.getDateInterviewed() == null) {
-			nullVars.put(new Integer(3), new Integer(Types.DATE));
-			variables.put(new Integer(3), null);
+			nullVars.put(3, Types.DATE);
+			variables.put(3, null);
 		} else {
-			variables.put(new Integer(3), ecb.getDateInterviewed());
+			variables.put(3, ecb.getDateInterviewed());
 		}
-		variables.put(new Integer(4), ecb.getInterviewerName());
-		variables.put(new Integer(5), new Integer(ecb.getCompletionStatusId()));
-		variables.put(new Integer(6), new Integer(ecb.getStatus().getId()));
-		variables.put(new Integer(7), ecb.getAnnotations());
+		variables.put(4, ecb.getInterviewerName());
+		variables.put(5, ecb.getCompletionStatusId());
+		variables.put(6, ecb.getStatus().getId());
+		variables.put(7, ecb.getAnnotations());
 		if (ecb.getDateCompleted() == null) {
-			nullVars.put(new Integer(8), new Integer(Types.TIMESTAMP));
-			variables.put(new Integer(8), null);
+			nullVars.put(8, Types.TIMESTAMP);
+			variables.put(8, null);
 		} else {
-			variables.put(new Integer(8), new java.sql.Timestamp(ecb
-					.getDateCompleted().getTime()));
+			variables.put(8, new java.sql.Timestamp(ecb.getDateCompleted().getTime()));
 		}
 
-		variables.put(new Integer(9), new Integer(ecb.getValidatorId()));
+		variables.put(9, ecb.getValidatorId());
 
 		if (ecb.getDateValidate() == null) {
-			nullVars.put(new Integer(10), new Integer(Types.DATE));
-			variables.put(new Integer(10), null);
+			nullVars.put(10, Types.DATE);
+			variables.put(10, null);
 		} else {
-			variables.put(new Integer(10), ecb.getDateValidate());
+			variables.put(10, ecb.getDateValidate());
 		}
 
 		if (ecb.getDateValidateCompleted() == null) {
-			nullVars.put(new Integer(11), new Integer(Types.TIMESTAMP));
-			variables.put(new Integer(11), null);
+			nullVars.put(11, Types.TIMESTAMP);
+			variables.put(11, null);
 		} else {
-			variables.put(new Integer(11), new Timestamp(ecb
-					.getDateValidateCompleted().getTime()));
+			variables.put(11, new Timestamp(ecb.getDateValidateCompleted().getTime()));
 		}
-		variables.put(new Integer(12), ecb.getValidatorAnnotations());
-		variables.put(new Integer(13), ecb.getValidateString());
-		variables.put(new Integer(14), new Integer(ecb.getStudySubjectId()));
-		variables.put(new Integer(15), new Integer(ecb.getUpdaterId()));
-		variables.put(new Integer(16),
-				new Boolean(ecb.isElectronicSignatureStatus()));
+		variables.put(12, ecb.getValidatorAnnotations());
+		variables.put(13, ecb.getValidateString());
+		variables.put(14, ecb.getStudySubjectId());
+		variables.put(15, ecb.getUpdaterId());
+		variables.put(16, ecb.isElectronicSignatureStatus());
 
-		variables.put(new Integer(17), new Boolean(ecb.isSdvStatus()));
+		variables.put(17, ecb.isSdvStatus());
 		if (ecb.getOldStatus() != null && ecb.getOldStatus().getId() > 0) {
-			variables.put(new Integer(18), new Integer(ecb.getOldStatus()
-					.getId()));
+			variables.put(18, ecb.getOldStatus().getId());
 		} else {
-			variables.put(new Integer(18), new Integer(0));
+			variables.put(18, 0);
 		}
-		variables.put(new Integer(19), ecb.getSdvUpdateId());
-		variables.put(new Integer(20), new Boolean(ecb.isNotStarted()));
-		variables.put(new Integer(21), new Integer(ecb.getId()));
+		variables.put(19, ecb.getSdvUpdateId());
+		variables.put(20, ecb.isNotStarted());
+		variables.put(21, ecb.getId());
 		this.execute(digester.getQuery("update"), variables, nullVars, con);
 		if (isQuerySuccessful()) {
 			ecb.setActive(true);
@@ -202,14 +195,14 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 
 		return ecb;
 	}
-	
+
 	public void markComplete(EventCRFBean ecb, boolean ide) {
-		markComplete (ecb, ide, null);
+		markComplete(ecb, ide, null);
 	}
 
 	public void markComplete(EventCRFBean ecb, boolean ide, Connection con) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(ecb.getId()));
+		variables.put(1, ecb.getId());
 
 		if (ide) {
 			execute(digester.getQuery("markCompleteIDE"), variables, con);
@@ -222,27 +215,27 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		EventCRFBean ecb = (EventCRFBean) eb;
 		HashMap variables = new HashMap();
 		HashMap nullVars = new HashMap();
-		variables.put(new Integer(1), new Integer(ecb.getStudyEventId()));
-		variables.put(new Integer(2), new Integer(ecb.getCRFVersionId()));
+		variables.put(1, ecb.getStudyEventId());
+		variables.put(2, ecb.getCRFVersionId());
 
 		Date interviewed = ecb.getDateInterviewed();
 		if (interviewed != null) {
-			variables.put(new Integer(3), ecb.getDateInterviewed());
+			variables.put(3, ecb.getDateInterviewed());
 		} else {
-			variables.put(new Integer(3), null);
-			nullVars.put(new Integer(3), new Integer(Types.DATE));
+			variables.put(3, null);
+			nullVars.put(3, Types.DATE);
 		}
 		logger.info("created: ecb.getInterviewerName()" + ecb.getInterviewerName());
-		variables.put(new Integer(4), ecb.getInterviewerName());
+		variables.put(4, ecb.getInterviewerName());
 
-		variables.put(new Integer(5), new Integer(ecb.getCompletionStatusId()));
-		variables.put(new Integer(6), new Integer(ecb.getStatus().getId()));
-		variables.put(new Integer(7), ecb.getAnnotations());
-		variables.put(new Integer(8), new Integer(ecb.getOwnerId()));
-		variables.put(new Integer(9), new Integer(ecb.getStudySubjectId()));
-		variables.put(new Integer(10), ecb.getValidateString());
-		variables.put(new Integer(11), ecb.getValidatorAnnotations());
-		variables.put(new Integer(12), ecb.isNotStarted());
+		variables.put(5, ecb.getCompletionStatusId());
+		variables.put(6, ecb.getStatus().getId());
+		variables.put(7, ecb.getAnnotations());
+		variables.put(8, ecb.getOwnerId());
+		variables.put(9, ecb.getStudySubjectId());
+		variables.put(10, ecb.getValidateString());
+		variables.put(11, ecb.getValidatorAnnotations());
+		variables.put(12, ecb.isNotStarted());
 
 		executeWithPK(digester.getQuery("create"), variables, nullVars);
 		if (isQuerySuccessful()) {
@@ -256,20 +249,20 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		EventCRFBean eb = new EventCRFBean();
 		this.setEntityAuditInformation(eb, hm);
 
-		eb.setId(((Integer) hm.get("event_crf_id")).intValue());
-		eb.setStudyEventId(((Integer) hm.get("study_event_id")).intValue());
-		eb.setCRFVersionId(((Integer) hm.get("crf_version_id")).intValue());
+		eb.setId((Integer) hm.get("event_crf_id"));
+		eb.setStudyEventId((Integer) hm.get("study_event_id"));
+		eb.setCRFVersionId((Integer) hm.get("crf_version_id"));
 		eb.setDateInterviewed((Date) hm.get("date_interviewed"));
 		eb.setInterviewerName((String) hm.get("interviewer_name"));
-		eb.setCompletionStatusId(((Integer) hm.get("completion_status_id")).intValue());
+		eb.setCompletionStatusId((Integer) hm.get("completion_status_id"));
 		eb.setAnnotations((String) hm.get("annotations"));
 		eb.setDateCompleted((Date) hm.get("date_completed"));
-		eb.setValidatorId(((Integer) hm.get("validator_id")).intValue());
+		eb.setValidatorId((Integer) hm.get("validator_id"));
 		eb.setDateValidate((Date) hm.get("date_validate"));
 		eb.setDateValidateCompleted((Date) hm.get("date_validate_completed"));
 		eb.setValidatorAnnotations((String) hm.get("validator_annotations"));
 		eb.setValidateString((String) hm.get("validate_string"));
-		eb.setStudySubjectId(((Integer) hm.get("study_subject_id")).intValue());
+		eb.setStudySubjectId((Integer) hm.get("study_subject_id"));
 		eb.setSdvStatus((Boolean) hm.get("sdv_status"));
 		Integer oldStatusId = (Integer) hm.get("old_status_id");
 		eb.setOldStatus(Status.get(oldStatusId));
@@ -282,18 +275,15 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		this.setTypesExpected();
 		ArrayList alist = this.select(digester.getQuery("findAll"));
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			EventCRFBean eb = (EventCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			EventCRFBean eb = (EventCRFBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public EntityBean findByPK(int ID) {
@@ -301,7 +291,7 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(ID));
+		variables.put(1, ID);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList alist = this.select(sql, variables);
@@ -316,64 +306,60 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public ArrayList findAllByStudyEvent(StudyEventBean studyEvent) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyEvent.getId()));
+		variables.put(1, studyEvent.getId());
 
 		return executeFindAllQuery("findAllByStudyEvent", variables);
 	}
 
 	public ArrayList findAllStartedByStudyEvent(StudyEventBean studyEvent) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyEvent.getId()));
+		variables.put(1, studyEvent.getId());
 
 		return executeFindAllQuery("findAllStartedByStudyEvent", variables);
 	}
 
 	public ArrayList findAllByStudyEventAndStatus(StudyEventBean studyEvent, Status status) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyEvent.getId()));
-		variables.put(new Integer(2), new Integer(status.getId()));
+		variables.put(1, studyEvent.getId());
+		variables.put(2, status.getId());
 		return executeFindAllQuery("findAllByStudyEventAndStatus", variables);
 	}
 
 	public ArrayList<EventCRFBean> findAllByStudySubject(int studySubjectId) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studySubjectId));
+		variables.put(1, studySubjectId);
 
 		return executeFindAllQuery("findAllByStudySubject", variables);
 	}
 
 	public ArrayList findAllByStudyEventAndCrfOrCrfVersionOid(StudyEventBean studyEvent, String crfVersionOrCrfOID) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyEvent.getId()));
-		variables.put(new Integer(2), crfVersionOrCrfOID);
-		variables.put(new Integer(3), crfVersionOrCrfOID);
+		variables.put(1, studyEvent.getId());
+		variables.put(2, crfVersionOrCrfOID);
+		variables.put(3, crfVersionOrCrfOID);
 
 		return executeFindAllQuery("findAllByStudyEventAndCrfOrCrfVersionOid", variables);
 	}
 
 	public ArrayList findAllByCRF(int crfId) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(crfId));
+		variables.put(1, crfId);
 
 		return executeFindAllQuery("findAllByCRF", variables);
 	}
 
 	public ArrayList findAllByCRFVersion(int versionId) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(versionId));
+		variables.put(1, versionId);
 
 		return executeFindAllQuery("findAllByCRFVersion", variables);
 	}
@@ -389,13 +375,12 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 			this.setTypeExpected(27, TypeNames.STRING); // r
 		}
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(versionId));
+		variables.put(1, versionId);
 
 		ArrayList alist = this.select(digester.getQuery("findAllStudySubjectByCRFVersion"), variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			EventCRFBean eb = (EventCRFBean) this.getEntityFromHashMap(hm);
 			eb.setStudySubjectName((String) hm.get("label"));
 			eb.setEventName((String) hm.get("sed_name"));
@@ -412,13 +397,12 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		this.setTypeExpected(26, TypeNames.STRING);
 		this.setTypeExpected(27, TypeNames.INT);
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(versionId));
+		variables.put(1, versionId);
 
 		ArrayList alist = this.select(digester.getQuery("findUndeletedWithStudySubjectsByCRFVersion"), variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			EventCRFBean eb = (EventCRFBean) this.getEntityFromHashMap(hm);
 			eb.setStudySubjectName((String) hm.get("label"));
 			eb.setEventName((String) hm.get("sed_name"));
@@ -432,9 +416,9 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 	public ArrayList findByEventSubjectVersion(StudyEventBean studyEvent, StudySubjectBean studySubject,
 			CRFVersionBean crfVersion) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyEvent.getId()));
-		variables.put(new Integer(2), new Integer(crfVersion.getId()));
-		variables.put(new Integer(3), new Integer(studySubject.getId()));
+		variables.put(1, studyEvent.getId());
+		variables.put(2, crfVersion.getId());
+		variables.put(3, studySubject.getId());
 
 		return executeFindAllQuery("findByEventSubjectVersion", variables);
 	}
@@ -444,8 +428,8 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 	public EventCRFBean findByEventCrfVersion(StudyEventBean studyEvent, CRFVersionBean crfVersion) {
 		EventCRFBean eventCrfBean = null;
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(studyEvent.getId()));
-		variables.put(new Integer(2), new Integer(crfVersion.getId()));
+		variables.put(1, studyEvent.getId());
+		variables.put(2, crfVersion.getId());
 
 		ArrayList<EventCRFBean> eventCrfs = executeFindAllQuery("findByEventCrfVersion", variables);
 		if (!eventCrfs.isEmpty() && eventCrfs.size() == 1) {
@@ -457,18 +441,15 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 
 	public void delete(int eventCRFId) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(eventCRFId));
-
+		variables.put(1, eventCRFId);
 		this.execute(digester.getQuery("delete"), variables);
-		return;
-
 	}
 
 	public void setSDVStatus(boolean sdvStatus, int userId, int eventCRFId) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), sdvStatus);
-		variables.put(new Integer(2), userId);
-		variables.put(new Integer(3), eventCRFId);
+		variables.put(1, sdvStatus);
+		variables.put(2, userId);
+		variables.put(3, eventCRFId);
 
 		this.execute(digester.getQuery("setSDVStatus"), variables);
 	}
@@ -580,12 +561,12 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 
 		return executeFindAllQuery("getEventCRFsByStudySubjectCompleteOrLocked", variables);
 	}
-	
+
 	public ArrayList getEventCRFsByStudySubjectExceptInvalid(int studySubjectId) {
-		 
+
 		HashMap variables = new HashMap();
 		variables.put(1, studySubjectId);
-		
+
 		return executeFindAllQuery("getEventCRFsByStudySubjectExceptInvalid", variables);
 	}
 
@@ -659,8 +640,7 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return null;
 		}
@@ -680,8 +660,7 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return null;
 		}
@@ -705,10 +684,9 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		}
 
 		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
 
-		while (it.hasNext()) {
-			EventCRFBean eventCRF = (EventCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object row : rows) {
+			EventCRFBean eventCRF = (EventCRFBean) this.getEntityFromHashMap((HashMap) row);
 			eventCRFs.add(eventCRF);
 		}
 		return eventCRFs;
@@ -732,10 +710,9 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		}
 
 		ArrayList rows = this.select(sql, variables);
-		Iterator it = rows.iterator();
 
-		while (it.hasNext()) {
-			EventCRFBean eventCRF = (EventCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object row : rows) {
+			EventCRFBean eventCRF = (EventCRFBean) this.getEntityFromHashMap((HashMap) row);
 			eventCRFs.add(eventCRF);
 		}
 		return eventCRFs;
@@ -826,10 +803,9 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			EventCRFBean eb = (EventCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			EventCRFBean eb = (EventCRFBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
@@ -989,15 +965,12 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		Map<Integer, SortedSet<EventCRFBean>> result = new HashMap<Integer, SortedSet<EventCRFBean>>();
 
 		HashMap<Integer, Object> param = new HashMap<Integer, Object>();
-		int i = 1;
-		param.put(i++, studySubjectId);
+		param.put(1, studySubjectId);
 
 		List selectResult = select(digester.getQuery("buildEventCrfListByStudyEvent"), param);
 
-		Iterator it = selectResult.iterator();
-
-		while (it.hasNext()) {
-			EventCRFBean bean = (EventCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object aSelectResult : selectResult) {
+			EventCRFBean bean = (EventCRFBean) this.getEntityFromHashMap((HashMap) aSelectResult);
 
 			Integer studyEventId = bean.getStudyEventId();
 			if (!result.containsKey(studyEventId)) {
@@ -1019,15 +992,12 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		Set<Integer> result = new HashSet<Integer>();
 
 		HashMap<Integer, Object> param = new HashMap<Integer, Object>();
-		int i = 1;
-		param.put(i++, studySubjectId);
+		param.put(1, studySubjectId);
 
 		List selectResult = select(digester.getQuery("buildNonEmptyEventCrfIds"), param);
 
-		Iterator it = selectResult.iterator();
-
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object aSelectResult : selectResult) {
+			HashMap hm = (HashMap) aSelectResult;
 			result.add((Integer) hm.get("event_crf_id"));
 		}
 
@@ -1035,8 +1005,7 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 	}
 
 	public void updateCRFVersionID(int event_crf_id, int crf_version_id, int user_id) {
-		Connection con = null;
-		updateCRFVersionID(event_crf_id, crf_version_id, user_id, con);
+		updateCRFVersionID(event_crf_id, crf_version_id, user_id, null);
 	}
 
 	public void updateCRFVersionID(int event_crf_id, int crf_version_id, int user_id, Connection con) {
@@ -1060,5 +1029,11 @@ public class EventCRFDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		} else {
 			this.execute(sql, variables, con);
 		}
+	}
+
+	public void deleteEventCRFDNMap(int eventCRFId) {
+		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
+		variables.put(1, eventCRFId);
+		this.execute(digester.getQuery("deleteEventCRFDNMap"), variables);
 	}
 }

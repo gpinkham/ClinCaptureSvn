@@ -24,10 +24,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -56,11 +54,11 @@ import org.springframework.stereotype.Component;
  * @author thickerson
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ViewDatasetsServlet extends RememberLastPage {
 
-    public static final String SAVED_VIEW_DATASETS_URL = "savedViewDatasetsUrl";
+	public static final String SAVED_VIEW_DATASETS_URL = "savedViewDatasetsUrl";
 
 	public static String getLink(int dsId) {
 		return "ViewDatasets?action=details&datasetId=" + dsId;
@@ -72,20 +70,20 @@ public class ViewDatasetsServlet extends RememberLastPage {
 		if (!(action != null && action.equalsIgnoreCase("details")) && shouldRedirect(request, response)) {
 			return;
 		}
-		
-		if("ongoing".equals(request.getSession().getAttribute("exportStatus"))){
+
+		if ("ongoing".equals(request.getSession().getAttribute("exportStatus"))) {
 			addPageMessage(respage.getString("extract_is_running"), request);
 			request.getSession().removeAttribute("exportStatus");
 		}
 
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
 		request.setAttribute("subjectAgeAtEvent",
 				currentStudy.getStudyParameterConfig().getCollectDob().equals("3") ? "0" : "1");
-        
+
 		DatasetDAO dsdao = getDatasetDAO();
-        StudyInfoPanel panel = getStudyInfoPanel(request);
+		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.reset();
 		request.getSession().removeAttribute("newDataset");
 		if (StringUtil.isBlank(action)) {
@@ -99,14 +97,14 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
 			CRFDAO crfdao = getCRFDAO();
 			HashMap events = new LinkedHashMap();
-            for (Object sed1 : seds) {
-                StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sed1;
-                ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
-                if (!crfs.isEmpty()) {
-                    events.put(sed, crfs);
-                }
-            }
-            request.getSession().setAttribute("eventsForCreateDataset", events);
+			for (Object sed1 : seds) {
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sed1;
+				ArrayList crfs = (ArrayList) crfdao.findAllActiveByDefinition(sed);
+				if (!crfs.isEmpty()) {
+					events.put(sed, crfs);
+				}
+			}
+			request.getSession().setAttribute("eventsForCreateDataset", events);
 			// YW >>
 
 			FormProcessor fp = new FormProcessor(request);
@@ -165,7 +163,7 @@ public class ViewDatasetsServlet extends RememberLastPage {
 
 				// ArrayList datasets = (ArrayList)dsdao.findByOwnerId(ownerId);
 				// request.setAttribute("datasets", datasets);
-                forward(Page.VIEW_DATASETS, request, response);
+				forwardPage(Page.VIEW_DATASETS, request, response);
 				// }
 			} else if ("details".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
@@ -176,8 +174,9 @@ public class ViewDatasetsServlet extends RememberLastPage {
 				StudyBean study = (StudyBean) sdao.findByPK(db.getStudyId());
 
 				if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
-					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+					addPageMessage(
+							respage.getString("no_have_correct_privilege_current_study") + " "
+									+ respage.getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				}
@@ -198,9 +197,10 @@ public class ViewDatasetsServlet extends RememberLastPage {
 	}
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -210,8 +210,9 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 
@@ -220,12 +221,14 @@ public class ViewDatasetsServlet extends RememberLastPage {
 	/**
 	 * Initialize data of a DatasetBean and set session attributes for displaying selected data of this DatasetBean
 	 * 
-	 * @param datasetId int
-     * @param request HttpServletRequest
+	 * @param datasetId
+	 *            int
+	 * @param request
+	 *            HttpServletRequest
 	 * @return DatasetBean
 	 */
 	public DatasetBean initializeAttributes(int datasetId, HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 		DatasetDAO dsdao = getDatasetDAO();
 		DatasetBean db = dsdao.initialDatasetData(datasetId);
 		request.getSession().setAttribute("newDataset", db);
@@ -236,40 +239,40 @@ public class ViewDatasetsServlet extends RememberLastPage {
 		ArrayList<Integer> selectedSubjectGroupIds = db.getSubjectGroupIds();
 		if (selectedSubjectGroupIds != null && allSelectedGroups != null) {
 			for (Integer id : selectedSubjectGroupIds) {
-                for (StudyGroupClassBean allSelectedGroup : allSelectedGroups) {
-                    if (allSelectedGroup.getId() == id) {
-                        allSelectedGroup.setSelected(true);
-                        break;
-                    }
-                }
+				for (StudyGroupClassBean allSelectedGroup : allSelectedGroups) {
+					if (allSelectedGroup.getId() == id) {
+						allSelectedGroup.setSelected(true);
+						break;
+					}
+				}
 			}
 		}
-        db.setAllSelectedGroups(allSelectedGroups);
+		db.setAllSelectedGroups(allSelectedGroups);
 
 		return db;
 	}
 
-    @Override
-    protected String getUrlKey(HttpServletRequest request) {
-        return SAVED_VIEW_DATASETS_URL;
-    }
+	@Override
+	protected String getUrlKey(HttpServletRequest request) {
+		return SAVED_VIEW_DATASETS_URL;
+	}
 
-    @Override
-    protected String getDefaultUrl(HttpServletRequest request) {
-        FormProcessor fp = new FormProcessor(request);
-        String eblFiltered = fp.getString("ebl_filtered");
-        String eblFilterKeyword = fp.getString("ebl_filterKeyword");
-        String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
-        String eblSortAscending = fp.getString("ebl_sortAscending");
-        return "?submitted=1&module=" + fp.getString("module") + "&ebl_page=1&ebl_sortColumnInd="
-                + (!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0") + "&ebl_sortAscending="
-                + (!eblSortAscending.isEmpty() ? eblSortAscending : "1") + "&ebl_filtered="
-                + (!eblFiltered.isEmpty() ? eblFiltered : "0") + "&ebl_filterKeyword="
-                + (!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "") + "&&ebl_paginated=1";
-    }
+	@Override
+	protected String getDefaultUrl(HttpServletRequest request) {
+		FormProcessor fp = new FormProcessor(request);
+		String eblFiltered = fp.getString("ebl_filtered");
+		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
+		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
+		String eblSortAscending = fp.getString("ebl_sortAscending");
+		return "?submitted=1&module=" + fp.getString("module") + "&ebl_page=1&ebl_sortColumnInd="
+				+ (!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0") + "&ebl_sortAscending="
+				+ (!eblSortAscending.isEmpty() ? eblSortAscending : "1") + "&ebl_filtered="
+				+ (!eblFiltered.isEmpty() ? eblFiltered : "0") + "&ebl_filterKeyword="
+				+ (!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "") + "&&ebl_paginated=1";
+	}
 
-    @Override
-    protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
-        return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
-    }
+	@Override
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
+		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
+	}
 }

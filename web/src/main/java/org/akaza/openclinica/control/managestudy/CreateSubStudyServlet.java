@@ -151,7 +151,7 @@ public class CreateSubStudyServlet extends Controller {
 							} else if (scg.getParameter().getHandle()
 									.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
 								scg.getValue().setValue(fp.getString("replaceExisitingDataDuringImport"));
-	} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowCodingVerification")) {
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowCodingVerification")) {
 								scg.getValue().setValue(fp.getString("allowCodingVerification"));
 							} else if (scg.getParameter().getHandle()
 									.equalsIgnoreCase("defaultMedicalCodingDictionary")) {
@@ -359,7 +359,7 @@ public class CreateSubStudyServlet extends Controller {
 		java.util.Date protocolDate;
 		SimpleDateFormat local_df = getLocalDf(request);
 		try {
-		local_df.setLenient(false);
+			local_df.setLenient(false);
 			startDate = local_df.parse(fp.getString("startDate"));
 
 		} catch (ParseException fe) {

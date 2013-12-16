@@ -109,7 +109,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(14, TypeNames.BOOL); // start_time_flag
 		this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
 		this.setTypeExpected(16, TypeNames.INT); // prev_status
-		this.setTypeExpected(17, TypeNames.INT); //reference_visit_id
+		this.setTypeExpected(17, TypeNames.INT); // reference_visit_id
 	}
 
 	public void setTypesExpected(boolean withSubject) {
@@ -138,7 +138,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
 
 		this.setTypeExpected(16, TypeNames.INT); // prev_status
-		this.setTypeExpected(17, TypeNames.INT); //reference_visit_id
+		this.setTypeExpected(17, TypeNames.INT); // reference_visit_id
 		if (withSubject) {
 			this.setTypeExpected(18, TypeNames.STRING);
 		}
@@ -170,15 +170,15 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		// STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID LOCATION
 		// SAMPLE_ORDINAL DATE_START DATE_END OWNER_ID
 		// STATUS_ID DATE_CREATED DATE_UPDATED UPDATE_ID
-		eb.setId(((Integer) hm.get("study_event_id")).intValue());
-		eb.setStudyEventDefinitionId(((Integer) hm.get("study_event_definition_id")).intValue());
-		eb.setStudySubjectId(((Integer) hm.get("study_subject_id")).intValue());
+		eb.setId((Integer) hm.get("study_event_id"));
+		eb.setStudyEventDefinitionId((Integer) hm.get("study_event_definition_id"));
+		eb.setStudySubjectId((Integer) hm.get("study_subject_id"));
 		eb.setLocation((String) hm.get("location"));
-		eb.setSampleOrdinal(((Integer) hm.get("sample_ordinal")).intValue());
+		eb.setSampleOrdinal((Integer) hm.get("sample_ordinal"));
 		eb.setDateStarted((Date) hm.get("date_start"));
 		eb.setDateEnded((Date) hm.get("date_end"));
 		// eb.setStatus(eb.getStatus());
-		int subjectEventStatuId = ((Integer) hm.get("subject_event_status_id")).intValue();
+		int subjectEventStatuId = (Integer) hm.get("subject_event_status_id");
 		eb.setSubjectEventStatus(SubjectEventStatus.get(subjectEventStatuId));
 		// YW 08-17-2007
 		eb.setStartTimeFlag((Boolean) hm.get("start_time_flag"));
@@ -186,7 +186,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		Integer prevSubjectEventStatus = (Integer) hm.get("prev_subject_event_status");
 		eb.setPrevSubjectEventStatus(SubjectEventStatus.getByCode(prevSubjectEventStatus));
-		
+
 		Integer referenceVisitId = (Integer) hm.get("reference_visit_id");
 		eb.setReferenceVisitId(referenceVisitId);
 
@@ -203,15 +203,15 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		// STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID LOCATION
 		// SAMPLE_ORDINAL DATE_START DATE_END OWNER_ID
 		// STATUS_ID DATE_CREATED DATE_UPDATED UPDATE_ID
-		eb.setId(((Integer) hm.get("study_event_id")).intValue());
-		eb.setStudyEventDefinitionId(((Integer) hm.get("study_event_definition_id")).intValue());
-		eb.setStudySubjectId(((Integer) hm.get("study_subject_id")).intValue());
+		eb.setId((Integer) hm.get("study_event_id"));
+		eb.setStudyEventDefinitionId((Integer) hm.get("study_event_definition_id"));
+		eb.setStudySubjectId((Integer) hm.get("study_subject_id"));
 		eb.setLocation((String) hm.get("location"));
-		eb.setSampleOrdinal(((Integer) hm.get("sample_ordinal")).intValue());
+		eb.setSampleOrdinal((Integer) hm.get("sample_ordinal"));
 		eb.setDateStarted((Date) hm.get("date_start"));
 		eb.setDateEnded((Date) hm.get("date_end"));
 		// eb.setStatus(eb.getStatus());
-		int subjectEventStatuId = ((Integer) hm.get("subject_event_status_id")).intValue();
+		int subjectEventStatuId = (Integer) hm.get("subject_event_status_id");
 		eb.setSubjectEventStatus(SubjectEventStatus.get(subjectEventStatuId));
 		// YW 08-17-2007
 		eb.setStartTimeFlag((Boolean) hm.get("start_time_flag"));
@@ -221,7 +221,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		eb.setPrevSubjectEventStatus(SubjectEventStatus.getByCode(prevSubjectEventStatus));
 
 		eb.setReferenceVisitId((Integer) hm.get("reference_visit_id"));
-		
+
 		if (withSubject) {
 			eb.setStudySubjectLabel((String) hm.get("label"));
 		}
@@ -235,9 +235,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 		ArrayList alist = this.select(digester.getQuery("findAll"));
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
@@ -246,14 +245,13 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	public Collection findAllByDefinition(int definitionId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(definitionId));
+		variables.put(1, definitionId);
 
 		String sql = digester.getQuery("findAllByDefinition");
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
@@ -262,16 +260,15 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	public ArrayList findAllByStudyEventDefinitionAndCrfOids(String studyEventDefinitionOid, String crfOrCrfVersionOid) {
 		this.setTypesExpected(true);
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(Integer.valueOf(1), studyEventDefinitionOid);
-		variables.put(Integer.valueOf(2), crfOrCrfVersionOid);
-		variables.put(Integer.valueOf(3), crfOrCrfVersionOid);
+		variables.put(1, studyEventDefinitionOid);
+		variables.put(2, crfOrCrfVersionOid);
+		variables.put(3, crfOrCrfVersionOid);
 
 		String sql = digester.getQuery("findAllByStudyEventDefinitionAndCrfOids");
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next(), true);
+		for (Object anAlist : alist) {
+			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist, true);
 			al.add(eb);
 		}
 		return al;
@@ -281,17 +278,16 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), currentStudy.getId());
-		variables.put(Integer.valueOf(2), currentStudy.getId());
-		variables.put(Integer.valueOf(3), subjectEventStatus.getId());
+		variables.put(1, currentStudy.getId());
+		variables.put(2, currentStudy.getId());
+		variables.put(3, subjectEventStatus.getId());
 		String sql = digester.getQuery("getCountofEventsBasedOnEventStatus");
 
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return null;
 		}
@@ -301,16 +297,15 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), currentStudy.getId());
-		variables.put(Integer.valueOf(2), currentStudy.getId());
+		variables.put(1, currentStudy.getId());
+		variables.put(2, currentStudy.getId());
 		String sql = digester.getQuery("getCountofEvents");
 
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return null;
 		}
@@ -320,18 +315,17 @@ public class StudyEventDAO extends AuditableEntityDAO {
 			String crfOrCrfVersionOid, String ordinal, String studySubjectId) {
 		this.setTypesExpected(true);
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(Integer.valueOf(1), studyEventDefinitionOid);
-		variables.put(Integer.valueOf(2), Integer.valueOf(studySubjectId));
-		variables.put(Integer.valueOf(3), Integer.valueOf(ordinal));
-		variables.put(Integer.valueOf(4), crfOrCrfVersionOid);
-		variables.put(Integer.valueOf(5), crfOrCrfVersionOid);
+		variables.put(1, studyEventDefinitionOid);
+		variables.put(2, Integer.valueOf(studySubjectId));
+		variables.put(3, Integer.valueOf(ordinal));
+		variables.put(4, crfOrCrfVersionOid);
+		variables.put(5, crfOrCrfVersionOid);
 
 		String sql = digester.getQuery("findAllByStudyEventDefinitionAndCrfOidsAndOrdinal");
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next(), true);
+		for (Object anAlist : alist) {
+			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist, true);
 			al.add(eb);
 		}
 		if (al.isEmpty()) {
@@ -350,14 +344,13 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	public ArrayList findAllWithSubjectLabelByDefinition(int definitionId) {
 		this.setTypesExpected(true);
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(definitionId));
+		variables.put(1, definitionId);
 
 		String sql = digester.getQuery("findAllWithSubjectLabelByDefinition");
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next(), true);
+		for (Object anAlist : alist) {
+			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist, true);
 			al.add(eb);
 		}
 		return al;
@@ -366,15 +359,14 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	public ArrayList findAllWithSubjectLabelByStudySubjectAndDefinition(StudySubjectBean studySubject, int definitionId) {
 		this.setTypesExpected(true);
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(studySubject.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(definitionId));
+		variables.put(1, studySubject.getId());
+		variables.put(2, definitionId);
 
 		String sql = digester.getQuery("findAllWithSubjectLabelByStudySubjectAndDefinition");
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next(), true);
+		for (Object anAlist : alist) {
+			StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist, true);
 			eb.setStudySubject(studySubject);
 			al.add(eb);
 		}
@@ -384,9 +376,9 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	public EntityBean findByStudySubjectIdAndDefinitionIdAndOrdinal(int ssbid, int sedid, int ord) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(ssbid));
-		variables.put(Integer.valueOf(2), Integer.valueOf(sedid));
-		variables.put(Integer.valueOf(3), Integer.valueOf(ord));
+		variables.put(1, ssbid);
+		variables.put(2, sedid);
+		variables.put(3, ord);
 
 		String sql = digester.getQuery("findByStudySubjectIdAndDefinitionIdAndOrdinal");
 		ArrayList alist = this.select(sql, variables);
@@ -399,9 +391,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	}
 
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public ArrayList findAllByDefinitionAndSubject(StudyEventDefinitionBean definition, StudySubjectBean subject) {
@@ -410,16 +400,15 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(definition.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(subject.getId()));
+		variables.put(1, definition.getId());
+		variables.put(2, subject.getId());
 
 		String sql = digester.getQuery("findAllByDefinitionAndSubject");
 
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			StudyEventBean studyEvent = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyEventBean studyEvent = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(studyEvent);
 		}
 
@@ -433,16 +422,15 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(definition.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(subject.getId()));
+		variables.put(1, definition.getId());
+		variables.put(2, subject.getId());
 
 		String sql = digester.getQuery("findAllByDefinitionAndSubjectOrderByOrdinal");
 
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			StudyEventBean studyEvent = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyEventBean studyEvent = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(studyEvent);
 		}
 
@@ -454,7 +442,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(ID));
+		variables.put(1, ID);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList alist = this.select(sql, variables);
@@ -472,7 +460,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(ID));
+		variables.put(1, ID);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList alist = this.selectByCache(sql, variables);
@@ -497,29 +485,29 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		// DATE_START,DATE_END,OWNER_ID,STATUS_ID,DATE_CREATED,subject_event_status_id
 		// start_time_flag, end_time_flag)
 		// VALUES (?,?,?,?,?,?,?,?,NOW())
-		variables.put(Integer.valueOf(1), Integer.valueOf(sb.getStudyEventDefinitionId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(sb.getStudySubjectId()));
-		variables.put(Integer.valueOf(3), sb.getLocation());
-		variables.put(Integer.valueOf(4), Integer.valueOf(sb.getSampleOrdinal()));
+		variables.put(1, sb.getStudyEventDefinitionId());
+		variables.put(2, sb.getStudySubjectId());
+		variables.put(3, sb.getLocation());
+		variables.put(4, sb.getSampleOrdinal());
 		if (sb.getDateStarted() == null) {
-			nullVars.put(Integer.valueOf(5), Integer.valueOf(TypeNames.TIMESTAMP));
-			variables.put(Integer.valueOf(5), null);
+			nullVars.put(5, TypeNames.TIMESTAMP);
+			variables.put(5, null);
 		} else {
-			variables.put(Integer.valueOf(5), new Timestamp(sb.getDateStarted().getTime()));
+			variables.put(5, new Timestamp(sb.getDateStarted().getTime()));
 		}
 		if (sb.getDateEnded() == null) {
-			nullVars.put(Integer.valueOf(6), Integer.valueOf(TypeNames.TIMESTAMP));
-			variables.put(Integer.valueOf(6), null);
+			nullVars.put(6, TypeNames.TIMESTAMP);
+			variables.put(6, null);
 		} else {
-			variables.put(Integer.valueOf(6), new Timestamp(sb.getDateEnded().getTime()));
+			variables.put(6, new Timestamp(sb.getDateEnded().getTime()));
 		}
-		variables.put(Integer.valueOf(7), Integer.valueOf(sb.getOwner().getId()));
-		variables.put(Integer.valueOf(8), Integer.valueOf(sb.getStatus().getId()));
-		variables.put(Integer.valueOf(9), Integer.valueOf(sb.getSubjectEventStatus().getId()));
-		variables.put(Integer.valueOf(10), sb.getStartTimeFlag());
-		variables.put(Integer.valueOf(11), sb.getEndTimeFlag());
-		variables.put(Integer.valueOf(12), sb.getReferenceVisitId());
-		
+		variables.put(7, sb.getOwner().getId());
+		variables.put(8, sb.getStatus().getId());
+		variables.put(9, sb.getSubjectEventStatus().getId());
+		variables.put(10, sb.getStartTimeFlag());
+		variables.put(11, sb.getEndTimeFlag());
+		variables.put(12, sb.getReferenceVisitId());
+
 		this.executeWithPK(digester.getQuery("create"), variables, nullVars);
 		if (isQuerySuccessful()) {
 			sb.setId(getLatestPK());
@@ -551,28 +539,29 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		sb.setActive(false);
 
-		variables.put(Integer.valueOf(1), Integer.valueOf(sb.getStudyEventDefinitionId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(sb.getStudySubjectId()));
-		variables.put(Integer.valueOf(3), sb.getLocation());
-		variables.put(Integer.valueOf(4), Integer.valueOf(sb.getSampleOrdinal()));
-		variables.put(Integer.valueOf(5), new Timestamp(sb.getDateStarted().getTime()));
+		variables.put(1, sb.getStudyEventDefinitionId());
+		variables.put(2, sb.getStudySubjectId());
+		variables.put(3, sb.getLocation());
+		variables.put(4, sb.getSampleOrdinal());
+		variables.put(5, new Timestamp(sb.getDateStarted().getTime()));
 		if (sb.getDateEnded() == null) {
-			nullVars.put(Integer.valueOf(6), Integer.valueOf(TypeNames.TIMESTAMP));
-			variables.put(Integer.valueOf(6), null);
+			nullVars.put(6, TypeNames.TIMESTAMP);
+			variables.put(6, null);
 		} else {
-			variables.put(Integer.valueOf(6), new Timestamp(sb.getDateEnded().getTime()));
+			variables.put(6, new Timestamp(sb.getDateEnded().getTime()));
 		}
-		variables.put(Integer.valueOf(7), Integer.valueOf(sb.getStatus().getId()));
-		variables.put(Integer.valueOf(8), new java.util.Date());// DATE_Updated
-		variables.put(Integer.valueOf(9), Integer.valueOf(sb.getUpdater().getId()));
-		variables.put(Integer.valueOf(10), Integer.valueOf(sb.getSubjectEventStatus().getId()));
-		variables.put(Integer.valueOf(11), sb.getStartTimeFlag()); // YW
+		variables.put(7, sb.getStatus().getId());
+		variables.put(8, new java.util.Date());// DATE_Updated
+		variables.put(9, sb.getUpdater().getId());
+		variables.put(10, sb.getSubjectEventStatus().getId());
+		variables.put(11, sb.getStartTimeFlag()); // YW
 		// start_time_flag
-		variables.put(Integer.valueOf(12), sb.getEndTimeFlag()); // YW
+		variables.put(12, sb.getEndTimeFlag()); // YW
 		// end_time_flag
-		variables.put(Integer.valueOf(13), Integer.valueOf(sb.getPrevSubjectEventStatus().getId()));
-		variables.put(Integer.valueOf(14), sb.getReferenceVisitId());
-		variables.put(Integer.valueOf(15), Integer.valueOf(sb.getId()));
+		variables.put(13, sb.getPrevSubjectEventStatus().getId());
+		variables.put(14, sb.getReferenceVisitId());
+
+		variables.put(15, sb.getId());
 
 		String sql = digester.getQuery("update");
 
@@ -587,15 +576,11 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	@Override
@@ -608,7 +593,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		if (al.size() > 0) {
 			HashMap h = (HashMap) al.get(0);
-			pk = ((Integer) h.get("key")).intValue();
+			pk = (Integer) h.get("key");
 		}
 
 		return pk;
@@ -620,15 +605,14 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(studySubjectId));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		variables.put(3, studySubjectId);
 
 		ArrayList alist = this.select(digester.getQuery("findAllByStudyAndStudySubjectId"), variables);
 
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 
@@ -641,15 +625,14 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(eventDefinitionId));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		variables.put(3, eventDefinitionId);
 
 		ArrayList alist = this.select(digester.getQuery("findAllByStudyAndEventDefinitionId"), variables);
 
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 
@@ -663,16 +646,15 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
-		variables.put(Integer.valueOf(3), Integer.valueOf(eventDefinitionId));
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		variables.put(3, eventDefinitionId);
 
 		ArrayList alist = this.select(
 				digester.getQuery("findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved"), variables);
 
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 
@@ -695,17 +677,17 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(sedb.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(studySubject.getId()));
+		variables.put(1, sedb.getId());
+		variables.put(2, studySubject.getId());
 
 		ArrayList alist = this.select(digester.getQuery("getMaxSampleOrdinal"), variables);
 		Iterator it = alist.iterator();
 		if (it.hasNext()) {
 			try {
 				HashMap hm = (HashMap) it.next();
-				Integer max = (Integer) hm.get("max_ord");
-				return max.intValue();
+				return (Integer) hm.get("max_ord");
 			} catch (Exception e) {
+				//
 			}
 		}
 
@@ -719,13 +701,12 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
+		variables.put(1, study.getId());
 
 		ArrayList alist = this.select(digester.getQuery("findAllByStudy"), variables);
 
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 
@@ -735,7 +716,9 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	/**
 	 * @deprecated
 	 * @param subjectId
+	 *            int
 	 * @param studyId
+	 *            int
 	 */
 	@Deprecated
 	public ArrayList findAllBySubjectAndStudy(int subjectId, int studyId) {
@@ -744,15 +727,14 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(subjectId));
-		variables.put(Integer.valueOf(2), Integer.valueOf(studyId));
-		variables.put(Integer.valueOf(3), Integer.valueOf(studyId));
+		variables.put(1, subjectId);
+		variables.put(2, studyId);
+		variables.put(3, studyId);
 
 		ArrayList alist = this.select(digester.getQuery("findAllBySubjectAndStudy"), variables);
 
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 
@@ -766,13 +748,12 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(subjectId));
+		variables.put(1, subjectId);
 
 		ArrayList alist = this.select(digester.getQuery("findAllBySubjectId"), variables);
 
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(seb);
 		}
 
@@ -806,8 +787,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	public HashMap getEventsAndMultipleCRFVersionInformation(ArrayList rows) {
 		HashMap returnMe = new HashMap();
 		Iterator it = rows.iterator();
-		EntityBean event = new EntityBean();
-		EntityBean crf = new EntityBean();
+		EntityBean event;
+		EntityBean crf;
 		while (it.hasNext()) {
 			HashMap answers = (HashMap) it.next();
 
@@ -815,13 +796,13 @@ public class StudyEventDAO extends AuditableEntityDAO {
 			// setActive calls
 			event = new EntityBean();
 			event.setName((String) answers.get("sed_name"));
-			event.setId(((Integer) answers.get("study_event_definition_id")).intValue());
+			event.setId((Integer) answers.get("study_event_definition_id"));
 
 			crf = new EntityBean();
-			crf.setName((String) answers.get("crf_name") + " " + (String) answers.get("ver_name"));
-			crf.setId(((Integer) answers.get("crf_version_id")).intValue());
+			crf.setName(answers.get("crf_name") + " " + answers.get("ver_name"));
+			crf.setId((Integer) answers.get("crf_version_id"));
 
-			ArrayList crfs = new ArrayList();
+			ArrayList crfs;
 			if (this.findDouble(returnMe, event)) {
 
 				crfs = this.returnDouble(returnMe, event);
@@ -845,8 +826,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	public HashMap getEventAndCRFVersionInformation(ArrayList al) {
 		HashMap returnMe = new HashMap();
 		Iterator it = al.iterator();
-		EntityBean event = new EntityBean();
-		EntityBean crf = new EntityBean();
+		EntityBean event;
+		EntityBean crf;
 		while (it.hasNext()) {
 			HashMap answers = (HashMap) it.next();
 			logger.warn("***Study Event Def ID: " + answers.get("study_event_definition_id"));
@@ -855,11 +836,11 @@ public class StudyEventDAO extends AuditableEntityDAO {
 			event = new EntityBean();
 			event.setActive(true);
 			event.setName((String) answers.get("sed_name"));
-			event.setId(((Integer) answers.get("study_event_definition_id")).intValue());
+			event.setId((Integer) answers.get("study_event_definition_id"));
 			crf = new EntityBean();
 			crf.setActive(true);
-			crf.setName((String) answers.get("crf_name") + " " + (String) answers.get("ver_name"));
-			crf.setId(((Integer) answers.get("crf_version_id")).intValue());
+			crf.setName(answers.get("crf_name") + " " + answers.get("ver_name"));
+			crf.setId((Integer) answers.get("crf_version_id"));
 			returnMe.put(event, crf);// maybe combine the two crf + version?
 		}// end of cycling through answers
 
@@ -889,10 +870,10 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		// AND SED.STUDY_ID = ?
 		// ORDER BY C.CRF_ID, V.CRF_VERSION_ID
 
-		HashMap crfs = new HashMap();
+		HashMap crfs;
 		this.setNewCRFTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(sb.getId()));
+		variables.put(1, sb.getId());
 		ArrayList alist = this.select(digester.getQuery("findCRFsByStudy"), variables);
 		// TODO make sure this other statement for eliciting crfs works, tbh
 		// switched from getEventAndCRFVersionInformation
@@ -910,7 +891,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		HashMap crfs = new HashMap();
 		this.setCRFTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(seb.getStudyEventDefinitionId()));
+		variables.put(1, seb.getStudyEventDefinitionId());
 		ArrayList alist = this.select(digester.getQuery("findCRFsByStudyEvent"), variables);
 		Iterator it = alist.iterator();
 		CRFDAO cdao = new CRFDAO(this.ds);
@@ -932,15 +913,14 @@ public class StudyEventDAO extends AuditableEntityDAO {
 			Set se = crfs.entrySet();
 			boolean found = false;
 			boolean versionFound = false;
-			for (Iterator itse = se.iterator(); itse.hasNext();) {
-				Map.Entry me = (Map.Entry) itse.next();
+			for (Object aSe : se) {
+				Map.Entry me = (Map.Entry) aSe;
 				CRFBean checkCrf = (CRFBean) me.getKey();
 				if (checkCrf.getId() == cbean.getId()) {
 					found = true;
 					ArrayList oldList = (ArrayList) me.getValue();
-					Iterator itself = oldList.iterator();
-					while (itself.hasNext()) {
-						CRFVersionBean cvbCheck = (CRFVersionBean) itself.next();
+					for (Object anOldList : oldList) {
+						CRFVersionBean cvbCheck = (CRFVersionBean) anOldList;
 						if (cvbCheck.getId() == cvb.getId()) {
 							versionFound = true;
 						}
@@ -968,8 +948,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	public boolean findDouble(HashMap hm, EntityBean event) {
 		boolean returnMe = false;
 		Set s = hm.entrySet();
-		for (Iterator it = s.iterator(); it.hasNext();) {
-			Map.Entry me = (Map.Entry) it.next();
+		for (Object value : s) {
+			Map.Entry me = (Map.Entry) value;
 			EntityBean eb = (EntityBean) me.getKey();
 			if (eb.getId() == event.getId() && eb.getName().equals(event.getName())) {
 				logger.warn("found OLD bean, return true");
@@ -983,8 +963,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	public ArrayList returnDouble(HashMap hm, EntityBean event) {
 		ArrayList al = new ArrayList();
 		Set s = hm.entrySet();
-		for (Iterator it = s.iterator(); it.hasNext();) {
-			Map.Entry me = (Map.Entry) it.next();
+		for (Object value : s) {
+			Map.Entry me = (Map.Entry) value;
 			EntityBean eb = (EntityBean) me.getKey();
 			if (eb.getId() == event.getId() && eb.getName().equals(event.getName())) {
 				// logger.warn("found OLD bean, return true");
@@ -998,8 +978,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 	public HashMap removeDouble(HashMap hm, EntityBean event) {
 		Set s = hm.entrySet();
 		EntityBean removeMe = new EntityBean();
-		for (Iterator it = s.iterator(); it.hasNext();) {
-			Map.Entry me = (Map.Entry) it.next();
+		for (Object value : s) {
+			Map.Entry me = (Map.Entry) value;
 			EntityBean eb = (EntityBean) me.getKey();
 			if (eb.getId() == event.getId() && eb.getName().equals(event.getName())) {
 				logger.warn("found OLD bean, remove it");
@@ -1017,13 +997,13 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(studyEventId));
+		variables.put(1, studyEventId);
 
 		ArrayList rows = select(digester.getQuery("getDefinitionIdFromStudyEventId"), variables);
 
 		if (rows.size() > 0) {
 			HashMap row = (HashMap) rows.get(0);
-			answer = ((Integer) row.get("study_event_definition_id")).intValue();
+			answer = (Integer) row.get("study_event_definition_id");
 		}
 
 		return answer;
@@ -1031,15 +1011,15 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 	public ArrayList findAllByStudySubject(StudySubjectBean ssb) {
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(ssb.getId()));
+		variables.put(1, ssb.getId());
 
 		return executeFindAllQuery("findAllByStudySubject", variables);
 	}
 
 	public ArrayList findAllByStudySubjectAndDefinition(StudySubjectBean ssb, StudyEventDefinitionBean sed) {
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(ssb.getId()));
-		variables.put(Integer.valueOf(2), Integer.valueOf(sed.getId()));
+		variables.put(1, ssb.getId());
+		variables.put(2, sed.getId());
 
 		return executeFindAllQuery("findAllByStudySubjectAndDefinition", variables);
 	}
@@ -1056,8 +1036,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		ArrayList rows = select("SELECT study_event_id, study_event_definition_id, study_subject_id, sample_ordinal FROM study_event ORDER BY study_subject_id ASC, study_event_definition_id ASC, sample_ordinal ASC");
 
-		for (int i = 0; i < rows.size(); i++) {
-			HashMap row = (HashMap) rows.get(i);
+		for (Object row1 : rows) {
+			HashMap row = (HashMap) row1;
 
 			Integer studyEventId = (Integer) row.get("study_event_id");
 			Integer studyEventDefinitionId = (Integer) row.get("study_event_definition_id");
@@ -1066,9 +1046,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
 			addEvent(studySubjectId, studyEventDefinitionId, studyEventId);
 		}
 
-		Iterator keysIt = subjDefs.keySet().iterator();
-		while (keysIt.hasNext()) {
-			String key = (String) keysIt.next();
+		for (Object o : subjDefs.keySet()) {
+			String key = (String) o;
 			ArrayList events = (ArrayList) subjDefs.get(key);
 
 			for (int i = 0; i < events.size(); i++) {
@@ -1103,15 +1082,14 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), studyEventDefinitionId);
+		variables.put(1, studyEventDefinitionId);
 		String sql = digester.getQuery("countNotRemovedEvents");
 
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return 0;
 		}
@@ -1119,18 +1097,18 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 	public HashMap getStudySubjectCRFData(StudyBean sb, int studySubjectId, int eventDefId, String crfVersionOID,
 			int eventOrdinal) {
-		HashMap studySubjectCRFDataDetails = new HashMap();
+		HashMap studySubjectCRFDataDetails;
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.INT);
 		this.setTypeExpected(3, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(1, Integer.valueOf(sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId()));
-		variables.put(2, Integer.valueOf(eventOrdinal));
+		variables.put(1, sb.getParentStudyId() > 0 ? sb.getParentStudyId() : sb.getId());
+		variables.put(2, eventOrdinal);
 		variables.put(3, crfVersionOID);
-		variables.put(4, Integer.valueOf(studySubjectId));
-		variables.put(5, Integer.valueOf(eventDefId));
+		variables.put(4, studySubjectId);
+		variables.put(5, eventDefId);
 
 		ArrayList alist = this.select(digester.getQuery("getStudySubjectCRFDataDetails"), variables);
 		studySubjectCRFDataDetails = this.getStudySubjectCRFDataDetails(alist);
@@ -1139,10 +1117,9 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 	private HashMap getStudySubjectCRFDataDetails(ArrayList rows) {
 		HashMap returnMe = new HashMap();
-		Iterator it = rows.iterator();
 
-		while (it.hasNext()) {
-			HashMap answers = (HashMap) it.next();
+		for (Object row : rows) {
+			HashMap answers = (HashMap) row;
 
 			returnMe.put("event_crf_id", answers.get("event_crf_id"));
 			returnMe.put("event_definition_crf_id", answers.get("event_definition_crf_id"));
@@ -1152,10 +1129,16 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		return returnMe;
 	}
-	
+
+	public void deleteStudyEventDNMap(int studyEventId) {
+		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
+		variables.put(1, studyEventId);
+		this.execute(digester.getQuery("deleteStudyEventDNMap"), variables);
+	}
+
 	public void deleteByPK(int id) {
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), id);
+		variables.put(1, id);
 		this.execute(digester.getQuery("deleteByPK"), variables);
 	}
 }

@@ -20,6 +20,10 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -27,28 +31,23 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
+import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 @Component
 public class ListEventsForSubjectsServlet extends RememberLastPage {
 
-    private static final long serialVersionUID = 1L;
-    public static final String SAVED_LIST_EVENTS_FOR_SUBJECTS_URL = "savedListEventsForSubjectsUrl";
+	private static final long serialVersionUID = 1L;
+	public static final String SAVED_LIST_EVENTS_FOR_SUBJECTS_URL = "savedListEventsForSubjectsUrl";
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -58,28 +57,25 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (shouldRedirect(request, response)) {
-            return;
-        }
-
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
-
-        boolean showMoreLink;
-		FormProcessor fp = new FormProcessor(request);
-		if (fp.getString("showMoreLink").equals("")) {
-			showMoreLink = true;
-		} else {
-			showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
+		if (shouldRedirect(request, response)) {
+			return;
 		}
+
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		boolean showMoreLink;
+		FormProcessor fp = new FormProcessor(request);
+		showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
 		String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
 		// set up auto study subject id
 		if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
@@ -124,7 +120,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
 		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
-        forward(Page.LIST_EVENTS_FOR_SUBJECTS, request, response);
+		forwardPage(Page.LIST_EVENTS_FOR_SUBJECTS, request, response);
 	}
 
 	private String parseDefId(String currentDefId, String savedUrl) {
@@ -142,12 +138,8 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 	@Override
 	protected String getDefaultUrl(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
-        boolean showMoreLink;
-		if (fp.getString("showMoreLink").equals("")) {
-			showMoreLink = true;
-		} else {
-			showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
-		}
+		boolean showMoreLink;
+		showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
 		String currentDefId = fp.getString("defId");
 		String savedUrl = (String) request.getSession().getAttribute(SAVED_LIST_EVENTS_FOR_SUBJECTS_URL);
 		if (savedUrl != null && !currentDefId.equals(parseDefId(currentDefId, savedUrl))) {
@@ -155,7 +147,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 			request.getSession().removeAttribute(SAVED_LIST_EVENTS_FOR_SUBJECTS_URL);
 		}
 		savedUrl = savedUrl != null ? savedUrl.replaceAll(".*" + request.getContextPath() + "/ListStudySubjects", "")
-				: savedUrl;
+				: null;
 		return request.getMethod().equalsIgnoreCase("POST") && savedUrl != null ? savedUrl : "?module="
 				+ fp.getString("module") + "&defId=" + fp.getString("defId") + "&maxRows=15&showMoreLink="
 				+ showMoreLink + "&listEventsForSubject_tr_=true&listEventsForSubject_p_=1&listEventsForSubject_mr_=15";

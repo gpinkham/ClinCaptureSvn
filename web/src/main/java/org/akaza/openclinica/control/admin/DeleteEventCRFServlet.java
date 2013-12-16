@@ -190,6 +190,7 @@ public class DeleteEventCRFServlet extends Controller {
 					iddao.delete(item.getId());
 				}
 				// delete event crf
+				ecdao.deleteEventCRFDNMap(eventCRF.getId());
 				ecdao.delete(eventCRF.getId());
 
 				SubjectEventStatusUtil.determineSubjectEventState(event, study, new DAOWrapper(sdao, sedao, subdao,

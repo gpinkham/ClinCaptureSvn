@@ -92,7 +92,7 @@ public class ListSubjectServlet extends RememberLastPage {
 		String auditLogsHtml = factory.createTable(request, response).render();
 		request.setAttribute("listSubjectsHtml", auditLogsHtml);
 
-		forward(Page.SUBJECT_LIST, request, response);
+		forwardPage(Page.SUBJECT_LIST, request, response);
 	}
 
 	@Override

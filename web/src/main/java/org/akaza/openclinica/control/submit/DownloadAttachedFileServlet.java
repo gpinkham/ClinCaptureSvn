@@ -40,19 +40,21 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({ "unchecked", "serial" })
 @Component
 public class DownloadAttachedFileServlet extends Controller {
 
 	/**
 	 * Checks whether the user has the correct privilege
-     * @param request
-     * @param response
-     */
+	 * 
+	 * @param request
+	 * @param response
+	 */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		int eventCRFId = fp.getInt("eventCRFId");
@@ -87,7 +89,7 @@ public class DownloadAttachedFileServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		String filePathName = "";
@@ -104,16 +106,15 @@ public class DownloadAttachedFileServlet extends Controller {
 				logger.info(currentStudy.getName() + " existing filePathName=" + filePathName);
 			} else {
 				if (currentStudy.isSite(parentStudyId)) {
-					testName = testPath
-							+ ((StudyBean) getStudyDAO().findByPK(parentStudyId)).getOid() + tail;
+					testName = testPath + ((StudyBean) getStudyDAO().findByPK(parentStudyId)).getOid() + tail;
 					temp = new File(testName);
 					if (temp.exists()) {
 						filePathName = testName;
 						logger.info("parent existing filePathName=" + filePathName);
 					}
 				} else {
-					ArrayList<StudyBean> sites = (ArrayList<StudyBean>) getStudyDAO()
-							.findAllByParent(currentStudy.getId());
+					ArrayList<StudyBean> sites = (ArrayList<StudyBean>) getStudyDAO().findAllByParent(
+							currentStudy.getId());
 					for (StudyBean s : sites) {
 						testPath = Utils.getAttachedFilePath(s);
 						testName = testPath + tail;// + s.getIdentifier() + tail;

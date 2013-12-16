@@ -22,23 +22,18 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteStatisticBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListNotesTableFactory;
@@ -115,8 +110,9 @@ public class ViewNotesServlet extends RememberLastPage {
 				request.setAttribute("module", "manage");
 			}
 		}
-		
-		boolean showMoreLink = fp.getString("showMoreLink").equals("") || Boolean.parseBoolean(fp.getString("showMoreLink"));
+
+		boolean showMoreLink = fp.getString("showMoreLink").equals("")
+				|| Boolean.parseBoolean(fp.getString("showMoreLink"));
 
 		int oneSubjectId = fp.getInt("id");
 		request.getSession().setAttribute("subjectId", oneSubjectId);
@@ -134,8 +130,8 @@ public class ViewNotesServlet extends RememberLastPage {
 
 		boolean removeSession = fp.getBoolean("removeSession");
 
-        request.getSession().setAttribute("module", module);
-		
+		request.getSession().setAttribute("module", module);
+
 		// Do we only want to view the notes for 1 subject?
 		String viewForOne = fp.getString("viewForOne");
 
@@ -153,21 +149,23 @@ public class ViewNotesServlet extends RememberLastPage {
 		}
 
 		if (removeSession) {
-            request.getSession().removeAttribute(WIN_LOCATION);
-            request.getSession().removeAttribute(NOTES_TABLE);
+			request.getSession().removeAttribute(WIN_LOCATION);
+			request.getSession().removeAttribute(NOTES_TABLE);
 		}
 
 		// after resolving a note, user wants to go back to view notes page, we
 		// save the current URL
 		// so we can go back later
-        request.getSession().setAttribute(WIN_LOCATION, "ViewNotes?viewForOne=" + viewForOne + "&id=" + oneSubjectId + "&module="
-				+ module + " &removeSession=1");
+		request.getSession().setAttribute(
+				WIN_LOCATION,
+				"ViewNotes?viewForOne=" + viewForOne + "&id=" + oneSubjectId + "&module=" + module
+						+ " &removeSession=1");
 
 		boolean hasAResolutionStatus = resolutionStatusId >= 1 && resolutionStatusId <= 5;
 		Set<Integer> resolutionStatusIds = (HashSet) request.getSession().getAttribute(RESOLUTION_STATUS);
 		// remove the session if there is no resolution status
 		if (!hasAResolutionStatus && resolutionStatusIds != null) {
-            request.getSession().removeAttribute(RESOLUTION_STATUS);
+			request.getSession().removeAttribute(RESOLUTION_STATUS);
 			resolutionStatusIds = null;
 		}
 		if (hasAResolutionStatus) {
@@ -175,7 +173,7 @@ public class ViewNotesServlet extends RememberLastPage {
 				resolutionStatusIds = new HashSet<Integer>();
 			}
 			resolutionStatusIds.add(resolutionStatusId);
-            request.getSession().setAttribute(RESOLUTION_STATUS, resolutionStatusIds);
+			request.getSession().setAttribute(RESOLUTION_STATUS, resolutionStatusIds);
 		}
 
 		StudySubjectDAO subdao = getStudySubjectDAO();
@@ -227,15 +225,15 @@ public class ViewNotesServlet extends RememberLastPage {
 
 		request.setAttribute("viewNotesHtml", viewNotesHtml);
 		String viewNotesURL = this.getPageURL(request);
-        request.getSession().setAttribute("viewNotesURL", viewNotesURL);
+		request.getSession().setAttribute("viewNotesURL", viewNotesURL);
 		String viewNotesPageFileName = this.getPageServletFileName(request);
-        request.getSession().setAttribute("viewNotesPageFileName", viewNotesPageFileName);
+		request.getSession().setAttribute("viewNotesPageFileName", viewNotesPageFileName);
 
 		List<DiscrepancyNoteStatisticBean> statisticBeans = dndao.countNotesStatistic(currentStudy);
-		
+
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		UserAccountBean loggedInUser = (UserAccountBean) uadao.findByUserName(authentication.getName());
-		
+
 		if (loggedInUser.getRoleByStudy(currentStudy.getId()).getName().equalsIgnoreCase("study coder")) {
 
 			statisticBeans = factory.getFilteredNotesStatistics();
@@ -248,59 +246,32 @@ public class ViewNotesServlet extends RememberLastPage {
 		request.setAttribute("mapKeys", ResolutionStatus.getMembers());
 		request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames(resterm));
 		request.setAttribute("typeKeys", customTotalMap);
-		
+
 		if (loggedInUser.getRoleByStudy(currentStudy.getId()).getName().equalsIgnoreCase("study coder")) {
-			
+
 			request.setAttribute("grandTotal", statisticBeans.size());
-			
+
 		} else {
-			
+
 			request.setAttribute("grandTotal", customTotalMap.get("Total"));
 		}
-			
 
-        forward(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY, request, response);
-	}
-
-	@SuppressWarnings({"rawtypes"})
-	public ArrayList<DiscrepancyNoteBean> filterForOneSubject(ArrayList<DiscrepancyNoteBean> allNotes, int subjectId,
-			int resolutionStatus) {
-
-		if (allNotes == null || allNotes.isEmpty() || subjectId == 0)
-			return allNotes;
-		// Are the D Notes filtered by resolution?
-		boolean filterByRes = resolutionStatus >= 1 && resolutionStatus <= 5;
-
-		ArrayList<DiscrepancyNoteBean> filteredNotes = new ArrayList<DiscrepancyNoteBean>();
-		StudySubjectDAO subjectDao = getStudySubjectDAO();
-		StudySubjectBean studySubjBean = (StudySubjectBean) subjectDao.findByPK(subjectId);
-
-		for (DiscrepancyNoteBean discBean : allNotes) {
-			if (discBean.getSubjectName().equalsIgnoreCase(studySubjBean.getLabel())) {
-				if (!filterByRes) {
-					filteredNotes.add(discBean);
-				} else {
-					if (discBean.getResolutionStatusId() == resolutionStatus) {
-						filteredNotes.add(discBean);
-					}
-				}
-			}
-		}
-
-		return filteredNotes;
+		forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY, request, response);
 	}
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_permission_to_view_discrepancies")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_permission_to_view_discrepancies")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_study_director_or_study_cordinator"), "1");
 	}
