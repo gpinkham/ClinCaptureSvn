@@ -89,8 +89,8 @@ public class ListSubjectServlet extends RememberLastPage {
 		factory.setStudyDao(studyDao);
 		factory.setCurrentStudy(currentStudy);
 
-		String auditLogsHtml = factory.createTable(request, response).render();
-		request.setAttribute("listSubjectsHtml", auditLogsHtml);
+		String listSubjectsHtml = factory.createTable(request, response).render();
+		request.setAttribute("listSubjectsHtml", listSubjectsHtml);
 
 		forwardPage(Page.SUBJECT_LIST, request, response);
 	}

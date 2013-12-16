@@ -46,7 +46,6 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
@@ -63,7 +62,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -200,15 +198,6 @@ public class AddNewSubjectServlet extends Controller {
 		fp.addPresetValue(DEFAULT_DYN_GROUP_CLASS_ID, defaultDynGroupClassId);
 		fp.addPresetValue(DEFAULT_DYN_GROUP_CLASS_NAME, defaultDynGroupClassName);
 
-		StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
-		StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "collectDob");
-		currentStudy.getStudyParameterConfig().setCollectDob(parentSPV.getValue());
-		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "genderRequired");
-		currentStudy.getStudyParameterConfig().setGenderRequired(parentSPV.getValue());
-
-		StudyParameterValueBean checkPersonId = spvdao.findByHandleAndStudy(parentStudyId, "subjectPersonIdRequired");
-		currentStudy.getStudyParameterConfig().setSubjectPersonIdRequired(checkPersonId.getValue());
-
 		if (!fp.isSubmitted()) {
 			if (fp.getBoolean("instr")) {
 				request.getSession().removeAttribute(FORM_DISCREPANCY_NOTES_NAME);
@@ -223,10 +212,6 @@ public class AddNewSubjectServlet extends Controller {
 				fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
 
 				String idSetting;
-				if (currentStudy.getParentStudyId() > 0) {
-					parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-					currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
-				}
 				idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
 				logger.info("subject id setting :" + idSetting);
 				// set up auto study subject id
@@ -849,10 +834,6 @@ public class AddNewSubjectServlet extends Controller {
 					fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
 
 					String idSetting;
-					if (currentStudy.getParentStudyId() > 0) {
-						parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-						currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
-					}
 					idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
 
 					logger.info("subject id setting :" + idSetting);
