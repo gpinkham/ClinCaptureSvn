@@ -507,7 +507,6 @@ public class CreateSubStudyServlet extends Controller {
 		forwardPage(Page.SITE_LIST_SERVLET, request, response);
 	}
 
-	@SuppressWarnings("ConstantConditions")
 	private ArrayList<StudyEventDefinitionBean> createSiteEventDefinitions(HttpServletRequest request, StudyBean site) {
 		FormProcessor fp = new FormProcessor(request);
 		ArrayList<StudyEventDefinitionBean> seds;
