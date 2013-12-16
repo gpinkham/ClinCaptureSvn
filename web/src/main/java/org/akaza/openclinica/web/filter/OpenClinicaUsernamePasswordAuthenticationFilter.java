@@ -64,13 +64,12 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	public static final String SPRING_SECURITY_FORM_PASSWORD_KEY = "j_password";
 	public static final String SPRING_SECURITY_LAST_USERNAME_KEY = "SPRING_SECURITY_LAST_USERNAME";
 
-    private String usernameParameter = SPRING_SECURITY_FORM_USERNAME_KEY;
+	private String usernameParameter = SPRING_SECURITY_FORM_USERNAME_KEY;
 	private String passwordParameter = SPRING_SECURITY_FORM_PASSWORD_KEY;
 	private boolean postOnly = true;
 
 	private AuditUserLoginDao auditUserLoginDao;
 	private ConfigurationDao configurationDao;
-	private UserAccountDAO userAccountDao;
 	private DataSource dataSource;
 
 	// ~ Constructors
@@ -123,7 +122,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 
 		Locale locale = request.getLocale();
 		ResourceBundleProvider.updateLocale(locale); // Set current language preferences
-        ResourceBundle restext = ResourceBundleProvider.getTextsBundle(locale);
+		ResourceBundle restext = ResourceBundleProvider.getTextsBundle(locale);
 		try {
 			EntityBean eb = getUserAccountDao().findByUserName(username);
 			if (eb.getId() != 0) {
@@ -245,7 +244,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	 * @param usernameParameter
 	 *            the parameter name. Defaults to "j_username".
 	 */
-    public void setUsernameParameter(String usernameParameter) {
+	public void setUsernameParameter(String usernameParameter) {
 		Assert.hasText(usernameParameter, "Username parameter must not be empty or null");
 		this.usernameParameter = usernameParameter;
 	}
@@ -256,7 +255,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	 * @param passwordParameter
 	 *            the parameter name. Defaults to "j_password".
 	 */
-    public void setPasswordParameter(String passwordParameter) {
+	public void setPasswordParameter(String passwordParameter) {
 		Assert.hasText(passwordParameter, "Password parameter must not be empty or null");
 		this.passwordParameter = passwordParameter;
 	}
@@ -269,15 +268,15 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	 * <p>
 	 * Defaults to <tt>true</tt> but may be overridden by subclasses.
 	 */
-    public void setPostOnly(boolean postOnly) {
+	public void setPostOnly(boolean postOnly) {
 		this.postOnly = postOnly;
 	}
 
-    public final String getUsernameParameter() {
+	public final String getUsernameParameter() {
 		return usernameParameter;
 	}
 
-    public final String getPasswordParameter() {
+	public final String getPasswordParameter() {
 		return passwordParameter;
 	}
 
@@ -306,8 +305,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 	}
 
 	public UserAccountDAO getUserAccountDao() {
-        userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
-        return userAccountDao;
+		return new UserAccountDAO(dataSource);
 	}
 
 }

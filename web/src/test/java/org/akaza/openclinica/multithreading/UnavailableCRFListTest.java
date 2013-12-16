@@ -55,12 +55,14 @@ public class UnavailableCRFListTest {
 		//
 	}
 
-	private boolean areAllAlive() {
+	private boolean shouldWait() {
 		boolean result = false;
-		for (Thread thread : threadList) {
-			if (thread.isAlive()) {
-				result = true;
-				break;
+		if (!cmErrors && !errors) {
+			for (Thread thread : threadList) {
+				if (thread.isAlive()) {
+					result = true;
+					break;
+				}
 			}
 		}
 		return result;
@@ -73,7 +75,7 @@ public class UnavailableCRFListTest {
 			threadList.add(servletThread);
 			servletThread.start();
 		}
-		while (areAllAlive())
+		while (shouldWait())
 			Thread.sleep(1000);
 		assertFalse(errors);
 		assertFalse(cmErrors);
