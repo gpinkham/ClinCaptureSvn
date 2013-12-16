@@ -17,17 +17,16 @@ public class HttpTransportTest extends BaseTest {
 	
 	@Before
 	public void setUp() {
-		
-		HttpMethod method = new GetMethod(BioPortalSearchInterface.URL);
 
-		method.setPath("/bioportal/search/");
-		method.setQueryString(new NameValuePair[] {
+        HttpMethod method = new GetMethod(BioPortalSearchInterface.URL);
 
-			new NameValuePair("query", "some-query-string"), 
-			new NameValuePair("ontologyids", "some-ontology-id"),
-			new NameValuePair("apikey", BioPortalSearchInterface.API_KEY)
+        method.setPath("/search");
+        method.setQueryString(new NameValuePair[] {
 
-		});
+                new NameValuePair("q", "term"), new NameValuePair("ontologies",  "dictionary"),
+                new NameValuePair("apikey", BioPortalSearchInterface.API_KEY)
+
+        });
 
 		transport.setMethod(method);
 		transport.setClient(stubHttpClient(200, searchResult.toString()));

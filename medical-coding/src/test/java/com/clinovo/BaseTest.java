@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 public class BaseTest {
 
 	protected static String searchResult;
-	protected static String forbiddenResult; // sounds like forbidden fruit huh?
+    protected static String treeResult;
 
 	private final static Logger log = LoggerFactory.getLogger(BaseTest.class.getName());
 
@@ -19,8 +19,8 @@ public class BaseTest {
 
 		try {
 
-			forbiddenResult = readFile("src/test/resources/com/clinovo/coding/ForbiddenResponse.xml");
-			searchResult = readFile("src/test/resources/com/clinovo/coding/ExampleSearchResponse.xml");
+            searchResult = readFile("src/test/resources/com/clinovo/coding/ExampleSearchResponse.json");
+            treeResult = readFile("src/test/resources/com/clinovo/coding/ExampleTreeResponse.json");
 
 		} catch (Exception ex) {
 
@@ -34,7 +34,7 @@ public class BaseTest {
 		BufferedReader fileReader = new BufferedReader(new FileReader(fileName));
 
 		try {
-			
+
 			String currentLine = fileReader.readLine();
 			while(currentLine != null) {
 
@@ -42,10 +42,10 @@ public class BaseTest {
 				currentLine = fileReader.readLine();
 			}
 		} finally {
-			
+
 			fileReader.close();
 		}
-		
+
 		return fileContents.toString();
 	}
 

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<errorStatus>
-  <accessedResource>/bioportal/search/</accessedResource>
-  <accessDate>2013-07-30 10:58:02.747 PDT</accessDate>
-  <shortMessage>Forbidden</shortMessage>
-  <longMessage>A valid API key is required to call REST services. Please visit http://bioportal.bioontology.org/account to get your API key.</longMessage>
-  <errorCode>403</errorCode>
-</errorStatus>

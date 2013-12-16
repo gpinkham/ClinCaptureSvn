@@ -1,44 +1,35 @@
 package com.clinovo.coding.model;
 
+import java.util.ArrayList;
+
 public class Classification {
 	
-	private String id;
-	private String term;
-	private String code;
-	private String dictionary;
-	
-	public String getId() {
-		return id;
-	}
+	private String httpPath;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+	private ArrayList<ClassificationElement> classificationElement;
 
-	public String getTerm() {
-		
-		return this.term;
-	}
+    public Classification() {
+        this.httpPath = "";
+        this.classificationElement = new ArrayList<ClassificationElement>();
+    }
 
-	public void setTerm(String name) {
-		
-		this.term = name;
-	}
+    public ArrayList<ClassificationElement> getClassificationElement() {
+        return classificationElement;
+    }
 
-	public String getCode() {
-		return code;
-	}
+    public void setClassificationElement(ArrayList<ClassificationElement> classificationElement) {
+        this.classificationElement = classificationElement;
+    }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+    public void addClassificationElement(ClassificationElement classElement) {
+        this.classificationElement.add(classElement);
+    }
 
-	public String getDictionary() {
-		
-		return this.dictionary;
-	}
-	
-	public void setDictionary(String dictionary) {
-		this.dictionary = dictionary;
-	}
+    public String getHttpPath() {
+        return httpPath;
+    }
+
+    public void setHttpPath(String httpPath) {
+        this.httpPath = httpPath;
+    }
 }

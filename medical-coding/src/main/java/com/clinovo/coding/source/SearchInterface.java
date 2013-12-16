@@ -8,4 +8,6 @@ public interface SearchInterface {
 	
 	public List<Classification> search(String term, String dictionary) throws Exception;
 
+    public void getClassificationCodes (Classification classification, String dictionary) throws Exception;
+
 }

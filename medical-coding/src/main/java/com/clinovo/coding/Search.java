@@ -18,6 +18,13 @@ public class Search {
 		return new ArrayList<Classification>();
 	}
 
+    public void getClassificationWithCodes (Classification classification, String dictionary) throws Exception {
+
+        if (searchInterface != null)
+            searchInterface.getClassificationCodes(classification, dictionary);
+
+    }
+
 	public void setSearchInterface(SearchInterface searchInterface) {
 
 		this.searchInterface = searchInterface;

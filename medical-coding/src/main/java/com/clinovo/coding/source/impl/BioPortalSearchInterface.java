@@ -1,18 +1,15 @@
 package com.clinovo.coding.source.impl;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import com.clinovo.coding.model.ClassificationElement;
+import com.clinovo.util.CompleteClassificationFieldsUtil;
+import com.google.gson.*;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.clinovo.coding.SearchException;
 import com.clinovo.coding.model.Classification;
@@ -22,115 +19,170 @@ import com.clinovo.http.HttpTransport;
 public class BioPortalSearchInterface implements SearchInterface {
 
 	private HttpTransport transport = null;
-	
-	// Supported dictionary ids
-	private final String ICD9_DICTIONARY_ID = "3195"; 
-	private final String ICD10_DICTIONARY_ID = "1516";
-	private final String MEDDRA_DICTIONARY_ID = "1422";
-	
-	// props
-	private final String CONCEPT_ID = "conceptId";
-	private final String PREFERRED_NAME = "preferredName";
-	private final String CONCEPT_ID_SHORT = "conceptIdShort";
-	private final String DICTIONARY_NAME = "ontologyDisplayLabel";
+    private ArrayList<ClassificationElement> classificationElementsForRecurse;
+    private String dictionary = "";
 
-	public static final String URL = "http://rest.bioontology.org";
+	public static final String URL = "http://data.bioontology.org/";
 	public static final String API_KEY = "b32c11a0-04e7-4120-975e-525819283996";
+    private static final String MEDDRA = "MEDDRA";
+    private static final String ICD9 = "ICD9";
+    private static final String ICD10 = "ICD10";
 
-	public List<Classification> search(String term, String dictionary) throws Exception {
+    public List<Classification> search(String term, String termDictionary) throws Exception {
 
-		if (transport == null)
-			transport = new HttpTransport();
+        dictionary = getDictionary(termDictionary);
 
-		HttpMethod method = new GetMethod(BioPortalSearchInterface.URL);
+        List<Classification> classifications = new ArrayList<Classification>();
+        classificationElementsForRecurse = new ArrayList<ClassificationElement>();
 
-		method.setPath("/bioportal/search/");
-		method.setQueryString(new NameValuePair[] {
+        String termResponseResult = getTermsResponse(term);
 
-		new NameValuePair("query", term), new NameValuePair("ontologyids", getDictionary(dictionary)),
-				new NameValuePair("apikey", BioPortalSearchInterface.API_KEY)
+        JsonObject jobject = new JsonParser().parse(termResponseResult).getAsJsonObject();
+        JsonArray jarray = jobject.getAsJsonArray("collection");
 
-		});
+        for (int i = 0; i < jarray.size(); i++) {
 
-		transport.setMethod(method);
+            JsonObject jsonObjectElement = jarray.get(i).getAsJsonObject();
+            JsonObject jsonObjectLinks = jsonObjectElement.getAsJsonObject("links");
 
-		return processResponse(transport.processRequest());
-	}
+            String treePath = jsonObjectLinks.get("tree").getAsString();
+            String codeHttpPath = jsonObjectElement.get("@id").getAsString();
+            String verbatimPrefLabel = jsonObjectElement.get("prefLabel").getAsString();
 
-	private String getDictionary(String dictionary) throws SearchException {
-		
-		if ("meddra".equalsIgnoreCase(dictionary)) {
-			return MEDDRA_DICTIONARY_ID;
-		} else if ("icd10".equalsIgnoreCase(dictionary)) {
-			return ICD10_DICTIONARY_ID;
-		} else if ("icd9".equalsIgnoreCase(dictionary)) {
-			return ICD9_DICTIONARY_ID;
-		}
-		
-		throw new SearchException("Unknown dictionary type specified");
-	}
+            if (treePath.contains("/tree") && treePath.contains(dictionary)) {
 
-	private List<Classification> processResponse(String httpResponse) throws Exception {
+                Classification classification = new Classification();
+                classification.setHttpPath(codeHttpPath);
 
-		List<Classification> classifications = new ArrayList<Classification>();
+                recursiveTreeResponseParser(getTreeResponse(treePath), verbatimPrefLabel);
 
-		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+                if (dictionary.equals(MEDDRA) && classificationElementsForRecurse.size() == 4 ||
+                        dictionary.equals(ICD9) && classificationElementsForRecurse.size() == 3 ||
+                        dictionary.equals(ICD10) && classificationElementsForRecurse.size() == 3) {
+                    CompleteClassificationFieldsUtil.completeClassificationNameFields(classificationElementsForRecurse, dictionary);
+                    classification.setClassificationElement(classificationElementsForRecurse);
 
-		Document document = docBuilder.parse(new ByteArrayInputStream(httpResponse.getBytes("utf-8")));
 
-		if (isValidResponse(document)) {
-			
-			NodeList searchBeans = document.getElementsByTagName("searchBean");
-			
-			for (int bean = 0; bean < searchBeans.getLength(); bean++) {
+                    classifications.add(classification);
+                }
 
-				Node node = searchBeans.item(bean);
+                classificationElementsForRecurse = new ArrayList<ClassificationElement>();
+            }
 
-				Classification classification = new Classification();
-				for (int index = 0; index < node.getChildNodes().getLength(); index++) {
+        }
 
-					if (node.getChildNodes().item(index).getNodeName().equals(CONCEPT_ID)) {
+        return classifications;
+    }
 
-						classification.setId(node.getChildNodes().item(index).getTextContent());
+    private void recursiveTreeResponseParser(String treeResponse, String verbatimPrefLabel) {
 
-					} else if (node.getChildNodes().item(index).getNodeName().equals(PREFERRED_NAME)) {
+        JsonArray jarray = new JsonParser().parse(treeResponse).getAsJsonArray();
 
-						classification.setTerm(node.getChildNodes().item(index).getTextContent());
+        for (int i = 0; i < jarray.size(); i++) {
 
-					} else if (node.getChildNodes().item(index).getNodeName().equals(CONCEPT_ID_SHORT)) {
+            JsonObject jsonObject = jarray.get(i).getAsJsonObject();
+            ClassificationElement clasificationElementTmp = new ClassificationElement();
 
-						classification.setCode(node.getChildNodes().item(index).getTextContent());
+            if (jsonObject.getAsJsonArray("children").size() > 0) {
 
-					} else if (node.getChildNodes().item(index).getNodeName().equals(DICTIONARY_NAME)) {
+                clasificationElementTmp.setCodeName(jsonObject.get("prefLabel").getAsString());
+                classificationElementsForRecurse.add(clasificationElementTmp);
 
-						classification.setDictionary(node.getChildNodes().item(index).getTextContent());
-					}
-				}
+                recursiveTreeResponseParser(jsonObject.get("children").toString(), verbatimPrefLabel);
 
-				classifications.add(classification);
+            } else if (jsonObject.get("prefLabel").getAsString().equals(verbatimPrefLabel)) {
 
-			}
-		}
+                clasificationElementTmp.setCodeName(verbatimPrefLabel);
+                classificationElementsForRecurse.add(clasificationElementTmp);
 
-		return classifications;
-	}
+                break;
+            }
+        }
 
-	private boolean isValidResponse(Document document) throws Exception {
-		
-		// Does it have an error code
-		Node errorCodeNode = document.getElementsByTagName("errorCode").item(0);
-		
-		if (errorCodeNode != null) {
+        return;
+    }
 
-			throw new SearchException(document.getElementsByTagName("longMessage").item(0).getTextContent());
-		}
+    public String getTreeResponse(String treePath) throws Exception {
 
-		return true;
-	}
+        HttpMethod method = new GetMethod();
+        method.setPath(treePath);
+        method.setRequestHeader(new Header("Authorization", "apikey token=" + API_KEY));
 
-	public void setTransport(HttpTransport transport) {
+        transport.setMethod(method);
 
-		this.transport = transport;
-	}
+        return transport.processRequest();
+    }
+
+    public String getTermsResponse(String term) throws Exception {
+
+        if (transport == null)
+            transport = new HttpTransport();
+
+        HttpMethod method = new GetMethod(BioPortalSearchInterface.URL);
+
+        method.setPath("/search");
+        method.setQueryString(new NameValuePair[] {
+
+                new NameValuePair("q", term), new NameValuePair("ontologies",  dictionary),
+                new NameValuePair("apikey", BioPortalSearchInterface.API_KEY)
+
+        });
+
+        transport.setMethod(method);
+
+        return transport.processRequest();
+    }
+
+    //used by coding job only
+    public void getClassificationCodes(Classification classification, String termDictionary) throws Exception {
+
+        for (ClassificationElement classfifcationElement : classification.getClassificationElement()) {
+            if (!classfifcationElement.getCodeName().equals("")) {
+
+                if (transport == null)
+                    transport = new HttpTransport();
+
+                if(dictionary == null)
+                    dictionary = getDictionary(termDictionary);
+
+                HttpMethod method = new GetMethod(BioPortalSearchInterface.URL);
+
+                method.setPath("/search");
+                method.setQueryString(new NameValuePair[]{
+
+                        new NameValuePair("q", classfifcationElement.getCodeName()), new NameValuePair("ontologies", dictionary),
+                        new NameValuePair("include", "prefLabel,notation"),
+                        new NameValuePair("exact_match", "true"),
+                        new NameValuePair("apikey", BioPortalSearchInterface.API_KEY)
+
+                });
+
+                transport.setMethod(method);
+
+                String codeResult = transport.processRequest();
+                JsonObject jobject = new JsonParser().parse(codeResult).getAsJsonObject();
+                String codeValue = jobject.getAsJsonArray("collection").get(0).getAsJsonObject().get("notation").getAsString();
+                classfifcationElement.setCodeValue(codeValue);
+            }
+        }
+    }
+
+    private String getDictionary(String dictionary) throws SearchException {
+
+        if ("meddra".equalsIgnoreCase(dictionary)) {
+            return MEDDRA;
+        } else if ("icd 10".equalsIgnoreCase(dictionary)) {
+            return ICD10;
+        } else if ("icd 9".equalsIgnoreCase(dictionary)) {
+            return ICD9;
+        }
+
+        throw new SearchException("Unknown dictionary type specified");
+    }
+
+    public void setTransport(HttpTransport transport) {
+
+        this.transport = transport;
+    }
+
 }
