@@ -96,7 +96,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	public static final String NEW_AND_UPDATED_VALUE = "21";
 	public static final String NOT_CLOSED_VALUE = "321";
 	private AuditUserLoginDao auditUserLoginDao;
-	private StudySubjectDAO<?, ?> studySubjectDao;
+	private StudySubjectDAO studySubjectDao;
 	private UserAccountDAO userAccountDao;
 	private DiscrepancyNoteDAO discrepancyNoteDao;
 	private StudyDAO studyDao;
@@ -504,7 +504,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 					se.setName(sedb.getName());
 
-					StudySubjectDAO<?, ?> ssdao = getStudySubjectDao();
+					StudySubjectDAO ssdao = getStudySubjectDao();
 					StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
 					dnb.setStudySub(ssub);
 					dnb.setEventStart(se.getDateStarted());
@@ -883,11 +883,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		return resformat.getString("date_format_string");
 	}
 
-	public StudySubjectDAO<?, ?> getStudySubjectDao() {
+	public StudySubjectDAO getStudySubjectDao() {
 		return studySubjectDao;
 	}
 
-	public void setStudySubjectDao(StudySubjectDAO<?, ?> studySubjectDao) {
+	public void setStudySubjectDao(StudySubjectDAO studySubjectDao) {
 		this.studySubjectDao = studySubjectDao;
 	}
 

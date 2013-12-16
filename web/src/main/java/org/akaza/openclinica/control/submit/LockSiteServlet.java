@@ -91,7 +91,7 @@ public class LockSiteServlet extends Controller {
 
 		if (request.getParameter("Submit") != null) {
 			String message = "";
-			List<StudySubjectBean> studySubjectBeanList = ssdao.findAllByStudyId(studyBean.getId());
+			List<StudySubjectBean> studySubjectBeanList = ssdao.findAllWithAllStatesByStudyId(studyBean.getId());
 			if (action.equalsIgnoreCase("lock")) {
 				message = resword.getString("lockSiteStudySubjectsResultMsg");
 				for (StudySubjectBean studySubjectBean : studySubjectBeanList) {

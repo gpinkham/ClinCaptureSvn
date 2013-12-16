@@ -38,7 +38,6 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletResponse;
 
-@SuppressWarnings({"rawtypes"})
 public class StudyStatisticsTableFactory extends AbstractTableFactory {
 
 	private StudyDAO studyDao;

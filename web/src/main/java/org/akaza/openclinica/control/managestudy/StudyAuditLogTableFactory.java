@@ -51,7 +51,7 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class StudyAuditLogTableFactory extends AbstractTableFactory {
 
 	private AuditUserLoginDao auditUserLoginDao;

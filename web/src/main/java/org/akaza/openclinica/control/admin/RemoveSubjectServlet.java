@@ -22,11 +22,13 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -37,56 +39,66 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @SuppressWarnings({ "rawtypes", "serial" })
-public class RemoveSubjectServlet extends SecureController {
+@Component
+public class RemoveSubjectServlet extends Controller {
 	/**
      *
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
 
 		if (ub.isSysAdmin()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
 
-		SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
+		SubjectDAO sdao = new SubjectDAO(getDataSource());
 		FormProcessor fp = new FormProcessor(request);
 		int subjectId = fp.getInt("id");
 
 		String action = fp.getString("action");
 		if (subjectId == 0 || StringUtil.isBlank(action)) {
-			addPageMessage(respage.getString("please_choose_a_subject_to_remove"));
-			forwardPage(Page.SUBJECT_LIST_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_subject_to_remove"), request);
+			forwardPage(Page.SUBJECT_LIST_SERVLET, request, response);
 		} else {
 
 			SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);
 
 			// find all study subjects
-			StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+			StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 			ArrayList studySubs = ssdao.findAllBySubjectId(subjectId);
 
 			// find study events
-			StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+			StudyEventDAO sedao = new StudyEventDAO(getDataSource());
 			ArrayList events = sedao.findAllBySubjectId(subjectId);
 			if ("confirm".equalsIgnoreCase(action)) {
 				request.setAttribute("subjectToRemove", subject);
 				request.setAttribute("studySubs", studySubs);
 				request.setAttribute("events", events);
-				forwardPage(Page.REMOVE_SUBJECT);
+				forwardPage(Page.REMOVE_SUBJECT, request, response);
 			} else {
 				logger.info("submit to remove the subject");
 				// change all statuses to deleted
@@ -96,8 +108,8 @@ public class RemoveSubjectServlet extends SecureController {
 				sdao.update(subject);
 
 				// remove subject references from study
-				for (int i = 0; i < studySubs.size(); i++) {
-					StudySubjectBean studySub = (StudySubjectBean) studySubs.get(i);
+				for (Object studySub1 : studySubs) {
+					StudySubjectBean studySub = (StudySubjectBean) studySub1;
 					if (!studySub.getStatus().equals(Status.DELETED)) {
 						studySub.setStatus(Status.AUTO_DELETED);
 						studySub.setUpdater(ub);
@@ -106,10 +118,10 @@ public class RemoveSubjectServlet extends SecureController {
 					}
 				}
 
-				EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+				EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 
-				for (int j = 0; j < events.size(); j++) {
-					StudyEventBean event = (StudyEventBean) events.get(j);
+				for (Object event1 : events) {
+					StudyEventBean event = (StudyEventBean) event1;
 					if (!event.getStatus().equals(Status.DELETED)) {
 						event.setStatus(Status.AUTO_DELETED);
 						event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
@@ -119,9 +131,9 @@ public class RemoveSubjectServlet extends SecureController {
 
 						ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
-						ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-						for (int k = 0; k < eventCRFs.size(); k++) {
-							EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
+						ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+						for (Object eventCRF1 : eventCRFs) {
+							EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
 							if (!eventCRF.getStatus().equals(Status.DELETED)) {
 								eventCRF.setStatus(Status.AUTO_DELETED);
 								eventCRF.setUpdater(ub);
@@ -129,8 +141,8 @@ public class RemoveSubjectServlet extends SecureController {
 								ecdao.update(eventCRF);
 								// remove all the item data
 								ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-								for (int a = 0; a < itemDatas.size(); a++) {
-									ItemDataBean item = (ItemDataBean) itemDatas.get(a);
+								for (Object itemData : itemDatas) {
+									ItemDataBean item = (ItemDataBean) itemData;
 									if (!item.getStatus().equals(Status.DELETED)) {
 										item.setStatus(Status.AUTO_DELETED);
 										item.setUpdater(ub);
@@ -146,10 +158,10 @@ public class RemoveSubjectServlet extends SecureController {
 				String emailBody = respage.getString("the_subject") + " " + subject.getUniqueIdentifier() + " "
 						+ respage.getString("has_been_removed_succesfully");
 
-				addPageMessage(emailBody);
+				addPageMessage(emailBody, request);
 				// sendEmail(emailBody);
 
-				forwardPage(Page.SUBJECT_LIST_SERVLET);
+				forwardPage(Page.SUBJECT_LIST_SERVLET, request, response);
 
 			}
 		}
@@ -157,7 +169,7 @@ public class RemoveSubjectServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
 		return SecureController.ADMIN_SERVLET_CODE;
 	}
 

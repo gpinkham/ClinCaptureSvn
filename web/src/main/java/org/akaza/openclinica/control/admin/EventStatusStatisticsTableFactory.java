@@ -40,7 +40,6 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.renderer.HtmlTableRenderer;
 
-@SuppressWarnings({"rawtypes"})
 public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
 
 	private StudyDAO studyDao;

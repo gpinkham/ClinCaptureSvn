@@ -39,7 +39,7 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.renderer.HtmlTableRenderer;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked" })
 public class SiteStatisticsTableFactory extends AbstractTableFactory {
 
 	private StudyDAO studyDao;

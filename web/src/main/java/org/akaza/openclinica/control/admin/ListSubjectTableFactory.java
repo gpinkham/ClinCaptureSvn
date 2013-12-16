@@ -53,7 +53,6 @@ import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
-@SuppressWarnings({ "rawtypes" })
 public class ListSubjectTableFactory extends AbstractTableFactory {
 
 	private AuditUserLoginDao auditUserLoginDao;

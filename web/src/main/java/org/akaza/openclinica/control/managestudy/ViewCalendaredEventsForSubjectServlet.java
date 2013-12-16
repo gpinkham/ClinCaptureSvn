@@ -25,10 +25,14 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.util.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -40,102 +44,102 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.CalendarEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Component;
 
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@Component
+public class ViewCalendaredEventsForSubjectServlet extends Controller {
 
-@SuppressWarnings("serial")
-public class ViewCalendaredEventsForSubjectServlet extends SecureController {
-	
-	public void mayProceed() throws InsufficientPermissionException {
-
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		//
 	}
-	
-	private StudyEventDAO sedao;
-	private StudyEventDefinitionDAO<?, ?> seddao;
-	private StudySubjectDAO<?, ?> ssdao;
-	
-	@SuppressWarnings({ "unchecked", "rawtypes"})
-	public void processRequest() throws Exception {
+
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
 		logger.info("servlet is connected");
 		FormProcessor fp = new FormProcessor(request);
-		sedao = new StudyEventDAO(sm.getDataSource());
-		seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		ssdao = new StudySubjectDAO(sm.getDataSource());
+		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
+		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 		ArrayList events = new ArrayList();
 		int subjectId = fp.getInt("id", true);
 		StudySubjectBean ssBean = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
-		ArrayList <StudyEventBean> seBeans = sedao.findAllBySubjectId(subjectId);
+		ArrayList<StudyEventBean> seBeans = sedao.findAllBySubjectId(subjectId);
 		for (StudyEventBean seBean : seBeans) {
-            StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seBean.getStudyEventDefinitionId());
-            logger.info("looking up type: " + sedBean.getType());
-            if ("calendared_visit".equalsIgnoreCase(sedBean.getType()) && !seBean.getSubjectEventStatus().isNotScheduled()) {
-                //try to found reference event for this event
-                StudyEventBean refEventResult = (StudyEventBean) sedao.findByPK(seBean.getReferenceVisitId());
-                Date dateStart = seBean.getDateStarted();
-                CalendarFuncBean calendFuncBean = new CalendarFuncBean();
-                if (!(refEventResult == null) && seBean.getReferenceVisitId() != 0) {
-                    if (refEventResult.getSubjectEventStatus().isCompleted() || refEventResult.getSubjectEventStatus().isSourceDataVerified() || refEventResult.getSubjectEventStatus().isSigned()) {
-                        Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMaxDay()).toDate();
-                        Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(sedBean.getMinDay()).toDate();
-                        int daysBetween = sedBean.getScheduleDay() - sedBean.getEmailDay();
-                        Date emailDay = new DateTime(seBean.getDateStarted()).minusDays(daysBetween).toDate();
-                        //set bean with values
-                        calendFuncBean.setDateMax(maxDate);
-                        calendFuncBean.setDateMin(minDate);
-                        calendFuncBean.setDateSchedule(dateStart);
-                        calendFuncBean.setDateEmail(emailDay);
-                        calendFuncBean.setEventName(sedBean.getName());
-                        if ("true".equalsIgnoreCase(String.valueOf(sedBean.getReferenceVisit()))) {
-                            calendFuncBean.setReferenceVisit("Yes");
-                        } else {
-                            calendFuncBean.setReferenceVisit("No");
-                        }
-                        calendFuncBean.setEventsReferenceVisit(seddao.findByPK(refEventResult.getStudyEventDefinitionId()).getName());
-                        events.add(calendFuncBean);
-                    }
-                } else {
-                    logger.info("This event is RV or Event without RV");
-                    calendFuncBean.setEventName(sedBean.getName());
-                    if ("true".equalsIgnoreCase(String.valueOf(sedBean.getReferenceVisit()))) {
-                        calendFuncBean.setReferenceVisit("Yes");
-                    } else {
-                        calendFuncBean.setReferenceVisit("No");
-                    }
-                    //set dateMax, dateMin, dateEmail using Date(0)
-                    //for correct sort table display
-                    calendFuncBean.setDateSchedule(new Date(0));
-                    calendFuncBean.setDateEmail(new Date(0));
-                    calendFuncBean.setDateMax(new Date(0));
-                    calendFuncBean.setDateMin(new Date(0));
-                    events.add(calendFuncBean);
-                }
+			StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seBean
+					.getStudyEventDefinitionId());
+			logger.info("looking up type: " + sedBean.getType());
+			if ("calendared_visit".equalsIgnoreCase(sedBean.getType())
+					&& !seBean.getSubjectEventStatus().isNotScheduled()) {
+				// try to found reference event for this event
+				StudyEventBean refEventResult = (StudyEventBean) sedao.findByPK(seBean.getReferenceVisitId());
+				Date dateStart = seBean.getDateStarted();
+				CalendarFuncBean calendFuncBean = new CalendarFuncBean();
+				if (!(refEventResult == null) && seBean.getReferenceVisitId() != 0) {
+					if (refEventResult.getSubjectEventStatus().isCompleted()
+							|| refEventResult.getSubjectEventStatus().isSourceDataVerified()
+							|| refEventResult.getSubjectEventStatus().isSigned()) {
+						Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(
+								sedBean.getMaxDay()).toDate();
+						Date minDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(
+								sedBean.getMinDay()).toDate();
+						int daysBetween = sedBean.getScheduleDay() - sedBean.getEmailDay();
+						Date emailDay = new DateTime(seBean.getDateStarted()).minusDays(daysBetween).toDate();
+						// set bean with values
+						calendFuncBean.setDateMax(maxDate);
+						calendFuncBean.setDateMin(minDate);
+						calendFuncBean.setDateSchedule(dateStart);
+						calendFuncBean.setDateEmail(emailDay);
+						calendFuncBean.setEventName(sedBean.getName());
+						if ("true".equalsIgnoreCase(String.valueOf(sedBean.getReferenceVisit()))) {
+							calendFuncBean.setReferenceVisit("Yes");
+						} else {
+							calendFuncBean.setReferenceVisit("No");
+						}
+						calendFuncBean.setEventsReferenceVisit(seddao.findByPK(
+								refEventResult.getStudyEventDefinitionId()).getName());
+						events.add(calendFuncBean);
+					}
+				} else {
+					logger.info("This event is RV or Event without RV");
+					calendFuncBean.setEventName(sedBean.getName());
+					if ("true".equalsIgnoreCase(String.valueOf(sedBean.getReferenceVisit()))) {
+						calendFuncBean.setReferenceVisit("Yes");
+					} else {
+						calendFuncBean.setReferenceVisit("No");
+					}
+					// set dateMax, dateMin, dateEmail using Date(0)
+					// for correct sort table display
+					calendFuncBean.setDateSchedule(new Date(0));
+					calendFuncBean.setDateEmail(new Date(0));
+					calendFuncBean.setDateMax(new Date(0));
+					calendFuncBean.setDateMin(new Date(0));
+					events.add(calendFuncBean);
+				}
 
-            }
-        }
-        //request.setAttribute("events", events);
-        request.setAttribute("table", getTable(events, subjectId));
-        request.setAttribute("subjectLabel", ssBean.getLabel());
+			}
+		}
+		// request.setAttribute("events", events);
+		request.setAttribute("table", getTable(fp, events, subjectId));
+		request.setAttribute("subjectLabel", ssBean.getLabel());
 		request.setAttribute("currentDate", new Date());
-		forwardPage(Page.SHOW_CALENDAR_FUNC_PER_SUBJ);
+		forwardPage(Page.SHOW_CALENDAR_FUNC_PER_SUBJ, request, response);
 	}
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	private EntityBeanTable getTable(ArrayList events, int subjectId) {
-        FormProcessor fp = new FormProcessor(request);
-        EntityBeanTable table = fp.getEntityBeanTable();
-        String[] columns = { resword.getString("calendared_event_name"), resword.getString("min_max_date_range"),
-                resword.getString("schedule_date"), resword.getString("user_email_date"), resword.getString("is_reference_event"),
-                resword.getString("reference_visit_for_event") };
-        ArrayList rows = CalendarEventRow.generateRowsFromBeans(events);
-        table.setColumns(new ArrayList(Arrays.asList(columns)));
-        HashMap args = new HashMap();
-        args.put("id", new Integer(subjectId).toString());
-        table.setQuery("ViewCalendaredEventsForSubject", args);
-        table.setSortingIfNotExplicitlySet(CalendarEventRow.COL_SCHEDULE_DATE, true);
-        table.setRows(rows);
-        table.computeDisplay();
-        return table;
-    }
+	private EntityBeanTable getTable(FormProcessor fp, ArrayList events, int subjectId) {
+		EntityBeanTable table = fp.getEntityBeanTable();
+		String[] columns = { resword.getString("calendared_event_name"), resword.getString("min_max_date_range"),
+				resword.getString("schedule_date"), resword.getString("user_email_date"),
+				resword.getString("is_reference_event"), resword.getString("reference_visit_for_event") };
+		ArrayList rows = CalendarEventRow.generateRowsFromBeans(events);
+		table.setColumns(new ArrayList(Arrays.asList(columns)));
+		HashMap args = new HashMap();
+		args.put("id", Integer.toString(subjectId));
+		table.setQuery("ViewCalendaredEventsForSubject", args);
+		table.setSortingIfNotExplicitlySet(CalendarEventRow.COL_SCHEDULE_DATE, true);
+		table.setRows(rows);
+		table.computeDisplay();
+		return table;
+	}
 }
-
-
-

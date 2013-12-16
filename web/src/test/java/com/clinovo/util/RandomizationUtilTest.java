@@ -21,7 +21,6 @@ import org.mockito.Mockito;
 import com.clinovo.exception.RandomizationException;
 import com.clinovo.model.RandomizationResult;
 
-@SuppressWarnings("rawtypes")
 public class RandomizationUtilTest {
 	
 	@Before

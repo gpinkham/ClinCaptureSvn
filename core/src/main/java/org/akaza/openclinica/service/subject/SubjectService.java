@@ -32,7 +32,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class SubjectService implements SubjectServiceInterface {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

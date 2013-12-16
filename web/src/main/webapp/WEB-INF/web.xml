@@ -882,9 +882,9 @@
         <servlet-class>org.akaza.openclinica.control.admin.RestoreCRFServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RemoveSubjectServlet</servlet-name>
+        <servlet-name>removeSubjectServlet</servlet-name>
         <display-name>RemoveSubject</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.RemoveSubjectServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RestoreSubjectServlet</servlet-name>
@@ -952,9 +952,9 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.ShowCalendarFuncServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewCalendaredEventsForSubjectServlet</servlet-name>
+        <servlet-name>viewCalendaredEventsForSubjectServlet</servlet-name>
         <display-name>ViewCalendaredEventsForSubject</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewCalendaredEventsForSubjectServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>printCRFServlet</servlet-name>
@@ -1876,7 +1876,7 @@
         <url-pattern>/RestoreCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveSubjectServlet</servlet-name>
+        <servlet-name>removeSubjectServlet</servlet-name>
         <url-pattern>/RemoveSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1930,7 +1930,7 @@
         <url-pattern>/ShowCalendarFunc</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewCalendaredEventsForSubjectServlet</servlet-name>
+        <servlet-name>viewCalendaredEventsForSubjectServlet</servlet-name>
         <url-pattern>/ViewCalendaredEventsForSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

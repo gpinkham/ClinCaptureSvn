@@ -233,6 +233,17 @@
 				AND (st.study_id=? or st.parent_study_id=?)
 		</sql>
 	</query>
+    <query>
+        <name>findAllWithAllStatesByStudyId</name>
+        <sql>
+            SELECT  s.unique_identifier, s.gender, ss.*, stu.name
+            FROM subject s, study_subject ss, study stu
+            WHERE s.subject_id = ss.subject_id
+            AND ss.study_id = stu.study_id
+            AND (stu.study_id=? or stu.parent_study_id=?)
+            order by ss.date_updated desc
+        </sql>
+    </query>
 	<query>
 		<name>findAllByStudyId</name>
 		<sql>

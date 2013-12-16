@@ -60,14 +60,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class RemoveStudySubjectServlet extends Controller {
 	/**
-     *
-     * @param request HttpServletRequest
-     * @param response HttpServletResponse
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"), request, response);
@@ -80,8 +83,9 @@ public class RemoveStudySubjectServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -89,8 +93,8 @@ public class RemoveStudySubjectServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String studySubIdString = request.getParameter("id");// studySubjectId
 		String subIdString = request.getParameter("subjectId");
@@ -115,17 +119,18 @@ public class RemoveStudySubjectServlet extends Controller {
 			StudyDAO studydao = getStudyDAO();
 			StudyBean study = (StudyBean) studydao.findByPK(studyId);
 
+			StudyEventDAO sedao = getStudyEventDAO();
+
 			checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 
-			// find study events
-			StudyEventDAO sedao = getStudyEventDAO();
-			// ArrayList events = sedao.findAllByStudyAndStudySubjectId(study, studySubId);
-			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, getDataSource(), ub, currentRole);
+			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,
+					getDataSource(), ub, currentRole);
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (!studySub.getStatus().equals(Status.AVAILABLE)) {
-					addPageMessage(respage.getString("this_subject_is_not_available_for_this_study") + " "
-							+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					addPageMessage(
+							respage.getString("this_subject_is_not_available_for_this_study") + " "
+									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
 					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
 					return;
 				}
@@ -148,41 +153,41 @@ public class RemoveStudySubjectServlet extends Controller {
 				// remove all event crfs
 				EventCRFDAO ecdao = getEventCRFDAO();
 
-                for (DisplayStudyEventBean dispEvent : displayEvents) {
-                    StudyEventBean event = dispEvent.getStudyEvent();
-                    if (!event.getStatus().equals(Status.DELETED)) {
-                        event.setStatus(Status.AUTO_DELETED);
-                        // clinovo - ticket #111
-                        event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
-                        event.setUpdater(ub);
-                        event.setUpdatedDate(new Date());
-                        sedao.update(event);
+				for (DisplayStudyEventBean dispEvent : displayEvents) {
+					StudyEventBean event = dispEvent.getStudyEvent();
+					if (!event.getStatus().equals(Status.DELETED)) {
+						event.setStatus(Status.AUTO_DELETED);
 
-                        ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+						event.setSubjectEventStatus(SubjectEventStatus.REMOVED);
+						event.setUpdater(ub);
+						event.setUpdatedDate(new Date());
+						sedao.update(event);
 
-                        ItemDataDAO iddao = getItemDataDAO();
-                        for (Object eventCRF1 : eventCRFs) {
-                            EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
-                            if (!eventCRF.getStatus().equals(Status.DELETED)) {
-                                eventCRF.setStatus(Status.AUTO_DELETED);
-                                eventCRF.setUpdater(ub);
-                                eventCRF.setUpdatedDate(new Date());
-                                ecdao.update(eventCRF);
-                                // remove all the item data
-                                ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-                                for (Object itemData : itemDatas) {
-                                    ItemDataBean item = (ItemDataBean) itemData;
-                                    if (!item.getStatus().equals(Status.DELETED)) {
-                                        item.setStatus(Status.AUTO_DELETED);
-                                        item.setUpdater(ub);
-                                        item.setUpdatedDate(new Date());
-                                        iddao.update(item);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+						ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+
+						ItemDataDAO iddao = getItemDataDAO();
+						for (Object eventCRF1 : eventCRFs) {
+							EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
+							if (!eventCRF.getStatus().equals(Status.DELETED)) {
+								eventCRF.setStatus(Status.AUTO_DELETED);
+								eventCRF.setUpdater(ub);
+								eventCRF.setUpdatedDate(new Date());
+								ecdao.update(eventCRF);
+								// remove all the item data
+								ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
+								for (Object itemData : itemDatas) {
+									ItemDataBean item = (ItemDataBean) itemData;
+									if (!item.getStatus().equals(Status.DELETED)) {
+										item.setStatus(Status.AUTO_DELETED);
+										item.setUpdater(ub);
+										item.setUpdatedDate(new Date());
+										iddao.update(item);
+									}
+								}
+							}
+						}
+					}
+				}
 
 				String emailBody = respage.getString("the_subject") + " " + subject.getName() + " "
 						+ respage.getString("has_been_removed_from_the_study") + study.getName() + ".";
@@ -192,5 +197,4 @@ public class RemoveStudySubjectServlet extends Controller {
 			}
 		}
 	}
-
 }

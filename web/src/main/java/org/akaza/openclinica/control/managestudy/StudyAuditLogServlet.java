@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  * 
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({ "serial" })
 @Component
 public class StudyAuditLogServlet extends Controller {
 

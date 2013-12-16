@@ -235,7 +235,17 @@
             AND ((SELECT count(distinct edc.event_definition_crf_id) FROM study_event_definition sed, study s, event_definition_crf edc WHERE sed.study_id = s.study_id and (s.study_id = mst.study_id or s.study_id = mst.parent_study_id) and sed.status_id = 1 and edc.study_id = sed.study_id and edc.study_event_definition_id = sed.study_event_definition_id and edc.status_id = 1 and edc.required_crf = true and edc.source_data_verification_code in (1,2)) > (SELECT count(distinct ec.event_crf_id) FROM study_event_definition sed, study s, event_definition_crf edc, study_event se, event_crf ec, crf_version cv WHERE ec.sdv_status = true and ec.crf_version_id = cv.crf_version_id and edc.crf_id = cv.crf_id and ec.study_event_id = se.study_event_id and ec.study_subject_id = se.study_subject_id and se.study_subject_id = mss.study_subject_id and se.study_event_definition_id = sed.study_event_definition_id and sed.study_id = s.study_id and (s.study_id = mst.study_id or s.study_id = mst.parent_study_id) and sed.status_id = 1 and edc.study_id = sed.study_id and edc.study_event_definition_id = sed.study_event_definition_id and edc.status_id = 1 and edc.required_crf = true and edc.source_data_verification_code in (1,2)))
         </sql>
     </query>
-
+    <query>
+        <name>findAllWithAllStatesByStudyId</name>
+        <sql>
+            SELECT  s.unique_identifier, s.gender, ss.*, stu.name
+            FROM subject s, study_subject ss, study stu
+            WHERE s.subject_id = ss.subject_id
+            AND ss.study_id = stu.study_id
+            AND (stu.study_id=? or stu.parent_study_id=?)
+            order by ss.date_updated desc
+        </sql>
+    </query>
 	<query>
 		<name>findAllByStudyId</name>
 		<sql>

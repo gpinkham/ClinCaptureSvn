@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author jxu
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({ "serial" })
 @Component
 public class ListSubjectServlet extends RememberLastPage {
 	public static final String SAVED_LIST_SUBJECTS_URL = "savedListSubjectsUrl";

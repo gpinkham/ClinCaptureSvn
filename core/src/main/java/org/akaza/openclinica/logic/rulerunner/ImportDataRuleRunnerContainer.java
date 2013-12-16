@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-@SuppressWarnings({"rawtypes"})
+@SuppressWarnings({ "rawtypes" })
 public class ImportDataRuleRunnerContainer {
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	/**
@@ -69,9 +69,13 @@ public class ImportDataRuleRunnerContainer {
 	 * means all OIDs are not empty.
 	 * 
 	 * @param ds
+	 *            DataSource
 	 * @param studyBean
+	 *            StudyBean
 	 * @param subjectDataBean
+	 *            SubjectDataBean
 	 * @param ruleSetService
+	 *            RuleSetServiceInterface
 	 */
 	@Transactional
 	public void initRuleSetsAndTargets(DataSource ds, StudyBean studyBean, SubjectDataBean subjectDataBean,
@@ -82,7 +86,7 @@ public class ImportDataRuleRunnerContainer {
 		this.variableAndValue = this.variableAndValue == null ? new HashMap<String, String>() : this.variableAndValue;
 		studyOid = studyBean.getOid();
 		studySubjectOid = subjectDataBean.getSubjectOID();
-		StudySubjectBean studySubject = new StudySubjectDAO<String, ArrayList>(ds).findByOid(studySubjectOid);
+		StudySubjectBean studySubject = new StudySubjectDAO(ds).findByOid(studySubjectOid);
 
 		HashMap<String, StudyEventDefinitionBean> seds = new HashMap<String, StudyEventDefinitionBean>();
 		HashMap<String, CRFVersionBean> cvs = new HashMap<String, CRFVersionBean>();
@@ -123,7 +127,7 @@ public class ImportDataRuleRunnerContainer {
 						// ruleSets = ruleSetService.filterRuleSetsByHiddenItems(ruleSets, eventCrfBean, crfVersion, new
 						// ArrayList<ItemBean>());
 						shouldRunRules = ruleSetService.shouldRunRulesForRuleSets(ruleSets, Phase.IMPORT);
-						if (shouldRunRules != null && shouldRunRules == Boolean.TRUE) {
+						if (shouldRunRules == Boolean.TRUE) {
 							// targetItemOids = collectTargetItemOids(ruleSets);
 
 							HashMap<String, Integer> grouped = new HashMap<String, Integer>();
@@ -167,8 +171,7 @@ public class ImportDataRuleRunnerContainer {
 	}
 
 	@Transactional
-	private List<RuleSetBean> filterByImportDataEntryTrue(List<RuleSetBean> ruleSetBeans) {
-		List<RuleSetBean> ruleSets = ruleSetBeans;
+	private List<RuleSetBean> filterByImportDataEntryTrue(List<RuleSetBean> ruleSets) {
 		if (ruleSets != null) {
 			for (RuleSetBean ruleSet : ruleSets) {
 				if (ruleSet.getRuleSetRules() != null) {
@@ -192,7 +195,7 @@ public class ImportDataRuleRunnerContainer {
 
 	private boolean isRepeatIGForSure(DataSource ds, Integer crfVersionId, String itemGroupOid, Integer igOrdinal,
 			Integer itemId) {
-		boolean isRepeatForSure = igOrdinal != null && igOrdinal > 1 ? true : false;
+		boolean isRepeatForSure = igOrdinal != null && igOrdinal > 1;
 		if (!isRepeatForSure) {
 			if (itemGroupOid.endsWith("_UNGROUPED") || itemGroupOid.contains("_UNGROUPED_"))
 				isRepeatForSure = false;

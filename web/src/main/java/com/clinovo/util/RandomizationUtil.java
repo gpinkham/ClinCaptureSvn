@@ -30,7 +30,6 @@ import com.clinovo.model.RandomizationResult;
  * Utilities to help with randomization at the servlet layer -
  *
  */
-@SuppressWarnings("rawtypes")
 public class RandomizationUtil {
 
 	private static StudyBean currentStudy;
