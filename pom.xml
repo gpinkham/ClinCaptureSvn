@@ -23,13 +23,11 @@
 		<jmock.version>2.6.0</jmock.version>
 		<spring.version>3.2.1.RELEASE</spring.version>
 		<main.basedir>${project.basedir}</main.basedir>
-		<build.revision>Rev: ${SVN_REVISION}</build.revision>
-		<scm.path>https://svn.clinovo.com/clincapture/trunk</scm.path>
+        <build.revision>Rev: ${SVN_REVISION}</build.revision>
+        <scm.path>https://svn.clinovo.com/clincapture/trunk</scm.path>
 		<spring.security.version>3.1.3.RELEASE</spring.security.version>
-		<config.file>src/main/resources/datainfo.properties</config.file>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cobertura.plugin.version>2.6</cobertura.plugin.version>
-		<cobertura.version>1.9.4.1</cobertura.version>
+        <config.file>src/main/resources/datainfo.properties</config.file>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	
     <modules>
@@ -418,13 +416,7 @@
 				</exclusions>
 			</dependency>
 	        <!-- LOGGING -->
-			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-				<version>1.2.12</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
+	        <dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
 				<version>${slf4j.version}</version>
@@ -575,34 +567,6 @@
 	<build>
 		<pluginManagement>
 			<plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.4</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.cargo</groupId>
-                    <artifactId>cargo-maven2-plugin</artifactId>
-                    <version>1.4.5</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>cobertura-maven-plugin</artifactId>
-                    <version>${cobertura.plugin.version}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>net.sourceforge.cobertura</groupId>
-                            <artifactId>cobertura</artifactId>
-                            <version>${cobertura.version}</version>
-                        </dependency>
-                    </dependencies>
-                    <configuration>
-                        <formats>
-                            <format>xml</format>
-                            <format>html</format>
-                        </formats>
-                    </configuration>
-                </plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -643,6 +607,17 @@
 						<findbugsXmlOutput>true</findbugsXmlOutput>
 						<findbugsXmlWithMessages>true</findbugsXmlWithMessages>
 						<xmlOutput>true</xmlOutput>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>cobertura-maven-plugin</artifactId>
+					<version>2.5.2</version>
+					<configuration>
+						<formats>
+							<format>xml</format>
+							<format>html</format>
+						</formats>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -689,16 +664,6 @@
 				      	<checkModificationExclude>web/openclinica-test.log</checkModificationExclude>
 				    </checkModificationExcludes>
 				  </configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-resources-plugin</artifactId>
-					<version>2.6</version>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>exec-maven-plugin</artifactId>
-					<version>1.2.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -775,30 +740,25 @@
 	
     <reporting>
         <plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>${cobertura.plugin.version}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.0.1</version>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>index</report>
-							<report>summary</report>
-							<report>dependencies</report>
-							<report>mailing-list</report>
-							<report>issue-tracking</report>
-							<report>javadocs</report>
-							<report>scm</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
-			<plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.0.1</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>summary</report>
+                            <report>dependencies</report>
+                            <report>mailing-list</report>
+                            <report>issue-tracking</report>
+                            <report>javadocs</report>
+                            <report>scm</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.9</version>
@@ -807,6 +767,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
 				<version>2.13</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.5.2</version>
 			</plugin>
         </plugins>
     </reporting>

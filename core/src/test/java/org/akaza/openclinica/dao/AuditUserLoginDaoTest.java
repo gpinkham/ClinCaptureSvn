@@ -11,6 +11,7 @@
 package org.akaza.openclinica.dao;
 
 import java.util.Date;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
@@ -32,9 +33,9 @@ public class AuditUserLoginDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testfindById() {
+		
+		AuditUserLoginBean auditUserLoginBean = auditUserLoginDao.findById(-1);
 
-		AuditUserLoginBean auditUserLoginBean = auditUserLoginDao.findById(1);
-
-		assertEquals("UserName should be root", "root", auditUserLoginBean.getUserName());
+		assertEquals("UserName should be testUser", "testUser", auditUserLoginBean.getUserName());
 	}
 }

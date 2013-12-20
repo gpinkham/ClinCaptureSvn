@@ -201,7 +201,7 @@ public class OpenClinicaExpressionParserTest extends TestCase {
 		String dateA = fmt.print(dm);
 		String expressionA = "_CURRENT_DATE eq " + dateA;
 		dm = dm.plusDays(5);
-		String dateB = fmt.print(new DateMidnight(ExpressionTreeHelper.getDate(fmt.print(dm)).getTime()));
+		String dateB = fmt.print(dm);
 		String expressionB = "_CURRENT_DATE + 5 eq " + dateB;
 
 		OpenClinicaExpressionParser expressionParserA = new OpenClinicaExpressionParser();
