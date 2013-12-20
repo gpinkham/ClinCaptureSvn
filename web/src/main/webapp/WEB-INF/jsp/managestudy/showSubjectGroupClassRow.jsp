@@ -71,10 +71,10 @@
            </c:if>
           </c:when>
           <c:otherwise>
-           <td>
+
              <c:if test="${!study.status.locked}">
-			<img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>			
-             <a href="RestoreSubjectGroupClass?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
+               <td><img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></td>
+               <td><a href="RestoreSubjectGroupClass?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
 		      onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
 		      onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img 
 		      name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
