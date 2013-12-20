@@ -232,8 +232,8 @@
 
 </tr>
 <tr>
-    <td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/></td>
-    <td class="table_cell"><c:out value="${studySubjectBean.oid}"/></td>
+    <td class="table_header_column"><fmt:message key="status" bundle="${resword}"/></td>
+    <td class="table_cell"><c:out value="${studySubjectBean.status.name}"/></td>
 
     <c:choose>
         <c:when test="${genderShow}">
@@ -280,8 +280,8 @@
 
 </tr>
 <tr>
-    <td class="table_header_column"><fmt:message key="status" bundle="${resword}"/></td>
-    <td class="table_cell"><c:out value="${studySubjectBean.status.name}"/></td>
+    <td class="table_header_column"> </td>
+    <td class="table_cell"> </td>
     <c:choose>
         <c:when test="${enrollmentDateShow}">
             <td class="table_header_row">${enrollmentDateLabel}

@@ -26,9 +26,7 @@ public class FindSubjectsSort implements CriteriaCommand {
 		columnMapping.put("studySubject.createdDate", "date_created");
 		columnMapping.put("studySubject.status", "status_id");
 		columnMapping.put("enrolledAt", "ST.unique_identifier");
-		columnMapping.put("studySubject.oid", "oc_oid");
 		columnMapping.put("studySubject.secondaryLabel", "secondary_label");
-		// columnMapping.put("subject.charGender", "gender");
 	}
 
 	public void addSort(String property, String order) {

@@ -183,8 +183,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		++index;
 		configureColumn(row.getColumn(columnNames[index]), resword.getString("site_id"), null, null);
 		++index;
-		configureColumn(row.getColumn(columnNames[index]), resword.getString("rule_oid"), null, null);
-		++index;
 
 		if (currentStudy == null || currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
 			configureColumn(row.getColumn(columnNames[index]), currentStudy == null ? resword.getString("gender")
@@ -224,13 +222,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			configureColumn(row.getColumn(columnNames[i]), studyEventDefinition.getName(),
 					new StudyEventDefinitionMapCellEditor(), new SubjectEventStatusDroplistFilterEditor(), true, false);
 		}
-		String actionsHeader = "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
-				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
-				+ resword.getString("rule_actions")
-				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
-				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
-		configureColumn(row.getColumn(columnNames[columnNames.length - 1]), actionsHeader, new ActionsCellEditor(),
-				new DefaultActionsEditor(locale), true, false);
+		
+		configureColumn(row.getColumn(columnNames[columnNames.length - 1]), resword.getString("rule_actions"), new ActionsCellEditor(),
+				new ListSubjectsActionsFilterEditor(locale), true, false);
 
 	}
 
@@ -312,7 +306,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			theItem.put("studySubject.status", studySubjectBean.getStatus());
 			theItem.put("enrolledAt",
 					((StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId())).getIdentifier());
-			theItem.put("studySubject.oid", studySubjectBean.getOid());
 			theItem.put("studySubject.secondaryLabel", studySubjectBean.getSecondaryLabel());
 
 			SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
@@ -425,7 +418,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		columnNamesList.add("studySubject.createdDate");
 		columnNamesList.add("studySubject.status");
 		columnNamesList.add("enrolledAt");
-		columnNamesList.add("studySubject.oid");
 		if (currentStudy == null || currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
 			startFrom++;
 			columnNamesList.add("subject.charGender");
@@ -454,7 +446,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	protected FindSubjectsFilter getSubjectFilter(Limit limit) {
-		FindSubjectsFilter auditUserLoginFilter = new FindSubjectsFilter();
+		FindSubjectsFilter findSubjectsFilter = new FindSubjectsFilter();
 		FilterSet filterSet = limit.getFilterSet();
 		Collection<Filter> filters = filterSet.getFilters();
 		for (Filter filter : filters) {
@@ -466,10 +458,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 				int studyGroupClassId = property.endsWith("_") ? 0 : Integer.valueOf(property.split("_")[1]);
 				value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId() + "";
 			}
-			auditUserLoginFilter.addFilter(property, value);
+			findSubjectsFilter.addFilter(property, value);
 		}
 
-		return auditUserLoginFilter;
+		return findSubjectsFilter;
 	}
 
 	/**
@@ -481,16 +473,16 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	 *            The Limit to use.
 	 */
 	protected FindSubjectsSort getSubjectSort(Limit limit) {
-		FindSubjectsSort auditUserLoginSort = new FindSubjectsSort();
+		FindSubjectsSort findSubjectsSort = new FindSubjectsSort();
 		SortSet sortSet = limit.getSortSet();
 		Collection<Sort> sorts = sortSet.getSorts();
 		for (Sort sort : sorts) {
 			String property = sort.getProperty();
 			String order = sort.getOrder().toParam();
-			auditUserLoginSort.addSort(property, order);
+			findSubjectsSort.addSort(property, order);
 		}
 
-		return auditUserLoginSort;
+		return findSubjectsSort;
 	}
 
 	private ArrayList<StudyEventDefinitionBean> getStudyEventDefinitionsForFilter() {
@@ -795,6 +787,22 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						((StudyGroupBean) subjectStudyGroup).getName()));
 			}
 			return options;
+		}
+	}
+	
+	private class ListSubjectsActionsFilterEditor extends DefaultActionsEditor {
+		public ListSubjectsActionsFilterEditor(Locale locale) {
+			super(locale);
+		}
+		
+		@Override
+		public Object getValue() {
+			HtmlBuilder html = new HtmlBuilder();
+			String value;
+			
+			value = (String) super.getValue();
+			html.append(value).div().style("width: 225px;").end().divEnd();
+			return html.toString();
 		}
 	}
 

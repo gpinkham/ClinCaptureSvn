@@ -30,7 +30,6 @@ public class FindSubjectsFilter implements CriteriaCommand {
 		columnMapping.put("studySubject.label", "ss.label");
 		columnMapping.put("studySubject.createdDate", "ss.date_created");
 		columnMapping.put("studySubject.status", "ss.status_id");
-		columnMapping.put("studySubject.oid", "ss.oc_oid");
 		columnMapping.put("enrolledAt", "ST.unique_identifier");
 		columnMapping.put("studySubject.secondaryLabel", "ss.secondary_label");
 		columnMapping.put("subject.charGender", "s.gender");

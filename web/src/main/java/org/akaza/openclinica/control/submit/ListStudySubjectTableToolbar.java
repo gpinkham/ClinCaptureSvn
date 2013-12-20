@@ -22,7 +22,6 @@ import org.jmesa.core.CoreContext;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.toolbar.AbstractItem;
 import org.jmesa.view.html.toolbar.AbstractItemRenderer;
-import org.jmesa.view.html.toolbar.ClearItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItem;
 import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
@@ -52,26 +51,11 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
 		addToolbarItem(ToolbarItemType.SEPARATOR);
 		addToolbarItem(createCustomItem(new StudyEventDefinitionDropDownItem()));
 		addToolbarItem(createCustomItem(new NewHiddenItem()));
-		// commented by Clinovo - HT
-		// if (addSubjectLinkShow) {
-		// addToolbarItem(createAddSubjectItem());
-		// }
 	}
 
 	private ToolbarItem createCustomItem(AbstractItem item) {
 
 		ToolbarItemRenderer renderer = new CustomItemRenderer(item, getCoreContext());
-		renderer.setOnInvokeAction("onInvokeAction");
-		item.setToolbarItemRenderer(renderer);
-
-		return item;
-	}
-
-	public ToolbarItem createAddSubjectItem() {
-
-		AddNewSubjectItem item = new AddNewSubjectItem();
-		item.setCode(ToolbarItemType.CLEAR_ITEM.toCode());
-		ToolbarItemRenderer renderer = new ClearItemRenderer(item, getCoreContext());
 		renderer.setOnInvokeAction("onInvokeAction");
 		item.setToolbarItemRenderer(renderer);
 
@@ -119,13 +103,13 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
 		 * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade, java.util.Locale)
 		 */
 		String getIndexes() {
-			int startFrom = 6;
-			String result = "1,2,3,4,5,6";
+			int startFrom = 5;
+			String result = "1,2,3,4,5";
 
 			StudyBean studyBean = (StudyBean) getWebContext().getSessionAttribute("study");
 			if (studyBean != null) {
-				startFrom = 4;
-				result = "1,2,3,4";
+				startFrom = 3;
+				result = "1,2,3";
 				if (!studyBean.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("false")) {
 					result += "," + ++startFrom;
 				}
@@ -164,29 +148,6 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
 						.append(studyEventDefinition.getName()).optionEnd();
 			}
 			html.selectEnd();
-			return html.toString();
-		}
-
-	}
-
-	private class AddNewSubjectItem extends AbstractItem {
-
-		@Override
-		public String disabled() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public String enabled() {
-			HtmlBuilder html = new HtmlBuilder();
-			html.a().href("#").id("addSubject");// onclick(
-			// "initmb();sm('box', 730,100);"
-			// );
-			html.quote();
-			html.quote().close();
-			html.nbsp().append(reswords.getString("add_new_subject")).nbsp().aEnd();
-
 			return html.toString();
 		}
 

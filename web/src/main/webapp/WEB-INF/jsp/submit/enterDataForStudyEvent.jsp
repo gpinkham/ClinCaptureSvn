@@ -154,11 +154,7 @@
 						            </td>
                       </tr>
                     </c:if>
-                    <%-- adding oid here, tbh 06/2008 --%>
-                    <tr>
-                        <td class="table_header_column"><fmt:message key="study_subject_oid" bundle="${resword}"/></td>
-                        <td class="table_cell"><c:out value="${studySubject.oid}"/></td>
-                    </tr>
+          
                     <tr>
                         <td class="table_divider" colspan="2">&nbsp;</td>
                     </tr>
