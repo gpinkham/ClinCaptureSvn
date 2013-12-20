@@ -39,7 +39,9 @@
 		match="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:FormDef" use="@OID" />
 		
 	<xsl:key name="studyGroups" match="//odm:SubjectData/OpenClinica:SubjectGroupData" use="@OpenClinica:StudyGroupClassName" />
+	
 	<xsl:variable name="studyGroupsCount" select="count(//odm:SubjectData/OpenClinica:SubjectGroupData[generate-id() = generate-id(key('studyGroups',@OpenClinica:StudyGroupClassName)[1])])"/>
+	<xsl:variable name="studyGroupClasses" select="//odm:SubjectData/OpenClinica:SubjectGroupData[generate-id() = generate-id(key('studyGroups',@OpenClinica:StudyGroupClassName)[1])]"/>
 	<xsl:strip-space elements="*" />
 	<xsl:variable name="fileName" select="/odm:ODM/@FileOID" />
 	<xsl:variable name="year"
@@ -114,7 +116,6 @@
 			select="$study/odm:GlobalVariables/odm:ProtocolName" />
 		
 		<xsl:variable name="subjectGroupHeaders" select="//odm:SubjectData/OpenClinica:SubjectGroupData"/>
-		<xsl:variable name="subjectGroupValues" select="//odm:SubjectData/OpenClinica:SubjectGroupData/@OpenClinica:StudyGroupName"/>
 		
 
 
@@ -189,7 +190,7 @@
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>
 		<xsl:if test="$subjectGroupDataExist">
-			<xsl:for-each select="//odm:SubjectData/OpenClinica:SubjectGroupData[generate-id() = generate-id(key('studyGroups',@OpenClinica:StudyGroupClassName)[1])]">
+			<xsl:for-each select="$studyGroupClasses">
 				<xsl:value-of select="@OpenClinica:StudyGroupClassName"/>
 				<xsl:value-of select="$delimiter" />
             </xsl:for-each>
@@ -451,12 +452,12 @@
 		<xsl:variable name="studyOID" select="../@StudyOID"/>
 		<xsl:variable name="studyElement" select="//odm:Study[@OID = $studyOID]"/>
 		<xsl:variable name="protocolName" select="$studyElement/odm:GlobalVariables/odm:ProtocolName"/>
-		<xsl:variable name="subjectGroupValues" select="//OpenClinica:SubjectGroupData"/>
-		<xsl:variable name="position" select="position()"/>
+		<xsl:variable name="subjectGroupValues" select="./OpenClinica:SubjectGroupData"/>
 		<xsl:apply-templates select="@OpenClinica:StudySubjectID" />
 		<xsl:value-of select="$sep"/>
 		<xsl:apply-templates select="$protocolName" />
 		<xsl:value-of select="$sep"/>
+		
 		<xsl:if test="$uniqueIdExist">
 			<xsl:value-of select="@OpenClinica:UniqueIdentifier"/>
 			<xsl:value-of select="$delimiter" />
@@ -481,31 +482,33 @@
 		</xsl:if>
 		
 		<xsl:if test="$subjectGroupDataExist">
-			<!--<xsl:for-each select="//odm:SubjectData/OpenClinica:SubjectGroupData[generate-id() = generate-id(key('studyGroups',@OpenClinica:StudyGroupClassName)[1])]">
-			<xsl:variable name="currentClassNames" select="//odm:SubjectData/OpenClinica:SubjectGroupData[generate-id() = generate-id(key('studyGroups',@OpenClinica:StudyGroupClassName)[$position])]"/>
-			<xsl:choose>
-				<xsl:when test="@OpenClinica:StudyGroupClassName = $currentClassNames/@OpenClinica:StudyGroupClassName and position() &lt; $studyGroupsCount">
-					<xsl:value-of select="$currentClassNames/@OpenClinica:StudyGroupName"/>
-					<xsl:value-of select="$delimiter" />
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="$delimiter" />
-				</xsl:otherwise>
-			</xsl:choose>
-				
-            </xsl:for-each>-->
-            <xsl:variable name="rowCount" select="count(//odm:SubjectData/OpenClinica:SubjectGroupData[generate-id() = generate-id(key('studyGroups',@OpenClinica:StudyGroupClassName)[$position])])"/>
-            
-            <xsl:for-each select="//odm:SubjectData/OpenClinica:SubjectGroupData[generate-id() = generate-id(key('studyGroups',@OpenClinica:StudyGroupClassName)[$position])]">
-				<xsl:value-of select="@OpenClinica:StudyGroupName"/>
-				<xsl:value-of select="$delimiter" />	
-				
+		<xsl:choose>
+		<xsl:when test="$subjectGroupValues">
+		
+			<xsl:for-each select="$studyGroupClasses">
+				<xsl:variable name="groupClassName" select="@OpenClinica:StudyGroupClassName"/>
+				<xsl:variable name="subjectGroupValuesMatches" select="$subjectGroupValues[@OpenClinica:StudyGroupClassName = $groupClassName]"/>
+			
+				<xsl:choose>
+						<xsl:when test="$subjectGroupValuesMatches">
+							<xsl:value-of select="$subjectGroupValuesMatches/@OpenClinica:StudyGroupName"/>
+							<xsl:value-of select="$delimiter" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$delimiter" />
+						</xsl:otherwise>
+				</xsl:choose>
             </xsl:for-each>
-            <!--<xsl:if test="$studyGroupsCount &gt; count(//odm:SubjectData/OpenClinica:SubjectGroupData[generate-id() = generate-id(key('studyGroups',@OpenClinica:StudyGroupClassName)[$position])])">-->
-            <!--<xsl:value-of select="$studyGroupsCount"/> <xsl:value-of select="$rowCount"/>-->
-            <xsl:if test="$studyGroupsCount &gt; $rowCount">
-				<xsl:for-each select="1 to ($studyGroupsCount - $rowCount)"><xsl:value-of select="$delimiter" /></xsl:for-each>
-            </xsl:if>
+            
+		</xsl:when>
+		<xsl:otherwise>
+		
+				<xsl:for-each select="1 to $studyGroupsCount">
+					<xsl:value-of select="$delimiter" />
+				</xsl:for-each>
+				
+		</xsl:otherwise>
+		</xsl:choose>
 		</xsl:if>
 								
 		<xsl:variable name="subjectEvents" select="./odm:StudyEventData" />
