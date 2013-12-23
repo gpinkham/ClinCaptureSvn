@@ -184,8 +184,8 @@ public abstract class ListStudySubjectServlet extends Controller {
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "allowCodingVerification");
         currentStudy.getStudyParameterConfig().setAllowCodingVerification(parentSPV.getValue());
         
-        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "defaultMedicalCodingDictionary");
-        currentStudy.getStudyParameterConfig().setDefaultMedicalCodingDictionary(parentSPV.getValue());
+        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "defaultBioontologyURL");
+        currentStudy.getStudyParameterConfig().setDefaultBioontologyURL(parentSPV.getValue());
         
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "autoCodeDictionaryName");
         currentStudy.getStudyParameterConfig().setAutoCodeDictionaryName(parentSPV.getValue());

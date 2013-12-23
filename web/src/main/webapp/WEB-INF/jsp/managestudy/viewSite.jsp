@@ -313,9 +313,9 @@
 		  </tr>
 	 </c:when>
 
-   <c:when test="${config.parameter.handle == 'defaultMedicalCodingDictionary'}">
+   <c:when test="${config.parameter.handle == 'defaultBioontologyURL'}">
       <tr valign="top">
-        <td class="table_header_column"><fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/></td>
+        <td class="table_header_column"><fmt:message key="defaultBioontologyURL" bundle="${resword}"/></td>
         <td class="table_cell">
             ${config.value.value}
         </td>

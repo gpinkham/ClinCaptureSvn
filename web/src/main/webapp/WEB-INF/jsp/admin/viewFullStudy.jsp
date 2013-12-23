@@ -7,9 +7,8 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-<c:set var="dictionaries">MedDRA,ICD9,ICD10</c:set>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
-<c:set var="selectedDictionary" value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>
+<c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
 
 <c:choose>
 	<c:when test="${userRole.role.id > 3}">
@@ -868,17 +867,10 @@
 
   <tr valign="top">
     <td class="table_header_column">
-      <fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/>
+      <fmt:message key="defaultBioontologyURL" bundle="${resword}"/>
     </td>
     <td class="table_cell">
-      <c:choose>
-        <c:when test="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary== ''}">
-          <fmt:message key="blank" bundle="${resword}"/>
-        </c:when>
-        <c:otherwise>
-          ${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}
-        </c:otherwise>
-      </c:choose>
+      <c:out value="${bioontologyURL}"/>&nbsp;
     </td>
   </tr>
 

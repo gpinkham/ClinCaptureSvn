@@ -24,7 +24,7 @@
 <c:set var="endDate" value="" />
 <c:set var="protocolDateVerification" value="" />
 <c:set var="dictionaries">MedDRA,ICD9,ICD10</c:set>
-<c:set var="selectedDictionary" value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>
+<c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
 
 <c:forEach var="presetValue" items="${presetValues}">
 	<c:if test='${presetValue.key == "startDate"}'>
@@ -504,30 +504,15 @@ function updateThis(multiSelEle, count) {
 		  </tr>
 	 </c:when>
 
-   <c:when test="${config.parameter.handle == 'defaultMedicalCodingDictionary'}">
-      <tr valign="top">
-        <td class="formlabel"><fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/></td>
-          <td>
-            <c:choose>
-              <c:when test="${config.value.value == ''}">
-                <select id="dictionaries" name="defaultMedicalCodingDictionary">
-                  <option value="0"></option>
-                  <c:forTokens items="${dictionaries}" delims="," var="dictionary">
-                    <option value="${dictionary}">${dictionary}</option>
-                  </c:forTokens>
-                </select>
-              </c:when>
-              <c:otherwise>
-                <select id="dictionaries" name="defaultMedicalCodingDictionary">
-                  <option value="0"></option>
-                  <c:forTokens items="${dictionaries}" delims="," var="dictionary">
-                    <option value="${dictionary}" ${dictionary == selectedDictionary ? 'selected' : ''}>${dictionary}</option>
-                  </c:forTokens>
-                </select>
-              </c:otherwise>
-            </c:choose>
-        </td>
-      </tr>
+   <c:when test="${config.parameter.handle == 'defaultBioontologyURL'}">
+       <tr valign="top">
+           <td class="formlabel">
+               <fmt:message key="defaultBioontologyURL" bundle="${resword}"/>:
+           </td>
+           <td>
+               <input id="bioontologyURL" name="defaultBioontologyURL" value="${bioontologyURL}"/>
+           </td>
+       </tr>
    </c:when>
 
   <c:when test="${config.parameter.handle=='autoCodeDictionaryName'}">

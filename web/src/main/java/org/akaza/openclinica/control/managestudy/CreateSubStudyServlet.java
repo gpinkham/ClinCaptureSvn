@@ -154,8 +154,8 @@ public class CreateSubStudyServlet extends Controller {
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowCodingVerification")) {
 								scg.getValue().setValue(fp.getString("allowCodingVerification"));
 							} else if (scg.getParameter().getHandle()
-									.equalsIgnoreCase("defaultMedicalCodingDictionary")) {
-								scg.getValue().setValue(fp.getString("defaultMedicalCodingDictionary"));
+									.equalsIgnoreCase("defaultBioontologyURL")) {
+								scg.getValue().setValue(fp.getString("defaultBioontologyURL"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCodeDictionaryName")) {
 								scg.getValue().setValue(fp.getString("autoCodeDictionaryName"));
 							}
@@ -438,11 +438,11 @@ public class CreateSubStudyServlet extends Controller {
 						&& !fp.getString("allowCodingVerification").isEmpty()) {
 					scg.getValue().setValue(fp.getString("allowCodingVerification"));
 					study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
-				} else if (scg.getParameter().getHandle().equalsIgnoreCase("defaultMedicalCodingDictionary")
-						&& !fp.getString("defaultMedicalCodingDictionary").isEmpty()) {
-					scg.getValue().setValue(fp.getString("defaultMedicalCodingDictionary"));
-					study.getStudyParameterConfig().setDefaultMedicalCodingDictionary(
-							fp.getString("defaultMedicalCodingDictionary"));
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("defaultBioontologyURL")
+						&& !fp.getString("defaultBioontologyURL").isEmpty()) {
+					scg.getValue().setValue(fp.getString("defaultBioontologyURL"));
+					study.getStudyParameterConfig().setDefaultBioontologyURL(
+							fp.getString("defaultBioontologyURL"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCodeDictionaryName")
 						&& !fp.getString("autoCodeDictionaryName").isEmpty()) {
 					scg.getValue().setValue(fp.getString("autoCodeDictionaryName"));

@@ -706,8 +706,10 @@ public class CreateStudyServlet extends Controller {
 		newStudy.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		newStudy.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
 				fp.getString("replaceExisitingDataDuringImport"));
+		
+		// Medical coding
 		newStudy.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
-		newStudy.getStudyParameterConfig().setAllowCodingVerification(fp.getString("defaultMedicalCodingDictionary"));
+		newStudy.getStudyParameterConfig().setDefaultBioontologyURL(fp.getString("defaultBioontologyURL"));
 
 		// Probably create custom dictionary from here
 		newStudy.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("autoCodeDictionaryName"));
@@ -875,8 +877,8 @@ public class CreateStudyServlet extends Controller {
 		spv.setValue(newStudy.getStudyParameterConfig().getAllowCodingVerification());
 		spvdao.create(spv);
 
-		spv.setParameter("defaultMedicalCodingDictionary");
-		spv.setValue(newStudy.getStudyParameterConfig().getDefaultMedicalCodingDictionary());
+		spv.setParameter("defaultBioontologyURL");
+		spv.setValue(newStudy.getStudyParameterConfig().getDefaultBioontologyURL());
 		spvdao.create(spv);
 
 		spv.setParameter("autoCodeDictionaryName");

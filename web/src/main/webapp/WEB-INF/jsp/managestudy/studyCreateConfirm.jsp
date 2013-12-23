@@ -4,9 +4,8 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-<c:set var="dictionaries">MedDRA,ICD9,ICD10</c:set>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
-<c:set var="selectedDictionary" value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>
+<c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
 
 
 <jsp:include page="../include/admin-header.jsp"/>
@@ -715,27 +714,10 @@
 
   <tr valign="top">
       <td class="table_header_column">
-          <fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/>
+          <fmt:message key="defaultBioontologyURL" bundle="${resword}"/>
       </td>
-      <td class="table_cell">
-        <c:choose>
-          <c:when test="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary == ''}">
-            <select id="dictionaries" name="defaultMedicalCodingDictionary">
-                <option value="0"></option>
-                <c:forTokens items="${dictionaries}" delims="," var="dictionary">
-                  <option value="${dictionary}">${dictionary}</option>
-                </c:forTokens>
-            </select>
-          </c:when>
-          <c:otherwise>
-            <select id="dictionaries" name="defaultMedicalCodingDictionary">
-                <option value="0"></option>
-                <c:forTokens items="${dictionaries}" delims="," var="dictionary">
-                  <option value="${dictionary}" ${dictionary == selectedDictionary ? 'selected' : ''}>${dictionary}</option>
-              </c:forTokens>
-            </select>
-          </c:otherwise>
-        </c:choose>
+      <td>
+          <input name="defaultBioontologyURL" value=<c:out value="${bioontologyURL}"/> />
       </td>
   </tr>
 

@@ -258,24 +258,24 @@
         </td>
         </tr>
     </c:when>
-    <c:when test="${config.parameter.handle == 'defaultMedicalCodingDictionary'}">
+    <c:when test="${config.parameter.handle == 'defaultBioontologyURL'}">
         <tr valign="top">
-            <td class="table_header_column"><fmt:message key="defaultMedicalCodingDictionary" bundle="${resword}"/></td>
+            <td class="table_header_column"><fmt:message key="defaultBioontologyURL" bundle="${resword}"/></td>
             <td class="table_cell">
-                <c:out value="${studyToView.studyParameterConfig.defaultMedicalCodingDictionary}"/>&nbsp;
+                <c:out value="${config.value.value}"/>&nbsp;
             </td>
         </tr>
     </c:when>
     <c:when test="${config.parameter.handle=='autoCodeDictionaryName'}">
-    <tr valign="top">
-      <td class="formlabel">
-        <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
-      </td>
-      <td>
-        <c:out value="${studyToView.studyParameterConfig.autoCodeDictionaryName}"/>
-      </td>
-    </tr>
-   </c:when>
+        <tr valign="top">
+            <td class="table_header_column">
+                <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
+            </td>
+            <td class="table_cell">
+                <c:out value="${config.value.value}"/>&nbsp;
+            </td>
+        </tr>
+    </c:when>
     <c:when test="${config.parameter.handle=='allowCodingVerification'}">
         <tr valign="top">
             <td class="table_header_column"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>

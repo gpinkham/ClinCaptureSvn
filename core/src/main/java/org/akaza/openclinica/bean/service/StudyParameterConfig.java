@@ -95,7 +95,7 @@ public class StudyParameterConfig {
     
     // Medical coding parameters
     private String allowCodingVerification = "no";
-    private String defaultMedicalCodingDictionary = "";
+    private String defaultBioontologyURL = "";
     private String autoCodeDictionaryName = "";
     private String medicalCodingApprovalNeeded = "no";
     
@@ -487,12 +487,12 @@ public class StudyParameterConfig {
 		this.allowCodingVerification = allowCodingVerification;
 	}
 
-	public String getDefaultMedicalCodingDictionary() {
-		return defaultMedicalCodingDictionary;
+	public String getDefaultBioontologyURL() {
+		return defaultBioontologyURL;
 	}
 
-	public void setDefaultMedicalCodingDictionary(String defaultMedicalCodingDictionary) {
-		this.defaultMedicalCodingDictionary = defaultMedicalCodingDictionary;
+	public void setDefaultBioontologyURL(String defaultBioontologyURL) {
+		this.defaultBioontologyURL = defaultBioontologyURL;
 	}
 
 	public String getAutoCodeDictionaryName() {

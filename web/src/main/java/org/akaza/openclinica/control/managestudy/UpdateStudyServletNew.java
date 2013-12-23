@@ -514,8 +514,8 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
 				fp.getString("replaceExisitingDataDuringImport"));
 		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
-		study.getStudyParameterConfig().setDefaultMedicalCodingDictionary(
-				fp.getString("defaultMedicalCodingDictionary"));
+		study.getStudyParameterConfig().setDefaultBioontologyURL(
+				fp.getString("defaultBioontologyURL"));
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 		study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded"));
 
@@ -858,8 +858,8 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getAllowCodingVerification());
 		updateParameter(spvdao, spv);
 
-		spv.setParameter("defaultMedicalCodingDictionary");
-		spv.setValue(study1.getStudyParameterConfig().getDefaultMedicalCodingDictionary());
+		spv.setParameter("defaultBioontologyURL");
+		spv.setValue(study1.getStudyParameterConfig().getDefaultBioontologyURL());
 		updateParameter(spvdao, spv);
 
 		spv.setParameter("autoCodeDictionaryName");
@@ -1006,8 +1006,8 @@ public class UpdateStudyServletNew extends Controller {
 			childspv.setValue(study1.getStudyParameterConfig().getAllowCodingVerification());
 			updateParameter(spvdao, childspv);
 
-			childspv.setParameter("defaultMedicalCodingDictionary");
-			childspv.setValue(study1.getStudyParameterConfig().getDefaultMedicalCodingDictionary());
+			childspv.setParameter("defaultBioontologyURL");
+			childspv.setValue(study1.getStudyParameterConfig().getDefaultBioontologyURL());
 			updateParameter(spvdao, childspv);
 
 			childspv.setParameter("autoCodeDictionaryName");
