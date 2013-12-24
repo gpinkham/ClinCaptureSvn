@@ -1734,6 +1734,24 @@
 		</td>
 	</tr>
 
+  <tr valign="top">
+    <td class="formlabel">
+      <fmt:message key="allowSdvWithOpenQueries" bundle="${resword}"/>
+    </td>
+    <td>
+      <c:choose>
+        <c:when test="${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes'}">
+          <input type="radio" checked name="allowSdvWithOpenQueries" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+          <input type="radio" name="allowSdvWithOpenQueries" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+        </c:when>
+        <c:otherwise>
+          <input type="radio" name="allowSdvWithOpenQueries" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+          <input type="radio" checked name="allowSdvWithOpenQueries" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+        </c:otherwise>
+      </c:choose>
+    </td>
+  </tr>
+
 	<tr valign="top">
 		<td class="formlabel">
 			<fmt:message key="event_location_required" bundle="${resword}"/>
@@ -1984,14 +2002,12 @@
 		<tr>
 			<td>&nbsp;</td>
 		</tr>
-		<tr valign="top" style="border: 1px solid black;width: 100%;">
-			<td class="formlabel" style="border-top: 1px solid black;text-align: left;">
-				&nbsp;
-			</td>
-			<td style=" border-top: 1px solid black; text-align: left;">
-				&nbsp;
-			</td>
-		</tr>
+
+    <tr valign="top" style="border: 1px solid black;width: 100%;">
+      <td class="formlabel" style="border-top: 1px solid black;text-align: left;">
+        <fmt:message key="dataImport" bundle="${resword}"/>:
+      </td><td style=" border-top: 1px solid black; text-align: left;">&nbsp;</td>
+    </tr>
 
 		<tr valign="top">
 			<td class="formlabel">
@@ -2011,23 +2027,23 @@
 			</td>
 		</tr>
 
-        <tr valign="top">
-            <td class="formlabel">
-                <fmt:message key="allowSdvWithOpenQueries" bundle="${resword}"/>
-            </td>
-            <td>
-                <c:choose>
-                    <c:when test="${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes'}">
-                        <input type="radio" checked name="allowSdvWithOpenQueries" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-                        <input type="radio" name="allowSdvWithOpenQueries" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-                    </c:when>
-                    <c:otherwise>
-                        <input type="radio" name="allowSdvWithOpenQueries" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-                        <input type="radio" checked name="allowSdvWithOpenQueries" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-                    </c:otherwise>
-                </c:choose>
-            </td>
-        </tr>
+    <tr valign="top">
+      <td class="formlabel">
+        <fmt:message key="autoScheduleEventDuringImport" bundle="${resword}"/>
+      </td>
+      <td>
+        <c:choose>
+          <c:when test="${studyToView.studyParameterConfig.autoScheduleEventDuringImport == 'yes'}">
+            <input type="radio" checked name="autoScheduleEventDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+            <input type="radio" name="autoScheduleEventDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+          </c:when>
+          <c:otherwise>
+            <input type="radio" name="autoScheduleEventDuringImport" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+            <input type="radio" checked name="autoScheduleEventDuringImport" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+          </c:otherwise>
+        </c:choose>
+      </td>
+    </tr>
 
         <tr valign="top">
             <td class="formlabel">

@@ -498,7 +498,7 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setEventLocationRequired(fp.getString("eventLocationRequired"));
 		study.getStudyParameterConfig().setSecondaryIdRequired(fp.getString("secondaryIdRequired"));
 		study.getStudyParameterConfig().setDateOfEnrollmentForStudyRequired(
-                fp.getString("dateOfEnrollmentForStudyRequired"));
+				fp.getString("dateOfEnrollmentForStudyRequired"));
 		study.getStudyParameterConfig().setStudySubjectIdLabel(fp.getString("studySubjectIdLabel"));
 		study.getStudyParameterConfig().setSecondaryIdLabel(fp.getString("secondaryIdLabel"));
 		study.getStudyParameterConfig().setDateOfEnrollmentForStudyLabel(fp.getString("dateOfEnrollmentForStudyLabel"));
@@ -510,6 +510,7 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setStartDateTimeLabel(fp.getString("startDateTimeLabel"));
 		study.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
+		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
 				fp.getString("replaceExisitingDataDuringImport"));
@@ -846,6 +847,10 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
 		updateParameter(spvdao, spv);
 
+		spv.setParameter("autoScheduleEventDuringImport");
+		spv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport());
+		updateParameter(spvdao, spv);
+
 		spv.setParameter("allowSdvWithOpenQueries");
 		spv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
 		updateParameter(spvdao, spv);
@@ -992,6 +997,10 @@ public class UpdateStudyServletNew extends Controller {
 
 			childspv.setParameter("markImportedCRFAsCompleted");
 			childspv.setValue(study1.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
+			updateParameter(spvdao, childspv);
+
+			childspv.setParameter("autoScheduleEventDuringImport");
+			childspv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport());
 			updateParameter(spvdao, childspv);
 
 			childspv.setParameter("allowSdvWithOpenQueries");

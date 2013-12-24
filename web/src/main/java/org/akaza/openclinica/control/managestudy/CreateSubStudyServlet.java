@@ -146,6 +146,8 @@ public class CreateSubStudyServlet extends Controller {
 								scg.getValue().setValue(fp.getString("interviewDateDefault"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("markImportedCRFAsCompleted")) {
 								scg.getValue().setValue(fp.getString("markImportedCRFAsCompleted"));
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoScheduleEventDuringImport")) {
+								scg.getValue().setValue(fp.getString("autoScheduleEventDuringImport"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")) {
 								scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));
 							} else if (scg.getParameter().getHandle()
@@ -425,6 +427,11 @@ public class CreateSubStudyServlet extends Controller {
 					scg.getValue().setValue(fp.getString("markImportedCRFAsCompleted"));
 					study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(
 							fp.getString("markImportedCRFAsCompleted"));
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoScheduleEventDuringImport")
+						&& !fp.getString("autoScheduleEventDuringImport").isEmpty()) {
+					scg.getValue().setValue(fp.getString("autoScheduleEventDuringImport"));
+					study.getStudyParameterConfig().setAutoScheduleEventDuringImport(
+							fp.getString("autoScheduleEventDuringImport"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")
 						&& !fp.getString("allowSdvWithOpenQueries").isEmpty()) {
 					scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));

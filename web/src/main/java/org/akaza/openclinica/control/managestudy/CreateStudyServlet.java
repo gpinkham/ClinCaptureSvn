@@ -703,6 +703,8 @@ public class CreateStudyServlet extends Controller {
 		newStudy.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
 
 		newStudy.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
+		newStudy.getStudyParameterConfig().setAutoScheduleEventDuringImport(
+				fp.getString("autoScheduleEventDuringImport"));
 		newStudy.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		newStudy.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
 				fp.getString("replaceExisitingDataDuringImport"));
@@ -859,6 +861,10 @@ public class CreateStudyServlet extends Controller {
 
 		spv.setParameter("endDateTimeLabel");
 		spv.setValue(newStudy.getStudyParameterConfig().getEndDateTimeLabel());
+		spvdao.create(spv);
+
+		spv.setParameter("autoScheduleEventDuringImport");
+		spv.setValue(newStudy.getStudyParameterConfig().getAutoScheduleEventDuringImport());
 		spvdao.create(spv);
 
 		spv.setParameter("markImportedCRFAsCompleted");

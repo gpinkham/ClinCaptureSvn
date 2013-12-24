@@ -59,7 +59,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author jxu
  */
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public abstract class ListStudySubjectServlet extends Controller {
 
 	public static String SUBJECT_PAGE_NUMBER = "ebl_page";
@@ -69,7 +69,7 @@ public abstract class ListStudySubjectServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		FormProcessor fp = new FormProcessor(request);
 
@@ -124,7 +124,7 @@ public abstract class ListStudySubjectServlet extends Controller {
 		ArrayList studyGroupClasses;
 		ArrayList allDefs;
 		// allDefs holds the list of study event definitions used in the table,
-		
+
 		if (parentStudyId > 0) {
 			StudyBean parentStudy = (StudyBean) stdao.findByPK(parentStudyId);
 			studyGroupClasses = sgcdao.findAllActiveByStudy(parentStudy);
@@ -158,7 +158,7 @@ public abstract class ListStudySubjectServlet extends Controller {
 		currentStudy.getStudyParameterConfig().setDateOfEnrollmentForStudyLabel(parentSPV.getValue());
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "genderLabel");
 		currentStudy.getStudyParameterConfig().setGenderLabel(parentSPV.getValue());
-		
+
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "startDateTimeRequired");
 		currentStudy.getStudyParameterConfig().setStartDateTimeRequired(parentSPV.getValue());
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "useStartTime");
@@ -174,6 +174,9 @@ public abstract class ListStudySubjectServlet extends Controller {
 		
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "markImportedCRFAsCompleted");
 		currentStudy.getStudyParameterConfig().setMarkImportedCRFAsCompleted(parentSPV.getValue());
+		
+		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "autoScheduleEventDuringImport");
+		currentStudy.getStudyParameterConfig().setAutoScheduleEventDuringImport(parentSPV.getValue());
 
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "allowSdvWithOpenQueries");
         currentStudy.getStudyParameterConfig().setAllowSdvWithOpenQueries(parentSPV.getValue());
@@ -306,22 +309,22 @@ public abstract class ListStudySubjectServlet extends Controller {
 		// determine whether any uncompleted CRFs are required.
 		boolean isRequiredUncomplete;
 		for (DisplayStudySubjectBean subject : displayStudySubs) {
-            for (Object o : subject.getStudyEvents()) {
-                StudyEventBean event = (StudyEventBean) o;
-                if (event.getSubjectEventStatus() != null && event.getSubjectEventStatus().getId() == 3) {
-                    // disallow the subject from signing any studies
-                    subject.setStudySignable(false);
-                    break;
-                } else {
-                    // determine whether the subject has any required,
-                    // uncompleted event CRFs
-                    isRequiredUncomplete = eventHasRequiredUncompleteCRFs(event);
-                    if (isRequiredUncomplete) {
-                        subject.setStudySignable(false);
-                        break;
-                    }
-                }
-            }
+			for (Object o : subject.getStudyEvents()) {
+				StudyEventBean event = (StudyEventBean) o;
+				if (event.getSubjectEventStatus() != null && event.getSubjectEventStatus().getId() == 3) {
+					// disallow the subject from signing any studies
+					subject.setStudySignable(false);
+					break;
+				} else {
+					// determine whether the subject has any required,
+					// uncompleted event CRFs
+					isRequiredUncomplete = eventHasRequiredUncompleteCRFs(event);
+					if (isRequiredUncomplete) {
+						subject.setStudySignable(false);
+						break;
+					}
+				}
+			}
 		}
 
 		fp = new FormProcessor(request);
@@ -346,14 +349,14 @@ public abstract class ListStudySubjectServlet extends Controller {
 					.getStudyParameterConfig().getSecondaryIdLabel());
 		}
 
-        for (Object studyGroupClass : studyGroupClasses) {
-            StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
-            columnArray.add(sgc.getName());
-        }
-        for (Object allDef : allDefs) {
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) allDef;
-            columnArray.add(sed.getName());
-        }
+		for (Object studyGroupClass : studyGroupClasses) {
+			StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
+			columnArray.add(sgc.getName());
+		}
+		for (Object allDef : allDefs) {
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) allDef;
+			columnArray.add(sed.getName());
+		}
 		columnArray.add(resword.getString("actions"));
 		String columns[] = new String[columnArray.size()];
 		columnArray.toArray(columns);
@@ -371,7 +374,7 @@ public abstract class ListStudySubjectServlet extends Controller {
 
 		request.setAttribute("table", table);
 
-		String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+		String idSetting = currentStudy != null ? currentStudy.getStudyParameterConfig().getSubjectIdGeneration() : "";
 		// set up auto study subject id
 		if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
 
@@ -380,7 +383,7 @@ public abstract class ListStudySubjectServlet extends Controller {
 		}
 
 		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
-        request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+		request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
 		forwardPage(getJSP(), request, response);
 	}

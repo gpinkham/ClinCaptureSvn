@@ -27,7 +27,7 @@ package org.akaza.openclinica.bean.service;
  * 
  */
 public class StudyParameterConfig {
-	
+
 	private String collectDob;
 
 	private String discrepancyManagement;
@@ -93,6 +93,8 @@ public class StudyParameterConfig {
 
     private String replaceExisitingDataDuringImport;
     
+    private String autoScheduleEventDuringImport;
+    
     // Medical coding parameters
     private String allowCodingVerification = "no";
     private String defaultBioontologyURL = "";
@@ -136,8 +138,9 @@ public class StudyParameterConfig {
 		endDateTimeLabel = "End Date/Time";
 
 		markImportedCRFAsCompleted = "no";
-        allowSdvWithOpenQueries = "no";
-        replaceExisitingDataDuringImport = "no";
+		autoScheduleEventDuringImport = "no";
+		allowSdvWithOpenQueries = "no";
+		replaceExisitingDataDuringImport = "no";
 	}
 
 	/**
@@ -463,21 +466,21 @@ public class StudyParameterConfig {
 		this.markImportedCRFAsCompleted = markImportedCRFAsCompleted;
 	}
 
-    public String getAllowSdvWithOpenQueries() {
-        return allowSdvWithOpenQueries;
-    }
+	public String getAllowSdvWithOpenQueries() {
+		return allowSdvWithOpenQueries;
+	}
 
-    public void setAllowSdvWithOpenQueries(String allowSdvWithOpenQueries) {
-        this.allowSdvWithOpenQueries = allowSdvWithOpenQueries;
-    }
+	public void setAllowSdvWithOpenQueries(String allowSdvWithOpenQueries) {
+		this.allowSdvWithOpenQueries = allowSdvWithOpenQueries;
+	}
 
-    public String getReplaceExisitingDataDuringImport() {
-        return replaceExisitingDataDuringImport;
-    }
+	public String getReplaceExisitingDataDuringImport() {
+		return replaceExisitingDataDuringImport;
+	}
 
-    public void setReplaceExisitingDataDuringImport(String replaceExisitingDataDuringImport) {
-        this.replaceExisitingDataDuringImport = replaceExisitingDataDuringImport;
-    }
+	public void setReplaceExisitingDataDuringImport(String replaceExisitingDataDuringImport) {
+		this.replaceExisitingDataDuringImport = replaceExisitingDataDuringImport;
+	}
 
 	public String getAllowCodingVerification() {
 		return allowCodingVerification;
@@ -509,5 +512,13 @@ public class StudyParameterConfig {
 
 	public void setMedicalCodingApprovalNeeded(String medicalCodingApprovalNeeded) {
 		this.medicalCodingApprovalNeeded = medicalCodingApprovalNeeded;
+	}
+
+	public String getAutoScheduleEventDuringImport() {
+		return autoScheduleEventDuringImport;
+	}
+
+	public void setAutoScheduleEventDuringImport(String autoScheduleEventDuringImport) {
+		this.autoScheduleEventDuringImport = autoScheduleEventDuringImport;
 	}
 }

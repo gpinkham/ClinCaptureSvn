@@ -64,6 +64,7 @@ public class StudyParameterConfigTest {
 		assertEquals("Start Date/Time", config.getStartDateTimeLabel());
 		assertEquals("End Date/Time", config.getEndDateTimeLabel());
 		assertEquals("no", config.getMarkImportedCRFAsCompleted());
+		assertEquals("no", config.getAutoScheduleEventDuringImport());
 
 	}
 }

@@ -392,6 +392,15 @@
             </td>
         </tr>
     </c:when>
+    <c:when test="${config.parameter.handle=='autoScheduleEventDuringImport'}">
+      <tr valign="top">
+        <td class="formlabel"><fmt:message key="autoScheduleEventDuringImport" bundle="${resword}"/></td>
+        <td>
+          <input type="radio" <c:if test="${newStudy.studyParameterConfig.autoScheduleEventDuringImport== 'yes'}">checked</c:if> name="autoScheduleEventDuringImport" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+          <input type="radio" <c:if test="${newStudy.studyParameterConfig.autoScheduleEventDuringImport== 'no'}">checked</c:if> name="autoScheduleEventDuringImport" value="no"><fmt:message key="no" bundle="${resword}"/>
+        </td>
+      </tr>
+    </c:when>
     <c:when test="${config.parameter.handle=='allowSdvWithOpenQueries'}">
         <tr valign="top">
             <td class="formlabel"><fmt:message key="allowSdvWithOpenQueries" bundle="${resword}"/></td>

@@ -24,7 +24,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameter;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ import java.util.ArrayList;
 
 import javax.sql.DataSource;
 
-@SuppressWarnings({"rawtypes"})
+@SuppressWarnings({ "rawtypes" })
 public class StudyConfigService {
 
 	private DataSource ds;
@@ -59,57 +58,19 @@ public class StudyConfigService {
 	}
 
 	/**
-	 * � true if the study has a value defined for this parameter o if studyId is a parent study, then this is true
-	 * iff there is a row for this study/parameter pair in the study_parameter_value table o if studyId is a site, then
-	 * this is true if: ? * the parameter is inheritable and the study�s parent has a defined parameter value; OR ? *
-	 * the parameter is not inheritable and there is a row for this studyId/parameter pair in the study_parameter_value
-	 * table
-	 * 
-	 * @param studyId
-	 * @param parameterHandle
-	 * @return
-	 */
-	public String hasDefinedParameterValue(int studyId, String parameterHandle) {
-		StudyDAO sdao = new StudyDAO(ds);
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
-
-		if (studyId <= 0 || StringUtil.isBlank(parameterHandle)) {
-			return null;
-		}
-
-		StudyParameterValueBean spv = spvdao.findByHandleAndStudy(studyId, parameterHandle);
-		StudyParameter sp = spvdao.findParameterByHandle(parameterHandle);
-		StudyBean study = (StudyBean) sdao.findByPK(studyId);
-		if (spv.getId() > 0) {// there is a row for that study, no matter it
-			// is a
-			// top study or not
-			return spv.getValue();
-		}
-		int parentId = study.getParentStudyId();
-		if (parentId > 0) {
-			StudyParameterValueBean spvParent = spvdao.findByHandleAndStudy(parentId, parameterHandle);
-			if (spvParent.getId() > 0 && sp.isInheritable()) {
-				return spvParent.getValue();
-			}
-
-		}
-		return null;
-
-	}
-
-	/**
 	 * This method construct an object which has all the study parameter values
 	 * 
 	 * @param study
-	 * @return
+	 *            StudyBean
+	 * @return StudyBean
 	 */
 	public StudyBean setParametersForStudy(StudyBean study) {
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
 		ArrayList parameters = spvdao.findAllParameters();
 		StudyParameterConfig spc = new StudyParameterConfig();
 
-		for (int i = 0; i < parameters.size(); i++) {
-			StudyParameter sp = (StudyParameter) parameters.get(i);
+		for (Object parameter : parameters) {
+			StudyParameter sp = (StudyParameter) parameter;
 			String handle = sp.getHandle();
 			StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), handle);
 			// TO DO: will change to use java reflection later
@@ -147,8 +108,7 @@ public class StudyConfigService {
 					spc.setAdminForcedReasonForChange(spv.getValue());
 				} else if (handle.equalsIgnoreCase("eventLocationRequired")) {
 					spc.setEventLocationRequired(spv.getValue());
-				}
-				else if (handle.equalsIgnoreCase("secondaryIdRequired")) {
+				} else if (handle.equalsIgnoreCase("secondaryIdRequired")) {
 					spc.setSecondaryIdRequired(spv.getValue());
 				} else if (handle.equalsIgnoreCase("dateOfEnrollmentForStudyRequired")) {
 					spc.setDateOfEnrollmentForStudyRequired(spv.getValue());
@@ -160,8 +120,7 @@ public class StudyConfigService {
 					spc.setDateOfEnrollmentForStudyLabel(spv.getValue());
 				} else if (handle.equalsIgnoreCase("genderLabel")) {
 					spc.setGenderLabel(spv.getValue());
-				}
-				else if (handle.equalsIgnoreCase("startDateTimeRequired")) {
+				} else if (handle.equalsIgnoreCase("startDateTimeRequired")) {
 					spc.setStartDateTimeRequired(spv.getValue());
 				} else if (handle.equalsIgnoreCase("useStartTime")) {
 					spc.setUseStartTime(spv.getValue());
@@ -175,6 +134,8 @@ public class StudyConfigService {
 					spc.setEndDateTimeLabel(spv.getValue());
 				} else if (handle.equalsIgnoreCase("markImportedCRFAsCompleted")) {
 					spc.setMarkImportedCRFAsCompleted(spv.getValue());
+				} else if (handle.equalsIgnoreCase("autoScheduleEventDuringImport")) {
+					spc.setAutoScheduleEventDuringImport(spv.getValue());
 				} else if (handle.equalsIgnoreCase("allowSdvWithOpenQueries")) {
                     spc.setAllowSdvWithOpenQueries(spv.getValue());
                 } else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
@@ -202,8 +163,8 @@ public class StudyConfigService {
 
 		ArrayList parameters = spvdao.findAllParameterValuesByStudy(study);
 
-		for (int i = 0; i < parameters.size(); i++) {
-			StudyParameterValueBean spvb = (StudyParameterValueBean) parameters.get(i);
+		for (Object parameter1 : parameters) {
+			StudyParameterValueBean spvb = (StudyParameterValueBean) parameter1;
 			String parameter = spvb.getParameter();
 			if (parameter.equalsIgnoreCase("collectDob")) {
 				study.getStudyParameterConfig().setCollectDob(spvb.getValue());
@@ -245,9 +206,7 @@ public class StudyConfigService {
 
 			} else if (parameter.equalsIgnoreCase("adminForcedReasonForChange")) {
 				study.getStudyParameterConfig().setAdminForcedReasonForChange(spvb.getValue());
-			}
-
-			else if (parameter.equalsIgnoreCase("secondaryIdRequired")) {
+			} else if (parameter.equalsIgnoreCase("secondaryIdRequired")) {
 				study.getStudyParameterConfig().setSecondaryIdRequired(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("secondaryLabelViewable")) {
 				study.getStudyParameterConfig().setSecondaryLabelViewable(spvb.getValue());
@@ -261,8 +220,7 @@ public class StudyConfigService {
 				study.getStudyParameterConfig().setDateOfEnrollmentForStudyLabel(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("genderLabel")) {
 				study.getStudyParameterConfig().setGenderLabel(spvb.getValue());
-			}
-			else if (parameter.equalsIgnoreCase("startDateTimeRequired")) {
+			} else if (parameter.equalsIgnoreCase("startDateTimeRequired")) {
 				study.getStudyParameterConfig().setStartDateTimeRequired(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("useStartTime")) {
 				study.getStudyParameterConfig().setUseStartTime(spvb.getValue());
@@ -276,6 +234,8 @@ public class StudyConfigService {
 				study.getStudyParameterConfig().setEndDateTimeLabel(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("markImportedCRFAsCompleted")) {
 				study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(spvb.getValue());
+			} else if (parameter.equalsIgnoreCase("autoScheduleEventDuringImport")) {
+				study.getStudyParameterConfig().setAutoScheduleEventDuringImport(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("allowSdvWithOpenQueries")) {
                 study.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
             } else if (parameter.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
@@ -302,8 +262,8 @@ public class StudyConfigService {
 		site.setStudyParameterConfig(parent.getStudyParameterConfig());
 		ArrayList siteParameters = spvdao.findAllParameterValuesByStudy(site);
 
-		for (int i = 0; i < siteParameters.size(); i++) {
-			StudyParameterValueBean spvb = (StudyParameterValueBean) siteParameters.get(i);
+		for (Object siteParameter : siteParameters) {
+			StudyParameterValueBean spvb = (StudyParameterValueBean) siteParameter;
 			String parameter = spvb.getParameter();
 			if (parameter.equalsIgnoreCase("collectDob")) {
 				site.getStudyParameterConfig().setCollectDob(spvb.getValue());
@@ -371,11 +331,13 @@ public class StudyConfigService {
 				site.getStudyParameterConfig().setEndDateTimeLabel(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("markImportedCRFAsCompleted")) {
 				site.getStudyParameterConfig().setMarkImportedCRFAsCompleted(spvb.getValue());
+			} else if (parameter.equalsIgnoreCase("autoScheduleEventDuringImport")) {
+				site.getStudyParameterConfig().setAutoScheduleEventDuringImport(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("allowSdvWithOpenQueries")) {
-                site.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
-            } else if (parameter.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
-                site.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
-			} 
+				site.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
+			} else if (parameter.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
+				site.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
+			}
 		}
 		return site;
 	}

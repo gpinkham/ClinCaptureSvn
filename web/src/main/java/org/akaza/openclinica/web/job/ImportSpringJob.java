@@ -112,7 +112,7 @@ public class ImportSpringJob extends QuartzJobBean {
 	XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
 
 	ResourceBundle respage;
-    ResourceBundle resword;
+	ResourceBundle resword;
 
 	Locale locale;
 	public static final String DIRECTORY = "filePathDir";
@@ -135,27 +135,21 @@ public class ImportSpringJob extends QuartzJobBean {
 	public static final String FIRST_FILE_PATH = "firstFilePath";
 	public static final String TNAME = "tname";
 
-	public static final String IMPORT_DIR_2 = SQLInitServlet.getField("filePath") + DEST_DIR + File.separator;
+	private TriggerService triggerService;
+	private ImportCRFDataService dataService;
 
-	private DataSource dataSource;
+	private ValidatorHelper validatorHelper;
 
-    private TriggerService triggerService;
-    private ImportCRFDataService dataService;
-    private RuleSetServiceInterface ruleSetService;
+	private OpenClinicaMailSender mailSender;
 
-    private ValidatorHelper validatorHelper;
-
-    private OpenClinicaMailSender mailSender;
-
-    private StudyDAO sdao;
-    private EventCRFDAO ecdao;
-    private StudyEventDAO sedao;
-    private StudySubjectDAO ssdao;
-    private ItemDataDAO itemDataDao;
-    private DiscrepancyNoteDAO dndao;
+	private StudyDAO sdao;
+	private EventCRFDAO ecdao;
+	private StudyEventDAO sedao;
+	private StudySubjectDAO ssdao;
+	private ItemDataDAO itemDataDao;
+	private DiscrepancyNoteDAO dndao;
 	private AuditEventDAO auditEventDAO;
-    private EventDefinitionCRFDAO edcdao;
-    private ConfigurationDao configurationDao;
+	private EventDefinitionCRFDAO edcdao;
 
 	@Override
 	protected void executeInternal(final JobExecutionContext context) throws JobExecutionException {
@@ -183,7 +177,7 @@ public class ImportSpringJob extends QuartzJobBean {
 
 		ResourceBundleProvider.updateLocale(locale);
 		respage = ResourceBundleProvider.getPageMessagesBundle();
-        resword = ResourceBundleProvider.getWordsBundle();
+		resword = ResourceBundleProvider.getWordsBundle();
 		triggerService = new TriggerService();
 
 		JobDataMap dataMap = context.getMergedJobDataMap();
@@ -196,10 +190,10 @@ public class ImportSpringJob extends QuartzJobBean {
 		try {
 			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
 					.get("applicationContext");
-			dataSource = (DataSource) appContext.getBean("dataSource");
+			DataSource dataSource = (DataSource) appContext.getBean("dataSource");
 			mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
-			ruleSetService = (RuleSetServiceInterface) appContext.getBean("ruleSetService");
-            configurationDao = (ConfigurationDao) appContext.getBean("configurationDao");
+			RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) appContext.getBean("ruleSetService");
+			ConfigurationDao configurationDao = (ConfigurationDao) appContext.getBean("configurationDao");
 
 			sdao = new StudyDAO(dataSource);
 			ecdao = new EventCRFDAO(dataSource);
@@ -212,7 +206,7 @@ public class ImportSpringJob extends QuartzJobBean {
 			StudyConfigService scs = new StudyConfigService(dataSource);
 			UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
 
-            validatorHelper = new ValidatorHelper(configurationDao, locale);
+			validatorHelper = new ValidatorHelper(configurationDao, locale);
 
 			int userId = dataMap.getInt(USER_ID);
 			UserAccountBean ub = (UserAccountBean) userAccountDAO.findByPK(userId);
@@ -233,13 +227,13 @@ public class ImportSpringJob extends QuartzJobBean {
 			} else {
 				studyBean = (StudyBean) sdao.findByName(studyName);
 			}
-            studyBean = scs.setParametersForStudy(studyBean);
+			studyBean = scs.setParametersForStudy(studyBean);
 			if (studyBean.getStatus().isFrozen()) {
 				try {
 					String message = respage.getString("import_study_frozen");
 					auditEventDAO.createRowForExtractDataJobFailure(triggerBean, message);
 					if (contactEmail != null && !"".equals(contactEmail)) {
-						StudyBean emailParentStudy = new StudyBean();
+						StudyBean emailParentStudy;
 						if (studyBean.getParentStudyId() > 0) {
 							emailParentStudy = (StudyBean) sdao.findByPK(studyBean.getParentStudyId());
 						} else {
@@ -265,8 +259,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				return;
 			}
 			File fileDirectory = new File(SQLInitServlet.getField("filePath") + DIR_PATH + File.separator);
-			if ("".equals(directory)) { // avoid NPEs
-			} else {
+			if (!"".equals(directory)) {
 				fileDirectory = new File(SQLInitServlet.getField("filePath") + DIR_PATH + File.separator + directory
 						+ File.separator);
 			}
@@ -285,9 +278,7 @@ public class ImportSpringJob extends QuartzJobBean {
 			for (int i = 0; i < files.length; i++) {
 				if (!new File(fileDirectory + File.separator + files[i]).isDirectory()) {
 					File f = new File(fileDirectory + File.separator + files[i]);
-					if (f == null || f.getName() == null) {
-						logger.debug("found a null file");
-					} else if (f.getName().indexOf(".xml") < 0 && f.getName().indexOf(".XML") < 0) {
+					if (!f.getName().contains(".xml") && !f.getName().contains(".XML")) {
 						logger.debug("does not seem to be an xml file");
 
 						// we need a place holder to avoid 'gaps' in the file
@@ -314,7 +305,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				}
 				try {
 					if (contactEmail != null && !"".equals(contactEmail)) {
-						StudyBean emailParentStudy = new StudyBean();
+						StudyBean emailParentStudy;
 						if (studyBean.getParentStudyId() > 0) {
 							emailParentStudy = (StudyBean) sdao.findByPK(studyBean.getParentStudyId());
 						} else {
@@ -323,7 +314,7 @@ public class ImportSpringJob extends QuartzJobBean {
 						mailSender.sendEmail(contactEmail,
 								respage.getString("job_ran_for") + " " + triggerBean.getFullName(),
 								generateMsg(auditMessages.get(0), contactEmail, emailParentStudy.getName()), true);
-						logger.debug("email body: " + auditMessages.get(1));
+						logger.debug("email body: " + auditMessages.get(0));
 					}
 				} catch (OpenClinicaSystemException e) {
 					// Do nothing
@@ -358,11 +349,10 @@ public class ImportSpringJob extends QuartzJobBean {
 	}
 
 	private String generateMsg(String msg, String contactEmail, String studyName) {
-		String returnMe = respage.getString("html_email_header_1") + " " + contactEmail + ",<br>"
+		return respage.getString("html_email_header_1") + " " + contactEmail + ",<br>"
 				+ respage.getString("your_job_ran_success_html") + "  "
-				+ respage.getString("please_review_the_data_html") + msg
-				+ "<br/>" + respage.getString("best_system_administrator").replace("{0}", studyName);
-		return returnMe;
+				+ respage.getString("please_review_the_data_html") + msg + "<br/>"
+				+ respage.getString("best_system_administrator").replace("{0}", studyName);
 	}
 
 	/*
@@ -373,18 +363,17 @@ public class ImportSpringJob extends QuartzJobBean {
 	private ArrayList<String> processData(File[] dest, DataSource dataSource, ResourceBundle respage,
 			UserAccountBean ub, StudyBean studyBean, File destDirectory, TriggerBean triggerBean,
 			RuleSetServiceInterface ruleSetService) throws Exception {
-        ImportSummaryInfo summary = new ImportSummaryInfo();
-        boolean hasSkippedItems = false;
-        boolean runRulesOptimisation = true;
+		ImportSummaryInfo summary = new ImportSummaryInfo();
+		boolean hasSkippedItems = false;
 		StringBuffer msg = new StringBuffer();
 		StringBuffer auditMsg = new StringBuffer();
-        StringBuffer skippedItemsSql = new StringBuffer();
+		StringBuffer skippedItemsSql = new StringBuffer();
 		String propertiesPath = CoreResources.PROPERTIES_DIR;
 
 		File xsdFile2 = new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
 		boolean fail = false;
-		ODMContainer odmContainer = new ODMContainer();
-        BufferedWriter out;
+		ODMContainer odmContainer;
+		BufferedWriter out;
 
 		for (File f : dest) {
 			String regex = "\\s+"; // all whitespace, one or more times
@@ -404,17 +393,17 @@ public class ImportSpringJob extends QuartzJobBean {
 
 			// TODO add more info here, like a timestamp
 
-			String firstLine = "<P>" + f.getName() + ": ";
+			String firstLine = "<P>" + f.getName() + ": <br/>";
 			msg.append(firstLine);
 			out.write(firstLine);
 			auditMsg.append(firstLine);
-            JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
-            javax.xml.bind.Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            //Create SAXSource
-            InputSource inputSource = new InputSource(new FileInputStream(f));
-            SAXSource saxSource = new SAXSource(inputSource);
+			JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
+			javax.xml.bind.Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+			// Create SAXSource
+			InputSource inputSource = new InputSource(new FileInputStream(f));
+			SAXSource saxSource = new SAXSource(inputSource);
 			try {
-                odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
+				odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
 				logger.debug("Found crf data container for study oid: "
 						+ odmContainer.getCrfDataPostImportContainer().getStudyOID());
 				logger.debug("found length of subject list: "
@@ -424,7 +413,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				try {
 					schemaValidator.validateAgainstSchema(f, xsdFile2);
 					// for backwards compatibility, we also try to validate vs
-                    odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
+					odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
 				} catch (Exception me2) {
 					// not sure if we want to report me2
 
@@ -499,7 +488,7 @@ public class ImportSpringJob extends QuartzJobBean {
 							|| dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
 							|| dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
 							|| dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-						permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
+						permittedEventCRFIds.add(eventCRFBean.getId());
 					} else {
 						MessageFormat mf = new MessageFormat("");
 						mf.applyPattern(respage.getString("your_listed_crf_in_the_file"));
@@ -507,7 +496,6 @@ public class ImportSpringJob extends QuartzJobBean {
 						msg.append(mf.format(arguments) + "<br/>");
 						auditMsg.append(mf.format(arguments) + "<br/>");
 						out.write(mf.format(arguments) + "<br/>");
-						continue;
 					}
 				}
 
@@ -521,12 +509,12 @@ public class ImportSpringJob extends QuartzJobBean {
 				}
 
 				try {
-					List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
+					List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers;
 					tempDisplayItemBeanWrappers = getImportCRFDataService(dataSource).lookupValidationErrors(
 							validatorHelper, odmContainer, ub, totalValidationErrors, hardValidationErrors,
 							permittedEventCRFIds);
 					logger.debug("size of total validation errors: " + totalValidationErrors.size());
-                    hasSkippedItems = validatorHelper.getAttribute("hasSkippedItems") != null;
+					hasSkippedItems = validatorHelper.getAttribute("hasSkippedItems") != null;
 					displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
 				} catch (NullPointerException npe1) {
 					// what if you have 2 event crfs but the third is a fake?
@@ -540,7 +528,8 @@ public class ImportSpringJob extends QuartzJobBean {
 				} catch (OpenClinicaException oce1) {
 					fail = true;
 					logger.error("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
-					msg.append(oce1.getOpenClinicaMessage() + "<br/>");
+					msg.append("<br/>" + oce1.getOpenClinicaMessage() + "<br/>");
+					auditMsg.append("<br/>" + oce1.getOpenClinicaMessage() + "<br/>");
 					out.write(oce1.getOpenClinicaMessage() + "<br/>");
 
 				}
@@ -564,7 +553,7 @@ public class ImportSpringJob extends QuartzJobBean {
 					// here we also append data to the file, tbh 06/2010
 				}
 				String validMsgs = triggerService.generateValidMessage(subjectData, totalValidationErrors,
-                        hasSkippedItems, respage);
+						hasSkippedItems, respage);
 				out.write(validMsgs);
 			}
 
@@ -572,6 +561,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				MessageFormat mf = new MessageFormat("");
 				mf.applyPattern(respage.getString("problems_encountered_with_file"));
 				Object[] arguments = { f.getName(), msg.toString() };
+				msg = new StringBuffer();
 				msg.append(mf.format(arguments) + "<br/>");
 				continue;
 			} else {
@@ -583,18 +573,18 @@ public class ImportSpringJob extends QuartzJobBean {
 				msg.append(triggerService.generateSummaryStatsMessage(ssBean, respage) + "<br/>");
 				// setup ruleSets to run if applicable
 				logger.debug("=== about to run rules ===");
-				List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(runRulesOptimisation,
-						dataSource.getConnection(), dataSource, studyBean, ub, ruleSetService, odmContainer);
+				List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(true, dataSource.getConnection(),
+						dataSource, studyBean, ub, ruleSetService, odmContainer);
 				Set<Integer> studyEventIds = new HashSet<Integer>();
 				Set<Integer> skippedItemIds = new HashSet<Integer>();
 				for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
-                    HashMap<Integer, EventCRFBean> idToEventCrfBeans = new HashMap<Integer, EventCRFBean>();
+					HashMap<Integer, EventCRFBean> idToEventCrfBeans = new HashMap<Integer, EventCRFBean>();
 					logger.debug("right before we check to make sure it is savable: " + wrapper.isSavable());
 					if (wrapper.isSavable()) {
 						logger.debug("wrapper problems found : " + wrapper.getValidationErrors().toString());
 						for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
-							EventCRFBean eventCrfBean = new EventCRFBean();
-							ItemDataBean itemDataBean = new ItemDataBean();
+							EventCRFBean eventCrfBean;
+							ItemDataBean itemDataBean;
 							int eventCrfBeanId = displayItemBean.getData().getEventCRFId();
 							if (idToEventCrfBeans.containsKey(eventCrfBeanId)) {
 								eventCrfBean = idToEventCrfBeans.get(eventCrfBeanId);
@@ -604,8 +594,8 @@ public class ImportSpringJob extends QuartzJobBean {
 									idToEventCrfBeans.put(eventCrfBeanId, eventCrfBean);
 								}
 							}
-                            logger.debug("found value here: " + displayItemBean.getData().getValue());
-                            logger.debug("found status here: " + eventCrfBean.getStatus().getName());
+							logger.debug("found value here: " + displayItemBean.getData().getValue());
+							logger.debug("found status here: " + eventCrfBean.getStatus().getName());
 							StudyEventBean studyEventBean = (StudyEventBean) sedao.findByPK(eventCrfBean
 									.getStudyEventId());
 							itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem()
@@ -616,7 +606,7 @@ public class ImportSpringJob extends QuartzJobBean {
 							summary.processItem(studyEventBean.getId() + "_" + studyEventBean.getRepeatingNum() + "_"
 									+ displayItemBean.getItem().getId() + "_" + displayItemBean.getData().getOrdinal(),
 									displayItemBean.isSkip());
-                            if (!displayItemBean.isSkip()) {
+							if (!displayItemBean.isSkip()) {
 								if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
 									logger.debug("just tried to find item data bean on item name "
 											+ displayItemBean.getItem().getName());
@@ -643,8 +633,8 @@ public class ImportSpringJob extends QuartzJobBean {
 										+ displayItemBean.getData().getOrdinal() + "_" + wrapper.getStudySubjectOid();
 								if (wrapper.getValidationErrors().containsKey(itemOid)) {
 									ArrayList messageList = (ArrayList) wrapper.getValidationErrors().get(itemOid);
-									for (int iter = 0; iter < messageList.size(); iter++) {
-										String message = (String) messageList.get(iter);
+									for (Object aMessageList : messageList) {
+										String message = (String) aMessageList;
 										DiscrepancyNoteBean parentDn = createDiscrepancyNote(ibean, message,
 												eventCrfBean, displayItemBean, null, ub, dataSource, studyBean);
 										createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean,
@@ -652,11 +642,23 @@ public class ImportSpringJob extends QuartzJobBean {
 										logger.debug("*** created disc note with message: " + message);
 									}
 								}
-                            } else {
+							} else {
 								skippedItemIds.add(displayItemBean.getItem().getId());
-                                skippedItemsSql.append("INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id) " +
-                                        "VALUES (52, now(), " + ub.getId() + ", 'item_data', " + itemDataBean.getId() + ", '" + displayItemBean.getItem().getName() + "', '" + itemDataBean.getValue() + "', '" + displayItemBean.getData().getValue() + "', " + displayItemBean.getData().getEventCRFId() + "); ");
-                            }
+								skippedItemsSql
+										.append("INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id) "
+                                                + "VALUES (52, now(), "
+                                                + ub.getId()
+                                                + ", 'item_data', "
+                                                + itemDataBean.getId()
+                                                + ", '"
+                                                + displayItemBean.getItem().getName()
+                                                + "', '"
+                                                + itemDataBean.getValue()
+                                                + "', '"
+                                                + displayItemBean.getData().getValue()
+                                                + "', "
+                                                + displayItemBean.getData().getEventCRFId() + "); ");
+							}
 						}
 
 						for (EventCRFBean eventCrfBean : idToEventCrfBeans.values()) {
@@ -693,7 +695,7 @@ public class ImportSpringJob extends QuartzJobBean {
 
 								sedao.update(seb);
 							}
-						}                       
+						}
 					}
 				}
 
@@ -705,7 +707,7 @@ public class ImportSpringJob extends QuartzJobBean {
 
 						SubjectEventStatusUtil.determineSubjectEventState(seb, sb, new DAOWrapper(sdao, sedao, ssdao,
 								ecdao, edcdao, dndao));
-						
+
 						seb.setUpdatedDate(new Date());
 						seb.setUpdater(ub);
 
@@ -718,7 +720,7 @@ public class ImportSpringJob extends QuartzJobBean {
 
 				msg.append(summary.prepareSummaryMessage(studyBean, resword));
 				auditMsg.append(summary.prepareSummaryMessage(studyBean, resword));
-                
+
 				if (hasSkippedItems) {
 					String additionalMsg = "<br/>"
 							+ (studyBean.getParentStudyId() > 0 ? respage.getString("site") : respage
@@ -727,7 +729,7 @@ public class ImportSpringJob extends QuartzJobBean {
 					msg.append(additionalMsg);
 					auditMsg.append(additionalMsg);
 				}
-                
+
 				String linkMessage = respage.getString("you_can_review_the_data") + SQLInitServlet.getSystemURL()
 						+ respage.getString("you_can_review_the_data_2") + SQLInitServlet.getSystemURL()
 						+ respage.getString("you_can_review_the_data_3") + generalFileDir + f.getName() + "&tn="
@@ -736,19 +738,17 @@ public class ImportSpringJob extends QuartzJobBean {
 				msg.append(linkMessage);
 				auditMsg.append(linkMessage);
 
-				auditMsg.append(this.runRules(runRulesOptimisation, dataSource.getConnection(), skippedItemIds,
-						studyBean, ub, containers, ruleSetService, ExecutionMode.SAVE));
+				auditMsg.append(this.runRules(true, dataSource.getConnection(), skippedItemIds, studyBean, ub,
+						containers, ruleSetService, ExecutionMode.SAVE));
 			}
 
-            if (out != null) {
-                out.close();
-            }
-        }
+			out.close();
+		}
 
 		ArrayList<String> retList = new ArrayList<String>();
 		retList.add(msg.toString());
 		retList.add(auditMsg.toString());
-        retList.add(skippedItemsSql.toString());
+		retList.add(skippedItemsSql.toString());
 		return retList;
 
 	}
@@ -797,7 +797,7 @@ public class ImportSpringJob extends QuartzJobBean {
 				java.io.OutputStream out = new FileOutputStream(dest[j]);
 
 				byte[] buf = new byte[1024];
-				int len = 0;
+				int len;
 
 				while ((len = in.read(buf)) > 0) {
 					out.write(buf, 0, len);
@@ -831,7 +831,7 @@ public class ImportSpringJob extends QuartzJobBean {
 						containers.add(container);
 					}
 				}
-				if (containers != null && !containers.isEmpty()) {
+				if (!containers.isEmpty()) {
 					logger.debug("=== dry run of rules in data entry ===");
 					ruleSetService.runRulesInImportData(runRulesOptimisation, connection, containers, studyBean,
 							userBean, ExecutionMode.DRY_RUN);
@@ -843,8 +843,8 @@ public class ImportSpringJob extends QuartzJobBean {
 	}
 
 	@Transactional
-	private StringBuffer runRules(Boolean runRulesOptimisation, Connection connection, Set<Integer> skippedItemIds, StudyBean studyBean,
-			UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
+	private StringBuffer runRules(Boolean runRulesOptimisation, Connection connection, Set<Integer> skippedItemIds,
+			StudyBean studyBean, UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
 			RuleSetServiceInterface ruleSetService, ExecutionMode executionMode) {
 		StringBuffer messages = new StringBuffer();
 		if (containers != null && !containers.isEmpty()) {

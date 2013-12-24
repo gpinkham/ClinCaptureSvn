@@ -124,7 +124,7 @@ public class UpdateSubStudyServlet extends Controller {
 			if ("confirm".equalsIgnoreCase(action)) {
 				confirmStudy(request, response, errors, parentStudy);
 			}
-	}
+		}
 	}
 
 	/**
@@ -319,6 +319,7 @@ public class UpdateSubStudyServlet extends Controller {
 		study.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
 
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
+		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
 				fp.getString("replaceExisitingDataDuringImport"));
