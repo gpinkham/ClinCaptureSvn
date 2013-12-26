@@ -20,8 +20,11 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.text.MessageFormat;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -91,6 +94,12 @@ public class DeleteUserServlet extends Controller {
 
 				if (udao.isQuerySuccessful()) {
 					message = respage.getString("the_user_has_been_removed_successfully");
+					
+					try {
+						sendRestoreEmail(request, u, null, desiredAction);
+					} catch (Exception e) {
+						message += respage.getString("however_was_error_sending_user_email_regarding");
+					}
 				} else {
 					message = respage.getString("the_user_could_not_be_deleted_due_database_error");
 				}
@@ -108,7 +117,7 @@ public class DeleteUserServlet extends Controller {
 					message = respage.getString("the_user_has_been_restored");
 
 					try {
-						sendRestoreEmail(request, u, password);
+						sendRestoreEmail(request, u, password, desiredAction);
 					} catch (Exception e) {
 						message += respage.getString("however_was_error_sending_user_email_regarding");
 					}
@@ -122,29 +131,37 @@ public class DeleteUserServlet extends Controller {
 		forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 	}
 
-	private void sendRestoreEmail(HttpServletRequest request, UserAccountBean u, String password) throws Exception {
+	private void sendRestoreEmail(HttpServletRequest request, UserAccountBean u, String password, EntityAction desiredAction) throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
-
-		logger.info("Sending restore and password reset notification to " + u.getName());
-
-		String body = resword.getString("dear") + " " + u.getFirstName() + " " + u.getLastName() + ",<br><br>";
-		body += restext.getString("your_account_has_been_restored_and_password_reset") + ":<br><br>\n\n";
-		body += resword.getString("user_name") + ": " + u.getName() + "<br>\n";
-		body += resword.getString("password") + ": " + password + "<br><br>\n\n";
-		body += restext.getString("please_test_your_login_information_and_let") + "<br>\n";
-		body += SQLInitServlet.getSystemURL();
-		body += " .<br><br>";
+		String body = "";
+		String subject = "";
 		StudyDAO sdao = getStudyDAO();
 		StudyBean emailParentStudy;
+		Object arguments[] = {};
+		MessageFormat msg = new MessageFormat("");
+		
 		if (currentStudy.getParentStudyId() > 0) {
 			emailParentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
 		} else {
 			emailParentStudy = currentStudy;
 		}
-		body += respage.getString("best_system_administrator").replace("{0}", emailParentStudy.getName());
+
+		if (desiredAction.equals(EntityAction.DELETE)) {
+			logger.info("Sending remove account notification to " + u.getName());
+			subject = restext.getString("your_clin_capture_account_has_been_removed");
+			msg.applyPattern(restext.getString("your_account_has_been_removed_email_message_html"));
+			arguments = new Object[] {u.getFirstName() + " " + u.getLastName(), u.getName(), emailParentStudy.getName()};
+		} else if (desiredAction.equals(EntityAction.RESTORE)) {
+			logger.info("Sending restore and password reset notification to " + u.getName());
+			subject = restext.getString("your_new_openclinica_account_has_been_restored");
+			msg.applyPattern(restext.getString("your_account_has_been_restored_and_password_reset_email_message_html"));
+			arguments = new Object[] {u.getFirstName() + " " + u.getLastName(), u.getName(), password, 
+					SQLInitServlet.getSystemURL(), emailParentStudy.getName()};
+		}
+		
+		body = msg.format(arguments);
 		logger.info("Sending email...begin");
-		sendEmail(u.getEmail().trim(), restext.getString("your_new_openclinica_account_has_been_restored"), body,
-				false, request);
+		sendEmail(u.getEmail().trim(), subject, body, false, request);
 		logger.info("Sending email...done");
 	}
 
