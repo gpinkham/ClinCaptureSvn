@@ -87,7 +87,6 @@
 	</h1>
 </div>
 <div style="float: right;"><p>
-<%-- <a href="#" onclick="javascript:window.close();"><fmt:message key="exit_window" bundle="${resword}"/></a> --%>
 </p></div>
 <br clear="all">
 
@@ -121,65 +120,58 @@
 			<div class="textbox_center">
             <table border="0" cellpadding="0" cellspacing="0">
             	<tr>
-                <td class="table_cell_noborder"><fmt:message key="subject" bundle="${resword}"/>:&nbsp;&nbsp;</td>
-                <td class="table_cell_noborder"><b><c:out value="${noteSubject.label}"/></b></td>
-                <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="event" bundle="${resword}"/>:&nbsp;&nbsp;</td>
-                <td class="table_cell_noborder">
-                    <b><c:choose>
-                        <c:when test="${studyEvent != null}">
-                            <c:out value="${studyEvent.name}"/>
-                        </c:when>
-                        <c:otherwise>N/A
-                        </c:otherwise>
-                    </c:choose></b>
-                </td>
+                    <td class="table_cell_noborder"><fmt:message key="subject" bundle="${resword}"/>:&nbsp;&nbsp;</td>
+                    <td class="table_cell_noborder"><b><c:out value="${noteSubject.label}"/></b></td>
+                    <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="event" bundle="${resword}"/>:&nbsp;&nbsp;</td>
+                    <td class="table_cell_noborder">
+                        <b><c:choose>
+                            <c:when test="${studyEvent != null}">
+                                <c:out value="${studyEvent.name}"/>
+                            </c:when>
+                            <c:otherwise>N/A
+                            </c:otherwise>
+                        </c:choose></b>
+                    </td>
             	</tr>
             	<tr>
-                <td class="table_cell_noborder"><fmt:message key="event_date" bundle="${resword}"/>:&nbsp;&nbsp;</td>
-                <td class="table_cell_noborder">
-                    <b><c:choose>
-                        <c:when test="${studyEvent != null}">
-                            <fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;
-                        </c:when>
-                        <c:otherwise>N/A
-                        </c:otherwise>
-                    </c:choose></b>
-                </td>
-                <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</td>
-                <td class="table_cell_noborder">
-                    <b><c:choose>
-                        <c:when test="${crf != null}">
-                            <c:out value="${crf.name}"/>
-                        </c:when>
-                        <c:otherwise>N/A
-                        </c:otherwise>
-                    </c:choose></b>
-                </td>
+                    <td class="table_cell_noborder"><fmt:message key="event_date" bundle="${resword}"/>:&nbsp;&nbsp;</td>
+                    <td class="table_cell_noborder">
+                        <b><c:choose>
+                            <c:when test="${studyEvent != null}">
+                                <fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;
+                            </c:when>
+                            <c:otherwise>N/A
+                            </c:otherwise>
+                        </c:choose></b>
+                    </td>
+                    <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</td>
+                    <td class="table_cell_noborder">
+                        <b><c:choose>
+                            <c:when test="${crf != null}">
+                                <c:out value="${crf.name}"/>
+                            </c:when>
+                            <c:otherwise>N/A
+                            </c:otherwise>
+                        </c:choose></b>
+                    </td>
             	</tr> 
             	<tr>
-            	<td class="table_cell_noborder"><fmt:message key="Current_Value" bundle="${resword}"/>:&nbsp;&nbsp;</td>
-                <td class="table_cell_noborder"><b><c:out value="${entityValue}"/>&nbsp;</b></td>
-                <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="More" bundle="${resword}"/>:&nbsp;&nbsp;</td>
-                <td class="table_cell_noborder">
-                <c:choose>
-                <c:when test="${name eq 'itemData' ||name eq 'ItemData'}">
-                    <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')">
-                    <fmt:message key="Data_Dictionary" bundle="${resword}"/></a>
-                </c:when>
-                <c:otherwise>
-                    <%-- <a href="javascript:scrollToY('audit');"><fmt:message key="Audit_History" bundle="${resword}"/></a> --%>
-                </c:otherwise> 
-                </c:choose>
-                </td>  
+                    <td class="table_cell_noborder"><fmt:message key="Current_Value" bundle="${resword}"/>:&nbsp;&nbsp;</td>
+                    <td class="table_cell_noborder"><b><c:out value="${entityValue}"/>&nbsp;</b></td>
+                    <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="More" bundle="${resword}"/>:&nbsp;&nbsp;</td>
+                    <td class="table_cell_noborder">
+                    <c:if test="${name eq 'itemData' ||name eq 'ItemData'}">
+                        <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')">
+                        <fmt:message key="Data_Dictionary" bundle="${resword}"/></a>
+                    </c:if>
+                    </td>  
                 </tr>
                 <c:if test="${name eq 'itemData' ||name eq 'ItemData'}">
 	                <tr>
-	                <td class="table_cell_noborder">
-	                <td class="table_cell_noborder">
-	                <td class="table_cell_noborder">
-	                <td class="table_cell_noborder">
-	                     <%-- <a href="javascript:scrollToY('audit');"><fmt:message key="Audit_History" bundle="${resword}"/></a> --%>
-	                </td>
+    	                <td class="table_cell_noborder">
+    	                <td class="table_cell_noborder">
+    	                <td class="table_cell_noborder">
+    	                <td class="table_cell_noborder">
 	            	</tr>
             	</c:if>
 			</table>
@@ -203,140 +195,142 @@
 <c:set var="count" value="${1}"/>
 <!-- Thread Heading -->
 <c:forEach var="note" items="${discrepancyNotes}">
-<c:if test="${note.value.saved==false}">
-	<c:set var="disableBeginNewThread" value="${true}"/>
-</c:if>
-<table border="0" cellpadding="0" cellspacing="0">
-    <tbody>
-        <tr>
-            <td>
-                <!-- These DIVs define shaded box borders -->
-                <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-                    <div class="tablebox_center">
-                        <table border="0" cellpadding="0" cellspacing="0" width="600">
-                            <tr class="aka_stripes">
-                                <td class="aka_header_border" colspan="4">
-                                    <div style="float: left; font-size: 15px;">
 
-                                        <!-- expand/collapse button -->
+    <c:if test="${note.value.saved==false}">
+    	<c:set var="disableBeginNewThread" value="${true}"/>
+    </c:if>   
+    
+    <table border="0" cellpadding="0" cellspacing="0">
+        <tbody>
+            <tr>
+                <td>
+                    <!-- These DIVs define shaded box borders -->
+                    <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+                        <div class="tablebox_center">
+                            <table border="0" cellpadding="0" cellspacing="0" width="600">
+                                <tr class="aka_stripes">
+                                    <td class="aka_header_border" colspan="4">
+                                        <div style="float: left; font-size: 15px;">
 
-                                        <a href="javascript:leftnavExpand('thread<c:out value="${count}"/>');leftnavExpand('thread<c:out value="${count}"/>_expand');leftnavExpand('thread<c:out value="${count}"/>_collapse');">
-                                            <div id="thread<c:out value="${count}"/>_collapse" style="width: 8px; height: 8px; border-color: #789EC5; border-width: 1px; border-style: solid; line-height: 6px; text-align: center; float: left; margin: 3px 6px 0px 0px; ">-</div>
-                                            <div id="thread<c:out value="${count}"/>_expand" style="width: 8px; height: 8px; border-color: #789EC5; border-width: 1px; border-style: solid; font-size: 10px; line-height: 6px; text-align: center; float: left; margin: 3px 6px 0px 0px; display: none;">+</div>
-                                        </a>
+                                            <!-- expand/collapse button -->
 
-                                        <!-- Thread title -->
-                                        <b><c:out value="${note.value.description}"/>
-                                            <c:if test="${note.value.saved==false}">
-                                                <span class="alert">[<fmt:message key="not_saved" bundle="${resword}"/>]</span>
-                                            </c:if></b>
-                                    </div>
-                                    <div style="float: right; padding-left: 30px;">
-                                    	<fmt:message key="Last_updated" bundle="${resword}"/>: <b><fmt:formatDate value="${note.value.lastDateUpdated}" pattern="${dteFormat}"/> by <c:out value="${note.value.owner.name}"/></b><br>
-                                    	<fmt:message key="Assigned_to" bundle="${resword}"/>:&nbsp;&nbsp;  <b> <c:out value="${note.value.assignedUser.firstName}"/> <c:out value="${note.value.assignedUser.lastName}"/> (<c:out value ="${note.value.assignedUser.name}"/>)
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="aka_stripes">
-                                <td class="aka_header_border" width="25%"><fmt:message key="ID" bundle="${resword}"/>: <b><c:out value="${note.value.id}"/></b></td>
-                                <td class="aka_header_border" width="25%"><fmt:message key="type" bundle="${resword}"/>: <b><c:out value="${note.value.disType.name}"/></b></td>
-                                <td class="aka_header_border" width="25%" >
-                                    Current Status: <b><c:out value="${note.value.resStatus.name}"/></b>
-                                    <input type="hidden" value="${note.value.resStatus.id}" id="dn_status_${note.value.id}">
-                                </td>
-                                <td class="aka_header_border" width="25%"><fmt:message key="of_notes" bundle="${resword}"/>: <b><c:out value="${note.value.numChildren}" /></b></td>
-                            </tr>
-                        </table>
-                        <table border="0" cellpadding="0" cellspacing="0" width="600" id="thread<c:out value="${count}"/>">
+                                            <a href="javascript:leftnavExpand('thread<c:out value="${count}"/>');leftnavExpand('thread<c:out value="${count}"/>_expand');leftnavExpand('thread<c:out value="${count}"/>_collapse');">
+                                                <div id="thread<c:out value="${count}"/>_collapse" style="width: 8px; height: 8px; border-color: #789EC5; border-width: 1px; border-style: solid; line-height: 6px; text-align: center; float: left; margin: 3px 6px 0px 0px; ">-</div>
+                                                <div id="thread<c:out value="${count}"/>_expand" style="width: 8px; height: 8px; border-color: #789EC5; border-width: 1px; border-style: solid; font-size: 10px; line-height: 6px; text-align: center; float: left; margin: 3px 6px 0px 0px; display: none;">+</div>
+                                            </a>
 
-                            <!-- Spacer row --->
-                            <tr>
-                                <td class="table_header_row_left" colspan="4"  style="border-top-width: 1px; border-top-color: #CCCCCC; font-size: 1px; line-height: 4px; height: 6px; padding: 0px;">&nbsp;</td>
-                            </tr>
-
-                                <%--do not display the parent note itself because there is a child which is same as the parent--%>
-                            <!-- all child notes if any -->
-                            <c:forEach var="child" items="${note.value.children}" varStatus="status">
-                                <tr>
-                                    <td class="table_cell_left" colspan="2" bgcolor="#f5f5f5" width="50%" valign="top"><b><c:out value="${child.description}"/></b></td>
-                                    <td class="table_cell" bgcolor="#f5f5f5" align="left" width="25%" valign="top" nowrap><fmt:message key="status" bundle="${resword}"/>: <c:out value="${child.resStatus.name}"/></td>
-                                    <td class="table_cell" bgcolor="#f5f5f5" width="25%" align="right" valign="top" nowrap>
-                                    	<fmt:formatDate value="${child.createdDate}" pattern="${dteFormat}"/> by <c:out value="${child.owner.name}"/><br>
-                                    	<c:if test="${child.assignedUserId > 0}">
-                                        <fmt:message key="Assigned_to" bundle="${resword}"/>: <c:out value="${child.assignedUser.firstName}"/> <c:out value="${child.assignedUser.lastName}"/> (<c:out value ="${child.assignedUser.name}"/>)
-                                </tr>
-                                </c:if>
+                                            <!-- Thread title -->
+                                            <b><c:out value="${note.value.description}"/>
+                                                <c:if test="${note.value.saved==false}">
+                                                    <span class="alert">[<fmt:message key="not_saved" bundle="${resword}"/>]</span>
+                                                </c:if>
+                                            </b>
+                                        </div>
+                                        <div style="float: right; padding-left: 30px;">
+                                            <fmt:message key="Last_updated" bundle="${resword}"/>: <b><fmt:formatDate value="${note.value.lastDateUpdated}" pattern="${dteFormat}"/> by <c:out value="${note.value.owner.name}"/></b><br>
+                                            <fmt:message key="Assigned_to" bundle="${resword}"/>:&nbsp;&nbsp;  <b> <c:out value="${note.value.assignedUser.firstName}"/> <c:out value="${note.value.assignedUser.lastName}"/> (<c:out value ="${note.value.assignedUser.name}"/>)
+                                        </div>
                                     </td>
                                 </tr>
-
-                                <tr>
-                                    <td class="table_cell_left" colspan="4">
-                                        <c:out value="${child.detailedNotes}"/>
+                                <tr class="aka_stripes">
+                                    <td class="aka_header_border" width="25%"><fmt:message key="ID" bundle="${resword}"/>: <b><c:out value="${note.value.id}"/></b></td>
+                                    <td class="aka_header_border" width="25%"><fmt:message key="type" bundle="${resword}"/>: <b><c:out value="${note.value.disType.name}"/></b></td>
+                                    <td class="aka_header_border" width="25%" >
+                                        Current Status: <b><c:out value="${note.value.resStatus.name}"/></b>
+                                        <input type="hidden" value="${note.value.resStatus.id}" id="dn_status_${note.value.id}">
                                     </td>
+                                    <td class="aka_header_border" width="25%"><fmt:message key="of_notes" bundle="${resword}"/>: <b><c:out value="${note.value.numChildren}" /></b></td>
                                 </tr>
+                            </table>
+                            <table border="0" cellpadding="0" cellspacing="0" width="600" id="thread<c:out value="${count}"/>">
 
-                                <c:if test="${!status.last}">
-                                    <!-- Spacer row --->
+                                <c:forEach var="child" items="${note.value.children}" varStatus="status">
+
+                                    <c:set var="addNote" value="true"/>
+                                    <c:if test="${userRole.studyCoder}">
+                                        <c:if test="${child.owner.id != userBean.id}">
+                                            <c:set var="addNote" value="false"/>
+                                        </c:if>
+                                    </c:if> 
+
                                     <tr>
-                                        <td class="table_header_row_left" colspan="4"  style="border-top-width: 1px; border-top-color: #CCCCCC; font-size: 1px; line-height: 4px; height: 6px; padding: 0px;">&nbsp;</td>
+                                        <td class="table_cell_left" colspan="2" bgcolor="#f5f5f5" width="50%" valign="top"><b><c:out value="${child.description}"/></b></td>
+                                        <td class="table_cell" bgcolor="#f5f5f5" align="left" width="25%" valign="top" nowrap><fmt:message key="status" bundle="${resword}"/>: <c:out value="${child.resStatus.name}"/></td>
+                                        <td class="table_cell" bgcolor="#f5f5f5" width="25%" align="right" valign="top" nowrap>
+                                            <fmt:formatDate value="${child.createdDate}" pattern="${dteFormat}"/> by <c:out value="${child.owner.name}"/><br>
+                                            <c:if test="${child.assignedUserId > 0}">
+                                                <fmt:message key="Assigned_to" bundle="${resword}"/>: <c:out value="${child.assignedUser.firstName}"/> <c:out value="${child.assignedUser.lastName}"/> (<c:out value ="${child.assignedUser.name}"/>)
+                                            </c:if>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="table_cell_left" colspan="4">
+                                            <c:out value="${child.detailedNotes}"/>
+                                        </td>
+                                    </tr>
+
+                                    <c:if test="${!status.last}">
+                                        <!-- Spacer row -->
+                                        <tr>
+                                            <td class="table_header_row_left" colspan="4"  style="border-top-width: 1px; border-top-color: #CCCCCC; font-size: 1px; line-height: 4px; height: 6px; padding: 0px;">&nbsp;</td>
+                                        </tr>
+                                    </c:if>
+                                </c:forEach>
+                                <c:set var="showDNBox" value="n"/>
+                                <c:if test="${!study.status.locked}">
+                                    <tr>
+                                        <td class="table_cell_left" colspan="4" align="right">
+                                            <c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4)}">
+                                                <c:set var="sindex" value="0"/>
+                                                <c:forEach var="status" items="${resolutionStatuses}">
+                                                    <c:choose>
+                                                    <c:when test="${status.id == 2}">
+
+                                                        <c:if test="${addNote == true}">
+                                                            <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>'); showAnotherDescriptions(2, ${note.value.id});/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
+                                                        </c:if>
+                                                    </c:when>
+                                                    <c:when test="${status.id == 4}">
+                                                        <c:if test="${addNote == true}">
+                                                            <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="close_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>'); showAnotherDescriptions(4, ${note.value.id});"/>
+                                                        </c:if>
+                                                    </c:when>
+                                                    </c:choose>
+                                                    <c:set var="sindex" value="${sindex+1}"/>
+                                                </c:forEach>
+                                                <br>
+                                                <c:set var="showDNBox" value="y"/>
+                                            </c:if>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="table_cell_left" id="msg${note.value.id}">
+                                        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${note.value.id}"/></jsp:include>  
+                                        </td>
                                     </tr>
                                 </c:if>
-
-                            </c:forEach>
-                            <c:set var="showDNBox" value="n"/>
-                            <c:if test="${!study.status.locked}">
-                            	<tr>
-                            	<td class="table_cell_left" colspan="4" align="right">
-                            		<c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4)}">
-										<c:set var="sindex" value="0"/>
-                            			<c:forEach var="status" items="${resolutionStatuses}">
-                        					<c:choose>
-                        					<c:when test="${status.id == 2}">
-                        						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>'); showAnotherDescriptions(2, ${note.value.id});/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
-            								</c:when>
-                                            <%--ClinCapture #42 DN worlflow simplification--%>
-            								<%--<c:when test="${status.id == 3}">--%>
-                        						<%--<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="Propose_Resolution" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>--%>
-            								<%--</c:when>--%>
-            								<c:when test="${status.id == 4}">
-                        						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="close_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>'); showAnotherDescriptions(4, ${note.value.id});"/>
-            								</c:when>
-                        					</c:choose>
-                        					<c:set var="sindex" value="${sindex+1}"/>
-                            			</c:forEach>
-                            			<br>
-                            			<c:set var="showDNBox" value="y"/>
-                            		</c:if>
-                            	</td>
-                            	</tr>
-                                <tr>
-                                	<td class="table_cell_left" id="msg${note.value.id}">
-                                	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${note.value.id}"/></jsp:include>	
-                                	</td>
-                                </tr>
-                            </c:if>
-                        </table>
-                    </div>
-                </div></div></div></div></div></div></div></div>
-                
-            </td>
-        </tr>
-             
-		<c:if test="${showDNBox eq 'y'}">
-			<c:import url="./discrepancyNote.jsp">
-        		<c:param name="parentId" value="${note.value.id}"/>
-				<c:param name="entityId" value="${id}"/>				
-				<c:param name="entityType" value="${name}"/>				
-				<c:param name="field" value="${field}"/>				
-				<c:param name="column" value="${column}"/>
-				<c:param name="boxId" value="box${note.value.id}"/>
-				<c:param name="typeId" value="${note.value.discrepancyNoteTypeId}"/>
-				<c:param name="typeName" value="${note.value.disType.name}"/>
-			</c:import>
-		</c:if>
-    </tbody>
-</table>
-<c:set var="count" value="${count+1}"/>
+                            </table>
+                        </div>
+                    </div></div></div></div></div></div></div></div>
+                    
+                </td>
+            </tr>
+                 
+            <c:if test="${showDNBox eq 'y'}">
+                <c:import url="./discrepancyNote.jsp">
+                    <c:param name="parentId" value="${note.value.id}"/>
+                    <c:param name="entityId" value="${id}"/>                
+                    <c:param name="entityType" value="${name}"/>                
+                    <c:param name="field" value="${field}"/>                
+                    <c:param name="column" value="${column}"/>
+                    <c:param name="boxId" value="box${note.value.id}"/>
+                    <c:param name="typeId" value="${note.value.discrepancyNoteTypeId}"/>
+                    <c:param name="typeName" value="${note.value.disType.name}"/>
+                </c:import>
+            </c:if>
+        </tbody>
+    </table>
+    <c:set var="count" value="${count+1}"/>
 </c:forEach>
 
 <c:if test="${!study.status.locked}">

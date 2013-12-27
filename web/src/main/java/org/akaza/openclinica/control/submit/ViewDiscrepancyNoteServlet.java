@@ -481,7 +481,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		request.setAttribute(CreateDiscrepancyNoteServlet.WRITE_TO_DB, writeToDB ? "1" : "0");
 
 		List<DiscrepancyNoteBean> notes = (List<DiscrepancyNoteBean>) dndao.findAllByEntityAndColumn(name, entityId, column);
-
+		
 		if (notes.size() > 0) {
 			manageStatuses(request, field);
 

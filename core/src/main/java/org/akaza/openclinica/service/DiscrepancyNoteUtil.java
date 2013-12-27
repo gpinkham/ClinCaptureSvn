@@ -65,8 +65,6 @@ public class DiscrepancyNoteUtil {
 		RESOLUTION_STATUS.put("Not Applicable", 5);
 	}
 
-	// These two variables are to arrange the Summary Statistics accordingly
-	// Mantis Issue: 7771
 	public static final String[] TYPE_NAMES = { "Query", "Failed Validation Check", "Reason for Change", "Annotation" };
 
 	public static String[] getTypeNames() {

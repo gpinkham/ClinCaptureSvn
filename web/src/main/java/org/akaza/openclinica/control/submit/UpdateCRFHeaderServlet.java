@@ -72,6 +72,8 @@ public class UpdateCRFHeaderServlet extends Controller {
 		if (eventCRFId > 0) {
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 			allNotes.addAll(dndao.findAllTopNotesByEventCRF(eventCRFId));
+			
+			allNotes = extractCoderNotes(allNotes, request);
 			List<DiscrepancyNoteBean> eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
 			if (!eventCrfNotes.isEmpty()) {
 				allNotes.addAll(eventCrfNotes);

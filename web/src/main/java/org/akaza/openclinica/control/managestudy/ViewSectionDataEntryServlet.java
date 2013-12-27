@@ -241,7 +241,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 			allNotes = dndao.findAllTopNotesByEventCRF(eventCRFId);
 			
-			allNotes = filterStudyCoderNotes(allNotes, request);
+			allNotes = extractCoderNotes(allNotes, request);
 			
 			// add interviewer.jsp related notes to this Collection
 			eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
@@ -414,7 +414,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		}
 
 		if ("saveNotes".equalsIgnoreCase(action)) {
-			logger.info("33333how many group rows:" + dsb.getDisplayItemGroups().size());
 
 			// let's save notes for the blank items
 			DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();

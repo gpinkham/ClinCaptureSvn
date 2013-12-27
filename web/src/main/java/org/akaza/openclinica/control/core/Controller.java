@@ -1550,4 +1550,34 @@ public abstract class Controller extends BaseController {
 
 		return de;
 	}
+	
+	protected List<DiscrepancyNoteBean> extractCoderNotes(List<DiscrepancyNoteBean> notes,
+			HttpServletRequest request) {
+
+		if (isCoder(getUserAccountBean(request), request)) {
+
+			List<DiscrepancyNoteBean> filteredDiscrepancyNotes = new ArrayList<DiscrepancyNoteBean>();
+
+			for (DiscrepancyNoteBean discrepancyNote : notes) {
+
+				UserAccountBean owner = (UserAccountBean) getUserAccountDAO().findByPK(discrepancyNote.getOwnerId());
+				UserAccountBean assignedUser = (UserAccountBean) getUserAccountDAO().findByPK(
+						discrepancyNote.getAssignedUserId());
+
+				if (isCoder(assignedUser, request) || isCoder(owner, request)) {
+
+					filteredDiscrepancyNotes.add(discrepancyNote);
+				}
+			}
+
+			return filteredDiscrepancyNotes;
+
+		} else {
+			return notes;
+		}
+	}
+
+	protected boolean isCoder(UserAccountBean loggedInUser, HttpServletRequest request) {
+		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("study coder");
+	}
 }

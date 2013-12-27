@@ -251,7 +251,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 		if (isCoder(loggedInUser)) {
 
-			customItems = filterAccordingToMedicalCodingRole(customItems);
+			customItems = extractCoderNotes(customItems);
 			tableFacade.setTotalRows(customItems.size());
 		}
 
@@ -303,9 +303,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	}
 
-	private List<DiscrepancyNoteBean> filterAccordingToMedicalCodingRole(List<DiscrepancyNoteBean> customItems) {
+	private List<DiscrepancyNoteBean> extractCoderNotes(List<DiscrepancyNoteBean> customItems) {
 
-		List<DiscrepancyNoteBean> filteredDiscrepancyNotes = new ArrayList<DiscrepancyNoteBean>();
+		List<DiscrepancyNoteBean> filteredNotes = new ArrayList<DiscrepancyNoteBean>();
 
 		List<DiscrepancyNoteBean> allDiscrepancyNotes = discrepancyNoteDao.getViewNotesWithFilterAndSort(
 				getCurrentStudy(), new ListNotesFilter(), new ListNotesSort());
@@ -318,11 +318,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 			if (isCoder(assignedUser) || isCoder(owner)) {
 
-				filteredDiscrepancyNotes.add(discrepancyNote);
+				filteredNotes.add(discrepancyNote);
 			}
 		}
 
-		return filteredDiscrepancyNotes;
+		return filteredNotes;
 	}
 
 	private boolean isCoder(UserAccountBean loggedInUser) {
@@ -1049,30 +1049,80 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 		this.dataSource = dataSource;
 	}
-
+	
+	/**
+	 * Filters the notes and discrepancies statics and returns only those issues by a user with the coder role. 
+	 * <p>
+	 * It is assumed that the logged in user is the coder user.
+	 * 
+	 * @return List of ND statics for logged in user with coder role.
+	 */
 	public List<DiscrepancyNoteStatisticBean> getFilteredNotesStatistics() {
 
-		List<DiscrepancyNoteStatisticBean> filteredDiscrepancyNotes = new ArrayList<DiscrepancyNoteStatisticBean>();
-		List<DiscrepancyNoteBean> allDiscrepancyNotes = discrepancyNoteDao.getViewNotesWithFilterAndSort(
+		List<DiscrepancyNoteStatisticBean> dnStatics = new ArrayList<DiscrepancyNoteStatisticBean>();
+		List<DiscrepancyNoteBean> discrepancyNotes = discrepancyNoteDao.getViewNotesWithFilterAndSort(
 				getCurrentStudy(), new ListNotesFilter(), new ListNotesSort());
 
-		List<DiscrepancyNoteBean> coderNotes = filterAccordingToMedicalCodingRole(allDiscrepancyNotes);
+		List<DiscrepancyNoteBean> coderNotes = extractCoderNotes(discrepancyNotes);
+		Map<String, Integer> noteTypes = extractFilteredNoteTypes(coderNotes);
+		
 		for (DiscrepancyNoteBean discrepancyNote : coderNotes) {
 
-			filteredDiscrepancyNotes.add(createDiscrepancyStatistic(discrepancyNote, coderNotes.size()));
+			DiscrepancyNoteStatisticBean stat = createDiscrepancyStatistic(discrepancyNote, noteTypes);
+			
+			if (!added(stat, dnStatics)) {
+				
+				dnStatics.add(stat);
+			}
 		}
 
-		return filteredDiscrepancyNotes;
+		return dnStatics;
 	}
 
-	private DiscrepancyNoteStatisticBean createDiscrepancyStatistic(DiscrepancyNoteBean discrepancyNote, int count) {
+	private Boolean added(DiscrepancyNoteStatisticBean stat, List<DiscrepancyNoteStatisticBean> notes) {
+		
+		for (DiscrepancyNoteStatisticBean st : notes) {
+			
+			if (st.getDiscrepancyNoteTypeId() == stat.getDiscrepancyNoteTypeId()
+					&& st.getResolutionStatusId() == stat.getResolutionStatusId()) {
+				
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	private Map<String, Integer> extractFilteredNoteTypes(List<DiscrepancyNoteBean> notes) {
+		
+		Map<String, Integer> noteTypes = new HashMap<String, Integer>();
+		for (DiscrepancyNoteBean note : notes) {
+			
+			if (noteTypes.containsKey(note.getResStatus().getName())) {
+				
+				int currentValue = noteTypes.get(note.getResStatus().getName());
+				noteTypes.put(note.getResStatus().getName(), currentValue + 1);
+				
+			} else {
+				
+				noteTypes.put(note.getResStatus().getName(), 1);
+			}
+		}
+		
+		return noteTypes;
+	}
+
+	private DiscrepancyNoteStatisticBean createDiscrepancyStatistic(DiscrepancyNoteBean note,
+			Map<String, Integer> noteTypes) {
 
 		DiscrepancyNoteStatisticBean statisticBean = new DiscrepancyNoteStatisticBean();
 
-		statisticBean.setDiscrepancyNotesCount(count);
-		statisticBean.setDiscrepancyNoteTypeId(discrepancyNote.getId());
-		statisticBean.setResolutionStatusId(discrepancyNote.getResolutionStatusId());
+		statisticBean.setDiscrepancyNoteTypeId(note.getDisType().getId());
+		statisticBean.setResolutionStatusId(note.getResolutionStatusId());
+
+		statisticBean.setDiscrepancyNotesCount(noteTypes.get(note.getResStatus().getName()));
 
 		return statisticBean;
+
 	}
 }

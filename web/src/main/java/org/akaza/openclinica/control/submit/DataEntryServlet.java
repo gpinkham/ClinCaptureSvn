@@ -372,8 +372,8 @@ public abstract class DataEntryServlet extends Controller {
 		eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
 
 		// Filter out coder notes
-		allNotes = filterStudyCoderNotes(allNotes, request);
-		eventCrfNotes = filterStudyCoderNotes(eventCrfNotes, request);
+		allNotes = extractCoderNotes(allNotes, request);
+		eventCrfNotes = extractCoderNotes(eventCrfNotes, request);
 
 		if (!eventCrfNotes.isEmpty()) {
 			allNotes.addAll(eventCrfNotes);
@@ -3516,7 +3516,7 @@ public abstract class DataEntryServlet extends Controller {
 		List<DiscrepancyNoteBean> existingIntrvDateNotes = new ArrayList();
 		long t = System.currentTimeMillis();
 
-		ecNotes = filterStudyCoderNotes(ecNotes, request);
+		ecNotes = extractCoderNotes(ecNotes, request);
 
 		logMe("Method:populateNotesWithDBNoteCounts" + t);
 		for (int i = 0; i < ecNotes.size(); i++) {
@@ -3585,7 +3585,7 @@ public abstract class DataEntryServlet extends Controller {
 
 						List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
 
-						dbNotes = filterStudyCoderNotes(dbNotes, request);
+						dbNotes = extractCoderNotes(dbNotes, request);
 
 						ArrayList notes = new ArrayList(discNotes.getNotes(inputName));
 						notes.addAll(dbNotes);
@@ -3623,7 +3623,7 @@ public abstract class DataEntryServlet extends Controller {
 				List dbNotes = dndao.findExistingNotesForItemData(itemDataId);
 				ArrayList notes = new ArrayList(discNotes.getNotes(inputFieldName));
 
-				dbNotes = filterStudyCoderNotes(dbNotes, request);
+				dbNotes = extractCoderNotes(dbNotes, request);
 
 				notes.addAll(dbNotes);
 				discNotes.setNumExistingFieldNotes(inputFieldName, dbNotes.size());
@@ -3646,7 +3646,7 @@ public abstract class DataEntryServlet extends Controller {
 					List dbChildNotes = dndao.findExistingNotesForItemData(childItemId);
 					List childNotes = new ArrayList(discNotes.getNotes(inputFieldName));
 
-					dbChildNotes = filterStudyCoderNotes(dbChildNotes, request);
+					dbChildNotes = extractCoderNotes(dbChildNotes, request);
 
 					childNotes.addAll(dbNotes);
 					noteThreads = dNoteUtil
@@ -3678,7 +3678,7 @@ public abstract class DataEntryServlet extends Controller {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		List<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesToolTips(ecb);
 
-		ecNotes = filterStudyCoderNotes(ecNotes, request);
+		ecNotes = extractCoderNotes(ecNotes, request);
 
 		ArrayList<DiscrepancyNoteBean> nameNotes = new ArrayList();
 		ArrayList<DiscrepancyNoteBean> dateNotes = new ArrayList();
@@ -3716,7 +3716,7 @@ public abstract class DataEntryServlet extends Controller {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		List<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
 
-		existingNotes = filterStudyCoderNotes(existingNotes, request);
+		existingNotes = extractCoderNotes(existingNotes, request);
 
 		dib.setDiscrepancyNotes(existingNotes);
 
@@ -5253,37 +5253,6 @@ public abstract class DataEntryServlet extends Controller {
 		result.put("field", field);
 
 		return result;
-	}
-
-	protected List<DiscrepancyNoteBean> filterStudyCoderNotes(List<DiscrepancyNoteBean> notes,
-			HttpServletRequest request) {
-
-		if (isCoder(getUserAccountBean(request), request)) {
-
-			List<DiscrepancyNoteBean> filteredDiscrepancyNotes = new ArrayList<DiscrepancyNoteBean>();
-
-			for (DiscrepancyNoteBean discrepancyNote : notes) {
-
-				UserAccountBean owner = (UserAccountBean) getUserAccountDAO().findByPK(discrepancyNote.getOwnerId());
-				UserAccountBean assignedUser = (UserAccountBean) getUserAccountDAO().findByPK(
-						discrepancyNote.getAssignedUserId());
-
-				if (isCoder(assignedUser, request) || isCoder(owner, request)) {
-
-					filteredDiscrepancyNotes.add(discrepancyNote);
-				}
-			}
-
-			return filteredDiscrepancyNotes;
-
-		} else {
-			return notes;
-		}
-
-	}
-
-	protected boolean isCoder(UserAccountBean loggedInUser, HttpServletRequest request) {
-		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("study coder");
 	}
 
 }

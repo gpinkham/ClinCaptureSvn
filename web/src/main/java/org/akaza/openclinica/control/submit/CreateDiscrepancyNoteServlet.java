@@ -255,9 +255,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				request.setAttribute("entityName", item.getName());
 				EventCRFDAO ecdao = getEventCRFDAO();
 				EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
-				/*
-				 * ClinCapture #1 add event crf owner id
-				 */
+				
 				request.setAttribute("eventCrfOwnerId", ec.getOwnerId());
 				preUserId = ec.getOwnerId();
 			} else if ("studySub".equalsIgnoreCase(entityType)) {

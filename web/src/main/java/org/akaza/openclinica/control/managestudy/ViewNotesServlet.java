@@ -234,28 +234,21 @@ public class ViewNotesServlet extends RememberLastPage {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		UserAccountBean loggedInUser = (UserAccountBean) uadao.findByUserName(authentication.getName());
 
-		if (loggedInUser.getRoleByStudy(currentStudy.getId()).getName().equalsIgnoreCase("study coder")) {
+		if (isCoder(loggedInUser, request)) {
 
 			statisticBeans = factory.getFilteredNotesStatistics();
 		}
 
-		Map<String, Map<String, String>> customStat = ListNotesTableFactory.getNotesStatistics(statisticBeans);
 		Map<String, String> customTotalMap = ListNotesTableFactory.getNotesTypesStatistics(statisticBeans);
+		Map<String, Map<String, String>> customStat = ListNotesTableFactory.getNotesStatistics(statisticBeans);
 
 		request.setAttribute("summaryMap", customStat);
+		request.setAttribute("typeKeys", customTotalMap);
 		request.setAttribute("mapKeys", ResolutionStatus.getMembers());
 		request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames(resterm));
-		request.setAttribute("typeKeys", customTotalMap);
-
-		if (loggedInUser.getRoleByStudy(currentStudy.getId()).getName().equalsIgnoreCase("study coder")) {
-
-			request.setAttribute("grandTotal", statisticBeans.size());
-
-		} else {
-
-			request.setAttribute("grandTotal", customTotalMap.get("Total"));
-		}
-
+		
+		request.setAttribute("grandTotal", customTotalMap.get("Total"));
+		
 		forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY, request, response);
 	}
 
