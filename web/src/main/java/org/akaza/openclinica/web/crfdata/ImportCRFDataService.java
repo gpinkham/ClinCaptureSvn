@@ -246,7 +246,6 @@ public class ImportCRFDataService {
 		return eventCRFBeans;
 	}
 
-    @SuppressWarnings("unused")
     public SummaryStatsBean generateSummaryStatsBean(ODMContainer odmContainer, List<DisplayItemBeanWrapper> wrappers) {
         int discNotesGenerated = 0;
         for (DisplayItemBeanWrapper wr : wrappers) {
