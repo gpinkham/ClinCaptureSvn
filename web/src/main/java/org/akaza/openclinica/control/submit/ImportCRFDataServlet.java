@@ -62,7 +62,6 @@ import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.springframework.stereotype.Component;
 import org.xml.sax.InputSource;
 
-
 /**
  * Create a new CRF verison by uploading excel file. Makes use of several other classes to validate and provide accurate
  * validation. More specifically, uses XmlSchemaValidationHelper, ImportCRFDataService, ODMContainer, and others to
@@ -74,14 +73,17 @@ import org.xml.sax.InputSource;
 public class ImportCRFDataServlet extends Controller {
 
 	/**
-     *
-     * @param request
-     * @param response
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"), request, response);
 		checkStudyFrozen(Page.MENU_SERVLET, respage.getString("current_study_frozen"), request, response);
@@ -96,19 +98,20 @@ public class ImportCRFDataServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-                + respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        
-        StudyInfoPanel panel= getStudyInfoPanel(request);
-        panel.reset();
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 
@@ -120,13 +123,14 @@ public class ImportCRFDataServlet extends Controller {
 
 		String action = request.getParameter("action");
 		CRFVersionBean version = (CRFVersionBean) request.getSession().getAttribute("version");
-		
+
 		File xsdFile2 = new File(SpringServletAccess.getPropertiesDir(getServletContext()) + "ODM1-2-1.xsd");
 
 		if (StringUtil.isBlank(action)) {
 			logger.info("action is blank");
 			request.setAttribute("version", version);
 			forwardPage(Page.IMPORT_CRF_DATA, request, response);
+			return;
 		}
 		if ("confirm".equalsIgnoreCase(action)) {
 			String dir = SQLInitServlet.getField("filePath");
@@ -134,6 +138,7 @@ public class ImportCRFDataServlet extends Controller {
 				logger.info("The filePath in datainfo.properties is invalid " + dir);
 				addPageMessage(respage.getString("filepath_you_defined_not_seem_valid"), request);
 				forwardPage(Page.IMPORT_CRF_DATA, request, response);
+				return;
 			}
 			// All the uploaded files will be saved in filePath/crf/original/
 			String theDir = dir + "crf" + File.separator + "original" + File.separator;
@@ -143,8 +148,8 @@ public class ImportCRFDataServlet extends Controller {
 			}
 			File f = null;
 			try {
-                HashMap errorsMap = new HashMap();
-				f = uploadFile(request, errorsMap, theDir, version);
+				HashMap errorsMap = new HashMap();
+				f = uploadFile(request, errorsMap);
 			} catch (Exception e) {
 				logger.warn("*** Found exception during file upload***");
 				e.printStackTrace();
@@ -152,14 +157,15 @@ public class ImportCRFDataServlet extends Controller {
 			}
 			if (f == null) {
 				forwardPage(Page.IMPORT_CRF_DATA, request, response);
+				return;
 			}
-			
+
 			boolean fail = false;
-			ODMContainer odmContainer = new ODMContainer();
-            request.getSession().removeAttribute("odmContainer");
+			ODMContainer odmContainer;
+			request.getSession().removeAttribute("odmContainer");
 			JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			//Create SAXSource
+			// Create SAXSource
 			InputSource inputSource = new InputSource(new FileInputStream(f));
 			SAXSource saxSource = new SAXSource(inputSource);
 			try {
@@ -174,7 +180,7 @@ public class ImportCRFDataServlet extends Controller {
 				logger.info("found exception with xml transform");
 				logger.info("trying 1.2.1");
 				try {
-                    XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
+					XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
 					schemaValidator.validateAgainstSchema(f, xsdFile2);
 					odmContainer = (ODMContainer) jaxbUnmarshaller.unmarshal(saxSource);
 				} catch (Exception me2) {
@@ -184,10 +190,12 @@ public class ImportCRFDataServlet extends Controller {
 					Object[] arguments = { me2.getMessage() };
 					addPageMessage(mf.format(arguments), request);
 					forwardPage(Page.IMPORT_CRF_DATA, request, response);
+					return;
 				}
 			}
 
-			List<String> errors = new ImportCRFDataService(getDataSource(), request.getLocale()).validateStudyMetadata(odmContainer, ub.getActiveStudyId());
+			List<String> errors = new ImportCRFDataService(getDataSource(), request.getLocale()).validateStudyMetadata(
+					odmContainer, ub.getActiveStudyId());
 			if (errors != null) {
 				// add to session
 				// forward to another page
@@ -198,6 +206,7 @@ public class ImportCRFDataServlet extends Controller {
 				if (errors.size() > 0) {
 					// fail = true;
 					forwardPage(Page.IMPORT_CRF_DATA, request, response);
+					return;
 				} else {
 					addPageMessage(respage.getString("passed_study_check"), request);
 					addPageMessage(respage.getString("passed_oid_metadata_check"), request);
@@ -206,12 +215,12 @@ public class ImportCRFDataServlet extends Controller {
 			}
 			logger.debug("passed error check");
 
-            ImportCRFDataService importCRFDataService = new ImportCRFDataService(getDataSource(), request.getLocale());
+			ImportCRFDataService importCRFDataService = new ImportCRFDataService(getDataSource(), request.getLocale());
 			List<EventCRFBean> eventCRFBeans = importCRFDataService.fetchEventCRFBeans(odmContainer, ub);
 			List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
 			HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
 			HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
-			
+
 			if (eventCRFBeans == null) {
 				fail = true;
 				addPageMessage(respage.getString("no_event_status_matching"), request);
@@ -232,8 +241,8 @@ public class ImportCRFDataServlet extends Controller {
 								|| dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
 								|| dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
 								|| dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-							permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
-						} 
+							permittedEventCRFIds.add(eventCRFBean.getId());
+						}
 					}
 
 					// so that we don't repeat this following message
@@ -246,10 +255,10 @@ public class ImportCRFDataServlet extends Controller {
 					}
 
 					try {
-						List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
-						tempDisplayItemBeanWrappers = importCRFDataService.lookupValidationErrors(
-								new ValidatorHelper(request, getConfigurationDao()), odmContainer, ub,
-								totalValidationErrors, hardValidationErrors, permittedEventCRFIds);
+						List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers;
+						tempDisplayItemBeanWrappers = importCRFDataService.lookupValidationErrors(new ValidatorHelper(
+								request, getConfigurationDao()), odmContainer, ub, totalValidationErrors,
+								hardValidationErrors, permittedEventCRFIds);
 						logger.info("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
 						logger.info("size of total validation errors: " + totalValidationErrors.size());
 						logger.info("size of hard validation errors: " + hardValidationErrors.size());
@@ -275,21 +284,24 @@ public class ImportCRFDataServlet extends Controller {
 				forwardPage(Page.IMPORT_CRF_DATA, request, response);
 			} else {
 				addPageMessage(respage.getString("passing_crf_edit_checks"), request);
-                request.getSession().setAttribute("odmContainer", odmContainer);
-                request.getSession().setAttribute("importedData", displayItemBeanWrappers);
-                request.getSession().setAttribute("validationErrors", totalValidationErrors);
-                request.getSession().setAttribute("hardValidationErrors", hardValidationErrors);
+				request.getSession().setAttribute("odmContainer", odmContainer);
+				request.getSession().setAttribute("importedData", displayItemBeanWrappers);
+				request.getSession().setAttribute("validationErrors", totalValidationErrors);
+				request.getSession().setAttribute("hardValidationErrors", hardValidationErrors);
 
 				logger.debug("+++ content of total validation errors: " + totalValidationErrors.toString());
 				SummaryStatsBean ssBean = new ImportCRFDataService(getDataSource(), request.getLocale())
 						.generateSummaryStatsBean(odmContainer, displayItemBeanWrappers);
-                request.getSession().setAttribute("summaryStats", ssBean);
-                request.getSession().setAttribute("subjectData", odmContainer.getCrfDataPostImportContainer().getSubjectData());
+				request.getSession().setAttribute("summaryStats", ssBean);
+				request.getSession().setAttribute("subjectData",
+						odmContainer.getCrfDataPostImportContainer().getSubjectData());
 				if (request.getAttribute("hasSkippedItems") != null) {
-					addPageMessage(resword.getString("import_msg_part1")
-							+ " "
-							+ (currentStudy.getParentStudyId() > 0 ? resword.getString("site") : resword
-									.getString("study")) + " " + resword.getString("import_msg_part2"), request);
+					addPageMessage(
+							resword.getString("import_msg_part1")
+									+ " "
+									+ (currentStudy.getParentStudyId() > 0 ? resword.getString("site") : resword
+											.getString("study")) + " " + resword.getString("import_msg_part2"),
+							request);
 				}
 				forwardPage(Page.VERIFY_IMPORT_SERVLET, request, response);
 			}
@@ -302,14 +314,14 @@ public class ImportCRFDataServlet extends Controller {
 	@SuppressWarnings("rawtypes")
 	private File getFirstFile(HttpServletRequest request, HashMap errorsMap) {
 		File f = null;
-        FileUploadHelper uploadHelper = new FileUploadHelper();
+		FileUploadHelper uploadHelper = new FileUploadHelper();
 		List<File> files = uploadHelper.returnFiles(request, getServletContext());
 		for (File file : files) {
 			f = file;
-			if (f == null || f.getName() == null) {
+			if (f == null) {
 				logger.info("file is empty.");
 				Validator.addError(errorsMap, "xml_file", "You have to provide an XML file!");
-			} else if (f.getName().indexOf(".xml") < 0 && f.getName().indexOf(".XML") < 0) {
+			} else if (!f.getName().contains(".xml") && !f.getName().contains(".XML")) {
 				logger.info("file name:" + f.getName());
 				// TODO change the message below
 				addPageMessage(respage.getString("file_you_uploaded_not_seem_xml_file"), request);
@@ -322,17 +334,16 @@ public class ImportCRFDataServlet extends Controller {
 	/**
 	 * Uploads the xml file
 	 * 
-	 * @param version
 	 * @throws Exception
 	 */
 	@SuppressWarnings("rawtypes")
-	public File uploadFile(HttpServletRequest request, HashMap errorsMap, String theDir, CRFVersionBean version) throws Exception {
+	public File uploadFile(HttpServletRequest request, HashMap errorsMap) throws Exception {
 		return getFirstFile(request, errorsMap);
 	}
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
 			return Controller.ADMIN_SERVLET_CODE;
 		} else {
