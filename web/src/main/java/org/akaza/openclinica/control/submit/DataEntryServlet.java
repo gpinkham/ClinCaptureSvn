@@ -2289,16 +2289,9 @@ public abstract class DataEntryServlet extends Controller {
 			throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET,
 					resexception.getString("new_event_CRF_not_created"));
 		} else {
-			if (sEvent.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
-				sEvent.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
-				sEvent.setUpdater(ub);
-				sEvent.setUpdatedDate(new Date());
-				sedao.update(sEvent);
-			} else {
-				sEvent.setUpdater(ub);
-				sEvent.setUpdatedDate(new Date());
-				sedao.update(sEvent);
-			}
+			sEvent.setUpdater(ub);
+			sEvent.setUpdatedDate(new Date());
+			sedao.update(sEvent);
 		}
 
 		return ecb;
