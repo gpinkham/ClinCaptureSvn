@@ -24,9 +24,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -244,33 +246,30 @@ public class ImportCRFDataService {
 		return eventCRFBeans;
 	}
 
-	@SuppressWarnings("unused")
-	public SummaryStatsBean generateSummaryStatsBean(ODMContainer odmContainer, List<DisplayItemBeanWrapper> wrappers) {
-		int countSubjects = 0;
-		int countEventCRFs = 0;
-		int discNotesGenerated = 0;
-		for (DisplayItemBeanWrapper wr : wrappers) {
-			HashMap validations = wr.getValidationErrors();
-			discNotesGenerated += validations.size();
-		}
-		ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
-		countSubjects += subjectDataBeans.size();
-		for (SubjectDataBean subjectDataBean : subjectDataBeans) {
-			ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
+    @SuppressWarnings("unused")
+    public SummaryStatsBean generateSummaryStatsBean(ODMContainer odmContainer, List<DisplayItemBeanWrapper> wrappers) {
+        int discNotesGenerated = 0;
+        for (DisplayItemBeanWrapper wr : wrappers) {
+            HashMap validations = wr.getValidationErrors();
+            discNotesGenerated += validations.size();
+        }
+        Set<String> setOfSubjectOids = new HashSet<String>();
+        Set<String> setOfStudyEventOids = new HashSet<String>();
+        for (SubjectDataBean subjectDataBean : odmContainer.getCrfDataPostImportContainer().getSubjectData()) {
+            setOfSubjectOids.add(subjectDataBean.getSubjectOID());
+            for (StudyEventDataBean studyEventDataBean : subjectDataBean.getStudyEventData()) {
+                setOfStudyEventOids.add(studyEventDataBean.getStudyEventOID());
+            }
+        }
 
-			for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
-				countEventCRFs += 1;
-			}
-		}
+        SummaryStatsBean ssBean = new SummaryStatsBean();
+        ssBean.setDiscNoteCount(discNotesGenerated);
+        ssBean.setEventCrfCount(setOfStudyEventOids.size());
+        ssBean.setStudySubjectCount(setOfSubjectOids.size());
+        return ssBean;
+    }
 
-		SummaryStatsBean ssBean = new SummaryStatsBean();
-		ssBean.setDiscNoteCount(discNotesGenerated);
-		ssBean.setEventCrfCount(countEventCRFs);
-		ssBean.setStudySubjectCount(countSubjects);
-		return ssBean;
-	}
-
-	public List<DisplayItemBeanWrapper> lookupValidationErrors(ValidatorHelper validatorHelper,
+    public List<DisplayItemBeanWrapper> lookupValidationErrors(ValidatorHelper validatorHelper,
 			ODMContainer odmContainer, UserAccountBean ub, HashMap<String, String> totalValidationErrors,
 			HashMap<String, String> hardValidationErrors, ArrayList<Integer> permittedEventCRFIds)
 			throws OpenClinicaException {
