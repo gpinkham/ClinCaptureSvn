@@ -334,10 +334,247 @@
 					</excludes>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <goals>
+                    <goal>exec</goal>
+                </goals>
+                <configuration>
+                    <executable>mvn</executable>
+                    <arguments>
+                        <argument>-Dtest=**/selenium/TestStudyParameterEventLocationRequired</argument>
+                        <argument>clean</argument>
+                        <argument>install</argument>
+                        <argument>exec:exec</argument>
+                        <argument>-Pcobertura-test-report</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 
 	<profiles>
+		<profile>
+            <id>cobertura-test-report</id>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.cobertura</groupId>
+                    <artifactId>cobertura</artifactId>
+                    <version>${cobertura.version}</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <finalName>web</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>target/web/WEB-INF/classes</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>target/generated-classes/cobertura</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>compile-copy-resources</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>cobertura-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>pre-integration-test-instrument</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>instrument</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="target/cargo/configurations/tomcat6x/cobertura.ser"
+                                      tofile="target/cobertura/cobertura.ser" />
+                            </tasks>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>compile-copy</id>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="../core/src/test/resources/test.properties"
+                                              tofile="target/datainfo.properties" />
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>process-test-resources-copy</id>
+                                <phase>process-test-resources</phase>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="src/test/resources/web-test.properties"
+                                              tofile="target/test-classes/web-test.properties" />
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>integration-test-copy</id>
+                                <phase>integration-test</phase>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="target/cobertura/cobertura.ser"
+                                              tofile="target/cargo/configurations/tomcat6x/cobertura.ser" />
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>post-integration-test-copy</id>
+                                <phase>pre-integration-test</phase>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="../core/src/test/resources/test.properties"
+                                              tofile="target/datainfo.properties" />
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <configuration>
+                            <manifest>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            </manifest>
+                            <archive>
+                                <manifestEntries>
+                                    <Specification-Title>${project.name}</Specification-Title>
+                                    <Specification-Version>${project.version}</Specification-Version>
+                                    <Build-Id>${BUILD_ID}</Build-Id>
+                                    <Implementation-Version>${BUILD_TAG}</Implementation-Version>
+                                    <Published-Version>${published.version}</Published-Version>
+                                </manifestEntries>
+                            </archive>
+                            <nonFilteredFileExtensions>
+                                <nonFilteredFileExtension>gif</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                            </nonFilteredFileExtensions>
+                            <webResources>
+                                <resource>
+                                    <directory>src/main/webapp</directory>
+                                    <filtering>true</filtering>
+                                    <excludes>
+                                        <exclude>**/*.jsp</exclude>
+                                    </excludes>
+                                </resource>
+                                <resource>
+                                    <filtering>true</filtering>
+                                    <directory>target</directory>
+                                    <targetPath>WEB-INF/classes</targetPath>
+                                    <includes>
+                                        <include>datainfo.properties</include>
+                                    </includes>
+                                </resource>
+                            </webResources>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <configuration>
+                            <wait>false</wait>
+                            <container>
+                                <type>installed</type>
+                                <containerId>tomcat6x</containerId>
+                                <home>${catalina.home}</home>
+                            </container>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>start-servet</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>start</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>stop-servet</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>false</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>mvn</executable>
+                            <arguments>
+                                <argument>-DskipTests=true</argument>
+                                <argument>antrun:run</argument>
+                                <argument>cobertura:cobertura</argument>
+                                <argument>-Pcobertura-test-report</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+		</profile>
 		<profile>
 			<id>run-sauce-tests</id>
 			<activation>
@@ -383,7 +620,6 @@
 					<plugin>
 						<groupId>org.codehaus.cargo</groupId>
 						<artifactId>cargo-maven2-plugin</artifactId>
-						<version>1.2.0</version>
 						<configuration>
 							<container>
 								<containerId>tomcat6x</containerId>
