@@ -17,7 +17,7 @@
         	<fmt:message key="instructions" bundle="${restext}"/>
         </b>
         <div class="sidebar_tab_content">
-            <fmt:message key="design_implement_sdv" bundle="${restext}"/>
+            <fmt:message key="design_implement_coding" bundle="${restext}"/>
         </div>
     </td>
 </tr>
