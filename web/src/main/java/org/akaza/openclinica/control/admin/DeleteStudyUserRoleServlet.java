@@ -20,9 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.text.MessageFormat;
 import java.util.Stack;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -160,21 +163,23 @@ public class DeleteStudyUserRoleServlet extends Controller {
 		StudyBean study = (StudyBean) sdao.findByPK(sub.getStudyId());
 		String subject = null;
 		String body = null;
+		MessageFormat msg = new MessageFormat("");
+		Object args[] = {};
 		logger.info("Sending email...");
 
 		if (action.equals(EntityAction.DELETE)) {
-			subject = resword.getString("notification_deleting_role");
-			body = resword.getString("delete_role_email_message_htm");
+			subject = restext.getString("notification_deleting_role");
+			msg.applyPattern(restext.getString("delete_role_email_message_htm"));
 		} else if (action.equals(EntityAction.REMOVE)) {
-			subject = resword.getString("notification_removing_role");
-			body = resword.getString("remove_role_email_message_htm");
+			subject = restext.getString("notification_removing_role");
+			msg.applyPattern(restext.getString("remove_role_email_message_htm"));
 		} else if (action.equals(EntityAction.RESTORE)) {
-			subject = resword.getString("notification_restoring_role");
-			body = resword.getString("restore_role_email_message_htm");
+			subject = restext.getString("notification_restoring_role");
+			msg.applyPattern(restext.getString("restore_role_email_message_htm"));
 		}
 
-		body = body != null ? body.replace("{0}", u.getFirstName() + " " + u.getLastName()).replace("{1}", u.getName())
-				.replace("{2}", study.getName()).replace("{3}", sub.getRoleName()) : null;
+		args = new Object[] {u.getFirstName() + " " + u.getLastName(), u.getName(), sub.getRoleName(), study.getName()};
+		body = msg.format(args);
 		sendEmail(u.getEmail().trim(), subject, body, false, request);
 
 	}
