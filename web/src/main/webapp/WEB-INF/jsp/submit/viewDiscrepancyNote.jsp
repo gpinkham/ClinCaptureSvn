@@ -247,11 +247,15 @@
                                 <c:forEach var="child" items="${note.value.children}" varStatus="status">
 
                                     <c:set var="addNote" value="true"/>
+
                                     <c:if test="${userRole.studyCoder}">
-                                        <c:if test="${child.owner.id != userBean.id}">
+
+                                        <c:set var="belongs" value="${child.owner.id == userBean.id || child.assignedUserId == userBean.id}"/>
+                                        <c:if test="${belongs == false}">
                                             <c:set var="addNote" value="false"/>
                                         </c:if>
-                                    </c:if> 
+
+                                    </c:if>
 
                                     <tr>
                                         <td class="table_cell_left" colspan="2" bgcolor="#f5f5f5" width="50%" valign="top"><b><c:out value="${child.description}"/></b></td>
@@ -285,7 +289,6 @@
                                                 <c:forEach var="status" items="${resolutionStatuses}">
                                                     <c:choose>
                                                     <c:when test="${status.id == 2}">
-
                                                         <c:if test="${addNote == true}">
                                                             <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>'); showAnotherDescriptions(2, ${note.value.id});/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
                                                         </c:if>
