@@ -53,10 +53,20 @@ public class ImportDataRuleRunner extends RuleRunner {
 	}
 
 	/**
+	 * @param optimiseRuleValidator
+	 *            Boolean
+	 * @param connection
+	 *            Connection
 	 * @param containers
+	 *            List<ImportDataRuleRunnerContainer>
+	 * @param skippedItemIds
+	 *            Set<Integer>
 	 * @param study
+	 *            StudyBean
 	 * @param ub
+	 *            UserAccountBean
 	 * @param executionMode
+	 *            ExecutionMode
 	 * @return Returned RuleActionBean summary with key as groupOrdinalPLusItemOid.
 	 */
 	@Transactional
@@ -68,12 +78,12 @@ public class ImportDataRuleRunner extends RuleRunner {
 		if (executionMode == ExecutionMode.DRY_RUN) {
 			for (ImportDataRuleRunnerContainer container : containers) {
 				if (container.getShouldRunRules())
-					container.setRuleActionContainerMap(this.populateToBeExpected(optimiseRuleValidator, container, study, ub));
+					container.setRuleActionContainerMap(this.populateToBeExpected(optimiseRuleValidator, container,
+							study));
 			}
 		} else if (executionMode == ExecutionMode.SAVE) {
 			for (ImportDataRuleRunnerContainer container : containers) {
 				MessageContainer messageContainer = this.runRules(connection, study, ub, skippedItemIds,
-						(HashMap<String, String>) container.getVariableAndValue(),
 						container.getRuleActionContainerMap());
 				messageMap.putAll(messageContainer.getByMessageType(MessageType.ERROR));
 			}
@@ -82,8 +92,8 @@ public class ImportDataRuleRunner extends RuleRunner {
 	}
 
 	@Transactional
-	private HashMap<String, ArrayList<RuleActionContainer>> populateToBeExpected(
-			Boolean optimiseRuleValidator, ImportDataRuleRunnerContainer container, StudyBean study, UserAccountBean ub) {
+	private HashMap<String, ArrayList<RuleActionContainer>> populateToBeExpected(Boolean optimiseRuleValidator,
+			ImportDataRuleRunnerContainer container, StudyBean study) {
 		// copied code for toBeExpected from DataEntryServlet runRules
 		HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
 		HashMap<String, String> variableAndValue = (HashMap<String, String>) container.getVariableAndValue();
@@ -96,20 +106,20 @@ public class ImportDataRuleRunner extends RuleRunner {
 		List<RuleSetBean> ruleSets = container.getImportDataTrueRuleSets();
 		for (RuleSetBean ruleSet : ruleSets) {
 			String key = getExpressionService().getItemOid(ruleSet.getOriginalTarget().getValue());
-			List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = null;
+			List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult;
 			if (toBeExecuted.containsKey(key)) {
 				allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
 			} else {
 				toBeExecuted.put(key, new ArrayList<RuleActionContainer>());
 				allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
 			}
-			ItemDataBean itemData = null;
+			ItemDataBean itemData;
 
 			for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
 				ruleSet.setTarget(expressionBean);
 
 				for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
-					String result = null;
+					String result;
 					RuleBean rule = ruleSetRule.getRuleBean();
 					// ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(),
 					// ruleSet, variableAndValue,ecb);
@@ -136,7 +146,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 								 * request.setAttribute(firstDDE, true); } }
 								 * if(request.getAttribute(firstDDE)==Boolean.TRUE) { } else {
 								 */
-								String itemDataValueFromImport = "";
+								String itemDataValueFromImport;
 								if (variableAndValue.containsKey(key)) {
 									itemDataValueFromImport = variableAndValue.get(key);
 								} else {
@@ -174,8 +184,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 
 	@Transactional
 	private MessageContainer runRules(Connection connection, StudyBean currentStudy, UserAccountBean ub,
-			Set<Integer> skippedItemIds, HashMap<String, String> variableAndValue,
-			HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted) {
+			Set<Integer> skippedItemIds, HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted) {
 		// Copied from DataEntryRuleRunner runRules
 		MessageContainer messageContainer = new MessageContainer();
 		for (Map.Entry<String, ArrayList<RuleActionContainer>> entry : toBeExecuted.entrySet()) {
@@ -199,20 +208,20 @@ public class ImportDataRuleRunner extends RuleRunner {
 				ItemDataBean itemData = getExpressionService().getItemDataBeanFromDb(
 						ruleActionContainer.getRuleSetBean().getTarget().getValue());
 
-				if (skippedItemIds.contains(itemData.getItemId())) {
+				if (itemData != null && skippedItemIds.contains(itemData.getItemId())) {
 					continue;
 				}
 
-                RuleActionBean rab = ap.execute(
-                        RuleRunnerMode.IMPORT_DATA,
-                        ExecutionMode.SAVE,
-                        ruleActionContainer.getRuleAction(),
-                        itemData,
-                        DiscrepancyNoteBean.ITEM_DATA,
-                        currentStudy,
-                        ub,
-                        prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction()
-                                .getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
+				RuleActionBean rab = ap.execute(
+						RuleRunnerMode.IMPORT_DATA,
+						ExecutionMode.SAVE,
+						ruleActionContainer.getRuleAction(),
+						itemData,
+						DiscrepancyNoteBean.ITEM_DATA,
+						currentStudy,
+						ub,
+						prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction()
+								.getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
 
 				if (rab != null) {
 					if (rab instanceof ShowActionBean) {

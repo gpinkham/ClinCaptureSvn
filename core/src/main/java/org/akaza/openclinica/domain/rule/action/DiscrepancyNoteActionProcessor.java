@@ -13,6 +13,12 @@
 
 package org.akaza.openclinica.domain.rule.action;
 
+import com.clinovo.context.SubmissionContext;
+
+import java.sql.Connection;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -21,11 +27,6 @@ import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
-
-import com.clinovo.context.SubmissionContext;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
 
 public class DiscrepancyNoteActionProcessor implements ActionProcessor {
 
@@ -61,11 +62,13 @@ public class DiscrepancyNoteActionProcessor implements ActionProcessor {
 
 	private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData,
 			StudyBean currentStudy, UserAccountBean ub) {
-		getDiscrepancyNoteService().saveFieldNotes(ruleAction.getCuratedMessage(), itemDataBean.getId(), itemData,
-                connection, currentStudy, ub, true);
-		RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean,
-				itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
-		ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
+        if (itemDataBean != null) {
+            getDiscrepancyNoteService().saveFieldNotes(ruleAction.getCuratedMessage(), itemDataBean.getId(), itemData,
+                    connection, currentStudy, ub, true);
+            RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean,
+                    itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
+            ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
+        }
 		return null;
 	}
 

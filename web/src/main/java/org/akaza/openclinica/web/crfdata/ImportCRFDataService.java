@@ -246,29 +246,61 @@ public class ImportCRFDataService {
 		return eventCRFBeans;
 	}
 
-    public SummaryStatsBean generateSummaryStatsBean(ODMContainer odmContainer, List<DisplayItemBeanWrapper> wrappers) {
-        int discNotesGenerated = 0;
-        for (DisplayItemBeanWrapper wr : wrappers) {
-            HashMap validations = wr.getValidationErrors();
-            discNotesGenerated += validations.size();
-        }
-        Set<String> setOfSubjectOids = new HashSet<String>();
-        Set<String> setOfStudyEventOids = new HashSet<String>();
-        for (SubjectDataBean subjectDataBean : odmContainer.getCrfDataPostImportContainer().getSubjectData()) {
-            setOfSubjectOids.add(subjectDataBean.getSubjectOID());
-            for (StudyEventDataBean studyEventDataBean : subjectDataBean.getStudyEventData()) {
-                setOfStudyEventOids.add(studyEventDataBean.getStudyEventOID());
-            }
-        }
+	public SummaryStatsBean generateSummaryStatsBean(ODMContainer odmContainer, List<DisplayItemBeanWrapper> wrappers) {
+		int discNotesGenerated = 0;
+		for (DisplayItemBeanWrapper wr : wrappers) {
+			HashMap validations = wr.getValidationErrors();
+			discNotesGenerated += validations.size();
+		}
+		Set<String> setOfSubjectOids = new HashSet<String>();
+		Set<String> setOfStudyEventOids = new HashSet<String>();
+		for (SubjectDataBean subjectDataBean : odmContainer.getCrfDataPostImportContainer().getSubjectData()) {
+			setOfSubjectOids.add(subjectDataBean.getSubjectOID());
+			for (StudyEventDataBean studyEventDataBean : subjectDataBean.getStudyEventData()) {
+				setOfStudyEventOids.add(studyEventDataBean.getStudyEventOID());
+			}
+		}
 
-        SummaryStatsBean ssBean = new SummaryStatsBean();
-        ssBean.setDiscNoteCount(discNotesGenerated);
-        ssBean.setEventCrfCount(setOfStudyEventOids.size());
-        ssBean.setStudySubjectCount(setOfSubjectOids.size());
-        return ssBean;
-    }
+		SummaryStatsBean ssBean = new SummaryStatsBean();
+		ssBean.setDiscNoteCount(discNotesGenerated);
+		ssBean.setEventCrfCount(setOfStudyEventOids.size());
+		ssBean.setStudySubjectCount(setOfSubjectOids.size());
+		return ssBean;
+	}
 
-    public List<DisplayItemBeanWrapper> lookupValidationErrors(ValidatorHelper validatorHelper,
+	private EventCRFBean createEventCRFBean(UserAccountBean ub, CRFVersionBean crfVersion, StudyBean studyBean,
+			StudySubjectBean studySubjectBean, StudyEventBean studyEvent, EventCRFDAO eventCRFDAO) {
+		EventCRFBean eventCRFBean = new EventCRFBean();
+		eventCRFBean.setAnnotations("");
+		eventCRFBean.setCreatedDate(new Date());
+		eventCRFBean.setCRFVersionId(crfVersion.getId());
+
+		if (studyBean.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
+			eventCRFBean.setInterviewerName("");
+		} else {
+			eventCRFBean.setInterviewerName(studyEvent.getOwner().getName());
+
+		}
+		if (!studyBean.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
+			eventCRFBean.setDateInterviewed(null);
+		} else {
+			eventCRFBean.setDateInterviewed(studyEvent.getDateStarted());
+		}
+
+		eventCRFBean.setOwner(ub);
+
+		eventCRFBean.setNotStarted(true);
+		eventCRFBean.setStatus(Status.AVAILABLE);
+		eventCRFBean.setCompletionStatusId(1);
+		eventCRFBean.setStudySubjectId(studySubjectBean.getId());
+		eventCRFBean.setStudyEventId(studyEvent.getId());
+		eventCRFBean.setValidateString("");
+		eventCRFBean.setValidatorAnnotations("");
+
+		return (EventCRFBean) eventCRFDAO.create(eventCRFBean);
+	}
+
+	public List<DisplayItemBeanWrapper> lookupValidationErrors(ValidatorHelper validatorHelper,
 			ODMContainer odmContainer, UserAccountBean ub, HashMap<String, String> totalValidationErrors,
 			HashMap<String, String> hardValidationErrors, ArrayList<Integer> permittedEventCRFIds)
 			throws OpenClinicaException {
@@ -360,19 +392,27 @@ public class ImportCRFDataService {
 
 					// System.out.println("running check on an event bean with seid " + studyEvent.getId() + " and " +
 					// crfBean.getOid());
+					EventCRFBean eventCRFBean = null;
 					ArrayList<EventCRFBean> eventCrfBeans = eventCRFDAO.findAllByStudyEventAndCrfOrCrfVersionOid(
-							studyEvent, crfBean.getOid());
-					EventCRFBean eventCRFBean = eventCrfBeans.get(0);
-					if (eventCRFBean.isNotStarted() && eventCRFBean.getCRFVersionId() != crfVersion.getId()) {
-						eventCRFBean.setCRFVersionId(crfVersion.getId());
-						eventCRFBean = (EventCRFBean) eventCRFDAO.update(eventCRFBean);
+                            studyEvent, crfBean.getOid());
+					if (eventCrfBeans.size() > 0) {
+						eventCRFBean = eventCrfBeans.get(0);
+						if (eventCRFBean.isNotStarted() && eventCRFBean.getCRFVersionId() != crfVersion.getId()) {
+							eventCRFBean.setCRFVersionId(crfVersion.getId());
+							eventCRFBean = (EventCRFBean) eventCRFDAO.update(eventCRFBean);
+						}
+					}
+					if (eventCRFBean == null) {
+						eventCRFBean = createEventCRFBean(ub, crfVersion, studyBean, studySubjectBean, studyEvent,
+								eventCRFDAO);
+						permittedEventCRFIds.add(eventCRFBean.getId());
 					}
 					EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
 					EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO
 							.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), crfVersion.getId());
 					String prevItemGroupOid = null;
 					Collections.sort(itemGroupDataBeans, new ItemGroupComparator());
-					if (permittedEventCRFIds.contains(new Integer(eventCRFBean.getId()))) {
+					if (permittedEventCRFIds.contains(eventCRFBean.getId())) {
 						for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
 							if (prevItemGroupOid != null
 									&& !prevItemGroupOid.equals(itemGroupDataBean.getItemGroupOID())) {
@@ -565,8 +605,7 @@ public class ImportCRFDataService {
 			ItemDataBean existingItemDataBean = getItemDataDao().findByItemIdAndEventCRFIdAndOrdinal(
 					displayItemBean.getItem().getId(), displayItemBean.getData().getEventCRFId(),
 					displayItemBean.getData().getOrdinal());
-			if (existingItemDataBean != null && existingItemDataBean.getId() > 0
-					&& existingItemDataBean.getValue() != null && !existingItemDataBean.getValue().isEmpty()) {
+			if (existingItemDataBean != null && existingItemDataBean.getId() > 0) {
 				displayItemBean.setSkip(true);
 				validatorHelper.setAttribute("hasSkippedItems", true);
 				itemBean.getImportItemDataBean().setSkip(true);
