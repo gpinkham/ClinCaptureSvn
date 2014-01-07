@@ -33,6 +33,6 @@ public class Status {
 	}
 	
 	public enum CodeStatus {
-		CODED, NOT_CODED, UNKNOWN, REMOVED
+		CODED, NOT_CODED, UNKNOWN, REMOVED, IN_PROGRESS
 	}
 }

@@ -69,10 +69,10 @@ public class CodingSpringJob extends QuartzJobBean {
 
                 //get codes for all verb terms & save it in classification
                 search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "));
-                //replace all terms & codes from classification to coded element
+                //replace all terms & codes from classification to coded elements
                 generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement());
 
-                //if isAlias true, create term using completed classification
+                //if isAlias is true, create term using completed classification
                 if (isAlias) {
 
                     StudyParameterValueBean configuredDictionary = studyParameterValueDAO.findByHandleAndStudy(codedItem.getStudyId(), "autoCodeDictionaryName");
@@ -81,7 +81,7 @@ public class CodingSpringJob extends QuartzJobBean {
                     Term term = new Term();
 
                     term.setDictionary(dictionary);
-                    term.setPreferredName(verbatimTerm.toLowerCase());
+                    term.setPreferredName(codedItem.getVerbatimTerm().toLowerCase());
                     term.setExternalDictionaryName(codedItem.getDictionary());
                     term.setTermElementList(generateTermElementList(classificationResult.getClassificationElement()));
                     term.setHttpPath(classificationResult.getHttpPath());
@@ -89,7 +89,8 @@ public class CodingSpringJob extends QuartzJobBean {
                     termService.saveTerm(term);
                 }
 
-                codedItem.setStatus("CODED");
+                codedItem.setStatus((String.valueOf(Status.CodeStatus.CODED)));
+
                 codedItemService.saveCodedItem(codedItem);
             }
 
@@ -111,7 +112,7 @@ public class CodingSpringJob extends QuartzJobBean {
             }
         }
 
-        return classificationResultList.get(0); //not sure that it is good idea.
+        return classificationResultList.get(0); //not sure that it is a good idea.
     }
 
     private List<TermElement> generateTermElementList(List<ClassificationElement> classificationElementList) {

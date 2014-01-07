@@ -2441,15 +2441,16 @@ disableRandomizeCRFButtons = function(flag) {
 codeItem = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-    var study = new RegExp("study=(\\d+)").exec(window.location.href.toString())[1]
+    $("a[name='Code']").css("visibility", "hidden");
+    $(".loader").css("display", "inline");
 
     $.ajax({
 
         type: "POST",
         url: url + "/codeItem",
+
         data: {
 
-            study: study,
             item: $(item).attr("itemid"),
             verbatimTerm: $.trim($(item).parent().siblings("td").find("input").val()),
             dictionary: $(item).parent().siblings("td").find("div[name='termDictionary']").text()
@@ -2457,19 +2458,45 @@ codeItem = function(item) {
 
         success: function(data) {
 
+            $(".loader").css('display', "none");
+            //delete old results
+            $("#emptyResult").parent().html('');
             $("#tablepaging").parent().html('');
-            $("div[id=" + ($(item).attr("itemid")) + "]").html(data);
 
-            // The item is created in codeItem.jsp
-            if ($("#autoCode").size() === 1) {
+            //display ajax response
+            $("div[id=" + ($(item).attr("itemid")) + "]").html(data).fadeIn('slow');
 
-                updateCodingUX($(item).parents("td").siblings("td").find("div.wrapText").parent());
-                $(item).parents('td').find("a[name='deleteTerm'][itemid=" + $(item).attr("itemid").toLowerCase() + "]").css("visibility", "visible");
+            //display code icon
+            $('tr:not(:contains("In Progress"))').find("a[name='Code']").css("visibility", "visible");
 
-                $("#autoCode").remove();
+            //auto code actions
+            if($("div[id=" + ($(item).attr("itemid")) + "]").find('table').length > 0 && $("#autoCode").size() === 1) {
+
+                //update coded item status
+                $(item).parent().siblings("td").filter(function () { return $(this).text() == 'To be Coded'; }).text("Completed");
+
+                //display uncode icon
+                $("a[name='unCode'][itemid=" + ($(item).attr("itemid")) + "]").css("visibility", "visible");
+
+                //update code icon url
+                $("a[name='Code'][itemid=" + ($(item).attr("itemid")) + "]").children('img').attr('src', '../images/code_confirm.png');
+
+                //update verb term attr for dynamic m.c. UX update
+                $("a[name='deleteTerm'][itemid=" + $(item).attr("itemid") + "]").attr("term", $.trim($(item).parent().siblings("td").find("input").val().toLowerCase()));
+
+                //display delete term icon
+                var dictionary =  $(item).parent().siblings("td").find("div[name='termDictionary']").text();
+                $("a[name='deleteTerm'][term=" + $.trim($(item).parent().siblings("td").find("input").val().toLowerCase()) + "]").filter(function () {
+                    return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary; }).children('img').css("visibility", "visible");
+
             }
         },
         error: function(e) {
+
+            //display code icon
+            $('tr:not(:contains("In Progress"))').find("a[name='Code']").css("visibility", "visible");
+            $(".loader").css('display', "none");
+
             console.log("Error:" + e);
         }
     })
@@ -2478,7 +2505,7 @@ codeItem = function(item) {
 saveCodedItem = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-
+    var code = $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
     $.ajax({
 
         type: "POST",
@@ -2486,16 +2513,17 @@ saveCodedItem = function(item) {
         data: {
 
             item: $(item).parents('div').attr("id"),
-            code: $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
+            code: code
         },
 
         success: function(data) {
 
-            updateCodingUX(item)
+            manualUpdateMedicalCodingUX(item, code);
 
             console.log("Medical coding executed successfully")
         },
         error: function(e) {
+
             console.log("Error:" + e);
         }
     })
@@ -2507,6 +2535,7 @@ uncodeCodeItem = function(item) {
     var confirmText = "Uncoding this item will reset the coded item and its status. Do you want to proceed?";
 
     if(confirm(confirmText)) {
+
         $.ajax({
 
             type: "POST",
@@ -2518,7 +2547,6 @@ uncodeCodeItem = function(item) {
 
             success: function(data) {
 
-                /* get theme color and choose icon */
                 var codeItemButtonSrc = "../images/code_blue.png";
                 var color = $('*').find('a').css('color').toLowerCase();
                 if (color == 'rgb(170, 98, 198)' || color == '#aa62c6') {
@@ -2528,29 +2556,32 @@ uncodeCodeItem = function(item) {
                     codeItemButtonSrc = "../images/green/code_green.png";
                 }
 
-                /* change completed code icon to available */
+                //unblock term input
+                $(item).parents().find("div[id=" + $(item).attr("itemid") + "]").siblings("input").attr('disabled', false);
+
+                //change completed code icon to available
                 $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc)
-                /* change code item version */
-                var versionNumber = parseInt($.trim($(item).parent('td').siblings("td").find("div[name='codedItemVersion']").text()));
-                $(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text(versionNumber + 1);
-                /* change status from completed to available */
+
+                //update coded item status
                 $(item).parent().siblings("td").filter(function () {
                     return $(this).text() == 'Completed'; }).text("To be Coded");
-                /* change input box value from coded term to verbatim term */
-                $(item).parent().siblings("td").find("input:first").val($(item).parent().siblings("td:first").text()).attr("disabled", false);
-                /* hide unCode icon */
+
+                //hide unCode icon
                 $(item).css("visibility", "hidden");
-                /* increase 'To be coded' value & decrease 'Coded' value */
+
+                //update coded items counter
                 var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
                 var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
                 $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded - 1);
                 $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded + 1);
-                /*clean up coding resuts*/
+
+                //cleanup results
                 $("#tablepaging").parent().html('');
 
                 console.log("Medical uncoding executed successfully");
             },
             error: function(e) {
+
                 console.log("Error:" + e);
             }
         })
@@ -2562,6 +2593,7 @@ function codeAndAlias(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
     var study = new RegExp("study=(\\d+)").exec(window.location.href.toString())[1]
+    var code = $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
 
     $.ajax({
 
@@ -2571,22 +2603,141 @@ function codeAndAlias(item) {
 
             study: study,
             item: $(item).parents('div').attr("id"),
-            code: $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
+            code: code
         },
 
         success: function(data) {
 
-            updateCodingUX(item)
-            $("a[name='deleteTerm'][term=" + $(item).parents('tr').find("a[name='deleteTerm'][itemid=" + $(item).children('div').attr("id") + "]").attr("term").toLowerCase() + "]").each(function () {
-                $(this).children('img').css("visibility", "visible");
-            });
+            manualUpdateMedicalCodingUX(item, code);
 
             console.log("Medical coding executed successfully")
         },
         error: function(e) {
+
             console.log("Error:" + e);
         }
     })
+}
+
+function codedItemAutoUpdate() {
+    $(document).ready(function () {
+
+        setInterval(function () {
+
+            var arr = new Array();
+
+            $("td:contains('In Progress')").each(
+
+                function () {
+
+                    if ($(this).next().find('div[id]').attr('id') !== undefined) {
+
+                        arr.push($(this).next().find('div[id]').attr('id'));
+                    }
+                }
+            );
+
+            if (arr.length > 0) {
+
+                arr = arr.toString();
+                codedItemAutoUpdateAjax(arr);
+            }
+        }, 20000);
+    });
+}
+
+function codedItemAutoUpdateAjax(arr) {
+
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+
+    $.ajax({
+        type: "POST",
+        url: url + "/checkCodedItemsStatus",
+        data: {
+            arr: arr
+        },
+        success: function (html) {
+
+            autoUpdateMedicalCodingUX(html);
+        },
+        error: function(e) {
+
+            console.log("Error:" + e);
+        }
+    });
+
+}
+
+function autoUpdateMedicalCodingUX(itemsToUpdate) {
+
+    var array  = itemsToUpdate.split(',');
+
+    jQuery.each(array, function () {
+
+        var idAndTerm = $.trim(this).replace('[','').replace(']','');
+
+        if (idAndTerm.length > 0) {
+
+            var id = idAndTerm.split('_')[0];
+            var term = idAndTerm.split('_')[1];
+
+            //update code icon url
+            $("a[name='Code'][itemid=" + id + "]").children('img').attr('src', '../images/code_confirm.png');
+
+            //display code icon
+            if($(".loader").css('display') == 'inline') {
+
+                $("a[name='Code'][itemid=" + id + "]").css("visibility", "hidden");
+            } else {
+
+                $("a[name='Code'][itemid=" + id + "]").css("visibility", "visible");
+            }
+
+            //change coded item status
+            $("a[name='Code'][itemid=" + id + "]").parents().siblings("td").filter(function () {
+                return $(this).text() == 'In Progress'; }).text("Completed");
+
+            //display uncode icon
+            $("a[name='unCode'][itemid=" + id + "]").css("visibility", "visible");
+
+            //update code status counter
+            var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
+            var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
+            $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
+            $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
+
+            //display deleteTerm button
+            if(term !== undefined) {
+
+                var dictionary = $("a[name='deleteTerm'][term=" + term + "][itemid=" + id + "]").parents().siblings("td").find("div[name='termDictionary']").text();
+                $("a[name='deleteTerm'][term=" + term + "]").filter(function () {
+                    return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary; }).children('img').css("visibility", "visible");
+            }
+        }
+    });
+}
+
+function manualUpdateMedicalCodingUX (item, code) {
+
+    //hide coded item icon
+    $("a[name='Code'][itemid=" + $(item).parents('div').attr("id") + "]").css("visibility", "hidden");
+
+    //update verb term attr for dynamic m.c. UX update
+    $("a[name='deleteTerm'][itemid=" + $(item).parents('div').attr("id") + "]").attr("term", code.toLowerCase());
+
+    //update input field
+    $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").val($.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text()));
+
+    //block input field
+    $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").attr('disabled', true);
+
+    //change coded item status
+    $(item).parents().siblings("td").filter(function () {
+        return $(this).text() == 'To be Coded'; }).text("In Progress");
+
+    //hide code icon results
+    $("div[id=" + $(item).parents('div').attr("id") + "]").fadeOut( "slow" );
+
 }
 
 function initCrfMoreInfo() {
@@ -2696,30 +2847,6 @@ function Pager(tableName, itemsPerPage) {
         element.innerHTML = pagerHtml;
 
     }
-}
-
-updateCodingUX = function(item) {
-
-    /* update code item version */
-    var versionNumber = parseInt($.trim($(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text()));
-
-    $(item).parents('td').siblings("td").find("div[name='codedItemVersion']").text(versionNumber + 1);
-    /* update code icon from available to code completed */
-    $(item).parents('td').find("a[name='Code'][itemid=" + $(item).children('div').attr("id") + "]").children('img').attr('src', '../images/code_confirm.png');
-    /* update status from Available to Completed */
-    $(item).parents('td').siblings("td").filter(function() {
-        return $(this).text() == 'To be Coded' || $(this).text() == 'Available';
-    }).text("Completed");
-    /* update coding box from verbatim term to coded term */
-    $(item).parents("div[id=" + $(item).children('div').attr("id") + "]").siblings("input").val($.trim($(item).children('div').text())).attr('disabled', true);
-    /* display unCode icon */
-    $(item).parents('td').find("a[name='unCode'][itemid=" + $(item).children('div').attr("id") + "]").css("visibility", "visible");
-    /* increase 'Coded' value & decrease 'To Be Coded' value */
-    var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
-    var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
-
-    $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
-    $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
 }
 
 deleteTerm = function(item) {

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="vitaly" id="2014-01-02-TICKET858">
+        <comment>Add new column to the coded_item table</comment>
+        <addColumn tableName="coded_item" >
+            <column name="verbatim_term" type="VARCHAR(255)" />
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

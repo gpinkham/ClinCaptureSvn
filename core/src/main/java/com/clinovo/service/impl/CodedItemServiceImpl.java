@@ -113,6 +113,7 @@ public class CodedItemServiceImpl implements CodedItemService {
             cItem.setDictionary(meta.getCodeRef());
             cItem.setSubjectId(eventCRF.getStudySubjectId());
             cItem.setCrfVersionId(eventCRF.getCRFVersionId());
+            cItem.setVerbatimTerm(itemData.getValue());
 
             codeItemDAO.saveOrUpdate(cItem);
             return cItem;

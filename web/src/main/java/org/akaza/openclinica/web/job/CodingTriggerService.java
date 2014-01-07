@@ -25,7 +25,7 @@ public class CodingTriggerService {
         codeJobDataMap.put(VERBATIUM_TERM, verbatiumTerm);
         codeJobDataMap.put(IS_ALIAS, String.valueOf(isAlias));
         SimpleTriggerImpl sTrigger = new SimpleTriggerImpl();
-        sTrigger.setName("coding_item_" + codedItemId + " verbatiumTerm_" + verbatiumTerm + " " + System.currentTimeMillis());
+        sTrigger.setName("coded_item_id_" + codedItemId + " verbTerm_" + verbatiumTerm + " " + System.currentTimeMillis());
         sTrigger.setGroup("CODING");
         sTrigger.setRepeatCount(0);
         sTrigger.setRepeatInterval(1);

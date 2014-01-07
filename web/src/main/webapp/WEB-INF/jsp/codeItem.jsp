@@ -8,8 +8,10 @@
 
 <c:choose>
     <c:when test="${fn:length(codedElementList) eq 0}">
-        <br>
-        <span class="formlabel">No matching results found in dictionary <c:out value="${itemDictionary}"/></span>
+        <div id="emptyResult">
+            <br>
+            <span class="formlabel">No matching results found in dictionary <c:out value="${itemDictionary}"/>
+        </div>
     </c:when>
     <c:otherwise>
         <table id="tablepaging" class="itemsTable">
@@ -64,4 +66,27 @@
     </c:otherwise>
 </c:choose>
 
+<div id="pageNavPosition" style="padding-top: 20px" align="center"/>
+<input type="hidden" name="<c:out value="${itemDictionary}"/>" id="dictionary"/>
 
+<script type="text/javascript">
+
+    var dictionary = $("#dictionary").attr('name');
+    var rowsToDisplay;
+
+    if(dictionary == "MedDRA") {
+
+        rowsToDisplay = 14;
+    } else if (dictionary == "ICD 10" || dictionary == "ICD 9") {
+
+        rowsToDisplay = 15;
+    } else {
+
+        rowsToDisplay = 10;
+    }
+
+    var pager = new Pager('tablepaging', rowsToDisplay);
+    pager.init();
+    pager.showPageNav('pager', 'pageNavPosition');
+    pager.showPage(1);
+</script>

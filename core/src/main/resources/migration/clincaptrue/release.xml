@@ -57,4 +57,5 @@
     <include file="migration/clincaptrue/2013-12-09-TICKET743.xml" />
     <include file="migration/clincaptrue/2013-12-20-TICKET852.xml" />
     <include file="migration/clincaptrue/2013-12-17-TICKET36.xml" />
+    <include file="migration/clincaptrue/2014-01-02-TICKET858.xml" />
 </databaseChangeLog>

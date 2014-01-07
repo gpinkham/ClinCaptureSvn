@@ -130,7 +130,6 @@ public class CodedItemsController {
 		StudyInfoPanel panel = new StudyInfoPanel();
 		panel.reset();
 
-		// probably a bad idea?
 		model.addAttribute("panel", panel);
 		model.addAttribute("allItems", items);
 		model.addAttribute("codedItems", codedItems.size());
@@ -169,8 +168,8 @@ public class CodedItemsController {
 
             // Ignore case - (until Marc changes his mind)
             term = termService.findByNonUniqueTermAndExternalDictionary(verbatimTerm, codedItem.getDictionary());
-
         }
+
         if (term != null) {
 
             Classification classification = new Classification();
@@ -182,6 +181,7 @@ public class CodedItemsController {
 
             codedItem.setStatus((String.valueOf(CodeStatus.CODED)));
             codedItem.setAutoCoded(true);
+            codedItem.setVerbatimTerm(verbatimTerm);
 
             codedItemService.saveCodedItem(codedItem);
 
@@ -191,8 +191,8 @@ public class CodedItemsController {
 
         } else {
 
-        search.setSearchInterface(new BioPortalSearchInterface());
-        classifications = search.getClassifications(verbatimTerm, dictionary);
+            search.setSearchInterface(new BioPortalSearchInterface());
+            classifications = search.getClassifications(verbatimTerm, dictionary);
         }
 
         model.addAttribute("itemDataId", codedItem.getItemId());
@@ -220,6 +220,12 @@ public class CodedItemsController {
 
         String codedItemItemDataId = request.getParameter("item");
         String codedItemVerbatimTerm = request.getParameter("code");
+        CodedItem codedItem = codedItemService.findCodedItem(Integer.valueOf(codedItemItemDataId));
+
+        codedItem.setStatus((String.valueOf(CodeStatus.IN_PROGRESS)));
+        codedItem.setVerbatimTerm(codedItemVerbatimTerm);
+
+        codedItemService.saveCodedItem(codedItem);
 
         createCodeItemJob(codedItemItemDataId, codedItemVerbatimTerm, false);
 
@@ -245,6 +251,7 @@ public class CodedItemsController {
 
         CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
 
+
         for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
 
             codedItemElement.setItemCode("");
@@ -259,7 +266,6 @@ public class CodedItemsController {
 
         codedItemService.saveCodedItem(codedItem);
 
-        // Redirect to main
         return "codedItems";
     }
     
@@ -292,12 +298,16 @@ public class CodedItemsController {
 
             isAlias = true;
         }
+
         if(codedItem != null) {
+
+            codedItem.setStatus((String.valueOf(CodeStatus.IN_PROGRESS)));
+            codedItem.setVerbatimTerm(code);
+            codedItemService.saveCodedItem(codedItem);
 
             createCodeItemJob(codedItemItemDataId, code, isAlias);
         }
 
-		// Redirect to main
 		return "codedItems";
 	}
 	
@@ -338,12 +348,15 @@ public class CodedItemsController {
         CodingTriggerService codingTriggerService = new CodingTriggerService();
         SimpleTriggerImpl trigger = codingTriggerService.generateCodeItemService(codedItemItemDataId, codedItemVerbatimTerm, isAlias);
         trigger.setDescription(codedItemItemDataId + " " + codedItemVerbatimTerm);
+
         JobDetailImpl jobDetailBean = new JobDetailImpl();
+
         jobDetailBean.setGroup(trigger.getGroup());
         jobDetailBean.setName(trigger.getName());
         jobDetailBean.setJobClass(org.akaza.openclinica.web.job.CodingStatefulJob.class);
         jobDetailBean.setJobDataMap(trigger.getJobDataMap());
         jobDetailBean.setDurability(true);
+
         getStdScheduler().scheduleJob(jobDetailBean, trigger);
     }
 

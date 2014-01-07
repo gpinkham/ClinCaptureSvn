@@ -19,6 +19,11 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 		assertEquals("some-dictionary-2", codedItemDAO.findById(2).getDictionary());
 	}
 
+    @Test
+    public void testThatFindByIdReturnsCodedItemWithVertbatimTerm() {
+        assertEquals("some-verbatim-term-3", codedItemDAO.findById(3).getVerbatimTerm());
+    }
+
 	@Test
 	public void testThatFindByIdReturnsCodedTermWithStatus() {
 		assertNotNull(codedItemDAO.findById(2).getCodeStatus());
@@ -33,6 +38,16 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	public void testThatFindAllReturnsAllTheItemsFromTheDB() {
 		assertEquals(4, codedItemDAO.findAll().size());
 	}
+
+    @Test
+    public void testThatFindyVerbatimTermDoesNotReturnNull() {
+        assertNotNull(codedItemDAO.findByVerbatimTerm("some-verbatim-term"));
+    }
+
+    @Test
+    public void testThatFindByVerbatimTermReturnsCodedItemWithDictionary() {
+        assertEquals("some-dictionary-2", codedItemDAO.findByVerbatimTerm("some-verbatim-term-2").get(0).getDictionary());
+    }
 
 	@Test
 	public void testThatFindByDictionaryDoesNotReturnNull() {
@@ -58,6 +73,26 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	public void testThatFindByItemIdDoesNotReturnNull() {
 		assertNotNull(codedItemDAO.findByItemId(1));
 	}
+
+    @Test
+    public void testThatFindByItemIdReturnsCodedItemWithDictionary() {
+        assertEquals(codedItemDAO.findByItemId(2).getDictionary(), "some-dictionary-2");
+    }
+
+    @Test
+    public void testThatFindByItemIdReturnsCodedItemWithVerbatimTerm() {
+        assertEquals(codedItemDAO.findByItemId(3).getVerbatimTerm(), "some-verbatim-term-3");
+    }
+
+    @Test
+    public void testThatFindByItemIdReturnsCodedItemWithEventCRFId() {
+        assertNotNull(codedItemDAO.findByItemId(1).getEventCrfId());
+    }
+
+    @Test
+    public void testThatFindByItemIdReturnsCodedItemWithValidEventCRFId() {
+        assertEquals(1, codedItemDAO.findByItemId(2).getEventCrfId());
+    }
 
 	@Test
 	public void testThatFindByEventCRFDoesNotReturnNull() {
@@ -128,7 +163,8 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	public void testThatDeleteRemovesCodedItemFromDB() {
 
 		codedItemDAO.deleteCodedItem(codedItemDAO.findById(2));
-		assertEquals(3, codedItemDAO.findAll().size());
+
+        assertEquals(3, codedItemDAO.findAll().size());
 	}
 
 	@Test

@@ -87,6 +87,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     public final static String DIV_VERSION_SUFIX = "</div>";
     public final static String DIV_DICITIONARY_PREFIX = "<div name=\"termDictionary\">";
     public final static String DIV_DICTIONARY_SUFIX = "</div>";
+    public final static String DIV_ITEMDATAVALUE_PREFIX = "<div name=\"itemDataValue\">";
+    public final static String DIV_ITEMDATAVALUE_SUFIX = "</div>";
 
     @Override
     protected String getTableName() {
@@ -96,12 +98,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
     	
-        tableFacade.setColumnProperties("verbatimTerm", "dictionaryList",
+        tableFacade.setColumnProperties("itemDataValue", "dictionaryList",
                 "codedItem.version", "codedItem.subjectName", "codedItem.eventName", "codedItem.isCoded", "codedColumn", "actionColumn");
         
         Row row = tableFacade.getTable().getRow();
         
-        configureColumn(row.getColumn("verbatimTerm"), "Verbatim Term", new VerbatimTermCellEditor(), null);
+        configureColumn(row.getColumn("itemDataValue"), "Verbatim Term", new ItemDataValueCellEditor(), null);
         configureColumn(row.getColumn("dictionaryList"), "Dictionary", new DictionaryCellEditor(), null, false, false);
         configureColumn(row.getColumn("codedItem.version"), "Version", new VersionCellEditor(), null, true, true);
         configureColumn(row.getColumn("codedItem.subjectName"), "Study Subject ID", new SubjectCellEditor(), null, true, true);
@@ -128,11 +130,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             HashMap<Object, Object> h = new HashMap<Object, Object>();
             h.put("codedItem", codedItem);
             h.put("codedItem.itemId", codedItem.getItemId());
-            h.put("verbatimTerm", getVerbatimTerm(codedItem.getItemId()));
+            h.put("itemDataValue", getItemDataValue(codedItem.getItemId()));
+            h.put("codedItem.verbatimTerm", codedItem.getVerbatimTerm());
             h.put("codedItem.version", codedItem.getVersion());
             h.put("codedItem.subjectName", getSubjectBean(codedItem.getSubjectId()).getLabel());
             h.put("codedItem.eventName", getStudyEventDefinitionBean(codedItem.getEventCrfId(), codedItem.getCrfVersionId()).getName());
-            h.put("codedItem.isCoded", codedItem.isCoded() ? "Completed" : "To be Coded");
+            h.put("codedItem.isCoded", getCodedItemStatus(codedItem));
 
             codedItemsResult.add(h);
         }
@@ -140,14 +143,32 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         tableFacade.setItems(codedItemsResult);
     }
 
+    private String getCodedItemStatus(CodedItem codedItem) {
+
+        if (codedItem.getStatus().equals("NOT_CODED")) {
+
+            return "To be Coded";
+        } else if (codedItem.getStatus().equals("CODED")) {
+
+            return "Completed";
+        } else if ((codedItem.getStatus().equals("IN_PROGRESS"))) {
+
+            return "In Progress";
+        }
+
+      return "Unknown";
+    }
+
     @SuppressWarnings("unchecked")
-    private class VerbatimTermCellEditor implements CellEditor {
+    private class ItemDataValueCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
             String value = "";
-            String verbatimTerm = (String) ((HashMap<Object, Object>) item).get("verbatimTerm");
-            if (!verbatimTerm.isEmpty()) {
+            String itemDataValue = (String) ((HashMap<Object, Object>) item).get("itemDataValue");
+            if (!itemDataValue.isEmpty()) {
                 StringBuilder url = new StringBuilder();
-                url.append(verbatimTerm)
+                url.append(DIV_ITEMDATAVALUE_PREFIX)
+                        .append(itemDataValue)
+                        .append(DIV_ITEMDATAVALUE_SUFIX)
                         .append(COLUMN_WIDTH_PREFIX)
                         .append("160")
                         .append(COLUMN_WIDTH_SUFFIX);
@@ -213,7 +234,6 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         	
             String value = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
-            String inputTerm = (String) ((HashMap<Object, Object>) item).get("verbatimTerm");
 
             if (codedItem != null) {
             	
@@ -221,12 +241,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                 
 				if (isLoggedInUserMonitor()) {
 
-                    url.append(inputTerm)
+                    url.append(codedItem.getVerbatimTerm())
                         .append(COLUMN_WIDTH_PREFIX)
                         .append("250")
                         .append(COLUMN_WIDTH_SUFFIX);
 					return url.toString();
-				} else if (codedItem.isCoded()) {
+				} else if (codedItem.getStatus().equals("CODED") || codedItem.getStatus().equals("IN_PROGRESS")) {
 
                     CODED_DIV_PREFIX = "Search: <input style=\"border:1px solid #a6a6a6;margin-bottom: 2px;background-color:#d9d9d9;color:#4D4D4D\" disabled=\"true\" type=\"text\" value=\"";
                 } else {
@@ -234,7 +254,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                     CODED_DIV_PREFIX = "Search: <input style=\"border:1px solid #a6a6a6;margin-bottom: 2px;background-color:#d9d9d9;color:#4D4D4D\" type=\"text\" value=\"";
                 }
 				
-                url.append(CODED_DIV_PREFIX).append(inputTerm)
+                url.append(CODED_DIV_PREFIX).append(codedItem.getVerbatimTerm())
                          .append(CODED_DIV_MIDDLE)
                          .append(codedItem.getItemId())
                          .append(CODED_DIV_SUFIX)
@@ -254,11 +274,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 			
             String value = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
-            String inputTerm = (String) ((HashMap<Object, Object>) item).get("verbatimTerm");
             EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(codedItem.getEventCrfId());
             StudyBean studyBean = (StudyBean) studyDAO.findByStudySubjectId(eventCRFBean.getStudySubjectId());
             EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(), codedItem.getCrfVersionId());
-            String codedItemButton = codedItem.isCoded() ? "code_confirm.png" : "code_blue.png";
+            String codedItemButtonColor = codedItem.isCoded() ? "code_confirm.png" : "code_blue.png";
             String uncodedItemButton = "";
             String deleteTermButton = "";
 
@@ -273,15 +292,15 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                     deleteTermButton = AJAX_DELETE_TERM_PREFIX + AJAX_DELETE_TERM_SUFFIX_HIDDEN;
  				} else {
 
-                    AJAX_REQUEST_PREFIX = "<a onClick=\"codeItem(this)\" name=\"Code\" itemId=\"";
+                    AJAX_REQUEST_PREFIX = codedItem.getStatus().equals("IN_PROGRESS") ? "<a onClick=\"codeItem(this)\" style=\"visibility:hidden\" name=\"Code\" itemId=\"" : "<a onClick=\"codeItem(this)\" name=\"Code\" itemId=\"";
                     uncodedItemButton = (AJAX_UNCODE_ITEM_PREFIX) + codedItem.getItemId() + (codedItem.isCoded() ? (AJAX_UNCODE_ITEM_SUFFIX) : AJAX_UNCODE_ITEM_SUFFIX_HIDDEN);
-                    deleteTermButton = (AJAX_DELETE_TERM_PREFIX) + codedItem.getItemId() + AJAX_DELETE_TERM_MIDDLE + inputTerm.toLowerCase() + (isDeleteable(codedItem, inputTerm) ? AJAX_DELETE_TERM_SUFFIX : AJAX_DELETE_TERM_SUFFIX_HIDDEN);
+                    deleteTermButton = (AJAX_DELETE_TERM_PREFIX) + codedItem.getItemId() + AJAX_DELETE_TERM_MIDDLE + codedItem.getVerbatimTerm().toLowerCase() + (isDeleteable(codedItem) ? AJAX_DELETE_TERM_SUFFIX : AJAX_DELETE_TERM_SUFFIX_HIDDEN);
                 }
  				
                 url.append(AJAX_REQUEST_PREFIX)
                 	.append(codedItem.getItemId())
                     .append(AJAX_REQUEST_MIDDLE)
-                    .append(codedItemButton)
+                    .append(codedItemButtonColor)
                     .append(AJAX_REQUEST_SUFIX)
                     .append(uncodedItemButton)
                     .append(deleteTermButton)
@@ -300,10 +319,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         }
     }
 
-    private boolean isDeleteable(CodedItem codedItem, String inputTerm) {
+    private boolean isDeleteable(CodedItem codedItem) {
             for (Term term : terms) {
 
-            	if(term.getPreferredName().equalsIgnoreCase(inputTerm) &&
+            	if(term.getPreferredName().equalsIgnoreCase(codedItem.getVerbatimTerm()) &&
             			term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
 
             		return true;
@@ -427,7 +446,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     public void setItemDataDAO(ItemDataDAO itemDataDAO) {
         this.itemDataDAO = itemDataDAO;
     }
-		
+
     private StudySubjectBean getSubjectBean(int subjectId) {
     	
         return  (StudySubjectBean) studySubjectDAO.findByPK(subjectId);
@@ -442,7 +461,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         return studyEventDefDao.findByEventDefinitionCRFId(eventDefCRFBean.getId());
     }
 
-    private String getVerbatimTerm(int itemId) {
+    private String getItemDataValue(int itemId) {
         ItemDataBean itemDataBean = (ItemDataBean) itemDataDAO.findByPK(itemId);
         return itemDataBean.getValue();
     }

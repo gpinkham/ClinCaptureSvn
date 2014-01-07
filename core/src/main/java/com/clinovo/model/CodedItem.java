@@ -44,6 +44,7 @@ public class CodedItem extends AbstractMutableDomainObject {
 
     private String dictionary = "";
     private Boolean autoCoded = Boolean.FALSE;
+    private String verbatimTerm = "";
     private String status = String.valueOf(CodeStatus.NOT_CODED);
 
     List<CodedItemElement> codedItemElement;
@@ -97,7 +98,7 @@ public class CodedItem extends AbstractMutableDomainObject {
     @Transient
     public boolean isCoded() {
 
-        return !this.status.equals("NOT_CODED");
+        return !this.status.equals("NOT_CODED") && !this.status.equals("IN_PROGRESS");
     }
 
     public int getCrfVersionId() {
@@ -151,4 +152,11 @@ public class CodedItem extends AbstractMutableDomainObject {
         codedItemElement.add(cItemElement);
     }
 
+    public String getVerbatimTerm() {
+        return verbatimTerm;
+    }
+
+    public void setVerbatimTerm(String verbatimTerm) {
+        this.verbatimTerm = verbatimTerm;
+    }
 }

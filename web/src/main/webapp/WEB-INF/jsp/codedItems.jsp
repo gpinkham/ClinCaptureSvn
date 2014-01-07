@@ -10,6 +10,11 @@
 <jsp:include page="include/managestudy_top_pages.jsp"/>
 
 <jsp:include page="include/sideAlert.jsp"/>
+
+<script type="text/javascript">
+    codedItemAutoUpdate();
+</script>
+
 <tr id="sidebar_Instructions_open">
     <td class="sidebar_tab">
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
@@ -191,3 +196,4 @@
 </div>
 
 <jsp:include page="include/footer.jsp"/>
+<div class="loader" style="display:none">Operation in progress...</div>
