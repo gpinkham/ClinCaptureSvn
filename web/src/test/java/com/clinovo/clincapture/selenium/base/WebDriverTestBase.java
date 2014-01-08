@@ -10,7 +10,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-@SuppressWarnings("unused")
 public class WebDriverTestBase {
 
 	public final WebDriver driver = new FirefoxDriver();
