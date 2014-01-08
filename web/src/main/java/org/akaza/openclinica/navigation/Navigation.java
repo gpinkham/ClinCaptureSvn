@@ -26,7 +26,7 @@ public class Navigation {
 			"/RestoreSubjectGroupClass", "/UpdateJobExport", "/EditDataset", "/RemoveSite", "/RestoreSite", "/extract",
 			"/ViewSelected", "/SelectItems", "/CreateDataset", "/EditSelected", "/EditDataset",
 			"/pages/managestudy/chooseCRFVersion", "/pages/managestudy/confirmCRFVersionChange",
-			"/pages/managestudy/changeCRFVersion"));
+			"/pages/managestudy/changeCRFVersion", "/CreateCRFVersion"));
 	//ignored-set of pages, pop-ups or like pop-ups
 	private static Set<String> exclusionPopUpURLs = new HashSet<String>(Arrays.asList("/ViewStudySubjectAuditLog",
 			"/PrintAllEventCRF", "/PrintDataEntry", "/DiscrepancyNoteOutputServlet", "/PrintDataEntry",
