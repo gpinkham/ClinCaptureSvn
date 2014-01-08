@@ -577,9 +577,6 @@ public class StudyInfoPanel {
 			EventCRFBean ecb) {
 		Iterator itRows = rows.iterator();
 
-		displayData.add(new StudyInfoPanelLine(resword.getString("study_events"), "(" + rows.size() + ")", true, false,
-				false));
-
 		while (itRows.hasNext()) {
 			DisplayStudyEventBean dseBean = (DisplayStudyEventBean) itRows.next();
 			StudyEventBean seBean = dseBean.getStudyEvent();
@@ -682,8 +679,6 @@ public class StudyInfoPanel {
 	public ArrayList generateTreeFromBeansWithoutLink(ArrayList rows, ArrayList displayData,
 			StudySubjectBean studySubject, EventCRFBean ecb) {
 		Iterator itRows = rows.iterator();
-
-		displayData.add(new StudyInfoPanelLine("Study Events", "(" + rows.size() + ")", true, false, false));
 
 		while (itRows.hasNext()) {
 			DisplayStudyEventBean dseBean = (DisplayStudyEventBean) itRows.next();

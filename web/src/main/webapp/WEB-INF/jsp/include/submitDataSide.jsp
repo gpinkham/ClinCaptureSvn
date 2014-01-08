@@ -56,10 +56,8 @@
              </c:when>
              <c:otherwise>
                <b><c:out value="${line.title}" escapeXml="false"/>: <c:out value="${line.info}" escapeXml="false"/></b>
-               <c:if test="${line.title!='Study Events'}">
                  <br/>
-               </c:if>
-                <br/>
+				 <br/>
              </c:otherwise>  
              </c:choose>           
              </c:if>

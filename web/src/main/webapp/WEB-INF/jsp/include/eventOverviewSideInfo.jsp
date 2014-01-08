@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -130,12 +131,14 @@
    
   
   
-  <c:if test="${panel.submitDataModule}">    
+  <c:if test="${panel.submitDataModule}"> 
+  <c:set var="studyEventsNumber" value="${fn:length(beans)}"/>   
   <tr id="sidebar_StudyEvents_open">
 		<td class="sidebar_tab">
 
 		<a href="javascript:leftnavExpand('sidebar_StudyEvents_open'); leftnavExpand('sidebar_StudyEvents_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-		<b><fmt:message key="study_events" bundle="${resword}"/></b>
+		<b><fmt:message key="study_events" bundle="${resword}"/>
+			<c:out value=" (${studyEventsNumber})"/></b>
 
 		<div class="sidebar_tab_content">  
            <c:import url="../include/submitDataSide.jsp"/>	
@@ -149,7 +152,8 @@
 
 		<a href="javascript:leftnavExpand('sidebar_StudyEvents_open'); leftnavExpand('sidebar_StudyEvents_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="study_events" bundle="${resword}"/></b>
+		<b><fmt:message key="study_events" bundle="${resword}"/>
+			<c:out value=" (${studyEventsNumber})"/></b>
 
 		</td>
 	</tr>
