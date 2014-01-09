@@ -20,10 +20,13 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.view.Page;
+import org.springframework.stereotype.Component;
 
 /**
  * Processes request to change ordinals of study event definitions in a study
@@ -31,16 +34,17 @@ import org.akaza.openclinica.view.Page;
  * @author jxu
  */
 @SuppressWarnings({ "rawtypes", "serial" })
+@Component
 public class ChangeDefinitionOrdinalServlet extends ChangeOrdinalServlet {
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		int current = fp.getInt("current");
 		int previous = fp.getInt("previous");
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
 		increase(current, previous, seddao);
-		forwardPage(Page.LIST_DEFINITION_SERVLET);
+		forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 
 	}
 
@@ -48,7 +52,11 @@ public class ChangeDefinitionOrdinalServlet extends ChangeOrdinalServlet {
 	 * increase the ordinal for current object and decrease the ordinal of the previous one
 	 * 
 	 * @param idCurrent
+	 *            idCurrent
 	 * @param idPrevious
+	 *            idPrevious
+	 * @param dao
+	 *            StudyEventDefinitionDAO
 	 */
 	private void increase(int idCurrent, int idPrevious, StudyEventDefinitionDAO dao) {
 

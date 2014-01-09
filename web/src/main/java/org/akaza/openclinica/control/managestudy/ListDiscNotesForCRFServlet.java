@@ -17,54 +17,34 @@ package org.akaza.openclinica.control.managestudy;
  *
  */
 
+import java.util.HashSet;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListDiscNotesForCRFTableFactory;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class ListDiscNotesForCRFServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class ListDiscNotesForCRFServlet extends Controller {
 
 	public static final String DISCREPANCY_NOTE_TYPE = "discrepancyNoteType";
 	public static final String RESOLUTION_STATUS = "resolutionStatus";
-	public static final String FILTER_SUMMARY = "filterSummary";
-	Locale locale;
-	private StudyEventDefinitionDAO studyEventDefinitionDAO;
-	private SubjectDAO subjectDAO;
-	private StudySubjectDAO studySubjectDAO;
-	private StudyEventDAO studyEventDAO;
-	private StudyGroupClassDAO studyGroupClassDAO;
-	private SubjectGroupMapDAO subjectGroupMapDAO;
-	private StudyDAO studyDAO;
-	private StudyGroupDAO studyGroupDAO;
-	private EventCRFDAO eventCRFDAO;
-	private EventDefinitionCRFDAO eventDefintionCRFDAO;
-	private DiscrepancyNoteDAO discrepancyNoteDAO;
-	private CRFDAO crfDAO;
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -76,17 +56,21 @@ public class ListDiscNotesForCRFServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		// Determine whether to limit the displayed DN's to a certain DN type
-		int resolutionStatus = 0;
+		int resolutionStatus;
 		try {
 			resolutionStatus = Integer.parseInt(request.getParameter("resolutionStatus"));
 		} catch (NumberFormatException nfe) {
@@ -100,10 +84,10 @@ public class ListDiscNotesForCRFServlet extends SecureController {
 		// Set object should be cleared,
 		// because we do not have to save a set of filter IDs.
 		boolean hasAResolutionStatus = resolutionStatus >= 1 && resolutionStatus <= 5;
-		Set<Integer> resolutionStatusIds = (HashSet) session.getAttribute(RESOLUTION_STATUS);
+		Set<Integer> resolutionStatusIds = (HashSet) request.getSession().getAttribute(RESOLUTION_STATUS);
 		// remove the session if there is no resolution status
 		if (!hasAResolutionStatus && resolutionStatusIds != null) {
-			session.removeAttribute(RESOLUTION_STATUS);
+			request.getSession().removeAttribute(RESOLUTION_STATUS);
 			resolutionStatusIds = null;
 		}
 		if (hasAResolutionStatus) {
@@ -111,9 +95,9 @@ public class ListDiscNotesForCRFServlet extends SecureController {
 				resolutionStatusIds = new HashSet<Integer>();
 			}
 			resolutionStatusIds.add(resolutionStatus);
-			session.setAttribute(RESOLUTION_STATUS, resolutionStatusIds);
+			request.getSession().setAttribute(RESOLUTION_STATUS, resolutionStatusIds);
 		}
-		int discNoteType = 0;
+		int discNoteType;
 		try {
 			discNoteType = Integer.parseInt(request.getParameter("type"));
 		} catch (NumberFormatException nfe) {
@@ -128,15 +112,15 @@ public class ListDiscNotesForCRFServlet extends SecureController {
 
 		int definitionId = fp.getInt("defId");
 		if (definitionId <= 0) {
-			addPageMessage(respage.getString("please_choose_an_ED_ta_to_vies_details"));
-			forwardPage(Page.LIST_SUBJECT_DISC_NOTE_SERVLET);
+			addPageMessage(respage.getString("please_choose_an_ED_ta_to_vies_details"), request);
+			forwardPage(Page.LIST_SUBJECT_DISC_NOTE_SERVLET, request, response);
 			return;
 		}
 
 		request.setAttribute("eventDefinitionId", definitionId);
 
 		ListDiscNotesForCRFTableFactory factory = new ListDiscNotesForCRFTableFactory();
-		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
+		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDAO());
 		factory.setSubjectDAO(getSubjectDAO());
 		factory.setStudySubjectDAO(getStudySubjectDAO());
 		factory.setStudyEventDAO(getStudyEventDAO());
@@ -149,84 +133,18 @@ public class ListDiscNotesForCRFServlet extends SecureController {
 		factory.setCurrentUser(ub);
 		factory.setEventCRFDAO(getEventCRFDAO());
 		factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
-		factory.setCrfDAO(getCrfDAO());
+		factory.setCrfDAO(getCRFDAO());
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setDiscNoteType(discNoteType);
 		factory.setModule(module);
 		factory.setResolutionStatus(resolutionStatus);
 		factory.setResolutionStatusIds(resolutionStatusIds);
-		factory.setSelectedStudyEventDefinition((StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(
+		factory.setSelectedStudyEventDefinition((StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(
 				definitionId));
 		String listDiscNotesForCRFHtml = factory.createTable(request, response).render();
 		request.setAttribute("listDiscNotesForCRFHtml", listDiscNotesForCRFHtml);
 		request.setAttribute("defId", definitionId);
 
-		forwardPage(Page.LIST_DNOTES_FOR_CRF);
+		forwardPage(Page.LIST_DNOTES_FOR_CRF, request, response);
 	}
-
-	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-		studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource())
-				: studyEventDefinitionDAO;
-		return studyEventDefinitionDAO;
-	}
-
-	public SubjectDAO getSubjectDAO() {
-		subjectDAO = this.subjectDAO == null ? new SubjectDAO(sm.getDataSource()) : subjectDAO;
-		return subjectDAO;
-	}
-
-	public StudySubjectDAO getStudySubjectDAO() {
-		studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
-		return studySubjectDAO;
-	}
-
-	public StudyGroupClassDAO getStudyGroupClassDAO() {
-		studyGroupClassDAO = this.studyGroupClassDAO == null ? new StudyGroupClassDAO(sm.getDataSource())
-				: studyGroupClassDAO;
-		return studyGroupClassDAO;
-	}
-
-	public SubjectGroupMapDAO getSubjectGroupMapDAO() {
-		subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource())
-				: subjectGroupMapDAO;
-		return subjectGroupMapDAO;
-	}
-
-	public StudyEventDAO getStudyEventDAO() {
-		studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
-		return studyEventDAO;
-	}
-
-	public StudyDAO getStudyDAO() {
-		studyDAO = this.studyDAO == null ? new StudyDAO(sm.getDataSource()) : studyDAO;
-		return studyDAO;
-	}
-
-	public EventCRFDAO getEventCRFDAO() {
-		eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
-		return eventCRFDAO;
-	}
-
-	public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
-		eventDefintionCRFDAO = this.eventDefintionCRFDAO == null ? new EventDefinitionCRFDAO(sm.getDataSource())
-				: eventDefintionCRFDAO;
-		return eventDefintionCRFDAO;
-	}
-
-	public CRFDAO getCrfDAO() {
-		crfDAO = this.crfDAO == null ? new CRFDAO(sm.getDataSource()) : crfDAO;
-		return crfDAO;
-	}
-
-	public StudyGroupDAO getStudyGroupDAO() {
-		studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
-		return studyGroupDAO;
-	}
-
-	public DiscrepancyNoteDAO getDiscrepancyNoteDAO() {
-		discrepancyNoteDAO = this.discrepancyNoteDAO == null ? new DiscrepancyNoteDAO(sm.getDataSource())
-				: discrepancyNoteDAO;
-		return discrepancyNoteDAO;
-	}
-
 }

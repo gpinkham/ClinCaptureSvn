@@ -24,18 +24,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -45,6 +45,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
+import org.springframework.stereotype.Component;
 
 /**
  * Processes request to assign a user to a study
@@ -52,30 +53,37 @@ import org.akaza.openclinica.web.bean.UserAccountRow;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
-public class AssignUserToStudyServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class AssignUserToStudyServlet extends Controller {
 
 	/**
      *
      */
-	
+
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		String action = request.getParameter("action");
-		ArrayList users = findUsers();
+		ArrayList users = findUsers(currentStudy);
 		String nextListPage = request.getParameter("next_list_page");
 		if (StringUtil.isBlank(action) || (nextListPage != null && nextListPage.equalsIgnoreCase("true"))) {
 			FormProcessor fp = new FormProcessor(request);
@@ -83,7 +91,7 @@ public class AssignUserToStudyServlet extends SecureController {
 			ArrayList allRows = UserAccountRow.generateRowsFromBeans(users);
 
 			if (nextListPage == null) {
-				session.removeAttribute("tmpSelectedUsersMap");
+				request.getSession().removeAttribute("tmpSelectedUsersMap");
 			}
 
 			/*
@@ -91,7 +99,7 @@ public class AssignUserToStudyServlet extends SecureController {
 			 * through the list. This has been done so that when the user moves to the next page of Users list, the
 			 * selection made in the previous page doesn't get lost.
 			 */
-			Map tmpSelectedUsersMap = (HashMap) session.getAttribute("tmpSelectedUsersMap");
+			Map tmpSelectedUsersMap = (HashMap) request.getSession().getAttribute("tmpSelectedUsersMap");
 			if (tmpSelectedUsersMap == null) {
 				tmpSelectedUsersMap = new HashMap();
 			}
@@ -111,7 +119,7 @@ public class AssignUserToStudyServlet extends SecureController {
 						}
 					}
 				}
-				session.setAttribute("tmpSelectedUsersMap", tmpSelectedUsersMap);
+				request.getSession().setAttribute("tmpSelectedUsersMap", tmpSelectedUsersMap);
 			}
 
 			String[] columns = { resword.getString("user_name"), resword.getString("first_name"),
@@ -125,45 +133,48 @@ public class AssignUserToStudyServlet extends SecureController {
 			table.setRows(allRows);
 			table.computeDisplay();
 
-			StudyParameterValueDAO dao = new StudyParameterValueDAO(sm.getDataSource());
-			StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(), "allowCodingVerification");
-			
+			StudyParameterValueDAO dao = new StudyParameterValueDAO(getDataSource());
+			StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(),
+					"allowCodingVerification");
+
 			request.setAttribute("table", table);
 			ArrayList roles = Role.toArrayList();
 			if (currentStudy.getParentStudyId() > 0) {
 				roles.remove(Role.STUDY_ADMINISTRATOR);
-                roles.remove(Role.STUDY_MONITOR);
-                roles.remove(Role.STUDY_CODER);
+				roles.remove(Role.STUDY_MONITOR);
+				roles.remove(Role.STUDY_CODER);
 			} else {
-				if(!allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
+				if (!allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
 					roles.remove(Role.STUDY_CODER);
 				}
-                roles.remove(Role.INVESTIGATOR);
-                roles.remove(Role.CLINICAL_RESEARCH_COORDINATOR);
-            }
+				roles.remove(Role.INVESTIGATOR);
+				roles.remove(Role.CLINICAL_RESEARCH_COORDINATOR);
+			}
 
-            roles.remove(Role.STUDY_DIRECTOR); // clincapture does not user the STUDY_DIRECTOR role
+			roles.remove(Role.STUDY_DIRECTOR); // clincapture does not user the STUDY_DIRECTOR role
 			roles.remove(Role.SYSTEM_ADMINISTRATOR); // admin is not a user role, only used
 			// for
 			// tomcat
 			request.setAttribute("roles", roles);
-			forwardPage(Page.STUDY_USER_LIST);
+			forwardPage(Page.STUDY_USER_LIST, request, response);
 		} else {
 			if ("submit".equalsIgnoreCase(action)) {
-				addUser(users);
+				addUser(request, response, users);
 			}
 		}
 	}
 
 	@SuppressWarnings("deprecation")
-	private void addUser(ArrayList users) throws Exception {
+	private void addUser(HttpServletRequest request, HttpServletResponse response, ArrayList users) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
 		String pageMass = "";
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO udao = getUserAccountDAO();
 		FormProcessor fp = new FormProcessor(request);
-		Map tmpSelectedUsersMap = (HashMap) session.getAttribute("tmpSelectedUsersMap");
+		Map tmpSelectedUsersMap = (HashMap) request.getSession().getAttribute("tmpSelectedUsersMap");
 		Set addedUsers = new HashSet();
-		boolean continueLoop = true;
-		for (int i = 0; i < users.size() && continueLoop; i++) {
+		for (int i = 0; i < users.size(); i++) {
 			int id = fp.getInt("id" + i);
 			String firstName = fp.getString("firstName" + i);
 			String lastName = fp.getString("lastName" + i);
@@ -194,11 +205,10 @@ public class AssignUserToStudyServlet extends SecureController {
 																				// database
 					udao.createStudyUserRole(u, sub);
 				else {
-					continueLoop = false;
 					break;
 				}
 				logger.info("one user added");
-				pageMass = pageMass + sendEmail(u, sub);
+				pageMass = pageMass + sendEmail(u, currentStudy, sub);
 
 			} else {
 				if (tmpSelectedUsersMap != null && tmpSelectedUsersMap.containsKey(id)) {
@@ -210,12 +220,12 @@ public class AssignUserToStudyServlet extends SecureController {
 		/* Assigning users which might have been selected during list navigation */
 		if (tmpSelectedUsersMap != null) {// try to fix the null pointer
 			// exception
-			for (Iterator iterator = tmpSelectedUsersMap.keySet().iterator(); iterator.hasNext();) {
-				int id = (Integer) iterator.next();
+			for (Object o : tmpSelectedUsersMap.keySet()) {
+				int id = (Integer) o;
 				int roleId = (Integer) tmpSelectedUsersMap.get(id);
 				boolean alreadyAdded = false;
-				for (Iterator it = addedUsers.iterator(); it.hasNext();) {
-					if (id == (Integer) it.next()) {
+				for (Object addedUser : addedUsers) {
+					if (id == (Integer) addedUser) {
 						alreadyAdded = true;
 					}
 				}
@@ -233,59 +243,60 @@ public class AssignUserToStudyServlet extends SecureController {
 					sub.setOwner(ub);
 					udao.createStudyUserRole(u, sub);
 					logger.info("one user added");
-					pageMass = pageMass + sendEmail(u, sub);
+					pageMass = pageMass + sendEmail(u, currentStudy, sub);
 				}
 			}
 		}
-		session.removeAttribute("tmpSelectedUsersMap");
+		request.getSession().removeAttribute("tmpSelectedUsersMap");
 
 		if ("".equals(pageMass)) {
-			addPageMessage(respage.getString("no_new_user_assigned_to_study"));
+			addPageMessage(respage.getString("no_new_user_assigned_to_study"), request);
 		} else {
-			addPageMessage(pageMass);
+			addPageMessage(pageMass, request);
 		}
 
 		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
-		session.setAttribute("pageMessages", pageMessages);
-		forwardPage(Page.LIST_USER_IN_STUDY_SERVLET);
+		request.getSession().setAttribute("pageMessages", pageMessages);
+		forwardPage(Page.LIST_USER_IN_STUDY_SERVLET, request, response);
 
 	}
 
 	/**
 	 * Find all users in the system
 	 * 
-	 * @return
+	 * @return currentStudy StudyBean
 	 */
-	private ArrayList findUsers() {
-		
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+	private ArrayList findUsers(StudyBean currentStudy) {
+
+		UserAccountDAO udao = new UserAccountDAO(getDataSource());
+		StudyDAO sdao = new StudyDAO(getDataSource());
 		StudyBean site;
 		StudyBean study;
-		List <UserAccountBean> userAvailable = new ArrayList <UserAccountBean>();
-		List <UserAccountBean> userListbyRoles;
+		List<UserAccountBean> userAvailable = new ArrayList<UserAccountBean>();
+		List<UserAccountBean> userListbyRoles;
 		String notes;
 		boolean hasRoleInCurrentStudy;
 		boolean hasRoleWithStatusRemovedInCurrentStudy;
-		
-	
+
 		if (currentStudy.getParentStudyId() > 0) {
-			userListbyRoles = (ArrayList <UserAccountBean>) udao.findAllByRole(Role.CLINICAL_RESEARCH_COORDINATOR.getName(), Role.INVESTIGATOR.getName());
+			userListbyRoles = (ArrayList<UserAccountBean>) udao.findAllByRole(
+					Role.CLINICAL_RESEARCH_COORDINATOR.getName(), Role.INVESTIGATOR.getName());
 		} else {
-			userListbyRoles = (ArrayList <UserAccountBean>) udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getName(), Role.STUDY_MONITOR.getName());
+			userListbyRoles = (ArrayList<UserAccountBean>) udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getName(),
+					Role.STUDY_MONITOR.getName());
 		}
-		
+
 		for (UserAccountBean accountBean : userListbyRoles) {
-			
+
 			if (accountBean.getEnabled() == null || !accountBean.getEnabled()) {
 				continue;
 			}
-			
+
 			hasRoleInCurrentStudy = false;
 			hasRoleWithStatusRemovedInCurrentStudy = false;
 			notes = "";
 			for (StudyUserRoleBean roleBean : accountBean.getRoles()) {
-				
+
 				if (currentStudy.getId() == roleBean.getStudyId() && roleBean.getStatus().equals(Status.DELETED)) {
 					hasRoleWithStatusRemovedInCurrentStudy = true;
 					break;
@@ -294,35 +305,36 @@ public class AssignUserToStudyServlet extends SecureController {
 				} else if (currentStudy.getParentStudyId() > 0 && !roleBean.getStatus().equals(Status.DELETED)) {
 					site = (StudyBean) sdao.findByPK(roleBean.getStudyId());
 					study = (StudyBean) sdao.findByPK(site.getParentStudyId());
-					notes = notes + roleBean.getRole().getDescription() + respage.getString("in_site") + ": " + site.getName() 
-							+ "," + respage.getString("in_the_study") + ": " + study.getName() + "; ";
+					notes = notes + roleBean.getRole().getDescription() + respage.getString("in_site") + ": "
+							+ site.getName() + "," + respage.getString("in_the_study") + ": " + study.getName() + "; ";
 				} else if (currentStudy.getParentStudyId() == 0 && !roleBean.getStatus().equals(Status.DELETED)) {
 					study = (StudyBean) sdao.findByPK(roleBean.getStudyId());
-					notes = notes + roleBean.getRole().getDescription() + respage.getString("in_the_study") + ": " + study.getName() + "; ";
+					notes = notes + roleBean.getRole().getDescription() + respage.getString("in_the_study") + ": "
+							+ study.getName() + "; ";
 				}
-				
+
 			}
-			
+
 			if (!hasRoleWithStatusRemovedInCurrentStudy) {
-				
+
 				accountBean.setNotes(notes);
-			
+
 				if (hasRoleInCurrentStudy) {
 					accountBean.setStatus(Status.UNAVAILABLE);
 					accountBean.setActiveStudyId(currentStudy.getId());
 				} else {
 					accountBean.setStatus(Status.AVAILABLE);
 				}
-			
+
 				userAvailable.add(accountBean);
 			}
-			
+
 		}
-		
-		return (ArrayList <UserAccountBean>) userAvailable;
+
+		return (ArrayList<UserAccountBean>) userAvailable;
 	}
 
-	private String sendEmail(UserAccountBean u, StudyUserRoleBean sub) throws Exception {
+	private String sendEmail(UserAccountBean u, StudyBean currentStudy, StudyUserRoleBean sub) throws Exception {
 		logger.info("Sending email...");
 		String body = u.getFirstName() + " " + u.getLastName() + "(" + resword.getString("username") + ": "
 				+ u.getName() + ") " + respage.getString("has_been_assigned_to_the_study") + currentStudy.getName()

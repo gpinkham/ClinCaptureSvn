@@ -21,14 +21,17 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.admin.RemoveCRFVersionServlet;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -37,59 +40,68 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
+@Component
 @SuppressWarnings({ "rawtypes", "serial" })
-public class LockCRFVersionServlet extends SecureController {
+public class LockCRFVersionServlet extends Controller {
 	/**
     *
     */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        UserAccountBean ub = getUserAccountBean(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		FormProcessor fp = new FormProcessor(request);
 
 		int crfVersionId = fp.getInt("id", true);
 		String action = fp.getString("action");
 
 		if (crfVersionId == 0) {
-			addPageMessage(respage.getString("choose_valid_crf_version"));
-			forwardPage(Page.CRF_LIST_SERVLET);
+			addPageMessage(respage.getString("choose_valid_crf_version"), request);
+			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 			return;
 		}
 
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
+		CRFVersionDAO cvdao = getCRFVersionDAO();
+		CRFDAO cdao = getCRFDAO();
 
 		CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(crfVersionId);
 		// System.out.println("crf version found:" + version.getName());
 		CRFBean crf = (CRFBean) cdao.findByPK(version.getCrfId());
 
 		if (!ub.isSysAdmin() && (version.getOwnerId() != ub.getId())) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-					+ respage.getString("change_active_study_or_contact"));
-			forwardPage(Page.MENU_SERVLET);
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study") + " "
+							+ respage.getString("change_active_study_or_contact"), request);
+			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
 		}
 
-		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+		EventCRFDAO ecdao = getEventCRFDAO();
 		ArrayList eventCRFs = ecdao.findAllStudySubjectByCRFVersion(crfVersionId);
 
 		if (StringUtil.isBlank(action)) {
 			request.setAttribute("crfVersionToLock", version);
 			request.setAttribute("crf", crf);
 			request.setAttribute("eventSubjectsUsingVersion", eventCRFs);
-			forwardPage(Page.CONFIRM_LOCKING_CRF_VERSION);
+			forwardPage(Page.CONFIRM_LOCKING_CRF_VERSION, request, response);
 
 		} else if ("confirm".equalsIgnoreCase(action)) {
 			version.setStatus(Status.LOCKED);
@@ -98,10 +110,10 @@ public class LockCRFVersionServlet extends SecureController {
 
 			ArrayList versionList = (ArrayList) cvdao.findAllByCRF(version.getCrfId());
 			if (versionList.size() > 0) {
-				EventDefinitionCRFDAO edCRFDao = new EventDefinitionCRFDAO(sm.getDataSource());
+				EventDefinitionCRFDAO edCRFDao = getEventDefinitionCRFDAO();
 				ArrayList edcList = (ArrayList) edCRFDao.findAllByCRF(version.getCrfId());
-				for (int i = 0; i < edcList.size(); i++) {
-					EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcList.get(i);
+				for (Object anEdcList : edcList) {
+					EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) anEdcList;
 					// @pgawade 18-May-2011 #5414 - Changes for setting the correct
 					// default crf version Id to event
 					// when existing default version is locked
@@ -111,8 +123,8 @@ public class LockCRFVersionServlet extends SecureController {
 				}
 			}
 
-			addPageMessage(respage.getString("crf_version_archived_successfully"));
-			forwardPage(Page.CRF_LIST_SERVLET);
+			addPageMessage(respage.getString("crf_version_archived_successfully"), request);
+			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		}
 	}
 

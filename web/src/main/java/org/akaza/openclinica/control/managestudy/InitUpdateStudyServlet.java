@@ -22,9 +22,7 @@ package org.akaza.openclinica.control.managestudy;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -45,18 +43,19 @@ import org.springframework.stereotype.Component;
 public class InitUpdateStudyServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-		if (ub.isSysAdmin()) {
-			return;
-		}
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		//
 	}
 
 	/**
 	 * Processes the request
-     * @param request
-     * @param response
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		StudyDAO sdao = getStudyDAO();
@@ -66,7 +65,7 @@ public class InitUpdateStudyServlet extends Controller {
 			addPageMessage(respage.getString("please_choose_a_study_to_edit"), request);
 			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 		} else {
-			int studyId = Integer.valueOf(idString.trim()).intValue();
+			int studyId = Integer.valueOf(idString.trim());
 			StudyBean study = (StudyBean) sdao.findByPK(studyId);
 			StudyConfigService scs = getStudyConfigService();
 			study = scs.setParametersForStudy(study);
@@ -78,8 +77,8 @@ public class InitUpdateStudyServlet extends Controller {
 			request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
 			request.setAttribute("statuses", Status.toActiveArrayList());
 
-            StudyInfoPanel panel = getStudyInfoPanel(request);
-            panel.reset();
+			StudyInfoPanel panel = getStudyInfoPanel(request);
+			panel.reset();
 			panel.setStudyInfoShown(false);
 			panel.setOrderedData(true);
 			panel.setExtractData(false);

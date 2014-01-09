@@ -23,16 +23,18 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -42,20 +44,31 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.CRFRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.stereotype.Component;
 
 /**
  * Processes request to add new CRFs info study event definition
  * 
  * @author jxu
  */
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
-public class AddCRFToDefinitionServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class AddCRFToDefinitionServlet extends Controller {
 
 	/**
 	 * Checks whether the user has the correct privilege
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -63,38 +76,39 @@ public class AddCRFToDefinitionServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_permission_to_update_study_event_definition")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String actionName = request.getParameter("actionName");
 		String submit = request.getParameter("Submit");
 
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
+		CRFDAO cdao = getCRFDAO();
 		ArrayList crfs = (ArrayList) cdao.findAllByStatus(Status.AVAILABLE);
-		ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
+		ArrayList edcs = (ArrayList) request.getSession().getAttribute("eventDefinitionCRFs");
 		if (edcs == null) {
 			edcs = new ArrayList();
 		}
 		HashMap crfIds = new HashMap();
-		for (int i = 0; i < edcs.size(); i++) {
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcs.get(i);
-			Integer crfId = new Integer(edc.getCrfId());
+		for (Object edc1 : edcs) {
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edc1;
+			Integer crfId = edc.getCrfId();
 			crfIds.put(crfId, edc);
 		}
-		for (int i = 0; i < crfs.size(); i++) {
-			CRFBean crf = (CRFBean) crfs.get(i);
+		for (Object crf1 : crfs) {
+			CRFBean crf = (CRFBean) crf1;
 			if (crfIds.containsKey(new Integer(crf.getId()))) {
 				crf.setSelected(true);
 			}
 		}
-		session.setAttribute("crfsWithVersion", crfs);
+		request.getSession().setAttribute("crfsWithVersion", crfs);
 		if (submit != null) {
-			addCRF();
+			addCRF(request, response);
 		} else {
 			if (StringUtil.isBlank(actionName)) {
 				FormProcessor fp = new FormProcessor(request);
@@ -110,31 +124,31 @@ public class AddCRFToDefinitionServlet extends SecureController {
 				table.computeDisplay();
 
 				request.setAttribute("table", table);
-				forwardPage(Page.UPDATE_EVENT_DEFINITION2);
+				forwardPage(Page.UPDATE_EVENT_DEFINITION2, request, response);
 			} else if (actionName.equalsIgnoreCase("next")) {
 				Integer pageNumber = Integer.valueOf(request.getParameter("pageNum"));
 				if (pageNumber != null) {
-					if (pageNumber.intValue() == 2) {
+					if (pageNumber == 2) {
 						String nextListPage = request.getParameter("next_list_page");
 						if (nextListPage != null && nextListPage.equalsIgnoreCase("true")) {
-							confirmDefinition();
+							confirmDefinition(request, response);
 						}
 					} else {
-						confirmDefinition();
+						confirmDefinition(request, response);
 					}
 				}
 			}
 		}
 	}
 
-	private void confirmDefinition() throws Exception {
+	private void confirmDefinition(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 
-		Map tmpCRFIdMap = (HashMap) session.getAttribute("tmpCRFIdMap");
+		Map tmpCRFIdMap = (HashMap) request.getSession().getAttribute("tmpCRFIdMap");
 		if (tmpCRFIdMap == null) {
 			tmpCRFIdMap = new HashMap();
 		}
-		ArrayList crfsWithVersion = (ArrayList) session.getAttribute("crfsWithVersion");
+		ArrayList crfsWithVersion = (ArrayList) request.getSession().getAttribute("crfsWithVersion");
 		for (int i = 0; i < crfsWithVersion.size(); i++) {
 			int id = fp.getInt("id" + i);
 			String name = fp.getString("name" + i);
@@ -147,7 +161,7 @@ public class AddCRFToDefinitionServlet extends SecureController {
 				}
 			}
 		}
-		session.setAttribute("tmpCRFIdMap", tmpCRFIdMap);
+		request.getSession().setAttribute("tmpCRFIdMap", tmpCRFIdMap);
 
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
@@ -156,12 +170,12 @@ public class AddCRFToDefinitionServlet extends SecureController {
 				resword.getString("selected") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(5);
-		StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) session.getAttribute("definition");
+		StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 		HashMap args = new HashMap();
 		args.put("actionName", "next");
 		args.put("pageNum", "1");
 		args.put("name", def1.getName());
-		args.put("repeating", new Boolean(def1.isRepeating()).toString());
+		args.put("repeating", Boolean.toString(def1.isRepeating()));
 		args.put("category", def1.getCategory());
 		args.put("description", def1.getDescription());
 		args.put("type", def1.getType());
@@ -170,19 +184,20 @@ public class AddCRFToDefinitionServlet extends SecureController {
 		table.computeDisplay();
 
 		request.setAttribute("table", table);
-		forwardPage(Page.UPDATE_EVENT_DEFINITION2);
+		forwardPage(Page.UPDATE_EVENT_DEFINITION2, request, response);
 	}
 
-	private void addCRF() throws Exception {
+	private void addCRF(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		FormProcessor fp = new FormProcessor(request);
-		CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
+		CRFVersionDAO vdao = getCRFVersionDAO();
 		ArrayList crfArray = new ArrayList();
-		Map tmpCRFIdMap = (HashMap) session.getAttribute("tmpCRFIdMap");
+		Map tmpCRFIdMap = (HashMap) request.getSession().getAttribute("tmpCRFIdMap");
 		if (tmpCRFIdMap == null) {
 			tmpCRFIdMap = new HashMap();
 		}
-		ArrayList crfsWithVersion = (ArrayList) session.getAttribute("crfsWithVersion");
+		ArrayList crfsWithVersion = (ArrayList) request.getSession().getAttribute("crfsWithVersion");
 		for (int i = 0; i < crfsWithVersion.size(); i++) {
 			int id = fp.getInt("id" + i);
 			String name = fp.getString("name" + i);
@@ -205,12 +220,12 @@ public class AddCRFToDefinitionServlet extends SecureController {
 			}
 		}
 
-		for (Iterator tmpCRFIterator = tmpCRFIdMap.keySet().iterator(); tmpCRFIterator.hasNext();) {
-			int id = (Integer) tmpCRFIterator.next();
+		for (Object o : tmpCRFIdMap.keySet()) {
+			int id = (Integer) o;
 			String name = (String) tmpCRFIdMap.get(id);
 			boolean isExists = false;
-			for (Iterator it = crfArray.iterator(); it.hasNext();) {
-				CRFBean cb = (CRFBean) it.next();
+			for (Object aCrfArray : crfArray) {
+				CRFBean cb = (CRFBean) aCrfArray;
 				if (id == cb.getId()) {
 					isExists = true;
 				}
@@ -225,21 +240,21 @@ public class AddCRFToDefinitionServlet extends SecureController {
 				crfArray.add(cb);
 			}
 		}
-		session.removeAttribute("tmpCRFIdMap");
+		request.getSession().removeAttribute("tmpCRFIdMap");
 
 		if (crfArray.size() == 0) {// no crf seleted
-			addPageMessage(respage.getString("no_new_CRF_added"));
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
+			addPageMessage(respage.getString("no_new_CRF_added"), request);
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 			sed.setCrfs(new ArrayList());
-			session.setAttribute("definition", sed);
-			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
+			request.getSession().setAttribute("definition", sed);
+			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		} else {
 
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-			ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
+			ArrayList edcs = (ArrayList) request.getSession().getAttribute("eventDefinitionCRFs");
 			int ordinalForNewCRF = edcs.size();
-			for (int i = 0; i < crfArray.size(); i++) {
-				CRFBean crf = (CRFBean) crfArray.get(i);
+			for (Object aCrfArray : crfArray) {
+				CRFBean crf = (CRFBean) aCrfArray;
 				EventDefinitionCRFBean edcBean = new EventDefinitionCRFBean();
 				edcBean.setCrfId(crf.getId());
 				edcBean.setCrfName(crf.getName());
@@ -258,9 +273,9 @@ public class AddCRFToDefinitionServlet extends SecureController {
 				ordinalForNewCRF++;
 				edcs.add(edcBean);
 			}
-			session.setAttribute("eventDefinitionCRFs", edcs);			
-			addPageMessage(respage.getString("has_have_been_added_need_confirmation"));
-			forwardPage(Page.UPDATE_EVENT_DEFINITION1);
+			request.getSession().setAttribute("eventDefinitionCRFs", edcs);
+			addPageMessage(respage.getString("has_have_been_added_need_confirmation"), request);
+			forwardPage(Page.UPDATE_EVENT_DEFINITION1, request, response);
 		}
 	}
 }

@@ -281,10 +281,17 @@
     </servlet>
 
     <servlet>
-        <servlet-name>ListDiscNotesForCRFServlet</servlet-name>
+        <servlet-name>listDiscNotesSubjectServlet</servlet-name>
+        <display-name>ListDiscNotesSubjectServlet</display-name>
+        <description>ListDiscNotesSubjectServlet</description>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>listDiscNotesForCRFServlet</servlet-name>
         <display-name>ListDiscNotesForCRFServlet</display-name>
         <description>ListDiscNotesForCRFServlet</description>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListDiscNotesForCRFServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -520,14 +527,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListStudyServlet</servlet-name>
+        <servlet-name>listStudyServlet</servlet-name>
         <display-name>ListStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>AssignUserToStudyServlet</servlet-name>
+        <servlet-name>assignUserToStudyServlet</servlet-name>
         <display-name>AssignUserToStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.AssignUserToStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>listCRFServlet</servlet-name>
@@ -535,14 +542,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>DefineStudyEventServlet</servlet-name>
+        <servlet-name>defineStudyEventServlet</servlet-name>
         <display-name>DefineStudyEvent</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.DefineStudyEventServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListEventDefinitionServlet</servlet-name>
+        <servlet-name>listEventDefinitionServlet</servlet-name>
         <display-name>ListEventDefinition</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListEventDefinitionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>initUpdateEventDefinitionServlet</servlet-name>
@@ -565,9 +572,9 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreCRFFromDefinitionServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>AddCRFToDefinitionServlet</servlet-name>
+        <servlet-name>addCRFToDefinitionServlet</servlet-name>
         <display-name>AddCRFToDefinition</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.AddCRFToDefinitionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewEventDefinitionServlet</servlet-name>
@@ -635,9 +642,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ManageStudyServlet</servlet-name>
+        <servlet-name>manageStudyServlet</servlet-name>
         <display-name>ManageStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ManageStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>submitDataServlet</servlet-name>
@@ -716,9 +723,9 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreEventDefinitionServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>LockEventDefinitionServlet</servlet-name>
+        <servlet-name>lockEventDefinitionServlet</servlet-name>
         <display-name>LockEventDefinition</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.LockEventDefinitionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UnlockEventDefinitionServlet</servlet-name>
@@ -726,24 +733,24 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.UnlockEventDefinitionServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListStudyUserServlet</servlet-name>
+        <servlet-name>listStudyUserServlet</servlet-name>
         <display-name>ListStudyUser</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListStudyUserServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewStudyUserServlet</servlet-name>
         <display-name>ViewStudyUser</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudyUserServlet</servlet-class>
     </servlet>
-
-    <!-- Export Excel -->
-    <servlet>
-        <servlet-name>ExportExcelStudySubjectAuditLogServlet</servlet-name>
+	
+	<!-- Export Excel -->
+	<servlet>
+        <servlet-name>exportExcelStudySubjectAuditLogServlet</servlet-name>
         <display-name>ExportExcelStudySubjectAuditLog</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ExportExcelStudySubjectAuditLogServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
-
-
+	
+	
     <servlet>
         <servlet-name>SetStudyUserRoleServlet</servlet-name>
         <display-name>SetStudyUserRole</display-name>
@@ -972,14 +979,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ChangeDefinitionOrdinalServlet</servlet-name>
+        <servlet-name>changeDefinitionOrdinalServlet</servlet-name>
         <display-name>ChangeDefinitionOrdinal</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ChangeDefinitionOrdinalServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ChangeDefinitionCRFOrdinalServlet</servlet-name>
+        <servlet-name>changeDefinitionCRFOrdinalServlet</servlet-name>
         <display-name>ChangeDefinitionCRFOrdinal</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ChangeDefinitionCRFOrdinalServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>administrativeEditingServlet</servlet-name>
@@ -1027,14 +1034,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListSubjectGroupClassServlet</servlet-name>
+        <servlet-name>listSubjectGroupClassServlet</servlet-name>
         <display-name>ListSubjectGroupClass</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListSubjectGroupClassServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CreateSubjectGroupClassServlet</servlet-name>
+        <servlet-name>createSubjectGroupClassServlet</servlet-name>
         <display-name>CreateSubjectGroupClass</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.CreateSubjectGroupClassServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UpdateSubjectGroupClassServlet</servlet-name>
@@ -1228,9 +1235,9 @@
     </servlet>
 
     <servlet>
-        <servlet-name>LockCRFVersionServlet</servlet-name>
+        <servlet-name>lockCRFVersionServlet</servlet-name>
         <display-name>LockCRFVersion</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.LockCRFVersionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -1281,7 +1288,7 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>LockCRFVersionServlet</servlet-name>
+        <servlet-name>lockCRFVersionServlet</servlet-name>
         <url-pattern>/LockCRFVersion</url-pattern>
     </servlet-mapping>
 
@@ -1300,9 +1307,13 @@
         <url-pattern>/UpdateStudyNew</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>listDiscNotesSubjectServlet</servlet-name>
+        <url-pattern>/ListDiscNotesSubjectServlet</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>ListDiscNotesForCRFServlet</servlet-name>
+        <servlet-name>listDiscNotesForCRFServlet</servlet-name>
         <url-pattern>/ListDiscNotesForCRFServlet</url-pattern>
     </servlet-mapping>
 
@@ -1494,7 +1505,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>ManageStudyServlet</servlet-name>
+        <servlet-name>manageStudyServlet</servlet-name>
         <url-pattern>/ManageStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1587,11 +1598,11 @@
         <url-pattern>/InitUpdateSubStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListStudyServlet</servlet-name>
+        <servlet-name>listStudyServlet</servlet-name>
         <url-pattern>/ListStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>AssignUserToStudyServlet</servlet-name>
+        <servlet-name>assignUserToStudyServlet</servlet-name>
         <url-pattern>/AssignUserToStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1599,11 +1610,11 @@
         <url-pattern>/ListCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>DefineStudyEventServlet</servlet-name>
+        <servlet-name>defineStudyEventServlet</servlet-name>
         <url-pattern>/DefineStudyEvent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListEventDefinitionServlet</servlet-name>
+        <servlet-name>listEventDefinitionServlet</servlet-name>
         <url-pattern>/ListEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1676,7 +1687,7 @@
         <url-pattern>/RestoreCRFFromDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>AddCRFToDefinitionServlet</servlet-name>
+        <servlet-name>addCRFToDefinitionServlet</servlet-name>
         <url-pattern>/AddCRFToDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1756,7 +1767,7 @@
         <url-pattern>/RestoreEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>LockEventDefinitionServlet</servlet-name>
+        <servlet-name>lockEventDefinitionServlet</servlet-name>
         <url-pattern>/LockEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1764,7 +1775,7 @@
         <url-pattern>/UnlockEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListStudyUserServlet</servlet-name>
+        <servlet-name>listStudyUserServlet</servlet-name>
         <url-pattern>/ListStudyUser</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1899,10 +1910,10 @@
         <servlet-name>ViewStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ViewStudySubjectAuditLog</url-pattern>
     </servlet-mapping>
-
-    <!--  Export Excel -->
+	
+	<!--  Export Excel -->
     <servlet-mapping>
-        <servlet-name>ExportExcelStudySubjectAuditLogServlet</servlet-name>
+        <servlet-name>exportExcelStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ExportExcelStudySubjectAuditLog</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1951,14 +1962,14 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>HelpThemeServlet</servlet-name>
-        <url-pattern>/HelpThemeServlet</url-pattern>
+        <url-pattern>/HelpThemeServlet</url-pattern> 
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ChangeDefinitionOrdinalServlet</servlet-name>
+        <servlet-name>changeDefinitionOrdinalServlet</servlet-name>
         <url-pattern>/ChangeDefinitionOrdinal</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ChangeDefinitionCRFOrdinalServlet</servlet-name>
+        <servlet-name>changeDefinitionCRFOrdinalServlet</servlet-name>
         <url-pattern>/ChangeDefinitionCRFOrdinal</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2002,11 +2013,11 @@
         <url-pattern>/EditSelected</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListSubjectGroupClassServlet</servlet-name>
+        <servlet-name>listSubjectGroupClassServlet</servlet-name>
         <url-pattern>/ListSubjectGroupClass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>CreateSubjectGroupClassServlet</servlet-name>
+        <servlet-name>createSubjectGroupClassServlet</servlet-name>
         <url-pattern>/CreateSubjectGroupClass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2127,7 +2138,7 @@
     </servlet-mapping>
     <!-- just for testing purposes -->
     <servlet-mapping>
-        <servlet-name>ManageStudyServlet</servlet-name>
+        <servlet-name>manageStudyServlet</servlet-name>
         <url-pattern>/ManageStudy1</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

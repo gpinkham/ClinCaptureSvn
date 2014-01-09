@@ -20,32 +20,39 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import org.springframework.stereotype.Component;
 
 /**
  * Generates the index page of manage study module
  * 
  * @author ssachs
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class ManageStudyServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class ManageStudyServlet extends Controller {
 
-	Locale locale;
 	public final List<String> INSTRUCTIONS = new ArrayList<String>();
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
+
 		if (!INSTRUCTIONS.isEmpty()) {
 			INSTRUCTIONS.clear();
 		}
@@ -60,7 +67,7 @@ public class ManageStudyServlet extends SecureController {
 		request.setAttribute("openInstructions", true);
 
 		// find last 5 modifed sites
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 		ArrayList allSites = (ArrayList) sdao.findAllByParent(currentStudy.getId());
 		ArrayList sites = new ArrayList();
 		for (int i = 0; i < allSites.size(); i++) {
@@ -70,28 +77,28 @@ public class ManageStudyServlet extends SecureController {
 			}
 		}
 		request.setAttribute("sites", sites);
-		request.setAttribute("sitesCount", new Integer(sites.size()));
-		request.setAttribute("allSitesCount", new Integer(allSites.size()));
+		request.setAttribute("sitesCount", sites.size());
+		request.setAttribute("allSitesCount", allSites.size());
 		if (currentStudy != null) {
 			request.setAttribute("studyIdentifier", currentStudy.getIdentifier());
 		}
 
-		StudyEventDefinitionDAO edao = new StudyEventDefinitionDAO(sm.getDataSource());
-		ArrayList seds = (ArrayList) edao.findAllByStudyAndLimit(currentStudy.getId());
+		StudyEventDefinitionDAO edao = getStudyEventDefinitionDAO();
+		ArrayList seds = (ArrayList) edao.findAllByStudyAndLimit(currentStudy != null ? currentStudy.getId() : 0);
 		ArrayList allSeds = edao.findAllByStudy(currentStudy);
 		request.setAttribute("seds", seds);
-		request.setAttribute("sedsCount", new Integer(seds.size()));
-		request.setAttribute("allSedsCount", new Integer(allSeds.size()));
+		request.setAttribute("sedsCount", seds.size());
+		request.setAttribute("allSedsCount", allSeds.size());
 
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-		ArrayList users = udao.findAllUsersByStudyIdAndLimit(currentStudy.getId(), true);
-		ArrayList allUsers = udao.findAllUsersByStudy(currentStudy.getId());
+		UserAccountDAO udao = getUserAccountDAO();
+		ArrayList users = udao.findAllUsersByStudyIdAndLimit(currentStudy != null ? currentStudy.getId() : 0, true);
+		ArrayList allUsers = udao.findAllUsersByStudy(currentStudy != null ? currentStudy.getId() : 0);
 		request.setAttribute("users", users);
-		request.setAttribute("usersCount", new Integer(users.size()));
-		request.setAttribute("allUsersCount", new Integer(allUsers.size()));
+		request.setAttribute("usersCount", users.size());
+		request.setAttribute("allUsersCount", allUsers.size());
 
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-		ArrayList allSubjects = ssdao.findAllByStudyId(currentStudy.getId());
+		StudySubjectDAO ssdao = getStudySubjectDAO();
+		ArrayList allSubjects = ssdao.findAllByStudyId(currentStudy != null ? currentStudy.getId() : 0);
 		ArrayList subjects = new ArrayList();
 		for (int i = 0; i < allSubjects.size(); i++) {
 			subjects.add(allSubjects.get(i));
@@ -100,37 +107,45 @@ public class ManageStudyServlet extends SecureController {
 			}
 		}
 		request.setAttribute("subs", subjects);
-		request.setAttribute("subsCount", new Integer(subjects.size()));
-		request.setAttribute("allSubsCount", new Integer(allSubjects.size()));
+		request.setAttribute("subsCount", subjects.size());
+		request.setAttribute("allSubsCount", allSubjects.size());
 
-		resetPanel();
+		StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 
 		if (allSubjects.size() > 0) {
-			setToPanel("Subjects", new Integer(allSubjects.size()).toString());
+			setToPanel("Subjects", Integer.toString(allSubjects.size()), request);
 		}
 		if (allUsers.size() > 0) {
-			setToPanel("Users", new Integer(allUsers.size()).toString());
+			setToPanel("Users", Integer.toString(allUsers.size()), request);
 		}
 		if (allSites.size() > 0) {
-			setToPanel("Sites", new Integer(allSites.size()).toString());
+			setToPanel("Sites", Integer.toString(allSites.size()), request);
 		}
 		if (allSeds.size() > 0) {
-			setToPanel("Event Definitions", new Integer(allSeds.size()).toString());
+			setToPanel("Event Definitions", Integer.toString(allSeds.size()), request);
 		}
 		String proto = request.getParameter("proto");
 		if (proto == null || "".equalsIgnoreCase(proto)) {
-			forwardPage(Page.MANAGE_STUDY);
+			forwardPage(Page.MANAGE_STUDY, request, response);
 		} else {
-			forwardPage(Page.MANAGE_STUDY_BODY);
+			forwardPage(Page.MANAGE_STUDY_BODY, request, response);
 		}
 	}
 
 	/**
 	 * Checks whether the user has the correct privilege
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -141,8 +156,9 @@ public class ManageStudyServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, restext.getString("not_study_director"), "1");// TODO
 	}
 

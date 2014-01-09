@@ -24,17 +24,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -45,6 +47,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyEventDefinitionRow;
+import org.springframework.stereotype.Component;
 
 /**
  * Processes user reuqest to generate study event definition list
@@ -52,21 +55,27 @@ import org.akaza.openclinica.web.bean.StudyEventDefinitionRow;
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
-public class ListEventDefinitionServlet extends SecureController {
-
-	Locale locale;
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class ListEventDefinitionServlet extends Controller {
 
 	/**
 	 * Checks whether the user has the correct privilege
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		session.removeAttribute("tmpCRFIdMap");
-		session.removeAttribute("crfsWithVersion");
-		session.removeAttribute("eventDefinitionCRFs");
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		locale = request.getLocale();
+		request.getSession().removeAttribute("tmpCRFIdMap");
+		request.getSession().removeAttribute("crfsWithVersion");
+		request.getSession().removeAttribute("eventDefinitionCRFs");
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -76,8 +85,9 @@ public class ListEventDefinitionServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MANAGE_STUDY_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -85,24 +95,30 @@ public class ListEventDefinitionServlet extends SecureController {
 
 	/**
 	 * Processes the request
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
 
-		StudyEventDefinitionDAO edao = new StudyEventDefinitionDAO(sm.getDataSource());
-		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-		CRFDAO crfDao = new CRFDAO(sm.getDataSource());
-		CRFVersionDAO crfVersionDao = new CRFVersionDAO(sm.getDataSource());
+		StudyEventDefinitionDAO edao = getStudyEventDefinitionDAO();
+		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
+		CRFDAO crfDao = getCRFDAO();
+		CRFVersionDAO crfVersionDao = getCRFVersionDAO();
 		ArrayList seds = edao.findAllByStudy(currentStudy);
 
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		for (int i = 0; i < seds.size(); i++) {
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seds.get(i);
+		StudyEventDAO sedao = getStudyEventDAO();
+		for (Object sed1 : seds) {
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sed1;
 			Collection eventDefinitionCRFlist = edcdao.findAllParentsByDefinition(sed.getId());
 			Map crfWithDefaultVersion = new LinkedHashMap();
-			for (Iterator it = eventDefinitionCRFlist.iterator(); it.hasNext();) {
+			for (Object anEventDefinitionCRFlist : eventDefinitionCRFlist) {
 				// FIXME can this be reduced to a non - N^2 loop?
-				EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) it.next();
+				EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) anEventDefinitionCRFlist;
 				CRFBean crfBean = (CRFBean) crfDao.findByPK(edcBean.getCrfId());
 				CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByPK(edcBean.getDefaultVersionId());
 				logger.info("ED[" + sed.getName() + "]crf[" + crfBean.getName() + "]dv[" + crfVersionBean.getName()
@@ -148,27 +164,26 @@ public class ListEventDefinitionServlet extends SecureController {
 		table.computeDisplay();
 
 		request.setAttribute("table", table);
-		request.setAttribute("defSize", new Integer(seds.size()));
+		request.setAttribute("defSize", seds.size());
 
 		if (request.getParameter("read") != null && request.getParameter("read").equals("true")) {
 			request.setAttribute("readOnly", true);
 		}
 
-		forwardPage(Page.STUDY_EVENT_DEFINITION_LIST);
+		forwardPage(Page.STUDY_EVENT_DEFINITION_LIST, request, response);
 	}
 
 	/**
 	 * Checked whether a definition is available to be locked
 	 * 
 	 * @param sed
-	 * @return
+	 *            StudyEventDefinitionBean
+	 * @param sedao
+	 *            StudyEventDAO
+	 * @return boolean
 	 */
 	private boolean isPopulated(StudyEventDefinitionBean sed, StudyEventDAO sedao) {
-		if (sedao.countNotRemovedEvents(sed.getId()) > 0) {
-			return true;
-		} else {
-			return false;
-		}
+		return sedao.countNotRemovedEvents(sed.getId()) > 0;
 	}
 
 }

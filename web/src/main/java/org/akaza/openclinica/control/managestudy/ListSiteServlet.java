@@ -24,10 +24,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -41,21 +39,24 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyRow;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ListSiteServlet extends RememberLastPage {
 
 	public static final String SAVED_LIST_SITES_URL = "savedListSitesUrl";
 
 	/**
-     *
-     * @param request
-     * @param response
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -65,8 +66,9 @@ public class ListSiteServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MANAGE_STUDY_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
@@ -74,9 +76,12 @@ public class ListSiteServlet extends RememberLastPage {
 
 	/**
 	 * Finds all the studies, processes the request
-     * @param request
-     * @param response
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if (shouldRedirect(request, response)) {
@@ -162,12 +167,11 @@ public class ListSiteServlet extends RememberLastPage {
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 	}
-	
-	private void addNewSiteNotificationMessage(HttpServletRequest request){
-		if (request.getSession().getAttribute("new_site_created")!=null){
+
+	private void addNewSiteNotificationMessage(HttpServletRequest request) {
+		if (request.getSession().getAttribute("new_site_created") != null) {
 			request.getSession().removeAttribute("new_site_created");
 			addPageMessage(respage.getString("the_new_site_created_succesfully_current"), request);
-		}	
-		return;
+		}
 	}
 }

@@ -20,12 +20,20 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -35,12 +43,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyGroupClassRow;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
+import org.springframework.stereotype.Component;
 
 /**
  * Lists all the subject group classes in a study
@@ -49,17 +52,21 @@ import java.util.Locale;
  * 
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class ListSubjectGroupClassServlet extends SecureController {
-
-	Locale locale;
+@Component
+public class ListSubjectGroupClassServlet extends Controller {
 
 	/**
-     *
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -69,46 +76,51 @@ public class ListSubjectGroupClassServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MANAGE_STUDY_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		FormProcessor fp = new FormProcessor(request);
 		String action = request.getParameter("action");
-		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-		StudyDAO stdao = new StudyDAO(sm.getDataSource());
+		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
+		StudyDAO stdao = getStudyDAO();
 		int parentStudyId = currentStudy.getParentStudyId();
-		ArrayList groups = new ArrayList();
+		ArrayList groups;
 		ArrayList<StudyGroupClassBean> availableDynGroups = new ArrayList<StudyGroupClassBean>();
 		HashMap<Integer, String> dynGroupClassIdToEventsNames = new HashMap<Integer, String>();
 		ArrayList<Integer> listOfGroupClassOrdinalsWithoutDef = new ArrayList<Integer>();
 		boolean defGroupExist = false;
-		
+
 		if (parentStudyId > 0) {
 			StudyBean parentStudy = (StudyBean) stdao.findByPK(parentStudyId);
 			groups = sgcdao.findAllByStudy(parentStudy);
 		} else {
 			groups = sgcdao.findAllByStudy(currentStudy);
 		}
-		StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		for (int i = 0; i < groups.size(); i++) {
-			StudyGroupClassBean group = (StudyGroupClassBean) groups.get(i);
-			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()){
-				ArrayList<StudyEventDefinitionBean> orderedDefinitions = seddao.findAllOrderedByStudyGroupClassId(group.getId());
-				group.setEventDefinitions(orderedDefinitions); 
+		StudyGroupDAO sgdao = getStudyGroupDAO();
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+		for (Object group1 : groups) {
+			StudyGroupClassBean group = (StudyGroupClassBean) group1;
+			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()) {
+				ArrayList<StudyEventDefinitionBean> orderedDefinitions = seddao.findAllOrderedByStudyGroupClassId(group
+						.getId());
+				group.setEventDefinitions(orderedDefinitions);
 				StringBuilder strOfEventsNames = new StringBuilder("");
-				if (group.getStatus().isAvailable()){
-					for (StudyEventDefinitionBean def: orderedDefinitions){
-						strOfEventsNames.append(", " + def.getName());
+				if (group.getStatus().isAvailable()) {
+					for (StudyEventDefinitionBean def : orderedDefinitions) {
+						strOfEventsNames.append(", ").append(def.getName());
 					}
 					dynGroupClassIdToEventsNames.put(group.getId(), strOfEventsNames.toString().replaceFirst(", ", ""));
-					availableDynGroups.add(group); 
+					availableDynGroups.add(group);
 				}
 			} else {
 				ArrayList studyGroups = sgdao.findAllByGroupClass(group);
@@ -116,37 +128,38 @@ public class ListSubjectGroupClassServlet extends SecureController {
 			}
 		}
 		Collections.sort(availableDynGroups, StudyGroupClassBean.comparatorForDynGroupClasses);
-		
+
 		if ("submit_order".equals(action)) {
-			for (StudyGroupClassBean dynamicGroup: availableDynGroups) {
-				if (!dynamicGroup.isDefault()){
+			for (StudyGroupClassBean dynamicGroup : availableDynGroups) {
+				if (!dynamicGroup.isDefault()) {
 					listOfGroupClassOrdinalsWithoutDef.add(dynamicGroup.getDynamicOrdinal());
 				} else {
 					defGroupExist = true;
 				}
 			}
-			for (StudyGroupClassBean dynamicGroup: availableDynGroups) {
-				if (!dynamicGroup.isDefault()){
+			for (StudyGroupClassBean dynamicGroup : availableDynGroups) {
+				if (!dynamicGroup.isDefault()) {
 					int index = Integer.valueOf(request.getParameter("dynamicGroup" + dynamicGroup.getId()));
-					int newDynamicOrdinal = listOfGroupClassOrdinalsWithoutDef.get(defGroupExist? index-2: index-1);
-					if (newDynamicOrdinal != dynamicGroup.getDynamicOrdinal()){
-						sgcdao.updateDynamicOrdinal(newDynamicOrdinal, parentStudyId > 0? parentStudyId : currentStudy.getId(), dynamicGroup.getId());
-						dynamicGroup.setDynamicOrdinal(newDynamicOrdinal); 
+					int newDynamicOrdinal = listOfGroupClassOrdinalsWithoutDef.get(defGroupExist ? index - 2
+							: index - 1);
+					if (newDynamicOrdinal != dynamicGroup.getDynamicOrdinal()) {
+						sgcdao.updateDynamicOrdinal(newDynamicOrdinal,
+								parentStudyId > 0 ? parentStudyId : currentStudy.getId(), dynamicGroup.getId());
+						dynamicGroup.setDynamicOrdinal(newDynamicOrdinal);
 					}
 				}
 			}
 			Collections.sort(availableDynGroups, StudyGroupClassBean.comparatorForDynGroupClasses);
 		}
-		
+
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allGroupRows = StudyGroupClassRow.generateRowsFromBeans(groups);
-		boolean isParentStudy = currentStudy.getParentStudyId() > 0 ? false : true;
+		boolean isParentStudy = currentStudy.getParentStudyId() <= 0;
 		request.setAttribute("isParentStudy", isParentStudy);
 
 		String[] columns = { resword.getString("subject_group_class"), resword.getString("type"),
-				resword.getString("subject_assignment"), resword.getString("default"),
-				resword.getString("study_name"), resword.getString("subject_groups"), 
-				resword.getString("study_events"), resword.getString("status"), 
+				resword.getString("subject_assignment"), resword.getString("default"), resword.getString("study_name"),
+				resword.getString("subject_groups"), resword.getString("study_events"), resword.getString("status"),
 				resword.getString("actions") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(3);
@@ -156,18 +169,17 @@ public class ListSubjectGroupClassServlet extends SecureController {
 		table.setQuery("ListSubjectGroupClass", new HashMap());
 		table.setRows(allGroupRows);
 		table.computeDisplay();
-		
-		
+
 		request.setAttribute("availableDynGroups", availableDynGroups);
 		request.setAttribute("dynGroupClassIdToEventsNames", dynGroupClassIdToEventsNames);
-		
+
 		request.setAttribute("table", table);
-		
+
 		if (request.getParameter("read") != null && request.getParameter("read").equals("true")
 				&& currentRole.getRole().equals(Role.STUDY_DIRECTOR)) {
 			request.setAttribute("readOnly", true);
 		}
-		forwardPage(Page.SUBJECT_GROUP_CLASS_LIST);
+		forwardPage(Page.SUBJECT_GROUP_CLASS_LIST, request, response);
 
 	}
 

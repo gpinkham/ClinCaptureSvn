@@ -20,6 +20,12 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.DisplayStudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -47,14 +53,6 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.bean.DisplayStudySubjectRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author jxu

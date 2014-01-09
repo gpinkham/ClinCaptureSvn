@@ -15,11 +15,14 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import org.akaza.openclinica.control.core.SecureController;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.submit.ListDiscNotesSubjectTableFactory;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -37,20 +40,23 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class ListDiscNotesSubjectServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class ListDiscNotesSubjectServlet extends Controller {
 	public static final String RESOLUTION_STATUS = "resolutionStatus";
 	// Include extra path info on the URL, which generates a file name hint in
 	// some
 	// browser's "save as..." dialog boxes
-	public static final String EXTRA_PATH_INFO = "discrepancyNoteReport";
 	public static final String DISCREPANCY_NOTE_TYPE = "discrepancyNoteType";
 	public static final String FILTER_SUMMARY = "filterSummary";
-	Locale locale;
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String module = request.getParameter("module");
 		String moduleStr = "manage";
@@ -70,7 +76,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
 		// Close the info side panel and show icons
 		request.setAttribute("closeInfoShowIcons", true);
 		// Determine whether to limit the displayed DN's to a certain DN type
-		int resolutionStatus = 0;
+		int resolutionStatus;
 		try {
 			resolutionStatus = Integer.parseInt(request.getParameter("resolutionStatus"));
 		} catch (NumberFormatException nfe) {
@@ -83,10 +89,10 @@ public class ListDiscNotesSubjectServlet extends SecureController {
 		// Set object should be cleared,
 		// because we do not have to save a set of filter IDs.
 		boolean hasAResolutionStatus = resolutionStatus >= 1 && resolutionStatus <= 5;
-		Set<Integer> resolutionStatusIds = (HashSet) session.getAttribute(RESOLUTION_STATUS);
+		Set<Integer> resolutionStatusIds = (HashSet) request.getSession().getAttribute(RESOLUTION_STATUS);
 		// remove the session if there is no resolution status
 		if (!hasAResolutionStatus && resolutionStatusIds != null) {
-			session.removeAttribute(RESOLUTION_STATUS);
+			request.getSession().removeAttribute(RESOLUTION_STATUS);
 			resolutionStatusIds = null;
 		}
 		if (hasAResolutionStatus) {
@@ -94,10 +100,10 @@ public class ListDiscNotesSubjectServlet extends SecureController {
 				resolutionStatusIds = new HashSet<Integer>();
 			}
 			resolutionStatusIds.add(resolutionStatus);
-			session.setAttribute(RESOLUTION_STATUS, resolutionStatusIds);
+			request.getSession().setAttribute(RESOLUTION_STATUS, resolutionStatusIds);
 		}
 
-		int discNoteType = 0;
+		int discNoteType;
 		try {
 			discNoteType = Integer.parseInt(request.getParameter("type"));
 		} catch (NumberFormatException nfe) {
@@ -113,28 +119,27 @@ public class ListDiscNotesSubjectServlet extends SecureController {
 		if (!filterSummary.isEmpty()) {
 			request.setAttribute(FILTER_SUMMARY, filterSummary);
 		}
-		locale = request.getLocale();
 
-		Map stats = discNoteUtil.generateDiscNoteSummaryRefactored(sm.getDataSource(), currentStudy,
-				resolutionStatusIds, discNoteType);
+		Map stats = discNoteUtil.generateDiscNoteSummaryRefactored(getDataSource(), currentStudy, resolutionStatusIds,
+				discNoteType);
 		request.setAttribute("summaryMap", stats);
 		Set mapKeys = stats.keySet();
 		request.setAttribute("mapKeys", mapKeys);
 
-		StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-		StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
-		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-		StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
-		EventCRFDAO edao = new EventCRFDAO(sm.getDataSource());
-		EventDefinitionCRFDAO eddao = new EventDefinitionCRFDAO(sm.getDataSource());
-		SubjectDAO subdao = new SubjectDAO(sm.getDataSource());
-		DiscrepancyNoteDAO dnDAO = new DiscrepancyNoteDAO(sm.getDataSource());
+		StudyDAO studyDAO = getStudyDAO();
+		StudySubjectDAO sdao = getStudySubjectDAO();
+		StudyEventDAO sedao = getStudyEventDAO();
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+		SubjectGroupMapDAO sgmdao = getSubjectGroupMapDAO();
+		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
+		StudyGroupDAO sgdao = getStudyGroupDAO();
+		EventCRFDAO edao = getEventCRFDAO();
+		EventDefinitionCRFDAO eddao = getEventDefinitionCRFDAO();
+		SubjectDAO subdao = getSubjectDAO();
+		DiscrepancyNoteDAO dnDAO = getDiscrepancyNoteDAO();
 
 		ListDiscNotesSubjectTableFactory factory = new ListDiscNotesSubjectTableFactory(
-				ResourceBundleProvider.getTermsBundle(locale));
+				ResourceBundleProvider.getTermsBundle(request.getLocale()));
 		factory.setStudyEventDefinitionDao(seddao);
 		factory.setSubjectDAO(subdao);
 		factory.setStudySubjectDAO(sdao);
@@ -154,20 +159,26 @@ public class ListDiscNotesSubjectServlet extends SecureController {
 		factory.setDiscNoteType(discNoteType);
 		factory.setResolutionStatus(resolutionStatus);
 		factory.setResolutionStatusIds(resolutionStatusIds);
-		factory.setResword(ResourceBundleProvider.getWordsBundle(locale));
+		factory.setResword(ResourceBundleProvider.getWordsBundle(request.getLocale()));
 		String listDiscNotesHtml = factory.createTable(request, response).render();
 		request.setAttribute("listDiscNotesHtml", listDiscNotesHtml);
 
-		forwardPage(getJSP());
+		forwardPage(getJSP(), request, response);
 	}
 
 	/**
 	 * Checks whether the user has the right permission to proceed function
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -177,18 +188,15 @@ public class ListDiscNotesSubjectServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	protected Page getJSP() {
 		return Page.LIST_SUBJECT_DISC_NOTE;
-	}
-
-	protected String getBaseURL() {
-		return "ListDiscNotesSubjectServlet";
 	}
 
 }

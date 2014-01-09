@@ -23,10 +23,8 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -58,14 +56,15 @@ import org.akaza.openclinica.web.bean.DisplayStudySubjectEventsRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "unchecked","serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ListEventsForSubjectServlet extends Controller {
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -75,16 +74,17 @@ public class ListEventsForSubjectServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		// checks which module the requests are from
@@ -146,16 +146,15 @@ public class ListEventsForSubjectServlet extends Controller {
 
 		}
 
-		ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(currentStudy,
-				definitionId);
+		ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(currentStudy, definitionId);
 
-        for (Object eventDefinitionCRF : eventDefinitionCRFs) {
-            // FIXME could we reduce this to one call to the DB?
-            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRF;
-            CRFBean crf = (CRFBean) crfdao.findByPK(edc.getCrfId());
-            edc.setCrf(crf);
+		for (Object eventDefinitionCRF : eventDefinitionCRFs) {
+			// FIXME could we reduce this to one call to the DB?
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRF;
+			CRFBean crf = (CRFBean) crfdao.findByPK(edc.getCrfId());
+			edc.setCrf(crf);
 
-        }
+		}
 		request.setAttribute("studyGroupClasses", studyGroupClasses);
 		request.setAttribute("allDefsArray", allDefs);
 		request.setAttribute("allDefsNumber", allDefs.size());
@@ -169,100 +168,100 @@ public class ListEventsForSubjectServlet extends Controller {
 		ArrayList subjects = sdao.findAllByStudyId(currentStudy.getId());
 
 		ArrayList displayStudySubs = new ArrayList();
-        for (Object subject : subjects) {
-            StudySubjectBean studySub = (StudySubjectBean) subject;
+		for (Object subject : subjects) {
+			StudySubjectBean studySub = (StudySubjectBean) subject;
 
-            ArrayList groups = (ArrayList) sgmdao.findAllByStudySubject(studySub.getId());
+			ArrayList groups = (ArrayList) sgmdao.findAllByStudySubject(studySub.getId());
 
-            ArrayList subGClasses = new ArrayList();
-            for (Object studyGroupClass : studyGroupClasses) {
-                StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
-                boolean hasClass = false;
-                for (Object group : groups) {
-                    SubjectGroupMapBean sgmb = (SubjectGroupMapBean) group;
-                    if (sgmb.getGroupClassName().equalsIgnoreCase(sgc.getName())) {
-                        subGClasses.add(sgmb);
-                        hasClass = true;
-                        break;
-                    }
+			ArrayList subGClasses = new ArrayList();
+			for (Object studyGroupClass : studyGroupClasses) {
+				StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
+				boolean hasClass = false;
+				for (Object group : groups) {
+					SubjectGroupMapBean sgmb = (SubjectGroupMapBean) group;
+					if (sgmb.getGroupClassName().equalsIgnoreCase(sgc.getName())) {
+						subGClasses.add(sgmb);
+						hasClass = true;
+						break;
+					}
 
-                }
-                if (!hasClass) {
-                    subGClasses.add(new SubjectGroupMapBean());
-                }
+				}
+				if (!hasClass) {
+					subGClasses.add(new SubjectGroupMapBean());
+				}
 
-            }
+			}
 
-            ArrayList<DisplayStudyEventBean> displayEvents = new ArrayList<DisplayStudyEventBean>();
-            ArrayList events = sedao.findAllByStudySubjectAndDefinition(studySub, sed);
+			ArrayList<DisplayStudyEventBean> displayEvents = new ArrayList<DisplayStudyEventBean>();
+			ArrayList events = sedao.findAllByStudySubjectAndDefinition(studySub, sed);
 
-            for (Object event : events) {
-                StudyEventBean seb = (StudyEventBean) event;
+			for (Object event : events) {
+				StudyEventBean seb = (StudyEventBean) event;
 				DisplayStudyEventBean dseb = getDisplayStudyEventsForStudySubject(seb, getDataSource(), ub,
 						currentRole, currentStudy);
 
-                displayEvents.add(dseb);
-            }
+				displayEvents.add(dseb);
+			}
 
-            for (DisplayStudyEventBean dseb : displayEvents) {
-                ArrayList eventCRFs = dseb.getDisplayEventCRFs();
+			for (DisplayStudyEventBean dseb : displayEvents) {
+				ArrayList eventCRFs = dseb.getDisplayEventCRFs();
 
-                for (Object eventDefinitionCRF : eventDefinitionCRFs) {
-                    EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRF;
-                    int crfId = edc.getCrfId();
-                    boolean hasCRF = false;
-                    for (Object eventCRF : eventCRFs) {
-                        DisplayEventCRFBean decb = (DisplayEventCRFBean) eventCRF;
-                        if (decb.getEventCRF().getCrf().getId() == crfId) {
-                            dseb.getAllEventCRFs().add(decb);
+				for (Object eventDefinitionCRF : eventDefinitionCRFs) {
+					EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRF;
+					int crfId = edc.getCrfId();
+					boolean hasCRF = false;
+					for (Object eventCRF : eventCRFs) {
+						DisplayEventCRFBean decb = (DisplayEventCRFBean) eventCRF;
+						if (decb.getEventCRF().getCrf().getId() == crfId) {
+							dseb.getAllEventCRFs().add(decb);
 
-                            hasCRF = true;
-                            break;
-                        }
-                    }
-                    if (!hasCRF) {
-                        DisplayEventCRFBean db = new DisplayEventCRFBean();
-                        db.setEventDefinitionCRF(edc);
-                        db.getEventDefinitionCRF().setCrf(edc.getCrf());
-                        dseb.getAllEventCRFs().add(db);
+							hasCRF = true;
+							break;
+						}
+					}
+					if (!hasCRF) {
+						DisplayEventCRFBean db = new DisplayEventCRFBean();
+						db.setEventDefinitionCRF(edc);
+						db.getEventDefinitionCRF().setCrf(edc.getCrf());
+						dseb.getAllEventCRFs().add(db);
 
-                    }
+					}
 
-                }
+				}
 
-                if (currentStudy.getParentStudyId() > 0) {
-                    // check each eventDefCRFBean and set its isHidden property
-                    // to true, if its
-                    // persistent/database-derived hideCrf is true (domain rule:
-                    // hide the CRF from users logged into a site)
-                    HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
-                    hideCRFManager.optionallyCheckHideCRFProperty(dseb);
+				if (currentStudy.getParentStudyId() > 0) {
+					// check each eventDefCRFBean and set its isHidden property
+					// to true, if its
+					// persistent/database-derived hideCrf is true (domain rule:
+					// hide the CRF from users logged into a site)
+					HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
+					hideCRFManager.optionallyCheckHideCRFProperty(dseb);
 
-                    // remove a DisplayEventCRFBean from a DisplayStudyEventBean
-                    // in the list
-                    // if it contains a hidden CRF in its event definition
-                    hideCRFManager.removeHiddenEventCRF(dseb);
+					// remove a DisplayEventCRFBean from a DisplayStudyEventBean
+					// in the list
+					// if it contains a hidden CRF in its event definition
+					hideCRFManager.removeHiddenEventCRF(dseb);
 
-                    // generate a boolean request attribute indicating whether
-                    // any of the CRFs
-                    // should be hidden
-                    boolean hideCRFs = hideCRFManager.studyEventHasAHideCRFProperty(dseb);
-                    request.setAttribute("hideCRFs", hideCRFs);
-                }
-            }
+					// generate a boolean request attribute indicating whether
+					// any of the CRFs
+					// should be hidden
+					boolean hideCRFs = hideCRFManager.studyEventHasAHideCRFProperty(dseb);
+					request.setAttribute("hideCRFs", hideCRFs);
+				}
+			}
 
-            DisplayStudySubjectBean dssb = new DisplayStudySubjectBean();
+			DisplayStudySubjectBean dssb = new DisplayStudySubjectBean();
 
-            dssb.setStudySubject(studySub);
-            dssb.setStudyGroups(subGClasses);
-            dssb.setStudyEvents(displayEvents);
-            if (definitionId > 0) {
-                dssb.setSedId(definitionId);
-            } else {
-                dssb.setSedId(-1);
-            }
-            displayStudySubs.add(dssb);
-        }
+			dssb.setStudySubject(studySub);
+			dssb.setStudyGroups(subGClasses);
+			dssb.setStudyEvents(displayEvents);
+			if (definitionId > 0) {
+				dssb.setSedId(definitionId);
+			} else {
+				dssb.setSedId(-1);
+			}
+			displayStudySubs.add(dssb);
+		}
 
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allStudyRows = DisplayStudySubjectEventsRow.generateRowsFromBeans(displayStudySubs);
@@ -275,10 +274,10 @@ public class ListEventsForSubjectServlet extends Controller {
 			columnArray.add(currentStudy == null ? resword.getString("gender") : currentStudy.getStudyParameterConfig()
 					.getGenderLabel());
 		}
-        for (Object studyGroupClass : studyGroupClasses) {
-            StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
-            columnArray.add(sgc.getName());
-        }
+		for (Object studyGroupClass : studyGroupClasses) {
+			StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass;
+			columnArray.add(sgc.getName());
+		}
 
 		columnArray.add(resword.getString("event_status"));
 		columnArray.add(resword.getString("event_date"));
@@ -286,16 +285,16 @@ public class ListEventsForSubjectServlet extends Controller {
 		HideCRFManager hideCRFMgr = HideCRFManager.createHideCRFManager();
 		hideCRFMgr.hideSpecifiedEventCRFDefBeans(eventDefinitionCRFs);
 
-        for (Object eventDefinitionCRF : eventDefinitionCRFs) {
-            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRF;
-            if (!(currentStudy.getParentStudyId() > 0)) {
-                columnArray.add(edc.getCrf().getName());
-            } else {
-                if (!edc.isHideCrf()) {
-                    columnArray.add(edc.getCrf().getName());
-                }
-            }
-        }
+		for (Object eventDefinitionCRF : eventDefinitionCRFs) {
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRF;
+			if (!((currentStudy != null ? currentStudy.getParentStudyId() : 0) > 0)) {
+				columnArray.add(edc.getCrf().getName());
+			} else {
+				if (!edc.isHideCrf()) {
+					columnArray.add(edc.getCrf().getName());
+				}
+			}
+		}
 		columnArray.add(resword.getString("actions"));
 		String columns[] = new String[columnArray.size()];
 		columnArray.toArray(columns);

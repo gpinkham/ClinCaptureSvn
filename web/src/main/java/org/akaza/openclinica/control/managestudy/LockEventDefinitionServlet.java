@@ -20,15 +20,22 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -40,9 +47,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.Date;
+import org.springframework.stereotype.Component;
 
 /**
  * Locks a study event definition
@@ -51,12 +56,21 @@ import java.util.Date;
  * 
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class LockEventDefinitionServlet extends SecureController {
+@Component
+public class LockEventDefinitionServlet extends Controller {
 	/**
-     *
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -65,28 +79,32 @@ public class LockEventDefinitionServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET,
 				resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
 		String idString = request.getParameter("id");
 
-		int defId = Integer.valueOf(idString.trim()).intValue();
-		StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(sm.getDataSource());
+		int defId = Integer.valueOf(idString.trim());
+		StudyEventDefinitionDAO sdao = getStudyEventDefinitionDAO();
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
 		// find all CRFs
-		EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
+		EventDefinitionCRFDAO edao = getEventDefinitionCRFDAO();
 		ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllByDefinition(defId);
 
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-		CRFDAO cdao = new CRFDAO(sm.getDataSource());
-		for (int i = 0; i < eventDefinitionCRFs.size(); i++) {
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
+		CRFVersionDAO cvdao = getCRFVersionDAO();
+		CRFDAO cdao = getCRFDAO();
+		for (Object eventDefinitionCRF : eventDefinitionCRFs) {
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRF;
 			ArrayList versions = (ArrayList) cvdao.findAllByCRF(edc.getCrfId());
 			edc.setVersions(versions);
 			CRFBean crf = (CRFBean) cdao.findByPK(edc.getCrfId());
@@ -94,26 +112,27 @@ public class LockEventDefinitionServlet extends SecureController {
 		}
 
 		// finds all events
-		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+		StudyEventDAO sedao = getStudyEventDAO();
 		ArrayList events = (ArrayList) sedao.findAllByDefinition(sed.getId());
 
 		String action = request.getParameter("action");
 		if (StringUtil.isBlank(idString)) {
-			addPageMessage(respage.getString("please_choose_a_SED_to_lock"));
-			forwardPage(Page.LIST_DEFINITION_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_SED_to_lock"), request);
+			forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (!sed.getStatus().equals(Status.AVAILABLE)) {
-					addPageMessage(respage.getString("this_SED_is_not_available_for_this_study")
-							+ respage.getString("please_contact_sysadmin_for_more_information"));
-					forwardPage(Page.LIST_DEFINITION_SERVLET);
+					addPageMessage(
+							respage.getString("this_SED_is_not_available_for_this_study")
+									+ respage.getString("please_contact_sysadmin_for_more_information"), request);
+					forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					return;
 				}
 
 				request.setAttribute("definitionToLock", sed);
 				request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
 				request.setAttribute("events", events);
-				forwardPage(Page.LOCK_DEFINITION);
+				forwardPage(Page.LOCK_DEFINITION, request, response);
 			} else {
 				logger.info("submit to lock the definition");
 				// lock definition
@@ -123,8 +142,8 @@ public class LockEventDefinitionServlet extends SecureController {
 				sdao.update(sed);
 
 				// lock all crfs
-				for (int j = 0; j < eventDefinitionCRFs.size(); j++) {
-					EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(j);
+				for (Object eventDefinitionCRF : eventDefinitionCRFs) {
+					EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRF;
 					edc.setStatus(Status.LOCKED);
 					edc.setUpdater(ub);
 					edc.setUpdatedDate(new Date());
@@ -132,10 +151,10 @@ public class LockEventDefinitionServlet extends SecureController {
 				}
 				// lock all events
 
-				EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+				EventCRFDAO ecdao = getEventCRFDAO();
 
-				for (int j = 0; j < events.size(); j++) {
-					StudyEventBean event = (StudyEventBean) events.get(j);
+				for (Object event1 : events) {
+					StudyEventBean event = (StudyEventBean) event1;
 					event.setStatus(Status.LOCKED);
 					event.setUpdater(ub);
 					event.setUpdatedDate(new Date());
@@ -143,17 +162,17 @@ public class LockEventDefinitionServlet extends SecureController {
 
 					ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 					// remove all the item data
-					ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-					for (int k = 0; k < eventCRFs.size(); k++) {
-						EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
+					ItemDataDAO iddao = getItemDataDAO();
+					for (Object eventCRF1 : eventCRFs) {
+						EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
 						eventCRF.setStatus(Status.LOCKED);
 						eventCRF.setUpdater(ub);
 						eventCRF.setUpdatedDate(new Date());
 						ecdao.update(eventCRF);
 
 						ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-						for (int a = 0; a < itemDatas.size(); a++) {
-							ItemDataBean item = (ItemDataBean) itemDatas.get(a);
+						for (Object itemData : itemDatas) {
+							ItemDataBean item = (ItemDataBean) itemData;
 							item.setStatus(Status.LOCKED);
 							item.setUpdater(ub);
 							item.setUpdatedDate(new Date());
@@ -166,9 +185,9 @@ public class LockEventDefinitionServlet extends SecureController {
 						+ respage.getString("has_been_locked_for_the_study") + currentStudy.getName()
 						+ respage.getString("no_new_data_may_entered_for_this_SED");
 
-				addPageMessage(emailBody);
-				sendEmail(emailBody);
-				forwardPage(Page.LIST_DEFINITION_SERVLET);
+				addPageMessage(emailBody, request);
+				sendEmail(emailBody, request);
+				forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 			}
 
 		}
@@ -178,16 +197,18 @@ public class LockEventDefinitionServlet extends SecureController {
 	/**
 	 * Send email to director and administrator
 	 * 
+	 * @param emailBody
+	 *            String
 	 * @param request
-	 * @param response
+	 *            HttpServletRequest
 	 */
-	private void sendEmail(String emailBody) throws Exception {
-
+	private void sendEmail(String emailBody, HttpServletRequest request) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
 		logger.info("Sending email...");
 		// to study director
-		sendEmail(ub.getEmail().trim(), respage.getString("lock_SED"), emailBody, false);
+		sendEmail(ub.getEmail().trim(), respage.getString("lock_SED"), emailBody, false, request);
 		// to admin
-		sendEmail(EmailEngine.getAdminEmail(), respage.getString("lock_SED"), emailBody, false);
+		sendEmail(EmailEngine.getAdminEmail(), respage.getString("lock_SED"), emailBody, false, request);
 		logger.info("Sending email done..");
 	}
 

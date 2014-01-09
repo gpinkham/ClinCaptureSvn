@@ -23,54 +23,63 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Locale;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.admin.DisplayStudyBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
-public class ListStudyServlet extends SecureController {
-
-	Locale locale;
-
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class ListStudyServlet extends Controller {
 	/**
-     *
-     */
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-
-		locale = request.getLocale();
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	/**
 	 * Finds all the studies
 	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
-	public void processRequest() throws Exception {
-
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyDAO sdao = getStudyDAO();
 		ArrayList studies = (ArrayList) sdao.findAll();
 		// find all parent studies
 		ArrayList parents = (ArrayList) sdao.findAllParents();
 		ArrayList displayStudies = new ArrayList();
 
-		for (int i = 0; i < parents.size(); i++) {
-			StudyBean parent = (StudyBean) parents.get(i);
+		for (Object parent1 : parents) {
+			StudyBean parent = (StudyBean) parent1;
 			ArrayList children = (ArrayList) sdao.findAllByParent(parent.getId());
 			DisplayStudyBean displayStudy = new DisplayStudyBean();
 			displayStudy.setParent(parent);
@@ -95,25 +104,26 @@ public class ListStudyServlet extends SecureController {
 		table.computeDisplay();
 
 		request.setAttribute("table", table);
-		session.setAttribute("fromListSite", "no");
+		request.getSession().setAttribute("fromListSite", "no");
 
-		resetPanel();
+		StudyInfoPanel panel = getStudyInfoPanel(request);
+		panel.reset();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
-		setToPanel(resword.getString("in_the_application"), "");
+		setToPanel(resword.getString("in_the_application"), "", request);
 		if (parents.size() > 0) {
-			setToPanel(resword.getString("studies"), new Integer(parents.size()).toString());
+			setToPanel(resword.getString("studies"), Integer.toString(parents.size()), request);
 		}
 		if (studies.size() > 0) {
-			setToPanel(resword.getString("sites"), new Integer(studies.size() - parents.size()).toString());
+			setToPanel(resword.getString("sites"), Integer.toString(studies.size() - parents.size()), request);
 		}
-		forwardPage(Page.STUDY_LIST);
+		forwardPage(Page.STUDY_LIST, request, response);
 
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 
 }

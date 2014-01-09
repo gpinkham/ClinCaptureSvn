@@ -21,7 +21,14 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -30,9 +37,10 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -46,32 +54,38 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.CRFRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import org.springframework.stereotype.Component;
 
 /**
  * @author jxu
  * 
  *         Defines a new study event
  */
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
-public class DefineStudyEventServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class DefineStudyEventServlet extends Controller {
 
 	/**
 	 * Checks whether the user has the correct privilege
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"));
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
 
 		if (currentStudy.getParentStudyId() > 0) {
-			addPageMessage(respage.getString("SED_may_only_added_top_level")
-					+ respage.getString("please_contact_sysadmin_questions"));
+			addPageMessage(
+					respage.getString("SED_may_only_added_top_level")
+							+ respage.getString("please_contact_sysadmin_questions"), request);
 			throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST,
 					resexception.getString("not_top_study"), "1");
 		}
@@ -84,8 +98,9 @@ public class DefineStudyEventServlet extends SecureController {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_persmission_add_SED_to_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_persmission_add_SED_to_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST,
 				resexception.getString("not_study_director"), "1");
 
@@ -94,106 +109,116 @@ public class DefineStudyEventServlet extends SecureController {
 	/**
 	 * Processes the 'define study event' request
 	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
 	 */
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		HttpSession session = request.getSession();
+		StudyBean currentStudy = getCurrentStudy(request);
 		FormProcessor fpr = new FormProcessor(request);
 		logger.trace("actionName*******" + fpr.getString("actionName"));
 		logger.trace("pageNum*******" + fpr.getString("pageNum"));
-		checkReferenceVisit();
+		checkReferenceVisit(request);
 		String actionName = request.getParameter("actionName");
-		ArrayList crfsWithVersion = (ArrayList) session.getAttribute("crfsWithVersion");
+		ArrayList crfsWithVersion = (ArrayList) request.getSession().getAttribute("crfsWithVersion");
 		if (crfsWithVersion == null) {
 			crfsWithVersion = new ArrayList();
-			CRFDAO cdao = new CRFDAO(sm.getDataSource());
-			CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+			CRFDAO cdao = getCRFDAO();
+			CRFVersionDAO cvdao = getCRFVersionDAO();
 			ArrayList crfs = (ArrayList) cdao.findAllByStatus(Status.AVAILABLE);
 
-			for (int i = 0; i < crfs.size(); i++) {
-				CRFBean crf = (CRFBean) crfs.get(i);
+			for (Object crf1 : crfs) {
+				CRFBean crf = (CRFBean) crf1;
 				ArrayList versions = cvdao.findAllByCRFId(crf.getId());
 				if (!versions.isEmpty()) {
 					crfsWithVersion.add(crf);
 				}
 
 			}
-			session.setAttribute("crfsWithVersion", crfsWithVersion);
+			request.getSession().setAttribute("crfsWithVersion", crfsWithVersion);
 		}
 		if (StringUtil.isBlank(actionName)) {
-			setOrGetDefinition();
-			forwardPage(Page.DEFINE_STUDY_EVENT1);
+			setOrGetDefinition(request);
+			forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
 		} else {
-			//When this page is called first time - session need to be cleaned
+			// When this page is called first time - session need to be cleaned
 			if ("init".equalsIgnoreCase(actionName)) {
-				UpdateEventDefinitionServlet.clearSession(session);
-				forwardPage(Page.DEFINE_STUDY_EVENT1);
+				UpdateEventDefinitionServlet.clearSession(request.getSession());
+				forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
 			} else {
 				if ("confirm".equalsIgnoreCase(actionName)) {
-					confirmWholeDefinition();	
+					confirmWholeDefinition(request, response);
 				} else if ("submit".equalsIgnoreCase(actionName)) {
 					try {
 						Integer nextAction = Integer.valueOf(request.getParameter("nextAction"));
 						if (nextAction != null) {
-							if (nextAction.intValue() == 1) {
+							if (nextAction == 1) {
 								session.removeAttribute("definition");
-								addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"));
-								forwardPage(Page.LIST_DEFINITION_SERVLET);
-							} else if (nextAction.intValue() == 2) {
-								submitDefinition();
+								addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"),
+										request);
+								forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
+							} else if (nextAction == 2) {
+								submitDefinition(request);
 								ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 								session.setAttribute("pageMessages", pageMessages);
-								forwardPage(Page.DEFINE_STUDY_EVENT1);
+								forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
 							} else {
 								logger.info("actionName ==> 3");
-								submitDefinition();
+								submitDefinition(request);
 								StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
 								sed.setStudyId(currentStudy.getId());
 								session.setAttribute("definition", sed);
-								forwardPage(Page.DEFINE_STUDY_EVENT1);
+								forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
 							}
 						}
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
-						addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"));
-						forwardPage(Page.LIST_DEFINITION_SERVLET);
+						addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"), request);
+						forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					} catch (NullPointerException e) {
 						e.printStackTrace();
-						addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"));
-						forwardPage(Page.LIST_DEFINITION_SERVLET);
+						addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"), request);
+						forwardPage(Page.LIST_DEFINITION_SERVLET, request, response);
 					}
-	
+
 				} else if ("next".equalsIgnoreCase(actionName)) {
 					Integer pageNumber = Integer.valueOf(request.getParameter("pageNum"));
 					if (pageNumber != null) {
-						if (pageNumber.intValue() == 2) {
+						if (pageNumber == 2) {
 							String nextListPage = request.getParameter("next_list_page");
 							if (nextListPage != null && nextListPage.equalsIgnoreCase("true")) {
 								logger.trace("+++ step 1");
-								confirmDefinition1();
+								confirmDefinition1(request, response);
 							} else {
 								logger.trace("+++ step 2");
-								confirmDefinition2(false);
+								confirmDefinition2(request, response, false);
 							}
 						} else {
 							logger.trace("+++ step 3");
-							confirmDefinition1();
+							confirmDefinition1(request, response);
 						}
 					} else {
 						logger.trace("+++ step 4");
-						setOrGetDefinition();
-						forwardPage(Page.DEFINE_STUDY_EVENT1);
+						setOrGetDefinition(request);
+						forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
 					}
 				} else if ("back1".equalsIgnoreCase(actionName)) {
 					FormProcessor fp = new FormProcessor(request);
-					prepareServletForStepTwo(fp, false);
+					prepareServletForStepTwo(fp, response, false);
 				} else if ("back2".equalsIgnoreCase(actionName)) {
-					confirmDefinition2(true);
+					confirmDefinition2(request, response, true);
 				}
 			}
 		}
 	}
 
-	private void setOrGetDefinition() throws Exception {
+	private void setOrGetDefinition(HttpServletRequest request) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
+		HttpSession session = request.getSession();
+
 		if (session.getAttribute("definition") == null) {
 			logger.trace("did not find definition");
 			StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
@@ -211,9 +236,10 @@ public class DefineStudyEventServlet extends SecureController {
 	 * 
 	 * @throws Exception
 	 */
-	private void confirmDefinition1() throws Exception {
+	private void confirmDefinition1(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
+        StudyBean currentStudy = getCurrentStudy(fp.getRequest());
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("type", Validator.NO_BLANKS);
 		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
@@ -240,15 +266,15 @@ public class DefineStudyEventServlet extends SecureController {
 			v.addValidation("emailDay", Validator.IS_REQUIRED);
 			v.addValidation("emailDay", Validator.IS_A_FLOAT,
 					NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3);
-			session.setAttribute("maxDay", fp.getString("maxDay"));
-			session.setAttribute("minDay", fp.getString("minDay"));
-			session.setAttribute("schDay", fp.getString("schDay"));
-			session.setAttribute("emailUser", fp.getString("emailUser"));
-			session.setAttribute("emailDay", fp.getString("emailDay"));
-			session.setAttribute("isReference", fp.getString("isReference"));
+            request.getSession().setAttribute("maxDay", fp.getString("maxDay"));
+            request.getSession().setAttribute("minDay", fp.getString("minDay"));
+            request.getSession().setAttribute("schDay", fp.getString("schDay"));
+            request.getSession().setAttribute("emailUser", fp.getString("emailUser"));
+            request.getSession().setAttribute("emailDay", fp.getString("emailDay"));
+            request.getSession().setAttribute("isReference", fp.getString("isReference"));
 
 		}
-		errors = v.validate();
+		HashMap errors = v.validate();
 		int minDay = fp.getInt("minDay");
 		int maxDay = fp.getInt("maxDay");
 		int schDay = fp.getInt("schDay");
@@ -266,33 +292,33 @@ public class DefineStudyEventServlet extends SecureController {
 		if(!(emailDay <= schDay)) {
 			Validator.addError(errors, "emailDay",resexception.getString("dayemail_less_or_equal_dayschedule"));
 		}
-		if (!checkUserName(emailUser) && "calendared_visit".equalsIgnoreCase(calendaredVisitType) && "".equalsIgnoreCase(fp.getString("isReference"))) {
+		if (!checkUserName(currentStudy, emailUser) && "calendared_visit".equalsIgnoreCase(calendaredVisitType) && "".equalsIgnoreCase(fp.getString("isReference"))) {
 			Validator.addError(errors, "emailUser", resexception.getString("this_user_name_does_not_exist"));
 		}
-		session.setAttribute("definition", createStudyEventDefinition());
+        request.getSession().setAttribute("definition", createStudyEventDefinition(request));
 				if (errors.isEmpty()) {
 					logger.info("no errors in the first section");
-					prepareServletForStepTwo(fp, true);
+					prepareServletForStepTwo(fp, response, true);
 				} else {
 					logger.trace("has validation errors in the first section");
 					request.setAttribute("formMessages", errors);
-					setOrGetDefinition();
-					forwardPage(Page.DEFINE_STUDY_EVENT1);
+					setOrGetDefinition(request);
+					forwardPage(Page.DEFINE_STUDY_EVENT1, request, response);
 				}	
 		
 	}
-	private void prepareServletForStepTwo(FormProcessor fp, boolean checkForm) {
+	private void prepareServletForStepTwo(FormProcessor fp, HttpServletResponse response, boolean checkForm) {
 		/*
 		 * The tmpCRFIdMap will hold all the selected CRFs in the session when the user is navigating through the list.
 		 * This has been done so that when the user moves to the next page of CRF list, the selection made in the
 		 * previous page doesn't get lost.
 		 */
-		Map tmpCRFIdMap = (HashMap) session.getAttribute("tmpCRFIdMap");
+		Map tmpCRFIdMap = (HashMap) fp.getRequest().getSession().getAttribute("tmpCRFIdMap");
 		if (tmpCRFIdMap == null) {
 			tmpCRFIdMap = new HashMap();
 		}
 		logger.trace("tmpCRFIdMap " + tmpCRFIdMap.toString());
-		ArrayList crfsWithVersion = (ArrayList) session.getAttribute("crfsWithVersion");
+		ArrayList crfsWithVersion = (ArrayList) fp.getRequest().getSession().getAttribute("crfsWithVersion");
 		logger.trace("crf version " + crfsWithVersion.size());
 		if (checkForm) {
 			for (int i = 0; i < crfsWithVersion.size(); i++) {
@@ -313,7 +339,7 @@ public class DefineStudyEventServlet extends SecureController {
 			}
 		}
 		logger.trace("about to set tmpCRFIdMap " + tmpCRFIdMap.toString());
-		session.setAttribute("tmpCRFIdMap", tmpCRFIdMap);
+		fp.getRequest().getSession().setAttribute("tmpCRFIdMap", tmpCRFIdMap);
 
 		EntityBeanTable table = fp.getEntityBeanTable();
 		ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
@@ -322,33 +348,34 @@ public class DefineStudyEventServlet extends SecureController {
 				resword.getString("selected") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(5);
-		StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) session.getAttribute("definition");
-		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) fp.getRequest().getSession()
+				.getAttribute("definition");
+		UserAccountDAO uadao = getUserAccountDAO();
 		UserAccountBean userBean = (UserAccountBean) uadao.findByPK(def1.getUserEmailId());
 		HashMap args = new HashMap();
 		args.put("actionName", "next");
 		args.put("pageNum", "1");
 		args.put("name", def1.getName());
-		args.put("repeating", new Boolean(def1.isRepeating()).toString());
+		args.put("repeating", Boolean.toString(def1.isRepeating()));
 		args.put("category", def1.getCategory());
 		args.put("description", def1.getDescription());
 		args.put("type", def1.getType());
-		args.put("schDay", new Integer(def1.getScheduleDay()).toString());
-		args.put("maxDay", new Integer(def1.getMaxDay()).toString());
-		args.put("minDay", new Integer(def1.getMinDay()).toString());
-		args.put("emailDay", new Integer(def1.getEmailDay()).toString());
+		args.put("schDay", Integer.toString(def1.getScheduleDay()));
+		args.put("maxDay", Integer.toString(def1.getMaxDay()));
+		args.put("minDay", Integer.toString(def1.getMinDay()));
+		args.put("emailDay", Integer.toString(def1.getEmailDay()));
 		args.put("emailUser", userBean.getName());
-		if ("true".equals(new Boolean(def1.getReferenceVisit()).toString())) {
-			args.put("isReference",   "true");
+		if ("true".equals(Boolean.toString(def1.getReferenceVisit()))) {
+			args.put("isReference", "true");
 		} else {
-			args.put("isReference",   "");
+			args.put("isReference", "");
 		}
 		table.setQuery("DefineStudyEvent", args);
 		table.setRows(allRows);
 		table.computeDisplay();
 
-		request.setAttribute("table", table);
-		forwardPage(Page.DEFINE_STUDY_EVENT2);
+		fp.getRequest().setAttribute("table", table);
+		forwardPage(Page.DEFINE_STUDY_EVENT2, fp.getRequest(), response);
 
 	}
 
@@ -357,11 +384,12 @@ public class DefineStudyEventServlet extends SecureController {
 	 * 
 	 * @throws Exception
 	 */
-	private void confirmWholeDefinition() throws Exception {
+	private void confirmWholeDefinition(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountBean ub = getUserAccountBean(request);
 		FormProcessor fp = new FormProcessor(request);
-		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
+		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 		ArrayList eventDefinitionCRFs = new ArrayList();
-		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+		CRFVersionDAO cvdao = getCRFVersionDAO();
 		for (int i = 0; i < sed.getCrfs().size(); i++) {
 			EventDefinitionCRFBean edcBean = new EventDefinitionCRFBean();
 			int crfId = fp.getInt("crfId" + i);
@@ -384,7 +412,7 @@ public class DefineStudyEventServlet extends SecureController {
 			if (!StringUtil.isBlank(hiddenCrf) && "yes".equalsIgnoreCase(hiddenCrf.trim())) {
 				edcBean.setHideCrf(true);
 			}
-			
+
 			String sdvOption = fp.getString("sdvOption" + i);
 			if (!StringUtil.isBlank(sdvOption)) {
 				int id = Integer.valueOf(sdvOption);
@@ -415,8 +443,8 @@ public class DefineStudyEventServlet extends SecureController {
 			String nullString = "";
 			// process null values
 			ArrayList nulls = NullValue.toArrayList();
-			for (int a = 0; a < nulls.size(); a++) {
-				NullValue n = (NullValue) nulls.get(a);
+			for (Object aNull : nulls) {
+				NullValue n = (NullValue) aNull;
 				String myNull = fp.getString(n.getName().toLowerCase() + i);
 				if (!StringUtil.isBlank(myNull) && "yes".equalsIgnoreCase(myNull.trim())) {
 					nullString = nullString + n.getName().toUpperCase() + ",";
@@ -429,19 +457,19 @@ public class DefineStudyEventServlet extends SecureController {
 			eventDefinitionCRFs.add(edcBean);
 		}
 		request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
-		session.setAttribute("edCRFs", eventDefinitionCRFs);// not used on page
-		forwardPage(Page.DEFINE_STUDY_EVENT_CONFIRM);
+		request.getSession().setAttribute("edCRFs", eventDefinitionCRFs);// not used on page
+		forwardPage(Page.DEFINE_STUDY_EVENT_CONFIRM, request, response);
 
 	}
 
 	/**
 	 * Constructs study bean from request-first section
 	 * 
-	 * @return
+	 * @return StudyEventDefinitionBean
 	 */
-	private StudyEventDefinitionBean createStudyEventDefinition() {
+	private StudyEventDefinitionBean createStudyEventDefinition(HttpServletRequest request) {
 		FormProcessor fp = new FormProcessor(request);
-		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
+		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 		sed.setName(fp.getString("name"));
 		// YW <<
 		String temp = fp.getString("repeating");
@@ -454,12 +482,12 @@ public class DefineStudyEventServlet extends SecureController {
 		sed.setCategory(fp.getString("category"));
 		sed.setDescription(fp.getString("description"));
 		sed.setType(fp.getString("type"));
-		//Clinovo ticket #134 start
+		// Clinovo ticket #134 start
 		sed.setMaxDay(fp.getInt("maxDay"));
 		sed.setMinDay(fp.getInt("minDay"));
 		sed.setScheduleDay(fp.getInt("schDay"));
 		int userId = getIdByUserName(fp.getString("emailUser"));
-		if(userId != 0) {
+		if (userId != 0) {
 			sed.setUserEmailId(userId);
 		} else {
 			sed.setUserEmailId(1);
@@ -476,18 +504,19 @@ public class DefineStudyEventServlet extends SecureController {
 
 	}
 
-	private void confirmDefinition2(boolean isBack) throws Exception {
+	private void confirmDefinition2(HttpServletRequest request, HttpServletResponse response, boolean isBack)
+			throws Exception {
 
 		FormProcessor fp = new FormProcessor(request);
-		CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
+		CRFVersionDAO vdao = getCRFVersionDAO();
 		ArrayList crfArray = new ArrayList();
-		Map tmpCRFIdMap = (HashMap) session.getAttribute("tmpCRFIdMap");
+		Map tmpCRFIdMap = (HashMap) request.getSession().getAttribute("tmpCRFIdMap");
 		// trying to avoid NPE not sure why we would get it there ((tmpCRFIdMap.containsKey(id))), tbh
 		if (tmpCRFIdMap == null) {
 			tmpCRFIdMap = new HashMap();
 		}
 		logger.trace("confirm definition 2: tmp crf id map " + tmpCRFIdMap.toString());
-		ArrayList crfsWithVersion = (ArrayList) session.getAttribute("crfsWithVersion");
+		ArrayList crfsWithVersion = (ArrayList) request.getSession().getAttribute("crfsWithVersion");
 		for (int i = 0; i < crfsWithVersion.size(); i++) {
 			int id = fp.getInt("id" + i);
 			String name = fp.getString("name" + i);
@@ -512,12 +541,12 @@ public class DefineStudyEventServlet extends SecureController {
 		}
 		logger.info("crf array after first pass: " + crfArray.toString());
 
-		for (Iterator tmpCRFIterator = tmpCRFIdMap.keySet().iterator(); tmpCRFIterator.hasNext();) {
-			int id = (Integer) tmpCRFIterator.next();
+		for (Object o : tmpCRFIdMap.keySet()) {
+			int id = (Integer) o;
 			String name = (String) tmpCRFIdMap.get(id);
 			boolean isExists = false;
-			for (Iterator it = crfArray.iterator(); it.hasNext();) {
-				CRFBean cb = (CRFBean) it.next();
+			for (Object aCrfArray : crfArray) {
+				CRFBean cb = (CRFBean) aCrfArray;
 				if (id == cb.getId()) {
 					isExists = true;
 				}
@@ -536,22 +565,22 @@ public class DefineStudyEventServlet extends SecureController {
 		}
 		logger.info("crf array after *second* pass: " + crfArray.toString());
 		logger.trace("about to set tmpCRFIdMap " + tmpCRFIdMap.toString());
-		session.setAttribute("tmpCRFIdMap", tmpCRFIdMap);
+		request.getSession().setAttribute("tmpCRFIdMap", tmpCRFIdMap);
 
 		if (crfArray.size() == 0 && !isBack) {// no crf selected
-			addPageMessage(respage.getString("no_CRF_selected_for_definition_add_later"));
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
+			addPageMessage(respage.getString("no_CRF_selected_for_definition_add_later"), request);
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 			sed.setCrfs(new ArrayList());
-			session.setAttribute("definition", sed);
-			forwardPage(Page.DEFINE_STUDY_EVENT_CONFIRM);
+			request.getSession().setAttribute("definition", sed);
+			forwardPage(Page.DEFINE_STUDY_EVENT_CONFIRM, request, response);
 
 		} else {
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-			
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
+
 			logger.info("setting crfs into defintion to review: " + crfArray.toString());
 			sed.setCrfs(crfArray);// crfs selected by user
-			
-			session.setAttribute("definition", sed);
+
+			request.getSession().setAttribute("definition", sed);
 
 			ArrayList<String> sdvOptions = new ArrayList<String>();
 			sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
@@ -561,7 +590,7 @@ public class DefineStudyEventServlet extends SecureController {
 			request.setAttribute("sdvOptions", sdvOptions);
 
 			logger.info("forwarding to defineStudyEvent3.jsp");
-			forwardPage(Page.DEFINE_STUDY_EVENT3);
+			forwardPage(Page.DEFINE_STUDY_EVENT3, request, response);
 		}
 	}
 
@@ -569,10 +598,13 @@ public class DefineStudyEventServlet extends SecureController {
 	 * Inserts the new study into database NullPointer catch added by tbh 092007, mean to fix task #1642 in Mantis
 	 * 
 	 */
-	private void submitDefinition() throws NullPointerException {
-		StudyEventDefinitionDAO edao = new StudyEventDefinitionDAO(sm.getDataSource());
-		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-		if (sed.getName() == "" || sed.getName() == null) {
+	private void submitDefinition(HttpServletRequest request) throws NullPointerException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		StudyEventDefinitionDAO edao = getStudyEventDefinitionDAO();
+		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
+		if (sed.getName().equals("") || sed.getName() == null) {
 			throw new NullPointerException();
 		}
 		logger.info("Definition bean to be created:" + sed.getName() + sed.getStudyId());
@@ -593,10 +625,10 @@ public class DefineStudyEventServlet extends SecureController {
 		sed.setStatus(Status.AVAILABLE);
 		StudyEventDefinitionBean sed1 = (StudyEventDefinitionBean) edao.create(sed);
 
-		EventDefinitionCRFDAO cdao = new EventDefinitionCRFDAO(sm.getDataSource());
+		EventDefinitionCRFDAO cdao = getEventDefinitionCRFDAO();
 		ArrayList eventDefinitionCRFs = new ArrayList();
-		if (session.getAttribute("edCRFs") != null) {
-			eventDefinitionCRFs = (ArrayList) session.getAttribute("edCRFs");
+		if (request.getSession().getAttribute("edCRFs") != null) {
+			eventDefinitionCRFs = (ArrayList) request.getSession().getAttribute("edCRFs");
 		}
 		for (int i = 0; i < eventDefinitionCRFs.size(); i++) {
 			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
@@ -607,42 +639,38 @@ public class DefineStudyEventServlet extends SecureController {
 			edc.setOrdinal(i + 1);
 			cdao.create(edc);
 		}
-		
-		session.removeAttribute("definition");
-		session.removeAttribute("edCRFs");
-		session.removeAttribute("crfsWithVersion");
-		session.removeAttribute("tmpCRFIdMap");
-		session.removeAttribute("referenceVisitAlredyExist");
-		session.removeAttribute("maxDay");
-		session.removeAttribute("minDay");
-		session.removeAttribute("schDay");
-		session.removeAttribute("emailUser");
-		session.removeAttribute("emailDay");
-		session.removeAttribute("isReference");
-		checkReferenceVisit();
-		addPageMessage(respage.getString("the_new_event_definition_created_succesfully"));
+
+		request.getSession().removeAttribute("definition");
+		request.getSession().removeAttribute("edCRFs");
+		request.getSession().removeAttribute("crfsWithVersion");
+		request.getSession().removeAttribute("tmpCRFIdMap");
+		request.getSession().removeAttribute("referenceVisitAlredyExist");
+		request.getSession().removeAttribute("maxDay");
+		request.getSession().removeAttribute("minDay");
+		request.getSession().removeAttribute("schDay");
+		request.getSession().removeAttribute("emailUser");
+		request.getSession().removeAttribute("emailDay");
+		request.getSession().removeAttribute("isReference");
+		checkReferenceVisit(request);
+		addPageMessage(respage.getString("the_new_event_definition_created_succesfully"), request);
 
 	}
-	
-	private void checkReferenceVisit() {
-		boolean referenceVisitAlredyExist = false;
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+
+	private void checkReferenceVisit(HttpServletRequest request) {
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		ArrayList<StudyEventDefinitionBean> definitions = seddao.findReferenceVisitBeans();
-				for (StudyEventDefinitionBean studyEventDefinition : definitions) {
-					if (studyEventDefinition.getReferenceVisit()) {
-							logger.trace("Reference visit already exist");
-							referenceVisitAlredyExist = true;
-							break;
-					}
-				}
-		if (referenceVisitAlredyExist) {
-		   session.setAttribute("referenceVisitAlredyExist", referenceVisitAlredyExist);
+		for (StudyEventDefinitionBean studyEventDefinition : definitions) {
+			if (studyEventDefinition.getReferenceVisit()) {
+				logger.trace("Reference visit already exist");
+				request.getSession().setAttribute("referenceVisitAlredyExist", true);
+				break;
+			}
 		}
 	}
-	
-	private boolean checkUserName(String emailUser) {
+
+	private boolean checkUserName(StudyBean currentStudy, String emailUser) {
 		boolean isValid = false;
-		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO uadao = getUserAccountDAO();
 		ArrayList<StudyUserRoleBean> userBean = uadao.findAllByStudyId(currentStudy.getId());
 		for (StudyUserRoleBean userAccountBean : userBean) {
 			if (emailUser.equals(userAccountBean.getUserName())) {
@@ -656,7 +684,7 @@ public class DefineStudyEventServlet extends SecureController {
 	}
 
 	private int getIdByUserName(String userName) {
-		UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO uadao = getUserAccountDAO();
 		UserAccountBean userBean = (UserAccountBean) uadao.findByUserName(userName);
 		return userBean.getId();
 	}

@@ -21,25 +21,26 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -51,7 +52,7 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
+import org.springframework.stereotype.Component;
 
 /**
  * @author jxu, igor
@@ -59,14 +60,23 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  *         Servlet to create a new subject group class
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class CreateSubjectGroupClassServlet extends SecureController {
+@Component
+public class CreateSubjectGroupClassServlet extends Controller {
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		checkStudyLocked(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, respage.getString("current_study_locked"));
-		checkStudyFrozen(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, respage.getString("current_study_frozen"));
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		checkStudyLocked(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, respage.getString("current_study_locked"), request,
+				response);
+		checkStudyFrozen(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, respage.getString("current_study_frozen"), request,
+				response);
 		if (currentStudy.getParentStudyId() > 0) {
-			addPageMessage(respage.getString("subject_group_class_only_added_top_level") + " "
-					+ respage.getString("please_contact_sysadmin_questions"));
+			addPageMessage(
+					respage.getString("subject_group_class_only_added_top_level") + " "
+							+ respage.getString("please_contact_sysadmin_questions"), request);
 			throw new InsufficientPermissionException(Page.SUBJECT_GROUP_CLASS_LIST,
 					resexception.getString("not_top_study"), "1");
 		}
@@ -77,33 +87,36 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET,
 				resexception.getString("not_study_director"), "1");
 	}
 
 	@Override
-	public void processRequest() throws Exception {
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
+
 		String action = request.getParameter("action");
 
 		if (StringUtil.isBlank(action)) {
 			ArrayList studyGroups = new ArrayList();
-			StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
+			StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
 			ArrayList defaultStudyGroupClasses = sgcdao.findAllDefault();
-			clearSession();
-			
-			session.setAttribute("groupTypes", GroupClassType.toArrayList());
-			session.setAttribute("studyGroups", studyGroups);
-			session.setAttribute("defaultGroupAlreadyExists", !defaultStudyGroupClasses.isEmpty());
-			
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+			clearSession(request);
+
+			request.getSession().setAttribute("groupTypes", GroupClassType.toArrayList());
+			request.getSession().setAttribute("studyGroups", studyGroups);
+			request.getSession().setAttribute("defaultGroupAlreadyExists", !defaultStudyGroupClasses.isEmpty());
+
+			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 			ArrayList allDefsFromStudy = seddao.findAllActiveNotClassGroupedByStudyId(currentStudy.getId());
 			HashMap<StudyEventDefinitionBean, Boolean> definitions = new HashMap<StudyEventDefinitionBean, Boolean>();
 
-			for (int i = 0; i < allDefsFromStudy.size(); i++) {
-				StudyEventDefinitionBean def = (StudyEventDefinitionBean) allDefsFromStudy.get(i);
+			for (Object anAllDefsFromStudy : allDefsFromStudy) {
+				StudyEventDefinitionBean def = (StudyEventDefinitionBean) anAllDefsFromStudy;
 				ArrayList crfs = (ArrayList) edcdao.findAllActiveParentsByEventDefinitionId(def.getId());
 				def.setCrfNum(crfs.size());
 				if (def.getStatus().isAvailable()) {
@@ -111,16 +124,16 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 				}
 			}
 
-			session.setAttribute("definitionsToView", definitions);
-			forwardPage(Page.CREATE_SUBJECT_GROUP_CLASS);
+			request.getSession().setAttribute("definitionsToView", definitions);
+			forwardPage(Page.CREATE_SUBJECT_GROUP_CLASS, request, response);
 
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
-				confirmGroup();
+				confirmGroup(request, response);
 			} else if ("submit".equalsIgnoreCase(action)) {
-				submitGroup();
+				submitGroup(request, response);
 			} else if ("back".equalsIgnoreCase(action)) {
-				forwardPage(Page.CREATE_SUBJECT_GROUP_CLASS);
+				forwardPage(Page.CREATE_SUBJECT_GROUP_CLASS, request, response);
 			}
 		}
 	}
@@ -129,26 +142,28 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 	 * Validates the first section of study inputs and save it into study bean
 	 * 
 	 * @param request
+	 *            HttpServletRequest
 	 * @param response
+	 *            HttpServletResponse
 	 * @throws Exception
 	 */
-	private void confirmGroup() throws Exception {
+	private void confirmGroup(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		boolean atLeastOneEventDefSelected = false;
 		boolean isDefault = false;
-		
+
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
-		
+
 		Map<String, String> fields = new HashMap<String, String>();
 		fields.put("groupClassName", fp.getString("name").trim());
 		fields.put("groupClassTypeId", fp.getString("groupClassTypeId"));
 		fields.put("subjectAssignment", fp.getString("subjectAssignment"));
 		fields.put("isDefault", fp.getString("isDefault"));
-		
-		session.setAttribute("fields", fields);
+
+		request.getSession().setAttribute("fields", fields);
 
 		v.addValidation("name", Validator.NO_BLANKS);
-		StudyGroupClassDAO studyGroupClassDAO = new StudyGroupClassDAO(sm.getDataSource());
+		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
 		ArrayList<StudyGroupClassBean> allStudyGroupClasses = (ArrayList<StudyGroupClassBean>) studyGroupClassDAO
 				.findAll();
 
@@ -159,18 +174,19 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 		v.addValidation("subjectAssignment", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
 
-		errors = v.validate();
-		
+		HashMap errors = v.validate();
+
 		ArrayList studyGroups = new ArrayList();
-		if (String.valueOf(GroupClassType.DYNAMIC.getId()).equals(request.getParameter("groupClassTypeId"))){ //dynamic group
+		if (String.valueOf(GroupClassType.DYNAMIC.getId()).equals(request.getParameter("groupClassTypeId"))) { // dynamic
+																												// group
 			if ("true".equals(request.getParameter("isDefault"))) {
 				isDefault = true;
 			}
 			ArrayList<StudyEventDefinitionBean> listOfDefinitions = new ArrayList<StudyEventDefinitionBean>();
-			HashMap<StudyEventDefinitionBean, Boolean> definitions = (HashMap)session.getAttribute("definitionsToView");
-			for (Iterator keyIt = definitions.keySet().iterator(); keyIt.hasNext();) {
-				StudyEventDefinitionBean def =(StudyEventDefinitionBean) keyIt.next();
-				if ("yes".equals(request.getParameter("selected"+def.getId()))){
+			HashMap<StudyEventDefinitionBean, Boolean> definitions = (HashMap) request.getSession().getAttribute(
+					"definitionsToView");
+			for (StudyEventDefinitionBean def : definitions.keySet()) {
+				if ("yes".equals(request.getParameter("selected" + def.getId()))) {
 					definitions.put(def, true);
 					atLeastOneEventDefSelected = true;
 					listOfDefinitions.add(def);
@@ -178,9 +194,9 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 					definitions.put(def, false);
 				}
 			}
-			session.setAttribute("listOfDefinitions", listOfDefinitions);
-			session.setAttribute("definitionsToView", definitions);
-		} else {  //not dynamic group
+			request.getSession().setAttribute("listOfDefinitions", listOfDefinitions);
+			request.getSession().setAttribute("definitionsToView", definitions);
+		} else { // not dynamic group
 			atLeastOneEventDefSelected = true;
 			StringBuilder rowsWithDuplicateNames = new StringBuilder("");
 			Set<String> setOfNames = new HashSet<String>();
@@ -193,20 +209,24 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 					sGroup.setDescription(description);
 					studyGroups.add(sGroup);
 					if (name.length() > 255) {
-						Validator.addError(errors, "studyGroupError", respage.getString("group_name_cannot_be_more_255"));
+						Validator.addError(errors, "studyGroupError",
+								respage.getString("group_name_cannot_be_more_255"));
 					}
 					if (!setOfNames.add(name)) {
-						rowsWithDuplicateNames.append(","+studyGroups.size());
-						Validator.addError(errors, "studyGroupError", respage.getString("please_correct_the_duplicate_name_found_in_row")+" "+rowsWithDuplicateNames.substring(1));
+						rowsWithDuplicateNames.append(",").append(studyGroups.size());
+						Validator.addError(errors, "studyGroupError",
+								respage.getString("please_correct_the_duplicate_name_found_in_row") + " "
+										+ rowsWithDuplicateNames.substring(1));
 					}
 					if (description.length() > 1000) {
-						Validator.addError(errors, "studyGroupError", respage.getString("group_description_cannot_be_more_100"));
+						Validator.addError(errors, "studyGroupError",
+								respage.getString("group_description_cannot_be_more_100"));
 					}
 				}
 			}
-			session.setAttribute("studyGroups", studyGroups);
+			request.getSession().setAttribute("studyGroups", studyGroups);
 		}
-		
+
 		for (StudyGroupClassBean thisBean : allStudyGroupClasses) {
 			if (fp.getString("name").trim().equals(thisBean.getName().trim())) {
 				Validator.addError(errors, "name", resexception.getString("group_class_name_used_choose_unique"));
@@ -216,28 +236,30 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 			Validator.addError(errors, "groupClassTypeId", resexception.getString("group_class_type_is_required"));
 		}
 		if (!atLeastOneEventDefSelected) {
-			Validator.addError(errors, "dynamicEvents", resexception.getString("at_least_one_element_should_be_selected"));
+			Validator.addError(errors, "dynamicEvents",
+					resexception.getString("at_least_one_element_should_be_selected"));
 		}
-		
+
 		if (errors.isEmpty()) {
 			logger.info("no errors in the first section");
 			StudyGroupClassBean group = new StudyGroupClassBean();
 			group.setName(fp.getString("name").trim());
 			group.setGroupClassTypeId(fp.getInt("groupClassTypeId"));
 			group.setDefault(isDefault);
-			if (!String.valueOf(GroupClassType.DYNAMIC.getId()).equals(request.getParameter("groupClassTypeId"))){ //dynamic group
+			if (!String.valueOf(GroupClassType.DYNAMIC.getId()).equals(request.getParameter("groupClassTypeId"))) { // dynamic
+																													// group
 				group.setSubjectAssignment(fp.getString("subjectAssignment"));
 			}
 			group.setGroupClassTypeName(GroupClassType.get(group.getGroupClassTypeId()).getName());
-			session.setAttribute("group", group);
-			
-			forwardPage(Page.CREATE_SUBJECT_GROUP_CLASS_CONFIRM);
+			request.getSession().setAttribute("group", group);
+
+			forwardPage(Page.CREATE_SUBJECT_GROUP_CLASS_CONFIRM, request, response);
 
 		} else {
 			logger.info("has validation errors in the first section");
 			request.setAttribute("formMessages", errors);
 
-			forwardPage(Page.CREATE_SUBJECT_GROUP_CLASS);
+			forwardPage(Page.CREATE_SUBJECT_GROUP_CLASS, request, response);
 		}
 	}
 
@@ -246,31 +268,36 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 	 * 
 	 * @throws OpenClinicaException
 	 */
-	private void submitGroup() throws OpenClinicaException, IOException {
-		StudyGroupClassBean group = (StudyGroupClassBean) session.getAttribute("group");
-		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
+	private void submitGroup(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException,
+			IOException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+
+		StudyGroupClassBean group = (StudyGroupClassBean) request.getSession().getAttribute("group");
+		StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
 		group.setStudyId(currentStudy.getId());
 		group.setOwner(ub);
 		group.setStatus(Status.AVAILABLE);
-		group.setDynamicOrdinal(sgcdao.getMaxDynamicOrdinalByStudyId(currentStudy.getId())+1);
-		
+		group.setDynamicOrdinal(sgcdao.getMaxDynamicOrdinalByStudyId(currentStudy.getId()) + 1);
+
 		group = (StudyGroupClassBean) sgcdao.create(group);
-		
+
 		if (!group.isActive()) {
-			addPageMessage(respage.getString("the_subject_group_class_not_created_database"));
+			addPageMessage(respage.getString("the_subject_group_class_not_created_database"), request);
 		} else {
-			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()){
-				ArrayList<StudyEventDefinitionBean> listOfDefinitions = (ArrayList)session.getAttribute("listOfDefinitions");
+			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()) {
+				ArrayList<StudyEventDefinitionBean> listOfDefinitions = (ArrayList) request.getSession().getAttribute(
+						"listOfDefinitions");
 				ArrayList<StudyEventDefinitionBean> listOfOrderedDefinitions = new ArrayList(listOfDefinitions);
-				
-				//read order from submit-page and create ordered list
-				for ( StudyEventDefinitionBean def: listOfDefinitions) {
+
+				// read order from submit-page and create ordered list
+				for (StudyEventDefinitionBean def : listOfDefinitions) {
 					int index = Integer.valueOf(request.getParameter("event" + def.getId()));
-					listOfOrderedDefinitions.set(index-1, def);
-				}	
-				//create DynamicEventBeans and write to DB
-				DynamicEventDao dedao = new DynamicEventDao(sm.getDataSource());
-				for ( int i=0; i<listOfOrderedDefinitions.size(); i++) {
+					listOfOrderedDefinitions.set(index - 1, def);
+				}
+				// create DynamicEventBeans and write to DB
+				DynamicEventDao dedao = getDynamicEventDao();
+				for (int i = 0; i < listOfOrderedDefinitions.size(); i++) {
 					StudyEventDefinitionBean def = listOfOrderedDefinitions.get(i);
 					DynamicEventBean de = new DynamicEventBean();
 					de.setStudyGroupClassId(group.getId());
@@ -281,33 +308,33 @@ public class CreateSubjectGroupClassServlet extends SecureController {
 					dedao.create(de);
 				}
 			} else {
-				ArrayList studyGroups = (ArrayList) session.getAttribute("studyGroups");
-				StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
-				for (int i = 0; i < studyGroups.size(); i++) {
-					StudyGroupBean sg = (StudyGroupBean) studyGroups.get(i);
+				ArrayList studyGroups = (ArrayList) request.getSession().getAttribute("studyGroups");
+				StudyGroupDAO sgdao = getStudyGroupDAO();
+				for (Object studyGroup : studyGroups) {
+					StudyGroupBean sg = (StudyGroupBean) studyGroup;
 					sg.setStudyGroupClassId(group.getId());
 					sg.setOwner(ub);
 					sg.setStatus(Status.AVAILABLE);
 					sgdao.create(sg);
 				}
-			}	
-			addPageMessage(respage.getString("the_subject_group_class_created_succesfully"));
+			}
+			addPageMessage(respage.getString("the_subject_group_class_created_succesfully"), request);
 		}
 		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 		request.setAttribute("pageMessages", pageMessages);
-		
-		clearSession();
-		
-		forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET);
+
+		clearSession(request);
+
+		forwardPage(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, request, response);
 	}
-	
-	private void clearSession() {
-		session.removeAttribute("listOfDefinitions");
-		session.removeAttribute("definitionsToView");
-		session.removeAttribute("fields");
-		session.removeAttribute("group");
-		session.removeAttribute("studyGroups");
-		session.removeAttribute("groupTypes");
-		session.removeAttribute("defaultGroupAlreadyExists");
+
+	private void clearSession(HttpServletRequest request) {
+		request.getSession().removeAttribute("listOfDefinitions");
+		request.getSession().removeAttribute("definitionsToView");
+		request.getSession().removeAttribute("fields");
+		request.getSession().removeAttribute("group");
+		request.getSession().removeAttribute("studyGroups");
+		request.getSession().removeAttribute("groupTypes");
+		request.getSession().removeAttribute("defaultGroupAlreadyExists");
 	}
 }
