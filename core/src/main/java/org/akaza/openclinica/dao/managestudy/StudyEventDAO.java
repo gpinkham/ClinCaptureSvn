@@ -51,7 +51,7 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.util.SignedData;
 
-@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class StudyEventDAO extends AuditableEntityDAO {
 
 	private void setQueryNames() {

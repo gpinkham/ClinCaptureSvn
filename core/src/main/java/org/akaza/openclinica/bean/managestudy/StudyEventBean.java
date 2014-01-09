@@ -30,7 +30,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.util.SignedData;
 
-@SuppressWarnings({ "rawtypes", "serial", "unused" })
+@SuppressWarnings({ "rawtypes", "serial" })
 public class StudyEventBean extends AuditableEntityBean {
 	// STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID
 	// LOCATION SAMPLE_ORDINAL DATE_START DATE_END
