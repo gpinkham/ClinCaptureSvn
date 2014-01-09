@@ -194,6 +194,9 @@ public abstract class ListStudySubjectServlet extends Controller {
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "medicalCodingApprovalNeeded");
         currentStudy.getStudyParameterConfig().setMedicalCodingApprovalNeeded(parentSPV.getValue());
 
+        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "medicalCodingContextNeeded");
+        currentStudy.getStudyParameterConfig().setMedicalCodingContextNeeded(parentSPV.getValue());
+
 		// for all the study groups for each group class
         for (Object studyGroupClass1 : studyGroupClasses) {
             StudyGroupClassBean sgc = (StudyGroupClassBean) studyGroupClass1;

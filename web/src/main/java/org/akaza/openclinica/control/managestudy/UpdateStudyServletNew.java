@@ -519,6 +519,7 @@ public class UpdateStudyServletNew extends Controller {
 				fp.getString("defaultBioontologyURL"));
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 		study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded"));
+        study.getStudyParameterConfig().setMedicalCodingContextNeeded(fp.getString("medicalCodingContextNeeded"));
 
 		try {
 
@@ -874,6 +875,10 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setParameter("medicalCodingApprovalNeeded");
 		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApprovalNeeded());
 		updateParameter(spvdao, spv);
+
+        spv.setParameter("medicalCodingContextNeeded");
+        spv.setValue(study1.getStudyParameterConfig().getMedicalCodingContextNeeded());
+        updateParameter(spvdao, spv);
 
 		try {
 

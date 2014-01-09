@@ -692,6 +692,24 @@
       </td>
   </tr>
 
+  <tr valign="top">
+      <td class="formlabel">
+          <fmt:message key="medicalCodingContextNeeded" bundle="${resword}"/>
+      </td>
+      <td>
+          <c:choose>
+              <c:when test="${studyToView.studyParameterConfig.medicalCodingContextNeeded == 'yes'}">
+                  <input type="radio" checked name="medicalCodingContextNeeded" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                  <input type="radio" name="medicalCodingContextNeeded" value="no"><fmt:message key="no" bundle="${resword}"/>
+              </c:when>
+              <c:otherwise>
+                  <input type="radio" name="medicalCodingContextNeeded" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+                  <input type="radio" checked name="medicalCodingContextNeeded" value="no"><fmt:message key="no" bundle="${resword}"/>
+              </c:otherwise>
+          </c:choose>
+      </td>
+  </tr>
+
   <tr>
       <td>&nbsp;</td>
   </tr>

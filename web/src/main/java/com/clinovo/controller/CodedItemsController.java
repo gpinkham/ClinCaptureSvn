@@ -28,6 +28,7 @@ import com.clinovo.coding.source.impl.BioPortalSearchInterface;
 import com.clinovo.model.*;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -97,9 +98,12 @@ public class CodedItemsController {
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		
 		String studyId = request.getParameter("study");
-		
+        String showMoreLink = request.getParameter("showMoreLink");
+        showMoreLink = showMoreLink == null ? "false" : showMoreLink;
+
 		StudyBean study = (StudyBean) getStudyDAO().findByPK(Integer.parseInt(studyId));
-		
+        StudyParameterValueBean medicalCodingContextNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingContextNeeded");
+
 		List<CodedItem> items = new ArrayList<CodedItem>();
 		
 		// Scope the items
@@ -112,7 +116,7 @@ public class CodedItemsController {
 		List<CodedItem> codedItems = getItems(items, CodeStatus.CODED);
 		List<CodedItem> unCodedItems = getItems(items, CodeStatus.NOT_CODED);
 		
-		CodedItemsTableFactory factory = new CodedItemsTableFactory();
+		CodedItemsTableFactory factory = new CodedItemsTableFactory(medicalCodingContextNeeded.getValue(), showMoreLink);
 
 		factory.setStudyId(studyId);
 		factory.setCodedItems(items);
@@ -124,6 +128,7 @@ public class CodedItemsController {
 		factory.setStudySubjectDAO(new StudySubjectDAO(datasource));
 		factory.setStudyEventDefinitionDAO(new StudyEventDefinitionDAO(datasource));
         factory.setItemDataDAO(new ItemDataDAO(datasource));
+        factory.setCrfDAO(new CRFDAO(datasource));
 
 		String codedItemsTable = factory.createTable(request, response).render();
 

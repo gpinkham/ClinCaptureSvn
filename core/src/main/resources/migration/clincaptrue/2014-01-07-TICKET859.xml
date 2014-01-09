@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="vitaly" id="2014-01-07-TICKET859">
+        <comment>Add new parameter to the study parameter list</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="37" />
+            <column name="handle" value="medicalCodingContextNeeded" />
+            <column name="name" value="medicalCodingContextNeeded" />
+            <column name="description" value="Flag to determine if m.c. page should contain additional info" />
+            <column name="default_value" value="" />
+            <column name="inheritable" valueBoolean="true" />
+            <column name="overridable" valueBoolean="false" />
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

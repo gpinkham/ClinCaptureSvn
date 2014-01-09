@@ -76,9 +76,9 @@
         </tr>
         <tr>
         	<td align="center">Medical Terms</td>
-        	<td align="center" name="tdToBeCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_codedItem.isCoded=To be Coded">${unCodedItems}</a></td>
+        	<td align="center" name="tdToBeCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_status=To be Coded">${unCodedItems}</a></td>
             <td align="center">0</td>
-        	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_codedItem.isCoded=Completed">${codedItems}</a></td>
+        	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_status=Completed">${codedItems}</a></td>
         </tr>
     </table> 
 </div>

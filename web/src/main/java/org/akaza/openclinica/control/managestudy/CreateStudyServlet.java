@@ -718,6 +718,8 @@ public class CreateStudyServlet extends Controller {
 
 		newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("medicalCodingApprovalNeeded"));
 
+        newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("medicalCodingContextNeeded"));
+
 		request.getSession().setAttribute("newStudy", newStudy);
 
 		if (errors.isEmpty()) {
@@ -894,6 +896,10 @@ public class CreateStudyServlet extends Controller {
 		spv.setParameter("medicalCodingApprovalNeeded");
 		spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingApprovalNeeded());
 		spvdao.create(spv);
+
+        spv.setParameter("medicalCodingContextNeeded");
+        spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingContextNeeded());
+        spvdao.create(spv);
 
 		logger.info("study parameters created done");
 

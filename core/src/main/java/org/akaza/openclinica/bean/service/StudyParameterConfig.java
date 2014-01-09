@@ -100,6 +100,7 @@ public class StudyParameterConfig {
     private String defaultBioontologyURL = "";
     private String autoCodeDictionaryName = "";
     private String medicalCodingApprovalNeeded = "no";
+    private String medicalCodingContextNeeded = "no";
     
 
 	public StudyParameterConfig() {
@@ -521,4 +522,12 @@ public class StudyParameterConfig {
 	public void setAutoScheduleEventDuringImport(String autoScheduleEventDuringImport) {
 		this.autoScheduleEventDuringImport = autoScheduleEventDuringImport;
 	}
+
+    public String getMedicalCodingContextNeeded() {
+        return medicalCodingContextNeeded;
+    }
+
+    public void setMedicalCodingContextNeeded(String medicalCodingContextNeeded) {
+        this.medicalCodingContextNeeded = medicalCodingContextNeeded;
+    }
 }

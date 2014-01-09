@@ -2630,9 +2630,9 @@ function codedItemAutoUpdate() {
 
                 function () {
 
-                    if ($(this).next().find('div[id]').attr('id') !== undefined) {
+                    if ($(this).siblings("td").find('div[id]').attr('id') !== undefined) {
 
-                        arr.push($(this).next().find('div[id]').attr('id'));
+                        arr.push($(this).siblings("td").find('div[id]').attr('id'));
                     }
                 }
             );

@@ -22,6 +22,7 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -31,6 +32,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -56,6 +58,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 	private int studyId = -1;
 	private StudyDAO studyDAO;
 	private DataSource datasource;
+
 	private EventCRFDAO eventCRFDAO;
     private ItemDataDAO itemDataDAO;
 	private List<CodedItem> codedItems;
@@ -63,6 +66,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 	private EventDefinitionCRFDAO eventDefCRFDAO;
 	private StudySubjectDAO studySubjectDAO;
 	private StudyEventDefinitionDAO studyEventDefDao;
+    private CRFDAO crfDAO;
+
+    private final String medicalCodingContextNeeded;
+    private final String showMoreLink;
 
     private String CODED_DIV_PREFIX = "";
     private final String CODED_DIV_MIDDLE = "\"/><div id=\"";
@@ -90,6 +97,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     public final static String DIV_ITEMDATAVALUE_PREFIX = "<div name=\"itemDataValue\">";
     public final static String DIV_ITEMDATAVALUE_SUFIX = "</div>";
 
+    public CodedItemsTableFactory(String medicalCodingContextNeeded, String showMoreLink) {
+
+        this.medicalCodingContextNeeded = medicalCodingContextNeeded;
+        this.showMoreLink = showMoreLink;
+    }
+
     @Override
     protected String getTableName() {
         return "codedItems";
@@ -97,18 +110,19 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
-    	
+
         tableFacade.setColumnProperties("itemDataValue", "dictionaryList",
-                "codedItem.version", "codedItem.subjectName", "codedItem.eventName", "codedItem.isCoded", "codedColumn", "actionColumn");
+                "codedItem.version", "status", "subjectName", "eventName", "crfName", "codedColumn", "actionColumn");
         
         Row row = tableFacade.getTable().getRow();
         
         configureColumn(row.getColumn("itemDataValue"), "Verbatim Term", new ItemDataValueCellEditor(), null);
         configureColumn(row.getColumn("dictionaryList"), "Dictionary", new DictionaryCellEditor(), null, false, false);
         configureColumn(row.getColumn("codedItem.version"), "Version", new VersionCellEditor(), null, true, true);
-        configureColumn(row.getColumn("codedItem.subjectName"), "Study Subject ID", new SubjectCellEditor(), null, true, true);
-        configureColumn(row.getColumn("codedItem.eventName"), "Study Event", new EventCellEditor(), null, true, true);
-        configureColumn(row.getColumn("codedItem.isCoded"), "Status", new StatusCellEditor(), new StatusDroplistFilterEditor());
+        configureColumn(row.getColumn("status"), "Status", new StatusCellEditor(), new StatusDroplistFilterEditor());
+        configureColumn(row.getColumn("subjectName"), "Study Subject ID", new SubjectCellEditor(), null, true, true);
+        configureColumn(row.getColumn("eventName"), "Study Event", new EventCellEditor(), null, true, true);
+        configureColumn(row.getColumn("crfName"), "CRF", new CrfCellEditor(), null, true, true);
         configureColumn(row.getColumn("codedColumn"), "Coded", new CodedCellEditor(), null, false, false);
         configureColumn(row.getColumn("actionColumn"), "Actions", new ActionCellEditor(), new DefaultActionsEditor(
                 locale), true, false);
@@ -131,11 +145,11 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             h.put("codedItem", codedItem);
             h.put("codedItem.itemId", codedItem.getItemId());
             h.put("itemDataValue", getItemDataValue(codedItem.getItemId()));
-            h.put("codedItem.verbatimTerm", codedItem.getVerbatimTerm());
             h.put("codedItem.version", codedItem.getVersion());
-            h.put("codedItem.subjectName", getSubjectBean(codedItem.getSubjectId()).getLabel());
-            h.put("codedItem.eventName", getStudyEventDefinitionBean(codedItem.getEventCrfId(), codedItem.getCrfVersionId()).getName());
-            h.put("codedItem.isCoded", getCodedItemStatus(codedItem));
+            h.put("subjectName", getSubjectBean(codedItem.getSubjectId()).getLabel());
+            h.put("eventName", getStudyEventDefinitionBean(codedItem.getEventCrfId(), codedItem.getCrfVersionId()).getName());
+            h.put("status", getCodedItemStatus(codedItem));
+            h.put("crfName", getCrfName(codedItem.getCrfVersionId()));
 
             codedItemsResult.add(h);
         }
@@ -338,7 +352,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         public Object getValue(Object item, String property, int cowcount) {
         	
             String value = "";
-            String codedItemStatus = (String) ((HashMap<Object, Object>) item).get("codedItem.isCoded");
+            String codedItemStatus = (String) ((HashMap<Object, Object>) item).get("status");
             if (!codedItemStatus.isEmpty()) {
             	
                 StringBuilder url = new StringBuilder();
@@ -356,7 +370,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private class SubjectCellEditor implements CellEditor {
         public Object getValue(Object item, String property, int cowcount) {
             String value = "";
-            String subjectLabel = (String) ((HashMap<Object, Object>) item).get("codedItem.subjectName");
+            String subjectLabel = (String) ((HashMap<Object, Object>) item).get("subjectName");
             if (!subjectLabel.isEmpty()) {
                 StringBuilder url = new StringBuilder();
                 url.append(subjectLabel);
@@ -370,10 +384,27 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private class EventCellEditor implements CellEditor {
         public Object getValue(Object item, String property, int cowcount) {
             String value = "";
-            String eventName = (String) ((HashMap<Object, Object>) item).get("codedItem.eventName");
+            String eventName = (String) ((HashMap<Object, Object>) item).get("eventName");
             if (!eventName.isEmpty()) {
                 StringBuilder url = new StringBuilder();
                 url.append(eventName);
+                value = url.toString();
+            }
+            return value;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private class CrfCellEditor implements CellEditor {
+        public Object getValue(Object item, String property, int cowcount) {
+            String value = "";
+            String crfName = (String) ((HashMap<Object, Object>) item).get("crfName");
+            if (!crfName.isEmpty()) {
+                StringBuilder url = new StringBuilder();
+                url.append(crfName)
+                        .append(COLUMN_WIDTH_PREFIX)
+                        .append("120")
+                        .append(COLUMN_WIDTH_SUFFIX);
                 value = url.toString();
             }
             return value;
@@ -439,6 +470,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		this.studySubjectDAO = studySubjectDAO;
 	}
 
+    public void setCrfDAO(CRFDAO crfDao) {
+        this.crfDAO = crfDao;
+    }
+
 	public void setStudyEventDefinitionDAO(StudyEventDefinitionDAO studyEventDefDao) {
 		this.studyEventDefDao = studyEventDefDao;
 	}
@@ -465,4 +500,27 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         ItemDataBean itemDataBean = (ItemDataBean) itemDataDAO.findByPK(itemId);
         return itemDataBean.getValue();
     }
+
+    private String getCrfName(int eventCrfVersionId) {
+            CRFBean crfBean = crfDAO.findByVersionId(eventCrfVersionId);
+           return crfBean.getName();
+    }
+
+    @Override
+    public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
+
+        boolean showMore = false;
+        boolean contextNeeded = false;
+
+        if (showMoreLink.equalsIgnoreCase("true")) {
+            showMore = true;
+        }
+        if (medicalCodingContextNeeded.equalsIgnoreCase("yes")) {
+            contextNeeded = true;
+        }
+
+        CodedItemsTableToolbar toolbar = new CodedItemsTableToolbar(showMore, contextNeeded);
+        tableFacade.setToolbar(toolbar);
+    }
+
 }
