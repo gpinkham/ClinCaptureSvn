@@ -20,6 +20,10 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -45,8 +49,9 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.util.SignedData;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 public class StudyEventDAO extends AuditableEntityDAO {
 
 	private void setQueryNames() {
@@ -110,6 +115,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
 		this.setTypeExpected(16, TypeNames.INT); // prev_status
 		this.setTypeExpected(17, TypeNames.INT); // reference_visit_id
+		this.setTypeExpected(18, TypeNames.BINARY_STREAM); // signed_data
 	}
 
 	public void setTypesExpected(boolean withSubject) {
@@ -189,6 +195,20 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
 		Integer referenceVisitId = (Integer) hm.get("reference_visit_id");
 		eb.setReferenceVisitId(referenceVisitId);
+
+		try {
+			eb.getSignedData().clear();
+			ByteArrayInputStream bais = (ByteArrayInputStream) hm.get("signed_data");
+			if (bais != null) {
+				Map<Integer, SignedData> signedData = (Map<Integer, SignedData>) new ObjectInputStream(bais)
+						.readObject();
+				if (signedData != null) {
+					eb.setSignedData(signedData);
+				}
+			}
+		} catch (Exception e) {
+			//
+		}
 
 		return eb;
 	}
@@ -561,7 +581,17 @@ public class StudyEventDAO extends AuditableEntityDAO {
 		variables.put(13, sb.getPrevSubjectEventStatus().getId());
 		variables.put(14, sb.getReferenceVisitId());
 
-		variables.put(15, sb.getId());
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oout = new ObjectOutputStream(baos);
+			oout.writeObject(sb.getSignedData());
+			oout.close();
+			variables.put(15, baos);
+		} catch (Exception e) {
+			nullVars.put(15, null);
+		}
+
+		variables.put(16, sb.getId());
 
 		String sql = digester.getQuery("update");
 

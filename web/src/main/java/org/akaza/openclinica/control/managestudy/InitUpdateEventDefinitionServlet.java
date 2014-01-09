@@ -48,6 +48,8 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.util.EventDefinitionInfo;
+import org.akaza.openclinica.util.SignStateRestorer;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -119,6 +121,21 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 
 	}
 
+	private SignStateRestorer prepareSignStateRestorer(ArrayList edcs) {
+		SignStateRestorer signStateRestorer = new SignStateRestorer();
+		for (Object object : edcs) {
+			EventDefinitionCRFBean eventDefinitionCrf = (EventDefinitionCRFBean) object;
+			if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive())
+				continue;
+			EventDefinitionInfo edi = new EventDefinitionInfo();
+			edi.id = eventDefinitionCrf.getId();
+			edi.required = eventDefinitionCrf.isRequiredCRF();
+			edi.defaultVersionId = eventDefinitionCrf.getDefaultVersionId();
+			signStateRestorer.getEventDefinitionInfoMap().put(eventDefinitionCrf.getId(), edi);
+		}
+		return signStateRestorer;
+	}
+
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -166,6 +183,8 @@ public class InitUpdateEventDefinitionServlet extends Controller {
 			request.getSession().setAttribute("definition", sed);
 			request.getSession().setAttribute("eventDefinitionCRFs", newEventDefinitionCRFs);
 			// changed above to new list because static, in-place updating is updating all EDCs
+
+			request.getSession().setAttribute("signStateRestorer", prepareSignStateRestorer(newEventDefinitionCRFs));
 
 			addSDVstatuses(request);
 

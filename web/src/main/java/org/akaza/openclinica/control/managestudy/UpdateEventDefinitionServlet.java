@@ -22,38 +22,6 @@ package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
 
-import org.akaza.openclinica.bean.core.*;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.domain.SourceDataVerification;
-import org.akaza.openclinica.util.DAOWrapper;
-import org.akaza.openclinica.util.SubjectEventStatusUtil;
-import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,6 +30,43 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.akaza.openclinica.bean.core.NullValue;
+import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.util.DAOWrapper;
+import org.akaza.openclinica.util.SignStateRestorer;
+import org.akaza.openclinica.util.SubjectEventStatusUtil;
+import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 @Component
@@ -106,7 +111,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 			} else if ("addCrfs".equalsIgnoreCase(action)) {
 				FormProcessor fp = new FormProcessor(request);
 				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute(
-                        "definition");
+						"definition");
 				saveEventDefinitionToSession(sed, fp);
 				saveEventDefinitionCRFsToSession(fp);
 				response.sendRedirect(request.getContextPath() + "/AddCRFToDefinition");
@@ -230,6 +235,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		ArrayList edcs = (ArrayList) request.getSession().getAttribute("eventDefinitionCRFs");
 
+		SignStateRestorer signStateRestorer = (SignStateRestorer) request.getSession().getAttribute("signStateRestorer");
+
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) request.getSession().getAttribute("definition");
 		logger.info("Definition bean to be updated:" + sed.getName() + sed.getCategory());
 
@@ -279,7 +286,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 
 		ArrayList<StudyEventBean> studyEventList = (ArrayList<StudyEventBean>) sedao
 				.findAllByStudyAndEventDefinitionIdExceptLockedSkippedStoppedRemoved(study, sed.getId());
-		SubjectEventStatusUtil.determineSubjectEventStates(studyEventList, study, daoWrapper);
+		SubjectEventStatusUtil.determineSubjectEventStates(studyEventList, study, daoWrapper, signStateRestorer);
 
 		clearSession(request.getSession());
 
@@ -391,18 +398,14 @@ public class UpdateEventDefinitionServlet extends Controller {
 	}
 
 	private void checkReferenceVisit(HttpServletRequest request) {
-		boolean referenceVisitAlredyExist = false;
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		ArrayList<StudyEventDefinitionBean> definitions = seddao.findReferenceVisitBeans();
 		for (StudyEventDefinitionBean studyEventDefinition : definitions) {
 			if (studyEventDefinition.getReferenceVisit()) {
 				logger.trace("Reference visit already exist");
-				referenceVisitAlredyExist = true;
+				request.getSession().setAttribute("referenceVisitAlredyExist", true);
 				break;
 			}
-		}
-		if (referenceVisitAlredyExist) {
-			request.getSession().setAttribute("referenceVisitAlredyExist", referenceVisitAlredyExist);
 		}
 	}
 

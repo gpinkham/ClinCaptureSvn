@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -66,37 +65,37 @@ public final class SubjectEventStatusUtil {
 		if (studyEvents.size() <= 1) {
 			if (studySubjectBean.getStatus().isLocked() && subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
 				String txt = resword.getString("locked");
-				url.append("<img src='"
-						+ imageIconPaths.get(SubjectEventStatus.LOCKED.getId())
-						+ "' title='"
-						+ txt
-						+ "' alt='"
-						+ txt
-						+ "' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative;'>");
+				url.append("<img src='")
+						.append(imageIconPaths.get(SubjectEventStatus.LOCKED.getId()))
+						.append("' title='")
+						.append(txt)
+						.append("' alt='")
+						.append(txt)
+						.append("' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative;'>");
 			} else if (studySubjectBean.getStatus().isDeleted()
 					&& subjectEventStatus == SubjectEventStatus.NOT_SCHEDULED) {
 				String txt = resword.getString("removed");
-				url.append("<img src='"
-						+ imageIconPaths.get(SubjectEventStatus.REMOVED.getId())
-						+ "' title='"
-						+ txt
-						+ "' alt='"
-						+ txt
-						+ "' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative;'>");
-			} else {                
+				url.append("<img src='")
+						.append(imageIconPaths.get(SubjectEventStatus.REMOVED.getId()))
+						.append("' title='")
+						.append(txt)
+						.append("' alt='")
+						.append(txt)
+						.append("' onmouseout='clearInterval(popupInterval);' onmouseover='if (!subjectMatrixPopupStick) { clearInterval(popupInterval); popupInterval = setInterval(function() { clearInterval(popupInterval); hideAllTooltips(); }, 500); }' border='0' style='position: relative;'>");
+			} else {
 				if (!subjectEventStatus.isNotScheduled() || permission_for_dynamic) {
-					url.append("<img src='"
-							+ imageIconPaths.get(subjectEventStatus.getId())
-							+ "' border='0' style='position: relative;' title=\""
-							+ (currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled() ? resword
+					url.append("<img src='")
+							.append(imageIconPaths.get(subjectEventStatus.getId()))
+							.append("' border='0' style='position: relative;' title=\"")
+							.append(currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled() ? resword
 									.getString("message_for_not_scheduled_event_if_study_is_not_available") : "")
-							+ "\" alt=\""
-							+ (currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled() ? resword
+							.append("\" alt=\"")
+							.append(currentStudy.getStatus() != Status.AVAILABLE && subjectEventStatus.isNotScheduled() ? resword
 									.getString("message_for_not_scheduled_event_if_study_is_not_available") : "")
-							+ "\">");
+							.append("\">");
 				} else {
 					url.append("<img src='' border='0' style='position: relative; display: none;'>");
-				}	
+				}
 			}
 		} else {
 			SubjectEventStatus status = null;
@@ -119,9 +118,9 @@ public final class SubjectEventStatusUtil {
 					status = studyEventBean.getSubjectEventStatus();
 				}
 			}
-			url.append("<img src='"
-					+ imageIconPaths.get((status == null ? SubjectEventStatus.SCHEDULED : status).getId())
-					+ "' border='0' style='position: relative;'>");
+			url.append("<img src='")
+					.append(imageIconPaths.get((status == null ? SubjectEventStatus.SCHEDULED : status).getId()))
+					.append("' border='0' style='position: relative;'>");
 		}
 	}
 
@@ -152,26 +151,32 @@ public final class SubjectEventStatusUtil {
 
 	public static void determineSubjectEventState(StudyEventBean studyEventBean, StudyBean studyBean,
 			List<EventCRFBean> eventCRFs, DAOWrapper daoWrapper) {
-		analyzeSubjectEventState(studyEventBean, studyBean, eventCRFs, daoWrapper);
+		analyzeSubjectEventState(studyEventBean, studyBean, eventCRFs, daoWrapper, null);
 		daoWrapper.getSedao().update(studyEventBean);
 	}
 
 	public static void determineSubjectEventState(StudyEventBean studyEventBean, StudyBean studyBean,
 			DAOWrapper daoWrapper) {
 		ArrayList<EventCRFBean> eventCRFs = daoWrapper.getEcdao().findAllByStudyEvent(studyEventBean);
-		analyzeSubjectEventState(studyEventBean, studyBean, eventCRFs, daoWrapper);
+		analyzeSubjectEventState(studyEventBean, studyBean, eventCRFs, daoWrapper, null);
+	}
+
+	public static void determineSubjectEventState(StudyEventBean studyEventBean, StudyBean studyBean,
+			DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
+		ArrayList<EventCRFBean> eventCRFs = daoWrapper.getEcdao().findAllByStudyEvent(studyEventBean);
+		analyzeSubjectEventState(studyEventBean, studyBean, eventCRFs, daoWrapper, signStateRestorer);
 	}
 
 	public static void determineSubjectEventStates(StudyEventDefinitionBean sed, StudySubjectBean ss,
 			StudyBean studyBean, DAOWrapper daoWrapper) {
 		List<StudyEventBean> studyEvents = daoWrapper.getSedao().findAllByDefinitionAndSubject(sed, ss);
-		determineSubjectEventStates(studyEvents, studyBean, daoWrapper);
+		determineSubjectEventStates(studyEvents, studyBean, daoWrapper, null);
 	}
 
 	public static void determineSubjectEventStates(List<StudyEventBean> studyEvents, StudyBean studyBean,
-			DAOWrapper daoWrapper) {
+			DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
 		for (StudyEventBean studyEventBean : studyEvents) {
-			determineSubjectEventState(studyEventBean, studyBean, daoWrapper);
+			determineSubjectEventState(studyEventBean, studyBean, daoWrapper, signStateRestorer);
 			daoWrapper.getSedao().update(studyEventBean);
 		}
 	}
@@ -245,14 +250,19 @@ public final class SubjectEventStatusUtil {
 	}
 
 	private static void analyzeSubjectEventState(StudyEventBean studyEventBean, StudyBean studyBean,
-			List<EventCRFBean> eventCRFs, DAOWrapper daoWrapper) {
+			List<EventCRFBean> eventCRFs, DAOWrapper daoWrapper, SignStateRestorer signStateRestorer) {
 		State state = State.DENS;
 		boolean hasStarted = false;
 		boolean justScheduled = true;
 		boolean hasSDVRequiredCRFs = false;
 		List<Integer> requiredCrfIds = new ArrayList<Integer>();
+		SubjectEventStatus savedPrevSubjectEventStatus = studyEventBean.getPrevSubjectEventStatus();
+		SubjectEventStatus savedCurrentSubjectEventStatus = studyEventBean.getSubjectEventStatus();
 		List<EventDefinitionCRFBean> eventDefCrfs = (List<EventDefinitionCRFBean>) daoWrapper.getEdcdao()
 				.findAllByDefinition(studyBean, studyEventBean.getStudyEventDefinitionId());
+		Map<Integer, SignedData> preSignedData = SignStateRestorer.initPreSignedData(savedCurrentSubjectEventStatus,
+				signStateRestorer);
+		Map<Integer, SignedData> postSignedData = SignStateRestorer.initPostSignedData(eventDefCrfs);
 		for (EventDefinitionCRFBean eventDefinitionCrf : eventDefCrfs) {
 			if (eventDefinitionCrf.getStatus() != Status.AVAILABLE || !eventDefinitionCrf.isActive())
 				continue;
@@ -266,13 +276,15 @@ public final class SubjectEventStatusUtil {
 		}
 		boolean notAllStartedSDVRequiredCRFsAreSDVed = false;
 		boolean hasRequiredCRFs = requiredCrfIds.size() > 0;
-        boolean hasSDVedCRFs = false;
+		boolean hasSDVedCRFs = false;
 		for (EventCRFBean eventCRFBean : eventCRFs) {
 			if (eventCRFBean.isNotStarted())
 				continue;
 			justScheduled = false;
 			EventDefinitionCRFBean eventDefinitionCrf = daoWrapper.getEdcdao().findByStudyEventIdAndCRFVersionId(
 					studyBean, studyEventBean.getId(), eventCRFBean.getCRFVersionId());
+			SignStateRestorer.prepareSignedData(eventCRFBean, eventDefinitionCrf, preSignedData);
+			SignStateRestorer.prepareSignedData(eventCRFBean, eventDefinitionCrf, postSignedData);
 			State eventCRFState = getState(eventCRFBean);
 			if (eventCRFBean.getStatus() == Status.UNAVAILABLE
 					&& eventCRFBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
@@ -285,9 +297,9 @@ public final class SubjectEventStatusUtil {
 								.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)) {
 					notAllStartedSDVRequiredCRFsAreSDVed = true;
 				}
-                if (!hasSDVedCRFs && eventCRFBean.isSdvStatus()) {
-                    hasSDVedCRFs  = true;
-                }
+				if (!hasSDVedCRFs && eventCRFBean.isSdvStatus()) {
+					hasSDVedCRFs = true;
+				}
 			} else {
 				hasStarted = true;
 			}
@@ -303,12 +315,19 @@ public final class SubjectEventStatusUtil {
 			}
 		}
 		setSubjectEventState(studyEventBean, studyBean, daoWrapper, state);
+		if (!studyEventBean.getSubjectEventStatus().equals(savedCurrentSubjectEventStatus)
+				|| (studyEventBean.getPrevSubjectEventStatus().equals(SubjectEventStatus.SIGNED) && studyEventBean
+						.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED))) {
+			studyEventBean.setPrevSubjectEventStatus(savedCurrentSubjectEventStatus);
+			SignStateRestorer.restoreSignState(studyEventBean, savedCurrentSubjectEventStatus,
+					savedPrevSubjectEventStatus, preSignedData, postSignedData, signStateRestorer);
+		}
 	}
-	
+
 	public static void fillDoubleDataOwner(ArrayList<EventCRFBean> eventCRFs, SessionManager sm) {
-		// validatorId field was used for another purpose in the past, but now it is used for DoubleDataEntry 
+		// validatorId field was used for another purpose in the past, but now it is used for DoubleDataEntry
 		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-		for (EventCRFBean eventCRF: eventCRFs){
+		for (EventCRFBean eventCRF : eventCRFs) {
 			if (eventCRF.getValidatorId() > 0) {
 				eventCRF.setDoubleDataOwner((UserAccountBean) udao.findByPK(eventCRF.getValidatorId()));
 			}

@@ -33,9 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
-
 import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -69,10 +67,10 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
  * @param <V>
  * @param <K>
  */
-@SuppressWarnings({"rawtypes","unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface {
 	protected DataSource ds;
-	
+
 	protected Connection con;
 	protected String digesterName;
 
@@ -115,8 +113,8 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	// initializeI18nStrings() method; for JUnit tests
 	protected String oc_df_string = "";
 	protected String local_df_string = "";
-    protected String local_yf_string = "";
-    protected String local_ymf_string = "";
+	protected String local_yf_string = "";
+	protected String local_ymf_string = "";
 
 	protected EhCacheWrapper ehCacheWrapper;
 
@@ -127,7 +125,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		initializeI18nStrings();
 		setCache(SQLFactory.getInstance().getEhCacheWrapper());
 	}
-	
+
 	public EntityDAO(DataSource ds, Connection con) {
 		this.ds = ds;
 		this.con = con;
@@ -141,6 +139,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * This is the method added to cache the queries
 	 * 
 	 * @param cache
+	 *            EhCacheWrapper
 	 */
 	public void setCache(final EhCacheWrapper cache) {
 		this.cache = cache;
@@ -159,7 +158,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 *            the number that is equal to TypeNames
 	 */
 	public void setTypeExpected(int num, int type) {
-		setTypes.put(Integer.valueOf(num), Integer.valueOf(type));
+		setTypes.put(num, type);
 	}
 
 	public void unsetTypeExpected() {
@@ -271,8 +270,10 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * purposes. We are keeping the more generic Map container so as to not have to break everything.
 	 * 
 	 * @param query
+	 *            String
 	 * @param variables
-	 * @return
+	 *            Map
+	 * @return ArrayList<V>
 	 */
 	public ArrayList<V> select(String query, Map variables) {
 		clearSignals();
@@ -418,7 +419,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 */
 	public void execute(String query) {
 		con = null;
-		execute(query, con);
+		execute(query, (Connection) null);
 	}
 
 	/*
@@ -468,7 +469,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 	public void execute(String query, HashMap variables) {
 		con = null;
-		execute(query, variables, con);
+		execute(query, variables, (Connection) null);
 	}
 
 	public void execute(String query, HashMap variables, Connection con) {
@@ -519,7 +520,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 	public void execute(String query, HashMap variables, HashMap nullVars) {
 		con = null;
-		execute(query, variables, nullVars, con);
+		execute(query, variables, nullVars, null);
 	}
 
 	public void execute(String query, HashMap variables, HashMap nullVars, Connection con) {
@@ -571,76 +572,78 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * This method inserts one row for an entity table and gets latestPK of this row.
 	 * 
 	 * @param query
+	 *            String
 	 * @param variables
+	 *            HashMap
 	 * @param nullVars
+	 *            HashMap
 	 * 
-	 * @author ywang 11-26-2007
 	 */
-    public void executeWithPK(String query, HashMap variables, HashMap nullVars) {
-        con = null;
-        executeWithPK(query, variables, nullVars, con);
-    }
+	public void executeWithPK(String query, HashMap variables, HashMap nullVars) {
+		con = null;
+		executeWithPK(query, variables, nullVars, null);
+	}
 
-    public void executeWithPK(String query, HashMap variables, HashMap nullVars, Connection con) {
-        clearSignals();
+	public void executeWithPK(String query, HashMap variables, HashMap nullVars, Connection con) {
+		clearSignals();
 
-        boolean isTrasactional = false;
-        if (con != null) {
-            isTrasactional = true;
-        }
+		boolean isTrasactional = false;
+		if (con != null) {
+			isTrasactional = true;
+		}
 
-        PreparedStatement ps = null;
-        PreparedStatementFactory psf = new PreparedStatementFactory(variables, nullVars);
-        try {
-            if (!isTrasactional) {
-                con = ds.getConnection();
-            }
-            if (con.isClosed()) {
-                if (logger.isWarnEnabled())
-                    logger.warn("Connection is closed: EntityDAO.execute!");
-                throw new SQLException();
-            }
-            ps = con.prepareStatement(query);
-            ps = psf.generate(ps);// enter variables here!
-            if (ps.executeUpdate() != 1) {
-                logger.warn("Problem with executing dynamic query, EntityDAO: " + query);
-                throw new SQLException();
+		PreparedStatement ps = null;
+		PreparedStatementFactory psf = new PreparedStatementFactory(variables, nullVars);
+		try {
+			if (!isTrasactional) {
+				con = ds.getConnection();
+			}
+			if (con.isClosed()) {
+				if (logger.isWarnEnabled())
+					logger.warn("Connection is closed: EntityDAO.execute!");
+				throw new SQLException();
+			}
+			ps = con.prepareStatement(query);
+			ps = psf.generate(ps);// enter variables here!
+			if (ps.executeUpdate() != 1) {
+				logger.warn("Problem with executing dynamic query, EntityDAO: " + query);
+				throw new SQLException();
 
-            } else {
-                logger.trace("Executing dynamic query, EntityDAO: " + query);
+			} else {
+				logger.trace("Executing dynamic query, EntityDAO: " + query);
 
-                if (getCurrentPKName == null) {
-                    this.latestPK = 0;
-                }
+				if (getCurrentPKName == null) {
+					this.latestPK = 0;
+				}
 
-                this.unsetTypeExpected();
-                this.setTypeExpected(1, TypeNames.INT);
+				this.unsetTypeExpected();
+				this.setTypeExpected(1, TypeNames.INT);
 
-                ArrayList al = select(digester.getQuery(getCurrentPKName), con);
+				ArrayList al = select(digester.getQuery(getCurrentPKName), con);
 
-                if (al.size() > 0) {
-                    HashMap h = (HashMap) al.get(0);
-                    this.latestPK = ((Integer) h.get("key")).intValue();
-                }
+				if (al.size() > 0) {
+					HashMap h = (HashMap) al.get(0);
+					this.latestPK = (Integer) h.get("key");
+				}
 
-            }
+			}
 
-        } catch (SQLException sqle) {
-            signalFailure(sqle);
-            if (logger.isWarnEnabled()) {
-                logger.warn("Exception while executing dynamic statement, EntityDAO.execute: " + query + ": "
-                        + sqle.getMessage());
-                sqle.printStackTrace();
-            }
-        } finally {
-            if (!isTrasactional) {
-                this.closeIfNecessary(con, ps);
-            } else {
-                closePreparedStatement(ps);
-            }
-        }
-    }
-	
+		} catch (SQLException sqle) {
+			signalFailure(sqle);
+			if (logger.isWarnEnabled()) {
+				logger.warn("Exception while executing dynamic statement, EntityDAO.execute: " + query + ": "
+						+ sqle.getMessage());
+				sqle.printStackTrace();
+			}
+		} finally {
+			if (!isTrasactional) {
+				this.closeIfNecessary(con, ps);
+			} else {
+				closePreparedStatement(ps);
+			}
+		}
+	}
+
 	/*
 	 * Currently, latestPK is set only in executeWithPK() after inserting has been executed successfully. So, this
 	 * method should be called only immediately after executeWithPK()
@@ -675,10 +678,13 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					// columns was null causing NullPointerException
 					// logMe("column name: "+column+" type # "+type.intValue()+" row # "+i);
 					if (null != type) {
-						switch (type.intValue()) {
+						switch (type) {
 						// just putting the top five in here for now, tbh
 						// put in statements to catch nulls in the db, tbh
 						// 10-15-2004
+						case TypeNames.BINARY_STREAM:
+							hm.put(column, rs.getBinaryStream(i));
+							break;
 						case TypeNames.DATE:
 							// logger.warn("date: "+column);
 							hm.put(column, rs.getDate(i));
@@ -693,25 +699,25 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 							break;
 						case TypeNames.DOUBLE:
 							// logger.warn("double: "+column);
-							hm.put(column, new Double(rs.getDouble(i)));
+							hm.put(column, rs.getDouble(i));
 							if (rs.wasNull()) {
-								hm.put(column, new Double(0));
+								hm.put(column, (double) 0);
 							}
 							break;
 						case TypeNames.BOOL:
 							// BADS FLAG
 							if (CoreResources.getDBName().equals("oracle")) {
-								hm.put(column, new Boolean(rs.getString(i).equals("1") ? true : false));
+								hm.put(column, rs.getString(i).equals("1"));
 								if (rs.wasNull()) {
 									if (column.equalsIgnoreCase("start_time_flag")
 											|| column.equalsIgnoreCase("end_time_flag")) {
-										hm.put(column, new Boolean(false));
+										hm.put(column, false);
 									} else {
-										hm.put(column, new Boolean(true));
+										hm.put(column, true);
 									}
 								}
 							} else {
-								hm.put(column, new Boolean(rs.getBoolean(i)));
+								hm.put(column, rs.getBoolean(i));
 								if (rs.wasNull()) {
 									// YW 08-17-2007 << Since I didn't
 									// investigate
@@ -723,24 +729,24 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 									// table study_event
 									if (column.equalsIgnoreCase("start_time_flag")
 											|| column.equalsIgnoreCase("end_time_flag")) {
-										hm.put(column, new Boolean(false));
+										hm.put(column, false);
 									} else {
-										hm.put(column, new Boolean(true));
+										hm.put(column, true);
 									}
 									// bad idea? what to put, then?
 								}
 							}
 							break;
 						case TypeNames.FLOAT:
-							hm.put(column, new Float(rs.getFloat(i)));
+							hm.put(column, rs.getFloat(i));
 							if (rs.wasNull()) {
 								hm.put(column, new Float(0.0));
 							}
 							break;
 						case TypeNames.INT:
-							hm.put(column, Integer.valueOf(rs.getInt(i)));
+							hm.put(column, rs.getInt(i));
 							if (rs.wasNull()) {
-								hm.put(column, Integer.valueOf(0));
+								hm.put(column, 0);
 							}
 							break;
 						case TypeNames.STRING:
@@ -753,7 +759,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 							hm.put(column, rs.getString(i));
 							if (rs.wasNull()) {
 								char x = 'x';
-								hm.put(column, new Character(x));
+								hm.put(column, x);
 							}
 							break;
 						default:
@@ -793,7 +799,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 		if (al.size() > 0) {
 			HashMap<String, ?> h = al.get(0);
-			answer = ((Integer) h.get("key")).intValue();
+			answer = (Integer) h.get("key");
 		}
 
 		return answer;
@@ -817,7 +823,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 		if (al.size() > 0) {
 			HashMap h = (HashMap) al.get(0);
-			answer = ((Integer) h.get("key")).intValue();
+			answer = (Integer) h.get("key");
 		}
 
 		return answer;
@@ -1047,7 +1053,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			try {
 				Integer i = (Integer) hm.get(column);
 				if (i != null) {
-					return i.intValue();
+					return i;
 				}
 			} catch (Exception e) {
 				return 0;
@@ -1061,7 +1067,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			try {
 				Boolean b = (Boolean) hm.get(column);
 				if (b != null) {
-					return b.booleanValue();
+					return b;
 				}
 			} catch (Exception e) {
 				return false;
@@ -1075,8 +1081,8 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			// oc_df_string = ResourceBundleProvider.getFormatBundle(locale).getString("oc_date_format_string");
 			oc_df_string = ApplicationConstants.getDateFormatInItemData();
 			local_df_string = ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string");
-            local_yf_string = ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year");
-            local_ymf_string = ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month");
+			local_yf_string = ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year");
+			local_ymf_string = ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month");
 		}
 	}
 
@@ -1098,8 +1104,8 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * This is the first operation created for the database, so therefore it is the simplest; cull information from the
 	 * database but not specify any parameters.
 	 * 
-	 * @param query
-	 *            a static query of the database.
+	 * a static query of the database.
+	 * 
 	 * @return ArrayList of HashMaps carrying the database values.
 	 */
 	public ArrayList selectStudySubjects(int studyid, int parentid, String sedin, String it_in, String dateConstraint,
@@ -1150,8 +1156,8 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 	/**
 	 * 
-	 * @param rs
-	 * @return
+	 * @param rs ResultSet
+	 * @return ArrayList
 	 */
 	public ArrayList processStudySubjects(ResultSet rs) {// throws
 		// SQLException
@@ -1167,9 +1173,9 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				}
 
 				// second column
-				obj.setSubjectId(Integer.valueOf(rs.getInt("subject_id")));
+				obj.setSubjectId(rs.getInt("subject_id"));
 				if (rs.wasNull()) {
-					obj.setSubjectId(Integer.valueOf(0));
+					obj.setSubjectId(0);
 				}
 
 				// old subject_identifier
@@ -1197,7 +1203,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 				// Date of birth
 				if (CoreResources.getDBName().equals("oracle")) {
-					obj.setDobCollected(new Boolean(rs.getString("dob_collected").equals("1") ? true : false));
+					obj.setDobCollected(rs.getString("dob_collected").equals("1"));
 				} else {
 					obj.setDobCollected(rs.getBoolean("dob_collected"));
 				}
@@ -1205,11 +1211,11 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					obj.setDobCollected(false);
 				}
 
-				Integer subjectStatusId = Integer.valueOf(rs.getInt("status_id"));
+				Integer subjectStatusId = rs.getInt("status_id");
 				if (rs.wasNull()) {
-					subjectStatusId = Integer.valueOf(0);
+					subjectStatusId = 0;
 				}
-				obj.setStatus(Status.get(subjectStatusId.intValue()));
+				obj.setStatus(Status.get(subjectStatusId));
 
 				obj.setSecondaryLabel(rs.getString("secondary_label"));
 				if (rs.wasNull()) {
@@ -1381,11 +1387,16 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	/**
 	 * 
 	 * @param studyid
+	 *            int
 	 * @param parentid
+	 *            int
 	 * @param sedin
+	 *            String
 	 * @param it_in
+	 *            String
 	 * @param eb
-	 * @return
+	 *            ExtractBean
+	 * @return boolean
 	 */
 	public boolean loadBASE_ITEMGROUPSIDEHashMap(int studyid, int parentid, String sedin, String it_in, ExtractBean eb) {
 		clearSignals();
@@ -1444,11 +1455,16 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * Main function call
 	 * 
 	 * @param studyid
+	 *            int
 	 * @param parentid
+	 *            int
 	 * @param sedin
+	 *            String
 	 * @param it_in
+	 *            String
 	 * @param eb
-	 * @return
+	 *            ExtractBean
+	 * @return boolean
 	 */
 	public boolean loadBASE_EVENTINSIDEHashMap(int studyid, int parentid, String sedin, String it_in, ExtractBean eb) {
 		clearSignals();
@@ -1507,7 +1523,10 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * For each item_data_id stores a getSQLDatasetBASE_ITEMGROUPSIDE object
 	 * 
 	 * @param rs
-	 * @return
+	 *            ResultSet
+	 * @param eb
+	 *            ExtractBean
+	 * @return boolean
 	 */
 	public boolean processBASE_ITEMGROUPSIDERecords(ResultSet rs, ExtractBean eb) {// throws
 		// SQLException
@@ -1526,27 +1545,27 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			while (rs.next()) {
 
 				// itemdataid
-				Integer vitemdataid = Integer.valueOf(rs.getInt("itemdataid"));
-				if (rs.wasNull()) {
-					// ERROR - should always be different than NULL
-				}
+				Integer vitemdataid = rs.getInt("itemdataid");
+				// if (rs.wasNull()) {
+				// ERROR - should always be different than NULL
+				// }
 
 				// itemdataordinal
-				Integer vitemdataordinal = Integer.valueOf(rs.getInt("itemdataordinal"));
-				if (rs.wasNull()) {
-					// ERROR - should always be different than NULL
-				}
+				Integer vitemdataordinal = rs.getInt("itemdataordinal");
+				// if (rs.wasNull()) {
+				// ERROR - should always be different than NULL
+				// }
 
 				// item_group_id
-				Integer vitem_group_id = Integer.valueOf(rs.getInt("item_group_id"));
-				if (rs.wasNull()) {
-					// ERROR - should always be different than NULL
-				}
+				Integer vitem_group_id = rs.getInt("item_group_id");
+				// if (rs.wasNull()) {
+				// ERROR - should always be different than NULL
+				// }
 
 				// itemgroupname
 				String vitemgroupname = rs.getString("name");
 				if (rs.wasNull()) {
-					vitemgroupname = new String("");
+					vitemgroupname = "";
 				}
 
 				if ("ungrouped".equalsIgnoreCase(vitemgroupname) && vitemdataordinal <= 0) {
@@ -1556,13 +1575,13 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				// itemdesc
 				String vitemdesc = rs.getString("itemdesc");
 				if (rs.wasNull()) {
-					vitemdesc = new String("");
+					vitemdesc = "";
 				}
 
 				// itemname
 				String vitemname = rs.getString("itemname");
 				if (rs.wasNull()) {
-					vitemname = new String("");
+					vitemname = "";
 				}
 
 				String vitemvalue = rs.getString("itemvalue");
@@ -1576,90 +1595,90 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				// itemunits
 				String vitemunits = rs.getString("itemunits");
 				if (rs.wasNull()) {
-					vitemunits = new String("");
+					vitemunits = "";
 				}
 
 				// crfversioname
 				String vcrfversioname = rs.getString("crfversioname");
 				if (rs.wasNull()) {
-					vcrfversioname = new String("");
+					vcrfversioname = "";
 				}
 
 				// crfversionstatusid
-				Integer vcrfversionstatusid = Integer.valueOf(rs.getInt("crfversionstatusid"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-					// vcrfversionstatusid = Integer.valueOf(?);
-				}
+				Integer vcrfversionstatusid = rs.getInt("crfversionstatusid");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// vcrfversionstatusid = Integer.valueOf(?);
+				// }
 
 				// dateinterviewed
 				Date vdateinterviewed = rs.getDate("dateinterviewed");
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// interviewername
 				String vinterviewername = rs.getString("interviewername");
 				if (rs.wasNull()) {
-					vinterviewername = new String("");
+					vinterviewername = "";
 				}
 
 				// eventcrfdatecompleted
 				Timestamp veventcrfdatecompleted = rs.getTimestamp("eventcrfdatecompleted");
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// eventcrfdatevalidatecompleted
 				Timestamp veventcrfdatevalidatecompleted = rs.getTimestamp("eventcrfdatevalidatecompleted");
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// eventcrfcompletionstatusid
-				Integer veventcrfcompletionstatusid = Integer.valueOf(rs.getInt("eventcrfcompletionstatusid"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer veventcrfcompletionstatusid = rs.getInt("eventcrfcompletionstatusid");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// repeat_number
-				Integer vrepeat_number = Integer.valueOf(rs.getInt("repeat_number"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer vrepeat_number = rs.getInt("repeat_number");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// crfid
-				Integer vcrfid = Integer.valueOf(rs.getInt("crfid"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer vcrfid = rs.getInt("crfid");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// studysubjectid
-				Integer vstudysubjectid = Integer.valueOf(rs.getInt("studysubjectid"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer vstudysubjectid = rs.getInt("studysubjectid");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// eventcrfid
-				Integer veventcrfid = Integer.valueOf(rs.getInt("eventcrfid"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer veventcrfid = rs.getInt("eventcrfid");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// itemid
-				Integer vitemid = Integer.valueOf(rs.getInt("itemid"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer vitemid = rs.getInt("itemid");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// crfversionid
-				Integer vcrfversionid = Integer.valueOf(rs.getInt("crfversionid"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer vcrfversionid = rs.getInt("crfversionid");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
-				Integer eventcrfstatusid = Integer.valueOf(rs.getInt("eventcrfstatusid"));
-				Integer itemdatatypeid = Integer.valueOf(rs.getInt("itemDataTypeId"));
+				Integer eventcrfstatusid = rs.getInt("eventcrfstatusid");
+				Integer itemdatatypeid = rs.getInt("itemDataTypeId");
 
 				// add it to the HashMap
 				eb.addEntryBASE_ITEMGROUPSIDE(
@@ -1709,7 +1728,10 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * For each item_data_id stores a getSQLDatasetBASE_ITEMGROUPSIDE object
 	 * 
 	 * @param rs
-	 * @return
+	 *            ResultSet
+	 * @param eb
+	 *            ExtractBean
+	 * @return boolean
 	 */
 	public boolean processBASE_EVENTSIDERecords(ResultSet rs, ExtractBean eb) {// throws
 		// SQLException
@@ -1732,69 +1754,69 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			while (rs.next()) {
 
 				// itemdataid
-				Integer vitemdataid = Integer.valueOf(rs.getInt("itemdataid"));
-				if (rs.wasNull()) {
-					// ERROR - should always be different than NULL
-				}
+				Integer vitemdataid = rs.getInt("itemdataid");
+				// if (rs.wasNull()) {
+				// ERROR - should always be different than NULL
+				// }
 
 				// studysubjectid
-				Integer vstudysubjectid = Integer.valueOf(rs.getInt("studysubjectid"));
-				if (rs.wasNull()) {
-					// ERROR - should always be different than NULL
-				}
+				Integer vstudysubjectid = rs.getInt("studysubjectid");
+				// if (rs.wasNull()) {
+				// ERROR - should always be different than NULL
+				// }
 
 				// sample_ordinal
 				Integer vsample_ordinal = rs.getInt("sample_ordinal");
-				if (rs.wasNull()) {
-					// TODO
-				}
+				// if (rs.wasNull()) {
+				// TODO
+				// }
 
 				// study_event_definition_id
-				Integer vstudy_event_definition_id = Integer.valueOf(rs.getInt("study_event_definition_id"));
-				if (rs.wasNull()) {
-					//
-				}
+				Integer vstudy_event_definition_id = rs.getInt("study_event_definition_id");
+				// if (rs.wasNull()) {
+				//
+				// }
 
 				// name
 				String vname = rs.getString("name");
 				if (rs.wasNull()) {
-					vname = new String("");
+					vname = "";
 				}
 
 				String vlocation = rs.getString("location");
 				// store the
 				if (rs.wasNull()) {
-					vlocation = new String("");
+					vlocation = "";
 				}
 
 				// date_start
 				Timestamp vdate_start = rs.getTimestamp("date_start");
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// date_end
 				Timestamp vdate_end = rs.getTimestamp("date_end");
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// BADS FLAG
 
 				// start_time_flag
 				Boolean vstart_time_flag;
 				if (CoreResources.getDBName().equals("oracle")) {
-					vstart_time_flag = new Boolean(rs.getString("start_time_flag").equals("1") ? true : false);
+					vstart_time_flag = rs.getString("start_time_flag").equals("1");
 					if (rs.wasNull()) {
 						// if (column.equalsIgnoreCase("start_time_flag") ||
 						// column.equalsIgnoreCase("end_time_flag")) {
-						vstart_time_flag = new Boolean(false);
+						vstart_time_flag = false;
 						// } else {
 						// hm.put(column, new Boolean(true));
 						// }
 					}
 				} else {
-					vstart_time_flag = new Boolean(rs.getBoolean("start_time_flag"));
+					vstart_time_flag = rs.getBoolean("start_time_flag");
 					if (rs.wasNull()) {
 						// YW 08-17-2007 << Since I didn't investigate
 						// what's the impact if changing true to false,
@@ -1803,7 +1825,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 						// table study_event
 						// if (column.equalsIgnoreCase("start_time_flag") ||
 						// column.equalsIgnoreCase("end_time_flag")) {
-						vstart_time_flag = new Boolean(false);
+						vstart_time_flag = false;
 						// } else {
 						// hm.put(column, new Boolean(true));
 						// }
@@ -1814,17 +1836,17 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				// end_time_flag
 				Boolean vend_time_flag;
 				if (CoreResources.getDBName().equals("oracle")) {
-					vend_time_flag = new Boolean(rs.getString("end_time_flag").equals("1") ? true : false);
+					vend_time_flag = rs.getString("end_time_flag").equals("1");
 					if (rs.wasNull()) {
 						// if (column.equalsIgnoreCase("start_time_flag") ||
 						// column.equalsIgnoreCase("end_time_flag")) {
-						vend_time_flag = new Boolean(false);
+						vend_time_flag = false;
 						// } else {
 						// hm.put(column, new Boolean(true));
 						// }
 					}
 				} else {
-					vend_time_flag = new Boolean(rs.getBoolean("end_time_flag"));
+					vend_time_flag = rs.getBoolean("end_time_flag");
 					if (rs.wasNull()) {
 						// YW 08-17-2007 << Since I didn't investigate
 						// what's the impact if changing true to false,
@@ -1833,7 +1855,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 						// table study_event
 						// if (column.equalsIgnoreCase("start_time_flag") ||
 						// column.equalsIgnoreCase("end_time_flag")) {
-						vend_time_flag = new Boolean(false);
+						vend_time_flag = false;
 						// } else {
 						// hm.put(column, new Boolean(true));
 						// }
@@ -1842,40 +1864,40 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				}// if
 
 				// status_id
-				Integer vstatus_id = Integer.valueOf(rs.getInt("status_id"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer vstatus_id = rs.getInt("status_id");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// subject_event_status_id
-				Integer vsubject_event_status_id = Integer.valueOf(rs.getInt("subject_event_status_id"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer vsubject_event_status_id = rs.getInt("subject_event_status_id");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// studyeventid
-				Integer vstudyeventid = Integer.valueOf(rs.getInt("studyeventid"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer vstudyeventid = rs.getInt("studyeventid");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// eventcrfid
-				Integer veventcrfid = Integer.valueOf(rs.getInt("eventcrfid"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer veventcrfid = rs.getInt("eventcrfid");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// itemid
-				Integer vitemid = Integer.valueOf(rs.getInt("itemid"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer vitemid = rs.getInt("itemid");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// crfversionid
-				Integer vcrfversionid = Integer.valueOf(rs.getInt("crfversionid"));
-				if (rs.wasNull()) {
-					// TODO - what value default
-				}
+				Integer vcrfversionid = rs.getInt("crfversionid");
+				// if (rs.wasNull()) {
+				// TODO - what value default
+				// }
 
 				// add it to the HashMap
 				eb.addEntryBASE_EVENTSIDE(
@@ -1923,10 +1945,14 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * There are two base querries for dataset
 	 * 
 	 * @param studyid
+	 *            int
 	 * @param studyparentid
+	 *            int
 	 * @param sedin
+	 *            String
 	 * @param it_in
-	 * @return
+	 *            String
+	 * @return String
 	 */
 	protected String getSQLDatasetBASE_EVENTSIDE(int studyid, int studyparentid, String sedin, String it_in,
 			String dateConstraint, String ecStatusConstraint, String itStatusConstraint) {
@@ -2280,10 +2306,14 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * This is the second base sql
 	 * 
 	 * @param studyid
+	 *            int
 	 * @param studyparentid
+	 *            int
 	 * @param sedin
+	 *            String
 	 * @param it_in
-	 * @return
+	 *            String
+	 * @return String
 	 */
 	protected String getSQLDatasetBASE_ITEMGROUPSIDE(int studyid, int studyparentid, String sedin, String it_in,
 			String dateConstraint, String ecStatusConstraint, String itStatusConstraint) {
@@ -2641,11 +2671,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 	/**
 	 * 
-	 * @param sedin
-	 * @param itin
-	 * @param currentstudyid
-	 * @param parentstudyid
-	 * @return
+	 * @return String
 	 */
 	protected String getSQLInKeyDatasetHelper(int studyid, int studyparentid, String sedin, String it_in,
 			String dateConstraint, String ecStatusConstraint, String itStatusConstraint) {
@@ -2775,17 +2801,12 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 					+ getSQLDatasetBASE_EVENTSIDE(studyid, studyparentid, sedin, it_in, dateConstraint,
 							ecStatusConstraint, itStatusConstraint) + "   ) AS SBQTWO " + " ) ";
 		}
-		/**
-		 * TODO - replace with sql
-		 */
+		// TODO - replace with sql
 	}
 
 	/**
 	 * 
-	 * @param studyid
-	 * @param parentid
-	 * @param sedin
-	 * @return
+	 * @return HashMap
 	 */
 	public HashMap setHashMapInKeysHelper(int studyid, int parentid, String sedin, String itin, String dateConstraint,
 			String ecStatusConstraint, String itStatusConstraint) {
@@ -2838,42 +2859,43 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * null!
 	 * 
 	 * @param rs
-	 * @return
+	 *            ResultSet
+	 * @return HashMap
 	 */
 	public HashMap processInKeyDataset(ResultSet rs) {// throws SQLException
 		HashMap al = new HashMap();
 
 		try {
 			while (rs.next()) {
-				String stsed = new String("");
+				String stsed;
 				stsed = ((Integer) rs.getInt("study_event_definition_id")).toString();
 				if (rs.wasNull()) {
-					stsed = new String("");
+					stsed = "";
 				}
 
 				// second column
-				String stso = new String("");
+				String stso;
 				stso = ((Integer) rs.getInt("sample_ordinal")).toString();
 				if (rs.wasNull()) {
-					stso = new String("");
+					stso = "";
 				}
 
-				String stcrf = new String("");
+				String stcrf;
 				stcrf = ((Integer) rs.getInt("crf_id")).toString();
 				if (rs.wasNull()) {
-					stcrf = new String("");
+					stcrf = "";
 				}
 
-				String stitem = new String("");
+				String stitem;
 				stitem = ((Integer) rs.getInt("item_id")).toString();
 				if (rs.wasNull()) {
-					stitem = new String("");
+					stitem = "";
 				}
 
-				String stgn = new String("");
+				String stgn;
 				stgn = rs.getString("item_group_name");
 				if (rs.wasNull()) {
-					stgn = new String("");
+					stgn = "";
 				}
 
 				/**
@@ -2882,7 +2904,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				String key = stsed + "_" + stso + "_" + stcrf + "_" + stitem + "_" + stgn;
 
 				// add
-				al.put(key, new Boolean(true));
+				al.put(key, true);
 
 			}// while
 		} catch (SQLException sqle) {
@@ -2907,10 +2929,14 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * strings of event_crf_id
 	 * 
 	 * @param studyid
+	 *            int
 	 * @param parentid
+	 *            int
 	 * @param sedin
+	 *            String
 	 * @param studysubj_in
-	 * @return
+	 *            String
+	 * @return ArrayList
 	 */
 	public ArrayList getEventCRFIDs(int studyid, int parentid, String sedin, String studysubj_in) {
 		clearSignals();
@@ -2952,25 +2978,26 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 		return results;
 
-	}//
+	}
 
 	/**
 	 * This returns an ArrayList of Strings
 	 * 
 	 * @param rs
-	 * @return
+	 *            ResultSet
+	 * @return ArrayList
 	 */
 	public ArrayList processEventCRFIDs(ResultSet rs) {// throws SQLException
 		ArrayList al = new ArrayList();
 
 		try {
 			while (rs.next()) {
-				String obj = new String("");
+				String obj;
 				// first column
 				obj = ((Integer) rs.getInt("event_crf_id")).toString();
 				if (rs.wasNull()) {
 					// NOTE: It shoudln't be NULL!
-					obj = new String("");
+					obj = "";
 				}
 
 				// add
@@ -2991,10 +3018,14 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	/**
 	 * 
 	 * @param studyid
+	 *            int
 	 * @param studyparentid
+	 *            int
 	 * @param sedin
+	 *            String
 	 * @param it_in
-	 * @return
+	 *            String
+	 * @return String
 	 */
 	protected String getSQLEventCRFIDs(int studyid, int studyparentid, String sedin, String it_in) {
 
@@ -3073,12 +3104,9 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		 * 
 		 */
 
-		String ret = "";
-		/**
-		 * TODO - implement
-		 */
+		// TODO - implement
 
-		return ret;
+		return "";
 	}
 
 	/**
@@ -3086,9 +3114,12 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * study_subject_id
 	 * 
 	 * @param studyid
-	 * @param studyparentid
+	 *            int
+	 * @param parentid
+	 *            int
 	 * @param sedin
-	 * @return
+	 *            String
+	 * @return String
 	 */
 	public ArrayList getStudySubjectIDs(int studyid, int parentid, String sedin) {
 		clearSignals();
@@ -3135,7 +3166,8 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * This returns an ArrayList of Strings
 	 * 
 	 * @param rs
-	 * @return
+	 *            ResultSet
+	 * @return ArrayList
 	 */
 	public ArrayList processStudySubjectIDs(ResultSet rs) {// throws
 		// SQLException
@@ -3143,12 +3175,12 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 		try {
 			while (rs.next()) {
-				String obj = new String("");
+				String obj;
 				// first column
 				obj = ((Integer) rs.getInt("study_subject_id")).toString();
 				if (rs.wasNull()) {
 					// NOTE: It shoudln't be NULL!
-					obj = new String("");
+					obj = "";
 				}
 
 				// add
@@ -3170,9 +3202,12 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	 * This returns the SQL with all active study_subject_id.
 	 * 
 	 * @param studyid
+	 *            int
 	 * @param studyparentid
+	 *            int
 	 * @param sedin
-	 * @return
+	 *            String
+	 * @return String
 	 */
 	protected String getSQLStudySubjectIDs(int studyid, int studyparentid, String sedin) {
 		/*
@@ -3226,11 +3261,9 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		 * study_event_definition.study_event_definition_id) ) AS SBQTWO )
 		 */
 
-		String ret = "";
-
 		// TODO - to implement
 
-		return ret;
+		return "";
 	}// getSQLStudySubjectIDs
 
 	/**
@@ -3263,7 +3296,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	}
 
 	public String getECStatusConstraint(int datasetItemStatusId) {
-		String statusConstraint = "";
+		String statusConstraint;
 		switch (datasetItemStatusId) {
 		default:
 		case 0:
@@ -3281,7 +3314,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 	}
 
 	public String getItemDataStatusConstraint(int datasetItemStatusId) {
-		String statusConstraint = "";
+		String statusConstraint;
 		switch (datasetItemStatusId) {
 		default:
 		case 0:

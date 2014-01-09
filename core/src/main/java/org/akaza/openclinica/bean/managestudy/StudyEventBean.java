@@ -22,13 +22,15 @@ package org.akaza.openclinica.bean.managestudy;
 
 import java.util.ArrayList;
 import java.util.Date;
-
+import java.util.HashMap;
+import java.util.Map;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.util.SignedData;
 
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({ "rawtypes", "serial", "unused" })
 public class StudyEventBean extends AuditableEntityBean {
 	// STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID
 	// LOCATION SAMPLE_ORDINAL DATE_START DATE_END
@@ -73,12 +75,22 @@ public class StudyEventBean extends AuditableEntityBean {
 	private boolean startTimeFlag = false;
 	private boolean endTimeFlag = false;
 
+	private Map<Integer, SignedData> signedData = new HashMap<Integer, SignedData>();
+
+	public void setSignedData(Map<Integer, SignedData> signedData) {
+		this.signedData = signedData;
+	}
+
+	public Map<Integer, SignedData> getSignedData() {
+		return signedData;
+	}
+
 	private int referenceVisitId;
-	
+
 	public int getReferenceVisitId() {
 		return referenceVisitId;
 	}
-	
+
 	public void setReferenceVisitId(int referenceVisitId) {
 		this.referenceVisitId = referenceVisitId;
 	}
@@ -104,6 +116,7 @@ public class StudyEventBean extends AuditableEntityBean {
 	/**
 	 * 
 	 * @param startTimeFlag
+	 *            boolean
 	 */
 	public void setStartTimeFlag(boolean startTimeFlag) {
 		this.startTimeFlag = startTimeFlag;
@@ -120,6 +133,7 @@ public class StudyEventBean extends AuditableEntityBean {
 	/**
 	 * 
 	 * @param endTimeFlag
+	 *            boolean
 	 */
 	public void setEndTimeFlag(boolean endTimeFlag) {
 		this.endTimeFlag = endTimeFlag;
@@ -189,8 +203,8 @@ public class StudyEventBean extends AuditableEntityBean {
 		stage = DataEntryStage.UNCOMPLETED;
 		subjectEventStatus = SubjectEventStatus.SCHEDULED;
 	}
-	
-	public StudyEventBean (StudyEventBean obj) {
+
+	public StudyEventBean(StudyEventBean obj) {
 		this.id = obj.getId();
 		this.stage = obj.getStage();
 		this.subjectEventStatus = obj.getPrevSubjectEventStatus();
