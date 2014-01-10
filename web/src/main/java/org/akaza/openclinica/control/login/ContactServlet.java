@@ -22,6 +22,7 @@ package org.akaza.openclinica.control.login;
 
 import com.clinovo.util.ValidatorHelper;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -97,6 +99,9 @@ public class ContactServlet extends Controller {
 	}
 
 	private void sendEmail(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		MessageFormat msg = new MessageFormat("");
+		String emailBody;
+		
         UserAccountBean ub = getUserAccountBean(request);
 
 		FormProcessor fp = new FormProcessor(request);
@@ -105,14 +110,11 @@ public class ContactServlet extends Controller {
 		String subject = fp.getString("subject");
 		String message = fp.getString("message");
 		logger.info("Sending email...");
+		
+		msg.applyPattern(restext.getString("support_email_message_html"));
+		emailBody = msg.format(new Object[] {name, email, subject, message});
 
-		StringBuffer emailBody = new StringBuffer(restext.getString("dear_openclinica_administrator") + ", <br><br>");
-		emailBody.append(name + " " + restext.getString("sent_you_the_following_message_br") + "<br>");
-		emailBody.append("<br>" + resword.getString("email") + ": " + email);
-		emailBody.append("<br>" + resword.getString("subject") + ": " + subject);
-		emailBody.append("<br>" + resword.getString("message") + ": " + message);
-
-		sendEmail(email, subject, emailBody.toString(), true, request);
+		sendEmail(EmailEngine.getAdminEmail(), subject, emailBody, true, request);
 
 		if (ub != null && ub.getId() > 0) {
 			forwardPage(Page.MENU_SERVLET, request, response);
