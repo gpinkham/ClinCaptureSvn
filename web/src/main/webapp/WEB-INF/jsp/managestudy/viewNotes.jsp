@@ -105,7 +105,8 @@
             <td align="center"><strong><fmt:message key="total" bundle="${resword}"/></strong></td>
         </tr>
             <c:forEach var="status" items="${mapKeys}">
-                <tr>
+                <c:if test="${status.code != 'Resolution_Proposed' || summaryMap[status.name]['Total'] > 0}">
+				<tr>
                     <td><strong>${status.name}</strong><img src="${status.iconFilePath}" border="0" align="right"></td>
 
                     <c:forEach var="typeName" items="${typeNames}">
@@ -143,6 +144,7 @@
                     </td>
 
                 </tr>
+				</c:if>
             </c:forEach>
         <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
         <tr><td><strong><fmt:message key="total" bundle="${resword}"/></strong></td>
@@ -188,15 +190,12 @@
         ${viewNotesHtml}
     </form>
 
-<br><br>
-<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
+
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" style="margin-top:20px"/> 
 
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
-
-
-    
+   
 <!-- EXPANDING WORKFLOW BOX -->
-
 
 <div style="clear:left">
 <br><br>
@@ -260,7 +259,6 @@
 
 							<b><fmt:message key="view_discrepancy_notes" bundle="${resword}"/></b>
 
-
 							</span>
 
 							</div>
@@ -269,7 +267,6 @@
 						</td>
 					</tr>
 				</table>
-
 
 		<!-- end Workflow items -->
 
@@ -302,13 +299,6 @@
 
     </form>
 <%-- end --%>
-
-
-
-
-
-
-
 
 <!-- END WORKFLOW BOX -->
 <jsp:include page="../include/footer.jsp"/>
