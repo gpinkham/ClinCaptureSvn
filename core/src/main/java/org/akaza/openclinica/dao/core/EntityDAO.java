@@ -67,7 +67,7 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
  * @param <V>
  * @param <K>
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface {
 	protected DataSource ds;
 

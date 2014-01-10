@@ -31,7 +31,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class PreparedStatementFactory {
 	private Map variables = new HashMap();
 	private HashMap nullVars = new HashMap();// to handle null
