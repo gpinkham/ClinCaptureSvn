@@ -925,9 +925,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 					|| getCurrentRole().getRole() == Role.SYSTEM_ADMINISTRATOR) {
 				url.append(studySubjectLockLinkBuilder(studySubjectBean));
 			}
-			if (getCurrentRole().getRole() != Role.STUDY_MONITOR) {
-				url.append(calendaredEventsBuilder(studySubjectBean));
-			}
+
+			url.append(calendaredEventsBuilder(studySubjectBean));
+
 			if (flagColour != null
 					&& (getStudyBean().getStatus() == Status.AVAILABLE || getStudyBean().getStatus() == Status.FROZEN)) {
 				// Make sure this is the last icon
