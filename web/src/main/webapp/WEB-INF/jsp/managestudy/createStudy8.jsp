@@ -599,6 +599,24 @@
   </tr>
 
   <tr valign="top">
+    <td class="formlabel">
+      <fmt:message key="autoCreateSubjectDuringImport" bundle="${resword}"/>
+    </td>
+    <td>
+      <c:choose>
+        <c:when test="${studyToView.studyParameterConfig.autoCreateSubjectDuringImport == 'yes'}">
+          <input type="radio" checked name="autoCreateSubjectDuringImport" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+          <input type="radio" name="autoCreateSubjectDuringImport" value="no"><fmt:message key="no" bundle="${resword}"/>
+        </c:when>
+        <c:otherwise>
+          <input type="radio" name="autoCreateSubjectDuringImport" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+          <input type="radio" checked name="autoCreateSubjectDuringImport" value="no"><fmt:message key="no" bundle="${resword}"/>
+        </c:otherwise>
+      </c:choose>
+    </td>
+  </tr>
+
+  <tr valign="top">
       <td class="formlabel">
           <fmt:message key="allowSdvWithOpenQueries" bundle="${resword}"/>
       </td>

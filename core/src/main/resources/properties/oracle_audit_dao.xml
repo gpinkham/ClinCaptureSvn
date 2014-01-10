@@ -128,4 +128,11 @@
   			where rownum=1 and   audit_table=? and entity_id=? and new_value=? order by audit_date 
 		</sql>
 	</query>
+    <query>
+        <name>insert</name>
+        <sql>
+            INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+            VALUES (?,NOW(),?,?,?,?,?,?,?)
+        </sql>
+    </query>
 </queries>

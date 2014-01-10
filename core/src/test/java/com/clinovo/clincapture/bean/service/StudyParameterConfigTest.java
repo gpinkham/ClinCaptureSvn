@@ -65,6 +65,7 @@ public class StudyParameterConfigTest {
 		assertEquals("End Date/Time", config.getEndDateTimeLabel());
 		assertEquals("no", config.getMarkImportedCRFAsCompleted());
 		assertEquals("no", config.getAutoScheduleEventDuringImport());
+        assertEquals("no", config.getAutoCreateSubjectDuringImport());
 
         assertEquals("no", config.getMedicalCodingApprovalNeeded());
         assertEquals("no", config.getMedicalCodingContextNeeded());

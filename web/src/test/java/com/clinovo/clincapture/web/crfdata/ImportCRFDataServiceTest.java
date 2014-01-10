@@ -1,5 +1,6 @@
 package com.clinovo.clincapture.web.crfdata;
 
+import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.util.ValidatorHelper;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -13,7 +14,6 @@ import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
-import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.junit.Before;
@@ -28,12 +28,14 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 		protected ImportCRFDataService service;
 		protected ODMContainer container;
 		protected InputStream stream;
+        protected StudySubjectIdService studySubjectIdService;
 		protected MockHttpServletRequest request = new MockHttpServletRequest();
 		protected UserAccountBean ub;
 		protected ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
 		protected ValidatorHelper validatorHelper;
 		protected ConfigurationDao configurationDao;
 		{
+            studySubjectIdService = Mockito.mock(StudySubjectIdService.class);
 			configurationDao = Mockito.mock(ConfigurationDao.class);
 
 			ub = new UserAccountBean();
@@ -66,7 +68,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 
 	private void parseFile(ObjectsHolder objectsHolder, String fileName) throws Exception {
 		Locale locale = new Locale("EN");
-		objectsHolder.service = new ImportCRFDataService(getDataSource(), locale);
+		objectsHolder.service = new ImportCRFDataService(objectsHolder.studySubjectIdService, getDataSource(), locale);
 		objectsHolder.container = new ODMContainer();
 		objectsHolder.stream = this.getClass().getClassLoader().getResourceAsStream("com/clinovo/" + fileName);
 		JAXBContext jaxbContext = JAXBContext.newInstance(ODMContainer.class);
@@ -86,46 +88,34 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 
 	@Test
 	public void testThatErrorMessagesListIsNotNull() {
-		ArrayList<String> errorMessages = new ArrayList<String>();
 		int currentStudyId = 1;
-		errorMessages = (ArrayList<String>) holder.service.validateStudyMetadata(holder.container, currentStudyId);
-		assertNotNull(errorMessages);
+		assertNotNull(holder.service.validateStudyMetadata(holder.container, currentStudyId, holder.ub));
 	}
 
 	@Test
 	public void testThatSizeOfTheErrorMessagesListIsCorrect() {
-		ArrayList<String> errorMessages = new ArrayList<String>();
 		int currentStudyId = 1;
-		errorMessages = (ArrayList<String>) holder.service.validateStudyMetadata(holder.container, currentStudyId);
-		assertEquals(errorMessages.size(), 1);
+		assertEquals(holder.service.validateStudyMetadata(holder.container, currentStudyId, holder.ub).size(), 0);
 	}
 
 	@Test
 	public void testThatGeneratedSummaryStatsBeanIsNotNull() {
-		List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
-		SummaryStatsBean stats = holder.service.generateSummaryStatsBean(holder.container, wrappers);
-		assertNotNull(stats);
+		assertNotNull(holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()));
 	}
 
 	@Test
 	public void testThatGetEventCrfCountReturnsCorrectValue() {
-		List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
-		SummaryStatsBean stats = holder.service.generateSummaryStatsBean(holder.container, wrappers);
-		assertEquals(1, stats.getEventCrfCount());
+		assertEquals(1, holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()).getEventCrfCount());
 	}
 
 	@Test
 	public void testThatGetDiscNoteCountReturnsCorrectValue() {
-		List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
-		SummaryStatsBean stats = holder.service.generateSummaryStatsBean(holder.container, wrappers);
-		assertEquals(0, stats.getDiscNoteCount());
+		assertEquals(0, holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()).getDiscNoteCount());
 	}
 
 	@Test
 	public void testThatGetStudySubjectCountReturnsCorrectValue() {
-		List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
-		SummaryStatsBean stats = holder.service.generateSummaryStatsBean(holder.container, wrappers);
-		assertEquals(1, stats.getStudySubjectCount());
+		assertEquals(1, holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()).getStudySubjectCount());
 	}
 
 	@Test

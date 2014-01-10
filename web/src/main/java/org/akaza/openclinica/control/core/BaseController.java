@@ -2,6 +2,8 @@ package org.akaza.openclinica.control.core;
 
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
+import com.clinovo.service.StudySubjectIdService;
+
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -196,6 +198,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private CodedItemService codedItemService;
 	@Autowired
 	private DictionaryService dictionaryService;
+    @Autowired
+    private StudySubjectIdService studySubjectIdService;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -461,4 +465,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	public DictionaryService getDictionaryService() {
 		return dictionaryService;
 	}
+
+    public StudySubjectIdService getStudySubjectIdService() {
+        return studySubjectIdService;
+    }
 }

@@ -879,4 +879,6 @@
     <coded_item_element id="6" coded_item_id="1" item_data_id="10" item_name="VERBITEM_HLTC" item_code="" version="0"/>
     <coded_item_element id="7" coded_item_id="1" item_data_id="11" item_name="VERBITEM_PT" item_code="" version="0"/>
 
+    <study_subject_id id="1" name="TEST1" index="1" version="0"/>
+
 </dataset>

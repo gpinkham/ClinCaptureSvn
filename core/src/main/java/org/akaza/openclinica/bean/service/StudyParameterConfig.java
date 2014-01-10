@@ -94,6 +94,8 @@ public class StudyParameterConfig {
     private String replaceExisitingDataDuringImport;
     
     private String autoScheduleEventDuringImport;
+
+    private String autoCreateSubjectDuringImport;
     
     // Medical coding parameters
     private String allowCodingVerification = "no";
@@ -140,6 +142,7 @@ public class StudyParameterConfig {
 
 		markImportedCRFAsCompleted = "no";
 		autoScheduleEventDuringImport = "no";
+        autoCreateSubjectDuringImport = "no";
 		allowSdvWithOpenQueries = "no";
 		replaceExisitingDataDuringImport = "no";
 	}
@@ -529,5 +532,13 @@ public class StudyParameterConfig {
 
     public void setMedicalCodingContextNeeded(String medicalCodingContextNeeded) {
         this.medicalCodingContextNeeded = medicalCodingContextNeeded;
+	}
+
+    public String getAutoCreateSubjectDuringImport() {
+        return autoCreateSubjectDuringImport;
+    }
+
+    public void setAutoCreateSubjectDuringImport(String autoCreateSubjectDuringImport) {
+        this.autoCreateSubjectDuringImport = autoCreateSubjectDuringImport;
     }
 }

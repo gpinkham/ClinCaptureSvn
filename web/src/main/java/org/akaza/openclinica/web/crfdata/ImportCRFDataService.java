@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.web.crfdata;
 
+import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.util.ValidatorHelper;
 
 import java.math.BigDecimal;
@@ -54,6 +55,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
@@ -78,6 +80,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
@@ -91,6 +94,8 @@ public class ImportCRFDataService {
 	private final DataSource ds;
 
 	private ItemDataDAO itemDataDao;
+
+	private StudySubjectIdService studySubjectIdService;
 
 	private Locale locale;
 
@@ -113,12 +118,46 @@ public class ImportCRFDataService {
 		}
 	}
 
-	public ImportCRFDataService(DataSource ds, Locale locale) {
+	public ImportCRFDataService(StudySubjectIdService studySubjectIdService, DataSource ds, Locale locale) {
 		ResourceBundleProvider.updateLocale(locale);
 		respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		resformat = ResourceBundleProvider.getFormatBundle(locale);
+		this.studySubjectIdService = studySubjectIdService;
 		this.locale = locale;
 		this.ds = ds;
+	}
+
+	private StudySubjectBean createStudySubject(UserAccountBean ub, StudyBean studyBean,
+			SubjectDataBean subjectDataBean, SubjectDAO subjectDAO, StudySubjectDAO studySubjectDAO) {
+		String studySubjectId = studySubjectIdService.getNextStudySubjectId(studyBean.getName());
+		if (studySubjectDAO.countByLabel(studySubjectId) > 0) {
+			createStudySubject(ub, studyBean, subjectDataBean, subjectDAO, studySubjectDAO);
+		}
+
+		Date currentDate = new Date();
+
+		String subjectOid = subjectDataBean.getSubjectOID();
+
+		SubjectBean subjectBean = new SubjectBean();
+		subjectBean.setOwner(ub);
+		subjectBean.setCreatedDate(currentDate);
+		subjectBean.setStatus(Status.AVAILABLE);
+		subjectBean.setUniqueIdentifier(studySubjectId);
+		subjectBean = subjectDAO.create(subjectBean);
+
+		StudySubjectBean studySubjectBean = new StudySubjectBean();
+		studySubjectBean.setOid(subjectOid);
+		studySubjectBean.setSubjectId(subjectBean.getId());
+		studySubjectBean.setOwner(ub);
+		studySubjectBean.setCreatedDate(currentDate);
+		studySubjectBean.setStatus(Status.AVAILABLE);
+		studySubjectBean.setStudyId(studyBean.getId());
+		studySubjectBean.setLabel(studySubjectId);
+		studySubjectBean.setSecondaryLabel(studySubjectId);
+		studySubjectBean.setEnrollmentDate(currentDate);
+
+		// TODO in a future we should know how to process study subject's groups
+		return studySubjectDAO.create(studySubjectBean, false);
 	}
 
 	private StudyEventBean scheduleStudyEvent(int sampleOrdinal, UserAccountBean ub, StudySubjectBean studySubjectBean,
@@ -394,7 +433,7 @@ public class ImportCRFDataService {
 					// crfBean.getOid());
 					EventCRFBean eventCRFBean = null;
 					ArrayList<EventCRFBean> eventCrfBeans = eventCRFDAO.findAllByStudyEventAndCrfOrCrfVersionOid(
-                            studyEvent, crfBean.getOid());
+							studyEvent, crfBean.getOid());
 					if (eventCrfBeans.size() > 0) {
 						eventCRFBean = eventCrfBeans.get(0);
 						if (eventCRFBean.isNotStarted() && eventCRFBean.getCRFVersionId() != crfVersion.getId()) {
@@ -833,7 +872,7 @@ public class ImportCRFDataService {
 		return value;
 	}
 
-	public List<String> validateStudyMetadata(ODMContainer odmContainer, int currentStudyId) {
+	public List<String> validateStudyMetadata(ODMContainer odmContainer, int currentStudyId, UserAccountBean ub) {
 		List<String> errors = new ArrayList<String>();
 		MessageFormat mf = new MessageFormat("");
 
@@ -841,6 +880,8 @@ public class ImportCRFDataService {
 			StudyDAO studyDAO = new StudyDAO(ds);
 			String studyOid = odmContainer.getCrfDataPostImportContainer().getStudyOID();
 			StudyBean studyBean = studyDAO.findByOid(studyOid);
+			StudyConfigService configService = new StudyConfigService(ds);
+			studyBean = configService.setParametersForStudy(studyBean);
 			if (studyBean == null) {
 				mf.applyPattern(respage.getString("your_study_oid_does_not_reference_an_existing"));
 				Object[] arguments = { studyOid };
@@ -862,6 +903,7 @@ public class ImportCRFDataService {
 			CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
 			ItemGroupDAO itemGroupDAO = new ItemGroupDAO(ds);
 			EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
+			SubjectDAO subjectDAO = new SubjectDAO(ds);
 			ItemDAO itemDAO = new ItemDAO(ds);
 			CRFDAO crfDAO = new CRFDAO(ds);
 
@@ -871,6 +913,12 @@ public class ImportCRFDataService {
 				for (SubjectDataBean subjectDataBean : subjectDataBeans) {
 					String oid = subjectDataBean.getSubjectOID();
 					StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(oid, studyBean.getId());
+					if (studySubjectBean == null
+							&& studyBean.getStudyParameterConfig().getAutoCreateSubjectDuringImport()
+									.equalsIgnoreCase("yes")) {
+						studySubjectBean = createStudySubject(ub, studyBean, subjectDataBean, subjectDAO,
+								studySubjectDAO);
+					}
 					if (studySubjectBean == null) {
 						mf.applyPattern(respage.getString("your_subject_oid_does_not_reference"));
 						Object[] arguments = { oid };

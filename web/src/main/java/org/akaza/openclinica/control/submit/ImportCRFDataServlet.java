@@ -194,8 +194,8 @@ public class ImportCRFDataServlet extends Controller {
 				}
 			}
 
-			List<String> errors = new ImportCRFDataService(getDataSource(), request.getLocale()).validateStudyMetadata(
-					odmContainer, ub.getActiveStudyId());
+			List<String> errors = new ImportCRFDataService(getStudySubjectIdService(), getDataSource(), request.getLocale()).validateStudyMetadata(
+					odmContainer, ub.getActiveStudyId(), ub);
 			if (errors != null) {
 				// add to session
 				// forward to another page
@@ -215,7 +215,7 @@ public class ImportCRFDataServlet extends Controller {
 			}
 			logger.debug("passed error check");
 
-			ImportCRFDataService importCRFDataService = new ImportCRFDataService(getDataSource(), request.getLocale());
+			ImportCRFDataService importCRFDataService = new ImportCRFDataService(getStudySubjectIdService(), getDataSource(), request.getLocale());
 			List<EventCRFBean> eventCRFBeans = importCRFDataService.fetchEventCRFBeans(odmContainer, ub);
 			List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
 			HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
@@ -290,7 +290,7 @@ public class ImportCRFDataServlet extends Controller {
 				request.getSession().setAttribute("hardValidationErrors", hardValidationErrors);
 
 				logger.debug("+++ content of total validation errors: " + totalValidationErrors.toString());
-				SummaryStatsBean ssBean = new ImportCRFDataService(getDataSource(), request.getLocale())
+				SummaryStatsBean ssBean = new ImportCRFDataService(getStudySubjectIdService(), getDataSource(), request.getLocale())
 						.generateSummaryStatsBean(odmContainer, displayItemBeanWrappers);
 				request.getSession().setAttribute("summaryStats", ssBean);
 				request.getSession().setAttribute("subjectData",

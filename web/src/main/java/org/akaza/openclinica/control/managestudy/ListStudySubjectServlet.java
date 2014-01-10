@@ -176,6 +176,9 @@ public abstract class ListStudySubjectServlet extends Controller {
 		parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "autoScheduleEventDuringImport");
 		currentStudy.getStudyParameterConfig().setAutoScheduleEventDuringImport(parentSPV.getValue());
 
+        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "autoCreateSubjectDuringImport");
+        currentStudy.getStudyParameterConfig().setAutoCreateSubjectDuringImport(parentSPV.getValue());
+
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "allowSdvWithOpenQueries");
         currentStudy.getStudyParameterConfig().setAllowSdvWithOpenQueries(parentSPV.getValue());
 

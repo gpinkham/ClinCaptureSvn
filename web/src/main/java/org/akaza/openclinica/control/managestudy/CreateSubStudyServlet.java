@@ -148,7 +148,9 @@ public class CreateSubStudyServlet extends Controller {
 								scg.getValue().setValue(fp.getString("markImportedCRFAsCompleted"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoScheduleEventDuringImport")) {
 								scg.getValue().setValue(fp.getString("autoScheduleEventDuringImport"));
-							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")) {
+                            } else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCreateSubjectDuringImport")) {
+                                scg.getValue().setValue(fp.getString("autoCreateSubjectDuringImport"));
+                            } else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")) {
 								scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));
 							} else if (scg.getParameter().getHandle()
 									.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
@@ -432,7 +434,12 @@ public class CreateSubStudyServlet extends Controller {
 					scg.getValue().setValue(fp.getString("autoScheduleEventDuringImport"));
 					study.getStudyParameterConfig().setAutoScheduleEventDuringImport(
 							fp.getString("autoScheduleEventDuringImport"));
-				} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")
+                } else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCreateSubjectDuringImport")
+                        && !fp.getString("autoCreateSubjectDuringImport").isEmpty()) {
+                    scg.getValue().setValue(fp.getString("autoCreateSubjectDuringImport"));
+                    study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(
+                            fp.getString("autoCreateSubjectDuringImport"));
+                } else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")
 						&& !fp.getString("allowSdvWithOpenQueries").isEmpty()) {
 					scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));
 					study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));

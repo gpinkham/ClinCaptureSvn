@@ -343,4 +343,12 @@
 			ORDER BY ss.label ASC
 		</sql>
 	</query>
+    <query>
+        <name>countByLabel</name>
+        <sql>
+            SELECT count(distinct ss.study_subject_id)
+            FROM study_subject ss, subject s
+            where s.subject_id = ss.subject_id and (s.unique_identifier = ? or ss.label = ? or ss.secondary_label = ?)
+        </sql>
+    </query>
 </queries>

@@ -705,6 +705,8 @@ public class CreateStudyServlet extends Controller {
 		newStudy.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
 		newStudy.getStudyParameterConfig().setAutoScheduleEventDuringImport(
 				fp.getString("autoScheduleEventDuringImport"));
+        newStudy.getStudyParameterConfig().setAutoCreateSubjectDuringImport(
+                fp.getString("autoCreateSubjectDuringImport"));
 		newStudy.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		newStudy.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
 				fp.getString("replaceExisitingDataDuringImport"));
@@ -868,6 +870,10 @@ public class CreateStudyServlet extends Controller {
 		spv.setParameter("autoScheduleEventDuringImport");
 		spv.setValue(newStudy.getStudyParameterConfig().getAutoScheduleEventDuringImport());
 		spvdao.create(spv);
+
+        spv.setParameter("autoCreateSubjectDuringImport");
+        spv.setValue(newStudy.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
+        spvdao.create(spv);
 
 		spv.setParameter("markImportedCRFAsCompleted");
 		spv.setValue(newStudy.getStudyParameterConfig().getMarkImportedCRFAsCompleted());

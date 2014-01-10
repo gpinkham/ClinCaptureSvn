@@ -511,6 +511,7 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
 		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
+        study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
 				fp.getString("replaceExisitingDataDuringImport"));
@@ -852,6 +853,10 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport());
 		updateParameter(spvdao, spv);
 
+        spv.setParameter("autoCreateSubjectDuringImport");
+        spv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
+        updateParameter(spvdao, spv);
+
 		spv.setParameter("allowSdvWithOpenQueries");
 		spv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
 		updateParameter(spvdao, spv);
@@ -1007,6 +1012,10 @@ public class UpdateStudyServletNew extends Controller {
 			childspv.setParameter("autoScheduleEventDuringImport");
 			childspv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport());
 			updateParameter(spvdao, childspv);
+
+            childspv.setParameter("autoCreateSubjectDuringImport");
+            childspv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
+            updateParameter(spvdao, childspv);
 
 			childspv.setParameter("allowSdvWithOpenQueries");
 			childspv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());

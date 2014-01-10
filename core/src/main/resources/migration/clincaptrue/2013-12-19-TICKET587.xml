@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="skirpichenok" id="2013-12-19-TICKET587-1">
+        <comment>Insert a new record in the studyParameter table</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="38"/>
+            <column name="handle" value="autoCreateSubjectDuringImport"/>
+            <column name="name" value="autoCreateSubjectDuringImport"/>
+            <column name="description" value="Auto-create subject during import"/>
+            <column name="default_value" value="no"/>
+            <!-- can be no, yes, not_used -->
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2013-12-19-TICKET587-2">
+        <createTable tableName="study_subject_id">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="index" type="INT" defaultValue="0" />
+            <column name="version" type="INT" />
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

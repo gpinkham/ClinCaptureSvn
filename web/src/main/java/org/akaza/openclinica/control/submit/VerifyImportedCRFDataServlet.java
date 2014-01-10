@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -150,6 +151,7 @@ public class VerifyImportedCRFDataServlet extends Controller {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection con = null;
 		try {
+			List<Map<String, Object>> auditItemList = new ArrayList<Map<String, Object>>();
 			UserAccountBean ub = getUserAccountBean(request);
 			StudyBean currentStudy = getCurrentStudy(request);
 
@@ -166,7 +168,6 @@ public class VerifyImportedCRFDataServlet extends Controller {
 			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource(), con);
 			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 			String action = request.getParameter("action");
-			StringBuilder skippedItemsSql = new StringBuilder();
 			FormProcessor fp = new FormProcessor(request);
 
 			// checks which module the requests are from
@@ -274,18 +275,16 @@ public class VerifyImportedCRFDataServlet extends Controller {
 								}
 							} else {
 								skippedItemIds.add(displayItemBean.getItem().getId());
-								String itemDataBeanValue = itemDataBean.getValue() != null ? itemDataBean.getValue()
-										.replaceAll("'", "''") : itemDataBean.getValue();
-								String displayItemBeanDataValue = displayItemBean.getData().getValue() != null ? displayItemBean
-										.getData().getValue().replaceAll("'", "''")
-										: displayItemBean.getData().getValue();
-								skippedItemsSql
-										.append("INSERT INTO audit_log_event(audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id) "
-												+ "VALUES (52, now(), ").append(ub.getId()).append(", 'item_data', ")
-										.append(itemDataBean.getId()).append(", '")
-										.append(displayItemBean.getItem().getName()).append("', '")
-										.append(itemDataBeanValue).append("', '").append(displayItemBeanDataValue)
-										.append("', ").append(displayItemBean.getData().getEventCRFId()).append("); ");
+								Map<String, Object> auditItemMap = new HashMap<String, Object>();
+								auditItemMap.put("audit_log_event_type_id", 52);
+								auditItemMap.put("user_id", ub.getId());
+								auditItemMap.put("audit_table", "item_data");
+								auditItemMap.put("entity_id", itemDataBean.getId());
+								auditItemMap.put("entity_name", displayItemBean.getItem().getName());
+								auditItemMap.put("old_value", itemDataBean.getValue());
+								auditItemMap.put("new_value", displayItemBean.getData().getValue());
+								auditItemMap.put("event_crf_id", displayItemBean.getData().getEventCRFId());
+								auditItemList.add(auditItemMap);
 							}
 						}
 
@@ -349,8 +348,8 @@ public class VerifyImportedCRFDataServlet extends Controller {
 				addPageMessage(summary.prepareSummaryMessage(currentStudy, resword), request);
 
 				con.close();
-				if (!skippedItemsSql.toString().isEmpty()) {
-					new AuditDAO(getDataSource()).execute(skippedItemsSql.toString());
+				if (auditItemList.size() > 0) {
+					new AuditDAO(getDataSource()).saveItems(auditItemList);
 				}
 				try {
 					con = getDataSource().getConnection();

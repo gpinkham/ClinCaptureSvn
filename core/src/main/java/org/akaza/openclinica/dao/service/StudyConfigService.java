@@ -136,7 +136,9 @@ public class StudyConfigService {
 					spc.setMarkImportedCRFAsCompleted(spv.getValue());
 				} else if (handle.equalsIgnoreCase("autoScheduleEventDuringImport")) {
 					spc.setAutoScheduleEventDuringImport(spv.getValue());
-				} else if (handle.equalsIgnoreCase("allowSdvWithOpenQueries")) {
+                } else if (handle.equalsIgnoreCase("autoCreateSubjectDuringImport")) {
+                    spc.setAutoCreateSubjectDuringImport(spv.getValue());
+                } else if (handle.equalsIgnoreCase("allowSdvWithOpenQueries")) {
                     spc.setAllowSdvWithOpenQueries(spv.getValue());
                 } else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
                     spc.setReplaceExisitingDataDuringImport(spv.getValue());
@@ -238,7 +240,9 @@ public class StudyConfigService {
 				study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("autoScheduleEventDuringImport")) {
 				study.getStudyParameterConfig().setAutoScheduleEventDuringImport(spvb.getValue());
-			} else if (parameter.equalsIgnoreCase("allowSdvWithOpenQueries")) {
+            } else if (parameter.equalsIgnoreCase("autoCreateSubjectDuringImport")) {
+                study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(spvb.getValue());
+            } else if (parameter.equalsIgnoreCase("allowSdvWithOpenQueries")) {
                 study.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
             } else if (parameter.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
                 study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
@@ -337,7 +341,9 @@ public class StudyConfigService {
 				site.getStudyParameterConfig().setMarkImportedCRFAsCompleted(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("autoScheduleEventDuringImport")) {
 				site.getStudyParameterConfig().setAutoScheduleEventDuringImport(spvb.getValue());
-			} else if (parameter.equalsIgnoreCase("allowSdvWithOpenQueries")) {
+            } else if (parameter.equalsIgnoreCase("autoCreateSubjectDuringImport")) {
+                site.getStudyParameterConfig().setAutoCreateSubjectDuringImport(spvb.getValue());
+            } else if (parameter.equalsIgnoreCase("allowSdvWithOpenQueries")) {
 				site.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
 				site.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());

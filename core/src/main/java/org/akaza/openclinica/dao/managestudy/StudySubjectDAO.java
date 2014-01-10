@@ -276,6 +276,24 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 		return studySubjects;
 	}
 
+    public Integer countByLabel(String label) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+
+        HashMap variables = new HashMap();
+        variables.put(1, label);
+        variables.put(2, label);
+        variables.put(3, label);
+
+        ArrayList alist = this.select(digester.getQuery("countByLabel"), variables);
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+            return (Integer) ((HashMap) it.next()).get("count");
+        } else {
+            return 0;
+        }
+    }
+
 	public int countAllByStudySDV(int studyId, int parentStudyId, StudySubjectSDVFilter filter) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
