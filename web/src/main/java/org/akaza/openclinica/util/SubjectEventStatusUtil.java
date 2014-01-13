@@ -319,8 +319,10 @@ public final class SubjectEventStatusUtil {
 				|| (studyEventBean.getPrevSubjectEventStatus().equals(SubjectEventStatus.SIGNED) && studyEventBean
 						.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED))) {
 			studyEventBean.setPrevSubjectEventStatus(savedCurrentSubjectEventStatus);
-			SignStateRestorer.restoreSignState(studyEventBean, savedCurrentSubjectEventStatus,
-					savedPrevSubjectEventStatus, preSignedData, postSignedData, signStateRestorer);
+			if (signStateRestorer != null) {
+				SignStateRestorer.restoreSignState(studyEventBean, savedCurrentSubjectEventStatus,
+						savedPrevSubjectEventStatus, preSignedData, postSignedData);
+			}
 		}
 	}
 

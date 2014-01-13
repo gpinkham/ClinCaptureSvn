@@ -47,7 +47,8 @@ public class SignStateRestorer {
 		return signedData;
 	}
 
-	public static void prepareSignedData(EventCRFBean eventCRFBean, EventDefinitionCRFBean eventDefinitionCrf, Map<Integer, SignedData> signedData) {
+	public static void prepareSignedData(EventCRFBean eventCRFBean, EventDefinitionCRFBean eventDefinitionCrf,
+			Map<Integer, SignedData> signedData) {
 		SignedData sd = signedData.get(eventDefinitionCrf.getId());
 		if (sd != null) {
 			EventCrfInfo eci = new EventCrfInfo();
@@ -60,25 +61,22 @@ public class SignStateRestorer {
 
 	public static void restoreSignState(StudyEventBean studyEventBean,
 			SubjectEventStatus savedCurrentSubjectEventStatus, SubjectEventStatus savedPrevSubjectEventStatus,
-			Map<Integer, SignedData> preSignedData, Map<Integer, SignedData> postSignedData,
-			SignStateRestorer signStateRestorer) {
-		if (signStateRestorer != null) {
-			if (savedCurrentSubjectEventStatus.equals(SubjectEventStatus.SIGNED)) {
-				studyEventBean.setSignedData(preSignedData);
-			} else {
-				boolean restoreSignState = false;
-				if ((studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
-						|| studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED) || studyEventBean
-						.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED))
-						&& savedPrevSubjectEventStatus.equals(SubjectEventStatus.SIGNED)
-						&& studyEventBean.getSignedData() != null && studyEventBean.getSignedData().size() > 0) {
-                    restoreSignState = SignStateRestorer.equals(studyEventBean.getSignedData(), postSignedData);
-				}
-				if (restoreSignState) {
-					studyEventBean.setSubjectEventStatus(SubjectEventStatus.SIGNED);
-				}
-				studyEventBean.getSignedData().clear();
+			Map<Integer, SignedData> preSignedData, Map<Integer, SignedData> postSignedData) {
+		if (savedCurrentSubjectEventStatus.equals(SubjectEventStatus.SIGNED)) {
+			studyEventBean.setSignedData(preSignedData);
+		} else {
+			boolean restoreSignState = false;
+			if ((studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
+					|| studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED) || studyEventBean
+					.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED))
+					&& savedPrevSubjectEventStatus.equals(SubjectEventStatus.SIGNED)
+					&& studyEventBean.getSignedData() != null && studyEventBean.getSignedData().size() > 0) {
+				restoreSignState = SignStateRestorer.equals(studyEventBean.getSignedData(), postSignedData);
 			}
+			if (restoreSignState) {
+				studyEventBean.setSubjectEventStatus(SubjectEventStatus.SIGNED);
+			}
+			studyEventBean.getSignedData().clear();
 		}
 	}
 
@@ -89,7 +87,7 @@ public class SignStateRestorer {
 		if (equals) {
 			for (Integer id : savedSignedData.keySet()) {
 				if (!equals(savedSignedData.get(id), postSignedData.get(id))) {
-                    equals = false;
+					equals = false;
 					break;
 				}
 			}
