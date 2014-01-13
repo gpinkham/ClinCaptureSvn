@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="markg" id="2013-12-30-TICKET728-1">
+		<addColumn tableName="term">
+			<column name="local_alias" type="VARCHAR(400)" />
+		</addColumn>
+	</changeSet>
+
+    <changeSet author="markg" id="2013-12-30-TICKET728-2">
+        <comment>Rename coded item column name</comment>
+        <renameColumn tableName="coded_item" oldColumnName="verbatim_term" newColumnName="preferred_term"/>
+    </changeSet>
+
+</databaseChangeLog>

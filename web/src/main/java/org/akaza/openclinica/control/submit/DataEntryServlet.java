@@ -1961,7 +1961,7 @@ public abstract class DataEntryServlet extends Controller {
 					if (codedItem != null && codedItem.getId() > 0) {
 						if (codedItem.getStatus().equals("CODED")) {
 							codedItem.setStatus("NOT_CODED");
-                            codedItem.setVerbatimTerm(displayItemBean.getData().getValue());
+                            codedItem.setPreferredTerm(displayItemBean.getData().getValue());
 							for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
 								codedItemElement.setItemCode("");
 							}

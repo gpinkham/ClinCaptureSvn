@@ -11,16 +11,13 @@ import javax.persistence.*;
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "coded_item_element_id_seq") })
 public class CodedItemElement extends AbstractMutableDomainObject {
 
-
     private CodedItem codedItem;
 
     private int itemDataId = -1;
     private String itemName = "";
     private String itemCode = "";
-
-    public CodedItemElement() {
-
-    }
+    
+    public CodedItemElement() {}
 
     public CodedItemElement(int itemDataId, String itemName) {
         this.itemDataId = itemDataId;

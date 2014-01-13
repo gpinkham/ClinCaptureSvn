@@ -2452,7 +2452,7 @@ codeItem = function(item) {
         data: {
 
             item: $(item).attr("itemid"),
-            verbatimTerm: $.trim($(item).parent().siblings("td").find("input").val()),
+            prefLabel: $.trim($(item).parent().siblings("td").find("input").val().toLowerCase()),
             dictionary: $(item).parent().siblings("td").find("div[name='termDictionary']").text()
         },
 
@@ -2505,20 +2505,21 @@ codeItem = function(item) {
 saveCodedItem = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-    var code = $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
+    var prefTerm = $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
     $.ajax({
 
         type: "POST",
         url: url + "/saveCodedItem",
         data: {
 
+            prefTerm: prefTerm,
             item: $(item).parents('div').attr("id"),
-            code: code
+            verbatimTerm: $.trim($(item).parents().siblings("td").find("div[name='itemDataValue']").text())
         },
 
         success: function(data) {
 
-            manualUpdateMedicalCodingUX(item, code);
+            manualUpdateMedicalCodingUX(item, prefTerm);
 
             console.log("Medical coding executed successfully")
         },
@@ -2589,11 +2590,11 @@ uncodeCodeItem = function(item) {
     return false;
 }
 
-function codeAndAlias(item) {
+codeAndAlias = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
     var study = new RegExp("study=(\\d+)").exec(window.location.href.toString())[1]
-    var code = $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
+    var prefTerm = $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
 
     $.ajax({
 
@@ -2601,14 +2602,16 @@ function codeAndAlias(item) {
         url: url + "/codeAndAlias",
         data: {
 
+            prefTerm: prefTerm,
             study: study,
             item: $(item).parents('div').attr("id"),
-            code: code
+            verbatimTerm: $.trim($(item).parents().siblings("td").find("div[name='itemDataValue']").text())
+
         },
 
         success: function(data) {
 
-            manualUpdateMedicalCodingUX(item, code);
+            manualUpdateMedicalCodingUX(item, prefTerm);
 
             console.log("Medical coding executed successfully")
         },
@@ -2717,13 +2720,13 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
     });
 }
 
-function manualUpdateMedicalCodingUX (item, code) {
+function manualUpdateMedicalCodingUX (item, prefTerm) {
 
     //hide coded item icon
     $("a[name='Code'][itemid=" + $(item).parents('div').attr("id") + "]").css("visibility", "hidden");
 
     //update verb term attr for dynamic m.c. UX update
-    $("a[name='deleteTerm'][itemid=" + $(item).parents('div').attr("id") + "]").attr("term", code.toLowerCase());
+    $("a[name='deleteTerm'][itemid=" + $(item).parents('div').attr("id") + "]").attr("term", prefTerm.toLowerCase());
 
     //update input field
     $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").val($.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text()));
@@ -2738,6 +2741,27 @@ function manualUpdateMedicalCodingUX (item, code) {
     //hide code icon results
     $("div[id=" + $(item).parents('div').attr("id") + "]").fadeOut( "slow" );
 
+}
+
+autoCode = function() {
+
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var study = new RegExp("study=(\\d+)").exec(window.location.href.toString())[1]
+
+    $.ajax({
+
+        type: "POST",
+        url: url + "/autoCode?study=" + study,
+
+        success: function(data) {
+
+            window.location.replace(url + "/codedItems?study=" + study);
+        },
+        error: function(e) {
+
+            console.log("Error:" + e);
+        }
+    })
 }
 
 function initCrfMoreInfo() {
@@ -2860,7 +2884,7 @@ deleteTerm = function(item) {
         data: {
 
             item: $(item).attr("itemid"),
-            code: $.trim($(item).parent().siblings("td").find("input:first").val()),
+            code: $.trim($(item).parent().siblings("td").find("input:first").val())
         },
 
         success: function(data) {

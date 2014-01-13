@@ -21,13 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import com.clinovo.coding.Search;
-import com.clinovo.coding.model.Classification;
-import com.clinovo.coding.model.ClassificationElement;
-import com.clinovo.coding.source.impl.BioPortalSearchInterface;
-import com.clinovo.model.*;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -50,7 +46,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.clinovo.coding.Search;
+import com.clinovo.coding.model.Classification;
+import com.clinovo.coding.model.ClassificationElement;
+import com.clinovo.coding.source.impl.BioPortalSearchInterface;
+import com.clinovo.model.CodedItem;
+import com.clinovo.model.CodedItemElement;
+import com.clinovo.model.CodedItemsTableFactory;
 import com.clinovo.model.Status.CodeStatus;
+import com.clinovo.model.Term;
+import com.clinovo.model.TermElement;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.TermService;
 
@@ -141,7 +146,11 @@ public class CodedItemsController {
 		model.addAttribute("codedItemsTable", codedItemsTable);
 		model.addAttribute("unCodedItems", unCodedItems.size());
 		model.addAttribute("studyId", Integer.valueOf(studyId));
-
+		
+		// After auto coding attempt
+		model.addAttribute("skippedItems", request.getAttribute("skippedItems"));
+		model.addAttribute("autoCodedItems", request.getAttribute("autoCodedItems"));
+		
 		return model;
 	}
 
@@ -157,56 +166,106 @@ public class CodedItemsController {
 	@RequestMapping("/codeItem")
 	public ModelMap codeItemHandler(HttpServletRequest request) throws Exception {
 
+		Term term = null;
 		ModelMap model = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
+		String itemId = request.getParameter("item");
         String dictionary = request.getParameter("dictionary");
-        String codedItemItemDataId = request.getParameter("item");
-        String verbatimTerm = request.getParameter("verbatimTerm");
+        String prefLabel = request.getParameter("prefLabel");
 
-        CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
-        StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "autoCodeDictionaryName");
-        Term term = null;
         List<Classification> classifications = new ArrayList<Classification>();
+        CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(itemId));
+        StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "autoCodeDictionaryName");
 
         if (configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
 
             // Ignore case - (until Marc changes his mind)
-            term = termService.findByNonUniqueTermAndExternalDictionary(verbatimTerm, codedItem.getDictionary());
+            term = termService.findByTermAndExternalDictionary(prefLabel, codedItem.getDictionary());
         }
 
-        if (term != null) {
+ 		if (term != null) {
+ 			  
+ 			Classification classification = new Classification();
+  
+ 			classification.setHttpPath(term.getHttpPath());
+ 			classification.setClassificationElement(generateClassificationElements(term.getTermElementList()));
+  
+ 			generateCodedItemElements(codedItem.getCodedItemElements(), classification.getClassificationElement());
+  
+ 			codedItem.setAutoCoded(true);
+ 			codedItem.setPreferredTerm(term.getPreferredName());
+ 			codedItem.setStatus((String.valueOf(CodeStatus.CODED)));
+  
+ 			codedItemService.saveCodedItem(codedItem);
+  
+ 			classifications.add(classification);
+  
+ 			model.addAttribute("autoCoded", true);
+  
+ 		} else {
+  
+			// Don't attempt to code the item again
+			if (!codedItem.isCoded()) {
 
-            Classification classification = new Classification();
+				search.setSearchInterface(new BioPortalSearchInterface());
+				classifications = search.getClassifications(prefLabel, dictionary);
+			}
+ 		}
 
-            classification.setHttpPath(term.getHttpPath());
-            classification.setClassificationElement(generateClassificationElements(term.getTermElementList()));
-
-            generateCodedItemElements(codedItem.getCodedItemElements(), classification.getClassificationElement());
-
-            codedItem.setStatus((String.valueOf(CodeStatus.CODED)));
-            codedItem.setAutoCoded(true);
-            codedItem.setVerbatimTerm(verbatimTerm);
-
-            codedItemService.saveCodedItem(codedItem);
-
-            classifications.add(classification);
-
-            model.addAttribute("autoCoded", true);
-
-        } else {
-
-            search.setSearchInterface(new BioPortalSearchInterface());
-            classifications = search.getClassifications(verbatimTerm, dictionary);
-        }
-
+ 		model.addAttribute("itemDictionary", dictionary);
         model.addAttribute("itemDataId", codedItem.getItemId());
-        model.addAttribute("itemDictionary", dictionary);
         model.addAttribute("codedElementList", classifications);
 
         return model;
 
     }
+	
+  	
+ 	@RequestMapping("/autoCode")
+ 	public void autoCodeItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
+ 
+ 		List<CodedItem> items = new ArrayList<CodedItem>();
+ 		ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
+ 		List<CodedItem> skippedItems = new ArrayList<CodedItem>();
+ 
+ 		List<CodedItem> uncodedItems = codedItemService.findCodedItemsByStatus(CodeStatus.NOT_CODED);
+ 
+ 		for (CodedItem item : uncodedItems) {
+ 
+ 			ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(item.getItemId());
+ 			Term term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(), item.getDictionary());
+ 
+ 			if (term != null) {
+ 
+ 				Classification classification = new Classification();
+ 
+ 				classification.setHttpPath(term.getHttpPath());
+ 				classification.setClassificationElement(generateClassificationElements(term.getTermElementList()));
+ 
+ 				generateCodedItemElements(item.getCodedItemElements(), classification.getClassificationElement());
+
+                item.setPreferredTerm(term.getPreferredName());
+ 				item.setAutoCoded(true);
+ 				item.setStatus((String.valueOf(CodeStatus.CODED)));
+ 
+ 				codedItemService.saveCodedItem(item);
+ 
+ 				items.add(item);
+ 
+ 			} else {
+ 
+ 				skippedItems.add(item);
+ 			}
+ 		}
+ 
+ 		request.setAttribute("autoCodedItems", items);
+ 		request.setAttribute("skippedItems", skippedItems);
+ 		
+ 		// Redirect to main
+ 		codedItemsHandler(request, response);
+ 
+ 	}
 	
 	/**
 	 * Handle for saving a coded item
@@ -223,16 +282,18 @@ public class CodedItemsController {
 
         ResourceBundleProvider.updateLocale(request.getLocale());
 
-        String codedItemItemDataId = request.getParameter("item");
-        String codedItemVerbatimTerm = request.getParameter("code");
-        CodedItem codedItem = codedItemService.findCodedItem(Integer.valueOf(codedItemItemDataId));
+        String itemId = request.getParameter("item");
+        String preferredName = request.getParameter("prefTerm");
+        String verbatimTerm = request.getParameter("verbatimTerm");
+        
+        CodedItem codedItem = codedItemService.findCodedItem(Integer.valueOf(itemId));
 
         codedItem.setStatus((String.valueOf(CodeStatus.IN_PROGRESS)));
-        codedItem.setVerbatimTerm(codedItemVerbatimTerm);
+        codedItem.setPreferredTerm(preferredName);
 
         codedItemService.saveCodedItem(codedItem);
 
-        createCodeItemJob(codedItemItemDataId, codedItemVerbatimTerm, false);
+        createCodeItemJob(itemId, verbatimTerm, preferredName, false);
 
         // Redirect to main
         return "codedItems";
@@ -262,10 +323,10 @@ public class CodedItemsController {
             codedItemElement.setItemCode("");
         }
 
-        if(codedItem.isAutoCoded()) {
+		if (codedItem.isAutoCoded()) {
 
-            codedItem.setAutoCoded(false);
-        }
+			codedItem.setAutoCoded(false);
+		}
 
         codedItem.setStatus(String.valueOf(CodeStatus.NOT_CODED));
 
@@ -290,27 +351,28 @@ public class CodedItemsController {
 
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
-		String code = request.getParameter("code");
-		String studyId = request.getParameter("study");
-		String codedItemItemDataId = request.getParameter("item");
-        boolean isAlias = false;
-		
-		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(Integer.parseInt(studyId), "autoCodeDictionaryName");
-		
-		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
+		boolean isAlias = false;
+ 		String item = request.getParameter("item");
+ 		String study = request.getParameter("study");
+ 		String preferredName = request.getParameter("prefTerm");
+ 		String verbatimTerm = request.getParameter("verbatimTerm");
+  		
+ 		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(Integer.parseInt(study), "autoCodeDictionaryName");
+  		
+ 		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(item));
+  
+ 		if (configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
+  
+ 			isAlias = true;
+ 		}
 
-        if(configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
-
-            isAlias = true;
-        }
-
-        if(codedItem != null) {
+        if (codedItem != null) {
 
             codedItem.setStatus((String.valueOf(CodeStatus.IN_PROGRESS)));
-            codedItem.setVerbatimTerm(code);
+            codedItem.setPreferredTerm(preferredName);
             codedItemService.saveCodedItem(codedItem);
 
-            createCodeItemJob(codedItemItemDataId, code, isAlias);
+            createCodeItemJob(item, verbatimTerm, preferredName, isAlias);
         }
 
 		return "codedItems";
@@ -348,11 +410,11 @@ public class CodedItemsController {
 		return studyParamDAO;
 	}
 
-    private void createCodeItemJob(String codedItemItemDataId, String codedItemVerbatimTerm, boolean isAlias) throws SchedulerException {
+	private void createCodeItemJob(String itemDataId, String verbatimTerm, String preferredName, boolean isAlias) throws SchedulerException {
 
         CodingTriggerService codingTriggerService = new CodingTriggerService();
-        SimpleTriggerImpl trigger = codingTriggerService.generateCodeItemService(codedItemItemDataId, codedItemVerbatimTerm, isAlias);
-        trigger.setDescription(codedItemItemDataId + " " + codedItemVerbatimTerm);
+        SimpleTriggerImpl trigger = codingTriggerService.generateCodeItemService(itemDataId, verbatimTerm, preferredName, isAlias);
+        trigger.setDescription(itemDataId + " " + verbatimTerm);
 
         JobDetailImpl jobDetailBean = new JobDetailImpl();
 

@@ -35,14 +35,14 @@ public class TermController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTermHandler(HttpServletRequest request) {
 
+    	String itemId = request.getParameter("item");
         String code = request.getParameter("code").toLowerCase().trim();
-        String itemId = request.getParameter("item");
 
         CodedItem codedItem = itemService.findCodedItem(Integer.valueOf(itemId));
 
         if(codedItem != null) {
 
-            Term term = codedItem.isCoded() ? termService.findTerm(code) : termService.findByTermAndExternalDictionary(code, codedItem.getDictionary());
+        	Term term = termService.findByTermAndExternalDictionary(code, codedItem.getDictionary());
 
             if (term != null) {
 

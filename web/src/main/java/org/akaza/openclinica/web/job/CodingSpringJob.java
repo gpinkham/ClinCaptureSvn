@@ -24,9 +24,6 @@ import java.util.List;
 
 public class CodingSpringJob extends QuartzJobBean {
 
-    public static final String CODED_ITEM = "codedItem";
-    public static final String VERB_TERM = "verbatimTerm";
-    public static final String IS_ALIAS = "isAlias";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     private CodedItemService codedItemService;
@@ -42,30 +39,30 @@ public class CodingSpringJob extends QuartzJobBean {
         JobDetailImpl jobDetail = (JobDetailImpl) context.getJobDetail();
         JobDataMap dataMap = jobDetail.getJobDataMap();
 
-        int codedItemId = Integer.valueOf(dataMap.getString(CODED_ITEM));
-        String verbatimTerm = dataMap.getString(VERB_TERM);
-        boolean isAlias = dataMap.getBooleanFromString(IS_ALIAS);
+        String verbatimTerm = dataMap.getString(CodingTriggerService.VERBATIM_TERM);
+        boolean isAlias = dataMap.getBooleanFromString(CodingTriggerService.IS_ALIAS);
+        String preferredName = dataMap.getString(CodingTriggerService.PREFERRED_NAME);
+        int codedItemId = Integer.valueOf(dataMap.getString(CodingTriggerService.CODED_ITEM_ID));
 
         try {
 
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
 
+            datasource = (DataSource) appContext.getBean("dataSource");
+            termService = (TermService) appContext.getBean("termService");
+            studyParameterValueDAO = new StudyParameterValueDAO(datasource);
             codedItemService = (CodedItemService) appContext.getBean("codedItemServiceImpl");
             dictionaryService = (DictionaryService) appContext.getBean("dictionaryService");
-            termService = (TermService) appContext.getBean("termService");
-            datasource = (DataSource) appContext.getBean("dataSource");
-
-            studyParameterValueDAO = new StudyParameterValueDAO(datasource);
 
             CodedItem codedItem = codedItemService.findCodedItem(codedItemId);
 
             search.setSearchInterface(new BioPortalSearchInterface());
 
-            List<Classification> classificationResultList = search.getClassifications(verbatimTerm, codedItem.getDictionary().replace("_", " "));
+            List<Classification> classificationResultList = search.getClassifications(preferredName, codedItem.getDictionary().replace("_", " "));
 
             if (classificationResultList.size() > 0) {
 
-                Classification classificationResult = getCurrentTermClassification(classificationResultList, verbatimTerm);
+                Classification classificationResult = getCurrentTermClassification(classificationResultList, preferredName);
 
                 //get codes for all verb terms & save it in classification
                 search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "));
@@ -81,10 +78,11 @@ public class CodingSpringJob extends QuartzJobBean {
                     Term term = new Term();
 
                     term.setDictionary(dictionary);
-                    term.setPreferredName(codedItem.getVerbatimTerm().toLowerCase());
+                    term.setLocalAlias(verbatimTerm.toLowerCase());
+                    term.setPreferredName(preferredName.toLowerCase());
+                    term.setHttpPath(classificationResult.getHttpPath());
                     term.setExternalDictionaryName(codedItem.getDictionary());
                     term.setTermElementList(generateTermElementList(classificationResult.getClassificationElement()));
-                    term.setHttpPath(classificationResult.getHttpPath());
 
                     termService.saveTerm(term);
                 }

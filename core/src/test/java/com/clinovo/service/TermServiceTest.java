@@ -86,19 +86,19 @@ public class TermServiceTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindByTermAndExternalDictionaryDoesNotReturnNull() {
 		
-		assertNotNull(termService.findByTermAndExternalDictionary("some preferred name", "icd10"));
+		assertNotNull(termService.findByAliasAndExternalDictionary("some pref", "icd10"));
 	}
 	
 	@Test
 	public void testThatFindByTermAndExternalDictionaryReturnsTermWithCorrectName() {
 		
-		assertEquals("some preferred name" ,termService.findByTermAndExternalDictionary("some preferred name", "icd10").getPreferredName());
+		assertEquals("some preferred name" ,termService.findByAliasAndExternalDictionary("some pref", "icd10").getPreferredName());
 	}
 	
 	@Test
 	public void testThatFindByTermAndExternalDictionaryReturnsTermWithCorrectExtDictionary() {
 		
-		assertEquals("icd10", termService.findByTermAndExternalDictionary("some preferred name", "icd10").getExternalDictionaryName());
+		assertEquals("icd10", termService.findByAliasAndExternalDictionary("some pref", "icd10").getExternalDictionaryName());
 	}
 
 	@Test
@@ -108,12 +108,12 @@ public class TermServiceTest extends DefaultAppContextTest {
 	
 	@Test
 	public void testThatFindByNonUniqueTermAndExternalDictionaryDoesNotReturnNullOnValidTerm() {
-		assertNotNull(termService.findByNonUniqueTermAndExternalDictionary("some Preferred name", "icd10"));
+		assertNotNull(termService.findByNonUniqueTermAndExternalDictionary("some Pref", "icd10"));
 	}
 	
 	@Test
 	public void testThatFindByNonUniqueTermAndExternalDictionaryReturnsTermEvenIfCaseDoesnotMatch() {
-		assertNotNull(termService.findByNonUniqueTermAndExternalDictionary("SOME preferred Name 2", "medDra"));
+		assertNotNull(termService.findByNonUniqueTermAndExternalDictionary("SOME pref 2", "medDra"));
 	}
 	
 	@Test

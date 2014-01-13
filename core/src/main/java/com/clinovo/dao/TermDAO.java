@@ -97,22 +97,40 @@ public class TermDAO extends AbstractDomainDao<Term> {
 	}
 
 	/**
-	 * Find a coded term given a verbatim term and an external dictionary to which it belongs.
+	 * Find a coded term given a local alias (akin to a verbatim term) and an external dictionary to which it belongs.
 	 * 
-	 * @param verbatimTerm The verbatim term matching the candidate term's preferred name
+	 * @param localAlias The local alias (verbatim term) matching the candidate term's preferred name
 	 * @param externalDictionaryName The external dictionary this term was picked from
 	 * 
 	 * @return Return Term only and only if both the verbatim term and dictionary match, null otherwise.
 	 */
-	public Term findByTermAndExternalDictionary(String verbatimTerm, String externalDictionaryName) {
+	public Term findByAliasAndExternalDictionary(String localAlias, String externalDictionaryName) {
 		
-		String query = "from " + getDomainClassName() + " t  where t.preferredName = :preferredName and externalDictionaryName = :externalDictionaryName";
+		String query = "from " + getDomainClassName() + " t  where t.localAlias = :localAlias and externalDictionaryName = :externalDictionaryName";
 		Query q = getCurrentSession().createQuery(query);
-		q.setString("preferredName", verbatimTerm);
+		q.setString("localAlias", localAlias);
 		q.setString("externalDictionaryName", externalDictionaryName);
 
 		return (Term) q.uniqueResult();
 	}
+
+    /**
+     * Find a coded term given a verbatim term and an external dictionary to which it belongs.
+     *
+     * @param prefTerm The verbatim term matching the candidate term's preferred name
+     * @param externalDictionaryName The external dictionary this term was picked from
+     *
+     * @return Return Term only and only if both the verbatim term and dictionary match, null otherwise.
+     */
+    public Term findByTermAndExternalDictionary(String prefTerm, String externalDictionaryName) {
+
+        String query = "from " + getDomainClassName() + " t  where t.preferredName = :preferredName and externalDictionaryName = :externalDictionaryName";
+        Query q = getCurrentSession().createQuery(query);
+        q.setString("preferredName", prefTerm);
+        q.setString("externalDictionaryName", externalDictionaryName);
+
+        return (Term) q.uniqueResult();
+    }
 
 	/**
 	 * Find all terms that were created using the specified external dictionary (from the specified external dictionary)

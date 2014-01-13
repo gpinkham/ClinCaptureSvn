@@ -255,7 +255,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                 
 				if (isLoggedInUserMonitor()) {
 
-                    url.append(codedItem.getVerbatimTerm())
+                    url.append(codedItem.getPreferredTerm())
                         .append(COLUMN_WIDTH_PREFIX)
                         .append("250")
                         .append(COLUMN_WIDTH_SUFFIX);
@@ -268,7 +268,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                     CODED_DIV_PREFIX = "Search: <input style=\"border:1px solid #a6a6a6;margin-bottom: 2px;background-color:#d9d9d9;color:#4D4D4D\" type=\"text\" value=\"";
                 }
 				
-                url.append(CODED_DIV_PREFIX).append(codedItem.getVerbatimTerm())
+                url.append(CODED_DIV_PREFIX).append(codedItem.getPreferredTerm())
                          .append(CODED_DIV_MIDDLE)
                          .append(codedItem.getItemId())
                          .append(CODED_DIV_SUFIX)
@@ -287,13 +287,13 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		public Object getValue(Object item, String property, int rowcount) {
 			
             String value = "";
+            String deleteTermButton = "";
+            String uncodedItemButton = "";
             CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
             EventCRFBean eventCRFBean = (EventCRFBean) eventCRFDAO.findByPK(codedItem.getEventCrfId());
             StudyBean studyBean = (StudyBean) studyDAO.findByStudySubjectId(eventCRFBean.getStudySubjectId());
             EventDefinitionCRFBean eventDefCRFBean = (EventDefinitionCRFBean) eventDefCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, eventCRFBean.getStudyEventId(), codedItem.getCrfVersionId());
             String codedItemButtonColor = codedItem.isCoded() ? "code_confirm.png" : "code_blue.png";
-            String uncodedItemButton = "";
-            String deleteTermButton = "";
 
             if (codedItem != null) {
             	
@@ -308,7 +308,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
                     AJAX_REQUEST_PREFIX = codedItem.getStatus().equals("IN_PROGRESS") ? "<a onClick=\"codeItem(this)\" style=\"visibility:hidden\" name=\"Code\" itemId=\"" : "<a onClick=\"codeItem(this)\" name=\"Code\" itemId=\"";
                     uncodedItemButton = (AJAX_UNCODE_ITEM_PREFIX) + codedItem.getItemId() + (codedItem.isCoded() ? (AJAX_UNCODE_ITEM_SUFFIX) : AJAX_UNCODE_ITEM_SUFFIX_HIDDEN);
-                    deleteTermButton = (AJAX_DELETE_TERM_PREFIX) + codedItem.getItemId() + AJAX_DELETE_TERM_MIDDLE + codedItem.getVerbatimTerm().toLowerCase() + (isDeleteable(codedItem) ? AJAX_DELETE_TERM_SUFFIX : AJAX_DELETE_TERM_SUFFIX_HIDDEN);
+                    deleteTermButton = (AJAX_DELETE_TERM_PREFIX) + codedItem.getItemId() + AJAX_DELETE_TERM_MIDDLE + codedItem.getPreferredTerm().toLowerCase() + (isDeleteable(codedItem) ? AJAX_DELETE_TERM_SUFFIX : AJAX_DELETE_TERM_SUFFIX_HIDDEN);
                 }
  				
                 url.append(AJAX_REQUEST_PREFIX)
@@ -333,18 +333,19 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         }
     }
 
-    private boolean isDeleteable(CodedItem codedItem) {
-            for (Term term : terms) {
+	private boolean isDeleteable(CodedItem codedItem) {
+			
+			for (Term term : terms) {
 
-            	if(term.getPreferredName().equalsIgnoreCase(codedItem.getVerbatimTerm()) &&
-            			term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
+				if (term.getPreferredName().equalsIgnoreCase(codedItem.getPreferredTerm())
+						&& term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
 
-            		return true;
-            	}
-            }
+					return true;
+				}
+			}
 
-            return false;
-        }
+		return false;
+	}
 
     @SuppressWarnings("unchecked")
     private class StatusCellEditor implements CellEditor {

@@ -20,8 +20,8 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	}
 
     @Test
-    public void testThatFindByIdReturnsCodedItemWithVertbatimTerm() {
-        assertEquals("some-verbatim-term-3", codedItemDAO.findById(3).getVerbatimTerm());
+    public void testThatFindByIdReturnsCodedItemWithPreferredName() {
+        assertEquals("some-pref-term-3", codedItemDAO.findById(3).getPreferredTerm());
     }
 
 	@Test
@@ -40,13 +40,13 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
 	}
 
     @Test
-    public void testThatFindyVerbatimTermDoesNotReturnNull() {
-        assertNotNull(codedItemDAO.findByVerbatimTerm("some-verbatim-term"));
+    public void testThatFindyPreferredNameDoesNotReturnNull() {
+        assertNotNull(codedItemDAO.findByPreferredTerm("some-pref-term"));
     }
 
     @Test
-    public void testThatFindByVerbatimTermReturnsCodedItemWithDictionary() {
-        assertEquals("some-dictionary-2", codedItemDAO.findByVerbatimTerm("some-verbatim-term-2").get(0).getDictionary());
+    public void testThatFindByPreferredNameReturnsCodedItemWithDictionary() {
+        assertEquals("some-dictionary-2", codedItemDAO.findByPreferredTerm("some-pref-term-2").get(0).getDictionary());
     }
 
 	@Test
@@ -80,8 +80,8 @@ public class CodedItemDAOTest extends DefaultAppContextTest {
     }
 
     @Test
-    public void testThatFindByItemIdReturnsCodedItemWithVerbatimTerm() {
-        assertEquals(codedItemDAO.findByItemId(3).getVerbatimTerm(), "some-verbatim-term-3");
+    public void testThatFindByItemIdReturnsCodedItemWithPreferredName() {
+        assertEquals(codedItemDAO.findByItemId(3).getPreferredTerm(), "some-pref-term-3");
     }
 
     @Test

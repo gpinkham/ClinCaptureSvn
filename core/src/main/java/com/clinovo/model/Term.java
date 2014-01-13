@@ -31,12 +31,13 @@ import org.hibernate.annotations.Parameter;
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "term_id_seq") })
 public class Term extends AbstractMutableDomainObject {
 
+	private String httpPath = "";
 	private Dictionary dictionary;
+	private String localAlias = "";
 	private String preferredName = "";
 	private Date dateCreated = new Date();
+	private List<TermElement> termElementList;
 	private String externalDictionaryName = "";
-    private String httpPath = "";
-    List<TermElement> termElementList;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
@@ -97,4 +98,12 @@ public class Term extends AbstractMutableDomainObject {
     public void setHttpPath(String httpPath) {
         this.httpPath = httpPath;
     }
+
+	public String getLocalAlias() {
+		return localAlias;
+	}
+
+	public void setLocalAlias(String localAlias) {
+		this.localAlias = localAlias;
+	}
 }

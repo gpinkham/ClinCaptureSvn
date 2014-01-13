@@ -43,7 +43,6 @@ public class CodedItemServiceImpl implements CodedItemService {
 	public List<CodedItem> findAll() {
 
 		return codeItemDAO.findAll();
-
 	}
 
 	public List<CodedItem> findByStudy(int studyId) {
@@ -113,7 +112,7 @@ public class CodedItemServiceImpl implements CodedItemService {
             cItem.setDictionary(meta.getCodeRef());
             cItem.setSubjectId(eventCRF.getStudySubjectId());
             cItem.setCrfVersionId(eventCRF.getCRFVersionId());
-            cItem.setVerbatimTerm(itemData.getValue());
+            cItem.setPreferredTerm(itemData.getValue());
 
             codeItemDAO.saveOrUpdate(cItem);
             return cItem;

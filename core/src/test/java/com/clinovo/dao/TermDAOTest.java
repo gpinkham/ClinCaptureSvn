@@ -38,7 +38,6 @@ public class TermDAOTest extends DefaultAppContextTest {
 
 		Term term = termDAO.findById(3);
 		assertEquals("Test Dictionary 2", term.getDictionary().getName());
-
 	}
 
 	@Test
@@ -91,22 +90,40 @@ public class TermDAOTest extends DefaultAppContextTest {
 	}
 	
 	@Test
-	public void testThatFindByTermAndExternalDictionaryDoesNotReturnNull() {
+	public void testThatFindByAliasAndExternalDictionaryDoesNotReturnNull() {
 		
-		assertNotNull(termDAO.findByTermAndExternalDictionary("some preferred name", "icd10"));
+		assertNotNull(termDAO.findByAliasAndExternalDictionary("some pref", "icd10"));
 	}
 	
 	@Test
-	public void testThatFindByTermAndExternalDictionaryReturnsTermWithCorrectName() {
+	public void testThatFindByAliasAndExternalDictionaryReturnsTermWithCorrectName() {
 		
-		assertEquals("some preferred name" ,termDAO.findByTermAndExternalDictionary("some preferred name", "icd10").getPreferredName());
+		assertEquals("some preferred name" ,termDAO.findByAliasAndExternalDictionary("some pref", "icd10").getPreferredName());
 	}
 	
 	@Test
-	public void testThatFindByTermAndExternalDictionaryReturnsTermWithCorrectExtDictionary() {
+	public void testThatFindByAliasAndExternalDictionaryReturnsTermWithCorrectExtDictionary() {
 		
-		assertEquals("icd10", termDAO.findByTermAndExternalDictionary("some preferred name", "icd10").getExternalDictionaryName());
+		assertEquals("icd10", termDAO.findByAliasAndExternalDictionary("some pref", "icd10").getExternalDictionaryName());
 	}
+
+    @Test
+    public void testThatFindByTermAndExternalDictionaryDoesNotReturnNull() {
+
+        assertNotNull(termDAO.findByTermAndExternalDictionary("some preferred name", "icd10"));
+    }
+
+    @Test
+    public void testThatFindByTermAndExternalDictionaryReturnsTermWithCorrectName() {
+
+        assertEquals("some preferred name 2" ,termDAO.findByTermAndExternalDictionary("some preferred name 2", "medDra").getPreferredName());
+    }
+
+    @Test
+    public void testThatFindByTermAndExternalDictionaryReturnsTermWithCorrectExtDictionary() {
+
+        assertEquals("icd10", termDAO.findByTermAndExternalDictionary("some preferred name", "icd10").getExternalDictionaryName());
+    }
 	
 	@Test
 	public void testThatFindByExternalDictionaryDoesNotReturnNull() {

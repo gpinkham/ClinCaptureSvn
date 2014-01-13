@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -42,9 +43,22 @@
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js"></script>
 
 <script type="text/javascript">
+
     function onInvokeAction(id) {
         createHiddenInputFieldsForLimitAndSubmit(id);
     }
+
+    var currentURL = "${requestScope['javax.servlet.forward.query_string']}"
+
+    // Conceal auto code button on completed page
+    $(document).ready(function() {
+
+    	if (/Completed$/.test(currentURL)) {
+
+    		$("input[name='autoCode']").hide();
+    	}
+    })
+
 </script>
 
 <h1>
@@ -78,7 +92,7 @@
         	<td align="center">Medical Terms</td>
         	<td align="center" name="tdToBeCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_status=To be Coded">${unCodedItems}</a></td>
             <td align="center">0</td>
-        	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_status=Completed">${codedItems}</a></td>
+        	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_status=Completed" onClick="showUncodedItems()">${codedItems}</a></td>
         </tr>
     </table> 
 </div>
@@ -90,6 +104,10 @@
 
 <div style="clear:left; float:left">
 	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
+</div>
+
+<div style="clear:right; float:left">
+	<input type="button" name="autoCode" value="<fmt:message key="autoCode" bundle="${resword}" />" class="button_medium" onClick="autoCode()"/> 
 </div>
 
 <div style="clear:left">

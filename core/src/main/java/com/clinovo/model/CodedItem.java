@@ -41,10 +41,11 @@ public class CodedItem extends AbstractMutableDomainObject {
     private int subjectId = -1;
     private int eventCrfId = -1;
     private int crfVersionId = -1;
-
+    
     private String dictionary = "";
+    private String preferredTerm = "";
+
     private Boolean autoCoded = Boolean.FALSE;
-    private String verbatimTerm = "";
     private String status = String.valueOf(CodeStatus.NOT_CODED);
 
     List<CodedItemElement> codedItemElement;
@@ -146,17 +147,19 @@ public class CodedItem extends AbstractMutableDomainObject {
     }
 
     public void addCodedItemElements(CodedItemElement cItemElement) {
+    	
         if (codedItemElement == null) {
             codedItemElement = new ArrayList<CodedItemElement>();
         }
+        
         codedItemElement.add(cItemElement);
     }
 
-    public String getVerbatimTerm() {
-        return verbatimTerm;
+    public String getPreferredTerm() {
+        return preferredTerm;
     }
 
-    public void setVerbatimTerm(String verbatimTerm) {
-        this.verbatimTerm = verbatimTerm;
+    public void setPreferredTerm(String preferredTerm) {
+        this.preferredTerm = preferredTerm;
     }
 }

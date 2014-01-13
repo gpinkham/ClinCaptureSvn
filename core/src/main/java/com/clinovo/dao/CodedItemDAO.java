@@ -53,17 +53,17 @@ public class CodedItemDAO extends AbstractDomainDao<CodedItem> {
 	}
 
     /**
-     * Retrieves coded items with similar verbatim term.
+     * Retrieves coded items with similar preferred name.
      *
-     * @param verbatimTerm The verbatim term to filter on.
+     * @param preferredTerm The preferred term to filter on.
      *
-     * @return List of coded items that have the given term as a verbatim term.
+     * @return List of coded items that have the given term as a coded term.
      */
-    public List<CodedItem> findByVerbatimTerm(String verbatimTerm) {
+    public List<CodedItem> findByPreferredTerm(String preferredTerm) {
 
-        String query = "from " + getDomainClassName() + " do  where do.verbatimTerm = :term";
+        String query = "from " + getDomainClassName() + " do  where do.preferredTerm = :term";
         Query q = getCurrentSession().createQuery(query);
-        q.setString("term", verbatimTerm);
+        q.setString("term", preferredTerm);
 
         return (List<CodedItem>) q.list();
     }

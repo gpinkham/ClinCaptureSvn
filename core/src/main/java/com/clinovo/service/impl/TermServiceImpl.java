@@ -35,21 +35,25 @@ public class TermServiceImpl implements TermService {
 		return termDAO.findByDictionary(dictionary);
 	}
 
-	public Term findByTermAndExternalDictionary(String verbatimTerm, String externalDictionaryName) {
-		return termDAO.findByTermAndExternalDictionary(verbatimTerm, externalDictionaryName);
+    public Term findByTermAndExternalDictionary(String prefTerm, String externalDictionaryName) {
+        return termDAO.findByTermAndExternalDictionary(prefTerm, externalDictionaryName);
+    }
+
+	public Term findByAliasAndExternalDictionary(String localAlias, String externalDictionaryName) {
+		return termDAO.findByAliasAndExternalDictionary(localAlias, externalDictionaryName);
 	}
 	
 	public List<Term> findByExternalDictionary(String externalDictionaryName) {
 		return termDAO.findByExternalDictionary(externalDictionaryName);
 	}
 
-	public Term findByNonUniqueTermAndExternalDictionary(String verbatimTerm, String dictionary) {
+	public Term findByNonUniqueTermAndExternalDictionary(String localAlias, String dictionary) {
 
 		List<Term> terms = termDAO.findAll();
 
 		for (Term term : terms) {
 			
-			if (term.getPreferredName().equalsIgnoreCase(verbatimTerm)
+			if (term.getLocalAlias().equalsIgnoreCase(localAlias)
 					&& term.getExternalDictionaryName().equalsIgnoreCase(dictionary)) {
 				
 				return term;
@@ -60,13 +64,13 @@ public class TermServiceImpl implements TermService {
 	}
 	
 	public Term saveTerm(Term term) throws CodeException {
-		
-		if(doesTermExist(term)) {
-			
+
+		if (doesTermExist(term)) {
+
 			throw new CodeException("Term already exists in the dictionary");
-			
+
 		}
-		
+
 		return termDAO.saveOrUpdate(term);
 	}
 
