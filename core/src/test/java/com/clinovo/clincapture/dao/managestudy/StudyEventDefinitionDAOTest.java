@@ -14,6 +14,8 @@
 package com.clinovo.clincapture.dao.managestudy;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -64,4 +66,19 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		assertEquals(3, result.size());
 	}
 
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testGetEventNamesFromStudyNotReturnNull() throws OpenClinicaException {
+		int studyId = 1;
+		List<String> result = studyEventDefinitionDAO.getEventNamesFromStudy(studyId);
+		assertNotNull(result);
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testGetEventNamesFromStudyCorrectSize() throws OpenClinicaException {
+		int studyId = 1;
+		List<String> result = studyEventDefinitionDAO.getEventNamesFromStudy(studyId);
+		assertEquals(4, result.size());
+	}
 }

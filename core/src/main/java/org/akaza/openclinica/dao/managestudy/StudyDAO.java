@@ -996,4 +996,20 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	}
 
+	public List<String> getAllStudyIdentifiersInStudy(int studyId) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.STRING);// ident
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyId));
+		variables.put(new Integer(2), new Integer(studyId));
+		ArrayList alist = this.select(digester.getQuery("getAllStudyIdentifiersInStudy"), variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			HashMap h = (HashMap) it.next();
+			al.add((String) h.get("unique_identifier"));
+		}
+		return al;
+	}
+
 }

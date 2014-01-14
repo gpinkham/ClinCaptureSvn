@@ -38,7 +38,7 @@ public class SDVToolbar extends DefaultToolbar {
 	protected void addToolbarItems() {
 		addToolbarItem(ToolbarItemType.SEPARATOR);
 		addToolbarItem(createCustomItem(new ShowMoreItem()));
-		addToolbarItem(ToolbarItemType.SEPARATOR);
+		
 		addToolbarItem(createCustomItem(new NewHiddenItem()));
 		addToolbarItem(createCustomItem(new InfoItem()));
 	}
@@ -52,18 +52,21 @@ public class SDVToolbar extends DefaultToolbar {
 		return item;
 	}
 
+	/**
+	 * Originally contained specific text about the sorting of the table.  If necessary, can be added back in under the new HtmlBuilder() line.
+	 * @author Tom
+	 *
+	 */
 	private class InfoItem extends AbstractItem {
 
 		@Override
 		public String disabled() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public String enabled() {
 			HtmlBuilder html = new HtmlBuilder();
-			html.nbsp().append(reswords.getString("table_sorted_event_date"));
 
 			return html.toString();
 		}
@@ -73,7 +76,6 @@ public class SDVToolbar extends DefaultToolbar {
 
 		@Override
 		public String disabled() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 

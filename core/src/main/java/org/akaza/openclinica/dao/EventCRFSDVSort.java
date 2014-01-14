@@ -25,6 +25,7 @@ public class EventCRFSDVSort implements CriteriaCommand {
 
 	public EventCRFSDVSort() {
 		columnMapping.put("eventDate", "ec.date_created");
+		columnMapping.put("studySubjectId", "ss.label");
 	}
 
 	public void addSort(String property, String order) {

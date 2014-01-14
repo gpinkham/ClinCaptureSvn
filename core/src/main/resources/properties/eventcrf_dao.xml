@@ -271,7 +271,7 @@
 
     <query>
         <name>getAvailableWithFilterAndSort</name>
-        <sql>select distinct ec.* from event_crf ec, study_event se, study_subject ss,study_event_definition sed,study
+        <sql>select distinct ec.*, ss.label from event_crf ec, study_event se, study_subject ss,study_event_definition sed,study
             s,
             event_definition_crf edc, crf crf,crf_version cv
             where cv.status_id = 1 AND

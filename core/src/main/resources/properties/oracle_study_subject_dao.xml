@@ -91,8 +91,7 @@
     <query>
         <name>findAllByStudySDV</name>
         <sql>
-            SELECT * from (select x.*, rownum as r from(
-            SELECT mss.* FROM study_subject mss, study mst
+            SELECT mss.*, mst.unique_identifier FROM study_subject mss, study mst
             WHERE
             mss.study_id = mst.study_id AND
             (mst.study_id=? or mst.parent_study_id=?) 

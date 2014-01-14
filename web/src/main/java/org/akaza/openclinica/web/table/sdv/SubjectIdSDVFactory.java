@@ -15,6 +15,7 @@ package org.akaza.openclinica.web.table.sdv;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -129,13 +130,21 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		sdvUtil.setTitles(allTitles, (HtmlTable) tableFacade.getTable());
 		sdvUtil.turnOffFilters(tableFacade, new String[] { "personId", "studySubjectStatus", "group",
 				"numberCRFComplete", "numberOfCRFsSDV", "totalEventCRF", "actions" });
-		sdvUtil.turnOffSorts(tableFacade, new String[] { "sdvStatus", "studySubjectId", "siteId", "personId",
+		sdvUtil.turnOffSorts(tableFacade, new String[] { "sdvStatus", "personId",
 				"studySubjectStatus", "group", "numberCRFComplete", "numberOfCRFsSDV", "totalEventCRF" });
 
 		sdvUtil.setHtmlCellEditors(tableFacade, new String[] { "sdvStatus", "actions" }, false);
 
 		HtmlColumn sdvStatus = ((HtmlRow) row).getColumn("sdvStatus");
 		sdvStatus.getFilterRenderer().setFilterEditor(new SdvStatusFilter());
+		
+		// siteId-filter
+		StudyDAO sdao = new StudyDAO(dataSource);
+		List<String> studyIds = sdao.getAllStudyIdentifiersInStudy(studyId);
+		Collections.sort(studyIds);
+		
+		HtmlColumn studyIdentifier = ((HtmlRow) row).getColumn("siteId");
+		studyIdentifier.getFilterRenderer().setFilterEditor(new SDVSimpleListFilter(studyIds));
 
 		String actionsHeader = resword.getString("rule_actions")
 				+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
@@ -149,6 +158,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		super.configureTableFacade(response, tableFacade);
 
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvStatus"), new SdvStatusMatcher());
+		tableFacade.addFilterMatcher(new MatcherKey(String.class, "siteId"), new SDVSimpleMatcher());
 
 	}
 

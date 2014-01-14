@@ -164,4 +164,10 @@
 			WHERE sed.reference_visit = 'true'
 		</sql>
 	</query>
+	<query>
+		<name>getEventNamesFromStudy</name>
+		<sql>
+			SELECT distinct name, repeating FROM study_event_definition WHERE study_id=?
+		</sql>
+	</query>
 </queries>

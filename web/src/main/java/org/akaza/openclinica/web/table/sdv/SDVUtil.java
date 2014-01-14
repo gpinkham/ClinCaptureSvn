@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -302,6 +303,12 @@ public class SDVUtil {
 				.getAttribute("showMoreLink").toString());
 		TableFacade tableFacade = createTableFacade("sdv", request);
 		tableFacade.setStateAttr("sdv_restore");
+		
+		
+		tableFacade.autoFilterAndSort(false);
+		
+		
+		
 		resformat = ResourceBundleProvider.getFormatBundle(request.getLocale());
 		this.pathPrefix = pathPrefix;
 
@@ -335,12 +342,12 @@ public class SDVUtil {
 				"sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
 				"sdvStatusActions" };
 		String[] formatColumns = new String[] { "eventDate", "enrollmentDate", "lastUpdatedDate" };
-		String[] turnOffSortsColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "personId",
-				"secondaryId", "eventName", "eventDate", "enrollmentDate", "studySubjectStatus", "crfNameVersion",
+		String[] turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId",
+				"secondaryId", "eventName", "enrollmentDate", "studySubjectStatus", "crfNameVersion",
 				"sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
 				"sdvStatusActions" };
 		String[] turnOffFiltersColumns = new String[] { "personId", "secondaryId", "enrollmentDate",
-				"studySubjectStatus", "crfNameVersion", "lastUpdatedDate", "lastUpdatedBy", "eventDate",
+				"studySubjectStatus", "lastUpdatedDate", "lastUpdatedBy", "eventDate",
 				"studyEventStatus" };
 
 		if (currentStudy != null) {
@@ -361,10 +368,10 @@ public class SDVUtil {
 						resword.getString("SDV_requirement"), resword.getString("CRF_status"),
 						resword.getString("last_updated_date"), resword.getString("last_updated_by"),
 						resword.getString("study_event_status"), resword.getString("actions") };
-				turnOffFiltersColumns = new String[] { "personId", "studySubjectStatus", "crfNameVersion",
+				turnOffFiltersColumns = new String[] { "personId", "studySubjectStatus", 
 						"lastUpdatedDate", "lastUpdatedBy", "eventDate", "studyEventStatus" };
-				turnOffSortsColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "personId",
-						"eventName", "eventDate", "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition",
+				turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId",
+						"eventName", "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition",
 						"crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus", "sdvStatusActions" };
 				formatColumns = new String[] { "eventDate", "lastUpdatedDate" };
 			} else if (currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used")) {
@@ -387,9 +394,9 @@ public class SDVUtil {
 						resword.getString("last_updated_date"), resword.getString("last_updated_by"),
 						resword.getString("study_event_status"), resword.getString("actions") };
 				turnOffFiltersColumns = new String[] { "personId", "enrollmentDate", "studySubjectStatus",
-						"crfNameVersion", "lastUpdatedDate", "lastUpdatedBy", "eventDate", "studyEventStatus" };
-				turnOffSortsColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "personId",
-						"eventName", "eventDate", "enrollmentDate", "studySubjectStatus", "crfNameVersion",
+						"lastUpdatedDate", "lastUpdatedBy", "eventDate", "studyEventStatus" };
+				turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId",
+						"eventName", "enrollmentDate", "studySubjectStatus", "crfNameVersion",
 						"sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy",
 						"studyEventStatus", "sdvStatusActions" };
 			} else if (currentStudy.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired()
@@ -412,9 +419,9 @@ public class SDVUtil {
 						resword.getString("last_updated_date"), resword.getString("last_updated_by"),
 						resword.getString("study_event_status"), resword.getString("actions") };
 				turnOffFiltersColumns = new String[] { "personId", "secondaryId", "studySubjectStatus",
-						"crfNameVersion", "lastUpdatedDate", "lastUpdatedBy", "eventDate", "studyEventStatus" };
-				turnOffSortsColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "personId",
-						"secondaryId", "eventName", "eventDate", "studySubjectStatus", "crfNameVersion",
+						"lastUpdatedDate", "lastUpdatedBy", "eventDate", "studyEventStatus" };
+				turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId",
+						"secondaryId", "eventName", "studySubjectStatus", "crfNameVersion",
 						"sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy",
 						"studyEventStatus", "sdvStatusActions" };
 				formatColumns = new String[] { "eventDate", "lastUpdatedDate" };
@@ -429,8 +436,13 @@ public class SDVUtil {
 
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvStatus"), new SdvStatusMatcher());
 
-		tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvRequirementDefinition"),
-				new SDVRequirementMatcher());
+		tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvRequirementDefinition"), new SDVRequirementMatcher());
+		
+		tableFacade.addFilterMatcher(new MatcherKey(String.class, "studyIdentifier"), new SDVSimpleMatcher());
+		
+		tableFacade.addFilterMatcher(new MatcherKey(String.class, "eventName"), new SDVEventNameMatcher());
+		
+		tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfNameVersion"), new SDVSimpleMatcher());
 
 		this.setDataAndLimitVariables(tableFacade, studyId, request);
 
@@ -449,7 +461,31 @@ public class SDVUtil {
 
 		HtmlColumn sdvRequirementDefinition = row.getColumn("sdvRequirementDefinition");
 		sdvRequirementDefinition.getFilterRenderer().setFilterEditor(new SDVRequirementFilter());
-
+		
+		StudyDAO sdao = new StudyDAO(dataSource);
+		StudyBean study = (StudyBean) sdao.findByPK(studyId);
+		int parentStudyId = study.getParentStudyId() > 0? study.getParentStudyId() : studyId;
+		
+		List<String> studyIds = sdao.getAllStudyIdentifiersInStudy(studyId);
+		Collections.sort(studyIds);
+		
+		HtmlColumn studyIdentifier = row.getColumn("studyIdentifier");
+		studyIdentifier.getFilterRenderer().setFilterEditor(new SDVSimpleListFilter(studyIds));
+		
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(dataSource);
+		List<String> eventNames = seddao.getEventNamesFromStudy(parentStudyId);
+		Collections.sort(eventNames);
+		
+		HtmlColumn eventName = row.getColumn("eventName");
+		eventName.getFilterRenderer().setFilterEditor(new SDVSimpleListFilter(eventNames));
+		
+		CRFDAO crfdao = new CRFDAO(dataSource);
+		List<String> crfNames = crfdao.getAllCRFNamesFromStudy(parentStudyId);
+		Collections.sort(crfNames);
+		
+		HtmlColumn crfNameVersion = row.getColumn("crfNameVersion");
+		crfNameVersion.getFilterRenderer().setFilterEditor(new SDVSimpleListFilter(crfNames));
+		
 		// fix HTML in columns
 		setHtmlCellEditors(tableFacade, allColumns, true);
 
@@ -510,7 +546,7 @@ public class SDVUtil {
 				"sdvStatusActions" };
 		String[] formatColumns = new String[] { "eventDate", "enrollmentDate", "lastUpdatedDate" };
 		String[] turnOffFiltersColumns = new String[] { "personId", "secondaryId", "enrollmentDate",
-				"studySubjectStatus", "crfNameVersion", "lastUpdatedDate", "lastUpdatedBy" };
+				"studySubjectStatus", "lastUpdatedDate", "lastUpdatedBy" };
 
 		if (currentStudy != null) {
 			if (currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used")
@@ -527,7 +563,7 @@ public class SDVUtil {
 						resword.getString("last_updated_date"), resword.getString("last_updated_by"),
 						resword.getString("study_event_status"),
 						resword.getString("SDV_status") + " / " + resword.getString("actions") };
-				turnOffFiltersColumns = new String[] { "personId", "studySubjectStatus", "crfNameVersion",
+				turnOffFiltersColumns = new String[] { "personId", "studySubjectStatus", 
 						"lastUpdatedDate", "lastUpdatedBy" };
 				formatColumns = new String[] { "eventDate", "lastUpdatedDate" };
 			} else if (currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used")) {
@@ -546,7 +582,7 @@ public class SDVUtil {
 						resword.getString("study_event_status"),
 						resword.getString("SDV_status") + " / " + resword.getString("actions") };
 				turnOffFiltersColumns = new String[] { "personId", "enrollmentDate", "studySubjectStatus",
-						"crfNameVersion", "lastUpdatedDate", "lastUpdatedBy" };
+						"lastUpdatedDate", "lastUpdatedBy" };
 			} else if (currentStudy.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired()
 					.equalsIgnoreCase("not_used")) {
 				allColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "personId",
@@ -563,11 +599,11 @@ public class SDVUtil {
 						resword.getString("study_event_status"),
 						resword.getString("SDV_status") + " / " + resword.getString("actions") };
 				turnOffFiltersColumns = new String[] { "personId", "secondaryId", "studySubjectStatus",
-						"crfNameVersion", "lastUpdatedDate", "lastUpdatedBy" };
+						"lastUpdatedDate", "lastUpdatedBy" };
 				formatColumns = new String[] { "eventDate", "lastUpdatedDate" };
 			}
 		}
-
+//!
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "studySubjectStatus"), new SubjectStatusMatcher());
 
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfStatus"), new CrfStatusMatcher());

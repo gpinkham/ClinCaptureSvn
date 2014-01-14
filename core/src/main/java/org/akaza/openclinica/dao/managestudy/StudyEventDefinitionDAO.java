@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 import javax.sql.DataSource;
@@ -589,5 +590,22 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		}
 		return al;
 	}
-
+	
+	public List<String> getEventNamesFromStudy(int studyId) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.STRING);
+		this.setTypeExpected(2, TypeNames.BOOL);
+		
+		HashMap variables = new HashMap();
+		variables.put(1, studyId);
+		
+		ArrayList alist = this.select(digester.getQuery("getEventNamesFromStudy"), variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			HashMap h = (HashMap) it.next();
+			al.add((String) h.get("name"));
+		}
+		return al;
+	}
 }

@@ -289,10 +289,10 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		seb.setUpdater(updater);
 		studyEventDao.update(seb);
 		
-		EventCRFBean ecb = (EventCRFBean) EventCRFDAO.findByPK(1);
+		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		Status eventCRFInitStatus = ecb.getStatus();
 		ecb.setStatus(Status.AUTO_DELETED);
-		EventCRFDAO.update(ecb);
+		eventCRFDAO.update(ecb);
 		//----------------------------------------------------
 		
 		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
@@ -307,7 +307,7 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		studyEventDao.update(seb);
 		
 		ecb.setStatus(eventCRFInitStatus);
-		EventCRFDAO.update(ecb);
+		eventCRFDAO.update(ecb);
 	}
 	
 	@Test
@@ -328,10 +328,10 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		seb.setUpdater(updater);
 		studyEventDao.update(seb);
 			
-		EventCRFBean ecb = (EventCRFBean) EventCRFDAO.findByPK(1);
+		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		Status eventCRFInitStatus = ecb.getStatus();
 		ecb.setStatus(Status.AUTO_DELETED);
-		EventCRFDAO.update(ecb);
+		eventCRFDAO.update(ecb);
 		//----------------------------------------------------
 		
 		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
@@ -348,7 +348,7 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		studyEventDao.update(seb);
 				
 		ecb.setStatus(eventCRFInitStatus);
-		EventCRFDAO.update(ecb);
+		eventCRFDAO.update(ecb);
 	}
 	
 	@Test
@@ -369,10 +369,10 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		seb.setUpdater(updater);
 		studyEventDao.update(seb);
 				
-		EventCRFBean ecb = (EventCRFBean) EventCRFDAO.findByPK(1);
+		EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(1);
 		Status eventCRFInitStatus = ecb.getStatus();
 		ecb.setStatus(Status.DELETED);
-		EventCRFDAO.update(ecb);
+		eventCRFDAO.update(ecb);
 		//----------------------------------------------------
 		
 		List<DiscrepancyNoteStatisticBean> statisticBeans = discrepancyNoteDAO.countNotesStatistic(study);
@@ -390,7 +390,7 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		studyEventDao.update(seb);
 				
 		ecb.setStatus(eventCRFInitStatus);
-		EventCRFDAO.update(ecb);
+		eventCRFDAO.update(ecb);
 	}
 
 	@Test

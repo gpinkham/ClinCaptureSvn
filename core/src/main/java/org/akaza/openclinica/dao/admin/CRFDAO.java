@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -368,4 +369,19 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 		}
 	}
 
+	public List<String> getAllCRFNamesFromStudy(int studyId) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.STRING);
+		this.setTypeExpected(2, TypeNames.STRING);
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyId));
+		ArrayList alist = this.select(digester.getQuery("getAllCRFNamesFromStudy"), variables);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			HashMap h = (HashMap) it.next();
+			al.add((String) h.get("name"));
+		}
+		return al;
+	}
 }

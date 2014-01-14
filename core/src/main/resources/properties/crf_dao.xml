@@ -141,4 +141,8 @@
       <name>getCountofCRFs</name>
       <sql>select count(crf.crf_id) from crf where crf.status_id != 5</sql>
     </query>
+	<query>
+		<name>getAllCRFNamesFromStudy</name>
+		<sql>SELECT distinct name FROM crf WHERE crf_id IN (SELECT distinct crf_id FROM event_definition_crf WHERE study_id=?)</sql>
+	</query>
 </queries>

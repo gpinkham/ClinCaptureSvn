@@ -702,7 +702,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(2, parentStudyId);
 		String sql = digester.getQuery("getAvailableWithFilterAndSort");
 		sql = sql + filter.execute("");
-		sql = sql + " order By  ec.date_created ASC "; // major hack
+		sql = sql + sort.execute("");
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
 			sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
 		} else {

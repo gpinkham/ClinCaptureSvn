@@ -60,7 +60,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 
 	protected ItemDAO idao;
 	protected CRFDAO crfdao;
-	protected EventCRFDAO EventCRFDAO;
+	protected EventCRFDAO eventCRFDAO;
 	protected StudyDAO studyDAO;
 	protected DatasetDAO datasetDAO;
 	protected ItemDataDAO itemDataDAO;
@@ -135,7 +135,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		// DAO that require data source
 		idao = new ItemDAO(dataSource);
 		crfdao = new CRFDAO(dataSource);
-		EventCRFDAO = new EventCRFDAO(dataSource);
+		eventCRFDAO = new EventCRFDAO(dataSource);
 		studyDAO = new StudyDAO(dataSource);
 		datasetDAO = new DatasetDAO(dataSource);
 		itemDataDAO = new ItemDataDAO(dataSource);
