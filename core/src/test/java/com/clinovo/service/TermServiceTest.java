@@ -123,7 +123,7 @@ public class TermServiceTest extends DefaultAppContextTest {
 	
 	@Test
 	public void testThatFindByExternalDictionaryReturnsCorrectNumberOfItems() {
-		assertEquals(1, termService.findByExternalDictionary("icd9").size());
+		assertEquals(1, termService.findByExternalDictionary("icd9cm").size());
 	}
 	
 	@Test

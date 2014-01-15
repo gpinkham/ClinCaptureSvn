@@ -190,6 +190,9 @@ public abstract class ListStudySubjectServlet extends Controller {
         
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "defaultBioontologyURL");
         currentStudy.getStudyParameterConfig().setDefaultBioontologyURL(parentSPV.getValue());
+
+        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "medicalCodingApiKey");
+        currentStudy.getStudyParameterConfig().setMedicalCodingApiKey(parentSPV.getValue());
         
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "autoCodeDictionaryName");
         currentStudy.getStudyParameterConfig().setAutoCodeDictionaryName(parentSPV.getValue());

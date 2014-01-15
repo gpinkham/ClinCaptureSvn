@@ -513,11 +513,10 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
         study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
-		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
-				fp.getString("replaceExisitingDataDuringImport"));
+		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
 		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
-		study.getStudyParameterConfig().setDefaultBioontologyURL(
-				fp.getString("defaultBioontologyURL"));
+		study.getStudyParameterConfig().setDefaultBioontologyURL(fp.getString("defaultBioontologyURL"));
+        study.getStudyParameterConfig().setMedicalCodingApiKey(fp.getString("medicalCodingApiKey"));
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
 		study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded"));
         study.getStudyParameterConfig().setMedicalCodingContextNeeded(fp.getString("medicalCodingContextNeeded"));
@@ -872,6 +871,10 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setParameter("defaultBioontologyURL");
 		spv.setValue(study1.getStudyParameterConfig().getDefaultBioontologyURL());
 		updateParameter(spvdao, spv);
+
+        spv.setParameter("medicalCodingApiKey");
+        spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApiKey());
+        updateParameter(spvdao, spv);
 
 		spv.setParameter("autoCodeDictionaryName");
 		spv.setValue(study1.getStudyParameterConfig().getAutoCodeDictionaryName());

@@ -10,6 +10,7 @@
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
+<c:set var="medicalCodingApiKey" value="${studyToView.studyParameterConfig.medicalCodingApiKey}"/>
 
 <c:choose>
 	<c:when test="${userRole.role.id > 3}">
@@ -2092,15 +2093,32 @@
 				&nbsp;
 			</td>
 		</tr>
+
 		<tr valign="top">
             <td class="formlabel">
                 <fmt:message key="defaultBioontologyURL" bundle="${resword}"/>:
             </td>
             <td>
-                <input id="bioontologyURL" name="defaultBioontologyURL" value="${bioontologyURL}"/>
+                <input onchange="javascript:changeIcon()" id="bioontologyURL" name="defaultBioontologyURL" value="${bioontologyURL}"/>
             </td>
         </tr>
-        <tr><td>&nbsp;</td></tr>
+
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+
+        <tr valign="top">
+            <td class="formlabel">
+                <fmt:message key="medicalCodingApiKey" bundle="${resword}"/>:
+            </td>
+            <td>
+                <input onchange="javascript:changeIcon()" id="medicalCodingApiKey" name="medicalCodingApiKey" value="${medicalCodingApiKey}"/>
+            </td>
+        </tr>
+
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
 
         <tr valign="top">
 		    <td class="formlabel">

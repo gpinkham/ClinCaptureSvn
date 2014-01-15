@@ -77,7 +77,7 @@
     if(dictionary == "MedDRA") {
 
         rowsToDisplay = 14;
-    } else if (dictionary == "ICD 10" || dictionary == "ICD 9") {
+    } else if (dictionary == "ICD 10" || dictionary == "ICD 9CM") {
 
         rowsToDisplay = 15;
     } else {

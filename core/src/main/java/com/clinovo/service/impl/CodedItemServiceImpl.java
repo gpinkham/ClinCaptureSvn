@@ -228,7 +228,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 
     private boolean currentDictionaryIsValid(String dictionaryName) {
         if (dictionaryName.equalsIgnoreCase("icd_10") ||
-                dictionaryName.equalsIgnoreCase("icd_9") ||
+                dictionaryName.equalsIgnoreCase("icd_9cm") ||
                 dictionaryName.equalsIgnoreCase("whodrug") ||
                 dictionaryName.equalsIgnoreCase("meddra")) {
             return true;

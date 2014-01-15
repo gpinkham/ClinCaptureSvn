@@ -887,7 +887,7 @@
           version="0"/>
 
     <term id="3" preferred_name="some preferred name 3" local_alias="some pref 3"
-          dictionary_id="2" date_created="2013-08-19" external_dictionary_name="icd9" http_path="http://path3"
+          dictionary_id="2" date_created="2013-08-19" external_dictionary_name="icd9cm" http_path="http://path3"
           version="0"/>
 
     <term_element id="1" term_id="1" element_name="element_name_1" term_name="term_name_1" term_code="term_code_1"

@@ -23,7 +23,6 @@
 <c:set var="startDate" value="" />
 <c:set var="endDate" value="" />
 <c:set var="protocolDateVerification" value="" />
-<c:set var="dictionaries">MedDRA,ICD9,ICD10</c:set>
 <c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
 
 <c:forEach var="presetValue" items="${presetValues}">

@@ -43,6 +43,8 @@ public class CodingSpringJob extends QuartzJobBean {
         boolean isAlias = dataMap.getBooleanFromString(CodingTriggerService.IS_ALIAS);
         String preferredName = dataMap.getString(CodingTriggerService.PREFERRED_NAME);
         int codedItemId = Integer.valueOf(dataMap.getString(CodingTriggerService.CODED_ITEM_ID));
+        String bioontologyUrl = dataMap.getString(CodingTriggerService.BIOONTOLOGY_URL);
+        String bioontologyApiKey = dataMap.getString(CodingTriggerService.BIOONTOLOGY_API_KEY);
 
         try {
 
@@ -58,14 +60,14 @@ public class CodingSpringJob extends QuartzJobBean {
 
             search.setSearchInterface(new BioPortalSearchInterface());
 
-            List<Classification> classificationResultList = search.getClassifications(preferredName, codedItem.getDictionary().replace("_", " "));
+            List<Classification> classificationResultList = search.getClassifications(preferredName, codedItem.getDictionary().replace("_", " "), bioontologyUrl, bioontologyApiKey);
 
             if (classificationResultList.size() > 0) {
 
                 Classification classificationResult = getCurrentTermClassification(classificationResultList, preferredName);
 
                 //get codes for all verb terms & save it in classification
-                search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "));
+                search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "), bioontologyUrl, bioontologyApiKey);
                 //replace all terms & codes from classification to coded elements
                 generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement());
 

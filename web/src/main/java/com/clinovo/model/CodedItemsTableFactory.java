@@ -211,8 +211,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
         private String selectItemDictionary(String codedItemDictionary) {
 
-            if(codedItemDictionary.equalsIgnoreCase("ICD_9")) {
-                return "ICD 9";
+            if(codedItemDictionary.equalsIgnoreCase("ICD_9CM")) {
+                return "ICD 9CM";
             } else if(codedItemDictionary.equalsIgnoreCase("ICD_10")) {
                 return "ICD 10";
             } else if (codedItemDictionary.equalsIgnoreCase("MEDDRA")) {

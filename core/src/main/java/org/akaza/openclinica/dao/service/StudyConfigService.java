@@ -152,6 +152,8 @@ public class StudyConfigService {
 					spc.setMedicalCodingApprovalNeeded(spv.getValue());
 				} else if (handle.equalsIgnoreCase("medicalCodingContextNeeded")) {
                     spc.setMedicalCodingContextNeeded(spv.getValue());
+                } else if (handle.equalsIgnoreCase("medicalCodingApiKey")) {
+                    spc.setMedicalCodingApiKey(spv.getValue());
                 }
 			}
 		}
@@ -256,6 +258,8 @@ public class StudyConfigService {
 				study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("medicalCodingContextNeeded")) {
                 study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(spvb.getValue());
+            } else if (parameter.equalsIgnoreCase("medicalCodingApiKey")) {
+                study.getStudyParameterConfig().setMedicalCodingApiKey(spvb.getValue());
             }
 		}
 		return study;

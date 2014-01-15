@@ -9,6 +9,7 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 
 <c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
+<c:set var="medicalCodingApiKey" value="${studyToView.studyParameterConfig.medicalCodingApiKey}"/>
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
@@ -659,6 +660,15 @@
     <td>
         <input name="defaultBioontologyURL" value=<c:out value="${bioontologyURL}"/> />
     </td>
+  </tr>
+
+  <tr valign="top">
+      <td class="formlabel">
+          <fmt:message key="medicalCodingApiKey" bundle="${resword}"/>
+      </td>
+      <td>
+          <input name="medicalCodingApiKey" value=<c:out value="${medicalCodingApiKey}"/> />
+      </td>
   </tr>
 
   <tr valign="top">

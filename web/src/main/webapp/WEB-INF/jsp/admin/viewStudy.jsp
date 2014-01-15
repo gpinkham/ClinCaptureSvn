@@ -10,6 +10,7 @@
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
+<c:set var="medicalCodingApiKey" value="${studyToView.studyParameterConfig.medicalCodingApiKey}"/>
 
 
 <c:choose>
@@ -739,6 +740,15 @@
       </td>
       <td class="table_cell">
           <c:out value="${bioontologyURL}"/>&nbsp;
+      </td>
+  </tr>
+
+  <tr valign="top">
+      <td class="table_header_column">
+          <fmt:message key="medicalCodingApiKey" bundle="${resword}"/>
+      </td>
+      <td class="table_cell">
+          <c:out value="${medicalCodingApiKey}"/>&nbsp;
       </td>
   </tr>
 

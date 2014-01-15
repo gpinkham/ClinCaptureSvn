@@ -100,6 +100,7 @@ public class StudyParameterConfig {
     // Medical coding parameters
     private String allowCodingVerification = "no";
     private String defaultBioontologyURL = "";
+    private String medicalCodingApiKey = "";
     private String autoCodeDictionaryName = "";
     private String medicalCodingApprovalNeeded = "no";
     private String medicalCodingContextNeeded = "no";
@@ -540,5 +541,13 @@ public class StudyParameterConfig {
 
     public void setAutoCreateSubjectDuringImport(String autoCreateSubjectDuringImport) {
         this.autoCreateSubjectDuringImport = autoCreateSubjectDuringImport;
+    }
+
+    public String getMedicalCodingApiKey() {
+        return medicalCodingApiKey;
+    }
+
+    public void setMedicalCodingApiKey(String medicalCodingApiKey) {
+        this.medicalCodingApiKey = medicalCodingApiKey;
     }
 }

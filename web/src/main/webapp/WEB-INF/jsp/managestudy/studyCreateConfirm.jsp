@@ -6,7 +6,7 @@
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
-
+<c:set var="medicalCodingApiKey" value="${studyToView.studyParameterConfig.medicalCodingApiKey}"/>
 
 <jsp:include page="../include/admin-header.jsp"/>
 
@@ -750,6 +750,15 @@
       </td>
       <td>
           <input name="defaultBioontologyURL" value=<c:out value="${bioontologyURL}"/> />
+      </td>
+  </tr>
+
+  <tr valign="top">
+      <td class="table_header_column">
+          <fmt:message key="medicalCodingApiKey" bundle="${resword}"/>
+      </td>
+      <td>
+          <input name="medicalCodingApiKey" value=<c:out value="${medicalCodingApiKey}"/> />
       </td>
   </tr>
 
