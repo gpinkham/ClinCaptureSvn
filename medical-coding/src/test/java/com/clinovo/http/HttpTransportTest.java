@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.clinovo.BaseTest;
-import com.clinovo.coding.source.impl.BioPortalSearchInterface;
 
 public class HttpTransportTest extends BaseTest {
 
