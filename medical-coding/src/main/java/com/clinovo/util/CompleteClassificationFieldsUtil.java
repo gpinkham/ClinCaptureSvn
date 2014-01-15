@@ -17,7 +17,7 @@ public class CompleteClassificationFieldsUtil {
 
         ArrayList dictionaryValuesList;
 
-        if (dictionary.equals("ICD9") || dictionary.equals("ICD10")) {
+        if (dictionary.equals("ICD9CM") || dictionary.equals("ICD10")) {
 
             dictionaryValuesList = new ArrayList<ICD910>(Arrays.asList(ICD910.values()));
 

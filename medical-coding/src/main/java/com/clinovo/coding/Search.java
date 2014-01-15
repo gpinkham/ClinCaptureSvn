@@ -10,18 +10,18 @@ public class Search {
 
 	private SearchInterface searchInterface = null;
 
-	public List<Classification> getClassifications(String term, String dictionary) throws Exception {
+	public List<Classification> getClassifications(String term, String dictionary, String bioontologyUrl, String bioontologyApiKey) throws Exception {
 
 		if (searchInterface != null)
-			return searchInterface.search(term, dictionary);
+			return searchInterface.search(term, dictionary, bioontologyUrl, bioontologyApiKey);
 
 		return new ArrayList<Classification>();
 	}
 
-    public void getClassificationWithCodes (Classification classification, String dictionary) throws Exception {
+    public void getClassificationWithCodes (Classification classification, String dictionary, String bioontologyUrl, String bioontologyApiKey) throws Exception {
 
         if (searchInterface != null)
-            searchInterface.getClassificationCodes(classification, dictionary);
+            searchInterface.getClassificationCodes(classification, dictionary, bioontologyUrl, bioontologyApiKey);
 
     }
 

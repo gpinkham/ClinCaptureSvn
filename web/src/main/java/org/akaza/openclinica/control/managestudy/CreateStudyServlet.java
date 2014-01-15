@@ -900,6 +900,10 @@ public class CreateStudyServlet extends Controller {
         spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingApiKey());
         spvdao.create(spv);
 
+        spv.setParameter("medicalCodingApiKey");
+        spv.setValue(newStudy.getStudyParameterConfig().getMedicalCodingApiKey());
+        spvdao.create(spv);
+
 		spv.setParameter("autoCodeDictionaryName");
 		spv.setValue(newStudy.getStudyParameterConfig().getAutoCodeDictionaryName());
 		spvdao.create(spv);

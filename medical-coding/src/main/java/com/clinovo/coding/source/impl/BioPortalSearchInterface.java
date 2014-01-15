@@ -22,20 +22,18 @@ public class BioPortalSearchInterface implements SearchInterface {
     private ArrayList<ClassificationElement> classificationElementsForRecurse;
     private String dictionary = "";
 
-	public static final String URL = "http://data.bioontology.org/";
-	public static final String API_KEY = "b32c11a0-04e7-4120-975e-525819283996";
     private static final String MEDDRA = "MEDDRA";
-    private static final String ICD9 = "ICD9";
+    private static final String ICD9CM = "ICD9CM";
     private static final String ICD10 = "ICD10";
 
-    public List<Classification> search(String term, String termDictionary) throws Exception {
+    public List<Classification> search(String term, String termDictionary, String bioontologyUrl, String bioontologyApiKey) throws Exception {
 
         dictionary = getDictionary(termDictionary);
 
         List<Classification> classifications = new ArrayList<Classification>();
         classificationElementsForRecurse = new ArrayList<ClassificationElement>();
 
-        String termResponseResult = getTermsResponse(term);
+        String termResponseResult = getTermsResponse(term, bioontologyUrl, bioontologyApiKey);
 
         JsonObject jobject = new JsonParser().parse(termResponseResult).getAsJsonObject();
         JsonArray jarray = jobject.getAsJsonArray("collection");
@@ -54,10 +52,10 @@ public class BioPortalSearchInterface implements SearchInterface {
                 Classification classification = new Classification();
                 classification.setHttpPath(codeHttpPath);
 
-                recursiveTreeResponseParser(getTreeResponse(treePath), verbatimPrefLabel);
+                recursiveTreeResponseParser(getTreeResponse(treePath, bioontologyApiKey), verbatimPrefLabel);
 
                 if (dictionary.equals(MEDDRA) && classificationElementsForRecurse.size() == 4 ||
-                        dictionary.equals(ICD9) && classificationElementsForRecurse.size() == 3 ||
+                        dictionary.equals(ICD9CM) && classificationElementsForRecurse.size() == 3 ||
                         dictionary.equals(ICD10) && classificationElementsForRecurse.size() == 3) {
                     CompleteClassificationFieldsUtil.completeClassificationNameFields(classificationElementsForRecurse, dictionary);
                     classification.setClassificationElement(classificationElementsForRecurse);
@@ -90,7 +88,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 
                 recursiveTreeResponseParser(jsonObject.get("children").toString(), verbatimPrefLabel);
 
-            } else if (jsonObject.get("prefLabel").getAsString().equals(verbatimPrefLabel)) {
+            } else if (jsonObject.get("prefLabel").getAsString().equalsIgnoreCase((verbatimPrefLabel))) {
 
                 clasificationElementTmp.setCodeName(verbatimPrefLabel);
                 classificationElementsForRecurse.add(clasificationElementTmp);
@@ -102,29 +100,29 @@ public class BioPortalSearchInterface implements SearchInterface {
         return;
     }
 
-    public String getTreeResponse(String treePath) throws Exception {
+    public String getTreeResponse(String treePath, String bioontologyApiKey) throws Exception {
 
         HttpMethod method = new GetMethod();
         method.setPath(treePath);
-        method.setRequestHeader(new Header("Authorization", "apikey token=" + API_KEY));
+        method.setRequestHeader(new Header("Authorization", "apikey token=" + bioontologyApiKey));
 
         transport.setMethod(method);
 
         return transport.processRequest();
     }
 
-    public String getTermsResponse(String term) throws Exception {
+    public String getTermsResponse(String term, String bioontologyUrl, String bioontologyApiKey) throws Exception {
 
         if (transport == null)
             transport = new HttpTransport();
 
-        HttpMethod method = new GetMethod(BioPortalSearchInterface.URL);
+        HttpMethod method = new GetMethod(bioontologyUrl);
 
         method.setPath("/search");
         method.setQueryString(new NameValuePair[] {
 
                 new NameValuePair("q", term), new NameValuePair("ontologies",  dictionary),
-                new NameValuePair("apikey", BioPortalSearchInterface.API_KEY)
+                new NameValuePair("apikey", bioontologyApiKey)
 
         });
 
@@ -134,7 +132,7 @@ public class BioPortalSearchInterface implements SearchInterface {
     }
 
     //used by coding job only
-    public void getClassificationCodes(Classification classification, String termDictionary) throws Exception {
+    public void getClassificationCodes(Classification classification, String termDictionary, String bioontologyUrl, String bioontologyApiKey) throws Exception {
 
         for (ClassificationElement classfifcationElement : classification.getClassificationElement()) {
             if (!classfifcationElement.getCodeName().equals("")) {
@@ -145,7 +143,7 @@ public class BioPortalSearchInterface implements SearchInterface {
                 if(dictionary == null)
                     dictionary = getDictionary(termDictionary);
 
-                HttpMethod method = new GetMethod(BioPortalSearchInterface.URL);
+                HttpMethod method = new GetMethod(bioontologyUrl);
 
                 method.setPath("/search");
                 method.setQueryString(new NameValuePair[]{
@@ -153,7 +151,7 @@ public class BioPortalSearchInterface implements SearchInterface {
                         new NameValuePair("q", classfifcationElement.getCodeName()), new NameValuePair("ontologies", dictionary),
                         new NameValuePair("include", "prefLabel,notation"),
                         new NameValuePair("exact_match", "true"),
-                        new NameValuePair("apikey", BioPortalSearchInterface.API_KEY)
+                        new NameValuePair("apikey", bioontologyApiKey)
 
                 });
 
@@ -173,8 +171,8 @@ public class BioPortalSearchInterface implements SearchInterface {
             return MEDDRA;
         } else if ("icd 10".equalsIgnoreCase(dictionary)) {
             return ICD10;
-        } else if ("icd 9".equalsIgnoreCase(dictionary)) {
-            return ICD9;
+        } else if ("icd 9cm".equalsIgnoreCase(dictionary)) {
+            return ICD9CM;
         }
 
         throw new SearchException("Unknown dictionary type specified");

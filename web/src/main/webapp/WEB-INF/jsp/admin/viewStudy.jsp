@@ -753,6 +753,15 @@
   </tr>
 
   <tr valign="top">
+      <td class="table_header_column">
+          <fmt:message key="medicalCodingApiKey" bundle="${resword}"/>
+      </td>
+      <td class="table_cell">
+          <c:out value="${medicalCodingApiKey}"/>&nbsp;
+      </td>
+  </tr>
+
+  <tr valign="top">
     <td class="table_header_column">
       <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
     </td>

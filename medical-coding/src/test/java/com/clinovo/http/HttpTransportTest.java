@@ -18,13 +18,13 @@ public class HttpTransportTest extends BaseTest {
 	@Before
 	public void setUp() {
 
-        HttpMethod method = new GetMethod(BioPortalSearchInterface.URL);
+        HttpMethod method = new GetMethod("http://1.1.1.1");
 
         method.setPath("/search");
         method.setQueryString(new NameValuePair[] {
 
                 new NameValuePair("q", "term"), new NameValuePair("ontologies",  "dictionary"),
-                new NameValuePair("apikey", BioPortalSearchInterface.API_KEY)
+                new NameValuePair("apikey", "api key")
 
         });
 

@@ -40,43 +40,43 @@ public class SearchTest {
 		
 		search.setSearchInterface(searchInterface);
 		
-		Mockito.when(searchInterface.search(Mockito.anyString(), Mockito.anyString())).thenReturn(classifications);
+		Mockito.when(searchInterface.search(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(classifications);
 	}
 	
 	@Test
 	public void testThatGetClassificationsDoesNotReturnNull() throws Exception {
 		
-		assertNotNull(search.getClassifications("some-term", "some-dictionary"));
+		assertNotNull(search.getClassifications("some-term", "some-dictionary", "http://1.1.1.1", "api key"));
 	}
 	
 	@Test
 	public void testThatGetClassificationsReturnsValidResultsWithId() throws Exception {
 		
-		assertEquals(1, search.getClassifications("term", "dictionary").size());
+		assertEquals(1, search.getClassifications("term", "dictionary", "http://1.1.1.1", "api key").size());
 	}
 
 	@Test
 	public void testThatGetClassificationsReturnsResultWithHttpPath() throws Exception {
 
-		assertEquals("http://test.ru", search.getClassifications("some-term", "some-dic").get(0).getHttpPath());
+		assertEquals("http://test.ru", search.getClassifications("some-term", "some-dic", "http://1.1.1.1", "api key").get(0).getHttpPath());
 	}
 
 
 	@Test
 	public void testThatGetClassificationsReturnsResultWithCodeName() throws Exception {
 		
-		assertEquals("some-codename", search.getClassifications("some-term", "some-dic").get(0).getClassificationElement().get(0).getCodeName());
+		assertEquals("some-codename", search.getClassifications("some-term", "some-dic", "http://1.1.1.1", "api key").get(0).getClassificationElement().get(0).getCodeName());
 	}
 
 	@Test
 	public void testThatGetClassificationsReturnsResultWithElementName() throws Exception {
 		
-		assertEquals("some-elementname", search.getClassifications("some-term", "some-dic").get(0).getClassificationElement().get(0).getElementName());
+		assertEquals("some-elementname", search.getClassifications("some-term", "some-dic", "http://1.1.1.1", "api key").get(0).getClassificationElement().get(0).getElementName());
 	}
 
     @Test
     public void testThatGetClassificationReturnsResultWithEmptyCodeValue() throws Exception {
 
-        assertEquals("", search.getClassifications("some-term", "some-dic").get(0).getClassificationElement().get(0).getCodeValue());
+        assertEquals("", search.getClassifications("some-term", "some-dic", "http://1.1.1.1", "api key").get(0).getClassificationElement().get(0).getCodeValue());
     }
 }

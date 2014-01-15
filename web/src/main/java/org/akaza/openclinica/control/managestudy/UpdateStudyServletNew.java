@@ -876,6 +876,10 @@ public class UpdateStudyServletNew extends Controller {
         spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApiKey());
         updateParameter(spvdao, spv);
 
+        spv.setParameter("medicalCodingApiKey");
+        spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApiKey());
+        updateParameter(spvdao, spv);
+
 		spv.setParameter("autoCodeDictionaryName");
 		spv.setValue(study1.getStudyParameterConfig().getAutoCodeDictionaryName());
 		updateParameter(spvdao, spv);
