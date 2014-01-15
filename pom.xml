@@ -30,6 +30,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cobertura.plugin.version>2.6</cobertura.plugin.version>
 		<cobertura.version>1.9.4.1</cobertura.version>
+        <tomcat.version>6.0.20</tomcat.version>
+        <tomcat.containerId>tomcat6x</tomcat.containerId>
+        <tomcat.servletPort>7070</tomcat.servletPort>
+        <tomcat.ajpPort>7009</tomcat.ajpPort>
 	</properties>
 	
     <modules>
@@ -583,7 +587,7 @@
                 <plugin>
                     <groupId>org.codehaus.cargo</groupId>
                     <artifactId>cargo-maven2-plugin</artifactId>
-                    <version>1.2.0</version>
+                    <version>1.2.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
