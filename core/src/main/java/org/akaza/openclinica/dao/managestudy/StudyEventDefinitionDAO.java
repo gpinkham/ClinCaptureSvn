@@ -307,6 +307,31 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 			return super.findAllByStudy(study);
 		}
 	}
+	
+	public ArrayList findAllAvailableByStudy(StudyBean study) {
+		ArrayList answer = new ArrayList();
+
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		
+		if (study.getParentStudyId() > 0) {
+			variables.put(Integer.valueOf(1), Integer.valueOf(study.getParentStudyId()));
+			variables.put(Integer.valueOf(2), Integer.valueOf(study.getParentStudyId()));
+		} else {
+			variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
+			variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+		}
+		
+		ArrayList alist = this.select(digester.getQuery("findAllAvailableByStudy"), variables);
+		
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+			answer.add(seb);
+		}
+
+		return answer;
+	}
 
 	public ArrayList findAllWithStudyEvent(StudyBean currentStudy) {
 		ArrayList answer = new ArrayList();
@@ -353,6 +378,24 @@ public class StudyEventDefinitionDAO<K, V extends ArrayList> extends AuditableEn
 		variables.put(new Integer(1), new Integer(id));
 
 		ArrayList alist = this.select(digester.getQuery("findAllOrderedByStudyGroupClassId"), variables);
+
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+			answer.add(seb);
+		}
+
+		return answer;
+	}
+	
+	public ArrayList<StudyEventDefinitionBean> findAllAvailableAndOrderedByStudyGroupClassId(int id) {
+		ArrayList<StudyEventDefinitionBean> answer = new ArrayList();
+
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(id));
+
+		ArrayList alist = this.select(digester.getQuery("findAllAvailableAndOrderedByStudyGroupClassId"), variables);
 
 		Iterator it = alist.iterator();
 		while (it.hasNext()) {

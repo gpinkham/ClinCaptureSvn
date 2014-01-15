@@ -124,7 +124,7 @@ public class RemoveStudySubjectServlet extends Controller {
 			checkRoleByUserAndStudy(request, response, ub, study.getParentStudyId(), study.getId());
 
 			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,
-					getDataSource(), ub, currentRole);
+					getDataSource(), ub, currentRole, false);
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (!studySub.getStatus().equals(Status.AVAILABLE)) {

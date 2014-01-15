@@ -64,10 +64,7 @@ public class InitUpdateSubStudyServlet extends Controller {
 
 		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
 
-		if (ub.isSysAdmin()) {
-			return;
-		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -158,7 +155,7 @@ public class InitUpdateSubStudyServlet extends Controller {
 		EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
 		CRFVersionDAO cvdao = getCRFVersionDAO();
 		CRFDAO cdao = getCRFDAO();
-		seds = sedDao.findAllByStudy(parentStudy);
+		seds = sedDao.findAllAvailableByStudy(parentStudy);
 		for (StudyEventDefinitionBean sed : seds) {
 			int defId = sed.getId();
 			ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) edcdao

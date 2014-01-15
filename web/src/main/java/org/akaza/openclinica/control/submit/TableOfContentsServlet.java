@@ -424,7 +424,7 @@ public class TableOfContentsServlet extends Controller {
 		StudySubjectDAO ssdao = getStudySubjectDAO();
 		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(objectPairs.ecb.getStudySubjectId());
 		ArrayList beans = getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub,
-				currentRole);
+				currentRole, false);
 		request.setAttribute("studySubject", ssb);
 		request.setAttribute("beans", beans);
 		request.setAttribute("eventCRF", objectPairs.ecb);

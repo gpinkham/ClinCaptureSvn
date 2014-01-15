@@ -59,7 +59,7 @@ public class StudyEventTableRowFilter extends DroplistFilterEditor {
 		log.trace("Extracting events for study: " + study.getName());
 
 		StudyEventDefinitionDAO studyEventDAO = new StudyEventDefinitionDAO(dataSource);
-		List<StudyEventDefinitionBean> studyEvents = studyEventDAO.findAllByStudy(study);
+		List<StudyEventDefinitionBean> studyEvents = studyEventDAO.findAllAvailableByStudy(study);
 
 		return studyEvents;
 	}

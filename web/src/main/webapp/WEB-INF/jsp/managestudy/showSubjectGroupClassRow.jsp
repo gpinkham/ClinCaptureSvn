@@ -1,9 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.StudyGroupClassRow" />
@@ -31,9 +33,16 @@
         </c:forEach>  
        </td>
        <td class="table_cell">
-        <c:forEach var="eventDefinition" items="${currRow.bean.eventDefinitions}">
-          <c:out value="${eventDefinition.name}"/><br>
-        </c:forEach>  
+        <c:choose>
+        	<c:when test="${fn:length(currRow.bean.eventDefinitions) eq 0}">
+        		<i><fmt:message key="all_events_in_group_removed" bundle="${restext}"/></i>
+        	</c:when>
+        	<c:otherwise>
+        		<c:forEach var="eventDefinition" items="${currRow.bean.eventDefinitions}">
+          			<c:out value="${eventDefinition.name}"/><br>
+        		</c:forEach>
+        	</c:otherwise>
+        </c:choose>  
        </td>
 		<c:choose>
 			<c:when test="${currRow.bean.status.available}">

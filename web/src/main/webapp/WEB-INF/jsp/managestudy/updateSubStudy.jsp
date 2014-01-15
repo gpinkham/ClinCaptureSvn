@@ -587,15 +587,9 @@ function updateThis(multiSelEle, count) {
 <c:set var="defCount" value="0"/>
 <c:forEach var="def" items="${definitions}">
 	<c:set var="defCount" value="${defCount+1}"/>
-	<c:choose>
-	<c:when test="${def.status.id==5 || def.status.id==7}">
-	&nbsp&nbsp&nbsp&nbsp<b><img name="ExpandGroup3" src="images/bt_Collapse.gif" border="0"> <c:out value="${def.name}"/> &nbsp;&nbsp;&nbsp;&nbsp; (<fmt:message key="this_removed" bundle="${resword}"/>)</b>
-	</c:when>
-	<c:otherwise>
 	&nbsp&nbsp&nbsp&nbsp<b><a href="javascript:leftnavExpand('sed<c:out value="${defCount}"/>');">
     <img id="excl_sed<c:out value="${defCount}"/>" src="images/bt_Expand.gif" border="0"> <c:out value="${def.name}"/></b></a>
-	</c:otherwise>
-	</c:choose>
+    
 	<div id="sed<c:out value="${defCount}"/>" style="display: none">
 
 	<!-- These DIVs define shaded box borders -->

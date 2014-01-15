@@ -117,7 +117,7 @@ public class RestoreStudySubjectServlet extends Controller {
 
 			// find study events
 			StudyEventDAO sedao = getStudyEventDAO();
-			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, getDataSource(), ub, currentRole);
+			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, getDataSource(), ub, currentRole, false);
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
 				if (studySub.getStatus().equals(Status.AVAILABLE)) {

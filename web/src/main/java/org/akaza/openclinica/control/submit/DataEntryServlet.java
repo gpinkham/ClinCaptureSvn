@@ -575,7 +575,7 @@ public abstract class DataEntryServlet extends Controller {
 			Date enrollmentDate = ssb.getEnrollmentDate();
 			age = Utils.getInstance().processAge(enrollmentDate, subject.getDateOfBirth());
 		}
-		ArrayList beans = getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub, currentRole);
+		ArrayList beans = getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub, currentRole, false);
 		request.setAttribute("studySubject", ssb);
 		request.setAttribute("subject", subject);
 		request.setAttribute("beans", beans);

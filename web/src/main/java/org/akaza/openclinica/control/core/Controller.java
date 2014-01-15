@@ -28,9 +28,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -41,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -865,14 +868,23 @@ public abstract class Controller extends BaseController {
 
 	public ArrayList<StudyGroupClassBean> getDynamicGroupClassesByStudyId(HttpServletRequest request, int studyId) {
 
+		ListIterator it;
 		StudyGroupClassDAO studyGroupClassDAO = getStudyGroupClassDAO();
 		StudyEventDefinitionDAO studyEventDefinitionDao = getStudyEventDefinitionDAO();
 		ArrayList<StudyGroupClassBean> dynamicGroupClasses = studyGroupClassDAO
 				.findAllActiveDynamicGroupsByStudyId(studyId);
 		for (StudyGroupClassBean dynGroup : dynamicGroupClasses) {
-			dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllActiveOrderedByStudyGroupClassId(dynGroup
+			dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup
 					.getId()));
 		}
+		
+		it = dynamicGroupClasses.listIterator();
+		while (it.hasNext()) {
+			if (((StudyGroupClassBean)it.next()).getEventDefinitions().size() == 0) {
+				it.remove();
+			}
+		}
+		
 		Collections.sort(dynamicGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
 
 		return dynamicGroupClasses;
@@ -1484,7 +1496,7 @@ public abstract class Controller extends BaseController {
 	}
 
 	public ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub,
-			DataSource ds, UserAccountBean ub, StudyUserRoleBean currentRole) {
+			DataSource ds, UserAccountBean ub, StudyUserRoleBean currentRole, boolean excludeEventDefinishionsRemoved) {
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDAO sedao = getStudyEventDAO();
 		EventCRFDAO ecdao = getEventCRFDAO();
@@ -1502,6 +1514,10 @@ public abstract class Controller extends BaseController {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
 					.findByPK(event.getStudyEventDefinitionId());
 			event.setStudyEventDefinition(sed);
+			
+			if (excludeEventDefinishionsRemoved && sed.getStatus().isDeleted()) {
+				continue;
+			}
 
 			// find all active crfs in the definition
 			StudyBean study = (StudyBean) sdao.findByPK(studySubject.getStudyId());

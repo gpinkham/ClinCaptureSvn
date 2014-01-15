@@ -81,6 +81,8 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.joda.time.DateTime;
 
+import java.util.ListIterator;
+
 @SuppressWarnings({ "unchecked", "rawtypes", "unused" })
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
@@ -489,10 +491,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	private ArrayList<StudyEventDefinitionBean> getStudyEventDefinitionsForFilter() {
 		if (studyEventDefinitionsFullList == null) {
 			if (studyBean.getParentStudyId() > 0) {
-				studyEventDefinitionsFullList = getStudyEventDefinitionDao().findAllByStudy(
+				studyEventDefinitionsFullList = getStudyEventDefinitionDao().findAllAvailableByStudy(
 						(StudyBean) getStudyDAO().findByPK(studyBean.getParentStudyId()));
 			} else {
-				studyEventDefinitionsFullList = getStudyEventDefinitionDao().findAllByStudy(studyBean);
+				studyEventDefinitionsFullList = getStudyEventDefinitionDao().findAllAvailableByStudy(studyBean);
 			}
 		}
 		return studyEventDefinitionsFullList;
@@ -529,6 +531,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private ArrayList<StudyGroupClassBean> getDynamicGroupClasses() {
+		ArrayList<StudyEventDefinitionBean> studyEventDefinitionsList;
+		StudyGroupClassBean sgcb;
 		// need to filter by events that are not in dynamic groups #done
 		// and yet, at the same time, add them to the beginning of the list
 		if (dynamicGroupClasses == null) {
@@ -538,10 +542,16 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			} else {
 				dynamicGroupClasses = getStudyGroupClassDAO().findAllActiveDynamicGroupsByStudyId(studyBean.getId());
 			}
-
-			for (StudyGroupClassBean dynGroup : dynamicGroupClasses) {
-				dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllActiveOrderedByStudyGroupClassId(dynGroup
-						.getId()));
+			
+			ListIterator<StudyGroupClassBean> it = dynamicGroupClasses.listIterator();
+			while (it.hasNext()) {
+				sgcb = it.next();
+				studyEventDefinitionsList = (ArrayList<StudyEventDefinitionBean>) studyEventDefinitionDao.findAllAvailableAndOrderedByStudyGroupClassId(sgcb.getId());
+				if (studyEventDefinitionsList.size() != 0) {
+					sgcb.setEventDefinitions(studyEventDefinitionsList);
+				} else {
+					it.remove();
+				}
 			}
 			Collections.sort(dynamicGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
 		}

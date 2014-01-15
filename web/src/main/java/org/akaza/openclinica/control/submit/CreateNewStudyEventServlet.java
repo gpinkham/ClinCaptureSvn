@@ -820,7 +820,7 @@ public class CreateNewStudyEventServlet extends Controller {
 		// ordered eventDefs from dynGroups
 		for (StudyGroupClassBean dynGroup : allActiveDynGroupClasses) {
 			ArrayList<StudyEventDefinitionBean> orderedEventDefinitionsFromDynGroup = seddao
-					.findAllActiveOrderedByStudyGroupClassId(dynGroup.getId());
+					.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId());
 			for (StudyEventDefinitionBean eventDefinition : orderedEventDefinitionsFromDynGroup) {
 				if (dynGroup.isDefault()
 						|| (ssb.getDynamicGroupClassId() != 0 && dynGroup.getId() == ssb.getDynamicGroupClassId())) {

@@ -53,10 +53,7 @@ public class ViewSiteServlet extends SecureController {
 	 */
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
-		if (ub.isSysAdmin()) {
-			return;
-		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 		int siteId = request.getParameter("id") == null ? 0 : Integer.valueOf(request.getParameter("id"));
@@ -118,7 +115,7 @@ public class ViewSiteServlet extends SecureController {
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 		CRFDAO cdao = new CRFDAO(sm.getDataSource());
-		seds = sedDao.findAllByStudy(siteToView);
+		seds = sedDao.findAllAvailableByStudy(siteToView);
 		for (StudyEventDefinitionBean sed : seds) {
 			int defId = sed.getId();
 			ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) edcdao

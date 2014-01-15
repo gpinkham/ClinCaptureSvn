@@ -148,7 +148,14 @@
 										(<fmt:message key="default" bundle="${resword}"/>)
 									</td>
 									<td class="table_cell">
-										<c:out value="${dynGroupClassIdToEventsNames[dynGroup.id]}"/>
+										<c:choose>
+											<c:when test="${fn:length(dynGroupClassIdToEventsNames[dynGroup.id]) eq 0}">
+												<i><fmt:message key="all_events_in_group_removed" bundle="${restext}"/></i>
+											</c:when>
+											<c:otherwise>
+												<c:out value="${dynGroupClassIdToEventsNames[dynGroup.id]}"/>
+											</c:otherwise>
+										</c:choose>
 									</td>
 								</tr>
 							</c:when>
@@ -189,7 +196,14 @@
 										<input type="hidden" name="dynamicGroup${dynGroup.id}" value="${status.count}">
 									</td>
 									<td class="table_cell">
-										<c:out value="${dynGroupClassIdToEventsNames[dynGroup.id]}"/>
+										<c:choose>
+											<c:when test="${fn:length(dynGroupClassIdToEventsNames[dynGroup.id]) eq 0}">
+												<i><fmt:message key="all_events_in_group_removed" bundle="${restext}"/></i>
+											</c:when>
+											<c:otherwise>
+												<c:out value="${dynGroupClassIdToEventsNames[dynGroup.id]}"/>
+											</c:otherwise>
+										</c:choose>
 									</td>
 								</tr>
 							</c:otherwise>

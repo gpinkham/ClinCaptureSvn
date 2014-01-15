@@ -67,6 +67,26 @@
                             repeating="false" type="scheduled" category="" owner_id="1" status_id="1"
                             date_created="2008-07-03" ordinal="4" oc_oid="SE_ED4NOTRE" reference_visit="false"
                             email_user_id="0"/>
+    <study_event_definition study_event_definition_id="5" study_id="1" name="ED-5-NotRepeating" description=""
+                            repeating="false" type="scheduled" category="" owner_id="1" status_id="5"
+                            date_created="2008-07-05" ordinal="5" oc_oid="SE_ED5NOTRE" reference_visit="false"
+                            email_user_id="0"/>
+    <study_event_definition study_event_definition_id="6" study_id="1" name="ED-6-NotRepeating" description=""
+                            repeating="false" type="scheduled" category="" owner_id="1" status_id="5"
+                            date_created="2008-07-06" ordinal="6" oc_oid="SE_ED6NOTRE" reference_visit="false"
+                            email_user_id="0"/>
+    <study_event_definition study_event_definition_id="7" study_id="1" name="ED-7-NotRepeating" description=""
+                            repeating="false" type="scheduled" category="" owner_id="1" status_id="5"
+                            date_created="2008-07-06" ordinal="7" oc_oid="SE_ED7NOTRE" reference_visit="false"
+                            email_user_id="0"/>
+    <study_event_definition study_event_definition_id="8" study_id="1" name="ED-8-NotRepeating" description=""
+                            repeating="false" type="scheduled" category="" owner_id="1" status_id="1"
+                            date_created="2008-07-06" ordinal="7" oc_oid="SE_ED8NOTRE" reference_visit="false"
+                            email_user_id="0"/>
+    <study_event_definition study_event_definition_id="9" study_id="1" name="ED-9-NotRepeating" description=""
+                            repeating="false" type="scheduled" category="" owner_id="1" status_id="1"
+                            date_created="2008-07-06" ordinal="7" oc_oid="SE_ED9NOTRE" reference_visit="false"
+                            email_user_id="0"/>
 
     <study_event study_event_id="1" study_event_definition_id="1" study_subject_id="1" location="Boston"
                  sample_ordinal="1" date_start="2008-07-11 00:00:00.0" date_end="2008-07-11 00:00:00.0" owner_id="1"
@@ -825,15 +845,30 @@
                        group_class_type_id="2" status_id="1" subject_assignment="Arm" is_default="false"
                        dynamic_ordinal="3"/>
 
-    <dynamic_event dynamic_event_id="1" study_group_class_id="2" study_event_definition_id="2" study_id="1" ordinal="2"
-                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 2"
-                   description="test dynamic event 2"/>
+    <dynamic_event dynamic_event_id="1" study_group_class_id="2" study_event_definition_id="1" study_id="1" ordinal="1"
+                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 1"
+                   description="test dynamic event 1"/>
     <dynamic_event dynamic_event_id="2" study_group_class_id="2" study_event_definition_id="2" study_id="1" ordinal="2"
                    update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 2"
                    description="test dynamic event 2"/>
-    <dynamic_event dynamic_event_id="3" study_group_class_id="2" study_event_definition_id="2" study_id="1" ordinal="2"
-                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 2"
-                   description="test dynamic event 2"/>
+    <dynamic_event dynamic_event_id="3" study_group_class_id="2" study_event_definition_id="3" study_id="1" ordinal="3"
+                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 3"
+                   description="test dynamic event 3"/>
+    <dynamic_event dynamic_event_id="4" study_group_class_id="2" study_event_definition_id="5" study_id="1" ordinal="3"
+                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 5"
+                   description="test dynamic event 5"/>
+    <dynamic_event dynamic_event_id="6" study_group_class_id="2" study_event_definition_id="6" study_id="1" ordinal="4"
+                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 6"
+                   description="test dynamic event 6"/>
+    <dynamic_event dynamic_event_id="7" study_group_class_id="1" study_event_definition_id="1" study_id="1" ordinal="1"
+                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 1"
+                   description="test dynamic event 1"/>
+    <dynamic_event dynamic_event_id="8" study_group_class_id="1" study_event_definition_id="3" study_id="1" ordinal="2"
+                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 3"
+                   description="test dynamic event 3"/>
+    <dynamic_event dynamic_event_id="9" study_group_class_id="1" study_event_definition_id="7" study_id="1" ordinal="3"
+                   update_id="1" owner_id="2" date_updated="2013-11-29" date_created="2013-11-29" name="dynamic event 7"
+                   description="test dynamic event 7"/>
 
     <dictionary id="1" name="Test Dictionary"
                 description="This is a test dictionary" type="1" date_created="2013-08-19"

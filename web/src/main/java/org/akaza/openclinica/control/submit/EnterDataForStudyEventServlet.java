@@ -216,7 +216,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 		prepareCRFVersionForLockedCRFs(fullCrfList, crfvdao, logger);
 
 		// this is for generating side info panel
-		ArrayList beans = getDisplayStudyEventsForStudySubject(studySubjectBean, getDataSource(), ub, currentRole);
+		ArrayList beans = getDisplayStudyEventsForStudySubject(studySubjectBean, getDataSource(), ub, currentRole, false);
 		request.setAttribute("beans", beans);
 		EventCRFBean ecb = new EventCRFBean();
 		ecb.setStudyEventId(eventId);

@@ -50,6 +50,17 @@
 		</sql>
 	</query>
 	<query>
+		<name>findAllAvailableByStudy</name>
+		<sql>
+			SELECT sed.*
+			FROM STUDY_EVENT_DEFINITION sed, study st
+			WHERE sed.study_id = st.study_id
+				AND (st.study_id=? or st.parent_study_id=?)
+				AND sed.status_id NOT IN (5)
+				order by sed.ordinal asc
+		</sql>
+	</query>
+	<query>
 		<name>findAllActiveByStudy</name>
 		<sql>
 			SELECT sed.*
@@ -138,6 +149,16 @@
 			FROM study_event_definition
 			INNER JOIN dynamic_event ON dynamic_event.study_event_definition_id = study_event_definition.study_event_definition_id
 			WHERE dynamic_event.study_group_class_id = ?
+			ORDER BY dynamic_event.ordinal
+		</sql>
+	</query>
+	<query>
+		<name>findAllAvailableAndOrderedByStudyGroupClassId</name>
+		<sql>
+			SELECT *
+			FROM study_event_definition
+			INNER JOIN dynamic_event ON dynamic_event.study_event_definition_id = study_event_definition.study_event_definition_id
+			WHERE dynamic_event.study_group_class_id = ? AND study_event_definition.status_id NOT IN (5)
 			ORDER BY dynamic_event.ordinal
 		</sql>
 	</query>

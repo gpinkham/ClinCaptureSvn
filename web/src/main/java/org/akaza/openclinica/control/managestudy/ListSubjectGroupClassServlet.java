@@ -111,8 +111,7 @@ public class ListSubjectGroupClassServlet extends Controller {
 		for (Object group1 : groups) {
 			StudyGroupClassBean group = (StudyGroupClassBean) group1;
 			if (group.getGroupClassTypeId() == GroupClassType.DYNAMIC.getId()) {
-				ArrayList<StudyEventDefinitionBean> orderedDefinitions = seddao.findAllOrderedByStudyGroupClassId(group
-						.getId());
+				ArrayList<StudyEventDefinitionBean> orderedDefinitions = seddao.findAllAvailableAndOrderedByStudyGroupClassId(group.getId());
 				group.setEventDefinitions(orderedDefinitions);
 				StringBuilder strOfEventsNames = new StringBuilder("");
 				if (group.getStatus().isAvailable()) {

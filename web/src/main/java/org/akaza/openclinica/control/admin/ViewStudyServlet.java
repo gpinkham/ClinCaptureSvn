@@ -105,7 +105,7 @@ public class ViewStudyServlet extends SecureController {
 						.getBean("discrepancyDescriptionService");
 				
 				// find all events in the study, include ones in sites
-				ArrayList definitions = seddao.findAllByStudy(study);
+				ArrayList definitions = seddao.findAllAvailableByStudy(study);
 				ArrayList dRFCDescriptions = (ArrayList) dDescriptionService.findAllByStudyIdAndTypeId(studyId, 
 						DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
 

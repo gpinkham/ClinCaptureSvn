@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -41,7 +42,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		ssb.setDynamicGroupClassId(1);
 		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllActiveBySubjectAndStudyId(ssb,
 				studyId);
-		assertEquals(3, result.size());
+		assertEquals(6, result.size());
 	}
 
 	@Test
@@ -52,7 +53,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		ssb.setDynamicGroupClassId(1);
 		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
-		assertEquals(3, result.size());
+		assertEquals(6, result.size());
 	}
 
 	@Test
@@ -60,10 +61,10 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	public void testFindAllActiveBySubjectFromActiveDynGroupAndStudyId_2() throws OpenClinicaException {
 		int studyId = 1;
 		StudySubjectBean ssb = new StudySubjectBean();
-		ssb.setDynamicGroupClassId(3);
+		ssb.setDynamicGroupClassId(2);
 		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
 				.findAllActiveBySubjectFromActiveDynGroupAndStudyId(ssb, studyId);
-		assertEquals(3, result.size());
+		assertEquals(8, result.size());
 	}
 
 	@Test
@@ -79,6 +80,37 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	public void testGetEventNamesFromStudyCorrectSize() throws OpenClinicaException {
 		int studyId = 1;
 		List<String> result = studyEventDefinitionDAO.getEventNamesFromStudy(studyId);
-		assertEquals(4, result.size());
+		assertEquals(9, result.size());
 	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testFindAllAvailableByStudy_excludingEventDefinitionsRemoved() throws OpenClinicaException {
+		final int studyId = 1;
+		final int expactedSize = 6;
+		StudyBean sb = new StudyBean();
+		sb.setId(studyId);
+		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO.findAllAvailableByStudy(sb);
+		assertEquals(expactedSize, result.size());
+	}
+		
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testFindAllAvailableAndOrderedByStudyGroupClassId_excludingEventDefinitionsRemoved_Test1() throws OpenClinicaException {
+		final int studyGroupClassId = 1;
+		final int expactedSize = 2;
+		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
+				.findAllAvailableAndOrderedByStudyGroupClassId(studyGroupClassId);
+		assertEquals(expactedSize, result.size());
+	}	
+		
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testFindAllAvailableAndOrderedByStudyGroupClassId_excludingEventDefinitionsRemoved_Test2() throws OpenClinicaException {
+		final int studyGroupClassId = 2;
+		final int expactedSize = 3;
+		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
+				.findAllAvailableAndOrderedByStudyGroupClassId(studyGroupClassId);
+		assertEquals(expactedSize, result.size());
+	}	
 }
