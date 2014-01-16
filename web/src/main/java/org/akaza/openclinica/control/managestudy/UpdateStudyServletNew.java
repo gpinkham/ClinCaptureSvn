@@ -514,7 +514,6 @@ public class UpdateStudyServletNew extends Controller {
         study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
-		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
 		study.getStudyParameterConfig().setDefaultBioontologyURL(fp.getString("defaultBioontologyURL"));
         study.getStudyParameterConfig().setMedicalCodingApiKey(fp.getString("medicalCodingApiKey"));
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
@@ -864,10 +863,6 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
 		updateParameter(spvdao, spv);
 
-		spv.setParameter("allowCodingVerification");
-		spv.setValue(study1.getStudyParameterConfig().getAllowCodingVerification());
-		updateParameter(spvdao, spv);
-
 		spv.setParameter("defaultBioontologyURL");
 		spv.setValue(study1.getStudyParameterConfig().getDefaultBioontologyURL());
 		updateParameter(spvdao, spv);
@@ -1030,10 +1025,6 @@ public class UpdateStudyServletNew extends Controller {
 
 			childspv.setParameter("replaceExisitingDataDuringImport");
 			childspv.setValue(study1.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("allowCodingVerification");
-			childspv.setValue(study1.getStudyParameterConfig().getAllowCodingVerification());
 			updateParameter(spvdao, childspv);
 
 			childspv.setParameter("defaultBioontologyURL");

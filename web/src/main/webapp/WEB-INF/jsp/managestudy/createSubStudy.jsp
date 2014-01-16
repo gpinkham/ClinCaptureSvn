@@ -519,18 +519,6 @@
       </tr>
    </c:when>
 
-   <c:when test="${config.parameter.handle=='allowCodingVerification'}">
-       <tr valign="top">
-           <td class="formlabel">
-            <fmt:message key="allowCodingVerification" bundle="${resword}"/>
-          </td>
-           <td>
-               <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowCodingVerification== 'yes'}">checked</c:if> name="allowCodingVerification" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-               <input type="radio" <c:if test="${newStudy.studyParameterConfig.allowCodingVerification== 'no'}">checked</c:if> name="allowCodingVerification" value="no"><fmt:message key="no" bundle="${resword}"/>
-           </td>
-       </tr>
-   </c:when>
-
 	 <c:otherwise>	  
 		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_editable" bundle="${resword}"/></td><td>
 		   <c:choose>

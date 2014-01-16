@@ -142,8 +142,6 @@ public class StudyConfigService {
                     spc.setAllowSdvWithOpenQueries(spv.getValue());
                 } else if (handle.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
                     spc.setReplaceExisitingDataDuringImport(spv.getValue());
-				} else if (handle.equalsIgnoreCase("allowCodingVerification")) {
-					spc.setAllowCodingVerification(spv.getValue());
 				} else if (handle.equalsIgnoreCase("defaultBioontologyURL")) {
 					spc.setDefaultBioontologyURL(spv.getValue());
 				} else if (handle.equalsIgnoreCase("autoCodeDictionaryName")) {
@@ -248,8 +246,6 @@ public class StudyConfigService {
                 study.getStudyParameterConfig().setAllowSdvWithOpenQueries(spvb.getValue());
             } else if (parameter.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
                 study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
-			} else if (parameter.equalsIgnoreCase("allowCodingVerification")) {
-				study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("defaultBioontologyURL")) {
 				study.getStudyParameterConfig().setDefaultBioontologyURL(spvb.getValue());
 			} else if (parameter.equalsIgnoreCase("autoCodeDictionaryName")) {

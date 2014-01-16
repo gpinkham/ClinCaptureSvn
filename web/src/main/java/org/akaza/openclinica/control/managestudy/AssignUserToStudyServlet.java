@@ -134,8 +134,8 @@ public class AssignUserToStudyServlet extends Controller {
 			table.computeDisplay();
 
 			StudyParameterValueDAO dao = new StudyParameterValueDAO(getDataSource());
-			StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(),
-					"allowCodingVerification");
+			StudyParameterValueBean medicalCodingApprovalNeeded = dao.findByHandleAndStudy(currentStudy.getId(),
+					"medicalCodingApprovalNeeded");
 
 			request.setAttribute("table", table);
 			ArrayList roles = Role.toArrayList();
@@ -144,7 +144,7 @@ public class AssignUserToStudyServlet extends Controller {
 				roles.remove(Role.STUDY_MONITOR);
 				roles.remove(Role.STUDY_CODER);
 			} else {
-				if (!allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
+				if (!medicalCodingApprovalNeeded.getValue().equalsIgnoreCase("yes")) {
 					roles.remove(Role.STUDY_CODER);
 				}
 				roles.remove(Role.INVESTIGATOR);

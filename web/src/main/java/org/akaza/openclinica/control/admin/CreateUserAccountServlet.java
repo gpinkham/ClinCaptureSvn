@@ -109,11 +109,11 @@ public class CreateUserAccountServlet extends Controller {
 		}
 
 		StudyParameterValueDAO dao = new StudyParameterValueDAO(getDataSource());
-		StudyParameterValueBean allowCodingVerification = dao.findByHandleAndStudy(currentStudy.getId(),
-				"allowCodingVerification");
+		StudyParameterValueBean medicalCodingApprovalNeeded = dao.findByHandleAndStudy(currentStudy.getId(),
+				"medicalCodingApprovalNeeded");
 
 		Map roleMap;
-		if (allowCodingVerification.getValue().equalsIgnoreCase("yes")) {
+		if (medicalCodingApprovalNeeded.getValue().equalsIgnoreCase("yes")) {
 			roleMap = Role.roleMapWithDescriptions;
 		} else {
 			Role.roleMapWithDescriptions.remove(7);
