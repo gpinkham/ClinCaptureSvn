@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
@@ -38,6 +39,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.jmesa.facade.TableFacade;
@@ -416,10 +418,17 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     	
         protected List<Option> getOptions() {
         	
+        	StudyParameterValueBean mcApprovalNeeded = new StudyParameterValueDAO(datasource).findByHandleAndStudy(studyId, "medicalCodingApprovalNeeded");
+        	
             List<Option> options = new ArrayList<Option>();
             options.add(new Option("To be Coded", "To be Coded"));
-            options.add(new Option(" To be Approved", " To be Approved"));
+            
+			if (mcApprovalNeeded.getValue().equals("yes")) {
+				options.add(new Option(" To be Approved", " To be Approved"));
+			}
+            
             options.add(new Option("Completed", "Completed"));
+            
             return options;
         }
     }

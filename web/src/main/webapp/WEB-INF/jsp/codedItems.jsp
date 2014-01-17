@@ -85,13 +85,18 @@
         <tr>
         	<td>&nbsp;</td>
         	<td align="center">To be Coded</td>
-        	<td align="center">To be Approved</td>
+
+        	<c:if test="${mcApprovalNeeded}">
+        		<td align="center">To be Approved</td>
+        	</c:if>
         	<td align="center">Completed</td>
         </tr>
         <tr>
         	<td align="center">Medical Terms</td>
         	<td align="center" name="tdToBeCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_status=To be Coded">${unCodedItems}</a></td>
-            <td align="center">0</td>
+        	<c:if test="${mcApprovalNeeded}">
+            	<td align="center">0</td>
+            </c:if>
         	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_status=Completed" onClick="showUncodedItems()">${codedItems}</a></td>
         </tr>
     </table> 

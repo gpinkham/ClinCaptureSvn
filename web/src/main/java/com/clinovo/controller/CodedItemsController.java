@@ -107,6 +107,7 @@ public class CodedItemsController {
         showMoreLink = showMoreLink == null ? "false" : showMoreLink;
 
 		StudyBean study = (StudyBean) getStudyDAO().findByPK(Integer.parseInt(studyId));
+		StudyParameterValueBean mcApprovalNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApprovalNeeded");
         StudyParameterValueBean medicalCodingContextNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingContextNeeded");
 
 		List<CodedItem> items = new ArrayList<CodedItem>();
@@ -146,6 +147,7 @@ public class CodedItemsController {
 		model.addAttribute("codedItemsTable", codedItemsTable);
 		model.addAttribute("unCodedItems", unCodedItems.size());
 		model.addAttribute("studyId", Integer.valueOf(studyId));
+		model.addAttribute("mcApprovalNeeded", mcApprovalNeeded.getValue().equals("yes"));
 		
 		// After auto coding attempt
 		model.addAttribute("skippedItems", request.getAttribute("skippedItems"));
