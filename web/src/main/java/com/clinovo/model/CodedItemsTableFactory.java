@@ -125,7 +125,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("subjectName"), "Study Subject ID", new SubjectCellEditor(), null, true, true);
         configureColumn(row.getColumn("eventName"), "Study Event", new EventCellEditor(), null, true, true);
         configureColumn(row.getColumn("crfName"), "CRF", new CrfCellEditor(), null, true, true);
-        configureColumn(row.getColumn("codedColumn"), "Coded", new CodedCellEditor(), null, false, false);
+        configureColumn(row.getColumn("codedColumn"), "Medical Codes", new CodedCellEditor(), null, false, false);
         configureColumn(row.getColumn("actionColumn"), "Actions", new ActionCellEditor(), new DefaultActionsEditor(
                 locale), true, false);
     }
