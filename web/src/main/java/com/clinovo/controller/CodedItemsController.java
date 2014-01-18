@@ -152,7 +152,18 @@ public class CodedItemsController {
 		// After auto coding attempt
 		model.addAttribute("skippedItems", request.getAttribute("skippedItems"));
 		model.addAttribute("autoCodedItems", request.getAttribute("autoCodedItems"));
-		
+
+        String httpPath = (String) request.getSession().getAttribute("codedItemUrl");
+        String queryString = request.getQueryString();
+
+        if (queryString.startsWith("study") && httpPath != null && !httpPath.startsWith("study")) {
+
+            response.sendRedirect("codedItems?" + httpPath);
+        } else {
+
+            request.getSession().setAttribute("codedItemUrl", queryString);
+        }
+
 		return model;
 	}
 
