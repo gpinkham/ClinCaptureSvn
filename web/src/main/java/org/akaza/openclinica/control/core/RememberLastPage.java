@@ -33,7 +33,7 @@ public abstract class RememberLastPage extends Controller {
 		if (url != null) {
 			result = true;
 			storeAttributes(request);
-			// for navigation purpose (to brake double url in stack)
+			// for navigation purpose (to prevent double url in back-button stack)
 			request.getSession().setAttribute("skipURL", "true");
 			response.sendRedirect(response.encodeRedirectURL(url));
 		}

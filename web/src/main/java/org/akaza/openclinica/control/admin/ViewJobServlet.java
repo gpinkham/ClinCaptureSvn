@@ -15,9 +15,10 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -32,11 +33,15 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * purpose: to generate the list of jobs and allow us to view them
@@ -44,38 +49,40 @@ import java.util.Set;
  * @author thickerson
  */
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
-public class ViewJobServlet extends SecureController {
+@Component
+public class ViewJobServlet extends RememberLastPage {
 
 	private static String SCHEDULER = "schedulerFactoryBean";
-	private StdScheduler scheduler;
+	public static final String SAVED_VIEW_EXPORT_JOB_URL = "savedViewExportJobUrl";
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request); 
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
 		}
 
+
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 	}
 
-	private StdScheduler getScheduler() {
-		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
-				context).getBean(SCHEDULER);
-		return scheduler;
-	}
+    private StdScheduler getScheduler(HttpServletRequest request) { 
+    	StdScheduler scheduler = (StdScheduler) SpringServletAccess.getApplicationContext(getServletContext()).getBean(SCHEDULER);   
+	                return scheduler; 
+    } 
 
 	@Override
-	protected void processRequest() throws Exception {
-		// TODO single stage servlet where we get the list of jobs
-		// and push them out to the JSP page
-		// related classes will be required to generate the table rows
-		// and eventually links to view and edit the jobs as well
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if (shouldRedirect(request, response)) {
+			return;
+		}
+		
 		FormProcessor fp = new FormProcessor(request);
 		// First we must get a reference to a scheduler
-		scheduler = getScheduler();
+		StdScheduler scheduler = getScheduler(request);
 		Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher
 				.triggerGroupEquals(XsltTriggerService.TRIGGER_GROUP_NAME));
 
@@ -88,6 +95,7 @@ public class ViewJobServlet extends SecureController {
 				logger.debug("final fire time: " + trigger.getFinalFireTime().toString());
 			} catch (NullPointerException npe) {
 				// could be nulls in the dates, etc
+				logger.warn("threw NPE with getting properties from trigger");
 			}
 
 			TriggerBean triggerBean = new TriggerBean();
@@ -99,8 +107,8 @@ public class ViewJobServlet extends SecureController {
 			}
 			// setting: frequency, dataset name
 			JobDataMap dataMap = new JobDataMap();
-			DatasetDAO datasetDAO = new DatasetDAO(sm.getDataSource());
-			StudyDAO studyDao = new StudyDAO(sm.getDataSource());
+			DatasetDAO datasetDAO = getDatasetDAO();
+			StudyDAO studyDao = getStudyDAO();
 
 			if (trigger.getJobDataMap().size() > 0) {
 				dataMap = trigger.getJobDataMap();
@@ -141,8 +149,32 @@ public class ViewJobServlet extends SecureController {
 
 		request.setAttribute("table", table);
 
-		forwardPage(Page.VIEW_JOB);
+		forwardPage(Page.VIEW_JOB, request, response);
 
+	}
+	
+	@Override
+	protected String getUrlKey(HttpServletRequest request) {
+		return SAVED_VIEW_EXPORT_JOB_URL;
+	}
+
+	@Override
+	protected String getDefaultUrl(HttpServletRequest request) {
+		FormProcessor fp = new FormProcessor(request);
+		String eblFiltered = fp.getString("ebl_filtered");
+		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
+		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
+		String eblSortAscending = fp.getString("ebl_sortAscending");
+		return "?submitted=1&ebl_page=1&ebl_sortColumnInd=" + (!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0")
+				+ "&ebl_sortAscending=" + (!eblSortAscending.isEmpty() ? eblSortAscending : "1") + "&ebl_filtered="
+				+ (!eblFiltered.isEmpty() ? eblFiltered : "0") + "&ebl_filterKeyword="
+				+ (!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "") + "&ebl_paginated=1";
+	}
+
+	@Override
+	protected boolean userDoesNotUseJmesaTableForNavigation(
+			HttpServletRequest request) {
+		return request.getQueryString() == null || (request.getQueryString().contains("tname") && request.getQueryString().contains("gname"));
 	}
 
 }

@@ -295,10 +295,10 @@
     </servlet>
 
     <servlet>
-        <servlet-name>ViewJobServlet</servlet-name>
+        <servlet-name>viewJobServlet</servlet-name>
         <display-name>ViewJobServlet</display-name>
         <description>ViewJobServlet</description>
-        <servlet-class>org.akaza.openclinica.control.admin.ViewJobServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewAllJobsServlet</servlet-name>
@@ -307,10 +307,10 @@
         <servlet-class>org.akaza.openclinica.control.admin.ViewAllJobsServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewImportJobServlet</servlet-name>
+        <servlet-name>viewImportJobServlet</servlet-name>
         <display-name>ViewImportJobServlet</display-name>
         <description>ViewImportJobServlet</description>
-        <servlet-class>org.akaza.openclinica.control.admin.ViewImportJobServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewSingleJobServlet</servlet-name>
@@ -337,17 +337,17 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UpdateJobExportServlet</servlet-name>
+        <servlet-name>updateJobExportServlet</servlet-name>
         <display-name>UpdateJobExportServlet</display-name>
         <description>UpdateJobExportServlet</description>
-        <servlet-class>org.akaza.openclinica.control.admin.UpdateJobExportServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
-        <servlet-name>UpdateJobImportServlet</servlet-name>
+        <servlet-name>updateJobImportServlet</servlet-name>
         <display-name>UpdateJobImportServlet</display-name>
         <description>UpdateJobImportServlet</description>
-        <servlet-class>org.akaza.openclinica.control.admin.UpdateJobImportServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -1318,7 +1318,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>ViewJobServlet</servlet-name>
+        <servlet-name>viewJobServlet</servlet-name>
         <url-pattern>/ViewJob</url-pattern>
     </servlet-mapping>
 
@@ -1328,7 +1328,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>ViewImportJobServlet</servlet-name>
+        <servlet-name>viewImportJobServlet</servlet-name>
         <url-pattern>/ViewImportJob</url-pattern>
     </servlet-mapping>
 
@@ -1353,12 +1353,12 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>UpdateJobExportServlet</servlet-name>
+        <servlet-name>updateJobExportServlet</servlet-name>
         <url-pattern>/UpdateJobExport</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>UpdateJobImportServlet</servlet-name>
+        <servlet-name>updateJobImportServlet</servlet-name>
         <url-pattern>/UpdateJobImport</url-pattern>
     </servlet-mapping>
 
