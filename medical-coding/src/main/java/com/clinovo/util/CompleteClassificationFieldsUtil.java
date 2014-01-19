@@ -40,5 +40,13 @@ public class CompleteClassificationFieldsUtil {
                 classificationElements.get(i).setElementName(dictionaryValuesList.get(i).toString());
             }
         }
+        
+        // Copy over PT to LTT
+        if (dictionary.equals("MEDDRA")) {
+        	
+        	if (classificationElements.get(4).getCodeName().isEmpty()) {
+        		classificationElements.get(4).setCodeName(classificationElements.get(3).getCodeName());
+        	}
+        }
     }
 }

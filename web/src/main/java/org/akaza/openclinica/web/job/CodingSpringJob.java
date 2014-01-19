@@ -42,9 +42,9 @@ public class CodingSpringJob extends QuartzJobBean {
         String verbatimTerm = dataMap.getString(CodingTriggerService.VERBATIM_TERM);
         boolean isAlias = dataMap.getBooleanFromString(CodingTriggerService.IS_ALIAS);
         String preferredName = dataMap.getString(CodingTriggerService.PREFERRED_NAME);
-        int codedItemId = Integer.valueOf(dataMap.getString(CodingTriggerService.CODED_ITEM_ID));
         String bioontologyUrl = dataMap.getString(CodingTriggerService.BIOONTOLOGY_URL);
         String bioontologyApiKey = dataMap.getString(CodingTriggerService.BIOONTOLOGY_API_KEY);
+        int codedItemId = Integer.valueOf(dataMap.getString(CodingTriggerService.CODED_ITEM_ID));
 
         try {
 
@@ -53,8 +53,8 @@ public class CodingSpringJob extends QuartzJobBean {
             datasource = (DataSource) appContext.getBean("dataSource");
             termService = (TermService) appContext.getBean("termService");
             studyParameterValueDAO = new StudyParameterValueDAO(datasource);
-            codedItemService = (CodedItemService) appContext.getBean("codedItemServiceImpl");
             dictionaryService = (DictionaryService) appContext.getBean("dictionaryService");
+            codedItemService = (CodedItemService) appContext.getBean("codedItemServiceImpl");
 
             CodedItem codedItem = codedItemService.findCodedItem(codedItemId);
 
@@ -128,22 +128,63 @@ public class CodingSpringJob extends QuartzJobBean {
         return termElementList;
     }
 
-    private void generateCodedItemFields(List<CodedItemElement> codedItemElements, List<ClassificationElement> classificationElements) {
-        for (CodedItemElement codedItemElement : codedItemElements) {
+	private void generateCodedItemFields(List<CodedItemElement> codedItemElements,
+			List<ClassificationElement> classificationElements) {
 
-            for (ClassificationElement classificationElement : classificationElements) {
-                //code items with values
-                if (StringUtils.substringAfter(codedItemElement.getItemName(), "_").equals(classificationElement.getElementName())) {
+		String ptCode = "";
+		String ptcCode = "";
 
-                    codedItemElement.setItemCode(classificationElement.getCodeName());
-                    break;
-                //code items with code
-                } else if (StringUtils.substringAfter(codedItemElement.getItemName(), "_").equals(classificationElement.getElementName() + "C")) {
+		for (CodedItemElement codedItemElement : codedItemElements) {
 
-                    codedItemElement.setItemCode(classificationElement.getCodeValue());
-                    break;
-                }
-            }
-        }
+			for (ClassificationElement classificationElement : classificationElements) {
+
+				// code items with values
+				String name = StringUtils.substringAfter(codedItemElement.getItemName(), "_");
+
+				if (name.equals(classificationElement.getElementName())) {
+
+					if (name.equalsIgnoreCase("pt")) {
+						ptCode = classificationElement.getCodeName();
+					}
+
+					codedItemElement.setItemCode(classificationElement.getCodeName());
+					break;
+					// code items with code
+				} else if (name.equals(classificationElement.getElementName() + "C")) {
+
+					if (name.equalsIgnoreCase("ptc")) {
+						ptcCode = classificationElement.getCodeValue();
+					}
+
+					codedItemElement.setItemCode(classificationElement.getCodeValue());
+					break;
+				}
+
+			}
+		}
+
+		// Copy over the PT to LLT
+		CodedItemElement lltElement = getClassificationElement("llt", codedItemElements);
+		lltElement.setItemCode(ptCode);
+
+		// Copy over the PTC to LLTC
+		CodedItemElement lltcElement = getClassificationElement("lltc", codedItemElements);
+		lltcElement.setItemCode(ptcCode);
+
+	}
+    
+    private CodedItemElement getClassificationElement(String name, List<CodedItemElement> codedItemElements) {
+    	
+    	CodedItemElement element = null;
+    	for (CodedItemElement codedItemElement : codedItemElements) {
+    		
+    		if (StringUtils.substringAfter(codedItemElement.getItemName(), "_").equalsIgnoreCase(name)) {
+    			
+    			element = codedItemElement;
+    			break;
+    		}
+    	}
+    	
+		return element;
     }
 }

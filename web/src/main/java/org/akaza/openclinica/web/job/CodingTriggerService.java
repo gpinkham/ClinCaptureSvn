@@ -34,13 +34,13 @@ public class CodingTriggerService {
 
         SimpleTriggerImpl sTrigger = new SimpleTriggerImpl();
         
-        sTrigger.setName("coding_item_" + codedItemId + " verbatiumTerm_" + preferredName + " " + System.currentTimeMillis());
+        sTrigger.setName("coding_item_" + codedItemId + " verbatimTerm_" + preferredName + " " + System.currentTimeMillis());
         sTrigger.setGroup("CODING");
         sTrigger.setRepeatCount(0);
         sTrigger.setRepeatInterval(1);
         sTrigger.setStartTime(new Date());
-        sTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
         sTrigger.setJobDataMap(codeJobDataMap);
+        sTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
         
         return sTrigger;
     }
