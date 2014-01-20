@@ -413,7 +413,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 	}
 
 	private int getColumnNamesMap(TableFacade tableFacade) {
-		int startFrom = 5;
+		int startFrom = 4;
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
 
 		ArrayList<String> columnNamesList = new ArrayList<String>();
