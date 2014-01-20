@@ -9,6 +9,7 @@
 
 
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.StudyGroupClassRow" />
+<c:set var="DynamicGroupTypeID" value="4" />
 
 
 <tr valign="top">   
@@ -19,7 +20,7 @@
 			<c:when test="${currRow.bean.default}">
 				<td class="table_cell aka_green_highlight"><c:out value="${currRow.bean.default}"/></td>	
 			</c:when>
-			<c:when test="${currRow.bean.groupClassTypeId == 4}">
+			<c:when test="${currRow.bean.groupClassTypeId eq DynamicGroupTypeID}">
 				<td class="table_cell"><c:out value="${currRow.bean.default}"/></td>	
 			</c:when>
 			<c:otherwise>
@@ -34,7 +35,7 @@
        </td>
        <td class="table_cell">
         <c:choose>
-        	<c:when test="${fn:length(currRow.bean.eventDefinitions) eq 0}">
+        	<c:when test="${fn:length(currRow.bean.eventDefinitions) eq 0 and currRow.bean.groupClassTypeId eq DynamicGroupTypeID}">
         		<i><fmt:message key="all_events_in_group_removed" bundle="${restext}"/></i>
         	</c:when>
         	<c:otherwise>
