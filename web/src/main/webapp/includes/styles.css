@@ -2232,21 +2232,3 @@ a.dnShortcut:hover {
     cursor: pointer;
     margin-left: 0px !important;
 }
-
-.loader {
-    position:fixed ;
-    width:300px;
-    height:100px;
-    z-index:15;
-    top:50%;
-    left:50%;
-    margin:-100px 0 0 -150px;
-    text-align: center;
-    vertical-align: middle;
-    line-height: 90px;
-    background: white;
-    background-image:url('../images/ajax-loader-blue.gif');
-    background-repeat: no-repeat;
-    background-position: 50% 70%;
-    border: solid 1px black;
-}

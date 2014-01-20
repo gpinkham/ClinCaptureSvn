@@ -2440,9 +2440,10 @@ disableRandomizeCRFButtons = function(flag) {
 
 codeItem = function(item) {
 
+    showMedicalCodingAlertBox(item);
+
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
     $("a[name='Code']").css("visibility", "hidden");
-    $(".loader").css("display", "inline");
 
     $.ajax({
 
@@ -2458,7 +2459,7 @@ codeItem = function(item) {
 
         success: function(data) {
 
-            $(".loader").css('display', "none");
+            hideMedicalCodingAlertBox();
             //delete old results
             $("#emptyResult").parent().html('');
             $("#tablepaging").parent().html('');
@@ -2471,6 +2472,9 @@ codeItem = function(item) {
 
             //auto code actions
             if($("div[id=" + ($(item).attr("itemid")) + "]").find('table').length > 0 && $("#autoCode").size() === 1) {
+
+                //disable input field
+                $(item).parent().siblings("td").find("input").attr('disabled', true);
 
                 //update coded item status
                 $(item).parent().siblings("td").filter(function () { return $(this).text() == 'To be Coded'; }).text("Completed");
@@ -2495,7 +2499,8 @@ codeItem = function(item) {
 
             //display code icon
             $('tr:not(:contains("In Progress"))').find("a[name='Code']").css("visibility", "visible");
-            $(".loader").css('display', "none");
+
+            hideMedicalCodingAlertBox();
 
             console.log("Error:" + e);
         }
@@ -2688,7 +2693,7 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
             $("a[name='Code'][itemid=" + id + "]").children('img').attr('src', '../images/code_confirm.png');
 
             //display code icon
-            if($(".loader").css('display') == 'inline') {
+            if($("#alertBox").length > 0) {
 
                 $("a[name='Code'][itemid=" + id + "]").css("visibility", "hidden");
             } else {
@@ -2902,6 +2907,48 @@ deleteTerm = function(item) {
             console.log("Error:" + e);
         }
     })
+}
+
+function showMedicalCodingAlertBox(item){
+
+    if ($("#alertBox").length == 0) {
+
+        $("<div id='alertBox' title='Medical coding process message'>" +
+            "<div style='clear: both; margin-top: 2%; text-align: center;'>Operation in process...</div>&nbsp;" +
+            "<img style='display:block;margin:auto;' src='../images/ajax-loader-blue.gif'>" +
+            "<input type='button' value='Cancel' class='button_medium' onclick='javascript: hideMedicalCodingAlertBox();' style='float: right; margin-top: 10%; margin-right: 6px;'/>" +
+            "</div>").appendTo("body");
+
+        $("#alertBox").dialog({
+                autoOpen : true,
+                open: function(event, ui) { $(".ui-dialog-titlebar-close", $(this).parent()).hide(); },
+                modal : true,
+                height: 150,
+                width: 450}
+        );
+    }
+
+    var color = $('*').find('a').css('color');
+    if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
+        $('input.button_medium').css('background-image', 'url(../images/violet/button_medium_BG.gif)');
+        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
+    }
+    if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
+        $('input.button_medium').css('background-image', 'url(../images/green/button_medium_BG.gif)');
+        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
+    }
+}
+
+function hideMedicalCodingAlertBox() {
+
+    if ($("#alertBox").length > 0) {
+
+        //return coded items icons
+        $('tr:not(:contains("In Progress"))').find("a[name='Code']").css("visibility", "visible");
+
+        $("#alertBox").remove();
+    }
+
 }
 
 function getBrowserClientWidth() {

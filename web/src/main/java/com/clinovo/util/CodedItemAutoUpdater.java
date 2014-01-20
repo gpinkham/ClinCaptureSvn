@@ -66,7 +66,7 @@ public class CodedItemAutoUpdater {
         for (int codedItemId : codedItemIdListInt) {
 
             CodedItem codedItem = codedItemService.findCodedItem(codedItemId);
-            Term term = termService.findTerm(codedItem.getPreferredTerm().toLowerCase());
+            Term term = termService.findByTermAndExternalDictionary(codedItem.getPreferredTerm().toLowerCase(), codedItem.getDictionary());
 
             if (term != null) {
 

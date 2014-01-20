@@ -69,7 +69,7 @@ public class CodingSpringJob extends QuartzJobBean {
                 //get codes for all verb terms & save it in classification
                 search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "), bioontologyUrl, bioontologyApiKey);
                 //replace all terms & codes from classification to coded elements
-                generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement());
+                generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement(), codedItem.getDictionary());
 
                 //if isAlias is true, create term using completed classification
                 if (isAlias) {
@@ -129,7 +129,7 @@ public class CodingSpringJob extends QuartzJobBean {
     }
 
 	private void generateCodedItemFields(List<CodedItemElement> codedItemElements,
-			List<ClassificationElement> classificationElements) {
+			List<ClassificationElement> classificationElements, String dictionary) {
 
 		String ptCode = "";
 		String ptcCode = "";
@@ -163,15 +163,17 @@ public class CodingSpringJob extends QuartzJobBean {
 			}
 		}
 
-		// Copy over the PT to LLT
-		CodedItemElement lltElement = getClassificationElement("llt", codedItemElements);
-		lltElement.setItemCode(ptCode);
+        if (dictionary.equals("MEDDRA")) {
 
-		// Copy over the PTC to LLTC
-		CodedItemElement lltcElement = getClassificationElement("lltc", codedItemElements);
-		lltcElement.setItemCode(ptcCode);
+            // Copy over the PT to LLT
+            CodedItemElement lltElement = getClassificationElement("llt", codedItemElements);
+            lltElement.setItemCode(ptCode);
 
-	}
+            // Copy over the PTC to LLTC
+            CodedItemElement lltcElement = getClassificationElement("lltc", codedItemElements);
+            lltcElement.setItemCode(ptcCode);
+        }
+    }
     
     private CodedItemElement getClassificationElement(String name, List<CodedItemElement> codedItemElements) {
     	

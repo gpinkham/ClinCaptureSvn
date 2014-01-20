@@ -12,6 +12,13 @@
 
 <jsp:include page="include/sideAlert.jsp"/>
 
+<c:set var="color" scope="session" value="${newThemeColor}"/>
+<c:if test="${(color == 'violet') || (color == 'green')}">
+    <script>
+        document.write( '<style class="hideStuff" ' + 'type="text/css">body {display:none;}<\/style>');
+    </script>
+</c:if>
+
 <script type="text/javascript">
     codedItemAutoUpdate();
 </script>
@@ -39,8 +46,10 @@
 </tr>
 <jsp:include page="include/sideInfo.jsp"/>
 <link rel="stylesheet" href="../includes/jmesa/jmesa.css" type="text/css">
+<link rel="stylesheet" href="../includes/jquery-ui.css"  type="text/css"/>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-ui.min.js"></script>
 
 <script type="text/javascript">
 
@@ -219,4 +228,3 @@
 </div>
 
 <jsp:include page="include/footer.jsp"/>
-<div class="loader" style="display:none">Operation in progress...</div>
