@@ -704,18 +704,18 @@ public class OdmExtractDAO extends DatasetDAO {
 		}
 	}
 
-	public void getMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
+	public void getMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, DatasetBean dataset) {
 		if (odmVersion.equalsIgnoreCase("occlinical_data"))
 			odmVersion = "oc1.3";
 
 		if ("oc1.3".equals(odmVersion)) {
 			if (metadata.getStudy().getParentStudyId() > 0) {
-				this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
+				this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion, dataset);
 			} else {
-				this.getMetadataOC1_3(parentStudyId, studyId, metadata, odmVersion);
+				this.getMetadataOC1_3(parentStudyId, studyId, metadata, odmVersion, dataset);
 			}
 		} else if ("oc1.2".equals(odmVersion)) {
-			this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
+			this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion, dataset);
 		} else {
 			this.getODMMetadata(parentStudyId, studyId, metadata, odmVersion);
 		}
@@ -1083,7 +1083,7 @@ public class OdmExtractDAO extends DatasetDAO {
 	 * @param metadata
 	 * @param odmVersion
 	 */
-	public void getOCMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
+	public void getOCMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, DatasetBean dataset) {
 		this.getODMMetadata(parentStudyId, studyId, metadata, odmVersion);
 		String cvIds = metadata.getCvIds();
 		if (odmVersion.startsWith("oc")) {
@@ -1139,7 +1139,8 @@ public class OdmExtractDAO extends DatasetDAO {
 					sg.setDescription(des);
 					StudyGroupClassListBean sgc = sgcLists.get(sgcLists.size() - 1);
 					sgc.getStudyGroupItems().add(sg);
-				} else {
+				} else if (dataset.getSubjectGroupIds().contains(sgcid)) {
+					logger.debug("FOUND " + sgcid + " VERSUS " + dataset.getSubjectGroupIds().toString());
 					sgcprev = sgcid + "";
 					StudyGroupClassListBean sgc = new StudyGroupClassListBean();
 					sgc.setID("SGC_" + sgcid);
@@ -1154,6 +1155,12 @@ public class OdmExtractDAO extends DatasetDAO {
 					sgcLists.add(sgc);
 				}
 			}
+			logger.debug("*** found study group class lists: " + sgcLists.toString() 
+					+ " size of " + sgcLists.size());
+			logger.debug("found checked subject group class lists from metadata: " 
+					+ metadata.getStudyGroupClassLists().toString());
+			logger.debug("found checked groups from dataset bean: " 
+					+ dataset.getSubjectGroupIds().toString());
 		}
 	}
 
@@ -1222,8 +1229,8 @@ public class OdmExtractDAO extends DatasetDAO {
 		}
 	}
 
-	public void getMetadataOC1_3(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
-		this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
+	public void getMetadataOC1_3(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, DatasetBean dataset) {
+		this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion, dataset);
 
 		this.getStudyEventAndFormMetaOC1_3(parentStudyId, studyId, metadata, odmVersion, false);
 
@@ -2228,7 +2235,7 @@ public class OdmExtractDAO extends DatasetDAO {
 			HashMap row = (HashMap) iter.next();
 			String studySubjectLabel = (String) row.get("study_subject_oid");
 			Integer sgcId = (Integer) row.get("sgc_id");
-			System.out.println("subject group class id " + sgcId.toString());
+			
 			String sgcName = (String) row.get("sgc_name");
 			String sgName = (String) row.get("sg_name");
 			String sedOID = (String) row.get("definition_oid");
@@ -2246,6 +2253,7 @@ public class OdmExtractDAO extends DatasetDAO {
 				int p = data.getExportSubjectData().size() - 1;
 				sub = data.getExportSubjectData().get(p);
 				if (sgcId > 0) {
+					logger.debug("FOUND study group class id: " + sgcId);
 					int presize = sgcIdSet.size();
 					sgcIdSet.add(sgcId);
 					if (sgcIdSet.size() > presize) {
@@ -2289,7 +2297,7 @@ public class OdmExtractDAO extends DatasetDAO {
 					sub.setStatus(Status.get((Integer) row.get("status_id")).getName());
 				}
 
-				if (dataset.isShowSubjectGroupInformation() && sgcId > 0) {
+				if (dataset.isShowSubjectGroupInformation() && sgcId > 0 && dataset.getSubjectGroupIds().contains(sgcId)) {
 					// need to look at the get subject group ids as well
 					sgcIdSet.clear();
 					sgcIdSet.add(sgcId);
@@ -2298,7 +2306,7 @@ public class OdmExtractDAO extends DatasetDAO {
 					sgd.setStudyGroupClassName(sgcName);
 					sgd.setStudyGroupName(sgName);
 					sub.getSubjectGroupData().add(sgd);
-					System.out.println("subject group data size of array " + sub.getSubjectGroupData().size() + " " + dataset.getSubjectGroupIds().toString());
+					// had a logging field here
 				}
 
 				data.getExportSubjectData().add(sub);
@@ -2519,7 +2527,9 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ " sgc.subject_assignment, sg.study_group_id, sg.name as sg_name, sg.description from study_group_class sgc,"
 				+ " study_group sg, group_class_types gct where study_id in (" + studyId + ")"
 				+ " and sgc.study_group_class_id = sg.study_group_class_id"
-				+ " and sgc.group_class_type_id = gct.group_class_type_id order by sgc.study_group_class_id";
+				+ " and sgc.group_class_type_id = gct.group_class_type_id"
+				+ " and sgc.status_id = 1" //adding status check here
+				+ " order by sgc.study_group_class_id";
 	}
 
 	protected String getStudyEventAndFormMetaSql(int parentStudyId, int studyId, boolean isIncludedSite) {
@@ -2714,7 +2724,8 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ " and ss.subject_id = s.subject_id)st_sub left join (select sgm.study_subject_id, sgc.study_group_class_id as sgc_id, sgc.name as sgc_name,"
 				+ " sg.study_group_id as sg_id, sg.name as sg_name from subject_group_map sgm, study_group_class sgc, study_group sg where sgc.study_id in ("
 				+ parentStudyIds // should be parent study ids!!!
-				+ ") and sgm.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = sg.study_group_class_id"
+				+ ") and sgm.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = sg.study_group_class_id and sgc.status_id = 1"
+				//adding status here
 				+ " and sgm.study_group_id = sg.study_group_id) sb_g on st_sub.study_subject_id = sb_g.study_subject_id) ss, "
 				+ " study_event_definition sed, event_definition_crf edc,"
 				+ " (select event_crf_id, crf_version_id, study_event_id, status_id, sdv_status, date_interviewed, interviewer_name, validator_id from event_crf where event_crf_id in ("
