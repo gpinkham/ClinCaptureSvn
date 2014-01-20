@@ -88,10 +88,11 @@ public class ListNotesFilter implements CriteriaCommand {
 			} else if (property.equals("studySubject.labelExact")) {
 				criteria += " and  UPPER(" + columnMapping.get(property) + ") = UPPER('" + value.toString() + "')"
 						+ " ";
-			} else if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description")
-					|| property.equals("discrepancyNoteBean.user")) {
+			} else if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description")) {
 				criteria += " and UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')"
 						+ " ";
+			} else if (property.equals("discrepancyNoteBean.user")) {
+				criteria += parseUserAccountName(columnMapping.get(property), value.toString());
 			} else if (property.equals("siteId")) {
 				criteria += " and ss.study_id in ( SELECT study_id FROM study WHERE unique_identifier like '%"
 						+ value.toString() + "%')";
@@ -175,6 +176,18 @@ public class ListNotesFilter implements CriteriaCommand {
 		}
 		
 		return result.toString().replaceFirst(" or ", "");
+	}
+	
+	private String parseUserAccountName(String property, String stringValue) {
+		StringBuilder result = new StringBuilder();
+		
+		if (!stringValue.equalsIgnoreCase(ResourceBundleProvider.getResTerm("not_assigned"))){
+			result.append(" and " + property + " like '" + stringValue + "' ");
+		} else {
+			result.append(" and " + property + " is NULL ");
+		}
+		
+		return result.toString();
 	}
 
 	public static class Filter {

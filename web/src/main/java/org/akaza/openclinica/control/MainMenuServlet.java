@@ -148,8 +148,8 @@ public class MainMenuServlet extends Controller {
 					}
 				}
 
-				Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(ub.getId(),
-						currentStudy.getId());
+				Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id = " + ub.getId()
+						+ " AND dn.resolution_status_id IN (1,2,3)", currentStudy);
 				request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
 				int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId()

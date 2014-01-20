@@ -23,8 +23,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -83,6 +85,8 @@ import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.jmesa.view.html.editor.HtmlFilterEditor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.clinovo.web.table.filter.UserAccountNameDroplistFilterEditor;
 
 @SuppressWarnings({ "unchecked", "unused" })
 public class ListNotesTableFactory extends AbstractTableFactory {
@@ -170,7 +174,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 				new DetailedNotesFilterEditor(), true, false);
 		configureColumn(row.getColumn("numberOfNotes"), resword.getString("of_notes"), null, null, false, false);
 		configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"),
-				new AssignedUserCellEditor(), null, true, false);
+				new AssignedUserCellEditor(), new UserAccountNameDroplistFilterEditor(dataSource), true, false);
 		configureColumn(row.getColumn(DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS), resword.getString("resolution_status"),
 				new ResolutionStatusCellEditor(), new ResolutionStatusDroplistFilterEditor(), true, false);
 		configureColumn(row.getColumn(DISCREPANCY_NOTE_BEAN_DIS_TYPE), resword.getString("type"),
@@ -759,11 +763,15 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	private class AssignedUserCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
 			String value = "";
+			ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
 			UserAccountBean user = (UserAccountBean) ((HashMap<Object, Object>) item).get("discrepancyNoteBean.user");
-
-			if (user != null) {
+			
+			if (user != null && !user.getName().trim().equals("")) {
 				value = user.getFirstName() + " " + user.getLastName() + " (" + user.getName() + ")";
+			} else {
+				value = reterm.getString("not_assigned");
 			}
+			
 			return value;
 		}
 	}

@@ -2014,29 +2014,21 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public String findSiteHiddenEventCrfIdsString(StudyBean site) {
 		String sql;
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-			sql = "select ec.event_crf_id from event_crf ec, study_event se, crf_version cv, "
-					+ "(select edc.study_event_definition_id, edc.crf_id, crf.name "
-					+ "from event_definition_crf edc, crf, study s " + "where s.study_id=" + site.getId()
-					+ " and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id)"
-					+ "    and edc.event_definition_crf_id not in ( "
-					+ "        select parent_id from event_definition_crf where study_id=s.study_id) "
-					+ "            and edc.status_id=1 and edc.hide_crf = 1 and edc.crf_id = crf.crf_id) sedc "
-					+ "where ec.study_event_id = se.study_event_id "
-					+ "and se.study_event_definition_id = sedc.study_event_definition_id "
-					+ "and ec.crf_version_id = cv.crf_version_id and cv.crf_id = sedc.crf_id";
-		} else {
-			sql = "select ec.event_crf_id from event_crf ec, study_event se, crf_version cv, "
-					+ "(select edc.study_event_definition_id, edc.crf_id, crf.name "
-					+ "from event_definition_crf edc, crf, study s " + "where s.study_id=" + site.getId()
-					+ " and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id)"
-					+ "    and edc.event_definition_crf_id not in ( "
-					+ "        select parent_id from event_definition_crf where study_id=s.study_id) "
-					+ "            and edc.status_id=1 and edc.hide_crf = 'true' and edc.crf_id = crf.crf_id) as sedc "
-					+ "where ec.study_event_id = se.study_event_id "
-					+ "and se.study_event_definition_id = sedc.study_event_definition_id "
-					+ "and ec.crf_version_id = cv.crf_version_id and cv.crf_id = sedc.crf_id";
-		}
+		String valueOfBooleanTrue = ("oracle".equalsIgnoreCase(CoreResources.getDBName())) ? "1" : "'true'";
+	
+		sql = "SELECT DISTINCT ec.event_crf_id " 
+				+ "FROM (((event_crf ec LEFT JOIN study_event se ON ec.study_event_id = se.study_event_id) "
+				+ "LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id) "
+				+ "LEFT JOIN study_subject ss ON ec.study_subject_id = ss.study_subject_id) "
+				+ "LEFT JOIN (SELECT edc.study_id, edc.study_event_definition_id, edc.crf_id "
+							+ "FROM event_definition_crf edc "
+							+ "WHERE (edc.study_id = " + site.getId() + " OR edc.study_id = (SELECT s.parent_study_id FROM study s WHERE s.study_id = " + site.getId() + ")) "
+								+ "AND edc.status_id = 1 " 
+								+ "AND edc.hide_crf = " + valueOfBooleanTrue + ") sedc ON cv.crf_id = sedc.crf_id "
+				+ "WHERE ec.status_id NOT IN (5,7) "
+					+ "AND se.study_event_definition_id = sedc.study_event_definition_id " 
+					+ "AND (ss.study_id = " + site.getId() + ")";
+		
 		return sql;
 	}
 
@@ -2079,25 +2071,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			}
 		}
 		return id;
-	}
-
-	public Integer getViewNotesCountWithFilter(Integer assignedUserId, Integer studyId) {
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-
-		HashMap variables = new HashMap();
-		variables.put(1, assignedUserId);
-		variables.put(2, studyId);
-		variables.put(3, studyId);
-		String sql = digester.getQuery("countViewNotesForAssignedUserInStudy");
-
-		ArrayList rows = select(sql, variables);
-		Iterator it = rows.iterator();
-		if (it.hasNext()) {
-			return (Integer) ((HashMap) it.next()).get("count");
-		} else {
-			return null;
-		}
 	}
 
 	public boolean doesNotHaveOutstandingDNs(StudySubjectBean ssb) {
