@@ -13,6 +13,9 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.List;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -26,9 +29,6 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.HtmlBuilder;
-
-import java.util.List;
-import java.util.ResourceBundle;
 
 public class EventCrfLayerBuilder {
 
@@ -428,7 +428,7 @@ public class EventCrfLayerBuilder {
 
 	private void viewSectionDataEntry(HtmlBuilder builder, EventCRFBean eventCrf, String link,
 			EventDefinitionCRFBean eventDefinitionCrf) {
-		String href = "ViewSectionDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&ecId="
+		String href = "ViewSectionDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&eventCRFId="
 				+ eventCrf.getId() + "&tabId=1" + "&exitTo=ListStudySubjects";
 		builder.a().href(href).close();
 		builder.append(link);
@@ -437,7 +437,7 @@ public class EventCrfLayerBuilder {
 
 	private void viewSectionDataEntry(HtmlBuilder builder, EventCRFBean eventCrf,
 			EventDefinitionCRFBean eventDefinitionCrf) {
-		String href = "ViewSectionDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&ecId="
+		String href = "ViewSectionDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&eventCRFId="
 				+ eventCrf.getId() + "&tabId=1" + "&exitTo=ListStudySubjects";
 		builder.a().href(href).close();
 		builder.img().src("images/bt_View.gif").border("0").align("left").close();
