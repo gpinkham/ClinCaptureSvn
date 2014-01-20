@@ -718,6 +718,24 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		return eventCRFs;
 	}
 
+	public int countAvailableFromStudy(int studyId) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+
+		HashMap variables = new HashMap();
+		variables.put(1, studyId);
+		variables.put(2, studyId);
+		String sql = digester.getQuery("countAvailableFromStudy");
+		ArrayList rows = this.select(sql, variables);
+		Iterator it = rows.iterator();
+
+		if (it.hasNext()) {
+			return (Integer) ((HashMap) it.next()).get("count");
+		} else {
+			return 0;
+		}
+	}
+	
 	public ArrayList getEventCRFsByStudy(int studyId, int parentStudyId, int limit, int offset) {
 
 		HashMap variables = new HashMap();

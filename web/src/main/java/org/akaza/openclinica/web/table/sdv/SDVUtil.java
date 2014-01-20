@@ -466,7 +466,8 @@ public class SDVUtil {
 		StudyBean study = (StudyBean) sdao.findByPK(studyId);
 		int parentStudyId = study.getParentStudyId() > 0? study.getParentStudyId() : studyId;
 		
-		List<String> studyIds = sdao.getAllStudyIdentifiersInStudy(studyId);
+		List<String> studyIds = createListWithNotEmptyStudyNames(
+				sdao.getMapStudyIdToStudyIdentifierFromStudy(studyId), dataSource);
 		Collections.sort(studyIds);
 		
 		HtmlColumn studyIdentifier = row.getColumn("studyIdentifier");
@@ -512,6 +513,18 @@ public class SDVUtil {
 
 		table.getTableRenderer().setWidth("800");
 		return tableFacade.render();
+	}
+
+	public static List<String> createListWithNotEmptyStudyNames(
+			Map<Integer, String> mapIdToStudyIdentifier, DataSource dataSource) {
+		EventCRFDAO ecfdao = new EventCRFDAO(dataSource);
+		List<String> result = new ArrayList<String>();
+		for(int studyId: mapIdToStudyIdentifier.keySet()){
+			if (ecfdao.countAvailableFromStudy(studyId) > 0){
+				result.add(mapIdToStudyIdentifier.get(studyId));
+			}
+		}
+		return result;
 	}
 
 	public String renderSubjectsTableWithLimit(HttpServletRequest request, int studyId, int studySubjectId) {

@@ -140,7 +140,8 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		
 		// siteId-filter
 		StudyDAO sdao = new StudyDAO(dataSource);
-		List<String> studyIds = sdao.getAllStudyIdentifiersInStudy(studyId);
+		List<String> studyIds = SDVUtil.createListWithNotEmptyStudyNames(
+				sdao.getMapStudyIdToStudyIdentifierFromStudy(studyId), dataSource);
 		Collections.sort(studyIds);
 		
 		HtmlColumn studyIdentifier = ((HtmlRow) row).getColumn("siteId");
