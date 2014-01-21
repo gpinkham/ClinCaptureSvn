@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.clinovo.clincapture</groupId>
 		<artifactId>clincapture</artifactId>
-		<version>1.0.3.10-SNAPSHOT</version>
+		<version>1.0.3.10</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -410,8 +410,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="target/cargo/configurations/tomcat6x/cobertura.ser"
-                                      tofile="target/cobertura/cobertura.ser" />
+                                <copy file="target/cargo/configurations/tomcat6x/cobertura.ser" tofile="target/cobertura/cobertura.ser" />
                             </tasks>
                         </configuration>
                         <executions>
@@ -420,8 +419,7 @@
                                 <phase>compile</phase>
                                 <configuration>
                                     <tasks>
-                                        <copy file="../core/src/test/resources/test.properties"
-                                              tofile="target/datainfo.properties" />
+                                        <copy file="../core/src/test/resources/test.properties" tofile="target/datainfo.properties" />
                                     </tasks>
                                 </configuration>
                                 <goals>
@@ -433,8 +431,7 @@
                                 <phase>process-test-resources</phase>
                                 <configuration>
                                     <tasks>
-                                        <copy file="src/test/resources/web-test.properties"
-                                              tofile="target/test-classes/web-test.properties" />
+                                        <copy file="src/test/resources/web-test.properties" tofile="target/test-classes/web-test.properties" />
                                     </tasks>
                                 </configuration>
                                 <goals>
@@ -446,8 +443,7 @@
                                 <phase>integration-test</phase>
                                 <configuration>
                                     <tasks>
-                                        <copy file="target/cobertura/cobertura.ser"
-                                              tofile="target/cargo/configurations/tomcat6x/cobertura.ser" />
+                                        <copy file="target/cobertura/cobertura.ser" tofile="target/cargo/configurations/tomcat6x/cobertura.ser" />
                                     </tasks>
                                 </configuration>
                                 <goals>
@@ -459,8 +455,7 @@
                                 <phase>pre-integration-test</phase>
                                 <configuration>
                                     <tasks>
-                                        <copy file="../core/src/test/resources/test.properties"
-                                              tofile="target/datainfo.properties" />
+                                        <copy file="../core/src/test/resources/test.properties" tofile="target/datainfo.properties" />
                                     </tasks>
                                 </configuration>
                                 <goals>
