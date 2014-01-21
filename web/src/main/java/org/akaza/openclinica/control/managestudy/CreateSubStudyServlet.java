@@ -79,10 +79,7 @@ public class CreateSubStudyServlet extends Controller {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		checkStudyLocked(Page.SITE_LIST_SERVLET, respage.getString("current_study_locked"), request, response);
-		if (ub.isSysAdmin()) {
-			return;
-		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 		addPageMessage(
@@ -522,7 +519,7 @@ public class CreateSubStudyServlet extends Controller {
 		seds = (ArrayList<StudyEventDefinitionBean>) request.getSession().getAttribute("definitions");
 		if (seds == null || seds.size() <= 0) {
 			StudyEventDefinitionDAO sedDao = getStudyEventDefinitionDAO();
-			seds = sedDao.findAllByStudy(parentStudy);
+			seds = sedDao.findAllAvailableByStudy(parentStudy);
 		}
 		CRFVersionDAO cvdao = getCRFVersionDAO();
 		HashMap<String, Boolean> changes = new HashMap<String, Boolean>();
@@ -690,7 +687,7 @@ public class CreateSubStudyServlet extends Controller {
 		CRFVersionDAO cvdao = getCRFVersionDAO();
 		CRFDAO cdao = getCRFDAO();
 		StudyBean parentStudy = (StudyBean) getStudyDAO().findByPK(site.getParentStudyId());
-		seds = sedDao.findAllByStudy(parentStudy);
+		seds = sedDao.findAllAvailableByStudy(parentStudy);
 		for (StudyEventDefinitionBean sed : seds) {
 			int defId = sed.getId();
 			ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) edcdao
