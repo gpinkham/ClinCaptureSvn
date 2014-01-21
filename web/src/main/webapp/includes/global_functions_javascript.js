@@ -2501,6 +2501,15 @@ codeItem = function(item) {
             $('tr:not(:contains("In Progress"))').find("a[name='Code']").css("visibility", "visible");
 
             hideMedicalCodingAlertBox();
+            //open alert box
+            if($("#sidebar_Alerts_open").css("display") == 'none') {
+
+                leftnavExpand('sidebar_Alerts_open');
+                leftnavExpand('sidebar_Alerts_closed');
+            }
+            //append error to the alert box
+            $("#sidebar_Alerts_open .sidebar_tab_content").html('')
+                .append("<div class='alert'>Dictionary is not available. Please contact yous system administrator.</div>");
 
             console.log("Error:" + e);
         }

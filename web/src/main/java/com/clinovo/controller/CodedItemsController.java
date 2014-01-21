@@ -177,7 +177,7 @@ public class CodedItemsController {
 	 * @throws Exception For all exceptions
 	 */
 	@RequestMapping("/codeItem")
-	public ModelMap codeItemHandler(HttpServletRequest request) throws Exception {
+	public ModelMap codeItemHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		Term term = null;
 		ModelMap model = new ModelMap();
@@ -224,9 +224,17 @@ public class CodedItemsController {
                 StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "defaultBioontologyURL");
                 StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "medicalCodingApiKey");
 
-				search.setSearchInterface(new BioPortalSearchInterface());
-				classifications = search.getClassifications(prefLabel, dictionary, bioontologyUrl.getValue(), bioontologyApiKey.getValue());
-			}
+                search.setSearchInterface(new BioPortalSearchInterface());
+
+                try {
+
+                    classifications = search.getClassifications(prefLabel, dictionary, bioontologyUrl.getValue(), bioontologyApiKey.getValue());
+                } catch (Exception ex) {
+
+                    response.sendError(HttpServletResponse.SC_BAD_GATEWAY);
+                    return model;
+                }
+            }
  		}
 
  		model.addAttribute("itemDictionary", dictionary);
