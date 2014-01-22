@@ -58,6 +58,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import com.clinovo.util.PrintCRFUtil;
 import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"rawtypes", "unchecked",  "serial"})
@@ -97,7 +98,7 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 		FormProcessor fp = new FormProcessor(request);
 		int subjectId = fp.getInt("subjectId", true);
 
-		System.out.println("Printing casebook for subject #" + subjectId);
+		logger.info("Printing casebook for subject #" + subjectId);
 
         SessionManager sm = (SessionManager) getSessionManager(request);
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
@@ -164,7 +165,7 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 
 			String crfStatus = resword.getString(ecb.getStage().getNameRaw());
 
-			System.out.println("I have found eCRF with status: " + crfStatus);
+			logger.info("I have found eCRF with status: " + crfStatus);
 
 			CRFBean crfBean = cdao.findByVersionId(ecb.getCRFVersionId());
 			List<ItemGroupBean> itemGroupBeans = itemGroupDao
@@ -203,6 +204,9 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 
 				List<DisplaySectionBean> displaySectionBeans = handler
 						.getDisplaySectionBeans();
+				
+				PrintCRFUtil.clearSectionDataFromHtmlTagsAndJS(displaySectionBeans);
+				
 				PrintCRFBean printCrfBean = new PrintCRFBean();
 
 				printCrfBean.setDisplaySectionBeans(displaySectionBeans);
@@ -234,6 +238,8 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 				request.setAttribute(SECTION_BEAN, sb);
 				request.setAttribute(ALL_SECTION_BEANS, allSectionBeans);
 				sectionBeans = super.getAllDisplayBeans(request);
+				
+				PrintCRFUtil.clearSectionDataFromHtmlTagsAndJS(sectionBeans);
 
 				DisplaySectionBean dsb = super.getDisplayBean(false, false,
 						request, isSubmitted);
@@ -255,7 +261,7 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 
 				list.add(printCrfBean);
 				sedCrfBeans.put(sedBean, list);
-			}
+			}	
 		}
 
 		request.setAttribute("studySubject", sub);

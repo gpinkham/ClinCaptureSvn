@@ -77,7 +77,7 @@
       <sql>
       select distinct ig.* from item_group ig, item_group_metadata igm
       where igm.crf_version_id=?
-      and ig.item_group_id = igm.item_group_id and ig.name != 'Ungrouped'
+      and ig.item_group_id = igm.item_group_id and igm.repeating_group = TRUE
       </sql>
     </query>
     <query>

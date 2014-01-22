@@ -189,10 +189,19 @@ $(document).ready(function() {
 											<tr>
 												<td class="table_cell_noborder" style="color: #789EC5"><b><fmt:message
 															key="interviewer" bundle="${resword}" />:</b></td>
-												<td class="table_cell_noborder" style="color: #789EC5"><c:out
-														value="${EventCRFBean.interviewerName}" /> (<fmt:formatDate
-														value="${EventCRFBean.dateInterviewed}"
-														pattern="${dteFormat}" />)</td>
+												<td class="table_cell_noborder" style="color: #789EC5">
+														<c:choose>
+															<c:when test="${not empty EventCRFBean.interviewerName}">
+																<c:out value="${EventCRFBean.interviewerName}" />
+															</c:when>
+															<c:otherwise>
+																<fmt:message key="N/A" bundle="${resword}" />
+															</c:otherwise>
+														</c:choose>
+														<c:if test="${not empty EventCRFBean.dateInterviewed}">
+															(<fmt:formatDate value="${EventCRFBean.dateInterviewed}" pattern="${dteFormat}" />)
+														</c:if>
+												</td>
 												<c:choose>
 													<c:when test="${genderShow}">
 														<td class="table_cell_top" style="color: #789EC5"><b>${genderLabel}:</b></td>
