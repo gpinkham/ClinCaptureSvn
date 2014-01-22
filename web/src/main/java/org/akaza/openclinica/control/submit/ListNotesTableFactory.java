@@ -176,7 +176,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"),
 				new AssignedUserCellEditor(), new UserAccountNameDroplistFilterEditor(dataSource), true, false);
 		configureColumn(row.getColumn(DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS), resword.getString("resolution_status"),
-				new ResolutionStatusCellEditor(), new ResolutionStatusDroplistFilterEditor(), true, false);
+				new ResolutionStatusCellEditor(), new ResolutionStatusDroplistFilterEditor(getExclusions()), true, false);
 		configureColumn(row.getColumn(DISCREPANCY_NOTE_BEAN_DIS_TYPE), resword.getString("type"),
 				new DiscrepancyNoteTypeCellEditor(), new TypeDroplistFilterEditor(), true, false);
 		configureColumn(row.getColumn("discrepancyNoteBean.entityType"), resword.getString("entity_type"), null, null,
@@ -187,6 +187,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 				new ListNotesActionsEditor(locale), true, false);
 		configureColumn(row.getColumn("age"), resword.getString("days_open"), null, null);
 		configureColumn(row.getColumn("days"), resword.getString("days_since_updated"), null, null);
+	}
+
+	private List<String> getExclusions() {
+		List<String> result = new ArrayList<String>();
+		if (getDiscrepancyNoteDao().countViewNotesByStatusId(getCurrentStudy().getId(), ResolutionStatus.RESOLVED.getId()) == 0){
+			result.add(ResolutionStatus.RESOLVED.getName());
+		}
+		return result;
 	}
 
 	@Override
@@ -662,12 +670,23 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	}
 
 	private class ResolutionStatusDroplistFilterEditor extends DroplistFilterEditor {
+		private List<String> exceptions; 
+		public ResolutionStatusDroplistFilterEditor(List<String> exceptions){
+			this.exceptions = exceptions;
+		}
+		
+		public ResolutionStatusDroplistFilterEditor(){
+			this.exceptions = new ArrayList<String>();
+		}
+		
 		@Override
 		protected List<Option> getOptions() {
 			List<Option> options = new ArrayList<Option>();
 			ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
 			for (Object status : ResolutionStatus.toArrayList()) {
-				options.add(new Option(((ResolutionStatus) status).getName(), ((ResolutionStatus) status).getName()));
+				if (!exceptions.contains(((ResolutionStatus) status).getName())) {
+					options.add(new Option(((ResolutionStatus) status).getName(), ((ResolutionStatus) status).getName()));
+				}
 			}
 			options.add(new Option(reterm.getString("New_and_Updated"), reterm.getString("New_and_Updated")));
 			options.add(new Option(reterm.getString(NOT_CLOSED_KEY), reterm.getString(NOT_CLOSED_KEY)));

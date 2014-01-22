@@ -2187,4 +2187,24 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			return 0;
 		}
 	}
+
+	public int countViewNotesByStatusId(int studyId, int statusId) {
+		this.unsetTypeExpected();
+		this.setTypeExpected(1, TypeNames.INT);
+
+		HashMap variables = new HashMap();
+		variables.put(1, statusId);
+		variables.put(2, studyId);
+		variables.put(3, studyId);
+
+		ArrayList rows = select(digester.getQuery("countViewNotesByStatusId"), variables);
+		Iterator it = rows.iterator();
+
+		if (it.hasNext()) {
+			Integer count = (Integer) ((HashMap) it.next()).get("count");
+			return count == null ? 0 : count;
+		} else {
+			return 0;
+		}
+	}
 }

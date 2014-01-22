@@ -416,5 +416,13 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		assertNotNull(discrepancyNoteDAO.countAllByStudyEventTypeAndStudyEvent(studyEvent));
 		assertEquals(new Integer(0), discrepancyNoteDAO.countAllByStudyEventTypeAndStudyEvent(studyEvent));
 	}
+	
+	@Test
+	public void testCountViewNotesByStatusId() {
+		int studyId = 1;
+		int statusId = 1;
 
+		assertNotNull(discrepancyNoteDAO.countViewNotesByStatusId(studyId, statusId));
+		assertEquals(2, discrepancyNoteDAO.countViewNotesByStatusId(studyId, statusId));
+	}
 }

@@ -890,6 +890,16 @@
             and se.study_event_id = ?
         </sql>
     </query>
+	<query>
+        <name>countViewNotesByStatusId</name>
+        <sql>
+            SELECT COUNT(dn.*) from discrepancy_note dn, study s
+            WHERE dn.study_id = s.study_id 
+			AND dn.resolution_status_id = ?
+            AND ( s.study_id =? or s.parent_study_id =?)
+            AND dn.parent_dn_id is null
+        </sql>
+    </query>
     <query>
         <name>create</name>
         <sql>
