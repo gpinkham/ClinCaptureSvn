@@ -19,9 +19,6 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
     @Before
     public void setUp() throws Exception {
 
-        HttpTransport transport = Mockito.mock(HttpTransport.class);
-        searchInterface.setTransport(transport);
-
         Mockito.doReturn(treeResult).when(searchInterface).getTreeResponse("http://data.bioontology.org/ontologies/MEDDRA/classes/http%3A%2F%2Fpurl.bioontology.org%2Fontology%2FMDR%2F10024319/tree", "api key");
         Mockito.doReturn(searchResult).when(searchInterface).getTermsResponse("Leukaemia plasmacytic (in remission)", "http://1.1.1.1", "api key");
         Mockito.doCallRealMethod().when(searchInterface).search("Leukaemia plasmacytic (in remission)", "MEDDRA", "http://1.1.1.1", "api key");

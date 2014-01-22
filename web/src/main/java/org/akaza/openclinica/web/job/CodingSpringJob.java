@@ -97,8 +97,14 @@ public class CodingSpringJob extends QuartzJobBean {
         } catch (Exception e) {
 
             logger.error(e.getMessage());
+
+            JobExecutionException qe = new JobExecutionException(e);
+            qe.refireImmediately();
+            throw qe;
         }
     }
+
+
 
     private Classification getCurrentTermClassification(List<Classification> classificationResultList, String verbatimTerm) {
 
