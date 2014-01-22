@@ -139,9 +139,8 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		sdvStatus.getFilterRenderer().setFilterEditor(new SdvStatusFilter());
 		
 		// siteId-filter
-		StudyDAO sdao = new StudyDAO(dataSource);
-		List<String> studyIds = SDVUtil.createListWithNotEmptyStudyNames(
-				sdao.getMapStudyIdToStudyIdentifierFromStudy(studyId), dataSource);
+		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
+		List<String> studyIds = eventCRFDAO.getAvailableForSDVSiteNamesByStudyId(studyId);
 		Collections.sort(studyIds);
 		
 		HtmlColumn studyIdentifier = ((HtmlRow) row).getColumn("siteId");

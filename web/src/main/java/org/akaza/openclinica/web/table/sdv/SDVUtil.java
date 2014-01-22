@@ -57,6 +57,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -64,6 +65,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.util.DAOWrapper;
+import org.akaza.openclinica.util.StudyEventUtil;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
@@ -462,26 +464,23 @@ public class SDVUtil {
 		HtmlColumn sdvRequirementDefinition = row.getColumn("sdvRequirementDefinition");
 		sdvRequirementDefinition.getFilterRenderer().setFilterEditor(new SDVRequirementFilter());
 		
+		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		StudyDAO sdao = new StudyDAO(dataSource);
 		StudyBean study = (StudyBean) sdao.findByPK(studyId);
 		int parentStudyId = study.getParentStudyId() > 0? study.getParentStudyId() : studyId;
 		
-		List<String> studyIds = createListWithNotEmptyStudyNames(
-				sdao.getMapStudyIdToStudyIdentifierFromStudy(studyId), dataSource);
+		List<String> studyIds = eventCRFDAO.getAvailableForSDVSiteNamesByStudyId(studyId);
 		Collections.sort(studyIds);
 		
 		HtmlColumn studyIdentifier = row.getColumn("studyIdentifier");
 		studyIdentifier.getFilterRenderer().setFilterEditor(new SDVSimpleListFilter(studyIds));
 		
-		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(dataSource);
-		List<String> eventNames = seddao.getEventNamesFromStudy(parentStudyId);
-		Collections.sort(eventNames);
+		List<String> eventNames = sortAsOnSubjectMatrix(eventCRFDAO.getAvailableForSDVEventNamesByStudyId(studyId), parentStudyId);
 		
 		HtmlColumn eventName = row.getColumn("eventName");
 		eventName.getFilterRenderer().setFilterEditor(new SDVSimpleListFilter(eventNames));
 		
-		CRFDAO crfdao = new CRFDAO(dataSource);
-		List<String> crfNames = crfdao.getAllCRFNamesFromStudy(parentStudyId);
+		List<String> crfNames = eventCRFDAO.getAvailableForSDVCRFNamesByStudyId(studyId);
 		Collections.sort(crfNames);
 		
 		HtmlColumn crfNameVersion = row.getColumn("crfNameVersion");
@@ -515,13 +514,12 @@ public class SDVUtil {
 		return tableFacade.render();
 	}
 
-	public static List<String> createListWithNotEmptyStudyNames(
-			Map<Integer, String> mapIdToStudyIdentifier, DataSource dataSource) {
-		EventCRFDAO ecfdao = new EventCRFDAO(dataSource);
-		List<String> result = new ArrayList<String>();
-		for(int studyId: mapIdToStudyIdentifier.keySet()){
-			if (ecfdao.countAvailableFromStudy(studyId) > 0){
-				result.add(mapIdToStudyIdentifier.get(studyId));
+	private List<String> sortAsOnSubjectMatrix(List<String> eventNames, int parentStudyId) {
+		ArrayList<String> result = new ArrayList<String>();
+		for (StudyEventDefinitionBean sedb: StudyEventUtil.selectStudyEventsSortedLikeOnSubjectMatrix(
+				parentStudyId, new StudyEventDefinitionDAO(dataSource), new StudyGroupClassDAO(dataSource))){
+			if (eventNames.contains(sedb.getName())){
+				result.add(sedb.getName());
 			}
 		}
 		return result;
@@ -1422,5 +1420,4 @@ public class SDVUtil {
 			return ItemUtils.getItemValue(item, property);
 		}
 	}
-
 }

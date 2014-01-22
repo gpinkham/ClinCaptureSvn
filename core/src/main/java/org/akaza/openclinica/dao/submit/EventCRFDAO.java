@@ -718,22 +718,35 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		return eventCRFs;
 	}
 
-	public int countAvailableFromStudy(int studyId) {
+	public List<String> getAvailableForSDVEntitiesByStudyId(int studyId, String entityProperty) {
 		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
+		this.setTypeExpected(1, TypeNames.STRING);
+		
+		List<String> result = new ArrayList<String>();
 
 		HashMap variables = new HashMap();
 		variables.put(1, studyId);
 		variables.put(2, studyId);
-		String sql = digester.getQuery("countAvailableFromStudy");
+		String sql = digester.getQuery("getAvailableForSDVEntitiesByStudyId").replaceFirst("entity", entityProperty);
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
-
-		if (it.hasNext()) {
-			return (Integer) ((HashMap) it.next()).get("count");
-		} else {
-			return 0;
-		}
+		
+		while (it.hasNext()) {
+			result.add((String) ((HashMap) it.next()).get("property"));
+		} 
+		return result;
+	}
+	
+	public List<String> getAvailableForSDVCRFNamesByStudyId(int studyId) {
+		return getAvailableForSDVEntitiesByStudyId(studyId, "crf.name");
+	}
+	
+	public List<String> getAvailableForSDVSiteNamesByStudyId(int studyId) {
+		return getAvailableForSDVEntitiesByStudyId(studyId, "s.unique_identifier");
+	}
+	
+	public List<String> getAvailableForSDVEventNamesByStudyId(int studyId) {
+		return getAvailableForSDVEntitiesByStudyId(studyId, "sed.name");
 	}
 	
 	public ArrayList getEventCRFsByStudy(int studyId, int parentStudyId, int limit, int offset) {

@@ -20,12 +20,12 @@ import org.junit.Test;
 public class StudyDAOTest extends DefaultAppContextTest {
 
 	@Test
-	public void testGetAllStudyIdentifiersInStudyNotReturnNull() throws OpenClinicaException {
-		assertNotNull(studyDAO.getAllStudyIdentifiersInStudy(1).get(0));
+	public void testFindByPKNotReturnNull() throws OpenClinicaException {
+		assertNotNull(studyDAO.findByPK(1));
 	}
 	
 	@Test
-	public void testGetAllStudyIdentifiersInStudyReturnsCorrectValue() throws OpenClinicaException {
-		assertEquals(1, studyDAO.getAllStudyIdentifiersInStudy(1).size());
+	public void testFindByPKReturnsCorrectValue() throws OpenClinicaException {
+		assertEquals("Default Study", studyDAO.findByPK(1).getName());
 	}
 }
