@@ -84,6 +84,7 @@ public class CodedItemsController {
 	@Autowired
 	private CodedItemService codedItemService;
 
+	private ItemDataDAO ItemDataDAO;
 	private StudyParameterValueDAO studyParamDAO;
 
 	/**
@@ -342,7 +343,7 @@ public class CodedItemsController {
         String codedItemItemDataId = request.getParameter("item");
 
         CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(codedItemItemDataId));
-
+        ItemDataBean itemData = (ItemDataBean) getItemDataDAO().findByPK(codedItem.getItemId());
 
         for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
 
@@ -355,6 +356,7 @@ public class CodedItemsController {
 		}
 
         codedItem.setStatus(String.valueOf(CodeStatus.NOT_CODED));
+        codedItem.setPreferredTerm(itemData.getValue());
 
         codedItemService.saveCodedItem(codedItem);
 
@@ -436,6 +438,15 @@ public class CodedItemsController {
 		}
 		
 		return studyParamDAO;
+	}
+	
+	private ItemDataDAO getItemDataDAO() {
+
+		if (ItemDataDAO == null) {
+			ItemDataDAO = new ItemDataDAO(datasource);
+		}
+		
+		return ItemDataDAO;
 	}
 
 	private void createCodeItemJob(String itemDataId, String verbatimTerm, String preferredName, String bioontologyUrl, String bioontologyApiKey, boolean isAlias) throws SchedulerException {

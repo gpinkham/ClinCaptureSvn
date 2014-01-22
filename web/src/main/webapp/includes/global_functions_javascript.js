@@ -2572,6 +2572,10 @@ uncodeCodeItem = function(item) {
 
                 //unblock term input
                 $(item).parents().find("div[id=" + $(item).attr("itemid") + "]").siblings("input").attr('disabled', false);
+                $(item).parents().find("div[id=" + $(item).attr("itemid") + "]").siblings("input").val($($(item).parent().siblings("td")[0]).children("div[name='itemDataValue']").text());
+
+                //update verb term attr for dynamic m.c. UX update
+                $("a[name='deleteTerm'][itemid=" + $(item).attr("itemid") + "]").attr("term", $.trim($($(item).parent().siblings("td")[0]).children("div[name='itemDataValue']").text().toLowerCase()));
 
                 //change completed code icon to available
                 $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc)
