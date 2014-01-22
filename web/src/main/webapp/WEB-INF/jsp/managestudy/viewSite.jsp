@@ -373,8 +373,9 @@
 </div>
 </div>
 <br>
-
-<div class="table_title_Manage" style="width:300px;float:left"><fmt:message key="view_site_event_definitions" bundle="${resword}"/></div>
+<c:if test = "${not empty definitions}">
+	<div class="table_title_Manage" style="width:300px;float:left"><fmt:message key="view_site_event_definitions" bundle="${resword}"/></div>
+</c:if>
 <div style="clear:both"></div>
 
 
@@ -545,10 +546,13 @@
 	value="<fmt:message key="back" bundle="${resword}"/>"
 	class="button_medium"
 	onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-<input type="button" name="BTN_Print" 
-	value="<fmt:message key="site_crfs" bundle="${resword}"/>" 
-	class="button_long" 
-	onclick="javascript:openDocWindow('PrintAllSiteEventCRF?siteId=<c:out value="${siteToView.id}"/>')"/>				
+	
+<c:if test = "${not empty definitions}">
+	<input type="button" name="BTN_Print" 
+		value="<fmt:message key="site_crfs" bundle="${resword}"/>" 
+		class="button_long" 
+		onclick="javascript:openDocWindow('PrintAllSiteEventCRF?siteId=<c:out value="${siteToView.id}"/>')"/>	
+</c:if>			
  <br><br>
 
 <jsp:include page="../include/footer.jsp"/>
