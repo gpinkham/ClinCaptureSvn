@@ -543,7 +543,10 @@
 
 </div>
 
- <div class="table_title_Manage"><fmt:message key="update_site_event_definitions" bundle="${resword}"/></div>
+<c:if test = "${not empty definitions}">
+	<div class="table_title_Manage"><fmt:message key="update_site_event_definitions" bundle="${resword}"/></div>
+</c:if>	
+	
 <c:set var="defCount" value="0"/>
 <c:forEach var="def" items="${definitions}">
 	<c:set var="defCount" value="${defCount+1}"/>
