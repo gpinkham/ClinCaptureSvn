@@ -2951,11 +2951,11 @@ function showMedicalCodingAlertBox(item, ajaxResponse){
 
     var color = $('*').find('a').css('color');
     if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
-        $('input.button_medium').css('background-image', 'url(../images/violet/button_medium_BG.gif)');
+        $('.ui-dialog-buttonpane').find('button:contains("Cancel")').css('background-image', 'url(../images/violet/button_medium_BG.gif)');
         $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
     }
     if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
-        $('input.button_medium').css('background-image', 'url(../images/green/button_medium_BG.gif)');
+        $('.ui-dialog-buttonpane').find('button:contains("Cancel")').css('background-image', 'url(../images/green/button_medium_BG.gif)');
         $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
     }
 }
