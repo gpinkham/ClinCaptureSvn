@@ -155,7 +155,7 @@ function submitform(){
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
 <td>
-  <input type="submit" onclick="return submitform();" value="<fmt:message key="preview_CRF" bundle="${resword}"/>" class="button_medium">
+  <input type="submit" onclick="return submitform();" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
 </td>
 <td>
   <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">
