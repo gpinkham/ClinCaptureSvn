@@ -67,10 +67,10 @@
 
 </div>
       <form action='DeleteStudyEvent?action=submit&id=<c:out value="${displayEvent.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
-        <input type="submit" name="submit" value="<fmt:message key="delete_event" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_delete_it" bundle="${resword}"/>");'>
-          &nbsp;
-        <input type="button" onclick="confirmCancel('ViewStudySubject?id=<c:out value="${studySub.id}"/>');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
-      </form> 
+        <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
+		&nbsp;
+		<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_delete_it" bundle="${resword}"/>");'>
+	  </form> 
 <br><br>
 <br><br><br><br>
 

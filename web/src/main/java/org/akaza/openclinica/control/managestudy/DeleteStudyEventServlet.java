@@ -23,7 +23,6 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -32,7 +31,6 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -96,10 +94,6 @@ public class DeleteStudyEventServlet extends Controller {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
 					.findByPK(event.getStudyEventDefinitionId());
 			event.setStudyEventDefinition(sed);
-
-			StudyDAO studydao = new StudyDAO(getDataSource());
-			StudyBean study = (StudyBean) studydao.findByPK(studySub.getStudyId());
-			request.setAttribute("study", study);
 
 			String action = request.getParameter("action");
 			if ("confirm".equalsIgnoreCase(action)) {
