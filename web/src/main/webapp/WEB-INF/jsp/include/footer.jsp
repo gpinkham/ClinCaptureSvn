@@ -21,13 +21,6 @@
 
             <table id="footerInnerTable1"  border="0" cellpadding="0" cellspacing="0" width="" style="white-space: nowrap;">
             <tr>
-                <td class="footer">
-                <input id="ShowAbout" class="button_medium" type="submit" onClick="openDefWindow('${pageContext.request.contextPath}/help/about.jsp');" value="<fmt:message key="about" bundle="${resword}"/>" name="BTN_Support"/><br/><br/>
-                <input id="ShowContactCAdministrator" class="button_medium" type="submit" onClick="window.location.href=('${pageContext.request.contextPath}/Contact');" value="<fmt:message key="nav_support" bundle="${resword}"/>" name="BTN_Support"/><br/><br/>
-                <input id="ShowForum" class="button_medium" type="submit" onClick="window.location.href=('http://www.clinovo.com/clincapture/forum/');" value="<fmt:message key="forums" bundle="${resword}"/>" name="BTN_Support"/><br/><br/>		    
-                <input id="ShowCommunity" class="button_medium" type="submit" onClick="window.location.href=('http://www.clinovo.com/clincapture/community');" value="<fmt:message key="community" bundle="${resword}"/>" name="BTN_Support"/>
-                &nbsp;&nbsp;&nbsp;
-                </td>
                 <td class="footer" style="width: 450px"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                 <td class="footer" align="right">
                     <div style="min-width: 70px;">

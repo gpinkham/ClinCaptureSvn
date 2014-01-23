@@ -101,12 +101,6 @@ View
             </c:if>
         </table>
 
-        <div class="sidebar_tab_content">
-
-            <input id="ViewAllIcons" class="button_medium" type="submit" onClick="openDefWindow('help/iconkey.html'); return false;" value="<fmt:message key="help" bundle="${reswords}"/>" name="BTN_Help">        
-
-        </div>
-
     </td>
 </tr>
 

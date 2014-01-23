@@ -434,9 +434,13 @@
         <div class="taskGroup"><fmt:message key="nav_other" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}UpdateProfile"><fmt:message key="nav_update_profile" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="javascript: openDefWindow('help/iconkey.html');"> <fmt:message key="help" bundle="${resword}"/> </a></div>
+            <div class="taskLink"><a href="javascript: window.location.href=('${pageContext.request.contextPath}/Contact');" > <fmt:message key="nav_support" bundle="${resword}"/> </a></div>
         </div>
         <div class="taskRightColumn">
             <div class="taskLink"><a href="${urlPrefix}j_spring_security_logout"><fmt:message key="nav_log_out" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="javascript: window.location.href=('http://www.clinovo.com/clincapture/forum/');" > <fmt:message key="forums" bundle="${resword}"/> </a></div>
+            <div class="taskLink"><a href="javascript: openDefWindow('${pageContext.request.contextPath}/help/about.jsp');" > <fmt:message key="about" bundle="${resword}"/> </a></div>
         </div>
         <br clear="all">
         <div></div>
