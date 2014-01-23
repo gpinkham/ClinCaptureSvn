@@ -712,6 +712,7 @@ public class CreateStudyServlet extends Controller {
 				fp.getString("replaceExisitingDataDuringImport"));
 		
 		// Medical coding
+		newStudy.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
 		newStudy.getStudyParameterConfig().setDefaultBioontologyURL(fp.getString("defaultBioontologyURL"));
         newStudy.getStudyParameterConfig().setMedicalCodingApiKey(fp.getString("medicalCodingApiKey"));
 
@@ -885,6 +886,10 @@ public class CreateStudyServlet extends Controller {
 
 		spv.setParameter("replaceExisitingDataDuringImport");
 		spv.setValue(newStudy.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
+		spvdao.create(spv);
+
+		spv.setParameter("allowCodingVerification");
+		spv.setValue(newStudy.getStudyParameterConfig().getAllowCodingVerification());
 		spvdao.create(spv);
 
 		spv.setParameter("defaultBioontologyURL");

@@ -152,6 +152,8 @@ public class CreateSubStudyServlet extends Controller {
 							} else if (scg.getParameter().getHandle()
 									.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
 								scg.getValue().setValue(fp.getString("replaceExisitingDataDuringImport"));
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowCodingVerification")) {
+								scg.getValue().setValue(fp.getString("allowCodingVerification"));
 							} else if (scg.getParameter().getHandle()
 									.equalsIgnoreCase("defaultBioontologyURL")) {
 								scg.getValue().setValue(fp.getString("defaultBioontologyURL"));
@@ -443,6 +445,10 @@ public class CreateSubStudyServlet extends Controller {
 					scg.getValue().setValue(fp.getString("replaceExisitingDataDuringImport"));
 					study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
 							fp.getString("replaceExisitingDataDuringImport"));
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowCodingVerification")
+						&& !fp.getString("allowCodingVerification").isEmpty()) {
+					scg.getValue().setValue(fp.getString("allowCodingVerification"));
+					study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("defaultBioontologyURL")
 						&& !fp.getString("defaultBioontologyURL").isEmpty()) {
 					scg.getValue().setValue(fp.getString("defaultBioontologyURL"));

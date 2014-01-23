@@ -546,6 +546,16 @@ function updateThis(multiSelEle, count) {
       </td>
     </tr>
    </c:when>
+
+   <c:when test="${config.parameter.handle=='allowCodingVerification'}">
+       <tr valign="top">
+           <td class="formlabel"><fmt:message key="allowCodingVerification" bundle="${resword}"/></td>
+           <td>
+               <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="allowCodingVerification" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+               <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="allowCodingVerification" value="no"><fmt:message key="no" bundle="${resword}"/>
+           </td>
+       </tr>
+   </c:when>
 	 <c:otherwise>
 		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_editable" bundle="${resword}"/></td><td>
 		   <c:choose>

@@ -69,6 +69,7 @@ public class StudyParameterConfigTest {
 
         assertEquals("no", config.getMedicalCodingApprovalNeeded());
         assertEquals("no", config.getMedicalCodingContextNeeded());
+        assertEquals("no", config.getAllowCodingVerification());
 
 
 	}

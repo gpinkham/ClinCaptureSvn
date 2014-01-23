@@ -917,6 +917,15 @@
   </tr>
 
   <tr valign="top">
+      <td class="table_header_column">
+          <fmt:message key="medicalCodingApiKey" bundle="${resword}"/>
+      </td>
+      <td class="table_cell">
+          <c:out value="${medicalCodingApiKey}"/>&nbsp;
+      </td>
+  </tr>
+
+  <tr valign="top">
     <td class="table_header_column">
       <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
     </td>
@@ -933,6 +942,22 @@
   </tr>
 
   <tr valign="top">
+      <td class="table_header_column">
+          <fmt:message key="allowCodingVerification" bundle="${resword}"/>
+      </td>
+      <td class="table_cell">
+          <c:choose>
+              <c:when test="${studyToView.studyParameterConfig.allowCodingVerification == 'yes'}">
+                  <fmt:message key="yes" bundle="${resword}"/>
+              </c:when>
+              <c:otherwise>
+                  <fmt:message key="no" bundle="${resword}"/>
+              </c:otherwise>
+          </c:choose>
+      </td>
+  </tr>
+
+  <tr valign="top">
     <td class="table_header_column">
       <fmt:message key="medicalCodingApprovalNeeded" bundle="${resword}"/>
     </td>
@@ -942,14 +967,7 @@
           <fmt:message key="blank" bundle="${resword}"/>
         </c:when>
         <c:otherwise>
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
+          ${studyToView.studyParameterConfig.medicalCodingApprovalNeeded}
         </c:otherwise>
       </c:choose>
     </td>
