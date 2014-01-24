@@ -206,9 +206,9 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 						allLocked = false;
 					}
 				}
-				if (allLocked && hasLockedBy) {
+				if (allLocked && hasLockedBy && (currentRole.isStudyAdministrator() || currentRole.isSysAdmin())) {
 					request.setAttribute("showUnlockEventsButton", true);
-				} else if (!allLocked) {
+				} else if (!allLocked && (currentRole.isStudyAdministrator() || currentRole.isSysAdmin())) {
 					request.setAttribute("showLockEventsButton", true);
 				}
 			}
