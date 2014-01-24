@@ -46,6 +46,7 @@ import org.springframework.stereotype.Component;
 public class ListStudySubjectsServlet extends RememberLastPage {
 
 	public static final String SAVED_SUBJECT_MATRIX_URL = "savedSubjectMatrixUrl";
+	public static final String SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX = "savedPageSizeForSubjectMatrix";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -186,5 +187,21 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&findSubjects_p_=");
 	}
-
+	
+	@Override
+	protected void saveUrl(String key, String value, HttpServletRequest request) {
+		if (value != null){
+			String pageSize = value.contains("findSubjects_mr_")? 
+					value.replaceFirst(".*&findSubjects_mr_=(\\d{2,})&.*", "$1") : "15";
+			request.getSession().setAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX, pageSize);
+			request.getSession().setAttribute(key, value);
+		}
+	}	
+	
+	@Override
+	protected String getSavedUrl(String key, HttpServletRequest request) {
+		String pageSize = (String) request.getSession().getAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
+		String savedUrl = (String) request.getSession().getAttribute(key);
+		return savedUrl == null || pageSize == null? savedUrl : savedUrl.replaceFirst("&findSubjects_mr_=\\d{2,}&", "&findSubjects_mr_="+pageSize+"&");
+	}
 }

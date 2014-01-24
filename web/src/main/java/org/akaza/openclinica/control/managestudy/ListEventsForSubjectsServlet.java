@@ -32,6 +32,7 @@ import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
+import org.akaza.openclinica.control.submit.ListStudySubjectsServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -148,13 +149,36 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		}
 		savedUrl = savedUrl != null ? savedUrl.replaceAll(".*" + request.getContextPath() + "/ListStudySubjects", "")
 				: null;
+
+		String pageSize = (String) request.getSession().getAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
+		if (pageSize == null) {
+			pageSize = "15";
+		}
+
 		return request.getMethod().equalsIgnoreCase("POST") && savedUrl != null ? savedUrl : "?module="
 				+ fp.getString("module") + "&defId=" + fp.getString("defId") + "&maxRows=15&showMoreLink="
-				+ showMoreLink + "&listEventsForSubject_tr_=true&listEventsForSubject_p_=1&listEventsForSubject_mr_=15";
+				+ showMoreLink + "&listEventsForSubject_tr_=true&listEventsForSubject_p_=1&listEventsForSubject_mr_="+pageSize;
 	}
 
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&listEventsForSubject_p_=");
+	}
+	
+	@Override
+	protected void saveUrl(String key, String value, HttpServletRequest request) {
+		if (value != null){
+			String pageSize = value.contains("listEventsForSubject_mr_")? 
+					value.replaceFirst(".*&listEventsForSubject_mr_=(\\d{2,}).*", "$1") : "15";
+			request.getSession().setAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX, pageSize);			
+			request.getSession().setAttribute(key, value);
+		}
+	}
+	
+	@Override
+	protected String getSavedUrl(String key, HttpServletRequest request) {
+		String pageSize = (String) request.getSession().getAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
+		String savedUrl = (String) request.getSession().getAttribute(key);
+		return savedUrl == null || pageSize == null? savedUrl : savedUrl.replaceFirst("&listEventsForSubject_mr_=\\d{2,}", "&listEventsForSubject_mr_="+pageSize);
 	}
 }

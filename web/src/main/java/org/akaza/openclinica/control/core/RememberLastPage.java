@@ -27,9 +27,9 @@ public abstract class RememberLastPage extends Controller {
 
 	protected abstract boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request);
 
-	private boolean redirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	protected boolean redirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		boolean result = false;
-		String url = (String) request.getSession().getAttribute(getUrlKey(request));
+		String url = getSavedUrl(getUrlKey(request), request);
 		if (url != null) {
 			result = true;
 			storeAttributes(request);
@@ -44,9 +44,9 @@ public abstract class RememberLastPage extends Controller {
 		boolean result = false;
 		String key = getUrlKey(request);
 		String defaultUrl = getDefaultUrl(request);
-		String keyValue = (String) request.getSession().getAttribute(key);
+		String keyValue = getSavedUrl(key, request);
 		if (keyValue == null && defaultUrl != null) {
-			request.getSession().setAttribute(key, request.getRequestURL() + defaultUrl);
+			saveUrl(key, request.getRequestURL() + defaultUrl, request);
 		}
 		if (request.getMethod().equalsIgnoreCase("POST")) {
 			if (request.getHeader(REFERER) != null
@@ -54,14 +54,14 @@ public abstract class RememberLastPage extends Controller {
 							.startsWith(request.getRequestURL().toString().toLowerCase())) {
 				result = redirect(request, response);
 			} else if (defaultUrl != null) {
-				request.getSession().setAttribute(key, request.getRequestURL() + defaultUrl);
+				saveUrl(key, request.getRequestURL() + defaultUrl, request);
 			}
 		} else if (request.getMethod().equalsIgnoreCase("GET")) {
 			if (userDoesNotUseJmesaTableForNavigation(request)) {
 				result = redirect(request, response);
 			} else {
 				if (request.getQueryString() != null) {
-					request.getSession().setAttribute(key, request.getRequestURL() + "?" + request.getQueryString());
+					saveUrl(key, request.getRequestURL() + "?" + request.getQueryString(), request);
 				}
 			}
 		}
@@ -69,6 +69,14 @@ public abstract class RememberLastPage extends Controller {
 			restoreAttributes(request);
 		}
 		return result;
+	}
+
+	protected void saveUrl(String key, String value, HttpServletRequest request) {
+		request.getSession().setAttribute(key, value);
+	}
+
+	protected String getSavedUrl(String key, HttpServletRequest request) {
+		return (String) request.getSession().getAttribute(key);
 	}
 
 	private void storeAttributes(HttpServletRequest request) {
