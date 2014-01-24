@@ -305,12 +305,9 @@ public class SDVUtil {
 				.getAttribute("showMoreLink").toString());
 		TableFacade tableFacade = createTableFacade("sdv", request);
 		tableFacade.setStateAttr("sdv_restore");
-		
-		
+
 		tableFacade.autoFilterAndSort(false);
-		
-		
-		
+
 		resformat = ResourceBundleProvider.getFormatBundle(request.getLocale());
 		this.pathPrefix = pathPrefix;
 
@@ -344,13 +341,11 @@ public class SDVUtil {
 				"sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
 				"sdvStatusActions" };
 		String[] formatColumns = new String[] { "eventDate", "enrollmentDate", "lastUpdatedDate" };
-		String[] turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId",
-				"secondaryId", "eventName", "enrollmentDate", "studySubjectStatus", "crfNameVersion",
-				"sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
-				"sdvStatusActions" };
+		String[] turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId", "secondaryId",
+				"eventName", "enrollmentDate", "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition",
+				"crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus", "sdvStatusActions" };
 		String[] turnOffFiltersColumns = new String[] { "personId", "secondaryId", "enrollmentDate",
-				"studySubjectStatus", "lastUpdatedDate", "lastUpdatedBy", "eventDate",
-				"studyEventStatus" };
+				"studySubjectStatus", "lastUpdatedDate", "lastUpdatedBy", "eventDate", "studyEventStatus" };
 
 		if (currentStudy != null) {
 			if (currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used")
@@ -370,11 +365,11 @@ public class SDVUtil {
 						resword.getString("SDV_requirement"), resword.getString("CRF_status"),
 						resword.getString("last_updated_date"), resword.getString("last_updated_by"),
 						resword.getString("study_event_status"), resword.getString("actions") };
-				turnOffFiltersColumns = new String[] { "personId", "studySubjectStatus", 
-						"lastUpdatedDate", "lastUpdatedBy", "eventDate", "studyEventStatus" };
-				turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId",
-						"eventName", "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition",
-						"crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus", "sdvStatusActions" };
+				turnOffFiltersColumns = new String[] { "personId", "studySubjectStatus", "lastUpdatedDate",
+						"lastUpdatedBy", "eventDate", "studyEventStatus" };
+				turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId", "eventName",
+						"studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus",
+						"lastUpdatedDate", "lastUpdatedBy", "studyEventStatus", "sdvStatusActions" };
 				formatColumns = new String[] { "eventDate", "lastUpdatedDate" };
 			} else if (currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used")) {
 				allColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "personId", "eventName",
@@ -397,10 +392,9 @@ public class SDVUtil {
 						resword.getString("study_event_status"), resword.getString("actions") };
 				turnOffFiltersColumns = new String[] { "personId", "enrollmentDate", "studySubjectStatus",
 						"lastUpdatedDate", "lastUpdatedBy", "eventDate", "studyEventStatus" };
-				turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId",
-						"eventName", "enrollmentDate", "studySubjectStatus", "crfNameVersion",
-						"sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy",
-						"studyEventStatus", "sdvStatusActions" };
+				turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId", "eventName",
+						"enrollmentDate", "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition",
+						"crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus", "sdvStatusActions" };
 			} else if (currentStudy.getStudyParameterConfig().getDateOfEnrollmentForStudyRequired()
 					.equalsIgnoreCase("not_used")) {
 				allColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "personId",
@@ -422,10 +416,9 @@ public class SDVUtil {
 						resword.getString("study_event_status"), resword.getString("actions") };
 				turnOffFiltersColumns = new String[] { "personId", "secondaryId", "studySubjectStatus",
 						"lastUpdatedDate", "lastUpdatedBy", "eventDate", "studyEventStatus" };
-				turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId",
-						"secondaryId", "eventName", "studySubjectStatus", "crfNameVersion",
-						"sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy",
-						"studyEventStatus", "sdvStatusActions" };
+				turnOffSortsColumns = new String[] { "sdvStatus", "studyIdentifier", "personId", "secondaryId",
+						"eventName", "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus",
+						"lastUpdatedDate", "lastUpdatedBy", "studyEventStatus", "sdvStatusActions" };
 				formatColumns = new String[] { "eventDate", "lastUpdatedDate" };
 			}
 		}
@@ -438,12 +431,13 @@ public class SDVUtil {
 
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvStatus"), new SdvStatusMatcher());
 
-		tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvRequirementDefinition"), new SDVRequirementMatcher());
-		
+		tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvRequirementDefinition"),
+				new SDVRequirementMatcher());
+
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "studyIdentifier"), new SDVSimpleMatcher());
-		
+
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "eventName"), new SDVEventNameMatcher());
-		
+
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfNameVersion"), new SDVSimpleMatcher());
 
 		this.setDataAndLimitVariables(tableFacade, studyId, request);
@@ -463,29 +457,30 @@ public class SDVUtil {
 
 		HtmlColumn sdvRequirementDefinition = row.getColumn("sdvRequirementDefinition");
 		sdvRequirementDefinition.getFilterRenderer().setFilterEditor(new SDVRequirementFilter());
-		
+
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 		StudyDAO sdao = new StudyDAO(dataSource);
 		StudyBean study = (StudyBean) sdao.findByPK(studyId);
-		int parentStudyId = study.getParentStudyId() > 0? study.getParentStudyId() : studyId;
-		
+		int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : studyId;
+
 		List<String> studyIds = eventCRFDAO.getAvailableForSDVSiteNamesByStudyId(studyId);
 		Collections.sort(studyIds);
-		
+
 		HtmlColumn studyIdentifier = row.getColumn("studyIdentifier");
 		studyIdentifier.getFilterRenderer().setFilterEditor(new SDVSimpleListFilter(studyIds));
-		
-		List<String> eventNames = sortAsOnSubjectMatrix(eventCRFDAO.getAvailableForSDVEventNamesByStudyId(studyId), parentStudyId);
-		
+
+		List<String> eventNames = sortAsOnSubjectMatrix(eventCRFDAO.getAvailableForSDVEventNamesByStudyId(studyId),
+				parentStudyId);
+
 		HtmlColumn eventName = row.getColumn("eventName");
 		eventName.getFilterRenderer().setFilterEditor(new SDVSimpleListFilter(eventNames));
-		
+
 		List<String> crfNames = eventCRFDAO.getAvailableForSDVCRFNamesByStudyId(studyId);
 		Collections.sort(crfNames);
-		
+
 		HtmlColumn crfNameVersion = row.getColumn("crfNameVersion");
 		crfNameVersion.getFilterRenderer().setFilterEditor(new SDVSimpleListFilter(crfNames));
-		
+
 		// fix HTML in columns
 		setHtmlCellEditors(tableFacade, allColumns, true);
 
@@ -516,9 +511,9 @@ public class SDVUtil {
 
 	private List<String> sortAsOnSubjectMatrix(List<String> eventNames, int parentStudyId) {
 		ArrayList<String> result = new ArrayList<String>();
-		for (StudyEventDefinitionBean sedb: StudyEventUtil.selectStudyEventsSortedLikeOnSubjectMatrix(
-				parentStudyId, new StudyEventDefinitionDAO(dataSource), new StudyGroupClassDAO(dataSource))){
-			if (eventNames.contains(sedb.getName())){
+		for (StudyEventDefinitionBean sedb : StudyEventUtil.selectStudyEventsSortedLikeOnSubjectMatrix(parentStudyId,
+				new StudyEventDefinitionDAO(dataSource), new StudyGroupClassDAO(dataSource))) {
+			if (eventNames.contains(sedb.getName())) {
 				result.add(sedb.getName());
 			}
 		}
@@ -574,8 +569,8 @@ public class SDVUtil {
 						resword.getString("last_updated_date"), resword.getString("last_updated_by"),
 						resword.getString("study_event_status"),
 						resword.getString("SDV_status") + " / " + resword.getString("actions") };
-				turnOffFiltersColumns = new String[] { "personId", "studySubjectStatus", 
-						"lastUpdatedDate", "lastUpdatedBy" };
+				turnOffFiltersColumns = new String[] { "personId", "studySubjectStatus", "lastUpdatedDate",
+						"lastUpdatedBy" };
 				formatColumns = new String[] { "eventDate", "lastUpdatedDate" };
 			} else if (currentStudy.getStudyParameterConfig().getSecondaryIdRequired().equalsIgnoreCase("not_used")) {
 				allColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "personId", "eventName",
@@ -614,7 +609,7 @@ public class SDVUtil {
 				formatColumns = new String[] { "eventDate", "lastUpdatedDate" };
 			}
 		}
-//!
+		// !
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "studySubjectStatus"), new SubjectStatusMatcher());
 
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfStatus"), new CrfStatusMatcher());
@@ -767,8 +762,8 @@ public class SDVUtil {
 					studyEventBean.getId(), crfBean.getCRFVersionId());
 
 			String allowSdvWithOpenQueries = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries();
-			boolean subjectHasUnclosedNDsInStudy = allowSdvWithOpenQueries.equals("no")
-					&& discrepancyNoteDAO.doesCRFHasUnclosedNDsInStudyForSubject(studyBean,
+			boolean crfHasUnclosedNDsInStudy = allowSdvWithOpenQueries.equals("no")
+					&& discrepancyNoteDAO.doesCRFHaveUnclosedNDsInStudyForSubject(studyBean,
 							studyEventDefinitionBean.getName(), studyEventBean.getId(), studySubjectBean.getLabel(),
 							eventDefinitionCRFBean.getCrfName());
 
@@ -822,7 +817,7 @@ public class SDVUtil {
 				sdvStatus.append(getIconForSdvStatusPrefix()).append("DoubleCheck").append(ICON_FORCRFSTATUS_SUFFIX)
 						.append("</a></center>");
 			} else {
-				if (!subjectHasUnclosedNDsInStudy) {
+				if (!crfHasUnclosedNDsInStudy) {
 					sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ")
 							.append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME).append(crfBean.getId())
 							.append("' /></center>");
@@ -860,7 +855,7 @@ public class SDVUtil {
 			}
 
 			actions = new StringBuilder("");
-			if (!crfBean.isSdvStatus() && !subjectHasUnclosedNDsInStudy) {
+			if (!crfBean.isSdvStatus() && !crfHasUnclosedNDsInStudy) {
 				actions.append("<input type=\"image\" name=\"sdvSubmit\" ").append("src=\"")
 						.append((request.getContextPath())).append("/images/icon_DoubleCheck_Action")
 						.append(ICON_FORSVN_SUFFIX).append("onclick=\"")
@@ -1017,7 +1012,6 @@ public class SDVUtil {
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCrfDAO = new EventDefinitionCRFDAO(dataSource);
 		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-		CRFDAO crfDAO = new CRFDAO(dataSource);
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		DAOWrapper daoWrapper = new DAOWrapper(studyDAO, studyEventDAO, studySubjectDAO, eventCRFDAO,
@@ -1032,23 +1026,11 @@ public class SDVUtil {
 			StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
 			StudyBean studyBean = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
 			for (EventCRFBean eventCRFBean : eventCrfs) {
-				CRFBean crfBean = crfDAO.findByVersionId(eventCRFBean.getCRFVersionId());
-				StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByPK(eventCRFBean.getStudyEventId());
-				EventDefinitionCRFBean eventDefinitionCrf = eventDefinitionCrfDAO
-						.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinitionId(),
-								crfBean.getId(), studySubject.getStudyId());
-				if (eventDefinitionCrf.getId() == 0) {
-					eventDefinitionCrf = eventDefinitionCrfDAO.findForStudyByStudyEventDefinitionIdAndCRFId(
-							studyEvent.getStudyEventDefinitionId(), crfBean.getId());
-				}
-				if (eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
-						|| eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) {
-					try {
-						eventCRFDAO.setSDVStatus(setVerification, userId, eventCRFBean.getId());
-					} catch (Exception exc) {
-						System.out.println(exc.getMessage());
-						return false;
-					}
+				try {
+					eventCRFDAO.setSDVStatus(setVerification, userId, eventCRFBean.getId());
+				} catch (Exception exc) {
+					System.out.println(exc.getMessage());
+					return false;
 				}
 
 			}

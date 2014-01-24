@@ -20,7 +20,15 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.core.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -35,20 +43,24 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.dao.managestudy.*;
-import org.akaza.openclinica.util.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
+import org.akaza.openclinica.util.CrfComparator;
+import org.akaza.openclinica.util.DAOWrapper;
+import org.akaza.openclinica.util.SDVUtil;
+import org.akaza.openclinica.util.SignUtil;
+import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * copy of the EnterDataForStudyEventServlet
@@ -100,8 +112,8 @@ public class CRFListForStudyEventServlet extends Controller {
 	public static final String STUDY_EVENT_NAME = "studyEventName";
 
 	private StudyEventBean getStudyEvent(HttpServletRequest request, int eventId) throws Exception {
-        StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		StudyEventDAO sedao = getStudyEventDAO();
 
@@ -111,7 +123,7 @@ public class CRFListForStudyEventServlet extends Controller {
 			studyWithSED.setId(currentStudy.getParentStudyId());
 		}
 
-        request.setAttribute("currentStudy", currentStudy);
+		request.setAttribute("currentStudy", currentStudy);
 
 		AuditableEntityBean aeb = sedao.findByPKAndStudy(eventId, studyWithSED);
 
@@ -126,7 +138,8 @@ public class CRFListForStudyEventServlet extends Controller {
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 		StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
 		seb.setStudyEventDefinition(sedb);
-		if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator()) && seb.getSubjectEventStatus().isLocked()) {
+		if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator())
+				&& seb.getSubjectEventStatus().isLocked()) {
 			seb.setEditable(false);
 		}
 		return seb;
@@ -134,9 +147,9 @@ public class CRFListForStudyEventServlet extends Controller {
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		removeLockedCRF(ub.getId());
 		FormProcessor fp = new FormProcessor(request);
@@ -186,11 +199,11 @@ public class CRFListForStudyEventServlet extends Controller {
 			setRequestAttributesForNotes(request, allNotesforSubjectAndEvent);
 		}
 
-        SessionManager sm = getSessionManager(request);
+		SessionManager sm = getSessionManager(request);
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(seb);
 		SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
-		
+
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 		ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
 				seb.getStudyEventDefinitionId());
@@ -202,8 +215,8 @@ public class CRFListForStudyEventServlet extends Controller {
 		EnterDataForStudyEventServlet.populateUncompletedCRFsWithAnOwner(sm.getDataSource(),
 				uncompletedEventDefinitionCRFs);
 
-		ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs,
-				eventDefinitionCRFs, ub, currentRole, seb.getSubjectEventStatus(), study);
+		ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
+				currentRole, seb.getSubjectEventStatus(), study);
 
 		if (currentStudy.getParentStudyId() > 0) {
 			HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
@@ -213,7 +226,7 @@ public class CRFListForStudyEventServlet extends Controller {
 
 			displayEventCRFs = hideCRFManager.removeHiddenEventCRFBeans(displayEventCRFs);
 		}
-		
+
 		request.setAttribute(STUDY_ID, currentStudy.getId());
 		request.setAttribute(BEAN_STUDY_EVENT, seb);
 		request.setAttribute(STUDY_EVENT_NAME, seb.getStudyEventDefinition().getName());
@@ -221,18 +234,20 @@ public class CRFListForStudyEventServlet extends Controller {
 		request.setAttribute(BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS, uncompletedEventDefinitionCRFs);
 		request.setAttribute(BEAN_DISPLAY_EVENT_CRFS, displayEventCRFs);
 		request.setAttribute(SES_ICON_URL, SubjectEventStatusUtil.getSESIconUrl(seb.getSubjectEventStatus()));
-		if (discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(currentStudy, studySubjectBean.getLabel())){
+		if (discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(currentStudy, studySubjectBean.getLabel())) {
 			String subjectFlagColor = "yellow";
-			if (discrepancyNoteDAO.doesSubjectHasNewNDsInStudy(currentStudy, studySubjectBean.getLabel())){
+			if (discrepancyNoteDAO.doesSubjectHasNewNDsInStudy(currentStudy, studySubjectBean.getLabel())) {
 				subjectFlagColor = "red";
 			}
 			request.setAttribute(SUBJECT_FLAG_COLOR, subjectFlagColor);
 		}
-		
+
 		String eventName = seb.getStudyEventDefinition().getName();
-		if (discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(currentStudy, eventName, eventId, studySubjectBean.getLabel())){
+		if (discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(currentStudy, eventName, eventId,
+				studySubjectBean.getLabel())) {
 			String eventFlagColor = "yellow";
-			if (discrepancyNoteDAO.doesEventHasNewNDsInStudy(currentStudy, eventName, eventId, studySubjectBean.getLabel())){
+			if (discrepancyNoteDAO.doesEventHasNewNDsInStudy(currentStudy, eventName, eventId,
+					studySubjectBean.getLabel())) {
 				eventFlagColor = "red";
 			}
 			request.setAttribute(EVENT_FLAG_COLOR, eventFlagColor);
@@ -253,7 +268,7 @@ public class CRFListForStudyEventServlet extends Controller {
 				String crfName = displayEventCRFBean.getEventCRF().getCrf().getName();
 				Integer crfId = displayEventCRFBean.getEventCRF().getCrf().getId();
 
-				if (discrepancyNoteDAO.doesCRFHasUnclosedNDsInStudyForSubject(currentStudy, eventName, eventId,
+				if (discrepancyNoteDAO.doesCRFHaveUnclosedNDsInStudyForSubject(currentStudy, eventName, eventId,
 						studySubjectBean.getLabel(), crfName)) {
 					String crfFlagColor = "yellow";
 					if (discrepancyNoteDAO.doesCRFHasNewNDsInStudyForSubject(currentStudy, eventName, eventId,
@@ -269,7 +284,7 @@ public class CRFListForStudyEventServlet extends Controller {
 				String crfName = displayEventDefinitionCRFBean.getEdc().getCrf().getName();
 				Integer crfId = displayEventDefinitionCRFBean.getEdc().getCrf().getId();
 
-				if (discrepancyNoteDAO.doesCRFHasUnclosedNDsInStudyForSubject(currentStudy, eventName, eventId,
+				if (discrepancyNoteDAO.doesCRFHaveUnclosedNDsInStudyForSubject(currentStudy, eventName, eventId,
 						studySubjectBean.getLabel(), crfName)) {
 					String crfFlagColor = "yellow";
 					if (discrepancyNoteDAO.doesCRFHasNewNDsInStudyForSubject(currentStudy, eventName, eventId,
@@ -314,9 +329,10 @@ public class CRFListForStudyEventServlet extends Controller {
 	}
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String exceptionName = resexception.getString("no_permission_to_submit_data");
 		String noAccessMessage = respage.getString("may_not_enter_data_for_this_study");

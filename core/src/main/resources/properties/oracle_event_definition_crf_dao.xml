@@ -158,9 +158,10 @@
         <query>
 			<name>findForStudyByStudyEventIdAndCRFVersionId</name>
 			<sql>
-				SELECT EDC.*
-				FROM EVENT_DEFINITION_CRF EDC, STUDY_EVENT SE, CRF_VERSION CV
+				SELECT EDC.*, C.name as crf_name
+				FROM EVENT_DEFINITION_CRF EDC, STUDY_EVENT SE, CRF_VERSION CV, CRF C
 				WHERE EDC.study_event_definition_id=SE.study_event_definition_id
+                    AND EDC.crf_id = C.crf_id
 					AND EDC.crf_id = CV.crf_id
 					AND SE.study_event_id = ?
 					AND CV.crf_version_id = ?
@@ -170,9 +171,10 @@
 		<query>
 			<name>findByStudyEventIdAndCRFVersionIdAndSiteIdAndParentStudyId</name>
 			<sql>
-				SELECT EDC.*
-				FROM EVENT_DEFINITION_CRF EDC, STUDY_EVENT SE, CRF_VERSION CV
+				SELECT EDC.*, C.name as crf_name
+				FROM EVENT_DEFINITION_CRF EDC, STUDY_EVENT SE, CRF_VERSION CV, CRF C
 				WHERE EDC.study_event_definition_id=SE.study_event_definition_id
+                    AND EDC.crf_id = C.crf_id
 					AND EDC.crf_id = CV.crf_id
 					AND SE.study_event_id = ?
 					AND CV.crf_version_id = ?

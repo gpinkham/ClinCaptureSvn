@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
@@ -167,26 +166,26 @@ public class ListNotesFilter implements CriteriaCommand {
 
 	private String parseResolutionStatus(String stringValue) {
 		StringBuilder result = new StringBuilder();
-		if (stringValue.length() > 0){
+		if (stringValue.length() > 0) {
 			result.append(" and (");
 			for (int i = 0; i < stringValue.length(); i++) {
 				result.append(" or " + "dn.resolution_status_id = " + stringValue.charAt(i));
 			}
 			result.append(")");
 		}
-		
+
 		return result.toString().replaceFirst(" or ", "");
 	}
-	
+
 	private String parseUserAccountName(String property, String stringValue) {
 		StringBuilder result = new StringBuilder();
-		
-		if (!stringValue.equalsIgnoreCase(ResourceBundleProvider.getResTerm("not_assigned"))){
+
+		if (!stringValue.equalsIgnoreCase(ResourceBundleProvider.getResTerm("not_assigned"))) {
 			result.append(" and " + property + " like '" + stringValue + "' ");
 		} else {
 			result.append(" and " + property + " is NULL ");
 		}
-		
+
 		return result.toString();
 	}
 
@@ -234,7 +233,7 @@ public class ListNotesFilter implements CriteriaCommand {
 		}
 		return builder.toString();
 	}
-    
+
 	public String getAdditionalFilter() {
 		StringBuilder builder = new StringBuilder(" where 1=1 ");
 		for (ListNotesFilter.Filter filter : this.getFilters()) {

@@ -20,6 +20,15 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import javax.sql.DataSource;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -30,18 +39,7 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.sql.DataSource;
-
-@SuppressWarnings({"rawtypes","unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
 	private void setQueryNames() {
@@ -118,6 +116,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		eb.setDefaultVersionId(((Integer) hm.get("default_version_id")).intValue());
 		eb.setOrdinal(((Integer) hm.get("ordinal")).intValue());
 		eb.setElectronicSignature(((Boolean) hm.get("electronic_signature")).booleanValue());
+		String crfName = (String) hm.get("crf_name");
+		eb.setCrfName(crfName != null ? crfName : eb.getCrfName());
 		// issue 3212
 		eb.setHideCrf(((Boolean) hm.get("hide_crf")));
 		int sdvId = (Integer) hm.get("source_data_verification_code");
@@ -635,6 +635,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		EventDefinitionCRFBean answer = new EventDefinitionCRFBean();
 
 		this.setTypesExpected();
+		this.setTypeExpected(22, TypeNames.STRING); // crfName
+
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(studyEventId));
 		variables.put(new Integer(2), new Integer(crfVersionId));
@@ -656,6 +658,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		EventDefinitionCRFBean answer = new EventDefinitionCRFBean();
 
 		this.setTypesExpected();
+		this.setTypeExpected(22, TypeNames.STRING); // crfName
+
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(studyEventId));
 		variables.put(new Integer(2), new Integer(crfVersionId));

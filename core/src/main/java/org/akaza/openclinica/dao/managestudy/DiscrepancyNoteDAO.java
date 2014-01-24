@@ -470,6 +470,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortLimits(StudyBean currentStudy,
 			ListNotesFilter filter, ListNotesSort sort, int offset, int limit) {
+		return getViewNotesWithFilterAndSortLimits(currentStudy, filter, sort, offset, limit, false);
+	}
+
+	public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSortLimits(StudyBean currentStudy,
+			ListNotesFilter filter, ListNotesSort sort, int offset, int limit, boolean eventCrfOnly) {
 		setTypesExpected();
 		this.setTypeExpected(12, TypeNames.STRING);
 		this.setTypeExpected(13, TypeNames.INT);
@@ -479,7 +484,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(17, TypeNames.STRING);
 
 		Map variables = new HashMap();
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= (eventCrfOnly ? 4 : 10); i++) {
 			variables.put(i, currentStudy.getId());
 		}
 
@@ -488,12 +493,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		String filterPart = filter.execute("");
 		String sortPart = sort.execute("");
 
-		sql.append(digester.getQuery("findAllSubjectDNByStudy"));
-		sql.append(filterPart).append(UNION_OP);
-		sql.append(digester.getQuery("findAllStudySubjectDNByStudy"));
-		sql.append(filterPart).append(UNION_OP);
-		sql.append(digester.getQuery("findAllStudyEventDNByStudy"));
-		sql.append(filterPart).append(filter.getAdditionalStudyEventFilter()).append(UNION_OP);
+		if (!eventCrfOnly) {
+			sql.append(digester.getQuery("findAllSubjectDNByStudy"));
+			sql.append(filterPart).append(UNION_OP);
+			sql.append(digester.getQuery("findAllStudySubjectDNByStudy"));
+			sql.append(filterPart).append(UNION_OP);
+			sql.append(digester.getQuery("findAllStudyEventDNByStudy"));
+			sql.append(filterPart).append(filter.getAdditionalStudyEventFilter()).append(UNION_OP);
+		}
 		sql.append(digester.getQuery("findAllEventCrfDNByStudy"));
 		if (currentStudy.isSite(currentStudy.getParentStudyId())) {
 			sql.append(" and ec.event_crf_id not in ( ").append(this.findSiteHiddenEventCrfIdsString(currentStudy))
@@ -2015,20 +2022,19 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	public String findSiteHiddenEventCrfIdsString(StudyBean site) {
 		String sql;
 		String valueOfBooleanTrue = ("oracle".equalsIgnoreCase(CoreResources.getDBName())) ? "1" : "'true'";
-	
-		sql = "SELECT DISTINCT ec.event_crf_id " 
+
+		sql = "SELECT DISTINCT ec.event_crf_id "
 				+ "FROM (((event_crf ec LEFT JOIN study_event se ON ec.study_event_id = se.study_event_id) "
 				+ "LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id) "
 				+ "LEFT JOIN study_subject ss ON ec.study_subject_id = ss.study_subject_id) "
 				+ "LEFT JOIN (SELECT edc.study_id, edc.study_event_definition_id, edc.crf_id "
-							+ "FROM event_definition_crf edc "
-							+ "WHERE (edc.study_id = " + site.getId() + " OR edc.study_id = (SELECT s.parent_study_id FROM study s WHERE s.study_id = " + site.getId() + ")) "
-								+ "AND edc.status_id = 1 " 
-								+ "AND edc.hide_crf = " + valueOfBooleanTrue + ") sedc ON cv.crf_id = sedc.crf_id "
-				+ "WHERE ec.status_id NOT IN (5,7) "
-					+ "AND se.study_event_definition_id = sedc.study_event_definition_id " 
-					+ "AND (ss.study_id = " + site.getId() + ")";
-		
+				+ "FROM event_definition_crf edc " + "WHERE (edc.study_id = " + site.getId()
+				+ " OR edc.study_id = (SELECT s.parent_study_id FROM study s WHERE s.study_id = " + site.getId()
+				+ ")) " + "AND edc.status_id = 1 " + "AND edc.hide_crf = " + valueOfBooleanTrue
+				+ ") sedc ON cv.crf_id = sedc.crf_id " + "WHERE ec.status_id NOT IN (5,7) "
+				+ "AND se.study_event_definition_id = sedc.study_event_definition_id " + "AND (ss.study_id = "
+				+ site.getId() + ")";
+
 		return sql;
 	}
 
@@ -2115,7 +2121,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
 		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
-				new ListNotesSort(), 0, 100);
+				new ListNotesSort(), 0, 100, true);
 		return noteBeans.size() > 0;
 	}
 
@@ -2147,7 +2153,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return doesEventHasSomeNDsInStudy(study, eventLabel, eventId, subjectLabel, "123");
 	}
 
-	public boolean doesCRFHasSomeNDsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
+	public boolean doesCRFHaveDNsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
 			String subjectLabel, String crfName, String resolutionStatus) {
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("eventId", eventId);
@@ -2156,18 +2162,18 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
 		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
-				new ListNotesSort(), 0, 100);
+				new ListNotesSort(), 0, 100, true);
 		return noteBeans.size() > 0;
 	}
 
 	public boolean doesCRFHasNewNDsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
 			String subjectLabel, String crfName) {
-		return doesCRFHasSomeNDsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "1");
+		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "1");
 	}
 
-	public boolean doesCRFHasUnclosedNDsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
+	public boolean doesCRFHaveUnclosedNDsInStudyForSubject(StudyBean study, String eventLabel, int eventId,
 			String subjectLabel, String crfName) {
-		return doesCRFHasSomeNDsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "123");
+		return doesCRFHaveDNsInStudyForSubject(study, eventLabel, eventId, subjectLabel, crfName, "123");
 	}
 
 	public Integer countAllByStudyEventTypeAndStudyEvent(StudyEventBean studyEvent) {
