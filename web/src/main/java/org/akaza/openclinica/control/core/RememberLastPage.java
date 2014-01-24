@@ -27,7 +27,7 @@ public abstract class RememberLastPage extends Controller {
 
 	protected abstract boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request);
 
-	protected boolean redirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	private boolean redirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		boolean result = false;
 		String url = getSavedUrl(getUrlKey(request), request);
 		if (url != null) {

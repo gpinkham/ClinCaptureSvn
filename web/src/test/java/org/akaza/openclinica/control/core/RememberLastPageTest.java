@@ -43,6 +43,7 @@ public class RememberLastPageTest {
 
 		Mockito.when(rememberLastPage.getUrlKey(request)).thenReturn(SAVED_URL);
 		Mockito.when(rememberLastPage.getDefaultUrl(request)).thenReturn(DEFAULT_URL);
+		Mockito.when(rememberLastPage.getSavedUrl(SAVED_URL, request)).thenReturn(URL);
 		Mockito.when(rememberLastPage.shouldRedirect(request, response)).thenCallRealMethod();
 	}
 
