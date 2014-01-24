@@ -99,7 +99,7 @@ public class CodedItem extends AbstractMutableDomainObject {
     @Transient
     public boolean isCoded() {
 
-        return !this.status.equals("NOT_CODED") && !this.status.equals("IN_PROGRESS");
+        return this.status.equals(String.valueOf(CodeStatus.CODED));
     }
 
     public int getCrfVersionId() {

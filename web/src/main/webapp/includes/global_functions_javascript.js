@@ -2470,13 +2470,13 @@ codeItem = function(item) {
             $('tr:not(:contains("In Progress"))').find("a[name='Code']").css("visibility", "visible");
 
             //auto code actions
-            if($("div[id=" + ($(item).attr("itemid")) + "]").find('table').length > 0 && $("#autoCode").size() === 1) {
+            if ($("div[id=" + ($(item).attr("itemid")) + "]").find('table').length > 0 && $("#autoCode").size() === 1) {
 
                 //disable input field
                 $(item).parent().siblings("td").find("input").attr('disabled', true);
 
                 //update coded item status
-                $(item).parent().siblings("td").filter(function () { return $(this).text() == 'To be Coded'; }).text("Completed");
+                $(item).parent().siblings("td").find("div[name='itemStatus']").text("Completed");
 
                 //display uncode icon
                 $("a[name='unCode'][itemid=" + ($(item).attr("itemid")) + "]").css("visibility", "visible");
@@ -2492,6 +2492,24 @@ codeItem = function(item) {
                 $("a[name='deleteTerm'][term=" + $.trim($(item).parent().siblings("td").find("input").val().toLowerCase()) + "]").filter(function () {
                     return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary; }).children('img').css("visibility", "visible");
 
+            } else if ($("#notCoded").size() === 1) {
+
+                // Update counters for new code not found items only
+
+                // Update counters for new code not found items only
+                if($(item).parent().siblings("td").find("div[name='itemStatus']").text() !== 'Code Not Found') {
+
+                    var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
+                    var tdCodeNotFound = parseInt($("table.summaryTable tr td[name='tdCodeNotFound']").text());
+
+                    $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
+                    $("table.summaryTable tr td[name='tdCodeNotFound'] a").text(tdCodeNotFound + 1);
+                }
+
+                $(item).parent().siblings("td").find("div[name='itemStatus']").text('Code Not Found');
+
+                $("#tdCodeNotFound").show();
+                $("td[name='tdCodeNotFound']").show();
             }
         },
         error: function(e) {
@@ -2581,8 +2599,7 @@ uncodeCodeItem = function(item) {
                 $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc)
 
                 //update coded item status
-                $(item).parent().siblings("td").filter(function () {
-                    return $(this).text() == 'Completed'; }).text("To be Coded");
+                $(item).parent().siblings("td").find("div[name='itemStatus']").text("To be Coded");
 
                 //hide unCode icon
                 $(item).css("visibility", "hidden");
@@ -2714,17 +2731,14 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
             }
 
             //change coded item status
-            $("a[name='Code'][itemid=" + id + "]").parents().siblings("td").filter(function () {
-                return $(this).text() == 'In Progress'; }).text("Completed");
+            $("div[id=" + id + "]").parent().siblings("td").find("div[name='itemStatus']").text('Completed');
 
             //display uncode icon
             $("a[name='unCode'][itemid=" + id + "]").css("visibility", "visible");
 
             //update code status counter
             var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
-            var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
             $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
-            $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
 
             //display deleteTerm button
             if(term !== undefined) {
@@ -2751,9 +2765,20 @@ function manualUpdateMedicalCodingUX (item, prefTerm) {
     //block input field
     $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").attr('disabled', true);
 
-    //change coded item status
-    $(item).parents().siblings("td").filter(function () {
-        return $(this).text() == 'To be Coded'; }).text("In Progress");
+    if($(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text() == 'Code Not Found') {
+
+        var tdCodeNotFound = parseInt($("table.summaryTable tr td[name='tdCodeNotFound']").text());
+
+        $("table.summaryTable tr td[name='tdCodeNotFound'] a").text(tdCodeNotFound - 1);
+
+    } else if ($(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text() == 'To be Coded') {
+
+        var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
+
+        $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
+    }
+
+    $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text('In Progress');
 
     //hide code icon results
     $("div[id=" + $(item).parents('div').attr("id") + "]").fadeOut( "slow" );

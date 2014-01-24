@@ -122,20 +122,25 @@ public class CodedItemsController {
 		
 		List<CodedItem> codedItems = getItems(items, CodeStatus.CODED);
 		List<CodedItem> unCodedItems = getItems(items, CodeStatus.NOT_CODED);
+		List<CodedItem> codeNotFoundItems = getItems(items, CodeStatus.CODE_NOT_FOUND);
 		
 		CodedItemsTableFactory factory = new CodedItemsTableFactory(medicalCodingContextNeeded.getValue(), showMoreLink);
 
 		factory.setStudyId(studyId);
 		factory.setCodedItems(items);
-        factory.setTerms(termService.findAll());
 		factory.setDataSource(datasource);
 		factory.setStudyDAO(getStudyDAO());
+		factory.setTerms(termService.findAll());
+		factory.setCrfDAO(new CRFDAO(datasource));
 		factory.setEventCRFDAO(new EventCRFDAO(datasource));
-		factory.setEventDefinitionCRFDAO(new EventDefinitionCRFDAO(datasource));
+		factory.setItemDataDAO(new ItemDataDAO(datasource));
 		factory.setStudySubjectDAO(new StudySubjectDAO(datasource));
+		factory.setEventDefinitionCRFDAO(new EventDefinitionCRFDAO(datasource));
 		factory.setStudyEventDefinitionDAO(new StudyEventDefinitionDAO(datasource));
-        factory.setItemDataDAO(new ItemDataDAO(datasource));
-        factory.setCrfDAO(new CRFDAO(datasource));
+		
+		if (!codeNotFoundItems.isEmpty()) {
+			factory.setShowCodeNotFoundStatus(true);
+		}
 
 		String codedItemsTable = factory.createTable(request, response).render();
 
@@ -148,6 +153,7 @@ public class CodedItemsController {
 		model.addAttribute("codedItemsTable", codedItemsTable);
 		model.addAttribute("unCodedItems", unCodedItems.size());
 		model.addAttribute("studyId", Integer.valueOf(studyId));
+		model.addAttribute("codeNotFoundItems", codeNotFoundItems.size());
 		model.addAttribute("mcApprovalNeeded", mcApprovalNeeded.getValue().equals("yes"));
 		
 		// After auto coding attempt
@@ -230,6 +236,14 @@ public class CodedItemsController {
                 try {
 
                     classifications = search.getClassifications(prefLabel, dictionary, bioontologyUrl.getValue(), bioontologyApiKey.getValue());
+                    
+                    if (classifications.size() == 0) {
+                    	
+                    	codedItem.setStatus(String.valueOf(CodeStatus.CODE_NOT_FOUND));
+                    	codedItemService.saveCodedItem(codedItem);
+                    	
+                    	model.addAttribute("notCoded", true);
+                    }
                 } catch (Exception ex) {
 
                     response.sendError(HttpServletResponse.SC_BAD_GATEWAY);

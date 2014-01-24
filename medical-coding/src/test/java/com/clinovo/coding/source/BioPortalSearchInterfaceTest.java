@@ -10,7 +10,6 @@ import org.mockito.Mockito;
 import com.clinovo.BaseTest;
 import com.clinovo.coding.model.Classification;
 import com.clinovo.coding.source.impl.BioPortalSearchInterface;
-import com.clinovo.http.HttpTransport;
 
 public class BioPortalSearchInterfaceTest extends BaseTest {
 

@@ -248,27 +248,30 @@ public class BioPortalSearchInterface implements SearchInterface {
     public static List<List<List<String>>> chopAttributesListForParts(final List<List<String>> ls, final int parts) {
 
         final List<List<List<String>>> listParts = new ArrayList<List<List<String>>>();
-        final int numberOfParts = ls.size() / parts;
+        
+        if (parts > 0) {
+        	
+        	final int numberOfParts = ls.size() / parts;
 
-        int itemsLeftOver = ls.size() % parts;
-        int itemsTake = numberOfParts;
+            int itemsLeftOver = ls.size() % parts;
+            int itemsTake = numberOfParts;
 
-        for (int i = 0, iT = ls.size(); i < iT; i += itemsTake) {
+            for (int i = 0, iT = ls.size(); i < iT; i += itemsTake) {
 
-            if (itemsLeftOver > 0) {
-                itemsLeftOver--;
-                itemsTake = numberOfParts + 1;
+                if (itemsLeftOver > 0) {
+                    itemsLeftOver--;
+                    itemsTake = numberOfParts + 1;
 
-            } else {
+                } else {
 
-                itemsTake = numberOfParts;
+                    itemsTake = numberOfParts;
+                }
+
+                List<List<String>> list = new ArrayList<List<String>>(ls.subList(i, Math.min(iT, i + itemsTake)));
+
+                listParts.add(list);
             }
-
-            List<List<String>> list = new ArrayList<List<String>>(ls.subList(i, Math.min(iT, i + itemsTake)));
-
-            listParts.add(list);
         }
-
         return listParts;
     }
 }

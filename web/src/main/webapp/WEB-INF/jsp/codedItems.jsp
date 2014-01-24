@@ -93,20 +93,35 @@
 	<table cellspacing="0" class="summaryTable" style="width:600px;">
         <tr>
         	<td>&nbsp;</td>
-        	<td align="center">To be Coded</td>
-
+        	<td align="center"><fmt:message key="toBeCoded" bundle="${resword}"/></td>
         	<c:if test="${mcApprovalNeeded}">
-        		<td align="center">To be Approved</td>
+        		<td align="center"><fmt:message key="toBeApproved" bundle="${resword}"/></td>
         	</c:if>
-        	<td align="center">Completed</td>
+        	<c:choose>
+        		<c:when test="${codeNotFoundItems > 0}">
+        			<td id="tdCodeNotFound" align="center"><fmt:message key="codeNotFound" bundle="${resword}"/></td>
+        		</c:when>
+        		<c:otherwise>
+        			<td id="tdCodeNotFound" align="center" style="display:none"><fmt:message key="codeNotFound" bundle="${resword}"/></td>
+        		</c:otherwise>
+        	</c:choose>
+        	<td align="center"><fmt:message key="completed" bundle="${resword}"/></td>
         </tr>
         <tr>
         	<td align="center">Medical Terms</td>
-        	<td align="center" name="tdToBeCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_status=To be Coded">${unCodedItems}</a></td>
+        	<td align="center" name="tdToBeCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?codedItems_f_status=To be Coded&study=${studyId}">${unCodedItems}</a></td>
         	<c:if test="${mcApprovalNeeded}">
             	<td align="center">0</td>
             </c:if>
-        	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?study=${studyId}&codedItems_f_status=Completed" onClick="showUncodedItems()">${codedItems}</a></td>
+            <c:choose>
+        		<c:when test="${codeNotFoundItems gt 0}">
+        			<td align="center" name="tdCodeNotFound"><a href="${pageContext.request.contextPath}/pages/codedItems?&codedItems_f_status=Code not found&study=${studyId}">${codeNotFoundItems}</a></td>
+        		</c:when>
+        		<c:otherwise>
+        			<td align="center" name="tdCodeNotFound" style="display:none"><a href="${pageContext.request.contextPath}/pages/codedItems?codedItems_f_status=Code not found&study=${studyId}">${codeNotFoundItems}</a></td>
+        		</c:otherwise>
+        	</c:choose>
+        	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?codedItems_f_status=Completed&study=${studyId}" onClick="showUncodedItems()">${codedItems}</a></td>
         </tr>
     </table> 
 </div>

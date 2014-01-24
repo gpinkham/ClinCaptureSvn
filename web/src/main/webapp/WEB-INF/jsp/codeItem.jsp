@@ -12,6 +12,7 @@
             <br>
             <span class="formlabel">No matching results found in dictionary <c:out value="${itemDictionary}"/>
         </div>
+        <input type="hidden" id="notCoded" />
     </c:when>
     <c:otherwise>
         <table id="tablepaging" class="itemsTable">

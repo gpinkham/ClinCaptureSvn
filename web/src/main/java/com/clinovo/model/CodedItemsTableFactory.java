@@ -74,6 +74,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     private final String medicalCodingContextNeeded;
     private final String showMoreLink;
+	private boolean shodCodeNotFoundStatus;
 
     public CodedItemsTableFactory(String medicalCodingContextNeeded, String showMoreLink) {
 
@@ -141,12 +142,18 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         if (codedItem.getStatus().equals("NOT_CODED")) {
 
             return "To be Coded";
+            
         } else if (codedItem.getStatus().equals("CODED")) {
 
             return "Completed";
+            
         } else if ((codedItem.getStatus().equals("IN_PROGRESS"))) {
 
             return "In Progress";
+            
+        } else if (codedItem.getStatus().equals("CODE_NOT_FOUND")) {
+        	
+        	return "Code Not Found";
         }
 
       return "Unknown";
@@ -391,8 +398,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             HtmlBuilder builder = new HtmlBuilder();
 
             if (!codedItemStatus.isEmpty()) {
-
-                builder.append(codedItemStatus).div().style("width:80px").close().divEnd();
+                builder.div().name("itemStatus").close()
+                .append(codedItemStatus).divEnd().div().style("width:100px").close().divEnd();
             }
             return builder.toString();
         }
@@ -459,6 +466,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 				options.add(new Option(" To be Approved", " To be Approved"));
 			}
             
+			if (shodCodeNotFoundStatus) {
+				options.add(new Option("Code Not Found", "Code Not Found"));
+			}
+			
             options.add(new Option("Completed", "Completed"));
             
             return options;
@@ -579,5 +590,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         CodedItemsTableToolbar toolbar = new CodedItemsTableToolbar(showMore, contextNeeded);
         tableFacade.setToolbar(toolbar);
     }
+
+	public void setShowCodeNotFoundStatus(boolean status) {
+		this.shodCodeNotFoundStatus = status;
+		
+	}
 
 }
