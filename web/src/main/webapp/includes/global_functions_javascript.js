@@ -2440,8 +2440,10 @@ disableRandomizeCRFButtons = function(flag) {
 
 codeItem = function(item) {
 
+    //disable coding for completed & in_progress items
+    if ($(item).attr('block') == 'true'){return;}
+
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-    $("a[name='Code']").css("visibility", "hidden");
 
     var ajaxRequest = $.ajax({
 
@@ -2465,9 +2467,6 @@ codeItem = function(item) {
 
             //display ajax response
             $("div[id=" + ($(item).attr("itemid")) + "]").html(data).fadeIn('slow');
-
-            //display code icon
-            $('tr:not(:contains("In Progress"))').find("a[name='Code']").css("visibility", "visible");
 
             //auto code actions
             if ($("div[id=" + ($(item).attr("itemid")) + "]").find('table').length > 0 && $("#autoCode").size() === 1) {
@@ -2514,10 +2513,8 @@ codeItem = function(item) {
         },
         error: function(e) {
 
-            //display code icon
-            $('tr:not(:contains("In Progress"))').find("a[name='Code']").css("visibility", "visible");
-
             hideMedicalCodingAlertBox(ajaxRequest);
+
             //open alert box
             if($("#sidebar_Alerts_open").css("display") == 'none') {
 
@@ -2594,6 +2591,9 @@ uncodeCodeItem = function(item) {
 
                 //update verb term attr for dynamic m.c. UX update
                 $("a[name='deleteTerm'][itemid=" + $(item).attr("itemid") + "]").attr("term", $.trim($($(item).parent().siblings("td")[0]).children("div[name='itemDataValue']").text().toLowerCase()));
+
+                //remove block from hyperlink
+                $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").attr('block', 'false');
 
                 //change completed code icon to available
                 $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc)
@@ -2721,15 +2721,6 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
             //update code icon url
             $("a[name='Code'][itemid=" + id + "]").children('img').attr('src', '../images/code_confirm.png');
 
-            //display code icon
-            if($("#alertBox").length > 0) {
-
-                $("a[name='Code'][itemid=" + id + "]").css("visibility", "hidden");
-            } else {
-
-                $("a[name='Code'][itemid=" + id + "]").css("visibility", "visible");
-            }
-
             //change coded item status
             $("div[id=" + id + "]").parent().siblings("td").find("div[name='itemStatus']").text('Completed');
 
@@ -2753,8 +2744,8 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
 
 function manualUpdateMedicalCodingUX (item, prefTerm) {
 
-    //hide coded item icon
-    $("a[name='Code'][itemid=" + $(item).parents('div').attr("id") + "]").css("visibility", "hidden");
+    //add block to hyperlink
+    $("a[name='Code'][itemid=" + $(item).parents('div').attr("id") + "]").attr('block', 'true');
 
     //update verb term attr for dynamic m.c. UX update
     $("a[name='deleteTerm'][itemid=" + $(item).parents('div').attr("id") + "]").attr("term", prefTerm.toLowerCase());
@@ -2951,7 +2942,7 @@ function showMedicalCodingAlertBox(item, ajaxResponse){
     if ($("#alertBox").length == 0) {
 
         $("<div id='alertBox' title='Medical coding process message'>" +
-            "<div style='clear: both; margin-top: 2%; text-align: center;'>Operation in process...</div>&nbsp;" +
+            "<div style='clear: both; margin-top: 2%; text-align: center;'>Retrieving medical codes. Please wait...</div>&nbsp;" +
             "<img style='display:block;margin:auto;' src='../images/ajax-loader-blue.gif'>" +
             "</div>").appendTo("body");
 
@@ -2970,6 +2961,7 @@ function showMedicalCodingAlertBox(item, ajaxResponse){
                 $('.ui-dialog-buttonpane').find('button:contains("Cancel")')
                     .mouseover(function() {$(this).removeClass("ui-state-hover");})
                     .focus(function () {$(this).removeClass("ui-state-focus");});
+                $('.ui-dialog-buttonpane').find('button:contains("Cancel")').blur();
             }
         });
     }
@@ -2990,8 +2982,6 @@ function hideMedicalCodingAlertBox(ajaxResponse) {
     if ($("#alertBox").length > 0) {
 
         ajaxResponse.abort();
-        //return coded items icons
-        $('tr:not(:contains("In Progress"))').find("a[name='Code']").css("visibility", "visible");
 
         $("#alertBox").remove();
     }

@@ -67,8 +67,10 @@
     </c:otherwise>
 </c:choose>
 
-<div id="pageNavPosition" style="padding-top: 20px" align="center"/>
-<input type="hidden" name="<c:out value="${itemDictionary}"/>" id="dictionary"/>
+<c:if test="${!autoCoded}">
+    <div id="pageNavPosition" style="padding-top: 20px" align="center"/>
+    <input type="hidden" name="<c:out value="${itemDictionary}"/>" id="dictionary"/>
+</c:if>
 
 <script type="text/javascript">
 

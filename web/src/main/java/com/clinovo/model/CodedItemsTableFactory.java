@@ -300,9 +300,9 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
             } else {
 
-                String hiddenItem = codedItem.getStatus().equals("IN_PROGRESS") ? "visibility:hidden" : "";
+                String disabled = (codedItem.getStatus().equals("CODED") || codedItem.getStatus().equals("IN_PROGRESS")) ? " block='true' " : " block='false' ";
 
-                builder.a().onclick("codeItem(this)").name("Code").style(hiddenItem).append("itemId=\"" + codedItem.getItemId() + "\"").close();
+                builder.a().onclick("codeItem(this)").append(disabled).name("Code").append("itemId=\"" + codedItem.getItemId() + "\"").close();
             }
 
             builder.img().style("float:left; height:17px").border("0").title(ResourceBundleProvider.getResWord("code"))
