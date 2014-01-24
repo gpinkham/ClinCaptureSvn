@@ -2096,6 +2096,26 @@
 
 		<tr valign="top">
             <td class="formlabel">
+                <fmt:message key="allowCodingVerification" bundle="${resword}"/>
+            </td>
+            <td>
+                <c:choose>
+                    <c:when test="${studyToView.studyParameterConfig.allowCodingVerification == 'yes'}">
+                        <input type="radio" checked name="allowCodingVerification" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" name="allowCodingVerification" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="radio" name="allowCodingVerification" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" checked name="allowCodingVerification" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                    </c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
+        <tr>
+			<td>&nbsp;</td>
+		</tr>
+		<tr valign="top">
+            <td class="formlabel">
                 <fmt:message key="defaultBioontologyURL" bundle="${resword}"/>:
             </td>
             <td>
@@ -2130,24 +2150,6 @@
 		    </td>
 		</tr>
         <tr><td>&nbsp;</td></tr>
-
-        <tr valign="top">
-            <td class="formlabel">
-                <fmt:message key="allowCodingVerification" bundle="${resword}"/>
-            </td>
-            <td>
-                <c:choose>
-                    <c:when test="${studyToView.studyParameterConfig.allowCodingVerification == 'yes'}">
-                        <input type="radio" checked name="allowCodingVerification" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-                        <input type="radio" name="allowCodingVerification" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-                    </c:when>
-                    <c:otherwise>
-                        <input type="radio" name="allowCodingVerification" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-                        <input type="radio" checked name="allowCodingVerification" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
-                    </c:otherwise>
-                </c:choose>
-            </td>
-        </tr>
 
 		<tr>
 			<td>&nbsp;</td>
