@@ -275,12 +275,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
                 String codeItemIcon = codeItemIconBuilder(codedItem);
                 String uncodeItemIcon = uncodeItemIconBuilder(codedItem);
-                String deleteTermIcon = deleteTermIconBuilder(codedItem);
                 String goToCrfIcon = goToCrfIconBuilder(eventCRFBean, eventDefCRFBean);
 
                 builder.append(codeItemIcon).nbsp().nbsp()
                         .append(uncodeItemIcon).nbsp().nbsp()
-                        .append(deleteTermIcon).nbsp().nbsp()
                         .append(goToCrfIcon);
 
                 builder.div().style("width:150px").close().divEnd();
@@ -315,7 +313,18 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
             HtmlBuilder builder = new HtmlBuilder();
 
-            builder.a().onclick("uncodeCodeItem(this)").name("unCode").append("itemId=\"" + codedItem.getItemId() + "\"");
+            builder.a().onclick("showMedicalCodingUncodeAlertBox(this)").name("unCode")
+                    .append("itemId=\"" + codedItem.getItemId() + "\"");
+
+            Term codedItemTerm = getCodedItemTerm(codedItem);
+
+            if(!codedItemTerm.getHttpPath().isEmpty()) {
+
+                builder.append("term=\"" + codedItem.getPreferredTerm().toLowerCase() + "\"");
+            } else {
+
+                builder.append("term=\"\"");
+            }
 
             if (codedItem.isCoded()) {
 
@@ -325,37 +334,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                 builder.style("visibility:hidden").close();
             }
 
-            builder.img().style("height:17px").border("0").title(ResourceBundleProvider.getResWord("unCode"))
-                    .alt(ResourceBundleProvider.getResWord("unCode")).src("../images/code_uncode.png").name("codeBtn").close().aEnd();
-
-            return builder.toString();
-        }
-
-        private String deleteTermIconBuilder(CodedItem codedItem) {
-
-            HtmlBuilder builder = new HtmlBuilder();
-
-            if (isLoggedInUserMonitor()) {
-
-                builder.a().onclick("deleteTerm(this)").name("deleteTerm").append("itemId=\"" + codedItem.getItemId() + "\"").style("visibility:hidden").close()
-                        .img().style("height:17px").border("0").src("../images/bt_Delete.gif").name("deleteTermBtn").close().aEnd();
-            } else {
-
-                Term codedItemTerm = getCodedItemTerm(codedItem);
-
-                builder.a().onclick("deleteTerm(this)").name("deleteTerm").append("itemId=\"" + codedItem.getItemId() + "\"").append("term=\"" + codedItem.getPreferredTerm().toLowerCase() + "\"");
-
-                if (codedItemTerm.getHttpPath().isEmpty()) {
-
-                    builder.style("visibility:hidden").close();
-                } else {
-
-                    builder.close();
-                }
-
-                builder.img().style("height:17px").border("0").src("../images/bt_Delete.gif").title(ResourceBundleProvider.getResWord("deleteAlias"))
-                        .alt(ResourceBundleProvider.getResWord("deleteAlias")).name("deleteTermBtn").close().aEnd();
-            }
+            builder.img().style("height:17px").border("0").title(ResourceBundleProvider.getResWord("deleteAlias"))
+                    .alt(ResourceBundleProvider.getResWord("deleteAlias")).src("../images/bt_Delete.gif").name("codeBtn").close().aEnd();
 
             return builder.toString();
         }
@@ -376,18 +356,18 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     }
 
     private Term getCodedItemTerm(CodedItem codedItem) {
-			
-			for (Term term : terms) {
 
-				if (term.getPreferredName().equalsIgnoreCase(codedItem.getPreferredTerm())
-						&& term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
+        for (Term term : terms) {
 
-					return term;
-				}
-			}
+            if (term.getPreferredName().equalsIgnoreCase(codedItem.getPreferredTerm())
+                    && term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
 
-		return new Term();
-	}
+                return term;
+            }
+        }
+
+        return new Term();
+    }
 
     @SuppressWarnings("unchecked")
     private class StatusCellEditor implements CellEditor {

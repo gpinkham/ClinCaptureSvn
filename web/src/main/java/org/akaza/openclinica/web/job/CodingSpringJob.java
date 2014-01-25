@@ -42,6 +42,7 @@ public class CodingSpringJob extends QuartzJobBean {
         String verbatimTerm = dataMap.getString(CodingTriggerService.VERBATIM_TERM);
         boolean isAlias = dataMap.getBooleanFromString(CodingTriggerService.IS_ALIAS);
         String preferredName = dataMap.getString(CodingTriggerService.PREFERRED_NAME);
+        String codeSearchTerm = dataMap.getString((CodingTriggerService.CODE_SEARCH_TERM));
         String bioontologyUrl = dataMap.getString(CodingTriggerService.BIOONTOLOGY_URL);
         String bioontologyApiKey = dataMap.getString(CodingTriggerService.BIOONTOLOGY_API_KEY);
         int codedItemId = Integer.valueOf(dataMap.getString(CodingTriggerService.CODED_ITEM_ID));
@@ -81,7 +82,7 @@ public class CodingSpringJob extends QuartzJobBean {
 
                     term.setDictionary(dictionary);
                     term.setLocalAlias(verbatimTerm.toLowerCase());
-                    term.setPreferredName(preferredName.toLowerCase());
+                    term.setPreferredName(codeSearchTerm.toLowerCase());
                     term.setHttpPath(classificationResult.getHttpPath());
                     term.setExternalDictionaryName(codedItem.getDictionary());
                     term.setTermElementList(generateTermElementList(classificationResult.getClassificationElement()));

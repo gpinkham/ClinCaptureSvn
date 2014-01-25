@@ -2483,17 +2483,7 @@ codeItem = function(item) {
                 //update code icon url
                 $("a[name='Code'][itemid=" + ($(item).attr("itemid")) + "]").children('img').attr('src', '../images/code_confirm.png');
 
-                //update verb term attr for dynamic m.c. UX update
-                $("a[name='deleteTerm'][itemid=" + $(item).attr("itemid") + "]").attr("term", $.trim($(item).parent().siblings("td").find("input").val().toLowerCase()));
-
-                //display delete term icon
-                var dictionary =  $(item).parent().siblings("td").find("div[name='termDictionary']").text();
-                $("a[name='deleteTerm'][term=" + $.trim($(item).parent().siblings("td").find("input").val().toLowerCase()) + "]").filter(function () {
-                    return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary; }).children('img').css("visibility", "visible");
-
             } else if ($("#notCoded").size() === 1) {
-
-                // Update counters for new code not found items only
 
                 // Update counters for new code not found items only
                 if($(item).parent().siblings("td").find("div[name='itemStatus']").text() !== 'Code Not Found') {
@@ -2542,12 +2532,13 @@ saveCodedItem = function(item) {
 
             prefTerm: prefTerm,
             item: $(item).parents('div').attr("id"),
-            verbatimTerm: $.trim($(item).parents().siblings("td").find("div[name='itemDataValue']").text())
+            verbatimTerm: $.trim($(item).parents().siblings("td").find("div[name='itemDataValue']").text()),
+            coderSearchTerm: $(item).parents().find("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").val()
         },
 
         success: function(data) {
 
-            manualUpdateMedicalCodingUX(item, prefTerm);
+            manualUpdateMedicalCodingUX(item);
 
             console.log("Medical coding executed successfully")
         },
@@ -2561,66 +2552,59 @@ saveCodedItem = function(item) {
 uncodeCodeItem = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-    var confirmText = "Uncoding this item will reset the coded item and its status. Do you want to proceed?";
-
-    if(confirm(confirmText)) {
 
         $.ajax({
 
-            type: "POST",
-            url: url + "/uncodeCodedItem",
-            data: {
+         type: "POST",
+         url: url + "/uncodeCodedItem",
+         data: {
 
-                item: $(item).attr("itemid")
-            },
+            item: $(item).attr("itemid")
+         },
 
-            success: function(data) {
+         success: function(data) {
 
-                var codeItemButtonSrc = "../images/code_blue.png";
-                var color = $('*').find('a').css('color').toLowerCase();
-                if (color == 'rgb(170, 98, 198)' || color == '#aa62c6') {
-                    codeItemButtonSrc = "../images/violet/code_violet.png";
-                }
-                if (color == 'rgb(117, 184, 148)' || color == '#75b894') {
-                    codeItemButtonSrc = "../images/green/code_green.png";
-                }
-
-                //unblock term input
-                $(item).parents().find("div[id=" + $(item).attr("itemid") + "]").siblings("input").attr('disabled', false);
-                $(item).parents().find("div[id=" + $(item).attr("itemid") + "]").siblings("input").val($($(item).parent().siblings("td")[0]).children("div[name='itemDataValue']").text());
-
-                //update verb term attr for dynamic m.c. UX update
-                $("a[name='deleteTerm'][itemid=" + $(item).attr("itemid") + "]").attr("term", $.trim($($(item).parent().siblings("td")[0]).children("div[name='itemDataValue']").text().toLowerCase()));
-
-                //remove block from hyperlink
-                $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").attr('block', 'false');
-
-                //change completed code icon to available
-                $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc)
-
-                //update coded item status
-                $(item).parent().siblings("td").find("div[name='itemStatus']").text("To be Coded");
-
-                //hide unCode icon
-                $(item).css("visibility", "hidden");
-
-                //update coded items counter
-                var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
-                var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
-                $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded - 1);
-                $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded + 1);
-
-                //cleanup results
-                $("#tablepaging").parent().html('');
-
-                console.log("Medical uncoding executed successfully");
-            },
-            error: function(e) {
-
-                console.log("Error:" + e);
+            var codeItemButtonSrc = "../images/code_blue.png";
+            var color = $('*').find('a').css('color').toLowerCase();
+            if (color == 'rgb(170, 98, 198)' || color == '#aa62c6') {
+                codeItemButtonSrc = "../images/violet/code_violet.png";
             }
-        })
-    }
+            if (color == 'rgb(117, 184, 148)' || color == '#75b894') {
+                codeItemButtonSrc = "../images/green/code_green.png";
+            }
+
+            $(item).parents().find("div[id=" + $(item).attr("itemid") + "]").siblings("input").attr('disabled', false);
+            $(item).parents().find("div[id=" + $(item).attr("itemid") + "]").siblings("input").val($($(item).parent().siblings("td")[0]).children("div[name='itemDataValue']").text());
+
+            //remove block from hyperlink
+            $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").attr('block', 'false');
+
+            //change completed code icon to available
+            $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc)
+
+            //update coded item status
+            $(item).parent().siblings("td").find("div[name='itemStatus']").text("To be Coded");
+
+            //hide unCode icon
+            $(item).css("visibility", "hidden");
+
+            //update coded items counter
+             var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
+             var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
+             $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded - 1);
+             $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded + 1);
+
+             //cleanup results
+             $("#tablepaging").parent().html('');
+
+             console.log("Medical uncoding executed successfully");
+         },
+         error: function(e) {
+
+             console.log("Error:" + e);
+         }
+    })
+
     return false;
 }
 
@@ -2639,13 +2623,14 @@ codeAndAlias = function(item) {
             prefTerm: prefTerm,
             study: study,
             item: $(item).parents('div').attr("id"),
-            verbatimTerm: $.trim($(item).parents().siblings("td").find("div[name='itemDataValue']").text())
+            verbatimTerm: $.trim($(item).parents().siblings("td").find("div[name='itemDataValue']").text()),
+            coderSearchTerm: $(item).parents().find("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").val()
 
         },
 
         success: function(data) {
 
-            manualUpdateMedicalCodingUX(item, prefTerm);
+            manualUpdateMedicalCodingUX(item);
 
             console.log("Medical coding executed successfully")
         },
@@ -2734,24 +2719,16 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
             //display deleteTerm button
             if(term !== undefined) {
 
-                var dictionary = $("a[name='deleteTerm'][term=" + term + "][itemid=" + id + "]").parents().siblings("td").find("div[name='termDictionary']").text();
-                $("a[name='deleteTerm'][term=" + term + "]").filter(function () {
-                    return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary; }).children('img').css("visibility", "visible");
+                $("a[name='unCode'][itemid=" + id + "]").attr('term',term);
             }
         }
     });
 }
 
-function manualUpdateMedicalCodingUX (item, prefTerm) {
+function manualUpdateMedicalCodingUX (item) {
 
     //add block to hyperlink
     $("a[name='Code'][itemid=" + $(item).parents('div').attr("id") + "]").attr('block', 'true');
-
-    //update verb term attr for dynamic m.c. UX update
-    $("a[name='deleteTerm'][itemid=" + $(item).parents('div').attr("id") + "]").attr("term", prefTerm.toLowerCase());
-
-    //update input field
-    $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").val($.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text()));
 
     //block input field
     $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").attr('disabled', true);
@@ -2772,7 +2749,7 @@ function manualUpdateMedicalCodingUX (item, prefTerm) {
     $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text('In Progress');
 
     //hide code icon results
-    $("div[id=" + $(item).parents('div').attr("id") + "]").fadeOut( "slow" );
+    $("div[id=" + $(item).parents('div').attr("id") + "]").html('');
 
 }
 
@@ -2922,10 +2899,9 @@ deleteTerm = function(item) {
 
         success: function(data) {
 
-            $("a[term=" + $(item).attr("term").toLowerCase() + "]").each(function () {
+            $("a[name='unCode'][term=" + $(item).attr("term").toLowerCase() + "]").each(function () {
 
-                $(this).children('img').css("visibility", "hidden");
-
+                $(this).attr('term', '');
             });
 
             console.log("Term successfully deleted")
@@ -2986,6 +2962,89 @@ function hideMedicalCodingAlertBox(ajaxResponse) {
         $("#alertBox").remove();
     }
 
+}
+
+function showMedicalCodingUncodeAlertBox(item) {
+
+    if ($("#alertBox").length == 0) {
+
+        if($(item).attr("term").length > 0) {
+
+            $("<div id='alertBox' title='Warning message'>" +
+                "<div style='clear: both; margin-top: 2%; text-align: center;'>Check the item you want to delete:<br><br>" +
+                "<input name='answer' type='radio' value='Code'>Code" +
+                "<input name='answer' type='radio' value='Alias'>Alias" +
+                "<input name='answer' type='radio' value='Both'>Both" +
+                "</div></div>").appendTo("body");
+
+            $("#alertBox").dialog({
+                autoOpen : true,
+                modal : true,
+                height: 150,
+                width: 500,
+                buttons:{ 'Submit': function() {
+                    var answer = $('input[name=answer]:checked' ).val();
+                    if(answer == 'Code') {
+                        uncodeCodeItem(item);
+                    } else if(answer == 'Alias') {
+                        deleteTerm(item);
+                    } else if(answer == 'Both') {
+                        uncodeCodeItem(item);
+                        deleteTerm(item);
+                    }
+                    $("#alertBox").remove();
+                },
+                    'Cancel': function() { $("#alertBox").remove();  }
+                },
+
+                open: function(event, ui) {
+
+                    $(".ui-dialog-titlebar-close", $(this).parent()).hide();
+                    $('.ui-widget-content').css('border', '0');
+                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
+                        .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0');
+                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
+                        .mouseover(function() {$(this).removeClass("ui-state-hover");})
+                        .focus(function () {$(this).removeClass("ui-state-focus");});
+                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")').blur();
+                }
+            });
+        } else {
+
+            $("<div id='alertBox' title='Warning message'>" +
+                "<div style='clear: both; margin-top: 2%; text-align: center;'>Are you sure you want to delete this code?</div>&nbsp;" +
+                "</div>").appendTo("body");
+
+            $("#alertBox").dialog({
+                autoOpen : true,
+                modal : true,
+                height: 150,
+                width: 450,
+                buttons: { 'Submit': function() { uncodeCodeItem(item); $("#alertBox").remove(); }, 'Cancel': function() { $("#alertBox").remove(); }},
+                open: function(event, ui) {
+
+                    $(".ui-dialog-titlebar-close", $(this).parent()).hide();
+                    $('.ui-widget-content').css('border', '0');
+                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
+                        .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0');
+                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
+                        .mouseover(function() {$(this).removeClass("ui-state-hover");})
+                        .focus(function () {$(this).removeClass("ui-state-focus");});
+                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")').blur();
+                }
+            });
+        }
+    }
+
+    var color = $('*').find('a').css('color');
+    if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
+        $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")').css('background-image', 'url(../images/violet/button_medium_BG.gif)');
+        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
+    }
+    if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
+        $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")').css('background-image', 'url(../images/green/button_medium_BG.gif)');
+        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
+    }
 }
 
 function getBrowserClientWidth() {

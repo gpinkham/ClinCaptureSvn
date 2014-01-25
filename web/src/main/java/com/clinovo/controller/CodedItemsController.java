@@ -324,17 +324,18 @@ public class CodedItemsController {
         String itemId = request.getParameter("item");
         String preferredName = request.getParameter("prefTerm");
         String verbatimTerm = request.getParameter("verbatimTerm");
+        String codeSearchTerm = request.getParameter("coderSearchTerm");
         
         CodedItem codedItem = codedItemService.findCodedItem(Integer.valueOf(itemId));
         StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "defaultBioontologyURL");
         StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "medicalCodingApiKey");
 
         codedItem.setStatus((String.valueOf(CodeStatus.IN_PROGRESS)));
-        codedItem.setPreferredTerm(preferredName);
+        codedItem.setPreferredTerm(codeSearchTerm);
 
         codedItemService.saveCodedItem(codedItem);
 
-        createCodeItemJob(itemId, verbatimTerm, preferredName, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), false);
+        createCodeItemJob(itemId, verbatimTerm, preferredName, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), false);
 
         // Redirect to main
         return "codedItems";
@@ -398,6 +399,7 @@ public class CodedItemsController {
  		String study = request.getParameter("study");
  		String preferredName = request.getParameter("prefTerm");
  		String verbatimTerm = request.getParameter("verbatimTerm");
+        String codeSearchTerm = request.getParameter("coderSearchTerm");
   		
  		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(Integer.parseInt(study), "autoCodeDictionaryName");
         StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(Integer.parseInt(study), "defaultBioontologyURL");
@@ -413,10 +415,10 @@ public class CodedItemsController {
         if (codedItem != null) {
 
             codedItem.setStatus((String.valueOf(CodeStatus.IN_PROGRESS)));
-            codedItem.setPreferredTerm(preferredName);
+            codedItem.setPreferredTerm(codeSearchTerm);
             codedItemService.saveCodedItem(codedItem);
 
-            createCodeItemJob(item, verbatimTerm, preferredName, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), isAlias);
+            createCodeItemJob(item, verbatimTerm, preferredName, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), isAlias);
         }
 
 		return "codedItems";
@@ -463,10 +465,10 @@ public class CodedItemsController {
 		return ItemDataDAO;
 	}
 
-	private void createCodeItemJob(String itemDataId, String verbatimTerm, String preferredName, String bioontologyUrl, String bioontologyApiKey, boolean isAlias) throws SchedulerException {
+	private void createCodeItemJob(String itemDataId, String verbatimTerm, String preferredName, String codeSearchTerm, String bioontologyUrl, String bioontologyApiKey, boolean isAlias) throws SchedulerException {
 
         CodingTriggerService codingTriggerService = new CodingTriggerService();
-        SimpleTriggerImpl trigger = codingTriggerService.generateCodeItemService(itemDataId, verbatimTerm, preferredName, bioontologyUrl, bioontologyApiKey, isAlias);
+        SimpleTriggerImpl trigger = codingTriggerService.generateCodeItemService(itemDataId, verbatimTerm, preferredName, codeSearchTerm, bioontologyUrl, bioontologyApiKey, isAlias);
         trigger.setDescription(itemDataId + " " + verbatimTerm);
 
         JobDetailImpl jobDetailBean = new JobDetailImpl();
