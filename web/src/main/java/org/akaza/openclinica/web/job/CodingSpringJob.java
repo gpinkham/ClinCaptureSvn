@@ -10,7 +10,6 @@ import com.clinovo.service.DictionaryService;
 import com.clinovo.service.TermService;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.quartz.impl.JobDetailImpl;
 import org.slf4j.Logger;
@@ -91,6 +90,7 @@ public class CodingSpringJob extends QuartzJobBean {
                 }
 
                 codedItem.setStatus((String.valueOf(Status.CodeStatus.CODED)));
+                codedItem.setHttpPath(classificationResult.getHttpPath());
 
                 codedItemService.saveCodedItem(codedItem);
             }
@@ -146,7 +146,7 @@ public class CodingSpringJob extends QuartzJobBean {
 			for (ClassificationElement classificationElement : classificationElements) {
 
 				// code items with values
-				String name = StringUtils.substringAfter(codedItemElement.getItemName(), "_");
+				String name = codedItemElement.getItemName();
 
 				if (name.equals(classificationElement.getElementName())) {
 
@@ -187,7 +187,7 @@ public class CodingSpringJob extends QuartzJobBean {
     	CodedItemElement element = null;
     	for (CodedItemElement codedItemElement : codedItemElements) {
     		
-    		if (StringUtils.substringAfter(codedItemElement.getItemName(), "_").equalsIgnoreCase(name)) {
+    		if (codedItemElement.getItemName().equalsIgnoreCase(name)) {
     			
     			element = codedItemElement;
     			break;

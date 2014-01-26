@@ -10,7 +10,7 @@ public class CompleteClassificationFieldsUtil {
 
     enum ICD910 {CAT, GRP, EXT}
 
-    enum MEDDRA {SOC, HLGT, HLT, PT, LTT}
+    enum MEDDRA {SOC, HLGT, HLT, PT, LLT}
 
     @SuppressWarnings("rawtypes")
 	public static void completeClassificationNameFields(ArrayList<ClassificationElement> classificationElements, String dictionary) throws SearchException {
@@ -24,9 +24,9 @@ public class CompleteClassificationFieldsUtil {
         } else if (dictionary.equals("MEDDRA")) {
 
             if (classificationElements.size() == 4) {
-                ClassificationElement lttElement = new ClassificationElement();
-                lttElement.setCodeName("");
-                classificationElements.add(lttElement);
+                ClassificationElement lltElement = new ClassificationElement();
+                lltElement.setCodeName("");
+                classificationElements.add(lltElement);
             }
             dictionaryValuesList = new ArrayList<MEDDRA>(Arrays.asList(MEDDRA.values()));
 

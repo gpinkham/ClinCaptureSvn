@@ -15,7 +15,7 @@
         <input type="hidden" id="notCoded" />
     </c:when>
     <c:otherwise>
-        <table id="tablepaging" class="itemsTable">
+        <table id="tablepaging_result" class="itemsTable">
             <c:set var="counter" value="0"/>
             <c:forEach items="${codedElementList}" var="obj">
                 <c:set var="counter" value="${counter + 1}"/>
@@ -64,10 +64,13 @@
                 </tr>
             </c:forEach>
         </table>
+        <c:if test="${fn:length(codedElementList) > 1}">
+            <input type="hidden" id="response" />
+        </c:if>
     </c:otherwise>
 </c:choose>
 
-<c:if test="${!autoCoded}">
+<c:if test="${!autoCoded && fn:length(codedElementList) > 0}">
     <div id="pageNavPosition" style="padding-top: 20px" align="center"/>
     <input type="hidden" name="<c:out value="${itemDictionary}"/>" id="dictionary"/>
 </c:if>
@@ -88,7 +91,7 @@
         rowsToDisplay = 10;
     }
 
-    var pager = new Pager('tablepaging', rowsToDisplay);
+    var pager = new Pager('tablepaging_result', rowsToDisplay);
     pager.init();
     pager.showPageNav('pager', 'pageNavPosition');
     pager.showPage(1);

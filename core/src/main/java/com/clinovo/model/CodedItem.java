@@ -44,6 +44,7 @@ public class CodedItem extends AbstractMutableDomainObject {
     
     private String dictionary = "";
     private String preferredTerm = "";
+    private String httpPath = "";
 
     private Boolean autoCoded = Boolean.FALSE;
     private String status = String.valueOf(CodeStatus.NOT_CODED);
@@ -161,5 +162,13 @@ public class CodedItem extends AbstractMutableDomainObject {
 
     public void setPreferredTerm(String preferredTerm) {
         this.preferredTerm = preferredTerm;
+    }
+
+    public String getHttpPath() {
+        return httpPath;
+    }
+
+    public void setHttpPath(String httpPath) {
+        this.httpPath = httpPath;
     }
 }

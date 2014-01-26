@@ -23,6 +23,17 @@
     codedItemAutoUpdate();
 </script>
 
+<script type="text/javascript">
+    $('html').click(function (e) {
+        if($(e.target).closest('#pageNavPosition').length === 0) {
+            if($(e.target).closest('#tablepaging_result').filter(function () {return $(this).siblings("#response").size() === 1; }).length === 0) {
+                $('#tablepaging_result').filter(function () {
+                    return $(this).siblings("#response").size() === 1; }).parent("div").html('');
+            }
+        }
+    });
+</script>
+
 <tr id="sidebar_Instructions_open">
     <td class="sidebar_tab">
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>

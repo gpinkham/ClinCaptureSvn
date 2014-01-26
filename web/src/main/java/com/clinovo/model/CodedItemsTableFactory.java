@@ -14,11 +14,7 @@
  *******************************************************************************/
 package com.clinovo.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.sql.DataSource;
 
@@ -251,11 +247,72 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                     builder.append("Search: ").input().style("border:1px solid #a6a6a6 ;margin-bottom: 2px; color:#4D4D4D").type("text").value(codedItem.getPreferredTerm()).close();
                 }
 
-                builder.div().id(String.valueOf(codedItem.getItemId())).close().divEnd();
+                String codedItemContextBox = contextBoxBuilder(codedItem);
+
+                builder.div().id(String.valueOf(codedItem.getItemId())).close().append(" "+ codedItemContextBox +" ").divEnd();
+
                 builder.div().style("width:420px").close().divEnd();
             }
 
             return builder.toString();
+        }
+
+        private String contextBoxBuilder(CodedItem codedItem) {
+
+            HtmlBuilder builder = new HtmlBuilder();
+
+            if (codedItem.isCoded()) {
+
+                builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:none;").close()
+                        .tr(1).close()
+                        .td(1).close().append("HTTP: ").tdEnd()
+                        .td(2).close().append(codedItem.getHttpPath()).tdEnd()
+                        .td(3).width("360px").colspan("2").close().tdEnd()
+                        .td(4).close().tdEnd().trEnd(1);
+
+
+                for (CodedItemElement codedItemElement : codedItemElementsFilter(codedItem).getCodedItemElements()) {
+
+                    builder.tr(1).close().td(1).close().append(" " + codedItemElement.getItemName() + ": ").tdEnd()
+                            .td(2).close().append(codedItemElement.getItemCode()).tdEnd().tdEnd()
+                            .td(3).width("360px").colspan("2").close().tdEnd()
+                            .td(4).close().tdEnd().trEnd(1).trEnd(1);
+                }
+
+                builder.tableEnd(1);
+            }
+
+            return builder.toString();
+        }
+
+        private CodedItem codedItemElementsFilter(CodedItem codedItem) {
+
+            CodedItem codedItemWithFilterFields = new CodedItem();
+
+            for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
+
+                for (CodedItemElement codedItemIteration : codedItem.getCodedItemElements()) {
+
+                    if ((codedItemElement.getItemName() + "C").equals(codedItemIteration.getItemName())) {
+
+                        codedItemWithFilterFields.addCodedItemElements(codedItemElement);
+                        break;
+                    }
+                }
+            }
+
+            Collections.sort(codedItemWithFilterFields.getCodedItemElements(), new codedElementSortByItemDataId());
+
+            return codedItemWithFilterFields;
+        }
+
+        private class codedElementSortByItemDataId implements Comparator {
+
+            public int compare(Object o1, Object o2) {
+                CodedItemElement p1 = (CodedItemElement) o1;
+                CodedItemElement p2 = (CodedItemElement) o2;
+                return p1.getItemDataId() - p2.getItemDataId();
+            }
         }
     }
 

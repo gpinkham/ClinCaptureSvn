@@ -2438,10 +2438,30 @@ disableRandomizeCRFButtons = function(flag) {
     }
 }
 
+function showHideCodedItemContext(item) {
+
+    if ($("div[id=" + $(item).attr("itemid") + "]").parent("td").find("#tablepaging").css('display') == 'none') {
+
+        $("div[id=" + $(item).attr("itemid") + "]").parent("td").find("#tablepaging").css('display', '');
+    } else {
+
+        $("div[id=" + $(item).attr("itemid") + "]").parent("td").find("#tablepaging").css('display', 'none');
+    }
+}
+
 codeItem = function(item) {
 
     //disable coding for completed & in_progress items
-    if ($(item).attr('block') == 'true'){return;}
+    if ($(item).attr('block') == 'true') {
+
+        if ($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'Completed') {
+
+            showHideCodedItemContext(item);
+            return;
+        }
+
+        return;
+    }
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
 
@@ -2463,10 +2483,9 @@ codeItem = function(item) {
             hideMedicalCodingAlertBox(ajaxRequest);
             //delete old results
             $("#emptyResult").parent().html('');
-            $("#tablepaging").parent().html('');
 
             //display ajax response
-            $("div[id=" + ($(item).attr("itemid")) + "]").html(data).fadeIn('slow');
+            $("div[id=" + ($(item).attr("itemid")) + "]").html(data);
 
             //auto code actions
             if ($("div[id=" + ($(item).attr("itemid")) + "]").find('table').length > 0 && $("#autoCode").size() === 1) {
@@ -2474,14 +2493,36 @@ codeItem = function(item) {
                 //disable input field
                 $(item).parent().siblings("td").find("input").attr('disabled', true);
 
-                //update coded item status
-                $(item).parent().siblings("td").find("div[name='itemStatus']").text("Completed");
-
                 //display uncode icon
                 $("a[name='unCode'][itemid=" + ($(item).attr("itemid")) + "]").css("visibility", "visible");
 
                 //update code icon url
                 $("a[name='Code'][itemid=" + ($(item).attr("itemid")) + "]").children('img').attr('src', '../images/code_confirm.png');
+
+                //add block for hyperlink
+                $("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").attr('block', 'true');
+
+                //add term mark
+                $("a[name='unCode'][itemid=" + $(item).attr("itemid") + "]").attr('term',  $(item).parent().siblings("td").find("input").val());
+
+                var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
+                $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
+
+                if($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'Code Not Found') {
+
+                    var tdCodeNotFound = parseInt($("table.summaryTable tr td[name='tdCodeNotFound']").text());
+                    $("table.summaryTable tr td[name='tdCodeNotFound'] a").text(tdCodeNotFound - 1);
+
+                } else if ($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'To be Coded') {
+
+                    var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
+                    $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
+                }
+
+                //update coded item status
+                $(item).parent().siblings("td").find("div[name='itemStatus']").text("Completed");
+
+                $("div[id=" + $(item).attr("itemid") + "]").find('#tablepaging_result').attr('id', 'tablepaging');
 
             } else if ($("#notCoded").size() === 1) {
 
@@ -2595,7 +2636,7 @@ uncodeCodeItem = function(item) {
              $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded + 1);
 
              //cleanup results
-             $("#tablepaging").parent().html('');
+             $(item).parents().find("div[id=" + $(item).attr("itemid") + "]").find("#tablepaging").remove();
 
              console.log("Medical uncoding executed successfully");
          },
@@ -2692,16 +2733,20 @@ function codedItemAutoUpdateAjax(arr) {
 
 function autoUpdateMedicalCodingUX(itemsToUpdate) {
 
-    var array  = itemsToUpdate.split(',');
+    var array = itemsToUpdate.split('separatorMark');
 
-    jQuery.each(array, function () {
+    $.each(array, function () {
 
-        var idAndTerm = $.trim(this).replace('[','').replace(']','');
+        var contextBox = $.trim(this).replace('[', '').replace(']', '');
 
-        if (idAndTerm.length > 0) {
+        if (contextBox.length > 0) {
 
-            var id = idAndTerm.split('_')[0];
-            var term = idAndTerm.split('_')[1];
+            var id = new RegExp("idToAppend=\"(\\d+)\"").exec(contextBox)[1];
+            var term = undefined;
+
+            try {
+                term = new RegExp("termToAppend=\"(.+)\"").exec(contextBox)[1];
+            } catch (e) {}
 
             //update code icon url
             $("a[name='Code'][itemid=" + id + "]").children('img').attr('src', '../images/code_confirm.png');
@@ -2716,16 +2761,19 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
             var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
             $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
 
-            //display deleteTerm button
-            if(term !== undefined) {
+            //append context box
+            $("div[id=" + id + "]").append(contextBox);
 
-                $("a[name='unCode'][itemid=" + id + "]").attr('term',term);
+            //display deleteTerm button
+            if (term !== undefined) {
+
+                $("a[name='unCode'][itemid=" + id + "]").attr('term', term);
             }
         }
     });
 }
 
-function manualUpdateMedicalCodingUX (item) {
+function manualUpdateMedicalCodingUX(item) {
 
     //add block to hyperlink
     $("a[name='Code'][itemid=" + $(item).parents('div').attr("id") + "]").attr('block', 'true');
@@ -2733,7 +2781,7 @@ function manualUpdateMedicalCodingUX (item) {
     //block input field
     $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").attr('disabled', true);
 
-    if($(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text() == 'Code Not Found') {
+    if ($(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text() == 'Code Not Found') {
 
         var tdCodeNotFound = parseInt($("table.summaryTable tr td[name='tdCodeNotFound']").text());
 
@@ -2899,10 +2947,10 @@ deleteTerm = function(item) {
 
         success: function(data) {
 
-            $("a[name='unCode'][term=" + $(item).attr("term").toLowerCase() + "]").each(function () {
+            var dictionary = $(item).parent().siblings("td").find("div[name='termDictionary']").text();
 
-                $(this).attr('term', '');
-            });
+            $("a[name='unCode'][term=" + $(item).attr("term").toLowerCase() + "]").filter(function () {
+                return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary; }).attr('term', '');
 
             console.log("Term successfully deleted")
         },

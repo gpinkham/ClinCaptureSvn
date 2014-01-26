@@ -69,6 +69,6 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
         assertEquals("HLGT", classification.getClassificationElement().get(1).getElementName());
         assertEquals("HLT", classification.getClassificationElement().get(2).getElementName());
         assertEquals("PT", classification.getClassificationElement().get(3).getElementName());
-        assertEquals("LTT", classification.getClassificationElement().get(4).getElementName());
+        assertEquals("LLT", classification.getClassificationElement().get(4).getElementName());
     }
 }

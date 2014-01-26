@@ -17,6 +17,7 @@ import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,7 +127,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 
             if(codedItem != null) {
 
-                CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), item.getName());
+            	CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), StringUtils.substringAfter(item.getName(), "_"));
 
                 codedItem.addCodedItemElements(codedItemElement);
 

@@ -36,7 +36,6 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.job.CodingTriggerService;
-import org.apache.commons.lang3.StringUtils;
 import org.quartz.SchedulerException;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
@@ -215,6 +214,7 @@ public class CodedItemsController {
   
  			codedItem.setAutoCoded(true);
  			codedItem.setPreferredTerm(term.getPreferredName());
+            codedItem.setHttpPath(term.getHttpPath());
  			codedItem.setStatus((String.valueOf(CodeStatus.CODED)));
   
  			codedItemService.saveCodedItem(codedItem);
@@ -505,12 +505,12 @@ public class CodedItemsController {
 
             for (ClassificationElement classificationElement : classificationElements) {
                 //code items with values
-                if (StringUtils.substringAfter(codedItemElement.getItemName(), "_").equals(classificationElement.getElementName())) {
+                if (codedItemElement.getItemName().equals(classificationElement.getElementName())) {
 
                     codedItemElement.setItemCode(classificationElement.getCodeName());
                     break;
                     //code items with code
-                } else if (StringUtils.substringAfter(codedItemElement.getItemName(), "_").equals(classificationElement.getElementName() + "C")) {
+                } else if (codedItemElement.getItemName().equals(classificationElement.getElementName() + "C")) {
 
                     codedItemElement.setItemCode(classificationElement.getCodeValue());
                     break;
