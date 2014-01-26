@@ -95,7 +95,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 		ItemFormMetadataDAO itemMetaDAO = new ItemFormMetadataDAO(dataSource);
         ItemFormMetadataBean meta = itemMetaDAO.findByItemIdAndCRFVersionId(item.getId(),
                 eventCRF.getCRFVersionId());
-		if (currentDictionaryIsValid(meta.getCodeRef())) {
+		if (currentDictionaryIsValid(meta.getCodeRef()) && !itemData.getValue().isEmpty()) {
 
             if (study.isSite(study.getParentStudyId())) {
 
@@ -123,12 +123,17 @@ public class CodedItemServiceImpl implements CodedItemService {
                     eventCRF.getCRFVersionId());
             ItemDataBean refItemData = getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(refItem.getId(), eventCRF.getId(), itemData.getOrdinal());
             CodedItem codedItem = codeItemDAO.findByItemId(refItemData.getId());
-            CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), item.getName());
 
-            codedItem.addCodedItemElements(codedItemElement);
+            if(codedItem != null) {
 
-            codeItemDAO.saveOrUpdate(codedItem);
-            return codedItem;
+                CodedItemElement codedItemElement = new CodedItemElement(itemData.getId(), item.getName());
+
+                codedItem.addCodedItemElements(codedItemElement);
+
+                codeItemDAO.saveOrUpdate(codedItem);
+
+                return codedItem;
+            }
         }
 
 		return cItem;
