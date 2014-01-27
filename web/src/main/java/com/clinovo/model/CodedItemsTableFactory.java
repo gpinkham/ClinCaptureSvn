@@ -515,11 +515,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 			if (mcApprovalNeeded.getValue().equals("yes")) {
 				options.add(new Option("Not Approved", "Not Approved"));
 			}
-            
-			if (shodCodeNotFoundStatus) {
-				options.add(new Option("Code not Found", "Code not Found"));
-			}
-			
+
+		    options.add(new Option("Code not Found", "Code not Found"));
             options.add(new Option("Coded", "Coded"));
             
             return options;
@@ -667,10 +664,4 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             return false;
         }
     }
-
-	public void setShowCodeNotFoundStatus(boolean status) {
-		this.shodCodeNotFoundStatus = status;
-		
-	}
-
 }

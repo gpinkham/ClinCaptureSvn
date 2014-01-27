@@ -139,10 +139,6 @@ public class CodedItemsController {
 		factory.setStudySubjectDAO(new StudySubjectDAO(datasource));
 		factory.setEventDefinitionCRFDAO(new EventDefinitionCRFDAO(datasource));
 		factory.setStudyEventDefinitionDAO(new StudyEventDefinitionDAO(datasource));
-		
-		if (!codeNotFoundItems.isEmpty()) {
-			factory.setShowCodeNotFoundStatus(true);
-		}
 
 		String codedItemsTable = factory.createTable(request, response).render();
 

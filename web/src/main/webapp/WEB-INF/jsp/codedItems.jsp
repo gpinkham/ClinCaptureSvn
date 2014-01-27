@@ -34,6 +34,24 @@
     });
 </script>
 
+<script type="text/javascript">
+    function redirectUrl(buttonType) {
+
+        var url = $("#codedItemUrl").val();
+
+        if (url.indexOf("codedItems_f_status") > 0) {
+
+            url = url.replace(/(codedItems_f_status=)[^\&]+/, '$1' + buttonType);
+        } else {
+
+            url = url + "&codedItems_f_status=" + buttonType;
+        }
+
+        window.location.replace(${pageContext.request.contextPath}"/pages/codedItems?" + url);
+    }
+</script>
+<input type="hidden" id="codedItemUrl" value='<c:out value="${codedItemUrl}"/>'/>
+
 <tr id="sidebar_Instructions_open">
     <td class="sidebar_tab">
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
@@ -120,19 +138,19 @@
         </tr>
         <tr>
         	<td align="center">Medical Terms</td>
-        	<td align="center" name="tdNotCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?codedItems_f_status=Not Coded&study=${studyId}">${unCodedItems}</a></td>
+        	<td align="center" name="tdNotCoded"><a href='javascript:redirectUrl("Not Coded");'>${unCodedItems}</a></td>
         	<c:if test="${mcApprovalNeeded}">
             	<td align="center">0</td>
             </c:if>
             <c:choose>
         		<c:when test="${codeNotFoundItems gt 0}">
-        			<td align="center" name="tdCodeNotFound"><a href="${pageContext.request.contextPath}/pages/codedItems?&codedItems_f_status=Code not found&study=${studyId}">${codeNotFoundItems}</a></td>
+        			<td align="center" name="tdCodeNotFound"><a href='javascript:redirectUrl("Code not Found");'>${codeNotFoundItems}</a></td>
         		</c:when>
         		<c:otherwise>
-        			<td align="center" name="tdCodeNotFound" style="display:none"><a href="${pageContext.request.contextPath}/pages/codedItems?codedItems_f_status=Code not found&study=${studyId}">${codeNotFoundItems}</a></td>
+        			<td align="center" name="tdCodeNotFound" style="display:none"><a href='javascript:redirectUrl("Code not Found");'>${codeNotFoundItems}</a></td>
         		</c:otherwise>
         	</c:choose>
-        	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?codedItems_f_status=Coded&study=${studyId}" onClick="showUncodedItems()">${codedItems}</a></td>
+        	<td align="center" name="tdCoded"><a href='javascript:redirectUrl("Coded"); showUncodedItems();'>${codedItems}</a></td>
         </tr>
     </table> 
 </div>
