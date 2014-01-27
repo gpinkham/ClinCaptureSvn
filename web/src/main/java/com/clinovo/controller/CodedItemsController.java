@@ -104,7 +104,10 @@ public class CodedItemsController {
 		
 		String studyId = request.getParameter("study");
         String showMoreLink = request.getParameter("showMoreLink");
+        String showContext = request.getParameter("showContext");
+
         showMoreLink = showMoreLink == null ? "false" : showMoreLink;
+        showContext =  showContext == null ? "false" : showContext;
 
 		StudyBean study = (StudyBean) getStudyDAO().findByPK(Integer.parseInt(studyId));
 		StudyParameterValueBean mcApprovalNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApprovalNeeded");
@@ -123,7 +126,7 @@ public class CodedItemsController {
 		List<CodedItem> unCodedItems = getItems(items, CodeStatus.NOT_CODED);
 		List<CodedItem> codeNotFoundItems = getItems(items, CodeStatus.CODE_NOT_FOUND);
 		
-		CodedItemsTableFactory factory = new CodedItemsTableFactory(medicalCodingContextNeeded.getValue(), showMoreLink);
+		CodedItemsTableFactory factory = new CodedItemsTableFactory(medicalCodingContextNeeded.getValue(), showMoreLink, showContext);
 
 		factory.setStudyId(studyId);
 		factory.setCodedItems(items);

@@ -26,16 +26,21 @@ public class CodedItemsTableToolbar extends DefaultToolbar {
 
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
     private boolean contextNeeded;
+    private boolean showCodedItemsContext;
 
     private final static String INDEXES_OF_COLUMNS_TO_BE_HIDDEN = "4, 5, 6";
 
-    public CodedItemsTableToolbar(boolean showMoreLink, boolean contextNeeded) {
+    public CodedItemsTableToolbar(boolean showMoreLink, boolean contextNeeded, boolean showCodedItemsContext) {
         this.showMoreLink = showMoreLink;
         this.contextNeeded = contextNeeded;
+        this.showCodedItemsContext = showCodedItemsContext;
     }
 
     @Override
     protected void addToolbarItems() {
+        addToolbarItem(ToolbarItemType.SEPARATOR);
+        addToolbarItem(createCustomItem(new displayCodedItemContextInput()));
+        addToolbarItem(createCustomItem(new showHideCodedItemsContext()));
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new ShowMoreItem()));
         addToolbarItem(createCustomItem(new NewHiddenItem()));
@@ -108,6 +113,31 @@ public class CodedItemsTableToolbar extends DefaultToolbar {
         }
     }
 
+   private class showHideCodedItemsContext extends AbstractItem {
+
+       @Override
+       public String disabled() {
+           return null;
+       }
+
+       @Override
+       public String enabled() {
+
+           HtmlBuilder html = new HtmlBuilder();
+           if (showCodedItemsContext) {
+
+               html.a().id("showContext").href("javascript:updateExpandCollapseCodedItemsInput(" + showCodedItemsContext + "); javascript:onInvokeAction('codedItems','filter')").close();
+               html.div().close().nbsp().append(reswords.getString("collapse")).nbsp().divEnd().aEnd();
+           } else {
+
+               html.a().id("showContext").href("javascript:updateExpandCollapseCodedItemsInput(" + showCodedItemsContext + "); javascript:onInvokeAction('codedItems','filter')").close();
+               html.div().close().nbsp().append(reswords.getString("expand")).nbsp().divEnd().aEnd();
+           }
+
+           return html.toString();
+       }
+   }
+
     private static class CustomItemRenderer extends AbstractItemRenderer {
         public CustomItemRenderer(ToolbarItem item, CoreContext coreContext) {
             setToolbarItem(item);
@@ -118,6 +148,22 @@ public class CodedItemsTableToolbar extends DefaultToolbar {
             ToolbarItem item = getToolbarItem();
             return item.enabled();
         }
+    }
+
+    public class displayCodedItemContextInput extends AbstractItem {
+
+        @Override
+        public String disabled() {
+            return null;
+        }
+
+        @Override
+        public String enabled() {
+            HtmlBuilder html = new HtmlBuilder();
+            html.input().id("showContext").type("hidden").name("showContext").value(showCodedItemsContext + "").end();
+            return html.toString();
+        }
+
     }
 
 }

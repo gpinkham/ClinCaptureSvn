@@ -10,7 +10,7 @@
     <c:when test="${fn:length(codedElementList) eq 0}">
         <div id="emptyResult">
             <br>
-            <span class="formlabel">No matching results found in dictionary <c:out value="${itemDictionary}"/>
+            <span class="formlabel">No matching results found in dictionary <c:out value="${itemDictionary}"/></span>
         </div>
         <input type="hidden" id="notCoded" />
     </c:when>
@@ -64,7 +64,7 @@
                 </tr>
             </c:forEach>
         </table>
-        <c:if test="${fn:length(codedElementList) > 1}">
+        <c:if test="${fn:length(codedElementList) > 0}">
             <input type="hidden" id="response" />
         </c:if>
     </c:otherwise>

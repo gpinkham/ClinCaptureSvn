@@ -2438,6 +2438,18 @@ disableRandomizeCRFButtons = function(flag) {
     }
 }
 
+function updateExpandCollapseCodedItemsInput(value) {
+
+    if (value) {
+
+        $("#showContext").val("false");
+
+    } else {
+
+        $("#showContext").val("true");
+    }
+}
+
 function showHideCodedItemContext(item) {
 
     if ($("div[id=" + $(item).attr("itemid") + "]").parent("td").find("#tablepaging").css('display') == 'none') {
@@ -2451,7 +2463,6 @@ function showHideCodedItemContext(item) {
 
 codeItem = function(item) {
 
-    //disable coding for completed & in_progress items
     if ($(item).attr('block') == 'true') {
 
         if ($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'Completed') {
@@ -2705,7 +2716,7 @@ function codedItemAutoUpdate() {
                 arr = arr.toString();
                 codedItemAutoUpdateAjax(arr);
             }
-        }, 20000);
+        }, 5000);
     });
 }
 

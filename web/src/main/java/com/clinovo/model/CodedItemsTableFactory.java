@@ -70,12 +70,14 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     private final String medicalCodingContextNeeded;
     private final String showMoreLink;
+    private final String showContext;
 	private boolean shodCodeNotFoundStatus;
 
-    public CodedItemsTableFactory(String medicalCodingContextNeeded, String showMoreLink) {
+    public CodedItemsTableFactory(String medicalCodingContextNeeded, String showMoreLink, String showContext) {
 
         this.medicalCodingContextNeeded = medicalCodingContextNeeded;
         this.showMoreLink = showMoreLink;
+        this.showContext = showContext;
     }
 
     @Override
@@ -249,7 +251,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
                 String codedItemContextBox = contextBoxBuilder(codedItem);
 
-                builder.div().id(String.valueOf(codedItem.getItemId())).close().append(" "+ codedItemContextBox +" ").divEnd();
+                builder.div().id(String.valueOf(codedItem.getItemId())).close().append(" " + codedItemContextBox + " ").divEnd();
 
                 builder.div().style("width:420px").close().divEnd();
             }
@@ -261,9 +263,16 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
             HtmlBuilder builder = new HtmlBuilder();
 
+            String showContextValue = "none";
+
+            if(showContext.equals("true")) {
+
+                showContextValue = "";
+            }
+
             if (codedItem.isCoded()) {
 
-                builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:none;").close()
+                builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:"+ showContextValue +";").close()
                         .tr(1).close()
                         .td(1).close().append("HTTP: ").tdEnd()
                         .td(2).close().append(codedItem.getHttpPath()).tdEnd()
@@ -615,16 +624,22 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
 
         boolean showMore = false;
+        boolean showCodedItemsContext = false;
         boolean contextNeeded = false;
 
         if (showMoreLink.equalsIgnoreCase("true")) {
             showMore = true;
         }
+
+        if (showContext.equalsIgnoreCase("true")) {
+            showCodedItemsContext = true;
+        }
+
         if (medicalCodingContextNeeded.equalsIgnoreCase("yes")) {
             contextNeeded = true;
         }
 
-        CodedItemsTableToolbar toolbar = new CodedItemsTableToolbar(showMore, contextNeeded);
+        CodedItemsTableToolbar toolbar = new CodedItemsTableToolbar(showMore, contextNeeded, showCodedItemsContext);
         tableFacade.setToolbar(toolbar);
     }
 

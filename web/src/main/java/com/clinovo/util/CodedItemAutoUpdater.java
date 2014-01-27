@@ -100,7 +100,6 @@ public class CodedItemAutoUpdater {
                     .td(3).width("360px").colspan("2").close().tdEnd()
                     .td(4).close().tdEnd().trEnd(1);
 
-
             for (CodedItemElement codedItemElement : codedItemElementsFilter(codedItem).getCodedItemElements()) {
 
                 builder.tr(1).close().td(1).close().append(" " + codedItemElement.getItemName() + ": ").tdEnd()
