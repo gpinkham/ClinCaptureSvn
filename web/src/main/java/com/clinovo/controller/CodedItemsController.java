@@ -333,7 +333,7 @@ public class CodedItemsController {
         StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "defaultBioontologyURL");
         StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "medicalCodingApiKey");
 
-        codedItem.setStatus((String.valueOf(CodeStatus.IN_PROGRESS)));
+        codedItem.setStatus((String.valueOf(CodeStatus.IN_PROCESS)));
         codedItem.setPreferredTerm(codeSearchTerm);
 
         codedItemService.saveCodedItem(codedItem);
@@ -417,7 +417,7 @@ public class CodedItemsController {
 
         if (codedItem != null) {
 
-            codedItem.setStatus((String.valueOf(CodeStatus.IN_PROGRESS)));
+            codedItem.setStatus((String.valueOf(CodeStatus.IN_PROCESS)));
             codedItem.setPreferredTerm(codeSearchTerm);
             codedItemService.saveCodedItem(codedItem);
 

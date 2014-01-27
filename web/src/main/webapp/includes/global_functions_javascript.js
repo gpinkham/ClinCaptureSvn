@@ -2465,7 +2465,7 @@ codeItem = function(item) {
 
     if ($(item).attr('block') == 'true') {
 
-        if ($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'Completed') {
+        if ($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'Coded') {
 
             showHideCodedItemContext(item);
             return;
@@ -2519,35 +2519,37 @@ codeItem = function(item) {
                 var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
                 $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
 
-                if($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'Code Not Found') {
+                if($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'Code not Found') {
 
                     var tdCodeNotFound = parseInt($("table.summaryTable tr td[name='tdCodeNotFound']").text());
                     $("table.summaryTable tr td[name='tdCodeNotFound'] a").text(tdCodeNotFound - 1);
 
-                } else if ($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'To be Coded') {
+                } else if ($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'Not Coded') {
 
-                    var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
-                    $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
+                    var tdNotCoded = parseInt($("table.summaryTable tr td[name='tdNotCoded']").text());
+                    $("table.summaryTable tr td[name='tdNotCoded'] a").text(tdNotCoded - 1);
                 }
 
                 //update coded item status
-                $(item).parent().siblings("td").find("div[name='itemStatus']").text("Completed");
+                $(item).parent().siblings("td").find("div[name='itemStatus']").text("Coded");
 
                 $("div[id=" + $(item).attr("itemid") + "]").find('#tablepaging_result').attr('id', 'tablepaging');
+
+                $("#autoCode").remove();
 
             } else if ($("#notCoded").size() === 1) {
 
                 // Update counters for new code not found items only
-                if($(item).parent().siblings("td").find("div[name='itemStatus']").text() !== 'Code Not Found') {
+                if($(item).parent().siblings("td").find("div[name='itemStatus']").text() !== 'Code not Found') {
 
-                    var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
+                    var tdNotCoded = parseInt($("table.summaryTable tr td[name='tdNotCoded']").text());
                     var tdCodeNotFound = parseInt($("table.summaryTable tr td[name='tdCodeNotFound']").text());
 
-                    $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
+                    $("table.summaryTable tr td[name='tdNotCoded'] a").text(tdNotCoded - 1);
                     $("table.summaryTable tr td[name='tdCodeNotFound'] a").text(tdCodeNotFound + 1);
                 }
 
-                $(item).parent().siblings("td").find("div[name='itemStatus']").text('Code Not Found');
+                $(item).parent().siblings("td").find("div[name='itemStatus']").text('Code not Found');
 
                 $("#tdCodeNotFound").show();
                 $("td[name='tdCodeNotFound']").show();
@@ -2635,16 +2637,16 @@ uncodeCodeItem = function(item) {
             $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc)
 
             //update coded item status
-            $(item).parent().siblings("td").find("div[name='itemStatus']").text("To be Coded");
+            $(item).parent().siblings("td").find("div[name='itemStatus']").text("Not Coded");
 
             //hide unCode icon
             $(item).css("visibility", "hidden");
 
             //update coded items counter
              var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
-             var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
+             var tdNotCoded = parseInt($("table.summaryTable tr td[name='tdNotCoded']").text());
              $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded - 1);
-             $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded + 1);
+             $("table.summaryTable tr td[name='tdNotCoded'] a").text(tdNotCoded + 1);
 
              //cleanup results
              $(item).parents().find("div[id=" + $(item).attr("itemid") + "]").find("#tablepaging").remove();
@@ -2700,7 +2702,7 @@ function codedItemAutoUpdate() {
 
             var arr = new Array();
 
-            $("td:contains('In Progress')").each(
+            $("td:contains('In Process')").each(
 
                 function () {
 
@@ -2763,7 +2765,7 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
             $("a[name='Code'][itemid=" + id + "]").children('img').attr('src', '../images/code_confirm.png');
 
             //change coded item status
-            $("div[id=" + id + "]").parent().siblings("td").find("div[name='itemStatus']").text('Completed');
+            $("div[id=" + id + "]").parent().siblings("td").find("div[name='itemStatus']").text('Coded');
 
             //display uncode icon
             $("a[name='unCode'][itemid=" + id + "]").css("visibility", "visible");
@@ -2792,20 +2794,20 @@ function manualUpdateMedicalCodingUX(item) {
     //block input field
     $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").attr('disabled', true);
 
-    if ($(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text() == 'Code Not Found') {
+    if ($(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text() == 'Code not Found') {
 
         var tdCodeNotFound = parseInt($("table.summaryTable tr td[name='tdCodeNotFound']").text());
 
         $("table.summaryTable tr td[name='tdCodeNotFound'] a").text(tdCodeNotFound - 1);
 
-    } else if ($(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text() == 'To be Coded') {
+    } else if ($(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text() == 'Not Coded') {
 
-        var tdToBeCoded = parseInt($("table.summaryTable tr td[name='tdToBeCoded']").text());
+        var tdNotCoded = parseInt($("table.summaryTable tr td[name='tdNotCoded']").text());
 
-        $("table.summaryTable tr td[name='tdToBeCoded'] a").text(tdToBeCoded - 1);
+        $("table.summaryTable tr td[name='tdNotCoded'] a").text(tdNotCoded - 1);
     }
 
-    $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text('In Progress');
+    $(item).parents("div[id=" + $(item).parents('div').attr("id") + "]").parent().siblings("td").find("div[name='itemStatus']").text('In Process');
 
     //hide code icon results
     $("div[id=" + $(item).parents('div').attr("id") + "]").html('');

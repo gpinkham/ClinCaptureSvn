@@ -201,9 +201,7 @@ public class CodedItemServiceImpl implements CodedItemService {
 		List<CodedItem> codedItems = findByCRFVersion(versionId);
 
 		for (CodedItem item : codedItems) {
-			
-			// Had coded status before removal              s
-			//if(item.getCodedTerm() != null && !item.getCodedTerm().isEmpty()) {
+
             if(item.getId() > 0) {
 
 				item.setStatus(String.valueOf(CodeStatus.CODED));

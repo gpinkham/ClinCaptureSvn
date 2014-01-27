@@ -11,6 +11,7 @@
         <div id="emptyResult">
             <br>
             <span class="formlabel">No matching results found in dictionary <c:out value="${itemDictionary}"/></span>
+            <br>
         </div>
         <input type="hidden" id="notCoded" />
     </c:when>

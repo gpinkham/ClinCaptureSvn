@@ -104,9 +104,9 @@
 	<table cellspacing="0" class="summaryTable" style="width:600px;">
         <tr>
         	<td>&nbsp;</td>
-        	<td align="center"><fmt:message key="toBeCoded" bundle="${resword}"/></td>
+        	<td align="center"><fmt:message key="notCoded" bundle="${resword}"/></td>
         	<c:if test="${mcApprovalNeeded}">
-        		<td align="center"><fmt:message key="toBeApproved" bundle="${resword}"/></td>
+        		<td align="center"><fmt:message key="notApproved" bundle="${resword}"/></td>
         	</c:if>
         	<c:choose>
         		<c:when test="${codeNotFoundItems > 0}">
@@ -120,7 +120,7 @@
         </tr>
         <tr>
         	<td align="center">Medical Terms</td>
-        	<td align="center" name="tdToBeCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?codedItems_f_status=To be Coded&study=${studyId}">${unCodedItems}</a></td>
+        	<td align="center" name="tdNotCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?codedItems_f_status=Not Coded&study=${studyId}">${unCodedItems}</a></td>
         	<c:if test="${mcApprovalNeeded}">
             	<td align="center">0</td>
             </c:if>
@@ -132,7 +132,7 @@
         			<td align="center" name="tdCodeNotFound" style="display:none"><a href="${pageContext.request.contextPath}/pages/codedItems?codedItems_f_status=Code not found&study=${studyId}">${codeNotFoundItems}</a></td>
         		</c:otherwise>
         	</c:choose>
-        	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?codedItems_f_status=Completed&study=${studyId}" onClick="showUncodedItems()">${codedItems}</a></td>
+        	<td align="center" name="tdCoded"><a href="${pageContext.request.contextPath}/pages/codedItems?codedItems_f_status=Coded&study=${studyId}" onClick="showUncodedItems()">${codedItems}</a></td>
         </tr>
     </table> 
 </div>

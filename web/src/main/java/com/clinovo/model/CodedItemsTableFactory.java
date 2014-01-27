@@ -16,6 +16,7 @@ package com.clinovo.model;
 
 import java.util.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -39,6 +40,9 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.apache.commons.lang.StringUtils;
+import org.jmesa.core.filter.FilterMatcher;
+import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Limit;
 import org.jmesa.view.component.Row;
@@ -139,19 +143,19 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
         if (codedItem.getStatus().equals("NOT_CODED")) {
 
-            return "To be Coded";
+            return "Not Coded";
             
         } else if (codedItem.getStatus().equals("CODED")) {
 
-            return "Completed";
+            return "Coded";
             
-        } else if ((codedItem.getStatus().equals("IN_PROGRESS"))) {
+        } else if ((codedItem.getStatus().equals("IN_PROCESS"))) {
 
-            return "In Progress";
+            return "In Process";
             
         } else if (codedItem.getStatus().equals("CODE_NOT_FOUND")) {
         	
-        	return "Code Not Found";
+        	return "Code not Found";
         }
 
       return "Unknown";
@@ -241,7 +245,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
 					return builder.toString();
 
-				} else if (codedItem.getStatus().equals("CODED") || codedItem.getStatus().equals("IN_PROGRESS")) {
+				} else if (codedItem.getStatus().equals("CODED") || codedItem.getStatus().equals("IN_PROCESS")) {
 
                     builder.append("Search: ").input().style("border:1px solid #a6a6a6; margin-bottom: 2px; color:#4D4D4D").disabled().type("text").value(codedItem.getPreferredTerm()).close();
                 } else {
@@ -364,7 +368,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
             } else {
 
-                String disabled = (codedItem.getStatus().equals("CODED") || codedItem.getStatus().equals("IN_PROGRESS")) ? " block='true' " : " block='false' ";
+                String disabled = (codedItem.getStatus().equals("CODED") || codedItem.getStatus().equals("IN_PROCESS")) ? " block='true' " : " block='false' ";
 
                 builder.a().onclick("codeItem(this)").append(disabled).name("Code").append("itemId=\"" + codedItem.getItemId() + "\"").close();
             }
@@ -506,17 +510,17 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         	StudyParameterValueBean mcApprovalNeeded = new StudyParameterValueDAO(datasource).findByHandleAndStudy(studyId, "medicalCodingApprovalNeeded");
         	
             List<Option> options = new ArrayList<Option>();
-            options.add(new Option("To be Coded", "To be Coded"));
+            options.add(new Option("Not Coded", "Not Coded"));
             
 			if (mcApprovalNeeded.getValue().equals("yes")) {
-				options.add(new Option(" To be Approved", " To be Approved"));
+				options.add(new Option("Not Approved", "Not Approved"));
 			}
             
 			if (shodCodeNotFoundStatus) {
-				options.add(new Option("Code Not Found", "Code Not Found"));
+				options.add(new Option("Code not Found", "Code not Found"));
 			}
 			
-            options.add(new Option("Completed", "Completed"));
+            options.add(new Option("Coded", "Coded"));
             
             return options;
         }
@@ -641,6 +645,27 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
         CodedItemsTableToolbar toolbar = new CodedItemsTableToolbar(showMore, contextNeeded, showCodedItemsContext);
         tableFacade.setToolbar(toolbar);
+    }
+
+    @Override
+    public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
+
+        super.configureTableFacade(response, tableFacade);
+
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "status"), new StatusFilterMatcher());
+    }
+
+    public class StatusFilterMatcher implements FilterMatcher {
+        public boolean evaluate(Object itemValue, String filterValue) {
+
+            String item = StringUtils.lowerCase(String.valueOf(itemValue));
+            String filter = StringUtils.lowerCase(String.valueOf(filterValue));
+
+            if (filter.equals(item)) {
+                return true;
+            }
+            return false;
+        }
     }
 
 	public void setShowCodeNotFoundStatus(boolean status) {
