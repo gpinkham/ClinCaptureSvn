@@ -47,7 +47,7 @@
             url = url + "&codedItems_f_status=" + buttonType;
         }
 
-        window.location.replace(${pageContext.request.contextPath}"/pages/codedItems?" + url);
+        window.location.replace("${pageContext.request.contextPath}/pages/codedItems?" + url);
     }
 </script>
 <input type="hidden" id="codedItemUrl" value='<c:out value="${codedItemUrl}"/>'/>
