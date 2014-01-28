@@ -22,8 +22,8 @@ import org.apache.commons.httpclient.methods.GetMethod;
 public class BioPortalSearchInterface implements SearchInterface {
 
 
-    private   List<ClassificationElement> classificationElementsForRecurse;
-    List<Classification> classifications;
+    private List<ClassificationElement> classificationElementsForRecurse;
+    private List<Classification> classifications;
     private String dictionary = "";
 
     private static final int THREADS_NUMBER = 50;
@@ -119,7 +119,6 @@ public class BioPortalSearchInterface implements SearchInterface {
         Classification classification = new Classification();
         classification.setHttpPath(codeHttp);
         classification.setClassificationElement(new ArrayList<ClassificationElement>(classificationElementsForRecurse));
-
 
         classificationElementsForRecurse =  Collections.synchronizedList(new ArrayList<ClassificationElement>());
 

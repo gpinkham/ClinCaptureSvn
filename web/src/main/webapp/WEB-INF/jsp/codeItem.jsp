@@ -49,7 +49,11 @@
                     </c:if>
                     <c:choose>
                         <c:when test="${autoCoded}">
-                            <input type="hidden" id="autoCode" />
+                            <td colspan="2"></td>
+                            <td></td>
+                            <td>
+                                <input type="hidden" id="autoCode" />
+                            </td>
                         </c:when>
                         <c:otherwise>
                             <td colspan="2"></td>

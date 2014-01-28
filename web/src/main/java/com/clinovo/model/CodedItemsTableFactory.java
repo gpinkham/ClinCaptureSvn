@@ -75,7 +75,6 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     private final String medicalCodingContextNeeded;
     private final String showMoreLink;
     private final String showContext;
-	private boolean shodCodeNotFoundStatus;
 
     public CodedItemsTableFactory(String medicalCodingContextNeeded, String showMoreLink, String showContext) {
 
@@ -390,10 +389,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
             if(!codedItemTerm.getHttpPath().isEmpty()) {
 
-                builder.append("term=\"" + codedItem.getPreferredTerm().toLowerCase() + "\"");
+                builder.append("term=\"" + codedItemTerm.getLocalAlias().toLowerCase() + "\" ")
+                       .append("pref=\"" + codedItemTerm.getPreferredName().toLowerCase() + "\" ");
             } else {
 
-                builder.append("term=\"\"");
+                builder.append("term=\"\" ");
+                builder.append("pref=\"\" ");
             }
 
             if (codedItem.isCoded()) {
@@ -427,9 +428,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     private Term getCodedItemTerm(CodedItem codedItem) {
 
+        ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
+        ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
+
         for (Term term : terms) {
 
-            if (term.getPreferredName().equalsIgnoreCase(codedItem.getPreferredTerm())
+            if (term.getLocalAlias().equalsIgnoreCase(data.getValue())
                     && term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
 
                 return term;

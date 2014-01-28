@@ -5,10 +5,13 @@ import com.clinovo.model.CodedItemElement;
 import com.clinovo.model.Term;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.TermService;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import org.jmesa.view.html.HtmlBuilder;
 import org.quartz.JobDataMap;
@@ -32,6 +35,9 @@ public class CodedItemAutoUpdater {
 
     @Autowired
     private CodedItemService codedItemService;
+
+    @Autowired
+    private DataSource datasource;
 
     @RequestMapping(value = "/checkCodedItemsStatus")
     public void checkCodedItemsStatus(HttpServletRequest request, HttpServletResponse response) throws SchedulerException, IOException {
@@ -66,34 +72,40 @@ public class CodedItemAutoUpdater {
         for (int codedItemId : codedItemIdListInt) {
 
             CodedItem codedItem = codedItemService.findCodedItem(codedItemId);
-            Term term = termService.findByTermAndExternalDictionary(codedItem.getPreferredTerm().toLowerCase(), codedItem.getDictionary());
+            ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
+            ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
+            Term term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(), codedItem.getDictionary());
 
             if (term != null) {
 
-                codedItemToAppend.add(contextBoxBuilder(codedItem, true));
+                codedItemToAppend.add(contextBoxBuilder(codedItem, term.getLocalAlias(), term.getPreferredName()));
             } else {
 
-                codedItemToAppend.add(contextBoxBuilder(codedItem, false));
+                codedItemToAppend.add(contextBoxBuilder(codedItem, "", ""));
             }
         }
 
         return codedItemToAppend;
     }
 
-    private String contextBoxBuilder(CodedItem codedItem, boolean withTerm) {
+    private String contextBoxBuilder(CodedItem codedItem, String alise, String prefTerm) {
 
         String termToAppend = "";
+        String prefToAppend = "";
 
-        if(withTerm) {
+        if(!alise.isEmpty() && !prefTerm.isEmpty()) {
 
-            termToAppend = codedItem.getPreferredTerm();
+            termToAppend = alise;
+            prefToAppend = prefTerm;
         }
 
         HtmlBuilder builder = new HtmlBuilder();
             builder.table(1).id("tablepaging").styleClass("itemsTable")
                     .append(" idToAppend=\"" + codedItem.getItemId() + "\" ")
-                    .append("termToAppend=\"" + termToAppend + "\" ")
-                    .style("display:none;").close()
+                    .style("display:none;")
+                    .append(" termToAppend=\"" + termToAppend + "\" ")
+                    .append(" prefToAppend=\"" + prefToAppend + "\" ")
+                    .close()
                     .tr(1).close()
                     .td(1).close().append("HTTP: ").tdEnd()
                     .td(2).close().append(codedItem.getHttpPath()).tdEnd()

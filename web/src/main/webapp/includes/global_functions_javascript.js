@@ -2504,6 +2504,9 @@ codeItem = function(item) {
                 //disable input field
                 $(item).parent().siblings("td").find("input").attr('disabled', true);
 
+                //set autocoding item name
+                $(item).parent().siblings("td").find("input").val($("a[name='unCode'][itemid=" + ($(item).attr("itemid")) + "]").attr('pref'));
+
                 //display uncode icon
                 $("a[name='unCode'][itemid=" + ($(item).attr("itemid")) + "]").css("visibility", "visible");
 
@@ -2514,7 +2517,7 @@ codeItem = function(item) {
                 $("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").attr('block', 'true');
 
                 //add term mark
-                $("a[name='unCode'][itemid=" + $(item).attr("itemid") + "]").attr('term',  $(item).parent().siblings("td").find("input").val());
+                $("a[name='unCode'][itemid=" + $(item).attr("itemid") + "]").attr('term',  $.trim($(item).parents().siblings("td").find("div[name='itemDataValue']").text()).toLowerCase());
 
                 var tdCoded = parseInt($("table.summaryTable tr td[name='tdCoded']").text());
                 $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
@@ -2754,12 +2757,19 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
 
         if (contextBox.length > 0) {
 
-            var id = new RegExp("idToAppend=\"(\\d+)\"").exec(contextBox)[1];
+            var idReg = /idToAppend=\"(\d*)\"/;
+            var termReg = /termToAppend=\"([\w\s\d]+)\"?/;
+            var prefReg = /prefToAppend=\"([\w\s\d]+)\"?/;
+
+            var id = contextBox.match(idReg)[1];
             var term = undefined;
+            var pref = undefined;
 
             try {
-                term = new RegExp("termToAppend=\"(.+)\"").exec(contextBox)[1];
-            } catch (e) {}
+
+                term = contextBox.match(termReg)[1];
+                pref = contextBox.match(prefReg)[1];
+            } catch(e) {}
 
             //update code icon url
             $("a[name='Code'][itemid=" + id + "]").children('img').attr('src', '../images/code_confirm.png');
@@ -2777,10 +2787,11 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
             //append context box
             $("div[id=" + id + "]").append(contextBox);
 
-            //display deleteTerm button
-            if (term !== undefined) {
+            //add hidden marks
+            if (term !== undefined && pref !== undefined) {
 
                 $("a[name='unCode'][itemid=" + id + "]").attr('term', term);
+                $("a[name='unCode'][itemid=" + id + "]").attr('pref', pref);
             }
         }
     });
@@ -2955,15 +2966,15 @@ deleteTerm = function(item) {
         data: {
 
             item: $(item).attr("itemid"),
-            code: $.trim($(item).parent().siblings("td").find("input:first").val())
+            code: $.trim($(item).parent().siblings("td").find("div[name='itemDataValue']").text()).toLowerCase()
         },
 
         success: function(data) {
 
             var dictionary = $(item).parent().siblings("td").find("div[name='termDictionary']").text();
 
-            $("a[name='unCode'][term=" + $(item).attr("term").toLowerCase() + "]").filter(function () {
-                return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary; }).attr('term', '');
+            $("a[name='unCode'][term=" + $(item).attr("term").toLowerCase() + "][pref=" + $(item).attr("pref").toLowerCase() + "]").filter(function () {
+                return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary; }).attr('term', '').attr('pref', '');
 
             console.log("Term successfully deleted")
         },

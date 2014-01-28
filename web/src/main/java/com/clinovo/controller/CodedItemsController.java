@@ -198,8 +198,10 @@ public class CodedItemsController {
 
         if (configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
 
+            ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
+            ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
             // Ignore case - (until Marc changes his mind)
-            term = termService.findByTermAndExternalDictionary(prefLabel, codedItem.getDictionary());
+            term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(), codedItem.getDictionary());
         }
 
  		if (term != null) {
@@ -221,7 +223,7 @@ public class CodedItemsController {
  			classifications.add(classification);
   
  			model.addAttribute("autoCoded", true);
-  
+
  		} else {
   
 			// Don't attempt to code the item again

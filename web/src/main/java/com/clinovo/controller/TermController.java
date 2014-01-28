@@ -42,7 +42,7 @@ public class TermController {
 
         if(codedItem != null) {
 
-        	Term term = termService.findByTermAndExternalDictionary(code, codedItem.getDictionary());
+        	Term term = termService.findByAliasAndExternalDictionary(code, codedItem.getDictionary());
 
             if (term != null) {
 
