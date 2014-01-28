@@ -134,7 +134,7 @@
         			<td id="tdCodeNotFound" align="center" style="display:none"><fmt:message key="codeNotFound" bundle="${resword}"/></td>
         		</c:otherwise>
         	</c:choose>
-        	<td align="center"><fmt:message key="completed" bundle="${resword}"/></td>
+        	<td align="center"><fmt:message key="coded" bundle="${resword}"/></td>
         </tr>
         <tr>
         	<td align="center">Medical Terms</td>

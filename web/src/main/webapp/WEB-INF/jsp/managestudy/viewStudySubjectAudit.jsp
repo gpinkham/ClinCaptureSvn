@@ -253,7 +253,7 @@
                                             <c:when test="${studyEventAudit.newValue eq '1'}"><fmt:message key="available" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.newValue eq '2'}"><fmt:message key="pending" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.newValue eq '3'}"><fmt:message key="private" bundle="${resterm}"/></c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '4'}"><fmt:message key="unavailable" bundle="${resterm}"/></c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '4'}"><fmt:message key="completed" bundle="${resword}"/></c:when>
                                             <c:when test="${studyEventAudit.newValue eq '5'}"><fmt:message key="removed" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.newValue eq '6'}"><fmt:message key="locked" bundle="${resterm}"/></c:when>
                                             <c:when test="${studyEventAudit.newValue eq '7'}"><fmt:message key="auto-removed" bundle="${resterm}"/></c:when>
@@ -378,7 +378,7 @@
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>
                                         <c:if test="${eventCRFAudit.newValue eq '0'}"><fmt:message key="invalid" bundle="${resterm}"/></c:if>
                                         <c:if test="${eventCRFAudit.newValue eq '1'}"><fmt:message key="available" bundle="${resterm}"/></c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '2'}"><fmt:message key="unavailable" bundle="${resterm}"/></c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '2'}"><fmt:message key="completed" bundle="${resword}"/></c:if>
                                         <c:if test="${eventCRFAudit.newValue eq '3'}"><fmt:message key="private" bundle="${resterm}"/></c:if>
                                         <c:if test="${eventCRFAudit.newValue eq '4'}"><fmt:message key="pending" bundle="${resterm}"/></c:if>
                                         <c:if test="${eventCRFAudit.newValue eq '5'}"><fmt:message key="removed" bundle="${resterm}"/></c:if>
