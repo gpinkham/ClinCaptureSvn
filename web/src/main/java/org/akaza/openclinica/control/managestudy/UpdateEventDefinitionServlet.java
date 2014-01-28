@@ -82,10 +82,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"), request, response);
-		if (ub.isSysAdmin()) {
-			return;
-		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 		addPageMessage(
@@ -487,6 +484,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 					}
 
 				}
+				nullString = (nullString != "") ? nullString.substring(0, nullString.length() - 1) : "";
 
 				if (sdvId > 0
 						&& (edcBean.getSourceDataVerification() == null || sdvId != edcBean.getSourceDataVerification()

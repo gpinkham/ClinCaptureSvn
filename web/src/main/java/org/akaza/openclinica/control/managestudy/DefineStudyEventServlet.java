@@ -90,11 +90,7 @@ public class DefineStudyEventServlet extends Controller {
 					resexception.getString("not_top_study"), "1");
 		}
 
-		if (ub.isSysAdmin()) {
-			return;
-		}
-
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
@@ -451,7 +447,8 @@ public class DefineStudyEventServlet extends Controller {
 				}
 
 			}
-
+			nullString = (nullString != "") ? nullString.substring(0, nullString.length() - 1) : "";
+			
 			edcBean.setNullValues(nullString);
 			edcBean.setStudyId(ub.getActiveStudyId());
 			eventDefinitionCRFs.add(edcBean);

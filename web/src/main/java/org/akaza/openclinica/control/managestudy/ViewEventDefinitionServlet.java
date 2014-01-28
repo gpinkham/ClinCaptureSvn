@@ -50,10 +50,7 @@ public class ViewEventDefinitionServlet extends SecureController {
 	 */
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
-		if (ub.isSysAdmin()) {
-			return;
-		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
+		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
