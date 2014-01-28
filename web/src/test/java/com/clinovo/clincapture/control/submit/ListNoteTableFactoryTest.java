@@ -204,7 +204,6 @@ public class ListNoteTableFactoryTest {
 		assertTrue(filterList.size() == 1);
 		ListNotesFilter.Filter filter = filterList.get(0);
 		assertEquals(filter.getProperty(), ListNotesTableFactory.DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS);
-		assertEquals(filter.getValue(), ListNotesTableFactory.NEW_AND_UPDATED_VALUE);
 	}
 
 	@Test

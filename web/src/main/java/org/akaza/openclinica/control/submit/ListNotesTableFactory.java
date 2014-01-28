@@ -562,9 +562,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					value = Integer.toString(DiscrepancyNoteType.getByName(value).getId());
 				}
 			} else if (DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS.equalsIgnoreCase(property)) {
-				if (reterm.getString(NEW_AND_UPDATED_KEY).equalsIgnoreCase(value)) {
-					value = NEW_AND_UPDATED_VALUE;
-				} else if (reterm.getString(NOT_CLOSED_KEY).equalsIgnoreCase(value)) {
+				if (reterm.getString(NOT_CLOSED_KEY).equalsIgnoreCase(value)) {
 					value = NOT_CLOSED_VALUE;
 				} else {
 					value = Integer.toString(ResolutionStatus.getByName(value).getId());
@@ -688,7 +686,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					options.add(new Option(((ResolutionStatus) status).getName(), ((ResolutionStatus) status).getName()));
 				}
 			}
-			options.add(new Option(reterm.getString("New_and_Updated"), reterm.getString("New_and_Updated")));
 			options.add(new Option(reterm.getString(NOT_CLOSED_KEY), reterm.getString(NOT_CLOSED_KEY)));
 			return options;
 		}
@@ -730,9 +727,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		public boolean evaluate(Object itemValue, String filterValue) {
 			int itemDNTypeId = ((ResolutionStatus) itemValue).getId();
 			ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
-			if (reterm.getString("New_and_Updated").equals(filterValue)) {
-				return itemDNTypeId == 1 || itemDNTypeId == 2;
-			} else if (reterm.getString(NOT_CLOSED_KEY).equals(filterValue)) {
+			if (reterm.getString(NOT_CLOSED_KEY).equals(filterValue)) {
 				return itemDNTypeId == 1 || itemDNTypeId == 2 || itemDNTypeId == 3;
 			} else {
 				return itemDNTypeId == ResolutionStatus.getByName(filterValue).getId();
