@@ -16,19 +16,19 @@ public class CodingTriggerService {
     public static final String IS_ALIAS = "isAlias";
     public static final String CODED_ITEM_ID = "codedItem";
     public static final String VERBATIM_TERM = "verbatimTerm";
-    public static final String PREFERRED_NAME = "preferredName";
+    public static final String CATEGORY_LIST = "categoryList";
     public static final String CODE_SEARCH_TERM = "codeSearchTerm";
     public static final String BIOONTOLOGY_URL = "bioontologyUrl";
     public static final String BIOONTOLOGY_API_KEY = "bioontologyApiKey";
 
 
-    public SimpleTriggerImpl generateCodeItemService(String codedItemId, String verbatimTerm, String preferredName, String codeSearchTerm, String bioontologyUrl, String bioontologyApiKey, boolean isAlias) {
+    public SimpleTriggerImpl generateCodeItemService(String codedItemId, String verbatimTerm, String categoryList, String codeSearchTerm, String bioontologyUrl, String bioontologyApiKey, boolean isAlias) {
 
         JobDataMap codeJobDataMap = new JobDataMap();
         
         codeJobDataMap.put(CODED_ITEM_ID, codedItemId);
         codeJobDataMap.put(VERBATIM_TERM, verbatimTerm);
-        codeJobDataMap.put(PREFERRED_NAME, preferredName);
+        codeJobDataMap.put(CATEGORY_LIST, categoryList);
         codeJobDataMap.put(CODE_SEARCH_TERM, codeSearchTerm);
         codeJobDataMap.put(IS_ALIAS, String.valueOf(isAlias));
         codeJobDataMap.put(BIOONTOLOGY_URL, bioontologyUrl);
@@ -36,7 +36,7 @@ public class CodingTriggerService {
 
         SimpleTriggerImpl sTrigger = new SimpleTriggerImpl();
         
-        sTrigger.setName("coding_item_" + codedItemId + " verbatimTerm_" + preferredName + " " + System.currentTimeMillis());
+        sTrigger.setName("coding_item_" + codedItemId + " verbatimTerm_" + verbatimTerm + " " + System.currentTimeMillis());
         sTrigger.setGroup("CODING");
         sTrigger.setRepeatCount(0);
         sTrigger.setRepeatInterval(1);

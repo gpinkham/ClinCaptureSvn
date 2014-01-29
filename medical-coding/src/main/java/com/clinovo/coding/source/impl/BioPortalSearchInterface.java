@@ -33,9 +33,9 @@ public class BioPortalSearchInterface implements SearchInterface {
 
     public List<Classification> search(String term, String termDictionary, String bioontologyUrl, String bioontologyApiKey) throws Exception {
 
-       dictionary = getDictionary(termDictionary);
-       classifications = Collections.synchronizedList(new ArrayList<Classification>());
-       classificationElementsForRecurse = Collections.synchronizedList(new ArrayList<ClassificationElement>());
+        dictionary = getDictionary(termDictionary);
+        classifications = Collections.synchronizedList(new ArrayList<Classification>());
+        classificationElementsForRecurse = Collections.synchronizedList(new ArrayList<ClassificationElement>());
 
         String termResponseResult = getTermsResponse(term, bioontologyUrl, bioontologyApiKey);
 
@@ -67,7 +67,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 
         int numberOfThreads = THREADS_NUMBER;
 
-        if(listWithAttribues.size() < THREADS_NUMBER) {
+        if (listWithAttribues.size() < THREADS_NUMBER) {
 
             numberOfThreads = listWithAttribues.size();
         }
@@ -77,18 +77,48 @@ public class BioPortalSearchInterface implements SearchInterface {
 
         List<Thread> threads = new ArrayList<Thread>();
 
-        for(List<List<String>>attributesList : attributesPartialLists) {
+        for (List<List<String>> attributesList : attributesPartialLists) {
 
-            BioportalThread bioontologyThread = new BioportalThread (attributesList, bioontologyApiKey);
+            BioportalThread bioontologyThread = new BioportalThread(attributesList, bioontologyApiKey);
             threads.add(bioontologyThread);
             bioontologyThread.start();
         }
 
-        for(Thread t : threads) {
+        for (Thread t : threads) {
             t.join();
         }
 
         return classifications;
+    }
+
+
+    public String getTermsResponse(String term, String bioontologyUrl, String bioontologyApiKey) throws Exception {
+
+        HttpMethod method = new GetMethod(bioontologyUrl);
+
+        method.setPath("/search");
+        method.setQueryString(new NameValuePair[]{
+
+                new NameValuePair("q", term), new NameValuePair("ontologies", dictionary),
+                new NameValuePair("apikey", bioontologyApiKey)
+
+        });
+
+        HttpTransport transport = new HttpTransport();
+        transport.setMethod(method);
+
+        return transport.processRequest();
+    }
+
+    public String getTreeResponse(String treePath, String bioontologyApiKey) throws Exception {
+
+        HttpMethod method = new GetMethod();
+        method.setPath(treePath);
+        method.setRequestHeader(new Header("Authorization", "apikey token=" + bioontologyApiKey));
+        HttpTransport transport = new HttpTransport();
+        transport.setMethod(method);
+
+        return transport.processRequest();
     }
 
     private void recursiveTreeResponseParser(String treeResponse, String prefLabel, String codeHttp) throws SearchException {
@@ -100,7 +130,8 @@ public class BioPortalSearchInterface implements SearchInterface {
             JsonObject jsonObject = jarray.get(i).getAsJsonObject();
             ClassificationElement clasificationElementTmp = new ClassificationElement();
 
-            if (jsonObject.getAsJsonArray("children").size() > 0) {
+            JsonArray jsonArrayWithChildItem = jsonObject.getAsJsonArray("children");
+            if (jsonArrayWithChildItem != null & jsonArrayWithChildItem.size() > 0) {
 
                 clasificationElementTmp.setCodeName(jsonObject.get("prefLabel").getAsString());
                 classificationElementsForRecurse.add(clasificationElementTmp);
@@ -120,7 +151,7 @@ public class BioPortalSearchInterface implements SearchInterface {
         classification.setHttpPath(codeHttp);
         classification.setClassificationElement(new ArrayList<ClassificationElement>(classificationElementsForRecurse));
 
-        classificationElementsForRecurse =  Collections.synchronizedList(new ArrayList<ClassificationElement>());
+        classificationElementsForRecurse = Collections.synchronizedList(new ArrayList<ClassificationElement>());
 
         if (dictionary.equals(MEDDRA) && classification.getClassificationElement().size() == 4 ||
                 dictionary.equals(ICD9CM) && classification.getClassificationElement().size() == 3 ||
@@ -132,81 +163,6 @@ public class BioPortalSearchInterface implements SearchInterface {
         }
 
         return;
-    }
-
-    public String getTreeResponse(String treePath, String bioontologyApiKey) throws Exception {
-
-        HttpMethod method = new GetMethod();
-        method.setPath(treePath);
-        method.setRequestHeader(new Header("Authorization", "apikey token=" + bioontologyApiKey));
-        HttpTransport transport = new HttpTransport();
-        transport.setMethod(method);
-
-        return transport.processRequest();
-    }
-
-    public String getTermsResponse(String term, String bioontologyUrl, String bioontologyApiKey) throws Exception {
-
-        HttpMethod method = new GetMethod(bioontologyUrl);
-
-        method.setPath("/search");
-        method.setQueryString(new NameValuePair[] {
-
-                new NameValuePair("q", term), new NameValuePair("ontologies",  dictionary),
-                new NameValuePair("apikey", bioontologyApiKey)
-
-        });
-
-        HttpTransport transport = new HttpTransport();
-        transport.setMethod(method);
-
-        return transport.processRequest();
-    }
-
-    //used by coding job only
-    public void getClassificationCodes(Classification classification, String termDictionary, String bioontologyUrl, String bioontologyApiKey) throws Exception {
-
-        for (ClassificationElement classfifcationElement : classification.getClassificationElement()) {
-            if (!classfifcationElement.getCodeName().equals("")) {
-
-                HttpTransport transport = new HttpTransport();
-
-                if(dictionary == null)
-                    dictionary = getDictionary(termDictionary);
-
-                HttpMethod method = new GetMethod(bioontologyUrl);
-
-                method.setPath("/search");
-                method.setQueryString(new NameValuePair[]{
-
-                        new NameValuePair("q", classfifcationElement.getCodeName()), new NameValuePair("ontologies", dictionary),
-                        new NameValuePair("include", "prefLabel,notation"),
-                        new NameValuePair("exact_match", "true"),
-                        new NameValuePair("apikey", bioontologyApiKey)
-
-                });
-
-                transport.setMethod(method);
-
-                String codeResult = transport.processRequest();
-                JsonObject jobject = new JsonParser().parse(codeResult).getAsJsonObject();
-                String codeValue = jobject.getAsJsonArray("collection").get(0).getAsJsonObject().get("notation").getAsString();
-                classfifcationElement.setCodeValue(codeValue);
-            }
-        }
-    }
-
-    private String getDictionary(String dictionary) throws SearchException {
-
-        if ("meddra".equalsIgnoreCase(dictionary)) {
-            return MEDDRA;
-        } else if ("icd 10".equalsIgnoreCase(dictionary)) {
-            return ICD10;
-        } else if ("icd 9cm".equalsIgnoreCase(dictionary)) {
-            return ICD9CM;
-        }
-
-        throw new SearchException("Unknown dictionary type specified");
     }
 
     private class BioportalThread extends Thread {
@@ -222,9 +178,9 @@ public class BioPortalSearchInterface implements SearchInterface {
 
         public void run() {
 
-            for(List<String> part : list) {
+            for (List<String> part : list) {
 
-                if(part.size() == 3) {
+                if (part.size() == 3) {
 
                     String treePath = part.get(0);
                     String codeHttp = part.get(1);
@@ -239,18 +195,88 @@ public class BioPortalSearchInterface implements SearchInterface {
                         e.printStackTrace();
                     }
                 }
-           }
+            }
 
+        }
+    }
+
+    public void getClassificationCodes(Classification classification, String termDictionary, String bioontologyUrl, String bioontologyApiKey) throws Exception {
+
+        dictionary = getDictionary(termDictionary);
+
+        List<Thread> threads = new ArrayList<Thread>();
+
+        for (ClassificationElement classificationElement : classification.getClassificationElement()) {
+
+            SearchCodeThread searchCodeThread = new SearchCodeThread(classificationElement, bioontologyUrl, bioontologyApiKey);
+            threads.add(searchCodeThread);
+            searchCodeThread.start();
+        }
+
+        for (Thread t : threads) {
+            t.join();
+        }
+
+    }
+
+    private class SearchCodeThread extends Thread {
+
+        ClassificationElement classificationElement;
+        String bioontologyUrl = "";
+        String bioontologyApiKey = "";
+
+        SearchCodeThread(ClassificationElement classificationElement, String bioontologyUrl, String bioontologyApiKey) {
+
+            this.classificationElement = classificationElement;
+            this.bioontologyUrl = bioontologyUrl;
+            this.bioontologyApiKey = bioontologyApiKey;
+        }
+
+        public void run() {
+            try {
+
+                getCodeResponse(classificationElement, bioontologyUrl, bioontologyApiKey);
+            } catch (Exception e) {
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void getCodeResponse(ClassificationElement classificationElement, String bioontologyUrl, String bioontologyApiKey) throws Exception {
+
+        if (!classificationElement.getCodeName().equals("")) {
+
+            HttpTransport transport = new HttpTransport();
+
+            HttpMethod method = new GetMethod(bioontologyUrl);
+
+            method.setPath("/search");
+            method.setQueryString(new NameValuePair[]{
+
+                    new NameValuePair("q", classificationElement.getCodeName()), new NameValuePair("ontologies", dictionary),
+                    new NameValuePair("include", "prefLabel,notation"),
+                    new NameValuePair("exact_match", "true"),
+                    new NameValuePair("apikey", bioontologyApiKey)
+
+            });
+
+            transport.setMethod(method);
+
+            String codeResult = transport.processRequest();
+            JsonObject jobject = new JsonParser().parse(codeResult).getAsJsonObject();
+            String codeValue = jobject.getAsJsonArray("collection").get(0).getAsJsonObject().get("notation").getAsString();
+            classificationElement.setCodeValue(codeValue);
         }
     }
 
     public static List<List<List<String>>> chopAttributesListForParts(final List<List<String>> ls, final int parts) {
 
         final List<List<List<String>>> listParts = new ArrayList<List<List<String>>>();
-        
+
         if (parts > 0) {
-        	
-        	final int numberOfParts = ls.size() / parts;
+
+            final int numberOfParts = ls.size() / parts;
 
             int itemsLeftOver = ls.size() % parts;
             int itemsTake = numberOfParts;
@@ -272,5 +298,19 @@ public class BioPortalSearchInterface implements SearchInterface {
             }
         }
         return listParts;
+    }
+
+
+    private String getDictionary(String dictionary) throws SearchException {
+
+        if ("meddra".equalsIgnoreCase(dictionary)) {
+            return MEDDRA;
+        } else if ("icd 10".equalsIgnoreCase(dictionary)) {
+            return ICD10;
+        } else if ("icd 9cm".equalsIgnoreCase(dictionary)) {
+            return ICD9CM;
+        }
+
+        throw new SearchException("Unknown dictionary type specified");
     }
 }

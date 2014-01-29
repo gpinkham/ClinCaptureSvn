@@ -20,53 +20,52 @@
             <c:set var="counter" value="0"/>
             <c:forEach items="${codedElementList}" var="obj">
                 <c:set var="counter" value="${counter + 1}"/>
-                <tr>
-                    <td>HTTP:</td>
-                    <td><c:out value="${obj.httpPath}"/></td>
-                    <td width=360px colspan="2"></td>
-                    <td></td>
-                </tr>
-                <c:forEach items="${obj.classificationElement}" var="classElement">
+                <tbody>
                     <tr>
-                        <td>
-                            <c:if test="${(classElement.elementName == 'PT' || classElement.elementName == 'EXT')}">
-                                <div id=<c:out value="${counter}"/> name="verbTermMark"/>
-                            </c:if>
-                            <c:out value="${classElement.elementName}"/>:
-                        </td>
-                        <td><c:out value="${classElement.codeName}"/></td>
-                        <td width=360px colspan="2"></td>
-                        <td></td>
+                         <td>HTTP:</td>
+                        <td><c:out value="${obj.httpPath}"/></td>
+                         <td width=360px colspan="2"></td>
+                         <td></td>
+                     </tr>
+                    <c:forEach items="${obj.classificationElement}" var="classElement">
+                        <tr>
+                            <td>
+                              <c:out value="${classElement.elementName}"/>:
+                            </td>
+                            <td><c:out value="${classElement.codeName}"/></td>
+                            <td width=360px colspan="2"></td>
+                            <td></td>
+                        </tr>
+                    </c:forEach>
+                    <tr>
+                        <c:set var="codeButtonColor" value="../images/button_BG.gif"/>
+                        <c:if test="${(color == 'violet')}">
+                            <c:set var="codeButtonColor" value="../images/violet/button_BG.gif"/>
+                        </c:if>
+                        <c:if test="${(color == 'green')}">
+                            <c:set var="codeButtonColor" value="../images/green/button_BG.gif"/>
+                        </c:if>
+                        <c:choose>
+                            <c:when test="${autoCoded}">
+                                <td colspan="2"></td>
+                                <td></td>
+                                <td>
+                                    <input type="hidden" id="autoCode" />
+                                </td>
+                            </c:when>
+                            <c:otherwise>
+                                <td colspan="2"></td>
+                                <td></td>
+                                <td>
+                                    <input type="button" id="<c:out value="${counter}"/>" name="codeAndAliasBtn" class="button" value="Code & Alias" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="codeAndAlias($(this))" />
+                                </td>
+                                <td>
+                                    <input type="button" id="<c:out value="${counter}"/>" name="codeItemBtn" class="button" value="Code" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="saveCodedItem($(this))" />
+                                </td>
+                            </c:otherwise>
+                        </c:choose>
                     </tr>
-                </c:forEach>
-                <tr>
-                    <c:set var="codeButtonColor" value="../images/button_BG.gif"/>
-                    <c:if test="${(color == 'violet')}">
-                        <c:set var="codeButtonColor" value="../images/violet/button_BG.gif"/>
-                    </c:if>
-                    <c:if test="${(color == 'green')}">
-                        <c:set var="codeButtonColor" value="../images/green/button_BG.gif"/>
-                    </c:if>
-                    <c:choose>
-                        <c:when test="${autoCoded}">
-                            <td colspan="2"></td>
-                            <td></td>
-                            <td>
-                                <input type="hidden" id="autoCode" />
-                            </td>
-                        </c:when>
-                        <c:otherwise>
-                            <td colspan="2"></td>
-                            <td></td>
-                            <td>
-                                <input type="button" id="<c:out value="${counter}"/>" name="codeAndAliasBtn" class="button" value="Code & Alias" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="codeAndAlias($(this))" />
-                            </td>
-                            <td>
-                                <input type="button" id="<c:out value="${counter}"/>" name="codeItemBtn" class="button" value="Code" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="saveCodedItem($(this))" />
-                            </td>
-                        </c:otherwise>
-                    </c:choose>
-                </tr>
+                </tbody>
             </c:forEach>
         </table>
         <c:if test="${fn:length(codedElementList) > 0}">

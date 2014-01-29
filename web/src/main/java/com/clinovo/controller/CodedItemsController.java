@@ -99,6 +99,17 @@ public class CodedItemsController {
 	@RequestMapping("/codedItems")
 	public ModelMap codedItemsHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+        String httpPath = (String) request.getSession().getAttribute("codedItemUrl");
+        String queryString = request.getQueryString();
+
+        if (queryString.startsWith("study") && httpPath != null && !httpPath.startsWith("study")) {
+
+            response.sendRedirect("codedItems?" + httpPath);
+        } else {
+
+            request.getSession().setAttribute("codedItemUrl", queryString);
+        }
+
 		ModelMap model = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
 		
@@ -157,17 +168,6 @@ public class CodedItemsController {
 		// After auto coding attempt
 		model.addAttribute("skippedItems", request.getAttribute("skippedItems"));
 		model.addAttribute("autoCodedItems", request.getAttribute("autoCodedItems"));
-
-        String httpPath = (String) request.getSession().getAttribute("codedItemUrl");
-        String queryString = request.getQueryString();
-
-        if (queryString.startsWith("study") && httpPath != null && !httpPath.startsWith("study")) {
-
-            response.sendRedirect("codedItems?" + httpPath);
-        } else {
-
-            request.getSession().setAttribute("codedItemUrl", queryString);
-        }
 
 		return model;
 	}
@@ -323,7 +323,7 @@ public class CodedItemsController {
         ResourceBundleProvider.updateLocale(request.getLocale());
 
         String itemId = request.getParameter("item");
-        String preferredName = request.getParameter("prefTerm");
+        String categoryList = request.getParameter("categoryList");
         String verbatimTerm = request.getParameter("verbatimTerm");
         String codeSearchTerm = request.getParameter("coderSearchTerm");
         
@@ -336,7 +336,7 @@ public class CodedItemsController {
 
         codedItemService.saveCodedItem(codedItem);
 
-        createCodeItemJob(itemId, verbatimTerm, preferredName, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), false);
+        createCodeItemJob(itemId, verbatimTerm, categoryList, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), false);
 
         // Redirect to main
         return "codedItems";
@@ -398,7 +398,7 @@ public class CodedItemsController {
 		boolean isAlias = false;
  		String item = request.getParameter("item");
  		String study = request.getParameter("study");
- 		String preferredName = request.getParameter("prefTerm");
+ 		String categoryList = request.getParameter("categoryList");
  		String verbatimTerm = request.getParameter("verbatimTerm");
         String codeSearchTerm = request.getParameter("coderSearchTerm");
   		
@@ -419,7 +419,7 @@ public class CodedItemsController {
             codedItem.setPreferredTerm(codeSearchTerm);
             codedItemService.saveCodedItem(codedItem);
 
-            createCodeItemJob(item, verbatimTerm, preferredName, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), isAlias);
+            createCodeItemJob(item, verbatimTerm, categoryList, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), isAlias);
         }
 
 		return "codedItems";
@@ -466,10 +466,10 @@ public class CodedItemsController {
 		return ItemDataDAO;
 	}
 
-	private void createCodeItemJob(String itemDataId, String verbatimTerm, String preferredName, String codeSearchTerm, String bioontologyUrl, String bioontologyApiKey, boolean isAlias) throws SchedulerException {
+	private void createCodeItemJob(String itemDataId, String verbatimTerm, String categoryList, String codeSearchTerm, String bioontologyUrl, String bioontologyApiKey, boolean isAlias) throws SchedulerException {
 
         CodingTriggerService codingTriggerService = new CodingTriggerService();
-        SimpleTriggerImpl trigger = codingTriggerService.generateCodeItemService(itemDataId, verbatimTerm, preferredName, codeSearchTerm, bioontologyUrl, bioontologyApiKey, isAlias);
+        SimpleTriggerImpl trigger = codingTriggerService.generateCodeItemService(itemDataId, verbatimTerm, categoryList, codeSearchTerm, bioontologyUrl, bioontologyApiKey, isAlias);
         trigger.setDescription(itemDataId + " " + verbatimTerm);
 
         JobDetailImpl jobDetailBean = new JobDetailImpl();

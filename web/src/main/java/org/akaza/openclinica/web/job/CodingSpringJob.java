@@ -19,6 +19,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CodingSpringJob extends QuartzJobBean {
@@ -40,7 +41,7 @@ public class CodingSpringJob extends QuartzJobBean {
 
         String verbatimTerm = dataMap.getString(CodingTriggerService.VERBATIM_TERM);
         boolean isAlias = dataMap.getBooleanFromString(CodingTriggerService.IS_ALIAS);
-        String preferredName = dataMap.getString(CodingTriggerService.PREFERRED_NAME);
+        String categoryList = dataMap.getString(CodingTriggerService.CATEGORY_LIST);
         String codeSearchTerm = dataMap.getString((CodingTriggerService.CODE_SEARCH_TERM));
         String bioontologyUrl = dataMap.getString(CodingTriggerService.BIOONTOLOGY_URL);
         String bioontologyApiKey = dataMap.getString(CodingTriggerService.BIOONTOLOGY_API_KEY);
@@ -57,43 +58,36 @@ public class CodingSpringJob extends QuartzJobBean {
             codedItemService = (CodedItemService) appContext.getBean("codedItemServiceImpl");
 
             CodedItem codedItem = codedItemService.findCodedItem(codedItemId);
-
+            Classification classificationResult = getClassificationFromCategoryString(categoryList);
             search.setSearchInterface(new BioPortalSearchInterface());
 
-            List<Classification> classificationResultList = search.getClassifications(preferredName, codedItem.getDictionary().replace("_", " "), bioontologyUrl, bioontologyApiKey);
+            //get codes for all verb terms & save it in classification
+            search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "), bioontologyUrl, bioontologyApiKey);
+            //replace all terms & codes from classification to coded elements
+            generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement(), codedItem.getDictionary());
 
-            if (classificationResultList.size() > 0) {
+            //if isAlias is true, create term using completed classification
+            if (isAlias) {
 
-                Classification classificationResult = getCurrentTermClassification(classificationResultList, preferredName);
+                StudyParameterValueBean configuredDictionary = studyParameterValueDAO.findByHandleAndStudy(codedItem.getStudyId(), "autoCodeDictionaryName");
+                Dictionary dictionary = dictionaryService.findDictionary(configuredDictionary.getValue());
 
-                //get codes for all verb terms & save it in classification
-                search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "), bioontologyUrl, bioontologyApiKey);
-                //replace all terms & codes from classification to coded elements
-                generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement(), codedItem.getDictionary());
+                Term term = new Term();
 
-                //if isAlias is true, create term using completed classification
-                if (isAlias) {
+                term.setDictionary(dictionary);
+                term.setLocalAlias(verbatimTerm.toLowerCase());
+                term.setPreferredName(codeSearchTerm.toLowerCase());
+                term.setHttpPath(classificationResult.getHttpPath());
+                term.setExternalDictionaryName(codedItem.getDictionary());
+                term.setTermElementList(generateTermElementList(classificationResult.getClassificationElement()));
 
-                    StudyParameterValueBean configuredDictionary = studyParameterValueDAO.findByHandleAndStudy(codedItem.getStudyId(), "autoCodeDictionaryName");
-                    Dictionary dictionary = dictionaryService.findDictionary(configuredDictionary.getValue());
-
-                    Term term = new Term();
-
-                    term.setDictionary(dictionary);
-                    term.setLocalAlias(verbatimTerm.toLowerCase());
-                    term.setPreferredName(codeSearchTerm.toLowerCase());
-                    term.setHttpPath(classificationResult.getHttpPath());
-                    term.setExternalDictionaryName(codedItem.getDictionary());
-                    term.setTermElementList(generateTermElementList(classificationResult.getClassificationElement()));
-
-                    termService.saveTerm(term);
-                }
-
-                codedItem.setStatus((String.valueOf(Status.CodeStatus.CODED)));
-                codedItem.setHttpPath(classificationResult.getHttpPath());
-
-                codedItemService.saveCodedItem(codedItem);
+                termService.saveTerm(term);
             }
+
+            codedItem.setStatus((String.valueOf(Status.CodeStatus.CODED)));
+            codedItem.setHttpPath(classificationResult.getHttpPath());
+
+            codedItemService.saveCodedItem(codedItem);
 
         } catch (Exception e) {
 
@@ -105,21 +99,27 @@ public class CodingSpringJob extends QuartzJobBean {
         }
     }
 
+    private Classification getClassificationFromCategoryString(String categoryList) {
 
+        Classification classification = new Classification();
+        List<String> list = new ArrayList<String>(Arrays.asList(categoryList.split("\\|")));
 
-    private Classification getCurrentTermClassification(List<Classification> classificationResultList, String verbatimTerm) {
+        for (int i = 0; i < list.size(); i++) {
 
-        for (Classification classification : classificationResultList) {
-            for (ClassificationElement classificationElement : classification.getClassificationElement()) {
+            if (list.get(i).equals("HTTP")) {
+                classification.setHttpPath(list.get(i + 1));
+                i++;
+            } else {
 
-                if (classificationElement.getCodeName().equals(verbatimTerm)) {
-
-                    return classification;
-                }
+                ClassificationElement classificationElement = new ClassificationElement();
+                classificationElement.setElementName(list.get(i));
+                classificationElement.setCodeName(list.get(i + 1));
+                classification.addClassificationElement(classificationElement);
+                i++;
             }
         }
 
-        return classificationResultList.get(0); //not sure that it is a good idea.
+        return classification;
     }
 
     private List<TermElement> generateTermElementList(List<ClassificationElement> classificationElementList) {

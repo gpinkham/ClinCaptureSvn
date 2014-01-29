@@ -2577,17 +2577,41 @@ codeItem = function(item) {
     })
 }
 
+getMedicalCodingCategoryList = function(item) {
+
+    var categoryList = $(item).closest('tbody').find('tr').map(function() {
+
+        return $(this).find('td').map(function(index) {
+
+            return $(this).html() == '' || $(this).html().indexOf('INPUT') > 0 || $(this).html().indexOf('input') > 0 ? null : $.trim($(this).html());
+        }).get();
+
+    }).get();
+
+    categoryList = $.map(categoryList, function(value, i) {
+
+        if(i % 2 == 0) {
+            return value.replace(/\:/g, '');
+        }
+
+        return value;
+    });
+
+    return categoryList;
+}
+
 saveCodedItem = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-    var prefTerm = $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
+    var categoryList = getMedicalCodingCategoryList(item).join("|");
+
     $.ajax({
 
         type: "POST",
         url: url + "/saveCodedItem",
         data: {
 
-            prefTerm: prefTerm,
+            categoryList: categoryList,
             item: $(item).parents('div').attr("id"),
             verbatimTerm: $.trim($(item).parents().siblings("td").find("div[name='itemDataValue']").text()),
             coderSearchTerm: $(item).parents().find("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").val()
@@ -2669,7 +2693,7 @@ codeAndAlias = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
     var study = new RegExp("study=(\\d+)").exec(window.location.href.toString())[1]
-    var prefTerm = $.trim($(item).parents().find("div[name='verbTermMark'][id=" + $(item).attr("id") +"]").parent("td").next().text())
+    var categoryList = getMedicalCodingCategoryList(item).join("|");
 
     $.ajax({
 
@@ -2677,7 +2701,7 @@ codeAndAlias = function(item) {
         url: url + "/codeAndAlias",
         data: {
 
-            prefTerm: prefTerm,
+            categoryList: categoryList,
             study: study,
             item: $(item).parents('div').attr("id"),
             verbatimTerm: $.trim($(item).parents().siblings("td").find("div[name='itemDataValue']").text()),
@@ -2721,7 +2745,7 @@ function codedItemAutoUpdate() {
                 arr = arr.toString();
                 codedItemAutoUpdateAjax(arr);
             }
-        }, 5000);
+        }, 1000);
     });
 }
 
@@ -2792,6 +2816,12 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
 
                 $("a[name='unCode'][itemid=" + id + "]").attr('term', term);
                 $("a[name='unCode'][itemid=" + id + "]").attr('pref', pref);
+
+                var dictionary = $("div[id=" + id + "]").parent().siblings("td").find("div[name='termDictionary']").text();
+
+                $("a[name='unCode']").filter(function () {
+                    return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary &&
+                        $(this).parents().siblings("td").find("div[name='itemDataValue']").text().toLowerCase() == term;}).attr('term', term).attr('pref', pref);
             }
         }
     });
