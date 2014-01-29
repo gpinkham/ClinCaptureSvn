@@ -717,11 +717,10 @@ public class CreateStudyServlet extends Controller {
         newStudy.getStudyParameterConfig().setMedicalCodingApiKey(fp.getString("medicalCodingApiKey"));
 
 		// Probably create custom dictionary from here
-		newStudy.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("autoCodeDictionaryName"));
 
-		newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("medicalCodingApprovalNeeded"));
-
-        newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("medicalCodingContextNeeded"));
+		newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
+		newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("medicalCodingContextNeeded"));
+		newStudy.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded"));
 
 		request.getSession().setAttribute("newStudy", newStudy);
 
