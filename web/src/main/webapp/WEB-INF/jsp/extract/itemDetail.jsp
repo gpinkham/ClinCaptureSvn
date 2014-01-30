@@ -25,21 +25,6 @@
 
 </head>
 <body class="popup_BG">
-<script language="JavaScript">
-       <!--
-         function leftnavExpand(strLeftNavRowElementName){
-
-	       var objLeftNavRowElement;
-
-           objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-           if (objLeftNavRowElement != null) {
-             if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; } 
-	           objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";		
-	         }
-           }
-
-       //-->
- </script>    
  <jsp:include page="../include/alertbox.jsp"/>
  <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
  <tr valign="top">
@@ -57,25 +42,25 @@
 
 <div class="textbox_center" align="center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">  
-  <tr valign="top" ><td class="table_header_column"><fmt:message key="CRF_name" bundle="${resword}"/>:</td><td class="table_cell">  
+  <tr valign="top" ><td class="table_header_column"><fmt:message key="CRF_name" bundle="${resword}"/>:</td><td class="table_header_column">  
   <c:out value="${crf.name}"/>
    </td></tr>
-  <tr valign="top" ><td class="table_header_column"><fmt:message key="item_name" bundle="${resword}"/>:</td><td class="table_cell">
+  <tr valign="top" ><td class="table_header_column"><fmt:message key="item_name" bundle="${resword}"/>:</td><td class="table_header_column">
   <c:out value="${item.name}"/>
    </td></tr>
-  <tr valign="top" ><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_cell">
+  <tr valign="top" ><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_header_column">
   <c:out value="${item.oid}"/>
    </td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td><td class="table_cell">
+  <tr valign="top"><td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td><td class="table_header_column">
   <c:out value="${item.description}"/>&nbsp;
   </td></tr> 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="data_type" bundle="${resword}"/>:</td><td class="table_cell">
+  <tr valign="top"><td class="table_header_column"><fmt:message key="data_type" bundle="${resword}"/>:</td><td class="table_header_column">
   <c:out value="${item.dataType.name}"/>&nbsp;
   </td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="units" bundle="${resword}"/>:</td><td class="table_cell">
+  <tr valign="top"><td class="table_header_column"><fmt:message key="units" bundle="${resword}"/>:</td><td class="table_header_column">
   <c:out value="${item.units}"/>&nbsp;
   </td></tr> 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="PHI" bundle="${resword}"/>:</td><td class="table_cell">  
+  <tr valign="top"><td class="table_header_column"><fmt:message key="PHI" bundle="${resword}"/>:</td><td class="table_header_column">  
   <c:choose>
     <c:when test="${item.phiStatus}">
       <fmt:message key="yes" bundle="${resword}"/>
@@ -101,12 +86,13 @@
   
   <table border="0" cellpadding="0" cellspacing="0" width="100%">
    <tr>
-	 <td valign="top" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${versionCount}"/>'); 
-	   javascript:setImage('ExpandGroup<c:out value="${versionCount}"/>','images/bt_Collapse.gif');"><img 
-	     name="ExpandGroup<c:out value="${versionCount}"/>" src="images/bt_Collapse.gif" border="0"></a></td>
-	 <td valign="top" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${versionCount}"/>'); 
-	     javascript:setImage('ExpandGroup<c:out value="${versionCount}"/>','images/bt_Expand.gif');"><b><c:out value="${versionItem.crfName}"/>&nbsp;<c:out value="${versionItem.crfVersionName}"/></b></a>
-	 </td>
+	<td valign="top" class="leftmenu">
+		<a href="javascript:leftnavExpand_ext('leftnavSubRow_SubSection<c:out value="${versionCount}"/>', true, '${newThemeColor}');">
+			<img id="excl_leftnavSubRow_SubSection<c:out value="${versionCount}"/>" src="images/bt_Collapse.gif" border="0"> 
+			<b><c:out value="${versionItem.crfName}"/>&nbsp;<c:out value="${versionItem.crfVersionName}"/></b>
+		</a>
+	</td>
+	 
    </tr>  
    <tr id="leftnavSubRow_SubSection<c:out value="${versionCount}"/>" style="display: all" valign="top">
 	 <td colspan="2">
@@ -114,8 +100,8 @@
          <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
          <div class="textbox_center" align="center">
-	     <table border="0" cellpadding="0" cellspacing="0">
-	      <tr>
+	     <table border="0" cellpadding="0" cellspacing="0" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
+	      <tr valign="top"> 
 
 	       <td class="table_header_column_top"><fmt:message key="left_item_text" bundle="${resword}"/></td>
            <td class="table_header_column_top"><fmt:message key="right_item_text" bundle="${resword}"/></td>   
@@ -134,13 +120,13 @@
            <td class="table_header_column_top"><fmt:message key="required" bundle="${resword}"/></td>
           </tr>
           <tr valign="top">            
-           <td class="table_cell"><c:out value="${versionItem.leftItemText}"/>&nbsp;</td>
-           <td class="table_cell"><c:out value="${versionItem.rightItemText}"/>&nbsp;</td>           
-           <td class="table_cell"><c:out value="${versionItem.defaultValue}"/>&nbsp;</td>             
-           <td class="table_cell"><c:out value="${versionItem.responseLayout}"/>&nbsp;</td>     
-           <td class="table_cell"><c:out value="${versionItem.responseSet.responseType.name}"/>&nbsp;</td>
-           <td class="table_cell"><c:out value="${versionItem.responseSet.label}"/>&nbsp;</td>
-           <td class="table_cell">
+           <td class="table_header_column"><c:out value="${versionItem.leftItemText}"/>&nbsp;</td>
+           <td class="table_header_column"><c:out value="${versionItem.rightItemText}"/>&nbsp;</td>           
+           <td class="table_header_column"><c:out value="${versionItem.defaultValue}"/>&nbsp;</td>             
+           <td class="table_header_column"><c:out value="${versionItem.responseLayout}"/>&nbsp;</td>     
+           <td class="table_header_column"><c:out value="${versionItem.responseSet.responseType.name}"/>&nbsp;</td>
+           <td class="table_header_column"><c:out value="${versionItem.responseSet.label}"/>&nbsp;</td>
+           <td class="table_header_column">
             <c:forEach var="option" items="${versionItem.responseSet.options}" varStatus="status">
                 <c:out value="${option.text}"/>
             |
@@ -150,20 +136,20 @@
                 </c:if>
 
             </c:forEach>&nbsp;
-           <td class="table_cell"><c:out value="${section.label}"/>&nbsp;</td>   
+           <td class="table_header_column"><c:out value="${section.label}"/>&nbsp;</td>   
               <c:choose>
                <c:when test="${versionItem.groupLabel != 'Ungrouped'}">
-                   <td class="table_cell"><c:out value="${versionItem.groupLabel}"/></td>
+                   <td class="table_header_column"><c:out value="${versionItem.groupLabel}"/></td>
                </c:when>
                <c:otherwise>
-                   <td class="table_cell"><c:out value=""/>&nbsp;</td>
+                   <td class="table_header_column"><c:out value=""/>&nbsp;</td>
                </c:otherwise>
                </c:choose>
 
-           <td class="table_cell"><c:out value="${ifmdBean.regexp}"/>&nbsp;</td>   
-           <td class="table_cell"><c:out value="${ifmdBean.regexpErrorMsg}"/>&nbsp;</td>   
+           <td class="table_header_column"><c:out value="${ifmdBean.regexp}"/>&nbsp;</td>   
+           <td class="table_header_column"><c:out value="${ifmdBean.regexpErrorMsg}"/>&nbsp;</td>   
 
-           <td class="table_cell">
+           <td class="table_header_column">
             <c:choose>
              <c:when test="${versionItem.required==true}">
                <fmt:message key="yes" bundle="${resword}"/> 
@@ -193,4 +179,3 @@
 </body>
 <jsp:include page="../include/changeTheme.jsp"/>
 </html>
-

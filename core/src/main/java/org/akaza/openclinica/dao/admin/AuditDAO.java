@@ -78,6 +78,8 @@ public class AuditDAO extends EntityDAO {
 	public void setTypesExpectedWithItemDataType() {
 		this.setTypesExpected();
 		this.setTypeExpected(14, TypeNames.INT); // item_data_type_id
+		this.setTypeExpected(15, TypeNames.INT); // item_id
+		this.setTypeExpected(16, TypeNames.STRING); // description
 	}
 
 	/**
@@ -112,9 +114,11 @@ public class AuditDAO extends EntityDAO {
 		return eb;
 	}
 
-	public Object getEntityFromHashMapWithItemDataType(HashMap hm) {
+	public Object getEntityFromHashMapWithItemDataTypeAndItemData(HashMap hm) {
 		AuditBean eb = (AuditBean) this.getEntityFromHashMap(hm);
 		eb.setItemDataTypeId((Integer) hm.get("item_data_type_id"));
+		eb.setItemId((Integer) hm.get("item_id"));
+		eb.setItemDescription((String) hm.get("description"));
 		return eb;
 	}
 
@@ -222,11 +226,11 @@ public class AuditDAO extends EntityDAO {
 		HashMap variables = new HashMap();
 		variables.put(1, eventCRFId);
 
-		String sql = digester.getQuery("findEventCRFAuditEventsWithItemDataType");
+		String sql = digester.getQuery("findEventCRFAuditEventsWithItemDataTypeAndItemData");
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
 		for (Object anAlist : alist) {
-			AuditBean eb = (AuditBean) this.getEntityFromHashMapWithItemDataType((HashMap) anAlist);
+			AuditBean eb = (AuditBean) this.getEntityFromHashMapWithItemDataTypeAndItemData((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;

@@ -340,7 +340,18 @@
                             <td class="table_header_column"><fmt:message key="${eventCRFAudit.auditEventTypeName}" bundle="${resaudit}"/>&nbsp;</td>
                             <td class="table_header_column"><fmt:formatDate value="${eventCRFAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${eventCRFAudit.userName}"/>&nbsp;</td>
-                            <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.ordinal}"/>)</td>
+                            <td class="table_header_column">
+								<c:choose>
+									<c:when test="${eventCRFAudit.itemId != 0}">
+										<a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${eventCRFAudit.itemId}"/>')" title="<c:out value="${eventCRFAudit.itemDescription}"/>">
+											<c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.ordinal}"/>)
+										</a>
+									</c:when>
+									<c:otherwise>
+											<c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.ordinal}"/>)
+									</c:otherwise>
+								</c:choose>
+							</td>
                             <td class="table_header_column">
                                 <c:choose>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>

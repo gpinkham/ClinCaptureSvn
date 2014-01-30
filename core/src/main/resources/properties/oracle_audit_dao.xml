@@ -80,11 +80,11 @@
         </sql>
     </query>
     <query>
-    	<name>findEventCRFAuditEventsWithItemDataType</name>
+    	<name>findEventCRFAuditEventsWithItemDataTypeAndItemData</name>
     	<sql>
     	SELECT ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
         	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
-        	ale.new_value, ale.event_crf_id, ale.user_name, ale.name, item.item_data_type_id
+        	ale.new_value, ale.event_crf_id, ale.user_name, ale.name, item.item_data_type_id, item.item_id, item.description
 		FROM (SELECT  ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
         	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
         	ale.new_value, ale.event_crf_id, ua.user_name, alet.name

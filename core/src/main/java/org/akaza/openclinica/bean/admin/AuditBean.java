@@ -36,6 +36,9 @@ public class AuditBean extends EntityBean {
 
 	private int itemDataTypeId;
 	private int ordinal;
+	
+	private int itemId;
+	private String itemDescription;
 
 	public int getItemDataTypeId() {
 		return this.itemDataTypeId;
@@ -186,6 +189,22 @@ public class AuditBean extends EntityBean {
 		if (id != other.id)
 			return false;
 		return true;
+	}
+
+	public int getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(int itemId) {
+		this.itemId = itemId;
+	}
+
+	public String getItemDescription() {
+		return itemDescription;
+	}
+
+	public void setItemDescription(String itemDescription) {
+		this.itemDescription = itemDescription;
 	}
 
 }

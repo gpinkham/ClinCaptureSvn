@@ -86,6 +86,7 @@ public class TermServiceImpl implements TermService {
 
 			if (x.getPreferredName().equals(term.getPreferredName())
 					&& x.getDictionary().equals(term.getDictionary())
+                    && x.getLocalAlias().equals(term.getLocalAlias())
                     && x.getExternalDictionaryName().equals(term.getExternalDictionaryName())) {
 
 				return true;

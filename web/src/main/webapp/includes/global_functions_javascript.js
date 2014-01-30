@@ -1513,6 +1513,26 @@ function leftnavExpand(strLeftNavRowElementName){
     }
 }
 
+function leftnavExpand_ext(strLeftNavRowElementName, isHeader, themeColor){
+	var objLeftNavRowElement;
+	var color = "";
+	if (themeColor) { color = "/" + themeColor; }
+	
+	objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+	if (objLeftNavRowElement != null) {
+		if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
+		objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
+		if (isHeader) {
+			objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
+			if(objLeftNavRowElement.display == "none"){
+				objExCl.src = "images"+color+"/bt_Expand.gif";
+			}else{
+				objExCl.src = "images"+color+"/bt_Collapse.gif";
+			}	
+		}
+	}
+}
+
 function showPopupForEvents(obj, e) {
   if (!subjectMatrixPopupStick) {
     clearInterval(popupInterval);
