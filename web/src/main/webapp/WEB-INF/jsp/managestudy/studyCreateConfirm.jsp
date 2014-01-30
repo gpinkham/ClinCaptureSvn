@@ -787,7 +787,7 @@
       <td class="table_cell">
           <c:choose>
               <c:when test="${studyToView.studyParameterConfig.allowCodingVerification == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
+                  <fmt:message key="no" bundle="${resword}"/>
               </c:when>
               <c:otherwise>
                   <fmt:message key="no" bundle="${resword}"/>

@@ -148,7 +148,7 @@ public class CodedItemAutoUpdater {
         return codedItemWithFilterFields;
     }
 
-    private class codedElementSortByItemDataId implements Comparator {
+    private class codedElementSortByItemDataId implements Comparator<Object> {
 
         public int compare(Object o1, Object o2) {
             CodedItemElement p1 = (CodedItemElement) o1;

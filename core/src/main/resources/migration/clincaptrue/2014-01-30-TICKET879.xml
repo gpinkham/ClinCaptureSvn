@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="satoshi" id="2014-01-30-TICKET879">
+    	<preConditions onFail="MARK_RAN">
+    		<sqlCheck expectedResult="0">select count(*) from study_parameter where name='allowCodingVerification'</sqlCheck>
+    	</preConditions>
+        <comment>Re-add 'allowCodingVerfication' if it does not exist in database</comment>
+        <insert tableName="study_parameter">
+			<column name="default_value" value="no" />
+			<column name="inheritable" valueBoolean="true" />
+			<column name="overridable" valueBoolean="false" />
+			<column name="name" value="allowCodingVerification" />
+            <column name="study_parameter_id" valueNumeric="32" />
+			<column name="handle" value="allowCodingVerification" />
+			<column name="description" value="Allow medical coding verification" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

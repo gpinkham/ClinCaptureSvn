@@ -2162,12 +2162,12 @@
             <td>
                 <c:choose>
                     <c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == 'yes'}">
-                        <input type="radio" checked name="medicalCodingApprovalNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-                        <input type="radio" name="medicalCodingApprovalNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                        <input type="radio" disabled="disabled" name="medicalCodingApprovalNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" disabled="disabled" checked name="medicalCodingApprovalNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
                     </c:when>
                     <c:otherwise>
-                        <input type="radio" name="medicalCodingApprovalNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
-                        <input type="radio" checked name="medicalCodingApprovalNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
+                        <input type="radio" disabled="disabled" name="medicalCodingApprovalNeeded" value="yes" onchange="javascript:changeIcon()"><fmt:message key="yes" bundle="${resword}"/>
+                        <input type="radio" disabled="disabled" checked name="medicalCodingApprovalNeeded" value="no" onchange="javascript:changeIcon()"><fmt:message key="no" bundle="${resword}"/>
                     </c:otherwise>
                 </c:choose>
             </td>

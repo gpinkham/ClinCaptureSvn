@@ -712,14 +712,13 @@ public class CreateStudyServlet extends Controller {
 				fp.getString("replaceExisitingDataDuringImport"));
 		
 		// Medical coding
-		newStudy.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
+		newStudy.getStudyParameterConfig().setMedicalCodingApiKey(fp.getString("medicalCodingApiKey"));
 		newStudy.getStudyParameterConfig().setDefaultBioontologyURL(fp.getString("defaultBioontologyURL"));
-        newStudy.getStudyParameterConfig().setMedicalCodingApiKey(fp.getString("medicalCodingApiKey"));
+		newStudy.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
 
 		// Probably create custom dictionary from here
-
 		newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
-		newStudy.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("medicalCodingContextNeeded"));
+		newStudy.getStudyParameterConfig().setMedicalCodingContextNeeded(fp.getString("medicalCodingContextNeeded"));
 		newStudy.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded"));
 
 		request.getSession().setAttribute("newStudy", newStudy);

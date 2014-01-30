@@ -960,7 +960,7 @@
         <c:otherwise>
           <c:choose>
               <c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
+                  <fmt:message key="no" bundle="${resword}"/>
               </c:when>
               <c:otherwise>
                   <fmt:message key="no" bundle="${resword}"/>

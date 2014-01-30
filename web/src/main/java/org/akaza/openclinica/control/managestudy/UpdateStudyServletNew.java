@@ -514,12 +514,14 @@ public class UpdateStudyServletNew extends Controller {
         study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
 		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
-		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
+		
+		// Medical coding
+		study.getStudyParameterConfig().setMedicalCodingApiKey(fp.getString("medicalCodingApiKey"));
 		study.getStudyParameterConfig().setDefaultBioontologyURL(fp.getString("defaultBioontologyURL"));
-        study.getStudyParameterConfig().setMedicalCodingApiKey(fp.getString("medicalCodingApiKey"));
 		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
+		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
+		study.getStudyParameterConfig().setMedicalCodingContextNeeded(fp.getString("medicalCodingContextNeeded"));
 		study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded"));
-        study.getStudyParameterConfig().setMedicalCodingContextNeeded(fp.getString("medicalCodingContextNeeded"));
 
 		try {
 
