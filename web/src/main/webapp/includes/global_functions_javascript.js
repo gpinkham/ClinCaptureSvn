@@ -2843,6 +2843,11 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
                     return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary &&
                         $(this).parents().siblings("td").find("div[name='itemDataValue']").text().toLowerCase() == term;}).attr('term', term).attr('pref', pref);
             }
+
+            if ($("div:contains('In process')").size() == 0) {
+
+                $('.ui-widget-overlay').remove();
+            }
         }
     });
 }
@@ -2872,6 +2877,9 @@ function manualUpdateMedicalCodingUX(item) {
 
     //hide code icon results
     $("div[id=" + $(item).parents('div').attr("id") + "]").html('');
+
+    //block page
+    $("<div class='ui-widget-overlay' style='width:" + $(document).width() + "px; height:" + $(document).height() + "px; z-index: 1005;' />").appendTo('body');
 
 }
 
