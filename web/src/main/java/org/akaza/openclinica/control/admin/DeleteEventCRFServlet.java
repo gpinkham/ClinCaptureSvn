@@ -23,6 +23,9 @@ package org.akaza.openclinica.control.admin;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -176,18 +179,29 @@ public class DeleteEventCRFServlet extends Controller {
 				forwardPage(Page.DELETE_EVENT_CRF, request, response);
 			} else {
 				logger.info("submit to delete the event CRF from event");
-				// delete all the item data first
+
+                CodedItemService codedItemsService = getCodedItemService();
+
 				for (Object anItemData : itemData) {
-					ItemDataBean item = (ItemDataBean) anItemData;
+
+                    ItemDataBean item = (ItemDataBean) anItemData;
+                    CodedItem codedItem = codedItemsService.findCodedItem(item.getId());
 					ArrayList discrepancyList = dnDao.findExistingNotesForItemData(item.getId());
-					iddao.deleteDnMap(item.getId());
-					for (Object aDiscrepancyList : discrepancyList) {
+
+                    iddao.deleteDnMap(item.getId());
+
+                    for (Object aDiscrepancyList : discrepancyList) {
 						DiscrepancyNoteBean noteBean = (DiscrepancyNoteBean) aDiscrepancyList;
 						dnDao.deleteNotes(noteBean.getId());
 					}
-					item.setUpdater(ub);
+
+                    item.setUpdater(ub);
 					iddao.updateUser(item);
 					iddao.delete(item.getId());
+
+                    if(codedItem != null) {
+                        codedItemsService.deleteCodedItem(codedItem);
+                    }
 				}
 				// delete event crf
 				ecdao.deleteEventCRFDNMap(eventCRF.getId());
