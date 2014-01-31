@@ -39,6 +39,8 @@ public class CodedItemAutoUpdater {
     @Autowired
     private DataSource datasource;
 
+    private String themeColor;
+
     @RequestMapping(value = "/checkCodedItemsStatus")
     public void checkCodedItemsStatus(HttpServletRequest request, HttpServletResponse response) throws SchedulerException, IOException {
 
@@ -46,6 +48,9 @@ public class CodedItemAutoUpdater {
         List<String> codedItemIdListString = new ArrayList<String>(Arrays.asList(codedItemIdList.split(",")));
         List<Integer> codedItemIdListInt = convertStringListToIntList(codedItemIdListString);
         List<Integer> codedItemsInProgress = new ArrayList<Integer>();
+
+        themeColor = (String) request.getSession().getAttribute("newThemeColor");
+        themeColor = themeColor == null ? "blue" : themeColor;
 
         for (JobExecutionContext jobExContext : getJobsList()) {
 
@@ -72,16 +77,20 @@ public class CodedItemAutoUpdater {
         for (int codedItemId : codedItemIdListInt) {
 
             CodedItem codedItem = codedItemService.findCodedItem(codedItemId);
-            ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
-            ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
-            Term term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(), codedItem.getDictionary());
 
-            if (term != null) {
+            if (codedItem.isCoded()) {
 
-                codedItemToAppend.add(contextBoxBuilder(codedItem, term.getLocalAlias(), term.getPreferredName()));
-            } else {
+                ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
+                ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
+                Term term = termService.findByAliasAndExternalDictionary(data.getValue().toLowerCase(), codedItem.getDictionary());
 
-                codedItemToAppend.add(contextBoxBuilder(codedItem, "", ""));
+                if (term != null) {
+
+                    codedItemToAppend.add(contextBoxBuilder(codedItem, term.getLocalAlias(), term.getPreferredName()));
+                } else {
+
+                    codedItemToAppend.add(contextBoxBuilder(codedItem, "", ""));
+                }
             }
         }
 
@@ -108,7 +117,7 @@ public class CodedItemAutoUpdater {
                     .close()
                     .tr(1).close()
                     .td(1).close().append("HTTP: ").tdEnd()
-                    .td(2).close().append(codedItem.getHttpPath()).tdEnd()
+                    .td(2).close().a().style("color:" + getThemeColor() +"").append(" target=\"_blank\" ").href(codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
                     .td(3).width("360px").colspan("2").close().tdEnd()
                     .td(4).close().tdEnd().trEnd(1);
 
@@ -172,6 +181,20 @@ public class CodedItemAutoUpdater {
     private List<JobExecutionContext> getJobsList() throws SchedulerException {
 
         return scheduler.getScheduler().getCurrentlyExecutingJobs();
+    }
+
+    public String getThemeColor() {
+
+        if (themeColor.equalsIgnoreCase("violet")) {
+
+            return "#aa62c6";
+
+        } else if (themeColor.equalsIgnoreCase("green")) {
+
+            return "#75b894";
+        }
+
+        return "#729fcf";
     }
 
 }

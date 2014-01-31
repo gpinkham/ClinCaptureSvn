@@ -71,6 +71,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 	private StudySubjectDAO studySubjectDAO;
 	private StudyEventDefinitionDAO studyEventDefDao;
     private CRFDAO crfDAO;
+    private String themeColor;
 
     private final String medicalCodingContextNeeded;
     private final String showMoreLink;
@@ -275,10 +276,10 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
             if (codedItem.isCoded()) {
 
-                builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:"+ showContextValue +";").close()
+                builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:" + showContextValue + ";").close()
                         .tr(1).close()
                         .td(1).close().append("HTTP: ").tdEnd()
-                        .td(2).close().append(codedItem.getHttpPath()).tdEnd()
+                        .td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href(codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
                         .td(3).width("360px").colspan("2").close().tdEnd()
                         .td(4).close().tdEnd().trEnd(1);
 
@@ -562,7 +563,9 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         this.terms = terms;
     }
 
-	public void setStudyId(String studyId) {
+    public void setThemeColor(String themeColor) { this.themeColor = themeColor; }
+
+    public void setStudyId(String studyId) {
 
 		try {
 			this.studyId = Integer.parseInt(studyId);
@@ -667,5 +670,19 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             }
             return false;
         }
+    }
+
+    public String getThemeColor() {
+
+        if (themeColor.equalsIgnoreCase("violet")) {
+
+            return "#aa62c6";
+
+        } else if (themeColor.equalsIgnoreCase("green")) {
+
+            return "#75b894";
+        }
+
+        return "#729fcf";
     }
 }

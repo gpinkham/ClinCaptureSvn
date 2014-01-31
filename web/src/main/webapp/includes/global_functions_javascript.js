@@ -2603,7 +2603,11 @@ getMedicalCodingCategoryList = function(item) {
 
         return $(this).find('td').map(function(index) {
 
-            return $(this).html() == '' || $(this).html().indexOf('INPUT') > 0 || $(this).html().indexOf('input') > 0 ? null : $.trim($(this).html());
+            var returnValue = $(this).html() == '' || $(this).html().indexOf('INPUT') > 0 || $(this).html().indexOf('input') > 0 ? null : $.trim($(this).html());
+            returnValue = returnValue != null && returnValue.indexOf("href") > 0 ? $.trim($(this).find("a").text()) : returnValue;
+
+            return returnValue;
+
         }).get();
 
     }).get();

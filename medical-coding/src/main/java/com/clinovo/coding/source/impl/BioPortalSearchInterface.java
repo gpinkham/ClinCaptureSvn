@@ -265,8 +265,13 @@ public class BioPortalSearchInterface implements SearchInterface {
 
             String codeResult = transport.processRequest();
             JsonObject jobject = new JsonParser().parse(codeResult).getAsJsonObject();
-            String codeValue = jobject.getAsJsonArray("collection").get(0).getAsJsonObject().get("notation").getAsString();
-            classificationElement.setCodeValue(codeValue);
+            JsonArray jsonArray = jobject.getAsJsonArray("collection");
+
+            if (!jsonArray.isJsonNull() && jsonArray.size() > 0) {
+
+                String codeValue = jsonArray.get(0).getAsJsonObject().get("notation").getAsString();
+                classificationElement.setCodeValue(codeValue);
+            }
         }
     }
 

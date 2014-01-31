@@ -116,9 +116,10 @@ public class CodedItemsController {
 		String studyId = request.getParameter("study");
         String showMoreLink = request.getParameter("showMoreLink");
         String showContext = request.getParameter("showContext");
-
+        String themeColor = (String) request.getSession().getAttribute("newThemeColor");
         showMoreLink = showMoreLink == null ? "false" : showMoreLink;
         showContext =  showContext == null ? "false" : showContext;
+        themeColor = themeColor == null ? "blue" : themeColor;
 
 		StudyBean study = (StudyBean) getStudyDAO().findByPK(Integer.parseInt(studyId));
 		StudyParameterValueBean mcApprovalNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApprovalNeeded");
@@ -142,6 +143,7 @@ public class CodedItemsController {
 		factory.setStudyId(studyId);
 		factory.setCodedItems(items);
 		factory.setDataSource(datasource);
+        factory.setThemeColor(themeColor);
 		factory.setStudyDAO(getStudyDAO());
 		factory.setTerms(termService.findAll());
 		factory.setCrfDAO(new CRFDAO(datasource));

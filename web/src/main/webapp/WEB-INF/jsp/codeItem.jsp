@@ -23,7 +23,14 @@
                 <tbody>
                     <tr>
                          <td>HTTP:</td>
-                        <td><c:out value="${obj.httpPath}"/></td>
+                         <c:set var="hyperlinkColor" value="#789EC5"/>
+                         <c:if test="${(color == 'violet')}">
+                            <c:set var="hyperlinkColor" value="#aa62c6"/>
+                        </c:if>
+                        <c:if test="${(color == 'green')}">
+                            <c:set var="hyperlinkColor" value="#75b894"/>
+                        </c:if>
+                         <td><a target="_blank" style="color:<c:out value="${hyperlinkColor}"/>" href="<c:out value="${obj.httpPath}"/>"><c:out value="${obj.httpPath}"/></a></td>
                          <td width=360px colspan="2"></td>
                          <td></td>
                      </tr>
