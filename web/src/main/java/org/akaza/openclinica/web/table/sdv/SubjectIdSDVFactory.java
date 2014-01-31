@@ -20,8 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -292,7 +294,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 		boolean shouldDisplaySDVButton = stats.get("shouldDisplaySDVButton") == 1;
 		String allowSdvWithOpenQueries = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries();
 		boolean subjectHasUnclosedNDsInStudy = allowSdvWithOpenQueries.equals("no")
-				&& discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel());
+				&& discrepancyNoteDAO.doesSubjectHaveUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel());
 
 		row.setNumberCRFComplete(numberOfCompletedEventCRFs + "");
 		row.setNumberOfCRFsSDV(numberOfSDVdEventCRFs + "");

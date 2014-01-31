@@ -25,8 +25,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -234,19 +236,19 @@ public class CRFListForStudyEventServlet extends Controller {
 		request.setAttribute(BEAN_UNCOMPLETED_EVENTDEFINITIONCRFS, uncompletedEventDefinitionCRFs);
 		request.setAttribute(BEAN_DISPLAY_EVENT_CRFS, displayEventCRFs);
 		request.setAttribute(SES_ICON_URL, SubjectEventStatusUtil.getSESIconUrl(seb.getSubjectEventStatus()));
-		if (discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(currentStudy, studySubjectBean.getLabel())) {
+		if (discrepancyNoteDAO.doesSubjectHaveUnclosedNDsInStudy(currentStudy, studySubjectBean.getLabel())) {
 			String subjectFlagColor = "yellow";
-			if (discrepancyNoteDAO.doesSubjectHasNewNDsInStudy(currentStudy, studySubjectBean.getLabel())) {
+			if (discrepancyNoteDAO.doesSubjectHaveNewNDsInStudy(currentStudy, studySubjectBean.getLabel())) {
 				subjectFlagColor = "red";
 			}
 			request.setAttribute(SUBJECT_FLAG_COLOR, subjectFlagColor);
 		}
 
 		String eventName = seb.getStudyEventDefinition().getName();
-		if (discrepancyNoteDAO.doesEventHasUnclosedNDsInStudy(currentStudy, eventName, eventId,
+		if (discrepancyNoteDAO.doesEventHaveUnclosedNDsInStudy(currentStudy, eventName, eventId,
 				studySubjectBean.getLabel())) {
 			String eventFlagColor = "yellow";
-			if (discrepancyNoteDAO.doesEventHasNewNDsInStudy(currentStudy, eventName, eventId,
+			if (discrepancyNoteDAO.doesEventHaveNewNDsInStudy(currentStudy, eventName, eventId,
 					studySubjectBean.getLabel())) {
 				eventFlagColor = "red";
 			}
@@ -262,6 +264,7 @@ public class CRFListForStudyEventServlet extends Controller {
 		Map<Integer, String> notedMap = new HashMap<Integer, String>();
 
 		for (Object bean : fullCrfList) {
+			boolean crfCanBeSDV = true;
 			if (bean instanceof DisplayEventCRFBean) {
 				DisplayEventCRFBean displayEventCRFBean = (DisplayEventCRFBean) bean;
 
@@ -271,7 +274,7 @@ public class CRFListForStudyEventServlet extends Controller {
 				if (discrepancyNoteDAO.doesCRFHaveUnclosedNDsInStudyForSubject(currentStudy, eventName, eventId,
 						studySubjectBean.getLabel(), crfName)) {
 					String crfFlagColor = "yellow";
-					if (discrepancyNoteDAO.doesCRFHasNewNDsInStudyForSubject(currentStudy, eventName, eventId,
+					if (discrepancyNoteDAO.doesCRFHaveNewNDsInStudyForSubject(currentStudy, eventName, eventId,
 							studySubjectBean.getLabel(), crfName)) {
 						crfFlagColor = "red";
 					}
@@ -287,7 +290,7 @@ public class CRFListForStudyEventServlet extends Controller {
 				if (discrepancyNoteDAO.doesCRFHaveUnclosedNDsInStudyForSubject(currentStudy, eventName, eventId,
 						studySubjectBean.getLabel(), crfName)) {
 					String crfFlagColor = "yellow";
-					if (discrepancyNoteDAO.doesCRFHasNewNDsInStudyForSubject(currentStudy, eventName, eventId,
+					if (discrepancyNoteDAO.doesCRFHaveNewNDsInStudyForSubject(currentStudy, eventName, eventId,
 							studySubjectBean.getLabel(), crfName)) {
 						crfFlagColor = "red";
 					}
@@ -312,7 +315,10 @@ public class CRFListForStudyEventServlet extends Controller {
 		DAOWrapper daoWrapper = new DAOWrapper(sdao, sedao, ssdao, ecdao, edcdao, seddao, discDao);
 		request.setAttribute(SHOW_SIGN_BUTTON, SignUtil.permitSign(seb, study, daoWrapper));
 		request.setAttribute(SHOW_SUBJECT_SIGN_BUTTON, SignUtil.permitSign(studySubjectBean, daoWrapper));
-		request.setAttribute(SHOW_SDV_BUTTON, SDVUtil.permitSDV(seb, studySubjectBean.getStudyId(), daoWrapper));
+		request.setAttribute(
+				SHOW_SDV_BUTTON,
+				SDVUtil.permitSDV(seb, studySubjectBean.getStudyId(), daoWrapper, currentStudy
+						.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes"), notedMap));
 		request.setAttribute(SHOW_SUBJECT_SDV_BUTTON, SDVUtil.permitSDV(studySubjectBean, daoWrapper));
 
 		boolean allLocked = true;

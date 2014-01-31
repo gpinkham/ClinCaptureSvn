@@ -13,13 +13,17 @@
 
 package org.akaza.openclinica.util;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
-
-import java.util.ArrayList;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public final class SDVUtil {
@@ -36,7 +40,8 @@ public final class SDVUtil {
 		return sdv;
 	}
 
-	public static boolean permitSDV(StudyEventBean studyEventBean, int studyId, DAOWrapper daoWrapper) {
+	public static boolean permitSDV(StudyEventBean studyEventBean, int studyId, DAOWrapper daoWrapper,
+			boolean allowSdvWithOpenQueries, Map<Integer, String> notedMap) {
 		boolean hasReadyForSDV = false;
 		StudyBean studyBean = (StudyBean) daoWrapper.getSdao().findByPK(studyId);
 		ArrayList eventCrfs = daoWrapper.getEcdao().findAllStartedByStudyEvent(studyEventBean);
@@ -49,7 +54,8 @@ public final class SDVUtil {
 					.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)
 					&& !eventCRFBean.isSdvStatus()
 					&& eventCRFBean.getStatus() == Status.UNAVAILABLE
-					&& eventCRFBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
+					&& eventCRFBean.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
+					&& (allowSdvWithOpenQueries || !notedMap.containsKey(eventDefinitionCrf.getCrfId()))) {
 				hasReadyForSDV = true;
 			}
 		}

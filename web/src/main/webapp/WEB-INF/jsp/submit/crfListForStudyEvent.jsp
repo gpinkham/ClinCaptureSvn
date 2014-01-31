@@ -194,7 +194,7 @@
             <img src="images/bt_Transparent.gif" border="0" align="left" hspace="4"/>
 
             <c:choose>
-                <c:when test="${showSDVButton and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (userRole.id eq 6 or userRole.id eq 2 or userRole.id eq 1) and not study.status.frozen and not study.status.locked and ((currentStudy.studyParameterConfig.allowSdvWithOpenQueries eq 'yes') or (currentStudy.studyParameterConfig.allowSdvWithOpenQueries eq 'no' and eventFlagColor eq null))}">
+                <c:when test="${showSDVButton and not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and (userRole.id eq 6 or userRole.id eq 2 or userRole.id eq 1) and not study.status.frozen and not study.status.locked}">
                     <c:set var="hideCol5" value="false"/>
                     <a class="sdvLink" href="pages/viewAllSubjectSDVtmp?sbb=true&studyId=${studyId}&imagePathPrefix=..%2F&crfId=0&redirection=viewAllSubjectSDVtmp&maxRows=15&showMoreLink=true&sdv_tr_=true&sdv_p_=1&sdv_mr_=15&sdv_f_studySubjectId=${studySubject.label}&sdv_f_eventName=${studyEvent.studyEventDefinition.name}" style="color: #666;"><img src="images/icon_DoubleCheck_Action.gif" border="0" align="left" alt="<fmt:message key="perform_sdv" bundle="${resword}"/>" title="<fmt:message key="perform_sdv" bundle="${resword}"/>" hspace="4"/></a>
                 </c:when>

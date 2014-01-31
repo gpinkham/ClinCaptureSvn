@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -80,8 +81,6 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.joda.time.DateTime;
-
-import java.util.ListIterator;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "unused" })
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
@@ -224,9 +223,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			configureColumn(row.getColumn(columnNames[i]), studyEventDefinition.getName(),
 					new StudyEventDefinitionMapCellEditor(), new SubjectEventStatusDroplistFilterEditor(), true, false);
 		}
-		
-		configureColumn(row.getColumn(columnNames[columnNames.length - 1]), resword.getString("rule_actions"), new ActionsCellEditor(),
-				new ListSubjectsActionsFilterEditor(locale), true, false);
+
+		configureColumn(row.getColumn(columnNames[columnNames.length - 1]), resword.getString("rule_actions"),
+				new ActionsCellEditor(), new ListSubjectsActionsFilterEditor(locale), true, false);
 
 	}
 
@@ -542,11 +541,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			} else {
 				dynamicGroupClasses = getStudyGroupClassDAO().findAllActiveDynamicGroupsByStudyId(studyBean.getId());
 			}
-			
+
 			ListIterator<StudyGroupClassBean> it = dynamicGroupClasses.listIterator();
 			while (it.hasNext()) {
 				sgcb = it.next();
-				studyEventDefinitionsList = (ArrayList<StudyEventDefinitionBean>) studyEventDefinitionDao.findAllAvailableAndOrderedByStudyGroupClassId(sgcb.getId());
+				studyEventDefinitionsList = (ArrayList<StudyEventDefinitionBean>) studyEventDefinitionDao
+						.findAllAvailableAndOrderedByStudyGroupClassId(sgcb.getId());
 				if (studyEventDefinitionsList.size() != 0) {
 					sgcb.setEventDefinitions(studyEventDefinitionsList);
 				} else {
@@ -788,17 +788,17 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			return options;
 		}
 	}
-	
+
 	private class ListSubjectsActionsFilterEditor extends DefaultActionsEditor {
 		public ListSubjectsActionsFilterEditor(Locale locale) {
 			super(locale);
 		}
-		
+
 		@Override
 		public Object getValue() {
 			HtmlBuilder html = new HtmlBuilder();
 			String value;
-			
+
 			value = (String) super.getValue();
 			html.append(value).div().style("width: 225px;").end().divEnd();
 			return html.toString();
@@ -870,9 +870,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			Boolean isSignable = (Boolean) ((HashMap<Object, Object>) item).get("isSignable");
 			Integer studySubjectId = studySubjectBean.getId();
 			String flagColour = null;
-			if (discrepancyNoteDAO.doesSubjectHasUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel())) {
+			if (discrepancyNoteDAO.doesSubjectHaveUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel())) {
 				flagColour = "yellow";
-				if (discrepancyNoteDAO.doesSubjectHasNewNDsInStudy(studyBean, studySubjectBean.getLabel())) {
+				if (discrepancyNoteDAO.doesSubjectHaveNewNDsInStudy(studyBean, studySubjectBean.getLabel())) {
 					flagColour = "red";
 				}
 			}
@@ -1677,12 +1677,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 							Date maxDate = new DateTime(refEventResult.getUpdatedDate().getTime()).plusDays(
 									sedBean.getMaxDay()).toDate();
 							if ((minDate.after(studyEventBean.getUpdatedDate()))
-									&& discrepancyNoteDAO.doesEventHasNewNDsInStudy(studyBean, sedBean.getName(),
+									&& discrepancyNoteDAO.doesEventHaveNewNDsInStudy(studyBean, sedBean.getName(),
 											studyEventBean.getId(), subjectBean.getLabel())) {
 								defaultColor = false;
 								break;
 							} else if (maxDate.before(studyEventBean.getUpdatedDate())
-									&& discrepancyNoteDAO.doesEventHasNewNDsInStudy(studyBean, sedBean.getName(),
+									&& discrepancyNoteDAO.doesEventHaveNewNDsInStudy(studyBean, sedBean.getName(),
 											studyEventBean.getId(), subjectBean.getLabel())) {
 								defaultColor = false;
 								break;
