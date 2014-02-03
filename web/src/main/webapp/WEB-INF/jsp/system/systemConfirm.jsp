@@ -76,7 +76,6 @@
 
 <div class="sysProps">
   <form:form id="systemForm" method="post" commandName="systemCommand">
-    <input type="hidden" id="formWithStateFlag" value=""/>
     <span class="first_level_header"><fmt:message key="listSystemProperties" bundle="${resword}"/></span><br/>
 
     <div class="groups">

@@ -82,8 +82,8 @@
 </script>
 
 <form:form id="systemForm" method="post" commandName="systemCommand" enctype="multipart/form-data">
+  <input type="hidden" id="formWithStateFlag" value=""/>
   <div class="sysProps">
-    <input type="hidden" id="formWithStateFlag" value=""/>
     <span class="first_level_header"><fmt:message key="systemPropertiesHeader" bundle="${resword}"/></span><br/>
     <c:choose>
       <c:when test="${systemCommandError ne null}">
@@ -138,7 +138,7 @@
               <td>
                 <input type="button" name="BTN_Back" value="<fmt:message key="back" bundle="${resword}"/>"
                        class="button_medium"
-                       onClick="formWithStateCancelSmart('<fmt:message key="you_have_unsaved_data3"
+                       onClick="formWithStateGoBackSmart('<fmt:message key="you_have_unsaved_data3"
                                                                        bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
               </td>
               <td>

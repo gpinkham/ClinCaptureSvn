@@ -105,7 +105,7 @@ function datasetConfirmBack(message, formId, address, action) {
 }
 
 function formWithStateGoBackSmart(message, servletURL, defaultURL) {
-  var newFormState = $("#formWithStateFlag").parent("form").serialize();
+  var newFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea").serialize();
   var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed" ? confirm(message) : true;
   if (confirm1) {
     goBackSmart(servletURL, defaultURL);
@@ -114,7 +114,7 @@ function formWithStateGoBackSmart(message, servletURL, defaultURL) {
 }
 
 function formWithStateCancelSmart(message, servletURL, defaultURL) {
-  var newFormState = $("#formWithStateFlag").parent("form").serialize();
+  var newFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea").serialize();
   var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed" ? confirm(message) : true;
   if (confirm1) {
     goBackSmart(servletURL, defaultURL);
@@ -123,7 +123,7 @@ function formWithStateCancelSmart(message, servletURL, defaultURL) {
 }
 
 function formWithStateConfirmGoTo(message, address) {
-  var newFormState = $("#formWithStateFlag").parent("form").serialize();
+  var newFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea").serialize();
   var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed" ? confirm(message) : true;
   if (confirm1) {
     window.location.href = address;
@@ -2440,7 +2440,7 @@ $(function() {
       firstFormState = $("#datasetForm").serialize();
     } else
     if ($("#formWithStateFlag").length > 0) {
-      firstFormState = $("#formWithStateFlag").parent("form").serialize();
+      firstFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea").serialize();
     }
 });
 
