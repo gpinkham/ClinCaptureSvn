@@ -2781,7 +2781,8 @@ function codedItemAutoUpdateAjax(arr) {
         type: "POST",
         url: url + "/checkCodedItemsStatus",
         data: {
-            arr: arr
+            arr: arr,
+            showContext: $("#showContext").val()
         },
         success: function (html) {
 
