@@ -21,14 +21,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.GroupClassType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -53,6 +45,11 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author jxu, igor
@@ -103,12 +100,14 @@ public class CreateSubjectGroupClassServlet extends Controller {
 		if (StringUtil.isBlank(action)) {
 			ArrayList studyGroups = new ArrayList();
 			StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
-			ArrayList defaultStudyGroupClasses = sgcdao.findAllDefault();
+			StudyGroupClassBean defaultStudyGroupClass = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(currentStudy
+					.getId());
+
 			clearSession(request);
 
 			request.getSession().setAttribute("groupTypes", GroupClassType.toArrayList());
 			request.getSession().setAttribute("studyGroups", studyGroups);
-			request.getSession().setAttribute("defaultGroupAlreadyExists", !defaultStudyGroupClasses.isEmpty());
+			request.getSession().setAttribute("defaultGroupAlreadyExists", defaultStudyGroupClass.getId() > 0);
 
 			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();

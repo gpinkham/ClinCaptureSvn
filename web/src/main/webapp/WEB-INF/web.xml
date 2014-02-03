@@ -1044,9 +1044,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UpdateSubjectGroupClassServlet</servlet-name>
+        <servlet-name>updateSubjectGroupClassServlet</servlet-name>
         <display-name>UpdateSubjectGroupClass</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UpdateSubjectGroupClassServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewSubjectGroupClassServlet</servlet-name>
@@ -2021,7 +2021,7 @@
         <url-pattern>/CreateSubjectGroupClass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UpdateSubjectGroupClassServlet</servlet-name>
+        <servlet-name>updateSubjectGroupClassServlet</servlet-name>
         <url-pattern>/UpdateSubjectGroupClass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
