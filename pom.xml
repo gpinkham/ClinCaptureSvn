@@ -673,6 +673,9 @@
 							</property>
 						</systemProperties>
 						<argLine>-Xms1024m -Xmx1024m</argLine>
+						<classpathDependencyExcludes>
+							<classpathDependencyExcludes>ch.qos.logback:logback-classic</classpathDependencyExcludes>
+						</classpathDependencyExcludes>
 					</configuration>
 				</plugin>
 				<plugin>

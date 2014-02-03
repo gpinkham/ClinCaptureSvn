@@ -1,12 +1,5 @@
 package org.akaza.openclinica.domain.rule.action;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.sql.Connection;
-import java.util.HashMap;
-import javax.mail.internet.MimeMessage;
-import javax.sql.DataSource;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -28,6 +21,14 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+
+import javax.mail.internet.MimeMessage;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.HashMap;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(EmailEngine.class)
@@ -67,7 +68,7 @@ public class EmailActionProcessorTest {
 		map.put("body", "test body");
 		map.put("subject", "test subject");
 
-		studyBean = new StudyBean();
+		studyBean = Mockito.mock(StudyBean.class);
 		studyBean.setId(1);
 		studyBean.setName("Default Study");
 		studyBean.setOid("S_DEFAULTS1");
