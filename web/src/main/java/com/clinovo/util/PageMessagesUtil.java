@@ -1,12 +1,12 @@
 package com.clinovo.util;
 
+import org.akaza.openclinica.control.core.BaseController;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.akaza.openclinica.control.core.BaseController;
-
+@SuppressWarnings("unchecked")
 public final class PageMessagesUtil {
 
 	private PageMessagesUtil() {

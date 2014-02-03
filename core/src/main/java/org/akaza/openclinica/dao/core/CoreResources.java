@@ -13,21 +13,7 @@
 
 package org.akaza.openclinica.dao.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
-
+import liquibase.spring.SpringLiquibase;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
@@ -44,7 +30,13 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.support.XmlWebApplicationContext;
+
+import java.io.*;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.*;
 
 @Component
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -141,25 +133,24 @@ public class CoreResources implements ResourceLoaderAware {
 
 		setDatabaseProperties(dbType);
 
-		if (resourceLoader instanceof XmlWebApplicationContext) {
-			// setup dataSource
-			ExtendedBasicDataSource dataSource = (ExtendedBasicDataSource) ((XmlWebApplicationContext) resourceLoader)
-					.getBean("dataSource");
-			dataSource.setUrl(dataInfo.getProperty("url"));
-			dataSource.setUsername(dataInfo.getProperty("username"));
-			dataSource.setPassword(dataInfo.getProperty("password"));
-			dataSource.setDriverClassName(dataInfo.getProperty("driver"));
+		// setup dataSource
+		ExtendedBasicDataSource dataSource = new ExtendedBasicDataSource();
+		dataSource.setUrl(dataInfo.getProperty("url"));
+		dataSource.setUsername(dataInfo.getProperty("username"));
+		dataSource.setPassword(dataInfo.getProperty("password"));
+		dataSource.setDriverClassName(dataInfo.getProperty("driver"));
+		Connection connection = dataSource.getConnection();
 
-			if (((XmlWebApplicationContext) resourceLoader).containsBean("liquibase")) {
-				// run liquibase
-				((XmlWebApplicationContext) resourceLoader).getBean("liquibase");
-			}
+		SpringLiquibase liquibase = new SpringLiquibase();
+		liquibase.setDataSource(dataSource);
+		liquibase.setChangeLog("classpath:migration/clincaptrue/2014-01-16-TICKET863.xml");
+		liquibase.setResourceLoader(resourceLoader);
+		liquibase.afterPropertiesSet();
 
-			Connection connection = dataSource.getConnection();
-
-			// load system properties from the database
-			loadPropertiesFromDB(connection);
-		}
+		// load system properties from the database
+		loadPropertiesFromDB(connection);
+		connection.close();
+		dataSource.close();
 
 		checkLogo();
 		prepareDataInfoProperties();
