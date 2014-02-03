@@ -233,7 +233,7 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
 	 */
 	protected List<Integer> queryForIDs(String oracleQuery, String postgresQuery, Integer groupId, Integer sectionId,
 			Integer eventCrfId, Integer crfVersionId) {
-		String query = "oracle".equalsIgnoreCase(CoreResources.getDBName()) ? oracleQuery : postgresQuery;
+		String query = "oracle".equalsIgnoreCase(CoreResources.getDBType()) ? oracleQuery : postgresQuery;
 		Query q = getCurrentSession().createSQLQuery(query);
 		if (groupId != null) {
 			q.setInteger("groupId", groupId);

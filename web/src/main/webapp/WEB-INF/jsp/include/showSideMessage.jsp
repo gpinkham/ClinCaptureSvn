@@ -4,6 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.exceptions" var="exceptions"/>
 
 <jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
 <%--<jsp:useBean scope='request' id='message' class='java.lang.String'/>--%>
@@ -25,3 +26,9 @@
 </div>
 </c:if>
 
+<c:if test="${param.message == 'system_no_permission'}">
+  <div class="alert">
+    <fmt:message key="system_no_permission" bundle="${exceptions}"/>
+    <br><br>
+  </div>
+</c:if>

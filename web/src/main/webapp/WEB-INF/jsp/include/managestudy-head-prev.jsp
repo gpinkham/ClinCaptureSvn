@@ -84,7 +84,7 @@ onload="<jsp:include page="../include/showPopUp2.jsp"/>"
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 
-<div class="logo"><img src="images/Logo.gif"></div>
+<div class="logo"><img src="<c:url value='${logoUrl}'/>"></div>
 
 <!-- Main Navigation -->
 

@@ -1,53 +1,63 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
- * You should have received a copy of the Lesser GNU General Public License along with this program.  
+ *
+ * You should have received a copy of the Lesser GNU General Public License along with this program.
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
 
 package org.akaza.openclinica.dao.core;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
+import org.akaza.openclinica.core.ExtendedBasicDataSource;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
 @Component
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class CoreResources implements ResourceLoaderAware {
 
+	protected final static Logger logger = LoggerFactory.getLogger("org.akaza.openclinica.dao.core.CoreResources");
+
 	private ResourceLoader resourceLoader;
 	public static String PROPERTIES_DIR;
-	private static String DB_NAME;
-	private static Properties DATAINFO;
-	private static Properties EXTRACTINFO;
 
-	private Properties dataInfo;
-	private Properties extractInfo;
+	private static Properties dataInfo;
+	private static Properties extractInfo;
 
-	public static final Integer PDF_ID = 10;
 	public static final Integer TAB_ID = 8;
 	public static final Integer CDISC_ODM_1_2_ID = 5;
 	public static final Integer CDISC_ODM_1_2_EXTENSION_ID = 4;
@@ -56,36 +66,124 @@ public class CoreResources implements ResourceLoaderAware {
 	public static final Integer SPSS_ID = 9;
 
 	private static String webapp;
-	protected final static Logger logger = LoggerFactory.getLogger("org.akaza.openclinica.dao.core.CoreResources");
+	private static boolean shouldBeRestarted;
+
 	// private MessageSource messageSource;
 	private static ArrayList<ExtractPropertyBean> extractProperties;
 
 	public static String ODM_MAPPING_DIR;
 
-	// TODO:Clean up all system outs
-	// default no arg constructor
-	public CoreResources() {
+	public static List<String> propertyNames = new ArrayList<String>(Arrays.asList("db", "dbType", "dbUser", "dbPass",
+			"dbHost", "dbPort"));
 
+	private static boolean loadPropertiesFromDB(Connection connection) throws Exception {
+		boolean result = false;
+		PreparedStatement ps = connection.prepareStatement("select name, value, type from system");
+		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			String propertyName = rs.getString(1);
+			String propertyValue = rs.getString(2);
+			String propertyType = rs.getString(3);
+			if (!propertyType.equalsIgnoreCase("dynamic_input") && !propertyType.equalsIgnoreCase("dynamic_radio")) {
+				propertyNames.add(propertyName);
+				String currentPropertyValue = dataInfo.getProperty(propertyName);
+				result = !result && !propertyName.equals("sysURL")
+						&& (currentPropertyValue == null || !currentPropertyValue.equals(propertyValue)) || result;
+				dataInfo.put(propertyName, propertyValue == null ? "" : propertyValue);
+			}
+		}
+		ps.close();
+		rs.close();
+		return result;
+	}
+
+	private void setDatabaseProperties(String dbType) {
+		dataInfo.setProperty("username", dataInfo.getProperty("dbUser"));
+		dataInfo.setProperty("password", dataInfo.getProperty("dbPass"));
+		String url, driver, hibernateDialect;
+		if (dbType.equalsIgnoreCase("postgres")) {
+			url = "jdbc:postgresql:" + "//" + dataInfo.getProperty("dbHost") + ":" + dataInfo.getProperty("dbPort")
+					+ "/" + dataInfo.getProperty("db");
+			driver = "org.postgresql.Driver";
+			hibernateDialect = "org.hibernate.dialect.PostgreSQLDialect";
+		} else if (dbType.equalsIgnoreCase("oracle")) {
+			url = "jdbc:oracle:thin:" + "@" + dataInfo.getProperty("dbHost") + ":" + dataInfo.getProperty("dbPort")
+					+ ":" + dataInfo.getProperty("db");
+			driver = "oracle.jdbc.driver.OracleDriver";
+			hibernateDialect = "org.hibernate.dialect.OracleDialect";
+
+		} else {
+			url = dataInfo.getProperty("url");
+			driver = dataInfo.getProperty("driver");
+			hibernateDialect = dataInfo.getProperty("hibernate.dialect");
+		}
+		dataInfo.setProperty("url", url.trim());
+		dataInfo.setProperty("hibernate.dialect", hibernateDialect);
+		dataInfo.setProperty("driver", driver);
+	}
+
+	private void loadSystemProperties() throws Exception {
+		String path = resourceLoader.getResource("/").getURI().getPath();
+		webapp = getWebAppName(path);
+
+		String logDir = dataInfo.getProperty("log.dir");
+		String filePath = dataInfo.getProperty("filePath");
+		String dbType = dataInfo.getProperty("dbType").trim();
+		String attachedFileLocation = dataInfo.getProperty("attached_file_location");
+		dataInfo.setProperty("log.dir", logDir != null ? logDir.replace("\\", "\\\\") : "");
+		dataInfo.setProperty("filePath", filePath != null ? filePath.replace("\\", "\\\\") : "");
+		dataInfo.setProperty("attached_file_location",
+				attachedFileLocation != null ? attachedFileLocation.replace("\\", "\\\\") : "");
+
+		dataInfo.setProperty("currentWebAppName", webapp);
+		dataInfo.setProperty("currentWebAppContext", "/" + webapp);
+		dataInfo.setProperty("currentDBName", dataInfo.getProperty("db").trim());
+
+		setDatabaseProperties(dbType);
+
+		if (resourceLoader instanceof XmlWebApplicationContext) {
+			// setup dataSource
+			ExtendedBasicDataSource dataSource = (ExtendedBasicDataSource) ((XmlWebApplicationContext) resourceLoader)
+					.getBean("dataSource");
+			dataSource.setUrl(dataInfo.getProperty("url"));
+			dataSource.setUsername(dataInfo.getProperty("username"));
+			dataSource.setPassword(dataInfo.getProperty("password"));
+			dataSource.setDriverClassName(dataInfo.getProperty("driver"));
+
+			if (((XmlWebApplicationContext) resourceLoader).containsBean("liquibase")) {
+				// run liquibase
+				((XmlWebApplicationContext) resourceLoader).getBean("liquibase");
+			}
+
+			Connection connection = dataSource.getConnection();
+
+			// load system properties from the database
+			loadPropertiesFromDB(connection);
+		}
+
+		checkLogo();
+		prepareDataInfoProperties();
+
+		SQLFactory.getInstance().run(dbType, resourceLoader);
+	}
+
+	private void checkLogo() {
+		try {
+			new DefaultResourceLoader().getResource(
+					new DefaultResourceLoader().getResource(".." + File.separator + ".." + File.separator).getFile()
+							.getAbsoluteFile()
+							+ CoreResources.getField("logo")).getFile();
+		} catch (Exception ex) {
+			CoreResources.setField("logo", "/images/Logo.gif");
+		}
 	}
 
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 		try {
 			setODM_MAPPING_DIR();
-			webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-
 			if (dataInfo != null) {
-				
-				String dbName = dataInfo.getProperty("dbType").trim();
-
-				DATAINFO = dataInfo;
-				dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
-													// instance
-				EXTRACTINFO = extractInfo;
-
-				DB_NAME = dbName;
-				SQLFactory factory = SQLFactory.getInstance();
-				factory.run(dbName, resourceLoader);
+				loadSystemProperties();
 				if (extractInfo != null) {
 					copyBaseToDest(resourceLoader);
 					copyODMMappingXMLtoResources(resourceLoader);
@@ -94,31 +192,27 @@ public class CoreResources implements ResourceLoaderAware {
 					copyImportRulesFiles();
 				}
 			}
-
-		} catch (OpenClinicaSystemException e) {
-			logger.debug(e.getMessage());
-			logger.debug(e.toString());
-			throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (OpenClinicaSystemException ex) {
+			logger.error("Error has occurred.", ex);
+		} catch (Exception ex) {
+			logger.error("Error has occurred.", ex);
 		}
 	}
 
 	/**
 	 * For changing values which are applicable to all properties, for ex webapp name can be used in any properties
 	 */
-	private void setDataInfoVals() {
+	private static void prepareDataInfoVals() {
 
-		Enumeration<String> properties = (Enumeration<String>) DATAINFO.propertyNames();
+		Enumeration<String> properties = (Enumeration<String>) dataInfo.propertyNames();
 		String vals, key;
 		while (properties.hasMoreElements()) {
 			key = properties.nextElement();
-			vals = DATAINFO.getProperty(key);
+			vals = dataInfo.getProperty(key);
 			// replacePaths(vals);
 			vals = replaceWebapp(vals);
 			vals = replaceCatHome(vals);
-			DATAINFO.setProperty(key, vals);
+			dataInfo.setProperty(key, vals);
 		}
 
 	}
@@ -142,10 +236,7 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	private static String replaceCatHome(String value) {
-		String catalina = null;
-		if (catalina == null) {
-			catalina = System.getProperty("CATALINA_HOME");
-		}
+		String catalina = System.getProperty("CATALINA_HOME");
 
 		if (catalina == null) {
 			catalina = System.getProperty("catalina.home");
@@ -183,154 +274,104 @@ public class CoreResources implements ResourceLoaderAware {
 		return vals;
 	}
 
-	private Properties setDataInfoProperties() {
-		String filePath = DATAINFO.getProperty("filePath");
+	public static void prepareDataInfoProperties() {
+		String filePath = dataInfo.getProperty("filePath");
 		if (filePath == null || filePath.isEmpty())
 			filePath = "$catalina.home/$WEBAPP.lower.data";
-		String database = DATAINFO.getProperty("dbType");
+		String dbType = dataInfo.getProperty("dbType");
 
-		setDatabaseProperties(database);
+		prepareDataInfoVals();
+		if (dataInfo.getProperty("filePath") == null || dataInfo.getProperty("filePath").length() <= 0)
+			dataInfo.setProperty("filePath", filePath);
 
-		setDataInfoVals();
-		if (DATAINFO.getProperty("filePath") == null || DATAINFO.getProperty("filePath").length() <= 0)
-			DATAINFO.setProperty("filePath", filePath);
-
-		DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
+		dataInfo.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
 		// sysURL.base
-		String sysURLBase = DATAINFO.getProperty("sysURL").replace("/MainMenu", "");
-		DATAINFO.setProperty("sysURL.base", sysURLBase);
+		String sysURLBase = dataInfo.getProperty("sysURL").replace("/MainMenu", "");
+		dataInfo.setProperty("sysURL.base", sysURLBase);
 
-		if (DATAINFO.getProperty("org.quartz.jobStore.misfireThreshold") == null)
-			DATAINFO.setProperty("org.quartz.jobStore.misfireThreshold", "60000");
-		DATAINFO.setProperty("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
+		if (dataInfo.getProperty("org.quartz.jobStore.misfireThreshold") == null)
+			dataInfo.setProperty("org.quartz.jobStore.misfireThreshold", "60000");
+		dataInfo.setProperty("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
 
-		if (database.equalsIgnoreCase("oracle")) {
-			DATAINFO.setProperty("org.quartz.jobStore.driverDelegateClass",
+		if (dbType.equalsIgnoreCase("oracle")) {
+			dataInfo.setProperty("org.quartz.jobStore.driverDelegateClass",
 					"org.quartz.impl.jdbcjobstore.oracle.OracleDelegate");
-		} else if (database.equalsIgnoreCase("postgres")) {
-			DATAINFO.setProperty("org.quartz.jobStore.driverDelegateClass",
+		} else if (dbType.equalsIgnoreCase("postgres")) {
+			dataInfo.setProperty("org.quartz.jobStore.driverDelegateClass",
 					"org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
 		}
 
-		DATAINFO.setProperty("org.quartz.jobStore.useProperties", "false");
-		DATAINFO.setProperty("org.quartz.jobStore.tablePrefix", "oc_qrtz_");
-		if (DATAINFO.getProperty("org.quartz.threadPool.threadCount") == null)
-			DATAINFO.setProperty("org.quartz.threadPool.threadCount", "1");
-		if (DATAINFO.getProperty("org.quartz.threadPool.threadPriority") == null)
-			DATAINFO.setProperty("org.quartz.threadPool.threadPriority", "5");
+		dataInfo.setProperty("org.quartz.jobStore.useProperties", "false");
+		dataInfo.setProperty("org.quartz.jobStore.tablePrefix", "oc_qrtz_");
+		if (dataInfo.getProperty("org.quartz.threadPool.threadCount") == null)
+			dataInfo.setProperty("org.quartz.threadPool.threadCount", "1");
+		if (dataInfo.getProperty("org.quartz.threadPool.threadPriority") == null)
+			dataInfo.setProperty("org.quartz.threadPool.threadPriority", "5");
 
-		String attached_file_location = DATAINFO.getProperty("attached_file_location");
-		if (attached_file_location == null || attached_file_location.isEmpty()) {
-			attached_file_location = DATAINFO.getProperty("filePath") + "attached_files" + File.separator;
-			DATAINFO.setProperty("attached_file_location", attached_file_location);
-		}
-
-		String change_passwd_required = DATAINFO.getProperty("change_passwd_required");
-		if (change_passwd_required == null || change_passwd_required.isEmpty()) {
-			change_passwd_required = "1";
-			DATAINFO.setProperty("change_passwd_required", change_passwd_required);
-
-		}
 		// Clinovo Ticket #188 start
-		String themeColor = DATAINFO.getProperty("themeColor");
+		String themeColor = dataInfo.getProperty("themeColor");
 		if (themeColor == null || themeColor.isEmpty()) {
 			themeColor = "blue";
-			DATAINFO.setProperty("themeColor", themeColor);
+			dataInfo.setProperty("themeColor", themeColor);
 		}
 		// end
 
-		setMailProps();
+		prepareMailProps();
 		// setRuleDesignerProps();
-		if (DATAINFO.getProperty("crfFileExtensions") != null)
-			DATAINFO.setProperty("crf_file_extensions", DATAINFO.getProperty("crfFileExtensions"));
-		if (DATAINFO.getProperty("crfFileExtensionSettings") != null)
-			DATAINFO.setProperty("crf_file_extension_settings", DATAINFO.getProperty("crfFileExtensionSettings"));
+		if (dataInfo.getProperty("crfFileExtensions") != null)
+			dataInfo.setProperty("crf_file_extensions", dataInfo.getProperty("crfFileExtensions"));
+		if (dataInfo.getProperty("crfFileExtensionSettings") != null)
+			dataInfo.setProperty("crf_file_extension_settings", dataInfo.getProperty("crfFileExtensionSettings"));
 
-		String dataset_file_delete = DATAINFO.getProperty("dataset_file_delete");
+		String dataset_file_delete = dataInfo.getProperty("dataset_file_delete");
 		if (dataset_file_delete == null)
-			DATAINFO.setProperty("dataset_file_delete", "true");
-		;// TODO:Revisit me!
-		String password_expiration_time = DATAINFO.getProperty("passwdExpirationTime");
-		if (password_expiration_time != null)
-			DATAINFO.setProperty("passwd_expiration_time", password_expiration_time);
+			dataInfo.setProperty("dataset_file_delete", "true");
+		// TODO:Revisit me!
 
-		if (DATAINFO.getProperty("maxInactiveInterval") != null)
-			DATAINFO.setProperty("max_inactive_interval", DATAINFO.getProperty("maxInactiveInterval"));
+		if (dataInfo.getProperty("maxInactiveInterval") != null)
+			dataInfo.setProperty("max_inactive_interval", dataInfo.getProperty("maxInactiveInterval"));
 
-		DATAINFO.setProperty("clinical_research_coordinator", "Clinical_Research_Coordinator");
-		DATAINFO.setProperty("investigator", "Investigator");
-		DATAINFO.setProperty("study_director", "Study_Director");
+		dataInfo.setProperty("clinical_research_coordinator", "Clinical_Research_Coordinator");
+		dataInfo.setProperty("investigator", "Investigator");
+		dataInfo.setProperty("study_director", "Study_Director");
 
-		DATAINFO.setProperty("study_administrator", "Study_Administrator");
-		DATAINFO.setProperty("study_monitor", "Study_Monitor");
-		DATAINFO.setProperty("ccts.waitBeforeCommit", "6000");
+		dataInfo.setProperty("study_administrator", "Study_Administrator");
+		dataInfo.setProperty("study_monitor", "Study_Monitor");
+		dataInfo.setProperty("ccts.waitBeforeCommit", "6000");
 
-		String rss_url = DATAINFO.getProperty("rssUrl");
+		String rss_url = dataInfo.getProperty("rssUrl");
 		if (rss_url == null || rss_url.isEmpty())
 			rss_url = "http://clinicalresearch.wordpress.com/feed/";
-		DATAINFO.setProperty("rss.url", rss_url);
-		String rss_more = DATAINFO.getProperty("rssMore");
+		dataInfo.setProperty("rss.url", rss_url);
+		String rss_more = dataInfo.getProperty("rssMore");
 		if (rss_more == null || rss_more.isEmpty())
 			rss_more = "http://clinicalresearch.wordpress.com/";
-		DATAINFO.setProperty("rss.more", rss_more);
+		dataInfo.setProperty("rss.more", rss_more);
 
-		String supportURL = DATAINFO.getProperty("supportURL");
+		String supportURL = dataInfo.getProperty("supportURL");
 		if (supportURL == null || supportURL.isEmpty())
 			supportURL = "http://www.openclinica.org/OpenClinica/3.0/support/";
-		DATAINFO.setProperty("supportURL", supportURL);
+		dataInfo.setProperty("supportURL", supportURL);
 
-		DATAINFO.setProperty("show_unique_id", "1");
+		dataInfo.setProperty("show_unique_id", "1");
 
-		DATAINFO.setProperty("auth_mode", "password");
-		if (DATAINFO.getProperty("userAccountNotification") != null)
-			DATAINFO.setProperty("user_account_notification", DATAINFO.getProperty("userAccountNotification"));
-
-		return DATAINFO;
+		dataInfo.setProperty("auth_mode", "password");
+		if (dataInfo.getProperty("userAccountNotification") != null)
+			dataInfo.setProperty("user_account_notification", dataInfo.getProperty("userAccountNotification"));
 	}
 
-	private void setMailProps() {
-
-		DATAINFO.setProperty("mail.host", DATAINFO.getProperty("mailHost"));
-		DATAINFO.setProperty("mail.port", DATAINFO.getProperty("mailPort"));
-		DATAINFO.setProperty("mail.protocol", DATAINFO.getProperty("mailProtocol"));
-		DATAINFO.setProperty("mail.username", DATAINFO.getProperty("mailUsername"));
-		DATAINFO.setProperty("mail.password", DATAINFO.getProperty("mailPassword"));
-		DATAINFO.setProperty("mail.smtp.auth", DATAINFO.getProperty("mailSmtpAuth"));
-		DATAINFO.setProperty("mail.smtp.starttls.enable", DATAINFO.getProperty("mailSmtpStarttls.enable"));
-		DATAINFO.setProperty("mail.smtps.auth", DATAINFO.getProperty("mailSmtpsAuth"));
-		DATAINFO.setProperty("mail.smtps.starttls.enable", DATAINFO.getProperty("mailSmtpsStarttls.enable"));
-		DATAINFO.setProperty("mail.smtp.connectiontimeout", DATAINFO.getProperty("mailSmtpConnectionTimeout"));
-		DATAINFO.setProperty("mail.errormsg", DATAINFO.getProperty("mailErrorMsg"));
-
-	}
-
-	private void setDatabaseProperties(String database) {
-
-		DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
-		DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
-		String url = null, driver = null, hibernateDialect = null;
-		if (database.equalsIgnoreCase("postgres")) {
-			url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort")
-					+ "/" + DATAINFO.getProperty("db");
-			driver = "org.postgresql.Driver";
-			hibernateDialect = "org.hibernate.dialect.PostgreSQLDialect";
-		} else if (database.equalsIgnoreCase("oracle")) {
-			url = "jdbc:oracle:thin:" + "@" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort")
-					+ ":" + DATAINFO.getProperty("db");
-			driver = "oracle.jdbc.driver.OracleDriver";
-			hibernateDialect = "org.hibernate.dialect.OracleDialect";
-			
-		} else {
-			
-			url = DATAINFO.getProperty("url");
-			driver = DATAINFO.getProperty("driver");
-			hibernateDialect = DATAINFO.getProperty("hibernate.dialect");
-		}
-		
-		DATAINFO.setProperty("dataBase", database);
-		DATAINFO.setProperty("url", url.trim());
-		DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
-		DATAINFO.setProperty("driver", driver);
+	private static void prepareMailProps() {
+		dataInfo.setProperty("mail.host", dataInfo.getProperty("mailHost"));
+		dataInfo.setProperty("mail.port", dataInfo.getProperty("mailPort"));
+		dataInfo.setProperty("mail.protocol", dataInfo.getProperty("mailProtocol"));
+		dataInfo.setProperty("mail.username", dataInfo.getProperty("mailUsername"));
+		dataInfo.setProperty("mail.password", dataInfo.getProperty("mailPassword"));
+		dataInfo.setProperty("mail.smtp.auth", dataInfo.getProperty("mailAuth"));
+		dataInfo.setProperty("mail.smtp.starttls.enable", dataInfo.getProperty("mailTls"));
+		dataInfo.setProperty("mail.smtps.auth", dataInfo.getProperty("mailAuth"));
+		dataInfo.setProperty("mail.smtps.starttls.enable", dataInfo.getProperty("mailTls"));
+		dataInfo.setProperty("mail.smtp.connectiontimeout", dataInfo.getProperty("mailSmtpConnectionTimeout"));
+		dataInfo.setProperty("mail.errormsg", dataInfo.getProperty("mailErrorMsg"));
 
 	}
 
@@ -396,8 +437,8 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	/**
-	 * @deprecated. ByteArrayInputStream keeps the whole file in memory needlessly. Use Commons IO's
-	 *              {@link IOUtils#copy(java.io.InputStream, java.io.OutputStream)} instead.
+	 * @deprecated ByteArrayInputStream keeps the whole file in memory needlessly. Use Commons IO's
+	 *             {@link IOUtils#copy(java.io.InputStream, java.io.OutputStream)} instead.
 	 */
 	@Deprecated
 	private void copyFiles(ByteArrayInputStream fis, File dest) {
@@ -467,7 +508,7 @@ public class CoreResources implements ResourceLoaderAware {
 			throw oe;
 		}
 
-		File dest = null;
+		File dest;
 		try {
 			File placeholder_file = new File(resourceLoader
 					.getResource("classpath:org/akaza/openclinica/applicationContext-web-beans.xml").getURL().getFile());
@@ -565,7 +606,7 @@ public class CoreResources implements ResourceLoaderAware {
 					function.setDatabasePassword(getExtractFieldNoRep(whichSettings + ".password"));
 				} else {
 					// set default db settings here
-					function.setDatabaseType(getField("dataBase"));
+					function.setDatabaseType(getField("dbType"));
 					function.setDatabaseUrl(getField("url"));
 					function.setDatabaseUsername(getField("username"));
 					function.setDatabasePassword(getField("password"));
@@ -609,7 +650,7 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	private String getExtractFieldNoRep(String key) {
-		String value = EXTRACTINFO.getProperty(key);
+		String value = extractInfo.getProperty(key);
 		if (value != null) {
 			value = value.trim();
 		}
@@ -655,8 +696,7 @@ public class CoreResources implements ResourceLoaderAware {
 
 			getInputStream(fileName);
 
-			File f = new File(getField("filePath") + relDirectory + fileName);
-			return f;
+			return new File(getField("filePath") + relDirectory + fileName);
 
 		} catch (IOException e) {
 			throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
@@ -666,7 +706,7 @@ public class CoreResources implements ResourceLoaderAware {
 	public void setPROPERTIES_DIR() {
 		String resource = "classpath:properties/placeholder.properties";
 		Resource scr = resourceLoader.getResource(resource);
-		String absolutePath = null;
+		String absolutePath;
 		try {
 			absolutePath = scr.getFile().getAbsolutePath();
 			PROPERTIES_DIR = absolutePath.replaceAll("placeholder.properties", "");
@@ -677,15 +717,15 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	/**
-	 * @pgawade 18-April-2011 - Fix for issue 8394 Method to set the absolute file path value to point to "odm_mapping"
-	 *          in resources. cd_odm_mapping.xml file used by Castor API during CRF data import will be copied to this
-	 *          location during application initialization
+	 * pgawade 18-April-2011 - Fix for issue 8394 Method to set the absolute file path value to point to "odm_mapping"
+	 * in resources. cd_odm_mapping.xml file used by Castor API during CRF data import will be copied to this location
+	 * during application initialization
 	 */
 	public void setODM_MAPPING_DIR() {
 		String resource = "classpath:datainfo.properties";
 
 		Resource scr = resourceLoader.getResource(resource);
-		String absolutePath = null;
+		String absolutePath;
 		try {
 
 			absolutePath = scr.getFile().getAbsolutePath();
@@ -695,18 +735,24 @@ public class CoreResources implements ResourceLoaderAware {
 		}
 	}
 
-	public static String getDBName() {
-		return DB_NAME;
+	public static String getDBType() {
+		return dataInfo.getProperty("dbType");
 	}
 
 	public static String getField(String key) {
-		if (DATAINFO == null)
+		if (dataInfo == null)
 			return "";
-		String value = DATAINFO.getProperty(key);
+		String value = dataInfo.getProperty(key);
 		if (value != null) {
 			value = value.trim();
 		}
 		return value == null ? "" : value;
+	}
+
+	public static void setField(String key, String value) {
+		if (dataInfo != null && value != null) {
+			dataInfo.setProperty(key, value.trim());
+		}
 	}
 
 	/**
@@ -714,7 +760,7 @@ public class CoreResources implements ResourceLoaderAware {
 	 * work as one, tbh
 	 */
 	public static String getSystemURL() {
-		String url = DATAINFO.getProperty("sysURL.base");
+		String url = dataInfo.getProperty("sysURL.base");
 		if (url != null) {
 			url = url.trim();
 		} else {
@@ -727,7 +773,7 @@ public class CoreResources implements ResourceLoaderAware {
 
 	// TODO internationalize
 	public static String getExtractField(String key) {
-		String value = EXTRACTINFO.getProperty(key);
+		String value = extractInfo.getProperty(key);
 		if (value != null) {
 			value = value.trim();
 		}
@@ -737,31 +783,25 @@ public class CoreResources implements ResourceLoaderAware {
 
 	// JN:The following method returns default of true when converting from string
 	public static boolean getExtractFieldBoolean(String key) {
-		String value = EXTRACTINFO.getProperty(key);
+		String value = extractInfo.getProperty(key);
 		if (value != null) {
 			value = value.trim();
 		}
-		if (value == null)
-			return true;// Defaulting to true
-		if (value.equalsIgnoreCase("false"))
-			return false;
-		else
-			return true;// defaulting to true
+		return value == null || !value.equalsIgnoreCase("false");
 
 	}
 
 	public static String[] getExtractFields(String key) {
-		String value = EXTRACTINFO.getProperty(key);
+		String value = extractInfo.getProperty(key);
 
 		if (value != null) {
 			value = value.trim();
 		}
-		return value.split(",");
+		return value != null ? value.split(",") : new String[0];
 	}
 
 	public ExtractPropertyBean findExtractPropertyBeanById(int id, String datasetId) {
 		ArrayList<ExtractPropertyBean> epBeans = findExtractProperties();
-		ExtractPropertyBean returnBean = null;
 		for (ExtractPropertyBean epbean : epBeans) {
 
 			if (epbean.getId() == id) {
@@ -770,23 +810,23 @@ public class CoreResources implements ResourceLoaderAware {
 			}
 
 		}
-		return returnBean;
+		return null;
 	}
 
 	public Properties getDataInfo() {
-		return DATAINFO;
+		return CoreResources.dataInfo;
 	}
 
 	public void setDataInfo(Properties dataInfo) {
-		this.dataInfo = dataInfo;
+		CoreResources.dataInfo = dataInfo;
 	}
 
 	public Properties getExtractInfo() {
-		return extractInfo;
+		return CoreResources.extractInfo;
 	}
 
 	public void setExtractInfo(Properties extractInfo) {
-		this.extractInfo = extractInfo;
+		CoreResources.extractInfo = extractInfo;
 	}
 
 	public String getWebAppName(String servletCtxRealPath) {
@@ -796,6 +836,14 @@ public class CoreResources implements ResourceLoaderAware {
 			webAppName = tokens[(tokens.length - 1)].trim();
 		}
 		return webAppName;
+	}
+
+	public static boolean isShouldBeRestarted() {
+		return shouldBeRestarted;
+	}
+
+	public static void setShouldBeRestarted(boolean shouldBeRestarted) {
+		CoreResources.shouldBeRestarted = shouldBeRestarted;
 	}
 
 }

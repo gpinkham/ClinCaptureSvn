@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +106,7 @@ public class PreparedStatementFactory {
 					ps.setTimestamp(order, (Timestamp) objParam);
 				} else if ("java.lang.Boolean".equals(objType)) {
 					// BADS FLAG
-					if (CoreResources.getDBName().equals("oracle")) {
+					if (CoreResources.getDBType().equals("oracle")) {
 						Boolean objBoolParam = (Boolean) objParam;
 						ps.setString(order, objBoolParam ? "1" : "0");
 					} else {

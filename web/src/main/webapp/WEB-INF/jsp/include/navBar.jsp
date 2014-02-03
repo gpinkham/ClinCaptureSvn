@@ -291,6 +291,7 @@
             </div>
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudyUser"><fmt:message key="assign_users" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}pages/system"><fmt:message key="system" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_administration" bundle="${resword}"/></div>
@@ -444,6 +445,7 @@
             </div>
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudyUser"><fmt:message key="assign_users" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}pages/system"><fmt:message key="system" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
             </c:when>

@@ -37,7 +37,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -369,7 +371,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 
 		this.setTypeExpected(25, TypeNames.STRING);
 		this.setTypeExpected(26, TypeNames.STRING);
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			this.setTypeExpected(25, TypeNames.STRING); // r
 			this.setTypeExpected(26, TypeNames.STRING); // r
 			this.setTypeExpected(27, TypeNames.STRING); // r
@@ -677,7 +679,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		String sql = digester.getQuery("getWithFilterAndSort");
 		sql = sql + filter.execute("");
 		sql = sql + " order By  ec.date_created ASC "; // major hack
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
 		} else {
 			sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
@@ -703,7 +705,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		String sql = digester.getQuery("getAvailableWithFilterAndSort");
 		sql = sql + filter.execute("");
 		sql = sql + sort.execute("");
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
 		} else {
 			sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
@@ -721,7 +723,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	public List<String> getAvailableForSDVEntitiesByStudyId(int studyId, String entityProperty) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.STRING);
-		
+
 		List<String> result = new ArrayList<String>();
 
 		HashMap variables = new HashMap();
@@ -730,25 +732,25 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		String sql = digester.getQuery("getAvailableForSDVEntitiesByStudyId").replaceFirst("entity", entityProperty);
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
-		
+
 		while (it.hasNext()) {
 			result.add((String) ((HashMap) it.next()).get("property"));
-		} 
+		}
 		return result;
 	}
-	
+
 	public List<String> getAvailableForSDVCRFNamesByStudyId(int studyId) {
 		return getAvailableForSDVEntitiesByStudyId(studyId, "crf.name");
 	}
-	
+
 	public List<String> getAvailableForSDVSiteNamesByStudyId(int studyId) {
 		return getAvailableForSDVEntitiesByStudyId(studyId, "s.unique_identifier");
 	}
-	
+
 	public List<String> getAvailableForSDVEventNamesByStudyId(int studyId) {
 		return getAvailableForSDVEntitiesByStudyId(studyId, "sed.name");
 	}
-	
+
 	public ArrayList getEventCRFsByStudy(int studyId, int parentStudyId, int limit, int offset) {
 
 		HashMap variables = new HashMap();

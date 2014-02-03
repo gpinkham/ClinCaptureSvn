@@ -23,6 +23,7 @@ package org.akaza.openclinica.control.core;
 
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +43,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -53,6 +55,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.Role;
@@ -292,7 +295,7 @@ public abstract class SecureController extends HttpServlet {
 		if (lastChangeDate == null) {
 			addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". "
 					+ respage.getString("password_set"));
-			int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
+			int pwdChangeRequired = new Integer(SQLInitServlet.getField("pwd.change.required")).intValue();
 			if (pwdChangeRequired == 1) {
 				request.setAttribute("mustChangePass", "yes");
 				forwardPage(Page.RESET_PASSWORD);
@@ -428,7 +431,7 @@ public abstract class SecureController extends HttpServlet {
 		local_df = new SimpleDateFormat(resformat.getString("date_format_string"), locale);
 
 		String includeReportingVar = "includeReporting";
-		if ("true".equals(SQLInitServlet.getField("include.reporting"))) {
+		if (!SQLInitServlet.getField("pentaho.url").trim().equals("")) {
 			request.setAttribute(includeReportingVar, true);
 		} else {
 			request.setAttribute(includeReportingVar, false);

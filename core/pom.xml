@@ -323,7 +323,10 @@
 			<artifactId>json</artifactId>
 			<version>20090211</version>
 		</dependency>
-
+        <dependency>
+            <groupId>org.springmodules</groupId>
+            <artifactId>spring-modules-validation</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>

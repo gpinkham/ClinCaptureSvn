@@ -20,22 +20,22 @@
  */
 package org.akaza.openclinica.web;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Properties;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.admin.DownloadVersionSpreadSheetServlet;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
-
-import java.util.Properties;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 
 /**
  * <P>
@@ -50,8 +50,9 @@ import javax.servlet.http.HttpServlet;
 public class SQLInitServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -7762647189740187841L;
-	
+
 	private ServletContext context;
+
 	private static Properties params = new Properties();
 	private static Properties entParams = new Properties();
 
@@ -64,7 +65,7 @@ public class SQLInitServlet extends HttpServlet {
 
 		ConfigurationDao configurationDao = SpringServletAccess.getApplicationContext(context).getBean(
 				ConfigurationDao.class);
-		
+
 		Role.STUDY_ADMINISTRATOR.setDescription(getField("study_administrator"));
 		Role.STUDY_DIRECTOR.setDescription(getField("study_director"));
 		Role.INVESTIGATOR.setDescription(getField("investigator"));
@@ -76,40 +77,46 @@ public class SQLInitServlet extends HttpServlet {
 		String crfDirectory = "crf" + File.separator;
 		String crfOriginalDirectory = "original" + File.separator;
 
-		// Creating rules directory if not exist 
+		// Creating rules directory if not exist
 		if (!(new File(rootDirectory)).isDirectory() || !(new File(ruleDirectory)).isDirectory()) {
 			(new File(rootDirectory + ruleDirectory)).mkdirs();
 		}
 
-		if (!(new File(rootDirectory)).isDirectory() || !(new File(crfDirectory)).isDirectory() || !(new File(crfOriginalDirectory)).isDirectory()) {
-			
+		if (!(new File(rootDirectory)).isDirectory() || !(new File(crfDirectory)).isDirectory()
+				|| !(new File(crfOriginalDirectory)).isDirectory()) {
+
 			(new File(rootDirectory + crfDirectory + crfOriginalDirectory)).mkdirs();
-			copyTemplate(rootDirectory + crfDirectory + crfOriginalDirectory, DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
-			copyTemplate(rootDirectory + crfDirectory + crfOriginalDirectory, DownloadVersionSpreadSheetServlet.RANDOMIZATION_CRF_TEMPLATE);
+			copyTemplate(rootDirectory + crfDirectory + crfOriginalDirectory,
+					DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+			copyTemplate(rootDirectory + crfDirectory + crfOriginalDirectory,
+					DownloadVersionSpreadSheetServlet.RANDOMIZATION_CRF_TEMPLATE);
 		}
-		
+
 		rootDirectory = rootDirectory + crfDirectory + crfOriginalDirectory;
-		
+
 		File crfTemplate = new File(rootDirectory + DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
-		File randomizationFormTemplate = new File(rootDirectory + DownloadVersionSpreadSheetServlet.RANDOMIZATION_CRF_TEMPLATE);
-		
-		if (!crfTemplate.isFile()
-				|| !randomizationFormTemplate.isFile()) {
-			
+		File randomizationFormTemplate = new File(rootDirectory
+				+ DownloadVersionSpreadSheetServlet.RANDOMIZATION_CRF_TEMPLATE);
+
+		if (!crfTemplate.isFile() || !randomizationFormTemplate.isFile()) {
+
 			copyTemplate(rootDirectory, DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
 			copyTemplate(rootDirectory, DownloadVersionSpreadSheetServlet.RANDOMIZATION_CRF_TEMPLATE);
 		}
-		
-		// 'passwd_expiration_time' and 'change_passwd_required' are now defined in the database
-		// Here the values in the datainfo.properites file (if any) are overridden.
-		overridePropertyFromDatabase(configurationDao, "pwd.expiration.days", params, "passwd_expiration_time");
-		overridePropertyFromDatabase(configurationDao, "pwd.change.required", params, "change_passwd_required");
+
+		overridePropertyFromDatabase(configurationDao, "pwd.expiration.days", params);
+		overridePropertyFromDatabase(configurationDao, "pwd.change.required", params);
+	}
+
+	public static void updateParams(Properties params) {
+		SQLInitServlet.params = params;
 	}
 
 	/**
 	 * Gets a field value from properties by its key name
 	 * 
 	 * @param key
+	 *            String
 	 * @return String The value of field
 	 */
 	public static String getField(String key) {
@@ -118,6 +125,12 @@ public class SQLInitServlet extends HttpServlet {
 			name = name.trim();
 		}
 		return name == null ? "" : name;
+	}
+
+	public static void setField(String key, String value) {
+		if (params != null && value != null) {
+			params.setProperty(key, value.trim());
+		}
 	}
 
 	/**
@@ -149,31 +162,31 @@ public class SQLInitServlet extends HttpServlet {
 	 * Gets a field value by its key name from the enterprise.properties file
 	 * 
 	 * @param key
+	 *            String
 	 * @return String The value of field
 	 */
 	public static String getEnterpriseField(String key) {
-		String name = null;
-		name = entParams.getProperty(key).trim();
-		return name == null ? "" : name;
+		String name = entParams.getProperty(key);
+		return name == null ? "" : name.trim();
 	}
 
 	/**
 	 * We return empty String if DBName is not found in params. The only reason why this is done this way is for unit
 	 * testing to work properly.
 	 * 
-	 * EntityDAO uses SQLInitServlet.getDBName().equals("oracle") , This works fine in the Servlet environment because
+	 * EntityDAO uses SQLInitServlet.getDBType().equals("oracle") , This works fine in the Servlet environment because
 	 * of this class but in a unit test it does not
 	 * 
-	 * @author Krikor Krumlian the return portion
+	 * author Krikor Krumlian the return portion
 	 * 
 	 */
-	public static String getDBName() {
-		String name = params.getProperty("dataBase");
-		return name == null ? "" : name;
+	public static String getDBType() {
+		String dbType = params.getProperty("dbType");
+		return dbType == null ? "" : dbType;
 	}
 
 	public void copyTemplate(String theDir, String fileName) {
-		
+
 		OutputStream out = null;
 		InputStream is = null;
 		CoreResources cr = (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
@@ -193,6 +206,7 @@ public class SQLInitServlet extends HttpServlet {
 				is.close();
 				out.close();
 			} catch (Exception e) {
+				//
 			}
 		}
 	}
@@ -201,15 +215,18 @@ public class SQLInitServlet extends HttpServlet {
 	 * Overrides a configuration in a properties file with a value read from the database.
 	 * 
 	 * @param configurationDao
+	 *            ConfigurationDao
 	 * @param propertyNameInDatabase
+	 *            String
 	 * @param properties
-	 * @param propertyNameInProperties
+	 *            Properties
 	 */
 	private void overridePropertyFromDatabase(ConfigurationDao configurationDao, String propertyNameInDatabase,
-			Properties properties, String propertyNameInProperties) {
+			Properties properties) {
 		ConfigurationBean config = configurationDao.findByKey(propertyNameInDatabase);
 		if (config != null) {
-			properties.setProperty(propertyNameInProperties, config.getValue());
+			properties.setProperty(propertyNameInDatabase, config.getValue());
+			CoreResources.setField(propertyNameInDatabase, config.getValue());
 		}
 	}
 }

@@ -13,14 +13,14 @@
 
 package org.akaza.openclinica.dao;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.apache.commons.lang.StringEscapeUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class EventCRFSDVFilter implements CriteriaCommand {
 
@@ -58,7 +58,7 @@ public class EventCRFSDVFilter implements CriteriaCommand {
 		value = StringEscapeUtils.escapeSql(value.toString());
 		if (value != null) {
 			if (property.equals("sdvStatus")) {
-				String dbType = CoreResources.getDBName();
+				String dbType = CoreResources.getDBType();
 				String theTrue = dbType.equals("postgres") ? " true " : " 1 ";
 				String theFalse = dbType.equals("postgres") ? " false " : " 0 ";
 				if (value.equals("complete")) {

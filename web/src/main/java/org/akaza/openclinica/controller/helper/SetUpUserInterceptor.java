@@ -13,19 +13,19 @@
 
 package org.akaza.openclinica.controller.helper;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
  * An "interceptor" class that sets up a UserAccount and stores it in the Session, before another class is initialized
@@ -51,14 +51,14 @@ public class SetUpUserInterceptor extends HandlerInterceptorAdapter {
 		// Set up the user account bean: check the Session first
 		HttpSession currentSession = httpServletRequest.getSession();
 		UserAccountBean userBean = (UserAccountBean) currentSession.getAttribute("userBean");
-		String userName = "";
+		String userName;
 		boolean userBeanIsInvalid;
 		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
 
 		if (userBean == null) {
 
 			userName = httpServletRequest.getRemoteUser();
-			userBeanIsInvalid = "".equalsIgnoreCase(userName);
+			userBeanIsInvalid = userName == null || "".equalsIgnoreCase(userName);
 			if (!userBeanIsInvalid) {
 				userBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
 				userBeanIsInvalid = (userBean == null);

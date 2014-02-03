@@ -13,16 +13,16 @@
 
 package org.akaza.openclinica.dao.managestudy;
 
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.joda.time.DateTime;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.joda.time.DateTime;
 
 public class StudyAuditLogFilter implements CriteriaCommand {
 
@@ -37,7 +37,7 @@ public class StudyAuditLogFilter implements CriteriaCommand {
 	public StudyAuditLogFilter(String dateFormat) {
 
 		theDefaultFormat = new SimpleDateFormat(defaultFormat);
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			theDefaultFormat = new SimpleDateFormat(oracleDateFormat);
 		}
 		i18Format = dateFormat;

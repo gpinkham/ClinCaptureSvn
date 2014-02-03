@@ -14,9 +14,6 @@
 package org.akaza.openclinica.controller.helper;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 

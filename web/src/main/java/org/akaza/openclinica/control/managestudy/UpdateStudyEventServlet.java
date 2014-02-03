@@ -23,7 +23,14 @@ package org.akaza.openclinica.control.managestudy;
 import com.clinovo.util.ValidatorHelper;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,10 +43,17 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.RememberLastPage;
+import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -52,7 +66,12 @@ import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -94,24 +113,27 @@ public class UpdateStudyEventServlet extends Controller {
 	public static final String INPUT_LOCATION = "location";
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (SubmitDataServlet.maySubmitData(ub, currentRole)) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_active_study_or_contact"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study") + " "
+						+ respage.getString("change_active_study_or_contact"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
-	private void redirectToStudySubjectView(HttpServletRequest request, HttpServletResponse response, int studySubjectId) throws Exception {
+	private void redirectToStudySubjectView(HttpServletRequest request, HttpServletResponse response, int studySubjectId)
+			throws Exception {
 		Map storedAttributes = new HashMap();
 		storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
-		request.getSession().setAttribute(RememberLastPage.STORED_ATTRIBUTES, storedAttributes);
+		request.getSession().setAttribute(BaseController.STORED_ATTRIBUTES, storedAttributes);
 		String viewStudySubjectUrl = (String) request.getSession().getAttribute(
 				ViewStudySubjectServlet.SAVED_VIEW_STUDY_SUBJECT_URL);
 		if (viewStudySubjectUrl != null && viewStudySubjectUrl.contains("id=" + studySubjectId + "&")) {
@@ -124,12 +146,12 @@ public class UpdateStudyEventServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-        HttpSession session = request.getSession();
-        SessionManager sm = getSessionManager(request);
+		HttpSession session = request.getSession();
+		SessionManager sm = getSessionManager(request);
 		FormDiscrepancyNotes discNotes;
 		FormProcessor fp = new FormProcessor(request);
 		int studyEventId = fp.getInt(EVENT_ID, true);
@@ -169,8 +191,9 @@ public class UpdateStudyEventServlet extends Controller {
 
 		Status s = ssub.getStatus();
 		if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
-			addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be")
-					+ resterm.getString("updated") + "." + respage.getString("study_subject_has_been_deleted"), request);
+			addPageMessage(
+					resword.getString("study_event") + resterm.getString("could_not_be") + resterm.getString("updated")
+							+ "." + respage.getString("study_subject_has_been_deleted"), request);
 			request.setAttribute("id", Integer.toString(studySubjectId));
 			redirectToStudySubjectView(request, response, studySubjectId);
 		}
@@ -192,8 +215,7 @@ public class UpdateStudyEventServlet extends Controller {
 		StudyDAO sdao = new StudyDAO(getDataSource());
 		StudyBean studyBean = (StudyBean) sdao.findByPK(ssub.getStudyId());
 		checkRoleByUserAndStudy(request, response, ub, studyBean.getParentStudyId(), studyBean.getId());
-		
-		
+
 		// To remove signed status from the list
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
@@ -207,7 +229,6 @@ public class UpdateStudyEventServlet extends Controller {
 			statuses.remove(SubjectEventStatus.SIGNED);
 		}
 
-		
 		if (!studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.NOT_SCHEDULED)) {
 			statuses.remove(SubjectEventStatus.NOT_SCHEDULED);
 		}
@@ -230,34 +251,34 @@ public class UpdateStudyEventServlet extends Controller {
 		// does the study event have all complete CRFs which are required?
 		logger.info("found number of ecrfs: " + getAllECRFs.size());
 		// may not be populated, only entered crfs seem to ping the list
-        for (Object getAllECRF : getAllECRFs) {
-            EventDefinitionCRFBean ecrfBean = (EventDefinitionCRFBean) getAllECRF;
+		for (Object getAllECRF : getAllECRFs) {
+			EventDefinitionCRFBean ecrfBean = (EventDefinitionCRFBean) getAllECRF;
 
-            //
-            logger.info("found number of existing ecrfs: " + getECRFs.size());
-            if (getECRFs.size() == 0) {
-                statuses.remove(SubjectEventStatus.COMPLETED);
-                statuses.remove(SubjectEventStatus.LOCKED);
+			//
+			logger.info("found number of existing ecrfs: " + getECRFs.size());
+			if (getECRFs.size() == 0) {
+				statuses.remove(SubjectEventStatus.COMPLETED);
+				statuses.remove(SubjectEventStatus.LOCKED);
 
-            }// otherwise...
-            for (Object getECRF : getECRFs) {
-                EventCRFBean existingBean = (EventCRFBean) getECRF;
-                logger.info("***** found: " + existingBean.getCRFVersionId() + " " + existingBean.getCrf().getId()
-                        + " " + existingBean.getCrfVersion().getName() + " " + existingBean.getStatus().getName() + " "
-                        + existingBean.getStage().getName());
+			}// otherwise...
+			for (Object getECRF : getECRFs) {
+				EventCRFBean existingBean = (EventCRFBean) getECRF;
+				logger.info("***** found: " + existingBean.getCRFVersionId() + " " + existingBean.getCrf().getId()
+						+ " " + existingBean.getCrfVersion().getName() + " " + existingBean.getStatus().getName() + " "
+						+ existingBean.getStage().getName());
 
-                logger.info("***** comparing above to ecrfBean.DefaultVersionID: " + ecrfBean.getDefaultVersionId());
+				logger.info("***** comparing above to ecrfBean.DefaultVersionID: " + ecrfBean.getDefaultVersionId());
 
-                if (!existingBean.getStatus().equals(Status.UNAVAILABLE)
-                        && edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent)) {
+				if (!existingBean.getStatus().equals(Status.UNAVAILABLE)
+						&& edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent)) {
 
-                    logger.info("found that " + existingBean.getCrfVersion().getName() + " is required...");
-                    // that is, it's not completed but required to complete
-                    statuses.remove(SubjectEventStatus.COMPLETED);
-                    statuses.remove(SubjectEventStatus.LOCKED);
-                }
-            }
-        }
+					logger.info("found that " + existingBean.getCrfVersion().getName() + " is required...");
+					// that is, it's not completed but required to complete
+					statuses.remove(SubjectEventStatus.COMPLETED);
+					statuses.remove(SubjectEventStatus.LOCKED);
+				}
+			}
+		}
 
 		if (!ub.isSysAdmin() && !currentRole.getRole().equals(Role.STUDY_DIRECTOR)
 				&& !currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
@@ -295,19 +316,19 @@ public class UpdateStudyEventServlet extends Controller {
 			ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
 			if (ses.equals(SubjectEventStatus.SKIPPED) || ses.equals(SubjectEventStatus.STOPPED)) {
 				studyEvent.setStatus(Status.UNAVAILABLE);
-                for (EventCRFBean ecb : eventCRFs) {
-                    ecb.setOldStatus(ecb.getStatus());
-                    ecb.setStatus(Status.UNAVAILABLE);
-                    ecb.setUpdater(ub);
-                    ecb.setUpdatedDate(new Date());
-                    ecdao.update(ecb);
-                }
+				for (EventCRFBean ecb : eventCRFs) {
+					ecb.setOldStatus(ecb.getStatus());
+					ecb.setStatus(Status.UNAVAILABLE);
+					ecb.setUpdater(ub);
+					ecb.setUpdatedDate(new Date());
+					ecdao.update(ecb);
+				}
 			} else {
-                for (EventCRFBean ecb : eventCRFs) {
-                    ecb.setUpdater(ub);
-                    ecb.setUpdatedDate(new Date());
-                    ecdao.update(ecb);
-                }
+				for (EventCRFBean ecb : eventCRFs) {
+					ecb.setUpdater(ub);
+					ecb.setUpdatedDate(new Date());
+					ecdao.update(ecb);
+				}
 			}
 
 			String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
@@ -393,7 +414,7 @@ public class UpdateStudyEventServlet extends Controller {
 				ecdao = new EventCRFDAO(getDataSource());
 				eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
 				SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
-				
+
 				study = (StudyBean) sdao.findByPK(ssb.getStudyId());
 				ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
 						studyEvent.getStudyEventDefinitionId());
@@ -401,8 +422,8 @@ public class UpdateStudyEventServlet extends Controller {
 				ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
 				populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
 
-				ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs,
-						eventDefinitionCRFs, ub, currentRole, studyEvent.getSubjectEventStatus(), study);
+				ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
+						currentRole, studyEvent.getSubjectEventStatus(), study);
 
 				request.setAttribute("studySubject", ssb);
 				request.setAttribute("uncompletedEventDefinitionCRFs", uncompletedEventDefinitionCRFs);
@@ -423,7 +444,8 @@ public class UpdateStudyEventServlet extends Controller {
 				displayEvents.add(displayEvBean);
 				// Don't filter for res status or disc note type; disc note
 				// beans are returned with eventCRFId set
-				discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), getDataSource(), 0);
+				discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), getDataSource(),
+						0);
 				Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
 				request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
 
@@ -485,8 +507,8 @@ public class UpdateStudyEventServlet extends Controller {
 				}
 
 				// save discrepancy notes into DB
-				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession()
-						.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
+						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 				DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 
 				AddNewSubjectServlet.saveFieldNotes(INPUT_LOCATION, fdn, dndao, studyEvent.getId(), "studyEvent",
@@ -498,7 +520,7 @@ public class UpdateStudyEventServlet extends Controller {
 
 				addPageMessage(respage.getString("study_event_updated"), request);
 				request.setAttribute("id", Integer.toString(studySubjectId));
-                request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+				request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
 				redirectToStudySubjectView(request, response, studySubjectId);
 			}
@@ -518,13 +540,13 @@ public class UpdateStudyEventServlet extends Controller {
 				// StudySubject signed as well
 				List studyEvents = sedao.findAllByStudySubject(ssub);
 				boolean allSigned = true;
-                for (Object studyEvent1 : studyEvents) {
-                    StudyEventBean temp = (StudyEventBean) studyEvent1;
-                    if (!temp.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
-                        allSigned = false;
-                        break;
-                    }
-                }
+				for (Object studyEvent1 : studyEvents) {
+					StudyEventBean temp = (StudyEventBean) studyEvent1;
+					if (!temp.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
+						allSigned = false;
+						break;
+					}
+				}
 				if (allSigned) {
 					logger.info("Signing StudySubject [" + ssub.getSubjectId() + "]");
 					ssub.setStatus(Status.SIGNED);
@@ -533,8 +555,8 @@ public class UpdateStudyEventServlet extends Controller {
 				}
 
 				// save discrepancy notes into DB
-				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession()
-						.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
+						AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 				DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 
 				AddNewSubjectServlet.saveFieldNotes(INPUT_LOCATION, fdn, dndao, studyEvent.getId(), "studyEvent",
@@ -565,8 +587,8 @@ public class UpdateStudyEventServlet extends Controller {
 				ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
 				populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
 
-				ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs,
-						eventDefinitionCRFs, ub, currentRole, studyEvent.getSubjectEventStatus(), study);
+				ArrayList displayEventCRFs = getDisplayEventCRFs(getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
+						currentRole, studyEvent.getSubjectEventStatus(), study);
 
 				request.setAttribute("studySubject", ssb);
 				request.setAttribute("uncompletedEventDefinitionCRFs", uncompletedEventDefinitionCRFs);
@@ -579,11 +601,13 @@ public class UpdateStudyEventServlet extends Controller {
 			}
 		} else {
 			logger.info("no action, go to update page");
-			
+
 			StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
-			List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil.getAllNotesforSubjectAndEvent(studySubjectBean, currentStudy, sm);
-			
-			EnterDataForStudyEventServlet.setRequestAttributesForNotes(allNotesforSubjectAndEvent, studyEvent, sm, request);
+			List<DiscrepancyNoteBean> allNotesforSubjectAndEvent = DiscrepancyNoteUtil.getAllNotesforSubjectAndEvent(
+					studySubjectBean, currentStudy, sm);
+
+			EnterDataForStudyEventServlet.setRequestAttributesForNotes(allNotesforSubjectAndEvent, studyEvent, sm,
+					request);
 
 			HashMap presetValues = new HashMap();
 			if (studyEvent.getStartTimeFlag()) {
@@ -610,7 +634,7 @@ public class UpdateStudyEventServlet extends Controller {
 				presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
 			}
 
-            SimpleDateFormat local_df = getLocalDf(request);
+			SimpleDateFormat local_df = getLocalDf(request);
 			String dateValue = local_df.format(studyEvent.getDateStarted());
 			presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
 
@@ -646,7 +670,7 @@ public class UpdateStudyEventServlet extends Controller {
 			request.setAttribute("studySubject", studySubjectBean);
 
 			discNotes = new FormDiscrepancyNotes();
-            request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+			request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
 			forwardPage(Page.UPDATE_STUDY_EVENT, request, response);
 		}
@@ -723,14 +747,14 @@ public class UpdateStudyEventServlet extends Controller {
 				dedcrf.getEdc().setVersions(versions);
 				if (versions != null && versions.size() != 0) {
 					boolean isLocked = false;
-                    for (Object version : versions) {
-                        CRFVersionBean crfvb = (CRFVersionBean) version;
-                        logger.info("...checking versions..." + crfvb.getName());
-                        if (!crfvb.getStatus().equals(Status.AVAILABLE)) {
-                            logger.info("found a non active crf version");
-                            isLocked = true;
-                        }
-                    }
+					for (Object version : versions) {
+						CRFVersionBean crfvb = (CRFVersionBean) version;
+						logger.info("...checking versions..." + crfvb.getName());
+						if (!crfvb.getStatus().equals(Status.AVAILABLE)) {
+							logger.info("found a non active crf version");
+							isLocked = true;
+						}
+					}
 					logger.info("re-set event def, line 240: " + isLocked);
 					if (isLocked) {
 						dedcrf.setStatus(Status.LOCKED);
@@ -755,7 +779,7 @@ public class UpdateStudyEventServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
 			return ADMIN_SERVLET_CODE;
 		} else {

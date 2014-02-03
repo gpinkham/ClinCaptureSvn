@@ -29,19 +29,34 @@ package org.akaza.openclinica.dao.managestudy;
  * 
  * 
  */
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyType;
-import org.akaza.openclinica.dao.core.*;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
 
-import java.sql.*;
-import java.util.*;
-import java.util.Date;
-
-import javax.sql.DataSource;
-
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 
 	public StudyDAO(DataSource ds) {
@@ -616,7 +631,7 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		String sql = null;
 		// Updated for ORACLE and PGSQL compatibility
 		if (isLimited) {
-			if (CoreResources.getDBName().equals("oracle")) {
+			if (CoreResources.getDBType().equals("oracle")) {
 				sql = digester.getQuery("findAll") + " where ROWNUM <=5";
 			} else {
 				sql = digester.getQuery("findAll") + " limit 5";

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
@@ -131,7 +132,7 @@ public class ListNotesFilter implements CriteriaCommand {
 				Date date = parseDate((String) value);
 				if (date != null) {
 					String pgDate = dateFormat.format(date);
-					if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+					if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 						criteria += " and dn.date_created=TO_DATE('" + pgDate + "', '" + pgDateFormat + "') ";
 					} else {
 						criteria += " and dn.date_created='" + dateFormat.format(date) + "' ";
@@ -143,7 +144,7 @@ public class ListNotesFilter implements CriteriaCommand {
 				Date date = parseDate((String) value);
 				if (date != null) {
 					String pgDate = dateFormat.format(date);
-					if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+					if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 						criteria += " and (" + "select max(dc.date_created) " + "from (( select date_created "
 								+ "from discrepancy_note where parent_dn_id = dn.discrepancy_note_id) "
 								+ "union (select dn.date_created)) dc)=TO_DATE('" + pgDate + "', '" + pgDateFormat

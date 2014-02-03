@@ -13,13 +13,13 @@
 
 package org.akaza.openclinica.dao;
 
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
-import org.apache.commons.lang.StringEscapeUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
+import org.apache.commons.lang.StringEscapeUtils;
 
 public class StudySubjectSDVFilter implements CriteriaCommand {
 
@@ -85,7 +85,7 @@ public class StudySubjectSDVFilter implements CriteriaCommand {
 		value = StringEscapeUtils.escapeSql(value.toString());
 		if (value != null) {
 			if (property.equals("sdvStatus")) {
-				if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+				if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 					if (value.equals("complete")) {
 						criteria += SDVD_STUDY_SUBJECTS_oracle;
 					} else {

@@ -4,14 +4,19 @@ import com.clinovo.dao.CodedItemDAO;
 import com.clinovo.dao.DictionaryDAO;
 import com.clinovo.dao.DiscrepancyDescriptionDAO;
 import com.clinovo.dao.StudySubjectIdDAO;
+import com.clinovo.dao.SystemDAO;
 import com.clinovo.dao.TermDAO;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.service.SystemService;
 import com.clinovo.service.TermService;
+
 import java.util.Date;
+
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
@@ -108,8 +113,10 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected CodedItemDAO codedItemDAO;
 	@Autowired
 	protected DictionaryDAO dictionaryDAO;
-    @Autowired
-    protected StudySubjectIdDAO studySubjectIdDAO;
+	@Autowired
+	protected StudySubjectIdDAO studySubjectIdDAO;
+	@Autowired
+	protected SystemDAO systemDAO;
 
 	// Services
 	@Autowired
@@ -120,8 +127,10 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected CodedItemService codedItemService;
 	@Autowired
 	protected DictionaryService dictionaryService;
-    @Autowired
-    protected StudySubjectIdService studySubjectIdService;
+	@Autowired
+	protected StudySubjectIdService studySubjectIdService;
+	@Autowired
+	protected SystemService systemService;
 	@Autowired
 	protected RuleSetServiceInterface ruleSetService;
 	@Autowired

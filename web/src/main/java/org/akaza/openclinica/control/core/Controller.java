@@ -206,7 +206,7 @@ public abstract class Controller extends BaseController {
 		if (lastChangeDate == null) {
 			addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". "
 					+ respage.getString("password_set"), request);
-			int pwdChangeRequired = Integer.parseInt(SQLInitServlet.getField("change_passwd_required"));
+			int pwdChangeRequired = Integer.parseInt(SQLInitServlet.getField("pwd.change.required"));
 			if (pwdChangeRequired == 1) {
 				request.setAttribute("mustChangePass", "yes");
 				forwardPage(Page.RESET_PASSWORD, request, response);
@@ -345,7 +345,7 @@ public abstract class Controller extends BaseController {
 			request.getSession().setAttribute(USER_BEAN_NAME, ub);
 
 			String includeReportingVar = "includeReporting";
-			if ("true".equals(SQLInitServlet.getField("include.reporting"))) {
+			if (!SQLInitServlet.getField("pentaho.url").trim().equals("")) {
 				request.setAttribute(includeReportingVar, true);
 			} else {
 				request.setAttribute(includeReportingVar, false);
@@ -877,14 +877,14 @@ public abstract class Controller extends BaseController {
 			dynGroup.setEventDefinitions(studyEventDefinitionDao.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup
 					.getId()));
 		}
-		
+
 		it = dynamicGroupClasses.listIterator();
 		while (it.hasNext()) {
-			if (((StudyGroupClassBean)it.next()).getEventDefinitions().size() == 0) {
+			if (((StudyGroupClassBean) it.next()).getEventDefinitions().size() == 0) {
 				it.remove();
 			}
 		}
-		
+
 		Collections.sort(dynamicGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
 
 		return dynamicGroupClasses;
@@ -1514,7 +1514,7 @@ public abstract class Controller extends BaseController {
 			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
 					.findByPK(event.getStudyEventDefinitionId());
 			event.setStudyEventDefinition(sed);
-			
+
 			if (excludeEventDefinishionsRemoved && sed.getStatus().isDeleted()) {
 				continue;
 			}
@@ -1566,9 +1566,8 @@ public abstract class Controller extends BaseController {
 
 		return de;
 	}
-	
-	protected List<DiscrepancyNoteBean> extractCoderNotes(List<DiscrepancyNoteBean> notes,
-			HttpServletRequest request) {
+
+	protected List<DiscrepancyNoteBean> extractCoderNotes(List<DiscrepancyNoteBean> notes, HttpServletRequest request) {
 
 		if (isCoder(getUserAccountBean(request), request)) {
 

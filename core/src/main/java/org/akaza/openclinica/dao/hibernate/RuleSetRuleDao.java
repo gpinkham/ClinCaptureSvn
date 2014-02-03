@@ -13,6 +13,9 @@
 
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.ArrayList;
+
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -21,14 +24,11 @@ import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.hibernate.stat.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
 
 @Repository
 public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
@@ -121,7 +121,7 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 			final ViewRuleAssignmentSort sort, final int rowStart, final int rowEnd) {
 
 		String select = "select DISTINCT(rsr.id),rsr.rule_set_id,rsr.rule_id,rsr.owner_id,rsr.date_created, rsr.date_updated, rsr.update_id, rsr.status_id,rsr.version,i.name as iname,re.value as revalue,sed.name as sedname,c.name as cname,cv.name as cvname,ig.name as igname,rer.value as rervalue,r.oc_oid as rocoid,r.description as rdescription,r.name as rname from rule_set_rule rsr ";
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			select = "select DISTINCT(rsr.id),rsr.rule_set_id,rsr.rule_id,rsr.owner_id,rsr.date_created, rsr.date_updated, rsr.update_id, rsr.status_id,rsr.version,i.name iname,re.value revalue,sed.name sedname,c.name cname,cv.name cvname,ig.name igname,rer.value rervalue,r.oc_oid rocoid,r.description rdescription,r.name rname from rule_set_rule rsr ";
 		}
 

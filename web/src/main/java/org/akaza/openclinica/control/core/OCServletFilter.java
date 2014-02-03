@@ -27,6 +27,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.log.LoggingConstants;
 import org.slf4j.MDC;
 
@@ -44,6 +45,8 @@ public class OCServletFilter implements javax.servlet.Filter {
 		UserAccountBean ub = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
 		boolean successfulRegistration = false;
 		String username = "";
+
+		((HttpServletRequest) request).getSession().setAttribute("logoUrl", CoreResources.getField("logo"));
 
 		Principal principal = req.getUserPrincipal();
 

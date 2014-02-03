@@ -28,13 +28,13 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
-
 import org.akaza.openclinica.dao.cache.EhCacheWrapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.xml.sax.SAXException;
+
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.CacheManager;
 
 /**
  * Provides a singleton SQLFactory instance
@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
  * @author Jun Xu
  * 
  */
-@SuppressWarnings({"rawtypes","unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SQLFactory {
 
 	// DAO KEYS TO USE FOR RETRIEVING DIGESTER
@@ -69,7 +69,7 @@ public class SQLFactory {
 	public final String DAO_CRFVERSION = "crfversion";
 	public final String DAO_DATASET = "dataset";
 	public final String DAO_SECTION = "section";
-	
+
 	public final String DAO_EVENTCRF = "eventcrf";
 	public final String DAO_ARCHIVED_DATASET_FILE = "archived_dataset_file";
 	public final String DAO_DISCREPANCY_NOTE = "discrepancy_note";
@@ -96,9 +96,16 @@ public class SQLFactory {
 		this.ehCacheWrapper = ehCacheWrapper;
 	}
 
-	public static String JUNIT_XML_DIR = (System.getProperty("user.dir").indexOf(File.separator + "web") > 0 ? System.getProperty("user.dir").replace(File.separator + "web", "") : System.getProperty("user.dir"))
+	public static String JUNIT_XML_DIR = (System.getProperty("user.dir").indexOf(File.separator + "web") > 0 ? System
+			.getProperty("user.dir").replace(File.separator + "web", "") : System.getProperty("user.dir"))
 			+ (System.getProperty("user.dir").indexOf(File.separator + "core") < 0 ? (File.separator + "core") : "")
-			+ File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
+			+ File.separator
+			+ "src"
+			+ File.separator
+			+ "main"
+			+ File.separator
+			+ "resources"
+			+ File.separator
 			+ "properties" + File.separator;
 
 	public static void setXMLDir(String path) {
@@ -136,6 +143,7 @@ public class SQLFactory {
 	}
 
 	public void run(String dbName, ResourceLoader resourceLoader) {
+		digesters.clear();
 		HashMap fileList = new HashMap();
 		CacheManager cacheManager = new CacheManager();
 
@@ -166,7 +174,7 @@ public class SQLFactory {
 			fileList.put(this.DAO_EVENTDEFINITIONCRF, "oracle_event_definition_crf_dao.xml");
 			fileList.put(this.DAO_AUDITEVENT, "oracle_audit_event_dao.xml");
 			fileList.put(this.DAO_AUDIT, "oracle_audit_dao.xml");
-            fileList.put(this.DAO_DYNAMIC_EVENT, "oracle_dynamic_event_dao.xml");
+			fileList.put(this.DAO_DYNAMIC_EVENT, "oracle_dynamic_event_dao.xml");
 			fileList.put(this.DAO_ITEM, "oracle_item_dao.xml");
 			fileList.put(this.DAO_ITEMDATA, "oracle_itemdata_dao.xml");
 			fileList.put(this.DAO_CRF, "oracle_crf_dao.xml");
@@ -188,12 +196,12 @@ public class SQLFactory {
 			fileList.put(this.DAO_RULESET_AUDIT, "oracle_ruleset_audit_dao.xml");
 			fileList.put(this.DAO_RULESETRULE_AUDIT, "oracle_rulesetrule_audit_dao.xml");
 			fileList.put(this.DAO_ODM_EXTRACT, "oracle_odm_extract_dao.xml");
-			
+
 		} else {
-			
+
 			addPostgresDigesters(fileList);
 
-		} 
+		}
 
 		Set DAONames = fileList.keySet();
 		Iterator DAONamesIt = DAONames.iterator();
@@ -222,9 +230,9 @@ public class SQLFactory {
 			}
 		}
 	}
-	
+
 	private void addPostgresDigesters(HashMap fileList) {
-		
+
 		fileList.put(this.DAO_USERACCOUNT, "useraccount_dao.xml");
 		fileList.put(this.DAO_ARCHIVED_DATASET_FILE, "archived_dataset_file_dao.xml");
 		fileList.put(this.DAO_STUDY, "study_dao.xml");
@@ -238,7 +246,7 @@ public class SQLFactory {
 		fileList.put(this.DAO_EVENTDEFINITIONCRF, "event_definition_crf_dao.xml");
 		fileList.put(this.DAO_AUDITEVENT, "audit_event_dao.xml");
 		fileList.put(this.DAO_AUDIT, "audit_dao.xml");
-        fileList.put(this.DAO_DYNAMIC_EVENT, "dynamic_event_dao.xml");
+		fileList.put(this.DAO_DYNAMIC_EVENT, "dynamic_event_dao.xml");
 		fileList.put(this.DAO_ITEM, "item_dao.xml");
 		fileList.put(this.DAO_ITEMDATA, "itemdata_dao.xml");
 		fileList.put(this.DAO_CRF, "crf_dao.xml");

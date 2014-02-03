@@ -28,8 +28,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import oracle.jdbc.pool.OracleDataSource;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -37,6 +35,8 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+
+import oracle.jdbc.pool.OracleDataSource;
 
 /**
  * Utility which handles connection and login, as prompted by OpenClinica control servlets. Updated August 2004 to
@@ -56,7 +56,7 @@ public class SessionManager {
 
 	final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-	private String dbName;
+	private String dbType;
 	private UserAccountDAO uDAO = null;
 
 	// TODO: this is a hack needs to be refactord
@@ -112,11 +112,11 @@ public class SessionManager {
 		try {
 			Context ctx = new InitialContext();
 			Context env = (Context) ctx.lookup("java:comp/env");
-			dbName = CoreResources.getField("dataBase");
-			if ("oracle".equals(dbName)) {
+			dbType = CoreResources.getField("dbType");
+			if ("oracle".equals(dbType)) {
 				logger.debug("looking up oracle...");
 				ds = (DataSource) env.lookup("SQLOracle");
-			} else if ("postgres".equals(dbName)) {
+			} else if ("postgres".equals(dbType)) {
 				ds = (DataSource) env.lookup("SQLPostgres");
 			}
 

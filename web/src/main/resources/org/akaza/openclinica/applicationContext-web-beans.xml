@@ -14,6 +14,16 @@
 	<!-- Service layer supports legacy DAOs via constructor injection of dataSource 
 		and Hibernate DAO injection via autowiring -->
 
+    <bean id="validator" class="org.springmodules.validation.bean.BeanValidator">
+        <property name="configurationLoader">
+            <bean class="org.springmodules.validation.bean.conf.loader.annotation.AnnotationBeanValidationConfigurationLoader"/>
+        </property>
+        <property name="errorCodeConverter">
+            <bean class="com.clinovo.util.ValidationErrorCodeConverter"/>
+        </property>
+    </bean>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
 
 	<bean id="sdvUtil" class="org.akaza.openclinica.web.table.sdv.SDVUtil"
 		name="sdvUtil">

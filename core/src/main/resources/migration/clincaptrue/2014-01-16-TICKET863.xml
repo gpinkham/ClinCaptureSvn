@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="skirpichenok" id="2014-01-16-TICKET864-1">
+        <comment>Create the system table</comment>
+        <createTable tableName="system">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="value" type="VARCHAR(255)" />
+            <column name="value_type" type="VARCHAR(255)" defaultValue="STRING"/>
+            <column name="required" type="BOOLEAN" defaultValueBoolean="true" />
+            <column name="type" type="VARCHAR(255)" defaultValue="TEXT" />
+            <column name="type_values" type="VARCHAR(255)" defaultValue="" />
+            <column name="size" type="INT" defaultValue="60" />
+            <column name="show_measurements" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="show_description" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="show_note" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="group_id" type="INT" defaultValue="0" />
+            <column name="crc" type="VARCHAR(255)" defaultValue="HIDDEN" />
+            <column name="investigator" type="VARCHAR(255)" defaultValue="HIDDEN" />
+            <column name="monitor" type="VARCHAR(255)" defaultValue="HIDDEN" />
+            <column name="admin" type="VARCHAR(255)" defaultValue="WRITE" />
+            <column name="root" type="VARCHAR(255)" defaultValue="WRITE" />
+            <column name="order_id" type="INT" defaultValue="0" />
+            <column name="version" type="INT" defaultValue="1"/>
+        </createTable>
+        <comment>Create the system_group table</comment>
+        <createTable tableName="system_group">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="parent_id" type="INT" defaultValue="0" />
+            <column name="order_id" type="INT" defaultValue="0" />
+            <column name="version" type="INT" defaultValue="1"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2014-01-16-TICKET864-2">
+        <comment>Insert groups into the system_group table</comment>
+        <insert tableName="system_group"><column name="id" value="1"/><column name="name" value="system"/><column name="order_id" value="1"/></insert>
+        <insert tableName="system_group"><column name="id" value="2"/><column name="name" value="extracts"/><column name="order_id" value="2"/></insert>
+        <insert tableName="system_group"><column name="id" value="3"/><column name="name" value="email"/><column name="order_id" value="3"/></insert>
+        <insert tableName="system_group"><column name="id" value="4"/><column name="name" value="security"/><column name="order_id" value="4"/></insert>
+        <insert tableName="system_group"><column name="id" value="5"/><column name="name" value="facility"/><column name="order_id" value="5"/></insert>
+        <insert tableName="system_group"><column name="id" value="6"/><column name="name" value="support"/><column name="order_id" value="6"/></insert>
+        <insert tableName="system_group"><column name="id" value="7"/><column name="name" value="rules_studio"/><column name="order_id" value="7"/></insert>
+        <insert tableName="system_group"><column name="id" value="8"/><column name="name" value="reporting"/><column name="order_id" value="8"/></insert>
+        <insert tableName="system_group"><column name="id" value="9"/><column name="name" value="randomization"/><column name="order_id" value="10"/></insert>
+        <insert tableName="system_group"><column name="id" value="10"/><column name="name" value="medical_coding"/><column name="order_id" value="11"/></insert>
+        <insert tableName="system_group"><column name="id" value="11"/><column name="name" value="cancer_clinical_trials_suites"/><column name="order_id" value="12"/></insert>
+        <insert tableName="system_group"><column name="id" value="113"/><column name="name" value="access"/><column name="parent_id" value="1"/><column name="order_id" value="1"/></insert>
+        <insert tableName="system_group"><column name="id" value="114"/><column name="name" value="repository"/><column name="parent_id" value="1"/><column name="order_id" value="2"/></insert>
+        <insert tableName="system_group"><column name="id" value="115"/><column name="name" value="file_management"/><column name="parent_id" value="1"/><column name="order_id" value="3"/></insert>
+        <insert tableName="system_group"><column name="id" value="116"/><column name="name" value="logging"/><column name="parent_id" value="1"/><column name="order_id" value="4"/></insert>
+        <insert tableName="system_group"><column name="id" value="117"/><column name="name" value="job_scheduler"/><column name="parent_id" value="1"/><column name="order_id" value="5"/></insert>
+        <insert tableName="system_group"><column name="id" value="118"/><column name="name" value="usage_statistics"/><column name="parent_id" value="1"/><column name="order_id" value="6"/></insert>
+        <insert tableName="system_group"><column name="id" value="119"/><column name="name" value="theme"/><column name="parent_id" value="1"/><column name="order_id" value="7"/></insert>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2014-01-16-TICKET864-3">
+        <comment>Insert default parameters into the system table</comment>
+
+        <insert tableName="system"><column name="name" value="currentHostName" /><column name="required" valueBoolean="false" /><column name="crc" value="READ" /><column name="investigator" value="READ" /><column name="monitor" value="READ" /><column name="admin" value="READ" /><column name="root" value="READ" /><column name="type" value="DYNAMIC_INPUT"/><column name="size" value="80" /><column name="value" value="" /><column name="group_id" value="113"/><column name="order_id" value="1"/></insert>
+        <insert tableName="system"><column name="name" value="currentWebAppName" /><column name="required" valueBoolean="false" /><column name="crc" value="READ" /><column name="investigator" value="READ" /><column name="monitor" value="READ" /><column name="admin" value="READ" /><column name="root" value="READ" /><column name="type" value="DYNAMIC_INPUT"/><column name="size" value="80" /><column name="value" value="" /><column name="group_id" value="113"/><column name="order_id" value="2"/></insert>
+        <insert tableName="system"><column name="name" value="currentDBName" /><column name="required" valueBoolean="false" /><column name="crc" value="READ" /><column name="investigator" value="READ" /><column name="monitor" value="READ" /><column name="admin" value="READ" /><column name="root" value="READ" /><column name="type" value="DYNAMIC_INPUT"/><column name="size" value="80" /><column name="value" value="" /><column name="group_id" value="113"/><column name="order_id" value="3"/></insert>
+        <insert tableName="system"><column name="name" value="sysURL" /><column name="admin" value="READ" /><column name="size" value="80" /><column name="value" value="http://localhost:8080/${WEBAPP}/MainMenu" /><column name="group_id" value="113"/><column name="order_id" value="4"/><column name="show_description" valueBoolean="true"/></insert>
+
+        <insert tableName="system"><column name="name" value="filePath"/><column name="size" value="80" /><column name="admin" value="READ" /><column name="value" value="C:\\\\Program Files\\\\Apache Software Foundation\\\\Tomcat 6.0\\\\clincapture.data\\\\" /><column name="group_id" value="114"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+
+        <insert tableName="system"><column name="name" value="attached_file_location" /><column name="admin" value="READ" /><column name="required" valueBoolean="false" /><column name="size" value="80" /><column name="value" value="" /><column name="group_id" value="115"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="crfFileExtensions" /><column name="required" valueBoolean="false" /><column name="size" value="50" /><column name="value" value="" /><column name="group_id" value="115"/><column name="order_id" value="2"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="crfFileExtensionSettings" /><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="group_id" value="115"/><column name="admin" value="HIDDEN"/><column name="root" value="HIDDEN"/><column name="order_id" value="3"/></insert>
+
+        <insert tableName="system"><column name="name" value="log.dir" /><column name="type" value="DYNAMIC_INPUT"/><column name="admin" value="READ" /><column name="size" value="80" /><column name="value" value="" /><column name="group_id" value="116"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="logLevel" /><column name="type" value="DYNAMIC_RADIO"/><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="type_values" value="trace,debug,info,warning,error"/><column name="group_id" value="116"/><column name="order_id" value="2"/></insert>
+        <insert tableName="system"><column name="name" value="syslog.host" /><column name="type" value="DYNAMIC_INPUT"/><column name="required" valueBoolean="false" /><column name="size" value="50" /><column name="value" value="" /><column name="group_id" value="116"/><column name="order_id" value="3"/></insert>
+        <insert tableName="system"><column name="name" value="syslog.port" /><column name="type" value="DYNAMIC_INPUT"/><column name="required" valueBoolean="false" /><column name="value_type" value="INTEGER"/><column name="size" value="10" /><column name="value" value="" /><column name="group_id" value="116"/><column name="order_id" value="4"/></insert>
+        <insert tableName="system"><column name="name" value="logLocation" /><column name="type" value="DYNAMIC_INPUT"/><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="group_id" value="116"/><column name="admin" value="HIDDEN"/><column name="root" value="HIDDEN"/><column name="order_id" value="5"/></insert>
+
+        <insert tableName="system"><column name="name" value="org.quartz.jobStore.misfireThreshold" /><column name="value_type" value="INTEGER"/><column name="size" value="10" /><column name="value" value="18000000" /><column name="group_id" value="117"/><column name="order_id" value="1"/><column name="show_measurements" valueBoolean="true"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="org.quartz.threadPool.threadCount" /><column name="value_type" value="INTEGER"/><column name="size" value="10" /><column name="value" value="1" /><column name="group_id" value="117"/><column name="order_id" value="2"/></insert>
+        <insert tableName="system"><column name="name" value="org.quartz.threadPool.threadPriority" /><column name="value_type" value="INTEGER"/><column name="size" value="10" /><column name="value" value="5" /><column name="group_id" value="117"/><column name="order_id" value="3"/></insert>
+
+        <insert tableName="system"><column name="name" value="collectStats" /><column name="type" value="DYNAMIC_RADIO"/><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="type_values" value="false,true"/><column name="group_id" value="118"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="usage.stats.host" /><column name="type" value="DYNAMIC_INPUT"/><column name="admin" value="READ" /><column name="required" valueBoolean="false" /><column name="size" value="50" /><column name="value" value="" /><column name="group_id" value="118"/><column name="order_id" value="2"/><column name="show_measurements" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="usage.stats.port" /><column name="type" value="DYNAMIC_INPUT"/><column name="admin" value="READ" /><column name="value_type" value="INTEGER"/><column name="required" valueBoolean="false" /><column name="size" value="10" /><column name="value" value="" /><column name="group_id" value="118"/><column name="order_id" value="3"/><column name="show_measurements" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="cc.ver" /><column name="admin" value="READ" /><column name="required" valueBoolean="false" /><column name="size" value="20" /><column name="value" value="Rev: ${SVN_REVISION}" /><column name="group_id" value="118"/><column name="order_id" value="4"/></insert>
+
+        <insert tableName="system"><column name="name" value="themeColor" /><column name="required" valueBoolean="false" /><column name="value" value="violet" /><column name="type" value="RADIO"/><column name="type_values" value="blue,green,violet"/><column name="group_id" value="119"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="logo" /><column name="required" valueBoolean="false" /><column name="value" value="/images/Logo.gif" /><column name="type" value="FILE"/><column name="group_id" value="119"/><column name="order_id" value="2"/><column name="show_description" valueBoolean="true"/></insert>
+
+        <insert tableName="system"><column name="name" value="exportFilePath" /><column name="admin" value="READ" /><column name="required" valueBoolean="false" /><column name="size" value="20" /><column name="value" value="scheduled_data_export" /><column name="group_id" value="2"/><column name="order_id" value="1"/><column name="show_measurements" valueBoolean="true"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="extract.number" /><column name="value_type" value="INTEGER"/><column name="size" value="4" /><column name="value" value="99" /><column name="group_id" value="2"/><column name="order_id" value="2"/><column name="show_description" valueBoolean="true"/></insert>
+
+        <insert tableName="system"><column name="name" value="mailHost" /><column name="required" valueBoolean="false" /><column name="value" value="mail.smtp.com" /><column name="size" value="50" /><column name="group_id" value="3"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="mailPort" /><column name="value_type" value="INTEGER"/><column name="required" valueBoolean="false" /><column name="size" value="10" /><column name="value" value="465" /><column name="group_id" value="3"/><column name="order_id" value="2"/></insert>
+        <insert tableName="system"><column name="name" value="mailSmtpConnectionTimeout" /><column name="value_type" value="INTEGER"/><column name="required" valueBoolean="false" /><column name="size" value="10" /><column name="value" value="1000" /><column name="group_id" value="3"/><column name="order_id" value="3"/></insert>
+        <insert tableName="system"><column name="name" value="mailUsername" /><column name="required" valueBoolean="false" /><column name="value" value="username" /><column name="size" value="50" /><column name="group_id" value="3"/><column name="order_id" value="4"/></insert>
+        <insert tableName="system"><column name="name" value="mailPassword" /><column name="required" valueBoolean="false" /><column name="type" value="PASSWORD"/><column name="value" value="password" /><column name="size" value="50" /><column name="group_id" value="3"/><column name="order_id" value="5"/></insert>
+        <insert tableName="system"><column name="name" value="mailProtocol" /><column name="required" valueBoolean="false" /><column name="value" value="smtp" /><column name="type" value="RADIO"/><column name="type_values" value="smtp,smtps"/><column name="group_id" value="3"/><column name="order_id" value="6"/></insert>
+        <!-- new parameter -->
+        <insert tableName="system"><column name="name" value="mailAuth" /><column name="required" valueBoolean="false" /><column name="value" value="false" /><column name="type" value="RADIO"/><column name="type_values" value="true,false"/><column name="group_id" value="3"/><column name="order_id" value="7"/></insert>
+        <!-- new parameter -->
+        <insert tableName="system"><column name="name" value="mailTls" /><column name="required" valueBoolean="false" /><column name="value" value="false" /><column name="type" value="RADIO"/><column name="type_values" value="true,false"/><column name="group_id" value="3"/><column name="order_id" value="8"/></insert>
+        <insert tableName="system"><column name="name" value="adminEmail" /><column name="required" valueBoolean="false" /><column name="value" value="admin@example.com" /><column name="size" value="50" /><column name="group_id" value="3"/><column name="order_id" value="9"/></insert>
+        <insert tableName="system"><column name="name" value="mailErrorMsg" /><column name="required" valueBoolean="false" /><column name="value" value="clincapture@example.com" /><column name="size" value="50" /><column name="group_id" value="3"/><column name="order_id" value="10"/></insert>
+
+        <insert tableName="system"><column name="name" value="userAccountNotification" /><column name="required" valueBoolean="false" /><column name="value" value="email" /><column name="type" value="RADIO"/><column name="type_values" value="none,email"/><column name="size" value="60" /><column name="group_id" value="4"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="password_reuse_frequency" /><column name="value_type" value="INTEGER"/><column name="value" value="365" /><column name="size" value="6" /><column name="group_id" value="4"/><column name="order_id" value="2"/><column name="show_measurements" valueBoolean="true"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="max_inactive_account" /><column name="value_type" value="INTEGER"/><column name="value" value="90" /><column name="size" value="6" /><column name="group_id" value="4"/><column name="order_id" value="3"/><column name="show_measurements" valueBoolean="true"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="maxInactiveInterval" /><column name="value_type" value="INTEGER"/><column name="value" value="1800" /><column name="size" value="6" /><column name="group_id" value="4"/><column name="order_id" value="4"/><column name="show_measurements" valueBoolean="true"/><column name="show_description" valueBoolean="true"/></insert>
+
+        <insert tableName="system"><column name="name" value="FacName" /><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="size" value="60" /><column name="group_id" value="5"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="FacCity" /><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="size" value="60" /><column name="group_id" value="5"/><column name="order_id" value="2"/></insert>
+        <insert tableName="system"><column name="name" value="FacState" /><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="size" value="60" /><column name="group_id" value="5"/><column name="order_id" value="3"/></insert>
+        <insert tableName="system"><column name="name" value="FacZIP" /><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="size" value="60" /><column name="group_id" value="5"/><column name="order_id" value="4"/></insert>
+        <insert tableName="system"><column name="name" value="FacCountry" /><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="size" value="60" /><column name="group_id" value="5"/><column name="order_id" value="5"/></insert>
+        <insert tableName="system"><column name="name" value="FacContactName" /><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="size" value="60" /><column name="group_id" value="5"/><column name="order_id" value="6"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="FacContactDegree" /><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="size" value="60" /><column name="group_id" value="5"/><column name="order_id" value="7"/></insert>
+        <insert tableName="system"><column name="name" value="FacContactPhone" /><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="size" value="60" /><column name="group_id" value="5"/><column name="order_id" value="8"/></insert>
+        <insert tableName="system"><column name="name" value="FacContactEmail" /><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="size" value="60" /><column name="group_id" value="5"/><column name="order_id" value="9"/></insert>
+
+        <!-- new parameter -->
+        <insert tableName="system"><column name="name" value="supportURL" /><column name="value" value="http://clindesk.clinovo.com" /><column name="size" value="80" /><column name="group_id" value="6"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+
+        <!-- new parameter -->
+        <insert tableName="system"><column name="name" value="rule.studio.url" /><column name="required" valueBoolean="false" /><column name="value" value="http://rs.clincapture.clinovo.com" /><column name="size" value="80" /><column name="group_id" value="7"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+
+        <insert tableName="system"><column name="name" value="pentaho.url" /><column name="required" valueBoolean="false" /><column name="value" value="http://pentaho:9090/pentaho/Login" /><column name="size" value="80" /><column name="group_id" value="8"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+
+        <insert tableName="system"><column name="name" value="randomizationUrl" /><column name="admin" value="READ" /><column name="required" valueBoolean="false" /><column name="value" value="https://www.randomize.net/api//RandomizeAPIService/RandomizePatientDelegated" /><column name="size" value="80" /><column name="group_id" value="9"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="randomizationAuthenticationUrl" /><column name="admin" value="READ" /><column name="required" valueBoolean="false" /><column name="value" value="https://www.randomize.net/api/RandomizeAPIService/Authenticate" /><column name="size" value="80" /><column name="group_id" value="9"/><column name="order_id" value="2"/></insert>
+        <insert tableName="system"><column name="name" value="randomizationusername" /><column name="required" valueBoolean="false" /><column name="value" value="username" /><column name="size" value="50" /><column name="group_id" value="9"/><column name="order_id" value="3"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="randomizationpassword" /><column name="required" valueBoolean="false" /><column name="value" value="password" /><column name="size" value="50" /><column name="group_id" value="9"/><column name="order_id" value="4"/></insert>
+        <insert tableName="system"><column name="name" value="randomizationTrialId" /><column name="required" valueBoolean="false" /><column name="value" value="0" /><column name="size" value="40" /><column name="group_id" value="9"/><column name="order_id" value="5"/><column name="show_description" valueBoolean="true"/></insert>
+
+        <insert tableName="system"><column name="name" value="level" /><column name="required" valueBoolean="false" /><column name="value" value="${level}" /><column name="size" value="40" /><column name="group_id" value="10"/><column name="order_id" value="1"/></insert>
+        <insert tableName="system"><column name="name" value="dictionary" /><column name="required" valueBoolean="false" /><column name="value" value="${dictionary}" /><column name="size" value="40" /><column name="group_id" value="10"/><column name="order_id" value="2"/></insert>
+
+        <insert tableName="system"><column name="name" value="ccts.waitBeforeCommit" /><column name="value_type" value="INTEGER"/><column name="required" valueBoolean="false" /><column name="value" value="6000" /><column name="size" value="30" /><column name="group_id" value="11"/><column name="order_id" value="2"/><column name="show_measurements" valueBoolean="true"/><column name="show_description" valueBoolean="true"/></insert>
+    </changeSet>
+</databaseChangeLog>

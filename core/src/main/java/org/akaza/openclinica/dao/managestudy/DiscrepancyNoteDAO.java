@@ -289,7 +289,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		String sql = digester.getQuery("getWithFilterAndSort");
 		sql = sql + filter.execute("");
 
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			sql += " AND rownum <= " + rowEnd + " and rownum >" + rowStart;
 			sql = sql + sort.execute("");
 		} else {
@@ -344,7 +344,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
 		}
 		sql += filter.execute("");
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			sql += " ) all_dn";
 		} else {
 			sql += " ) as all_dn";
@@ -391,7 +391,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 					.append(" ) ");
 		}
 		sql.append(filter);
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			sql.append(" ) all_dn");
 		} else {
 			sql.append(" ) as all_dn");
@@ -428,7 +428,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		variables.put(10, currentStudy.getId());
 
 		String sql = "";
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			sql = sql + "SELECT * FROM ( SELECT x.*, ROWNUM as rnum FROM (";
 		}
 		sql = sql + digester.getQuery("findAllSubjectDNByStudy");
@@ -452,7 +452,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 		sql += filter.execute("");
 
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			sql += ") x )  WHERE rnum BETWEEN " + (rowStart + 1) + " and " + rowEnd;
 			sql += sort.execute("");
 		} else {
@@ -1714,7 +1714,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		String sql = digester.getQuery("findByStudyEvent");
 		sql += constraints.toString();
 		if (isSite) {
-			if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+			if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 				sql += " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
 						+ "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = "
 						+ studyEvent.getId()
@@ -1757,7 +1757,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			sql = digester.getQuery("findByStudyEvent");
 			temp = " and (dn.entity_type='itemData' or dn.entity_type='ItemData') ";
 			if (isSite) {
-				if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+				if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 					temp += " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
 							+ "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = "
 							+ studyEvent.getId()
@@ -1778,7 +1778,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 			sql = digester.getQuery("countByEventCrfTypeAndStudyEvent");
 			temp = " and dn.entity_type='eventCrf' ";
 			if (isSite) {
-				if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+				if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 					temp += " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
 							+ "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = "
 							+ studyEvent.getId()
@@ -2023,7 +2023,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public String findSiteHiddenEventCrfIdsString(StudyBean site) {
 		String sql;
-		String valueOfBooleanTrue = ("oracle".equalsIgnoreCase(CoreResources.getDBName())) ? "1" : "'true'";
+		String valueOfBooleanTrue = ("oracle".equalsIgnoreCase(CoreResources.getDBType())) ? "1" : "'true'";
 
 		sql = "SELECT DISTINCT ec.event_crf_id "
 				+ "FROM (((event_crf ec LEFT JOIN study_event se ON ec.study_event_id = se.study_event_id) "

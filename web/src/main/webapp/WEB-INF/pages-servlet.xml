@@ -20,17 +20,25 @@
      
     <bean id="accessConfirmationController" class="org.akaza.openclinica.controller.AccessConfirmationController">
         <property name="clientDetailsService" ref="clientDetails"/>
-    </bean> 
-    
-    <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-    <property name="mappings">
-      <props>
-        <prop key="/oauth/confirm_access">accessConfirmationController</prop>
-      </props>
-    </property>
-    <property name="alwaysUseFullPath" value="true"/>
-  </bean>
+    </bean>
 
+    <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <prop key="/oauth/confirm_access">accessConfirmationController</prop>
+                <prop key="/pages/system">systemController</prop>
+                <prop key="/pages/codedItems">codedItemsController</prop>
+            </props>
+        </property>
+        <property name="interceptors">
+            <list>
+                <ref bean="setUpSessionInterceptor" />
+            </list>
+        </property>
+        <property name="alwaysUseFullPath" value="true"/>
+    </bean>
+
+    <bean id="setUpSessionInterceptor" class="com.clinovo.interceptor.SetUpSessionInterceptor"/>
 
     <!-- Simple redirects to internal resources; URL path substring becomes view name (e.g. '/login.htm' -> 'login') -->
     <bean name="/login/login" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />

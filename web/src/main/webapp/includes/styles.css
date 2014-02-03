@@ -2020,10 +2020,6 @@ div#sumBox table tr:first-child td { border-top-width: 0px;
 
 .taskLink { padding: 3px 10px 4px 10px; font-weight: bold; }
 
-.hidden {
-    display: none !important;
-}
-
 #loginBox { width: 310px; }
 
 #loginBox #login { width: 160px; padding-right: 8px; }
@@ -2231,4 +2227,233 @@ a.dnShortcut:hover {
     float: left;
     cursor: pointer;
     margin-left: 0px !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.clear {
+    clear: both;
+}
+
+.error {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: bold;
+    color: #E46E16;
+}
+
+.errorBlock {
+    text-align: left;
+}
+
+/*************************/
+/*** System properties ***/
+/*************************/
+
+#systemForm input[type=file] {
+    padding: 10px !important;
+}
+
+#systemForm  input[type=text], #systemForm input[type=password], #systemForm input[type=file] {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    color: #4D4D4D;
+    background-color: white;
+    border-width: 0px;
+    margin-left: 4px;
+    margin-right: 9px;
+    margin-top: 1px;
+    margin-bottom: 7px;
+    width: 100% !important;
+    line-height: 16px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border: 1px solid silver;
+    border-radius: 2px;
+    box-shadow: 2px 2px 5px 2px silver;
+    padding-left: 4px;
+}
+
+#systemForm input.inputError  {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    color: #4D4D4D;
+    background-color: white;
+    border-width: 0px;
+    margin-left: 4px;
+    margin-right: 9px;
+    margin-top: 1px;
+    margin-bottom: 7px;
+    width: 100% !important;
+    line-height: 16px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border: 1px solid red !important;
+    border-radius: 2px;
+    box-shadow: 2px 2px 5px 2px #FF6666 !important;
+    padding-left: 4px;
+}
+
+#systemForm div.sysProps {
+    width: 800px;
+}
+
+#systemForm .mousePointer {
+    cursor: pointer;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    padding-right: 5px;
+}
+
+#systemForm .subGroup {
+    padding-left: 20px;
+}
+
+#systemForm .groups {
+    padding-left: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+#systemForm .group {
+    padding-bottom: 10px;
+}
+
+#systemForm .propertyHolder {
+    padding-left: 10px;
+    padding-bottom: 10px;
+    line-height: 0px;
+}
+
+#systemForm .propertyDescription {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 13px;
+    color: #947F94;
+    line-height: 20px;
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#systemForm .propertyInputHolder {
+    float: left;
+    padding-top: 5px;
+    padding-bottom: 0px;
+}
+
+#systemForm .propertyLabel {
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    line-height: 20px;
+    padding-left: 20px;
+    padding-right: 10px;
+    padding-top: 3px;
+    color: #9D3BC9;
+    float: left;
+    width: 160px;
+}
+
+#systemForm br.clear {
+    clear: both;
+}
+
+#systemForm .propertyRequired {
+    color: red;
+    float: left;
+    padding-top: 17px;
+    font-weight: bold;
+    font-size: 12px;
+    padding-left: 20px;
+}
+
+#systemForm .propertyMeasurements {
+    float: left;
+    padding-left: 10px;
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    color: #947F94;
+    line-height: 20px;
+    padding-top: 3px;
+}
+
+#systemForm .propertyInput {
+    float: left;
+    padding-top: 2px;
+}
+
+#systemForm .propertyInput img {
+    padding-left: 5px;
+}
+
+#systemForm .radioLabel {
+    float: left;
+    line-height: 20px;
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 12px;
+    color: #947F94;
+    padding-right: 30px;
+    margin-top: -2px;
+}
+
+#systemForm .propertyInput input {
+    float: left;
+}
+
+#systemForm .propertyInput input:disabled {
+    background-color: #F0F0F0 !important;
+}
+
+#systemForm .propertyInput input[type=radio] {
+    width: 13px;
+    height: 13px;
+}
+
+#systemForm table#systemConfirmationTable {
+    border-top: 1px solid gray;
+    border-left: 1px solid gray;
+    border-radius: 2px;
+    box-shadow: 2px 2px 5px 2px silver;
+}
+
+#systemForm table#systemConfirmationTable th {
+    border-right: 1px solid gray;
+    border-bottom: 1px solid gray;
+}
+
+#systemForm table#systemConfirmationTable td {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    border-right: 1px solid gray;
+    border-bottom: 1px solid gray;
+    font-size: 11px;
+    padding: 4px;
+}
+
+#systemForm .systemErrors {
+    width: 100%;
+    padding-top: 15px;
+}
+
+#systemForm .systemError {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: bold;
+    color: #E46E16;
+}
+
+#systemForm .propertyLabel .table_title_Admin {
+    font-size: 11px !important;
 }

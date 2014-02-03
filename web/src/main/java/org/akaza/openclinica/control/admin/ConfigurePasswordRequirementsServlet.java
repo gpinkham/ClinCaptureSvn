@@ -20,17 +20,22 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
+
 import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
 /**
@@ -89,6 +94,11 @@ public class ConfigurePasswordRequirementsServlet extends Controller {
 				passwordRequirementsDao.setMaxLength(fp.getInt("pwd.chars.max"));
 				passwordRequirementsDao.setExpirationDays(fp.getInt("pwd.expiration.days"));
 				passwordRequirementsDao.setChangeRequired(fp.getInt("pwd.change.required"));
+
+				CoreResources.setField("pwd.expiration.days", fp.getString("pwd.expiration.days"));
+				CoreResources.setField("pwd.change.required", fp.getString("pwd.change.required"));
+				SQLInitServlet.setField("pwd.expiration.days", fp.getString("pwd.expiration.days"));
+				SQLInitServlet.setField("pwd.change.required", fp.getString("pwd.change.required"));
 
 				addPageMessage(respage.getString("password_req_changes_have_been_saved"), request);
 				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);

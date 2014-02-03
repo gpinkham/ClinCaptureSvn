@@ -97,9 +97,9 @@ import org.akaza.openclinica.logic.odmExport.MetadataUnit;
 /**
  * Fetch odm data from database and load odm related classes.
  * 
- * @author ywang 
+ * @author ywang
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class OdmExtractDAO extends DatasetDAO {
 	public OdmExtractDAO(DataSource ds) {
 		super(ds);
@@ -316,7 +316,7 @@ public class OdmExtractDAO extends DatasetDAO {
 			this.setTypeExpected(23, TypeNames.STRING);// crf_version
 			this.setTypeExpected(24, TypeNames.INT); // cv_status_id
 			this.setTypeExpected(25, TypeNames.INT);// ec_status_id
-            this.setTypeExpected(26, TypeNames.BOOL);// ec_sdv_status
+			this.setTypeExpected(26, TypeNames.BOOL);// ec_sdv_status
 			this.setTypeExpected(27, TypeNames.INT);// event_crf_id
 			this.setTypeExpected(28, TypeNames.DATE);// date_interviewed
 			this.setTypeExpected(29, TypeNames.STRING);// interviewer_name
@@ -704,7 +704,8 @@ public class OdmExtractDAO extends DatasetDAO {
 		}
 	}
 
-	public void getMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, DatasetBean dataset) {
+	public void getMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion,
+			DatasetBean dataset) {
 		if (odmVersion.equalsIgnoreCase("occlinical_data"))
 			odmVersion = "oc1.3";
 
@@ -1083,7 +1084,8 @@ public class OdmExtractDAO extends DatasetDAO {
 	 * @param metadata
 	 * @param odmVersion
 	 */
-	public void getOCMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, DatasetBean dataset) {
+	public void getOCMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion,
+			DatasetBean dataset) {
 		this.getODMMetadata(parentStudyId, studyId, metadata, odmVersion);
 		String cvIds = metadata.getCvIds();
 		if (odmVersion.startsWith("oc")) {
@@ -1155,12 +1157,10 @@ public class OdmExtractDAO extends DatasetDAO {
 					sgcLists.add(sgc);
 				}
 			}
-			logger.debug("*** found study group class lists: " + sgcLists.toString() 
-					+ " size of " + sgcLists.size());
-			logger.debug("found checked subject group class lists from metadata: " 
+			logger.debug("*** found study group class lists: " + sgcLists.toString() + " size of " + sgcLists.size());
+			logger.debug("found checked subject group class lists from metadata: "
 					+ metadata.getStudyGroupClassLists().toString());
-			logger.debug("found checked groups from dataset bean: " 
-					+ dataset.getSubjectGroupIds().toString());
+			logger.debug("found checked groups from dataset bean: " + dataset.getSubjectGroupIds().toString());
 		}
 	}
 
@@ -1229,7 +1229,8 @@ public class OdmExtractDAO extends DatasetDAO {
 		}
 	}
 
-	public void getMetadataOC1_3(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, DatasetBean dataset) {
+	public void getMetadataOC1_3(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion,
+			DatasetBean dataset) {
 		this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion, dataset);
 
 		this.getStudyEventAndFormMetaOC1_3(parentStudyId, studyId, metadata, odmVersion, false);
@@ -1438,7 +1439,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
 	public void getClinicalData(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion,
 			String studySubjectIds, String odmType) {
-		String dbName = CoreResources.getDBName();
+		String dbType = CoreResources.getDBType();
 		String subprev = "";
 		HashMap<String, Integer> sepos = new HashMap<String, Integer>();
 		String seprev = "";
@@ -1450,7 +1451,7 @@ public class OdmExtractDAO extends DatasetDAO {
 		HashMap<Integer, String> idataOidPoses = new HashMap<Integer, String>();
 
 		String studyIds = study.getId() + "";
-		String parentStudyIds = study.getParentStudyId() > 0 ? study.getParentStudyId() + ""  : studyIds;
+		String parentStudyIds = study.getParentStudyId() > 0 ? study.getParentStudyId() + "" : studyIds;
 		int datasetItemStatusId = dataset.getDatasetItemStatus().getId();
 		String sql = dataset.getSQLStatement().split("order by")[0].trim();
 		sql = sql.split("study_event_definition_id in")[1];
@@ -1459,10 +1460,10 @@ public class OdmExtractDAO extends DatasetDAO {
 		String[] sss = ss[1].split("and");
 		String itemIds = sss[0];
 		String dateConstraint = "";
-		if ("postgres".equalsIgnoreCase(dbName)) {
+		if ("postgres".equalsIgnoreCase(dbType)) {
 			dateConstraint = "and " + sss[1] + " and " + sss[2];
 			dateConstraint = dateConstraint.replace("date_created", "ss.enrollment_date");
-		} else if ("oracle".equalsIgnoreCase(dbName)) {
+		} else if ("oracle".equalsIgnoreCase(dbType)) {
 			String[] os = (sss[1] + sss[2]).split("'");
 			dateConstraint = "and trunc(ss.enrollment_date) >= to_date('" + os[1]
 					+ "') and trunc(ss.enrollment_date) <= to_date('" + os[3] + "')";
@@ -2235,7 +2236,7 @@ public class OdmExtractDAO extends DatasetDAO {
 			HashMap row = (HashMap) iter.next();
 			String studySubjectLabel = (String) row.get("study_subject_oid");
 			Integer sgcId = (Integer) row.get("sgc_id");
-			
+
 			String sgcName = (String) row.get("sgc_name");
 			String sgName = (String) row.get("sg_name");
 			String sedOID = (String) row.get("definition_oid");
@@ -2297,7 +2298,8 @@ public class OdmExtractDAO extends DatasetDAO {
 					sub.setStatus(Status.get((Integer) row.get("status_id")).getName());
 				}
 
-				if (dataset.isShowSubjectGroupInformation() && sgcId > 0 && dataset.getSubjectGroupIds().contains(sgcId)) {
+				if (dataset.isShowSubjectGroupInformation() && sgcId > 0
+						&& dataset.getSubjectGroupIds().contains(sgcId)) {
 					// need to look at the get subject group ids as well
 					sgcIdSet.clear();
 					sgcIdSet.add(sgcId);
@@ -2312,8 +2314,7 @@ public class OdmExtractDAO extends DatasetDAO {
 				data.getExportSubjectData().add(sub);
 				seprev = "";
 				formprev = "";
-				
-				
+
 			}
 
 			oidPos = data.getExportSubjectData().size() - 1 + "";
@@ -2425,7 +2426,8 @@ public class OdmExtractDAO extends DatasetDAO {
 		}
 	}
 
-	private String getCrfVersionStatus(String seSubjectEventStatus, boolean sdvStatus, int cvStatusId, int ecStatusId, int validatorId) {
+	private String getCrfVersionStatus(String seSubjectEventStatus, boolean sdvStatus, int cvStatusId, int ecStatusId,
+			int validatorId) {
 		DataEntryStage stage = DataEntryStage.INVALID;
 		Status status = Status.get(ecStatusId);
 
@@ -2527,8 +2529,8 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ " sgc.subject_assignment, sg.study_group_id, sg.name as sg_name, sg.description from study_group_class sgc,"
 				+ " study_group sg, group_class_types gct where study_id in (" + studyId + ")"
 				+ " and sgc.study_group_class_id = sg.study_group_class_id"
-				+ " and sgc.group_class_type_id = gct.group_class_type_id"
-				+ " and sgc.status_id = 1" //adding status check here
+				+ " and sgc.group_class_type_id = gct.group_class_type_id" + " and sgc.status_id = 1" // adding status
+																										// check here
 				+ " order by sgc.study_group_class_id";
 	}
 
@@ -2725,7 +2727,7 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ " sg.study_group_id as sg_id, sg.name as sg_name from subject_group_map sgm, study_group_class sgc, study_group sg where sgc.study_id in ("
 				+ parentStudyIds // should be parent study ids!!!
 				+ ") and sgm.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = sg.study_group_class_id and sgc.status_id = 1"
-				//adding status here
+				// adding status here
 				+ " and sgm.study_group_id = sg.study_group_id) sb_g on st_sub.study_subject_id = sb_g.study_subject_id) ss, "
 				+ " study_event_definition sed, event_definition_crf edc,"
 				+ " (select event_crf_id, crf_version_id, study_event_id, status_id, sdv_status, date_interviewed, interviewer_name, validator_id from event_crf where event_crf_id in ("
@@ -2743,7 +2745,7 @@ public class OdmExtractDAO extends DatasetDAO {
 			int datasetItemStatusId, String studySubjectIds) {
 		String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
 		String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
-        return "select cvidata.event_crf_id, cvidata.crf_version_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name,"
+		return "select cvidata.event_crf_id, cvidata.crf_version_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name,"
 				+ " cvidata.item_id, cvidata.item_oid, cvidata.item_data_ordinal, cvidata.value, cvidata.item_data_type_id, cvidata.item_data_id"
 				+ " from (select ec.event_crf_id, ec.crf_version_id, item.item_id, item.oc_oid as item_oid,"
 				+ " idata.ordinal as item_data_ordinal, idata.value as value, item.item_data_type_id, idata.item_data_id as item_data_id from item,"
@@ -2887,8 +2889,9 @@ public class OdmExtractDAO extends DatasetDAO {
 				+ this.getEventGroupItemSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId,
 						studySubjectIds)
 				+ " )cvit left join (select item.item_id, mu.oc_oid from versioning_map vm, item, measurement_unit mu where vm.item_id in "
-				+ itemIds + " and vm.item_id = item.item_id and item.units = mu.name )mu on cvit.item_id = mu.item_id " +
-                " left join (select xec.event_crf_id as event_crf_id, xsed.study_event_definition_id as study_event_definition_id from event_crf xec, study_event xse, study_event_definition xsed where xse.study_event_id = xec.study_event_id and xsed.study_event_definition_id = xse.study_event_definition_id) xxec on xxec.event_crf_id = cvit.event_crf_id;";
+				+ itemIds
+				+ " and vm.item_id = item.item_id and item.units = mu.name )mu on cvit.item_id = mu.item_id "
+				+ " left join (select xec.event_crf_id as event_crf_id, xsed.study_event_definition_id as study_event_definition_id from event_crf xec, study_event xse, study_event_definition xsed where xse.study_event_id = xec.study_event_id and xsed.study_event_definition_id = xse.study_event_definition_id) xxec on xxec.event_crf_id = cvit.event_crf_id;";
 	}
 
 	protected String getItemGroupAndItemMetaWithUnitSql(String crfVersionIds) {

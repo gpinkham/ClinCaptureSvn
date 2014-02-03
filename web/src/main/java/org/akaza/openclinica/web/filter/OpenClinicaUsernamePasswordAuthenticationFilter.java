@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -89,6 +90,9 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 		if (postOnly && !request.getMethod().equals("POST")) {
 			throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
 		}
+
+		String hostName = request.getRequestURL().toString().replaceAll("http.{0,1}://", "").replaceAll(":.*|/.*", "");
+		CoreResources.setField("currentHostName", hostName);
 
 		String username = obtainUsername(request);
 		String password = obtainPassword(request);

@@ -20,6 +20,13 @@
  */
 package org.akaza.openclinica.control;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -39,13 +46,6 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * 
  * The main controller servlet for all the work behind study sites for OpenClinica.
@@ -58,15 +58,16 @@ import javax.servlet.http.HttpServletResponse;
 public class MainMenuServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		//
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		ub.incNumVisitsToMainMenu();
 		request.getSession().setAttribute(USER_BEAN_NAME, ub);
@@ -79,14 +80,14 @@ public class MainMenuServlet extends Controller {
 			return;
 		}
 		StudyDAO sdao = new StudyDAO(getDataSource());
-		ArrayList studies = null;
+		ArrayList studies;
 
-		long pwdExpireDay = new Long(SQLInitServlet.getField("passwd_expiration_time")).longValue();
+		long pwdExpireDay = Long.parseLong(SQLInitServlet.getField("pwd.expiration.days"));
 		Date lastPwdChangeDate = ub.getPasswdTimestamp();
 
 		// a flag tells whether users are required to change pwd upon the first
 		// time log in or pwd expired
-		int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
+		int pwdChangeRequired = Integer.parseInt(SQLInitServlet.getField("pwd.change.required"));
 		// update last visit date to current date
 		UserAccountDAO udao = getUserAccountDAO();
 		UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
@@ -103,7 +104,7 @@ public class MainMenuServlet extends Controller {
 		request.setAttribute("studyGroupClasses", getStudyGroupClassesByCurrentStudy(request));
 		if (lastPwdChangeDate != null || pwdChangeRequired == 0) {// not a new user
 
-			if (lastPwdChangeDate == null && pwdChangeRequired == 0) {
+			if (lastPwdChangeDate == null) {
 				lastPwdChangeDate = new Date();
 			}
 			Calendar cal = Calendar.getInstance();
@@ -115,27 +116,29 @@ public class MainMenuServlet extends Controller {
 			if (pwdExpireDay != 0 && days >= pwdExpireDay) {// password expired, need to be changed
 				studies = (ArrayList) sdao.findAllByUser(ub.getName());
 				request.setAttribute("studies", studies);
-                request.getSession().setAttribute("userBean1", ub);
+				request.getSession().setAttribute("userBean1", ub);
 				addPageMessage(respage.getString("password_expired"), request);
 				// Add the feature that if password is expired,
 				// have to go through /ResetPassword page
-                request.getSession().setAttribute("passwordExpired", "yes");
+				request.getSession().setAttribute("passwordExpired", "yes");
 				if (pwdChangeRequired == 1) {
 					request.setAttribute("mustChangePass", "yes");
 					addPageMessage(respage.getString("your_password_has_expired_must_change"), request);
 				} else {
 					request.setAttribute("mustChangePass", "no");
-					addPageMessage(respage.getString("password_expired") + " "
-							+ respage.getString("if_you_do_not_want_change_leave_blank"), request);
+					addPageMessage(
+							respage.getString("password_expired") + " "
+									+ respage.getString("if_you_do_not_want_change_leave_blank"), request);
 				}
 				forwardPage(Page.RESET_PASSWORD, request, response);
 			} else {
 
 				if (ub.getNumVisitsToMainMenu() <= 1) {
 					if (ub.getLastVisitDate() != null) {
-						addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName()
-								+ ". " + respage.getString("last_logged") + " "
-								+ getLocalDf(request).format(ub.getLastVisitDate()) + ". ", request);
+						addPageMessage(
+								respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". "
+										+ respage.getString("last_logged") + " "
+										+ getLocalDf(request).format(ub.getLastVisitDate()) + ". ", request);
 					} else {
 						addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName()
 								+ ". ", request);
@@ -148,8 +151,9 @@ public class MainMenuServlet extends Controller {
 					}
 				}
 
-				Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id = " + ub.getId()
-						+ " AND dn.resolution_status_id IN (1,2,3)", currentStudy);
+				Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(
+						" AND dn.assigned_user_id = " + ub.getId() + " AND dn.resolution_status_id IN (1,2,3)",
+						currentStudy);
 				request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
 				int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId()
@@ -161,22 +165,23 @@ public class MainMenuServlet extends Controller {
 				if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
 					request.setAttribute("label", resword.getString("id_generated_Save_Add"));
 				}
-                
-                if (currentRole.isInvestigator() || currentRole.isClinicalResearchCoordinator()) {
-                    setupListStudySubjectTable(request, response);
-                } 
-                if (currentRole.getRole() == Role.STUDY_MONITOR) {
-                    setupSubjectSDVTable(request);
-                } else if(currentRole.getRole().equals(Role.STUDY_CODER)) {
-                    response.sendRedirect(request.getContextPath() + "/pages/codedItems?study=" + currentStudy.getId());
-                    return;
-                } else if (currentRole.isSysAdmin() || currentRole.isStudyAdministrator() || currentRole.isStudyDirector()) {
-                    if (currentStudy.getStatus().isPending()) {
-                    	request.getSession().setAttribute("skipURL", "true");
-                    	
-                        response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
-                        return;
-                    }
+
+				if (currentRole.isInvestigator() || currentRole.isClinicalResearchCoordinator()) {
+					setupListStudySubjectTable(request, response);
+				}
+				if (currentRole.getRole() == Role.STUDY_MONITOR) {
+					setupSubjectSDVTable(request);
+				} else if (currentRole.getRole().equals(Role.STUDY_CODER)) {
+					response.sendRedirect(request.getContextPath() + "/pages/codedItems?study=" + currentStudy.getId());
+					return;
+				} else if (currentRole.isSysAdmin() || currentRole.isStudyAdministrator()
+						|| currentRole.isStudyDirector()) {
+					if (currentStudy.getStatus().isPending()) {
+						request.getSession().setAttribute("skipURL", "true");
+
+						response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
+						return;
+					}
 					setupStudySiteStatisticsTable(request, response);
 					setupSubjectEventStatusStatisticsTable(request, response);
 					setupStudySubjectStatusStatisticsTable(request, response);
@@ -185,17 +190,17 @@ public class MainMenuServlet extends Controller {
 					}
 
 				}
-				udao.updatePasswdHistory(ub); 
+				udao.updatePasswdHistory(ub);
 				forwardPage(Page.MENU, request, response);
 			}
 
 		} else {
 			studies = (ArrayList) sdao.findAllByUser(ub.getName());
 			request.setAttribute("studies", studies);
-            request.getSession().setAttribute("userBean1", ub);
+			request.getSession().setAttribute("userBean1", ub);
 
 			if (pwdChangeRequired != 1) {
-				udao.updatePasswdHistory(ub); 
+				udao.updatePasswdHistory(ub);
 				forwardPage(Page.MENU, request, response);
 			}
 		}
@@ -203,7 +208,7 @@ public class MainMenuServlet extends Controller {
 	}
 
 	private void setupSubjectSDVTable(HttpServletRequest request) {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		request.setAttribute("studyId", currentStudy.getId());
 		request.setAttribute("showMoreLink", "true");
 		String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
@@ -211,7 +216,7 @@ public class MainMenuServlet extends Controller {
 	}
 
 	private void setupStudySubjectStatusStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		StudySubjectStatusStatisticsTableFactory factory = new StudySubjectStatusStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -221,7 +226,7 @@ public class MainMenuServlet extends Controller {
 	}
 
 	private void setupSubjectEventStatusStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		EventStatusStatisticsTableFactory factory = new EventStatusStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -232,7 +237,7 @@ public class MainMenuServlet extends Controller {
 	}
 
 	private void setupStudySiteStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		SiteStatisticsTableFactory factory = new SiteStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -242,7 +247,7 @@ public class MainMenuServlet extends Controller {
 	}
 
 	private void setupStudyStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		StudyStatisticsTableFactory factory = new StudyStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -252,9 +257,9 @@ public class MainMenuServlet extends Controller {
 	}
 
 	private void setupListStudySubjectTable(HttpServletRequest request, HttpServletResponse response) {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(true);
 		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDAO());
@@ -272,7 +277,7 @@ public class MainMenuServlet extends Controller {
 		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setStudyGroupDAO(getStudyGroupDAO());
 		factory.setDynamicEventDao(getDynamicEventDao());
-        factory.setSortForMainMenuServlet(true);
+		factory.setSortForMainMenuServlet(true);
 		String findSubjectsHtml = factory.createTable(request, response).render();
 		request.setAttribute("findSubjectsHtml", findSubjectsHtml);
 	}

@@ -22,7 +22,6 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.springframework.validation.Errors;
 
-@SuppressWarnings({"rawtypes"})
 public class BaseVSValidatorImplementation implements BaseWSValidatorInterface {
 
 	public StudyBean verifyStudy(StudyDAO dao, String study_id, Status[] included_status, Errors errors) {

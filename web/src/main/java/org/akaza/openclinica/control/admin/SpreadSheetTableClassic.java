@@ -74,7 +74,7 @@ import org.slf4j.LoggerFactory;
  * 
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SpreadSheetTableClassic implements SpreadSheetTable {
 
 	private POIFSFileSystem fs = null;
@@ -121,7 +121,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 	public NewCRFBean toNewCRF(javax.sql.DataSource ds, ResourceBundle resPageMsg) throws IOException,
 			CRFReadingException {
 
-		String dbName = SQLInitServlet.getDBName();
+		String dbName = SQLInitServlet.getDBType();
 
 		NewCRFBean ncrf = new NewCRFBean(ds, crfId);
 		ncrf.setCrfId(crfId);// set crf id
@@ -774,7 +774,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 						} else {
 							isRequired = "1".equals(required) ? true : false;
 						}
-						
+
 						String codeRef = "";
 						cell = sheet.getRow(k).getCell((short) 27);
 						codeRef = getValue(cell);
@@ -1007,12 +1007,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 									+ "','"
 									+ stripQuotes(regexpError)
 									+ "', "
-									+ (isRequired ? 1 : 0)
-									+ "', "
-									+ "'"
-									+ stripQuotes(codeRef)
-									+ "'"
-									+ ")";
+									+ (isRequired ? 1 : 0) + "', " + "'" + stripQuotes(codeRef) + "'" + ")";
 
 							logger.warn(sql2);
 
@@ -1060,11 +1055,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 									+ stripQuotes(regexpError)
 									+ "', "
 									+ isRequired
-									+ "', "
-									+ "'"
-									+ stripQuotes(codeRef)
-									+ "'"
-									+ ")";
+									+ "', " + "'" + stripQuotes(codeRef) + "'" + ")";
 						}
 
 						queries.add(sql2);

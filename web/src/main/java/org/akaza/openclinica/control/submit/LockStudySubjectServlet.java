@@ -1,6 +1,11 @@
 package org.akaza.openclinica.control.submit;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +20,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.RememberLastPage;
+import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -46,9 +51,10 @@ public class LockStudySubjectServlet extends Controller {
 	public final static String ENROLLMENT_NOTE = "enrollmentNote";
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -58,15 +64,16 @@ public class LockStudySubjectServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		StudySubjectDAO ssdao = getStudySubjectDAO();
 		SubjectDAO sdao = getSubjectDAO();
@@ -217,6 +224,6 @@ public class LockStudySubjectServlet extends Controller {
 		addPageMessage(message.replace("{0}", studySubjectBean.getName()), request);
 		Map storedAttributes = new HashMap();
 		storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
-		request.getSession().setAttribute(RememberLastPage.STORED_ATTRIBUTES, storedAttributes);
+		request.getSession().setAttribute(BaseController.STORED_ATTRIBUTES, storedAttributes);
 	}
 }

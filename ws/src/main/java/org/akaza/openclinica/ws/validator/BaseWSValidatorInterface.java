@@ -20,7 +20,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.springframework.validation.Errors;
 import org.akaza.openclinica.bean.core.Status;
 
-@SuppressWarnings({"rawtypes"})
 public interface BaseWSValidatorInterface {
 	public abstract boolean verifyRole(UserAccountBean user, int study_id, int site_id, Role excluded_role,
 			Errors errors);

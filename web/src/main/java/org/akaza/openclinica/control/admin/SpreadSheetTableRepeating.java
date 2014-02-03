@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
  * @author thickerson with help from Brian Gilman @ the Whitehead Institute modified by jxu
  * @version CVS: $Id: SpreadSheetTableRepeating.java 13005 2009-06-23 13:45:33Z kkrumlian $
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
 	private POIFSFileSystem fs = null;
@@ -146,7 +146,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 	@SuppressWarnings({ "unused", "deprecation" })
 	public NewCRFBean toNewCRF(DataSource ds, ResourceBundle resPageMsg) throws IOException, CRFReadingException {
 
-		String dbName = SQLInitServlet.getDBName();
+		String dbName = SQLInitServlet.getDBType();
 
 		NewCRFBean ncrf = new NewCRFBean(ds, crfId);
 
@@ -337,7 +337,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 						// group_label will go here, tbh in place 6
 						// have to advance all the rest by one at least (if
 						// there are
-						// no other columns) 
+						// no other columns)
 
 						cell = sheet.getRow(k).getCell((short) 6);// group label
 						item_from_row.setGroupLabel(getValue(cell));
@@ -960,12 +960,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 						cell = sheet.getRow(k).getCell((short) cellIndex);
 						String display = getValue(cell);
 						String controlItemName = "", optionValue = "", message = "";
-						
+
 						++cellIndex;
 						// default is true
 						cell = sheet.getRow(k).getCell((short) cellIndex);
 						String codeRef = getValue(cell);
-						
+
 						if (!StringUtil.isBlank(display)) {
 							if (isShowItem != false) {
 								errors.add(resPageMsg.getString("the") + " "
@@ -1144,8 +1144,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 									ib.getDataType();
 									if (oldItem.getDataType() == ItemDataType.DATE
 											&& ib.getDataType() == ItemDataType.PDATE)// New Feature allow date to
-																							// pdate even if the data is
-																							// entered
+																						// pdate even if the data is
+																						// entered
 									{
 
 										if (dbName.equals("oracle")) {
@@ -1343,11 +1343,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 									+ widthDecimal
 									+ "', "
 									+ (isShowItem ? 1 : 0)
-									+ ", '"
-									+ stripQuotes(codeRef)
-									+ "'"
-									+ ")";
-							
+									+ ", '" + stripQuotes(codeRef) + "'" + ")";
+
 							logger.debug(sql2);
 
 						} else {
@@ -1400,13 +1397,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 									+ "','"
 									+ stripQuotes(responseLayout)
 									+ "','"
-									+ widthDecimal 
-									+ "'," 
-									+ isShowItem 
-									+ ", '"
-									+ codeRef
-									+ "'"
-									+ ")";
+									+ widthDecimal + "'," + isShowItem + ", '" + codeRef + "'" + ")";
 
 						}
 						queries.add(sql2);

@@ -39,7 +39,7 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SubjectDAO extends AuditableEntityDAO {
 
 	protected void setQueryNames() {
@@ -187,7 +187,7 @@ public class SubjectDAO extends AuditableEntityDAO {
 		String sql = digester.getQuery("getWithFilterAndSort");
 		sql = sql + filter.execute("");
 
-		if (CoreResources.getDBName().equals("oracle")) {
+		if (CoreResources.getDBType().equals("oracle")) {
 			sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
 			sql = sql + sort.execute("");
 		} else {

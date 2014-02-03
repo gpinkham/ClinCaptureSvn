@@ -33,7 +33,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -706,7 +708,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 							break;
 						case TypeNames.BOOL:
 							// BADS FLAG
-							if (CoreResources.getDBName().equals("oracle")) {
+							if (CoreResources.getDBType().equals("oracle")) {
 								hm.put(column, rs.getString(i).equals("1"));
 								if (rs.wasNull()) {
 									if (column.equalsIgnoreCase("start_time_flag")
@@ -1112,7 +1114,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 			String ecStatusConstraint, String itStatusConstraint) {
 		clearSignals();
 		String query = getSQLSubjectStudySubjectDataset(studyid, parentid, sedin, it_in, dateConstraint,
-				ecStatusConstraint, itStatusConstraint, CoreResources.getDBName());
+				ecStatusConstraint, itStatusConstraint, CoreResources.getDBType());
 		logger.error("sqlSubjectStudySubjectDataset=" + query);
 		ArrayList results = new ArrayList();
 		ResultSet rs = null;
@@ -1156,7 +1158,8 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 	/**
 	 * 
-	 * @param rs ResultSet
+	 * @param rs
+	 *            ResultSet
 	 * @return ArrayList
 	 */
 	public ArrayList processStudySubjects(ResultSet rs) {// throws
@@ -1202,7 +1205,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 				}
 
 				// Date of birth
-				if (CoreResources.getDBName().equals("oracle")) {
+				if (CoreResources.getDBType().equals("oracle")) {
 					obj.setDobCollected(rs.getString("dob_collected").equals("1"));
 				} else {
 					obj.setDobCollected(rs.getBoolean("dob_collected"));
@@ -1328,7 +1331,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		 * 
 		 * 
 		 */
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			// The original sql for postgresql fetched only one record for each
 			// study_subject.study_subject_id.
 			// It is possible that there exists multiple records for one
@@ -1805,7 +1808,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 				// start_time_flag
 				Boolean vstart_time_flag;
-				if (CoreResources.getDBName().equals("oracle")) {
+				if (CoreResources.getDBType().equals("oracle")) {
 					vstart_time_flag = rs.getString("start_time_flag").equals("1");
 					if (rs.wasNull()) {
 						// if (column.equalsIgnoreCase("start_time_flag") ||
@@ -1835,7 +1838,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 				// end_time_flag
 				Boolean vend_time_flag;
-				if (CoreResources.getDBName().equals("oracle")) {
+				if (CoreResources.getDBType().equals("oracle")) {
 					vend_time_flag = rs.getString("end_time_flag").equals("1");
 					if (rs.wasNull()) {
 						// if (column.equalsIgnoreCase("start_time_flag") ||
@@ -2028,7 +2031,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		 * study_event_definition.study_event_definition_id)
 		 */
 
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			return " SELECT  "
 					+ " itemdataid,  "
 					+ " studysubjectid, study_event.sample_ordinal,  "
@@ -2394,7 +2397,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		 * (item_group.item_group_id = item_group_metadata.item_group_id)
 		 */
 
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			return " SELECT  "
 					+ " itemdataid,  itemdataordinal,"
 					+ " item_group_metadata.item_group_id , item_group.name, itemdatatypeid, itemdesc, itemname, itemvalue, itemunits, "
@@ -2753,7 +2756,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 		 * study_event_definition.study_event_definition_id) ) AS SBQTWO )
 		 */
 
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			return " 	SELECT DISTINCT  "
 					+ "	study_event.study_event_definition_id,  "
 					+ "	study_event.sample_ordinal,  "
@@ -3282,7 +3285,7 @@ public abstract class EntityDAO<K, V extends ArrayList> implements DAOInterface 
 
 	public String genDatabaseDateConstraint(ExtractBean eb) {
 		String dateConstraint = "";
-		String dbName = CoreResources.getDBName();
+		String dbName = CoreResources.getDBType();
 		String sql = eb.getDataset().getSQLStatement();
 		String[] os = sql.split("'");
 		if ("postgres".equalsIgnoreCase(dbName)) {

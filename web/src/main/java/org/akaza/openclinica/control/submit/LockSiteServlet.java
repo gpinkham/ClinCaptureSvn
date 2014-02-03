@@ -17,7 +17,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.control.RememberLastPage;
+import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -28,7 +28,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class LockSiteServlet extends Controller {
 
@@ -37,9 +37,10 @@ public class LockSiteServlet extends Controller {
 	public static final String LOCK_SITE = "LockSite";
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -49,14 +50,15 @@ public class LockSiteServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 
 		StudyDAO sdao = getStudyDAO();
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -147,6 +149,6 @@ public class LockSiteServlet extends Controller {
 		addPageMessage(message.replace("{0}", studyBean.getName()), request);
 		Map storedAttributes = new HashMap();
 		storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
-		request.getSession().setAttribute(RememberLastPage.STORED_ATTRIBUTES, storedAttributes);
+		request.getSession().setAttribute(BaseController.STORED_ATTRIBUTES, storedAttributes);
 	}
 }

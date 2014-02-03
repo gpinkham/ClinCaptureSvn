@@ -50,7 +50,7 @@ public class DynamicsItemGroupMetadataDao extends AbstractDomainDao<DynamicsItem
 
 	public Boolean hasShowingInSection(int sectionId, int crfVersionId, int eventCrfId) {
 		String query = "";
-		if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			query = "select dg.item_group_id from dyn_item_group_metadata dg where dg.event_crf_id = :eventCrfId and dg.item_group_metadata_id in ("
 					+ " select distinct igm.item_group_metadata_id from item_group_metadata igm where igm.crf_version_id = :crfVersionId"
 					+ " and igm.show_group = 0"

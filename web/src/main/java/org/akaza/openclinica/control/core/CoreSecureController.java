@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
@@ -211,7 +213,7 @@ public abstract class CoreSecureController extends HttpServlet {
 		if (lastChangeDate == null) {
 			addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". "
 					+ respage.getString("password_set"), request);
-			int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
+			int pwdChangeRequired = new Integer(SQLInitServlet.getField("pwd.change.required")).intValue();
 			if (pwdChangeRequired == 1) {
 				request.setAttribute("mustChangePass", "yes");
 				forwardPage(Page.RESET_PASSWORD, request, response);
@@ -331,7 +333,7 @@ public abstract class CoreSecureController extends HttpServlet {
 		local_df = new SimpleDateFormat(resformat.getString("date_format_string"), locale);
 
 		String includeReportingVar = "includeReporting";
-		if ("true".equals(SQLInitServlet.getField("include.reporting"))) {
+		if (!SQLInitServlet.getField("pentaho.url").trim().equals("")) {
 			request.setAttribute(includeReportingVar, true);
 		} else {
 			request.setAttribute(includeReportingVar, false);

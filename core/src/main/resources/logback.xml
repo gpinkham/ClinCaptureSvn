@@ -427,6 +427,32 @@
 			</then>
 		</if>		
 	</logger>
+    <!-- Clinovo logs -->
+    <logger additivity="false" name="com.clinovo">
+        <level value="${logLevel}" />
+        <if condition='property("logLocation").equalsIgnoreCase("local") || property("logLocation").equalsIgnoreCase("both")'>
+            <then>
+                <appender-ref ref="LOGFILE-OTHER"/>
+                <appender-ref ref="LOGFILE-LPR"/>
+                <appender-ref ref="LOGFILE-USER"/>
+                <appender-ref ref="LOGFILE-MAIL"/>
+                <appender-ref ref="LOGFILE-AUTH"/>
+                <appender-ref ref="LOGFILE-UUCP"/>
+                <appender-ref ref="LOGFILE-AUTHPRIV"/>
+            </then>
+        </if>
+        <if condition='property("logLocation").equalsIgnoreCase("syslog") || property("logLocation").equalsIgnoreCase("both")'>
+            <then>
+                <appender-ref ref="SYSLOG-OTHER"/>
+                <appender-ref ref="SYSLOG-LPR"/>
+                <appender-ref ref="SYSLOG-USER"/>
+                <appender-ref ref="SYSLOG-MAIL"/>
+                <appender-ref ref="SYSLOG-AUTH"/>
+                <appender-ref ref="SYSLOG-UUCP"/>
+                <appender-ref ref="SYSLOG-AUTHPRIV"/>
+            </then>
+        </if>
+    </logger>
 	<!-- OpenClinica logs -->
 	<logger additivity="false" name="org.akaza.openclinica">
 		<level value="${logLevel}" />	
