@@ -36,7 +36,9 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Properties;
 
 @Component
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -65,9 +67,6 @@ public class CoreResources implements ResourceLoaderAware {
 
 	public static String ODM_MAPPING_DIR;
 
-	public static List<String> propertyNames = new ArrayList<String>(Arrays.asList("db", "dbType", "dbUser", "dbPass",
-			"dbHost", "dbPort"));
-
 	private static boolean loadPropertiesFromDB(Connection connection) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = connection.prepareStatement("select name, value, type from system");
@@ -77,10 +76,6 @@ public class CoreResources implements ResourceLoaderAware {
 			String propertyValue = rs.getString(2);
 			String propertyType = rs.getString(3);
 			if (!propertyType.equalsIgnoreCase("dynamic_input") && !propertyType.equalsIgnoreCase("dynamic_radio")) {
-				propertyNames.add(propertyName);
-				String currentPropertyValue = dataInfo.getProperty(propertyName);
-				result = !result && !propertyName.equals("sysURL")
-						&& (currentPropertyValue == null || !currentPropertyValue.equals(propertyValue)) || result;
 				dataInfo.put(propertyName, propertyValue == null ? "" : propertyValue);
 			}
 		}
@@ -115,47 +110,73 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	private void loadSystemProperties() throws Exception {
-		String path = resourceLoader.getResource("/").getURI().getPath();
-		webapp = getWebAppName(path);
+		Connection connection = null;
+		ExtendedBasicDataSource dataSource = null;
+		try {
+			String path = resourceLoader.getResource("/").getURI().getPath();
+			webapp = getWebAppName(path);
 
-		String logDir = dataInfo.getProperty("log.dir");
-		String filePath = dataInfo.getProperty("filePath");
-		String dbType = dataInfo.getProperty("dbType").trim();
-		String attachedFileLocation = dataInfo.getProperty("attached_file_location");
-		dataInfo.setProperty("log.dir", logDir != null ? logDir.replace("\\", "\\\\") : "");
-		dataInfo.setProperty("filePath", filePath != null ? filePath.replace("\\", "\\\\") : "");
-		dataInfo.setProperty("attached_file_location",
-				attachedFileLocation != null ? attachedFileLocation.replace("\\", "\\\\") : "");
+			String logDir = dataInfo.getProperty("log.dir");
+			String filePath = dataInfo.getProperty("filePath");
+			String dbType = dataInfo.getProperty("dbType").trim();
+			String attachedFileLocation = dataInfo.getProperty("attached_file_location");
+			dataInfo.setProperty("log.dir", logDir != null ? logDir.replace("\\", "\\\\") : "");
+			dataInfo.setProperty("filePath", filePath != null ? filePath.replace("\\", "\\\\") : "");
+			dataInfo.setProperty("attached_file_location",
+					attachedFileLocation != null ? attachedFileLocation.replace("\\", "\\\\") : "");
 
-		dataInfo.setProperty("currentWebAppName", webapp);
-		dataInfo.setProperty("currentWebAppContext", "/" + webapp);
-		dataInfo.setProperty("currentDBName", dataInfo.getProperty("db").trim());
+			dataInfo.setProperty("currentWebAppName", webapp);
+			dataInfo.setProperty("currentWebAppContext", "/" + webapp);
+			dataInfo.setProperty("currentDBName", dataInfo.getProperty("db").trim());
 
-		setDatabaseProperties(dbType);
+			setDatabaseProperties(dbType);
 
-		// setup dataSource
-		ExtendedBasicDataSource dataSource = new ExtendedBasicDataSource();
-		dataSource.setUrl(dataInfo.getProperty("url"));
-		dataSource.setUsername(dataInfo.getProperty("username"));
-		dataSource.setPassword(dataInfo.getProperty("password"));
-		dataSource.setDriverClassName(dataInfo.getProperty("driver"));
-		Connection connection = dataSource.getConnection();
+			// setup dataSource
+			dataSource = new ExtendedBasicDataSource();
+			dataSource.setUrl(dataInfo.getProperty("url"));
+			dataSource.setUsername(dataInfo.getProperty("username"));
+			dataSource.setPassword(dataInfo.getProperty("password"));
+			dataSource.setDriverClassName(dataInfo.getProperty("driver"));
+			dataSource.setMaxActive(50);
+			dataSource.setMaxIdle(2);
+			dataSource.setMaxWait(180000);
+			dataSource.setRemoveAbandoned(true);
+			dataSource.setRemoveAbandonedTimeout(300);
+			dataSource.setLogAbandoned(true);
+			dataSource.setTestWhileIdle(true);
+			dataSource.setTestOnReturn(true);
+			dataSource.setTimeBetweenEvictionRunsMillis(300000);
+			dataSource.setMinEvictableIdleTimeMillis(600000);
+			dataSource.setBigStringTryClob("true");
+			connection = dataSource.getConnection();
 
-		SpringLiquibase liquibase = new SpringLiquibase();
-		liquibase.setDataSource(dataSource);
-		liquibase.setChangeLog("classpath:migration/clincaptrue/2014-01-16-TICKET863.xml");
-		liquibase.setResourceLoader(resourceLoader);
-		liquibase.afterPropertiesSet();
+			SpringLiquibase liquibase = new SpringLiquibase();
+			liquibase.setDataSource(dataSource);
+			liquibase.setChangeLog("classpath:migration/clincaptrue/2014-01-16-TICKET863.xml");
+			liquibase.setResourceLoader(resourceLoader);
+			liquibase.afterPropertiesSet();
 
-		// load system properties from the database
-		loadPropertiesFromDB(connection);
-		connection.close();
-		dataSource.close();
+			// load system properties from the database
+			loadPropertiesFromDB(connection);
 
-		checkLogo();
-		prepareDataInfoProperties();
+			checkLogo();
+			prepareDataInfoProperties();
 
-		SQLFactory.getInstance().run(dbType, resourceLoader);
+			SQLFactory.getInstance().run(dbType, resourceLoader);
+		} catch (Exception ex) {
+			throw ex;
+		} finally {
+			try {
+				if (connection != null) {
+					connection.close();
+				}
+				if (dataSource != null) {
+					dataSource.close();
+				}
+			} catch (Exception ex) {
+				logger.error("Error has occurred.", ex);
+			}
+		}
 	}
 
 	private void checkLogo() {

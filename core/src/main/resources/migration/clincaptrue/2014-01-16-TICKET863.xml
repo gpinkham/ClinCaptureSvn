@@ -3,7 +3,51 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-    <changeSet author="skirpichenok" id="2014-01-16-TICKET864-1">
+    <changeSet author="skirpichenok" id="2014-01-16-TICKET863-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="system_group" />
+            </not>
+        </preConditions>
+        <comment>Create the system_group table</comment>
+        <createTable tableName="system_group">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="parent_id" type="INT" defaultValue="0" />
+            <column name="order_id" type="INT" defaultValue="0" />
+            <column name="version" type="INT" defaultValue="1"/>
+        </createTable>
+        <!--Insert groups into the system_group table-->
+        <insert tableName="system_group"><column name="id" value="1"/><column name="name" value="system"/><column name="order_id" value="1"/></insert>
+        <insert tableName="system_group"><column name="id" value="2"/><column name="name" value="extracts"/><column name="order_id" value="2"/></insert>
+        <insert tableName="system_group"><column name="id" value="3"/><column name="name" value="email"/><column name="order_id" value="3"/></insert>
+        <insert tableName="system_group"><column name="id" value="4"/><column name="name" value="security"/><column name="order_id" value="4"/></insert>
+        <insert tableName="system_group"><column name="id" value="5"/><column name="name" value="facility"/><column name="order_id" value="5"/></insert>
+        <insert tableName="system_group"><column name="id" value="6"/><column name="name" value="support"/><column name="order_id" value="6"/></insert>
+        <insert tableName="system_group"><column name="id" value="7"/><column name="name" value="rules_studio"/><column name="order_id" value="7"/></insert>
+        <insert tableName="system_group"><column name="id" value="8"/><column name="name" value="reporting"/><column name="order_id" value="8"/></insert>
+        <insert tableName="system_group"><column name="id" value="9"/><column name="name" value="randomization"/><column name="order_id" value="10"/></insert>
+        <insert tableName="system_group"><column name="id" value="10"/><column name="name" value="medical_coding"/><column name="order_id" value="11"/></insert>
+        <insert tableName="system_group"><column name="id" value="11"/><column name="name" value="cancer_clinical_trials_suites"/><column name="order_id" value="12"/></insert>
+        <insert tableName="system_group"><column name="id" value="113"/><column name="name" value="access"/><column name="parent_id" value="1"/><column name="order_id" value="1"/></insert>
+        <insert tableName="system_group"><column name="id" value="114"/><column name="name" value="repository"/><column name="parent_id" value="1"/><column name="order_id" value="2"/></insert>
+        <insert tableName="system_group"><column name="id" value="115"/><column name="name" value="file_management"/><column name="parent_id" value="1"/><column name="order_id" value="3"/></insert>
+        <insert tableName="system_group"><column name="id" value="116"/><column name="name" value="logging"/><column name="parent_id" value="1"/><column name="order_id" value="4"/></insert>
+        <insert tableName="system_group"><column name="id" value="117"/><column name="name" value="job_scheduler"/><column name="parent_id" value="1"/><column name="order_id" value="5"/></insert>
+        <insert tableName="system_group"><column name="id" value="118"/><column name="name" value="usage_statistics"/><column name="parent_id" value="1"/><column name="order_id" value="6"/></insert>
+        <insert tableName="system_group"><column name="id" value="119"/><column name="name" value="theme"/><column name="parent_id" value="1"/><column name="order_id" value="7"/></insert>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2014-01-16-TICKET863-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="system" />
+            </not>
+        </preConditions>
         <comment>Create the system table</comment>
         <createTable tableName="system">
             <column autoIncrement="true" name="id" type="INT">
@@ -30,51 +74,14 @@
             <column name="order_id" type="INT" defaultValue="0" />
             <column name="version" type="INT" defaultValue="1"/>
         </createTable>
-        <comment>Create the system_group table</comment>
-        <createTable tableName="system_group">
-            <column autoIncrement="true" name="id" type="INT">
-                <constraints nullable="false" primaryKey="true" />
-            </column>
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false" unique="true" />
-            </column>
-            <column name="parent_id" type="INT" defaultValue="0" />
-            <column name="order_id" type="INT" defaultValue="0" />
-            <column name="version" type="INT" defaultValue="1"/>
-        </createTable>
-    </changeSet>
-
-    <changeSet author="skirpichenok" id="2014-01-16-TICKET864-2">
-        <comment>Insert groups into the system_group table</comment>
-        <insert tableName="system_group"><column name="id" value="1"/><column name="name" value="system"/><column name="order_id" value="1"/></insert>
-        <insert tableName="system_group"><column name="id" value="2"/><column name="name" value="extracts"/><column name="order_id" value="2"/></insert>
-        <insert tableName="system_group"><column name="id" value="3"/><column name="name" value="email"/><column name="order_id" value="3"/></insert>
-        <insert tableName="system_group"><column name="id" value="4"/><column name="name" value="security"/><column name="order_id" value="4"/></insert>
-        <insert tableName="system_group"><column name="id" value="5"/><column name="name" value="facility"/><column name="order_id" value="5"/></insert>
-        <insert tableName="system_group"><column name="id" value="6"/><column name="name" value="support"/><column name="order_id" value="6"/></insert>
-        <insert tableName="system_group"><column name="id" value="7"/><column name="name" value="rules_studio"/><column name="order_id" value="7"/></insert>
-        <insert tableName="system_group"><column name="id" value="8"/><column name="name" value="reporting"/><column name="order_id" value="8"/></insert>
-        <insert tableName="system_group"><column name="id" value="9"/><column name="name" value="randomization"/><column name="order_id" value="10"/></insert>
-        <insert tableName="system_group"><column name="id" value="10"/><column name="name" value="medical_coding"/><column name="order_id" value="11"/></insert>
-        <insert tableName="system_group"><column name="id" value="11"/><column name="name" value="cancer_clinical_trials_suites"/><column name="order_id" value="12"/></insert>
-        <insert tableName="system_group"><column name="id" value="113"/><column name="name" value="access"/><column name="parent_id" value="1"/><column name="order_id" value="1"/></insert>
-        <insert tableName="system_group"><column name="id" value="114"/><column name="name" value="repository"/><column name="parent_id" value="1"/><column name="order_id" value="2"/></insert>
-        <insert tableName="system_group"><column name="id" value="115"/><column name="name" value="file_management"/><column name="parent_id" value="1"/><column name="order_id" value="3"/></insert>
-        <insert tableName="system_group"><column name="id" value="116"/><column name="name" value="logging"/><column name="parent_id" value="1"/><column name="order_id" value="4"/></insert>
-        <insert tableName="system_group"><column name="id" value="117"/><column name="name" value="job_scheduler"/><column name="parent_id" value="1"/><column name="order_id" value="5"/></insert>
-        <insert tableName="system_group"><column name="id" value="118"/><column name="name" value="usage_statistics"/><column name="parent_id" value="1"/><column name="order_id" value="6"/></insert>
-        <insert tableName="system_group"><column name="id" value="119"/><column name="name" value="theme"/><column name="parent_id" value="1"/><column name="order_id" value="7"/></insert>
-    </changeSet>
-
-    <changeSet author="skirpichenok" id="2014-01-16-TICKET864-3">
-        <comment>Insert default parameters into the system table</comment>
+        <!--Insert default parameters into the system table-->
 
         <insert tableName="system"><column name="name" value="currentHostName" /><column name="required" valueBoolean="false" /><column name="crc" value="READ" /><column name="investigator" value="READ" /><column name="monitor" value="READ" /><column name="admin" value="READ" /><column name="root" value="READ" /><column name="type" value="DYNAMIC_INPUT"/><column name="size" value="80" /><column name="value" value="" /><column name="group_id" value="113"/><column name="order_id" value="1"/></insert>
         <insert tableName="system"><column name="name" value="currentWebAppName" /><column name="required" valueBoolean="false" /><column name="crc" value="READ" /><column name="investigator" value="READ" /><column name="monitor" value="READ" /><column name="admin" value="READ" /><column name="root" value="READ" /><column name="type" value="DYNAMIC_INPUT"/><column name="size" value="80" /><column name="value" value="" /><column name="group_id" value="113"/><column name="order_id" value="2"/></insert>
         <insert tableName="system"><column name="name" value="currentDBName" /><column name="required" valueBoolean="false" /><column name="crc" value="READ" /><column name="investigator" value="READ" /><column name="monitor" value="READ" /><column name="admin" value="READ" /><column name="root" value="READ" /><column name="type" value="DYNAMIC_INPUT"/><column name="size" value="80" /><column name="value" value="" /><column name="group_id" value="113"/><column name="order_id" value="3"/></insert>
         <insert tableName="system"><column name="name" value="sysURL" /><column name="admin" value="READ" /><column name="size" value="80" /><column name="value" value="http://localhost:8080/${WEBAPP}/MainMenu" /><column name="group_id" value="113"/><column name="order_id" value="4"/><column name="show_description" valueBoolean="true"/></insert>
 
-        <insert tableName="system"><column name="name" value="filePath"/><column name="size" value="80" /><column name="admin" value="READ" /><column name="value" value="C:\\\\Program Files\\\\Apache Software Foundation\\\\Tomcat 6.0\\\\clincapture.data\\\\" /><column name="group_id" value="114"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
+        <insert tableName="system"><column name="name" value="filePath"/><column name="type" value="DYNAMIC_INPUT"/><column name="size" value="80" /><column name="admin" value="READ" /><column name="value" value="" /><column name="group_id" value="114"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
 
         <insert tableName="system"><column name="name" value="attached_file_location" /><column name="admin" value="READ" /><column name="required" valueBoolean="false" /><column name="size" value="80" /><column name="value" value="" /><column name="group_id" value="115"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
         <insert tableName="system"><column name="name" value="crfFileExtensions" /><column name="required" valueBoolean="false" /><column name="size" value="50" /><column name="value" value="" /><column name="group_id" value="115"/><column name="order_id" value="2"/><column name="show_description" valueBoolean="true"/></insert>
@@ -93,7 +100,7 @@
         <insert tableName="system"><column name="name" value="collectStats" /><column name="type" value="DYNAMIC_RADIO"/><column name="required" valueBoolean="false" /><column name="value" value="" /><column name="type_values" value="false,true"/><column name="group_id" value="118"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
         <insert tableName="system"><column name="name" value="usage.stats.host" /><column name="type" value="DYNAMIC_INPUT"/><column name="admin" value="READ" /><column name="required" valueBoolean="false" /><column name="size" value="50" /><column name="value" value="" /><column name="group_id" value="118"/><column name="order_id" value="2"/><column name="show_measurements" valueBoolean="true"/></insert>
         <insert tableName="system"><column name="name" value="usage.stats.port" /><column name="type" value="DYNAMIC_INPUT"/><column name="admin" value="READ" /><column name="value_type" value="INTEGER"/><column name="required" valueBoolean="false" /><column name="size" value="10" /><column name="value" value="" /><column name="group_id" value="118"/><column name="order_id" value="3"/><column name="show_measurements" valueBoolean="true"/></insert>
-        <insert tableName="system"><column name="name" value="cc.ver" /><column name="admin" value="READ" /><column name="required" valueBoolean="false" /><column name="size" value="20" /><column name="value" value="Rev: ${SVN_REVISION}" /><column name="group_id" value="118"/><column name="order_id" value="4"/></insert>
+        <insert tableName="system"><column name="name" value="cc.ver" /><column name="admin" value="READ" /><column name="required" valueBoolean="false" /><column name="size" value="20" /><column name="value" value="Rev: ${svn_rev}" /><column name="group_id" value="118"/><column name="order_id" value="4"/></insert>
 
         <insert tableName="system"><column name="name" value="themeColor" /><column name="required" valueBoolean="false" /><column name="value" value="violet" /><column name="type" value="RADIO"/><column name="type_values" value="blue,green,violet"/><column name="group_id" value="119"/><column name="order_id" value="1"/><column name="show_description" valueBoolean="true"/></insert>
         <insert tableName="system"><column name="name" value="logo" /><column name="required" valueBoolean="false" /><column name="value" value="/images/Logo.gif" /><column name="type" value="FILE"/><column name="group_id" value="119"/><column name="order_id" value="2"/><column name="show_description" valueBoolean="true"/></insert>
@@ -107,7 +114,6 @@
         <insert tableName="system"><column name="name" value="mailUsername" /><column name="required" valueBoolean="false" /><column name="value" value="username" /><column name="size" value="50" /><column name="group_id" value="3"/><column name="order_id" value="4"/></insert>
         <insert tableName="system"><column name="name" value="mailPassword" /><column name="required" valueBoolean="false" /><column name="type" value="PASSWORD"/><column name="value" value="password" /><column name="size" value="50" /><column name="group_id" value="3"/><column name="order_id" value="5"/></insert>
         <insert tableName="system"><column name="name" value="mailProtocol" /><column name="required" valueBoolean="false" /><column name="value" value="smtp" /><column name="type" value="RADIO"/><column name="type_values" value="smtp,smtps"/><column name="group_id" value="3"/><column name="order_id" value="6"/></insert>
-        <!-- new parameter -->
         <insert tableName="system"><column name="name" value="mailAuth" /><column name="required" valueBoolean="false" /><column name="value" value="false" /><column name="type" value="RADIO"/><column name="type_values" value="true,false"/><column name="group_id" value="3"/><column name="order_id" value="7"/></insert>
         <!-- new parameter -->
         <insert tableName="system"><column name="name" value="mailTls" /><column name="required" valueBoolean="false" /><column name="value" value="false" /><column name="type" value="RADIO"/><column name="type_values" value="true,false"/><column name="group_id" value="3"/><column name="order_id" value="8"/></insert>
@@ -147,15 +153,6 @@
         <insert tableName="system"><column name="name" value="dictionary" /><column name="required" valueBoolean="false" /><column name="value" value="${dictionary}" /><column name="size" value="40" /><column name="group_id" value="10"/><column name="order_id" value="2"/></insert>
 
         <insert tableName="system"><column name="name" value="ccts.waitBeforeCommit" /><column name="value_type" value="INTEGER"/><column name="required" valueBoolean="false" /><column name="value" value="6000" /><column name="size" value="30" /><column name="group_id" value="11"/><column name="order_id" value="2"/><column name="show_measurements" valueBoolean="true"/><column name="show_description" valueBoolean="true"/></insert>
-    </changeSet>
-
-    <changeSet author="skirpichenok" id="2014-01-16-TICKET864-4">
-        <comment>The 'filePath' settings should be dynamic</comment>
-        <update tableName="system">
-            <column name="type" value="DYNAMIC_INPUT"/>
-            <column name="value" value=""/>
-            <where>name='filePath'</where>
-        </update>
     </changeSet>
 
 </databaseChangeLog>
