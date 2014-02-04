@@ -1954,22 +1954,30 @@ public abstract class DataEntryServlet extends Controller {
 				.getData().getOrdinal());
 
 		if (refItemData.getId() > 0) {
+
 			for (DisplayItemBean displayItemBean : changedItemsList) {
+
 				if (refItemData.getId() == displayItemBean.getData().getId()
 						&& !refItemData.getValue().equalsIgnoreCase(displayItemBean.getData().getValue())) {
-					CodedItem codedItem = (CodedItem) getCodedItemService().findCodedItem(refItemData.getId());
-					if (codedItem != null && codedItem.getId() > 0) {
-						if (codedItem.getStatus().equals("CODED")) {
-							codedItem.setStatus("NOT_CODED");
-                            codedItem.setPreferredTerm(displayItemBean.getData().getValue());
-							for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
-								codedItemElement.setItemCode("");
-							}
-							getCodedItemService().saveCodedItem(codedItem);
-						}
-						item.getData().setValue("");
-					}
-				}
+
+                    CodedItem codedItem = (CodedItem) getCodedItemService().findCodedItem(refItemData.getId());
+
+                    if (codedItem != null && codedItem.getId() > 0) {
+
+                        codedItem.setStatus("NOT_CODED");
+                        codedItem.setHttpPath("");
+                        codedItem.setPreferredTerm(displayItemBean.getData().getValue());
+
+                        for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
+
+                            codedItemElement.setItemCode("");
+                        }
+
+                        getCodedItemService().saveCodedItem(codedItem);
+
+                        item.getData().setValue("");
+                    }
+                }
 			}
 		}
 	}
