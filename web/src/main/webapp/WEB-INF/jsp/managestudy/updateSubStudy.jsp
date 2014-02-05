@@ -529,10 +529,10 @@ function updateThis(multiSelEle, count) {
                <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="allowCodingVerification" value="no"><fmt:message key="no" bundle="${resword}"/>
            </td>
        </tr>
+       <tr>
+          <td>&nbsp;</td>
+      </tr>
    </c:when>
-   <tr>
-      <td>&nbsp;</td>
-    </tr>
    <c:when test="${config.parameter.handle == 'defaultBioontologyURL'}">
        <tr valign="top">
            <td class="formlabel">
