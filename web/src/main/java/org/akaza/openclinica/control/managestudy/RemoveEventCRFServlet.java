@@ -23,6 +23,8 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -161,6 +163,8 @@ public class RemoveEventCRFServlet extends SecureController {
 				eventCRF.setUpdatedDate(new Date());
 				ecdao.update(eventCRF);
 
+                CodedItemService codedItemService = getCodedItemService();
+
 				// remove all the item data
 				for (int a = 0; a < itemData.size(); a++) {
 					ItemDataBean item = (ItemDataBean) itemData.get(a);
@@ -170,6 +174,14 @@ public class RemoveEventCRFServlet extends SecureController {
 						item.setUpdatedDate(new Date());
 						iddao.update(item);
 					}
+
+                    CodedItem codedItem = codedItemService.findCodedItem(item.getId());
+
+                    if(codedItem != null) {
+
+                        codedItem.setStatus("REMOVED");
+                        codedItemService.saveCodedItem(codedItem);
+                    }
 				}
 
 				String emailBody = respage.getString("the_event_CRF") + " " + cb.getName() + " "

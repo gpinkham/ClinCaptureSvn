@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -176,6 +178,8 @@ public class RestoreEventCRFServlet extends SecureController {
 				event.setUpdatedDate(new Date());
 				sedao.update(event);
 
+                CodedItemService codedItemService = getCodedItemService();
+
 				// restore all the item data
 				for (int a = 0; a < itemData.size(); a++) {
 					ItemDataBean item = (ItemDataBean) itemData.get(a);
@@ -185,7 +189,22 @@ public class RestoreEventCRFServlet extends SecureController {
 						item.setUpdatedDate(new Date());
 						iddao.update(item);
 					}
-				}
+
+                    CodedItem codedItem = codedItemService.findCodedItem(item.getId());
+
+                    if (codedItem != null) {
+
+                        if (codedItem.getHttpPath().isEmpty()) {
+
+                            codedItem.setStatus("NOT_CODED");
+                        } else {
+
+                            codedItem.setStatus("CODED");
+                        }
+
+                        codedItemService.saveCodedItem(codedItem);
+                    }
+                }
 
 				String emailBody = respage.getString("the_event_CRF") + cb.getName() + " "
 						+ respage.getString("has_been_restored_to_the_event") + " "

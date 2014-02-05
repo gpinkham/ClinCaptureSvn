@@ -373,6 +373,7 @@ public class CodedItemsController {
 			codedItem.setAutoCoded(false);
 		}
 
+        codedItem.setHttpPath("");
         codedItem.setStatus(String.valueOf(CodeStatus.NOT_CODED));
         codedItem.setPreferredTerm(itemData.getValue());
 
