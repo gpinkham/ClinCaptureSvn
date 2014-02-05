@@ -434,7 +434,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
         for (Term term : terms) {
 
-            if (term.getLocalAlias().equalsIgnoreCase(data.getValue())
+            if (data.getValue().equalsIgnoreCase(term.getLocalAlias())
                     && term.getExternalDictionaryName().equals(codedItem.getDictionary())) {
 
                 return term;

@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
@@ -338,6 +339,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	}
 
 	private boolean isCoder(UserAccountBean loggedInUser) {
+
+		// site
+		if (getCurrentStudy().isSite(getCurrentStudy().getParentStudyId())) {
+
+			return loggedInUser.getRoleByStudy(getCurrentStudy().getParentStudyId()).getName().equalsIgnoreCase("study coder");
+		}
+
+		// Otherwise, study
 		return loggedInUser.getRoleByStudy(getCurrentStudy().getId()).getName().equalsIgnoreCase("study coder");
 	}
 

@@ -1593,6 +1593,14 @@ public abstract class Controller extends BaseController {
 	}
 
 	protected boolean isCoder(UserAccountBean loggedInUser, HttpServletRequest request) {
+		
+		// site
+		if (getCurrentStudy(request).isSite(getCurrentStudy(request).getParentStudyId())) {
+			
+			return loggedInUser.getRoleByStudy(getCurrentStudy(request).getParentStudyId()).getName().equalsIgnoreCase("study coder");
+		}
+		
+		// Otherwise, study
 		return loggedInUser.getRoleByStudy(getCurrentStudy(request).getId()).getName().equalsIgnoreCase("study coder");
 	}
 }
