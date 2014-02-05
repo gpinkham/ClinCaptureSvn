@@ -20,28 +20,13 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -49,11 +34,7 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.util.SubjectLabelNormalizer;
 import org.akaza.openclinica.view.Page;
@@ -63,7 +44,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.ValidatorHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 @Component
@@ -813,31 +797,38 @@ public class CreateNewStudyEventServlet extends Controller {
 			StudyEventDefinitionIdToStudyEvent.put(studyEvent.getStudyEventDefinitionId(), studyEvent);
 		}
 
+		StudyGroupClassBean defaultStudyGroupClassBean = (StudyGroupClassBean) sgcdao
+				.findDefaultByStudyId(parentStudyId);
+		boolean defaultStudyGroupClassBeanExist = defaultStudyGroupClassBean == null
+				|| defaultStudyGroupClassBean.getId() == 0 ? false : true;
+
 		ArrayList<StudyGroupClassBean> allActiveDynGroupClasses = sgcdao
 				.findAllActiveDynamicGroupsByStudyId(parentStudyId);
 		Collections.sort(allActiveDynGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
 
 		// ordered eventDefs from dynGroups
-		for (StudyGroupClassBean dynGroup : allActiveDynGroupClasses) {
-			ArrayList<StudyEventDefinitionBean> orderedEventDefinitionsFromDynGroup = seddao
-					.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId());
-			for (StudyEventDefinitionBean eventDefinition : orderedEventDefinitionsFromDynGroup) {
-				if (dynGroup.isDefault()
-						|| (ssb.getDynamicGroupClassId() != 0 && dynGroup.getId() == ssb.getDynamicGroupClassId())) {
-					// eventDefs from defDynGroup and subject's dynGroup
-					if (StudyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())) {
-						if (StudyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus()
-								.isNotScheduled()
-								|| eventDefinition.isRepeating()) {
+		if (defaultStudyGroupClassBeanExist || ssb.getDynamicGroupClassId() != 0) {
+			for (StudyGroupClassBean dynGroup : allActiveDynGroupClasses) {
+				ArrayList<StudyEventDefinitionBean> orderedEventDefinitionsFromDynGroup = seddao
+						.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId());
+				for (StudyEventDefinitionBean eventDefinition : orderedEventDefinitionsFromDynGroup) {
+					if (dynGroup.isDefault()
+							|| (ssb.getDynamicGroupClassId() != 0 && dynGroup.getId() == ssb.getDynamicGroupClassId())) {
+						// eventDefs from defDynGroup and subject's dynGroup
+						if (StudyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())) {
+							if (StudyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus()
+									.isNotScheduled()
+									|| eventDefinition.isRepeating()) {
+								result.add(eventDefinition);
+							}
+						} else {
 							result.add(eventDefinition);
 						}
 					} else {
-						result.add(eventDefinition);
-					}
-				} else {
-					// eventDefs from others dynGroups
-					if (eventDefinition.isRepeating()) {
-						result.add(eventDefinition);
+						// eventDefs from others dynGroups
+						if (eventDefinition.isRepeating()) {
+							result.add(eventDefinition);
+						}
 					}
 				}
 			}
