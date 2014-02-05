@@ -13,7 +13,10 @@
 
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.List;
+
 import org.akaza.openclinica.domain.rule.RuleBean;
+import org.hibernate.Query;
 
 public class RuleDao extends AbstractDomainDao<RuleBean> {
 
@@ -22,6 +25,15 @@ public class RuleDao extends AbstractDomainDao<RuleBean> {
 		return RuleBean.class;
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<RuleBean> findAll() {
+		
+		String query = "from  " + this.getDomainClassName() + " order by oid asc";
+		Query q = this.getCurrentSession().createQuery(query);
+
+		return (List<RuleBean>) q.list();
+	}
+	
 	public RuleBean findByOid(RuleBean ruleBean) {
 		String query = "from " + getDomainClassName() + " rule  where rule.oid = :oid and  rule.studyId = :studyId ";
 		org.hibernate.Query q = getCurrentSession().createQuery(query);
@@ -36,6 +48,14 @@ public class RuleDao extends AbstractDomainDao<RuleBean> {
 		q.setString("oid", oid);
 		q.setInteger("studyId", studyId);
 		return (RuleBean) q.uniqueResult();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<String> findRuleOIDs() {
+		
+		Query q = this.getCurrentSession().createQuery("select oid from " + this.getDomainClassName() + " order by oid desc");
+
+		return (List<String>) q.list();
 	}
 
 }

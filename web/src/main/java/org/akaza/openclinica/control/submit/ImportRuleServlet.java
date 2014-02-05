@@ -55,6 +55,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonObject;
+
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
  * 
@@ -73,39 +75,35 @@ public class ImportRuleServlet extends Controller {
 		String action = request.getParameter("action");
 		request.setAttribute("contextPath", getContextPath(request));
 		request.setAttribute("hostPath", getHostPath(request));
-		copyFiles();
 
 		if (StringUtil.isBlank(action)) {
 			forwardPage(Page.IMPORT_RULES, request, response);
 
 		}
 		if ("downloadrulesxsd".equalsIgnoreCase(action)) {
-			// File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
 			File xsdFile = getCoreResources().getFile("rules.xsd", "rules" + File.separator);
 			dowloadFile(xsdFile, "text/xml", request, response);
 		}
 		if ("downloadtemplate".equalsIgnoreCase(action)) {
-			// File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template.xml");
 			File file = getCoreResources().getFile("rules_template.xml", "rules" + File.separator);
 			dowloadFile(file, "text/xml", request, response);
 		}
 		if ("downloadtemplateWithNotes".equalsIgnoreCase(action)) {
-			// File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template_with_notes.xml");
 			File file = getCoreResources().getFile("rules_template_with_notes.xml", "rules" + File.separator);
 			dowloadFile(file, "text/xml", request, response);
 		}
 		if ("confirm".equalsIgnoreCase(action)) {
 
 			try {
-                FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties("xml"));
-				File f = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn()).get(0);
-				// File xsdFile = new File(getServletContext().getInitParameter("propertiesDir") + "rules.xsd");
-				// File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
+				
+				FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties("xml"));
+				File ruleFile = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn()).get(0);
+				
 				InputStream xsdFile = getCoreResources().getInputStream("rules.xsd");
 
                 XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
-				schemaValidator.validateAgainstSchema(f, xsdFile);
-				RulesPostImportContainer importedRules = handleLoadCastor(f);
+				schemaValidator.validateAgainstSchema(ruleFile, xsdFile);
+				RulesPostImportContainer importedRules = handleLoadCastor(ruleFile);
 				logger.info(ub.getFirstName());
 				RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
 						currentStudy, ub);
@@ -113,9 +111,38 @@ public class ImportRuleServlet extends Controller {
 				importedRules = rulesPostImportContainerService.validateRuleSetDefs(importedRules);
 				request.getSession().setAttribute("importedData", importedRules);
 				provideMessage(importedRules, request);
-				forwardPage(Page.VERIFY_RULES_IMPORT_SERVLET, request, response);
+				
+				
+				// If request is coming from rule studio
+				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")) {
+					
+					try {
+						
+						getRuleSetService().saveImport(importedRules);
+						MessageFormat mf = new MessageFormat("");
+						mf.applyPattern(resword.getString("successful_rule_upload"));
+
+						Object[] arguments = {
+								importedRules.getValidRuleDefs().size() + importedRules.getDuplicateRuleDefs().size(),
+								importedRules.getValidRuleSetDefs().size() + importedRules.getDuplicateRuleSetDefs().size() };
+						
+						JsonObject obj = new JsonObject();
+						
+						obj.addProperty("argument", arguments.toString());
+						obj.addProperty("message", resword.getString("successful_rule_upload"));
+						
+						response.getWriter().write(obj.toString());
+						
+					} catch(Exception ex) {
+						
+						response.sendError(500, ex.getMessage());
+					}
+					
+				} else {
+					
+					forwardPage(Page.VERIFY_RULES_IMPORT_SERVLET, request, response);
+				}
 			} catch (OpenClinicaSystemException re) {
-				// re.printStackTrace();
 				MessageFormat mf = new MessageFormat("");
 				mf.applyPattern(re.getErrorCode() == null ? respage.getString("OCRERR_0016") : respage.getString(re
 						.getErrorCode()));
@@ -127,10 +154,6 @@ public class ImportRuleServlet extends Controller {
 				forwardPage(Page.IMPORT_RULES, request, response);
 			}
 		}
-	}
-
-	private void copyFiles() {
-
 	}
 
 	private void provideMessage(RulesPostImportContainer rulesContainer, HttpServletRequest request) {

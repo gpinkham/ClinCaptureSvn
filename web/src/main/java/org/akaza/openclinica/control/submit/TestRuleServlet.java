@@ -20,8 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import com.clinovo.util.ValidatorHelper;
-
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -67,6 +65,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.clinovo.util.ValidatorHelper;
+import com.google.gson.Gson;
+
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
  * 
@@ -111,7 +112,13 @@ public class TestRuleServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
         StudyBean currentStudy = getCurrentStudy(request);
+        
+        if (currentStudy == null) {
+        	
+        	currentStudy = (StudyBean) getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study")));
+        }
 
 		FormProcessor fp = new FormProcessor(request);
 		String action = request.getParameter("action");
@@ -149,8 +156,12 @@ public class TestRuleServlet extends Controller {
 			forwardPage(Page.TEST_RULES, request, response);
 
 		} else if (action.equals("validate")) {
-
+			
+			
 			HashMap<String, String> result = validate(request, v);
+			
+			// do not modify
+			Map serialResult = new HashMap(result);
 
 			if (result.get("ruleValidation").equals("rule_valid")) {
 				addPageMessage(resword.getString("test_rules_message_valid"), request);
@@ -169,8 +180,14 @@ public class TestRuleServlet extends Controller {
 			populateTooltip(request, result);
 			request.getSession().setAttribute("testValues", result);
 			populteFormFields(fp);
-
-			forwardPage(Page.TEST_RULES, request, response);
+			
+			if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")) {
+				
+				response.getWriter().write(new Gson().toJson(serialResult));
+				
+			} else {
+				forwardPage(Page.TEST_RULES, request, response);
+			}
 
 		} else if (action.equals("test")) {
 
@@ -361,9 +378,7 @@ public class TestRuleServlet extends Controller {
 		RuleSetBean persistentRuleSet = getRuleSetDao().findByExpressionAndStudy(ruleSet, currentStudy.getId());
 
 		if (persistentRuleSet != null) {
-			
 			request.setAttribute("ruleSetId", request.getParameter("ruleSetId"));
-
 		}
 
 		ExpressionBean rule = new ExpressionBean();

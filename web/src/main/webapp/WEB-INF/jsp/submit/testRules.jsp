@@ -9,7 +9,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-
 <c:choose>
     <c:when test="${userBean.sysAdmin && module=='admin'}">
         <c:import url="../include/admin-header.jsp" />
@@ -19,8 +18,6 @@
     </c:otherwise>
 </c:choose>
 
-<!-- *JSP* submit/testRules.jsp -->
-<!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp" />
 
 <!-- then instructions-->
@@ -169,11 +166,6 @@
     <tr valign="top">
         <td>&nbsp;</td>
     </tr>
-    <!--
-  <tr valign="top"><td class="formlabel"><fmt:message key="rule_result" bundle="${resword}"/>:</td>
-  <td style="color:#789EC5;"><center>${result} - ${duration} </center></td>
-  </tr>
--->
 </table>
 
 <table border="0" cellpadding="0" cellspacing="0">
@@ -532,18 +524,11 @@
 	
 	<td><input type="button" name="Exit" onClick="window.location.href='ViewRuleAssignment?read=true'" value="<fmt:message key="exit" bundle="${resword}"/>" title="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" size="50""/>
 	</td>
-		
-        <%--<td><input type="submit" name="Submit"
-            value="<fmt:message key="test_rules_validate_test" bundle="${resword}"/>"
-            class="button_long"></td>--%>
     </tr>
 
 </table>
 </form>
 <br>
-<%-- <p><a href="ViewRuleAssignment?restore=true"/><fmt:message key="test_rules_back_to_rule_assignments" bundle="${resword}"/></a></p>
-<br>
---%>
 <c:choose>
     <c:when test="${userBean.sysAdmin && module=='admin'}">
         <c:import url="../include/workflow.jsp">

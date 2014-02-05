@@ -29,11 +29,12 @@ public abstract class AbstractAuditableMutableDomainObject extends AbstractMutab
 		MutableDomainObject, AuditableMutableDomainObject {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	protected Date createdDate;
+	
+	protected Status status;
 	protected Date updatedDate;
 	protected UserAccountBean owner;
 	protected UserAccountBean updater;
-	protected Status status;
+	protected Date createdDate = new Date();
 
 	// TODO: phase out the use of these Once the above beans become Hibernated
 	protected Integer ownerId;

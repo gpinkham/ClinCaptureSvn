@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  
+    <title>Rule Designer</title>
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="https://www.clinovo.com/favicon.ico"> 
+
+    <!-- Bootstrap -->
+    <link href="deps/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="deps/jquery/css/jquery-ui-1.10.3.min.css" rel="stylesheet">
+    <link href="deps/datepicker/css/datepicker.css" rel="stylesheet">
+
+    <link href="css/designer.css" rel="stylesheet" media="screen">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="deps/json2/json2.js"></script>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="deps/jquery/js/jquery.min.js"></script>
+    <script src="deps/jquery/js/jquery-ui-1.10.3.min.js"></script>
+    <script src="deps/bootstrap/js/bootstrap.min.js"></script>
+    <script src="deps/bootbox/bootbox.js"></script>
+    
+    <script src="js/designer.js"></script>
+    <script src="js/transport.js"></script>
+    <script src="js/validation.js"></script>    
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-offset-3">
+          <legend >Rule validation results</legend>
+          <div class="alert alert-success success">Rule is valid</div>
+          <div class="alert alert-danger failure">Rule is Invalid</div>
+
+          <legend id="evaluates">Rule evaluates to</legend>
+          <div class="alert alert-info">  
+            False
+          </div>
+
+          <legend class="success">CRF items affected:</legend>
+          <ul id="items" class="list-group success"></ul>
+          <legend class="success">Rule executions</legend>
+          <ul id="executions" class="list-group success"></ul>
+          <legend class="success">Rule actions</legend>
+          <ul id="actions" class="list-group success"></ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <nav class="navbar navbar-default nav-cont navbar-fixed-bottom" role="navigation">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="http://trac.clinovo.com"><img style="max-width:100px" src="images/brand1.png"></a>
+            </div>
+            <ul class="nav nav-justified">
+              <li><a id="back" href="" class="btn btn-primary navbar-btn">Back</a></li>
+              <li><a id="save" class="btn btn-primary navbar-btn">Save</a></li>
+              <li><a id="exit" href="" class="btn btn-warning navbar-btn">Exit</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

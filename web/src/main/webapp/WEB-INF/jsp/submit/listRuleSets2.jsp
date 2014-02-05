@@ -22,10 +22,8 @@
 <!-- *JSP* submit/listRuleSets2.jsp -->
 <link type="text/css" href="includes/jmesa/jmesa.css"  rel="stylesheet">    
 
-<!--script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script-->
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<%-- <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa-original.js"></script> --%>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-ui-1.8.2.custom.min.js"></script>
 
@@ -89,12 +87,10 @@
 
 <script>$("img[title*='PDF']").attr('title', '<fmt:message key="view_rules_download_xml" bundle="${resword}"/>' );</script>
 <br>
-<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-<input type="button" name="ImportRule" value="<fmt:message key="import_rules" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='ImportRule';"/>
-<input type="button" name="TestRule" value="<fmt:message key="test_rules_title" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='TestRule';"/>
+    <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+    <input type="button" name="createRule" value="<fmt:message key="create_rule" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='designer/rule.html';"/>
+    <input type="button" name="ImportRule" value="<fmt:message key="import_rules" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='ImportRule';"/>
+    <input type="button" name="TestRule" value="<fmt:message key="test_rules_title" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='TestRule';"/>
 
 <br>
 
