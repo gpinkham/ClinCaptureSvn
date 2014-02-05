@@ -124,8 +124,11 @@ public class CodedItemsController {
 		StudyBean study = (StudyBean) getStudyDAO().findByPK(Integer.parseInt(studyId));
 		StudyParameterValueBean mcApprovalNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApprovalNeeded");
         StudyParameterValueBean medicalCodingContextNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingContextNeeded");
+        StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "autoCodeDictionaryName");
 
-		List<CodedItem> items = new ArrayList<CodedItem>();
+        boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty() ? true : false;
+
+        List<CodedItem> items = new ArrayList<CodedItem>();
 		
 		// Scope the items
 		if (study.isSite(study.getParentStudyId())) {
@@ -166,6 +169,7 @@ public class CodedItemsController {
 		model.addAttribute("studyId", Integer.valueOf(studyId));
 		model.addAttribute("codeNotFoundItems", codeNotFoundItems.size());
 		model.addAttribute("mcApprovalNeeded", mcApprovalNeeded.getValue().equals("yes"));
+        model.addAttribute("configuredDictionaryIsAvailable", configuredDictionaryIsAvailable);
 		
 		// After auto coding attempt
 		model.addAttribute("skippedItems", request.getAttribute("skippedItems"));
@@ -198,7 +202,9 @@ public class CodedItemsController {
         CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(itemId));
         StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(codedItem.getStudyId(), "autoCodeDictionaryName");
 
-        if (configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
+        boolean configuredDictionaryIsAvailable = configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty() ? true : false;
+
+        if (configuredDictionaryIsAvailable) {
 
             ItemDataDAO itemDataDAO = new ItemDataDAO(datasource);
             ItemDataBean data = (ItemDataBean) itemDataDAO.findByPK(codedItem.getItemId());
@@ -258,6 +264,7 @@ public class CodedItemsController {
  		model.addAttribute("itemDictionary", dictionary);
         model.addAttribute("itemDataId", codedItem.getItemId());
         model.addAttribute("codedElementList", classifications);
+        model.addAttribute("configuredDictionaryIsAvailable", configuredDictionaryIsAvailable);
 
         return model;
 

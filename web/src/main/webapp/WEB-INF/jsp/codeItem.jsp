@@ -64,7 +64,9 @@
                                 <td colspan="2"></td>
                                 <td></td>
                                 <td>
-                                    <input type="button" id="<c:out value="${counter}"/>" name="codeAndAliasBtn" class="button" value="Code & Alias" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="codeAndAlias($(this))" />
+                                    <c:if test="${configuredDictionaryIsAvailable}">
+                                        <input type="button" id="<c:out value="${counter}"/>" name="codeAndAliasBtn" class="button" value="Code & Alias" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="codeAndAlias($(this))" />
+                                    </c:if>
                                 </td>
                                 <td>
                                     <input type="button" id="<c:out value="${counter}"/>" name="codeItemBtn" class="button" value="Code" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="saveCodedItem($(this))" />

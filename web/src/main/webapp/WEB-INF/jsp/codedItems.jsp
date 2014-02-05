@@ -165,7 +165,9 @@
 </div>
 
 <div style="clear:right; float:left">
-	<input type="button" name="autoCode" value="<fmt:message key="autoCode" bundle="${resword}" />" class="button_medium" onClick="autoCode()"/> 
+    <c:if test="${configuredDictionaryIsAvailable}">
+	    <input type="button" name="autoCode" value="<fmt:message key="autoCode" bundle="${resword}" />" class="button_medium" onClick="autoCode()"/>
+    </c:if>
 </div>
 
 <div style="clear:left">
