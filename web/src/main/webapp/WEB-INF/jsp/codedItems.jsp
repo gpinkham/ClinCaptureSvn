@@ -38,15 +38,19 @@
     function redirectUrl(buttonType) {
 
         var url = $("#codedItemUrl").val();
+        url = url.replace(/(codedItems_f_status=)[^\&]+/, '$1' + buttonType);
 
-        if (url.indexOf("codedItems_f_status") > 0) {
+        if (url.indexOf(buttonType) < 0) {
 
-            url = url.replace(/(codedItems_f_status=)[^\&]+/, '$1' + buttonType);
-        } else {
+            if(url.indexOf("codedItems_f_status") > 0) {
 
-            url = url + "&codedItems_f_status=" + buttonType;
+                url = url.replace("&codedItems_f_status=", '&codedItems_f_status=' + buttonType);
+            } else {
+
+                url = url + "&codedItems_f_status=" + buttonType;
+            }
+
         }
-
         window.location.replace("${pageContext.request.contextPath}/pages/codedItems?" + url);
     }
 </script>
@@ -122,7 +126,8 @@
 	<table cellspacing="0" class="summaryTable" style="width:600px;">
         <tr>
         	<td>&nbsp;</td>
-        	<td align="center"><fmt:message key="notCoded" bundle="${resword}"/></td>
+            <td align="center" width="100px"><fmt:message key="all" bundle="${resword}"/></td>
+            <td align="center"><fmt:message key="notCoded" bundle="${resword}"/></td>
         	<c:if test="${mcApprovalNeeded}">
         		<td align="center"><fmt:message key="notApproved" bundle="${resword}"/></td>
         	</c:if>
@@ -138,6 +143,7 @@
         </tr>
         <tr>
         	<td align="center">Medical Terms</td>
+            <td align="center" name="tdAll"><a href='javascript:redirectUrl("All");'>${codeNotFoundItems + unCodedItems + codedItems}</a></td>
         	<td align="center" name="tdNotCoded"><a href='javascript:redirectUrl("Not Coded");'>${unCodedItems}</a></td>
         	<c:if test="${mcApprovalNeeded}">
             	<td align="center">0</td>

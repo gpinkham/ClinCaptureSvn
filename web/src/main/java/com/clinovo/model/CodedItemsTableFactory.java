@@ -515,6 +515,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         	StudyParameterValueBean mcApprovalNeeded = new StudyParameterValueDAO(datasource).findByHandleAndStudy(studyId, "medicalCodingApprovalNeeded");
         	
             List<Option> options = new ArrayList<Option>();
+            options.add(new Option("All", "All"));
             options.add(new Option("Not Coded", "Not Coded"));
             
 			if (mcApprovalNeeded.getValue().equals("yes")) {
@@ -665,7 +666,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             String item = StringUtils.lowerCase(String.valueOf(itemValue));
             String filter = StringUtils.lowerCase(String.valueOf(filterValue));
 
-            if (filter.equals(item)) {
+            if (filter.equals(item) || filter.equals("all")) {
                 return true;
             }
             return false;
