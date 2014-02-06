@@ -31,11 +31,11 @@
 
         <b><fmt:message key="instructions" bundle="${restext}"/></b>
 
-        <div class="sidebar_tab_content">
+    <div class="sidebar_tab_content">
 
-            <fmt:message key="study_module_instruction" bundle="${restext}"/>
+      <fmt:message key="system_properties_instruction" bundle="${restext}"/>
 
-        </div>
+    </div>
 
     </td>
 

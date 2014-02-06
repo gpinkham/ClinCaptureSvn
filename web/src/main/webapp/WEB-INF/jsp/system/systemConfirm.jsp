@@ -24,7 +24,7 @@
 
     <div class="sidebar_tab_content">
 
-      <fmt:message key="study_module_instruction" bundle="${restext}"/>
+      <fmt:message key="system_properties_confirm_instruction" bundle="${restext}"/>
 
     </div>
 
@@ -76,7 +76,7 @@
 
 <div class="sysProps">
   <form:form id="systemForm" method="post" commandName="systemCommand">
-    <span class="first_level_header"><fmt:message key="listSystemProperties" bundle="${resword}"/></span><br/>
+    <span class="first_level_header"><fmt:message key="confirmSystemProperties" bundle="${resword}"/></span><br/>
 
     <div class="groups">
       <table cellspacing="0" cellpadding="0" border="0" id="systemConfirmationTable">
