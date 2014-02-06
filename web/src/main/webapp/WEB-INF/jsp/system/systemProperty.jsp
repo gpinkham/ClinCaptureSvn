@@ -94,7 +94,7 @@
         </c:when>
       </c:choose>
     </div>
-    <c:if test="${systemProperty.required}">
+    <c:if test="${systemProperty.required and access eq 'WRITE' and systemProperty.type ne 'DYNAMIC_INPUT' and systemProperty.type ne 'DYNAMIC_RADIO'}">
       <div class="propertyRequired">*</div>
     </c:if>
     <c:if test="${systemProperty.showMeasurements}">

@@ -5,13 +5,11 @@ import com.clinovo.service.SystemService;
 import com.clinovo.util.FileUtil;
 import com.clinovo.util.MayProceedUtil;
 import com.clinovo.util.PageMessagesUtil;
+import com.clinovo.util.SessionUtil;
 import com.clinovo.validation.SystemValidator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.slf4j.Logger;
@@ -25,11 +23,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Controller
 @RequestMapping("/system")
 public class SystemController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
+
+	public static final String SYSTEM_COMMAND_RESULT = "systemCommandResult";
+	public static final String SYSTEM_COMMAND_ERROR = "systemCommandError";
+	public static final String SYSTEM_COMMAND = "systemCommand";
 
 	@Autowired
 	private SystemValidator validator;
@@ -49,37 +53,42 @@ public class SystemController {
 		if (!MayProceedUtil.mayProceed(request, Role.SYSTEM_ADMINISTRATOR, Role.STUDY_ADMINISTRATOR)) {
 			page = "redirect:/MainMenu?message=system_no_permission";
 		} else {
-			SystemCommand systemCommand = (SystemCommand) request.getSession().getAttribute("systemCommand");
-			if (systemCommand != null) {
-				request.getSession().removeAttribute("systemCommand");
-			} else {
+			SystemCommand systemCommand = (SystemCommand) request.getSession().getAttribute(SYSTEM_COMMAND);
+			request.getSession().removeAttribute(SYSTEM_COMMAND);
+			if (systemCommand == null || !systemCommand.isBackMode()) {
 				systemCommand = new SystemCommand();
+				Role role = ((StudyUserRoleBean) request.getSession().getAttribute(BaseController.USER_ROLE)).getRole();
+				systemCommand.setSystemPropertyGroups(systemService.getSystemPropertyGroups(role));
 			}
-			model.addAttribute("systemCommand", systemCommand);
-
-			String systemCommandError = (String) request.getSession().getAttribute("systemCommandError");
-			request.getSession().removeAttribute("systemCommandError");
-			model.addAttribute("systemCommandError", systemCommandError);
-
-			Role role = ((StudyUserRoleBean) request.getSession().getAttribute("userRole")).getRole();
-			systemCommand.setSystemPropertyGroups(systemService.getSystemPropertyGroups(role));
+			model.addAttribute(SYSTEM_COMMAND, systemCommand);
 
 			if (systemCommand.getSystemPropertyGroups().size() == 0) {
-				model.addAttribute("systemCommandError", "system_no_permission");
+				model.addAttribute(SYSTEM_COMMAND_ERROR, "system_no_permission");
+			} else {
+				String systemCommandError = (String) request.getSession().getAttribute(SYSTEM_COMMAND_ERROR);
+				request.getSession().removeAttribute(SYSTEM_COMMAND_ERROR);
+				model.addAttribute(SYSTEM_COMMAND_ERROR, systemCommandError);
 			}
 
-			String messageCode = (String) request.getSession().getAttribute("systemCommandResult");
+			String messageCode = (String) request.getSession().getAttribute(SYSTEM_COMMAND_RESULT);
+			request.getSession().removeAttribute(SYSTEM_COMMAND_RESULT);
 			if (messageCode != null) {
 				PageMessagesUtil.addPageMessage(request,
 						messageSource.getMessage(messageCode, null, request.getLocale()));
-				request.getSession().removeAttribute("systemCommandResult");
 			}
 		}
 		return page;
 	}
 
+	@RequestMapping(method = RequestMethod.POST, params = "back")
+	public String back(HttpServletRequest request) throws Exception {
+		SystemCommand systemCommand = (SystemCommand) request.getSession().getAttribute(SYSTEM_COMMAND);
+		systemCommand.setBackMode(true);
+		return "redirect:system";
+	}
+
 	@RequestMapping(method = RequestMethod.POST)
-	public String post(HttpServletRequest request, @ModelAttribute("systemCommand") SystemCommand command,
+	public String post(HttpServletRequest request, @ModelAttribute(SYSTEM_COMMAND) SystemCommand command,
 			BindingResult result) throws Exception {
 		String page = "system/systemConfirm";
 		if (!MayProceedUtil.mayProceed(request, Role.SYSTEM_ADMINISTRATOR, Role.STUDY_ADMINISTRATOR)) {
@@ -91,10 +100,10 @@ public class SystemController {
 			} else {
 				try {
 					FileUtil.saveLogo(command);
-					request.getSession().setAttribute("systemCommand", command);
+					request.getSession().setAttribute(SYSTEM_COMMAND, command);
 				} catch (Exception ex) {
 					page = "system/system";
-					request.setAttribute("systemCommandError", "error.systemCommand.dataWasNotSaved");
+					request.setAttribute(SYSTEM_COMMAND_ERROR, "error.systemCommand.dataWasNotSaved");
 					LOGGER.error("Error has occurred.", ex);
 				}
 			}
@@ -104,40 +113,23 @@ public class SystemController {
 
 	@RequestMapping(method = RequestMethod.POST, params = "confirm")
 	public String confirm(HttpServletRequest request) throws Exception {
-		String page = "system/system";
-		request.setAttribute("systemCommandError", "error.systemCommand.dataWasNotSaved");
-		SystemCommand systemCommand = (SystemCommand) request.getSession().getAttribute("systemCommand");
+		String page = "redirect:system";
+		SystemCommand systemCommand = (SystemCommand) request.getSession().getAttribute(SYSTEM_COMMAND);
+		request.getSession().removeAttribute(SYSTEM_COMMAND);
+		request.setAttribute(SYSTEM_COMMAND, systemCommand);
 		if (!MayProceedUtil.mayProceed(request, Role.SYSTEM_ADMINISTRATOR, Role.STUDY_ADMINISTRATOR)) {
 			page = "redirect:/MainMenu?message=system_no_permission";
 		} else {
-			if (systemCommand != null) {
-				try {
-					request.setAttribute("systemCommand", systemCommand);
-					request.getSession().removeAttribute("systemCommand");
-					systemService.updateSystemProperties(systemCommand);
-					updateSession(request.getSession());
-					SQLInitServlet.updateParams(coreResources.getDataInfo());
-					request.removeAttribute("systemCommandError");
-					request.getSession().removeAttribute("systemCommand");
-					request.getSession().setAttribute("systemCommandResult", "systemCommand.dataWasSuccessfullySaved");
-					page = "redirect:system";
-				} catch (Exception ex) {
-					LOGGER.error("Error has occurred.", ex);
-				}
+			try {
+				systemService.updateSystemProperties(systemCommand);
+				SessionUtil.updateSession(coreResources, request.getSession());
+				SQLInitServlet.updateParams(coreResources.getDataInfo());
+				request.getSession().setAttribute(SYSTEM_COMMAND_RESULT, "systemCommand.dataWasSuccessfullySaved");
+			} catch (Exception ex) {
+				request.getSession().setAttribute(SYSTEM_COMMAND_ERROR, "error.systemCommand.dataWasNotSaved");
+				LOGGER.error("Error has occurred.", ex);
 			}
 		}
 		return page;
-	}
-
-	private void updateSession(HttpSession session) throws Exception {
-		for (Object key : coreResources.getDataInfo().keySet()) {
-			if (key instanceof String) {
-				Object value = session.getAttribute((String) key);
-				if (value != null) {
-					session.setAttribute((String) key, CoreResources.getField((String) key));
-				}
-			}
-		}
-		session.setAttribute("newThemeColor", CoreResources.getField("themeColor"));
 	}
 }

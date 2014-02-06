@@ -2371,7 +2371,7 @@ a.dnShortcut:hover {
 }
 
 #systemForm .propertyRequired {
-    color: red;
+    color: orange;
     float: left;
     padding-top: 17px;
     font-weight: bold;
@@ -2381,7 +2381,7 @@ a.dnShortcut:hover {
 
 #systemForm .propertyMeasurements {
     float: left;
-    padding-left: 10px;
+    padding-left: 20px;
     font-family: Tahoma, Arial, Helvetica, Sans-Serif;
     font-size: 11px;
     color: #947F94;

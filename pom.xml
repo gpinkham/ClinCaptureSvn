@@ -19,6 +19,7 @@
     </repositories>  
 	  
 	<properties>
+        <aspectj.version>1.7.3</aspectj.version>
 		<slf4j.version>1.5.11</slf4j.version>
 		<jmock.version>2.6.0</jmock.version>
 		<spring.version>3.2.1.RELEASE</spring.version>
@@ -45,6 +46,16 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjrt</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.clinovo.clincapture</groupId>
                 <artifactId>core</artifactId>

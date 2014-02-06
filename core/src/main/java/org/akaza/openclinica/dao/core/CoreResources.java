@@ -113,7 +113,8 @@ public class CoreResources implements ResourceLoaderAware {
 		Connection connection = null;
 		ExtendedBasicDataSource dataSource = null;
 		try {
-			String path = resourceLoader.getResource("/").getURI().getPath();
+			String path = resourceLoader.getResource("/").exists() ? resourceLoader.getResource("/").getURI().getPath()
+					: "";
 			webapp = getWebAppName(path);
 
 			String logDir = dataInfo.getProperty("log.dir");

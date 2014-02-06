@@ -16,7 +16,7 @@
             http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd
             http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
-
+    <aop:aspectj-autoproxy/>
      
     <bean id="accessConfirmationController" class="org.akaza.openclinica.controller.AccessConfirmationController">
         <property name="clientDetailsService" ref="clientDetails"/>
@@ -26,19 +26,18 @@
         <property name="mappings">
             <props>
                 <prop key="/oauth/confirm_access">accessConfirmationController</prop>
-                <prop key="/pages/system">systemController</prop>
-                <prop key="/pages/codedItems">codedItemsController</prop>
             </props>
-        </property>
-        <property name="interceptors">
-            <list>
-                <ref bean="setUpSessionInterceptor" />
-            </list>
         </property>
         <property name="alwaysUseFullPath" value="true"/>
     </bean>
 
-    <bean id="setUpSessionInterceptor" class="com.clinovo.interceptor.SetUpSessionInterceptor"/>
+    <mvc:interceptors>
+        <bean class="com.clinovo.interceptor.SetUpSessionInterceptor" />
+    </mvc:interceptors>
+
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="defaultErrorView" value="error/error"/>
+    </bean>
 
     <!-- Simple redirects to internal resources; URL path substring becomes view name (e.g. '/login.htm' -> 'login') -->
     <bean name="/login/login" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
@@ -106,19 +105,5 @@
     <!-- Resolves logical view names to JSP views -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" id="internalViewResolver"
           p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />
-          
-    <!-- AOP-block for "smart" back-button, aspect waves with @Controller-annotated spring beans -->      
-          
-	<aop:config proxy-target-class="true">      
-    	<aop:pointcut id="allControllersPointcut" expression="@within(org.springframework.stereotype.Controller) 
-	 		and args(request, ..)"/>
-    
-    	<aop:aspect ref="backButtonAdvice">
-            <aop:before pointcut-ref="allControllersPointcut" method="simpleBeforeAdvice"/>         
-        </aop:aspect>        
-    </aop:config>
-
-    <bean id="backButtonAdvice" class="org.akaza.openclinica.navigation.BackButtonAdvice"/>    
-     
 
 </beans>

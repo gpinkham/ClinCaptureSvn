@@ -126,12 +126,12 @@
       <table border="0" cellpadding="0" cellspacing="0">
         <tr>
           <td>
-            <input type="button" name="BTN_Back" id="GoToPreviousPage"
+            <input type="submit" name="back" id="back"
                    value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"
                    onClick="history.go(-1);"/>
           </td>
           <td>
-            <input type="submit" name="confirm" value="<fmt:message key="submit" bundle="${resword}"/>"
+            <input type="submit" name="confirm" id="confirm" value="<fmt:message key="submit" bundle="${resword}"/>"
                    class="button_medium">
           </td>
           <td>
