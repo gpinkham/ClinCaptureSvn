@@ -566,14 +566,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     public void setThemeColor(String themeColor) { this.themeColor = themeColor; }
 
-    public void setStudyId(String studyId) {
-
-		try {
-			this.studyId = Integer.parseInt(studyId);
-		} catch (Exception ex) {
-			this.studyId = 1;
-		}
-	}
+    public void setStudyId(int studyId) { this.studyId = studyId; }
 
 	public void setDataSource(DataSource datasource) {
 		this.datasource = datasource;

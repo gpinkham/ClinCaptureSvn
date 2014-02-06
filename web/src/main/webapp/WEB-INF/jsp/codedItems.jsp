@@ -163,7 +163,6 @@
 
 <form action="${pageContext.request.contextPath}/pages/codedItems" style="clear:left; float:left;">
     ${codedItemsTable}
-    <input type="hidden" name="study" value="${studyId}">
 </form>
 
 <div style="clear:left; float:left">

@@ -102,7 +102,7 @@ public class CodedItemsController {
         String httpPath = (String) request.getSession().getAttribute("codedItemUrl");
         String queryString = request.getQueryString();
 
-        if (queryString.startsWith("study") && httpPath != null && !httpPath.startsWith("study")) {
+        if (queryString == null && httpPath != null) {
 
             response.sendRedirect("codedItems?" + httpPath);
         } else {
@@ -112,8 +112,7 @@ public class CodedItemsController {
 
 		ModelMap model = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
-		
-		String studyId = request.getParameter("study");
+
         String showMoreLink = request.getParameter("showMoreLink");
         String showContext = request.getParameter("showContext");
         String themeColor = (String) request.getSession().getAttribute("newThemeColor");
@@ -121,7 +120,7 @@ public class CodedItemsController {
         showContext =  showContext == null ? "false" : showContext;
         themeColor = themeColor == null ? "blue" : themeColor;
 
-		StudyBean study = (StudyBean) getStudyDAO().findByPK(Integer.parseInt(studyId));
+		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
 		StudyParameterValueBean mcApprovalNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApprovalNeeded");
         StudyParameterValueBean medicalCodingContextNeeded = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingContextNeeded");
         StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "autoCodeDictionaryName");
@@ -132,9 +131,9 @@ public class CodedItemsController {
 		
 		// Scope the items
 		if (study.isSite(study.getParentStudyId())) {
-			items = codedItemService.findByStudyAndSite(study.getParentStudyId(), Integer.parseInt(studyId));
+			items = codedItemService.findByStudyAndSite(study.getParentStudyId(), study.getId());
 		} else {
-			items = codedItemService.findByStudy(Integer.parseInt(studyId));
+			items = codedItemService.findByStudy(study.getId());
 		}
 		
 		List<CodedItem> codedItems = getItems(items, CodeStatus.CODED);
@@ -143,7 +142,7 @@ public class CodedItemsController {
 		
 		CodedItemsTableFactory factory = new CodedItemsTableFactory(medicalCodingContextNeeded.getValue(), showMoreLink, showContext);
 
-		factory.setStudyId(studyId);
+		factory.setStudyId(study.getId());
 		factory.setCodedItems(items);
 		factory.setDataSource(datasource);
         factory.setThemeColor(themeColor);
@@ -166,7 +165,6 @@ public class CodedItemsController {
 		model.addAttribute("codedItems", codedItems.size());
 		model.addAttribute("codedItemsTable", codedItemsTable);
 		model.addAttribute("unCodedItems", unCodedItems.size());
-		model.addAttribute("studyId", Integer.valueOf(studyId));
 		model.addAttribute("codeNotFoundItems", codeNotFoundItems.size());
 		model.addAttribute("mcApprovalNeeded", mcApprovalNeeded.getValue().equals("yes"));
         model.addAttribute("configuredDictionaryIsAvailable", configuredDictionaryIsAvailable);
@@ -407,14 +405,15 @@ public class CodedItemsController {
 
 		boolean isAlias = false;
  		String item = request.getParameter("item");
- 		String study = request.getParameter("study");
  		String categoryList = request.getParameter("categoryList");
  		String verbatimTerm = request.getParameter("verbatimTerm");
         String codeSearchTerm = request.getParameter("coderSearchTerm");
-  		
- 		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(Integer.parseInt(study), "autoCodeDictionaryName");
-        StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(Integer.parseInt(study), "defaultBioontologyURL");
-        StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(Integer.parseInt(study), "medicalCodingApiKey");
+
+        StudyBean study = (StudyBean) request.getSession().getAttribute("study");
+
+ 		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "autoCodeDictionaryName");
+        StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "defaultBioontologyURL");
+        StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApiKey");
   		
  		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(item));
   

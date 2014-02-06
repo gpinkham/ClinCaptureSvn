@@ -2716,7 +2716,6 @@ uncodeCodeItem = function(item) {
 codeAndAlias = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-    var study = new RegExp("study=(\\d+)").exec(window.location.href.toString())[1]
     var categoryList = getMedicalCodingCategoryList(item).join("|");
 
     $.ajax({
@@ -2726,7 +2725,6 @@ codeAndAlias = function(item) {
         data: {
 
             categoryList: categoryList,
-            study: study,
             item: $(item).parents('div').attr("id"),
             verbatimTerm: $.trim($(item).parents().siblings("td").find("div[name='itemDataValue']").text()),
             coderSearchTerm: $(item).parents().find("div[id=" + $(item).parents('div').attr("id") + "]").siblings("input").val()
@@ -2891,7 +2889,6 @@ function manualUpdateMedicalCodingUX(item) {
 autoCode = function() {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
-    var study = new RegExp("study=(\\d+)").exec(window.location.href.toString())[1]
 
     $.ajax({
 
@@ -2900,7 +2897,7 @@ autoCode = function() {
 
         success: function(data) {
 
-            window.location.replace(url + "/codedItems?study=" + study);
+            window.location.replace(url + "/codedItems");
         },
         error: function(e) {
 

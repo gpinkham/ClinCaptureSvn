@@ -131,7 +131,7 @@
                                                 <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
 
                                                 <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
-                                                    <li><a name="codedItems" href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <li><a name="codedItems" href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 </c:if>
                                                 <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
@@ -140,7 +140,7 @@
                                                 <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
-                                                    <li><a name="codedItems" href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <li><a name="codedItems" href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 </c:if>
                                                 <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
@@ -163,7 +163,7 @@
                                             </c:when>
                                             <c:when test="${userRole.studyCoder}">
                                                 <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
-                                                    <li><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <li><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 </c:if>
                                                 <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             </c:when>
@@ -171,7 +171,7 @@
                                                 <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
-                                                    <li><a name="codedItems" href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                    <li><a name="codedItems" href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 </c:if>
                                                 <li>
                                                     <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}">
@@ -264,7 +264,7 @@
                         <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
                         <div class="taskLink"><a href="${urlPrefix}ListCRF"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
                         <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
-                            <div class="taskLink"><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a></div>
+                            <div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
                         </c:if>
                     </c:otherwise>
                 </c:choose>
@@ -322,7 +322,7 @@
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
                 <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
-                    <div class="taskLink"><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
                 </c:if>
                 <c:if test="${includeReporting}">
                     <div class="taskLink"><a href="${urlPrefix}reports" target="_blank"><fmt:message key="reporting" bundle="${resword}"/></a></div>
@@ -381,7 +381,7 @@
             <c:when test="${userRole.studyCoder}">
                 <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
                 <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
-                    <div class="taskLink"><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
                 </c:if>
             </c:when>
             <c:when test="${userRole.studyAdministrator}">
@@ -418,7 +418,7 @@
                     <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
                     <div class="taskLink"><a href="${urlPrefix}ListCRF"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
                     <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
-                        <div class="taskLink"><a href="${urlPrefix}pages/codedItems?study=${study.id}"><fmt:message key="code" bundle="${resword}"/></a></div>
+                        <div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
                     </c:if>
                 </c:otherwise>
             </c:choose>
