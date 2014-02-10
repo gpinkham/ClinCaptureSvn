@@ -471,7 +471,7 @@ function addDroppable(popov) {
 		modalOuterDiv.remove();
 
 		var d = createStartExpressionDroppable();
-		if (drop.attr("last") === "group") {
+		if (drop.attr("last") === "group" && !drop.next().is(".dotted-border")) {
 
 			drop.after(d);
 			createPopover(d);
