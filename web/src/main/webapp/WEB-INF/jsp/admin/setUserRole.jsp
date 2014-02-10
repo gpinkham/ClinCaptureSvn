@@ -72,6 +72,7 @@
     <c:when test="${isThisStudy}">
         <c:set var="inclRoleCode1" value="2" />
         <c:set var="inclRoleCode2" value="6" />
+        <c:set var="inclRoleCode3" value="7" />
     </c:when>
     <c:otherwise>
         <c:set var="inclRoleCode1" value="4" />
@@ -142,7 +143,7 @@
                                     <c:set var="role1" value="${uRole.role}"/>
                                     <select name="roleId" class="formfieldXL" onchange="javascript:'changeFlag();'">
                                         <c:forEach var="currRole" items="${roles}">
-                                            <c:if test="${currRole.key == inclRoleCode1 || currRole.key == inclRoleCode2}">
+                                            <c:if test="${currRole.key == inclRoleCode1 || currRole.key == inclRoleCode2 || currRole.key == inclRoleCode3}">
                                                 <option value='<c:out value="${currRole.key}" />' <c:if test="${role1.id == currRole.key}">selected</c:if>><c:out value="${currRole.value}" /></option>
                                             </c:if>
                                         </c:forEach>
