@@ -80,15 +80,11 @@ Parser.prototype.createNextDroppable = function(params) {
 
 		dataPredicate.text("Group or Data");
 
-		if (!params.element.next().is(".group")) {
+		params.element.after(dataPredicate);
 
-			params.element.after(dataPredicate);
+		dataPredicate.after(RPAREN);
 
-			// Check for existing data
-			dataPredicate.after(RPAREN);
-
-			createPopover(RPAREN);
-		}
+		createPopover(RPAREN);
 
 		createPopover(dataPredicate);
 
@@ -564,16 +560,21 @@ Parser.prototype.findItem = function(itemName) {
 
 				var crf = event.crfs[c];
 
-				for (var i in crf.items) {
+				for (var v in crf.versions) {
 
-					var item = crf.items[i];
+					var version = crf.versions[v];
 
-					if (item.name === itemName) {
+					for (var i in version.items) {
 
-						item.item = item;
-						item.formOid = crf.oid;
+						var item = version.items[i];
 
-						return item;
+						if (item.name === itemName) {
+
+							item.item = item;
+							item.formOid = crf.oid;
+
+							return item;
+						}
 					}
 				}
 			}
@@ -606,16 +607,21 @@ Parser.prototype.findItemName = function(itemOID) {
 
 				var crf = event.crfs[c];
 
-				for (var i in crf.items) {
+				for (var v in crf.versions) {
 
-					var item = crf.items[i];
+					var version = crf.versions[v];
 
-					if (item.oid === itemOID) {
+					for (var i in version.items) {
 
-						item.item = item;
-						item.formOid = crf.oid;
+						var item = version.items[i];
 
-						return item;
+						if (item.oid === itemOID) {
+
+							item.item = item;
+							item.formOid = crf.oid;
+
+							return item;
+						}
 					}
 				}
 			}

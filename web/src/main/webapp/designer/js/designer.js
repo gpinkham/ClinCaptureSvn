@@ -167,6 +167,25 @@ function createBreadCrumb(params) {
 		ol.append(crfCrumb);
 	}	
 
+	if (params.version) {
+
+		ol.find(".active").removeClass(".active");
+
+		var versionCrumb = $("<li>");
+
+		var versionLink = $("<a>");
+		versionLink.text(params.version);
+		versionLink.click(function() {
+
+			$("a[href='#versions']").tab('show');
+		})
+
+		versionCrumb.addClass("active");
+
+		versionCrumb.append(versionLink)
+		ol.append(versionCrumb);
+	}
+
 	ol.prepend(studyCrumb);
 	
 	$("#data").find(".panel-body").append(ol);

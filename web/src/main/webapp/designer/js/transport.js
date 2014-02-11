@@ -120,13 +120,13 @@ function loadStudies(studies) {
 							// Cascade load
 							var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]
 
-							loadStudyEventCRFs({
+							loadEventCRFs({
 
 								study: currentStudy,
 								studyEvent: topEvent
 							});
 
-							loadStudyEventCRFItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]])
+							loadCRFVersionItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]])
 
 							createBreadCrumb({
 
@@ -153,18 +153,29 @@ function loadStudies(studies) {
 
 					selectedStudy = currentStudy.id;
 
-					loadStudyEvents(currentStudy)
+					if (currentStudy.events) {
 
-					// Cascade load
-					var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]
+						loadStudyEvents(currentStudy)
 
-					loadStudyEventCRFs({
+						// Cascade load
+						var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]
 
-						study: currentStudy,
-						studyEvent: topEvent
-					});
+						loadEventCRFs({
 
-					loadStudyEventCRFItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]])
+							study: currentStudy,
+							studyEvent: topEvent
+						});
+
+						var version = topEvent.crfs[0].versions[0]
+
+						loadCRFVersions({
+							study: study,
+							event: topEvent,
+							crf: topEvent.crfs[0]
+						});
+
+						loadCRFVersionItems(version);
+					}
 
 					createBreadCrumb({
 
@@ -253,14 +264,18 @@ function loadStudyEvents(study) {
 
 				var currentEvent = study.events[$(this).attr("id")]
 
-				loadStudyEventCRFs({
+				loadEventCRFs({
 
 					study: study,
 					studyEvent: currentEvent
 				});
 
 				// Cascade load
-				loadStudyEventCRFItems(currentEvent.crfs[Object.keys(currentEvent.crfs)[0]])
+				loadCRFVersions({
+					study: study,
+					event: currentEvent,
+					crf: currentEvent.crfs[Object.keys(currentEvent.crfs)[0]]
+				});
 
 				createBreadCrumb({
 
@@ -336,14 +351,14 @@ function loadStudyEvents(study) {
  * - studyEvent - the event for whom crfs should be loaded
  * - study - the study to which the event belongs to
  * ============================================================== */
-function loadStudyEventCRFs(params) {
+function loadEventCRFs(params) {
 
 	var itemArr = []
 	$("div[id='crfs']").find("table").remove();
 
-	if (params.studyEvent.crfs) {
+	if (params.studyEvent.crfs && params.studyEvent.crfs) {
 
-		var crfTable = createTable(['Name', 'Description', 'Identifier', 'Version']);
+		var crfTable = createTable(['Name', 'Identifier', 'Description']);
 
 		for (var cf = 0; cf < params.studyEvent.crfs.length; cf++) {
 
@@ -353,7 +368,7 @@ function loadStudyEventCRFs(params) {
 			tr.attr("id", cf);
 			tr.click(function() {
 
-				$("a[href='#items']").tab('show');
+				$("a[href='#versions']").tab('show');
 
 				// Make bold
 				$(this).siblings(".selected").removeClass("selected");
@@ -362,7 +377,12 @@ function loadStudyEventCRFs(params) {
 
 				var currentCRF = params.studyEvent.crfs[$(this).attr("id")];
 
-				loadStudyEventCRFItems(currentCRF);
+				loadCRFVersions({
+
+					crf: currentCRF,
+					study: params.study,
+					event: params.studyEvent.name
+				});
 
 				createBreadCrumb({
 
@@ -371,7 +391,6 @@ function loadStudyEventCRFs(params) {
 					event: params.studyEvent.name,
 					
 				})
-
 			})
 
 			var tdName = $("<td>");
@@ -399,15 +418,31 @@ function loadStudyEventCRFs(params) {
 			}
 
 			var tdOID = $("<td>");
-			tdOID.text(crf.oid);
+			if (crf.oid) {
+
+				if (crf.oid.length > 7) {
+
+					tdOID.text(crf.oid.slice(0, 7) + "...");
+
+					tdOID.tooltip({
+
+						placement: "top",
+						container: "body",
+						title: crf.oid,
+					})
+
+				} else {
+
+					tdOID.text(crf.oid);
+				}
+			}
 
 			var tdVersion = $("<td>");
 			tdVersion.text(crf.version);
 
 			tr.append(tdName);
-			tr.append(tdDescription);
 			tr.append(tdOID);
-			tr.append(tdVersion);
+			tr.append(tdDescription);
 
 			itemArr.push(tr);
 		}
@@ -436,6 +471,98 @@ function loadStudyEventCRFs(params) {
 	}
 }
 
+function loadCRFVersions(params) {
+
+	var itemArr = []
+	$("div[id='versions']").find("table").remove();
+
+	if (params.crf.versions) {
+
+		var versionTable = createTable(['Name', 'Identifier']);
+
+		for (var ver = 0; ver < params.crf.versions.length; ver++) {
+
+			var version = params.crf.versions[ver]
+
+			var tr = $("<tr>");
+			tr.attr("id", ver);
+			tr.click(function() {
+
+				$("a[href='#items']").tab('show');
+
+				// Make bold
+				$(this).siblings(".selected").removeClass("selected");
+
+				$(this).addClass("selected");
+
+				var currentVersion = params.crf.versions[$(this).attr("id")];
+
+				loadCRFVersionItems(currentVersion);
+
+				createBreadCrumb({
+
+					event: params.event.name,
+					study: params.study.name,
+					version: currentVersion.name
+
+				})
+			})
+
+			var tdName = $("<td>");
+			tdName.text(version.name);
+
+
+			var tdOID = $("<td>");
+
+			if (version.oid) {
+
+				if (version.oid.length > 7) {
+
+					tdOID.text(version.oid.slice(0, 7) + "...");
+
+					tdOID.tooltip({
+
+						placement: "top",
+						container: "body",
+						title: version.oid,
+					})
+
+				} else {
+
+					tdOID.text(version.oid);
+				}
+			}
+
+			tr.append(tdName);
+			tr.append(tdOID);
+
+			itemArr.push(tr);
+		}
+
+		$("div[id='versions']").append(versionTable)
+
+		currentPageIndex = 0;
+
+		// Global
+		var chunkedItemsArr = itemArr.chunk(10);
+
+		var pagination = createPagination({
+
+			div: $("div[id='versions']"),
+			itemsArr: chunkedItemsArr
+		});
+
+		versionTable.after(pagination);
+
+		resetTable({
+
+			table: versionTable,
+			arr: chunkedItemsArr,
+			pagination: pagination
+		});
+	}
+}
+
 /* =================================================================
  * Adds the a given crf's items to the items table for display.
  *
@@ -443,14 +570,14 @@ function loadStudyEventCRFs(params) {
  * Argument Object [params] parameters:
  * - crf - the crf for whom items should be loaded
  * ============================================================== */
-function loadStudyEventCRFItems(crf) {
+function loadCRFVersionItems(crf) {
 
 	var itemArr = []
 	$("div[id='items']").find("table").remove();
 
 	if (crf.items) {
 
-		var itemsTable = createTable(['Name', 'Description', 'Version(s)', 'Data Type']);
+		var itemsTable = createTable(['Name', 'Description', 'Data Type']);
 
 		for (var it = 0; it < crf.items.length; it++) {
 
@@ -492,15 +619,11 @@ function loadStudyEventCRFItems(crf) {
 				}
 			}
 
-			var tdVersion = $("<td>");
-			tdVersion.text(item.version);
-
 			var tdDataType = $("<td>");
 			tdDataType.text(item.type);
 
 			tr.append(tdName);
 			tr.append(tdDescription);
-			tr.append(tdVersion);
 			tr.append(tdDataType);
 
 			itemArr.push(tr);

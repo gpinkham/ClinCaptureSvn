@@ -13,7 +13,23 @@
 
 package org.akaza.openclinica.dao.submit;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
@@ -21,14 +37,6 @@ import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
-
-import javax.sql.DataSource;
 
 @SuppressWarnings({"rawtypes","unchecked"})
 public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
@@ -160,7 +168,6 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		return beanList;
 	}
 
-	// YW 10-30-2007, one item_id might have more than one item_groups
 	public Collection findGroupsByItemID(int ID) {
 		this.setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
@@ -225,7 +232,7 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 	}
 
 	public List<ItemGroupBean> findAllByOid(String oid) {
-		// ItemGroupBean itemGroup = new ItemGroupBean();
+		
 		this.unsetTypeExpected();
 		setTypesExpected();
 
@@ -298,6 +305,28 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 			beanList.add(bean);
 		}
 		return beanList;
+	}
+	
+	public ItemGroupBean findByItemAndCRFVersion(ItemBean item, CRFVersionBean crfVersion) {
+
+		ItemGroupBean itemGroup = new ItemGroupBean();
+		this.unsetTypeExpected();
+		setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), item.getId());
+		variables.put(new Integer(2), crfVersion.getId());
+		String sql = digester.getQuery("findByItemAndCRFVersion");
+
+		ArrayList rows = this.select(sql, variables);
+		Iterator it = rows.iterator();
+
+		if (it.hasNext()) {
+			itemGroup = (ItemGroupBean) this.getEntityFromHashMap((HashMap) it.next());
+			return itemGroup;
+		} else {
+			return null;
+		}
 	}
 
 	public List<ItemGroupBean> findOnlyGroupsByCRFVersionID(int Id) {

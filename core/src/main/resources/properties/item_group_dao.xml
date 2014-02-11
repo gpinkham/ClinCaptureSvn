@@ -144,4 +144,8 @@
   	  limit 1
   </sql>
   </query>
+  <query>
+  	<name>findByItemAndCRFVersion</name>
+  	<sql>select ig.* from item_group_metadata igm, item_group ig where igm.item_id = ? and igm.crf_version_id = ? and ig.item_group_id = igm.item_group_id</sql>
+  </query>
 </queries>

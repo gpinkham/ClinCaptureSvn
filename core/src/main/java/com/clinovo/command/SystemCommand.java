@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({ "unused", "serial" })
+@SuppressWarnings("serial")
 public class SystemCommand implements Serializable {
 
 	private boolean backMode;

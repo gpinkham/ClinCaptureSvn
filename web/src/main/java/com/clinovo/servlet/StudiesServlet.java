@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
@@ -38,6 +39,7 @@ import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
@@ -54,7 +56,7 @@ import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class StudiesServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -64,7 +66,6 @@ public class StudiesServlet extends HttpServlet {
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked" })
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		String action = request.getParameter("action");
@@ -272,7 +273,6 @@ public class StudiesServlet extends HttpServlet {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private JSONArray getStudyEvents(StudyBean study, DataSource datasource) throws Exception {
 
 		JSONArray events = new JSONArray();
@@ -304,7 +304,6 @@ public class StudiesServlet extends HttpServlet {
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private JSONArray getStudyEventCRFs(StudyEventDefinitionBean evt, StudyBean study, DataSource datasource)
 			throws Exception {
 
@@ -327,9 +326,9 @@ public class StudiesServlet extends HttpServlet {
 			obj.put("name", cf.getName());
 			obj.put("version", cf.getVersionNumber());
 
-			JSONArray items = getCRFItems(cf, datasource);
+			JSONArray versions = getCRFVersions(cf, datasource);
 
-			obj.put("items", items);
+			obj.put("versions", versions);
 
 			crfs.put(obj);
 
@@ -338,32 +337,58 @@ public class StudiesServlet extends HttpServlet {
 		return crfs;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private JSONArray getCRFItems(CRFBean crf, DataSource datasource) throws Exception {
+	private JSONArray getCRFVersions(CRFBean cf, DataSource datasource) throws Exception {
+		
+		JSONArray versions= new JSONArray();
+
+		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(datasource);
+		List<CRFVersionBean> vers = (List<CRFVersionBean>) crfVersionDAO.findAllActiveByCRF(cf.getId());
+
+		for (CRFVersionBean ver : vers) {
+
+			JSONObject obj = new JSONObject();
+			
+			obj.put("id", ver.getId());
+			obj.put("oid", ver.getOid());
+			obj.put("name", ver.getName());
+
+			JSONArray items = getCRFVersionItems(ver, datasource);
+
+			obj.put("items", items);
+
+			versions.put(obj);
+
+		}
+		
+		return versions;
+	}
+
+	private JSONArray getCRFVersionItems(CRFVersionBean cf, DataSource datasource) throws Exception {
 
 		JSONArray items = new JSONArray();
 		ItemDAO crfDAO = new ItemDAO(datasource);
 		ItemGroupDAO itemGroupDAO = new ItemGroupDAO(datasource);
-		ItemFormMetadataDAO itemMetaDataDAO = new ItemFormMetadataDAO(datasource);
+		ItemFormMetadataDAO itemFormMetaDataDAO = new ItemFormMetadataDAO(datasource);
 
-		List<ItemBean> crfItems = (List<ItemBean>) crfDAO.findAllActiveByCRF(crf);
+		List<ItemBean> crfItems = (List<ItemBean>) crfDAO.findAllItemsByVersionId(cf.getId());
 
 		for (ItemBean item : crfItems) {
 
 			JSONObject obj = new JSONObject();
 
-			ItemFormMetadataBean itemMeta = itemMetaDataDAO.findByItemIdAndCRFVersionId(item.getId(), crf.getId());
-
 			// Item group
-			ItemGroupBean itemGroup = (ItemGroupBean) itemGroupDAO.findTopOneGroupBySectionId(itemMeta.getSectionId());
+			ItemGroupBean itemGroup = (ItemGroupBean) itemGroupDAO.findByItemAndCRFVersion(item, cf);
+			
+			// Form meta data
+			ItemFormMetadataBean itemFormMetaData = itemFormMetaDataDAO.findByItemIdAndCRFVersionId(item.getId(), cf.getId());
 
 			obj.put("id", item.getId());
 			obj.put("oid", item.getOid());
 			obj.put("name", item.getName());
 			obj.put("group", itemGroup.getOid());
-			obj.put("ordinal", itemMeta.getOrdinal());
 			obj.put("type", item.getDataType().getName());
 			obj.put("description", item.getDescription());
+			obj.put("ordinal", itemFormMetaData.getOrdinal());
 
 			items.put(obj);
 		}

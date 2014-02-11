@@ -180,6 +180,12 @@ $(function() {
 
 	createToolTip({
 		
+		element: $("#versionsLink"),
+		title: "Select a CRF Version"
+	})
+
+	createToolTip({
+		
 		element: $("#itemsLink"),
 		title: "Select a CRF item"
 	})
@@ -392,15 +398,28 @@ $(function() {
 
 			var study = data[$("table").find(".selected").attr("id")]
 			var studyEvent = study.events[Object.keys(study.events)[0]]
-			var crf = studyEvent.crfs[Object.keys(studyEvent.crfs)[0]]
 
-			createBreadCrumb({
+			if (studyEvent) {
 
-				crf: crf.name,
-				study: study.name,
-				event: studyEvent.name
+				var crf = studyEvent.crfs[Object.keys(studyEvent.crfs)[0]]
 
-			})
+				createBreadCrumb({
+
+					crf: crf.name,
+					study: study.name,
+					event: studyEvent.name,
+					version: crf.versions[0].name
+
+				})
+
+			} else {
+
+				createBreadCrumb({
+
+					study: study.name
+
+				})
+			}
 		}
 	})
 
