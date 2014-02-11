@@ -126,7 +126,6 @@
 	<table cellspacing="0" class="summaryTable" style="width:600px;">
         <tr>
         	<td>&nbsp;</td>
-            <td align="center" width="100px"><fmt:message key="all" bundle="${resword}"/></td>
             <td align="center"><fmt:message key="notCoded" bundle="${resword}"/></td>
         	<c:if test="${mcApprovalNeeded}">
         		<td align="center"><fmt:message key="notApproved" bundle="${resword}"/></td>
@@ -140,10 +139,10 @@
         		</c:otherwise>
         	</c:choose>
         	<td align="center"><fmt:message key="coded" bundle="${resword}"/></td>
+            <td align="center" width="100px"><fmt:message key="total" bundle="${resword}"/></td>
         </tr>
         <tr>
         	<td align="center">Medical Terms</td>
-            <td align="center" name="tdAll"><a href='javascript:redirectUrl("All");'>${codeNotFoundItems + unCodedItems + codedItems}</a></td>
         	<td align="center" name="tdNotCoded"><a href='javascript:redirectUrl("Not Coded");'>${unCodedItems}</a></td>
         	<c:if test="${mcApprovalNeeded}">
             	<td align="center">0</td>
@@ -157,6 +156,7 @@
         		</c:otherwise>
         	</c:choose>
         	<td align="center" name="tdCoded"><a href='javascript:redirectUrl("Coded"); showUncodedItems();'>${codedItems}</a></td>
+            <td align="center" name="tdTotal"><a href='javascript:redirectUrl("All");'>${codeNotFoundItems + unCodedItems + codedItems}</a></td>
         </tr>
     </table> 
 </div>
