@@ -34,19 +34,34 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.domain.rule.RuleBean;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.domain.rule.action.ActionType;
+import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
+import org.akaza.openclinica.domain.rule.action.EmailActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @SuppressWarnings("serial")
 public class StudiesServlet extends HttpServlet {
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+		response.sendRedirect(request.getContextPath() + "/designer/rule.html?action=edit&id="
+				+ request.getParameter("ruleSetId"));
+	}
 
 	@Override
 	@SuppressWarnings({ "unchecked" })
@@ -69,7 +84,7 @@ public class StudiesServlet extends HttpServlet {
 				// Get studies DESIGN and AVAILABLE
 				List<StudyBean> pendingStudies = (List<StudyBean>) studyDAO.findAllByStatus(Status.PENDING);
 				List<StudyBean> availableStudies = (List<StudyBean>) studyDAO.findAllByStatus(Status.AVAILABLE);
-				
+
 				// Merge
 				availableStudies.addAll(pendingStudies);
 
@@ -97,13 +112,7 @@ public class StudiesServlet extends HttpServlet {
 
 			} else if ("validate".equals(action)) {
 
-				String name = request.getParameter("name");
-				String targets = request.getParameter("targets");
-				String ruleActions = request.getParameter("actions");
-				String expression = request.getParameter("expression");
-				String properties = request.getParameter("properties");
-
-				JSONObject props = new JSONObject(properties);
+				JSONObject rule = new JSONObject(request.getParameter("rule"));
 
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder builder = factory.newDocumentBuilder();
@@ -114,12 +123,12 @@ public class StudiesServlet extends HttpServlet {
 				Element rootElement = document.createElement("RuleImport");
 
 				// Rule Assignments
-				JSONArray rTargets = new JSONArray(targets);
-				
+				JSONArray rTargets = rule.getJSONArray("targets");
+
 				int currentCount = 1;
 				for (int x = 0; x < rTargets.length(); x++) {
 
-					JSONArray actions = new JSONArray(ruleActions);
+					JSONArray actions = rule.getJSONArray("actions");
 					Element rAssigment = document.createElement("RuleAssignment");
 
 					// Target
@@ -133,22 +142,22 @@ public class StudiesServlet extends HttpServlet {
 					rAssigment.appendChild(rTarget);
 
 					for (int r = 0; r < actions.length(); r++) {
-						
+
 						// Rule Def
 						Element ruleDef = document.createElement("RuleDef");
 
 						// attributes
 						ruleDef.setAttribute("Name", "RS_GEN_RULE");
-						ruleDef.setAttribute("OID", generateOID(expression, currentCount));
-						
+						ruleDef.setAttribute("OID", generateOID(rule.getString("expression"), currentCount));
+
 						// Increment the count
 						currentCount = currentCount + 1;
 
 						Element expr = document.createElement("Expression");
-						expr.setTextContent(expression);
+						expr.setTextContent(rule.getString("expression"));
 
 						Element description = document.createElement("Description");
-						description.setTextContent(name);
+						description.setTextContent(rule.getString("name"));
 
 						// desc comes first
 						ruleDef.appendChild(description);
@@ -157,7 +166,7 @@ public class StudiesServlet extends HttpServlet {
 						// Rule Ref
 						Element ref = document.createElement("RuleRef");
 						ref.setAttribute("OID", ruleDef.getAttribute("OID"));
-						ref.appendChild(createAction(actions.getString(r), props, document));
+						ref.appendChild(createAction(actions.getString(r), rule, document));
 
 						// Append ref
 						rAssigment.appendChild(ref);
@@ -186,6 +195,70 @@ public class StudiesServlet extends HttpServlet {
 
 				writer.write(xWriter.getBuffer().toString());
 
+			} else if ("edit".equals(action)) {
+
+				RuleSetDao dao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(
+						RuleSetDao.class);
+
+				JSONObject object = new JSONObject();
+				RuleSetBean rsb = dao.findById(Integer.parseInt(request.getParameter("id")));
+
+				// Targets
+				JSONArray targets = new JSONArray();
+				targets.put(rsb.getOriginalTarget().getValue());
+
+				if (rsb != null) {
+
+					JSONArray ruleActions = new JSONArray();
+					for (RuleSetRuleBean rb : rsb.getRuleSetRules()) {
+
+						RuleBean rule = rb.getRuleBean();
+						RuleActionBean at = rb.getActions().get(0);
+
+						try {
+
+							JSONObject act = new JSONObject();
+
+							act.put("select", at.getExpressionEvaluatesTo());
+							act.put("type", at.getActionType());
+							object.put("evaluateTo", at.getExpressionEvaluatesTo());
+
+							if (at.getActionType().equals(ActionType.EMAIL)) {
+
+								EmailActionBean emailAction = (EmailActionBean) at;
+								
+								act.put("to", emailAction.getTo());
+								act.put("body", emailAction.getMessage());
+
+							} else if (at.getActionType().equals(ActionType.FILE_DISCREPANCY_NOTE)) {
+
+								DiscrepancyNoteActionBean discrepancyAction = (DiscrepancyNoteActionBean) at;
+								
+								act.put("type", "discrepancy");
+								act.put("message", discrepancyAction.getMessage());
+							}
+							
+							ruleActions.put(act);
+							
+							object.put("di", at.getRuleActionRun().getImportDataEntry());
+							object.put("dde", at.getRuleActionRun().getDoubleDataEntry());
+							object.put("ide", at.getRuleActionRun().getInitialDataEntry());
+							object.put("ae", at.getRuleActionRun().getAdministrativeDataEntry());
+
+							// Rule properties
+							object.put("targets", targets);
+							object.put("oid", rule.getOid());
+							object.put("actions", ruleActions);
+							object.put("name", rule.getDescription());
+							object.put("expression", rule.getExpression().getValue());
+
+						} catch (JSONException e) {
+							response.sendError(500, e.getMessage());
+						}
+					}
+				}
+
+				response.getWriter().write(object.toString());
 			}
 
 		} catch (Exception ex) {
@@ -352,7 +425,7 @@ public class StudiesServlet extends HttpServlet {
 					}
 				}
 			} else {
-				
+
 				oid = oid + "_0" + x;
 			}
 
@@ -361,42 +434,43 @@ public class StudiesServlet extends HttpServlet {
 		return oid;
 	}
 
-	private Element createAction(String action, JSONObject properties, Document document) throws Exception {
+	private Element createAction(String action, JSONObject rule, Document document) throws Exception {
 
 		Element rAction = null;
+		JSONObject act = new JSONObject(action);
 
 		// Run
 		Element run = document.createElement("Run");
 
 		run.setAttribute("Batch", "true");
-		run.setAttribute("ImportDataEntry", properties.getString("importDataEntry"));
-		run.setAttribute("InitialDataEntry", properties.getString("initialDataEntry"));
-		run.setAttribute("DoubleDataEntry", properties.getString("doubleDataEntry"));
-		run.setAttribute("AdministrativeDataEntry", properties.getString("administrativeDataEntry"));
+		run.setAttribute("ImportDataEntry", rule.getString("di"));
+		run.setAttribute("InitialDataEntry", rule.getString("ide"));
+		run.setAttribute("DoubleDataEntry", rule.getString("dde"));
+		run.setAttribute("AdministrativeDataEntry", rule.getString("ae"));
 
-		if (action.equals("discrepancy")) {
+		if (act.getString("type").equalsIgnoreCase("discrepancy")) {
 
 			Element discrepancyText = document.createElement("Message");
-			discrepancyText.setTextContent(properties.getString("discrepancyText"));
+			discrepancyText.setTextContent(act.getString("message"));
 
 			rAction = document.createElement("DiscrepancyNoteAction");
-			rAction.setAttribute("IfExpressionEvaluates", properties.getString("evaluateTo"));
+			rAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
 
 			rAction.appendChild(run);
 			rAction.appendChild(discrepancyText);
 
-		} else if (action.equals("email")) {
+		} else if (act.getString("type").equalsIgnoreCase("email")) {
 
 			// Message element
 			Element message = document.createElement("Message");
-			message.setTextContent(properties.getString("body"));
+			message.setTextContent(act.getString("body"));
 
 			rAction = document.createElement("EmailAction");
-			rAction.setAttribute("IfExpressionEvaluates", properties.getString("evaluateTo"));
+			rAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
 
 			// To element
 			Element to = document.createElement("To");
-			to.setTextContent(properties.getString("to"));
+			to.setTextContent(act.getString("to"));
 
 			rAction.appendChild(run);
 
@@ -404,16 +478,16 @@ public class StudiesServlet extends HttpServlet {
 			rAction.appendChild(message);
 			rAction.appendChild(to);
 
-		} else if (action.equals("hide")) {
+		} else if (act.getString("type").equalsIgnoreCase("hide")) {
 
 			// Message element
 			Element message = document.createElement("Message");
-			message.setTextContent(properties.getString("message"));
+			message.setTextContent(rule.getString("message"));
 
 			rAction = document.createElement("HideAction");
-			rAction.setAttribute("IfExpressionEvaluates", properties.getString("evaluateTo"));
+			rAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
 
-			JSONArray targets = properties.getJSONArray("destinationProperty");
+			JSONArray targets = rule.getJSONArray("destinationProperty");
 			rAction.appendChild(run);
 
 			for (int x = 0; x < targets.length(); x++) {
@@ -427,16 +501,16 @@ public class StudiesServlet extends HttpServlet {
 
 			rAction.appendChild(message);
 
-		} else if (action.equals("show")) {
+		} else if (act.getString("type").equalsIgnoreCase("show")) {
 
 			// Message element
 			Element message = document.createElement("Message");
-			message.setTextContent(properties.getString("message"));
+			message.setTextContent(rule.getString("message"));
 
 			rAction = document.createElement("ShowAction");
-			rAction.setAttribute("IfExpressionEvaluates", properties.getString("evaluateTo"));
+			rAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
 
-			JSONArray targets = properties.getJSONArray("destinationProperty");
+			JSONArray targets = rule.getJSONArray("destinationProperty");
 			rAction.appendChild(run);
 
 			for (int x = 0; x < targets.length(); x++) {
@@ -450,12 +524,12 @@ public class StudiesServlet extends HttpServlet {
 
 			rAction.appendChild(message);
 
-		} else if (action.equals("insert")) {
+		} else if (act.getString("type").equalsIgnoreCase("insert")) {
 
 			rAction = document.createElement("InsertAction");
-			rAction.setAttribute("IfExpressionEvaluates", properties.getString("evaluateTo"));
+			rAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
 
-			JSONArray targets = properties.getJSONArray("iDestinationProperty");
+			JSONArray targets = rule.getJSONArray("iDestinationProperty");
 			rAction.appendChild(run);
 
 			for (int x = 0; x < targets.length(); x++) {

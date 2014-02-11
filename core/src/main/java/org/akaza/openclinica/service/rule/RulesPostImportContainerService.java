@@ -28,22 +28,10 @@ import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
-import org.akaza.openclinica.domain.rule.RuleBean;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.domain.rule.*;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
-import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
-import org.akaza.openclinica.domain.rule.action.HideActionBean;
-import org.akaza.openclinica.domain.rule.action.InsertActionBean;
-import org.akaza.openclinica.domain.rule.action.PropertyBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.rule.action.ShowActionBean;
-import org.akaza.openclinica.domain.rule.expression.Context;
-import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
-import org.akaza.openclinica.domain.rule.expression.ExpressionProcessor;
-import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
+import org.akaza.openclinica.domain.rule.action.*;
+import org.akaza.openclinica.domain.rule.expression.*;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.akaza.openclinica.validator.rule.action.InsertActionValidator;
 import org.slf4j.Logger;
@@ -51,12 +39,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 
+import javax.sql.DataSource;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import javax.sql.DataSource;
 
 /**
  * @author Krikor Krumlian
@@ -65,7 +52,7 @@ import javax.sql.DataSource;
 public class RulesPostImportContainerService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    DataSource ds;
+	DataSource ds;
 	private RuleDao ruleDao;
 	private RuleSetDao ruleSetDao;
 	private final OidGenerator oidGenerator;
@@ -158,6 +145,13 @@ public class RulesPostImportContainerService {
 						RuleSetRuleBean ruleSetRuleBean = itr.next();
 						ruleSetRuleBean.setRuleBean(getRuleDao().findByOid(ruleSetRuleBean.getOid(),
 								persistentRuleSetBean.getStudyId()));
+						if (ruleSetRuleBean.getRuleBean() == null) {
+							AuditableBeanWrapper<RuleBean> ruleBeanWrapper = importContainer.getValidRules().get(
+									ruleSetRuleBean.getOid());
+							if (ruleBeanWrapper != null) {
+								ruleSetRuleBean.setRuleBean(ruleBeanWrapper.getAuditableBean());
+							}
+						}
 						// ruleSetRuleBean.setRuleSetBean(ruleSetBeanWrapper.getAuditableBean());
 						for (RuleSetRuleBean persistentruleSetRuleBean : persistentRuleSetBean.getRuleSetRules()) {
 							if (persistentruleSetRuleBean.getStatus() != Status.DELETED
@@ -219,7 +213,7 @@ public class RulesPostImportContainerService {
 					.setValue(
 							ruleBeanWrapper.getAuditableBean().getExpression().getValue().trim()
 									.replaceAll("(\n|\t|\r)", " "));
-			
+
 			if (isRuleOidValid(ruleBeanWrapper) && isRuleExpressionValid(ruleBeanWrapper, null)) {
 				RuleBean persistentRuleBean = getRuleDao().findByOid(ruleBeanWrapper.getAuditableBean());
 				if (persistentRuleBean != null) {
@@ -503,7 +497,7 @@ public class RulesPostImportContainerService {
 		this.ruleSetDao = ruleSetDao;
 	}
 
-    /**
+	/**
 	 * @return the currentStudy
 	 */
 	public StudyBean getCurrentStudy() {

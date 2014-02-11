@@ -7,7 +7,9 @@ $(function() {
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 
 	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true");
-	// Create tooltips for the controls to aid in navigation
+
+	// ======================= Tool tip creation =======================
+
 	$("#deleteButton").tooltip({
 
 		container: "body",
@@ -188,13 +190,14 @@ $(function() {
 		title: "Drag and drop an item from the Group tool box, the data toolbox or a CRF item."
 	})	
 
-	// End of tool tip creation
+	// ======================= End of tool tip creation =======================
 
 	// Hide action messages parameter divs
 	$("div[id='actionMessages']").hide();
 	$("div[id='actionMessages'] > *").hide();
 
-	// Create draggables
+	// ======================= Draggables =======================
+
 	createDraggable({
 
 		target: $("#groupSurface"),
@@ -243,9 +246,9 @@ $(function() {
 		});
 	})
 
-	// End of creating draggables
+	// ======================= End of creating draggables =======================
 
-	// Create droppables
+	// ======================= Droppables =======================
 	createDroppable({
 		element: $("#groupSurface"),
 		accept: "#leftParentheses, div[id='data'] p, div[id='items'] td"
@@ -256,7 +259,119 @@ $(function() {
 		accept: "div[id='items'] td"
 	})
 
-	// End of creating droppables
+	// ======================= End of creating droppables =======================
+
+	// ======================= Event handlers =======================
+
+	$("#ruleName").blur(function() {
+
+		parser.setName($(this).val());
+	})
+
+	$("input[name='ruleInvoke']").change(function() {
+
+		if ($("#evaluateTrue").is(":checked")) {
+			parser.setEvaluatesTo(true);
+		} else {
+			parser.setEvaluatesTo(false);
+		}
+	})
+
+	$("#ide").change(function() {
+
+		parser.setInitialDataEntryExecute($(this).is(":checked"));
+	})
+
+	$("#ae").change(function() {
+		parser.setAdministrativeEditingExecute($(this).is(":checked"));	
+	})
+
+	$("#dde").change(function() {
+		parser.setDoubleDataEntryExecute($(this).is(":checked"));
+	})
+
+	$("#dataImport").change(function() {
+		parser.setDataImportExecute($(this).is(":checked"));
+	})
+
+	$("#chkDiscrepancyText").change(function() {
+
+		parser.setDiscrepancyAction({
+
+			selected: $(this).is(":checked"),
+			message: $("#discrepancyText").val()
+		})
+
+		$("#discrepancyText").find("textarea").focus();
+	})
+
+	$("#discrepancyText").find("textarea").blur(function() {
+
+		parser.setDiscrepancyAction({
+
+			message: $(this).val(),
+			selected: $("#chkDiscrepancyText").is(":checked")
+		})	
+	})
+
+	$("#chkEmail").change(function() {
+
+		parser.setEmailAction({
+
+			to: $("#toField").val(),
+			message: $("#body").val(),
+			selected: $(this).is(":checked")
+		})
+
+		$("#toField").focus();
+	})
+
+	$("#toField").blur(function() {
+
+		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+		if (!re.test($(this).val().trim())) {
+
+			$(this).parent().addClass("has-error");
+
+		} else {
+
+			parser.setEmailAction({
+
+				to: $("#toField").val(),
+				message: $("#body").val(),
+				selected: $("#chkEmail").is(":checked")
+			})
+
+			$(this).parent().removeClass("has-error");
+		}
+	})
+
+	$("#body").blur(function() {
+
+		parser.setEmailAction({
+
+			to: $("#toField").val(),
+			message: $("#body").val(),
+			selected: $("#chkEmail").is(":checked")
+		})
+	})
+
+	$("#deleteButton").click(function() {
+
+		if ($("#designSurface").find(".panel-body").children().size() > 2) {
+
+			bootbox.confirm("Are you sure you want to clear the entire expression?", function(result) {
+
+				if (result) {
+
+					resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
+
+					$(".modal-backdrop").remove();
+				}
+			});
+		}
+	})
 
 	$('div[id="variables"] a').click(function(e) {
 
@@ -289,260 +404,33 @@ $(function() {
 		}
 	})
 
-	$("#chkDiscrepancyText").change(function() {
-
-		toggleActionControls({
-			control: this,
-			element: $("#discrepancyText")
-		})
-
-		$("#discrepancyText").find("textarea").focus();
-	})
-
-	$("#chkEmail").change(function() {
-
-		toggleActionControls({
-			control: this,
-			element: $("#emailTo")
-		})
-
-		$("#emailTo").find("input").focus();
-
-		toggleActionControls({
-			control: this,
-			element: $("#email")
-		})
-	})
-
-	$("#chkData").change(function() {
-
-		toggleActionControls({
-			control: this,
-			element: $("#ruleData")
-		})
-
-		$("#ruleData").find("textarea").focus();
-	})
-
-	$("input[name=tItem]").change(function() {
-
-		toggleActionControls({
-			control: this,
-			element: $("#parameters")
-		})
-
-		$("#parameters").find("textarea").focus();
-	})
-
-	$("#deleteButton").click(function() {
-
-		if ($("#designSurface").find(".panel-body").children().size() > 2) {
-
-			bootbox.confirm("Are you sure you want to clear the entire expression?", function(result) {
-
-				if (result) {
-
-					resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
-
-					$(".modal-backdrop").remove();
-				}
-			});
-		}
-	})
-
-	$("#toField").blur(function() {
-
-		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-		if (!re.test($(this).val().trim())) {
-
-			$(this).parent().addClass("has-error");
-		} else {
-
-			$(this).parent().removeClass("has-error");
-		}
-	})
-
-	$("a[id='test']").click(function() {
-
-		var vRule = parser.createRule();
-
-		if (vRule && vRule.valid) {
-
-			validate({
-
-				targets: vRule.targets,
-				expression: vRule.expression.replace(/\,/g, " "),
-				evaluateTo: $("input[name='ruleInvoke']:checked").parent().text().trim()
-			});
-		}
-	})
-
 	$("#validate").click(function() {
 
-		var vRule = parser.createRule();
-		if (vRule && vRule.valid) {
+		var rule = parser.getRule();
 
-			validate({
+		if (rule) {
 
-				targets: vRule.targets,
-				expression: vRule.expression.replace(/\,/g, " "),
-				evaluateTo: $("input[name='ruleInvoke']:checked").parent().text().trim()
-
-			})
+			validate(rule);
 		}
 	})
 
 	createPopover($("#groupSurface"));
 	fetchStudies();
 
+	// If editing a rule
+	if (getURLParameter("action") === "edit") {
+
+		fetchRuleForEditing();
+	}
+
 	// If a rule already exists in a session, display it
 	$(document).ready(function() {
 
-		if (sessionStorage.getItem("status")) {
+		if (sessionStorage.getItem("status") && sessionStorage.getItem("status") === "load") {
 
-			// Persist these to be used in validation.js
-			var name = sessionStorage.getItem("name");
-			var actions = sessionStorage.getItem("actions");
-			var targets = JSON.parse(sessionStorage.getItem("targets"));
-			var properties = JSON.parse(sessionStorage.getItem("properties"));
-			var expression = JSON.parse(sessionStorage.getItem("oExpression"));
+			var rule = JSON.parse(sessionStorage.getItem("rule"));
 
-			// Rule name
-			$("#ruleName").val(name);
-
-			var currInput = $(".target");
-
-			// Targets
-			for (var t = 0; t < targets.length; t++) {
-
-				var crfItem = parser.findItemName(targets[t]);
-
-				if (t > 0) {
-
-					var input = $(".target").clone();
-
-					createDroppable({
-						element: input,
-						accept: "div[id='items'] td"
-					})
-
-					input.val(crfItem.item.name);
-
-
-					currInput.after(input);
-
-					currInput = input;
-
-				} else {
-
-					$(".target").val(crfItem.item.name);
-				}
-
-				parser.targets.push(crfItem.item.name);
-			}
-
-			var newInput = $(".target").last().clone();
-
-			createDroppable({
-				element: newInput,
-				accept: "div[id='items'] td"
-			})
-
-			newInput.val("");
-			$(".target").last().after(newInput);
-
-			// Rule execution
-			if (properties.doubleDataEntry) {
-				$("#dde").prop("checked", true);
-			}
-
-			if (properties.initialDataEntry) {
-				$("#ide").prop("checked", true);
-			}
-
-			if (properties.importDataEntry) {
-				$("#dataImport").prop("checked", true);
-			}
-
-			if (properties.administrativeDataEntry) {
-				$("#ae").prop("checked", true);
-			}
-
-			// Rule evaluate to
-			if (properties.evaluateTo) {
-
-				$("#evaluateTrue").prop("checked", true);
-
-			} else {
-
-				$("#evaluateFalse").prop("checked", true);
-			}
-
-			// Parameters
-			$("#message").show();
-			$("#actionMessages").show();
-
-			// Actions
-			if (properties.to) {
-
-				$("#email").show();
-				$("#emailTo").show();
-
-				$("#body").val(properties.body);
-				$("#toField").val(properties.to);
-
-				$("#chkEmail").prop("checked", true);
-			}
-
-			if (properties.discrepancyText) {
-
-				$("#discrepancyText").show();
-				$("#discrepancyText").find("textarea").val(properties.discrepancyText);
-
-				$("#chkDiscrepancyText").prop("checked", true);
-			}
-
-			var currDroppable = $("#groupSurface");
-			for (var e = 0; e < expression.length; e++) {
-
-				if (e === 0) {
-
-					$("#groupSurface").text(expression[e]);
-
-				} else {
-
-					var predicate = expression[e];
-
-					if (parser.isOp(predicate)) {
-
-						var droppable = createSymbolDroppable();
-						droppable.text(predicate);
-
-						currDroppable.after(droppable);
-
-						currDroppable = droppable;
-
-					} else if (parser.isConditionalOp(predicate)) {
-
-						var droppable = createConditionDroppable();
-						droppable.text(predicate);
-
-						currDroppable.after(droppable);
-
-						currDroppable = droppable;
-
-					} else {
-
-						var droppable = createStartExpressionDroppable();
-						droppable.text(predicate);
-
-						currDroppable.after(droppable);
-
-						currDroppable = droppable;
-					}
-				}
-			}
+			parser.render(rule);
 		}
 
 		sessionStorage.removeItem("status");
@@ -555,50 +443,6 @@ $(function() {
 		$(".popover").remove();
 	});
 })
-
-/* =============================================================================
- * Determines the parameter boxes to show depending on the selected action.
- *
- * Argument Object [params] parameters:
- * - control - the action control that has been select
- * - element - the corresponding action element to display if control is selected
- * ============================================================================ */
-function toggleActionControls(params) {
-
-	$("#message").show();
-	if ($(params.control).is(":checked")) {
-
-		if ($("#actionMessages").is(":visible")) {
-
-			params.element.show();
-
-			$("#actionMessages > .space-top-x").removeClass("space-top-x");
-			$("#actionMessages > div").filter(":visible:first").addClass("space-top-x");
-
-		} else {
-
-			$("#actionMessages").show();
-			$("#actionMessages > span").show();
-
-			// show element
-			params.element.show();
-
-			$("#actionMessages > div").filter(":visible:first").addClass("space-top-x");
-		}
-	} else {
-
-		$(params.element).hide();
-
-		if (!$("div[id='actionMessages'] > div").is(":visible")) {
-
-			$("#actionMessages").hide();
-
-		} else {
-
-			$("#actionMessages > div").filter(":visible:first").addClass("space-top-x");
-		}
-	}
-}
 
 Array.prototype.chunk = function(arr) {
 

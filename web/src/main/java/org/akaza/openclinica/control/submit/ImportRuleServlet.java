@@ -20,16 +20,7 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.google.gson.JsonObject;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -55,7 +46,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.JsonObject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.text.MessageFormat;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
@@ -71,7 +65,7 @@ public class ImportRuleServlet extends Controller {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
-        
+
 		String action = request.getParameter("action");
 		request.setAttribute("contextPath", getContextPath(request));
 		request.setAttribute("hostPath", getHostPath(request));
@@ -95,13 +89,14 @@ public class ImportRuleServlet extends Controller {
 		if ("confirm".equalsIgnoreCase(action)) {
 
 			try {
-				
+
 				FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties("xml"));
-				File ruleFile = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn()).get(0);
-				
+				File ruleFile = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn())
+						.get(0);
+
 				InputStream xsdFile = getCoreResources().getInputStream("rules.xsd");
 
-                XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
+				XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
 				schemaValidator.validateAgainstSchema(ruleFile, xsdFile);
 				RulesPostImportContainer importedRules = handleLoadCastor(ruleFile);
 				logger.info(ub.getFirstName());
@@ -111,35 +106,35 @@ public class ImportRuleServlet extends Controller {
 				importedRules = rulesPostImportContainerService.validateRuleSetDefs(importedRules);
 				request.getSession().setAttribute("importedData", importedRules);
 				provideMessage(importedRules, request);
-				
-				
+
 				// If request is coming from rule studio
 				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")) {
-					
+
 					try {
-						
+
 						getRuleSetService().saveImport(importedRules);
 						MessageFormat mf = new MessageFormat("");
 						mf.applyPattern(resword.getString("successful_rule_upload"));
 
 						Object[] arguments = {
 								importedRules.getValidRuleDefs().size() + importedRules.getDuplicateRuleDefs().size(),
-								importedRules.getValidRuleSetDefs().size() + importedRules.getDuplicateRuleSetDefs().size() };
-						
+								importedRules.getValidRuleSetDefs().size()
+										+ importedRules.getDuplicateRuleSetDefs().size() };
+
 						JsonObject obj = new JsonObject();
-						
+
 						obj.addProperty("argument", arguments.toString());
 						obj.addProperty("message", resword.getString("successful_rule_upload"));
-						
+
 						response.getWriter().write(obj.toString());
-						
-					} catch(Exception ex) {
-						
+
+					} catch (Exception ex) {
+						logger.error("Error has occurred.", ex);
 						response.sendError(500, ex.getMessage());
 					}
-					
+
 				} else {
-					
+
 					forwardPage(Page.VERIFY_RULES_IMPORT_SERVLET, request, response);
 				}
 			} catch (OpenClinicaSystemException re) {
@@ -229,8 +224,8 @@ public class ImportRuleServlet extends Controller {
 			UserAccountBean ub) {
 		RulesPostImportContainerService rulesPostImportContainerService = new RulesPostImportContainerService(
 				getDataSource());
-        rulesPostImportContainerService.setRuleDao(getRuleDao());
-        rulesPostImportContainerService.setRuleSetDao(getRuleSetDao());
+		rulesPostImportContainerService.setRuleDao(getRuleDao());
+		rulesPostImportContainerService.setRuleSetDao(getRuleSetDao());
 		rulesPostImportContainerService.setCurrentStudy(currentStudy);
 		rulesPostImportContainerService.setRespage(respage);
 		rulesPostImportContainerService.setUserAccount(ub);
@@ -239,7 +234,7 @@ public class ImportRuleServlet extends Controller {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
 			return Controller.ADMIN_SERVLET_CODE;
 		} else {
@@ -248,9 +243,10 @@ public class ImportRuleServlet extends Controller {
 	}
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin()) {
 			return;
@@ -259,8 +255,9 @@ public class ImportRuleServlet extends Controller {
 		if (r.equals(Role.STUDY_DIRECTOR) || r.equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
 	}
 }

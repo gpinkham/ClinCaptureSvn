@@ -207,7 +207,9 @@ function createPagination(params) {
 
 		var el = $("<li>");
 		var aEL = $("<a>");
-		aEL.text("Â«Â«")
+
+		var tt = unescape(JSON.parse('"\u00AB\u00AB"'));
+		aEL.text(tt);
 		aEL.click(function() {
 
 			if (currentPageIndex === 0) {
@@ -249,7 +251,9 @@ function createPagination(params) {
 
 		var rEl = $("<li>");
 		var rAEL = $("<a>");
-		rAEL.text("Â»Â»")
+
+		var tt = unescape(JSON.parse('"\u00BB\u00BB"'));
+		rAEL.text(tt);
 		rAEL.click(function() {
 
 			if (currentPageIndex < params.itemsArr.length - 1) {
@@ -318,7 +322,9 @@ function createDropSurface(params) {
 
 	}).text(params.text)
 
-	return div;
+	createPopover(div);
+
+	return div;	
 }
 
 /* ====================================================================================
@@ -425,6 +431,9 @@ function createPopover(droppable) {
 		container: droppable
 
 	}).click(function(evt) {
+
+		// existing
+		$(".popover").remove();
 
 		evt.stopPropagation();
 		$(this).popover('show');
@@ -625,21 +634,19 @@ function handleErrorResponse(params) {
 
 	if (params.response.status === 404) {
 
-		bootbox.alert("The server you are attempting to connect to appears to be unavailable at the moment. Please try again later!", function(result) {
-
-			if (result) {
-				$(".modal-backdrop").remove();
-			}
+		bootbox.alert({
+			backdrop: false,
+			message: "The server you are attempting to connect to appears to be unavailable at the moment. Please try again later!"
 		});
 
 	} else {
 
-		bootbox.alert(params.response.responseText, function(result) {
+		bootbox.alert({
 
-			if (result) {
-				$(".modal-backdrop").remove();
-			}
+			backdrop: false,
+			message: params.response.responseText
 		});
+
 	}
 }
 

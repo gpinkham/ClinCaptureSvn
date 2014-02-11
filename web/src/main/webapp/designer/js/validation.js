@@ -2,19 +2,16 @@ $(function() {
 	
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 
-	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true");
 	$("a[id='back']").attr("href", c + "/designer/rule.html");
+	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true");
 
 	if (sessionStorage.getItem("validation")) {
 
 		var validation = JSON.parse(sessionStorage.getItem("validation"));
 
-		var expression = sessionStorage.getItem("expression");
-		var actions = JSON.parse(sessionStorage.getItem("actions"));
-		var targets = JSON.parse(sessionStorage.getItem("targets"));
-		var properties = JSON.parse(sessionStorage.getItem("properties"));
+		var rule = JSON.parse(sessionStorage.getItem("rule"));
 
-		sessionStorage.setItem("status", "loaded");
+		sessionStorage.setItem("status", "load");
 
 		// if a rule passed validation
 		if (validation.ruleValidation === "rule_valid") {
@@ -22,33 +19,33 @@ $(function() {
 			$(".failure").hide();
 			$(".success").show();
 
-			$(".alert-success").text("Rule is valid: " + expression);
+			$(".alert-success").text("Rule is valid: " + rule.expression);
 			$("#evaluates").text("Rule evaluates to");
 			$(".alert-info").text(validation.ruleEvaluatesTo);
 
-			if (targets) {
+			if (rule.targets) {
 
-				for (var x = 0; x < targets.length; x++) {
+				for (var x = 0; x < rule.targets.length; x++) {
 
 					var list = $("<li class='list-group-item'>");
-					list.text(targets[x]);
+					list.text(rule.targets[x]);
 
 					$("#items").append(list);
 				}
 
-				for (var x = 0; x < actions.length; x++) {
+				for (var x = 0; x < rule.actions.length; x++) {
 
 					var list = $("<li class='list-group-item'>");
-					if (actions[x] === "discrepancy") {
+					if (rule.actions[x].type === "discrepancy") {
 						list.text("Discrepancy Action");
-					} else if (actions[x] === "email") {
+					} else if (rule.actions[x].type === "email") {
 						list.text("Email Action");
 					}
 
 					$("#actions").append(list);
 				}
 				
-				if (properties.initialDataEntry) {
+				if (rule.ide) {
 
 					var list = $("<li class='list-group-item'>");
 					list.text("Intial data entry");
@@ -56,7 +53,7 @@ $(function() {
 					$("#executions").append(list);
 				}
 
-				if (properties.doubleDataEntry) {
+				if (rule.dde) {
 
 					var list = $("<li class='list-group-item'>");
 					list.text("Double data entry");
@@ -64,7 +61,7 @@ $(function() {
 					$("#executions").append(list);
 				}
 
-				if (properties.administrativeDataEntry) {
+				if (rule.ae) {
 
 					var list = $("<li class='list-group-item'>");
 					list.text("Administrative data entry");
@@ -72,7 +69,7 @@ $(function() {
 					$("#executions").append(list);
 				}
 
-				if (properties.importDataEntry) {
+				if (rule.di) {
 
 					var list = $("<li class='list-group-item'>");
 					list.text("Import data entry");
@@ -90,8 +87,6 @@ $(function() {
 
 			$("#evaluates").text("Rule failure message");
 			$(".alert-info").text(validation.ruleValidationFailMessage);
-
-			sessionStorage.setItem("status", "failed");
 		}
 	} else {
 
@@ -135,6 +130,8 @@ function saveRule(data) {
 
 		success: function(response) {
 
+			sessionStorage.setItem("status", "remove");
+
 			var obj = JSON.parse(response);
 			bootbox.confirm(obj.message, function(result) {
 
@@ -147,6 +144,8 @@ function saveRule(data) {
 		},
 
 		error: function(response) {
+
+			sessionStorage.setItem("status", "load");
 
 			handleErrorResponse({
 

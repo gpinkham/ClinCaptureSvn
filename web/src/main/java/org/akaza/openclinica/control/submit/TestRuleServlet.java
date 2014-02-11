@@ -157,36 +157,41 @@ public class TestRuleServlet extends Controller {
 
 		} else if (action.equals("validate")) {
 			
-			
-			HashMap<String, String> result = validate(request, v);
-			
-			// do not modify
-			Map serialResult = new HashMap(result);
+			try {
+				
+				HashMap<String, String> result = validate(request, v);
+				
+				// do not modify
+				Map serialResult = new HashMap(result);
 
-			if (result.get("ruleValidation").equals("rule_valid")) {
-				addPageMessage(resword.getString("test_rules_message_valid"), request);
-			} else {
-				addPageMessage(resword.getString("test_rules_message_invalid"), request);
-			}
-			request.setAttribute("ruleValidation", result.get("ruleValidation"));
-			request.setAttribute("validate", "on");
-			request.setAttribute("ruleEvaluatesTo", resword.getString("test_rules_validate_message"));
-			request.setAttribute("ruleValidationFailMessage", result.get("ruleValidationFailMessage"));
-			request.setAttribute("action", result.get("ruleValidation").equals("rule_valid") ? "test" : "validate");
-			result.remove("result");
-			result.remove("ruleValidation");
-			result.remove("ruleEvaluatesTo");
-			result.remove("ruleValidationFailMessage");
-			populateTooltip(request, result);
-			request.getSession().setAttribute("testValues", result);
-			populteFormFields(fp);
-			
-			if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")) {
+				if (result.get("ruleValidation").equals("rule_valid")) {
+					addPageMessage(resword.getString("test_rules_message_valid"), request);
+				} else {
+					addPageMessage(resword.getString("test_rules_message_invalid"), request);
+				}
+				request.setAttribute("ruleValidation", result.get("ruleValidation"));
+				request.setAttribute("validate", "on");
+				request.setAttribute("ruleEvaluatesTo", resword.getString("test_rules_validate_message"));
+				request.setAttribute("ruleValidationFailMessage", result.get("ruleValidationFailMessage"));
+				request.setAttribute("action", result.get("ruleValidation").equals("rule_valid") ? "test" : "validate");
+				result.remove("result");
+				result.remove("ruleValidation");
+				result.remove("ruleEvaluatesTo");
+				result.remove("ruleValidationFailMessage");
+				populateTooltip(request, result);
+				request.getSession().setAttribute("testValues", result);
+				populteFormFields(fp);
 				
-				response.getWriter().write(new Gson().toJson(serialResult));
+				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")) {
+					
+					response.getWriter().write(new Gson().toJson(serialResult));
+					
+				} else {
+					forwardPage(Page.TEST_RULES, request, response);
+				}
+			} catch (Exception ex) {
 				
-			} else {
-				forwardPage(Page.TEST_RULES, request, response);
+				response.sendError(500, ex.getMessage());
 			}
 
 		} else if (action.equals("test")) {

@@ -3,9 +3,9 @@
  * added.
  * =============================================================== */
 function fetchStudies() {
-
-	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 	
+	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
+
 	$.ajax({
 
 		type: "POST",
@@ -22,6 +22,40 @@ function fetchStudies() {
 
 			sessionStorage.setItem("studies", JSON.stringify(studies));
 			loadStudies(studies);
+
+		},
+
+		error: function(response) {
+
+			handleErrorResponse({
+
+				response: response
+			})
+		}
+	})
+}
+
+function fetchRuleForEditing() {
+	
+	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
+
+	$.ajax({
+
+		type: "POST",
+
+		url: c + "/studies?action=edit&id=" + gup("id"),
+
+		success: function(response) {
+
+			var rule = null;
+
+			// FF can return a string
+			if (typeof(response) === "string") {
+
+				rule = JSON.parse(response)
+			}
+
+			parser.render(rule);
 
 		},
 
@@ -61,9 +95,10 @@ function loadStudies(studies) {
 			tr.attr("id", x);
 			tr.click(function() {
 
-				if ($("div[id='studies']").find("table > tbody > tr").size() > 1 && $("#designSurface").find(".panel-body").children().size() > 2) {
+				if ($("div[id='studies']").find("table > tbody > tr").size() > 1 && $("#designSurface").find(".panel-body").find(".dotted-borders").size() > 2) {
 
-					bootbox.confirm("The current rule will be lost. Are you sure you want to select another study?", function(result) {
+					bootbox.confirm("The current rule will be lost. Are you sure you want to select another study?", 
+						function(result) {
 
 						if (result) {
 
@@ -98,7 +133,11 @@ function loadStudies(studies) {
 								study: currentStudy.name,
 							})
 							
-							resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"))
+							resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
+
+							$(".modal-backdrop").remove();
+						} else {
+							$(".modal-backdrop").remove();
 						}
 					});
 				} else {
@@ -435,6 +474,7 @@ function loadStudyEventCRFItems(crf) {
 			var tdDescription = $("<td>");
 
 			if (item.description) {
+
 				if (item.description.length > 25) {
 
 					tdDescription.text(item.description.slice(0, 20) + "...");
@@ -498,9 +538,7 @@ function loadStudyEventCRFItems(crf) {
  * => targets - the rule targets
  * => evaluateTo - What the rule should evaluate to
  * ============================================================= */
-function validate(params) {
-
-	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
+function validate(rule) {
 
 	$.ajax({
 
@@ -509,17 +547,17 @@ function validate(params) {
 		data: {
 
 			rs: true,
-			rule: params.expression,
-			target: params.targets[0],
-			testRuleActions: params.evaluateTo
+			rule: rule.expression,
+			target: rule.targets[0],
+			testRuleActions: rule.evaluateTo
 		},
 
-		url: c + "/TestRule?action=validate&study=" + selectedStudy,
+		url: rule.submission + "/TestRule?action=validate&study=" + selectedStudy,
 
 		success: function(response) {
 
 			sessionStorage.setItem("validation", response);
-			displayValidationResults(params)
+			displayValidationResults(rule)
 		},
 
 		error: function(response) {
@@ -543,60 +581,7 @@ function validate(params) {
  * => targets - the rule targets
  * => evaluateTo - What the rule should evaluate to
  * ============================================================= */
-function displayValidationResults(params) {
-
-	var vRule = new Parser().createRule();
-
-	var properties = Object.create(null);
-
-	properties.evaluateTo = params.evaluateTo
-
-	// Run
-	properties.doubleDataEntry = $("#dde").is(":checked");
-	properties.initialDataEntry = $("#ide").is(":checked");
-	properties.importDataEntry = $("#dataImport").is(":checked");
-	properties.administrativeDataEntry = $("#ae").is(":checked");
-
-	// Overall rule message
-	properties.message = $("#message").find("textarea").val();
-
-	if ($("#chkDiscrepancyText").is(":checked")) {
-		
-		properties.discrepancyText = $("#discrepancyText").find("textarea").val();
-	}
-
-	if ($("#chkEmail").is(":checked")) {
-
-		properties.body = $("#body").val();
-		properties.to = $("#toField").val().trim();
-	}
-
-	if ($("input[name=tItem]:checked").length > 0) {
-
-		var dests = [];
-		var destinations = $("#parameters").val().split(",");
-
-		for (var x = 0; x < destinations.length; x++) {
-			dests.push(destinations[x]);
-		}
-
-		properties.destinationProperty = dests;
-	}
-
-	var actions = []
-	var rActions = $(".action:checked");
-
-	for (var act = 0; act < rActions.length; act++) {
-		actions.push($(rActions[act]).attr("action"));
-	}
-
-	sessionStorage.setItem("name", $("#ruleName").val());
-	sessionStorage.setItem("expression", params.expression);
-	sessionStorage.setItem("actions", JSON.stringify(actions));
-	sessionStorage.setItem("properties", JSON.stringify(properties));
-	sessionStorage.setItem("targets", JSON.stringify(params.targets));
-
-	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
+function displayValidationResults(rule) {
 
 	$.ajax({
 
@@ -605,21 +590,21 @@ function displayValidationResults(params) {
 		data: {
 
 			action: "save",
-			name: $("#ruleName").val(),
-			expression: params.expression,
-			actions: JSON.stringify(actions),
-			properties: JSON.stringify(properties),
-			targets: JSON.stringify(params.targets)
+			rule: JSON.stringify(rule)
 			
 		},
 
-		url: c + "/studies?action=validate",
+		url: rule.submission + "/studies?action=validate",
 
 		success: function(response) {
 
 			if (response) {
 
+				// To be used in validation
 				sessionStorage.setItem("xml", response);
+				sessionStorage.setItem("rule", JSON.stringify(rule));
+
+				// launch validation window
 				window.open("validation.html", '_self');
 
 			}
@@ -633,4 +618,22 @@ function displayValidationResults(params) {
 			})
 		}
 	})
+}
+
+function getURLParameter(name) {
+  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+}
+
+function gup(name) {
+
+	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+
+	var regexS = "[\\?&]" + name + "=([^&#]*)";
+	var regex = new RegExp(regexS);
+	var results = regex.exec(window.location.href);
+	if (results == null) {
+		return "";
+	} else {
+		return results[1];	
+	} 
 }
