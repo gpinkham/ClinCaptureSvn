@@ -751,12 +751,12 @@ public class Page {
 
 	public final static Page ADD_DISCREPANCY_NOTE = new Page("/WEB-INF/jsp/submit/addDiscrepancyNote.jsp",
 			"Add Discrepancy Note");
+	public final static Page ADD_DISCREPANCY_NOTE_DIV = new Page("/WEB-INF/jsp/submit/addDiscrepancyNoteDiv.jsp",
+			"Add Discrepancy Note");
+	public final static Page ADD_ONE_DISCREPANCY_NOTE_DIV = new Page("/WEB-INF/jsp/submit/addOneDiscrepancyNoteDiv.jsp",
+			"Add Discrepancy Note");
 	public final static Page ADD_DISCREPANCY_NOTE_SERVLET = new Page("/CreateDiscrepancyNote", "Add Discrepancy Note");
-	public final static Page ADD_DISCREPANCY_NOTE_DONE = new Page("/WEB-INF/jsp/submit/addDiscrepancyNoteDone.jsp",
-			"Add Discrepancy Note Done");
-	public final static Page ADD_DISCREPANCY_NOTE_SAVE_DONE = new Page(
-			"/WEB-INF/jsp/submit/addDiscrepancyNoteSaveDone.jsp", "Add Discrepancy Note Save Done");
-
+	
 	public final static Page UPDATE_CRF_HEADER_PAGE = new Page(path + "submit/updateCRFHeader.jsp", "Update CRF Header");
 
     public final static Page UPDATE_DN_SHORTCUT_ANCHORS_PAGE = new Page(path + "submit/updateDNShortcutAnchors.jsp", "Update DN Shortcut  Anchors");

@@ -12,9 +12,10 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<html>   
+<html>    
 <head>
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 <title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="add_discrepancy_note" bundle="${resword}"/></title>
@@ -23,6 +24,12 @@
 <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css">
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+
+<link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
+<link rel="stylesheet" href="includes/jquery-ui.css"  type="text/css"/>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui.min.js"></script>
 
 <script language="JavaScript" src="includes/CalendarPopup.js"></script>
 
@@ -131,9 +138,102 @@ function setElements(typeId,user1,user2,filter1,nw,ud,rs,cl,na,isRFC) {
 	}
 }
 
+function sendFormDataViaAjax() {
+	var aForm = $('[name=noteForm]');
+	$( "div#divWithData").hide();
+    $( "div#ajax-loader").show();
+	$.ajax({
+        type: aForm.attr('method'),
+        url: aForm.attr('action'),
+        data: aForm.serialize(),
+        success: function (data) {
+			function showDiv() {
+				$("div#divWithData").html('');
+				$("div#divWithData").append(data);
+				$("select[id*=typeId]").change();
+				$("div#ajax-loader").hide();
+				$("div#divWithData").show();
+			};
+			
+			if (data.indexOf('Save Done') > -1) {
+				showDiv();
+				changeDNFlagIconInParentWindow();
+				window.close();
+			} else if (data.indexOf('Show pop-up') > -1) {
+				showDiv();
+				changeDNFlagIconInParentWindow();
+				showMessageForDN();
+			} else if (data.indexOf('Error in data') > -1) {
+				showDiv();
+			} else {
+				alert('No response from server');
+			}
+        }
+    });
+}
+	
+function displayMessageInBox(showOkButton, showCancelButton, headerOfMessageBox, message, notShowAgainMessage, themeColor){
+    if ($("#confirmation").length == 0) {
+		$("body").append(
+            "<div id=\"confirmation\" style=\"display: none;\" title=\"" + headerOfMessageBox + "\">" +
+                "<div style=\"clear: both; text-align: justify;\">"+ message +"</div>"+
+                "<div style=\"clear: both; padding: 6px;\"><input type=\"checkbox\" id=\"ignoreBoxMSG\"/>" + notShowAgainMessage + "</div>" +
+                "<div style=\"clear: both;\">" +
+                    (showOkButton == true? "<input type=\"button\" value=\"OK\" class=\"button_medium\" onclick=\"clickOkInMessageBox();\" style=\"float: left;\">" : "") +
+                    (showCancelButton == true? "<input type=\"button\" value=\"Cancel\" class=\"button_medium\" onclick=\"clickCancelInMessageBox();\" style=\"float: left; margin-left: 6px;\">" : "") +
+                "</div>" +
+            "</div>");
+
+        $("#confirmation").dialog({
+            autoOpen : false,
+            modal : true,
+            height: 180,
+            width: 450,
+			close: function(event, ui) {
+				window.close();
+				}
+			});
+			
+        $("#confirmation #ignoreBoxMSG").unbind("change").bind("change", function() {
+			setCookie("ignoreBoxMSG31", $(this).attr("checked") ? "yes" : "no", 1000);
+        });
+			
+		if (themeColor == 'violet') {
+			$('input.button_medium').css('background-image', 'url(images/violet/button_medium_BG.gif)');
+			$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
+		}
+			
+		if (themeColor == 'green') {
+			$('input.button_medium').css('background-image', 'url(images/green/button_medium_BG.gif)');
+			$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
+		}
+	
+		if (getCookie("ignoreBoxMSG31") == "yes") {
+			clickOkInMessageBox();
+		} else {
+			$("#confirmation #ignoreBoxMSG").attr('checked', false);
+			$("#confirmation").dialog("open");
+        }
+    } 
+}
+ 
+function clickOkInMessageBox(){
+    $('#confirmation').dialog('close');
+	window.close();
+}
+ 
+function showMessageForDN(){
+    displayMessageInBox(true, false, '<fmt:message key="this_note_is_associated_with_data" bundle="${respage}"/>', '${popupMessage}', '<fmt:message key="do_not_show_this_message_anymore" bundle="${respage}"/>', '${newThemeColor}'); 
+}
+
 $(document).ready(function() {
-		$( "select[id*=typeId]" ).change();
-	})
+	$("select[id*=typeId]").change();
+	var aForm = $('[name=noteForm]');
+	aForm.submit(function (e) {
+		e.preventDefault();
+		sendFormDataViaAjax();
+	});
+})
 
 </script> 
 </head>
@@ -247,7 +347,8 @@ $(document).ready(function() {
 <h3 class="title_manage"><fmt:message key="add_note" bundle="${resword}"/></h3>
 
 <!-- dn box -->
-<div style="width: 418;">	
+<div id="ajax-loader" style="width: 418; height: 200; display: none;" align="center"><img src="images/ajax-loader-blue.gif"/></div>
+<div id="divWithData" style="width: 418;">	
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">
 
@@ -407,10 +508,10 @@ $(document).ready(function() {
 	<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
         <c:choose>
             <c:when test="${writeToDB eq '1'}">
-                <div class="dnBoxCol2"><input type="button" name="SubmitExit" onclick="javascript:$('#typeId option').removeAttr('disabled');this.form.submit();" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></div>
+                <div class="dnBoxCol2"><input type="button" name="SubmitExit" onclick="javascript: $('#typeId option').removeAttr('disabled'); sendFormDataViaAjax();" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium"></div>
             </c:when>
             <c:otherwise>
-                <div class="dnBoxCol2"><input type="button" name="Submit" onclick="javascript:this.form.submit();" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></div>
+                <div class="dnBoxCol2"><input type="button" name="Submit" onclick="javascript: sendFormDataViaAjax();" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></div>
             </c:otherwise>
         </c:choose>
     </c:if>

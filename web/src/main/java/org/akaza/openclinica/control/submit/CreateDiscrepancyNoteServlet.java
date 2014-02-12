@@ -169,6 +169,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		
 		request.setAttribute(DIS_TYPES, types);
 		request.setAttribute(RES_STATUSES, ResolutionStatus.toArrayList());
+		
+		String popupMessage = respage.getString("this_note_is_associated_with_data_in_the_CRF");
 
         String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
         String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note")
@@ -262,6 +264,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				StudySubjectBean ssub = (StudySubjectBean) getStudySubjectDAO().findByPK(entityId);
 				SubjectBean sub = (SubjectBean) getSubjectDAO().findByPK(ssub.getSubjectId());
 				preUserId = ssub.getOwnerId();
+				popupMessage = respage.getString("this_note_is_associated_with_data_for_the_Study_Subject");
 				
 				if (!StringUtil.isBlank(column)) {
 					if ("enrollment_date".equalsIgnoreCase(column)) {
@@ -306,6 +309,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			} else if ("subject".equalsIgnoreCase(entityType)) {
 				SubjectBean sub = (SubjectBean) getSubjectDAO().findByPK(entityId);
 				preUserId = sub.getOwnerId();
+				popupMessage = respage.getString("this_note_is_associated_with_data_for_the_Subject");
+
 				if (!StringUtil.isBlank(column)) {
 					if ("gender".equalsIgnoreCase(column)) {
 						String genderToDisplay = resword.getString("not_specified");
@@ -336,6 +341,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			} else if ("studyEvent".equalsIgnoreCase(entityType)) {
 				StudyEventBean se = (StudyEventBean) getStudyEventDAO().findByPK(entityId);
 				preUserId = se.getOwnerId();
+				popupMessage = respage.getString("this_note_is_associated_with_data_for_the_Study_Event");
+
 				if (!StringUtil.isBlank(column)) {
 					if ("location".equalsIgnoreCase(column)) {
 						request.setAttribute("entityValue",
@@ -361,6 +368,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			} else if ("eventCrf".equalsIgnoreCase(entityType)) {
 				EventCRFBean ec = (EventCRFBean) getEventCRFDAO().findByPK(entityId);
 				preUserId = ec.getOwnerId();
+
 				if (!StringUtil.isBlank(column)) {
 					if ("date_interviewed".equals(column)) {
 						if (ec.getDateInterviewed() != null) {
@@ -452,7 +460,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			actualStatusesList = ResolutionStatus.simpleList;
 			request.setAttribute(WHICH_RES_STATUSES, "1");
 		}
-
+		request.setAttribute("popupMessage", popupMessage.replaceAll("'", "&rsquo;"));
+		
 		if (!fp.isSubmitted()) {
 			DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
 			
@@ -573,7 +582,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			request.getSession().setAttribute("cdn_groupOid", fp.getString("groupOid"));
             request.getSession().setAttribute("cdn_itemId", itemId);
             request.getSession().setAttribute("cdn_order", fp.getString("order"));
-
+            
 			// set the user account id for the user who completed data entry
 			forwardPage(Page.ADD_DISCREPANCY_NOTE, request, response);
 		} else {
@@ -710,7 +719,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				request.setAttribute("unlock", "0");
 				logger.debug("set UNLOCK to ZERO");
 			}
-
+			
 			request.setAttribute(USER_ACCOUNTS, userAccounts);
 
 			if (errors.isEmpty()) {
@@ -732,7 +741,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 					}
 					
                     request.setAttribute(UPDATED_DISCREPANCY_NOTE, note.clone());
-					forwardPage(Page.ADD_DISCREPANCY_NOTE_DONE, request, response);
+                    request.setAttribute("responseMessage", "Show pop-up");
+                    forwardPage(Page.ADD_DISCREPANCY_NOTE_DIV, request, response);
 				} else {
 					// if not creating a new thread(note), update existing notes
 					// if necessary
@@ -883,7 +893,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 					addPageMessage(respage.getString("note_saved_into_db"), request);
 					addPageMessage(respage.getString("page_close_automatically"), request);
                     request.setAttribute(UPDATED_DISCREPANCY_NOTE, note);
-					forwardPage(Page.ADD_DISCREPANCY_NOTE_SAVE_DONE, request, response);
+                    request.setAttribute("responseMessage", "Save Done");
+                    forwardPage(Page.ADD_DISCREPANCY_NOTE_DIV, request, response);
 				}
 			} else {
 				if (parentId > 0) {
@@ -902,7 +913,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				} 
 				
 				setInputMessages(errors, request);
-				forwardPage(Page.ADD_DISCREPANCY_NOTE, request, response);
+				request.setAttribute("responseMessage", "Error in data");
+				forwardPage(Page.ADD_DISCREPANCY_NOTE_DIV, request, response);
 			}
 		}
 	}

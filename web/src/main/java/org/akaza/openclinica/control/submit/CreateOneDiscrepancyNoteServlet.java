@@ -102,8 +102,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         UserAccountBean ub = getUserAccountBean(request);
         StudyBean currentStudy = getCurrentStudy(request);
-
-        Page forwardTo = null;
+        boolean shouldBeForwardTo = true;
 		FormProcessor fp = new FormProcessor(request);
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 
@@ -355,10 +354,14 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 				String close = fp.getString("close" + parentId);
 				// session.setAttribute(CLOSE_WINDOW, "true".equals(close)?"true":"");
 				if ("true".equals(close)) {
-					addPageMessage(respage.getString("note_saved_into_db"), request);
-					addPageMessage(respage.getString("page_close_automatically"), request);
-                    forwardTo = Page.ADD_DISCREPANCY_NOTE_SAVE_DONE;
-					logger.info("Should forwardPage to ADD_DISCREPANCY_NOTE_SAVE_DONE.");
+					shouldBeForwardTo = false;
+					ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(dn.getEntityType(), dn.getEntityId(),
+							dn.getColumn());
+					dn.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));
+					request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn.clone());
+					request.setAttribute("responseMessage", "Save Done");
+                    forwardPage(Page.ADD_ONE_DISCREPANCY_NOTE_DIV, request, response);
+                    return;
 				} else {
 					if (parentId == dn.getParentDnId()) {
 						mess.add(restext.getString("a_new_child_dn_added"));
@@ -375,6 +378,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 
 		} else {
 			setInputMessages(errors, request);
+			request.setAttribute("errorsMap", errors);
 			boxDNMap.put(parentId, dn);
             request.getSession().setAttribute(BOX_TO_SHOW, parentId + "");
 		}
@@ -387,8 +391,9 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 				dn.getColumn());
 		dn.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));
 		request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn.clone());
-		forwardPage(forwardTo == null ? Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle())
-				: forwardTo, request, response);
+		if (shouldBeForwardTo) {
+			forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()), request, response);
+		}
 	}
 
 	private void manageReasonForChangeState(HttpSession session, Integer itemDataBeanId) {

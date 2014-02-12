@@ -29,7 +29,7 @@ function boxShowWithDefault(id, index, defaultId, defaultValue){
 	var objSelect = MM_findObj("resStatusId"+id);
     // ClinCapture #42
     if(objSelect.options.length <= 1) {
-        jQuery("#res1${parentId}").hide();
+        jQuery("#res1${parentId}").hide(); 
     } else {
         jQuery("#res1${parentId}").show();
     }
@@ -185,7 +185,7 @@ function setYPos(id) {
 		<c:set var="discrepancyNote" value="${boxDNMap[boxDN.key]}"/>
 	</c:if>
 </c:forEach>
-<c:forEach var="av" items="${autoViews}">
+<c:forEach var="av" items="${autoViews}"> 
 	<c:if test="${parentId==av.key}">
 		<c:set var="autoView" value="${autoViews[av.key]}"/>
 	</c:if>
@@ -193,7 +193,8 @@ function setYPos(id) {
 <c:if test="${parentId==boxToShow}">
 	<c:set var="displayAll" value="block"/>
 </c:if>
-<form name="oneDNForm" method="POST" action="CreateOneDiscrepancyNote"> 
+
+<form name="oneDNForm_${parentId}" method="POST" action="CreateOneDiscrepancyNote"> 	
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;display:<c:out value="${displayAll}"/>" id="${boxId}">
 	<input type="hidden" name="parentId" value="${parentId}"/>
 	<input type="hidden" name="viewDNLink${parentId}" value="${viewDNLink}"/>
@@ -205,7 +206,6 @@ function setYPos(id) {
 	<input type="hidden" name="ypos${parentId}" value="0"/>
 	<input type="hidden" name="isRFC" value="${param.isRFC}"/>
 	<input type="hidden" name="originJSP" value="${originJSP}"/>
-
 	<!-- *JSP* submit/discrepancyNote.jsp -->
 	<td valign="top">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -292,7 +292,7 @@ function setYPos(id) {
 				<c:set var="typeIdl" value="${discrepancyNote.discrepancyNoteTypeId}"/>
 				<c:choose>
 				<c:when test="${whichResStatus == 22 || whichResStatus == 1}">
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
+					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript: setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
 						<c:forEach var="type" items="${discrepancyTypes2}">
 							<c:choose>
 								<c:when test="${typeIdl == type.id}">
@@ -306,7 +306,7 @@ function setYPos(id) {
 					</select>
 				</c:when>
 				<c:otherwise>
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
+					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript: setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
 						<c:forEach var="type" items="${discrepancyTypes}">
 							<c:choose>
 								<c:when test="${typeIdl == type.id}">
@@ -410,8 +410,8 @@ function setYPos(id) {
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 		<c:if test="${(enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData')}">
 			<div class="dnBoxCol3" style="margin-right: -10px; margin-top: -25px;">
-				<input type="submit" id="submitBtn${parentId}" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled');">
-				<input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled');">
+				<input type="button" id="submitBtn${parentId}" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled');this.form.submit();">
+				<input type="button" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled'); sendFormDataViaAjax(${parentId});">
 			</div>
 		</c:if>
 		<c:if test="${parentId==0}">
@@ -425,4 +425,6 @@ function setYPos(id) {
 	</td>
 </table>
 </form>
+
 <div style="clear:both;"></div>
+<jsp:include page="../include/changeTheme.jsp"/>

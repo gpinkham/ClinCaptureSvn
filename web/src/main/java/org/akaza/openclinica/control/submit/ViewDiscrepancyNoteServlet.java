@@ -712,7 +712,13 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			ArrayList itemAuditEvents = adao.findItemAuditEvents(entityId, name);
 			request.setAttribute("itemAudits", itemAuditEvents);
 		}
-        forwardPage(Page.VIEW_DISCREPANCY_NOTE, request, response);
+
+		if (!"XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+			forwardPage(Page.VIEW_DISCREPANCY_NOTE, request, response);
+		} else {
+			request.setAttribute("responseMessage", "Error in data");
+			forwardPage(Page.ADD_ONE_DISCREPANCY_NOTE_DIV, request, response);
+		}
 	}
 
 	private void setupStudyEventCRFAttributes(EventCRFBean eventCRFBean, HttpServletRequest request) {

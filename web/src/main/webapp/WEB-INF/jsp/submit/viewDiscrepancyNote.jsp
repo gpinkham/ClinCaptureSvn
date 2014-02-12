@@ -21,7 +21,7 @@
 
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
-<html>
+<html> 
 <head>
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
@@ -48,6 +48,43 @@
             return [curtop];
             }
         }
+		
+		function sendFormDataViaAjax(formId) {
+			var aForm = $('[name=oneDNForm_'+formId+']');
+			$( "div#divWithData_"+formId).hide();
+			$( "div#ajax-loader_"+formId).show();
+			$.ajax({
+				type: aForm.attr('method'),
+				url: aForm.attr('action'),
+				data: aForm.serialize(),
+				success: function (data) {
+					function showDiv() {
+						$("div#divWithData_"+formId).html('');
+						$("div#divWithData_"+formId).append(data);
+						$("div#ajax-loader_"+formId).hide();
+						$("div#divWithData_"+formId).show();
+					};
+					if (data.indexOf('Save Done') > -1) {
+						showDiv();
+						changeDNFlagIconInParentWindow();
+						window.close();
+					} else if (data.indexOf('Error in data') > -1) {
+						showDiv();
+					} else {
+						alert('No response from server');
+					}
+				}
+			});
+		}
+		
+		$(document).ready(function() {
+			$("form[name*=oneDNForm_]").each(function() {
+				$(this).submit(function (e) {
+					e.preventDefault();
+					sendFormDataViaAjax();
+				});
+			});
+		})
     </script>
 
     <style type="text/css">
@@ -67,7 +104,7 @@
 
 <c:if test="${updatedDiscrepancyNote ne null}">
   <script type="text/javascript" language="javascript">
-    setImageInParentWin('flag_<c:out value="${updatedDiscrepancyNote.field}"/>', '<%=request.getContextPath()%>/<c:out value="${updatedDiscrepancyNote.resStatus.iconFilePath}"/>', '${updatedDiscrepancyNote.resStatus.id}');
+			setImageInParentWin('flag_<c:out value="${updatedDiscrepancyNote.field}"/>', '${contextPath}<c:out value="${updatedDiscrepancyNote.resStatus.iconFilePath}"/>', '${updatedDiscrepancyNote.resStatus.id}');
   </script>
 </c:if>
 
@@ -320,16 +357,20 @@
             </tr>
                  
             <c:if test="${showDNBox eq 'y'}">
-                <c:import url="./discrepancyNote.jsp">
-                    <c:param name="parentId" value="${note.value.id}"/>
-                    <c:param name="entityId" value="${id}"/>                
-                    <c:param name="entityType" value="${name}"/>                
-                    <c:param name="field" value="${field}"/>                
-                    <c:param name="column" value="${column}"/>
-                    <c:param name="boxId" value="box${note.value.id}"/>
-                    <c:param name="typeId" value="${note.value.discrepancyNoteTypeId}"/>
-                    <c:param name="typeName" value="${note.value.disType.name}"/>
-                </c:import>
+				<div id="ajax-loader_${note.value.id}" style="width: 418; height: 200; display: none;" align="center"><img src="images/ajax-loader-blue.gif"/></div>
+				<div id="divWithData_${note.value.id}">
+					<c:import url="./discrepancyNote.jsp">
+						<c:param name="formCounter" value="${count}"/>
+						<c:param name="parentId" value="${note.value.id}"/>
+						<c:param name="entityId" value="${id}"/>                
+						<c:param name="entityType" value="${name}"/>                
+						<c:param name="field" value="${field}"/>                
+						<c:param name="column" value="${column}"/>
+						<c:param name="boxId" value="box${note.value.id}"/>
+						<c:param name="typeId" value="${note.value.discrepancyNoteTypeId}"/>
+						<c:param name="typeName" value="${note.value.disType.name}"/>
+					</c:import>
+				</div>
             </c:if>
         </tbody>
     </table>
@@ -350,17 +391,20 @@
 		</p>
 	</c:otherwise>
 	</c:choose>
-	<c:import url="./discrepancyNote.jsp">
-        <c:param name="parentId" value="0"/>
-		<c:param name="entityId" value="${id}"/>				
-		<c:param name="entityType" value="${name}"/>				
-		<c:param name="field" value="${field}"/>				
-		<c:param name="column" value="${column}"/>
-		<c:param name="boxId" value="box${0}New"/>
-		<c:param name="isRFC" value="${isRFC}"/>
-		<c:param name="isInError" value="${isInError}"/>
-		<c:param name="strErrMsg" value="${strErrMsg}"/>
-	</c:import> 
+	<div id="ajax-loader_0" style="width: 418; height: 200; display: none;" align="center"><img src="images/ajax-loader-blue.gif"/></div>
+		<div id="divWithData_0">
+		<c:import url="./discrepancyNote.jsp">
+			<c:param name="parentId" value="0"/>
+			<c:param name="entityId" value="${id}"/>				
+			<c:param name="entityType" value="${name}"/>				
+			<c:param name="field" value="${field}"/>				
+			<c:param name="column" value="${column}"/>
+			<c:param name="boxId" value="box${0}New"/>
+			<c:param name="isRFC" value="${isRFC}"/>
+			<c:param name="isInError" value="${isInError}"/>
+			<c:param name="strErrMsg" value="${strErrMsg}"/>
+		</c:import> 
+		</div>
 </c:if>  
  
 <div style="clear:both;"></div>
