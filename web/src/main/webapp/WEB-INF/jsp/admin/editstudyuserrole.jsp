@@ -48,6 +48,7 @@
     <c:when test="${isThisStudy}">
         <c:set var="inclRoleCode1" value="2" />
         <c:set var="inclRoleCode2" value="6" />
+        <c:set var="inclRoleCode3" value="7" />
     </c:when>
     <c:otherwise>
         <c:set var="inclRoleCode1" value="4" />
@@ -98,7 +99,7 @@
 						<select name="role" class="formfieldM" onchange="javascript:changeIcon();">
 							<option value="0">-<fmt:message key="select" bundle="${resword}"/>-</option>
 							<c:forEach var="role" items="${roles}">
-                                <c:if test="${role.key == inclRoleCode1 || role.key == inclRoleCode2}">
+                                <c:if test="${role.key == inclRoleCode1 || role.key == inclRoleCode2 || role.key == inclRoleCode3}">
                                     <option value="<c:out value="${role.key}"/>" <c:if test="${chosenRoleId == role.key}">selected</c:if>><c:out value="${role.value}" /></option>
                                 </c:if>
 							</c:forEach>
