@@ -1973,7 +1973,11 @@ public abstract class DataEntryServlet extends Controller {
                             codedItemElement.setItemCode("");
                         }
 
-                        getCodedItemService().saveCodedItem(codedItem);
+                        if (displayItemBean.getData().getValue().isEmpty()) {
+                            getCodedItemService().deleteCodedItem(codedItem);
+                        } else {
+                            getCodedItemService().saveCodedItem(codedItem);
+                        }
 
                         item.getData().setValue("");
                     }
