@@ -33,16 +33,19 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
+import org.apache.commons.io.FileUtils;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdScheduler;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.util.FileCopyUtils;
 
 import javax.sql.DataSource;
 import javax.xml.transform.*;
@@ -78,6 +81,15 @@ public class XsltTransformJob extends QuartzJobBean {
 	public static final String SUCCESS_MESSAGE = "SUCCESS_MESSAGE";
 	public static final String FAILURE_MESSAGE = "FAILURE_MESSAGE";
 	public static final String XSLT_PATH = "XSLT_PATH";
+	public static final String SAS_JOB_DIR = "sasJobDir";
+	public static final String SAS_EMAIL_BUFFER = "sasEmailBuffer";
+	public static final String SAS_ODM_OUTPUT_PATH = "sasOdmOutputPath";
+	public static final String SAS_ODM_ARCHIVED_FILENAME = "sasOdmArchivedFilename";
+	public static final String SAS_DIR = "sas.dir";
+	public static final int SAS_DATASET_JOB_ID = 10;
+	public static final String SAS_START_TIME = "sas_startTime";
+	public static final int MINUTE = 60000;
+	public static final String SAS_DELETE_OLD_OBJECT = "sasDeleteOldObject";
 	private OpenClinicaMailSender mailSender;
 	private DataSource dataSource;
 	private GenerateExtractFileService generateFileService;
@@ -96,6 +108,14 @@ public class XsltTransformJob extends QuartzJobBean {
 	private static final long KILOBYTE = 1024;
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
+	public static class DeleteOldObject implements Serializable {
+		public String endFile;
+		public Boolean deleteOld;
+		public String[] dontDelFiles = new String[] {};
+		public List<File> markForDelete = new LinkedList<File>();
+		public List<File> intermediateFiles = new LinkedList<File>();
+	}
 
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
@@ -148,6 +168,8 @@ public class XsltTransformJob extends QuartzJobBean {
 			// datasetId as a variable which is different for each dataset and
 			// that needs to be loaded dynamically
 			ExtractPropertyBean epBean = (ExtractPropertyBean) dataMap.get(EP_BEAN);
+			boolean sasDatasetJob = epBean.getId() == SAS_DATASET_JOB_ID
+					&& context.getTrigger() instanceof SimpleTriggerImpl;
 
 			File doNotDelDir = new File(generalFileDir);
 			if (doNotDelDir.isDirectory()) {
@@ -168,249 +190,84 @@ public class XsltTransformJob extends QuartzJobBean {
 			String failureMsg = epBean.getFailureMessage();
 			final long start = System.currentTimeMillis();
 
+			String subject = "";
+			StringBuffer emailBuffer = new StringBuffer("");
+
+			String sasDir = CoreResources.getField(SAS_DIR);
+			if (sasDatasetJob && (sasDir == null || sasDir.trim().isEmpty())) {
+				throw new Exception("You should specify the SAS extract folder on the system properties page.");
+			}
+			File sasDirFile = new File(sasDir);
+
+			String jobName = dataMap.getString(XsltTriggerService.JOB_NAME);
+
 			datasetBean = (DatasetBean) dsdao.findByPK(dsId);
 			ExtractBean eb = generateFileService.generateExtractBean(datasetBean, currentStudy, parentStudy);
 
-			// generate file directory for file service
-
-			datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
-			logger.debug("--> job starting: ");
-
-			HashMap answerMap = generateFileService.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir,
-					datasetBean, currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",
-					(Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType());
-
-			// won't save a record of the XML to db
-			// won't be a zipped file, so that we can submit it for
-			// transformation
-			// this will have to be toggled by the export data format? no, the
-			// export file will have to be zipped/not zipped
-			String ODMXMLFileName = "";
-			int fId = 0;
-			for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
-				java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
-				Object key = entry.getKey();
-				Object value = entry.getValue();
-				ODMXMLFileName = (String) key;// JN: Since there is a logic to
-												// delete all the intermittent
-												// files, this file could be a
-												// zip
-												// file.
-				Integer fileID = (Integer) value;
-				fId = fileID.intValue();
-				logger.debug("found " + fId + " and " + ODMXMLFileName);
-			}
-
-			// create dirs
-
-			File output = new File(outputPath);
-			if (!output.isDirectory()) {
-				output.mkdirs();
-			}
-
-			TransformerFactory tFactory = TransformerFactory.newInstance();
-
-			// Use the TransformerFactory to instantiate a Transformer that will
-			// work with
-			// the stylesheet you specify. This method call also processes the
-			// stylesheet
-			// into a compiled Templates object.
-
-			int numXLS = epBean.getFileName().length;
-			int fileCntr = 0;
-
-			String xmlFilePath = generalFileDir + ODMXMLFileName;
-			String endFile = null;
-			File oldFilesPath = new File(generalFileDir);
-			while (fileCntr < numXLS) {
-				String xsltPath = dataMap.getString(XSLT_PATH) + File.separator + epBean.getFileName()[fileCntr];
-				in = new java.io.FileInputStream(xsltPath);
-
-				Transformer transformer = tFactory.newTransformer(new StreamSource(in));
-
-				// String endFile = outputPath + File.separator +
-				// dataMap.getString(POST_FILE_NAME);
-				endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
-
-				endFileStream = new FileOutputStream(endFile);
-				transformer.transform(new StreamSource(xmlFilePath), new StreamResult(endFileStream));
-
-				in.close();
-				endFileStream.close();
-
-				fileCntr++;
-			}
-			if (oldFilesPath.isDirectory()) {
-
-				markForDelete = Arrays.asList(oldFilesPath.listFiles());
-
-			}
-			final double done = setFormat((new Double(System.currentTimeMillis() - start)) / 1000);
-			logger.trace("--> job completed in " + done + " ms");
-			// run post processing
-
-			ProcessingFunction function = epBean.getPostProcessing();
-			String subject = "";
-			String jobName = dataMap.getString(XsltTriggerService.JOB_NAME);
-			// String emailBody = "";
-			StringBuffer emailBuffer = new StringBuffer("");
-			emailBuffer.append("<p>" + pageMessages.getString("email_header_1")
-					+ " " + pageMessages.getString("email_header_2") + " Job Execution "
-					+ pageMessages.getString("email_header_3") + "</p>");
-			emailBuffer.append("<P>Dataset: " + datasetBean.getName() + "</P>");
-			emailBuffer.append("<P>Study: " + currentStudy.getName() + "</P>");
-			if (function != null
-					&& function.getClass().equals(org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
-				String dbUrl = ((org.akaza.openclinica.bean.service.SqlProcessingFunction) function).getDatabaseUrl();
-				int lastIndex = dbUrl.lastIndexOf("/");
-				String schemaName = dbUrl.substring(lastIndex);
-				int HostIndex = dbUrl.substring(0, lastIndex).indexOf("//");
-				String Host = dbUrl.substring(HostIndex, lastIndex);
-				emailBuffer.append("<P>Database: "
-						+ ((org.akaza.openclinica.bean.service.SqlProcessingFunction) function).getDatabaseType()
-						+ "</P>");
-				emailBuffer.append("<P>Schema: " + schemaName.replace("/", "") + "</P>");
-				emailBuffer.append("<P>Host: " + Host.replace("//", "") + "</P>");
-
-			}
-			emailBuffer.append("<p>" + pageMessages.getString("html_email_body_1") + datasetBean.getName()
-					+ pageMessages.getString("html_email_body_2_2") + "</p>");
-			if (function != null) {
-				function.setTransformFileName(outputPath + File.separator + dataMap.getString(POST_FILE_NAME));
-				function.setODMXMLFileName(endFile);
-				function.setXslFileName(dataMap.getString(XSL_FILE_PATH));
-				function.setDeleteOld((Boolean) dataMap.get(POST_PROC_DELETE_OLD));
-				function.setZip((Boolean) dataMap.get(POST_PROC_ZIP));
-				function.setLocation(dataMap.getString(POST_PROC_LOCATION));
-				function.setExportFileName(dataMap.getString(POST_PROC_EXPORT_NAME));
-				File oldFiles[] = getOldFiles(outputPath, dataMap.getString(POST_PROC_LOCATION));
-				function.setOldFiles(oldFiles);
-				File intermediateFiles[] = getInterFiles(dataMap.getString(POST_FILE_PATH));
-				ProcessingResultType message = function.run();
-
-				// Delete these files only in case when there is no failure
-				if (message.getCode().intValue() != 2)
-					deleteOldFiles(intermediateFiles);
-				final long done2 = System.currentTimeMillis() - start;
-				logger.trace("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
-				logger.trace("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
-
-				if (!function.getClass().equals(org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
-					String archivedFile = dataMap.getString(POST_FILE_NAME) + "." + function.getFileType();
-					// JN: if the properties is set to zip the output file,
-					// download the zip file
-					if (function.isZip())
-						archivedFile = archivedFile + ".zip";
-					// JN: The above 2 lines code is useless, it should be
-					// removed..added it only for the sake of custom processing
-					// but it will produce erroneous results in case of custom
-					// post processing as well.
-					if (function.getClass().equals(org.akaza.openclinica.bean.service.PdfProcessingFunction.class))
-						archivedFile = function.getArchivedFileName();
-
-					ArchivedDatasetFileBean fbFinal = generateFileRecord(archivedFile, outputPath, datasetBean, done,
-							new File(outputPath + File.separator + archivedFile).length(), ExportFormatBean.PDFFILE,
-							userAccountId);
-
-					if (successMsg.contains("$linkURL")) {
-						successMsg = successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getSystemURL()
-								+ "/AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
-								+ "/AccessFile?fileId=" + fbFinal.getId() + " </a>");
-					}
-					emailBuffer.append("<p>" + successMsg + "</p>");
-					logMe("System time begining.." + sysTimeBegin);
-					logMe("System time end.." + System.currentTimeMillis());
-					double sysTimeEnd = setFormat((System.currentTimeMillis() - sysTimeBegin) / 1000);
-					logMe("difference" + sysTimeEnd);
-
-					if (fbFinal != null) {
-						fbFinal.setFileSize((int) bytesToKilo(new File(archivedFile).length()));
-						fbFinal.setRunTime(sysTimeEnd);
-					}
-
+			String sasJobDir = (String) dataMap.get(SAS_JOB_DIR);
+			if (sasDatasetJob && sasJobDir != null) {
+				emailBuffer = (StringBuffer) dataMap.get(SAS_EMAIL_BUFFER);
+				String sasOdmOutputPath = (String) dataMap.get(SAS_ODM_OUTPUT_PATH);
+				if (!sasDirFile.exists()) {
+					throw new Exception("The '" + sasDir + "' folder was specified but it does not exist.");
 				}
-				// otherwise don't do it
-				if (message.getCode().intValue() == 1) {
-					if (jobName != null) {
-						subject = "Success: " + jobName;
-					} else {
-						subject = "Success: " + datasetBean.getName();
+				File sasJobDirFile = new File(sasJobDir);
+				if (!sasJobDirFile.exists()) {
+					throw new Exception("The '" + sasJobDir + "' folder was specified but it does not exist.");
+				}
+				Date startTime = (Date) dataMap.get(SAS_START_TIME);
+				if (System.currentTimeMillis() - startTime.getTime() > (MINUTE * 10)) {
+					try {
+						FileUtils.deleteDirectory(sasJobDirFile);
+					} catch (Exception ex) {
+						logger.error("Error has occurred.", ex);
 					}
-				} else if (message.getCode().intValue() == 2) {
-					if (jobName != null) {
-						subject = "Failure: " + jobName;
-					} else {
-						subject = "Failure: " + datasetBean.getName();
-					}
-					if (failureMsg != null && !failureMsg.isEmpty()) {
-						emailBuffer.append(failureMsg);
-					}
-					emailBuffer.append("<P>" + message.getDescription());
-					postErrorMessage(message.getDescription(), context);
-				} else if (message.getCode().intValue() == 3) {
-					if (jobName != null) {
-						subject = "Update: " + jobName;
-					} else {
-						subject = "Update: " + datasetBean.getName();
-					}
+					throw new Exception("Job: " + (jobName != null ? jobName : datasetBean.getName())
+							+ ". SAS dataset was not generated during 10 minutes.");
+				}
+				if (!new File(sasJobDirFile.getAbsolutePath() + File.separator + "ready.txt").exists()) {
+					startTime = new Date(System.currentTimeMillis() + MINUTE);
+					((SimpleTriggerImpl) context.getTrigger()).setRepeatCount(1);
+					((SimpleTriggerImpl) context.getTrigger()).setStartTime(startTime);
+					((SimpleTriggerImpl) context.getTrigger()).setRepeatInterval(MINUTE);
+					Date nextFireTime = context.getScheduler().rescheduleJob(context.getTrigger().getKey(),
+							context.getTrigger());
+					logger.info("Job: " + (jobName != null ? jobName : datasetBean.getName())
+							+ ". The next fire time is: " + nextFireTime);
+					return;
 				}
 
-			} else {
-				// extract ran but no post-processing - we send an email with
-				// success and url to link to
-				// generate archived dataset file bean here, and use the id to
-				// build the URL
-				String archivedFilename = dataMap.getString(POST_FILE_NAME);
-				// JN: if the properties is set to zip the output file, download
-				// the zip file
-				if (zipped)
-					archivedFilename = dataMap.getString(POST_FILE_NAME) + ".zip";
-				// delete old files now
-				List<File> intermediateFiles = generateFileService.getOldFiles();
-				String[] dontDelFiles = epBean.getDoNotDelFiles();
-				// JN: The following is the code for zipping up the files, in
-				// case of more than one xsl being provided.
-				if (dontDelFiles.length > 1 && zipped) {
-					// unzip(dontDelFiles);
-					logMe("count =====" + cnt + "dontDelFiles length==---" + dontDelFiles.length);
-
-					logMe("Entering this?" + cnt + "dontDelFiles" + dontDelFiles);
-					String path = outputPath + File.separator;
-					logMe("path = " + path);
-					logMe("zipName?? = " + epBean.getZipName());
-
-					String zipName = (epBean.getZipName() == null || epBean.getZipName().isEmpty()) ? endFile + ".zip"
-							: path + epBean.getZipName() + ".zip";
-
-					archivedFilename = new File(zipName).getName();
-					zipAll(path, epBean.getDoNotDelFiles(), zipName);
-					String[] tempArray = { archivedFilename };
-					dontDelFiles = tempArray;
-					endFile = archivedFilename;
-					// }
-
-				} else if (zipped) {
-					markForDelete = zipxmls(markForDelete, endFile);
-					endFile = endFile + ".zip";
-
-					String[] temp = new String[dontDelFiles.length];
-					int i = 0;
-					while (i < dontDelFiles.length) {
-						temp[i] = dontDelFiles[i] + ".zip";
-						i++;
+				String[] myFiles;
+				final File directory = new File(sasJobDirFile.getAbsolutePath());
+				FilenameFilter filter = new FilenameFilter() {
+					public boolean accept(File directory, String fileName) {
+						return fileName.toLowerCase().startsWith("sas_");
 					}
-					dontDelFiles = temp;
+				};
+				myFiles = directory.list(filter);
+				if (myFiles.length != 1) {
+					throw new Exception("The ready.txt was found but the sas dataset zip was not found.");
+				}
+				File sasDirArchivedFile = new File(sasJobDirFile.getAbsolutePath() + File.separator + myFiles[0]);
+				File sasOdmDirArchivedFile = new File(sasOdmOutputPath + File.separator + sasDirArchivedFile.getName());
+				FileCopyUtils.copy(sasDirArchivedFile, sasOdmDirArchivedFile);
+				FileUtils.deleteDirectory(sasJobDirFile);
 
-					// Actually deleting all the xml files which are produced
-					// since its zipped
-					FilenameFilter xmlFilter = new XMLFileFilter();
-					File tempFile = new File(generalFileDir);
-					deleteOldFiles(tempFile.listFiles(xmlFilter));
+				XsltTransformJob.DeleteOldObject deleteOldObject = (XsltTransformJob.DeleteOldObject) dataMap
+						.get(SAS_DELETE_OLD_OBJECT);
+
+				if (deleteOldObject.deleteOld) {
+					deleteIntermFiles(deleteOldObject.intermediateFiles, deleteOldObject.endFile,
+							deleteOldObject.dontDelFiles);
+					deleteIntermFiles(deleteOldObject.markForDelete, deleteOldObject.endFile,
+							deleteOldObject.dontDelFiles);
 				}
 
-				ArchivedDatasetFileBean fbFinal = generateFileRecord(archivedFilename, outputPath, datasetBean, done,
-						new File(outputPath + File.separator + archivedFilename).length(), ExportFormatBean.TXTFILE,
-						userAccountId);
+				double done = setFormat((new Double(System.currentTimeMillis() - start)) / 1000);
+				logger.trace("--> job completed in " + done + " ms");
+
+				ArchivedDatasetFileBean fbFinal = generateFileRecord(sasOdmDirArchivedFile.getName(), outputPath,
+						datasetBean, done, sasOdmDirArchivedFile.length(), ExportFormatBean.TXTFILE, userAccountId);
 
 				if (jobName != null) {
 					subject = "Job Ran: " + jobName;
@@ -418,26 +275,319 @@ public class XsltTransformJob extends QuartzJobBean {
 					subject = "Job Ran: " + datasetBean.getName();
 				}
 
-				if (successMsg == null || successMsg.isEmpty()) {
-					logger.trace("email buffer??" + emailBuffer);
-
-				} else {
-					if (successMsg.contains("$linkURL")) {
-						successMsg = successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getSystemURL()
-								+ "AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
-								+ "AccessFile?fileId=" + fbFinal.getId() + " </a>");
-					}
+				if (successMsg != null && successMsg.contains("$linkURL")) {
+					successMsg = successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getSystemURL()
+							+ "AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
+							+ "AccessFile?fileId=" + fbFinal.getId() + " </a>");
 					emailBuffer.append("<p>" + successMsg + "</p>");
 				}
+			} else {
 
-				if (deleteOld) {
-					deleteIntermFiles(intermediateFiles, endFile, dontDelFiles);
+				// generate file directory for file service
+				datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
+				logger.debug("--> job starting: ");
 
-					deleteIntermFiles(markForDelete, endFile, dontDelFiles);
+				HashMap answerMap = generateFileService.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir,
+						datasetBean, currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",
+						(Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType());
 
+				// won't save a record of the XML to db
+				// won't be a zipped file, so that we can submit it for
+				// transformation
+				// this will have to be toggled by the export data format? no, the
+				// export file will have to be zipped/not zipped
+				String ODMXMLFileName = "";
+				int fId = 0;
+				for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
+					java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
+					Object key = entry.getKey();
+					Object value = entry.getValue();
+					ODMXMLFileName = (String) key;// JN: Since there is a logic to
+													// delete all the intermittent
+													// files, this file could be a
+													// zip
+													// file.
+					Integer fileID = (Integer) value;
+					fId = fileID.intValue();
+					logger.debug("found " + fId + " and " + ODMXMLFileName);
 				}
 
+				// create dirs
+
+				File output = new File(outputPath);
+				if (!output.isDirectory()) {
+					output.mkdirs();
+				}
+
+				TransformerFactory tFactory = TransformerFactory.newInstance();
+
+				// Use the TransformerFactory to instantiate a Transformer that will
+				// work with
+				// the stylesheet you specify. This method call also processes the
+				// stylesheet
+				// into a compiled Templates object.
+
+				int numXLS = epBean.getFileName().length;
+				int fileCntr = 0;
+
+				String xmlFilePath = generalFileDir + ODMXMLFileName;
+				String endFile = null;
+				File oldFilesPath = new File(generalFileDir);
+				while (fileCntr < numXLS) {
+					String xsltPath = dataMap.getString(XSLT_PATH) + File.separator + epBean.getFileName()[fileCntr];
+					in = new java.io.FileInputStream(xsltPath);
+
+					Transformer transformer = tFactory.newTransformer(new StreamSource(in));
+
+					// String endFile = outputPath + File.separator +
+					// dataMap.getString(POST_FILE_NAME);
+					endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
+
+					endFileStream = new FileOutputStream(endFile);
+					transformer.transform(new StreamSource(xmlFilePath), new StreamResult(endFileStream));
+
+					in.close();
+					endFileStream.close();
+
+					fileCntr++;
+				}
+				if (oldFilesPath.isDirectory()) {
+
+					markForDelete = Arrays.asList(oldFilesPath.listFiles());
+
+				}
+				final double done = setFormat((new Double(System.currentTimeMillis() - start)) / 1000);
+				logger.trace("--> job completed in " + done + " ms");
+				// run post processing
+
+				ProcessingFunction function = epBean.getPostProcessing();
+				emailBuffer.append("<p>" + pageMessages.getString("email_header_1") + " "
+						+ pageMessages.getString("email_header_2") + " Job Execution "
+						+ pageMessages.getString("email_header_3") + "</p>");
+				emailBuffer.append("<P>Dataset: " + datasetBean.getName() + "</P>");
+				emailBuffer.append("<P>Study: " + currentStudy.getName() + "</P>");
+				if (function != null
+						&& function.getClass().equals(org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
+					String dbUrl = ((org.akaza.openclinica.bean.service.SqlProcessingFunction) function)
+							.getDatabaseUrl();
+					int lastIndex = dbUrl.lastIndexOf("/");
+					String schemaName = dbUrl.substring(lastIndex);
+					int HostIndex = dbUrl.substring(0, lastIndex).indexOf("//");
+					String Host = dbUrl.substring(HostIndex, lastIndex);
+					emailBuffer.append("<P>Database: "
+							+ ((org.akaza.openclinica.bean.service.SqlProcessingFunction) function).getDatabaseType()
+							+ "</P>");
+					emailBuffer.append("<P>Schema: " + schemaName.replace("/", "") + "</P>");
+					emailBuffer.append("<P>Host: " + Host.replace("//", "") + "</P>");
+
+				}
+				emailBuffer.append("<p>" + pageMessages.getString("html_email_body_1") + datasetBean.getName()
+						+ pageMessages.getString("html_email_body_2_2") + "</p>");
+				if (function != null) {
+					function.setTransformFileName(outputPath + File.separator + dataMap.getString(POST_FILE_NAME));
+					function.setODMXMLFileName(endFile);
+					function.setXslFileName(dataMap.getString(XSL_FILE_PATH));
+					function.setDeleteOld((Boolean) dataMap.get(POST_PROC_DELETE_OLD));
+					function.setZip((Boolean) dataMap.get(POST_PROC_ZIP));
+					function.setLocation(dataMap.getString(POST_PROC_LOCATION));
+					function.setExportFileName(dataMap.getString(POST_PROC_EXPORT_NAME));
+					File oldFiles[] = getOldFiles(outputPath, dataMap.getString(POST_PROC_LOCATION));
+					function.setOldFiles(oldFiles);
+					File intermediateFiles[] = getInterFiles(dataMap.getString(POST_FILE_PATH));
+					ProcessingResultType message = function.run();
+
+					// Delete these files only in case when there is no failure
+					if (message.getCode().intValue() != 2)
+						deleteOldFiles(intermediateFiles);
+					final long done2 = System.currentTimeMillis() - start;
+					logger.trace("--> postprocessing completed in " + done2 + " ms, found result type "
+							+ message.getCode());
+					logger.trace("--> postprocessing completed in " + done2 + " ms, found result type "
+							+ message.getCode());
+
+					if (!function.getClass().equals(org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
+						String archivedFile = dataMap.getString(POST_FILE_NAME) + "." + function.getFileType();
+						// JN: if the properties is set to zip the output file,
+						// download the zip file
+						if (function.isZip())
+							archivedFile = archivedFile + ".zip";
+						// JN: The above 2 lines code is useless, it should be
+						// removed..added it only for the sake of custom processing
+						// but it will produce erroneous results in case of custom
+						// post processing as well.
+						if (function.getClass().equals(org.akaza.openclinica.bean.service.PdfProcessingFunction.class))
+							archivedFile = function.getArchivedFileName();
+
+						ArchivedDatasetFileBean fbFinal = generateFileRecord(archivedFile, outputPath, datasetBean,
+								done, new File(outputPath + File.separator + archivedFile).length(),
+								ExportFormatBean.PDFFILE, userAccountId);
+
+						if (successMsg.contains("$linkURL")) {
+							successMsg = successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getSystemURL()
+									+ "/AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
+									+ "/AccessFile?fileId=" + fbFinal.getId() + " </a>");
+						}
+						emailBuffer.append("<p>" + successMsg + "</p>");
+						logMe("System time begining.." + sysTimeBegin);
+						logMe("System time end.." + System.currentTimeMillis());
+						double sysTimeEnd = setFormat((System.currentTimeMillis() - sysTimeBegin) / 1000);
+						logMe("difference" + sysTimeEnd);
+
+						if (fbFinal != null) {
+							fbFinal.setFileSize((int) bytesToKilo(new File(archivedFile).length()));
+							fbFinal.setRunTime(sysTimeEnd);
+						}
+
+					}
+					// otherwise don't do it
+					if (message.getCode().intValue() == 1) {
+						if (jobName != null) {
+							subject = "Success: " + jobName;
+						} else {
+							subject = "Success: " + datasetBean.getName();
+						}
+					} else if (message.getCode().intValue() == 2) {
+						if (jobName != null) {
+							subject = "Failure: " + jobName;
+						} else {
+							subject = "Failure: " + datasetBean.getName();
+						}
+						if (failureMsg != null && !failureMsg.isEmpty()) {
+							emailBuffer.append(failureMsg);
+						}
+						emailBuffer.append("<P>" + message.getDescription());
+						postErrorMessage(message.getDescription(), context);
+					} else if (message.getCode().intValue() == 3) {
+						if (jobName != null) {
+							subject = "Update: " + jobName;
+						} else {
+							subject = "Update: " + datasetBean.getName();
+						}
+					}
+
+				} else {
+					// extract ran but no post-processing - we send an email with
+					// success and url to link to
+					// generate archived dataset file bean here, and use the id to
+					// build the URL
+					String archivedFilename = dataMap.getString(POST_FILE_NAME);
+					// JN: if the properties is set to zip the output file, download
+					// the zip file
+					if (zipped)
+						archivedFilename = dataMap.getString(POST_FILE_NAME) + ".zip";
+					// delete old files now
+					List<File> intermediateFiles = generateFileService.getOldFiles();
+					String[] dontDelFiles = epBean.getDoNotDelFiles();
+					// JN: The following is the code for zipping up the files, in
+					// case of more than one xsl being provided.
+					if (dontDelFiles.length > 1 && zipped) {
+						// unzip(dontDelFiles);
+						logMe("count =====" + cnt + "dontDelFiles length==---" + dontDelFiles.length);
+
+						logMe("Entering this?" + cnt + "dontDelFiles" + dontDelFiles);
+						String path = outputPath + File.separator;
+						logMe("path = " + path);
+						logMe("zipName?? = " + epBean.getZipName());
+
+						String zipName = (epBean.getZipName() == null || epBean.getZipName().isEmpty()) ? endFile
+								+ ".zip" : path + epBean.getZipName() + ".zip";
+
+						archivedFilename = new File(zipName).getName();
+						zipAll(path, epBean.getDoNotDelFiles(), zipName);
+						String[] tempArray = { archivedFilename };
+						dontDelFiles = tempArray;
+						endFile = archivedFilename;
+						// }
+
+					} else if (zipped) {
+						markForDelete = zipxmls(markForDelete, endFile);
+						endFile = endFile + ".zip";
+
+						String[] temp = new String[dontDelFiles.length];
+						int i = 0;
+						while (i < dontDelFiles.length) {
+							temp[i] = dontDelFiles[i] + ".zip";
+							i++;
+						}
+						dontDelFiles = temp;
+
+						// Actually deleting all the xml files which are produced
+						// since its zipped
+						FilenameFilter xmlFilter = new XMLFileFilter();
+						File tempFile = new File(generalFileDir);
+						deleteOldFiles(tempFile.listFiles(xmlFilter));
+					}
+
+					File odmFile = new File(outputPath + File.separator + archivedFilename);
+
+					// odm was generate - starting the sas dataset job
+					if (sasDatasetJob) {
+						if (!sasDirFile.exists()) {
+							throw new Exception("The '" + sasDir + "' folder was specified but it does not exist.");
+						}
+						File sasJobDirFile = new File(sasDirFile.getAbsolutePath() + File.separator + "odm_"
+								+ userBean.getId() + "_" + datasetBean.getName() + "_" + System.currentTimeMillis());
+						if (!sasJobDirFile.exists()) {
+							sasJobDirFile.mkdirs();
+						}
+
+						FileCopyUtils.copy(odmFile,
+								new File(sasJobDirFile.getAbsolutePath() + File.separator + odmFile.getName()));
+						odmFile.delete();
+						new File(sasJobDirFile.getAbsolutePath() + File.separator + "uploaded.txt").createNewFile();
+
+						XsltTransformJob.DeleteOldObject deleteOldObject = new XsltTransformJob.DeleteOldObject();
+						deleteOldObject.endFile = endFile;
+						deleteOldObject.deleteOld = deleteOld;
+						deleteOldObject.dontDelFiles = dontDelFiles;
+						deleteOldObject.markForDelete = markForDelete;
+						deleteOldObject.intermediateFiles = intermediateFiles;
+
+						Date startTime = new Date(System.currentTimeMillis() + MINUTE);
+
+						dataMap.put(SAS_START_TIME, startTime);
+						dataMap.put(SAS_EMAIL_BUFFER, emailBuffer);
+						dataMap.put(SAS_ODM_OUTPUT_PATH, outputPath);
+						dataMap.put(SAS_DELETE_OLD_OBJECT, deleteOldObject);
+						dataMap.put(SAS_JOB_DIR, sasJobDirFile.getAbsolutePath());
+
+						((SimpleTriggerImpl) context.getTrigger()).setRepeatCount(1);
+						((SimpleTriggerImpl) context.getTrigger()).setJobDataMap(dataMap);
+						((SimpleTriggerImpl) context.getTrigger()).setStartTime(startTime);
+						((SimpleTriggerImpl) context.getTrigger()).setRepeatInterval(MINUTE);
+						Date nextFireTime = context.getScheduler().rescheduleJob(context.getTrigger().getKey(),
+								context.getTrigger());
+						logger.info("Job: " + (jobName != null ? jobName : datasetBean.getName())
+								+ ". The next fire time is: " + nextFireTime);
+						return;
+					}
+					ArchivedDatasetFileBean fbFinal = generateFileRecord(archivedFilename, outputPath, datasetBean,
+							done, odmFile.length(), ExportFormatBean.TXTFILE, userAccountId);
+
+					if (jobName != null) {
+						subject = "Job Ran: " + jobName;
+					} else {
+						subject = "Job Ran: " + datasetBean.getName();
+					}
+
+					if (successMsg == null || successMsg.isEmpty()) {
+						logger.trace("email buffer??" + emailBuffer);
+
+					} else {
+						if (successMsg.contains("$linkURL")) {
+							successMsg = successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getSystemURL()
+									+ "AccessFile?fileId=" + fbFinal.getId() + "\">" + CoreResources.getSystemURL()
+									+ "AccessFile?fileId=" + fbFinal.getId() + " </a>");
+						}
+						emailBuffer.append("<p>" + successMsg + "</p>");
+					}
+					if (deleteOld) {
+						deleteIntermFiles(intermediateFiles, endFile, dontDelFiles);
+						deleteIntermFiles(markForDelete, endFile, dontDelFiles);
+					}
+				}
 			}
+
 			// email the message to the user
 			// String email = dataMap.getString(EMAIL);
 			StudyBean emailParentStudy = new StudyBean();
@@ -446,7 +596,8 @@ public class XsltTransformJob extends QuartzJobBean {
 			} else {
 				emailParentStudy = currentStudy;
 			}
-			emailBuffer.append("<p>" + pageMessages.getString("html_email_body_5").replace("{0}", emailParentStudy.getName()) + "</p>");
+			emailBuffer.append("<p>"
+					+ pageMessages.getString("html_email_body_5").replace("{0}", emailParentStudy.getName()) + "</p>");
 			try {
 
 				if ((null != dataMap.get("job_type"))
@@ -480,7 +631,7 @@ public class XsltTransformJob extends QuartzJobBean {
 			sendErrorEmail(e.getMessage(), context, alertEmail);
 			postErrorMessage(e.getMessage(), context);
 			e.printStackTrace();
-			logger.error(e.getStackTrace().toString());
+			logger.error("Error has occurred.", e);
 			exceptions = true;
 		} catch (FileNotFoundException e) {
 			sendErrorEmail(e.getMessage(), context, alertEmail);
@@ -492,19 +643,19 @@ public class XsltTransformJob extends QuartzJobBean {
 			sendErrorEmail(e.getMessage(), context, alertEmail);
 			postErrorMessage(e.getMessage(), context);
 			e.printStackTrace();
-			logger.error(e.getStackTrace().toString());
+			logger.error("Error has occurred.", e);
 			exceptions = true;
 		} catch (TransformerException e) {
 			sendErrorEmail(e.getMessage(), context, alertEmail);
 			postErrorMessage(e.getMessage(), context);
 			e.printStackTrace();
-			logger.error(e.getStackTrace().toString());
+			logger.error("Error has occurred.", e);
 			exceptions = true;
 		} catch (Exception ee) {
 			sendErrorEmail(ee.getMessage(), context, alertEmail);
 			postErrorMessage(ee.getMessage(), context);
 			ee.printStackTrace();
-			logger.error(ee.getStackTrace().toString());
+			logger.error("Error has occurred.", ee);
 			exceptions = true;
 
 			if ((null != dataMap.get("job_type")) && (((String) dataMap.get("job_type")).equalsIgnoreCase("exportJob"))) {
@@ -822,7 +973,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
 	private void sendErrorEmail(String message, JobExecutionContext context, String target) {
 		String subject = "Warning: " + message;
-		String emailBody = "An exception was thrown while running an extract job on your server, please see the logs for more details."; 
+		String emailBody = "An exception was thrown while running an extract job on your server, please see the logs for more details.";
 		try {
 			ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext()
 					.get("applicationContext");

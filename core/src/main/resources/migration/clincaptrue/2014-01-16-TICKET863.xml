@@ -155,4 +155,8 @@
         <insert tableName="system"><column name="name" value="ccts.waitBeforeCommit" /><column name="value_type" value="INTEGER"/><column name="required" valueBoolean="false" /><column name="value" value="6000" /><column name="size" value="30" /><column name="group_id" value="11"/><column name="order_id" value="2"/><column name="show_measurements" valueBoolean="true"/><column name="show_description" valueBoolean="true"/></insert>
     </changeSet>
 
+    <changeSet author="skirpichenok" id="2014-01-16-TICKET863-12">
+        <insert tableName="system"><column name="name" value="sas.dir" /><column name="required" valueBoolean="false" /><column name="size" value="80" /><column name="value" value="" /><column name="group_id" value="2"/><column name="order_id" value="3"/><column name="show_description" valueBoolean="true"/></insert>
+    </changeSet>
+
 </databaseChangeLog>

@@ -206,8 +206,10 @@ public class CoreResources implements ResourceLoaderAware {
 				}
 			}
 		} catch (OpenClinicaSystemException ex) {
+			ex.printStackTrace();
 			logger.error("Error has occurred.", ex);
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			logger.error("Error has occurred.", ex);
 		}
 	}
