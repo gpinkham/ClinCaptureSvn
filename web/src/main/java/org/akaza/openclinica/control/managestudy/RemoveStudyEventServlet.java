@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -150,6 +152,9 @@ public class RemoveStudyEventServlet extends SecureController {
 						eventCRF.setUpdatedDate(new Date());
 						ecdao.update(eventCRF);
 						// remove all the item data
+
+                        CodedItemService codedItemService = getCodedItemService();
+
 						ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
 						for (int a = 0; a < itemDatas.size(); a++) {
 							ItemDataBean item = (ItemDataBean) itemDatas.get(a);
@@ -159,6 +164,14 @@ public class RemoveStudyEventServlet extends SecureController {
 								item.setUpdatedDate(new Date());
 								iddao.update(item);
 							}
+
+                            CodedItem codedItem = codedItemService.findCodedItem(item.getId());
+
+                            if(codedItem != null) {
+
+                                codedItem.setStatus("REMOVED");
+                                codedItemService.saveCodedItem(codedItem);
+                            }
 						}
 					}
 				}

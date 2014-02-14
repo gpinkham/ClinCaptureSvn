@@ -20,11 +20,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -32,10 +31,7 @@ import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -71,6 +67,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 	private StudySubjectDAO studySubjectDAO;
 	private StudyEventDefinitionDAO studyEventDefDao;
     private CRFDAO crfDAO;
+    private StudyEventDAO studyEventDAO;
     private String themeColor;
 
     private final String medicalCodingContextNeeded;
@@ -345,7 +342,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
                 String codeItemIcon = codeItemIconBuilder(codedItem);
                 String uncodeItemIcon = uncodeItemIconBuilder(codedItem);
-                String goToCrfIcon = goToCrfIconBuilder(eventCRFBean, eventDefCRFBean);
+                String goToCrfIcon = goToCrfIconBuilder(eventCRFBean, eventDefCRFBean, codedItem.getItemId());
 
                 builder.append(codeItemIcon).nbsp().nbsp()
                         .append(uncodeItemIcon).nbsp().nbsp()
@@ -412,18 +409,53 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             return builder.toString();
         }
 
-        private String goToCrfIconBuilder(EventCRFBean eventCRFBean, EventDefinitionCRFBean eventDefCRFBean) {
+        private String goToCrfIconBuilder(EventCRFBean eventCRFBean, EventDefinitionCRFBean eventDefCRFBean, int itemId) {
 
             HtmlBuilder builder = new HtmlBuilder();
 
-            builder.a().append(" onmouseup=\"javascript:setImage('Complete','../images/icon_DEcomplete_long.gif');\"")
+            builder.a().name("goToEcrf").append("itemId=\"" + itemId + "\"").append(" onmouseup=\"javascript:setImage('Complete','../images/"+ getEventCrfStatusIcon(eventCRFBean) + "');\"")
                     .href("../ViewSectionDataEntry?eventCRFId=" + eventCRFBean.getId()
                             + "&eventDefinitionCRFId=" + eventDefCRFBean.getId()
                             + "&tabId=1&eventId=" + eventCRFBean.getStudyEventId() + "&amp;viewFull=yes").close()
                     .img().border("0").title(ResourceBundleProvider.getResWord("openCrf")).alt(ResourceBundleProvider.getResWord("openCrf"))
-                    .style("height:17px").src("../images/icon_DEcomplete_long.gif").close().aEnd();
+                    .style("height:17px").src("../images/"+ getEventCrfStatusIcon(eventCRFBean) + "").close().aEnd();
 
             return builder.toString();
+        }
+
+        private String getEventCrfStatusIcon(EventCRFBean eventCRFBean) {
+
+            StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCRFBean.getStudyEventId());
+
+            String goToEcrfIcon = "";
+
+            if (studyEventBean.getSubjectEventStatus().isLocked() || studyEventBean.getSubjectEventStatus().isStopped() || studyEventBean.getSubjectEventStatus().isSkipped()) {
+
+                goToEcrfIcon = "icon_Locked_long.gif";
+            } else  if (eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
+
+                goToEcrfIcon = "icon_InitialDE_long.gif";
+            } else if (eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) ) {
+
+                goToEcrfIcon = "icon_InitialDEcomplete.gif";
+            } else if(eventCRFBean.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+
+                goToEcrfIcon = "icon_DDE.gif";
+            } else if(eventCRFBean.getStage().isDoubleDE_Complete()) {
+
+                if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
+
+                    goToEcrfIcon = "icon_Signed_long.gif";
+                } else if (eventCRFBean.isSdvStatus()) {
+
+                    goToEcrfIcon = "icon_DoubleCheck_long.gif";
+                } else {
+
+                    goToEcrfIcon = "icon_DEcomplete_long.gif";
+                }
+            }
+
+            return goToEcrfIcon;
         }
     }
 
@@ -468,8 +500,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             String subjectLabel = (String) ((HashMap<Object, Object>) item).get("subjectName");
 
             if (!subjectLabel.isEmpty()) {
-
-                builder.append(subjectLabel);
+                builder.div().name("subjectId").close()
+                        .append(subjectLabel).divEnd().div().style("width:100px").close().divEnd();
             }
 
             return builder.toString();
@@ -485,7 +517,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
             if (!eventName.isEmpty()) {
 
-                builder.append(eventName);
+                builder.div().name("eventName").close()
+                        .append(eventName).divEnd().div().style("width:100px").close().divEnd();
             }
 
             return builder.toString();
@@ -501,7 +534,8 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
             if (!crfName.isEmpty()) {
 
-                builder.append(crfName).div().style("width:120px").close().divEnd();
+                builder.div().name("crfName").close()
+                        .append(crfName).divEnd().div().style("width:120px").close().divEnd();
             }
 
             return builder.toString();
@@ -582,21 +616,15 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 		return loggedInUser.getRoleByStudy(studyId).getName().equalsIgnoreCase("study monitor");
 	}
 	
-	public void setStudySubjectDAO(StudySubjectDAO studySubjectDAO) {
-		this.studySubjectDAO = studySubjectDAO;
-	}
+	public void setStudySubjectDAO(StudySubjectDAO studySubjectDAO) { this.studySubjectDAO = studySubjectDAO; }
 
-    public void setCrfDAO(CRFDAO crfDao) {
-        this.crfDAO = crfDao;
-    }
+    public void setCrfDAO(CRFDAO crfDao) { this.crfDAO = crfDao; }
 
-	public void setStudyEventDefinitionDAO(StudyEventDefinitionDAO studyEventDefDao) {
-		this.studyEventDefDao = studyEventDefDao;
-	}
+	public void setStudyEventDefinitionDAO(StudyEventDefinitionDAO studyEventDefDao) { this.studyEventDefDao = studyEventDefDao; }
 
-    public void setItemDataDAO(ItemDataDAO itemDataDAO) {
-        this.itemDataDAO = itemDataDAO;
-    }
+    public void setItemDataDAO(ItemDataDAO itemDataDAO) { this.itemDataDAO = itemDataDAO; }
+
+    public void setStudyEventDAO(StudyEventDAO studyEventDAO) { this.studyEventDAO = studyEventDAO; }
 
     private StudySubjectBean getSubjectBean(int subjectId) {
     	

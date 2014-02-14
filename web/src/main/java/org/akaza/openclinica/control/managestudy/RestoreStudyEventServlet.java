@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -161,6 +163,9 @@ public class RestoreStudyEventServlet extends SecureController {
 
 				boolean hasStarted = false;
 				ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+
+                CodedItemService codedItemService = getCodedItemService();
+
 				for (int k = 0; k < eventCRFs.size(); k++) {
 					EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
 					if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
@@ -178,6 +183,21 @@ public class RestoreStudyEventServlet extends SecureController {
 								item.setUpdatedDate(new Date());
 								iddao.update(item);
 							}
+
+                            CodedItem codedItem = codedItemService.findCodedItem(item.getId());
+
+                            if (codedItem != null) {
+
+                                if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
+
+                                    codedItem.setStatus("NOT_CODED");
+                                } else {
+
+                                    codedItem.setStatus("CODED");
+                                }
+
+                                codedItemService.saveCodedItem(codedItem);
+                            }
 						}
 					}
 					hasStarted = !hasStarted ? !eventCRF.isNotStarted() : hasStarted;

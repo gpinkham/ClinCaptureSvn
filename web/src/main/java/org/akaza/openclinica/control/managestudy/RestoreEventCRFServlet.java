@@ -194,7 +194,7 @@ public class RestoreEventCRFServlet extends SecureController {
 
                     if (codedItem != null) {
 
-                        if (codedItem.getHttpPath().isEmpty()) {
+                        if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
 
                             codedItem.setStatus("NOT_CODED");
                         } else {

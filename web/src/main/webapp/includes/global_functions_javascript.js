@@ -2483,7 +2483,9 @@ function showHideCodedItemContext(item) {
 
 codeItem = function(item) {
 
-    if ($(item).attr('block') == 'true') {
+    var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {
+        return $(this).attr('src').indexOf('icon_Locked_long.gif') > 0;});
+    if ($(item).attr('block') == 'true' || isLocked.size() > 0) {
 
         if ($(item).parent().siblings("td").find("div[name='itemStatus']").text() == 'Coded') {
 
@@ -2552,6 +2554,22 @@ codeItem = function(item) {
                     var tdNotCoded = parseInt($("table.summaryTable tr td[name='tdNotCoded']").text());
                     $("table.summaryTable tr td[name='tdNotCoded'] a").text(tdNotCoded - 1);
                 }
+
+                //update goToEcrf icon if item is sdv or signed
+                var subjectId = $("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").parents().siblings("td").find("div[name='subjectId']").text();
+                var eventName = $("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").parents().siblings("td").find("div[name='eventName']").text();
+                var crfName = $("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").parents().siblings("td").find("div[name='crfName']").text();
+
+                $("a[name='goToEcrf']").children('img').each(function () {
+
+                    if(($(this).attr('src').indexOf('icon_Signed_long.gif') > 0 || $(this).attr('src').indexOf('icon_DoubleCheck_long.gif') > 0)
+                        && $(this).parents().siblings("td").find("div[name='subjectId']").text() == subjectId
+                        && $(this).parents().siblings("td").find("div[name='eventName']").text() == eventName
+                        && $(this).parents().siblings("td").find("div[name='crfName']").text() == crfName) {
+
+                        $(this).attr('src', '../images/icon_DEcomplete_long.gif');
+                    }
+                })
 
                 //update coded item status
                 $(item).parent().siblings("td").find("div[name='itemStatus']").text("Coded");
@@ -2702,6 +2720,22 @@ uncodeCodeItem = function(item) {
              //cleanup results
              $(item).parents().find("div[id=" + $(item).attr("itemid") + "]").find("#tablepaging").remove();
 
+             //update goToEcrf icon if item is sdv or signed
+             var subjectId = $("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").parents().siblings("td").find("div[name='subjectId']").text();
+             var eventName = $("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").parents().siblings("td").find("div[name='eventName']").text();
+             var crfName = $("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").parents().siblings("td").find("div[name='crfName']").text();
+
+             $("a[name='goToEcrf']").children('img').each(function () {
+
+                 if(($(this).attr('src').indexOf('icon_Signed_long.gif') > 0 || $(this).attr('src').indexOf('icon_DoubleCheck_long.gif') > 0)
+                     && $(this).parents().siblings("td").find("div[name='subjectId']").text() == subjectId
+                     && $(this).parents().siblings("td").find("div[name='eventName']").text() == eventName
+                     && $(this).parents().siblings("td").find("div[name='crfName']").text() == crfName) {
+
+                     $(this).attr('src', '../images/icon_DEcomplete_long.gif');
+                 }
+             })
+
              console.log("Medical uncoding executed successfully");
          },
          error: function(e) {
@@ -2821,6 +2855,21 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
             //update code icon url
             $("a[name='Code'][itemid=" + id + "]").children('img').attr('src', '../images/code_confirm.png');
 
+            //update goToEcrf icon if item is sdv or signed
+            var subjectId = $("a[name='Code'][itemid=" + id + "]").parents().siblings("td").find("div[name='subjectId']").text();
+            var eventName = $("a[name='Code'][itemid=" + id + "]").parents().siblings("td").find("div[name='eventName']").text();
+            var crfName = $("a[name='Code'][itemid=" + id + "]").parents().siblings("td").find("div[name='crfName']").text();
+
+            $("a[name='goToEcrf']").children('img').each(function () {
+                if(($(this).attr('src').indexOf('icon_Signed_long.gif') > 0 || $(this).attr('src').indexOf('icon_DoubleCheck_long.gif') > 0)
+                    && $(this).parents().siblings("td").find("div[name='subjectId']").text() == subjectId
+                    && $(this).parents().siblings("td").find("div[name='eventName']").text() == eventName
+                    && $(this).parents().siblings("td").find("div[name='crfName']").text() == crfName) {
+
+                    $(this).attr('src', '../images/icon_DEcomplete_long.gif');
+                }
+            })
+
             //change coded item status
             $("div[id=" + id + "]").parent().siblings("td").find("div[name='itemStatus']").text('Coded');
 
@@ -2893,7 +2942,7 @@ autoCode = function() {
     $.ajax({
 
         type: "POST",
-        url: url + "/autoCode?study=" + study,
+        url: url + "/autoCode",
 
         success: function(data) {
 
@@ -3097,6 +3146,10 @@ function hideMedicalCodingAlertBox(ajaxResponse) {
 }
 
 function showMedicalCodingUncodeAlertBox(item) {
+
+    var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {
+        return $(this).attr('src').indexOf('icon_Locked_long.gif') > 0;});
+    if(isLocked.size() > 0) { return };
 
     if ($("#alertBox").length == 0) {
 

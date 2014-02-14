@@ -8,12 +8,17 @@ import javax.sql.DataSource;
 
 import com.clinovo.exception.CodeException;
 import com.clinovo.model.CodedItemElement;
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.ItemDataType;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
@@ -147,7 +152,6 @@ public class CodedItemServiceImpl implements CodedItemService {
            
             if (itemData.getId() > 0) {
 
-                //itemData.setUpdater(loggedInUser);
                 itemData.setUpdatedDate(new Date());
                 itemData.setValue(codedItemElement.getItemCode());
 
@@ -159,6 +163,8 @@ public class CodedItemServiceImpl implements CodedItemService {
                 throw new CodeException("ItemData for this Item not found. Has the CRF been completed?");
             }
         }
+
+        resetEventAndCrfStatus(codedItem);
 
         return codeItemDAO.saveOrUpdate(codedItem);
     }
@@ -238,6 +244,26 @@ public class CodedItemServiceImpl implements CodedItemService {
             return true;
         } else {
             return false;
+        }
+    }
+
+    private void resetEventAndCrfStatus(CodedItem codedItem) {
+
+        EventCRFDAO eventEcrfDAO = new EventCRFDAO(dataSource);
+        StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
+
+        EventCRFBean eventCRFBean = (EventCRFBean) eventEcrfDAO.findByPK(codedItem.getEventCrfId());
+        StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCRFBean.getStudyEventId());
+
+        if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED) || eventCRFBean.isSdvStatus()) {
+
+            eventCRFBean.setStage(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE);
+            eventCRFBean.setSdvStatus(false);
+            eventEcrfDAO.update(eventCRFBean);
+
+            studyEventBean.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
+            studyEventBean.setUpdatedDate(new Date());
+            studyEventDAO.update(studyEventBean);
         }
     }
 }
