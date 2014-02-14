@@ -190,7 +190,7 @@ public class InitUpdateSubStudyServlet extends Controller {
 		}
 		// not sure if request is better, since not sure if there is another
 		// process using this.
-		request.setAttribute("definitions", seds);
+		request.getSession().setAttribute("definitions", seds);
 		request.getSession().setAttribute("sdvOptions", this.setSDVOptions());
 	}
 
