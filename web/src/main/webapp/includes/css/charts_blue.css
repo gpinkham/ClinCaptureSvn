@@ -1,0 +1,16 @@
+.widget h2 {
+	background-color:#789EC5;
+}
+
+.toolbar_wrapper h2 {
+	background-color:#789EC5;
+}
+
+.ui-sortable-placeholder {
+  visibility:visible !important;
+  border: 1px dashed #789EC5!important;
+}
+
+#show_hide {
+	background-color:#789EC5;
+}

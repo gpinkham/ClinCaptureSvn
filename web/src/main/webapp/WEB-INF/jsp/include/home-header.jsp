@@ -14,32 +14,36 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
+	<c:set var="color" scope="session" value="${newThemeColor}"/>
+	
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=8" />
 
+	<title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
-<title><fmt:message key="openclinica" bundle="${resword}"/></title>
-
-<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css"/>
-<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
-<%-- <link rel="stylesheet" href="includes/NewNavStyles.css" type="text/css" />--%>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
-<%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
-<script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/repetition-model/repetition-model.js"></script>
-  <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
-  <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects"></script>
-  <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
+	<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css"/>
+	<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/css/charts.css" type="text/css"/>
+	<link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
+	<link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
+	
+	<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+	<!--<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui-1.10.4.custom.min.js"></script>-->
+	<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/Charts.js"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/repetition-model/repetition-model.js"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
     <!-- Added for the new Calender -->
 
     <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
     <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
     <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
-<!-- End -->
+	<!-- End -->
 
     <script language="JavaScript">
         function reportBug() {
@@ -62,15 +66,13 @@
         function initmb(){var ab='absolute';var n='none';var obody=document.getElementsByTagName('body')[0];var frag=document.createDocumentFragment();var obol=document.createElement('div');obol.setAttribute('id','ol');obol.style.display=n;obol.style.position=ab;obol.style.top=0;obol.style.left=0;obol.style.zIndex=998;obol.style.width='100%';frag.appendChild(obol);var obbx=document.createElement('div');obbx.setAttribute('id','mbox');obbx.style.display=n;obbx.style.position=ab;obbx.style.zIndex=999;var obl=document.createElement('span');obbx.appendChild(obl);var obbxd=document.createElement('div');obbxd.setAttribute('id','mbd');obl.appendChild(obbxd);frag.insertBefore(obbx,obol.nextSibling);obody.insertBefore(frag,obody.firstChild);
             window.onscroll = scrollFix; window.onresize = sizeFix;
         }
-    </script>
-    <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
-    <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-    <c:set var="color" scope="session" value="${newThemeColor}"/>
+    </script>	
+	
 	<c:if test="${(color == 'violet') || (color == 'green')}">
-	<script>
-	document.write( '<style class="hideStuff" ' +
-              'type="text/css">body {display:none;}<\/style>');
-	</script>
+		<script>
+			document.write( '<style class="hideStuff" ' +
+				  'type="text/css">body {display:none;}<\/style>');
+		</script>
 	</c:if>
 </head>
 

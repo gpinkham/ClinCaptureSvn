@@ -3509,3 +3509,11 @@ function isPhoneNumberValid(id, msg) {
   }
   return valid;
 }
+
+function chooseHomePageVersion(){
+	if($.browser.msie && parseFloat($.browser.version) < 8){
+		$(".new_home_page").remove();
+	} else {
+		$(".old_home_page").remove();
+	}
+}

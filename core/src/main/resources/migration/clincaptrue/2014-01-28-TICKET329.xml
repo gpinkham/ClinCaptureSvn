@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="denis" id="2014-01-25-TICKET329-CREATE-WIDGETS-LAYOUT">
+        <comment>Create table widgets_layout</comment>
+        <createTable tableName="widgets_layout">
+			<column autoIncrement="true" name="id" type="int">
+				<constraints nullable="false" primaryKey="true"/>
+			</column>
+			<column name="user_id" type="int"/>
+			<column name="study_id" type="int"/>
+			<column name="widget_id" type="int"/>
+			<column name="ordinal" type="int"/>
+			<column name="version" type="int"/>
+		</createTable>
+    </changeSet>
+    
+    <changeSet author="denis" id="2014-01-25-TICKET329-CREATE-WIDGET">
+        <comment>Create table widget</comment>
+        <createTable tableName="widget">
+			<column autoIncrement="true" name="id" type="int">
+				<constraints nullable="false" primaryKey="true"/>
+			</column>
+			<column name="version" type="int"/>	
+			<column name="widget_name" type="varchar(250)"/>
+			<column name="description" type="varchar(2048)"/>
+			<column name="have_access" type="varchar(50)"/>
+			<column name="display_as_default" type="varchar(50)"/>	
+			<column name="study_metrics" type="BOOLEAN"/>
+			<column name="site_metrics" type="BOOLEAN"/>		
+		</createTable>
+    </changeSet>
+    	
+	<changeSet author="denis" id="2013-01-25-TICKET329-4">
+		<comment>Add foreign key for widgets_layout</comment>
+    	<addForeignKeyConstraint constraintName="widgets_layout_fk_users_id"
+    	                         baseColumnNames="user_id" 
+    	                         baseTableName="widgets_layout" 
+    	                         onDelete="RESTRICT" onUpdate="RESTRICT" 
+    	                         referencedColumnNames="user_id" 
+    	                         referencedTableName="user_account"/>
+    </changeSet>
+    
+    <changeSet author="denis" id="2013-01-25-TICKET329-5">
+		<comment>Add foreign key for widgets_layout</comment>
+    	<addForeignKeyConstraint constraintName="widgets_layout_fk_study_id"
+    	                         baseColumnNames="study_id" 
+    	                         baseTableName="widgets_layout" 
+    	                         onDelete="RESTRICT" onUpdate="RESTRICT" 
+    	                         referencedColumnNames="study_id" 
+    	                         referencedTableName="study"/>
+    </changeSet>
+    
+    <changeSet author="denis" id="2013-01-25-TICKET329-KEY-FOR-WIDGET">
+		<comment>Add foreign key for widgets_layout</comment>
+    	<addForeignKeyConstraint constraintName="widgets_layout_fk_widget_id"
+    	                         baseColumnNames="widget_id" 
+    	                         baseTableName="widgets_layout" 
+    	                         onDelete="RESTRICT" onUpdate="RESTRICT" 
+    	                         referencedColumnNames="id" 
+    	                         referencedTableName="widget"/>
+    </changeSet>
+    <changeSet author="denis" id="2013-01-25-TICKET329-7-CREATE-NDS-ASSIGNED-TO-ME-WIDGET">
+        <comment>Insert "Notes and discrepancies assigned to me" widget</comment>        
+        <insert tableName="widget">            
+            <column name="id" value="1"/>
+            <column name="version" value="0"/>
+            <column name="widget_name" value="Notes and discrepancies assigned to me"/>   
+            <column name="have_access" value="1,2,3,4,5,6"/>
+			<column name="display_as_default" value="1,2,3,4,5,6"/>
+			<column name="study_metrics" value="TRUE"/>
+			<column name="site_metrics" value="TRUE"/>
+        </insert>        
+    </changeSet>	   
+</databaseChangeLog>

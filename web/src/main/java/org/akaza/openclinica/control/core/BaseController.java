@@ -3,16 +3,20 @@ package org.akaza.openclinica.control.core;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.service.WidgetService;
+import com.clinovo.service.WidgetsLayoutService;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -200,6 +204,10 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	private DictionaryService dictionaryService;
     @Autowired
     private StudySubjectIdService studySubjectIdService;
+    @Autowired
+    private WidgetsLayoutService widgetsLayoutService;
+    @Autowired
+    private WidgetService widgetService;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -469,4 +477,12 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
     public StudySubjectIdService getStudySubjectIdService() {
         return studySubjectIdService;
     }
+
+	public WidgetsLayoutService getWidgetsLayoutService() {
+		return widgetsLayoutService;
+	}
+
+	public WidgetService getWidgetService() {
+		return widgetService;
+	}    
 }

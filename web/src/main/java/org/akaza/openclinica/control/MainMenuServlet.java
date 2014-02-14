@@ -20,9 +20,15 @@
  */
 package org.akaza.openclinica.control;
 
+import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
+import com.clinovo.model.Widget;
+import com.clinovo.model.WidgetsLayout;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,10 +73,12 @@ public class MainMenuServlet extends Controller {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
+        StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		ub.incNumVisitsToMainMenu();
+		
 		request.getSession().setAttribute(USER_BEAN_NAME, ub);
+		request.getSession().setAttribute("userRole", currentRole);
 		request.setAttribute("iconInfoShown", true);
 		request.setAttribute("closeInfoShowIcons", false);
 
@@ -79,6 +87,7 @@ public class MainMenuServlet extends Controller {
 			forwardPage(Page.MENU, false, request, response);
 			return;
 		}
+		
 		StudyDAO sdao = new StudyDAO(getDataSource());
 		ArrayList studies;
 
@@ -102,7 +111,9 @@ public class MainMenuServlet extends Controller {
 		// Event Definition list and Group Class list for add suybject window.
 		request.setAttribute("allDefsArray", getEventDefinitionsByCurrentStudy(request));
 		request.setAttribute("studyGroupClasses", getStudyGroupClassesByCurrentStudy(request));
-		if (lastPwdChangeDate != null || pwdChangeRequired == 0) {// not a new user
+		
+		// not a new user
+		if (lastPwdChangeDate != null || pwdChangeRequired == 0) {
 
 			if (lastPwdChangeDate == null) {
 				lastPwdChangeDate = new Date();
@@ -132,7 +143,15 @@ public class MainMenuServlet extends Controller {
 				}
 				forwardPage(Page.RESET_PASSWORD, request, response);
 			} else {
-
+				
+				String userAgent = request.getHeader("User-Agent");
+				int browserVer = 0;
+					
+				if(userAgent.contains("MSIE")){ //Checking if Internet Explorer
+					String substring=userAgent.substring(userAgent.indexOf("MSIE")).split(";")[0];
+					browserVer=Integer.parseInt(substring.split(" ")[1]);
+				}
+				
 				if (ub.getNumVisitsToMainMenu() <= 1) {
 					if (ub.getLastVisitDate() != null) {
 						addPageMessage(
@@ -165,7 +184,7 @@ public class MainMenuServlet extends Controller {
 				if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
 					request.setAttribute("label", resword.getString("id_generated_Save_Add"));
 				}
-
+				if (browserVer!=0 && browserVer<8){
 				if (currentRole.isInvestigator() || currentRole.isClinicalResearchCoordinator()) {
 					setupListStudySubjectTable(request, response);
 				}
@@ -192,7 +211,81 @@ public class MainMenuServlet extends Controller {
 				}
 				udao.updatePasswdHistory(ub);
 				forwardPage(Page.MENU, request, response);
+				request.setAttribute("displayPageVersion", "old");
+				} else {
+	
+				if (currentRole.isSysAdmin() || currentRole.isStudyAdministrator()	|| currentRole.isStudyDirector()) {			
+					if (currentStudy.getStatus().isPending()) {
+						request.getSession().setAttribute("skipURL", "true");
+						response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
+						return;
+					}
+				}
+									
+				StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+	
+				int studyId = sb.getId();
+				int userId = ub.getId();
+				List<WidgetsLayout> widgetsLayout = getWidgetsLayoutService().findAllByStudyIdAndUserId(studyId, userId);
+				List <DisplayWidgetsLayoutBean> dispayWidgetsLayout = new ArrayList<DisplayWidgetsLayoutBean>();
+
+				if(widgetsLayout.size()==0||widgetsLayout==null){
+					int widgetsOrdinalCounter = 1;
+					List <Widget> widgets = getWidgetService().findAll();                	
+
+					for(int w = 0; w < widgets.size(); w++){
+						Widget currentWidget = widgets.get(w);
+						String accesToCurrentWidget = currentWidget.getHaveAccess();                		
+
+						if ((currentStudy.getParentStudyId()>0 && currentWidget.isSiteMetrics()) || (currentStudy.getParentStudyId() == 0 && currentWidget.isStudyMetrics() == true)){
+
+							int currentUserRole = currentRole.getRole().getId();
+							if (accesToCurrentWidget.contains(Integer.toString(currentUserRole))){
+								WidgetsLayout currentWidgetsLayout = new WidgetsLayout();	                		
+								currentWidgetsLayout.setStudyId(studyId);
+								currentWidgetsLayout.setUserId(userId);
+
+								String defaultFor = currentWidget.getDisplayAsDefault();
+
+								if (defaultFor.contains(Integer.toString(currentUserRole))){
+									currentWidgetsLayout.setOrdinal(widgetsOrdinalCounter);
+									widgetsOrdinalCounter++;
+								} else {
+									currentWidgetsLayout.setOrdinal(0);
+								}
+									widgetsLayout.add(currentWidgetsLayout);
+									currentWidget.getWidgetsLayout().add(currentWidgetsLayout);
+								} else {
+									//user have no access to this widget
+								}
+							}
+					getWidgetService().saveWidget(currentWidget);
+					}          	
+				}
+					                
+				for (int z=0; z<widgetsLayout.size();z++){                	
+					WidgetsLayout currentLayout = widgetsLayout.get(z);
+					Widget currentWidget = getWidgetService().findByChildsId(currentLayout.getId());
+
+					String widgetName = currentWidget.getWidgetName().toLowerCase().replaceAll(" ", "_");
+
+					DisplayWidgetsLayoutBean currentDisplay = new DisplayWidgetsLayoutBean();
+
+					currentDisplay.setWidgetName(widgetName+".jsp");
+					currentDisplay.setOrdinal(currentLayout.getOrdinal());
+					currentDisplay.setWidgetId(currentWidget.getId());
+
+					dispayWidgetsLayout.add(currentDisplay);
+				}
+
+				Collections.sort(dispayWidgetsLayout, DisplayWidgetsLayoutBean.comparatorForDisplayWidgetsLayout);
+				request.setAttribute("dispayWidgetsLayout", dispayWidgetsLayout);
+				request.setAttribute("displayPageVersion", "new");
+
+				udao.updatePasswdHistory(ub);
+				forwardPage(Page.MENU, request, response);					
 			}
+		}
 
 		} else {
 			studies = (ArrayList) sdao.findAllByUser(ub.getName());
