@@ -109,6 +109,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+	@SuppressWarnings("serial")
 	public static class DeleteOldObject implements Serializable {
 		public String endFile;
 		public Boolean deleteOld;

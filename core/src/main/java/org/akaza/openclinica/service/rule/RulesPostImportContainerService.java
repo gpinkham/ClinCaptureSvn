@@ -88,22 +88,17 @@ public class RulesPostImportContainerService {
 							&& ruleSetRuleBean.equals(persistentruleSetRuleBean)) {
 						persistentruleSetRuleBean
 								.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.EXACT_DOUBLE);
-						// TODO : DO SOMETHING HERE
-						// itr.remove();
 						break;
 					} else if (persistentruleSetRuleBean.getStatus() != Status.DELETED
 							&& ruleSetRuleBean.getRuleBean() != null
 							&& ruleSetRuleBean.getRuleBean().equals(persistentruleSetRuleBean.getRuleBean())) {
-						// persistentruleSetRuleBean.setActions(ruleSetRuleBean.getActions());
 						persistentruleSetRuleBean
 								.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
-						// itr.remove();
 						break;
 					}
 					ruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.LINE);
 				}
 				ruleSetBeanWrapper.getAuditableBean().addRuleSetRules(importedRuleSetRules);
-				// ruleSetBeanWrapper.getAuditableBean().setId(persistentRuleSetBean.getId());
 			} else {
 				ruleSetBeanWrapper.getAuditableBean().setOwner(getUserAccount());
 				ruleSetBeanWrapper.getAuditableBean().setStudyEventDefinition(
@@ -230,8 +225,6 @@ public class RulesPostImportContainerService {
 					ruleBeanWrapper.getAuditableBean().getExpression().setValue(expressionValue);
 					ruleBeanWrapper.getAuditableBean().getExpression().setContext(context);
 					doesPersistentRuleBeanBelongToCurrentStudy(ruleBeanWrapper);
-					// ruleBeanWrapper.getAuditableBean().setId(persistentRuleBean.getId());
-					// ruleBeanWrapper.getAuditableBean().getExpression().setId(persistentRuleBean.getExpression().getId());
 				} else {
 					ruleBeanWrapper.getAuditableBean().setOwner(getUserAccount());
 				}
@@ -329,18 +322,13 @@ public class RulesPostImportContainerService {
 			EventDefinitionCRFBean eventDefinitionCRFBean) {
 		if (ruleActionBean instanceof ShowActionBean) {
 			List<PropertyBean> properties = ((ShowActionBean) ruleActionBean).getProperties();
-			// if (ruleActionBean.getRuleActionRun().getBatch() == true ||
-			// ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
 			if (ruleActionBean.getRuleActionRun().getBatch() == true) {
 				ruleSetBeanWrapper.error("ShowAction " + ((ShowActionBean) ruleActionBean).toString()
 						+ " is not Valid. You cannot have Batch=\"true\". ");
-				// + " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
 			}
 			for (PropertyBean propertyBean : properties) {
 				String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(),
 						ruleSetBeanWrapper.getAuditableBean());
-				// String result = getExpressionService().isExpressionValid(oid, ruleSetBeanWrapper.getAuditableBean(),
-				// 2) ? "OK" : "";
 				if (!result.equals("OK")) {
 					ruleSetBeanWrapper.error("ShowAction OID " + result + " is not Valid. ");
 				}
@@ -348,26 +336,19 @@ public class RulesPostImportContainerService {
 		}
 		if (ruleActionBean instanceof HideActionBean) {
 			List<PropertyBean> properties = ((HideActionBean) ruleActionBean).getProperties();
-			// if (ruleActionBean.getRuleActionRun().getBatch() == true ||
-			// ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
 			if (ruleActionBean.getRuleActionRun().getBatch() == true) {
 				ruleSetBeanWrapper.error("HideAction " + ((HideActionBean) ruleActionBean).toString()
 						+ " is not Valid. You cannot have Batch=\"true\". ");
-				// + " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
 			}
 			for (PropertyBean propertyBean : properties) {
 				String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(),
 						ruleSetBeanWrapper.getAuditableBean());
-				// String result = getExpressionService().isExpressionValid(oid, ruleSetBeanWrapper.getAuditableBean(),
-				// 2) ? "OK" : "";
 				if (!result.equals("OK")) {
 					ruleSetBeanWrapper.error("HideAction OID " + result + " is not Valid. ");
 				}
 			}
 		}
 		if (ruleActionBean instanceof InsertActionBean) {
-			// if (ruleActionBean.getRuleActionRun().getBatch() == true ||
-			// ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
 			if (ruleActionBean.getRuleActionRun().getBatch() == true) {
 				ruleSetBeanWrapper.error("InsertAction " + ((InsertActionBean) ruleActionBean).toString()
 						+ " is not Valid. ");
@@ -384,12 +365,6 @@ public class RulesPostImportContainerService {
 						+ errors.getAllErrors().get(0).getDefaultMessage());
 			}
 		}
-		// if (ruleActionBean instanceof EmailActionBean) {
-		// if (ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
-		// ruleSetBeanWrapper.error("EmailAction " + ((EmailActionBean) ruleActionBean).toString()
-		// + " is not Valid.You cannot have ImportDataEntry=\"true\". ");
-		// }
-		// }
 	}
 
 	private String createError(String key) {

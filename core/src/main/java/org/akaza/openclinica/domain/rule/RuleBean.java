@@ -87,7 +87,7 @@ public class RuleBean extends AbstractAuditableMutableDomainObject {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-
+	
 	public String getDescription() {
 		return description;
 	}

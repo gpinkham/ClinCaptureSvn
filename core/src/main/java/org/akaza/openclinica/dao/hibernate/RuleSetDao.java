@@ -168,5 +168,4 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		q.setParameter("status", org.akaza.openclinica.domain.Status.AVAILABLE);
 		return (Long) q.uniqueResult();
 	}
-
 }

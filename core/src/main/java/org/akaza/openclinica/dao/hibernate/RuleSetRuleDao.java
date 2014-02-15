@@ -31,6 +31,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional
 public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 
 	private CoreResources coreResources;
@@ -59,7 +60,6 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 	 * @return List of RuleSetRuleBeans
 	 */
 	@SuppressWarnings("unchecked")
-	@Transactional
 	public ArrayList<RuleSetRuleBean> findByRuleSetStudyIdAndStatusAvail(Integer studyId) {
 		String query = "from " + getDomainClassName()
 				+ " ruleSetRule  where ruleSetRule.ruleSetBean.studyId = :studyId and status = :status ";

@@ -784,7 +784,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			Integer ruleId = (Integer) ((HashMap<Object, Object>) item).get("ruleId");
 			RuleSetRuleBean ruleSetRule = (RuleSetRuleBean) ((HashMap<Object, Object>) item).get("ruleSetRule");
 
-			value += buildEditRuleLink(ruleSetRuleId, ruleSetId);
+			value += buildEditRuleLink(ruleId, ruleSetRule.getId());
 			if (ruleSetRule.getStatus() != Status.DELETED) {
 				value += viewLinkBuilder(ruleSetId) + executeLinkBuilder(ruleSetId, ruleId)
 						+ removeLinkBuilder(ruleSetRuleId, ruleSetId) + extractXmlLinkBuilder(ruleSetRuleId)
@@ -894,10 +894,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
 	}
 
-	private String buildEditRuleLink(Integer ruleSetRuleId, Integer ruleSetId) {
+	private String buildEditRuleLink(Integer ruleId, Integer ruleSetRuleId) {
 		HtmlBuilder actionLink = new HtmlBuilder();
-		actionLink.a().href(
-				"studies?ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
+		actionLink.a().href("designer/rule.html?action=edit&id=" + ruleId + "&rId=" + ruleSetRuleId);
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Edit1','images/bt_Edit.gif');\"");
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_Edit1','images/bt_Edit.gif');\"").close();
 		actionLink.img().name("bt_Edit1").src("images/bt_Edit.gif").border("0").alt("Edit").title("Edit")

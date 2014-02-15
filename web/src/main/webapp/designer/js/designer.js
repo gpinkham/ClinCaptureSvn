@@ -1,3 +1,18 @@
+/* ===================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+ * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
+ * 
+ * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer. 
+ * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
+ * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
+ * 
+ * You may not modify, decompile, or reverse engineer the software.
+ * Clinovo disclaims any express or implied warranty of fitness for use. 
+ * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
+ * THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLINOVO FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
+
+ * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO‚ÄôS ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
+ * =================================================================================================================================================================================================================================================================================================================================================================================================================================================================== */
+
 /* ============================================
  * Creates an <div> element.
  *
@@ -49,8 +64,6 @@ function createButton(params) {
  * Returns the created control
  * ========================================================================= */
 function createInput(params) {
-
-	if (params.type === undefined) throw formDesignException();
 
 	// Question type text box
 	var input = $("<input/>");
@@ -665,7 +678,6 @@ function handleErrorResponse(params) {
 			backdrop: false,
 			message: params.response.responseText
 		});
-
 	}
 }
 
@@ -746,10 +758,8 @@ function createDroppable(params) {
 		params.element.removeClass("init");
  		params.element.addClass("bordered");
 
-		var currentValue = $(this).text().slice(0, -5);
-
 		var input = $("<input>");
-		input.val(currentValue);
+		input.val($(this).text());
 
 		input.blur(function() {
 
@@ -895,4 +905,587 @@ function handleDateDrop(element) {
 
 	element.append(newInput);
 	newInput.focus();
+}
+
+/* ===================================================
+ * Adds the studies to the studies table for display.
+ *
+ *
+ * Argument Object [studies] parameters:
+ *  - studies - the return studies from CC
+ * =================================================== */
+function loadStudies(studies) {
+
+	var itemArr = []
+	$("div[id='studies']").find("table").remove();
+
+	if (studies) {
+
+		// Table headers
+		var table = createTable(['Name', 'OID', 'Identifier']);
+
+		for (var x = 0; x < studies.length; x++) {
+
+			var study = studies[x]
+
+			var tr = $("<tr>");
+
+			tr.attr("id", x);
+			tr.click(function() {
+
+				if ($("div[id='studies']").find("table > tbody > tr").size() > 1 && $("#designSurface").find(".panel-body").find(".dotted-borders").size() > 2) {
+
+					bootbox.confirm("The current rule will be lost. Are you sure you want to select another study?", 
+						function(result) {
+
+						if (result) {
+
+							$("a[href='#events']").tab('show');
+
+							// Make bold
+							tr.siblings(".selected").removeClass("selected");
+
+							tr.addClass("selected");
+
+							var data = JSON.parse(sessionStorage.getItem("studies"));
+
+							var currentStudy = data[tr.attr("id")]
+
+							selectedStudy = currentStudy.id;
+
+							loadStudyEvents(currentStudy)
+
+							// Cascade load
+							var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]
+
+							loadEventCRFs({
+
+								study: currentStudy,
+								studyEvent: topEvent
+							});
+
+							loadCRFVersionItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]])
+
+							createBreadCrumb({
+
+								study: currentStudy.name,
+							})
+							
+							resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
+
+							$(".modal-backdrop").remove();
+						} else {
+							$(".modal-backdrop").remove();
+						}
+					});
+				} else {
+
+					// Make bold
+					$(this).siblings(".selected").removeClass("selected");
+
+					$(this).addClass("selected");
+
+					var data = JSON.parse(sessionStorage.getItem("studies"));
+
+					var currentStudy = data[$(this).attr("id")]
+
+					selectedStudy = currentStudy.id;
+
+					if (currentStudy.events) {
+
+						loadStudyEvents(currentStudy)
+
+						// Cascade load
+						var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]
+
+						loadEventCRFs({
+
+							study: currentStudy,
+							studyEvent: topEvent
+						});
+
+						var version = topEvent.crfs[0].versions[0]
+
+						loadCRFVersions({
+							study: study,
+							event: topEvent,
+							crf: topEvent.crfs[0]
+						});
+
+						loadCRFVersionItems(version);
+					}
+
+					createBreadCrumb({
+
+						study: currentStudy.name,
+					})
+
+					$("a[href='#events']").tab('show');
+				}
+			})
+
+			var tdName = $("<td>");
+			tdName.text(study.name);
+
+			var tdOID = $("<td>");
+			tdOID.text(study.oid);
+
+			var tdIdentifier = $("<td>");
+			tdIdentifier.text(study.identifier);
+
+			tr.append(tdName);
+			tr.append(tdOID);
+			tr.append(tdIdentifier);
+
+			itemArr.push(tr);
+		}
+
+		$("div[id='studies']").append(table)
+
+		currentPageIndex = 0;
+
+		// Global
+		var chunkedItemsArr = itemArr.chunk(10);
+
+		var pagination = createPagination({
+
+			itemsArr: chunkedItemsArr,
+			div: $("div[id='studies']")
+		});
+
+		table.after(pagination);
+
+		resetTable({
+
+			table: table,
+			arr: chunkedItemsArr,
+			pagination: pagination
+		});
+
+		$(".table-hover").find("tbody > tr").filter(":first").click();
+
+		// Initial load should show studies
+		$("a[href='#studies']").tab('show');
+	}
+}
+
+/* =================================================================
+ * Adds the a given study's events to the events table for display.
+ *
+ *
+ * Argument Object [study] parameters:
+ *  - study - the study for whom events should be loaded
+ * ============================================================== */
+function loadStudyEvents(study) {
+
+	var itemArr = []
+	$("div[id='events']").find("table").remove();
+
+	if (study.events) {
+
+		var eventTable = createTable(['Name', 'Description', 'Identifier']);
+
+		for (var x = 0; x < study.events.length; x++) {
+
+			var studyEvent = study.events[x]
+
+			var tr = $("<tr>");
+			tr.attr("id", x);
+			tr.click(function() {
+
+				$("a[href='#crfs']").tab('show');
+
+				// Make bold
+				$(this).siblings(".selected").removeClass("selected");
+
+				$(this).addClass("selected");
+
+				var currentEvent = study.events[$(this).attr("id")]
+
+				loadEventCRFs({
+
+					study: study,
+					studyEvent: currentEvent
+				});
+
+				// Cascade load
+				loadCRFVersions({
+					study: study,
+					event: currentEvent,
+					crf: currentEvent.crfs[Object.keys(currentEvent.crfs)[0]]
+				});
+
+				createBreadCrumb({
+
+					study: study.name,
+					event: currentEvent.name,
+				})
+
+			})
+
+			var tdName = $("<td>");
+			tdName.text(studyEvent.name);
+
+			var tdDescription = $("<td>");
+
+			if (studyEvent.description) {
+
+				if (studyEvent.description.length > 25) {
+
+					tdDescription.text(studyEvent.description.slice(0, 20) + "...");
+
+					tdDescription.tooltip({
+
+						placement: "top",
+						container: "body",
+						title: studyEvent.description
+					})
+
+				} else {
+
+					tdDescription.text(studyEvent.description);
+				}
+			}
+
+			var tdIdentifier = $("<td>");
+			tdIdentifier.text(studyEvent.identifier);
+
+			tr.append(tdName);
+			tr.append(tdDescription);
+			tr.append(tdIdentifier);
+
+			itemArr.push(tr);
+		}
+
+		$("div[id='events']").append(eventTable);
+
+		currentPageIndex = 0;
+
+		// Global
+		var chunkedItemsArr = itemArr.chunk(10);
+
+		var pagination = createPagination({
+
+			div: $("div[id='events']"),
+			itemsArr: chunkedItemsArr
+		});
+
+		eventTable.after(pagination);
+
+		resetTable({
+
+			table: eventTable,
+			arr: chunkedItemsArr,
+			pagination: pagination
+		});		
+	}
+}
+
+/* =================================================================
+ * Adds the a given event's crfs to the crf table for display.
+ *
+ * Argument Object [params] parameters:
+ * - studyEvent - the event for whom crfs should be loaded
+ * - study - the study to which the event belongs to
+ * ============================================================== */
+function loadEventCRFs(params) {
+
+	var itemArr = []
+	$("div[id='crfs']").find("table").remove();
+
+	if (params.studyEvent.crfs && params.studyEvent.crfs) {
+
+		var crfTable = createTable(['Name', 'Identifier', 'Description']);
+
+		for (var cf = 0; cf < params.studyEvent.crfs.length; cf++) {
+
+			var crf = params.studyEvent.crfs[cf]
+
+			var tr = $("<tr>");
+			tr.attr("id", cf);
+			tr.click(function() {
+
+				$("a[href='#versions']").tab('show');
+
+				// Make bold
+				$(this).siblings(".selected").removeClass("selected");
+
+				$(this).addClass("selected");
+
+				var currentCRF = params.studyEvent.crfs[$(this).attr("id")];
+
+				loadCRFVersions({
+
+					crf: currentCRF,
+					study: params.study,
+					event: params.studyEvent.name
+				});
+
+				createBreadCrumb({
+
+					crf: currentCRF.name,
+					study: params.study.name,
+					event: params.studyEvent.name,
+					
+				})
+			})
+
+			var tdName = $("<td>");
+			tdName.text(crf.name);
+
+			var tdDescription = $("<td>");
+
+			if (crf.description) {
+
+				if (crf.description.length > 25) {
+
+					tdDescription.text(crf.description.slice(0, 20) + "...");
+
+					tdDescription.tooltip({
+
+						placement: "top",
+						container: "body",
+						title: crf.description,
+					})
+
+				} else {
+
+					tdDescription.text(crf.description);
+				}
+			}
+
+			var tdOID = $("<td>");
+			if (crf.oid) {
+
+				if (crf.oid.length > 7) {
+
+					tdOID.text(crf.oid.slice(0, 7) + "...");
+
+					tdOID.tooltip({
+
+						placement: "top",
+						container: "body",
+						title: crf.oid,
+					})
+
+				} else {
+
+					tdOID.text(crf.oid);
+				}
+			}
+
+			var tdVersion = $("<td>");
+			tdVersion.text(crf.version);
+
+			tr.append(tdName);
+			tr.append(tdOID);
+			tr.append(tdDescription);
+
+			itemArr.push(tr);
+		}
+
+		$("div[id='crfs']").append(crfTable)
+
+		currentPageIndex = 0;
+
+		// Global
+		var chunkedItemsArr = itemArr.chunk(10);
+
+		var pagination = createPagination({
+
+			div: $("div[id='crfs']"),
+			itemsArr: chunkedItemsArr
+		});
+
+		crfTable.after(pagination);
+
+		resetTable({
+
+			table: crfTable,
+			arr: chunkedItemsArr,
+			pagination: pagination
+		});
+	}
+}
+
+function loadCRFVersions(params) {
+
+	var itemArr = []
+	$("div[id='versions']").find("table").remove();
+
+	if (params.crf.versions) {
+
+		var versionTable = createTable(['Name', 'Identifier']);
+
+		for (var ver = 0; ver < params.crf.versions.length; ver++) {
+
+			var version = params.crf.versions[ver]
+
+			var tr = $("<tr>");
+			tr.attr("id", ver);
+			tr.click(function() {
+
+				$("a[href='#items']").tab('show');
+
+				// Make bold
+				$(this).siblings(".selected").removeClass("selected");
+
+				$(this).addClass("selected");
+
+				var currentVersion = params.crf.versions[$(this).attr("id")];
+
+				loadCRFVersionItems(currentVersion);
+
+				createBreadCrumb({
+
+					event: params.event.name,
+					study: params.study.name,
+					version: currentVersion.name
+
+				})
+			})
+
+			var tdName = $("<td>");
+			tdName.text(version.name);
+
+
+			var tdOID = $("<td>");
+
+			if (version.oid) {
+
+				if (version.oid.length > 7) {
+
+					tdOID.text(version.oid.slice(0, 7) + "...");
+
+					tdOID.tooltip({
+
+						placement: "top",
+						container: "body",
+						title: version.oid,
+					})
+
+				} else {
+
+					tdOID.text(version.oid);
+				}
+			}
+
+			tr.append(tdName);
+			tr.append(tdOID);
+
+			itemArr.push(tr);
+		}
+
+		$("div[id='versions']").append(versionTable)
+
+		currentPageIndex = 0;
+
+		// Global
+		var chunkedItemsArr = itemArr.chunk(10);
+
+		var pagination = createPagination({
+
+			div: $("div[id='versions']"),
+			itemsArr: chunkedItemsArr
+		});
+
+		versionTable.after(pagination);
+
+		resetTable({
+
+			table: versionTable,
+			arr: chunkedItemsArr,
+			pagination: pagination
+		});
+	}
+}
+
+/* =================================================================
+ * Adds the a given crf's items to the items table for display.
+ *
+ *
+ * Argument Object [params] parameters:
+ * - crf - the crf for whom items should be loaded
+ * ============================================================== */
+function loadCRFVersionItems(crf) {
+
+	var itemArr = []
+	$("div[id='items']").find("table").remove();
+
+	if (crf.items) {
+
+		var itemsTable = createTable(['Name', 'Description', 'Data Type']);
+
+		for (var it = 0; it < crf.items.length; it++) {
+
+			var item = crf.items[it]
+
+			var tr = $("<tr>");
+
+			var tdName = $("<td>");
+			tdName.text(item.name);
+			tdName.addClass("group")
+			tdName.attr("oid", item.oid);
+			tdName.attr("goid", item.group);
+
+			createDraggable({
+
+				element: tdName,
+				target: ($("#dataSurface"), $("#secondDataSurface"))
+			});
+
+
+			var tdDescription = $("<td>");
+
+			if (item.description) {
+
+				if (item.description.length > 25) {
+
+					tdDescription.text(item.description.slice(0, 20) + "...");
+
+					tdDescription.tooltip({
+
+						placement: "top",
+						container: "body",
+						title: item.description,
+					})
+
+				} else {
+
+					tdDescription.text(item.description);
+				}
+			}
+
+			var tdDataType = $("<td>");
+			tdDataType.text(item.type);
+
+			tr.append(tdName);
+			tr.append(tdDescription);
+			tr.append(tdDataType);
+
+			itemArr.push(tr);
+		}
+
+		$("div[id='items']").append(itemsTable);
+
+		currentPageIndex = 0;
+
+		// Global
+		var chunkedItemsArr = itemArr.chunk(10);
+
+		var pagination = createPagination({
+
+			div: $("div[id='items']"),
+			itemsArr: chunkedItemsArr
+		});
+
+		itemsTable.after(pagination);
+
+		resetTable({
+
+			table: itemsTable,
+			arr: chunkedItemsArr,
+			pagination: pagination
+		});
+	}
 }

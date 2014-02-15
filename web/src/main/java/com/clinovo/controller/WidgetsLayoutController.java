@@ -44,7 +44,7 @@ import com.clinovo.service.WidgetsLayoutService;
 import com.lowagie.text.pdf.hyphenation.TernaryTree.Iterator;
 
 @Controller
-@SuppressWarnings({"unused","rawtypes","unchecked"})
+@SuppressWarnings({"unused","rawtypes"})
 
 public class WidgetsLayoutController {
 	

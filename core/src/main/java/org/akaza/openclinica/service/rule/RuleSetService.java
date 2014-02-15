@@ -85,8 +85,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @SuppressWarnings("rawtypes")
 public class RuleSetService implements RuleSetServiceInterface {
 
@@ -168,7 +170,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 		return ruleSetBean;
 
 	}
-
+	
 	private RuleSetAuditBean createRuleSetAuditBean(RuleSetBean ruleSetBean, UserAccountBean user, Status status) {
 		RuleSetAuditBean ruleSetAuditBean = new RuleSetAuditBean();
 		ruleSetAuditBean.setRuleSetBean(ruleSetBean);

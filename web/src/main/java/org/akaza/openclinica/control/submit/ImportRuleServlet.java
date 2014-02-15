@@ -30,7 +30,9 @@ import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.view.Page;
@@ -42,6 +44,8 @@ import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.xml.XMLContext;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -100,11 +104,35 @@ public class ImportRuleServlet extends Controller {
 				schemaValidator.validateAgainstSchema(ruleFile, xsdFile);
 				RulesPostImportContainer importedRules = handleLoadCastor(ruleFile);
 				logger.info(ub.getFirstName());
+
+				// Editing a rule - remove existing rules
+				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")
+						&& request.getParameter("edit") != null && "true".equalsIgnoreCase(request.getParameter("edit"))) {
+					
+					RuleSetRuleBean bean = getRuleSetRuleDao().findById(Integer.parseInt(request.getParameter("id")));
+					if (bean != null) {
+						Session session = getRuleDao().getSessionFactory().getCurrentSession();
+						Transaction transaction = session.beginTransaction();
+
+						for (RuleActionBean act : bean.getActions()) {
+							session.delete(act);
+							session.delete(act.getRuleActionRun());
+						}
+
+						session.delete(bean.getRuleSetBean());
+						session.delete(bean.getRuleBean());
+						session.delete(bean);
+
+						transaction.commit();
+						session.flush();
+					}
+				}
+
 				RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
 						currentStudy, ub);
 				importedRules = rulesPostImportContainerService.validateRuleDefs(importedRules);
 				importedRules = rulesPostImportContainerService.validateRuleSetDefs(importedRules);
-				request.getSession().setAttribute("importedData", importedRules);
+
 				provideMessage(importedRules, request);
 
 				// If request is coming from rule studio
@@ -135,6 +163,7 @@ public class ImportRuleServlet extends Controller {
 
 				} else {
 
+					request.getSession().setAttribute("importedData", importedRules);
 					forwardPage(Page.VERIFY_RULES_IMPORT_SERVLET, request, response);
 				}
 			} catch (OpenClinicaSystemException re) {

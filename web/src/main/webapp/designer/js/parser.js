@@ -1,3 +1,18 @@
+/* ===================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+ * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
+ * 
+ * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer. 
+ * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
+ * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
+ * 
+ * You may not modify, decompile, or reverse engineer the software.
+ * Clinovo disclaims any express or implied warranty of fitness for use. 
+ * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
+ * THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLINOVO FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
+
+ * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO‚ÄôS ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
+ * =================================================================================================================================================================================================================================================================================================================================================================================================================================================================== */
+
 function Parser() {
 
 	this.rule = Object.create(null);
@@ -95,25 +110,20 @@ Parser.prototype.createNextDroppable = function(params) {
 			this.rule.targets.push(params.ui.draggable.text());
 
 			var newInput = params.element.clone();
+			createDroppable({
+				element: newInput,
+				accept: "div[id='items'] td"
+			})
 
 			// create a new input 
-			if (params.element.val()) {
-
-				if (params.element.siblings("input").length == 0) {
-
-					createDroppable({
-						element: newInput,
-						accept: "div[id='items'] td"
-					})
-				}
-			} else {
+			if (!params.element.val()) {
 
 				params.element.after(newInput);
 				createDroppable({
 					element: newInput,
 					accept: "div[id='items'] td"
 				})
-			}
+			} 
 
 			newInput.focus();
 			params.element.val(params.ui.draggable.text());
@@ -323,10 +333,10 @@ Parser.prototype.isValid = function(expression) {
 	var valid = true;
 	var message = "";
 
-	if (!$("#chkDiscrepancyText").is(":checked") && !$("#chkEmail").is(":checked") && !$("#chkData").is(":checked") && $("input[name=tItem]:checked").length == 0) {
+	if (this.rule.actions.length === 0) {
 
 		valid = false,
-		message = "A rule is supposed to fire an action. Please the action to take if the rule evaluates correctly"
+		message = "A rule is supposed to fire an action. Please select the action(s) to take if the rule evaluates as intended."
 	}
 
 	if (!$("#ide").is(":checked") && !$("#ae").is(":checked") && !$("#dde").is(":checked") && !$("#dataImport").is(":checked")) {
@@ -341,7 +351,7 @@ Parser.prototype.isValid = function(expression) {
 		message = "A rule is supposed to evaluate to true or false. Please specify"
 	}
 
-	if ($(".target").val().length == 0) {
+	if (this.rule.targets.length === 0) {
 
 		valid = false,
 		message = "Please specify a rule target"
@@ -372,7 +382,6 @@ Parser.prototype.isValid = function(expression) {
 			message = "The email address is invalid. Check the email and try again."
 		}
 	}
-
 
 	return {
 
@@ -545,7 +554,6 @@ Parser.prototype.isAlreadyAddedTarget = function(target) {
  * ========================================================================= */
 Parser.prototype.findItem = function(itemName) {
 
-	var item = Object.create(null);
 	var storedStudies = JSON.parse(sessionStorage.getItem("studies"));
 
 	for (var x in storedStudies) {
@@ -562,18 +570,17 @@ Parser.prototype.findItem = function(itemName) {
 
 				for (var v in crf.versions) {
 
-					var version = crf.versions[v];
+					var ver = crf.versions[v];
 
-					for (var i in version.items) {
+					for (var i in ver.items) {
 
-						var item = version.items[i];
+						var itm = ver.items[i];
 
-						if (item.name === itemName) {
+						if (itm.name === itemName) {
 
-							item.item = item;
-							item.formOid = crf.oid;
+							itm.formOid = crf.oid;
 
-							return item;
+							return itm;
 						}
 					}
 				}
@@ -592,7 +599,6 @@ Parser.prototype.findItem = function(itemName) {
  * ======================================================================== */
 Parser.prototype.findItemName = function(itemOID) {
 
-	var item = Object.create(null);
 	var storedStudies = JSON.parse(sessionStorage.getItem("studies"));
 
 	for (var x in storedStudies) {
@@ -609,18 +615,17 @@ Parser.prototype.findItemName = function(itemOID) {
 
 				for (var v in crf.versions) {
 
-					var version = crf.versions[v];
+					var ver = crf.versions[v];
 
-					for (var i in version.items) {
+					for (var i in ver.items) {
 
-						var item = version.items[i];
+						var itm = ver.items[i];
 
-						if (item.oid === itemOID) {
+						if (itm.oid === itemOID) {
 
-							item.item = item;
-							item.formOid = crf.oid;
+							itm.formOid = crf.oid;
 
-							return item;
+							return itm;
 						}
 					}
 				}
@@ -650,30 +655,27 @@ Parser.prototype.setTargets = function(targets) {
 		var currInput = $(".target");
 		for (var x = 0; x < targets.length; x++) {
 
-			var crfItem = this.findItemName(targets[x]);
+			var input = $(".target").clone();
 
-			if (x > 0) {
+			createDroppable({
+				element: input,
+				accept: "div[id='items'] td"
+			})
 
-				var input = $(".target").clone();
+			input.val(this.findItemName(targets[x]).name);
+			input.css('font-weight', 'bold');
 
-				createDroppable({
-					element: input,
-					accept: "div[id='items'] td"
-				})
+			if (x === 0) {
 
-				input.val(crfItem.item.name);
-
-
-				currInput.after(input);
-
-				currInput = input;
+				$(".target").before(input);
 
 			} else {
 
-				$(".target").val(crfItem.item.name);
+				currInput.after(input);
+				currInput = input;
 			}
 
-			this.rule.targets.push(crfItem.item.name);
+			this.rule.targets.push(this.findItemName(targets[x]).name);
 		}
 	}
 }
@@ -789,9 +791,37 @@ Parser.prototype.setDiscrepancyAction = function(params) {
 
 	if (params) {
 
-		if (params.selected) {
+		var action = Object.create(null);
 
-			var action = Object.create(null);
+		// function to toggle display
+		action.render = function(visible) {
+
+			if (visible) {
+
+				$("#message").show();
+				$("#actionMessages").show();
+
+				$("#discrepancyText").show();
+				$("#discrepancyText").find("textarea").val(action.message);
+
+				$("#chkDiscrepancyText").prop("checked", params.selected);
+
+			} else {
+
+				// Update UI
+				$("#message").hide();
+				$("#discrepancyText").hide();
+
+				$("#chkDiscrepancyText").prop("checked", params.selected);
+
+				if ($("#actionMessages").find("div:visible").length === 0) {
+
+					$("#actionMessages").hide();
+				}
+			}
+		}
+
+		if (params.selected) {
 
 			if (this.getActions().length > 0 && this.getDiscrepancyAction()) {
 				action = this.getDiscrepancyAction();
@@ -802,29 +832,6 @@ Parser.prototype.setDiscrepancyAction = function(params) {
 			
 			action.type = "discrepancy";
 			action.message = params.message;
-
-			// function to show
-			action.render = function(visible) {
-
-				if (visible) {
-
-					$("#message").show();
-					$("#actionMessages").show();
-
-					$("#discrepancyText").show();
-					$("#discrepancyText").find("textarea").val(action.message);
-
-					$("#chkDiscrepancyText").prop("checked", params.selected);
-
-				} else {
-
-					// Update UI
-					$("#message").hide();
-					$("#discrepancyText").hide();
-
-					$("#chkDiscrepancyText").prop("checked", params.selected);
-				}
-			}
 			
 			action.render(params.selected);
 
@@ -832,7 +839,12 @@ Parser.prototype.setDiscrepancyAction = function(params) {
 
 			// Delete saved reference
 			var act = this.getDiscrepancyAction();
-			delete act;
+			
+			if ($.inArray(act, this.rule.actions) > -1) {
+				this.rule.actions.splice($.inArray(act, this.rule.actions), 1);
+			}
+
+			action.render(params.selected);
 		}
 	}
 }
@@ -857,9 +869,45 @@ Parser.prototype.setEmailAction = function(params) {
 
 	if (params) {
 
-		if (params.selected) {
+		var action = Object.create(null);
 
-			var action = Object.create(null);
+		// function to toggle display
+		action.render = function(visible) {
+
+			if (visible) {
+
+				$("#actionMessages").show();
+
+				// Action controls
+				$("#email").show();
+				$("#emailTo").show();
+
+				$("#body").show();
+				$("#toField").show();
+
+				$("#toField").val(action.to);
+				$("#body").val(action.body);
+
+				$("#chkEmail").prop("checked", params.selected);
+
+			} else {
+
+				$("#email").hide();
+				$("#emailTo").hide();
+
+				$("#body").val("");
+				$("#toField").val("");
+
+				$("#chkEmail").prop("checked", params.selected);
+
+				if ($("#actionMessages").find("div:visible").length === 0) {
+
+					$("#actionMessages").hide();
+				}
+			}
+		}
+
+		if (params.selected) {
 
 			if (this.getActions().length > 0 && this.getEmailAction()) {
 				action = this.getEmailAction();
@@ -873,45 +921,18 @@ Parser.prototype.setEmailAction = function(params) {
 			action.to = params.to;
 			action.body = params.message;
 
-			// Update UI
-			action.render = function(visible) {
-
-				if (visible) {
-
-					$("#actionMessages").show();
-
-					// Action controls
-					$("#email").show();
-					$("#emailTo").show();
-
-					$("#body").show();
-					$("#toField").show();
-
-					$("#toField").val(action.to);
-					$("#body").val(action.body);
-
-					$("#chkEmail").prop("checked", params.selected);
-
-				} else {
-
-					// Update UI
-					$("#email").hide();
-					$("#emailTo").hide();
-
-					$("#body").val("");
-					$("#toField").val("");
-
-					$("#chkEmail").prop("checked", params.selected);
-				}
-			}
-
 			action.render(params.selected);
 
 		} else {
 
 			// Delete saved reference
 			var act = this.getEmailAction();
-			delete act;
+			if ($.inArray(act, this.rule.actions) > -1) {
+				this.rule.actions.splice($.inArray(act, this.rule.actions), 1);
+			}
+
+			action.render(params.selected);
+
 		}
 	}
 }
@@ -1076,14 +1097,204 @@ Parser.prototype.render = function(rule) {
 	// properties
 	this.setName(rule.name);
 	this.setTargets(rule.targets);
-	this.setEvaluatesTo(rule.evaluateTo);
+	this.setEvaluatesTo(rule.evaluatesTo);
 
 	// executions
 	this.setDataImportExecute(rule.di);
-	this.setInitialDataEntryExecute(rule.ide);
 	this.setDoubleDataEntryExecute(rule.dde);
+	this.setInitialDataEntryExecute(rule.ide);
 	this.setAdministrativeEditingExecute(rule.ae);
 
 	// Actions
 	parser.setActions(rule.actions);
+}
+
+/* ========================================================================
+ * Fetch studies from CC. The studies come with events/crf and items added.
+ * ====================================================================== */
+Parser.prototype.fetchStudies = function() {
+	
+	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
+
+	$.ajax({
+
+		type: "POST",
+
+		url: c + "/studies?action=fetch",
+
+		success: function(studies) {
+
+			// FF can return a string
+			if (typeof(studies) === "string") {
+
+				studies = JSON.parse(studies)
+			}
+
+			sessionStorage.setItem("studies", JSON.stringify(studies));
+			loadStudies(studies);
+
+		},
+
+		error: function(response) {
+
+			handleErrorResponse({
+
+				response: response
+			})
+		}
+	})
+}
+
+/* ========================================================================
+ * Fetch a specific rule from CC for editing in the designer. The rule is
+ * passed as an id on the url with a parameter action=editing
+ * ====================================================================== */
+Parser.prototype.fetchRuleForEditing = function() {
+
+	sessionStorage.setItem("edit", true);
+	sessionStorage.setItem("id", this.getParameterValue("rId"));
+	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
+
+	$.ajax({
+
+		type: "POST",
+
+		url: c + "/studies?action=edit&id=" + this.getParameterValue("id") + "&rId=" + this.getParameterValue("rId"),
+
+		success: function(response) {
+
+			var rule = null;
+
+			// FF can return a string
+			if (typeof(response) === "string") {
+
+				rule = JSON.parse(response)
+			}
+
+			parser.render(rule);
+
+		},
+
+		error: function(response) {
+
+			handleErrorResponse({
+
+				response: response
+			})
+		}
+	})
+}
+
+/* =================================================================
+ * Validates the designed rule using the CC Test Rule servlet
+ *
+ * Arguments [params]:
+ * => expression - the expression in text format
+ * => targets - the rule targets
+ * => evaluateTo - What the rule should evaluate to
+ * ============================================================= */
+Parser.prototype.validate = function(rule) {
+
+	var rule = parser.getRule();
+
+	if (rule) {
+
+		$.ajax({
+
+			type: "POST",
+
+			data: {
+
+				rs: true,
+				rule: rule.expression,
+				target: rule.targets[0],
+				testRuleActions: rule.evaluateTo
+			},
+
+			url: rule.submission + "/TestRule?action=validate&study=" + selectedStudy,
+
+			success: function(response) {
+
+				sessionStorage.setItem("validation", response);
+				parser.displayValidationResults(rule)
+			},
+
+			error: function(response) {
+
+				handleErrorResponse({
+
+					response: response
+				})
+			}
+		})
+	}
+}
+
+/* =================================================================
+ * Displays the validation results from testing a rule in CC.
+ *
+ * Note that this function loads the validation page to display the 
+ * results.
+ *
+ * Arguments [params]:
+ * => expression - the expression in text format
+ * => targets - the rule targets
+ * => evaluateTo - What the rule should evaluate to
+ * ============================================================= */
+Parser.prototype.displayValidationResults = function(rule) {
+
+		$.ajax({
+
+		type: "POST",
+
+		data: {
+
+			action: "save",
+			rule: JSON.stringify(rule)
+			
+		},
+
+		url: rule.submission + "/studies?action=validate",
+
+		success: function(response) {
+
+			if (response) {
+
+				// To be used in validation
+				rule.xml = response;
+				sessionStorage.setItem("rule", JSON.stringify(rule));
+
+				// launch validation window
+				window.open("validation.html", '_self');
+
+			}
+		},
+
+		error: function(response) {
+
+			handleErrorResponse({
+
+				response: response
+			})
+		}
+	})
+}
+
+Parser.prototype.getParameter = function(name) {
+
+	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))|| null;
+}
+
+Parser.prototype.getParameterValue = function(name) {
+
+	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+
+	var regexS = "[\\?&]" + name + "=([^&#]*)";
+	var regex = new RegExp(regexS);
+	var results = regex.exec(window.location.href);
+	if (results == null) {
+		return "";
+	} else {
+		return results[1];
+	}
 }

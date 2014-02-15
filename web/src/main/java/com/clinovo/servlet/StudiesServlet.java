@@ -1,3 +1,17 @@
+/*******************************************************************************
+ * CLINOVO RESERVES ALL RIGHTS TO THIS SOFTWARE, INCLUDING SOURCE AND DERIVED BINARY CODE. BY DOWNLOADING THIS SOFTWARE YOU AGREE TO THE FOLLOWING LICENSE:
+ * 
+ * Subject to the terms and conditions of this Agreement including, Clinovo grants you a non-exclusive, non-transferable, non-sublicenseable limited license without license fees to reproduce and use internally the software complete and unmodified for the sole purpose of running Programs on one computer. 
+ * This license does not allow for the commercial use of this software except by IRS approved non-profit organizations; educational entities not working in joint effort with for profit business.
+ * To use the license for other purposes, including for profit clinical trials, an additional paid license is required. Please contact our licensing department at http://www.clinovo.com/contact for pricing information.
+ * 
+ * You may not modify, decompile, or reverse engineer the software.
+ * Clinovo disclaims any express or implied warranty of fitness for use. 
+ * No right, title or interest in or to any trademark, service mark, logo or trade name of Clinovo or its licensors is granted under this Agreement.
+ * THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. CLINOVO FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
+
+ * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
+ *******************************************************************************/
 package com.clinovo.servlet;
 
 import java.io.IOException;
@@ -35,7 +49,7 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -44,12 +58,10 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.domain.rule.RuleBean;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.ActionType;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.action.EmailActionBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,12 +70,6 @@ import org.w3c.dom.Element;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class StudiesServlet extends HttpServlet {
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-		response.sendRedirect(request.getContextPath() + "/designer/rule.html?action=edit&id="
-				+ request.getParameter("ruleSetId"));
-	}
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -198,66 +204,62 @@ public class StudiesServlet extends HttpServlet {
 
 			} else if ("edit".equals(action)) {
 
-				RuleSetDao dao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(
-						RuleSetDao.class);
+				RuleDao dao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(RuleDao.class);
+				RuleSetRuleDao rDao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(RuleSetRuleDao.class);
 
 				JSONObject object = new JSONObject();
-				RuleSetBean rsb = dao.findById(Integer.parseInt(request.getParameter("id")));
+				RuleBean rule = dao.findById(Integer.parseInt(request.getParameter("id")));
 
+				JSONArray ruleActions = new JSONArray();
+				
+				RuleSetRuleBean ruleSetRule = rDao.findById(Integer.parseInt(request.getParameter("rId")));
+
+				try {
+
+					JSONObject act = new JSONObject();
+
+					act.put("type", ruleSetRule.getActions().get(0).getActionType());
+					act.put("select", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
+
+					object.put("evaluateTo", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
+
+					if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.EMAIL)) {
+
+						EmailActionBean emailAction = (EmailActionBean) ruleSetRule.getActions().get(0);
+
+						act.put("to", emailAction.getTo());
+						act.put("body", emailAction.getMessage());
+
+					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.FILE_DISCREPANCY_NOTE)) {
+
+						DiscrepancyNoteActionBean discrepancyAction = (DiscrepancyNoteActionBean) ruleSetRule.getActions().get(0);
+
+						act.put("type", "discrepancy");
+						act.put("message", discrepancyAction.getMessage());
+					}
+
+					ruleActions.put(act);
+
+				} catch (JSONException e) {
+					response.sendError(500, e.getMessage());
+				}
+				
+				// Rule run
+				object.put("di", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getImportDataEntry());
+				object.put("dde", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getDoubleDataEntry());
+				object.put("ide", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getInitialDataEntry());
+				object.put("ae", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getAdministrativeDataEntry());
+				
 				// Targets
 				JSONArray targets = new JSONArray();
-				targets.put(rsb.getOriginalTarget().getValue());
-
-				if (rsb != null) {
-
-					JSONArray ruleActions = new JSONArray();
-					for (RuleSetRuleBean rb : rsb.getRuleSetRules()) {
-
-						RuleBean rule = rb.getRuleBean();
-						RuleActionBean at = rb.getActions().get(0);
-
-						try {
-
-							JSONObject act = new JSONObject();
-
-							act.put("select", at.getExpressionEvaluatesTo());
-							act.put("type", at.getActionType());
-							object.put("evaluateTo", at.getExpressionEvaluatesTo());
-
-							if (at.getActionType().equals(ActionType.EMAIL)) {
-
-								EmailActionBean emailAction = (EmailActionBean) at;
-								
-								act.put("to", emailAction.getTo());
-								act.put("body", emailAction.getMessage());
-
-							} else if (at.getActionType().equals(ActionType.FILE_DISCREPANCY_NOTE)) {
-
-								DiscrepancyNoteActionBean discrepancyAction = (DiscrepancyNoteActionBean) at;
-								
-								act.put("type", "discrepancy");
-								act.put("message", discrepancyAction.getMessage());
-							}
-							
-							ruleActions.put(act);
-							
-							object.put("di", at.getRuleActionRun().getImportDataEntry());
-							object.put("dde", at.getRuleActionRun().getDoubleDataEntry());
-							object.put("ide", at.getRuleActionRun().getInitialDataEntry());
-							object.put("ae", at.getRuleActionRun().getAdministrativeDataEntry());
-
-							// Rule properties
-							object.put("targets", targets);
-							object.put("oid", rule.getOid());
-							object.put("actions", ruleActions);
-							object.put("name", rule.getDescription());
-							object.put("expression", rule.getExpression().getValue());
-
-						} catch (JSONException e) {
-							response.sendError(500, e.getMessage());
-						}
-					}
-				}
+				targets.put(rule.getRuleSetRules().get(0).getRuleSetBean().getOriginalTarget().getValue());
+				
+				// Rule properties
+				object.put("targets", targets);
+				object.put("oid", rule.getOid());
+				object.put("actions", ruleActions);
+				object.put("name", rule.getDescription());
+				object.put("expression", rule.getExpression().getValue());
 
 				response.getWriter().write(object.toString());
 			}
@@ -312,8 +314,8 @@ public class StudiesServlet extends HttpServlet {
 		CRFDAO crfDAO = new CRFDAO(datasource);
 		EventDefinitionCRFDAO eCrfDAO = new EventDefinitionCRFDAO(datasource);
 
-		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eCrfDAO
-				.findAllActiveByEventDefinitionId(study, evt.getId());
+		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eCrfDAO.findAllByDefinition(study,
+				evt.getId());
 
 		for (EventDefinitionCRFBean crf : eventCRFs) {
 
@@ -338,8 +340,8 @@ public class StudiesServlet extends HttpServlet {
 	}
 
 	private JSONArray getCRFVersions(CRFBean cf, DataSource datasource) throws Exception {
-		
-		JSONArray versions= new JSONArray();
+
+		JSONArray versions = new JSONArray();
 
 		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(datasource);
 		List<CRFVersionBean> vers = (List<CRFVersionBean>) crfVersionDAO.findAllActiveByCRF(cf.getId());
@@ -347,7 +349,7 @@ public class StudiesServlet extends HttpServlet {
 		for (CRFVersionBean ver : vers) {
 
 			JSONObject obj = new JSONObject();
-			
+
 			obj.put("id", ver.getId());
 			obj.put("oid", ver.getOid());
 			obj.put("name", ver.getName());
@@ -359,7 +361,7 @@ public class StudiesServlet extends HttpServlet {
 			versions.put(obj);
 
 		}
-		
+
 		return versions;
 	}
 
@@ -378,9 +380,10 @@ public class StudiesServlet extends HttpServlet {
 
 			// Item group
 			ItemGroupBean itemGroup = (ItemGroupBean) itemGroupDAO.findByItemAndCRFVersion(item, cf);
-			
+
 			// Form meta data
-			ItemFormMetadataBean itemFormMetaData = itemFormMetaDataDAO.findByItemIdAndCRFVersionId(item.getId(), cf.getId());
+			ItemFormMetadataBean itemFormMetaData = itemFormMetaDataDAO.findByItemIdAndCRFVersionId(item.getId(),
+					cf.getId());
 
 			obj.put("id", item.getId());
 			obj.put("oid", item.getOid());
