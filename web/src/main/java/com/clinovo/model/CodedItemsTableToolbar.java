@@ -70,30 +70,30 @@ public class CodedItemsTableToolbar extends DefaultToolbar {
 
                 if(showMoreLink) {
 
-                    html.a().id("showMore").href("javascript:hideCols('codedItems',["
-                            + getIndexes() + "],true); javascript:onInvokeAction('codedItems','filter')").close();
+                    html.a().id("showMore").href("javascript:hideCols('codedItemsId',["
+                            + getIndexes() + "],true); javascript:onInvokeAction('codedItemsId','filter')").close();
                     html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
 
-                    html.a().id("hide").style("display: none;") .href("javascript:hideCols('codedItems',["
-                            + getIndexes() + "],false); javascript:onInvokeAction('codedItems','filter')").close();
+                    html.a().id("hide").style("display: none;") .href("javascript:hideCols('codedItemsId',["
+                            + getIndexes() + "],false); javascript:onInvokeAction('codedItemsId','filter')").close();
                     html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
                     html.script().type("text/javascript").close().append("$(document).ready(function(){ "
-                            + "hideCols('codedItems',["
+                            + "hideCols('codedItemsId',["
                             + getIndexes() + "],false);});").scriptEnd();
 
                 } else {
 
-                    html.a().id("showMore").style("display: none;").href("javascript:hideCols('codedItems',["
-                            + getIndexes() + "],true); javascript:onInvokeAction('codedItems','filter')").close();
+                    html.a().id("showMore").style("display: none;").href("javascript:hideCols('codedItemsId',["
+                            + getIndexes() + "],true); javascript:onInvokeAction('codedItemsId','filter')").close();
                     html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
 
-                    html.a().id("hide").href("javascript:hideCols('codedItems',["
-                            + getIndexes() + "],false); javascript:onInvokeAction('codedItems','filter')").close();
+                    html.a().id("hide").href("javascript:hideCols('codedItemsId',["
+                            + getIndexes() + "],false); javascript:onInvokeAction('codedItemsId','filter')").close();
                     html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
                     html.script().type("text/javascript").close().append("$(document).ready(function(){ "
-                            + "hideCols('codedItems',["
+                            + "hideCols('codedItemsId',["
                             + getIndexes() + "],true);});").scriptEnd();
 
                 }
@@ -101,7 +101,7 @@ public class CodedItemsTableToolbar extends DefaultToolbar {
             } else {
 
                 html.script().type("text/javascript").close().append("$(document).ready(function(){ "
-                        + "hideCols('codedItems',["
+                        + "hideCols('codedItemsId',["
                         + getIndexes() + "],false);});").scriptEnd();
             }
 
@@ -126,11 +126,11 @@ public class CodedItemsTableToolbar extends DefaultToolbar {
            HtmlBuilder html = new HtmlBuilder();
            if (showCodedItemsContext) {
 
-               html.a().id("showContext").href("javascript:updateExpandCollapseCodedItemsInput(" + showCodedItemsContext + "); javascript:onInvokeAction('codedItems','filter')").close();
+               html.a().id("showContext").href("javascript:updateExpandCollapseCodedItemsInput(" + showCodedItemsContext + "); javascript:onInvokeAction('codedItemsId','filter')").close();
                html.div().close().nbsp().append(reswords.getString("collapse")).nbsp().divEnd().aEnd();
            } else {
 
-               html.a().id("showContext").href("javascript:updateExpandCollapseCodedItemsInput(" + showCodedItemsContext + "); javascript:onInvokeAction('codedItems','filter')").close();
+               html.a().id("showContext").href("javascript:updateExpandCollapseCodedItemsInput(" + showCodedItemsContext + "); javascript:onInvokeAction('codedItemsId','filter')").close();
                html.div().close().nbsp().append(reswords.getString("expand")).nbsp().divEnd().aEnd();
            }
 

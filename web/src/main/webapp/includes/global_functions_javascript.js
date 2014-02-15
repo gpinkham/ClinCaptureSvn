@@ -3114,7 +3114,7 @@ function showMedicalCodingAlertBox(item, ajaxResponse){
                 $(".ui-dialog-titlebar-close", $(this).parent()).hide();
                 $('.ui-widget-content').css('border', '0');
                 $('.ui-dialog-buttonpane').find('button:contains("Cancel")')
-                    .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0');
+                    .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0').css('padding-top', '0.4em').css('padding-bottom', '0.4em');
                 $('.ui-dialog-buttonpane').find('button:contains("Cancel")')
                     .mouseover(function() {$(this).removeClass("ui-state-hover");})
                     .focus(function () {$(this).removeClass("ui-state-focus");});
@@ -3187,7 +3187,7 @@ function showMedicalCodingUncodeAlertBox(item) {
                     $(".ui-dialog-titlebar-close", $(this).parent()).hide();
                     $('.ui-widget-content').css('border', '0');
                     $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
-                        .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0');
+                        .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0').css('padding-top', '0.4em').css('padding-bottom', '0.4em');
                     $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
                         .mouseover(function() {$(this).removeClass("ui-state-hover");})
                         .focus(function () {$(this).removeClass("ui-state-focus");});
@@ -3211,7 +3211,7 @@ function showMedicalCodingUncodeAlertBox(item) {
                     $(".ui-dialog-titlebar-close", $(this).parent()).hide();
                     $('.ui-widget-content').css('border', '0');
                     $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
-                        .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0');
+                        .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0').css('padding-top', '0.4em').css('padding-bottom', '0.4em');
                     $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
                         .mouseover(function() {$(this).removeClass("ui-state-hover");})
                         .focus(function () {$(this).removeClass("ui-state-focus");});

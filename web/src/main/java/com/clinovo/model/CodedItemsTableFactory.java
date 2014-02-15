@@ -83,7 +83,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
     @Override
     protected String getTableName() {
-        return "codedItems";
+        return "codedItemsId";
     }
 
     @Override

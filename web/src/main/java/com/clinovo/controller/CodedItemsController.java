@@ -291,6 +291,7 @@ public class CodedItemsController {
  				generateCodedItemElements(item.getCodedItemElements(), classification.getClassificationElement());
 
                 item.setPreferredTerm(term.getPreferredName());
+                item.setHttpPath(term.getHttpPath());
  				item.setAutoCoded(true);
  				item.setStatus((String.valueOf(CodeStatus.CODED)));
  

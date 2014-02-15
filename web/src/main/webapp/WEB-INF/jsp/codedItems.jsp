@@ -37,21 +37,8 @@
 <script type="text/javascript">
     function redirectUrl(buttonType) {
 
-        var url = $("#codedItemUrl").val();
-        url = url.replace(/(codedItems_f_status=)[^\&]+/, '$1' + buttonType);
-
-        if (url.indexOf(buttonType) < 0) {
-
-            if(url.indexOf("codedItems_f_status") > 0) {
-
-                url = url.replace("&codedItems_f_status=", '&codedItems_f_status=' + buttonType);
-            } else {
-
-                url = url + "&codedItems_f_status=" + buttonType;
-            }
-
-        }
-        window.location.replace("${pageContext.request.contextPath}/pages/codedItems?" + url);
+        $.jmesa.addFilterToLimit('codedItemsId', 'status', buttonType);
+        $.jmesa.onInvokeAction('codedItemsId', 'filter');
     }
 </script>
 <input type="hidden" id="codedItemUrl" value='<c:out value="${codedItemUrl}"/>'/>
@@ -165,14 +152,16 @@
     ${codedItemsTable}
 </form>
 
-<div style="clear:left; float:left">
-	<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
-</div>
+<div>
+    <div style="clear:left; float:left">
+        <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/>
+    </div>
 
-<div style="clear:right; float:left">
-    <c:if test="${configuredDictionaryIsAvailable}">
-	    <input type="button" name="autoCode" value="<fmt:message key="autoCode" bundle="${resword}" />" class="button_medium" onClick="autoCode()"/>
-    </c:if>
+    <div style="float:left">
+        <c:if test="${configuredDictionaryIsAvailable}">
+            <input  type="button" name="autoCode" value="<fmt:message key="autoCode" bundle="${resword}" />" class="button_medium" onClick="autoCode()"/>
+        </c:if>
+    </div>
 </div>
 
 <div style="clear:left">
