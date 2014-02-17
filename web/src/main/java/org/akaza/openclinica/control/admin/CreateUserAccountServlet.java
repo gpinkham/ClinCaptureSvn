@@ -21,16 +21,7 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.TermType;
-import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -48,6 +39,12 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Servlet for creating a user account.
@@ -91,7 +88,7 @@ public class CreateUserAccountServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 
 		StudyDAO sdao = getStudyDAO();
-		ArrayList<StudyBean> all = (ArrayList<StudyBean>) sdao.findAll();
+		ArrayList<StudyBean> all = (ArrayList<StudyBean>) sdao.findAllNotRemoved();
 		ArrayList<StudyBean> finalList = new ArrayList<StudyBean>();
 		for (StudyBean sb : all) {
 			if (!(sb.getParentStudyId() > 0)) {

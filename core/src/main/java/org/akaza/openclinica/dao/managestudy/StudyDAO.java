@@ -649,6 +649,19 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		return al;
 	}
 
+    public Collection findAllNotRemoved() {
+        this.setTypesExpected();
+        String sql = digester.getQuery("findAllNotRemoved");
+        ArrayList alist = this.select(sql);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+    }
+
 	public Collection findAllParents() {
 		this.setTypesExpected();
 

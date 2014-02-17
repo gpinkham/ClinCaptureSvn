@@ -20,6 +20,10 @@
 		<name>findAll</name>
 		<sql>SELECT * FROM STUDY order by name</sql>
 	</query>
+    <query>
+        <name>findAllNotRemoved</name>
+        <sql>SELECT * FROM STUDY where status_id not in (5,7) order by name</sql>
+    </query>
 	<query>
         <name>findAllByStudyId</name>
         <sql>SELECT * FROM STUDY where (study_id =? or parent_study_id =?) and parent_study_id is not null order by name</sql>

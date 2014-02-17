@@ -74,7 +74,7 @@ public class ChangeStudyServlet extends Controller {
 		UserAccountDAO udao = getUserAccountDAO();
 		StudyDAO sdao = getStudyDAO();
 
-		ArrayList studies = udao.findStudyByUser(ub, (ArrayList) sdao.findAll());
+		ArrayList studies = udao.findStudyByUser(ub, (ArrayList) sdao.findAllNotRemoved());
         request.setAttribute("roleMap", Role.roleMap);
 		if (request.getAttribute("label") != null) {
 			String label = (String) request.getAttribute("label");

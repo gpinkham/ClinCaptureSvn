@@ -32,7 +32,10 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * @author jxu
@@ -42,9 +45,9 @@ import java.util.*;
  *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
  *         Code Templates
  */
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class SetUserRoleServlet extends SecureController {
-	
+
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
 		if (ub.isSysAdmin()) {
@@ -74,7 +77,7 @@ public class SetUserRoleServlet extends SecureController {
 		} else {
 			String action = request.getParameter("action");
 			UserAccountBean user = (UserAccountBean) udao.findByPK(userId);
-			ArrayList studies = (ArrayList) sdao.findAll();
+			ArrayList studies = (ArrayList) sdao.findAllNotRemoved();
 			ArrayList studiesHaveRole = (ArrayList) sdao.findAllByUser(user.getName());
 			studies.removeAll(studiesHaveRole);
 			HashSet<StudyBean> studiesNotHaveRole = new HashSet<StudyBean>();
@@ -109,25 +112,25 @@ public class SetUserRoleServlet extends SecureController {
 				// Re-order studiesNotHaveRole so that sites
 				// under their studies;
 				boolean userRolesFilter = checkRolesFilter(user);
-                ArrayList finalStudiesNotHaveRole = new ArrayList();
+				ArrayList finalStudiesNotHaveRole = new ArrayList();
 				Iterator iter_study = studiesNotHaveRole.iterator();
 				while (iter_study.hasNext()) {
 					StudyBean s = (StudyBean) iter_study.next();
-                    if (userRolesFilter) {
-                        finalStudiesNotHaveRole.add(s);
-                    }
-                    Iterator iter_site = sitesNotHaveRole.iterator();
+					if (userRolesFilter) {
+						finalStudiesNotHaveRole.add(s);
+					}
+					Iterator iter_site = sitesNotHaveRole.iterator();
 					while (iter_site.hasNext()) {
 						StudyBean site = (StudyBean) iter_site.next();
 						if (site.getParentStudyId() == s.getId()) {
-                            if (!userRolesFilter) {
-							finalStudiesNotHaveRole.add(site);
-                            }
+							if (!userRolesFilter) {
+								finalStudiesNotHaveRole.add(site);
+							}
 						}
 					}
 				}
 
-                request.setAttribute("isThisStudy", userRolesFilter);
+				request.setAttribute("isThisStudy", userRolesFilter);
 
 				request.setAttribute("user", user);
 				request.setAttribute("studies", finalStudiesNotHaveRole);
@@ -156,10 +159,10 @@ public class SetUserRoleServlet extends SecureController {
 
 				if (studyId > 0) {
 					udao.createStudyUserRole(user, sur);
-                    if (ub.getId() == user.getId()) {
-                        session.setAttribute("reloadUserBean", true);
-                    }
-                    addPageMessage(user.getFirstName() + " " + user.getLastName() + " ("
+					if (ub.getId() == user.getId()) {
+						session.setAttribute("reloadUserBean", true);
+					}
+					addPageMessage(user.getFirstName() + " " + user.getLastName() + " ("
 							+ resword.getString("username") + ": " + user.getName() + ") "
 							+ respage.getString("has_been_granted_the_role") + " \"" + sur.getRole().getDescription()
 							+ "\" " + respage.getString("in_the_study_site") + " " + userStudy.getName() + ".");
@@ -177,17 +180,17 @@ public class SetUserRoleServlet extends SecureController {
 		return SecureController.ADMIN_SERVLET_CODE;
 	}
 
-    private boolean checkRolesFilter(UserAccountBean userBean) {
-        boolean displayStudy = true;
-        ArrayList<StudyUserRoleBean> userRolesBean = userBean.getRoles();
-        for (StudyUserRoleBean userRoleBean : userRolesBean) {
-            //if user crc or investigator
-            if (userRoleBean.getId() == 4 || userRoleBean.getId() == 5) {
-                displayStudy = false;
-                break;
-            }
-        }
-        return displayStudy;
-    }
+	private boolean checkRolesFilter(UserAccountBean userBean) {
+		boolean displayStudy = true;
+		ArrayList<StudyUserRoleBean> userRolesBean = userBean.getRoles();
+		for (StudyUserRoleBean userRoleBean : userRolesBean) {
+			// if user crc or investigator
+			if (userRoleBean.getId() == 4 || userRoleBean.getId() == 5) {
+				displayStudy = false;
+				break;
+			}
+		}
+		return displayStudy;
+	}
 
 }
