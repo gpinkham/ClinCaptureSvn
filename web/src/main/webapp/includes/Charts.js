@@ -88,8 +88,9 @@ function initNdsAssignedToMeWidget(){
 			var array = html.split(',');			
 			var newNds = parseInt(array[0]);
 			var updatedNds = parseInt(array[1]);
-			var closedNds = parseInt(array[2]);
-			var totalNds = newNds + updatedNds + closedNds;
+			var resolutionProposedDns = parseInt(array[2]);
+			var closedNds = parseInt(array[3]);
+			var totalNds = newNds + updatedNds + closedNds + resolutionProposedDns;
 			captionLimit = countCaptionLimit(totalNds);				
 			var captionSelector = ".dns_assigned_to_me .captions td";
 			setCaption (captionSelector, captionLimit);

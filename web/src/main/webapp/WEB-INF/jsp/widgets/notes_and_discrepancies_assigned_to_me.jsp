@@ -20,9 +20,12 @@ $(document).ready(function($) {
 			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Updated' bundle='${resterm}'/>"><li id="stack" class="updated">
 					<div id="pop-up"></div>			
 			</li></a>
-			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Closed' bundle='${resterm}'/>"><li id="stack" class="closed">
+			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Resolution_Proposed' bundle='${resterm}'/>"><li id="stack" class="resolution_proposed">
 					<div id="pop-up"></div>				
 			</li></a>
+			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Closed' bundle='${resterm}'/>"><li id="stack" class="closed">
+					<div id="pop-up"></div>				
+			</li></a>			
 		</ul>
 	</div>
 	<table class="captions">
@@ -35,9 +38,12 @@ $(document).ready(function($) {
 		</tr>
 	</table>	
 	<table class="signs">
-		<tr align="center">
+		<tr align="left">
 			<td><div class="new sign">&nbsp</div> - <fmt:message key="new" bundle="${resword}"/></td>
 			<td><div class="updated sign">&nbsp</div> - <fmt:message key="updated" bundle="${resword}"/></td>
+		</tr>
+		<tr align="left">
+			<td><div class="resolution_proposed sign">&nbsp</div> - <fmt:message key="Resolution_Proposed" bundle="${resword}"/></td>
 			<td><div class="closed sign">&nbsp</div> - <fmt:message key="closed" bundle="${resword}"/></td>
 		</tr>
 	</table>	

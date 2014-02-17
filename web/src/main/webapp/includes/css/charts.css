@@ -1,55 +1,55 @@
-table.widgets_container{
-	width : 800px;
-	margin : 10px 0px;
-	border-spacing: 3px;	
+table.widgets_container {
+	width: 800px;
+	margin: 10px 0px;
+	border-spacing: 3px;
 }
 
 table.widgets_container td {
-	vertical-align:top;
-	width:400px;
+	vertical-align: top;
+	width: 400px;
 }
 
 .widget {
-	width:380px;
-	height:auto;
-	padding:5px;
+	width: 380px;
+	height: auto;
+	padding: 5px;
 	margin: 6px 0px;
 	border: 1px solid gray;
 }
 
 .widget h2 {
-	margin:3px 3px;
-	padding:1px 10px;
-	width:auto;
-	color:white;
+	margin: 3px 3px;
+	padding: 1px 10px;
+	width: auto;
+	color: white;
 	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
 	font-size: 11px;
-	text-align:center;
+	text-align: center;
 }
 
 .toolbar_wrapper {
-	position:fixed;
+	position: fixed;
 	right: 0px;
 	top: 100px;
-	vertical-align:top;
-	width:392px;
-	padding:5px;
+	vertical-align: top;
+	width: 392px;
+	padding: 5px;
 	border: 1px solid gray;
-	background-color:white;
+	background-color: white;
 }
 
 .toolbar_wrapper h2 {
-	width:auto;
+	width: auto;
 	padding: 1px 10px;
-	margin:0px;
-	color:white;
+	margin: 0px;
+	color: white;
 	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
 	font-size: 11px;
 }
 
 .toolbar_wrapper .note {
-	padding-bottom:10px;
-	padding-left:10px;
+	padding-bottom: 10px;
+	padding-left: 10px;
 	background-image: url(../images/dots.gif);
 	background-repeat: repeat-x;
 	background-position: bottom;
@@ -57,27 +57,25 @@ table.widgets_container td {
 
 #show_hide {
 	position: relative;
-	left:-65px;
-	width:60px;
-	height:20px;
-	text-align:center;
-	vertical-align:center;
+	left: -65px;
+	width: 60px;
+	height: 20px;
+	text-align: center;
+	vertical-align: center;
 	color: white;
 }
 
-
-
 .widget .remove {
-    display:none;
+	display: none;
 }
 
 .configure .widget:hover .remove {
-	width:20px;
-    height:20px;
-    display:block;
-    position:absolute;
-    margin-left:360px;
-	border:none;
+	width: 20px;
+	height: 20px;
+	display: block;
+	position: absolute;
+	margin-left: 360px;
+	border: none;
 }
 
 form#actionForSave input {
@@ -86,137 +84,143 @@ form#actionForSave input {
 
 #filler {
 	visibility: hidden;
-	height:1px;
-    display:block;
-    margin: 1px 0px;
+	height: 1px;
+	display: block;
+	margin: 1px 0px;
 }
 
 .toolbar_wrapper #filler {
-	height:5px;
+	height: 5px;
 }
 
 /*Charts*/
 /*Stacked-chart*/
-
-.widget  .chart_wrapper{
-	width:330px;
-	border-bottom:1px solid gray;
-	border-left:1px solid gray;
-	padding:10px 0px;
-	margin-top:20px;
+.widget  .chart_wrapper {
+	width: 330px;
+	border-bottom: 1px solid gray;
+	border-left: 1px solid gray;
+	padding: 10px 0px;
+	margin-top: 20px;
 }
 
-.widget #stacked_bar , .stacked_bar {
-	height:20px;
-	padding:0px;
-	margin:0px;
+.widget #stacked_bar,.stacked_bar {
+	height: 20px;
+	padding: 0px;
+	margin: 0px;
 }
 
-.widget  #stacked_bar li , .stacked_bar li{
-	display:inline-block !important;
-	width:0px;
-	height:20px;
-	margin-right:-3px;
+.widget  #stacked_bar li,.stacked_bar li {
+	display: inline-block !important;
+	width: 0px;
+	height: 20px;
+	margin-right: -3px;
 }
 
-@-moz-document url-prefix() {
-#stacked_bar li , .stacked_bar li{
-	display:inline-block !important;
-	width:0px;
-	height:20px;
-	margin-left:-2px;
-}
+@-moz-document url-prefix () { #stacked_bar li , .stacked_bar li{ 
+	display:inline-block!important;
+	width: 0px;
+	height: 20px;
+	margin-left: 0px;
 }
 
-.widget  #stack #pop-up{
-	display:none;
+}
+.widget  #stack #pop-up {
+	display: none;
 }
 
-.widget  #stack:hover #pop-up{
-	background-color:white;
-	border:1px solid gray;
-	position:absolute;
-	width:30px;
-	height:15px;
-	display:block;
-	margin-top:-10px;
-	text-align:center;
-	font-weight:bold;
+.widget  #stack:hover #pop-up {
+	background-color: white;
+	border: 1px solid gray;
+	position: absolute;
+	width: 30px;
+	height: 15px;
+	display: block;
+	margin-top: -10px;
+	text-align: center;
+	font-weight: bold;
 }
 
-.widget  table.captions{
-	position:relative;
-	width:410px;
-	margin-left:-15px;
+.widget  table.captions {
+	position: relative;
+	width: 410px;
+	margin-left: -15px;
 }
 
-.widget  table.captions td, table.captions_percents td{
-	text-align:center;	
+.widget  table.captions td,table.captions_percents td {
+	text-align: center;
 }
 
-.widget  table.captions_percents{
-	position:relative;
-	width:360px;
+.widget  table.captions_percents {
+	position: relative;
+	width: 360px;
 }
 
 .widget  table.signs {
 	margin: 15px 20px;
-	vertical-align:middle;
-	width:360px;
+	vertical-align: middle;
+	width: 360px;
 }
 
-.widget table.signs  td{
-	vertical-align:middle;
+.widget table.signs  td {
+	vertical-align: middle;
 }
 
 .widget  div.sign {
-	position:relative;
-	top:3px;
-	width:10px;
-	height:10px;
-	display:inline-block;
+	position: relative;
+	top: 3px;
+	width: 10px;
+	height: 10px;
+	display: inline-block;
 }
 
-.widget .notes{
-	width:360px
+.widget .notes {
+	width: 360px
 }
 
-.widget .notes td{
-	color:gray;
+.widget .notes td {
+	color: gray;
 	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
 	font-size: 11px;
 	text-align: center;
 }
 
-.widget #bar_name{	
-	top:3px;
-	width:330px;
-	display:block;
-	text-align:center;	
-	color:black;
+.widget #bar_name {
+	top: 3px;
+	width: 330px;
+	display: block;
+	text-align: center;
+	color: black;
 	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
 	font-size: 11px;
-	font-weight:bold;
+	font-weight: bold;}
+
+.widget input#previous,.widget input#next {
+	display: none;
 }
 
-.widget input#previous, .widget input#next{
-	display:none;
-}
-
-.widget form#events_completion{
-	display:none;
+.widget form#events_completion {
+	display: none;
 }
 
 /* DNs assigned to me */
 .dns_assigned_to_me .new {
-	background-color:#83ff43;
+	background-color: red;
+}
+
+.dns_assigned_to_me table.signs {
+	width: 260px;
+	margin-left: 60px;
 }
 
 .dns_assigned_to_me .updated {
-	background-color:#ffba00;
+	background-color: #e5a200;
 }
 
 .dns_assigned_to_me .closed {
-	background-color:#004586;
+	background-color: #32a656;
+}
+
+.dns_assigned_to_me .resolution_proposed {
+	background-color: black;
 }
 /* /DNs assigned to me */
