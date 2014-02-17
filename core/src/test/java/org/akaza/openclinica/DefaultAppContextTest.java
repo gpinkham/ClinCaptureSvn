@@ -6,12 +6,16 @@ import com.clinovo.dao.DiscrepancyDescriptionDAO;
 import com.clinovo.dao.StudySubjectIdDAO;
 import com.clinovo.dao.SystemDAO;
 import com.clinovo.dao.TermDAO;
+import com.clinovo.dao.WidgetDAO;
+import com.clinovo.dao.WidgetsLayoutDAO;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.service.SystemService;
 import com.clinovo.service.TermService;
+import com.clinovo.service.WidgetService;
+import com.clinovo.service.WidgetsLayoutService;
 
 import java.util.Date;
 
@@ -117,6 +121,10 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected StudySubjectIdDAO studySubjectIdDAO;
 	@Autowired
 	protected SystemDAO systemDAO;
+	@Autowired
+	protected WidgetDAO widgetDAO;
+	@Autowired
+	protected WidgetsLayoutDAO widgetsLayoutDAO;
 
 	// Services
 	@Autowired
@@ -133,6 +141,10 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected SystemService systemService;
 	@Autowired
 	protected RuleSetServiceInterface ruleSetService;
+	@Autowired
+	protected WidgetService widgetService;
+	@Autowired
+	protected WidgetsLayoutService widgetsLayoutService;
 	@Autowired
 	private SessionFactory sessionFactory;
 
@@ -178,6 +190,13 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			max = (Integer) session.createSQLQuery("SELECT max(id) from coded_item_element").uniqueResult();
 			session.createSQLQuery("ALTER SEQUENCE coded_item_element_id_seq RESTART WITH " + (max + 1))
 					.executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(id) from widget").uniqueResult();
+			session.createSQLQuery("ALTER SEQUENCE widget_id_seq RESTART WITH " + (max + 1)).executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(id) from widgets_layout").uniqueResult();
+			session.createSQLQuery("ALTER SEQUENCE widgets_layout_id_seq RESTART WITH " + (max + 1)).executeUpdate();
+			
 		} else if (dbDriverClassName.contains(ORACLE)) {
 			Integer max = (Integer) session.createSQLQuery("SELECT max(id) from dictionary").uniqueResult();
 			session.createSQLQuery("DROP SEQUENCE dictionary_id_seq").executeUpdate();
@@ -201,6 +220,18 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 			session.createSQLQuery("DROP SEQUENCE coded_item_element_id_seq").executeUpdate();
 			session.createSQLQuery(
 					"CREATE SEQUENCE coded_item_element_id_seq START WITH " + (max + 1)
+							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(id) from widgets_layout").uniqueResult();
+			session.createSQLQuery("DROP SEQUENCE widgets_layout_id_seq").executeUpdate();
+			session.createSQLQuery(
+					"CREATE SEQUENCE widgets_layout_id_seq START WITH " + (max + 1)
+							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
+
+			max = (Integer) session.createSQLQuery("SELECT max(id) from widget").uniqueResult();
+			session.createSQLQuery("DROP SEQUENCE widget_id_seq").executeUpdate();
+			session.createSQLQuery(
+					"CREATE SEQUENCE widget_id_seq START WITH " + (max + 1)
 							+ " INCREMENT BY 1 NOMAXVALUE NOCYCLE CACHE 20").executeUpdate();
 		}
 

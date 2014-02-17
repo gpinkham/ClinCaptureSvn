@@ -916,4 +916,11 @@
 
     <study_subject_id id="1" name="TEST1" index="1" version="0"/>
 
+	<widget id="1" version="0" widget_name="test-widget-1" description="test description 1" have_access="1,2" display_as_default="1,2" study_metrics="TRUE" site_metrics="FALSE"/>
+	<widget id="2" version="0" widget_name="test-widget-2" description="test description 2" have_access="1,2" display_as_default="1" study_metrics="TRUE" site_metrics="FALSE"/>
+	<widget id="3" version="0" widget_name="test-widget-3" description="test description 3" have_access="1" display_as_default="1" study_metrics="TRUE" site_metrics="FALSE"/>
+
+	<widgets_layout id="1" user_id="1" study_id="1" widget_id="1" ordinal="0" version="0"/>
+	<widgets_layout id="2" user_id="1" study_id="1" widget_id="2" ordinal="1" version="0"/>
+	<widgets_layout id="3" user_id="1" study_id="1" widget_id="3" ordinal="2" version="0"/>
 </dataset>
