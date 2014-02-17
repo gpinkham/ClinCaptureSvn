@@ -159,4 +159,17 @@
         <insert tableName="system"><column name="name" value="sas.dir" /><column name="required" valueBoolean="false" /><column name="size" value="80" /><column name="value" value="" /><column name="group_id" value="2"/><column name="order_id" value="3"/><column name="show_description" valueBoolean="true"/></insert>
     </changeSet>
 
+    <changeSet author="skirpichenok" id="2014-01-16-TICKET863-13">
+        <update tableName="system">
+            <column name="admin" value="HIDDEN"/>
+            <column name="root" value="HIDDEN"/>
+            <where>name='userAccountNotification'</where>
+        </update>
+        <update tableName="system">
+            <column name="admin" value="HIDDEN"/>
+            <column name="root" value="HIDDEN"/>
+            <where>name='password_reuse_frequency'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>
