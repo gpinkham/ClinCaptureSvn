@@ -27,3 +27,10 @@ div.login_BG { background: url(../images/login_BG.gif) no-repeat top center; hei
 .loginBox li { margin-bottom: 13px; }
 
 .footer { background-image: url(../images/login_footer_BG.gif); }
+
+.dbTitle {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 24pt;
+    font-weight: bold;
+    color:  #ff0000;
+}

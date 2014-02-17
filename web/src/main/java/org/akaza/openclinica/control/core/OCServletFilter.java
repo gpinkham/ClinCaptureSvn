@@ -47,6 +47,7 @@ public class OCServletFilter implements javax.servlet.Filter {
 		String username = "";
 
 		((HttpServletRequest) request).getSession().setAttribute("logoUrl", CoreResources.getField("logo"));
+        ((HttpServletRequest) request).getSession().setAttribute("instanceType", CoreResources.getField("instanceType"));
 
 		Principal principal = req.getUserPrincipal();
 
