@@ -870,9 +870,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 			Boolean isSignable = (Boolean) ((HashMap<Object, Object>) item).get("isSignable");
 			Integer studySubjectId = studySubjectBean.getId();
 			String flagColour = null;
-			if (discrepancyNoteDAO.doesSubjectHaveUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel())) {
+			if (discrepancyNoteDAO.doesSubjectHaveAnyUnclosedNDsInStudy(studyBean, studySubjectBean.getLabel())) {
 				flagColour = "yellow";
-				if (discrepancyNoteDAO.doesSubjectHaveNewNDsInStudy(studyBean, studySubjectBean.getLabel())) {
+				if (discrepancyNoteDAO.doesSubjectHaveAnyNewNDsInStudy(studyBean, studySubjectBean.getLabel())) {
 					flagColour = "red";
 				}
 			}

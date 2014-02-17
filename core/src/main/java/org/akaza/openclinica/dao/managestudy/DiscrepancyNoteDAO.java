@@ -2119,6 +2119,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	public boolean doesSubjectHaveSomeNDsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
+		//NDs for subject only (like "Date of birth" and etc., not for event's NDs)
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
@@ -2133,6 +2134,24 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
 	public boolean doesSubjectHaveUnclosedNDsInStudy(StudyBean study, String subjectLabel) {
 		return doesSubjectHaveSomeNDsInStudy(study, subjectLabel, "123");
+	}
+	
+	public boolean doesSubjectHaveAnyNDsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
+		//all NDs for subject (like "Date of birth" and etc., for event's NDs too)
+		ListNotesFilter listNotesFilter = new ListNotesFilter();
+		listNotesFilter.addFilter("studySubject.label", subjectLabel);
+		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
+		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(
+				study, listNotesFilter, new ListNotesSort(), 0, 100);
+		return noteBeans.size() > 0;
+	}
+	
+	public boolean doesSubjectHaveAnyNewNDsInStudy(StudyBean study, String subjectLabel) {
+		return doesSubjectHaveAnyNDsInStudy(study, subjectLabel, "1");
+	}
+
+	public boolean doesSubjectHaveAnyUnclosedNDsInStudy(StudyBean study, String subjectLabel) {
+		return doesSubjectHaveAnyNDsInStudy(study, subjectLabel, "123");
 	}
 
 	public boolean doesEventHaveSomeNDsInStudy(StudyBean study, String eventLabel, int eventId, String subjectLabel,
