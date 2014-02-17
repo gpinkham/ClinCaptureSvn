@@ -30,6 +30,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
 
 import java.io.*;
 import java.net.URL;
@@ -182,10 +183,13 @@ public class CoreResources implements ResourceLoaderAware {
 
 	private void checkLogo() {
 		try {
-			new DefaultResourceLoader().getResource(
-					new DefaultResourceLoader().getResource(".." + File.separator + ".." + File.separator).getFile()
-							.getAbsoluteFile()
-							+ CoreResources.getField("logo")).getFile();
+			File logoFile = new File(new DefaultResourceLoader()
+					.getResource(".." + File.separator + ".." + File.separator).getFile().getAbsoluteFile()
+					+ CoreResources.getField("logo"));
+			if (!logoFile.exists()) {
+				FileCopyUtils.copy(new File(new File(CoreResources.getField("filePath")).getAbsolutePath()
+						+ File.separator + "uploads" + File.separator + logoFile.getName()), logoFile);
+			}
 		} catch (Exception ex) {
 			CoreResources.setField("logo", "/images/CLIlogo.jpg");
 		}
