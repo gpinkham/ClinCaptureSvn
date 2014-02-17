@@ -187,7 +187,7 @@ public class CoreResources implements ResourceLoaderAware {
 							.getAbsoluteFile()
 							+ CoreResources.getField("logo")).getFile();
 		} catch (Exception ex) {
-			CoreResources.setField("logo", "/images/Logo.gif");
+			CoreResources.setField("logo", "/images/CLIlogo.jpg");
 		}
 	}
 

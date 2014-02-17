@@ -44,7 +44,7 @@
                         <fmt:message key="Version_release" bundle="${resword}"/>&nbsp;&nbsp;<fmt:message key="buildNumber" bundle="${resbuildnumber}"/>
                     </div>
                 </td>
-				<td width="80" align="right" valign="bottom"><a href="http://www.clinovo.com/"><img src="${pageContext.request.contextPath}/images/CLIlogo.jpg" width="150" height="50" border="0" ></a></td>
+				<td width="80" align="right" valign="bottom"><a href="http://www.clinovo.com/"><img src="<c:url value='${logoUrl}'/>" width="150" height="50" border="0" ></a></td>
 			</tr>
 		</table>
 

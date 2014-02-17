@@ -94,7 +94,7 @@ onload="TabsForwardByNum(<c:out value="${tabId}"/>);<jsp:include page="../includ
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 
-	<div class="logo"><img src="<c:url value='${logoUrl}'/>"></div>
+	<div class="logo"><img src="<c:url value='/images/Logo.gif'/>"></div>
 
 <!-- Main Navigation -->
 
