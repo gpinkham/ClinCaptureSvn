@@ -28,43 +28,45 @@ import org.hibernate.annotations.Parameter;
 @Table(name = "widgets_layout")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "widgets_layout_id_seq") })
 public class WidgetsLayout extends AbstractMutableDomainObject {
-	
+
 	private Widget widget;
-	
+
 	private int studyId = 0;
 	private int userId = 0;
 	private int ordinal = 0;
-		
-	public WidgetsLayout(){
-		
+
+	public WidgetsLayout() {
+
 	}
-	
-	public WidgetsLayout(int studyId, int userId, int widgetId, int ordinal){
+
+	public WidgetsLayout(int studyId, int userId, int widgetId, int ordinal) {
 		this.studyId = studyId;
 		this.userId = userId;
 		this.ordinal = ordinal;
 	}
-	
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="widget_id", referencedColumnName = "id", insertable=false, updatable=false, nullable=false)
+	@JoinColumn(name = "widget_id", referencedColumnName = "id", insertable = false, updatable = false, nullable = false)
 	public Widget getWidget() {
 		return widget;
 	}
-	
+
 	public void setWidget(Widget widget) {
 		this.widget = widget;
-	}	
+	}
 
 	public int getStudyId() {
 		return studyId;
 	}
+
 	public void setStudyId(int studyId) {
 		this.studyId = studyId;
 	}
+
 	public int getUserId() {
 		return userId;
 	}
+
 	public void setUserId(int userId) {
 		this.userId = userId;
 	}
@@ -72,7 +74,9 @@ public class WidgetsLayout extends AbstractMutableDomainObject {
 	public int getOrdinal() {
 		return ordinal;
 	}
+
 	public void setOrdinal(int ordinal) {
 		this.ordinal = ordinal;
-	}	
+	}
+
 }

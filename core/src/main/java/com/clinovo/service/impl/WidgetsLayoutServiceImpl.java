@@ -26,7 +26,7 @@ import com.clinovo.service.WidgetsLayoutService;
 
 @Transactional
 @Service("widgetsLayoutService")
-public class WidgetsLayoutServiceImpl implements WidgetsLayoutService{
+public class WidgetsLayoutServiceImpl implements WidgetsLayoutService {
 	
 	@Autowired
 	private WidgetsLayoutDAO widgetLayoutDAO;
@@ -39,11 +39,11 @@ public class WidgetsLayoutServiceImpl implements WidgetsLayoutService{
 		widgetLayoutDAO.saveLayout(widgetsLayout);
 	}
 	
-	public WidgetsLayout findByWidgetIdAndStudyIdAndUserId(int widgetId, int studyId, int userId){
+	public WidgetsLayout findByWidgetIdAndStudyIdAndUserId(int widgetId, int studyId, int userId) {
 		return widgetLayoutDAO.findByWidgetIdAndStudyIdAndUserId(widgetId, studyId, userId);
 	}
 	
-	public void saveWidgetLayout(WidgetsLayout widgetLayout){
+	public void saveWidgetLayout(WidgetsLayout widgetLayout) {
 		widgetLayoutDAO.saveOrUpdate(widgetLayout);
 	}
 }

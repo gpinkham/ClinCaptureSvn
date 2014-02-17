@@ -32,8 +32,7 @@ public interface WidgetsLayoutService {
 	 * @return List of widgets if found
 	 */
 	List<WidgetsLayout> findAllByStudyIdAndUserId(int studyId, int userId);
-	
-	
+
 	/**
 	 * Save layout of all widgets for specific user and study
 	 * 
@@ -44,7 +43,7 @@ public interface WidgetsLayoutService {
 	/**
 	 * Find widgets layout by widget ID for specific user and study
 	 * 
-	 * @param widgetID The ID of widget to filter on.
+	 * @param widgetId The ID of widget to filter on.
 	 * @param studyId The ID of Study to filter on.
 	 * @param userId The ID of User dictionary to filter on.
 	 * 
@@ -56,7 +55,6 @@ public interface WidgetsLayoutService {
 	 * Save widget layout
 	 * 
 	 * @param widgetLayout widget layout that should be saved to database	
-	 */	
-	
+	 */
 	void saveWidgetLayout(WidgetsLayout widgetLayout);
 }

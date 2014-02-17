@@ -19,25 +19,26 @@ import java.util.Comparator;
 import org.akaza.openclinica.bean.core.EntityBean;
 
 @SuppressWarnings("serial")
-public class DisplayWidgetsLayoutBean extends EntityBean{
+public class DisplayWidgetsLayoutBean extends EntityBean {
+
 	private String widgetName;
 	private int widgetId;
 	private int ordinal;
-	
+
 	public static ComparatorForDisplayWidgetsLayout comparatorForDisplayWidgetsLayout = new ComparatorForDisplayWidgetsLayout();
-	
+
 	public String getWidgetName() {
 		return widgetName;
 	}
-	
+
 	public void setWidgetName(String widgetName) {
 		this.widgetName = widgetName;
 	}
-	
+
 	public int getOrdinal() {
 		return ordinal;
 	}
-	
+
 	public void setOrdinal(int ordinal) {
 		this.ordinal = ordinal;
 	}
@@ -51,14 +52,19 @@ public class DisplayWidgetsLayoutBean extends EntityBean{
 	}
 }
 
-class ComparatorForDisplayWidgetsLayout implements Comparator<DisplayWidgetsLayoutBean>{
-	public int compare(DisplayWidgetsLayoutBean display1, DisplayWidgetsLayoutBean display2){
-		if (display1.getOrdinal() < display2.getOrdinal()){
-			return -1;
+class ComparatorForDisplayWidgetsLayout implements Comparator<DisplayWidgetsLayoutBean> {
+
+	public int compare(DisplayWidgetsLayoutBean display1, DisplayWidgetsLayoutBean display2) {
+
+        if (display1.getOrdinal() < display2.getOrdinal()) {
+
+            return -1;
 		}
-		if (display1.getOrdinal() > display2.getOrdinal()){
-			return 1;
+		if (display1.getOrdinal() > display2.getOrdinal()) {
+
+            return 1;
 		}
-		return 0;
+
+        return 0;
 	}
 }

@@ -30,22 +30,21 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 @Entity
-@Table(name="widget")
+@Table(name = "widget")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "widget_id_seq") })
-public class Widget extends AbstractMutableDomainObject{
-	
+public class Widget extends AbstractMutableDomainObject {
+
 	private String widgetName = "";
 	private String description = "";
-	private List <WidgetsLayout> widgetsLayout;
+	private List<WidgetsLayout> widgetsLayout;
 	private String haveAccess = "";
 	private String displayAsDefault = "";
 	private boolean studyMetrics = false;
 	private boolean siteMetrics = false;
-	
-	
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
-	@JoinColumn(name="widget_id", referencedColumnName = "id", nullable=false)
+	@JoinColumn(name = "widget_id", referencedColumnName = "id", nullable = false)
 	public List<WidgetsLayout> getWidgetsLayout() {
 		return widgetsLayout;
 	}
@@ -53,7 +52,7 @@ public class Widget extends AbstractMutableDomainObject{
 	public void setWidgetsLayout(List<WidgetsLayout> widgetsLayout) {
 		this.widgetsLayout = widgetsLayout;
 	}
-		
+
 	public String getWidgetName() {
 		return widgetName;
 	}
@@ -65,7 +64,7 @@ public class Widget extends AbstractMutableDomainObject{
 	public String getDescription() {
 		return description;
 	}
-	
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -100,5 +99,5 @@ public class Widget extends AbstractMutableDomainObject{
 
 	public void setSiteMetrics(boolean siteMetrics) {
 		this.siteMetrics = siteMetrics;
-	}		
+	}
 }

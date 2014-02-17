@@ -19,14 +19,14 @@ import java.util.List;
 import com.clinovo.model.Widget;
 
 public interface WidgetService {
-	
+
 	/**
 	 * Find all widgets
 	 * 
 	 * @return List of widgets
 	 */	
 	List<Widget> findAll();
-	
+
 	/**
 	 * Retrieves widgets selected by id.
 	 * 
@@ -34,13 +34,13 @@ public interface WidgetService {
 	 * @return Widget selected by id
 	 */
 	Widget findById(int id);
-	
+
 	void saveWidget(Widget widget);
-	
+
 	/**
 	 * Retrieves widget selected by child.
 	 * 
-	 * @param Id of widgetLayout, using which Widget should be found.
+	 * @param id of widgetLayout, using which Widget should be found.
 	 * @return Widget selected by id of layout.
 	 */
 	Widget findByChildsId(int id);

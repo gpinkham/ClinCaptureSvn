@@ -157,13 +157,8 @@
 	  <div id="addSubjectForm" style="display:none;">
 	    <c:import url="addSubjectMonitor.jsp"/>
 	  </div>
-	
-	
 	</c:if>
-	
-	<c:if test="${userRole.sysAdmin || userRole.studyAdministrator || userRole.studyDirector}">
-	
-	
+	<c:if test="${userRole.sysAdmin || userRole.studyAdministrator || userRole.studyDirector}">	
 	  <script type="text/javascript">
 	    function onInvokeAction(id, action) {
 	      if (id.indexOf('studySiteStatistics') == -1) {
@@ -177,7 +172,6 @@
 	      }
 	      createHiddenInputFieldsForLimitAndSubmit(id);
 	    }
-	
 	  </script>
 	
 	  <table>
@@ -358,13 +352,15 @@
 	</span>
 	<!--//New home page layout-->
 </c:if>
-<c:if test="${userRole.role.id ne 6}">
+
  <br>
  	<table>
  		<tr>
+ 			<c:if test="${((userRole.role.id ne 6 && displayPageVersion=='old') || (displayPageVersion=='new'))}">
 	 		<td>
 	 			<input type="button" name="BTN_Back_Smart" id="GoToPrevisusPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 
 	 		</td>
+	 		</c:if>
 	 		<c:if test="${displayPageVersion=='new'}">
 				<td class="new_home_page">
 					<input id="ConfigueHomePage" class="button_long" type="button" name="BTN_Config" value="<fmt:message key="customize_home_page" bundle="${resword}"/>" onClick="window.location.href=('pages/configureHomePage');"/>
@@ -373,7 +369,5 @@
 		</tr>
  	</table> 
 <br>
-</c:if>
-
 
 <jsp:include page="include/footer.jsp"/>

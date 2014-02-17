@@ -35,6 +35,7 @@ table.widgets_container td {
 	width:392px;
 	padding:5px;
 	border: 1px solid gray;
+	background-color:white;
 }
 
 .toolbar_wrapper h2 {
@@ -161,6 +162,7 @@ form#actionForSave input {
 .widget  table.signs {
 	margin: 15px 20px;
 	vertical-align:middle;
+	width:360px;
 }
 
 .widget table.signs  td{
