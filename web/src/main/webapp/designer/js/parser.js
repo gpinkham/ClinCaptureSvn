@@ -1114,6 +1114,7 @@ Parser.prototype.render = function(rule) {
  * ====================================================================== */
 Parser.prototype.fetchStudies = function() {
 	
+	$("body").append(createLoader());
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 
 	$.ajax({
@@ -1133,6 +1134,8 @@ Parser.prototype.fetchStudies = function() {
 			sessionStorage.setItem("studies", JSON.stringify(studies));
 			loadStudies(studies);
 
+			$(".spinner").remove();
+
 		},
 
 		error: function(response) {
@@ -1151,6 +1154,7 @@ Parser.prototype.fetchStudies = function() {
  * ====================================================================== */
 Parser.prototype.fetchRuleForEditing = function() {
 
+	$("body").append(createLoader());
 	sessionStorage.setItem("edit", true);
 	sessionStorage.setItem("id", this.getParameterValue("rId"));
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
@@ -1173,6 +1177,7 @@ Parser.prototype.fetchRuleForEditing = function() {
 
 			parser.render(rule);
 
+			$(".spinner").remove();
 		},
 
 		error: function(response) {
@@ -1193,9 +1198,11 @@ Parser.prototype.fetchRuleForEditing = function() {
  * => targets - the rule targets
  * => evaluateTo - What the rule should evaluate to
  * ============================================================= */
-Parser.prototype.validate = function(rule) {
+Parser.prototype.validate = function() {
 
-	var rule = parser.getRule();
+	var rule = this.getRule();
+
+	$("body").append(createLoader());
 
 	if (rule) {
 
@@ -1216,7 +1223,9 @@ Parser.prototype.validate = function(rule) {
 			success: function(response) {
 
 				sessionStorage.setItem("validation", response);
-				parser.displayValidationResults(rule)
+				parser.displayValidationResults(rule);
+
+				$(".spinner").remove();
 			},
 
 			error: function(response) {

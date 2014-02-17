@@ -387,9 +387,9 @@ $(function() {
 				if (result) {
 
 					resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
-
-					$(".modal-backdrop").remove();
 				}
+
+				$(".modal-backdrop").remove();
 			});
 		}
 	})
@@ -444,16 +444,17 @@ $(function() {
 	})
 
 	createPopover($("#groupSurface"));
-	parser.fetchStudies();
-
-	// If editing a rule
-	if (parser.getParameter("action") === "edit") {
-
-		parser.fetchRuleForEditing();
-	}
 
 	// If a rule already exists in a session, display it
 	$(document).ready(function() {
+
+		parser.fetchStudies();
+
+		// If editing a rule
+		if (parser.getParameter("action") === "edit") {
+
+			parser.fetchRuleForEditing();
+		}
 
 		if (sessionStorage.getItem("status") && sessionStorage.getItem("status") === "load") {
 
@@ -468,7 +469,7 @@ $(function() {
 
 	$('body').click(function(e) {
 
-		$(".modal").remove();
+		$(".tops").remove();
 		$(".popover").remove();
 	});
 })

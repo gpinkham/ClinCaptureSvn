@@ -664,6 +664,8 @@ function createAlert(text) {
  * ========================================================================== */
 function handleErrorResponse(params) {
 
+	$(".spinner").remove();
+
 	if (params.response.status === 404) {
 
 		bootbox.alert({
@@ -785,6 +787,7 @@ function createDroppable(params) {
 		$(this).append(input);
 
 		input.focus(); 
+		params.element.css('font-weight', 'bold');
 	})
 
 	return params.element;
@@ -933,61 +936,62 @@ function loadStudies(studies) {
 			tr.attr("id", x);
 			tr.click(function() {
 
-				if ($("div[id='studies']").find("table > tbody > tr").size() > 1 && $("#designSurface").find(".panel-body").find(".dotted-borders").size() > 2) {
+				var row = this;
+				var data = JSON.parse(sessionStorage.getItem("studies"));
 
-					bootbox.confirm("The current rule will be lost. Are you sure you want to select another study?", 
+				// Extract selected study
+				var currentStudy = data[$(row).attr("id")]
+
+				if (selectedStudy !== data[$(row).attr("id")].id && 
+					($("div[id='studies']").find("table > tbody > tr").size() > 1 && $(".dotted-border").size() > 2)) {
+
+					bootbox.confirm("The current rule will be lost. Are you sure you want to select another study?",
+
 						function(result) {
 
-						if (result) {
+							if (result) {
 
-							$("a[href='#events']").tab('show');
+								$("a[href='#events']").tab('show');
 
-							// Make bold
-							tr.siblings(".selected").removeClass("selected");
+								// Make bold
+								$(row).siblings(".selected").removeClass("selected");
 
-							tr.addClass("selected");
+								$(row).addClass("selected");
 
-							var data = JSON.parse(sessionStorage.getItem("studies"));
+								selectedStudy = currentStudy.id;
 
-							var currentStudy = data[tr.attr("id")]
+								loadStudyEvents(currentStudy)
 
-							selectedStudy = currentStudy.id;
+								// Cascade load
+								var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]
 
-							loadStudyEvents(currentStudy)
+								loadEventCRFs({
 
-							// Cascade load
-							var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]
+									study: currentStudy,
+									studyEvent: topEvent
+								});
 
-							loadEventCRFs({
+								loadCRFVersionItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]])
 
-								study: currentStudy,
-								studyEvent: topEvent
-							});
+								createBreadCrumb({
 
-							loadCRFVersionItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]])
+									study: currentStudy.name,
+								})
 
-							createBreadCrumb({
+								resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
 
-								study: currentStudy.name,
-							})
-							
-							resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
+								$(".modal-backdrop").remove();
+							} else {
+								$(".modal-backdrop").remove();
+							}
+						});
 
-							$(".modal-backdrop").remove();
-						} else {
-							$(".modal-backdrop").remove();
-						}
-					});
 				} else {
 
 					// Make bold
 					$(this).siblings(".selected").removeClass("selected");
 
 					$(this).addClass("selected");
-
-					var data = JSON.parse(sessionStorage.getItem("studies"));
-
-					var currentStudy = data[$(this).attr("id")]
 
 					selectedStudy = currentStudy.id;
 
@@ -1488,4 +1492,15 @@ function loadCRFVersionItems(crf) {
 			pagination: pagination
 		});
 	}
+}
+
+function createLoader() {
+
+	var modalOuterDiv = createDiv({
+		divClass: "spinner"
+	})
+
+	modalOuterDiv.append($('<img src="images/loader.gif" alt="Loading...">'))
+
+	return modalOuterDiv;
 }

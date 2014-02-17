@@ -324,3 +324,29 @@ td.ui-draggable {
 body .modal-dialog {
   width: 650px;
 }
+
+.spinner {
+
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  opacity: .9;
+  z-index:1000;
+  position:absolute;
+  background-color:transparent; 
+}
+
+.spinner * {
+  
+  left: 35%;
+  top: 45%;
+  display: block;    
+  margin-top: -20px;
+  margin-left: -45px;
+  position: absolute;
+}
+
+.selected {
+  font-weight: bold;
+}

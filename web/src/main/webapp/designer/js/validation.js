@@ -124,6 +124,7 @@ $(function() {
  * ============================================================= */
 function saveRule(rule) {
 
+	$("body").append(createLoader());
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 
 	var boundary = "---------------------------7da24f2e50046";
@@ -157,6 +158,8 @@ function saveRule(rule) {
 			});
 
 			sessionStorage.removeItem("edit");
+
+			$(".spinner").remove();
 		},
 
 		error: function(response) {
