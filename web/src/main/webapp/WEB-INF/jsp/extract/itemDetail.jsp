@@ -37,7 +37,9 @@
 	    	 <fmt:message key="item_meta_global_att" bundle="${resword}"/>
 	     </span>
      <h1>
-<div style="width: 600px">
+<table>
+<tr><td> 	 
+<div>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center" align="center">
@@ -76,6 +78,8 @@
 
 </div></div></div></div></div></div></div></div>
 </div>
+</td></tr>
+</table> 
 <br>
 
 <span class="table_title_manage"><fmt:message key="item_meta_crf_att" bundle="${resword}"/></span>
@@ -96,7 +100,7 @@
    </tr>  
    <tr id="leftnavSubRow_SubSection<c:out value="${versionCount}"/>" style="display: all" valign="top">
 	 <td colspan="2">
-	   <div style="width: 860px">
+	   <div>
          <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
          <div class="textbox_center" align="center">
