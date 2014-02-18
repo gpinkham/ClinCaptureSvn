@@ -214,11 +214,14 @@ public class SDVUtil {
 
 		EventCRFSDVFilter eventCRFSDVFilter = getEventCRFSDVFilter(limit, studyId);
 		String restore = request.getAttribute(limit.getId() + "_restore") + "";
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+		boolean allowSdvWithOpenQueries = "no".equals(currentStudy.getStudyParameterConfig()
+				.getAllowSdvWithOpenQueries()) ? false : true;
 		if (!limit.isComplete()) {
-			int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
+			int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, allowSdvWithOpenQueries);
 			tableFacade.setTotalRows(totalRows);
 		} else if ("true".equalsIgnoreCase(restore)) {
-			int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
+			int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId, allowSdvWithOpenQueries);
 			int pageNum = limit.getRowSelect().getPage();
 			int maxRows = limit.getRowSelect().getMaxRows();
 			tableFacade.setMaxRows(maxRows);
@@ -235,10 +238,10 @@ public class SDVUtil {
 		tableFacade.setItems(items);
 	}
 
-	public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId) {
+	public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId, boolean allowSdvWithOpenQueries) {
 
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-		return eventCRFDAO.getCountOfAvailableWithFilter(studyId, studyId, eventCRFSDVFilter);
+		return eventCRFDAO.getCountOfAvailableWithFilter(studyId, studyId, eventCRFSDVFilter, allowSdvWithOpenQueries);
 
 	}
 
@@ -271,8 +274,12 @@ public class SDVUtil {
 	private Collection<SubjectSDVContainer> getFilteredItems(EventCRFSDVFilter filterSet, EventCRFSDVSort sortSet,
 			int rowStart, int rowEnd, int studyId, HttpServletRequest request) {
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
+		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+		boolean allowSdvWithOpenQueries = "no".equals(currentStudy.getStudyParameterConfig()
+				.getAllowSdvWithOpenQueries()) ? false : true;
+
 		List<EventCRFBean> eventCRFBeans = eventCRFDAO.getAvailableWithFilterAndSort(studyId, studyId, filterSet,
-				sortSet, rowStart, rowEnd);
+				sortSet, allowSdvWithOpenQueries, rowStart, rowEnd);
 		return getSubjectRows(eventCRFBeans, request);
 	}
 
@@ -732,7 +739,6 @@ public class SDVUtil {
 		SubjectDAO subjectDAO = new SubjectDAO(dataSource);
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-		DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 
@@ -750,7 +756,6 @@ public class SDVUtil {
 		for (EventCRFBean crfBean : eventCRFBeans) {
 			tempSDVBean = new SubjectSDVContainer();
 
-			StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 			studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(crfBean.getStudySubjectId());
 			studyEventBean = (StudyEventBean) studyEventDAO.findByPK(crfBean.getStudyEventId());
 			studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(studyEventBean
@@ -760,12 +765,6 @@ public class SDVUtil {
 			studyBean = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
 			eventDefinitionCRFBean = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean,
 					studyEventBean.getId(), crfBean.getCRFVersionId());
-
-			String allowSdvWithOpenQueries = currentStudy.getStudyParameterConfig().getAllowSdvWithOpenQueries();
-			boolean crfHasUnclosedNDsInStudy = allowSdvWithOpenQueries.equals("no")
-					&& discrepancyNoteDAO.doesCRFHaveUnclosedNDsInStudyForSubject(studyBean,
-							studyEventDefinitionBean.getName(), studyEventBean.getId(), studySubjectBean.getLabel(),
-							eventDefinitionCRFBean.getCrfName());
 
 			tempSDVBean.setStudyIdentifier(studyBean.getIdentifier());
 
@@ -817,11 +816,9 @@ public class SDVUtil {
 				sdvStatus.append(getIconForSdvStatusPrefix()).append("DoubleCheck").append(ICON_FORCRFSTATUS_SUFFIX)
 						.append("</a></center>");
 			} else {
-				if (!crfHasUnclosedNDsInStudy) {
-					sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ")
-							.append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME).append(crfBean.getId())
-							.append("' /></center>");
-				}
+				sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ")
+						.append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME).append(crfBean.getId())
+						.append("' /></center>");
 			}
 			tempSDVBean.setSdvStatus(sdvStatus.toString());
 			tempSDVBean.setStudySubjectId(studySubjectBean.getLabel());
@@ -855,7 +852,7 @@ public class SDVUtil {
 			}
 
 			actions = new StringBuilder("");
-			if (!crfBean.isSdvStatus() && !crfHasUnclosedNDsInStudy) {
+			if (!crfBean.isSdvStatus()) {
 				actions.append("<input type=\"image\" name=\"sdvSubmit\" ").append("src=\"")
 						.append((request.getContextPath())).append("/images/icon_DoubleCheck_Action")
 						.append(ICON_FORSVN_SUFFIX).append("onclick=\"")

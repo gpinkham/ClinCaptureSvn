@@ -648,7 +648,8 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		}
 	}
 
-	public Integer getCountOfAvailableWithFilter(int studyId, int parentStudyId, EventCRFSDVFilter filter) {
+	public Integer getCountOfAvailableWithFilter(int studyId, int parentStudyId, EventCRFSDVFilter filter,
+			boolean allowSdvWithOpenQueries) {
 
 		setTypesExpected();
 
@@ -657,6 +658,12 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(2, parentStudyId);
 		String sql = digester.getQuery("getCountOfAvailableWithFilter");
 		sql += filter.execute("");
+		if (!allowSdvWithOpenQueries) {
+			variables.put(3, studyId);
+			variables.put(4, parentStudyId);
+
+			sql = sql + digester.getQuery("notAllowSdvWithOpenQueries");
+		}
 
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
@@ -695,16 +702,25 @@ public class EventCRFDAO extends AuditableEntityDAO {
 	}
 
 	public ArrayList<EventCRFBean> getAvailableWithFilterAndSort(int studyId, int parentStudyId,
-			EventCRFSDVFilter filter, EventCRFSDVSort sort, int rowStart, int rowEnd) {
+			EventCRFSDVFilter filter, EventCRFSDVSort sort, boolean allowSdvWithOpenQueries, int rowStart, int rowEnd) {
 		ArrayList<EventCRFBean> eventCRFs = new ArrayList<EventCRFBean>();
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
 		variables.put(1, studyId);
 		variables.put(2, parentStudyId);
+
 		String sql = digester.getQuery("getAvailableWithFilterAndSort");
 		sql = sql + filter.execute("");
 		sql = sql + sort.execute("");
+
+		if (!allowSdvWithOpenQueries) {
+			variables.put(3, studyId);
+			variables.put(4, parentStudyId);
+
+			sql = sql + digester.getQuery("notAllowSdvWithOpenQueries");
+		}
+
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
 		} else {

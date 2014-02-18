@@ -617,4 +617,16 @@
         <name>deleteEventCRFDNMap</name>
         <sql>Delete FROM DN_EVENT_CRF_MAP WHERE event_crf_id=?</sql>
     </query>
+	<query>
+        <name>notAllowSdvWithOpenQueries</name>
+        <sql>
+			AND ec.event_crf_id NOT IN (select distinct evc.event_crf_id from event_crf evc,  
+			discrepancy_note dn, dn_item_data_map didm, item_data itd 
+			where (dn.resolution_status_id = 1 OR dn.resolution_status_id = 2) AND dn.parent_dn_id IS null AND
+			(dn.study_id = ? or dn.study_id in (select study_id from study where parent_study_id = ?)) AND 
+			dn.discrepancy_note_id = didm.discrepancy_note_id AND 
+			didm.item_data_id = itd.item_data_id AND 
+			itd.event_crf_id = evc.event_crf_id AND evc.sdv_status = false order by evc.event_crf_id)
+        </sql>
+    </query>
 </queries>
