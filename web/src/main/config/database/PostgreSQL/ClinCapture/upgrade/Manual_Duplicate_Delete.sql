@@ -1,4 +1,4 @@
-﻿-- Tom Hickerson
+ï»¿-- Tom Hickerson
 -- OpenClinica LLC
 CREATE OR REPLACE FUNCTION delete(remove integer, promote integer) returns integer AS $$
         BEGIN

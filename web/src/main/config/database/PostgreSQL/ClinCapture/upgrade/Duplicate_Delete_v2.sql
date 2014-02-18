@@ -1,4 +1,4 @@
-﻿-- Tom Hickerson -- OpenClinica, LLC - 2011
+ï»¿-- Tom Hickerson -- OpenClinica, LLC - 2011
 
 -- meant to remove duplicates, possibly triplcates or quadruplicates, and reassign their discrepancy notes.
 -- however, need to reconcile different values in database.
