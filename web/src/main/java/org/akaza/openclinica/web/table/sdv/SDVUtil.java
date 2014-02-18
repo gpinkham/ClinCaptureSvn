@@ -740,14 +740,12 @@ public class SDVUtil {
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
 		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
-		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 
 		StudySubjectBean studySubjectBean;
 		SubjectBean subjectBean;
 		StudyEventBean studyEventBean;
 		StudyBean studyBean;
 		EventDefinitionCRFBean eventDefinitionCRFBean;
-		StudyEventDefinitionBean studyEventDefinitionBean;
 
 		Collection<SubjectSDVContainer> allRows = new ArrayList<SubjectSDVContainer>();
 		SubjectSDVContainer tempSDVBean;
@@ -758,8 +756,6 @@ public class SDVUtil {
 
 			studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(crfBean.getStudySubjectId());
 			studyEventBean = (StudyEventBean) studyEventDAO.findByPK(crfBean.getStudyEventId());
-			studyEventDefinitionBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(studyEventBean
-					.getStudyEventDefinitionId());
 			subjectBean = (SubjectBean) subjectDAO.findByPK(studySubjectBean.getSubjectId());
 			// find out the study's identifier
 			studyBean = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
