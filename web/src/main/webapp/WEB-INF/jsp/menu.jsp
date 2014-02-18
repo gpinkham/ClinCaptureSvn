@@ -111,7 +111,7 @@
 </c:if>
 <span class="table_title_Admin" style="line-height:15px;">
 	<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key="Not_Closed" bundle="${resterm}"/>">
-	  <fmt:message key="notes_assigned_to_me" bundle="${restext}"/><span>${assignedDiscrepancies}</span>&nbsp;
+	  <fmt:message key="unresolved_discrepancies_assigned_to_me" bundle="${restext}"/><span>${assignedDiscrepancies}</span>&nbsp;
 	</a><br/><br/>
 </span>
 
