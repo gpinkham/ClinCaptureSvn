@@ -237,7 +237,7 @@ $(function() {
 		createDraggable({
 
 			element: $(this),
-			target: $(".eval"),
+			target: $(".eval")
 		});
 	})
 
@@ -246,7 +246,7 @@ $(function() {
 		createDraggable({
 
 			element: $(this),
-			target: $(".comp"),
+			target: $(".comp")
 		});
 	})
 
@@ -255,7 +255,7 @@ $(function() {
 		createDraggable({
 
 			element: $(this),
-			target: $(".comp"),
+			target: $(".comp")
 		});
 	})
 
@@ -264,7 +264,7 @@ $(function() {
 		createDraggable({
 
 			element: $(this),
-			target: $(".group"),
+			target: $(".group")
 		});
 	})
 
@@ -433,7 +433,6 @@ $(function() {
 				createBreadCrumb({
 
 					study: study.name
-
 				})
 			}
 		}

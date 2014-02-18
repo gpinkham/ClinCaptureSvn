@@ -978,7 +978,7 @@ function loadStudies(studies) {
 
 								createBreadCrumb({
 
-									study: currentStudy.name,
+									study: currentStudy.name
 								})
 
 								resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
@@ -1027,7 +1027,7 @@ function loadStudies(studies) {
 
 					createBreadCrumb({
 
-						study: currentStudy.name,
+						study: currentStudy.name
 					})
 
 					$("a[href='#events']").tab('show');
@@ -1129,7 +1129,7 @@ function loadStudyEvents(study) {
 				createBreadCrumb({
 
 					study: study.name,
-					event: currentEvent.name,
+					event: currentEvent.name
 				})
 
 			})
@@ -1236,7 +1236,7 @@ function loadEventCRFs(params) {
 
 					crf: currentCRF.name,
 					study: params.study.name,
-					event: params.studyEvent.name,
+					event: params.studyEvent.name
 					
 				})
 			})
@@ -1256,7 +1256,7 @@ function loadEventCRFs(params) {
 
 						placement: "top",
 						container: "body",
-						title: crf.description,
+						title: crf.description
 					})
 
 				} else {
@@ -1276,7 +1276,7 @@ function loadEventCRFs(params) {
 
 						placement: "top",
 						container: "body",
-						title: crf.oid,
+						title: crf.oid
 					})
 
 				} else {
@@ -1373,7 +1373,7 @@ function loadCRFVersions(params) {
 
 						placement: "top",
 						container: "body",
-						title: version.oid,
+						title: version.oid
 					})
 
 				} else {
@@ -1424,7 +1424,7 @@ function loadCRFVersionItems(crf) {
 	var itemArr = []
 	$("div[id='items']").find("table").remove();
 
-	if (crf.items) {
+	if (crf && crf.items) {
 
 		var itemsTable = createTable(['Name', 'Description', 'Data Type']);
 
@@ -1459,7 +1459,7 @@ function loadCRFVersionItems(crf) {
 
 						placement: "top",
 						container: "body",
-						title: item.description,
+						title: item.description
 					})
 
 				} else {
