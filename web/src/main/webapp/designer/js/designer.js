@@ -1005,21 +1005,24 @@ function loadStudies(studies) {
 						// Cascade load
 						var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]
 
-						loadEventCRFs({
+						if(topEvent){
 
-							study: currentStudy,
-							studyEvent: topEvent
-						});
+							loadEventCRFs({
 
-						var version = topEvent.crfs[0].versions[0]
+								study: currentStudy,
+								studyEvent: topEvent
+							});
 
-						loadCRFVersions({
-							study: study,
-							event: topEvent,
-							crf: topEvent.crfs[0]
-						});
+							var version = topEvent.crfs[0].versions[0]						
+								
+							loadCRFVersions({
+								study: study,
+								event: topEvent,
+								crf: topEvent.crfs[0]
+							});
 
-						loadCRFVersionItems(version);
+							loadCRFVersionItems(version);
+						}
 					}
 
 					createBreadCrumb({
@@ -1201,7 +1204,7 @@ function loadEventCRFs(params) {
 	var itemArr = []
 	$("div[id='crfs']").find("table").remove();
 
-	if (params.studyEvent.crfs && params.studyEvent.crfs) {
+	if (params.studyEvent && params.studyEvent.crfs) {
 
 		var crfTable = createTable(['Name', 'Identifier', 'Description']);
 
@@ -1226,7 +1229,7 @@ function loadEventCRFs(params) {
 
 					crf: currentCRF,
 					study: params.study,
-					event: params.studyEvent.name
+					event: params.studyEvent
 				});
 
 				createBreadCrumb({
@@ -1346,6 +1349,7 @@ function loadCRFVersions(params) {
 
 				createBreadCrumb({
 
+					crf: params.crf.name,
 					event: params.event.name,
 					study: params.study.name,
 					version: currentVersion.name
