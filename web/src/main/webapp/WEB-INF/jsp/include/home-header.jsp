@@ -22,7 +22,7 @@
 
 	<title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
-	<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css"/>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css"/>
 	<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/css/charts.css" type="text/css"/>
 	<link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
 	<link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
