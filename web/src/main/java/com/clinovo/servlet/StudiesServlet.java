@@ -221,7 +221,7 @@ public class StudiesServlet extends HttpServlet {
 					act.put("type", ruleSetRule.getActions().get(0).getActionType());
 					act.put("select", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
 
-					object.put("evaluateTo", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
+					object.put("evaluatesTo", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
 
 					if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.EMAIL)) {
 

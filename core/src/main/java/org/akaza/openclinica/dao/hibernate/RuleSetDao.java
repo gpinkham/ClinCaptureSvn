@@ -112,11 +112,11 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 		q.setInteger("studyId",
 				currentStudy.getParentStudyId() != 0 ? currentStudy.getParentStudyId() : currentStudy.getId());
 		q.setInteger("studyEventDefinitionId", sed.getId());
-		q.setCacheable(true);
-		ArrayList<RuleSetBean> returnMe = (ArrayList<RuleSetBean>) q.list();
-		// return (ArrayList<RuleSetBean>) q.list();
+		
+		ArrayList<RuleSetBean> results = (ArrayList<RuleSetBean>) q.list();
 		s.close();
-		return returnMe;
+		
+		return results;
 		
 	}
 

@@ -146,9 +146,10 @@ function saveRule(rule) {
 
 		success: function(response) {
 
-			sessionStorage.setItem("status", "remove");
-
 			var obj = JSON.parse(response);
+			sessionStorage.removeItem("edit");
+			sessionStorage.setItem("status", "remove");
+			
 			bootbox.confirm(obj.message, function(result) {
 
 				if (result) {
@@ -158,8 +159,6 @@ function saveRule(rule) {
 			});
 
 			sessionStorage.removeItem("edit");
-
-			$(".spinner").remove();
 		},
 
 		error: function(response) {

@@ -20,7 +20,16 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import com.google.gson.JsonObject;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.MessageFormat;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -30,9 +39,12 @@ import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.domain.rule.RuleBean;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.view.Page;
@@ -50,10 +62,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.text.MessageFormat;
+import com.google.gson.JsonObject;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
@@ -109,27 +118,33 @@ public class ImportRuleServlet extends Controller {
 				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")
 						&& request.getParameter("edit") != null && "true".equalsIgnoreCase(request.getParameter("edit"))) {
 					
-					RuleSetRuleBean bean = getRuleSetRuleDao().findById(Integer.parseInt(request.getParameter("id")));
-					if (bean != null) {
+					RuleSetRuleBean ruleSetRule = getRuleSetRuleDao().findById(Integer.parseInt(request.getParameter("id")));
+					
+					RuleBean rule = ruleSetRule.getRuleBean();
+					ExpressionBean expression = rule.getExpression();
+					RuleSetBean ruleSet = ruleSetRule.getRuleSetBean();
+					
+					if (ruleSetRule != null) {
 						Session session = getRuleDao().getSessionFactory().getCurrentSession();
 						Transaction transaction = session.beginTransaction();
 
-						for (RuleActionBean act : bean.getActions()) {
+						for (RuleActionBean act : ruleSetRule.getActions()) {
 							session.delete(act);
 							session.delete(act.getRuleActionRun());
 						}
-
-						session.delete(bean.getRuleSetBean());
-						session.delete(bean.getRuleBean());
-						session.delete(bean);
+						
+						// Remove current rule and props
+						session.delete(ruleSetRule);
+						session.delete(ruleSet);
+						session.delete(rule);
+						session.delete(expression);
 
 						transaction.commit();
 						session.flush();
 					}
 				}
 
-				RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
-						currentStudy, ub);
+				RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(currentStudy, ub);
 				importedRules = rulesPostImportContainerService.validateRuleDefs(importedRules);
 				importedRules = rulesPostImportContainerService.validateRuleSetDefs(importedRules);
 

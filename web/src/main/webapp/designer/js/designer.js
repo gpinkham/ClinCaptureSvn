@@ -720,6 +720,8 @@ function createDroppable(params) {
 
 		drop: function(event, ui) {			
 
+			var existingValue = params.element.val();
+
  			params.element.text("");
  			params.element.removeClass("init");
  			params.element.addClass("bordered");
@@ -748,6 +750,7 @@ function createDroppable(params) {
 
 				ui: ui,
 				element: params.element,
+				existingValue: existingValue
 			});
 
 			params.element.css('font-weight', 'bold');
@@ -943,7 +946,7 @@ function loadStudies(studies) {
 				var currentStudy = data[$(row).attr("id")]
 
 				if (selectedStudy !== data[$(row).attr("id")].id && 
-					($("div[id='studies']").find("table > tbody > tr").size() > 1 && $(".dotted-border").size() > 2)) {
+					($("div[id='studies']").find("table > tbody > tr").size() > 1 && $(".dotted-border").size() > 2) && !editing) {
 
 					bootbox.confirm("The current rule will be lost. Are you sure you want to select another study?",
 
@@ -1026,6 +1029,7 @@ function loadStudies(studies) {
 
 					$("a[href='#events']").tab('show');
 				}
+				editing = false;
 			})
 
 			var tdName = $("<td>");

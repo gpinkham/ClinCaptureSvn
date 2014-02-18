@@ -103,9 +103,19 @@ Parser.prototype.createNextDroppable = function(params) {
 
 		createPopover(dataPredicate);
 
-	} else if (params.element.is("input")) {
+	} else if (params.element.is(".target")) {
 
 		if (!this.isAlreadyAddedTarget(params.ui.draggable.text())) {
+
+			if (params.existingValue) {
+
+				var index = this.rule.targets.indexOf(params.existingValue);
+
+				if (index > -1) {
+
+					this.rule.targets.splice(index, 1);
+				}
+			}
 
 			this.rule.targets.push(params.ui.draggable.text());
 
@@ -1154,6 +1164,7 @@ Parser.prototype.fetchStudies = function() {
  * ====================================================================== */
 Parser.prototype.fetchRuleForEditing = function() {
 
+	editing = true;
 	$("body").append(createLoader());
 	sessionStorage.setItem("edit", true);
 	sessionStorage.setItem("id", this.getParameterValue("rId"));
