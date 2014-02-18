@@ -90,6 +90,11 @@ function initNdsAssignedToMeWidget(){
 			var updatedNds = parseInt(array[1]);
 			var resolutionProposedDns = parseInt(array[2]);
 			var closedNds = parseInt(array[3]);
+
+			if (resolutionProposedDns != 0) {
+				$(".widget table.signs td.optional").css("display","table-cell");
+			}
+			
 			var totalNds = newNds + updatedNds + closedNds + resolutionProposedDns;
 			captionLimit = countCaptionLimit(totalNds);				
 			var captionSelector = ".dns_assigned_to_me .captions td";

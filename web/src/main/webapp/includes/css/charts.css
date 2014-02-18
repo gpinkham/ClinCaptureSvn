@@ -95,7 +95,7 @@ form#actionForSave input {
 
 /*Charts*/
 /*Stacked-chart*/
-.widget  .chart_wrapper {
+.widget .chart_wrapper {
 	width: 330px;
 	border-bottom: 1px solid gray;
 	border-left: 1px solid gray;
@@ -109,7 +109,7 @@ form#actionForSave input {
 	margin: 0px;
 }
 
-.widget  #stacked_bar li,.stacked_bar li {
+.widget #stacked_bar li,.stacked_bar li {
 	display: inline-block !important;
 	width: 0px;
 	height: 20px;
@@ -124,11 +124,11 @@ form#actionForSave input {
 }
 
 }
-.widget  #stack #pop-up {
+.widget #stack #pop-up {
 	display: none;
 }
 
-.widget  #stack:hover #pop-up {
+.widget #stack:hover #pop-up {
 	background-color: white;
 	border: 1px solid gray;
 	position: absolute;
@@ -140,32 +140,36 @@ form#actionForSave input {
 	font-weight: bold;
 }
 
-.widget  table.captions {
+.widget table.captions {
 	position: relative;
 	width: 410px;
 	margin-left: -15px;
 }
 
-.widget  table.captions td,table.captions_percents td {
+.widget table.captions td,table.captions_percents td {
 	text-align: center;
 }
 
-.widget  table.captions_percents {
+.widget table.captions_percents {
 	position: relative;
 	width: 360px;
 }
 
-.widget  table.signs {
+.widget table.signs {
 	margin: 15px 20px;
 	vertical-align: middle;
 	width: 360px;
 }
 
-.widget table.signs  td {
+.widget table.signs td {
 	vertical-align: middle;
 }
 
-.widget  div.sign {
+.widget table.signs td.optional {
+	display: none;
+}
+
+.widget div.sign {
 	position: relative;
 	top: 3px;
 	width: 10px;

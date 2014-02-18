@@ -43,7 +43,7 @@ $(document).ready(function($) {
 			<td><div class="updated sign">&nbsp</div> - <fmt:message key="updated" bundle="${resword}"/></td>
 		</tr>
 		<tr align="left">
-			<td><div class="resolution_proposed sign">&nbsp</div> - <fmt:message key="Resolution_Proposed" bundle="${resword}"/></td>
+			<td class="optional"><div class="resolution_proposed sign">&nbsp</div> - <fmt:message key="Resolution_Proposed" bundle="${resword}"/></td>
 			<td><div class="closed sign">&nbsp</div> - <fmt:message key="closed" bundle="${resword}"/></td>
 		</tr>
 	</table>	
