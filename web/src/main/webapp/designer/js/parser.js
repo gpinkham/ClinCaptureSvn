@@ -95,13 +95,17 @@ Parser.prototype.createNextDroppable = function(params) {
 
 		dataPredicate.text("Group or Data");
 
-		params.element.after(dataPredicate);
+		if (params.element.next().length === 0) {
 
-		dataPredicate.after(RPAREN);
+			params.element.after(dataPredicate);
 
-		createPopover(RPAREN);
+			dataPredicate.after(RPAREN);
 
-		createPopover(dataPredicate);
+			createPopover(RPAREN);
+
+			createPopover(dataPredicate);
+
+		} 
 
 	} else if (params.element.is(".target")) {
 
@@ -146,7 +150,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			var dataPredicate = createStartExpressionDroppable();
 
 			// Avoid creating unnecessary evaluation/data/crf item/group boxes
-			if (params.element.next().size() == 0 || params.element.next().is(".pull-right") || params.element.next().is(".group")) {
+			if (params.element.next().size() === 0 || params.element.next().is(".pull-right") || params.element.next().is(".group")) {
 
 				if (params.element.next().is(".group") && params.element.next().text() === ")") {
 
@@ -166,19 +170,25 @@ Parser.prototype.createNextDroppable = function(params) {
 
 		} else if (params.element.is(".eval")) {
 
-			var droppable = createStartExpressionDroppable();
-			params.element.after(droppable);
+			if (!params.element.next().is(".dotted-border")) {
 
-			createPopover(droppable);
+				var droppable = createStartExpressionDroppable();
+				params.element.after(droppable);
+
+				createPopover(droppable);
+			}
 
 		} else {
 
 			if (!params.element.next().is(".comp")) {
 
-				var droppable = createSymbolDroppable();
-				params.element.after(droppable);
+				if (!params.element.next().is(".dotted-border")) {
+					
+					var droppable = createSymbolDroppable();
+					params.element.after(droppable);
 
-				createPopover(droppable);
+					createPopover(droppable);
+				}
 			}
 		}
 	}

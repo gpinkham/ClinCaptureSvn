@@ -450,9 +450,7 @@ function createConditionDroppable() {
  * =========================================================================== */
 function createPopover(droppable) {
 	
-
-	var last = droppable.last().attr("class").split(" ")[2]	
-	var btn = '<div type="button" class="pull-left space-right-m" onclick="addDroppable(this)" last="' + last + '"><span class="glyphicon glyphicon-pencil"></span></div><div class="pull-left space-right-m" type="button" onclick="x(this)"><span class="glyphicon glyphicon-trash"></span></div>'
+	var btn = '<div type="button" class="pull-left space-right-m" onclick="addDroppable(this)"><span class="glyphicon glyphicon-pencil"></span></div><div class="pull-left space-right-m" type="button" onclick="x(this)"><span class="glyphicon glyphicon-trash"></span></div>'
 
 	droppable.popover({
 
@@ -482,9 +480,7 @@ function createPopover(droppable) {
  * =========================================================================== */
 function addDroppable(popov) {
 
-	var drop = $(popov).parents(".dotted-border");
-
-	drop.attr("last", $(popov).attr("last"))
+	var drop = $(popov).parents(".dotted-border")[0];
 
 	var modalOuterDiv = createDiv({
 		divClass: "modal fade tops"
@@ -512,14 +508,20 @@ function addDroppable(popov) {
 		modalOuterDiv.remove();
 
 		var d = createStartExpressionDroppable();
-		if (drop.attr("last") === "group" && !drop.next().is(".dotted-border")) {
+		
+		if ($(drop.previousSibling).is(".dotted-border")) {
 
-			drop.after(d);
+			$(drop).after(d);
+			createPopover(d);
+
+		} else if (!$(drop.previousSibling).is(".dotted-border")) {
+
+			$(drop).before(d);
 			createPopover(d);
 
 		} else  {
 
-			drop.before(d);
+			$(drop).after(d);
 			createPopover(d);
 		}
 	})
@@ -533,16 +535,16 @@ function addDroppable(popov) {
 
 		modalOuterDiv.remove();
 		var c = createSymbolDroppable();
-		if (drop.next().size() > 0) {
+		if ($(drop).next().size() > 0) {
 
-			if (!drop.is(".eval") && !drop.is(".comp") && !drop.next().is(".comp") && !drop.next().is(".eval")) {
-				drop.after(c);
+			if (!$(drop).is(".eval") && !$(drop).is(".comp") && !$(drop).next().is(".comp") && !$(drop).next().is(".eval")) {
+				$(drop).after(c);
 				createPopover(c);
 			}
 		} else {
 
-			if (!drop.is(".eval") && !drop.is(".comp")) {
-				drop.after(c);
+			if (!$(drop).is(".eval") && !$(drop).is(".comp")) {
+				$(drop).after(c);
 				createPopover(c);
 			}
 		}
@@ -557,16 +559,16 @@ function addDroppable(popov) {
 
 		modalOuterDiv.remove();
 		var eval = createConditionDroppable();
-		if (drop.next().size() > 0) {
+		if ($(drop).next().size() > 0) {
 
-			if (!drop.is(".eval") && !drop.is(".comp") && !drop.next().is(".comp") && !drop.next().is(".eval")) {
-				drop.after(eval);
+			if (!$(drop).is(".eval") && !$(drop).is(".comp") && !$(drop).next().is(".comp") && !$(drop).next().is(".eval")) {
+				$(drop).after(eval);
 				createPopover(eval);
 			}
 		} else {
 
-			if (!drop.is(".eval") && !drop.is(".comp")) {
-				drop.after(eval);
+			if (!$(drop).is(".eval") && !$(drop).is(".comp")) {
+				$(drop).after(eval);
 				createPopover(eval);
 			}
 		}
