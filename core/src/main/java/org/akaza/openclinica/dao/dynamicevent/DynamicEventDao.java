@@ -13,9 +13,6 @@
 
 package org.akaza.openclinica.dao.dynamicevent;
 
-import java.util.*;
-
-import javax.sql.DataSource;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
@@ -25,9 +22,12 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+import javax.sql.DataSource;
+import java.util.*;
+
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO {
-	
+
 	public DynamicEventDao(DataSource ds) {
 		super(ds);
 	}
@@ -138,7 +138,7 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		this.execute(digester.getQuery("update"), variables);
 		return eb;
 	}
-	
+
 	public void deleteByPK(int key) throws OpenClinicaException {
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(key));
@@ -150,11 +150,11 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		variables.put(new Integer(1), new Integer(studyGroupClassId));
 		this.execute(digester.getQuery("deleteAllFromStudyGroupClass"), variables);
 	}
-	
+
 	public Collection findAllByStudyGroupClassId(int studyGroupClassId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyGroupClassId)); 
+		variables.put(new Integer(1), new Integer(studyGroupClassId));
 		ArrayList alist = this.select(digester.getQuery("findAllByStudyGroupClassId"), variables);
 		ArrayList al = new ArrayList();
 		Iterator it = alist.iterator();
@@ -164,13 +164,13 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		}
 		return al;
 	}
-	
+
 	/**
 	 * 
 	 * @return list of all events, used in the subject matrix
 	 * @throws OpenClinicaException
 	 */
-	
+
 	public ArrayList<Integer> findAllDefIdsInActiveDynGroupsByStudyId(int id) {
 		ArrayList<Integer> idList = new ArrayList<Integer>();
 		this.setTypesExpected();
@@ -180,15 +180,15 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 			DynamicEventBean deb = (DynamicEventBean) it.next();
 			idList.add(Integer.valueOf(deb.getStudyEventDefinitionId()));
 		}
-		
+
 		return idList;
 	}
-	
+
 	public ArrayList<DynamicEventBean> findAllByGroupClassStatusIdAndStudyId(int statusId, int studyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(statusId)); 
-		variables.put(new Integer(2), new Integer(studyId)); 
+		variables.put(new Integer(1), new Integer(statusId));
+		variables.put(new Integer(2), new Integer(studyId));
 		ArrayList alist = this.select(digester.getQuery("findAllByGroupClassStatusIdAndStudyId"), variables);
 		ArrayList result = new ArrayList();
 		Iterator it = alist.iterator();
@@ -198,11 +198,11 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		}
 		return result;
 	}
-	
+
 	public ArrayList<DynamicEventBean> findAllByStudyId(int studyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyId)); 
+		variables.put(new Integer(1), new Integer(studyId));
 		ArrayList alist = this.select(digester.getQuery("findAllByStudyId"), variables);
 		ArrayList result = new ArrayList();
 		Iterator it = alist.iterator();
@@ -212,7 +212,20 @@ public class DynamicEventDao<K, V extends ArrayList> extends AuditableEntityDAO 
 		}
 		return result;
 	}
-	
+
+	public DynamicEventBean findByStudyEventDefinitionId(int studyEventDefinitionId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(studyEventDefinitionId));
+		ArrayList alist = this.select(digester.getQuery("findByStudyEventDefinitionId"), variables);
+		DynamicEventBean result = null;
+		Iterator it = alist.iterator();
+		if (it.hasNext()) {
+			result = (DynamicEventBean) this.getEntityFromHashMap((HashMap) it.next());
+		}
+		return result;
+	}
+
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase)
 			throws OpenClinicaException {
 		ArrayList al = new ArrayList();

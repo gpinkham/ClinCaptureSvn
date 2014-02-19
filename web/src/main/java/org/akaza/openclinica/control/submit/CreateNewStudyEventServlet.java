@@ -33,6 +33,7 @@ import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.control.managestudy.ListEventsForSubjectTableFactory;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -53,7 +54,15 @@ import java.util.*;
 @Component
 public class CreateNewStudyEventServlet extends Controller {
 
+	public static final String INPUT_PAGE_TO_SHOW_POPUP = "page";
+
 	public static final String INPUT_STUDY_EVENT_DEFINITION = "studyEventDefinition";
+
+	public static final String INPUT_SELECTED_EVENT_DEF_ID = "selectedEventDefId";
+
+	public static final String INPUT_EVENT_CRF_ID = "eventCRFId";
+
+	public static final String INPUT_EVENT_DEFINITION_CRF_ID = "eventDefintionCRFId";
 
 	public static final String INPUT_STUDY_SUBJECT = "studySubject";
 
@@ -81,7 +90,9 @@ public class CreateNewStudyEventServlet extends Controller {
 	public final static int ADDITIONAL_SCHEDULED_NUM = 4;
 
 	private void processEvents(JSONArray eventDefs, String eventDivId, int studyEventId,
-			StudyEventDefinitionBean definition, StudySubjectBean studySubject, StudyEventDAO sed) throws Exception {
+			StudyEventDefinitionBean definition, StudySubjectBean studySubject, StudyEventDAO sed,
+			String pageToShowPopup, int selectedEventDefId) throws Exception {
+		String eventCRFDivId;
 		JSONObject jsonObject = null;
 		JSONArray eventIds = null;
 		for (int i = 0; i < eventDefs.length(); i++) {
@@ -91,16 +102,57 @@ public class CreateNewStudyEventServlet extends Controller {
 				break;
 			}
 		}
+
 		if (jsonObject == null) {
-			eventIds = new JSONArray();
-			eventIds.put(studyEventId);
-			jsonObject = new JSONObject();
-			jsonObject.put("eventDivId", eventDivId);
-			jsonObject.put("eventIds", eventIds);
-			Collection<StudyEventBean> studyEvents = sed.findAllByDefinitionAndSubject(definition, studySubject);
-			jsonObject.put("totalEvents", studyEvents.size());
-			jsonObject.put("repeatingEvent", definition.isRepeating());
-			eventDefs.put(jsonObject);
+
+			if (pageToShowPopup.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName())) {
+
+				if (selectedEventDefId == definition.getId()) {
+
+					eventIds = new JSONArray();
+					eventIds.put(studyEventId);
+					jsonObject = new JSONObject();
+					jsonObject.put("eventDivId", eventDivId);
+					jsonObject.put("eventIds", eventIds);
+					jsonObject.put("totalEvents", sed.findAllByDefinitionAndSubject(definition, studySubject).size());
+					jsonObject.put("repeatingEvent", definition.isRepeating());
+					jsonObject.put("popupToDisplayEntireEvent", true);
+					eventDefs.put(jsonObject);
+
+					for (EventDefinitionCRFBean eventDefBean : (ArrayList<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
+							.findAllActiveByEventDefinitionId(definition.getId())) {
+
+						eventCRFDivId = "Event_"
+								+ SubjectLabelNormalizer.normalizeSubjectLabel(studySubject.getLabel()) + "_"
+								+ eventDefBean.getId() + "_";
+
+						eventIds = new JSONArray();
+						eventIds.put(studyEventId);
+						jsonObject = new JSONObject();
+						jsonObject.put("eventDivId", eventCRFDivId);
+						jsonObject.put("eventIds", eventIds);
+						jsonObject.put("totalEvents", sed.findAllByDefinitionAndSubject(definition, studySubject)
+								.size());
+						jsonObject.put("repeatingEvent", definition.isRepeating());
+						jsonObject.put("popupToDisplayEntireEvent", false);
+						eventDefs.put(jsonObject);
+
+					}
+
+				}
+
+			} else {
+				eventIds = new JSONArray();
+				eventIds.put(studyEventId);
+				jsonObject = new JSONObject();
+				jsonObject.put("eventDivId", eventDivId);
+				jsonObject.put("eventIds", eventIds);
+				jsonObject.put("totalEvents", sed.findAllByDefinitionAndSubject(definition, studySubject).size());
+				jsonObject.put("repeatingEvent", definition.isRepeating());
+				jsonObject.put("popupToDisplayEntireEvent", true);
+				eventDefs.put(jsonObject);
+			}
+
 		} else {
 			eventIds.put(studyEventId);
 			jsonObject.put("totalEvents", jsonObject.getInt("totalEvents") + 1);
@@ -121,6 +173,13 @@ public class CreateNewStudyEventServlet extends Controller {
 		// input from manage subject matrix, user has specified definition id
 		int studyEventDefinitionId = fp.getInt(INPUT_STUDY_EVENT_DEFINITION);
 
+		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
+
+		String pageToShowPopup = fp.getString(INPUT_PAGE_TO_SHOW_POPUP);
+		int selectedEventDefId = fp.getInt(INPUT_SELECTED_EVENT_DEF_ID);
+		String eventCRFId = fp.getString(INPUT_EVENT_CRF_ID);
+		String eventDefintionCRFId = fp.getString(INPUT_EVENT_DEFINITION_CRF_ID);
+
 		String popupSubjectLabel = "";
 		JSONArray eventDefs = new JSONArray();
 		JSONArray pageMessages = new JSONArray();
@@ -131,23 +190,17 @@ public class CreateNewStudyEventServlet extends Controller {
 			StudySubjectBean studySubject = (StudySubjectBean) getStudySubjectDAO().findByPK(studySubjectId);
 			popupSubjectLabel = studySubject.getLabel();
 		}
+
 		String returnScheduledEvenContent = request.getParameter("returnScheduledEvenContent");
 		if (returnScheduledEvenContent != null) {
-			int p = returnScheduledEvenContent.lastIndexOf("_");
-			int rowCount = Integer.parseInt(returnScheduledEvenContent.substring(p + 1,
-					returnScheduledEvenContent.length()));
 
-			studySubjectId = Integer.parseInt(request.getParameter("popupQueryStudySubjectId"));
-			StudySubjectBean ss = (StudySubjectBean) getStudySubjectDAO().findByPK(studySubjectId);
-			int sedId = Integer.parseInt(returnScheduledEvenContent.replace(
-					"Event_" + SubjectLabelNormalizer.normalizeSubjectLabel(ss.getLabel()) + "_", "").replaceAll("_.*",
-					""));
-
-			String eventDiv = getEventDivForScheduledEvent(request, studySubjectId, sedId, rowCount);
+			String eventDiv = getEventDivForScheduledEvent(request, pageToShowPopup, returnScheduledEvenContent,
+					selectedEventDefId, eventCRFId, eventDefintionCRFId);
 			response.setContentType("text/html");
 			response.getWriter().write(eventDiv);
 			getServletContext().getRequestDispatcher("/WEB-INF/jsp/include/changeTheme.jsp").include(request, response);
 			return;
+
 		}
 
 		// TODO: make this sensitive to permissions
@@ -170,7 +223,6 @@ public class CreateNewStudyEventServlet extends Controller {
 		}
 
 		// TODO: make this sensitive to permissions
-		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 
 		StudyBean studyWithEventDefinitions = currentStudy;
 		if (currentStudy.getParentStudyId() > 0) {
@@ -562,9 +614,12 @@ public class CreateNewStudyEventServlet extends Controller {
 							currentStudy);
 				}
 
-				String eventDivId = "Event_" + SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel) + "_"
-						+ definition.getId() + "_";
-				processEvents(eventDefs, eventDivId, studyEvent.getId(), definition, studySubject, sed);
+				if (popupQuery) {
+					String eventDivId = "Event_" + SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel)
+							+ "_" + definition.getId() + "_";
+					processEvents(eventDefs, eventDivId, studyEvent.getId(), definition, studySubject, sed,
+							pageToShowPopup, selectedEventDefId);
+				}
 
 				if (hasScheduledEvent) {
 					for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
@@ -620,12 +675,12 @@ public class CreateNewStudyEventServlet extends Controller {
 										studyEventScheduled.getId(), "studyEvent", currentStudy);
 
 								if (popupQuery) {
-									eventDivId = "Event_"
+									String eventDivId = "Event_"
 											+ SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel) + "_"
 											+ scheduledDefinitionIds[i] + "_";
 									processEvents(eventDefs, eventDivId, studyEventScheduled.getId(),
 											(StudyEventDefinitionBean) seddao.findByPK(scheduledDefinitionIds[i]),
-											studySubject, sed);
+											studySubject, sed, pageToShowPopup, selectedEventDefId);
 								}
 							} else {
 								String pageMessage = restext.getString("scheduled_event_definition")
@@ -661,36 +716,67 @@ public class CreateNewStudyEventServlet extends Controller {
 		}
 	}
 
-	private String getEventDivForScheduledEvent(HttpServletRequest request, int studySubjectId,
-			int studyEventDefinitionId, int rowCount) {
+	private String getEventDivForScheduledEvent(HttpServletRequest request, String pageToShowPopup,
+			String returnScheduledEvenContent, int selectedEventDefId, String eventCRFId, String eventDefintionCRFId) {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-		ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(true);
-		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDAO());
-		factory.setSubjectDAO(getSubjectDAO());
-		factory.setStudySubjectDAO(getStudySubjectDAO());
-		factory.setStudyEventDAO(getStudyEventDAO());
-		factory.setStudyBean(currentStudy);
-		factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
-		factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
-		factory.setStudyDAO(getStudyDAO());
-		factory.setCurrentRole(currentRole);
-		factory.setCurrentUser(ub);
-		factory.setEventCRFDAO(getEventCRFDAO());
-		factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
-		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
-		factory.setStudyGroupDAO(getStudyGroupDAO());
+		int position = returnScheduledEvenContent.lastIndexOf("_");
+		int rowCount = Integer.parseInt(returnScheduledEvenContent.substring(position + 1,
+				returnScheduledEvenContent.length()));
 
+		int studySubjectId = Integer.parseInt(request.getParameter("popupQueryStudySubjectId"));
 		StudySubjectBean studySubject = (StudySubjectBean) getStudySubjectDAO().findByPK(studySubjectId);
 		SubjectBean subject = (SubjectBean) getSubjectDAO().findByPK(studySubject.getSubjectId());
-		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(
-				studyEventDefinitionId);
-		List<StudyEventBean> studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubject, sed);
-		Collections.reverse(studyEvents);
 
-		return factory.eventDivBuilder(subject, rowCount, studyEvents, sed, studySubject, request.getLocale());
+		int studyEventDefinitionId;
+		StudyEventDefinitionBean sed;
+		List<StudyEventBean> studyEvents;
+
+		if (pageToShowPopup.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName())) {
+
+			ListEventsForSubjectTableFactory factory = new ListEventsForSubjectTableFactory(true);
+			factory.setStudyBean(currentStudy);
+			factory.setCurrentRole(currentRole);
+			factory.setCurrentUser(ub);
+
+			sed = (StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(selectedEventDefId);
+			studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubject, sed);
+			Collections.reverse(studyEvents);
+
+			return factory.eventDivBuilder(subject, rowCount, studyEvents, studyEvents.size(), sed, studySubject,
+					(StringUtil.isBlank(eventCRFId) ? null : eventCRFId),
+					(StringUtil.isBlank(eventDefintionCRFId) ? null : eventDefintionCRFId), true);
+
+		} else {
+
+			ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(true);
+			factory.setStudyEventDefinitionDao(getStudyEventDefinitionDAO());
+			factory.setSubjectDAO(getSubjectDAO());
+			factory.setStudySubjectDAO(getStudySubjectDAO());
+			factory.setStudyEventDAO(getStudyEventDAO());
+			factory.setStudyBean(currentStudy);
+			factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
+			factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
+			factory.setStudyDAO(getStudyDAO());
+			factory.setCurrentRole(currentRole);
+			factory.setCurrentUser(ub);
+			factory.setEventCRFDAO(getEventCRFDAO());
+			factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
+			factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
+			factory.setStudyGroupDAO(getStudyGroupDAO());
+
+			studyEventDefinitionId = Integer.parseInt(returnScheduledEvenContent.replace(
+					"Event_" + SubjectLabelNormalizer.normalizeSubjectLabel(studySubject.getLabel()) + "_", "")
+					.replaceAll("_.*", ""));
+			sed = (StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(studyEventDefinitionId);
+			studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubject, sed);
+			Collections.reverse(studyEvents);
+
+			return factory.eventDivBuilder(subject, rowCount, studyEvents, sed, studySubject, request.getLocale());
+
+		}
 	}
 
 	@Override

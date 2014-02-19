@@ -340,9 +340,10 @@ function EnableScrollArrows2(StatusBoxID, StatusBoxNum) {
     loadCRFList(StatusBoxID,1);
 }
 
-function adjustCrfListTable2(studyEventId) {
+function adjustCrfListTable2(studyEventId, StatusBoxID, StatusBoxNum) {
   var wereRemoved = 0;
   var popupTotalColumns = 8;
+  var idAttribute = StatusBoxID + "_" + StatusBoxNum;
 
   var hideCol = function(num) {
     $(".crfListTable tr").find("td:last").find("img:eq(" + (num - wereRemoved) + ")").remove();
@@ -350,43 +351,44 @@ function adjustCrfListTable2(studyEventId) {
     wereRemoved++;
   }
 
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol1").val() == 'true') hideCol(0);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol2").val() == 'true') hideCol(1);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol3").val() == 'true') hideCol(2);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol4").val() == 'true') hideCol(3);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol5").val() == 'true') hideCol(4);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol6").val() == 'true') hideCol(5);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol7").val() == 'true') hideCol(6);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol8").val() == 'true') hideCol(7);
+  if ($("#crfListWrapper_" + idAttribute + " #hideCol1").val() == 'true') hideCol(0);
+  if ($("#crfListWrapper_" + idAttribute + " #hideCol2").val() == 'true') hideCol(1);
+  if ($("#crfListWrapper_" + idAttribute + " #hideCol3").val() == 'true') hideCol(2);
+  if ($("#crfListWrapper_" + idAttribute + " #hideCol4").val() == 'true') hideCol(3);
+  if ($("#crfListWrapper_" + idAttribute + " #hideCol5").val() == 'true') hideCol(4);
+  if ($("#crfListWrapper_" + idAttribute + " #hideCol6").val() == 'true') hideCol(5);
+  if ($("#crfListWrapper_" + idAttribute + " #hideCol7").val() == 'true') hideCol(6);
+  if ($("#crfListWrapper_" + idAttribute + " #hideCol8").val() == 'true') hideCol(7);
 
   $("#popupTotalColumns").val(popupTotalColumns);
 
   var crfActionIconWidth = 33;
   var crfActionsMaxIconsCount = parseInt($("#popupTotalColumns").val());
   crfActionsMaxIconsCount = (crfActionsMaxIconsCount < 2 ? 2 : crfActionsMaxIconsCount);
-  jQuery('#crfListWrapper_' + studyEventId + ' .crfListTableActions').attr("style", "width: " + (crfActionIconWidth * crfActionsMaxIconsCount) + "px;");
+  jQuery('#crfListWrapper_' + idAttribute + ' .crfListTableActions').attr("style", "width: " + (crfActionIconWidth * crfActionsMaxIconsCount) + "px;");
 
   $(".crfListTable tr").find("td:first").each(function() {
     $(this).attr("style", "border-left : none !important;" + $(this).attr("style"));
   });
 }
 
-function loadCRFList(StatusBoxID,StatusBoxNum) {
-    var href = jQuery("tr[id^='Menu_on_" + StatusBoxID + "_" + StatusBoxNum + "'] a[href^='UpdateStudyEvent']").attr("href");
+function loadCRFList(StatusBoxID, StatusBoxNum) {
+	var idAttribute = StatusBoxID + "_" + StatusBoxNum;
+    var href = jQuery("tr[id^='Menu_on_" + idAttribute + "'] a[href^='UpdateStudyEvent']").attr("href");
     jQuery("a#" + StatusBoxID).attr("href", href);
-    var studyEventId = parseInt(document.getElementById('Event_' + StatusBoxID + '_' + StatusBoxNum).getAttribute("rel"));
+    var studyEventId = parseInt(document.getElementById('Event_' + idAttribute).getAttribute("rel"));
     jQuery('.crfListTable').remove();
-    jQuery('#crfListWrapper_' + studyEventId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
-    jQuery('#crfListWrapper_' + studyEventId).css("height", "18px");
+    jQuery('#crfListWrapper_' + idAttribute).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
+    jQuery('#crfListWrapper_' + idAttribute).css("height", "18px");
     jQuery.ajax({
         url: "CRFListForStudyEvent",
         type: "GET",
-        data: {eventId: studyEventId},
+        data: {studyEventId: studyEventId},
         cache: false,
         success: function (data) {
-            jQuery('#crfListWrapper_' + studyEventId).css("height", "auto");
-            jQuery('#crfListWrapper_' + studyEventId).html(data);
-            adjustCrfListTable2(studyEventId);
+            jQuery('#crfListWrapper_' + idAttribute).css("height", "auto");
+            jQuery('#crfListWrapper_' + idAttribute).html(data);
+            adjustCrfListTable2(studyEventId, StatusBoxID, StatusBoxNum);
         }
     });
 }

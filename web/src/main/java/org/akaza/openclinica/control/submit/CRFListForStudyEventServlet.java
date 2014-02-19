@@ -59,7 +59,7 @@ public class CRFListForStudyEventServlet extends Controller {
 
 	public static final String SES_ICON_URL = "sesIconUrl";
 
-	public static final String INPUT_EVENT_ID = "eventId";
+	public static final String INPUT_EVENT_ID = "studyEventId";
 
 	public static final String BEAN_STUDY_EVENT = "studyEvent";
 
@@ -92,6 +92,9 @@ public class CRFListForStudyEventServlet extends Controller {
 	public static final String SHOW_SUBJECT_SDV_BUTTON = "showSubjectSDVButton";
 	public static final String EVENT_FLAG_COLOR = "eventFlagColor";
 	public static final String STUDY_EVENT_NAME = "studyEventName";
+	public static final String EVENT_CRF_ID_PARAMETER = "eventCRFId";
+	public static final String EVENT_DEFINITION_CRF_ID_PARAMETER = "eventDefintionCRFId";
+	public static final String PAGE_PARAMETER = "page";
 
 	private StudyEventBean getStudyEvent(HttpServletRequest request, int eventId) throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -137,6 +140,7 @@ public class CRFListForStudyEventServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 
 		int eventId = fp.getInt(INPUT_EVENT_ID, true);
+
 		request.setAttribute("eventId", eventId + "");
 
 		// so we can display the event for which we're entering data
@@ -162,6 +166,19 @@ public class CRFListForStudyEventServlet extends Controller {
 		DiscrepancyNoteDAO discrepancyNoteDAO = getDiscrepancyNoteDAO();
 		ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent;
 
+		// determines page name, popup content should be customized for
+		String pageTitle = fp.getString(PAGE_PARAMETER);
+
+		// if SM is displayed by event CRFs for a particular event definition,
+		// we need to know eventCRFId or eventDefintionCRFId (in case if a proper EventCRFBean does not exist in DB)
+		// to display the pop-up for a single CRF
+		int eventCRFId = 0;
+		int eventDefintionCRFId = 0;
+		if (pageTitle.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName())) {
+			eventCRFId = fp.getInt(EVENT_CRF_ID_PARAMETER);
+			eventDefintionCRFId = fp.getInt(EVENT_DEFINITION_CRF_ID_PARAMETER);
+		}
+
 		// These methods return only parent disc notes
 		if (subjectStudyIsCurrentStudy && isParentStudy) {
 			allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudyAndId(currentStudy,
@@ -183,12 +200,36 @@ public class CRFListForStudyEventServlet extends Controller {
 
 		SessionManager sm = getSessionManager(request);
 		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-		ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(seb);
-		SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
-
+		ArrayList<EventCRFBean> eventCRFs = new ArrayList<EventCRFBean>();
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
-		ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
-				seb.getStudyEventDefinitionId());
+		ArrayList eventDefinitionCRFs = new ArrayList();
+
+		if (pageTitle.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName())) {
+
+			// if SM displays subjects list for single selected event definition from study
+			if (eventDefintionCRFId > 0) {
+				// and user wants to see the pop-up for a specific CRF (using event CRF status icon)
+				if (eventCRFId > 0) {
+					eventCRFs.add((EventCRFBean) ecdao.findByPK(eventCRFId));
+				}
+				eventDefinitionCRFs.add(edcdao.findByPK(eventDefintionCRFId));
+			} else {
+				// and user wants to see the pop-up for whole study event (using study event status icon)
+				eventCRFs = ecdao.findAllByStudyEvent(seb);
+				eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
+						seb.getStudyEventDefinitionId());
+			}
+
+		} else {
+
+			// if SM displays subjects list for all of the event definitions in study
+			eventCRFs = ecdao.findAllByStudyEvent(seb);
+			eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study,
+					seb.getStudyEventDefinitionId());
+
+		}
+
+		SubjectEventStatusUtil.fillDoubleDataOwner(eventCRFs, sm);
 
 		ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
 		EnterDataForStudyEventServlet.populateUncompletedCRFsWithCRFAndVersions(sm.getDataSource(), logger,

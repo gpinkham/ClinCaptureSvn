@@ -505,7 +505,7 @@ public class Page {
 	/**
 	 * Page for view all datasets, tbh
 	 */
-    public final static Page VIEW_DATASETS_SERVLET = new Page("/ViewDatasets", "View Datasets Servlet");
+	public final static Page VIEW_DATASETS_SERVLET = new Page("/ViewDatasets", "View Datasets Servlet");
 	public final static Page VIEW_DATASETS = new Page("/WEB-INF/jsp/extract/viewDatasets.jsp", "View Datasets");
 	public final static Page VIEW_EMPTY_DATASETS = new Page("/WEB-INF/jsp/extract/viewEmptyDatasets.jsp",
 			"View Datasets");
@@ -555,9 +555,9 @@ public class Page {
 	public final static Page RESTORE_DATASET = new Page("/WEB-INF/jsp/extract/restoreDataset.jsp", "Restore Dataset");
 
 	public final static Page ITEM_DETAIL = new Page("/WEB-INF/jsp/extract/itemDetail.jsp", "Remove Dataset");
-	
+
 	public final static Page EDIT_DATASET = new Page("/WEB-INF/jsp/extract/editDataset.jsp", "Edit Dataset");
-	
+
 	public final static Page ERROR = new Page("/WEB-INF/jsp/error.jsp", "Error Page of OpenClinica");
 
 	private final static String path = "/WEB-INF/jsp/";
@@ -753,13 +753,14 @@ public class Page {
 			"Add Discrepancy Note");
 	public final static Page ADD_DISCREPANCY_NOTE_DIV = new Page("/WEB-INF/jsp/submit/addDiscrepancyNoteDiv.jsp",
 			"Add Discrepancy Note");
-	public final static Page ADD_ONE_DISCREPANCY_NOTE_DIV = new Page("/WEB-INF/jsp/submit/addOneDiscrepancyNoteDiv.jsp",
-			"Add Discrepancy Note");
+	public final static Page ADD_ONE_DISCREPANCY_NOTE_DIV = new Page(
+			"/WEB-INF/jsp/submit/addOneDiscrepancyNoteDiv.jsp", "Add Discrepancy Note");
 	public final static Page ADD_DISCREPANCY_NOTE_SERVLET = new Page("/CreateDiscrepancyNote", "Add Discrepancy Note");
-	
+
 	public final static Page UPDATE_CRF_HEADER_PAGE = new Page(path + "submit/updateCRFHeader.jsp", "Update CRF Header");
 
-    public final static Page UPDATE_DN_SHORTCUT_ANCHORS_PAGE = new Page(path + "submit/updateDNShortcutAnchors.jsp", "Update DN Shortcut  Anchors");
+	public final static Page UPDATE_DN_SHORTCUT_ANCHORS_PAGE = new Page(path + "submit/updateDNShortcutAnchors.jsp",
+			"Update DN Shortcut  Anchors");
 
 	public final static Page VIEW_DISCREPANCY_NOTE = new Page("/WEB-INF/jsp/submit/viewDiscrepancyNote.jsp",
 			"View Discrepancy Note");
@@ -773,8 +774,10 @@ public class Page {
 
 	public final static Page LIST_EVENTS_FOR_SUBJECT = new Page("/WEB-INF/jsp/submit/listEventsForSubject.jsp",
 			"List Events For Subject");
+	public final static Page LIST_EVENTS_FOR_SUBJECTS_SERVLET = new Page("/ListEventsForSubjects",
+			"List Selected Event For Subjects");
 	public final static Page LIST_EVENTS_FOR_SUBJECTS = new Page("/WEB-INF/jsp/managestudy/listEventsForSubjects.jsp",
-			"List Events For Subject");
+			"List Selected Event For Subjects");
 	public final static Page INITIAL_DATA_ENTRY_NW = new Page("/WEB-INF/jsp/submit/initialDataEntryNw.jsp",
 			"Data Entry");
 	public final static Page VIEW_SECTION_DATA_ENTRY_PRINT_GROUPS = new Page(
@@ -810,17 +813,17 @@ public class Page {
 			"/WEB-INF/jsp/managestudy/defaultCrfVersionPrint.jsp", "View default crf versions print");
 	public final static Page VIEW_ALL_DEFAULT_CRF_VERSIONS_PRINT = new Page(
 			"/WEB-INF/jsp/managestudy/defaultAllCrfVersionPrint.jsp", "View default crf versions print");
-	public final static Page VIEW_SUBJECT_CASE_BOOK_PRINT = new Page("/WEB-INF/jsp/managestudy/printSubjectCaseBook.jsp",
-			"View subject's case book print");
+	public final static Page VIEW_SUBJECT_CASE_BOOK_PRINT = new Page(
+			"/WEB-INF/jsp/managestudy/printSubjectCaseBook.jsp", "View subject's case book print");
 	public final static Page SHOW_CALENDAR_FUNC = new Page("/WEB-INF/jsp/managestudy/showCalendarFunc.jsp",
 			"View caledar events properties");
-	public final static Page SHOW_CALENDAR_FUNC_PER_SUBJ = new Page("/WEB-INF/jsp/managestudy/viewCalendaredEventsForSubject.jsp",
-			"View caledar events properties");
+	public final static Page SHOW_CALENDAR_FUNC_PER_SUBJ = new Page(
+			"/WEB-INF/jsp/managestudy/viewCalendaredEventsForSubject.jsp", "View caledar events properties");
 
 	public final static Page LOCK_SITE = new Page("/WEB-INF/jsp/submit/lockSite.jsp", "Lock / Unlock Site");
 	public final static Page LOCK_STUDY_SUBJECT = new Page("/WEB-INF/jsp/submit/lockStudySubject.jsp",
 			"Lock / Unlock Study Subject");
-	
+
 	/**
 	 * Constructs the JSP Page instance
 	 * 

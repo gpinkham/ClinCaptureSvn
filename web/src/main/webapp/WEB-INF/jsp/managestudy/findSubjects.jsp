@@ -113,10 +113,6 @@
         ${findSubjectsHtml}
     </form>
 </div>
-<div id="addSubjectForm" style="display:none;">
-      <c:import url="../submit/addNewSubjectExpressNew.jsp">
-      </c:import>
-</div>
 <br>
 <br>
 <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');"/> 

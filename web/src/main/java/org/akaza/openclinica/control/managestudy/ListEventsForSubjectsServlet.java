@@ -20,10 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -37,6 +33,11 @@ import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class ListEventsForSubjectsServlet extends RememberLastPage {
@@ -97,6 +98,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 
 		ListEventsForSubjectTableFactory factory = new ListEventsForSubjectTableFactory(showMoreLink);
 		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDAO());
+		factory.setDynamicEventDAO(getDynamicEventDao());
 		factory.setSubjectDAO(getSubjectDAO());
 		factory.setStudySubjectDAO(getStudySubjectDAO());
 		factory.setStudyEventDAO(getStudyEventDAO());
@@ -110,6 +112,7 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		factory.setEventCRFDAO(getEventCRFDAO());
 		factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
 		factory.setCrfDAO(getCRFDAO());
+		factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
 		factory.setSelectedStudyEventDefinition((StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(
 				definitionId));
 		String listEventsForSubjectsHtml = factory.createTable(request, response).render();
@@ -150,35 +153,39 @@ public class ListEventsForSubjectsServlet extends RememberLastPage {
 		savedUrl = savedUrl != null ? savedUrl.replaceAll(".*" + request.getContextPath() + "/ListStudySubjects", "")
 				: null;
 
-		String pageSize = (String) request.getSession().getAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
+		String pageSize = (String) request.getSession().getAttribute(
+				ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
 		if (pageSize == null) {
 			pageSize = "15";
 		}
 
 		return request.getMethod().equalsIgnoreCase("POST") && savedUrl != null ? savedUrl : "?module="
 				+ fp.getString("module") + "&defId=" + fp.getString("defId") + "&maxRows=15&showMoreLink="
-				+ showMoreLink + "&listEventsForSubject_tr_=true&listEventsForSubject_p_=1&listEventsForSubject_mr_="+pageSize;
+				+ showMoreLink + "&listEventsForSubject_tr_=true&listEventsForSubject_p_=1&listEventsForSubject_mr_="
+				+ pageSize;
 	}
 
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&listEventsForSubject_p_=");
 	}
-	
+
 	@Override
 	protected void saveUrl(String key, String value, HttpServletRequest request) {
-		if (value != null){
-			String pageSize = value.contains("listEventsForSubject_mr_")? 
-					value.replaceFirst(".*&listEventsForSubject_mr_=(\\d{2,}).*", "$1") : "15";
-			request.getSession().setAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX, pageSize);			
+		if (value != null) {
+			String pageSize = value.contains("listEventsForSubject_mr_") ? value.replaceFirst(
+					".*&listEventsForSubject_mr_=(\\d{2,}).*", "$1") : "15";
+			request.getSession().setAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX, pageSize);
 			request.getSession().setAttribute(key, value);
 		}
 	}
-	
+
 	@Override
 	protected String getSavedUrl(String key, HttpServletRequest request) {
-		String pageSize = (String) request.getSession().getAttribute(ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
+		String pageSize = (String) request.getSession().getAttribute(
+				ListStudySubjectsServlet.SAVED_PAGE_SIZE_FOR_SUBJECT_MATRIX);
 		String savedUrl = (String) request.getSession().getAttribute(key);
-		return savedUrl == null || pageSize == null? savedUrl : savedUrl.replaceFirst("&listEventsForSubject_mr_=\\d{2,}", "&listEventsForSubject_mr_="+pageSize);
+		return savedUrl == null || pageSize == null ? savedUrl : savedUrl.replaceFirst(
+				"&listEventsForSubject_mr_=\\d{2,}", "&listEventsForSubject_mr_=" + pageSize);
 	}
 }

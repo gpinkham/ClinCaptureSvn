@@ -50,4 +50,12 @@
 		<name>deleteAllFromStudyGroupClass</name>
 		<sql>DELETE FROM DYNAMIC_EVENT WHERE STUDY_GROUP_CLASS_ID=?</sql>
 	</query>
+	<query>
+		<name>findByStudyEventDefinitionId</name>
+		<sql>
+			SELECT * 
+			FROM dynamic_event	
+			WHERE study_event_definition_id = ?
+		</sql>
+	</query>
 </queries>

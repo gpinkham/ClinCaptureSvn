@@ -20,13 +20,9 @@
  */
 package org.akaza.openclinica.bean.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class Status extends Term implements Comparable {
 	// waiting for the db to come in sync with our set of terms...
 	public static final Status INVALID = new Status(0, "invalid");
@@ -39,16 +35,21 @@ public class Status extends Term implements Comparable {
 	public static final Status AUTO_DELETED = new Status(7, "auto-removed");
 	public static final Status SIGNED = new Status(8, "signed");
 	public static final Status FROZEN = new Status(9, "frozen");
-	public static final Status SOURCE_DATA_VERIFICATION = new Status(10, "source_data_verification");
+	public static final Status SOURCE_DATA_VERIFIED = new Status(10, "source_data_verified");
+	public static final Status NOT_STARTED = new Status(11, "not_started");
+	public static final Status DATA_ENTRY_STARTED = new Status(12, "data_entry_started");
+	public static final Status INITIAL_DATA_ENTRY_COMPLETED = new Status(13, "initial_data_entry_completed");
+	public static final Status DOUBLE_DATA_ENTRY = new Status(14, "double_data_entry");
+	public static final Status COMPLETED = new Status(15, "completed");
 
 	private static final Status[] members = { INVALID, AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED,
-			AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFICATION };
+			AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFIED };
 	private static List list = Arrays.asList(members);
 
 	private static final Status[] activeMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
 	private static List activeList = Arrays.asList(activeMembers);
 
-	private static final Status[] studySubjectDropDownMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
+	private static final Status[] studySubjectDropDownMembers = { AVAILABLE, SIGNED, DELETED, LOCKED };
 	private static List studySubjectDropDownList = Arrays.asList(studySubjectDropDownMembers);
 
 	private static final Status[] subjectDropDownMembers = { AVAILABLE, DELETED };
@@ -56,6 +57,9 @@ public class Status extends Term implements Comparable {
 
 	private static final Status[] studyUpdateMembers = { PENDING, AVAILABLE, FROZEN, LOCKED };
 	private static List studyUpdateMembersList = Arrays.asList(studyUpdateMembers);
+
+	private static List crfStatusList = Arrays.asList(NOT_STARTED, DATA_ENTRY_STARTED, INITIAL_DATA_ENTRY_COMPLETED,
+			DOUBLE_DATA_ENTRY, COMPLETED, SOURCE_DATA_VERIFIED, SIGNED, LOCKED, DELETED);
 
 	// Solve the problem with the get() method...
 	private static final Map<Integer, String> membersMap = new HashMap<Integer, String>();
@@ -123,6 +127,10 @@ public class Status extends Term implements Comparable {
 
 	public static ArrayList toSubjectDropDownArrayList() {
 		return new ArrayList(subjectDropDownList);
+	}
+
+	public static ArrayList<Status> toCRFStatusDropDownList() {
+		return new ArrayList<Status>(crfStatusList);
 	}
 
 	public int compareTo(Object o) {

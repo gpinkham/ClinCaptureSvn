@@ -6,6 +6,9 @@ var dnShortcutAnchors = ["firstNewDn", "firstUpdatedDn", "firstResolutionPropose
 var dnShortcutLinks = ["dnShortcutTotalNew", "dnShortcutTotalUpdated", "dnShortcutTotalResolutionProposed", "dnShortcutTotalClosed", "dnShortcutTotalAnnotations"];
 var dnFlagImages = ["icon_Note.gif", "icon_flagYellow.gif", "icon_flagBlack.gif", "icon_flagGreen.gif", "icon_flagWhite.gif"];
 
+var pageTitle_SMForAllOfEvents = "/ListStudySubjects";
+var pageTitle_SMForSelectedEvent = "/ListEventsForSubjects";
+
 function selectAllChecks(formObj,value){
     if(formObj) {
         var allChecks = formObj.getElementsByTagName("input");
@@ -1930,32 +1933,33 @@ var hideCurrentPopup = function(ev) {
     }
 }
 
-function getSchedulePage(statusBoxId) {
-    var element = jQuery('#eventScheduleWrapper_' + statusBoxId);
+function getSchedulePage(params) {
+    var element = jQuery('#eventScheduleWrapper_' + params.statusBoxId);
     if (element.length == 1) {
-        jQuery('#eventScheduleWrapper_' + statusBoxId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
-        jQuery('#eventScheduleWrapper_' + statusBoxId).css("height", "18px");
+        jQuery('#eventScheduleWrapper_' + params.statusBoxId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
+        jQuery('#eventScheduleWrapper_' + params.statusBoxId).css("height", "18px");
+        
         jQuery.ajax({
             url: element.attr("rel"),
             type: "GET",
-            data: {},
+            data: {page: params.page},
             cache: false,
             success: function (data) {
                 jQuery(".calendar").remove();
-                jQuery('#eventScheduleWrapper_' + statusBoxId).css("height", "auto");
-                jQuery('#eventScheduleWrapper_' + statusBoxId).html(data);
+                jQuery('#eventScheduleWrapper_' + params.statusBoxId).css("height", "auto");
+                jQuery('#eventScheduleWrapper_' + params.statusBoxId).html(data);
                 jQuery("img[class='showCalendar']").each(function() {
                     var jsCode = jQuery(this).attr("rel");
                     eval(jsCode);
                 });
-                jQuery("#addSubjectForm").remove();
                 jQuery("*").unbind("mousedown", hideCurrentPopup).bind("mousedown", hideCurrentPopup);
             }
         });
+       
     }
 }
 
-function adjustCrfListTable(studyEventId) {
+function adjustCrfListTable(studyEventId, statusBoxId) {
   var wereRemoved = 0;
   var popupTotalColumns = 8;
 
@@ -1965,40 +1969,41 @@ function adjustCrfListTable(studyEventId) {
     wereRemoved++;
   }
 
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol1").val() == 'true') hideCol(0);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol2").val() == 'true') hideCol(1);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol3").val() == 'true') hideCol(2);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol4").val() == 'true') hideCol(3);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol5").val() == 'true') hideCol(4);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol6").val() == 'true') hideCol(5);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol7").val() == 'true') hideCol(6);
-  if ($("#crfListWrapper_" + studyEventId + " #hideCol8").val() == 'true') hideCol(7);
+  if ($("#crfListWrapper_" + statusBoxId + " #hideCol1").val() == 'true') hideCol(0);
+  if ($("#crfListWrapper_" + statusBoxId + " #hideCol2").val() == 'true') hideCol(1);
+  if ($("#crfListWrapper_" + statusBoxId + " #hideCol3").val() == 'true') hideCol(2);
+  if ($("#crfListWrapper_" + statusBoxId + " #hideCol4").val() == 'true') hideCol(3);
+  if ($("#crfListWrapper_" + statusBoxId + " #hideCol5").val() == 'true') hideCol(4);
+  if ($("#crfListWrapper_" + statusBoxId + " #hideCol6").val() == 'true') hideCol(5);
+  if ($("#crfListWrapper_" + statusBoxId + " #hideCol7").val() == 'true') hideCol(6);
+  if ($("#crfListWrapper_" + statusBoxId + " #hideCol8").val() == 'true') hideCol(7);
 
   $("#popupTotalColumns").val(popupTotalColumns);
 
   var crfActionIconWidth = 33;
   var crfActionsMaxIconsCount = parseInt($("#popupTotalColumns").val());
   crfActionsMaxIconsCount = (crfActionsMaxIconsCount < 2 ? 2 : crfActionsMaxIconsCount);
-  jQuery('#crfListWrapper_' + studyEventId + ' .crfListTableActions').attr("style", "width: " + (crfActionIconWidth * crfActionsMaxIconsCount) + "px;");
+  jQuery('#crfListWrapper_' + statusBoxId + ' .crfListTableActions').attr("style", "width: " + (crfActionIconWidth * crfActionsMaxIconsCount) + "px;");
 
   $(".crfListTable tr").find("td:first").each(function() {
     $(this).attr("style", "border-left : none !important;" + $(this).attr("style"));
   });
 }
 
-function getCRFList(studyEventId) {
-    jQuery('#crfListWrapper_' + studyEventId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
-    jQuery('#crfListWrapper_' + studyEventId).css("height", "18px");
+function getCRFList(params) {
+    jQuery('#crfListWrapper_' + params.statusBoxId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
+    jQuery('#crfListWrapper_' + params.statusBoxId).css("height", "18px");
     jQuery.ajax({
         url: "CRFListForStudyEvent",
         type: "GET",
-        data: {eventId: studyEventId},
+        data: {studyEventId: params.studyEventId, eventCRFId: params.eventCRFId,
+        	eventDefintionCRFId: params.eventDefintionCRFId, page: params.page},
         cache: false,
         success: function (data) {
-            jQuery('#crfListWrapper_' + studyEventId).css("height", "auto");
-            jQuery('#crfListWrapper_' + studyEventId).html(data);
+            jQuery('#crfListWrapper_' + params.statusBoxId).css("height", "auto");
+            jQuery('#crfListWrapper_' + params.statusBoxId).html(data);
             jQuery("*").unbind("mousedown", hideCurrentPopup).bind("mousedown", hideCurrentPopup);
-            adjustCrfListTable(studyEventId);
+            adjustCrfListTable(params.studyEventId, params.statusBoxId);
         }
     });
 }
@@ -2008,92 +2013,104 @@ function closePopup() {
     subjectMatrixPopupStick = undefined;
 }
 
-function canShowPopup(studyEventId) {
+function canShowPopup() {
     return !subjectMatrixPopupStick;
 }
 
-function showPopup(studyEventId, statusBoxId, statusBoxNum, event) {
+function showPopup(params, event) {
     clearInterval(popupInterval);
     var coords = analyzeEvent(event);
     popupInterval = setInterval(function() {
         clearInterval(popupInterval);
-        hideAllTooltips(studyEventId, statusBoxId, statusBoxNum, coords.top, coords.left);
+        hideAllTooltips(params, coords.top, coords.left);
     }, 1000);
 }
 
-function justShowPopup(studyEventId, statusBoxId, statusBoxNum, event) {
+function justShowPopup(params, event) {
     clearInterval(popupInterval);
     var coords = analyzeEvent(event);
     setTimeout(function() {
-        hideAllTooltips(studyEventId, statusBoxId, statusBoxNum, coords.top, coords.left);
+        hideAllTooltips(params, coords.top, coords.left);
     }, 200);
 }
 
-function getScheduledEventContent(studyEventId, statusBoxId, statusBoxNum, top, left, localDivId, localDivRel) {
-    jQuery('#eventScheduleWrapper_' + statusBoxId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
-    jQuery('#eventScheduleWrapper_' + statusBoxId).css("height", "18px");
+function getScheduledEventContent(params, top, left, localDivId, localDivRel) {
+    jQuery('#eventScheduleWrapper_' + params.statusBoxId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
+    jQuery('#eventScheduleWrapper_' + params.statusBoxId).css("height", "18px");
+    
+    var paramsForReqest = {};
+    paramsForReqest["returnScheduledEvenContent"] = localDivId;
+    paramsForReqest["popupQueryStudySubjectId"] = localDivRel;
+    paramsForReqest["page"] = params.page;
+    paramsForReqest["eventCRFId"] = params.eventCRFId;
+    paramsForReqest["eventDefintionCRFId"] = params.eventDefintionCRFId;
+    if (params.page == pageTitle_SMForSelectedEvent) {
+    	params['selectedEventDefId'] = jQuery("#sedDropDown").val();    //determines event definition name, SM filtered for
+    }
+    
     jQuery.ajax({
         url: "CreateNewStudyEvent",
         type: "GET",
-        data: {returnScheduledEvenContent: localDivId, popupQueryStudySubjectId: localDivRel},
+        data: paramsForReqest,
         cache: false,
         success: function (data) {
+   
             var localDiv = jQuery("#" + localDivId);
-            localDiv.html(data);
-            //IE8 bug
-            if (localDiv.html() == "") {
-                localDiv.get(0).innerHTML = data;
-            }
+  
+            localDiv.get(0).innerHTML = data;
+         
             if (localDiv[0].repeatingEvent && parseInt(localDiv[0].totalEvents) > 1) {
                 localDiv.attr("style", localDiv.attr("style").replace("width: 608px;", "width: 658px;"));
             }
-            hideAllTooltips(studyEventId, statusBoxId, statusBoxNum, top, left);
+            
+            hideAllTooltips(params, top, left);
         }
     });
 }
 
-function hideAllTooltips(studyEventId, statusBoxId, statusBoxNum, top, left) {
+function hideAllTooltips(params, top, left) {
     try {
         jQuery(".calendar").remove();
-        jQuery("table#findSubjects div[id^='Event_']").css("visibility", "hidden");
-        jQuery("table#findSubjects div[id^='crfListWrapper_']").html("");
-        jQuery("table#findSubjects div[id^='eventScheduleWrapper_']").html("");
+        jQuery("div[id^='Event_']").css("visibility", "hidden");
+        jQuery("div[id^='crfListWrapper_']").html("");
+        jQuery("div[id^='eventScheduleWrapper_']").html("");
 
-        var objHolder = document.getElementById("Event_" + statusBoxId);
+        var objHolder = document.getElementById("Event_" + params.statusBoxId);
         if (objHolder == undefined || top == undefined || left == undefined) return;
         objHolder.style.top  = top;
         objHolder.style.left = left;
         objHolder.style.display = 'block';
         objHolder.style.visibility = 'visible';
 
-        jQuery('#crfListWrapper_' + studyEventId).html("<div align=\"center\"><img src=\"images/ajax-loader-blue.gif\"/></div>");
-        jQuery('#crfListWrapper_' + studyEventId).css("height", "18px");
+        if (params.statusBoxId != undefined) {
+            currentPopupUid = params.statusBoxId;
 
-        if (statusBoxId != undefined) {
-            currentPopupUid = statusBoxId;
-
-            var eventDiv = jQuery("#Event_" + statusBoxId);
+            var eventDiv = jQuery("#Event_" + params.statusBoxId);
             if (eventDiv.length > 0) {
                 if (eventDiv[0].repeatingEvent && parseInt(eventDiv[0].totalEvents) > 1) {
-                    statusBoxNum = eventDiv[0].totalEvents;
+                	params.statusBoxNum = eventDiv[0].totalEvents;
                 }
                 if (eventDiv[0].getScheduledContent) {
                     eventDiv[0].getScheduledContent = undefined;
-                    getScheduledEventContent(studyEventId, statusBoxId, statusBoxNum, top, left, eventDiv.attr("id"), eventDiv.attr("rel"));
+                    getScheduledEventContent(params, top, left, eventDiv.attr("id"), eventDiv.attr("rel"));
                     return;
                 }
             }
 
-            if (statusBoxNum != undefined) {
-                EnableScrollArrows2(statusBoxId, statusBoxNum);
+            if (params.statusBoxNum != undefined) {
+                EnableScrollArrows2(params.statusBoxId, params.statusBoxNum);
                 jQuery("*").unbind("mousedown", hideCurrentPopup).bind("mousedown", hideCurrentPopup);
             } else {
-                if (document.getElementById('Menu_on_' + statusBoxId) != undefined) document.getElementById('Menu_on_' + statusBoxId).style.display = "";
-                if (document.getElementById('Menu_off_' + statusBoxId) != undefined) document.getElementById('Menu_off_' + statusBoxId).style.display = "none";
-                if (studyEventId != '') {
-                    getCRFList(studyEventId);
+                if (document.getElementById('Menu_on_' + params.statusBoxId) != undefined) {
+                	document.getElementById('Menu_on_' + params.statusBoxId).style.display = "";
+                }	
+                if (document.getElementById('Menu_off_' + params.statusBoxId) != undefined) {
+                	document.getElementById('Menu_off_' + params.statusBoxId).style.display = "none";
+                }	
+                if (params.studyEventId != '') {
+                    getCRFList(params);
                 } else {
-                    getSchedulePage(statusBoxId);
+                    getSchedulePage(params);
                 }
             }
         }
@@ -2131,7 +2148,7 @@ function createNewEvent_ClosePopup(event) {
     }
 }
 
-function createNewEvent(event) {
+function createNewEvent(page, event) {
     closePopup();
     var ev = event || window.event;
     var element =  ev.target || ev.srcElement;
@@ -2151,6 +2168,11 @@ function createNewEvent(event) {
         try {
             params['popupQuery'] = jQuery(element).closest("div[id^='Event_']").attr("id");
             params['popupQueryStudySubjectId'] = jQuery(element).closest("div[id^='Event_']").attr("rel");
+            params['page'] = page;    //determines page name, on which user perfoms scheduling
+            if (page == pageTitle_SMForSelectedEvent) {
+            	params['selectedEventDefId'] = jQuery("#sedDropDown").val();    //determines event definition name, SM filtered for
+            }
+
             jQuery.post(
                 "CreateNewStudyEvent",
                 params,
@@ -2167,17 +2189,19 @@ function createNewEvent(event) {
                             var eventDef = result.eventDefs[h];
                             if (eventDef != undefined && eventDef.eventDivId != undefined) {
                                 var eventDiv = jQuery("div[id^='" + eventDef.eventDivId + "']");
+              
                                 if (eventDiv.length > 0 && eventDef.eventIds.length > 0) {
                                     var aElement = eventDiv.next();
                                     var eventId = eventDef.eventIds[0];
-
+                     
                                     eventDiv[0].totalEvents = eventDef.totalEvents;
                                     eventDiv[0].repeatingEvent = eventDef.repeatingEvent;
                                     eventDiv[0].getScheduledContent = true;
-
+                                    
                                     var newMOFuncBody = jQuery.trim(aElement.attr("onmouseover").toString().match(/{((?:.|\n)+)}/)[1]).toString();
-                                    newMOFuncBody = newMOFuncBody.replace(/canShowPopup\(''\)/g, "canShowPopup('" + eventId + "')").replace(/canShowPopup\(\"\"\)/g, "canShowPopup(\"" + eventId + "\")");
-                                    newMOFuncBody = newMOFuncBody.replace(/showPopup\('',/g, "showPopup('" + eventId + "',").replace(/showPopup\(\"\",/g, "showPopup(\"" + eventId + "\",");
+                                    newMOFuncBody = newMOFuncBody.replace(/'studyEventId':''/g, "'studyEventId':'" + eventId + "'")
+                                    		.replace(/\"studyEventId\":\"\"/g, "\"studyEventId\":\"" + eventId + "\"");
+                                    
                                     aElement.attr("onmouseover", "");
                                     var confEvent = function(element, funcBody) {
                                         element.unbind("mouseover").bind("mouseover", function(event){
@@ -2185,9 +2209,11 @@ function createNewEvent(event) {
                                         });
                                     }
                                     confEvent(aElement, newMOFuncBody);
-
+                    
                                     var newCLFuncBody = jQuery.trim(aElement.attr("onclick").toString().match(/{((?:.|\n)+)}/)[1]).toString();
-                                    newCLFuncBody = newCLFuncBody.replace(/justShowPopup\('',/g, "justShowPopup('" + eventId + "',").replace(/justShowPopup\(\"\",/g, "justShowPopup(\"" + eventId + "\",");
+                                    newCLFuncBody = newCLFuncBody.replace(/'studyEventId':''/g, "'studyEventId':'" + eventId + "'")
+                                    		.replace(/\"studyEventId\":\"\"/g, "\"studyEventId\":\"" + eventId + "\"");
+                                    
                                     aElement.attr("onclick", "");
                                     var confEvent = function(element, funcBody) {
                                         element.unbind("click").bind("click", function(event){
@@ -2195,8 +2221,8 @@ function createNewEvent(event) {
                                         });
                                     }
                                     confEvent(aElement, newCLFuncBody);
-
-                                    if (aElement.find("img").attr("src").indexOf("icon_NotStarted.gif") > 0) {
+                                    
+                                    if (eventDef.popupToDisplayEntireEvent && aElement.find("img").attr("src").indexOf("icon_NotStarted.gif") > 0) {
                                         aElement.find("img").attr("src", "images/icon_Scheduled.gif");
                                         aElement.find("img").attr("style", "position: relative;");
                                     }

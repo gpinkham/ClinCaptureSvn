@@ -124,4 +124,16 @@ public class DynamicEventDaoTest extends DefaultAppContextTest {
 		dynamicEventDao.deleteAllFromStudyGroupClass(1);
 		assertEquals(2, ((DynamicEventBean) dynamicEventDao.findByPK(2)).getStudyEventDefinitionId());
 	}
+
+	@Test
+	public void testThatFindByStudyEventDefinitionIdReturnsNull() throws OpenClinicaException {
+		final int studyEventDefinitionId = 9;
+		assertNull(dynamicEventDao.findByStudyEventDefinitionId(studyEventDefinitionId));
+	}
+
+	@Test
+	public void testThatFindByStudyEventDefinitionIdReturnsNotNull() throws OpenClinicaException {
+		final int studyEventDefinitionId = 5;
+		assertNotNull(dynamicEventDao.findByStudyEventDefinitionId(studyEventDefinitionId));
+	}
 }
