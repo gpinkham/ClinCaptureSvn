@@ -79,9 +79,8 @@ public class WidgetsLayoutController {
 		List<WidgetsLayout> widgetsLayout = widgetLayoutService.findAllByStudyIdAndUserId(studyId, userId);
 		List<DisplayWidgetsLayoutBean> dispayWidgetsLayout = new ArrayList<DisplayWidgetsLayoutBean>();
 
-		for (int z = 0; z < widgetsLayout.size(); z++) {
+		for (WidgetsLayout currentLayout : widgetsLayout) {
 			
-			WidgetsLayout currentLayout = widgetsLayout.get(z);
 			Widget currentWidget = widgetService.findByChildsId(currentLayout.getId());
 
 			String widgetName = currentWidget.getWidgetName().toLowerCase().replaceAll(" ", "_");
@@ -163,9 +162,9 @@ public class WidgetsLayoutController {
 	@RequestMapping("/initNdsAssignedToMeWidget")
 	public void initNdsAssignedToMeWidget(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Pragma", "no-cache");
 		response.setDateHeader("Expires", -1);
+		response.setHeader("Pragma", "no-cache");
+		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Cache-Control", "no-store");
 
 		int currentUser = Integer.parseInt(request.getParameter("userId"));
