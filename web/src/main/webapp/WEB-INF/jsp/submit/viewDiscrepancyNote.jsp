@@ -84,6 +84,10 @@
 					sendFormDataViaAjax();
 				});
 			});
+			var beginNewThreadLink = $("a[id=a0]");
+			if (beginNewThreadLink && ${isRFC}) {
+				eval(beginNewThreadLink.attr('href'));
+			}
 		})
     </script>
 
@@ -387,7 +391,7 @@
     </c:when>
     <c:otherwise>
 		<p id="p">
-			<a href="javascript:showOnly('box<c:out value="${0}"/>New');javascript:removeText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');" id="a0"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a>
+			<a href="javascript:showOnly('box<c:out value="${0}"/>New');removeText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');" id="a0"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a>
 		</p>
 	</c:otherwise>
 	</c:choose>
@@ -418,6 +422,5 @@
 </body>
 
 <input type="button" name="BTN_Close" id="CloseWindow" value="<fmt:message key="close_window" bundle="${resword}"/>" class="button_medium" onClick="javascript:window.close();"/>
-
 <jsp:include page="../include/changeTheme.jsp"/>
 </html>
