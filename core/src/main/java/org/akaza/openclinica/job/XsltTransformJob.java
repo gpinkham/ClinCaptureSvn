@@ -147,7 +147,7 @@ public class XsltTransformJob extends QuartzJobBean {
 			RuleSetRuleDao ruleSetRuleDao = (RuleSetRuleDao) appContext.getBean("ruleSetRuleDao");
 			CoreResources coreResources = (CoreResources) appContext.getBean("coreResources");
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle()
-					.getString("date_time_format"));
+					.getString("date_time_format_string"));
 
 			// init all fields from the data map
 			int userAccountId = dataMap.getInt(USER_ID);
