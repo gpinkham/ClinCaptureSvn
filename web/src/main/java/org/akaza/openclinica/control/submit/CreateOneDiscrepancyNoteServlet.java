@@ -20,16 +20,6 @@
 package org.akaza.openclinica.control.submit;
 
 import com.clinovo.util.ValidatorHelper;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -55,6 +45,14 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Create a discrepancy note
  * 
@@ -66,7 +64,6 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 	public static final String UPDATED_DISCREPANCY_NOTE = "updatedDiscrepancyNote";
 	public static final String REFRESH_PARENT_WINDOW = "refreshParentWindow";
 	public static final String ENTITY_ID = "id";
-	public static final String SUBJECT_ID = "subjectId";
 	public static final String ITEM_ID = "itemId";
 	public static final String PARENT_ID = "parentId";// parent note id
 	public static final String ENTITY_TYPE = "name";
@@ -103,7 +100,6 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
-		boolean shouldBeForwardTo = true;
 		FormProcessor fp = new FormProcessor(request);
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 
@@ -362,12 +358,11 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 				String close = fp.getString("close" + parentId);
 				// session.setAttribute(CLOSE_WINDOW, "true".equals(close)?"true":"");
 				if ("true".equals(close)) {
-					shouldBeForwardTo = false;
 					ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(dn.getEntityType(), dn.getEntityId(),
 							dn.getColumn());
 					dn.setResolutionStatusId(DataEntryServlet
 							.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));
-					request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn.clone());
+					request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn);
 					request.setAttribute("responseMessage", "Save Done");
 					forwardPage(Page.ADD_ONE_DISCREPANCY_NOTE_DIV, request, response);
 					return;
@@ -399,10 +394,8 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(dn.getEntityType(), dn.getEntityId(),
 				dn.getColumn());
 		dn.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));
-		request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn.clone());
-		if (shouldBeForwardTo) {
-			forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()), request, response);
-		}
+		request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn);
+    	forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()), request, response);
 	}
 
 	private void manageReasonForChangeState(HttpSession session, Integer itemDataBeanId) {
