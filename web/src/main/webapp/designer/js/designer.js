@@ -509,21 +509,17 @@ function addDroppable(popov) {
 
 		var d = createStartExpressionDroppable();
 		
-		if ($(drop.previousSibling).is(".dotted-border")) {
-
-			$(drop).after(d);
-			createPopover(d);
-
-		} else if (!$(drop.previousSibling).is(".dotted-border")) {
+		if ($(drop.previousSibling).is(".eval") || !$(drop.previousSibling).is(".dotted-border")) {
 
 			$(drop).before(d);
 			createPopover(d);
 
-		} else  {
+		} else {
 
 			$(drop).after(d);
 			createPopover(d);
-		}
+
+		} 
 	})
 
 	var compBtn = createButton({
