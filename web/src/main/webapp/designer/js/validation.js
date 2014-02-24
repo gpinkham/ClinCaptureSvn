@@ -150,7 +150,7 @@ function saveRule(rule) {
 			sessionStorage.removeItem("edit");
 			sessionStorage.setItem("status", "remove");
 			
-			bootbox.confirm(obj.message, function(result) {
+			bootbox.confirm("Rule(s) successfully saved", function(result) {
 
 				if (result) {
 

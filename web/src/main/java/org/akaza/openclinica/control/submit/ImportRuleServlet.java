@@ -161,8 +161,7 @@ public class ImportRuleServlet extends Controller {
 
 						Object[] arguments = {
 								importedRules.getValidRuleDefs().size() + importedRules.getDuplicateRuleDefs().size(),
-								importedRules.getValidRuleSetDefs().size()
-										+ importedRules.getDuplicateRuleSetDefs().size() };
+								importedRules.getValidRuleSetDefs().size() + importedRules.getDuplicateRuleSetDefs().size() };
 
 						JsonObject obj = new JsonObject();
 
@@ -232,7 +231,6 @@ public class ImportRuleServlet extends Controller {
 			XMLContext xmlContext = new XMLContext();
 			// create and set a Mapping instance
 			Mapping mapping = xmlContext.createMapping();
-			// mapping.loadMapping(SpringServletAccess.getPropertiesDir(context) + "mapping.xml");
 			mapping.loadMapping(getCoreResources().getURL("mapping.xml"));
 
 			xmlContext.addMapping(mapping);
