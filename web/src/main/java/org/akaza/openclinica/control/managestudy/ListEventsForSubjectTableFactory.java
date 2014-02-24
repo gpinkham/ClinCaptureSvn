@@ -83,7 +83,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 	private UserAccountBean currentUser;
 	private boolean showMoreLink;
 	private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
-	private ResourceBundle resformat = ResourceBundleProvider.getWordsBundle();
+	private ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
 	private StudyEventDefinitionBean selectedStudyEventDefinition;
 
 	private final int POPUP_BASE_WIDTH = 600;
@@ -893,6 +893,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		HtmlBuilder eventDiv = new HtmlBuilder();
 
 		if (goingToReplaceHtmlContent) {
+			
+			resword = ResourceBundleProvider.getWordsBundle();
+			resformat = ResourceBundleProvider.getFormatBundle();
 
 			// Event Div
 			eventDiv.div().close();

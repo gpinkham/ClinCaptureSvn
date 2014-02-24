@@ -179,6 +179,10 @@ public abstract class AbstractTableFactory {
 	public Locale getLocale() {
 		return locale;
 	}
+	
+	public void setLocale(Locale locale) {
+		this.locale = locale;
+	}
 
 	protected void configureColumn(Column column, String title, CellEditor editor, FilterEditor filterEditor) {
 		configureColumn(column, title, editor, filterEditor, true, true);

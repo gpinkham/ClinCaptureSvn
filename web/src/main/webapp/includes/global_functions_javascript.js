@@ -2045,7 +2045,7 @@ function getScheduledEventContent(params, top, left, localDivId, localDivRel) {
     paramsForReqest["eventCRFId"] = params.eventCRFId;
     paramsForReqest["eventDefintionCRFId"] = params.eventDefintionCRFId;
     if (params.page == pageTitle_SMForSelectedEvent) {
-    	params['selectedEventDefId'] = jQuery("#sedDropDown").val();    //determines event definition name, SM filtered for
+    	paramsForReqest['selectedEventDefId'] = jQuery("#sedDropDown").val();    //determines event definition name, SM filtered for
     }
     
     jQuery.ajax({

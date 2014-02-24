@@ -740,14 +740,15 @@ public class CreateNewStudyEventServlet extends Controller {
 			factory.setStudyBean(currentStudy);
 			factory.setCurrentRole(currentRole);
 			factory.setCurrentUser(ub);
+			factory.setLocale(request.getLocale());
 
 			sed = (StudyEventDefinitionBean) getStudyEventDefinitionDAO().findByPK(selectedEventDefId);
 			studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubject, sed);
 			Collections.reverse(studyEvents);
 
 			return factory.eventDivBuilder(subject, rowCount, studyEvents, studyEvents.size(), sed, studySubject,
-					(StringUtil.isBlank(eventCRFId) ? null : eventCRFId),
-					(StringUtil.isBlank(eventDefintionCRFId) ? null : eventDefintionCRFId), true);
+					((StringUtil.isBlank(eventCRFId) || eventCRFId.equalsIgnoreCase("undefined")) ? null : eventCRFId),
+					((StringUtil.isBlank(eventDefintionCRFId) || eventDefintionCRFId.equalsIgnoreCase("undefined")) ? null : eventDefintionCRFId), true);
 
 		} else {
 
