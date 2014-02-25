@@ -139,7 +139,7 @@ function setElements(typeId,user1,user2,filter1,nw,ud,rs,cl,na,isRFC) {
 }
 
 function sendFormDataViaAjax() {
-	var aForm = $('[name=noteForm]');
+	var aForm = $('form#noteForm');
 	$( "div#divWithData").hide();
     $( "div#ajax-loader").show();
 	$.ajax({
@@ -175,7 +175,7 @@ function sendFormDataViaAjax() {
 function displayMessageInBox(showOkButton, showCancelButton, headerOfMessageBox, message, notShowAgainMessage, themeColor){
     if ($("#confirmation").length == 0) {
 		$("body").append(
-            "<div id=\"confirmation\" style=\"display: none;\" title=\"" + headerOfMessageBox + "\">" +
+            "<div id=\"confirmation\" class=\"message_box_confirmation\" style=\"display: none;\" title=\"" + headerOfMessageBox + "\">" +
                 "<div style=\"clear: both; text-align: justify;\">"+ message +"</div>"+
                 "<div style=\"clear: both; padding: 6px;\"><input type=\"checkbox\" id=\"ignoreBoxMSG\"/>" + notShowAgainMessage + "</div>" +
                 "<div style=\"clear: both;\">" +
@@ -228,7 +228,7 @@ function showMessageForDN(){
 
 $(document).ready(function() {
 	$("select[id*=typeId]").change();
-	var aForm = $('[name=noteForm]');
+	var aForm = $('form#noteForm');
 	aForm.submit(function (e) {
 		e.preventDefault();
 		sendFormDataViaAjax();
@@ -258,7 +258,7 @@ $(document).ready(function() {
  <c:out value="${message}" escapeXml="false"/>
 </c:forEach>
 </div>         
-<form name="noteForm" method="POST" action="CreateDiscrepancyNote">
+<form id="noteForm" method="POST" action="CreateDiscrepancyNote">
 <jsp:include page="../include/showSubmitted.jsp" />
 <input type="hidden" name="name" value="<c:out value="${discrepancyNote.entityType}"/>">
 <input type="hidden" name="column" value="<c:out value="${discrepancyNote.column}"/>">

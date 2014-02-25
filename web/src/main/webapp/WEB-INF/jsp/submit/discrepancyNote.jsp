@@ -70,11 +70,26 @@ function addText(id,text) {
 	if(p!=null) {
 		p.innerHTML = "<a id='a0'></a>";
 		var a = document.getElementById(id);
-		if(a!=null) {	
+		if(a!=null) {
+			var linkColor = '';
+			switch (getThemeColor()) {
+				case 'violet':
+					linkColor = '#AA62C6';
+					break
+				case 'green':
+					break
+					linkColor = '#75b894';
+				default:
+			}
 			a.innerHTML = text;
-			a.href = "javascript:showOnly('box0New');javascript:removeText('a0','"+ text + "');";
+			a.href = "javascript:showOnly('box0');javascript:removeText('a0','"+ text + "');";
+			a.style.color = linkColor;
 		}
 	}
+}
+
+function getThemeColor() {
+	return '${newThemeColor}';
 }
 
 function setElements(typeId,user1,user2,id,filter1,nw,ud,rs,cl,na,isRFC,parentId) {
@@ -150,7 +165,6 @@ function setStatusWithId(typeId, id, filter1, nw, ud, rs, cl, na) {
         resStatusSelect.options[2]=new Option(cl, '4');
     }
 }
-// ClinCapture #42 end
   
 function scrollToY(id) {
 	var element = MM_findObj(id);
@@ -169,9 +183,14 @@ function setYPos(id) {
 	setValue("ypos"+id,y);
 }
 	
-	$(document).ready(function() {
-		$( "select[id*=typeId]" ).change();
-	})
+$(document).ready(function() {
+	$('select[id*=typeId]').change();
+	var formId = '${param.parentId}';
+	$("form#oneDNForm_"+formId).submit(function (e) {
+		e.preventDefault();
+		sendFormDataViaAjax(formId);
+	});
+})
 
 </script>
 
@@ -194,7 +213,7 @@ function setYPos(id) {
 	<c:set var="displayAll" value="block"/>
 </c:if>
 
-<form name="oneDNForm_${parentId}" method="POST" action="CreateOneDiscrepancyNote"> 	
+<form id="oneDNForm_${parentId}" method="POST" action="CreateOneDiscrepancyNote"> 	
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;display:<c:out value="${displayAll}"/>" id="${boxId}">
 	<input type="hidden" name="parentId" value="${parentId}"/>
 	<input type="hidden" name="viewDNLink${parentId}" value="${viewDNLink}"/>
@@ -217,7 +236,7 @@ function setYPos(id) {
 		<div style="float:right">
 			<c:choose>
 			<c:when test="${parentId==0}">
-				<a href="javascript:scrollToY('p');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');javascript:addText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a>
+				<a href="javascript:scrollToY('p');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');addText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a>
 			</c:when>
 			<c:otherwise>
 				<a href="javascript:scrollToY('msg<c:out value="${parentId}"/>');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a>
@@ -409,10 +428,12 @@ function setYPos(id) {
 	<c:if test="${not showStatus}"> </div> </c:if>
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 		<c:if test="${(enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData')}">
+		<span id="user3${parentId}" style="display:block">
 			<div class="dnBoxCol3" style="margin-right: -10px; margin-top: -25px;">
 				<input type="button" id="submitBtn${parentId}" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled');this.form.submit();">
 				<input type="button" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled'); sendFormDataViaAjax(${parentId});">
 			</div>
+		</span>	
 		</c:if>
 		<c:if test="${parentId==0}">
 				<div style="float:left">

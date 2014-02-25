@@ -2201,6 +2201,11 @@ a.dnShortcut:hover {
     cursor: pointer;
 }
 
+.message_box_confirmation {
+    display: block;
+	height:120px!important;
+}
+
 .rule-table-expression-td {
     width: 450px;
 }

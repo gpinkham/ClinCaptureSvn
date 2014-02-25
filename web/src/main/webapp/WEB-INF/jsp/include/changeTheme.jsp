@@ -40,8 +40,10 @@
 		$('H1').css('color', '#AA62C6');
 
 		$(".nav_bt").find('a:link').css('color', '#FFFFFF');
-		$('.oc_nav').find('.nav_bt').css("background-color", "#AA62C6");
-		$('#bt_Home td, #bt_Home li').css("background-color", "#AA62C6");
+		$('.oc_nav').find('.nav_bt').css('background-color', "#AA62C6");
+		if ($('#bt_Home td, #bt_Home li').css('background-color') != 'transparent'){
+			$('#bt_Home td, #bt_Home li').css('background-color', "#AA62C6");
+		}
 		$('input.navSearch:text').css('background-color', "#dbc4e4");
 		$('.table_cell_noborder').css('color', "#AA62C6");
 		$('.table_cell_top').css('color', "#AA62C6");

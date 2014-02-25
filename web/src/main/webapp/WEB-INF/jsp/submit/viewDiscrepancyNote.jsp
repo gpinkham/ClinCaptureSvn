@@ -50,7 +50,7 @@
         }
 		
 		function sendFormDataViaAjax(formId) {
-			var aForm = $('[name=oneDNForm_'+formId+']');
+			var aForm = $('form#oneDNForm_'+formId);
 			$( "div#divWithData_"+formId).hide();
 			$( "div#ajax-loader_"+formId).show();
 			$.ajax({
@@ -59,10 +59,11 @@
 				data: aForm.serialize(),
 				success: function (data) {
 					function showDiv() {
-						$("div#divWithData_"+formId).html('');
-						$("div#divWithData_"+formId).append(data);
+						var divWithData = $("div#divWithData_"+formId);
+						divWithData.html('');
+						divWithData.append(data);
 						$("div#ajax-loader_"+formId).hide();
-						$("div#divWithData_"+formId).show();
+						divWithData.show();
 					};
 					if (data.indexOf('Save Done') > -1) {
 						showDiv();
@@ -78,13 +79,7 @@
 		}
 		
 		$(document).ready(function() {
-			$("form[name*=oneDNForm_]").each(function() {
-				$(this).submit(function (e) {
-					e.preventDefault();
-					sendFormDataViaAjax();
-				});
-			});
-			var beginNewThreadLink = $("a[id=a0]");
+			var beginNewThreadLink = $("a#a0");0
 			if (beginNewThreadLink && ${isRFC}) {
 				eval(beginNewThreadLink.attr('href'));
 			}
@@ -104,7 +99,8 @@
 
 </head>
 
-<body class="popup_BG" style="margin: 0px 12px 0px 12px;" onload="window.scrollTo(0,'<c:out value="${y}"/>');javascript:setStatusWithId('<c:out value="${typeID0}"/>','0','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');javascript:refreshSource('<c:out value="${refresh}"/>', '/ViewNotes?');">
+<body class="popup_BG" style="margin: 0px 12px 0px 12px;" 
+	onload="window.scrollTo(0,'<c:out value="${y}"/>');javascript:setStatusWithId('<c:out value="${typeID0}"/>','0','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');refreshSource('<c:out value="${refresh}"/>', '/ViewNotes?');">
 
 <c:if test="${updatedDiscrepancyNote ne null}">
   <script type="text/javascript" language="javascript">
@@ -331,7 +327,7 @@
                                                     <c:choose>
                                                     <c:when test="${status.id == 2}">
                                                         <c:if test="${addNote == true}">
-                                                            <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>'); showAnotherDescriptions(2, ${note.value.id});/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
+                                                            <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="update_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>'); showAnotherDescriptions(2, ${note.value.id});/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
                                                         </c:if>
                                                     </c:when>
                                                     <c:when test="${status.id == 4}">
@@ -353,32 +349,34 @@
                                         </td>
                                     </tr>
                                 </c:if>
-                            </table>
-                        </div>
-                    </div></div></div></div></div></div></div></div>
-                    
-                </td>
-            </tr>
-                 
-            <c:if test="${showDNBox eq 'y'}">
-				<div id="ajax-loader_${note.value.id}" style="width: 418; height: 200; display: none;" align="center"><img src="images/ajax-loader-blue.gif"/></div>
-				<div id="divWithData_${note.value.id}">
-					<c:import url="./discrepancyNote.jsp">
-						<c:param name="formCounter" value="${count}"/>
-						<c:param name="parentId" value="${note.value.id}"/>
-						<c:param name="entityId" value="${id}"/>                
-						<c:param name="entityType" value="${name}"/>                
-						<c:param name="field" value="${field}"/>                
-						<c:param name="column" value="${column}"/>
-						<c:param name="boxId" value="box${note.value.id}"/>
-						<c:param name="typeId" value="${note.value.discrepancyNoteTypeId}"/>
-						<c:param name="typeName" value="${note.value.disType.name}"/>
-					</c:import>
-				</div>
-            </c:if>
-        </tbody>
-    </table>
-    <c:set var="count" value="${count+1}"/>
+                        </table>
+                    </div>
+                </div></div></div></div></div></div></div></div>
+            </td>
+        </tr>
+        <tr>
+            <td>        
+        		<c:if test="${showDNBox eq 'y'}">
+					<div id="ajax-loader_${note.value.id}" style="width: 580; height: 270; display: none;" align="center"><img src="images/ajax-loader-blue.gif"/></div>
+					<div id="divWithData_${note.value.id}">
+						<c:import url="./discrepancyNote.jsp">
+							<c:param name="formCounter" value="${count}"/>
+							<c:param name="parentId" value="${note.value.id}"/>
+							<c:param name="entityId" value="${id}"/>                
+							<c:param name="entityType" value="${name}"/>                
+							<c:param name="field" value="${field}"/>                
+							<c:param name="column" value="${column}"/>
+							<c:param name="boxId" value="box${note.value.id}"/>
+							<c:param name="typeId" value="${note.value.discrepancyNoteTypeId}"/>
+							<c:param name="typeName" value="${note.value.disType.name}"/>
+						</c:import>
+					</div>
+        		</c:if>
+			</td>
+        </tr>
+    </tbody>
+</table>
+<c:set var="count" value="${count+1}"/>
 </c:forEach>
 
 <c:if test="${!study.status.locked}">
@@ -391,24 +389,24 @@
     </c:when>
     <c:otherwise>
 		<p id="p">
-			<a href="javascript:showOnly('box<c:out value="${0}"/>New');removeText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');" id="a0"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a>
+			<a href="javascript:showOnly('box<c:out value="${0}"/>');removeText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');" id="a0"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a>
 		</p>
 	</c:otherwise>
 	</c:choose>
-	<div id="ajax-loader_0" style="width: 418; height: 200; display: none;" align="center"><img src="images/ajax-loader-blue.gif"/></div>
-		<div id="divWithData_0">
+	<div id="ajax-loader_0" style="width: 580; height: 270; display: none;" align="center"><img src="images/ajax-loader-blue.gif"/></div>
+	<div id="divWithData_0">
 		<c:import url="./discrepancyNote.jsp">
 			<c:param name="parentId" value="0"/>
 			<c:param name="entityId" value="${id}"/>				
 			<c:param name="entityType" value="${name}"/>				
 			<c:param name="field" value="${field}"/>				
 			<c:param name="column" value="${column}"/>
-			<c:param name="boxId" value="box${0}New"/>
+			<c:param name="boxId" value="box${0}"/>
 			<c:param name="isRFC" value="${isRFC}"/>
 			<c:param name="isInError" value="${isInError}"/>
 			<c:param name="strErrMsg" value="${strErrMsg}"/>
 		</c:import> 
-		</div>
+	</div>
 </c:if>  
  
 <div style="clear:both;"></div>
