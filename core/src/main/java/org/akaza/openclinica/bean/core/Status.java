@@ -43,7 +43,8 @@ public class Status extends Term implements Comparable {
 	public static final Status COMPLETED = new Status(15, "completed");
 
 	private static final Status[] members = { INVALID, AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED,
-			AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFIED };
+			AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFIED, NOT_STARTED, DATA_ENTRY_STARTED, INITIAL_DATA_ENTRY_COMPLETED, 
+			DOUBLE_DATA_ENTRY, COMPLETED };
 	private static List list = Arrays.asList(members);
 
 	private static final Status[] activeMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };

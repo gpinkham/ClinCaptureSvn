@@ -25,10 +25,10 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 	private List<Filter> filters = new ArrayList<Filter>();
 	private HashMap<String, String> columnMapping = new HashMap<String, String>();
-	private Integer studyEventDefinitionId;
+	private int studyEventDefinitionId;
 	private int dynamicGroupClassIdToFilterBy;
 
-	public ListEventsForSubjectFilter(Integer studyEventDefinitionId, int dynamicGroupClassIdToFilterBy) {
+	public ListEventsForSubjectFilter(int studyEventDefinitionId, int dynamicGroupClassIdToFilterBy) {
 		columnMapping.put("studySubject.label", "ss.label");
 		columnMapping.put("studySubject.status", "ss.status_id");
 		columnMapping.put("studySubject.oid", "ss.oc_oid");
@@ -44,57 +44,64 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 	}
 
 	public String execute(String criteria) {
-		String theCriteria = "";
+		
+		StringBuilder theCriteria = new StringBuilder("");
+		
 		for (Filter filter : filters) {
-			theCriteria += buildCriteria(criteria, filter.getProperty(), filter.getValue());
+			theCriteria.append(buildCriteria(criteria, filter.getProperty(), filter.getValue()));
 		}
 
 		if (dynamicGroupClassIdToFilterBy != 0) {
-			theCriteria += " AND ss.dynamic_group_class_id = " + dynamicGroupClassIdToFilterBy + " ";
+			theCriteria.append(" AND ss.dynamic_group_class_id = ").append(dynamicGroupClassIdToFilterBy).append(" ");
 		}
-
-		return theCriteria;
+		
+		return theCriteria.toString();
 	}
 
 	private String buildCriteria(String criteria, String property, Object value) {
+		
+		StringBuilder sqlCriteria = new StringBuilder(""); 
+		
 		value = StringEscapeUtils.escapeSql(value.toString());
+		
 		if (value != null) {
 			if (property.equals("studySubject.status")) {
-				criteria = criteria + " and ";
-				criteria = criteria + " " + columnMapping.get(property) + " = " + value.toString() + " ";
+				sqlCriteria.append(" and ")
+					.append(" ").append(columnMapping.get(property)).append(" = ").append(value.toString()).append(" ");		
 			} else if (property.equals("event.status")) {
 				
 				if (value.equals(String.valueOf(SubjectEventStatus.NOT_SCHEDULED.getId()))) {
-					criteria += " AND ss.status_id NOT IN (" + Status.DELETED.getId() + ", " + Status.LOCKED.getId() + ")";
-					criteria += " AND (se.study_subject_id IS NULL OR (se.study_event_definition_id != " + studyEventDefinitionId;
-					criteria += " AND (SELECT count(*) FROM study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id";
-					criteria += " WHERE study_event.study_event_definition_id =" + studyEventDefinitionId
-							+ " AND ss.study_subject_id = ss1.study_subject_id) =0))";
+					sqlCriteria.append(" AND ss.status_id NOT IN (").append(Status.DELETED.getId()).append(", ").append(Status.LOCKED.getId()).append(")")
+						.append(" AND (se.study_subject_id IS NULL OR (se.study_event_definition_id != ").append(studyEventDefinitionId)
+						.append(" AND (SELECT count(*) FROM study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id")
+						.append(" WHERE study_event.study_event_definition_id =").append(studyEventDefinitionId)
+						.append(" AND ss.study_subject_id = ss1.study_subject_id) =0))");
 				} else if (value.equals(String.valueOf(SubjectEventStatus.LOCKED.getId()))) {
-					criteria += " AND ( ss.status_id = " + Status.LOCKED.getId();
-					criteria += " OR ( se.study_event_definition_id = " + studyEventDefinitionId;
-					criteria += " AND se.subject_event_status_id = " + value + " ))";
+					sqlCriteria.append(" AND ( ss.status_id = ").append(Status.LOCKED.getId())
+						.append(" OR ( se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND se.subject_event_status_id = ").append(value).append(" ))");
 				} else if (value.equals(String.valueOf(SubjectEventStatus.REMOVED.getId()))) {
-					criteria += " AND ( ss.status_id = " + Status.DELETED.getId();
-					criteria += " OR ( se.study_event_definition_id = " + studyEventDefinitionId;
-					criteria += " AND se.subject_event_status_id = " + value + " ))";
+					sqlCriteria.append(" AND ( ss.status_id = ").append(Status.DELETED.getId())
+						.append(" OR ( se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND se.subject_event_status_id = ").append(value).append(" ))");
 				} else {
-					criteria += " AND";
-					criteria += " ( se.study_event_definition_id = " + studyEventDefinitionId;
-					criteria += " AND se.subject_event_status_id = " + value + " )";
+					sqlCriteria.append(" AND")
+						.append(" ( se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND se.subject_event_status_id = ").append(value).append(" )");
 				}
 				
 			} else if (property.startsWith("sgc_")) {
 				int study_group_class_id = Integer.parseInt(property.substring(4));
 
 				int group_id = Integer.parseInt(value.toString());
-				criteria += " AND " + group_id + " = (" + " select distinct sgm.study_group_id"
-						+ " FROM SUBJECT_GROUP_MAP sgm, STUDY_GROUP sg, STUDY_GROUP_CLASS sgc, STUDY s" + " WHERE "
-						+ " sgm.study_group_class_id = " + study_group_class_id
-						+ " AND sgm.study_subject_id = SS.study_subject_id"
-						+ " AND sgm.study_group_id = sg.study_group_id"
-						+ " AND (s.parent_study_id = sgc.study_id OR SS.study_id = sgc.study_id)"
-						+ " AND sgm.study_group_class_id = sgc.study_group_class_id" + " ) ";
+				
+				sqlCriteria.append(" AND ").append(group_id).append(" = ( select distinct sgm.study_group_id")
+					.append(" FROM SUBJECT_GROUP_MAP sgm, STUDY_GROUP sg, STUDY_GROUP_CLASS sgc, STUDY s")
+					.append(" WHERE sgm.study_group_class_id = ").append(study_group_class_id)
+					.append(" AND sgm.study_subject_id = SS.study_subject_id")
+					.append(" AND sgm.study_group_id = sg.study_group_id")
+					.append(" AND (s.parent_study_id = sgc.study_id OR SS.study_id = sgc.study_id)")
+					.append(" AND sgm.study_group_class_id = sgc.study_group_class_id ) ");
 
 			} else if (property.startsWith("crf_")) {
 
@@ -102,108 +109,134 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
 				if (value.equals(Status.NOT_STARTED.getName())) {
 
-					criteria += " AND ss.status_id NOT IN (" + Status.DELETED.getId() + ", " + Status.LOCKED.getId() + ")"
-							+ " AND se.subject_event_status_id <> " + SubjectEventStatus.LOCKED.getId()
-							+ " AND (((SELECT COUNT(study_event.study_event_id)"
-							+ " FROM study_event"
-							+ " WHERE study_event.study_event_definition_id = " + studyEventDefinitionId
-							+ " AND ss.study_subject_id = study_event.study_subject_id) = 0)"
-							+ " OR (se.study_event_definition_id = " + studyEventDefinitionId
-							+ " AND ((SELECT COUNT(ec.event_crf_id) FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id"
-							+ " WHERE cv.crf_id = " + crfId
-							+ " AND ec.study_event_id = se.study_event_id ) = 0"
-							+ " OR (SELECT COUNT(ec.event_crf_id) FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id"
-							+ " WHERE cv.crf_id = " + crfId
-							+ " AND ec.study_event_id = se.study_event_id AND ec.not_started = TRUE) = 1)))";
+					sqlCriteria.append(" AND ss.status_id NOT IN (").append(Status.DELETED.getId()).append(", ").append(Status.LOCKED.getId()).append(")")
+						.append(" AND se.subject_event_status_id <> ").append(SubjectEventStatus.LOCKED.getId())
+						.append(" AND (((SELECT COUNT(study_event.study_event_id)")
+						.append(" FROM study_event")
+						.append(" WHERE study_event.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND ss.study_subject_id = study_event.study_subject_id) = 0)")
+						.append(" OR (se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND ((SELECT COUNT(ec.event_crf_id) FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+						.append(" WHERE cv.crf_id = ").append(crfId)
+						.append(" AND ec.study_event_id = se.study_event_id ) = 0")
+						.append(" OR (SELECT COUNT(ec.event_crf_id) FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+						.append(" WHERE cv.crf_id = ").append(crfId)
+						.append(" AND ec.study_event_id = se.study_event_id AND ec.not_started = TRUE) = 1)))");
 
 				} else if (value.equals(Status.DATA_ENTRY_STARTED.getName())) {
 
-					criteria += " AND se.study_event_definition_id = " + studyEventDefinitionId;
-					criteria += " AND se.study_event_id IN" + " (SELECT study_event_id"
-							+ " FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id"
-							+ " WHERE crf_id = " + crfId + " AND ec.status_id = " + Status.AVAILABLE.getId()
-							+ " AND ec.date_completed IS NULL AND ec.not_started = FALSE )";
+					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND se.study_event_id IN")
+						.append(" (SELECT study_event_id")
+						.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+						.append(" WHERE crf_id = ").append(crfId).append(" AND ec.status_id = ").append(Status.AVAILABLE.getId())
+						.append(" AND ec.date_completed IS NULL AND ec.not_started = FALSE )");
 
 				} else if (value.equals(Status.INITIAL_DATA_ENTRY_COMPLETED.getName())) {
-
-					criteria += " AND se.study_event_definition_id = " + studyEventDefinitionId;
-					criteria += " AND se.study_event_id IN" + " (SELECT study_event_id"
-							+ " FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id"
-							+ " WHERE crf_id = " + crfId + " AND ec.status_id = " + Status.PENDING.getId()
-							+ " AND ec.date_completed IS NOT NULL"
-							+ " AND ec.validator_id = 0 AND ec.date_validate_completed IS NULL )";
+					
+					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND se.study_event_id IN")
+						.append(" (SELECT study_event_id")
+						.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+						.append(" WHERE crf_id = ").append(crfId).append(" AND ec.status_id = ").append(Status.PENDING.getId())
+						.append(" AND ec.date_completed IS NOT NULL")
+						.append(" AND ec.validator_id = 0 AND ec.date_validate_completed IS NULL )");
 
 				} else if (value.equals(Status.DOUBLE_DATA_ENTRY.getName())) {
-
-					criteria += " AND se.study_event_definition_id = " + studyEventDefinitionId;
-					criteria += " AND se.study_event_id IN" + " (SELECT study_event_id"
-							+ " FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id"
-							+ " WHERE crf_id = " + crfId + " AND ec.status_id = " + Status.PENDING.getId()
-							+ " AND ec.date_completed IS NOT NULL"
-							+ " AND ec.validator_id > 0 AND ec.date_validate_completed IS NULL )";
+					
+					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND se.study_event_id IN")
+						.append(" (SELECT study_event_id")
+						.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+						.append(" WHERE crf_id = ").append(crfId).append(" AND ec.status_id = ").append(Status.PENDING.getId())
+						.append(" AND ec.date_completed IS NOT NULL")
+						.append(" AND ec.validator_id > 0 AND ec.date_validate_completed IS NULL )");
 
 				} else if (value.equals(Status.COMPLETED.getName())) {
-
-					criteria += " AND se.study_event_definition_id = " + studyEventDefinitionId;
-					criteria += " AND se.study_event_id IN" + " (SELECT study_event_id"
-							+ " FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id"
-							+ " WHERE crf_id = " + crfId + " AND ec.status_id = " + Status.UNAVAILABLE.getId()
-							+ " AND ec.date_validate_completed IS NOT NULL" + " AND sdv_status <> TRUE )"
-							+ " AND se.subject_event_status_id <> " + SubjectEventStatus.SIGNED.getId();
+					
+					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND se.study_event_id IN")
+						.append(" (SELECT study_event_id")
+						.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+						.append(" WHERE crf_id = ").append(crfId).append(" AND ec.status_id = ").append(Status.UNAVAILABLE.getId())
+						.append(" AND ec.date_validate_completed IS NOT NULL")
+						.append(" AND sdv_status <> TRUE )")
+						.append(" AND se.subject_event_status_id <> ").append(SubjectEventStatus.SIGNED.getId());
 
 				} else if (value.equals(Status.SOURCE_DATA_VERIFIED.getName())) {
-
-					criteria += " AND se.study_event_definition_id = " + studyEventDefinitionId;
-					criteria += " AND se.study_event_id IN" + " (SELECT study_event_id"
-							+ " FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id"
-							+ " WHERE crf_id = " + crfId + " AND ec.status_id = " + Status.UNAVAILABLE.getId()
-							+ " AND sdv_status = TRUE )" + " AND se.subject_event_status_id <> "
-							+ SubjectEventStatus.SIGNED.getId();
+					
+					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND se.study_event_id IN")
+						.append(" (SELECT study_event_id")
+						.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+						.append(" WHERE crf_id = ").append(crfId).append(" AND ec.status_id = ").append(Status.UNAVAILABLE.getId())
+						.append(" AND sdv_status = TRUE )")
+						.append(" AND se.subject_event_status_id <> ").append(SubjectEventStatus.SIGNED.getId());
 
 				} else if (value.equals(Status.SIGNED.getName())) {
-
-					criteria += " AND se.study_event_definition_id = " + studyEventDefinitionId;
-					criteria += " AND se.study_event_id IN" + " (SELECT study_event_id"
-							+ " FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id"
-							+ " WHERE crf_id = " + crfId + " AND ec.status_id = " + Status.UNAVAILABLE.getId()
-							+ " AND ec.date_validate_completed IS NOT NULL )" + " AND se.subject_event_status_id = "
-							+ SubjectEventStatus.SIGNED.getId();
+					
+					sqlCriteria.append(" AND se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND se.study_event_id IN")
+						.append(" (SELECT study_event_id")
+						.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+						.append(" WHERE crf_id = ").append(crfId).append(" AND ec.status_id = ").append(Status.UNAVAILABLE.getId())
+						.append(" AND ec.date_validate_completed IS NOT NULL )")
+						.append(" AND se.subject_event_status_id = ").append(SubjectEventStatus.SIGNED.getId());
 
 				} else if (value.equals(Status.LOCKED.getName())) {
-
-					criteria += " AND ((se.study_event_definition_id = " + studyEventDefinitionId
-							+ " AND ( se.subject_event_status_id = " + SubjectEventStatus.LOCKED.getId()
-							+ " OR ((se.subject_event_status_id = " + SubjectEventStatus.SKIPPED.getId()
-							+ " OR se.subject_event_status_id = " + SubjectEventStatus.STOPPED.getId() + ")"
-							+ " AND se.study_event_id IN" + " (SELECT study_event_id"
-							+ " FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id"
-							+ " WHERE crf_id = " + crfId + " AND ec.not_started = FALSE))))" + " OR ss.status_id = "
-							+ Status.LOCKED.getId() + ")";
+					
+					sqlCriteria.append(" AND ((se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND ( se.subject_event_status_id = ").append(SubjectEventStatus.LOCKED.getId())
+						.append(" OR ((se.subject_event_status_id = ").append(SubjectEventStatus.SKIPPED.getId())
+						.append(" OR se.subject_event_status_id = ").append(SubjectEventStatus.STOPPED.getId()).append(")")
+						.append(" AND se.study_event_id IN")
+						.append(" (SELECT study_event_id")
+						.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+						.append(" WHERE crf_id = ").append(crfId).append(" AND ec.not_started = FALSE))))")
+						.append(" OR ss.status_id = ").append(Status.LOCKED.getId()).append(")");
 
 				} else if (value.equals(Status.DELETED.getName())) {
-
-					criteria += " AND ((se.study_event_definition_id = " + studyEventDefinitionId
-							+ " AND se.study_event_id IN" + " (SELECT study_event_id"
-							+ " FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id"
-							+ " WHERE crf_id = " + crfId + " AND ec.not_started = FALSE" + " AND (ec.status_id = "
-							+ Status.DELETED.getId() + " OR ec.status_id = " + Status.AUTO_DELETED.getId() + ")))"
-							+ " OR ss.status_id = " + Status.DELETED.getId() + ")";
+					
+					sqlCriteria.append(" AND ((se.study_event_definition_id = ").append(studyEventDefinitionId)
+						.append(" AND se.study_event_id IN")
+						.append(" (SELECT study_event_id")
+						.append(" FROM event_crf ec LEFT JOIN crf_version cv ON ec.crf_version_id = cv.crf_version_id")
+						.append(" WHERE crf_id = ").append(crfId).append(" AND ec.not_started = FALSE")
+						.append(" AND (ec.status_id = ").append(Status.DELETED.getId())
+						.append(" OR ec.status_id = ").append(Status.AUTO_DELETED.getId()).append(")))")
+						.append(" OR ss.status_id = ").append(Status.DELETED.getId()).append(")");
 
 				}
 
 			} else if (property.equals("studySubject.createdDate")) {
 				// do nothing
 			} else {
-				criteria = criteria + " and ";
-				criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString()
-						+ "%')" + " ";
+				
+				sqlCriteria.append(" AND ")
+					.append(" UPPER(").append(columnMapping.get(property)).append(") like UPPER('%").append(value.toString()).append("%') ");
+			
 			}
 
 		}
 
-		return criteria;
+		return (criteria + sqlCriteria.toString());
 	}
 
+	public boolean isEmpty() {
+		return filters.isEmpty() ? true : false;
+	}
+	
+	public String getFilterValueByProperty(String property) {
+		
+		for(Filter filter: filters) {
+			if (filter.getProperty().equalsIgnoreCase(property)) {
+				return (String) filter.getValue();
+			}
+		}
+		
+		return null;
+	}
+	
 	private static class Filter {
 		private final String property;
 		private final Object value;
