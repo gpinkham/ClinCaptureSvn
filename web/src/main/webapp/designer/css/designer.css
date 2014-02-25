@@ -350,3 +350,11 @@ body .modal-dialog {
 .selected {
   font-weight: bold;
 }
+
+.lbl {
+  margin-top: .5em;
+}
+
+.dest {
+  margin-left: -1em;
+}

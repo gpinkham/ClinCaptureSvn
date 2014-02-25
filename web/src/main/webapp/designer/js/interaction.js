@@ -212,6 +212,12 @@ $(function() {
 		title: "Drag and drop an item from the Group tool box, the data toolbox or a CRF item."
 	})	
 
+	createToolTip({
+		
+		element: $(".item"),
+		title: "Drag and drop a CRF item."
+	})	
+
 	// ======================= End of tool tip creation =======================
 
 	// Hide action messages parameter divs
@@ -281,6 +287,16 @@ $(function() {
 		accept: "div[id='items'] td"
 	})
 
+	createDroppable({
+		element: $(".item"),
+		accept: "div[id='items'] td"
+	})
+
+	createDroppable({
+		element: $(".dest"),
+		accept: "div[id='items'] td"
+	})
+
 	// ======================= End of creating droppables =======================
 
 	// ======================= Event handlers =======================
@@ -316,6 +332,8 @@ $(function() {
 		parser.setDataImportExecute($(this).is(":checked"));
 	})
 
+	// === Discrepancy action ====
+
 	$("#chkDiscrepancyText").change(function() {
 
 		parser.setDiscrepancyAction({
@@ -335,6 +353,8 @@ $(function() {
 			selected: $("#chkDiscrepancyText").is(":checked")
 		})	
 	})
+
+	// === Email action ====
 
 	$("#chkEmail").change(function() {
 
@@ -377,6 +397,57 @@ $(function() {
 			message: $("#body").val(),
 			selected: $("#chkEmail").is(":checked")
 		})
+	})
+
+	// === Insert action ====
+
+	$("#chkData").change(function() {
+
+		parser.setInsertAction({
+
+			selected: $(this).is(":checked")
+		})
+
+		$("#insert").find("textarea").focus();
+	})
+
+	$("#insert").find("textarea").blur(function() {
+
+		parser.setInsertActionMessage($(this).val());
+	})
+
+	$(".value").blur(function() {
+
+		parser.setDestinationValue({
+
+			value: $(this).val(),
+			id: $(this).parents(".row").attr("id")
+		})
+	})
+
+	// === Show/Hide action ====
+
+	$("input[action=show]").change(function() {
+
+		parser.setShowHideAction({
+
+			show: true,
+			hide: false
+		})
+	})
+
+	$("input[action=hide]").change(function() {
+
+		parser.setShowHideAction({
+
+			hide: true,
+			show: false
+		})
+	})
+
+	$("#dActionMessage").blur(function() {
+
+		parser.setShowHideActionMessage($(this).val());
 	})
 
 	$("#deleteButton").click(function() {

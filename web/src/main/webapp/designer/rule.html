@@ -203,7 +203,6 @@
 
       <div class="row">
         <div id="actionMessages" class="col-md-12 pull-left dotted-border-lg">
-            <span class="space-left-m">With the following information:</span>
             <div id="discrepancyText" class="form-group">
               <label for="discrepancyText" class="col-md-2 control-label">Discrepancy text:</label>
               <textarea class="form-control input-sm" rows="2"></textarea>
@@ -216,13 +215,33 @@
               <label for="email" class="col-md-2 control-label">Email message:</label>
               <textarea id="body" class="form-control" rows="2"></textarea>
             </div>
-            <div id="ruleData" class="form-group">
-              <label for="ruleData" class="col-md-2 control-label">Data:</label>
-              <textarea id="ruleData" class="form-control input-sm" rows="2"></textarea>
+            <span class="space-left-m">With the following information:</span>
+            <div id="insert" class="form-group">
+              <label for="insertActionMessage" class="col-md-2 control-label">Message:</label>
+              <textarea id="insertActionMessage" class="form-control input-sm" rows="1"></textarea>
+              <div id="1" class="row">
+                <div class="col-md-2">
+                  &nbsp;
+                </div>
+                <div class="col-md-3">
+                  <label class="lbl">Item:</label>
+                  <input type="text" class="form-control input-sm col-md-3 item" style="text-align:center">
+                </div>
+                <div class="col-md-4">
+                  <label class="lbl">Value:</label>
+                  <input type="text" class="form-control input-sm col-md-3 value" style="text-align:center">
+                </div>
+              </div>
             </div>
-            <div id="parameters" class="form-group">
-              <label for="parameters" class="col-md-2 control-label">Parameters:</label>
-              <textarea id="parameters" class="form-control input-sm" rows="2"></textarea>
+            <div id="dispActions" class="form-group">
+              <div class="form-group">
+                <label class="col-md-2 control-label">Message:</label>
+                <textarea id="dActionMessage" class="form-control input-sm" rows="2"></textarea>
+              </div>
+              <label class="col-md-2 control-label">Destinations:</label>
+              <div class="col-md-6">
+                <input type="text" class="form-control input-sm dest">
+              </div>
             </div>
           </div>
       </div>

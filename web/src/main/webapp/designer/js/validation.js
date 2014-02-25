@@ -55,6 +55,10 @@ $(function() {
 						list.text("Discrepancy Action");
 					} else if (rule.actions[x].type === "email") {
 						list.text("Email Action");
+					} else if (rule.actions[x].type === "insert") {
+						list.text("Insert Action");
+					} else if (rule.actions[x].type === "showHide") {
+						list.text("Show/Hide Action");
 					}
 
 					$("#actions").append(list);
@@ -146,19 +150,23 @@ function saveRule(rule) {
 
 		success: function(response) {
 
-			var obj = JSON.parse(response);
-			sessionStorage.removeItem("edit");
-			sessionStorage.setItem("status", "remove");
-			
-			bootbox.confirm("Rule(s) successfully saved", function(result) {
+			try {
+				
+				var obj = JSON.parse(response);
+				sessionStorage.removeItem("edit");
+				sessionStorage.setItem("status", "remove");
 
-				if (result) {
+				bootbox.confirm("Rule(s) successfully saved", function(result) {
 
-					window.open(rule.submission + "/ViewRuleAssignment?read=true", '_self');
-				}
-			});
+					if (result) {
+						window.open(rule.submission + "/ViewRuleAssignment?read=true", '_self');
+					}
+				});
 
-			sessionStorage.removeItem("edit");
+				sessionStorage.removeItem("edit");
+			} catch (e) {
+				$(".spinner").remove();
+			}
 		},
 
 		error: function(response) {

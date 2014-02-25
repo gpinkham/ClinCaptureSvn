@@ -143,6 +143,102 @@ Parser.prototype.createNextDroppable = function(params) {
 			params.element.val(params.ui.draggable.text());
 		}
 
+	} else if (params.element.is(".item")) {
+
+		if (!this.isAlreadyAddedInsertTarget(params.ui.draggable.text())) {
+
+			if (params.existingValue) {
+
+				var index = this.getInsertAction().targets.indexOf(params.existingValue);
+
+				if (index > -1) {
+
+					this.getInsertAction().targets.splice(index, 1);
+				}	
+			}
+
+			this.getInsertAction().targets.push(params.ui.draggable.text());
+
+			// Destination
+			var dest = Object.create(null);
+
+			dest.value = "";
+			dest.id = params.element.parents(".row").attr("id");
+			dest.oid = this.findItem(params.ui.draggable.text()).oid;
+
+			this.getInsertAction().destinations.push(dest);			
+
+			var newRow = $("#insert").find(".row").first().clone();
+			newRow.attr("id", $("#insert").find(".row").size() + 1);
+			newRow.find("label").remove();
+
+			var input = newRow.find(".item");
+			input.val("");
+			input.text("");
+
+			var inputVal = newRow.find(".value");
+			inputVal.val("");
+			inputVal.text("");
+
+			inputVal.blur(function() {
+
+				parser.setDestinationValue({
+
+					value: $(this).val(),
+					id: $(this).parents(".row").attr("id")
+				})
+			})
+
+			if (!params.element.val()) {
+
+				createDroppable({
+
+					element: input,
+					accept: "div[id='items'] td"
+				})
+
+				$("#insert").append(newRow);
+			}
+
+			params.element.val(params.ui.draggable.text());
+		}
+
+	} else if (params.element.is(".dest")) {
+
+		if (!this.isAlreadyAddedInsertTarget(params.ui.draggable.text())) {
+
+			if (params.existingValue) {
+
+				this.getShowHideAction().destinations.indexOf(params.existingValue);
+
+				if (index > -1) {
+
+					this.getShowHideAction().destinations.splice(index, 1);
+				}
+			}
+
+			this.getShowHideAction().destinations.push(params.ui.draggable.text());
+
+			var newInput = params.element.clone();
+			createDroppable({
+				element: newInput,
+				accept: "div[id='items'] td"
+			})
+
+			// create a new input 
+			if (!params.element.val()) {
+
+				params.element.after(newInput);
+				createDroppable({
+					element: newInput,
+					accept: "div[id='items'] td"
+				})
+			} 
+
+			newInput.focus();
+			params.element.val(params.ui.draggable.text());
+
+		}
 	} else {
 
 		if (params.element.is(".comp")) {
@@ -564,6 +660,16 @@ Parser.prototype.isAlreadyAddedTarget = function(target) {
 	return this.rule.targets.indexOf(target) > -1;
 }
 
+Parser.prototype.isAlreadyAddedInsertTarget = function(target) {
+
+	return this.getInsertAction() && this.getInsertAction().targets.indexOf(target) > -1;
+}
+
+Parser.prototype.isAlreadyAddedInsertTarget = function(target) {
+
+	return this.getShowHideAction() && this.getShowHideAction().targets.indexOf(target) > -1;
+}
+
 /* ===========================================================================
  * Finds a CRF item from the original data returns from CC given an item name
  *
@@ -957,6 +1063,260 @@ Parser.prototype.setEmailAction = function(params) {
 	}
 }
 
+Parser.prototype.getInsertAction = function() {
+
+	if (this.rule.actions.length > 0) {
+
+		for (var x = 0; x < this.rule.actions.length; x++) {
+
+			var action = this.rule.actions[x];
+
+			if (action.type === "insert") {
+
+				return action;
+			}
+		}
+	}
+}
+
+Parser.prototype.setInsertAction = function(params) {
+
+	if (params) {
+
+		var action = Object.create(null);
+
+		// function to toggle display
+		action.render = function(visible) {
+
+			if (visible) {
+
+				$("#insert").show();
+				$("#actionMessages").show();
+
+				$("#insert").show();
+				$("#insert").find("textarea").val(action.message);
+
+				$("#chkData").prop("checked", params.selected);
+
+			} else {
+
+				// Update UI
+				$("#insert").hide();
+
+				$("#chkData").prop("checked", params.selected);
+
+				if ($("#actionMessages").find("div:visible").length === 0) {
+
+					$("#actionMessages").hide();
+				}
+			}
+		}
+
+		if (params.selected) {
+
+			if (this.getActions().length > 0 && this.getInsertAction()) {
+				action = this.getInsertAction();
+			} else {
+
+				this.rule.actions.push(action);
+			}
+			
+			if (params.edit) {
+
+				action.type = "insert";
+				action.message = params.action.message;
+				action.targets = params.action.targets;
+				action.destinations = params.action.destinations;
+
+				// Add action targets
+				this.setDestinations(action.destinations)
+
+			} else {
+
+				action.targets = [];
+				action.type = "insert";
+				action.destinations = [];
+			}
+			
+			action.render(params.selected);
+
+		} else {
+
+			// Delete saved reference
+			var act = this.getInsertAction();
+			
+			if ($.inArray(act, this.rule.actions) > -1) {
+				this.rule.actions.splice($.inArray(act, this.rule.actions), 1);
+			}
+
+			action.render(params.selected);
+		}
+	}
+}
+
+Parser.prototype.getShowHideAction = function() {
+
+	if (this.rule.actions.length > 0) {
+
+		for (var x = 0; x < this.rule.actions.length; x++) {
+
+			var action = this.rule.actions[x];
+
+			if (action.type === "showHide") {
+
+				return action;
+			}
+		}
+	}
+}
+
+Parser.prototype.setShowHideActionMessage = function(message) {
+	this.getShowHideAction().message = message;	
+}
+
+Parser.prototype.setShowHideAction = function(params) {
+
+	if (params) {
+
+		var action = Object.create(null);
+
+		// function to toggle display
+		action.render = function(visible) {
+
+			if (params.show || params.hide) {
+
+				$("#dispActions").show();
+				$("#actionMessages").show();
+
+				$("#dispActions").show();
+				$("#dispActions").find("input").val(action.message);
+
+			} else {
+
+				// Update UI
+				$("#dispActions").hide();
+
+				if ($("#actionMessages").find("div:visible").length === 0) {
+
+					$("#actionMessages").hide();
+				}
+			}
+		}
+
+		if (params.hide || params.show) {
+
+			if (this.getActions().length > 0 && this.getShowHideAction()) {
+				action = this.getShowHideAction();
+			} else {
+
+				this.rule.actions.push(action);
+			}
+
+			if (params.edit) {
+
+				action.type = "showHide";
+				action.message = params.action.message;
+				action.targets = params.action.targets;
+				action.destinations = params.action.destinations;
+
+				// Add action targets
+				this.setDestinations(action.destinations)
+
+			} else {
+
+				action.targets = [];
+				action.type = "showHide";
+				action.destinations = [];
+			}
+
+			action.render(params.selected);
+
+		} else {
+
+			// Delete saved reference
+			var act = this.getShowHideAction();
+
+			if ($.inArray(act, this.rule.actions) > -1) {
+				this.rule.actions.splice($.inArray(act, this.rule.actions), 1);
+			}
+
+			action.render(params);
+		}
+	}
+}
+
+Parser.prototype.setDestinationValue = function(params) {
+
+	var act = this.getInsertAction();
+
+	if (act) {
+
+		for (var x = 0; x < act.destinations.length; x++) {
+
+			var dest = act.destinations[x]
+
+			if (dest.id === params.id) {
+
+				dest.value = params.value;
+			}
+		}
+	}
+}
+
+Parser.prototype.setDestinations = function(dests) {
+
+	if (dests.length > 0) {
+
+		var newRow = $("#insert").find(".row").first().clone();
+
+		// Remove labels
+		$("#insert").find(".row").find("label").remove();
+
+		for (var x = 0; x < dests.length; x++) {
+
+			var dest = dests[x];
+
+			var input = newRow.find(".item");
+			newRow.attr("id", dest.id);
+
+			input.val(this.findItemName(dest.oid).name);
+			input.css('font-weight', 'bold');
+
+			var inputVal = newRow.find(".value");
+			inputVal.val(dest.value);
+			input.css('font-weight', 'bold');
+
+			inputVal.blur(function() {
+
+				parser.setDestinationValue({
+
+					value: $(this).val(),
+					id: $(this).parents(".row").attr("id")
+				})
+			})
+
+			createDroppable({
+
+				element: input,
+				accept: "div[id='items'] td"
+			})
+
+			if (x === 0) {
+
+				$("#insert").find(".row").before(newRow);
+
+			} else {
+
+				$("#insert").append(newRow);
+			}
+		}
+	}
+}
+
+Parser.prototype.setInsertActionMessage = function(message) {
+	this.getInsertAction().message = message;
+}
+
 Parser.prototype.setExpression = function(expression) {
 
 	if (expression instanceof Array) {
@@ -1062,6 +1422,15 @@ Parser.prototype.setActions = function(actions) {
 					selected: true,
 					to: action.to,
 					message: action.body
+				})
+			} else if (action.type.toLowerCase() === "insert") {
+
+				this.setInsertAction({
+
+					edit: true,
+					action: action,
+					selected: true
+					
 				})
 			}
 		}
@@ -1258,6 +1627,8 @@ Parser.prototype.validate = function() {
 			}
 		})
 	}
+
+	$(".spinner").remove();
 }
 
 /* =================================================================

@@ -788,6 +788,7 @@ function createDroppable(params) {
 		$(this).append(input);
 
 		input.focus(); 
+		input.select();
 		params.element.css('font-weight', 'bold');
 	})
 

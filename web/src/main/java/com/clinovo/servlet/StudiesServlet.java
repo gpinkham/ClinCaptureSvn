@@ -173,7 +173,12 @@ public class StudiesServlet extends HttpServlet {
 						// Rule Ref
 						Element ref = document.createElement("RuleRef");
 						ref.setAttribute("OID", ruleDef.getAttribute("OID"));
-						ref.appendChild(createAction(actions.getString(r), rule, document));
+						
+						List<Element> acts = createAction(actions.getString(r), rule, document);
+						
+						for (Element el : acts) {
+							ref.appendChild(el);
+						}
 
 						// Append ref
 						rAssigment.appendChild(ref);
@@ -462,116 +467,120 @@ public class StudiesServlet extends HttpServlet {
 		return oid;
 	}
 
-	private Element createAction(String action, JSONObject rule, Document document) throws Exception {
-
-		Element rAction = null;
-		JSONObject act = new JSONObject(action);
+	private List<Element> createAction(String actString, JSONObject rule, Document document) throws Exception {
+		
+		List<Element> actions = new LinkedList<Element>();
+		
+		JSONObject act = new JSONObject(actString);
 
 		// Run
 		Element run = document.createElement("Run");
 
-		run.setAttribute("Batch", "true");
 		run.setAttribute("ImportDataEntry", rule.getString("di"));
 		run.setAttribute("InitialDataEntry", rule.getString("ide"));
 		run.setAttribute("DoubleDataEntry", rule.getString("dde"));
 		run.setAttribute("AdministrativeDataEntry", rule.getString("ae"));
 
 		if (act.getString("type").equalsIgnoreCase("discrepancy")) {
-
+			
+			run.setAttribute("Batch", "true");
+			
 			Element discrepancyText = document.createElement("Message");
 			discrepancyText.setTextContent(act.getString("message"));
 
-			rAction = document.createElement("DiscrepancyNoteAction");
-			rAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
+			Element action = document.createElement("DiscrepancyNoteAction");
+			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
 
-			rAction.appendChild(run);
-			rAction.appendChild(discrepancyText);
+			action.appendChild(run);
+			action.appendChild(discrepancyText);
+			
+			actions.add(action);
 
 		} else if (act.getString("type").equalsIgnoreCase("email")) {
-
+			
+			run.setAttribute("Batch", "true");
+			
 			// Message element
 			Element message = document.createElement("Message");
 			message.setTextContent(act.getString("body"));
 
-			rAction = document.createElement("EmailAction");
-			rAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
+			Element action = document.createElement("EmailAction");
+			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
 
 			// To element
 			Element to = document.createElement("To");
 			to.setTextContent(act.getString("to"));
 
-			rAction.appendChild(run);
+			action.appendChild(run);
 
 			// Email props
-			rAction.appendChild(message);
-			rAction.appendChild(to);
+			action.appendChild(message);
+			action.appendChild(to);
+			
+			actions.add(action);
 
-		} else if (act.getString("type").equalsIgnoreCase("hide")) {
-
-			// Message element
+		} else if (act.getString("type").equalsIgnoreCase("showHide")) {
+				
+			run.setAttribute("Batch", "true");
+			
+			// Message element	
 			Element message = document.createElement("Message");
-			message.setTextContent(rule.getString("message"));
-
-			rAction = document.createElement("HideAction");
-			rAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
-
-			JSONArray targets = rule.getJSONArray("destinationProperty");
-			rAction.appendChild(run);
-
+			message.setTextContent(act.getString("message"));
+			
+			// Show action
+			Element showAction = document.createElement("ShowAction");
+			
+			// children
+			showAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
+			showAction.appendChild(run);
+			showAction.appendChild(message);
+			
+			JSONArray targets = act.getJSONArray("destinations");
 			for (int x = 0; x < targets.length(); x++) {
 
 				// Target
 				Element destProp = document.createElement("DestinationProperty");
-				destProp.setAttribute("OID", targets.getJSONObject(x).getString("oid"));
+				destProp.setAttribute("OID", targets.getString(x));
 
-				rAction.appendChild(destProp);
+				showAction.appendChild(destProp);
 			}
-
-			rAction.appendChild(message);
-
-		} else if (act.getString("type").equalsIgnoreCase("show")) {
-
-			// Message element
-			Element message = document.createElement("Message");
-			message.setTextContent(rule.getString("message"));
-
-			rAction = document.createElement("ShowAction");
-			rAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
-
-			JSONArray targets = rule.getJSONArray("destinationProperty");
-			rAction.appendChild(run);
-
-			for (int x = 0; x < targets.length(); x++) {
-
-				// Target
-				Element destProp = document.createElement("DestinationProperty");
-				destProp.setAttribute("OID", targets.getJSONObject(x).getString("oid"));
-
-				rAction.appendChild(destProp);
-			}
-
-			rAction.appendChild(message);
+			
+			actions.add(showAction);
+			
+			// clone node
+			Element hideAction = (Element) showAction.cloneNode(true);
+			document.renameNode(hideAction, null, "HideAction");
+			
+			actions.add(hideAction);
 
 		} else if (act.getString("type").equalsIgnoreCase("insert")) {
+			
+			run.setAttribute("Batch", "false");
+			
+			Element action = document.createElement("InsertAction");
+			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
+			
+			Element msg = document.createElement("Message");
+			msg.setTextContent(act.getString("message"));
+			
+			JSONArray destinations = act.getJSONArray("destinations");
+			action.appendChild(run);
 
-			rAction = document.createElement("InsertAction");
-			rAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
-
-			JSONArray targets = rule.getJSONArray("iDestinationProperty");
-			rAction.appendChild(run);
-
-			for (int x = 0; x < targets.length(); x++) {
-
+			for (int x = 0; x < destinations.length(); x++) {
+				
+				JSONObject dest = destinations.getJSONObject(x);
 				// Target
 				Element destProp = document.createElement("DestinationProperty");
 
-				destProp.setAttribute("OID", targets.getJSONObject(x).getString("oid"));
-				destProp.setAttribute("Value", targets.getJSONObject(x).getString("value"));
+				destProp.setAttribute("OID", dest.getString("oid"));
+				destProp.setAttribute("Value", dest.getString("value"));
 
-				rAction.appendChild(destProp);
+				action.appendChild(destProp);
 			}
+			
+			actions.add(action);
 		}
 
-		return rAction;
+		return actions;
 	}
 }
