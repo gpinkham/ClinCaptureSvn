@@ -34,7 +34,7 @@ public class EqualityOpNode extends ExpressionNode {
 	EqualityOpNode(Operator op, ExpressionNode left, ExpressionNode right) {
 		// Construct a BinOpNode containing the specified data.
 		assert op == Operator.EQUAL || op == Operator.NOT_EQUAL
-				|| op == Operator.CONTAINS;
+				|| op == Operator.CONTAINS || op == Operator.NOTCONTAINS;
 		assert left != null && right != null;
 		this.op = op;
 		this.left = left;
@@ -48,10 +48,8 @@ public class EqualityOpNode extends ExpressionNode {
 		String l = left.testValue();
 		String r = right.testValue();
 		try {
-			Float fx = Float.valueOf(l);
-			Float fy = Float.valueOf(r);
-			x = fx.toString();
-			y = fy.toString();
+			x = correctStringValue(l);
+			y = correctStringValue(r);
 		} catch (NumberFormatException nfe) {
 			logger.error(nfe.getMessage());
 		}
@@ -60,6 +58,28 @@ public class EqualityOpNode extends ExpressionNode {
 			y = String.valueOf(r);
 		}
 		return calc(x, y);
+	}
+	
+	/***
+	 * Returns string value of operand depending on the operator. The idea is to avoid unncessary .0 float values
+	 * when performing a CONTAINS or NOTCONTAINS operation
+	 * @param value
+	 * @return
+	 */
+	private String correctStringValue(String value){
+		try{
+
+			//if value ends with .0 then it should be treated as a whole number
+			if(value.endsWith(".0")){
+				return String.valueOf((long)Float.valueOf(value).floatValue());
+			}
+			else {
+				return String.valueOf(Float.valueOf(value));
+			}
+		
+		} catch(NumberFormatException nfe){
+			return value;
+		}
 	}
 
 	@Override
@@ -93,6 +113,8 @@ public class EqualityOpNode extends ExpressionNode {
 			return String.valueOf(!x.equals(y));
 		case CONTAINS:
 			return String.valueOf(x.contains(y));
+		case NOTCONTAINS:
+			return String.valueOf(!x.contains(y));
 		default:
 			throw new OpenClinicaSystemException("OCRERR_0002", new Object[] {
 					left.value(), right.value(), op.toString() });

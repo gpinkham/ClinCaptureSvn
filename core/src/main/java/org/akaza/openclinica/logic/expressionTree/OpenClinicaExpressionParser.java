@@ -214,6 +214,7 @@ public class OpenClinicaExpressionParser {
 		while (textIO.peek() == 'e' && textIO.peek(3).matches("eq ")
 				|| textIO.peek() == 'n' && textIO.peek(3).matches("ne ")
 				|| textIO.peek() == 'c' && textIO.peek(3).matches("ct ")
+				|| textIO.peek() == 'n' && textIO.peek(4).matches("nct ")
 				|| textIO.peek() == 'g' && textIO.peek(3).matches("gt ")
 				|| textIO.peek() == 'g' && textIO.peek(4).matches("gte ")
 				|| textIO.peek() == 'l' && textIO.peek(3).matches("lt ")
@@ -222,7 +223,8 @@ public class OpenClinicaExpressionParser {
 			// previous terms into a bigger expression tree.
 			// char op = textIO.getAnyChar();
 			String op = textIO.peek(4).matches("gte ")
-					|| textIO.peek(4).matches("lte ") ? textIO.getAnyString(4)
+					|| textIO.peek(4).matches("lte ")
+					|| textIO.peek(4).matches("nct ") ? textIO.getAnyString(4)
 					: textIO.getAnyString(3);
 			ExpressionNode nextTerm = termTree2(optimiseRuleValidator);
 			term = ExpressionNodeFactory.getExpNode(

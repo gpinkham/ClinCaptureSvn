@@ -34,7 +34,7 @@ class ExpressionNodeFactory {
 		} else if (op == Operator.GREATER_THAN || op == Operator.GREATER_THAN_EQUAL || op == Operator.LESS_THAN
 				|| op == Operator.LESS_THAN_EQUAL) {
 			return new RelationalOpNode(op, node1, node2);
-		} else if (op == Operator.EQUAL || op == Operator.NOT_EQUAL || op == Operator.CONTAINS) {
+		} else if (op == Operator.EQUAL || op == Operator.NOT_EQUAL || op == Operator.CONTAINS || op == Operator.NOTCONTAINS) {
 			return new EqualityOpNode(op, node1, node2);
 		} else if (op == Operator.OR || op == Operator.AND) {
 			return new ConditionalOpNode(op, node1, node2);
