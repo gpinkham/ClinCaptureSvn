@@ -92,6 +92,9 @@
           <input type="file" name="logoFile" id="logoFile" ${access ne 'WRITE' ? 'disabled="true"' : ''}/>
           <br/><img src="<c:url value='${systemProperty.value}'/>"/>
         </c:when>
+        <c:when test="${systemProperty.type eq 'COMBOBOX'}">
+            <form:select multiple="false" style="width: ${systemProperty.size}px;" path="${paramPath}.systemProperties['${spStatus.index}'].value" items="${fn:split(systemProperty.typeValues, ',')}" class="formfieldXL" cssErrorClass="inputError" disabled="${access ne 'WRITE' ? 'true' : 'false'}"/>
+        </c:when>
       </c:choose>
     </div>
     <c:if test="${systemProperty.required and access eq 'WRITE' and systemProperty.type ne 'DYNAMIC_INPUT' and systemProperty.type ne 'DYNAMIC_RADIO'}">

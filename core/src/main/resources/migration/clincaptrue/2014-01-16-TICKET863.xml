@@ -212,4 +212,8 @@
         <insert tableName="system"><column name="name" value="instanceType" /><column name="required" valueBoolean="false" /><column name="value" value="production" /><column name="type" value="RADIO"/><column name="type_values" value="development,training,production"/><column name="group_id" value="119"/><column name="order_id" value="2"/><column name="show_description" valueBoolean="true"/></insert>
     </changeSet>
 
+    <changeSet author="skirpichenok" id="2014-01-16-TICKET863-17">
+        <insert tableName="system"><column name="name" value="sas.timer" /><column name="value_type" value="INTEGER"/><column name="type_values" value="1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24"/><column name="type" value="COMBOBOX"/><column name="required" valueBoolean="false" /><column name="size" value="80" /><column name="value" value="12" /><column name="group_id" value="2"/><column name="order_id" value="4"/><column name="show_description" valueBoolean="true"/><column name="show_measurements" valueBoolean="true"/></insert>
+    </changeSet>
+
 </databaseChangeLog>

@@ -2265,7 +2265,7 @@ a.dnShortcut:hover {
     padding: 10px !important;
 }
 
-#systemForm  input[type=text], #systemForm input[type=password], #systemForm input[type=file] {
+#systemForm  select, #systemForm input[type=text], #systemForm input[type=password], #systemForm input[type=file] {
     font-family: Tahoma, Arial, Helvetica, Sans-Serif;
     font-size: 11px;
     color: #4D4D4D;
@@ -2285,7 +2285,7 @@ a.dnShortcut:hover {
     padding-left: 4px;
 }
 
-#systemForm input.inputError  {
+#systemForm input.inputError, #systemForm  option.inputError  {
     font-family: Tahoma, Arial, Helvetica, Sans-Serif;
     font-size: 11px;
     color: #4D4D4D;

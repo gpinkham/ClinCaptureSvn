@@ -26,7 +26,7 @@
         <c:when test="${systemProperty.type eq 'PASSWORD'}">
           <td>********************</td>
         </c:when>
-        <c:when test="${systemProperty.type eq 'TEXT' || systemProperty.type eq 'DYNAMIC_INPUT'}">
+        <c:when test="${systemProperty.type eq 'TEXT' || systemProperty.type eq 'COMBOBOX' || systemProperty.type eq 'DYNAMIC_INPUT'}">
           <td>${systemProperty.value}</td>
         </c:when>
         <c:when test="${systemProperty.type eq 'RADIO' || systemProperty.type eq 'DYNAMIC_RADIO'}">

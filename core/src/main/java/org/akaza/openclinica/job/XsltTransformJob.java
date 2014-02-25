@@ -85,9 +85,10 @@ public class XsltTransformJob extends QuartzJobBean {
 	public static final String SAS_ODM_OUTPUT_PATH = "sasOdmOutputPath";
 	public static final String SAS_DIR = "sas.dir";
 	public static final int SAS_DATASET_JOB_ID = 10;
-	public static final int MINUTE = 60000;
+	public static final int MILLISECONDS_IN_MINUTE = 60000;
 	public static final String SAS_DELETE_OLD_OBJECT = "sasDeleteOldObject";
-	public static final int SAS_DATASET_ATTEMPTS_QUANTITY = 10;
+	public static final int MINUTES_IN_HOUR = 60;
+	public static final String SAS_TIMER = "sas.timer";
 	private OpenClinicaMailSender mailSender;
 	private DataSource dataSource;
 	AuditEventDAO auditEventDAO;
@@ -208,11 +209,12 @@ public class XsltTransformJob extends QuartzJobBean {
 				}
 			}
 			if (sasDatasetJob && sasJobDir != null) {
+				int sasTimer = (Integer) dataMap.get(SAS_TIMER);
 				File sasJobDirFile = new File(sasJobDir);
-				if (((SimpleTriggerImpl) context.getTrigger()).getTimesTriggered() == SAS_DATASET_ATTEMPTS_QUANTITY + 1) {
+				if (((SimpleTriggerImpl) context.getTrigger()).getTimesTriggered() == sasTimer * MINUTES_IN_HOUR + 1) {
 					deleteDirectory(sasJobDirFile);
 					throw new Exception(messageSource.getMessage("sasDataset.exception.failed", new Object[] {
-							jobName != null ? jobName : datasetBean.getName(), SAS_DATASET_ATTEMPTS_QUANTITY }, locale));
+							jobName != null ? jobName : datasetBean.getName(), sasTimer, sasTimer > 1 ? "s" : "" }, locale));
 				}
 				emailBuffer = (StringBuffer) dataMap.get(SAS_EMAIL_BUFFER);
 				String sasOdmOutputPath = (String) dataMap.get(SAS_ODM_OUTPUT_PATH);
@@ -525,6 +527,8 @@ public class XsltTransformJob extends QuartzJobBean {
 						odmFile.delete();
 						new File(sasJobDirFile.getAbsolutePath() + File.separator + "uploaded.txt").createNewFile();
 
+						Integer sasTimer = Integer.parseInt(CoreResources.getField(SAS_TIMER));
+
 						XsltTransformJob.DeleteOldObject deleteOldObject = new XsltTransformJob.DeleteOldObject();
 						deleteOldObject.endFile = endFile;
 						deleteOldObject.deleteOld = deleteOld;
@@ -532,16 +536,17 @@ public class XsltTransformJob extends QuartzJobBean {
 						deleteOldObject.markForDelete = markForDelete;
 						deleteOldObject.intermediateFiles = intermediateFiles;
 
+						dataMap.put(SAS_TIMER, sasTimer);
 						dataMap.put(SAS_EMAIL_BUFFER, emailBuffer);
 						dataMap.put(SAS_ODM_OUTPUT_PATH, outputPath);
 						dataMap.put(SAS_DELETE_OLD_OBJECT, deleteOldObject);
 						dataMap.put(SAS_JOB_DIR, sasJobDirFile.getAbsolutePath());
 
 						((SimpleTriggerImpl) context.getTrigger()).setJobDataMap(dataMap);
-						((SimpleTriggerImpl) context.getTrigger()).setRepeatInterval(MINUTE);
-						((SimpleTriggerImpl) context.getTrigger()).setRepeatCount(SAS_DATASET_ATTEMPTS_QUANTITY);
+						((SimpleTriggerImpl) context.getTrigger()).setRepeatInterval(MILLISECONDS_IN_MINUTE);
+						((SimpleTriggerImpl) context.getTrigger()).setRepeatCount(sasTimer * MINUTES_IN_HOUR);
 						((SimpleTriggerImpl) context.getTrigger()).setStartTime(new Date(System.currentTimeMillis()
-								+ MINUTE));
+								+ MILLISECONDS_IN_MINUTE));
 						Date nextFireTime = context.getScheduler().rescheduleJob(context.getTrigger().getKey(),
 								context.getTrigger());
 						logger.info("Job: " + (jobName != null ? jobName : datasetBean.getName())
