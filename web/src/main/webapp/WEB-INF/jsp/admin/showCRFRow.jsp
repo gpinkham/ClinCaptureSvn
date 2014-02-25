@@ -117,14 +117,14 @@
               <td><a href="LockCRFVersion?id=<c:out value="${version.id}"/>"
                 onMouseDown="javascript:setImage('bt_Lock1','images/bt_Lock_d.gif');"
                 onMouseUp="javascript:setImage('bt_Lock1','images/bt_Lock.gif');"><img
-                name="bt_Lock1" src="images/bt_Lock.gif" border="0" alt="<fmt:message key="archive" bundle="${resword}"/>" title="<fmt:message key="archive" bundle="${resword}"/>" align="left" hspace="6"></a>
+                name="bt_Lock1" src="images/bt__Lock.png" border="0" alt="<fmt:message key="lock" bundle="${resword}"/>" title="<fmt:message key="lock" bundle="${resword}"/>" align="left" hspace="6"></a>
               </td>
 		  </c:if>
 		  <c:if test="${version.status.name=='locked'}">             
              <td><a href="UnlockCRFVersion?id=<c:out value="${version.id}"/>"
 			  onMouseDown="javascript:setImage('bt_Unlock1','images/bt_Unlock_d.gif');"
 			  onMouseUp="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"><img 
-			  name="bt_Unlock1" src="images/bt_Unlock.gif" border="0" alt="<fmt:message key="unarchive" bundle="${resword}"/>" title="<fmt:message key="unarchive" bundle="${resword}"/>" align="left" hspace="6"></a>
+			  name="bt_Unlock1" src="images/bt__Unlock.png" border="0" alt="<fmt:message key="unlock" bundle="${resword}"/>" title="<fmt:message key="unlock" bundle="${resword}"/>" align="left" hspace="6"></a>
 		     </td>       
           </c:if>
           <c:if test="${userBean.sysAdmin || (userRole.manageStudy && userBean.name==version.owner.name)}">

@@ -34,6 +34,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+
 @SuppressWarnings({ "rawtypes", "serial" })
 public class UnlockCRFVersionServlet extends SecureController {
 	/**
@@ -83,7 +84,7 @@ public class UnlockCRFVersionServlet extends SecureController {
 			version.setStatus(Status.AVAILABLE);
 			version.setUpdater(ub);
 			cvdao.update(version);
-			addPageMessage(respage.getString("crf_version_unarchived_successfully"));
+			addPageMessage(respage.getString("crf_version_unlocked_successfully"));
 			forwardPage(Page.CRF_LIST_SERVLET);
 		}
 	}

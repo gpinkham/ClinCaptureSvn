@@ -20,8 +20,7 @@
 
 		<div class="sidebar_tab_content">
 
-        <fmt:message key="confirm_archive_of_this_version"  bundle="${resword}"/>.
-        <fmt:message key="no_new_event_will_be_created_using_this_version"  bundle="${resword}"/>
+        <fmt:message key="confirm_lock_of_this_version"  bundle="${resword}"/>
 
 		</div>
 
@@ -44,7 +43,7 @@
 
 <h1>
 	<span class="first_level_header">
-		<fmt:message key="confirm_archiving_crf_version"  bundle="${resword}"/> 
+		<fmt:message key="confirm_locking_crf_version"  bundle="${resword}"/> 
 	</span>
 </h1>
 

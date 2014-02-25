@@ -21,8 +21,11 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -50,8 +53,9 @@ public class LockCRFVersionServlet extends Controller {
     */
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
@@ -64,8 +68,10 @@ public class LockCRFVersionServlet extends Controller {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
 		UserAccountBean ub = getUserAccountBean(request);
 
 		FormProcessor fp = new FormProcessor(request);
@@ -83,12 +89,10 @@ public class LockCRFVersionServlet extends Controller {
 		CRFDAO cdao = getCRFDAO();
 
 		CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(crfVersionId);
-		// System.out.println("crf version found:" + version.getName());
 		CRFBean crf = (CRFBean) cdao.findByPK(version.getCrfId());
 
 		if (!ub.isSysAdmin() && (version.getOwnerId() != ub.getId())) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
 							+ respage.getString("change_active_study_or_contact"), request);
 			forwardPage(Page.MENU_SERVLET, request, response);
 			return;
@@ -109,21 +113,18 @@ public class LockCRFVersionServlet extends Controller {
 			cvdao.update(version);
 
 			ArrayList versionList = (ArrayList) cvdao.findAllByCRF(version.getCrfId());
+			
 			if (versionList.size() > 0) {
+				
 				EventDefinitionCRFDAO edCRFDao = getEventDefinitionCRFDAO();
-				ArrayList edcList = (ArrayList) edCRFDao.findAllByCRF(version.getCrfId());
-				for (Object anEdcList : edcList) {
-					EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) anEdcList;
-					// @pgawade 18-May-2011 #5414 - Changes for setting the correct
-					// default crf version Id to event
-					// when existing default version is locked
-					// RemoveCRFVersionServlet.updateEventDef(edcBean, edCRFDao,
-					// versionList);
+				List<EventDefinitionCRFBean> edcList = (ArrayList<EventDefinitionCRFBean>) edCRFDao.findAllByCRF(version.getCrfId());
+				for (EventDefinitionCRFBean edcBean : edcList) {
+					
 					RemoveCRFVersionServlet.updateEventDef(edcBean, edCRFDao, versionList, crfVersionId);
 				}
 			}
 
-			addPageMessage(respage.getString("crf_version_archived_successfully"), request);
+			addPageMessage(respage.getString("crf_version_locked_successfully"), request);
 			forwardPage(Page.CRF_LIST_SERVLET, request, response);
 		}
 	}
