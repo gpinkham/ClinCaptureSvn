@@ -646,7 +646,7 @@
 <td>
 <form action="CreateSubStudy" method="post">
 <input type="hidden" name="action" value="submit">
- <input type="submit" name="Submit" value="<fmt:message key="submit_site" bundle="${resword}"/>" class="button_long">
+ <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
 </form>
 </td>
 </tr>
