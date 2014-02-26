@@ -158,7 +158,7 @@ public class StudiesServlet extends HttpServlet {
 						Element ruleDef = document.createElement("RuleDef");
 
 						// attributes
-						ruleDef.setAttribute("Name", "RS_GEN_RULE");
+						ruleDef.setAttribute("Name", rule.getString("name"));
 						ruleDef.setAttribute("OID", generateOID(rule.getString("expression"), currentCount));
 
 						// Increment the count

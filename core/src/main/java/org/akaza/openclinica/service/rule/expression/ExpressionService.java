@@ -774,16 +774,8 @@ public class ExpressionService {
 		if (studyEventDefinitions.get(studyEventDefinitionKey) != null) {
 			return studyEventDefinitions.get(studyEventDefinitionKey);
 		} else {
-			// temp fix
-			int studyId = study.getParentStudyId() != 0 ? study.getParentStudyId() : study.getId();
-			StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(
-					studyEventDefinitionKey, studyId, studyId);
-			// another way to get at the problem which I fix in the
-			// findByOidAndStudy method, tbh
 			
-			if (studyEventDefinition == null) {
-				studyEventDefinition = getStudyEventDefinitionDao().findByOid(studyEventDefinitionKey);
-			}
+			StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOid(studyEventDefinitionKey);
 			
 			if (studyEventDefinition != null) {
 				studyEventDefinitions.put(studyEventDefinitionKey, studyEventDefinition);

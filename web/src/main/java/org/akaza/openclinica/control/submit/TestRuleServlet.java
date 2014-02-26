@@ -130,6 +130,7 @@ public class TestRuleServlet extends Controller {
 			Integer ruleSetRuleId = fp.getInt("ruleSetRuleId");
 
 			if (ruleSetRuleId != 0) { // If testing an existing ruleSetRule
+				
 				RuleSetRuleBean rsr = getRuleSetRuleDao().findById(ruleSetRuleId);
 				rsr.getActions().size();
 				HashMap presetValues = new HashMap();

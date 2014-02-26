@@ -1640,7 +1640,7 @@ Parser.prototype.validate = function() {
 				testRuleActions: rule.evaluateTo
 			},
 
-			url: rule.submission + "/TestRule?action=validate&study=" + rule.study,
+			url: rule.study ? rule.submission + "/TestRule?action=validate&study=" + rule.study : rule.submission + "/TestRule?action=validate",
 
 			success: function(response) {
 
