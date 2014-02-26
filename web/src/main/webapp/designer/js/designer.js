@@ -1072,7 +1072,12 @@ function loadStudies(studies) {
 			pagination: pagination
 		});
 
-		$(".table-hover").find("tbody > tr").filter(":first").click();
+		// probably editing
+		if (parser.getStudy()) {
+			$('tr[id="'+ parser.getStudy() +'"]').click();
+		} else {
+			$(".table-hover").find("tbody > tr").filter(":first").click();
+		}
 
 		// Initial load should show studies
 		$("a[href='#studies']").tab('show');

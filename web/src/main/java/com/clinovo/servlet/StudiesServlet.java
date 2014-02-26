@@ -62,6 +62,10 @@ import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.ActionType;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.action.EmailActionBean;
+import org.akaza.openclinica.domain.rule.action.HideActionBean;
+import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.domain.rule.action.PropertyBean;
+import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -241,8 +245,76 @@ public class StudiesServlet extends HttpServlet {
 
 						act.put("type", "discrepancy");
 						act.put("message", discrepancyAction.getMessage());
+						
+					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.INSERT)) {
+						
+						InsertActionBean insertAction = (InsertActionBean) ruleSetRule.getActions().get(0);
+						
+						act.put("type","insert");
+						act.put("message", insertAction.getCuratedMessage());
+						
+						// Destinations
+						JSONArray destinations = new JSONArray();
+						for (int x = 0; x < insertAction.getProperties().size(); x++) {
+							
+							JSONObject dest = new JSONObject();
+							PropertyBean bean = insertAction.getProperties().get(x);
+							
+							dest.put("id", bean.getId());
+							dest.put("oid", bean.getOid());
+							dest.put("value", bean.getValue());
+							
+							destinations.put(dest);
+						}
+						
+						act.put("destinations", destinations);
+						
+					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.SHOW)) {
+						
+						ShowActionBean showAction = (ShowActionBean) ruleSetRule.getActions().get(0);
+						
+						act.put("show", true);
+						act.put("hide", false);
+						act.put("type","insert");
+						act.put("message", showAction.getMessage());
+						
+						JSONArray destinations = new JSONArray();
+						for (int x = 0; x < showAction.getProperties().size(); x++) {
+							
+							JSONObject dest = new JSONObject();
+							PropertyBean bean = showAction.getProperties().get(x);
+							
+							dest.put("id", bean.getId());
+							dest.put("oid", bean.getOid());
+							dest.put("value", bean.getValue());
+							
+							destinations.put(dest);
+						}
+						
+					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.HIDE)) {
+						
+						HideActionBean hideAction = (HideActionBean) ruleSetRule.getActions().get(0);
+						
+						act.put("show", true);
+						act.put("hide", false);
+						act.put("type","insert");
+						act.put("message", hideAction.getMessage());
+						
+						JSONArray destinations = new JSONArray();
+						for (int x = 0; x < hideAction.getProperties().size(); x++) {
+							
+							JSONObject dest = new JSONObject();
+							PropertyBean bean = hideAction.getProperties().get(x);
+							
+							dest.put("id", bean.getId());
+							dest.put("oid", bean.getOid());
+							dest.put("value", bean.getValue());
+							
+							destinations.put(dest);
+						}
+						
 					}
-
+					
 					ruleActions.put(act);
 
 				} catch (JSONException e) {
@@ -263,7 +335,13 @@ public class StudiesServlet extends HttpServlet {
 				object.put("targets", targets);
 				object.put("oid", rule.getOid());
 				object.put("actions", ruleActions);
-				object.put("name", rule.getDescription());
+				
+				if (!rule.getDescription().isEmpty()) {
+					object.put("name", rule.getDescription());
+				} else {
+					object.put("name", rule.getName());
+				}
+				
 				object.put("expression", rule.getExpression().getValue());
 
 				response.getWriter().write(object.toString());

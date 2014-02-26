@@ -92,7 +92,7 @@ public class InsertActionBean extends RuleActionBean {
 		if (properties == null) {
 			if (other.properties != null)
 				return false;
-		} else {// if (!properties.equals(other.properties))
+		} else {
 			if (properties.size() != other.properties.size())
 				return false;
 			for (PropertyBean propertyBean : other.properties) {

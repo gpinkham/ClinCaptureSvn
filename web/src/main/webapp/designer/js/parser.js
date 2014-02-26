@@ -21,6 +21,13 @@ function Parser() {
 	this.rule.actions = [];	
 }
 
+Parser.prototype.getStudy = function() {
+
+	if (this.rule) {
+		return this.rule.study;
+	}
+}
+
 /* ===========================================================================
  * Validates what the next droppable should be given a droppable with a type
  *
@@ -162,9 +169,13 @@ Parser.prototype.createNextDroppable = function(params) {
 			// Destination
 			var dest = Object.create(null);
 
+			var item = this.findItem(params.ui.draggable.text());
+
+			var oid = item.formOid + "." + item.group + "." + item.oid;
+
+			dest.oid = oid;
 			dest.value = "";
 			dest.id = params.element.parents(".row").attr("id");
-			dest.oid = this.findItem(params.ui.draggable.text()).oid;
 
 			this.getInsertAction().destinations.push(dest);			
 
@@ -217,7 +228,10 @@ Parser.prototype.createNextDroppable = function(params) {
 				}
 			}
 
-			this.getShowHideAction().destinations.push(params.ui.draggable.text());
+			var item = this.findItem(params.ui.draggable.text());
+			var destination = item.formOid + "." + item.group + "." + item.oid;
+
+			this.getShowHideAction().destinations.push(destination);
 
 			var newInput = params.element.clone();
 			createDroppable({
@@ -403,8 +417,8 @@ Parser.prototype.createRule = function() {
 
 		if (item) {
 
-			// Add form oid and group oid
-			exprItem = item.formOid + "." + item.group + "." + item.oid;
+			// Add event oid, form oid and group oid
+			exprItem = item.eventOid + "." + item.formOid + "." + item.group + "." + item.oid;
 		}
 
 		expression.push(exprItem);
@@ -418,9 +432,9 @@ Parser.prototype.createRule = function() {
 		for (var x = 0; x < this.rule.targets.length; x++) {
 
 			var obj = this.findItem(this.rule.targets[x])
-			var itemOid = obj !== undefined ? obj : $(".target").val();
+			var itemOid = obj !== undefined ? obj.eventOid + "." + obj.formOid + "." + obj.group + "." + obj.oid : $(".target").val();
 
-			tt.push(itemOid.oid)
+			tt.push(itemOid);
 		}
 
 		this.rule.targets = tt;
@@ -667,7 +681,11 @@ Parser.prototype.isAlreadyAddedInsertTarget = function(target) {
 
 Parser.prototype.isAlreadyAddedInsertTarget = function(target) {
 
-	return this.getShowHideAction() && this.getShowHideAction().targets.indexOf(target) > -1;
+	var item = this.findItem(target);
+
+	var dest = item.formOid + "." + item.group + "." + item.oid;
+
+	return this.getShowHideAction() && this.getShowHideAction().destinations.indexOf(dest) > -1;
 }
 
 /* ===========================================================================
@@ -703,8 +721,9 @@ Parser.prototype.findItem = function(itemName) {
 						var itm = ver.items[i];
 
 						if (itm.name === itemName) {
-
+							
 							itm.formOid = crf.oid;
+							itm.eventOid = event.oid;
 
 							return itm;
 						}
@@ -750,6 +769,7 @@ Parser.prototype.findItemName = function(itemOID) {
 						if (itm.oid === itemOID) {
 
 							itm.formOid = crf.oid;
+							itm.eventOid = event.oid;
 
 							return itm;
 						}
@@ -788,7 +808,7 @@ Parser.prototype.setTargets = function(targets) {
 				accept: "div[id='items'] td"
 			})
 
-			input.val(this.findItemName(targets[x]).name);
+			input.val(this.findItemName(this.extractLastItem(targets[x])).name);
 			input.css('font-weight', 'bold');
 
 			if (x === 0) {
@@ -801,7 +821,7 @@ Parser.prototype.setTargets = function(targets) {
 				currInput = input;
 			}
 
-			this.rule.targets.push(this.findItemName(targets[x]).name);
+			this.rule.targets.push(this.findItemName(this.extractLastItem(targets[x])).name);
 		}
 	}
 }
@@ -1123,8 +1143,8 @@ Parser.prototype.setInsertAction = function(params) {
 			
 			if (params.edit) {
 
+				action.message = "";
 				action.type = "insert";
-				action.message = params.action.message;
 				action.targets = params.action.targets;
 				action.destinations = params.action.destinations;
 
@@ -1133,6 +1153,7 @@ Parser.prototype.setInsertAction = function(params) {
 
 			} else {
 
+				action.message = "";
 				action.targets = [];
 				action.type = "insert";
 				action.destinations = [];
@@ -1189,7 +1210,9 @@ Parser.prototype.setShowHideAction = function(params) {
 				$("#actionMessages").show();
 
 				$("#dispActions").show();
-				$("#dispActions").find("input").val(action.message);
+				$("#dispActions").find("textarea").val(action.message);
+
+				$("#dispActions").find("textarea").focus();
 
 			} else {
 
@@ -1216,7 +1239,6 @@ Parser.prototype.setShowHideAction = function(params) {
 
 				action.type = "showHide";
 				action.message = params.action.message;
-				action.targets = params.action.targets;
 				action.destinations = params.action.destinations;
 
 				// Add action targets
@@ -1224,7 +1246,7 @@ Parser.prototype.setShowHideAction = function(params) {
 
 			} else {
 
-				action.targets = [];
+				action.message = "";
 				action.type = "showHide";
 				action.destinations = [];
 			}
@@ -1279,7 +1301,7 @@ Parser.prototype.setDestinations = function(dests) {
 			var input = newRow.find(".item");
 			newRow.attr("id", dest.id);
 
-			input.val(this.findItemName(dest.oid).name);
+			input.val(this.findItemName(this.extractLastItem(dest.oid)).name);
 			input.css('font-weight', 'bold');
 
 			var inputVal = newRow.find(".value");
@@ -1374,24 +1396,25 @@ Parser.prototype.setExpression = function(expression) {
 		var rawExpression = [];
 
 		// The regex skips quoted strings in expression
-		var expr = expression.split(/\s+(?!\w+")/);
+		var expr = expression.split(/(\()|(?=\))|\s+(?!\w+")/g);
 
 		for (var x = 0; x < expr.length; x++) {
 
-			if (expr[x].indexOf(".") !== -1) {
+			if (expr[x] && expr[x].length > 0) {
 
-				var itemOID = new RegExp("\.([^\.]+)$").exec(expr[x])[1]
+				if (expr[x].indexOf(".") !== -1) {
 
-				var itm = this.findItemName(itemOID);
+					var itm = this.findItemName(this.extractLastItem(expr[x]));
 
-				rawExpression.push(itm.name);
+					rawExpression.push(itm.name);
 
-			} else {
-
-				if (this.isOp(expr[x])) {
-					rawExpression.push(this.getLocalOp(expr[x]));
 				} else {
-					rawExpression.push(expr[x]);
+
+					if (this.isOp(expr[x])) {
+						rawExpression.push(this.getLocalOp(expr[x]));
+					} else {
+						rawExpression.push(expr[x]);
+					}
 				}
 			}
 		}
@@ -1432,6 +1455,11 @@ Parser.prototype.setActions = function(actions) {
 					selected: true
 					
 				})
+			} else if (action.type.toLowerCase() === "showHide") {
+
+				this.setShowHideAction({
+
+				})
 			}
 		}
 	}
@@ -1463,6 +1491,7 @@ Parser.prototype.getRule = function() {
 
 		rule.actions = this.getActions();
 
+		rule.study = this.rule.study;
 		rule.submission = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 
 		return rule;
@@ -1481,10 +1510,12 @@ Parser.prototype.getRule = function() {
 
 Parser.prototype.render = function(rule) {
 
+	this.rule.targets = [];
 	this.setExpression(rule.expression);
 
 	// properties
 	this.setName(rule.name);
+	this.rule.study = rule.study;
 	this.setTargets(rule.targets);
 	this.setEvaluatesTo(rule.evaluatesTo);
 
@@ -1565,6 +1596,7 @@ Parser.prototype.fetchRuleForEditing = function() {
 				rule = JSON.parse(response)
 			}
 
+			rule.study = parseInt(parser.getParameterValue("study"));
 			parser.render(rule);
 
 			$(".spinner").remove();
@@ -1608,7 +1640,7 @@ Parser.prototype.validate = function() {
 				testRuleActions: rule.evaluateTo
 			},
 
-			url: rule.submission + "/TestRule?action=validate&study=" + selectedStudy,
+			url: rule.submission + "/TestRule?action=validate&study=" + rule.study,
 
 			success: function(response) {
 
@@ -1690,12 +1722,16 @@ Parser.prototype.getParameterValue = function(name) {
 
 	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
-	var regexS = "[\\?&]" + name + "=([^&#]*)";
-	var regex = new RegExp(regexS);
+	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
 	var results = regex.exec(window.location.href);
 	if (results == null) {
 		return "";
 	} else {
 		return results[1];
 	}
+}
+
+Parser.prototype.extractLastItem = function(predicate) {
+
+	return new RegExp("\.([^\.]+)$").exec(predicate)[1]
 }

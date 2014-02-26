@@ -780,6 +780,11 @@ public class ExpressionService {
 					studyEventDefinitionKey, studyId, studyId);
 			// another way to get at the problem which I fix in the
 			// findByOidAndStudy method, tbh
+			
+			if (studyEventDefinition == null) {
+				studyEventDefinition = getStudyEventDefinitionDao().findByOid(studyEventDefinitionKey);
+			}
+			
 			if (studyEventDefinition != null) {
 				studyEventDefinitions.put(studyEventDefinitionKey, studyEventDefinition);
 				return studyEventDefinition;

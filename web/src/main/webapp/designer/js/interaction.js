@@ -411,6 +411,8 @@ $(function() {
 		$("#insert").find("textarea").focus();
 	})
 
+
+	// Not used yet
 	$("#insert").find("textarea").blur(function() {
 
 		parser.setInsertActionMessage($(this).val());
@@ -531,6 +533,8 @@ $(function() {
 
 			var rule = JSON.parse(sessionStorage.getItem("rule"));
 
+			selectedStudy = rule.study;
+			
 			parser.render(rule);
 		}
 
