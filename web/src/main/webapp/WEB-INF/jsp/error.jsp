@@ -39,7 +39,7 @@
 <fmt:message key="error_page" bundle="${resword}">
 	<%--<fmt:param><%=request.getHeader("Referer")%></fmt:param>--%>
 	<%-- tbh 02/2010 remove HTML/XML from the referer name --%>
-	<fmt:param><%=SQLInitServlet.getField("mail.errormsg")%></fmt:param>
+	<fmt:param><c:url value="/Contact"/></fmt:param>
 </fmt:message>
 <br></br>
 <br></br>
