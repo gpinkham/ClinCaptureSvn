@@ -315,6 +315,10 @@
 							<nonFilteredFileExtension>ico</nonFilteredFileExtension>
 							<nonFilteredFileExtension>jpg</nonFilteredFileExtension>
 							<nonFilteredFileExtension>png</nonFilteredFileExtension>
+							<nonFilteredFileExtension>eot</nonFilteredFileExtension>
+							<nonFilteredFileExtension>svg</nonFilteredFileExtension>
+							<nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+							<nonFilteredFileExtension>woff</nonFilteredFileExtension>
 						</nonFilteredFileExtensions>
 						<webResources>
 							<resource>
