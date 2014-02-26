@@ -95,7 +95,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 	@Test
 	public void testThatSizeOfTheErrorMessagesListIsCorrect() {
 		int currentStudyId = 1;
-		assertEquals(holder.service.validateStudyMetadata(holder.container, currentStudyId, holder.ub).size(), 0);
+		assertEquals(holder.service.validateStudyMetadata(holder.container, currentStudyId, holder.ub).size(), 1);
 	}
 
 	@Test

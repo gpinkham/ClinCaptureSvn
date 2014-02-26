@@ -15,76 +15,32 @@ package org.akaza.openclinica.web.crfdata;
 
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.util.ValidatorHelper;
-
-import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.ItemDataType;
-import org.akaza.openclinica.bean.core.NullValue;
+import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.core.ResponseType;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ResponseOptionBean;
-import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
-import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
+import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.submit.crfdata.*;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyConfigService;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.dao.submit.*;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ImportCRFDataService {
@@ -128,15 +84,45 @@ public class ImportCRFDataService {
 	}
 
 	private StudySubjectBean createStudySubject(UserAccountBean ub, StudyBean studyBean,
-			SubjectDataBean subjectDataBean, SubjectDAO subjectDAO, StudySubjectDAO studySubjectDAO) {
-		String studySubjectId = studySubjectIdService.getNextStudySubjectId(studyBean.getName());
-		if (studySubjectDAO.countByLabel(studySubjectId) > 0) {
-			createStudySubject(ub, studyBean, subjectDataBean, subjectDAO, studySubjectDAO);
+			SubjectDataBean subjectDataBean, SubjectDAO subjectDAO, StudySubjectDAO studySubjectDAO, List<String> errors)
+			throws OpenClinicaException {
+		String subjectOid = subjectDataBean.getSubjectOID();
+		String studySubjectId = subjectDataBean.getStudySubjectId();
+		if (subjectOid == null || subjectOid.trim().isEmpty()) {
+			studySubjectId = studySubjectIdService.getNextStudySubjectId(studyBean.getName());
+			subjectOid = "SS_" + studySubjectId.replaceAll(" |-", "").toUpperCase();
+			if (studySubjectDAO.findByOid(subjectOid) != null) {
+				return createStudySubject(ub, studyBean, subjectDataBean, subjectDAO, studySubjectDAO, errors);
+			}
+			String idSetting = studyBean.getStudyParameterConfig().getSubjectIdGeneration();
+			if (idSetting.equals("manual")) {
+				studySubjectId = subjectDataBean.getStudySubjectId();
+				if (studySubjectDAO.findByLabelAndStudy(studySubjectId, studyBean).getId() > 0) {
+					MessageFormat mf = new MessageFormat("");
+					mf.applyPattern(respage
+							.getString("study_subject_id_is_not_unique_in_the_study_you_may_change_the_study_param"));
+					Object[] arguments = { studySubjectId };
+					errors.add(mf.format(arguments));
+					logger.debug("Study subject id is not unique");
+					throw new OpenClinicaException("Study subject id is not unique", "");
+				}
+			} else {
+				if (studySubjectDAO.findByLabelAndStudy(studySubjectId, studyBean).getId() > 0) {
+					return createStudySubject(ub, studyBean, subjectDataBean, subjectDAO, studySubjectDAO, errors);
+				}
+			}
+		}
+
+		if (studySubjectId == null || studySubjectId.trim().isEmpty()) {
+			MessageFormat mf = new MessageFormat("");
+			mf.applyPattern(respage.getString("study_subject_id_should_be_specifyed"));
+			Object[] arguments = { studySubjectId };
+			errors.add(mf.format(arguments));
+			logger.debug("The Study Subject Id should be specified");
+			throw new OpenClinicaException("The Study Subject Id should be specified", "");
 		}
 
 		Date currentDate = new Date();
-
-		String subjectOid = subjectDataBean.getSubjectOID();
 
 		SubjectBean subjectBean = new SubjectBean();
 		subjectBean.setOwner(ub);
@@ -157,7 +143,9 @@ public class ImportCRFDataService {
 		studySubjectBean.setEnrollmentDate(currentDate);
 
 		// TODO in a future we should know how to process study subject's groups
-		return studySubjectDAO.create(studySubjectBean, false);
+		studySubjectBean = studySubjectDAO.create(studySubjectBean, false);
+		subjectDataBean.setSubjectOID(studySubjectBean.getOid());
+		return studySubjectBean;
 	}
 
 	private StudyEventBean scheduleStudyEvent(int sampleOrdinal, UserAccountBean ub, StudySubjectBean studySubjectBean,
@@ -880,8 +868,6 @@ public class ImportCRFDataService {
 			StudyDAO studyDAO = new StudyDAO(ds);
 			String studyOid = odmContainer.getCrfDataPostImportContainer().getStudyOID();
 			StudyBean studyBean = studyDAO.findByOid(studyOid);
-			StudyConfigService configService = new StudyConfigService(ds);
-			studyBean = configService.setParametersForStudy(studyBean);
 			if (studyBean == null) {
 				mf.applyPattern(respage.getString("your_study_oid_does_not_reference_an_existing"));
 				Object[] arguments = { studyOid };
@@ -895,6 +881,8 @@ public class ImportCRFDataService {
 				Object[] arguments = { studyBean.getName() };
 				errors.add(mf.format(arguments));
 			}
+			StudyConfigService configService = new StudyConfigService(ds);
+			studyBean = configService.setParametersForStudy(studyBean);
 			ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
 
 			StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
@@ -910,17 +898,31 @@ public class ImportCRFDataService {
 			if (subjectDataBeans != null) {// need to do this so as not to
 				// throw the exception below and
 				// report all available errors, tbh
+				Map<String, String> createdOidsMap = new HashMap<String, String>();
 				for (SubjectDataBean subjectDataBean : subjectDataBeans) {
 					String oid = subjectDataBean.getSubjectOID();
-					StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(oid, studyBean.getId());
+					if ((oid == null || oid.trim().isEmpty())
+							&& createdOidsMap.containsKey(subjectDataBean.getStudySubjectId())) {
+						oid = createdOidsMap.get(subjectDataBean.getStudySubjectId());
+						subjectDataBean.setSubjectOID(oid);
+					}
+					StudySubjectBean studySubjectBean = oid != null && !oid.trim().isEmpty() ? studySubjectDAO
+							.findByOid(oid) : null;
 					if (studySubjectBean == null
 							&& studyBean.getStudyParameterConfig().getAutoCreateSubjectDuringImport()
 									.equalsIgnoreCase("yes")) {
 						studySubjectBean = createStudySubject(ub, studyBean, subjectDataBean, subjectDAO,
-								studySubjectDAO);
+								studySubjectDAO, errors);
+						createdOidsMap.put(subjectDataBean.getStudySubjectId(), studySubjectBean.getOid());
 					}
 					if (studySubjectBean == null) {
 						mf.applyPattern(respage.getString("your_subject_oid_does_not_reference"));
+						Object[] arguments = { oid };
+						errors.add(mf.format(arguments));
+
+						logger.debug("logged an error with subject oid " + oid);
+					} else if (studySubjectBean.getStudyId() != studyBean.getId()) {
+						mf.applyPattern(respage.getString("your_subject_oid_is_linked_with_another_study"));
 						Object[] arguments = { oid };
 						errors.add(mf.format(arguments));
 

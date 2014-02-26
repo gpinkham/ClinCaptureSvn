@@ -25,20 +25,21 @@ import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(namespace="http://www.cdisc.org/ns/odm/v1.3")
+@XmlRootElement(namespace = "http://www.cdisc.org/ns/odm/v1.3")
 public class SubjectDataBean {
-	
+
 	private ArrayList<StudyEventDataBean> studyEventData;
 	private String subjectOID;
+	private String studySubjectId;
 	private AuditLogsBean auditLogs;
 	private DiscrepancyNotesBean discrepancyNotes;
-	
+
 	public SubjectDataBean() {
 		studyEventData = new ArrayList<StudyEventDataBean>();
 		auditLogs = new AuditLogsBean();
 		discrepancyNotes = new DiscrepancyNotesBean();
 	}
-	
+
 	@XmlAttribute(name = "SubjectKey")
 	public String getSubjectOID() {
 		return subjectOID;
@@ -47,8 +48,17 @@ public class SubjectDataBean {
 	public void setSubjectOID(String subjectOID) {
 		this.subjectOID = subjectOID;
 	}
-	
-	@XmlElement(name = "StudyEventData", namespace="http://www.cdisc.org/ns/odm/v1.3")
+
+	@XmlAttribute(name = "StudySubjectID", namespace = "http://www.openclinica.org/ns/odm_ext_v130/v3.1")
+	public String getStudySubjectId() {
+		return studySubjectId;
+	}
+
+	public void setStudySubjectId(String studySubjectId) {
+		this.studySubjectId = studySubjectId;
+	}
+
+	@XmlElement(name = "StudyEventData", namespace = "http://www.cdisc.org/ns/odm/v1.3")
 	public ArrayList<StudyEventDataBean> getStudyEventData() {
 		return studyEventData;
 	}
