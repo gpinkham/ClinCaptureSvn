@@ -459,7 +459,7 @@
         </div>
         <div class="taskRightColumn">
             <div class="taskLink"><a href="${urlPrefix}j_spring_security_logout"><fmt:message key="nav_log_out" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="javascript: window.location.href=('http://www.clinovo.com/clincapture/forum/');" > <fmt:message key="forums" bundle="${resword}"/> </a></div>
+            <div class="taskLink"><a href="http://www.clinovo.com/clincapture/forum/" target="_blank" > <fmt:message key="forums" bundle="${resword}"/> </a></div>
             <div class="taskLink"><a href="javascript: openDefWindow('${pageContext.request.contextPath}/help/about.jsp');" > <fmt:message key="about" bundle="${resword}"/> </a></div>
         </div>
         <br clear="all">

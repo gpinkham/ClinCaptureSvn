@@ -30,11 +30,11 @@
 							key="nav_support" bundle="${resword}" /></a><br />
 				<br />
 				<br />
-				<br /><a href="http://www.clinovo.com/clincapture/forum/"><fmt:message
+				<br /><a href="http://www.clinovo.com/clincapture/forum/" target="_blank"><fmt:message
 							key="forums" bundle="${resword}" /></a><br/>
 				<br />
 				<br />
-				<br /><a href="http://www.clinovo.com/clincapture/community/"><fmt:message
+				<br /><a href="http://www.clinovo.com/clincapture/community/" target="_blank"><fmt:message
 							key="community" bundle="${resword}" /></a> 
 						&nbsp;&nbsp;&nbsp;</td>
 				<td class="footer"></td>
@@ -45,7 +45,7 @@
                 </td>
                 <td width="80" align="right" valign="bottom" nowrap> 
 					&nbsp;&nbsp;
-					<a href="http://www.clinovo.com/"><img src="<c:url value='${logoUrl}'/>" width="150" height="50" border="0" ></a>
+					<a href="http://www.clinovo.com/" target="_blank"><img src="<c:url value='${logoUrl}'/>" width="150" height="50" border="0" ></a>
 					&nbsp;&nbsp;
 				</td>
             </tr>
