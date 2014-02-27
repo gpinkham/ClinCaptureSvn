@@ -36,7 +36,7 @@ public class Navigation {
 			"/CreateDiscrepancyNote", "/confirmCRFVersionChange", "/ViewDiscrepancyNote", "/AccessFile", "/help",
 			"/PrintSubjectCaseBook", "/ExportExcelStudySubjectAuditLog", "/ShowCalendarFunc",
 			"/ViewCalendaredEventsForSubject", "/ResetPassword", "/pages/cancelScheduledJob", "/CRFListForStudyEvent",
-			"/ChangeDefinitionCRFOrdinal", "/DoubleDataEntry", "/CreateOneDiscrepancyNote"));
+			"/ChangeDefinitionCRFOrdinal", "/DoubleDataEntry", "/CreateOneDiscrepancyNote", "/MatchPassword"));
 	private static String defaultShortURL = "/MainMenu";
 
 	public static void removeUrl(HttpServletRequest request, String excludeUrl) throws Exception {
