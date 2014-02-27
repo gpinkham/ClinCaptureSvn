@@ -276,8 +276,9 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
                 builder.table(1).id("tablepaging").styleClass("itemsTable").style("display:" + showContextValue + ";").close()
                         .tr(1).close()
                         .td(1).close().append("HTTP: ").tdEnd()
-                        .td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href(codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
-                        .td(3).width("360px").colspan("2").close().tdEnd()
+						.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href("http://bioportal.bioontology.org/ontologies/"
+						+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
+						.td(3).width("360px").colspan("2").close().tdEnd()
                         .td(4).close().tdEnd().trEnd(1);
 
 

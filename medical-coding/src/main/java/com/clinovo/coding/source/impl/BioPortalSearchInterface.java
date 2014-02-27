@@ -53,6 +53,7 @@ public class BioPortalSearchInterface implements SearchInterface {
             String codeHttpPath = jsonObjectElement.get("@id").getAsString();
             String prefLabel = jsonObjectElement.get("prefLabel").getAsString();
 
+			codeHttpPath = codeHttpPath.indexOf("/MDR/") > 0 ? codeHttpPath.replace("/MDR/", "/MEDDRA/") : codeHttpPath;
 
             if (treePath.contains("/tree") && treePath.contains(dictionary)) {
 

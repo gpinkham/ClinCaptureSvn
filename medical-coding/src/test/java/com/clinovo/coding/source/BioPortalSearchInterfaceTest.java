@@ -40,7 +40,7 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
     public void testThatSearchReturnsClassificationEachHavingHttpPath() throws Exception {
 
         Classification classification = searchInterface.search("Leukaemia plasmacytic (in remission)", "MEDDRA", "http://1.1.1.1", "api key").get(0);
-        assertEquals("http://purl.bioontology.org/ontology/MDR/10024319", classification.getHttpPath());
+        assertEquals("http://purl.bioontology.org/ontology/MEDDRA/10024319", classification.getHttpPath());
 
     }
 

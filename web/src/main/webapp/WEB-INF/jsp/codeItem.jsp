@@ -30,8 +30,13 @@
                         <c:if test="${(color == 'green')}">
                             <c:set var="hyperlinkColor" value="#75b894"/>
                         </c:if>
-                         <td><a target="_blank" style="color:<c:out value="${hyperlinkColor}"/>" href="<c:out value="${obj.httpPath}"/>"><c:out value="${obj.httpPath}"/></a></td>
-                         <td width=360px colspan="2"></td>
+                        <td>
+                            <a target="_blank" style="color:<c:out value="${hyperlinkColor}"/>" href="http://bioportal.bioontology.org/ontologies/
+                               <c:out value="${fn:toUpperCase(fn:replace(itemDictionary, ' ', ''))}"/>?p=classes&conceptid=<c:out value="${obj.httpPath}"/>">
+                               <c:out value="${obj.httpPath}"/>
+                            </a>
+                        </td>
+                        <td width=360px colspan="2"></td>
                          <td></td>
                      </tr>
                     <c:forEach items="${obj.classificationElement}" var="classElement">
