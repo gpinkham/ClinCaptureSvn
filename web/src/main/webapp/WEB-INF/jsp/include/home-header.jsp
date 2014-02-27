@@ -74,6 +74,17 @@
 				  'type="text/css">body {display:none;}<\/style>');
 		</script>
 	</c:if>
+	<c:choose>
+		<c:when test="${(color == 'violet')}">
+			<link rel="stylesheet" href="<c:out value="${pageContext.request.contextPath}" />/includes/css/charts_violet.css" type="text/css"/>
+		</c:when>
+		<c:when test="${(color == 'green')}">
+			<link rel="stylesheet" href="<c:out value="${pageContext.request.contextPath}" />/includes/css/charts_green.css" type="text/css"/>
+		</c:when>
+		<c:otherwise>
+			<link rel="stylesheet" href="<c:out value="${pageContext.request.contextPath}" />/includes/css/charts_blue.css" type="text/css"/>
+		</c:otherwise>
+	</c:choose>
 </head>
 
 <body class="main_BG" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0"

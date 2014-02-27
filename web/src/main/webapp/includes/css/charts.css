@@ -17,16 +17,6 @@ table.widgets_container td {
 	border: 1px solid gray;
 }
 
-.widget h2 {
-	margin: 3px 3px;
-	padding: 1px 10px;
-	width: auto;
-	color: white;
-	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
-	font-size: 11px;
-	text-align: center;
-}
-
 .toolbar_wrapper {
 	position: fixed;
 	right: 0px;
@@ -65,8 +55,23 @@ table.widgets_container td {
 	color: white;
 }
 
+.widget h2 {
+	margin: 3px 3px;
+	padding: 1px 10px;
+	width: auto;
+	color: white;
+	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+	font-size: 11px;
+	text-align: center;
+}
+
 .widget .remove {
 	display: none;
+}
+
+.widget .bar_name {
+	text-align: center;
+	padding-top: 5px;
 }
 
 .configure .widget:hover .remove {
@@ -116,7 +121,7 @@ form#actionForSave input {
 	margin-right: -3px;
 }
 
-@-moz-document url-prefix () { #stacked_bar li , .stacked_bar li{ 
+@-moz-document url-prefix () { #stacked_bar li , .stacked_bar li { 
 	display:inline-block!important;
 	width: 0px;
 	height: 20px;
@@ -181,6 +186,10 @@ form#actionForSave input {
 	width: 360px
 }
 
+.widget .hidden {
+	display: none;
+}
+
 .widget .notes td {
 	color: gray;
 	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
@@ -202,7 +211,7 @@ form#actionForSave input {
 	display: none;
 }
 
-.widget form#events_completion {
+.widget form#events_completion_form {
 	display: none;
 }
 
@@ -228,3 +237,45 @@ form#actionForSave input {
 	background-color: black;
 }
 /* /DNs assigned to me */
+
+/* Events Completion */
+.events_completion ul#stacked_bar,  .events_completion .not_cheduled{
+	background-color: #ecf8ff;
+}
+
+.events_completion .scheduled {
+	background-color: #b8e6ff;
+}
+
+.events_completion .data_entry_started {
+	background-color: #f9ff49;
+}
+
+.events_completion .completed {
+	background-color: #6c1dd5;
+}
+
+.events_completion .signed {
+	background-color: #83ff43;
+}
+
+.events_completion  .locked {
+	background-color: #b8b8b8;
+}
+
+.events_completion .skipped {
+	background-color: #ffba00;
+}
+
+.events_completion .stopped {
+	background-color: #d30500;
+}
+
+.events_completion  .sdved,.events_completion .source_data_verified {
+	background-color: #339500;
+}
+
+.events_completion  .stacked_bar,.events_completion .not_scheduled {
+	background-color: #ecf8ff;
+}
+/*/ Events Completion */
