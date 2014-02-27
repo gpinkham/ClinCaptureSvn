@@ -358,12 +358,9 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 				String close = fp.getString("close" + parentId);
 				// session.setAttribute(CLOSE_WINDOW, "true".equals(close)?"true":"");
 				if ("true".equals(close)) {
-					ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(dn.getEntityType(), dn.getEntityId(),
-							dn.getColumn());
-					dn.setResolutionStatusId(DataEntryServlet
-							.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));
-					request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn);
+					sendUpdatedDN(entityId, dn, dndao, request);
 					request.setAttribute("responseMessage", "Save Done");
+					
 					forwardPage(Page.ADD_ONE_DISCREPANCY_NOTE_DIV, request, response);
 					return;
 				} else {
@@ -391,11 +388,19 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "y", ypos != null && ypos.length() > 0 ? ypos : "0");
 		request.setAttribute(REFRESH_PARENT_WINDOW, true);
 		dn.setItemId(fp.getInt(ITEM_ID));
+		sendUpdatedDN(entityId, dn, dndao, request);
+		
+		forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()), request, response);
+	}
+
+	private void sendUpdatedDN(int entityId, DiscrepancyNoteBean dn, DiscrepancyNoteDAO dndao,
+			HttpServletRequest request) {
+		// we should send fake dn with correct resolution status to change flag color for the field
 		ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(dn.getEntityType(), dn.getEntityId(),
 				dn.getColumn());
-		dn.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));
-		request.setAttribute(UPDATED_DISCREPANCY_NOTE, dn);
-    	forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()), request, response);
+		DiscrepancyNoteBean dnDuplicate = new DiscrepancyNoteBean(dn);
+		dnDuplicate.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));
+		request.setAttribute(UPDATED_DISCREPANCY_NOTE, dnDuplicate);
 	}
 
 	private void manageReasonForChangeState(HttpSession session, Integer itemDataBeanId) {

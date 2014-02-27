@@ -141,6 +141,27 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 		lastUpdator = new UserAccountBean();
 		updatedDate = null;
 	}
+	
+	public DiscrepancyNoteBean(DiscrepancyNoteBean dnb) {
+		// simple fields are copied
+		this.description = dnb.getDescription();
+		this.detailedNotes = dnb.getDetailedNotes();
+		this.itemId = dnb.getItemId();
+		this.resolutionStatusId = dnb.getResolutionStatusId();
+		this.column = dnb.getColumn();
+		this.assignedUserId = dnb.getAssignedUserId();
+		this.field = dnb.getField();
+		this.discrepancyNoteTypeId = dnb.getDiscrepancyNoteTypeId();
+		this.parentDnId = dnb.parentDnId;
+		this.subjectId = dnb.getSubjectId();
+		this.studyId = dnb.getStudyId();
+		this.isSaved = dnb.isSaved();
+		this.active = dnb.isActive();
+		
+		// bean-fields are copied
+		this.disType = dnb.getDisType();
+		this.resStatus = dnb.getResStatus();
+	}
 
 	/**
 	 * @return Returns the disType.
