@@ -171,7 +171,7 @@ public class ImportRuleServlet extends Controller {
 						response.getWriter().write(obj.toString());
 
 					} catch (Exception ex) {
-						logger.error("Error has occurred.", ex);
+						logger.error("RS save error.", ex);
 						response.sendError(500, ex.getMessage());
 					}
 

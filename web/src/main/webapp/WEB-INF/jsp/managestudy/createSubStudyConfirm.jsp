@@ -650,6 +650,7 @@
 </form>
 </td>
 </tr>
+</table>
 
 <br><br>
 
