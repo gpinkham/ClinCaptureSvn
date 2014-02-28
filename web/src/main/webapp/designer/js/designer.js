@@ -1077,7 +1077,13 @@ function loadStudies(studies) {
 
 		// probably editing
 		if (parser.getStudy()) {
-			$('tr[id="'+ parser.getStudy() +'"]').click();
+
+			var st = studies.filter(function(x) {
+				return x.id === parser.getStudy();
+			})
+
+			$('tr[id="'+ studies.indexOf(st[0]) +'"]').click();
+
 		} else {
 			$(".table-hover").find("tbody > tr").filter(":first").click();
 		}
