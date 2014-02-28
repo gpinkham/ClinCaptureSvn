@@ -1960,28 +1960,28 @@ public abstract class DataEntryServlet extends Controller {
 				if (refItemData.getId() == displayItemBean.getData().getId()
 						&& !refItemData.getValue().equalsIgnoreCase(displayItemBean.getData().getValue())) {
 
-                    CodedItem codedItem = (CodedItem) getCodedItemService().findCodedItem(refItemData.getId());
+					CodedItem codedItem = (CodedItem) getCodedItemService().findCodedItem(refItemData.getId());
 
-                    if (codedItem != null && codedItem.getId() > 0) {
+					if (codedItem != null && codedItem.getId() > 0) {
 
-                        codedItem.setStatus("NOT_CODED");
-                        codedItem.setHttpPath("");
-                        codedItem.setPreferredTerm(displayItemBean.getData().getValue());
+						codedItem.setStatus("NOT_CODED");
+						codedItem.setHttpPath("");
+						codedItem.setPreferredTerm(displayItemBean.getData().getValue());
 
-                        for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
+						for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
 
-                            codedItemElement.setItemCode("");
-                        }
+							codedItemElement.setItemCode("");
+						}
 
-                        if (displayItemBean.getData().getValue().isEmpty()) {
-                            getCodedItemService().deleteCodedItem(codedItem);
-                        } else {
-                            getCodedItemService().saveCodedItem(codedItem);
-                        }
+						if (displayItemBean.getData().getValue().isEmpty()) {
+							getCodedItemService().deleteCodedItem(codedItem);
+						} else {
+							getCodedItemService().saveCodedItem(codedItem);
+						}
 
-                        item.getData().setValue("");
-                    }
-                }
+						item.getData().setValue("");
+					}
+				}
 			}
 		}
 	}
@@ -2195,17 +2195,18 @@ public abstract class DataEntryServlet extends Controller {
 		logger.trace("***FOUND*** crfversionid: " + crfVersionId);
 		int studyEventId = fp.getInt(INPUT_STUDY_EVENT_ID);
 		int eventDefinitionCRFId = fp.getInt(INPUT_EVENT_DEFINITION_CRF_ID);
-		int subjectId = fp.getInt(INPUT_SUBJECT_ID);
+		int studySubjectId = fp.getInt(INPUT_SUBJECT_ID);
 		int eventCRFId = fp.getInt(INPUT_EVENT_CRF_ID);
 
 		logger.trace("look specifically wrt event crf id: " + eventCRFId);
 
 		logger.trace("Creating event CRF.  Study id: " + currentStudy.getId() + "; CRF Version id: " + crfVersionId
 				+ "; Study Event id: " + studyEventId + "; Event Definition CRF id: " + eventDefinitionCRFId
-				+ "; Subject: " + subjectId);
+				+ "; Study Subject: " + studySubjectId);
 
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
-		StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
+		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studySubjectId);
+		StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(studySubjectBean.getSubjectId(), currentStudy);
 
 		if (ssb.getId() <= 0) {
 			logger.trace("throwing ISE with study subject bean id of " + ssb.getId());
