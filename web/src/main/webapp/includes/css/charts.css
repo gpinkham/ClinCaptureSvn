@@ -244,35 +244,35 @@ form#actionForSave input {
 }
 
 .events_completion .scheduled {
-	background-color: #b8e6ff;
+	background-color: #12d2ff;
 }
 
 .events_completion .data_entry_started {
-	background-color: #f9ff49;
+	background-color: #ffc700;
 }
 
 .events_completion .completed {
-	background-color: #6c1dd5;
+	background-color: #9439c4;
 }
 
 .events_completion .signed {
-	background-color: #83ff43;
+	background-color: #029f32;
 }
 
 .events_completion  .locked {
-	background-color: #b8b8b8;
+	background-color: #868686;
 }
 
 .events_completion .skipped {
-	background-color: #ffba00;
+	background-color: #ff6301;
 }
 
 .events_completion .stopped {
-	background-color: #d30500;
+	background-color: #ff0000;
 }
 
 .events_completion  .sdved,.events_completion .source_data_verified {
-	background-color: #339500;
+	background-color: #8ac819;
 }
 
 .events_completion  .stacked_bar,.events_completion .not_scheduled {
