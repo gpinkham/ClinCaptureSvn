@@ -89,14 +89,12 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-        tableFacade.setColumnProperties("itemDataValue", "dictionary",
-                "codedItem.version", "status", "subjectName", "eventName", "crfName", "codedColumn", "actionColumn");
+        tableFacade.setColumnProperties("itemDataValue", "dictionary", "status", "subjectName", "eventName", "crfName", "codedColumn", "actionColumn");
         
         Row row = tableFacade.getTable().getRow();
         
         configureColumn(row.getColumn("itemDataValue"), "Verbatim Term", new ItemDataValueCellEditor(), null);
         configureColumn(row.getColumn("dictionary"), "Dictionary", new DictionaryCellEditor(), new DictionaryDroplistFilterEditor());
-        configureColumn(row.getColumn("codedItem.version"), "Version", new VersionCellEditor(), null, true, true);
         configureColumn(row.getColumn("status"), "Status", new StatusCellEditor(), new StatusDroplistFilterEditor());
         configureColumn(row.getColumn("subjectName"), "Study Subject ID", new SubjectCellEditor(), null, true, true);
         configureColumn(row.getColumn("eventName"), "Study Event", new EventCellEditor(), null, true, true);
@@ -123,7 +121,6 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             h.put("codedItem", codedItem);
             h.put("codedItem.itemId", codedItem.getItemId());
             h.put("itemDataValue", getItemDataValue(codedItem.getItemId()));
-            h.put("codedItem.version", codedItem.getVersion());
             h.put("subjectName", getSubjectBean(codedItem.getSubjectId()).getLabel());
             h.put("eventName", getStudyEventDefinitionBean(codedItem.getEventCrfId(), codedItem.getCrfVersionId()).getName());
             h.put("status", getCodedItemStatus(codedItem));
@@ -209,23 +206,6 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         return "Dictionary Not Found";
     }
     
-    @SuppressWarnings({ "unchecked"})
-    private class VersionCellEditor implements CellEditor {
-
-		public Object getValue(Object item, String property, int rowcount) {
-
-            CodedItem codedItem = (CodedItem) ((HashMap<Object, Object>) item).get("codedItem");
-            HtmlBuilder builder = new HtmlBuilder();
-
-            if (codedItem != null) {
-
-                builder.div().name("codedItemVersion").close().append(codedItem.getVersion()).divEnd();
-            }
-
-            return builder.toString();
-        }
-    }
-
     @SuppressWarnings("unchecked")
     private class CodedCellEditor implements CellEditor {
     	

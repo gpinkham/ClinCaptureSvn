@@ -2907,7 +2907,10 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
             $("table.summaryTable tr td[name='tdCoded'] a").text(tdCoded + 1);
 
             //append context box
-            $("div[id=" + id + "]").append(contextBox);
+            if ($.trim($("div[id=" + id + "]").text()).length == 0) {
+
+                $("div[id=" + id + "]").append(contextBox);
+            }
 
             //add hidden marks
             if (term !== undefined && pref !== undefined) {

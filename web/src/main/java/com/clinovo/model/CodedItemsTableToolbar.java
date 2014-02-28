@@ -28,7 +28,7 @@ public class CodedItemsTableToolbar extends DefaultToolbar {
     private boolean contextNeeded;
     private boolean showCodedItemsContext;
 
-    private final static String INDEXES_OF_COLUMNS_TO_BE_HIDDEN = "4, 5, 6";
+    private final static String INDEXES_OF_COLUMNS_TO_BE_HIDDEN = "3, 4, 5";
 
     public CodedItemsTableToolbar(boolean showMoreLink, boolean contextNeeded, boolean showCodedItemsContext) {
         this.showMoreLink = showMoreLink;
