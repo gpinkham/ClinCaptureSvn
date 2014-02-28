@@ -129,7 +129,7 @@ $(document).ready(function() {
 	<div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
 	<div class="dnBoxCol2 dnBoxText">
 		<div class="formtextareaXL4_BG">
-	  		<textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
+	  		<textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4 textarea_fixed_size"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
 		</div>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes${parentId}"/></jsp:include>
 	</div>

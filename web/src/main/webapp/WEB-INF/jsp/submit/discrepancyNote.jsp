@@ -289,12 +289,12 @@ $(document).ready(function() {
 			<c:choose>
 				<c:when test="${parentId == 0 && param.isInError}">
 					<div class="formtextareaXL4_BG">
-						<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${param.strErrMsg}"/></textarea>
+						<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4 textarea_fixed_size"><c:out value="${param.strErrMsg}"/></textarea>
 					</div>
 				</c:when>
 				<c:otherwise>
 					<div class="formtextareaXL4_BG">
-						<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
+						<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4 textarea_fixed_size"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
 					</div> 
 				</c:otherwise>
 			</c:choose>

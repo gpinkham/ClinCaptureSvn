@@ -1291,6 +1291,10 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-bottom: 7px;
 }
 
+.textarea_fixed_size {
+	resize: none;
+}
+
 .formtextareaXL4_BG { background-image: url(../images/formtextareaXL4_BG.gif);
     background-repeat: no-repeat;
     width: 257px;
