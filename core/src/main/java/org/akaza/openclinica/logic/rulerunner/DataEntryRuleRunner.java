@@ -87,10 +87,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 			toBeExecuted = (HashMap<String, ArrayList<RuleActionContainer>>) request
 					.getAttribute("toBeExecuted");
 
-			if (request.getAttribute("insertAction") == null) // Break only if
-																// the action is
-																// insertAction;
-			{
+			if (request.getAttribute("insertAction") == null) {
 				break;
 			} else {
 				toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
@@ -277,8 +274,9 @@ public class DataEntryRuleRunner extends RuleRunner {
 				request.setAttribute(firstDDE, true);
 			}
 		}
-		if (request.getAttribute(firstDDE) == Boolean.TRUE) {
-		} else {
+		
+		if (!(request.getAttribute(firstDDE) == Boolean.TRUE)) {
+		
 			String key = getExpressionService().getItemOid(
 					ruleSet.getOriginalTarget().getValue());
 			String itemDataValueFromForm = "";
@@ -287,11 +285,11 @@ public class DataEntryRuleRunner extends RuleRunner {
 			} else {
 				itemDataValueFromForm = itemData.getValue();
 			}
-			RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(
-					ruleActionBean.getActionType(), itemData,
+			
+			RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData,
 					itemDataValueFromForm, ruleSetRule.getRuleBean().getOid());
-			exists = getRuleActionRunLogDao().findCountByRuleActionRunLogBean(
-					ruleActionRunLog) > 0;
+			
+			exists = getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0;
 		}
 		return exists;
 	}

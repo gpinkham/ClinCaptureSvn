@@ -947,7 +947,7 @@ function loadStudies(studies) {
 				// Extract selected study
 				var currentStudy = data[$(row).attr("id")]
 
-				if (selectedStudy !== data[$(row).attr("id")].id && 
+				if (parser.getStudy() !== data[$(row).attr("id")].id && 
 					($("div[id='studies']").find("table > tbody > tr").size() > 1 && $(".dotted-border").size() > 2) && !editing) {
 
 					bootbox.confirm("The current rule will be lost. Are you sure you want to select another study?",
@@ -963,9 +963,9 @@ function loadStudies(studies) {
 
 								$(row).addClass("selected");
 
-								selectedStudy = currentStudy.id;
+								parser.setStudy(currentStudy.id);
 
-								loadStudyEvents(currentStudy)
+								loadStudyEvents(currentStudy);
 
 								// Cascade load
 								var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]
@@ -998,11 +998,11 @@ function loadStudies(studies) {
 
 					$(this).addClass("selected");
 
-					selectedStudy = currentStudy.id;
+					parser.setStudy(currentStudy.id);
 
 					if (currentStudy.events) {
 
-						loadStudyEvents(currentStudy)
+						loadStudyEvents(currentStudy);
 
 						// Cascade load
 						var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]

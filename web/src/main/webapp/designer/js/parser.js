@@ -28,6 +28,10 @@ Parser.prototype.getStudy = function() {
 	}
 }
 
+Parser.prototype.setStudy = function(study) {
+	this.rule.study = study;
+}
+
 /* ===========================================================================
  * Validates what the next droppable should be given a droppable with a type
  *
@@ -116,7 +120,7 @@ Parser.prototype.createNextDroppable = function(params) {
 
 	} else if (params.element.is(".target")) {
 
-		if (!this.isAlreadyAddedTarget(params.ui.draggable.text())) {
+		if (!this.isAddedTarget(params.ui.draggable.text())) {
 
 			if (params.existingValue) {
 
@@ -152,7 +156,7 @@ Parser.prototype.createNextDroppable = function(params) {
 
 	} else if (params.element.is(".item")) {
 
-		if (!this.isAlreadyAddedInsertTarget(params.ui.draggable.text())) {
+		if (!this.isAddedInsertTarget(params.ui.draggable.text())) {
 
 			if (params.existingValue) {
 
@@ -216,7 +220,7 @@ Parser.prototype.createNextDroppable = function(params) {
 
 	} else if (params.element.is(".dest")) {
 
-		if (!this.isAlreadyAddedInsertTarget(params.ui.draggable.text())) {
+		if (!this.isAddedShowHideTarget(params.ui.draggable.text())) {
 
 			if (params.existingValue) {
 
@@ -228,10 +232,7 @@ Parser.prototype.createNextDroppable = function(params) {
 				}
 			}
 
-			var item = this.findItem(params.ui.draggable.text());
-			var destination = item.formOid + "." + item.group + "." + item.oid;
-
-			this.getShowHideAction().destinations.push(destination);
+			this.getShowHideAction().destinations.push(this.findItem(params.ui.draggable.text()).oid);
 
 			var newInput = params.element.clone();
 			createDroppable({
@@ -669,17 +670,17 @@ Parser.prototype.getLocalOp = function(predicate) {
  *
  * Returns true if target is in added array of targets, false otherwise
  * =================================================================== */
-Parser.prototype.isAlreadyAddedTarget = function(target) {
+Parser.prototype.isAddedTarget = function(target) {
 
 	return this.rule.targets.indexOf(target) > -1;
 }
 
-Parser.prototype.isAlreadyAddedInsertTarget = function(target) {
+Parser.prototype.isAddedInsertTarget = function(target) {
 
 	return this.getInsertAction() && this.getInsertAction().targets.indexOf(target) > -1;
 }
 
-Parser.prototype.isAlreadyAddedInsertTarget = function(target) {
+Parser.prototype.isAddedShowHideTarget = function(target) {
 
 	var item = this.findItem(target);
 
@@ -801,7 +802,7 @@ Parser.prototype.setTargets = function(targets) {
 		var currInput = $(".target");
 		for (var x = 0; x < targets.length; x++) {
 
-			var input = $(".target").clone();
+			var input = currInput.clone();
 
 			createDroppable({
 				element: input,
@@ -813,12 +814,11 @@ Parser.prototype.setTargets = function(targets) {
 
 			if (x === 0) {
 
-				$(".target").before(input);
+				currInput.before(input);
 
 			} else {
 
-				currInput.after(input);
-				currInput = input;
+				$(".target").last().before(input);
 			}
 
 			this.rule.targets.push(this.findItemName(this.extractLastItem(targets[x])).name);
@@ -1204,7 +1204,7 @@ Parser.prototype.setShowHideAction = function(params) {
 		// function to toggle display
 		action.render = function(visible) {
 
-			if (params.show || params.hide) {
+			if (visible.show || visible.hide) {
 
 				$("#dispActions").show();
 				$("#actionMessages").show();
@@ -1224,34 +1224,46 @@ Parser.prototype.setShowHideAction = function(params) {
 					$("#actionMessages").hide();
 				}
 			}
+
+			$("input[action=show]").prop("checked", visible.show);
+			$("input[action=hide]").prop("checked", visible.hide);
 		}
 
 		if (params.hide || params.show) {
 
 			if (this.getActions().length > 0 && this.getShowHideAction()) {
+
 				action = this.getShowHideAction();
-			} else {
-
-				this.rule.actions.push(action);
-			}
-
-			if (params.edit) {
-
+				
 				action.type = "showHide";
-				action.message = params.action.message;
-				action.destinations = params.action.destinations;
-
-				// Add action targets
-				this.setDestinations(action.destinations)
+				action.hide = params.hide;
+				action.show = params.show;
+				action.message = action.message;
+				action.destinations = action.destinations;
 
 			} else {
 
 				action.message = "";
 				action.type = "showHide";
 				action.destinations = [];
+				action.hide = params.hide;
+				action.show = params.show;
+
+				this.rule.actions.push(action);
 			}
 
-			action.render(params.selected);
+			if (params.action) {
+
+				action.type = "showHide";
+				action.hide = params.hide;
+				action.show = params.show;
+				action.message = params.action.message;
+				action.destinations = params.action.destinations;
+
+				// Add action targets
+				this.setShowHideDestinations(action.destinations);
+
+			}
 
 		} else {
 
@@ -1261,9 +1273,9 @@ Parser.prototype.setShowHideAction = function(params) {
 			if ($.inArray(act, this.rule.actions) > -1) {
 				this.rule.actions.splice($.inArray(act, this.rule.actions), 1);
 			}
-
-			action.render(params);
 		}
+
+		action.render(params);
 	}
 }
 
@@ -1282,6 +1294,8 @@ Parser.prototype.setDestinationValue = function(params) {
 				dest.value = params.value;
 			}
 		}
+
+		action.render(params);
 	}
 }
 
@@ -1330,6 +1344,66 @@ Parser.prototype.setDestinations = function(dests) {
 			} else {
 
 				$("#insert").append(newRow);
+			}
+		}
+	}
+}
+
+Parser.prototype.setShowHideDestinations = function(dests) {
+
+	if (dests.length > 0) {
+
+		var currInput = $(".dest");
+		for (var x = 0; x < dests.length; x++) {
+
+			var input = currInput.clone();
+
+			createDroppable({
+
+				element: input,
+				accept: "div[id='items'] td"
+			})
+			
+			input.val(this.findItemName(dests[x]).name);
+			input.css('font-weight', 'bold');
+
+			if (x === 0) {
+
+				currInput.before(input);
+
+			} else {
+
+				$(".dest").last().before(input);
+			}
+		}
+	}
+}
+
+Parser.prototype.setShowHideDestinations = function(dests) {
+
+	if (dests.length > 0) {
+
+		var currInput = $(".dest");
+		for (var x = 0; x < dests.length; x++) {
+
+			var input = currInput.clone();
+
+			createDroppable({
+
+				element: input,
+				accept: "div[id='items'] td"
+			})
+			
+			input.val(this.findItemName(dests[x]).name);
+			input.css('font-weight', 'bold');
+
+			if (x === 0) {
+
+				currInput.before(input);
+
+			} else {
+
+				$(".dest").last().before(input);
 			}
 		}
 	}
@@ -1396,7 +1470,7 @@ Parser.prototype.setExpression = function(expression) {
 		var rawExpression = [];
 
 		// The regex skips quoted strings in expression
-		var expr = expression.split(/(\()|(?=\))|\s+(?!\w+")/g);
+		var expr = expression.split(/(\()|(?=\))|\s+(?!\w+(\s+\w+)*?")/g);
 
 		for (var x = 0; x < expr.length; x++) {
 
@@ -1455,12 +1529,15 @@ Parser.prototype.setActions = function(actions) {
 					selected: true
 					
 				})
-			} else if (action.type.toLowerCase() === "showHide") {
+			} else if (action.type === "showHide") {
 
 				this.setShowHideAction({
 
+					action: action,
+					hide: action.hide,
+					show: action.show
 				})
-			}
+			} 
 		}
 	}
 }
@@ -1515,7 +1592,7 @@ Parser.prototype.render = function(rule) {
 
 	// properties
 	this.setName(rule.name);
-	this.rule.study = rule.study;
+	this.setStudy(rule.study);
 	this.setTargets(rule.targets);
 	this.setEvaluatesTo(rule.evaluatesTo);
 

@@ -17,7 +17,6 @@ package com.clinovo.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -65,6 +64,7 @@ import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -260,59 +260,43 @@ public class StudiesServlet extends HttpServlet {
 							JSONObject dest = new JSONObject();
 							PropertyBean bean = insertAction.getProperties().get(x);
 							
-							dest.put("id", bean.getId());
-							dest.put("oid", bean.getOid());
-							dest.put("value", bean.getValue());
+							RuleActionBean vAction = ruleSetRule.getActions().get(x);
 							
 							destinations.put(dest);
 						}
 						
 						act.put("destinations", destinations);
 						
-					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.SHOW)) {
+					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.SHOW) || ruleSetRule.getActions().get(0).getActionType().equals(ActionType.HIDE)) {
 						
-						ShowActionBean showAction = (ShowActionBean) ruleSetRule.getActions().get(0);
+						act.put("type", "showHide");
 						
-						act.put("show", true);
-						act.put("hide", false);
-						act.put("type","insert");
-						act.put("message", showAction.getMessage());
-						
-						JSONArray destinations = new JSONArray();
-						for (int x = 0; x < showAction.getProperties().size(); x++) {
+						for (int x = 0; x < ruleSetRule.getActions().size(); x++) {
 							
-							JSONObject dest = new JSONObject();
-							PropertyBean bean = showAction.getProperties().get(x);
+							RuleActionBean vAction = ruleSetRule.getActions().get(x);
 							
-							dest.put("id", bean.getId());
-							dest.put("oid", bean.getOid());
-							dest.put("value", bean.getValue());
-							
-							destinations.put(dest);
+							if (vAction.getActionType().equals(ActionType.SHOW)) {
+								
+								ShowActionBean showAction = (ShowActionBean) ruleSetRule.getActions().get(x);
+								
+								act.put("type", "showHide");
+								act.put("message", showAction.getMessage());
+								act.put("show", showAction.getExpressionEvaluatesTo());
+								
+							} else {
+								
+								HideActionBean hideAction = (HideActionBean) ruleSetRule.getActions().get(x);
+								act.put("hide", hideAction.getExpressionEvaluatesTo());
+								
+								JSONArray destinations = new JSONArray();
+								for (int d = 0; d < hideAction.getProperties().size(); d++) {
+									
+									destinations.put(hideAction.getProperties().get(d).getOid());
+								}
+								
+								act.put("destinations", destinations);
+							}
 						}
-						
-					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.HIDE)) {
-						
-						HideActionBean hideAction = (HideActionBean) ruleSetRule.getActions().get(0);
-						
-						act.put("show", true);
-						act.put("hide", false);
-						act.put("type","insert");
-						act.put("message", hideAction.getMessage());
-						
-						JSONArray destinations = new JSONArray();
-						for (int x = 0; x < hideAction.getProperties().size(); x++) {
-							
-							JSONObject dest = new JSONObject();
-							PropertyBean bean = hideAction.getProperties().get(x);
-							
-							dest.put("id", bean.getId());
-							dest.put("oid", bean.getOid());
-							dest.put("value", bean.getValue());
-							
-							destinations.put(dest);
-						}
-						
 					}
 					
 					ruleActions.put(act);
@@ -364,9 +348,7 @@ public class StudiesServlet extends HttpServlet {
 
 		StudyEventDefinitionDAO eventDAO = new StudyEventDefinitionDAO(datasource);
 
-		List<StudyEventDefinitionBean> studyEvents = new ArrayList<StudyEventDefinitionBean>();
-
-		studyEvents = eventDAO.findAllActiveByStudyId(study.getId());
+		List<StudyEventDefinitionBean> studyEvents = eventDAO.findAllActiveByStudyId(study.getId());
 
 		for (StudyEventDefinitionBean evt : studyEvents) {
 
@@ -462,7 +444,7 @@ public class StudiesServlet extends HttpServlet {
 			JSONObject obj = new JSONObject();
 
 			// Item group
-			ItemGroupBean itemGroup = (ItemGroupBean) itemGroupDAO.findByItemAndCRFVersion(item, cf);
+			ItemGroupBean itemGroup = itemGroupDAO.findByItemAndCRFVersion(item, cf);
 
 			// Form meta data
 			ItemFormMetadataBean itemFormMetaData = itemFormMetaDataDAO.findByItemIdAndCRFVersionId(item.getId(),
@@ -599,7 +581,7 @@ public class StudiesServlet extends HttpServlet {
 
 		} else if (act.getString("type").equalsIgnoreCase("showHide")) {
 				
-			run.setAttribute("Batch", "true");
+			run.setAttribute("Batch", "false");
 			
 			// Message element	
 			Element message = document.createElement("Message");
@@ -628,6 +610,15 @@ public class StudiesServlet extends HttpServlet {
 			// clone node
 			Element hideAction = (Element) showAction.cloneNode(true);
 			document.renameNode(hideAction, null, "HideAction");
+			
+			Boolean eval = Boolean.valueOf(rule.getString("evaluatesTo"));
+			
+			// Hide action opposite of show
+			if (eval) {
+				hideAction.setAttribute("IfExpressionEvaluates", Boolean.FALSE.toString());
+			} else {
+				hideAction.setAttribute("IfExpressionEvaluates", Boolean.TRUE.toString());
+			}
 			
 			actions.add(hideAction);
 
