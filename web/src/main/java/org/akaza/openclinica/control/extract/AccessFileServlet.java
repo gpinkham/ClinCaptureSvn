@@ -73,8 +73,7 @@ public class AccessFileServlet extends Controller {
 		// logic: is parentId of the dataset created not equal to currentstudy? or is current study
 		if ((parentId) != currentStudy.getId())
 			if (dsBean.getStudyId() != currentStudy.getId()) {
-				addPageMessage(
-						respage.getString("no_have_correct_privilege_current_study")
+				addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 								+ respage.getString("change_study_contact_sysadmin"), request);
 				throw new InsufficientPermissionException(Page.MENU_SERVLET,
 						resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
@@ -103,7 +102,6 @@ public class AccessFileServlet extends Controller {
 
 		System.out.println("just set content type: " + response.getContentType());
 		request.setAttribute("generate", asdfBean.getFileReference());
-		response.setHeader("Pragma", "public");
 		writeFile(request, response);
 	}
 
@@ -134,27 +132,27 @@ public class AccessFileServlet extends Controller {
 					bos.write(buff, 0, bytesRead);
 				}
 			} catch (Exception ee) {
-				ee.printStackTrace();
+				logger.error("Failed downloading dataset file in the AccessFileServlet.java: 135", ee);
 			} finally {
 				if (bis != null) {
 					try {
 						bis.close();
 					} catch (IOException ex) {
-						ex.printStackTrace();
+						logger.error("Failed to close instance of BufferedInputStream in the AccessFileServlet.java: 141", ex);
 					}
 				}
 				if (is != null) {
 					try {
 						is.close();
 					} catch (IOException ex) {
-                        ex.printStackTrace();
+						logger.error("Failed to close instance of FileInputStream in the AccessFileServlet.java: 148", ex);
 					}
 				}
 				if (bos != null) {
 					try {
 						bos.close();
 					} catch (IOException ex) {
-                        ex.printStackTrace();
+						logger.error("Failed to close instance of BufferedOutputStream in the AccessFileServlet.java: 155", ex);
 					}
 				}
 				if (sos != null) {
@@ -162,7 +160,7 @@ public class AccessFileServlet extends Controller {
 						sos.flush();
 						sos.close();
 					} catch (IOException ex) {
-                        ex.printStackTrace();
+						logger.error("Failed to close instance of ServletOutputStream in the AccessFileServlet.java: 163", ex);
 					}
 				}
 			}
@@ -178,13 +176,12 @@ public class AccessFileServlet extends Controller {
 		if (ub.isSysAdmin()) {
 			return;
 		}
-		if (currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
-				|| currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.STUDY_MONITOR)) {
+		if (currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR) || currentRole.getRole().equals(Role.INVESTIGATOR) 
+				|| currentRole.getRole().equals(Role.STUDY_MONITOR)) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
