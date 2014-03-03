@@ -158,8 +158,13 @@ function saveRule(rule) {
 
 				bootbox.confirm("Rule(s) successfully saved", function(result) {
 
+					// Clean up
+					sessionStorage.removeItem("id");
+					sessionStorage.removeItem("rule");
+					sessionStorage.removeItem("validation");
+
 					if (result) {
-						window.open(rule.submission + "/ViewRuleAssignment?read=true", '_self');
+						window.open(rule.submission + "/designer/rule.html", '_self');
 					}
 				});
 
