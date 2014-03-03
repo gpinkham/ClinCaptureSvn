@@ -7,6 +7,7 @@
 
 <script language="JavaScript">
 	function changeDNFlagIconInParentWindow(){
+		refreshSource('<c:out value="${refresh}"/>', '/ViewNotes?');
 		setImageInParentWin('flag_${updatedDiscrepancyNote.field}', '${contextPath}/${updatedDiscrepancyNote.resStatus.iconFilePath}', '${updatedDiscrepancyNote.resStatus.id}');
 	}
 </script>

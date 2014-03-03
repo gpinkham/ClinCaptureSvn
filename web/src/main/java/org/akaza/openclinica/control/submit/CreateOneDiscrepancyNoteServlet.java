@@ -360,7 +360,8 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 				if ("true".equals(close)) {
 					sendUpdatedDN(entityId, dn, dndao, request);
 					request.setAttribute("responseMessage", "Save Done");
-					
+					request.setAttribute("refresh", true);
+
 					forwardPage(Page.ADD_ONE_DISCREPANCY_NOTE_DIV, request, response);
 					return;
 				} else {
@@ -389,7 +390,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		request.setAttribute(REFRESH_PARENT_WINDOW, true);
 		dn.setItemId(fp.getInt(ITEM_ID));
 		sendUpdatedDN(entityId, dn, dndao, request);
-		
+
 		forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()), request, response);
 	}
 
