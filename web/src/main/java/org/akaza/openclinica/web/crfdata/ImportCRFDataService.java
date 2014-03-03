@@ -989,7 +989,10 @@ public class ImportCRFDataService {
 													for (EventCRFBean eventCRFBean : eventCRFBeanList) {
 														if (!eventCRFBean.isNotStarted()
 																&& eventCRFBean.getCRFVersionId() != crfVersionBean
-																		.getId()) {
+																		.getId()
+																&& studyBean.getStudyParameterConfig()
+																		.getReplaceExisitingDataDuringImport()
+																		.equals("no")) {
 															mf.applyPattern(respage
 																	.getString("you_already_have_started_other_crf_version_for_study_event_and_subject"));
 															Object[] arguments = studyEventDefintionBean != null

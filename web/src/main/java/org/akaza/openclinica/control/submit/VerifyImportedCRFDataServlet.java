@@ -146,6 +146,62 @@ public class VerifyImportedCRFDataServlet extends Controller {
 		return note;
 	}
 
+	private void deleteEventCRF(UserAccountBean ub, int eventCrfId) {
+		ItemDataDAO iddao = getItemDataDAO();
+		EventCRFDAO ecdao = getEventCRFDAO();
+		DiscrepancyNoteDAO dnDao = getDiscrepancyNoteDAO();
+		ArrayList itemData = iddao.findAllByEventCRFId(eventCrfId);
+		for (Object anItemData : itemData) {
+			ItemDataBean item = (ItemDataBean) anItemData;
+			ArrayList discrepancyList = dnDao.findExistingNotesForItemData(item.getId());
+			iddao.deleteDnMap(item.getId());
+			for (Object aDiscrepancyList : discrepancyList) {
+				DiscrepancyNoteBean noteBean = (DiscrepancyNoteBean) aDiscrepancyList;
+				dnDao.deleteNotes(noteBean.getId());
+			}
+			item.setUpdater(ub);
+			iddao.updateUser(item);
+			iddao.delete(item.getId());
+		}
+		// delete event crf
+		ecdao.deleteEventCRFDNMap(eventCrfId);
+		ecdao.delete(eventCrfId);
+	}
+
+	private EventCRFBean createEventCRFBean(UserAccountBean ub, StudyBean studyBean, int StudySubjectId,
+			int crfVersionId, int studyEventId, StudyEventDAO studyEventDAO, EventCRFDAO eventCRFDAO) {
+		EventCRFBean eventCRFBean = new EventCRFBean();
+		eventCRFBean.setAnnotations("");
+		eventCRFBean.setCreatedDate(new Date());
+		eventCRFBean.setCRFVersionId(crfVersionId);
+
+		StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
+
+		if (studyBean.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
+			eventCRFBean.setInterviewerName("");
+		} else {
+			eventCRFBean.setInterviewerName(studyEvent.getOwner().getName());
+
+		}
+		if (!studyBean.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
+			eventCRFBean.setDateInterviewed(null);
+		} else {
+			eventCRFBean.setDateInterviewed(studyEvent.getDateStarted());
+		}
+
+		eventCRFBean.setOwner(ub);
+
+		eventCRFBean.setNotStarted(true);
+		eventCRFBean.setStatus(Status.AVAILABLE);
+		eventCRFBean.setCompletionStatusId(1);
+		eventCRFBean.setStudySubjectId(StudySubjectId);
+		eventCRFBean.setStudyEventId(studyEventId);
+		eventCRFBean.setValidateString("");
+		eventCRFBean.setValidatorAnnotations("");
+
+		return (EventCRFBean) eventCRFDAO.create(eventCRFBean);
+	}
+
 	@Override
 	@SuppressWarnings(value = { "unchecked", "deprecation" })
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -223,6 +279,18 @@ public class VerifyImportedCRFDataServlet extends Controller {
 								eventCrfBean = (EventCRFBean) ecdao.findByPK(eventCrfBeanId);
 								if (!displayItemBean.isSkip()) {
 									idToEventCrfBeans.put(eventCrfBeanId, eventCrfBean);
+								}
+							}
+							if (!displayItemBean.isSkip()
+									&& displayItemBean.getMetadata().getCrfVersionId() != eventCrfBean
+											.getCRFVersionId()) {
+								deleteEventCRF(ub, eventCrfBean.getId());
+								eventCrfBean = createEventCRFBean(ub, currentStudy, eventCrfBean.getStudySubjectId(),
+										displayItemBean.getMetadata().getCrfVersionId(),
+										eventCrfBean.getStudyEventId(), sedao, ecdao);
+								idToEventCrfBeans.put(eventCrfBean.getId(), eventCrfBean);
+								for (DisplayItemBean dib : wrapper.getDisplayItemBeans()) {
+									dib.getData().setEventCRFId(eventCrfBean.getId());
 								}
 							}
 							logger.debug("found value here: " + displayItemBean.getData().getValue());
