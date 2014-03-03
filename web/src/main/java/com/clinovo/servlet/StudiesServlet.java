@@ -260,7 +260,9 @@ public class StudiesServlet extends HttpServlet {
 							JSONObject dest = new JSONObject();
 							PropertyBean bean = insertAction.getProperties().get(x);
 							
-							RuleActionBean vAction = ruleSetRule.getActions().get(x);
+							dest.put("id", bean.getId());
+							dest.put("oid", bean.getOid());
+							dest.put("value", bean.getValue());
 							
 							destinations.put(dest);
 						}
@@ -282,6 +284,8 @@ public class StudiesServlet extends HttpServlet {
 								act.put("type", "showHide");
 								act.put("message", showAction.getMessage());
 								act.put("show", showAction.getExpressionEvaluatesTo());
+								
+								object.put("evaluatesTo", showAction.getExpressionEvaluatesTo());
 								
 							} else {
 								
@@ -371,8 +375,7 @@ public class StudiesServlet extends HttpServlet {
 
 	}
 
-	private JSONArray getStudyEventCRFs(StudyEventDefinitionBean evt, StudyBean study, DataSource datasource)
-			throws Exception {
+	private JSONArray getStudyEventCRFs(StudyEventDefinitionBean evt, StudyBean study, DataSource datasource) throws Exception {
 
 		JSONArray crfs = new JSONArray();
 
@@ -387,18 +390,20 @@ public class StudiesServlet extends HttpServlet {
 			JSONObject obj = new JSONObject();
 
 			CRFBean cf = (CRFBean) crfDAO.findByPK(crf.getCrfId());
+			
+			if (!cf.getStatus().equals(Status.DELETED)) {
+				
+				obj.put("id", cf.getId());
+				obj.put("oid", cf.getOid());
+				obj.put("name", cf.getName());
+				obj.put("version", cf.getVersionNumber());
 
-			obj.put("id", cf.getId());
-			obj.put("oid", cf.getOid());
-			obj.put("name", cf.getName());
-			obj.put("version", cf.getVersionNumber());
+				JSONArray versions = getCRFVersions(cf, datasource);
 
-			JSONArray versions = getCRFVersions(cf, datasource);
+				obj.put("versions", versions);
 
-			obj.put("versions", versions);
-
-			crfs.put(obj);
-
+				crfs.put(obj);
+			}
 		}
 
 		return crfs;
@@ -610,6 +615,9 @@ public class StudiesServlet extends HttpServlet {
 			// clone node
 			Element hideAction = (Element) showAction.cloneNode(true);
 			document.renameNode(hideAction, null, "HideAction");
+			
+			// Remove message node
+			hideAction.getElementsByTagName("Message").item(0).setTextContent(null);
 			
 			Boolean eval = Boolean.valueOf(rule.getString("evaluatesTo"));
 			

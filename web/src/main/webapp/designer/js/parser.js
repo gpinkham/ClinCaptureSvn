@@ -433,7 +433,7 @@ Parser.prototype.createRule = function() {
 		for (var x = 0; x < this.rule.targets.length; x++) {
 
 			var obj = this.findItem(this.rule.targets[x])
-			var itemOid = obj !== undefined ? obj.eventOid + "." + obj.formOid + "." + obj.group + "." + obj.oid : $(".target").val();
+			var itemOid = obj !== undefined ? obj.formOid + "." + obj.group + "." + obj.oid : $(".target").val();
 
 			tt.push(itemOid);
 		}

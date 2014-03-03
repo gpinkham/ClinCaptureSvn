@@ -163,6 +163,8 @@ function saveRule(rule) {
 					sessionStorage.removeItem("rule");
 					sessionStorage.removeItem("validation");
 
+					//sessionStorage.removeItem("rule");
+
 					if (result) {
 						window.open(rule.submission + "/designer/rule.html", '_self');
 					}
