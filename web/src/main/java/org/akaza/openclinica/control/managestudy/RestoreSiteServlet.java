@@ -20,10 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -49,13 +45,17 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
 /**
  * Restores a removed site and all its data, including users. roles, study groups, definitions, events and items
  * 
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings({ "serial", "unchecked" })
 public class RestoreSiteServlet extends SecureController {
 	/**
      *
@@ -85,16 +85,16 @@ public class RestoreSiteServlet extends SecureController {
 		String idString = request.getParameter("id");
 		logger.info("site id:" + idString);
 
-		int siteId = Integer.valueOf(idString.trim()).intValue();
+		int siteId = Integer.valueOf(idString.trim());
 		StudyBean study = (StudyBean) sdao.findByPK(siteId);
 
 		// find all user and roles
 		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-		ArrayList userRoles = udao.findAllByStudyId(siteId);
+		ArrayList<StudyUserRoleBean> userRoles = (ArrayList<StudyUserRoleBean>) udao.findAllByStudyId(siteId);
 
 		// find all subjects
 		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-		ArrayList subjects = ssdao.findAllByStudy(study);
+		ArrayList<StudySubjectBean> subjects = (ArrayList<StudySubjectBean>) ssdao.findAllByStudy(study);
 
 		String action = request.getParameter("action");
 		if (StringUtil.isBlank(idString)) {
@@ -123,14 +123,20 @@ public class RestoreSiteServlet extends SecureController {
 				logger.info("submit to restore the site");
 				// change all statuses to unavailable
 				StudyDAO studao = new StudyDAO(sm.getDataSource());
-				study.setStatus(study.getOldStatus());
+				Status newStatus = Status.AVAILABLE;
+				if (study.getParentStudyId() > 0) {
+					StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+					newStatus = parentStudy.getStatus();
+				}
+				
+				study.setOldStatus(study.getStatus());
+				study.setStatus(newStatus);
 				study.setUpdater(ub);
 				study.setUpdatedDate(new Date());
 				studao.update(study);
 
 				// restore all users and roles
-				for (int i = 0; i < userRoles.size(); i++) {
-					StudyUserRoleBean role = (StudyUserRoleBean) userRoles.get(i);
+				for (StudyUserRoleBean role : userRoles) {
 					if (role.getStatus().equals(Status.AUTO_DELETED)) {
 						role.setStatus(Status.AVAILABLE);
 						role.setUpdater(ub);
@@ -159,18 +165,17 @@ public class RestoreSiteServlet extends SecureController {
 				// restore all study_group
 				StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
 				SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
-				ArrayList groups = sgdao.findAllByStudy(study);
-				for (int i = 0; i < groups.size(); i++) {
-					StudyGroupBean group = (StudyGroupBean) groups.get(i);
+				ArrayList<StudyGroupBean> groups = (ArrayList<StudyGroupBean>) sgdao.findAllByStudy(study);
+				for (StudyGroupBean group : groups) {
 					if (group.getStatus().equals(Status.AUTO_DELETED)) {
 						group.setStatus(Status.AVAILABLE);
 						group.setUpdater(ub);
 						group.setUpdatedDate(new Date());
 						sgdao.update(group);
 						// all subject_group_map
-						ArrayList subjectGroupMaps = sgmdao.findAllByStudyGroupId(group.getId());
-						for (int j = 0; j < subjectGroupMaps.size(); j++) {
-							SubjectGroupMapBean sgMap = (SubjectGroupMapBean) subjectGroupMaps.get(j);
+						ArrayList<SubjectGroupMapBean> subjectGroupMaps = (ArrayList<SubjectGroupMapBean>) sgmdao
+								.findAllByStudyGroupId(group.getId());
+						for (SubjectGroupMapBean sgMap : subjectGroupMaps) {
 							if (sgMap.getStatus().equals(Status.AUTO_DELETED)) {
 								sgMap.setStatus(Status.AVAILABLE);
 								sgMap.setUpdater(ub);
@@ -182,31 +187,30 @@ public class RestoreSiteServlet extends SecureController {
 				}
 
 				StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-				for (int i = 0; i < subjects.size(); i++) {
-					StudySubjectBean subject = (StudySubjectBean) subjects.get(i);
+				for (StudySubjectBean subject : subjects) {
 					if (subject.getStatus().equals(Status.AUTO_DELETED)) {
 						subject.setStatus(Status.AVAILABLE);
 						subject.setUpdater(ub);
 						subject.setUpdatedDate(new Date());
 						ssdao.update(subject);
 
-						ArrayList events = sedao.findAllByStudySubject(subject);
+						ArrayList<StudyEventBean> events = (ArrayList<StudyEventBean>) sedao
+								.findAllByStudySubject(subject);
 						EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
-						for (int j = 0; j < events.size(); j++) {
-							StudyEventBean event = (StudyEventBean) events.get(j);
+						for (StudyEventBean event : events) {
 							if (event.getStatus().equals(Status.AUTO_DELETED)) {
 								event.setStatus(Status.AVAILABLE);
 								event.setUpdater(ub);
 								event.setUpdatedDate(new Date());
 								sedao.update(event);
 
-								ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+								ArrayList<EventCRFBean> eventCRFs = (ArrayList<EventCRFBean>) ecdao
+										.findAllByStudyEvent(event);
 
 								ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-								for (int k = 0; k < eventCRFs.size(); k++) {
+								for (EventCRFBean eventCRF : eventCRFs) {
 									// YW << fix broken page for storing site
-									EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
 									// >> YW
 									if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
 										eventCRF.setStatus(eventCRF.getOldStatus());
@@ -214,9 +218,8 @@ public class RestoreSiteServlet extends SecureController {
 										eventCRF.setUpdatedDate(new Date());
 										ecdao.update(eventCRF);
 
-										ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-										for (int a = 0; a < itemDatas.size(); a++) {
-											ItemDataBean item = (ItemDataBean) itemDatas.get(a);
+										ArrayList<ItemDataBean> itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
+										for (ItemDataBean item : itemDatas) {
 											if (item.getStatus().equals(Status.AUTO_DELETED)) {
 												item.setStatus(item.getOldStatus());
 												item.setUpdater(ub);
@@ -232,9 +235,8 @@ public class RestoreSiteServlet extends SecureController {
 				}// for subjects
 
 				DatasetDAO datadao = new DatasetDAO(sm.getDataSource());
-				ArrayList dataset = datadao.findAllByStudyId(study.getId());
-				for (int i = 0; i < dataset.size(); i++) {
-					DatasetBean data = (DatasetBean) dataset.get(i);
+				ArrayList<DatasetBean> dataset = (ArrayList<DatasetBean>) datadao.findAllByStudyId(study.getId());
+				for (DatasetBean data : dataset) {
 					data.setStatus(Status.AVAILABLE);
 					data.setUpdater(ub);
 					data.setUpdatedDate(new Date());

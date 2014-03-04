@@ -13,14 +13,6 @@
 
 package org.akaza.openclinica.controller;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -53,11 +45,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Controller("studyModuleController")
 @RequestMapping("/studymodule")
 @SessionAttributes("studyModuleStatus")
-@SuppressWarnings({"rawtypes","unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class StudyModuleController {
+
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
 	@Autowired
 	private SidebarInit sidebarInit;
 
@@ -70,18 +73,8 @@ public class StudyModuleController {
 	@Autowired
 	private BasicDataSource dataSource;
 
-	private StudyEventDefinitionDAO studyEventDefinitionDao;
-	private CRFDAO crfDao;
-	private StudyGroupClassDAO studyGroupClassDao;
-	private StudyDAO studyDao;
-	private UserAccountDAO userDao;
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	@Autowired
 	CoreResources coreResources;
-
-	public StudyModuleController() {
-
-	}
 
 	@SuppressWarnings("deprecation")
 	@RequestMapping(method = RequestMethod.GET)
@@ -106,11 +99,11 @@ public class StudyModuleController {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
 		new EventDefinitionCRFDAO(dataSource);
-		studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
-		crfDao = new CRFDAO(dataSource);
-		studyGroupClassDao = new StudyGroupClassDAO(dataSource);
-		studyDao = new StudyDAO(dataSource);
-		userDao = new UserAccountDAO(dataSource);
+		StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
+		CRFDAO crfDao = new CRFDAO(dataSource);
+		StudyGroupClassDAO studyGroupClassDao = new StudyGroupClassDAO(dataSource);
+		StudyDAO studyDao = new StudyDAO(dataSource);
+		UserAccountDAO userDao = new UserAccountDAO(dataSource);
 
 		StudyModuleStatus sms = studyModuleStatusDao.findByStudyId(currentStudy.getId());
 		if (sms == null) {
@@ -215,17 +208,18 @@ public class StudyModuleController {
 			studyModuleStatusDao.saveOrUpdate(studyModuleStatus);
 			status.setComplete();
 		} else {
+			StudyDAO studyDao = new StudyDAO(dataSource);
 			currentStudy.setOldStatus(currentStudy.getStatus());
 			currentStudy.setStatus(Status.get(studyModuleStatus.getStudyStatus()));
-			if (currentStudy.getParentStudyId() > 0) {
-				studyDao.updateStudyStatus(currentStudy);
-			} else {
-				studyDao.updateStudyStatus(currentStudy);
-			}
-
-			ArrayList siteList = (ArrayList) studyDao.findAllByParent(currentStudy.getId());
-			if (siteList.size() > 0) {
-				studyDao.updateSitesStatus(currentStudy);
+			studyDao.updateStudyStatus(currentStudy);
+			List<StudyBean> siteList = (List<StudyBean>) studyDao.findAllByParent(currentStudy.getId());
+			for (StudyBean site : siteList) {
+				if (site.getStatus().getId() != Status.DELETED.getId()
+						&& site.getStatus().getId() != Status.AUTO_DELETED.getId()) {
+					site.setOldStatus(site.getStatus());
+					site.setStatus(currentStudy.getStatus());
+					studyDao.updateStudyStatus(site);
+				}
 			}
 		}
 		return "redirect:studymodule";
@@ -246,71 +240,19 @@ public class StudyModuleController {
 		throw ex;
 	}
 
-	public SidebarInit getSidebarInit() {
-		return sidebarInit;
-	}
-
-	public void setSidebarInit(SidebarInit sidebarInit) {
-		this.sidebarInit = sidebarInit;
-	}
-
-	public StudyModuleStatusDao getStudyModuleStatusDao() {
-		return studyModuleStatusDao;
-	}
-
 	public BasicDataSource getDataSource() {
 		return dataSource;
 	}
 
 	public String getContextPath(HttpServletRequest request) {
-		String contextPath = request.getContextPath().replaceAll("/", "");
-		return contextPath;
-	}
-
-	public String getRequestURLMinusServletPath(HttpServletRequest request) {
-		String requestURLMinusServletPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
-		logMe("processing.." + requestURLMinusServletPath);
-		return requestURLMinusServletPath;
-	}
-
-	public String getHostPath(HttpServletRequest request) {
-		logMe("into the getHostPath/....URL = " + request.getRequestURL() + "URI=" + request.getRequestURI()
-				+ "PROTOCOL=");
-		String requestURLMinusServletPath = getRequestURLMinusServletPath(request);
-		String hostPath = "";
-
-		if (null != requestURLMinusServletPath) {
-			String tmpPath = requestURLMinusServletPath.substring(0, requestURLMinusServletPath.lastIndexOf("/"));
-			logMe("processing2..." + tmpPath);
-			hostPath = tmpPath.substring(0, tmpPath.lastIndexOf("/"));
-			logMe("processing2..." + hostPath);
-		}
-		logMe("after all the stripping returning" + hostPath);
-		return hostPath;
-	}
-
-	public String getWebAppName(String servletCtxRealPath) {
-		String webAppName = null;
-		if (null != servletCtxRealPath) {
-			String[] tokens = servletCtxRealPath.split("\\\\");
-			webAppName = tokens[(tokens.length - 1)].trim();
-		}
-		return webAppName;
+		return request.getContextPath().replaceAll("/", "");
 	}
 
 	private boolean mayProceed(HttpServletRequest request) {
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
 		Role r = currentRole.getRole();
-
-		if (Role.SYSTEM_ADMINISTRATOR.equals(r) || Role.STUDY_DIRECTOR.equals(r) || Role.STUDY_ADMINISTRATOR.equals(r)) {
-			return true;
-		}
-		return false;
-	}
-
-	private void logMe(String msg) {
-		System.out.println(msg);
-		logger.info(msg);
+		return Role.SYSTEM_ADMINISTRATOR.equals(r) || Role.STUDY_DIRECTOR.equals(r)
+				|| Role.STUDY_ADMINISTRATOR.equals(r);
 	}
 
 }
