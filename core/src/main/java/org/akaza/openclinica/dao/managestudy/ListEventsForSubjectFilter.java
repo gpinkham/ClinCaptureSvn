@@ -47,12 +47,14 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 		
 		StringBuilder theCriteria = new StringBuilder("");
 		
+		if (dynamicGroupClassIdToFilterBy != 0) {
+			theCriteria.append(" AND (( ss.dynamic_group_class_id = ").append(dynamicGroupClassIdToFilterBy)
+				.append(") OR (se.study_event_id IS NOT NULL AND se.study_event_definition_id = ")
+				.append(studyEventDefinitionId).append(")) ");
+		}
+		
 		for (Filter filter : filters) {
 			theCriteria.append(buildCriteria(criteria, filter.getProperty(), filter.getValue()));
-		}
-
-		if (dynamicGroupClassIdToFilterBy != 0) {
-			theCriteria.append(" AND ss.dynamic_group_class_id = ").append(dynamicGroupClassIdToFilterBy).append(" ");
 		}
 		
 		return theCriteria.toString();
