@@ -35,7 +35,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author jxu
@@ -77,18 +77,16 @@ public class SetUserRoleServlet extends SecureController {
 		} else {
 			String action = request.getParameter("action");
 			UserAccountBean user = (UserAccountBean) udao.findByPK(userId);
-			ArrayList studies = (ArrayList) sdao.findAllNotRemoved();
-			ArrayList studiesHaveRole = (ArrayList) sdao.findAllByUser(user.getName());
+			ArrayList<StudyBean> studies = (ArrayList) sdao.findAllNotRemoved();
+			ArrayList<StudyBean> studiesHaveRole = (ArrayList) sdao.findAllByUser(user.getName());
 			studies.removeAll(studiesHaveRole);
 			HashSet<StudyBean> studiesNotHaveRole = new HashSet<StudyBean>();
 			HashSet<StudyBean> sitesNotHaveRole = new HashSet<StudyBean>();
-			for (int i = 0; i < studies.size(); i++) {
-				StudyBean study1 = (StudyBean) studies.get(i);
+			for (StudyBean study1 : studies) {
 
 				// TODO: implement equal() according to id
 				boolean hasStudy = false;
-				for (int j = 0; j < studiesHaveRole.size(); j++) {
-					StudyBean study2 = (StudyBean) studiesHaveRole.get(j);
+				for (StudyBean study2 : studiesHaveRole) {
 					if (study2.getId() == study1.getId()) {
 						hasStudy = true;
 						break;
@@ -103,34 +101,53 @@ public class SetUserRoleServlet extends SecureController {
 				}
 			}
 
-			Boolean changeRoles = request.getParameter("changeRoles") == null ? false : Boolean.parseBoolean(request
-					.getParameter("changeRoles"));
+			Boolean changeRoles = request.getParameter("changeRoles") != null
+					&& Boolean.parseBoolean(request.getParameter("changeRoles"));
 			int studyId = fp.getInt("studyId");
 			request.setAttribute("roles", Role.roleMapWithDescriptions);
 			request.setAttribute("studyId", studyId);
+
+			// Re-order studiesNotHaveRole so that sites
+			// under their studies;
+			List<Integer> cantAddRoleForStudies = new ArrayList<Integer>();
+			List<Integer> excludeSitesForStudies = new ArrayList<Integer>();
+			ArrayList<StudyUserRoleBean> userRolesBean = user.getRoles();
+			for (StudyUserRoleBean userRoleBean : userRolesBean) {
+				StudyBean studyBean = (StudyBean) sdao.findByPK(userRoleBean.getStudyId());
+				if (studyBean.getParentStudyId() == 0) {
+					excludeSitesForStudies.add(userRoleBean.getStudyId());
+				}
+				if (studyBean.getParentStudyId() != 0 && !excludeSitesForStudies.contains(userRoleBean.getStudyId())) {
+					cantAddRoleForStudies.add(studyBean.getParentStudyId());
+				}
+			}
+
 			if ("confirm".equalsIgnoreCase(action) || changeRoles) {
-				// Re-order studiesNotHaveRole so that sites
-				// under their studies;
-				boolean userRolesFilter = checkRolesFilter(user);
 				ArrayList finalStudiesNotHaveRole = new ArrayList();
-				Iterator iter_study = studiesNotHaveRole.iterator();
-				while (iter_study.hasNext()) {
-					StudyBean s = (StudyBean) iter_study.next();
-					if (userRolesFilter) {
+				for (StudyBean s : studiesNotHaveRole) {
+					if (!excludeSitesForStudies.contains(s.getId())) {
 						finalStudiesNotHaveRole.add(s);
 					}
-					Iterator iter_site = sitesNotHaveRole.iterator();
-					while (iter_site.hasNext()) {
-						StudyBean site = (StudyBean) iter_site.next();
+					for (StudyBean site : sitesNotHaveRole) {
 						if (site.getParentStudyId() == s.getId()) {
-							if (!userRolesFilter) {
+							if (!excludeSitesForStudies.contains(site.getParentStudyId())) {
 								finalStudiesNotHaveRole.add(site);
 							}
 						}
 					}
 				}
 
-				request.setAttribute("isThisStudy", userRolesFilter);
+				StudyBean studyBean = studyId > 0 ? (StudyBean) sdao.findByPK(studyId) : (finalStudiesNotHaveRole
+						.size() > 0 ? (StudyBean) finalStudiesNotHaveRole.get(0) : null);
+				if (studyBean != null) {
+					if (studyBean.getParentStudyId() == 0 && cantAddRoleForStudies.contains(studyBean.getId())) {
+						String message = resexception
+								.getString("error.toAddRoleForTheStudyRemoveTheSiteLevelRoleFirst");
+						addPageMessage(message.replace("{0}", studyBean.getName()));
+					}
+				}
+
+				request.setAttribute("isThisStudy", ((StudyBean) sdao.findByPK(studyId)).getParentStudyId() == 0);
 
 				request.setAttribute("user", user);
 				request.setAttribute("studies", finalStudiesNotHaveRole);
@@ -142,32 +159,38 @@ public class SetUserRoleServlet extends SecureController {
 
 				forwardPage(Page.SET_USER_ROLE);
 			} else {
-				// set role
-				String userName = fp.getString("name");
-				studyId = fp.getInt("studyId");
-				StudyBean userStudy = (StudyBean) sdao.findByPK(studyId);
-				int roleId = fp.getInt("roleId");
-				// new user role
-				StudyUserRoleBean sur = new StudyUserRoleBean();
-				sur.setName(userName);
-				sur.setRole(Role.get(roleId));
-				sur.setStudyId(studyId);
-				sur.setStudyName(userStudy.getName());
-				sur.setStatus(Status.AVAILABLE);
-				sur.setOwner(ub);
-				sur.setCreatedDate(new Date());
+				StudyBean studyBean = (StudyBean) sdao.findByPK(studyId);
+				if (!cantAddRoleForStudies.contains(studyBean.getId())) {
+					// set role
+					String userName = fp.getString("name");
+					studyId = fp.getInt("studyId");
+					StudyBean userStudy = (StudyBean) sdao.findByPK(studyId);
+					int roleId = fp.getInt("roleId");
+					// new user role
+					StudyUserRoleBean sur = new StudyUserRoleBean();
+					sur.setName(userName);
+					sur.setRole(Role.get(roleId));
+					sur.setStudyId(studyId);
+					sur.setStudyName(userStudy.getName());
+					sur.setStatus(Status.AVAILABLE);
+					sur.setOwner(ub);
+					sur.setCreatedDate(new Date());
 
-				if (studyId > 0) {
-					udao.createStudyUserRole(user, sur);
-					if (ub.getId() == user.getId()) {
-						session.setAttribute("reloadUserBean", true);
+					if (studyId > 0) {
+						udao.createStudyUserRole(user, sur);
+						if (ub.getId() == user.getId()) {
+							session.setAttribute("reloadUserBean", true);
+						}
+						addPageMessage(user.getFirstName() + " " + user.getLastName() + " ("
+								+ resword.getString("username") + ": " + user.getName() + ") "
+								+ respage.getString("has_been_granted_the_role") + " \""
+								+ sur.getRole().getDescription() + "\" " + respage.getString("in_the_study_site") + " "
+								+ userStudy.getName() + ".");
 					}
-					addPageMessage(user.getFirstName() + " " + user.getLastName() + " ("
-							+ resword.getString("username") + ": " + user.getName() + ") "
-							+ respage.getString("has_been_granted_the_role") + " \"" + sur.getRole().getDescription()
-							+ "\" " + respage.getString("in_the_study_site") + " " + userStudy.getName() + ".");
+				} else {
+					String message = resexception.getString("error.toAddRoleForTheStudyRemoveTheSiteLevelRoleFirst");
+					addPageMessage(message.replace("{0}", sdao.findByPK(studyId).getName()));
 				}
-
 				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
 
 			}
@@ -179,18 +202,4 @@ public class SetUserRoleServlet extends SecureController {
 	protected String getAdminServlet() {
 		return SecureController.ADMIN_SERVLET_CODE;
 	}
-
-	private boolean checkRolesFilter(UserAccountBean userBean) {
-		boolean displayStudy = true;
-		ArrayList<StudyUserRoleBean> userRolesBean = userBean.getRoles();
-		for (StudyUserRoleBean userRoleBean : userRolesBean) {
-			// if user crc or investigator
-			if (userRoleBean.getId() == 4 || userRoleBean.getId() == 5) {
-				displayStudy = false;
-				break;
-			}
-		}
-		return displayStudy;
-	}
-
 }
