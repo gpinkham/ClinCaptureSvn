@@ -22,16 +22,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
@@ -66,22 +56,31 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings({"rawtypes", "serial"})
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+@SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class ResolveDiscrepancyServlet extends Controller {
 
-    private static final String INPUT_NOTE_ID = "noteId";
+	private static final String INPUT_NOTE_ID = "noteId";
 	private static final String EVENT_CRF_ID = "ecId";
 	private static final String STUDY_SUB_ID = "studySubjectId";
-    public static final String REFERER = "referer";
-    public static final String EXIT_TO = "exitTo";
-    public static final String TAB_ID = "tabId";
-    public static final String SECTION_ID = "sectionId";
-    public static final String FIELD = "field";
+	public static final String REFERER = "referer";
+	public static final String EXIT_TO = "exitTo";
+	public static final String TAB_ID = "tabId";
+	public static final String SECTION_ID = "sectionId";
+	public static final String FIELD = "field";
 
-    public Page getPageForForwarding(HttpServletRequest request, DiscrepancyNoteBean note, boolean isCompleted) {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	public Page getPageForForwarding(HttpServletRequest request, DiscrepancyNoteBean note, boolean isCompleted) {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String entityType = note.getEntityType().toLowerCase();
 		request.setAttribute("fromResolvingNotes", "yes");
@@ -105,7 +104,8 @@ public class ResolveDiscrepancyServlet extends Controller {
 				return Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET;
 			}
 		} else if ("itemdata".equalsIgnoreCase(entityType) || "eventcrf".equalsIgnoreCase(entityType)) {
-			if (currentRole.getRole().equals(Role.STUDY_MONITOR) || !isCompleted) {
+			if (currentRole.getRole().equals(Role.STUDY_CODER) || currentRole.getRole().equals(Role.STUDY_MONITOR)
+					|| !isCompleted) {
 				return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
 			} else {
 				return Page.ADMIN_EDIT_SERVLET;
@@ -117,7 +117,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 	@SuppressWarnings("unchecked")
 	public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy,
 			DiscrepancyNoteBean note, boolean isCompleted) {
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 		String entityType = note.getEntityType().toLowerCase();
 		int id = note.getEntityId();
 		if ("subject".equalsIgnoreCase(entityType)) {
@@ -148,18 +148,19 @@ public class ResolveDiscrepancyServlet extends Controller {
 			request.setAttribute(EnterDataForStudyEventServlet.INPUT_EVENT_ID, String.valueOf(id));
 			request.setAttribute(UpdateStudyEventServlet.EVENT_ID, String.valueOf(id));
 			request.setAttribute(UpdateStudyEventServlet.STUDY_SUBJECT_ID, String.valueOf(seb.getStudySubjectId()));
-            request.getSession().setAttribute(CreateDiscrepancyNoteServlet.SUBJECT_ID,  String.valueOf(seb.getStudySubjectId()));
+			request.getSession().setAttribute(CreateDiscrepancyNoteServlet.SUBJECT_ID,
+					String.valueOf(seb.getStudySubjectId()));
 		}
 
 		// this is for item data
 		else if ("itemdata".equalsIgnoreCase(entityType)) {
 			SectionDAO sdao = new SectionDAO(ds);
 			ItemDataDAO iddao = new ItemDataDAO(ds);
-            ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
+			ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
 
-            ItemDataBean idb = (ItemDataBean) iddao.findByPK(id);
+			ItemDataBean idb = (ItemDataBean) iddao.findByPK(id);
 
-            EventCRFDAO ecdao = new EventCRFDAO(ds);
+			EventCRFDAO ecdao = new EventCRFDAO(ds);
 
 			EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
 
@@ -173,7 +174,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 				StudyEventDAO sedao = new StudyEventDAO(ds);
 				StudyEventBean seb = (StudyEventBean) sedao.findByPK(id);
 				request.setAttribute(EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
-                request.setAttribute(ViewSectionDataEntryServlet.EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
+				request.setAttribute(ViewSectionDataEntryServlet.EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
 				request.setAttribute(STUDY_SUB_ID, String.valueOf(seb.getStudySubjectId()));
 
 			} else {
@@ -190,10 +191,10 @@ public class ResolveDiscrepancyServlet extends Controller {
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
-        prepareExitTo(request);
+		prepareExitTo(request);
 		FormProcessor fp = new FormProcessor(request);
 		int noteId = fp.getInt(INPUT_NOTE_ID);
 		String module = (String) request.getSession().getAttribute("module");
@@ -301,63 +302,33 @@ public class ResolveDiscrepancyServlet extends Controller {
 					request.getRequestURL()
 							.toString()
 							.replace(request.getServletPath(),
-                                    Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET.getFileName()));
+									Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET.getFileName()));
 		}
-	}
-
-	/**
-	 * Determines if a discrepancy note is closed or not. The note is closed if it has status closed, or any of its
-	 * children have closed status.
-	 * 
-	 * @param note
-	 *            The discrepancy note. The children should already be set.
-	 * @return <code>true</code> if the note is closed, <code>false</code> otherwise.
-	 */
-	public static boolean noteIsClosed(DiscrepancyNoteBean note) {
-		if (note.getResolutionStatusId() == ResolutionStatus.CLOSED.getId()) {
-			return true;
-		}
-
-		ArrayList children = note.getChildren();
-		for (int i = 0; i < children.size(); i++) {
-			DiscrepancyNoteBean child = (DiscrepancyNoteBean) children.get(i);
-			if (child.getResolutionStatusId() == ResolutionStatus.CLOSED.getId()) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public static boolean parentNoteIsClosed(DiscrepancyNoteBean parentNote) {
-		if (parentNote.getResolutionStatusId() == ResolutionStatus.CLOSED.getId()) {
-			return true;
-		}
-		return false;
 	}
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String module = (String) request.getSession().getAttribute("module");
 		if (module != null) {
-            request.getSession().removeAttribute("module");
+			request.getSession().removeAttribute("module");
 		}
 
-		if (currentRole.getRole().equals(Role.STUDY_CODER)
-				|| currentRole.getRole().equals(Role.INVESTIGATOR)
+		if (currentRole.getRole().equals(Role.STUDY_CODER) || currentRole.getRole().equals(Role.INVESTIGATOR)
 				|| currentRole.getRole().equals(Role.STUDY_MONITOR)
 				|| currentRole.getRole().equals(Role.STUDY_DIRECTOR)
 				|| currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR)
 				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)) {
-			
+
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_permission_to_resolve_discrepancy")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_permission_to_resolve_discrepancy")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_study_director_or_study_coordinator"), "1");
 	}
@@ -367,15 +338,17 @@ public class ResolveDiscrepancyServlet extends Controller {
 	 * item data or event crf.
 	 * 
 	 * @param module
-	 *            A String like "managestudy" or "admin"
+	 *            String A String like "managestudy" or "admin"
 	 * @param discrepancyNoteBean
+	 *            DiscrepancyNoteBean
 	 */
-	private void redirectMonitor(HttpServletRequest request, HttpServletResponse response, String module, DiscrepancyNoteBean discrepancyNoteBean) {
-        StudyBean currentStudy = getCurrentStudy(request);
+	private void redirectMonitor(HttpServletRequest request, HttpServletResponse response, String module,
+			DiscrepancyNoteBean discrepancyNoteBean) {
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		if (discrepancyNoteBean != null) {
 
-			String createNoteURL = "";
+			String createNoteURL;
 			// This String will determine whether the type is other than
 			// itemdata.
 			String entityType = discrepancyNoteBean.getEntityType().toLowerCase();
@@ -384,7 +357,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 			RequestDispatcher dispatcher = null;
 			DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
 
-			if (entityType != null && !"".equalsIgnoreCase(entityType) && !"itemdata".equalsIgnoreCase(entityType)
+			if (!"".equalsIgnoreCase(entityType) && !"itemdata".equalsIgnoreCase(entityType)
 					&& !"eventcrf".equalsIgnoreCase(entityType)) {
 				if ("studySub".equalsIgnoreCase(entityType)) {
 					dispatcher = request.getRequestDispatcher("/ViewStudySubject?id=" + entityId + "&module=" + module);

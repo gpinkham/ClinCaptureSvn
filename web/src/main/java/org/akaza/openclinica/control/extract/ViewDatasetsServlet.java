@@ -20,12 +20,6 @@
  */
 package org.akaza.openclinica.control.extract;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -47,6 +41,13 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DatasetRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * ViewDatasetsServlet.java, the view datasets function accessed from the extract datasets main page.
@@ -206,7 +207,8 @@ public class ViewDatasetsServlet extends RememberLastPage {
 			return;
 		}
 
-		if (!currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)) {
+		if (!currentRole.getRole().equals(Role.STUDY_CODER)
+				&& !currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)) {
 			return;
 		}
 
