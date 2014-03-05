@@ -35,8 +35,6 @@ $(function() {
 			$(".success").show();
 
 			$(".alert-success").text("Rule is valid: " + rule.expression);
-			$("#evaluates").text("Rule evaluates to");
-			$(".alert-info").text(validation.ruleEvaluatesTo);
 
 			if (rule.targets) {
 
