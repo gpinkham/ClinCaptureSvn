@@ -22,7 +22,7 @@ table.widgets_container td {
 	right: 0px;
 	top: 100px;
 	vertical-align: top;
-	width: 392px;
+	width: 420px;
 	padding: 5px;
 	border: 1px solid gray;
 	background-color: white;
@@ -43,6 +43,12 @@ table.widgets_container td {
 	background-image: url(../../images/dots.gif);
 	background-repeat: repeat-x;
 	background-position: bottom;
+}
+
+.toolbar_wrapper #toolbar {
+	overflow-x: hidden;
+	overflow-y: scroll;
+	max-height: 500px;
 }
 
 #show_hide {

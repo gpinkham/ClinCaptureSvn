@@ -2,7 +2,7 @@
 function tollbarToogle(e) {
 	if ($(e).children().text() == "Hide") {
 		$(e).parent().animate({
-			right : "-412px"
+			right : "-430px"
 		}, 500);
 		$(e).children().html("Show");
 	} else {
