@@ -3493,11 +3493,11 @@ function switchOffElement(elementName){
 	setDisabledProperty(elementName, 'disabled');
 }
 		
-function setParameterForDNWithPath(field, parameterName, value, contextPath) {
+function setParameterForDNWithPath(toOverwrite, field, parameterName, value, contextPath) {
 	$.ajax({
 		url: contextPath+'/ChangeParametersForDNote',
 		type: 'GET',
-		data: 'field='+field+'&parameterName='+parameterName+'&value='+value,
+		data: 'field='+field+'&parameterName='+parameterName+'&value='+value+'&toOverwrite='+toOverwrite,
 		dataType: 'text'
 	});
 }

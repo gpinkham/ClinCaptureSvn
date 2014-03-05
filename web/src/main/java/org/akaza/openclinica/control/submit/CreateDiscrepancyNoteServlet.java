@@ -940,17 +940,33 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 	public static void turnOffIsInErrorParamOfDN(String field, HttpServletRequest request) {
 		setParameterForDN(field, "isInError", "0", request);
 	}
-
+	
 	public static void setParameterForDN(String field, String parameterName, String value, HttpServletRequest request) {
+		setParameterForDN("1", field, parameterName, value, request);
+	}
+
+	public static void setParameterForDN(String toOverwrite, String field, String parameterName, String value, HttpServletRequest request) {
 		if (request.getSession().getAttribute("dnAdditionalCreatingParameters") != null) {
 			Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request
 					.getSession().getAttribute("dnAdditionalCreatingParameters");
 			if (field != null && dnAdditionalCreatingParameters.get(field) != null) {
-				dnAdditionalCreatingParameters.get(field).put(parameterName, value);
+				changeParameter(toOverwrite, field, parameterName, value, dnAdditionalCreatingParameters);
 			}
 		}
 	}
 
+	private static void changeParameter(String toOverwrite, String field, String parameterName, String value, Map<String, HashMap<String, String>> dnAdditionalCreatingParameters) {
+		// logic of changing parameter is there
+		if ("0".equals(toOverwrite)) {
+			if (dnAdditionalCreatingParameters.get(field).get(parameterName) == null || 
+					"".equals(dnAdditionalCreatingParameters.get(field).get(parameterName))) {
+				dnAdditionalCreatingParameters.get(field).put(parameterName, value);
+			}
+		} else {
+			dnAdditionalCreatingParameters.get(field).put(parameterName, value);
+		}
+	}
+	
 	public static Map<String, String> getMapWithParameters(String field, HttpServletRequest request) {
 		if (request.getSession().getAttribute("dnAdditionalCreatingParameters") != null) {
 			

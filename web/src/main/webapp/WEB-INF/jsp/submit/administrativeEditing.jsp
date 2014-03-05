@@ -321,9 +321,9 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         }
     }
 
-  function setParameterForDN(field, parameterName, value) {
-    setParameterForDNWithPath(field, parameterName, value, '${pageContext.request.contextPath}');
-  };
+  	function setParameterForDN(field, parameterName, value) {
+    	setParameterForDNWithPath('0', field, parameterName, value, '${pageContext.request.contextPath}');
+ 	};
 </script>
 <%--
 <td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>

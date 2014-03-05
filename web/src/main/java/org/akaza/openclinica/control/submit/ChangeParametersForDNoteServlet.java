@@ -28,7 +28,8 @@ public class ChangeParametersForDNoteServlet extends HttpServlet {
 		String field = request.getParameter("field");
 		String parameterName = request.getParameter("parameterName");
 		String value = request.getParameter("value");
+		String toOverwrite = request.getParameter("toOverwrite");
 		
-		CreateDiscrepancyNoteServlet.setParameterForDN(field, parameterName, value, request);
+		CreateDiscrepancyNoteServlet.setParameterForDN(toOverwrite, field, parameterName, value, request);
     }
 }

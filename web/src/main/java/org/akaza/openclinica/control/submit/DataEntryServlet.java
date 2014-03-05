@@ -2195,18 +2195,17 @@ public abstract class DataEntryServlet extends Controller {
 		logger.trace("***FOUND*** crfversionid: " + crfVersionId);
 		int studyEventId = fp.getInt(INPUT_STUDY_EVENT_ID);
 		int eventDefinitionCRFId = fp.getInt(INPUT_EVENT_DEFINITION_CRF_ID);
-		int studySubjectId = fp.getInt(INPUT_SUBJECT_ID);
+		int subjectId = fp.getInt(INPUT_SUBJECT_ID);
 		int eventCRFId = fp.getInt(INPUT_EVENT_CRF_ID);
 
 		logger.trace("look specifically wrt event crf id: " + eventCRFId);
 
 		logger.trace("Creating event CRF.  Study id: " + currentStudy.getId() + "; CRF Version id: " + crfVersionId
 				+ "; Study Event id: " + studyEventId + "; Event Definition CRF id: " + eventDefinitionCRFId
-				+ "; Study Subject: " + studySubjectId);
+				+ "; Subject: " + subjectId);
 
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
-		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studySubjectId);
-		StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(studySubjectBean.getSubjectId(), currentStudy);
+		StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
 
 		if (ssb.getId() <= 0) {
 			logger.trace("throwing ISE with study subject bean id of " + ssb.getId());
@@ -5238,8 +5237,8 @@ public abstract class DataEntryServlet extends Controller {
 			HttpServletRequest request) {
 		HashMap<String, String> result = new HashMap<String, String>();
 		// calculate parameters block
-
-		String isInError = "0";
+		// started values should be initialed by "", not "0"
+		String isInError = "";
 		HashMap formMessages = (HashMap) request.getAttribute("formMessages");
 		if (formMessages != null) {
 			if (formMessages.keySet().contains(field)) {
@@ -5247,7 +5246,7 @@ public abstract class DataEntryServlet extends Controller {
 			}
 		}
 
-		String isInRFCError = "0";
+		String isInRFCError = "";
 		Set<String> setOfItemNamesWithRFCErrors = (Set<String>) request.getAttribute("setOfItemNamesWithRFCErrors");
 		if (setOfItemNamesWithRFCErrors != null) {
 			if (setOfItemNamesWithRFCErrors.contains(field)) {
@@ -5255,15 +5254,15 @@ public abstract class DataEntryServlet extends Controller {
 			}
 		}
 
-		String isInFVCError = "0";
-		if ("1".equals(isInError) && "0".equals(isInRFCError)) {
+		String isInFVCError = "";
+		if ("1".equals(isInError) && ("0".equals(isInRFCError) || "".equals(isInRFCError))) {
 			isInFVCError = "1";
 		}
 
 		result.put("isInError", isInError);
 		result.put("isInRFCError", isInRFCError);
 		result.put("isInFVCError", isInFVCError);
-		result.put("isDataChanged", "0");
+		result.put("isDataChanged", "");
 		result.put("field", field);
 
 		return result;

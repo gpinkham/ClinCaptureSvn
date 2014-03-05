@@ -269,7 +269,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 				 */
 
 				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()
-						|| (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.QUERY.getId() && "Updated".equals(dn
+						|| ((dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.QUERY.getId() || dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId()) && "Updated".equals(dn
 								.getResStatus().getName()))) {
 					CreateDiscrepancyNoteServlet.turnOffIsDataChangedParamOfDN(field, request);
 					CreateDiscrepancyNoteServlet.turnOffIsInRFCErrorParamOfDN(field, request);
