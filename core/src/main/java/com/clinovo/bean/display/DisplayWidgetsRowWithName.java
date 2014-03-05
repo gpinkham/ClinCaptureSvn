@@ -15,7 +15,7 @@
 
 package com.clinovo.bean.display;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 
@@ -23,7 +23,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 public class DisplayWidgetsRowWithName extends EntityBean {
 
 	private String rowName = "";
-	private HashMap<String, Integer> rowValues = new HashMap<String, Integer>();
+	private LinkedHashMap<String, Integer> rowValues = new LinkedHashMap<String, Integer>();
 
 	public String getRowName() {
 		return rowName;
@@ -33,11 +33,11 @@ public class DisplayWidgetsRowWithName extends EntityBean {
 		this.rowName = rowName;
 	}
 
-	public HashMap<String, Integer> getRowValues() {
+	public LinkedHashMap<String, Integer> getRowValues() {
 		return rowValues;
 	}
 
-	public void setRowValues(HashMap<String, Integer> rowValues) {
+	public void setRowValues(LinkedHashMap<String, Integer> rowValues) {
 		this.rowValues = rowValues;
 	}
 }

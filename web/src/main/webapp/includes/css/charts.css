@@ -40,7 +40,7 @@ table.widgets_container td {
 .toolbar_wrapper .note {
 	padding-bottom: 10px;
 	padding-left: 10px;
-	background-image: url(../images/dots.gif);
+	background-image: url(../../images/dots.gif);
 	background-repeat: repeat-x;
 	background-position: bottom;
 }
@@ -51,7 +51,7 @@ table.widgets_container td {
 	width: 60px;
 	height: 20px;
 	text-align: center;
-	vertical-align: center;
+	vertical-align: middle;
 	color: white;
 }
 
@@ -108,20 +108,20 @@ form#actionForSave input {
 	margin-top: 20px;
 }
 
-.widget #stacked_bar,.stacked_bar {
+.widget .stacked_bar {
 	height: 20px;
 	padding: 0px;
 	margin: 0px;
 }
 
-.widget #stacked_bar li,.stacked_bar li {
+.widget .stacked_bar li {
 	display: inline-block !important;
 	width: 0px;
 	height: 20px;
 	margin-right: -3px;
 }
 
-@-moz-document url-prefix () { #stacked_bar li , .stacked_bar li { 
+@-moz-document url-prefix () { .stacked_bar li { 
 	display:inline-block!important;
 	width: 0px;
 	height: 20px;
@@ -129,11 +129,11 @@ form#actionForSave input {
 }
 
 }
-.widget #stack #pop-up {
+.widget .stack .pop-up {
 	display: none;
 }
 
-.widget #stack:hover #pop-up {
+.widget .stack:hover .pop-up {
 	background-color: white;
 	border: 1px solid gray;
 	position: absolute;
@@ -170,7 +170,7 @@ form#actionForSave input {
 	vertical-align: middle;
 }
 
-.widget table.signs td.optional {
+.widget table.signs td.optional, .dns_assigned_to_me a.optional {
 	display: none;
 }
 
@@ -205,7 +205,8 @@ form#actionForSave input {
 	color: black;
 	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
 	font-size: 11px;
-	font-weight: bold;}
+	font-weight: bold;
+}
 
 .widget input#previous,.widget input#next {
 	display: none;
@@ -239,7 +240,11 @@ form#actionForSave input {
 /* /DNs assigned to me */
 
 /* Events Completion */
-.events_completion ul#stacked_bar,  .events_completion .not_cheduled{
+.events_completion .signs td {
+	width:auto;
+}
+
+.events_completion ul.stacked_bar,  .events_completion .not_cheduled{
 	background-color: #ecf8ff;
 }
 

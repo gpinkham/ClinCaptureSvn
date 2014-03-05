@@ -13,18 +13,18 @@ $(document).ready(function($) {
 <div class="dns_assigned_to_me" align="center">
 	<h2><fmt:message key="nds_assigned_to_me_widget_header" bundle="${resword}"/></h2>
 	<div class="chart_wrapper" align="left">
-		<ul id="stacked_bar">
-			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='New' bundle='${resterm}'/>"><li id="stack" class="new">
-					<div id="pop-up"></div>				
+		<ul class="stacked_bar">
+			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='New' bundle='${resterm}'/>"><li class="new stack">
+					<div class="pop-up"></div>				
 			</li></a>
-			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Updated' bundle='${resterm}'/>"><li id="stack" class="updated">
-					<div id="pop-up"></div>			
+			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Updated' bundle='${resterm}'/>"><li class="updated stack">
+					<div class="pop-up"></div>			
 			</li></a>
-			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Resolution_Proposed' bundle='${resterm}'/>"><li id="stack" class="resolution_proposed">
-					<div id="pop-up"></div>				
+			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Resolution_Proposed' bundle='${resterm}'/>" class="optional"><li class="resolution_proposed stack">
+					<div class="pop-up"></div>				
 			</li></a>
-			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Closed' bundle='${resterm}'/>"><li id="stack" class="closed">
-					<div id="pop-up"></div>				
+			<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />&listNotes_f_discrepancyNoteBean.resolutionStatus=<fmt:message key='Closed' bundle='${resterm}'/>"><li class="closed stack">
+					<div class="pop-up"></div>				
 			</li></a>			
 		</ul>
 	</div>

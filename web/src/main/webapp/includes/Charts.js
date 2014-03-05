@@ -100,8 +100,11 @@ function initNdsAssignedToMeWidget() {
 			var closedNds = parseInt(array[3]);
 
 			if (resolutionProposedDns != 0) {
-				$(".widget table.signs td.optional").css("display",
+				$(".dns_assigned_to_me td.optional").css("display",
 						"table-cell");
+
+				$(".dns_assigned_to_me a.optional").css("display",
+						"inline-block");
 			}
 
 			var totalNds = newNds + updatedNds + closedNds
@@ -109,7 +112,7 @@ function initNdsAssignedToMeWidget() {
 			captionLimit = countCaptionLimit(totalNds);
 			var captionSelector = ".dns_assigned_to_me .captions td";
 			setCaption(captionSelector, captionLimit);
-			var valuesSecelctor = ".dns_assigned_to_me #stack";
+			var valuesSecelctor = ".dns_assigned_to_me .stack";
 			setStacksLenghts(valuesSecelctor, array, captionLimit);
 		},
 		error : function(e) {
@@ -120,7 +123,7 @@ function initNdsAssignedToMeWidget() {
 
 function initEventsCompletionWidget(action) {
 	var url = getCurentUrl();
-	var lastElement = $(".events_completion input#last_element").val();
+	var lastElement = $(".events_completion input#ec_last_element").val();
 
 	if (lastElement == undefined) {
 		lastElement = 0;
@@ -138,8 +141,8 @@ function initEventsCompletionWidget(action) {
 		},
 		success : function(html) {
 			$(".events_completion #events_completion_container").html(html);
-			var hasNext = $("#events_completion_form #has_next").val();
-			var hasPrevious = $("#events_completion_form #has_previous").val();
+			var hasNext = $("#events_completion_form #ec_has_next").val();
+			var hasPrevious = $("#events_completion_form #ec_has_previous").val();
 
 			if (hasNext == "true") {
 				$(".events_completion input#next").css("display", "block");
@@ -154,7 +157,7 @@ function initEventsCompletionWidget(action) {
 			}
 			$(".events_completion #events_completion_container").show(500);
 
-			var stack = $("#events_completion_container #stacked_bar");
+			var stack = $("#events_completion_container .stacked_bar");
 			stack.each(function(entry) {
 				var values = new Array();
 				var total = 0;
@@ -167,12 +170,18 @@ function initEventsCompletionWidget(action) {
 					}
 				});
 				if (parseInt(total) != 0) {
-					var currentBarClass = $(this).attr("class");
-					var selector = "#events_completion_container #stacked_bar."
-							+ (currentBarClass) + " #stack";
+					var currentBarClass = $(this).attr("barnumber");
+					var selector = "#events_completion_container .stacked_bar[barnumber="
+							+ (currentBarClass) + "] .stack";
 					setStacksLenghts(selector, values, total);
 				}
 			});
+
+			var element = document.getElementById('toolbar');
+
+			if (element) {
+				$(".events_completion .chart_wrapper a").attr("href", "#");
+			}
 		},
 		error : function(e) {
 			console.log("Error:" + e);
@@ -182,12 +191,6 @@ function initEventsCompletionWidget(action) {
 /* /Initialization of widgets */
 
 /* Supporting functions */
-function updateStucksNumbers() {
-	$(".events_completion #stacked_bar").each(function(index) {
-		$(this).attr("id", "stacked_bar" + index);
-	});
-}
-
 function countCaptionLimit(total) {
 	if (total < 4) {
 		total = 4;
@@ -229,7 +232,7 @@ function setStacksLenghts(selector, values, captionLimit) {
 					width : stackWidth
 				}, 500);
 
-				$(this).find("#pop-up").css("margin-left",
+				$(this).find(".pop-up").css("margin-left",
 						(parseInt(values[counter]) * unitSize) / 2).html(
 						parseInt(values[counter]));
 

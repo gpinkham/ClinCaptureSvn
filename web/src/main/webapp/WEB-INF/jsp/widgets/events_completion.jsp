@@ -17,22 +17,22 @@ $(document).ready(function($) {
 	<table class="captions_percents">
 		<tr>
 			<td>0%</td>
-			<td>10</td>
-			<td>20</td>
-			<td>30</td>
-			<td>40</td>
-			<td>50</td>
-			<td>60</td>
-			<td>70</td>
-			<td>80</td>
-			<td>90</td>
+			<td>10%</td>
+			<td>20%</td>
+			<td>30%</td>
+			<td>40%</td>
+			<td>50%</td>
+			<td>60%</td>
+			<td>70%</td>
+			<td>80%</td>
+			<td>90%</td>
 			<td>100%</td>
 		</tr>
 	</table>
 	<table class="signs">
 		<tr>
 			<td><div class="scheduled sign"></div> - Scheduled</td>
-			<td><div class="data_entry_started sign"></div> - DES*</td>
+			<td><div class="data_entry_started sign"></div> - Data Entry Started</td>
 			<td><div class="completed sign"></div> - Completed</td>
 		</tr>
 		<tr>
@@ -43,12 +43,8 @@ $(document).ready(function($) {
 		<tr>
 			<td><div class="stopped sign"></div> - Stopped</td>
 			<td><div class="not_scheduled sign"></div> - Not Scheduled</td>
-			<td><div class="sdved sign"></div> - SDV**</td>
+			<td><div class="sdved sign"></div> - Source Data Verified</td>
 		</tr>
-	</table>	
-	<table class="notes">
-	<tr><td>* - Data Entry Started</td>
-		<td>** - Source Data Verified</td></tr>
 	</table>
 	<table>
 		<tr>

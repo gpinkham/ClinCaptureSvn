@@ -1,65 +1,42 @@
 package com.clinovo.controller;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
+import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
+import com.clinovo.bean.display.DisplayWidgetsRowWithName;
+import com.clinovo.model.Widget;
+import com.clinovo.model.WidgetsLayout;
+import com.clinovo.service.WidgetService;
+import com.clinovo.service.WidgetsLayoutService;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.apache.http.HttpResponse;
-import org.eclipse.jetty.util.ajax.JSON;
-import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.view.RedirectView;
 
-import com.clinovo.bean.display.DisplayWidgetsLayoutBean;
-import com.clinovo.bean.display.DisplayWidgetsRowWithName;
-import com.clinovo.dao.WidgetsLayoutDAO;
-import com.clinovo.model.Widget;
-import com.clinovo.model.WidgetsLayout;
-import com.clinovo.service.WidgetService;
-import com.clinovo.service.WidgetsLayoutService;
-import com.lowagie.text.pdf.hyphenation.TernaryTree.Iterator;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @Controller
 @SuppressWarnings({ "unused", "rawtypes" })
 public class WidgetsLayoutController {
-
-	private DiscrepancyNoteDAO discrepancyNoteDao;
-	private StudyDAO studyDAO;
-	private StudyEventDAO studyEventDAO;
-	private StudyEventDefinitionDAO studyEventDefinitionDAO;
-
-	private UserAccountBean ub;
-	private StudyBean sb;
 
 	@Autowired
 	private DataSource datasource;
@@ -75,8 +52,8 @@ public class WidgetsLayoutController {
 		ModelMap model = new ModelMap();
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
-		ub = (UserAccountBean) request.getSession().getAttribute("userBean");
-		sb = (StudyBean) request.getSession().getAttribute("study");
+		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
 
 		int studyId = sb.getId();
 		int userId = ub.getId();
@@ -86,7 +63,7 @@ public class WidgetsLayoutController {
 		List<DisplayWidgetsLayoutBean> dispayWidgetsLayout = new ArrayList<DisplayWidgetsLayoutBean>();
 
 		for (WidgetsLayout currentLayout : widgetsLayout) {
-			
+
 			Widget currentWidget = widgetService.findByChildsId(currentLayout.getId());
 
 			String widgetName = currentWidget.getWidgetName().toLowerCase().replaceAll(" ", "_");
@@ -146,14 +123,13 @@ public class WidgetsLayoutController {
 		if (!unusedWidgets.equals("")) {
 			List<String> unusedWidgetsIds = Arrays.asList(unusedWidgets.split("\\s*,\\s*"));
 
-			for (int i3 = 0; i3 < unusedWidgetsIds.size(); i3++) {
+			for (String unusedWidgetsId : unusedWidgetsIds) {
 				WidgetsLayout currentWidgetLayout = widgetLayoutService.findByWidgetIdAndStudyIdAndUserId(
-						Integer.parseInt(unusedWidgetsIds.get(i3)), studyId, userId);
+						Integer.parseInt(unusedWidgetsId), studyId, userId);
 				currentWidgetLayout.setOrdinal(0);
 				widgetLayoutService.saveWidgetLayout(currentWidgetLayout);
 			}
 		}
-		return;
 	}
 
 	@RequestMapping("/initNdsAssignedToMeWidget")
@@ -168,26 +144,26 @@ public class WidgetsLayoutController {
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(datasource);
 
-		Integer newDns = discrepancyNoteDao.getViewNotesCountWithFilter(
-				" AND dn.assigned_user_id = " + currentUser + " AND dn.resolution_status_id = 1", currentStudy);
+		Integer newDns = discrepancyNoteDao.getViewNotesCountWithFilter(" AND dn.assigned_user_id = " + currentUser
+				+ " AND dn.resolution_status_id = 1", currentStudy);
 
 		if (newDns == null) {
 			newDns = 0;
 		}
-		Integer updatedDns = discrepancyNoteDao.getViewNotesCountWithFilter(
-				" AND dn.assigned_user_id = " + currentUser + " AND dn.resolution_status_id = 2", currentStudy);
+		Integer updatedDns = discrepancyNoteDao.getViewNotesCountWithFilter(" AND dn.assigned_user_id = " + currentUser
+				+ " AND dn.resolution_status_id = 2", currentStudy);
 
 		if (updatedDns == null) {
 			updatedDns = 0;
 		}
-		Integer resolutionProposedDns = discrepancyNoteDao.getViewNotesCountWithFilter(
-				" AND dn.assigned_user_id = " + currentUser + " AND dn.resolution_status_id = 3", currentStudy);
+		Integer resolutionProposedDns = discrepancyNoteDao.getViewNotesCountWithFilter(" AND dn.assigned_user_id = "
+				+ currentUser + " AND dn.resolution_status_id = 3", currentStudy);
 
 		if (resolutionProposedDns == null) {
 			resolutionProposedDns = 0;
 		}
-		Integer closedDns = discrepancyNoteDao.getViewNotesCountWithFilter(
-				" AND dn.assigned_user_id = " + currentUser + " AND dn.resolution_status_id = 4", currentStudy);
+		Integer closedDns = discrepancyNoteDao.getViewNotesCountWithFilter(" AND dn.assigned_user_id = " + currentUser
+				+ " AND dn.resolution_status_id = 4", currentStudy);
 
 		if (closedDns == null) {
 			closedDns = 0;
@@ -198,7 +174,8 @@ public class WidgetsLayoutController {
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping("/initEventsCompletionWidget")
-	public String initEventsCompletionWidget(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
+	public String initEventsCompletionWidget(HttpServletRequest request, HttpServletResponse response, Model model)
+			throws IOException {
 
 		response.setHeader("Cache-Control", "no-cache");
 		response.setHeader("Pragma", "no-cache");
@@ -211,6 +188,7 @@ public class WidgetsLayoutController {
 		String action = request.getParameter("action");
 
 		StudyEventDAO studyEventDAO = new StudyEventDAO(datasource);
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
 		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(datasource);
 
 		boolean hasPrevious;
@@ -228,18 +206,28 @@ public class WidgetsLayoutController {
 		}
 
 		SubjectEventStatus[] subjectEventStatuses = { SubjectEventStatus.SCHEDULED,
-				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SIGNED,
-				SubjectEventStatus.LOCKED, SubjectEventStatus.SKIPPED, SubjectEventStatus.STOPPED,
-				SubjectEventStatus.SOURCE_DATA_VERIFIED, SubjectEventStatus.NOT_SCHEDULED  };
+				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.SOURCE_DATA_VERIFIED,
+				SubjectEventStatus.SIGNED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SKIPPED,
+				SubjectEventStatus.STOPPED, SubjectEventStatus.LOCKED };
 
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+		List<StudyEventDefinitionBean> studyEventDefinitions;
+		int countOfSubject;
 
-		List<StudyEventDefinitionBean> studyEventDefinitions = studyEventDefinitionDAO.findAllActiveByStudyId(studyId);
+		if (sb.isSite(sb.getParentStudyId())) {
+			countOfSubject = studySubjectDAO.getCountofStudySubjectsAtStudyOrSite(sb);
+			studyEventDefinitions = studyEventDefinitionDAO.findAllActiveByParentStudyId(sb.getParentStudyId());
+		} else {
+			studyEventDefinitions = studyEventDefinitionDAO.findAllActiveByStudyId(sb.getId());
+			countOfSubject = studySubjectDAO.getCountofStudySubjectsAtStudy(sb);
+		}
+
 		List<DisplayWidgetsRowWithName> eventCompletionRows = new ArrayList<DisplayWidgetsRowWithName>();
 
 		for (int i = displayFrom; i < studyEventDefinitions.size() && i < displayFrom + maxDisplayNumber; i++) {
 			DisplayWidgetsRowWithName currentRow = new DisplayWidgetsRowWithName();
-			HashMap<String, Integer> countOfSubjectEventStatuses = new HashMap<String, Integer>();
+			LinkedHashMap<String, Integer> countOfSubjectEventStatuses = new LinkedHashMap<String, Integer>();
+			int countOfSubjectsStartedEvent = 0;
 
 			for (SubjectEventStatus subjectEventStatus : subjectEventStatuses) {
 				int eventsWithStatus = studyEventDAO.getCountofEventsBasedOnEventStatusAndStudyEventDefinitionId(sb,
@@ -247,24 +235,20 @@ public class WidgetsLayoutController {
 
 				countOfSubjectEventStatuses.put(subjectEventStatus.getName().toLowerCase().replaceAll(" ", "_"),
 						eventsWithStatus);
+
+				countOfSubjectsStartedEvent += eventsWithStatus;
 			}
 
+			countOfSubjectEventStatuses.put("not_scheduled", countOfSubject - countOfSubjectsStartedEvent);
+			currentRow.setId(studyEventDefinitions.get(i).getId());
 			currentRow.setRowName(studyEventDefinitions.get(i).getName());
 			currentRow.setRowValues(countOfSubjectEventStatuses);
 			eventCompletionRows.add(currentRow);
 		}
 
-		if (displayFrom == 0) {
-			hasPrevious = false;
-		} else {
-			hasPrevious = true;
-		}
+		hasPrevious = displayFrom != 0;
 
-		if (displayFrom + 5 > studyEventDefinitions.size()) {
-			hasNext = false;
-		} else {
-			hasNext = true;
-		}
+		hasNext = displayFrom + 5 <= studyEventDefinitions.size();
 
 		model.addAttribute("eventCompletionRows", eventCompletionRows);
 		model.addAttribute("eventCompletionHasNext", hasNext);
