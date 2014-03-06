@@ -48,7 +48,12 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Date;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 @Component
@@ -122,8 +127,7 @@ public class CreateNewStudyEventServlet extends Controller {
 					for (EventDefinitionCRFBean eventDefBean : (ArrayList<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
 							.findAllActiveByEventDefinitionId(definition.getId())) {
 
-						eventCRFDivId = "Event_"
-								+ SubjectLabelNormalizer.normalizeSubjectLabel(studySubject.getLabel()) + "_"
+						eventCRFDivId = "Event_" + SubjectLabelNormalizer.normalizeSubjectLabel(studySubject.getLabel()) + "_"
 								+ eventDefBean.getId() + "_";
 
 						eventIds = new JSONArray();
@@ -131,8 +135,7 @@ public class CreateNewStudyEventServlet extends Controller {
 						jsonObject = new JSONObject();
 						jsonObject.put("eventDivId", eventCRFDivId);
 						jsonObject.put("eventIds", eventIds);
-						jsonObject.put("totalEvents", sed.findAllByDefinitionAndSubject(definition, studySubject)
-								.size());
+						jsonObject.put("totalEvents", sed.findAllByDefinitionAndSubject(definition, studySubject).size());
 						jsonObject.put("repeatingEvent", definition.isRepeating());
 						jsonObject.put("popupToDisplayEntireEvent", false);
 						eventDefs.put(jsonObject);
@@ -212,8 +215,7 @@ public class CreateNewStudyEventServlet extends Controller {
 			ssb = (StudySubjectBean) sdao.findByPK(studySubjectId);
 			Status s = ssb.getStatus();
 			if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
-				addPageMessage(
-						resword.getString("study_event") + resterm.getString("could_not_be")
+				addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be")
 								+ resterm.getString("added") + "."
 								+ respage.getString("study_subject_has_been_deleted"), request);
 				request.setAttribute("id", Integer.toString(studySubjectId));
@@ -615,8 +617,12 @@ public class CreateNewStudyEventServlet extends Controller {
 				}
 
 				if (popupQuery) {
-					String eventDivId = "Event_" + SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel)
-							+ "_" + definition.getId() + "_";
+					String eventDivId = "Event_"
+							+ SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel)
+							+ "_"
+							+ definition.getId()
+							+ (pageToShowPopup.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName()) ? "ev" : "") 
+							+ "_";
 					processEvents(eventDefs, eventDivId, studyEvent.getId(), definition, studySubject, sed,
 							pageToShowPopup, selectedEventDefId);
 				}
@@ -677,7 +683,9 @@ public class CreateNewStudyEventServlet extends Controller {
 								if (popupQuery) {
 									String eventDivId = "Event_"
 											+ SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel) + "_"
-											+ scheduledDefinitionIds[i] + "_";
+											+ scheduledDefinitionIds[i]
+											+ (pageToShowPopup.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName()) ? "ev" : "")
+											+ "_";
 									processEvents(eventDefs, eventDivId, studyEventScheduled.getId(),
 											(StudyEventDefinitionBean) seddao.findByPK(scheduledDefinitionIds[i]),
 											studySubject, sed, pageToShowPopup, selectedEventDefId);
@@ -707,7 +715,6 @@ public class CreateNewStudyEventServlet extends Controller {
 					JSONObject jsonObject = new JSONObject();
 					jsonObject.put("eventDefs", eventDefs);
 					jsonObject.put("pageMessages", pageMessages);
-					System.out.println("jsonObject: " + jsonObject.toString());
 					response.getWriter().write(jsonObject.toString());
 				} else {
 					forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET, request, response);
@@ -746,9 +753,11 @@ public class CreateNewStudyEventServlet extends Controller {
 			studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubject, sed);
 			Collections.reverse(studyEvents);
 
-			return factory.eventDivBuilder(subject, rowCount, studyEvents, studyEvents.size(), sed, studySubject,
-					((StringUtil.isBlank(eventCRFId) || eventCRFId.equalsIgnoreCase("undefined")) ? null : eventCRFId),
-					((StringUtil.isBlank(eventDefintionCRFId) || eventDefintionCRFId.equalsIgnoreCase("undefined")) ? null : eventDefintionCRFId), true);
+			return factory
+					.eventDivBuilder(subject, rowCount, studyEvents, studyEvents.size(), sed, studySubject,
+							((StringUtil.isBlank(eventCRFId) || eventCRFId.equalsIgnoreCase("undefined")) ? null
+									: eventCRFId), ((StringUtil.isBlank(eventDefintionCRFId) || eventDefintionCRFId
+									.equalsIgnoreCase("undefined")) ? null : eventDefintionCRFId), true);
 
 		} else {
 

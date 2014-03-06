@@ -43,7 +43,11 @@ import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
-import org.jmesa.limit.*;
+import org.jmesa.limit.Limit;
+import org.jmesa.limit.FilterSet;
+import org.jmesa.limit.Filter;
+import org.jmesa.limit.SortSet;
+import org.jmesa.limit.Sort;
 import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
@@ -54,7 +58,13 @@ import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ResourceBundle;
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Date;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
@@ -175,7 +185,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		int stratFrom = getColumnNamesMap(tableFacade);
 		tableFacade.addFilterMatcher(new MatcherKey(Character.class), new CharFilterMatcher());
 		tableFacade.addFilterMatcher(new MatcherKey(Status.class), new StatusFilterMatcher());
-		
+
 		tableFacade.addFilterMatcher(new MatcherKey(String.class, "event.status"),
 				new SubjectEventStatusFilterMatcher());
 
@@ -190,8 +200,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 					new SubjectEventCRFStatusFilterMatcher());
 		}
 
-		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "studySubject.createdDate"), new DateFilterMatcher(
-				getDateFormat()));
+		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "studySubject.createdDate"), 
+				new DateFilterMatcher(getDateFormat()));
 	}
 
 	@Override
@@ -229,8 +239,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			theItem.put("studySubject", studySubjectBean);
 			theItem.put("studySubject.label", studySubjectBean.getLabel());
 			theItem.put("studySubject.status", studySubjectBean.getStatus());
-			theItem.put("enrolledAt",
-					((StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId())).getIdentifier());
+			theItem.put("enrolledAt", ((StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId())).getIdentifier());
 
 			SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
 			theItem.put("subject", subjectBean);
@@ -264,9 +273,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			List<StudyEventBean> eventsForStudySubjectAndEventDefinitions = getStudyEventDAO()
 					.findAllByDefinitionAndSubjectOrderByOrdinal(selectedStudyEventDefinition, studySubjectBean);
 			List<DisplayBean> events = new ArrayList<DisplayBean>();
-			
+
 			theItem.put("numberOfEvents", eventsForStudySubjectAndEventDefinitions.size());
-			
+
 			// study event size < 1
 			if (eventsForStudySubjectAndEventDefinitions.isEmpty()) {
 				DisplayBean d = new DisplayBean();
@@ -293,8 +302,10 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
 					CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
 					EventCRFBean eventCRFBean = crfAsKeyEventCrfAsValue.get(crf.getId() + "_" + studyEventBean.getId());
-					d.getProps().put("crf_" + crf.getId(), getCRFStatusId(studySubjectBean, studyEventBean,
-							studyEventBean.getSubjectEventStatus(), eventCRFBean));
+					d.getProps().put(
+							"crf_" + crf.getId(),
+							getCRFStatusId(studySubjectBean, studyEventBean, studyEventBean.getSubjectEventStatus(),
+									eventCRFBean));
 					if (eventCRFBean != null) {
 						d.getProps().put("crf_" + crf.getId() + "_eventCrf", eventCRFBean);
 					} else {
@@ -306,15 +317,15 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 					theItem.put("crf_" + crf.getId(), "");
 				}
-				
+
 				if (eventsForStudySubjectAndEventDefinitions.size() > 1 && !eventsForSubjectFilter.isEmpty()) {
 					if (isStudyEventMatchingFilters(d, eventsForSubjectFilter)) {
 						events.add(d);
-					}			
+					}
 				} else {
 					events.add(d);
 				}
-				
+
 			}
 
 			theItem.put("events", events);
@@ -628,7 +639,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			return false;
 		}
 	}
-	
+
 	public class SubjectEventStatusFilterMatcher implements FilterMatcher {
 		public boolean evaluate(Object itemValue, String filterValue) {
 			// No need to evaluate itemValue and filterValue.
@@ -643,7 +654,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			return filterValue.equalsIgnoreCase(itemSGName);
 		}
 	}
-	
+
 	public class SubjectEventCRFStatusFilterMatcher implements FilterMatcher {
 
 		public boolean evaluate(Object itemValue, String filterValue) {
@@ -830,12 +841,11 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 					studyEvents.add(studyEvent);
 				}
 
-				url.append(eventDivBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents, 
-						numberOfEvents, selectedStudyEventDefinition, studySubjectBean,
-						(eventCrf == null ? null : String.valueOf(eventCrf.getId())), String.valueOf(eventDefintionCrf
-								.getId()), false));
+				url.append(eventDivBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents,
+						numberOfEvents, selectedStudyEventDefinition, studySubjectBean, (eventCrf == null ? null
+								: String.valueOf(eventCrf.getId())), String.valueOf(eventDefintionCrf.getId()), false));
 
-				url.append("<img src='"	+ crfColumnImageIconPaths.get(eventCRFStatusId) + "' border='0'>");
+				url.append("<img src='" + crfColumnImageIconPaths.get(eventCRFStatusId) + "' border='0'>");
 
 				url.append("</a></td></tr></table>");
 
@@ -901,7 +911,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		HtmlBuilder eventDiv = new HtmlBuilder();
 
 		if (goingToReplaceHtmlContent) {
-			
+
 			resword = ResourceBundleProvider.getWordsBundle();
 			resformat = ResourceBundleProvider.getFormatBundle();
 
@@ -916,7 +926,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			// Event Div
 			eventDiv.div()
 					.id("Event_" + studySubjectLabel + "_"
-							+ (eventDefintionCRFId == null ? sed.getId() : eventDefintionCRFId) + "_" + rowCount)
+							+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_" + rowCount)
 					.style("position: absolute; visibility: hidden; white-space: normal; z-index: 3;width:" + divWidth
 							+ "px; top: 0px; float: left;").rel("" + studySubject.getId()).close();
 
@@ -981,7 +991,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 		eventDiv.tr(0)
 				.id("Menu_on_" + studySubjectLabel + "_"
-						+ (eventDefintionCRFId == null ? sed.getId() : eventDefintionCRFId) + "_" + rowCount)
+						+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_" + rowCount)
 				.style("display: all").close();
 		eventDiv.td(0).colspan("2").close();
 		eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
@@ -997,16 +1007,16 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 						+ "&studyEventDefinition=" + sed.getId();
 				eventDiv.div()
 						.id("eventScheduleWrapper_" + studySubjectLabel + "_"
-								+ (eventDefintionCRFId == null ? sed.getId() : eventDefintionCRFId) + "_" + rowCount)
-						.rel(href1).style(POPUP_BASE_WIDTH_PX).close().divEnd();
+								+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_"
+								+ rowCount).rel(href1).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			} else {
 				eventDiv.tr(0).valign("top").close();
 				eventDiv.td(0).styleClass("table_cell_left").close();
 				eventDiv.div()
 						.id("crfListWrapper_" + studySubjectLabel + "_"
-								+ (eventDefintionCRFId == null ? sed.getId() : eventDefintionCRFId) + "_" + rowCount)
-						.style(POPUP_BASE_WIDTH_PX).close().divEnd();
+								+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_"
+								+ rowCount).style(POPUP_BASE_WIDTH_PX).close().divEnd();
 				eventDiv.tdEnd().trEnd(0);
 			}
 		}
@@ -1016,7 +1026,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			eventDiv.td(0).styleClass("table_cell_left").close();
 			eventDiv.div()
 					.id("crfListWrapper_" + studySubjectLabel + "_"
-							+ (eventDefintionCRFId == null ? sed.getId() : eventDefintionCRFId) + "_" + rowCount)
+							+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_" + rowCount)
 					.style(POPUP_BASE_WIDTH_PX).close().divEnd();
 			eventDiv.tdEnd().trEnd(0);
 		}
@@ -1053,7 +1063,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			params.put("eventCRFId", eventCRFId);
 			params.put("eventDefintionCRFId", eventDefintionCRFId);
 			params.put("statusBoxId", studySubjectLabel + "_"
-					+ (eventDefintionCRFId == null ? sed.getId() : eventDefintionCRFId) + "_" + rowCount);
+					+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_" + rowCount);
 		} catch (JSONException e) {
 			logger.error("Error has occurred.", e);
 		}
@@ -1067,7 +1077,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 	private int getCRFStatusId(StudySubjectBean studySubjectBean, StudyEventBean studyEvent,
 			SubjectEventStatus subjectEventStatus, EventCRFBean eventCrf) {
-		
+
 		int eventCRFStatusId;
 
 		if (studyEvent == null) {
@@ -1131,35 +1141,36 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		SimpleDateFormat sdf = new SimpleDateFormat(format, locale);
 		return sdf.format(date);
 	}
-	
+
 	private String getDateFormat() {
 		return resformat.getString("date_format_string");
 	}
-	
-	private boolean isStudyEventMatchingFilters(DisplayBean eventDisplayBean, ListEventsForSubjectFilter eventsForSubjectFilter) {
-		
+
+	private boolean isStudyEventMatchingFilters(DisplayBean eventDisplayBean,
+			ListEventsForSubjectFilter eventsForSubjectFilter) {
+
 		String filterValue;
 
 		filterValue = eventsForSubjectFilter.getFilterValueByProperty("event.status");
-		
-		if (filterValue != null) {	
-			if (((SubjectEventStatus) eventDisplayBean.getProps().get("event.status")).getId() 
-					!= Integer.parseInt(filterValue)) {
+
+		if (filterValue != null) {
+			if (((SubjectEventStatus) eventDisplayBean.getProps().get("event.status")).getId() != Integer
+					.parseInt(filterValue)) {
 				return false;
 			}
 		}
-		
-		for (CRFBean crfBean: getCrfs(selectedStudyEventDefinition)) {
+
+		for (CRFBean crfBean : getCrfs(selectedStudyEventDefinition)) {
 			filterValue = eventsForSubjectFilter.getFilterValueByProperty("crf_" + crfBean.getId());
-			
+
 			if (filterValue != null) {
-				if ((Integer) eventDisplayBean.getProps().get("crf_" + crfBean.getId())
-						!= Status.getByName(filterValue).getId()) {
+				if ((Integer) eventDisplayBean.getProps().get("crf_" + crfBean.getId()) != Status
+						.getByName(filterValue).getId()) {
 					return false;
 				}
 			}
 		}
-		
+
 		return true;
 	}
 }
