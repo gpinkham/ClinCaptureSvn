@@ -466,41 +466,32 @@ Parser.prototype.isValid = function(expression) {
 
 	if (this.rule.actions.length === 0) {
 
-		valid = false,
-		message = "A rule is supposed to fire an action. Please select the action(s) to take if the rule evaluates as intended."
+		valid = false;
+		message = "A rule is supposed to fire an action. Please select the action(s) to take if the rule evaluates as intended.";
 	}
 
 	if (!$("#ide").is(":checked") && !$("#ae").is(":checked") && !$("#dde").is(":checked") && !$("#dataImport").is(":checked")) {
 
-		valid = false,
-		message = "Please specify when the rule should be run"
+		valid = false;
+		message = "Please specify when the rule should be run";
 	}
 
 	if ($("input[name=ruleInvoke]:checked").length == 0) {
 
-		valid = false,
-		message = "A rule is supposed to evaluate to true or false. Please specify"
+		valid = false;
+		message = "A rule is supposed to evaluate to true or false. Please specify";
 	}
 
 	if (this.rule.targets.length === 0) {
 
-		valid = false,
-		message = "Please specify a rule target"
+		valid = false;
+		message = "Please specify a rule target";
 	}
 
 	if ($("#ruleName").val().length == 0) {
 
-		valid = false,
-		message = "Please specify the rule description"
-	}
-
-	for (var x = 0; x < expression.length; x++) {
-
-		if (expression[x] === "Group or Data" || expression[x] === "Compare or Calculate" || expression[x] === "Evaluate") {
-
-			valid = false,
-			message = "The expression is invalid. Please fill in or delete unused boxes in the expression."
-		}
+		valid = false;
+		message = "Please specify the rule description";
 	}
 
 	if ($("#chkEmail").is(":checked")) {
@@ -509,9 +500,25 @@ Parser.prototype.isValid = function(expression) {
 
 		if (!re.test($("#toField").val().trim())) {
 
-			valid = false,
-			message = "The email address is invalid. Check the email and try again."
+			valid = false;
+			message = "The email address is invalid. Check the email and try again.";
 		}
+	}
+
+	for (var x = 0; x < expression.length; x++) {
+
+		if (expression[x] === "Group or Data" || expression[x] === "Compare or Calculate" || expression[x] === "Evaluate") {
+
+			var index = expression.indexOf(expression[x]);
+			expression.splice(index, 1);
+		}
+	}
+
+	// It should not be empty
+	if (expression.length < 3) {
+
+		valid = false;
+		message = "Cannot validate an empty or incomplete expressions.";
 	}
 
 	return {
