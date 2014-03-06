@@ -17,10 +17,9 @@ package com.clinovo.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -490,45 +489,34 @@ public class StudiesServlet extends HttpServlet {
 			}
 		}
 
-		if (oid != null && !oid.isEmpty()) {
+		List<String> oids = ruleDAO.findRuleOIDs();
+		if (oids != null && !oids.isEmpty()) {
+			
+			oid = oid + new Random().nextInt(110 - 10 + 1) + 10;
+			oid = checkOIDAvailability(oid, oids);
 
-			List<String> oids = ruleDAO.findRuleOIDs();
+		} else {
 
-			if (oids != null && !oids.isEmpty()) {
-				Collections.sort(oids, new Comparator<String>() {
-
-					// Note that this comparison does not strictly adhere to the Object.equals protocol
-					public int compare(String predicate1, String predicate2) {
-
-						if (predicate1.length() > predicate2.length()) {
-							return 1;
-						} else if (predicate1.length() < predicate2.length()) {
-							return -1;
-						} else {
-							return predicate1.compareTo(predicate2);
-						}
-					}
-				});
-
-				Pattern dPattern = Pattern.compile("(\\d+)");
-				Matcher dMatcher = dPattern.matcher(oids.get(oids.size() - 1));
-
-				if (dMatcher.find()) {
-
-					String _num = dMatcher.group(0);
-					if (_num.contains("0")) {
-						oid = oid + "_0" + (Integer.valueOf(_num) + x);
-					} else {
-						oid = oid + "_" + (Integer.valueOf(_num) + x);
-					}
-				}
-			} else {
-
-				oid = oid + "_0" + x;
-			}
-
+			oid = oid + "_0" + x;
 		}
 
+		return oid;
+	}
+
+	private String checkOIDAvailability(String oid, List<String> oids) {
+		
+		if (oids.contains(oid)) {
+			
+			Pattern pattern = Pattern.compile("(\\d+)");
+			Matcher matcher = pattern.matcher(oid);
+			
+			if (matcher.find()) {
+				
+				oid = oid.substring(0, oid.length() - 1) + (Integer.valueOf(matcher.group(0)) + 1);
+				return checkOIDAvailability(oid, oids);
+			}
+		} 
+		
 		return oid;
 	}
 

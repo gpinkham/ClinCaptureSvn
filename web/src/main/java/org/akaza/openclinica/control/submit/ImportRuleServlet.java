@@ -39,6 +39,7 @@ import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -137,7 +138,10 @@ public class ImportRuleServlet extends Controller {
 						session.delete(ruleSetRule);
 						session.delete(ruleSet);
 						session.delete(rule);
-						session.delete(expression);
+						
+						// Expressions can't be deleted
+						expression.setStatus(Status.DELETED);
+						session.save(expression);
 
 						transaction.commit();
 						session.flush();

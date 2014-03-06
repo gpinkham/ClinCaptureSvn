@@ -205,9 +205,7 @@ public class RulesPostImportContainerService {
 			ruleBeanWrapper
 					.getAuditableBean()
 					.getExpression()
-					.setValue(
-							ruleBeanWrapper.getAuditableBean().getExpression().getValue().trim()
-									.replaceAll("(\n|\t|\r)", " "));
+					.setValue(ruleBeanWrapper.getAuditableBean().getExpression().getValue().trim().replaceAll("(\n|\t|\r)", " "));
 
 			if (isRuleOidValid(ruleBeanWrapper) && isRuleExpressionValid(ruleBeanWrapper, null)) {
 				RuleBean persistentRuleBean = getRuleDao().findByOid(ruleBeanWrapper.getAuditableBean());
