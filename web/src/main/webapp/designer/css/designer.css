@@ -46,15 +46,12 @@ body .panel {
 
 .bordered {
 
-  border: solid !important;
-  border-width: 1px !important;
-  border-color: #357EBD !important;
+  border: none !important;
   background-color: #fff !important;
 }
 
 .dotted-border {
 
-  min-width: 10%;
   margin-top: 3em;
   min-height: 43px;
   margin-right: 2px;
