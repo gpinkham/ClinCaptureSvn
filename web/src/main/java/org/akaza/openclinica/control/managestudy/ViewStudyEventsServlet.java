@@ -21,16 +21,6 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -48,13 +38,23 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyEventRow;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 /**
- *  Handles user request of "view study events"
- *  
+ * Handles user request of "view study events"
+ * 
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class ViewStudyEventsServlet extends SecureController {
 
 	Locale locale;
@@ -112,11 +112,7 @@ public class ViewStudyEventsServlet extends SecureController {
 		int month = cal.get(Calendar.MONTH) + 1;
 		int year = cal.get(Calendar.YEAR);
 		String defaultStartDateString = month + "/01/" + year;
-		Date defaultStartDate = new Date();
-
-		defaultStartDate = new SimpleDateFormat("MM/dd/yy").parse(defaultStartDateString);
-		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
-		defaultStartDateString = dateFormatter.format(defaultStartDate);
+		Date defaultStartDate = new SimpleDateFormat("MM/dd/yy").parse(defaultStartDateString);
 
 		cal.setTime(defaultStartDate);
 		cal.add(Calendar.DATE, 30);
@@ -151,11 +147,10 @@ public class ViewStudyEventsServlet extends SecureController {
 		request.setAttribute(STATUS_MAP, SubjectEventStatus.toArrayList());
 
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-		ArrayList definitions = seddao.findAllAvailableByStudy(currentStudy);
+		ArrayList<StudyEventDefinitionBean> definitions = seddao.findAllAvailableByStudy(currentStudy);
 		request.setAttribute(DEFINITION_MAP, definitions);
 
-		ArrayList allEvents = new ArrayList();
-		allEvents = genTables(fp, definitions, startDate, endDate, sedId, definitionId, statusId);
+		ArrayList allEvents = genTables(fp, definitions, startDate, endDate, sedId, definitionId, statusId);
 
 		request.setAttribute("allEvents", allEvents);
 
@@ -164,7 +159,7 @@ public class ViewStudyEventsServlet extends SecureController {
 				+ statusId + "&" + "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
 		request.setAttribute("queryUrl", queryUrl);
 		if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
-			allEvents = genEventsForPrint(fp, definitions, startDate, endDate, sedId, definitionId, statusId);
+			allEvents = genEventsForPrint(definitions, startDate, endDate, definitionId, statusId);
 			request.setAttribute("allEvents", allEvents);
 			forwardPage(Page.VIEW_STUDY_EVENTS_PRINT);
 		} else {
@@ -173,33 +168,42 @@ public class ViewStudyEventsServlet extends SecureController {
 
 	}
 
-	private ArrayList genTables(FormProcessor fp, ArrayList definitions, Date startDate, Date endDate, int sedId,
-			int definitionId, int statusId) {
+	private ArrayList genTables(FormProcessor fp, ArrayList<StudyEventDefinitionBean> definitions, Date startDate,
+			Date endDate, int sedId, int definitionId, int statusId) {
 		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 		ArrayList allEvents = new ArrayList();
 		definitions = findDefinitionById(definitions, definitionId);
 		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+		Map<Integer, ArrayList<StudyEventBean>> studyEventDefinitionEventsMap = new HashMap<Integer, ArrayList<StudyEventBean>>();
 		ArrayList studySubjects = ssdao.findAllByStudyId(currentStudy.getId());
-		for (int i = 0; i < definitions.size(); i++) {
+		for (Object studySubject : studySubjects) {
+			StudySubjectBean ssb = (StudySubjectBean) studySubject;
+			ArrayList<StudyEventBean> evts = sedao.findAllByStudySubject(ssb);
+			for (StudyEventBean seb : evts) {
+				if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator())
+						&& seb.getSubjectEventStatus().isLocked()) {
+					seb.setEditable(false);
+				}
+				ArrayList<StudyEventBean> studyEventList = studyEventDefinitionEventsMap.get(seb
+						.getStudyEventDefinitionId());
+				if (studyEventList == null) {
+					studyEventList = new ArrayList<StudyEventBean>();
+					studyEventDefinitionEventsMap.put(seb.getStudyEventDefinitionId(), studyEventList);
+				}
+				studyEventList.add(seb);
+			}
+		}
+
+		for (Object definition : definitions) {
 			ViewEventDefinitionBean ved = new ViewEventDefinitionBean();
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) definitions.get(i);
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) definition;
 
 			ved.setDefinition(sed);
 
-			ArrayList events = new ArrayList();
-			for (int s = 0; s < studySubjects.size(); ++s) {
-				StudySubjectBean ssb = (StudySubjectBean) studySubjects.get(s);
-				ArrayList evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb, sed.getId());
-
-				for (int v = 0; v < evts.size(); ++v) {
-					StudyEventBean seb = (StudyEventBean) evts.get(v);
-					if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator())
-							&& seb.getSubjectEventStatus().isLocked()) {
-						seb.setEditable(false);
-					}
-					events.add(seb);
-				}
+			ArrayList<StudyEventBean> events = studyEventDefinitionEventsMap.get(sed.getId());
+			if (events == null) {
+				events = new ArrayList<StudyEventBean>();
 			}
 
 			int subjectScheduled = 0;
@@ -210,8 +214,7 @@ public class ViewStudyEventsServlet extends SecureController {
 			Date firstStartDateForScheduled = null;
 			Date lastCompletionDate = null;
 			// find the first firstStartDateForScheduled
-			for (int k = 0; k < events.size(); k++) {
-				StudyEventBean se = (StudyEventBean) events.get(k);
+			for (StudyEventBean se : events) {
 				if (se.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)) {
 					firstStartDateForScheduled = se.getDateStarted();
 					break;
@@ -219,16 +222,14 @@ public class ViewStudyEventsServlet extends SecureController {
 
 			}
 			// find the first lastCompletionDate
-			for (int k = 0; k < events.size(); k++) {
-				StudyEventBean se = (StudyEventBean) events.get(k);
+			for (StudyEventBean se : events) {
 				if (se.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED) && se.getDateEnded() != null) {
 					lastCompletionDate = se.getDateEnded();
 					break;
 				}
 			}
 
-			for (int j = 0; j < events.size(); j++) {
-				StudyEventBean se = (StudyEventBean) events.get(j);
+			for (StudyEventBean se : events) {
 				if (se.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)) {
 					subjectScheduled++;
 					if (se.getDateStarted().before(new Date())) {
@@ -271,7 +272,7 @@ public class ViewStudyEventsServlet extends SecureController {
 			table.setSortingIfNotExplicitlySet(1, false);// sort by event
 			// start date,
 			// desc
-			ArrayList allEventRows = StudyEventRow.generateRowsFromBeans(events);
+			ArrayList allEventRows = StudyEventRow.generateRowsFromBeans((ArrayList) events);
 
 			String[] columns = {
 					currentStudy == null ? resword.getString("study_subject_ID") : currentStudy
@@ -281,9 +282,9 @@ public class ViewStudyEventsServlet extends SecureController {
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(3);
 			HashMap args = new HashMap();
-			args.put("sedId", new Integer(sed.getId()).toString());
-			args.put("definitionId", new Integer(definitionId).toString());
-			args.put("statusId", new Integer(statusId).toString());
+			args.put("sedId", Integer.toString(sed.getId()));
+			args.put("definitionId", Integer.toString(definitionId));
+			args.put("statusId", Integer.toString(statusId));
 			args.put("startDate", local_df.format(startDate));
 			args.put("endDate", local_df.format(endDate));
 			table.setQuery("ViewStudyEvents", args);
@@ -303,36 +304,37 @@ public class ViewStudyEventsServlet extends SecureController {
 	/**
 	 * Generates an arraylist of study events for printing
 	 * 
-	 * @param fp
 	 * @param definitions
+	 *            ArrayList<StudyEventDefinitionBean>
 	 * @param startDate
+	 *            Date
 	 * @param endDate
-	 * @param sedId
+	 *            Date
 	 * @param definitionId
+	 *            int
 	 * @param statusId
-	 * @return
+	 *            int
+	 * @return ArrayList
 	 */
-	private ArrayList genEventsForPrint(FormProcessor fp, ArrayList definitions, Date startDate, Date endDate,
-			int sedId, int definitionId, int statusId) {
+	private ArrayList genEventsForPrint(ArrayList<StudyEventDefinitionBean> definitions, Date startDate, Date endDate,
+			int definitionId, int statusId) {
 		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 		ArrayList allEvents = new ArrayList();
 		definitions = findDefinitionById(definitions, definitionId);
 		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-		ArrayList studySubjects = ssdao.findAllByStudyId(currentStudy.getId());
-		for (int i = 0; i < definitions.size(); i++) {
+		List<StudySubjectBean> studySubjects = ssdao.findAllByStudyId(currentStudy.getId());
+		for (StudyEventDefinitionBean sed : definitions) {
 			ViewEventDefinitionBean ved = new ViewEventDefinitionBean();
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) definitions.get(i);
 
 			ved.setDefinition(sed);
 
-			ArrayList events = new ArrayList();
-			for (int s = 0; s < studySubjects.size(); ++s) {
-				StudySubjectBean ssb = (StudySubjectBean) studySubjects.get(s);
-				ArrayList evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb, sed.getId());
-
-				for (int v = 0; v < evts.size(); ++v) {
-					events.add(evts.get(v));
+			ArrayList<StudyEventBean> events = new ArrayList<StudyEventBean>();
+			for (StudySubjectBean studySubject : studySubjects) {
+				List<StudyEventBean> evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(studySubject,
+						sed.getId());
+				for (StudyEventBean evt : evts) {
+					events.add(evt);
 				}
 			}
 
@@ -344,8 +346,8 @@ public class ViewStudyEventsServlet extends SecureController {
 			Date firstStartDateForScheduled = null;
 			Date lastCompletionDate = null;
 			// find the first firstStartDateForScheduled
-			for (int k = 0; k < events.size(); k++) {
-				StudyEventBean se = (StudyEventBean) events.get(k);
+			for (Object event1 : events) {
+				StudyEventBean se = (StudyEventBean) event1;
 				if (se.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)) {
 					firstStartDateForScheduled = se.getDateStarted();
 					break;
@@ -353,16 +355,16 @@ public class ViewStudyEventsServlet extends SecureController {
 
 			}
 			// find the first lastCompletionDate
-			for (int k = 0; k < events.size(); k++) {
-				StudyEventBean se = (StudyEventBean) events.get(k);
+			for (Object event1 : events) {
+				StudyEventBean se = (StudyEventBean) event1;
 				if (se.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
 					lastCompletionDate = se.getDateEnded();
 					break;
 				}
 			}
 
-			for (int j = 0; j < events.size(); j++) {
-				StudyEventBean se = (StudyEventBean) events.get(j);
+			for (Object event : events) {
+				StudyEventBean se = (StudyEventBean) event;
 				if (se.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)) {
 					subjectScheduled++;
 					if (se.getDateStarted().before(new Date())) {
@@ -404,10 +406,10 @@ public class ViewStudyEventsServlet extends SecureController {
 		return allEvents;
 	}
 
-	private ArrayList findDefinitionById(ArrayList definitions, int definitionId) {
+	private ArrayList<StudyEventDefinitionBean> findDefinitionById(ArrayList<StudyEventDefinitionBean> definitions,
+			int definitionId) {
 		if (definitionId > 0) {
-			for (int i = 0; i < definitions.size(); i++) {
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) definitions.get(i);
+			for (StudyEventDefinitionBean sed : definitions) {
 				if (sed.getId() == definitionId) {
 					ArrayList a = new ArrayList();
 					a.add(sed);
@@ -418,18 +420,17 @@ public class ViewStudyEventsServlet extends SecureController {
 		return definitions;
 	}
 
-	private ArrayList findEventByStatusAndDate(ArrayList events, int statusId, Date startDate, Date endDate) {
-		ArrayList a = new ArrayList();
-		for (int i = 0; i < events.size(); i++) {
-			StudyEventBean se = (StudyEventBean) events.get(i);
+	private ArrayList<StudyEventBean> findEventByStatusAndDate(ArrayList<StudyEventBean> events, int statusId,
+			Date startDate, Date endDate) {
+		ArrayList<StudyEventBean> a = new ArrayList<StudyEventBean>();
+		for (StudyEventBean se : events) {
 			if (!se.getDateStarted().before(startDate) && !se.getDateStarted().after(endDate)) {
 				a.add(se);
 			}
 		}
-		ArrayList b = new ArrayList();
+		ArrayList<StudyEventBean> b = new ArrayList<StudyEventBean>();
 		if (statusId > 0) {
-			for (int i = 0; i < a.size(); i++) {
-				StudyEventBean se = (StudyEventBean) a.get(i);
+			for (StudyEventBean se : a) {
 				if (se.getSubjectEventStatus().getId() == statusId) {
 					b.add(se);
 				}
