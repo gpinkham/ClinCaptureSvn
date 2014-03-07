@@ -355,3 +355,7 @@ body .modal-dialog {
 .dest {
   margin-left: -1em;
 }
+
+div {
+  word-wrap: break-word;  
+}
