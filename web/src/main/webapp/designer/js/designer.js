@@ -542,6 +542,8 @@ function addDroppable(popov) {
 			if (!$(drop).is(".eval") && !$(drop).is(".comp")) {
 				$(drop).after(c);
 				createPopover(c);
+			} else {
+				removeInsert(drop, c);
 			}
 		}
 	})
@@ -566,6 +568,8 @@ function addDroppable(popov) {
 			if (!$(drop).is(".eval") && !$(drop).is(".comp")) {
 				$(drop).after(eval);
 				createPopover(eval);
+			} else {
+				removeInsert(drop, eval);
 			}
 		}
 	})
@@ -584,6 +588,12 @@ function addDroppable(popov) {
 	modalOuterDiv.modal({
 		backdrop: false
 	})
+}
+
+function removeInsert(drop, predicate) {
+
+	$(drop).after(predicate);
+	drop.remove();
 }
 
 /* =============================================================================
