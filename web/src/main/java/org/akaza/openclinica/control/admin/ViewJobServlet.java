@@ -17,7 +17,6 @@ import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -35,13 +34,12 @@ import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * purpose: to generate the list of jobs and allow us to view them
@@ -52,37 +50,32 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class ViewJobServlet extends RememberLastPage {
 
-	private static String SCHEDULER = "schedulerFactoryBean";
 	public static final String SAVED_VIEW_EXPORT_JOB_URL = "savedViewExportJobUrl";
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request); 
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
 		}
 
-
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 	}
-
-    private StdScheduler getScheduler(HttpServletRequest request) { 
-    	StdScheduler scheduler = (StdScheduler) SpringServletAccess.getApplicationContext(getServletContext()).getBean(SCHEDULER);   
-	                return scheduler; 
-    } 
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if (shouldRedirect(request, response)) {
 			return;
 		}
-		
+
 		FormProcessor fp = new FormProcessor(request);
 		// First we must get a reference to a scheduler
-		StdScheduler scheduler = getScheduler(request);
+		StdScheduler scheduler = getStdScheduler();
 		Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher
 				.triggerGroupEquals(XsltTriggerService.TRIGGER_GROUP_NAME));
 
@@ -106,7 +99,7 @@ public class ViewJobServlet extends RememberLastPage {
 				triggerBean.setDescription(trigger.getDescription());
 			}
 			// setting: frequency, dataset name
-			JobDataMap dataMap = new JobDataMap();
+			JobDataMap dataMap;
 			DatasetDAO datasetDAO = getDatasetDAO();
 			StudyDAO studyDao = getStudyDAO();
 
@@ -152,7 +145,7 @@ public class ViewJobServlet extends RememberLastPage {
 		forwardPage(Page.VIEW_JOB, request, response);
 
 	}
-	
+
 	@Override
 	protected String getUrlKey(HttpServletRequest request) {
 		return SAVED_VIEW_EXPORT_JOB_URL;
@@ -172,9 +165,9 @@ public class ViewJobServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected boolean userDoesNotUseJmesaTableForNavigation(
-			HttpServletRequest request) {
-		return request.getQueryString() == null || (request.getQueryString().contains("tname") && request.getQueryString().contains("gname"));
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
+		return request.getQueryString() == null
+				|| (request.getQueryString().contains("tname") && request.getQueryString().contains("gname"));
 	}
 
 }

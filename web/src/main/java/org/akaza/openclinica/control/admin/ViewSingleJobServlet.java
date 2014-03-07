@@ -13,16 +13,11 @@
 
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -37,45 +32,49 @@ import org.quartz.JobDataMap;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class ViewSingleJobServlet extends SecureController {
+@Component
+public class ViewSingleJobServlet extends Controller {
 
-	private static String TRIGGER_IMPORT_GROUP = "importTrigger";
-	private static String SCHEDULER = "schedulerFactoryBean";
-	private StdScheduler scheduler;
+	private static final String TRIGGER_IMPORT_GROUP = "importTrigger";
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 
 	}
 
-	private StdScheduler getScheduler() {
-		scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(
-				context).getBean(SCHEDULER);
-		return scheduler;
-	}
-
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		String triggerName = fp.getString("tname");
 		String gName = fp.getString("gname");
-		String groupName = "";
+		String groupName;
 		if (gName.equals("") || gName.equals("0")) {
 			groupName = XsltTriggerService.TRIGGER_GROUP_NAME;
 		} else {
 			groupName = TRIGGER_IMPORT_GROUP;
 		}
-		scheduler = getScheduler();
+		StdScheduler scheduler = getStdScheduler();
 		Trigger trigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName, groupName));
 
 		if (trigger == null) {
@@ -86,8 +85,8 @@ public class ViewSingleJobServlet extends SecureController {
 		logger.debug("found trigger name: " + triggerName);
 		logger.debug("found group name: " + groupName);
 		TriggerBean triggerBean = new TriggerBean();
-		JobDataMap dataMap = new JobDataMap();
-		AuditEventDAO auditEventDAO = new AuditEventDAO(sm.getDataSource());
+		JobDataMap dataMap;
+		AuditEventDAO auditEventDAO = getAuditEventDAO();
 
 		try {
 			triggerBean.setFullName(trigger.getKey().getName());
@@ -114,14 +113,14 @@ public class ViewSingleJobServlet extends SecureController {
 					int dsId = dataMap.getInt(ExampleSpringJob.DATASET_ID);
 					triggerBean.setExportFormat(exportFormat);
 					triggerBean.setPeriodToRun(periodToRun);
-					DatasetDAO datasetDAO = new DatasetDAO(sm.getDataSource());
+					DatasetDAO datasetDAO = getDatasetDAO();
 					DatasetBean dataset = (DatasetBean) datasetDAO.findByPK(dsId);
 					triggerBean.setDataset(dataset);
 				}
 				int userId = dataMap.getInt(ExampleSpringJob.USER_ID);
 				// need to set information, extract bean, user account bean
 
-				UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
+				UserAccountDAO userAccountDAO = getUserAccountDAO();
 
 				triggerBean.setContactEmail(contactEmail);
 
@@ -165,6 +164,6 @@ public class ViewSingleJobServlet extends SecureController {
 
 		request.setAttribute("groupName", groupName);
 
-		forwardPage(Page.VIEW_SINGLE_JOB);
+		forwardPage(Page.VIEW_SINGLE_JOB, request, response);
 	}
 }

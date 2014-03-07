@@ -13,17 +13,8 @@
 
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
@@ -38,23 +29,31 @@ import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
+
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ViewImportJobServlet extends RememberLastPage {
 
-	private static final String SAVED_VIEW_IMPORT_JOB_URL = "savedViewImportJobUrl";
-	private static String SCHEDULER = "schedulerFactoryBean";
-	private static String IMPORT_TRIGGER = "importTrigger";
+	public static final String SAVED_VIEW_IMPORT_JOB_URL = "savedViewImportJobUrl";
+	public static String IMPORT_TRIGGER = "importTrigger";
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 		// TODO
@@ -62,21 +61,15 @@ public class ViewImportJobServlet extends RememberLastPage {
 		// allow only admin-level users
 	}
 
-	private StdScheduler getScheduler(HttpServletRequest request) {
-		StdScheduler scheduler = (StdScheduler) SpringServletAccess.getApplicationContext(getServletContext()).getBean(SCHEDULER);  
-
-		return scheduler;
-	}
-
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if (shouldRedirect(request, response)) {
 			return;
 		}
-		
+
 		FormProcessor fp = new FormProcessor(request);
 		// First we must get a reference to a scheduler
-		StdScheduler scheduler = getScheduler(request);
+		StdScheduler scheduler = getStdScheduler();
 		// then we pull all the triggers that are specifically named
 		// IMPORT_TRIGGER.
 		Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(IMPORT_TRIGGER));
@@ -104,7 +97,7 @@ public class ViewImportJobServlet extends RememberLastPage {
 			}
 			// this next bit of code looks at the job data map and pulls out
 			// specific items
-			JobDataMap dataMap = new JobDataMap();
+			JobDataMap dataMap;
 
 			if (trigger.getJobDataMap().size() > 0) {
 				dataMap = trigger.getJobDataMap();
@@ -164,8 +157,8 @@ public class ViewImportJobServlet extends RememberLastPage {
 	}
 
 	@Override
-	protected boolean userDoesNotUseJmesaTableForNavigation(
-			HttpServletRequest request) {
-		return request.getQueryString() == null || (request.getQueryString().contains("tname") && request.getQueryString().contains("gname"));
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
+		return request.getQueryString() == null
+				|| (request.getQueryString().contains("tname") && request.getQueryString().contains("gname"));
 	}
 }

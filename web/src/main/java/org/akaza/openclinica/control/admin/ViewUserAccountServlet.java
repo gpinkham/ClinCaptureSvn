@@ -23,7 +23,7 @@ package org.akaza.openclinica.control.admin;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -31,11 +31,15 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
-public class ViewUserAccountServlet extends SecureController {
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@Component
+public class ViewUserAccountServlet extends Controller {
 	public static final String PATH = "ViewUserAccount";
 	public static final String ARG_USER_ID = "userId";
 
@@ -44,22 +48,23 @@ public class ViewUserAccountServlet extends SecureController {
 	}
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 		if (!ub.isSysAdmin()) {
-			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-					+ respage.getString("change_study_contact_sysadmin"));
+			addPageMessage(
+					respage.getString("no_have_correct_privilege_current_study")
+							+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
 		}
-
-		return;
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp = new FormProcessor(request);
 		int userId = fp.getInt(ARG_USER_ID, true);
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO udao = getUserAccountDAO();
 
 		UserAccountBean user = getBean(udao, userId);
 
@@ -71,15 +76,15 @@ public class ViewUserAccountServlet extends SecureController {
 		}
 		// To provide the view with the correct date format pattern, locale
 		// sensitive
-		String pattn = "";
+		String pattn;
 		pattn = ResourceBundleProvider.getFormatBundle().getString("date_format_string");
 		request.setAttribute("dateFormatPattern", pattn);
-		forwardPage(Page.VIEW_USER_ACCOUNT);
+		forwardPage(Page.VIEW_USER_ACCOUNT, request, response);
 	}
 
 	private UserAccountBean getBean(UserAccountDAO udao, int id) {
 		UserAccountBean answer = (UserAccountBean) udao.findByPK(id);
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyDAO sdao = getStudyDAO();
 
 		ArrayList roles = answer.getRoles();
 
@@ -95,7 +100,7 @@ public class ViewUserAccountServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;
+	protected String getAdminServlet(HttpServletRequest request) {
+		return Controller.ADMIN_SERVLET_CODE;
 	}
 }

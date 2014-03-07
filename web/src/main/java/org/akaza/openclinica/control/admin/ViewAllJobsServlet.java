@@ -13,30 +13,38 @@
 
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings({ "serial" })
-public class ViewAllJobsServlet extends SecureController {
+@Component
+public class ViewAllJobsServlet extends Controller {
 
 	@Override
-	protected void mayProceed() throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
 
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");
 	}
 
 	@Override
-	protected void processRequest() throws Exception {
-
-		forwardPage(Page.VIEW_ALL_JOBS);
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		forwardPage(Page.VIEW_ALL_JOBS, request, response);
 	}
 
 }
