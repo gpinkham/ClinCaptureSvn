@@ -44,7 +44,9 @@ public class OCServletFilter implements javax.servlet.Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		UserAccountBean ub = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
 		boolean successfulRegistration = false;
-		String username = "";
+		String username;
+
+		CoreResources.setField("remoteIp", request.getRemoteAddr());
 
 		((HttpServletRequest) request).getSession().setAttribute("logoUrl", CoreResources.getField("logo"));
         ((HttpServletRequest) request).getSession().setAttribute("instanceType", CoreResources.getField("instanceType"));
@@ -78,7 +80,7 @@ public class OCServletFilter implements javax.servlet.Filter {
 	/**
 	 * Register the user in the MDC under USERNAME.
 	 * 
-	 * @param username
+	 * @param username String
 	 * @return true id the user can be successfully registered
 	 */
 	private boolean registerUsernameWithLogContext(String username) {

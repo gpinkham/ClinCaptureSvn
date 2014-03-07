@@ -14,7 +14,11 @@
 package org.akaza.openclinica.job;
 
 import org.akaza.openclinica.bean.admin.TriggerBean;
-import org.akaza.openclinica.bean.extract.*;
+import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
+import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.extract.ExportFormatBean;
+import org.akaza.openclinica.bean.extract.ExtractBean;
+import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.ProcessingFunction;
@@ -49,13 +53,33 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.util.FileCopyUtils;
 
 import javax.sql.DataSource;
-import javax.xml.transform.*;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -214,7 +238,8 @@ public class XsltTransformJob extends QuartzJobBean {
 				if (((SimpleTriggerImpl) context.getTrigger()).getTimesTriggered() == sasTimer * MINUTES_IN_HOUR + 1) {
 					deleteDirectory(sasJobDirFile);
 					throw new Exception(messageSource.getMessage("sasDataset.exception.failed", new Object[] {
-							jobName != null ? jobName : datasetBean.getName(), sasTimer, sasTimer > 1 ? "s" : "" }, locale));
+							jobName != null ? jobName : datasetBean.getName(), sasTimer, sasTimer > 1 ? "s" : "" },
+							locale));
 				}
 				emailBuffer = (StringBuffer) dataMap.get(SAS_EMAIL_BUFFER);
 				String sasOdmOutputPath = (String) dataMap.get(SAS_ODM_OUTPUT_PATH);
@@ -516,8 +541,10 @@ public class XsltTransformJob extends QuartzJobBean {
 
 					// odm was generate - starting the sas dataset job
 					if (sasDatasetJob) {
-						File sasJobDirFile = new File(sasDirFile.getAbsolutePath() + File.separator + "odm_"
-								+ userBean.getId() + "_" + datasetBean.getName() + "_" + System.currentTimeMillis());
+						File sasJobDirFile = new File(sasDirFile.getAbsolutePath() + File.separator
+								+ CoreResources.getField("remoteIp") + "_"
+								+ CoreResources.getField("currentWebAppName") + "_" + userBean.getId() + "_"
+								+ datasetBean.getName() + "_" + System.currentTimeMillis());
 						if (!sasJobDirFile.exists()) {
 							sasJobDirFile.mkdirs();
 						}
