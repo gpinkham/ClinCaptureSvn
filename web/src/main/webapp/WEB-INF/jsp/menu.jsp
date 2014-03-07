@@ -332,7 +332,18 @@
 					<c:forEach var="widget" items="${dispayWidgetsLayout}">
 						<c:if test="${widget.ordinal ne 0 && widget.ordinal%2 ne 0}">
 							<div class="widget">
-								<jsp:include page="widgets/${widget.widgetName}"/>
+								<c:catch var="e">
+									<c:import url="widgets/${widget.widgetName}" />
+								</c:catch>
+								<c:if test="${!empty e}">
+									<div class="widget_error_message">
+										<fmt:message key="widget_error_message_cannot_load_widget" bundle="${restext}">
+											<fmt:param>
+												<c:out value="${widget.widgetName}" />
+											</fmt:param>
+										</fmt:message>
+									</div>
+								</c:if>
 							</div>
 						</c:if>
 					</c:forEach>
@@ -341,7 +352,18 @@
 					<c:forEach var="widget" items="${dispayWidgetsLayout}">
 						<c:if test="${widget.ordinal ne 0 && widget.ordinal%2 eq 0}">
 							<div class="widget">
-								<jsp:include page="widgets/${widget.widgetName}"/>
+								<c:catch var="e">
+									<c:import url="widgets/${widget.widgetName}" />
+								</c:catch>
+								<c:if test="${!empty e}">
+									<div class="widget_error_message">
+										<fmt:message key="widget_error_message_cannot_load_widget" bundle="${restext}">
+											<fmt:param>
+												<c:out value="${widget.widgetName}" />
+											</fmt:param>
+										</fmt:message>
+									</div>
+								</c:if>
 							</div>
 						</c:if>
 					</c:forEach>

@@ -1,5 +1,5 @@
 /* Customize page */
-function tollbarToogle(e) {
+function toolbarToogle(e) {
 	if ($(e).children().text() == "Hide") {
 		$(e).parent().animate({
 			right : "-430px"
@@ -28,7 +28,7 @@ function inicializeDnD() {
 		update : updatePostOrder
 	});
 
-	$("#toolbar, #layout").disableSelection();
+	$("#toolbar, #layout1, #layout2").disableSelection();
 	$(".widget .chart_wrapper a").attr("href", "#");
 	$(".widget input[type=button]").remove();
 	updatePostOrder();

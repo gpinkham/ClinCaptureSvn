@@ -50,27 +50,49 @@
 <c:if test="${!empty dispayWidgetsLayout}">
 	<table class="widgets_container configure">
 		<tr>
-			<td id="layout" class="droptrue ui-sortable column1" unselectable="on">
+			<td id="layout1" class="droptrue ui-sortable column1" unselectable="on">
 				<c:forEach var="widget" items="${dispayWidgetsLayout}">
 					<c:if test="${widget.ordinal ne 0 && widget.ordinal%2 ne 0}">
-					<div class="widget" id="${widget.widgetId}">
-						<a onclick="javascript:removeWidget(this)" href="#"><img src="../images/remove_widget.png" class="remove" title="remove"></img></a>
-						<jsp:include page="widgets/${widget.widgetName}"/>
-					</div>
-					</c:if>
-				</c:forEach>
-				<span id="filler">filler</span>
-			</td>
-			<td id="layout" class="droptrue ui-sortable column2" unselectable="on">
-				<c:forEach var="widget" items="${dispayWidgetsLayout}">
-					<c:if test="${widget.ordinal ne 0 && widget.ordinal%2 eq 0}">
 						<div class="widget" id="${widget.widgetId}">
-							<a onclick="javascript:removeWidget(this)" href="#"><img src="../images/remove_widget.png" class="remove" title="remove"></img></a>
-							<jsp:include page="widgets/${widget.widgetName}"/>
+							<a onclick="javascript:removeWidget(this)" href="#"><img src="../images/remove_widget.png" class="remove" title="remove"/></a>
+							<c:catch var="e">
+								<c:import url="widgets/${widget.widgetName}" />
+							</c:catch>
+							<c:if test="${!empty e}">
+								<div class="widget_error_message">
+									<fmt:message key="widget_error_message_cannot_load_widget" bundle="${restext}">
+										<fmt:param>
+											<c:out value="${widget.widgetName}" />
+										</fmt:param>
+									</fmt:message>
+								</div>
+							</c:if>
 						</div>
 					</c:if>
 				</c:forEach>
-				<span id="filler">filler</span>
+				<span class="filler">filler</span>
+			</td>
+			<td id="layout2" class="droptrue ui-sortable column2" unselectable="on">
+				<c:forEach var="widget" items="${dispayWidgetsLayout}">
+					<c:if test="${widget.ordinal ne 0 && widget.ordinal%2 eq 0}">
+						<div class="widget" id="${widget.widgetId}">
+							<a onclick="javascript:removeWidget(this)" href="#"><img src="../images/remove_widget.png" class="remove" title="remove"/></a>
+							<c:catch var="e">
+								<c:import url="widgets/${widget.widgetName}" />
+							</c:catch>
+							<c:if test="${!empty e}">
+								<div class="widget_error_message">
+									<fmt:message key="widget_error_message_cannot_load_widget" bundle="${restext}">
+										<fmt:param>
+											<c:out value="${widget.widgetName}" />
+										</fmt:param>
+									</fmt:message>
+								</div>
+							</c:if>
+						</div>
+					</c:if>
+				</c:forEach>
+				<span class="filler">filler</span>
 			</td>
 		</tr>
 	</table>
@@ -84,14 +106,25 @@
 		<c:forEach var="widget" items="${dispayWidgetsLayout}">
 			<c:if test="${widget.ordinal eq 0}">
 				<div class="widget" id="${widget.widgetId}">
-					<a onclick="javascript:removeWidget(this)" href="#"><img src="../images/remove_widget.png" class="remove" title="Remove"></img></a>
-				<jsp:include page="widgets/${widget.widgetName}"/>
+					<a onclick="javascript:removeWidget(this)" href="#"><img src="../images/remove_widget.png" class="remove" title="Remove"/></a>
+					<c:catch var="e">
+						<c:import url="widgets/${widget.widgetName}" />
+					</c:catch>
+					<c:if test="${!empty e}">
+						<div class="widget_error_message">
+							<fmt:message key="widget_error_message_cannot_load_widget" bundle="${restext}">
+								<fmt:param>
+									<c:out value="${widget.widgetName}" />
+								</fmt:param>
+							</fmt:message>
+						</div>
+					</c:if>
 				</div>
 			</c:if>
 		</c:forEach>
-		<span id="filler">filler</span>		
+		<span class="filler">filler</span>		
 	</div>
-	<a onclick="javascript:tollbarToogle(this)" href="#"><div id="show_hide">Hide</div></a>
+	<a onclick="javascript:toolbarToogle(this)" href="#"><div id="show_hide">Hide</div></a>
 </div>
 
 </c:if>

@@ -17,6 +17,12 @@ table.widgets_container td {
 	border: 1px solid gray;
 }
 
+.widget .widget_error_message {
+	color: red;
+	font-weight: bold;
+	margin: 15px;
+}
+
 .toolbar_wrapper {
 	position: fixed;
 	right: 0px;
@@ -93,7 +99,7 @@ form#actionForSave input {
 	display: none;
 }
 
-#filler {
+.filler {
 	visibility: hidden;
 	height: 1px;
 	display: block;
