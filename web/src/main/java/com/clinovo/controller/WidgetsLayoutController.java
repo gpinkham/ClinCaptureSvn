@@ -93,7 +93,7 @@ public class WidgetsLayoutController {
 		int userId = Integer.parseInt(request.getParameter("userId"));
 		int studyId = Integer.parseInt(request.getParameter("studyId"));
 
-		if (!orderInColumn1.equals("")) {
+		if (!orderInColumn1.isEmpty()) {
 			int ordinalCounter1 = 1;
 			List<String> widgetsIdsColumn1 = Arrays.asList(orderInColumn1.split("\\s*,\\s*"));
 
@@ -106,7 +106,7 @@ public class WidgetsLayoutController {
 			}
 		}
 
-		if (!orderInColumn2.equals("")) {
+		if (!orderInColumn2.isEmpty()) {
 			int ordinalCounter2 = 2;
 			List<String> widgetsIdsColumn2 = Arrays.asList(orderInColumn2.split("\\s*,\\s*"));
 
@@ -120,7 +120,7 @@ public class WidgetsLayoutController {
 			}
 		}
 
-		if (!unusedWidgets.equals("")) {
+		if (!unusedWidgets.isEmpty()) {
 			List<String> unusedWidgetsIds = Arrays.asList(unusedWidgets.split("\\s*,\\s*"));
 
 			for (String unusedWidgetsId : unusedWidgetsIds) {
@@ -233,10 +233,14 @@ public class WidgetsLayoutController {
 				int eventsWithStatus = studyEventDAO.getCountofEventsBasedOnEventStatusAndStudyEventDefinitionId(sb,
 						subjectEventStatus, studyEventDefinitions.get(i));
 
+				int eventsWithStatusNoRepeats = studyEventDAO
+						.getEventCountFromEventStatusAndStudyEventDefinitionIdNoRepeats(sb, subjectEventStatus,
+								studyEventDefinitions.get(i));
+
 				countOfSubjectEventStatuses.put(subjectEventStatus.getName().toLowerCase().replaceAll(" ", "_"),
 						eventsWithStatus);
 
-				countOfSubjectsStartedEvent += eventsWithStatus;
+				countOfSubjectsStartedEvent += eventsWithStatusNoRepeats;
 			}
 
 			countOfSubjectEventStatuses.put("not_scheduled", countOfSubject - countOfSubjectsStartedEvent);

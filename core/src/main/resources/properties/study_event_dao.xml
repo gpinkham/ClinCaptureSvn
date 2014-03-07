@@ -41,6 +41,19 @@
             and subject_event_status_id = ?  
             and sd.study_event_definition_id = ?) as ss 
         </sql>
+	</query>
+	<query>
+        <name>getEventCountFromEventStatusAndStudyEventDefinitionIdNoRepeats</name>
+        <sql>
+			select count (*) from (select distinct se.* from study_event se, study_subject ss, study s, study_event_definition sd 
+			where se.study_subject_id = ss.study_subject_id 
+			and ss.study_id = s.study_id 
+			and se.study_event_definition_id = sd.study_event_definition_id
+			and ( s.study_id = ? or s.parent_study_id = ? )
+			and subject_event_status_id = ?  
+			and sd.study_event_definition_id = ?
+			and se.sample_ordinal=1) as ss 
+        </sql>
     </query>
     <query>
         <name>getCountofEvents</name>

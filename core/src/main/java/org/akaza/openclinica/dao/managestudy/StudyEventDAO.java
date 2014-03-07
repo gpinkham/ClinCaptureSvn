@@ -332,6 +332,31 @@ public class StudyEventDAO extends AuditableEntityDAO {
 			return null;
 		}
 	}
+	
+	public Integer getEventCountFromEventStatusAndStudyEventDefinitionIdNoRepeats(
+			StudyBean currentStudy, SubjectEventStatus subjectEventStatus,
+			StudyEventDefinitionBean studyEventDefinitionBean) {
+		
+		setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(1, currentStudy.getId());
+		variables.put(2, currentStudy.getId());
+		variables.put(3, subjectEventStatus.getId());
+		variables.put(4, studyEventDefinitionBean.getId());
+		
+		String sql = digester
+				.getQuery("getEventCountFromEventStatusAndStudyEventDefinitionIdNoRepeats");
+
+		ArrayList rows = this.select(sql, variables);
+		Iterator it = rows.iterator();
+
+		if (it.hasNext()) {
+			return (Integer) ((HashMap) it.next()).get("count");
+		} else {
+			return null;
+		}
+	}
 
 	public Integer getCountofEvents(StudyBean currentStudy) {
 		setTypesExpected();
