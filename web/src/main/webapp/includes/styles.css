@@ -2466,3 +2466,7 @@ a.dnShortcut:hover {
 #systemForm .propertyLabel .table_title_Admin {
     font-size: 11px !important;
 }
+
+.scheduleLink {
+    display: block;
+}

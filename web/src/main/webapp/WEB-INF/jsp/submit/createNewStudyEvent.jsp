@@ -361,7 +361,7 @@
 </div></div></div></div></div></div></div></div>
 </div> </div><br>
 
-<a href="javascript:leftnavExpand('schedule0');">
+<a class="scheduleLink" href="javascript:leftnavExpand('schedule0');">
     <img id="excl_schedule0" src="images/bt_Expand.gif" border="0"> <fmt:message key="schedule_another_event" bundle="${resword}"/></a>
 
 <div id="schedule0" style="display: <c:out value="${display0}"/>">
@@ -511,9 +511,10 @@
 </div></div></div></div></div></div></div></div>
 
 </div>
-</div><br>
+<br>
+</div>
 
-<a href="javascript:leftnavExpand('schedule1');">
+<a class="scheduleLink" href="javascript:leftnavExpand('schedule1');">
     <img id="excl_schedule1" src="images/bt_Expand.gif" border="0"> <fmt:message key="schedule_another_event" bundle="${resword}"/> </a></div>
 
 <div id="schedule1" style="display: <c:out value="${display1}"/>">
@@ -663,10 +664,11 @@
 </div></div></div></div></div></div></div></div>
 
 </div>
-</div><br>
+<br>
+</div>
 
 
-<a href="javascript:leftnavExpand('schedule2');">
+<a class="scheduleLink" href="javascript:leftnavExpand('schedule2');">
     <img id="excl_schedule2" src="images/bt_Expand.gif" border="0"> <fmt:message key="schedule_another_event" bundle="${resword}"/> </a></div>
 
 <div id="schedule2" style="display:<c:out value="${display2}"/>">
@@ -816,10 +818,11 @@
 </div></div></div></div></div></div></div></div>
 
 </div>
-</div><br>
+<br>
+</div>
 
 
-<a href="javascript:leftnavExpand('schedule3');">
+<a class="scheduleLink" href="javascript:leftnavExpand('schedule3');">
     <img id="excl_schedule3" src="images/bt_Expand.gif" border="0"> <fmt:message key="schedule_another_event" bundle="${resword}"/> </a></div>
 
 <div id="schedule3" style="display:<c:out value="${display3}"/>">
