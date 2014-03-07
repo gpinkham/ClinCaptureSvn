@@ -70,6 +70,19 @@
                         <ItemData ItemOID="I_AGEN_AGENT_INTERRUPTED" Value="20">
                         </ItemData>
                     </ItemGroupData>
+                    <ItemGroupData ItemGroupOID="IG_CONC_UNGROUPED" ItemGroupRepeatKey="4"
+                                   TransactionType="Insert">
+                        <ItemData ItemOID="I_AGEN_AGENT_NAME" Value="16">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_AGENT_DOSE" Value="17">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_MTD_DETERMINED" Value="18">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_MTD_DOSE" Value="19">
+                        </ItemData>
+                        <ItemData ItemOID="I_AGEN_AGENT_INTERRUPTED" Value="20">
+                        </ItemData>
+                    </ItemGroupData>
                 </FormData>
             </StudyEventData>
         </SubjectData>

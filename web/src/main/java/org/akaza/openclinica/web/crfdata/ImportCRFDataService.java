@@ -16,20 +16,53 @@ package org.akaza.openclinica.web.crfdata;
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.*;
+import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.ItemDataType;
+import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.ResponseType;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
-import org.akaza.openclinica.bean.submit.*;
-import org.akaza.openclinica.bean.submit.crfdata.*;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
+import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
-import org.akaza.openclinica.dao.submit.*;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
@@ -40,12 +73,27 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ImportCRFDataService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
+	private class GroupOrdinalInfo {
+		public int maxOrdinal;
+		public int groupOrdinal;
+	}
 
 	private final DataSource ds;
 
@@ -327,6 +375,28 @@ public class ImportCRFDataService {
 		return (EventCRFBean) eventCRFDAO.create(eventCRFBean);
 	}
 
+	private GroupOrdinalInfo addGroupOrdinal(HashMap<String, Set<Integer>> groupOrdinalMap, CRFVersionBean crfVersion,
+			ImportItemGroupDataBean itemGroupDataBean) {
+		GroupOrdinalInfo goi = new GroupOrdinalInfo();
+		goi.groupOrdinal = 1;
+		String key = crfVersion.getOid() + "_" + itemGroupDataBean.getItemGroupOID();
+		Set<Integer> ordinalList = groupOrdinalMap.get(key);
+		if (ordinalList == null) {
+			ordinalList = new HashSet<Integer>();
+			groupOrdinalMap.put(key, ordinalList);
+		}
+		if (itemGroupDataBean.getItemGroupRepeatKey() != null) {
+			try {
+				goi.groupOrdinal = Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey());
+			} catch (Exception e) {
+				logger.debug("found npe for group ordinals!");
+			}
+		}
+		ordinalList.add(goi.groupOrdinal);
+		goi.maxOrdinal = Collections.max(ordinalList);
+		return goi;
+	}
+
 	public List<DisplayItemBeanWrapper> lookupValidationErrors(ValidatorHelper validatorHelper,
 			ODMContainer odmContainer, UserAccountBean ub, HashMap<String, String> totalValidationErrors,
 			HashMap<String, String> hardValidationErrors, ArrayList<Integer> permittedEventCRFIds)
@@ -347,8 +417,8 @@ public class ImportCRFDataService {
 		StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
 		StudyConfigService scs = new StudyConfigService(ds);
 		studyBean = scs.setParametersForStudy(studyBean);
-		int maxOrdinal;
-		HashMap<String, ItemDataBean> blankCheck = new HashMap<String, ItemDataBean>();
+		HashMap<String, ItemDataBean> groupItemDataMap = new HashMap<String, ItemDataBean>();
+		HashMap<String, Set<Integer>> groupOrdinalMap = new HashMap<String, Set<Integer>>();
 		ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
 		int totalEventCRFCount = 0;
 		int totalItemDataBeanCount = 0;
@@ -394,9 +464,6 @@ public class ImportCRFDataService {
 				displayItemBeans = new ArrayList<DisplayItemBean>();
 				HashMap prevValidationErrors = new HashMap();
 				for (FormDataBean formDataBean : formDataBeans) {
-					maxOrdinal = 1;// JN:Moving maxOrdinal here, so max ordinal is there per form rather than per study
-									// eventData bean
-
 					CRFDAO crfDAO = new CRFDAO(ds);
 					CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
 					EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
@@ -434,19 +501,17 @@ public class ImportCRFDataService {
 								eventCRFDAO);
 						permittedEventCRFIds.add(eventCRFBean.getId());
 					}
+					boolean doNotAddItems = false;
+					List<ItemBean> groupItemList = new ArrayList<ItemBean>();
+					ItemDAO itemDAO = new ItemDAO(ds);
+					ItemFormMetadataDAO itemFormMetadataDAO = new ItemFormMetadataDAO(ds);
 					EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
 					EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO
 							.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), crfVersion.getId());
-					String prevItemGroupOid = null;
 					Collections.sort(itemGroupDataBeans, new ItemGroupComparator());
 					if (permittedEventCRFIds.contains(eventCRFBean.getId())) {
 						for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
-							if (prevItemGroupOid != null
-									&& !prevItemGroupOid.equals(itemGroupDataBean.getItemGroupOID())) {
-								maxOrdinal = 1;
-							}
-							prevItemGroupOid = itemGroupDataBean.getItemGroupOID();
-							ArrayList<ItemBean> blankCheckItems = new ArrayList<ItemBean>();
+							GroupOrdinalInfo goi = addGroupOrdinal(groupOrdinalMap, crfVersion, itemGroupDataBean);
 							ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
 							logger.debug("iterating through group beans: " + itemGroupDataBean.getItemGroupOID());
 							// put a checker in here
@@ -463,10 +528,6 @@ public class ImportCRFDataService {
 							HashMap<String, DisplayItemBean> nonDuplicationMap = new HashMap<String, DisplayItemBean>();
 							for (ImportItemDataBean importItemDataBean : itemDataBeans) {
 								logger.debug("   iterating through item data beans: " + importItemDataBean.getItemOID());
-								ItemDAO itemDAO = new ItemDAO(ds);
-								ItemFormMetadataDAO itemFormMetadataDAO = new ItemFormMetadataDAO(ds);
-								// ItemDataDAO itemDataDAO = new ItemDataDAO(ds);
-
 								List<ItemBean> itemBeans = itemDAO.findByOid(importItemDataBean.getItemOID());
 								if (!itemBeans.isEmpty()) {
 									ItemBean itemBean = itemBeans.get(0);
@@ -478,24 +539,16 @@ public class ImportCRFDataService {
 									ItemFormMetadataBean metadataBean = itemFormMetadataDAO
 											.findAllByCRFVersionIdAndItemId(crfVersion.getId(), itemBean.getId());
 									logger.debug("      found metadata item bean: " + metadataBean);
-									int groupOrdinal = 1;
-									if (itemGroupDataBean.getItemGroupRepeatKey() != null) {
-										try {
-											groupOrdinal = Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey());
-											if (groupOrdinal > maxOrdinal) {
-												maxOrdinal = groupOrdinal;
-											}
-										} catch (Exception e) {
-											logger.debug("found npe for group ordinals, line 344!");
-										}
-									}
 									ItemDataBean itemDataBean = createItemDataBean(itemBean, eventCRFBean,
-											importItemDataBean.getValue(), ub, groupOrdinal);
-									blankCheckItems.add(itemBean);
-									String newKey = groupOrdinal + "_" + itemGroupDataBean.getItemGroupOID() + "_"
-											+ itemBean.getOid() + "_" + subjectDataBean.getSubjectOID();
-									blankCheck.put(newKey, itemDataBean);
+											importItemDataBean.getValue(), ub, goi.groupOrdinal);
+									if (!doNotAddItems) {
+										groupItemList.add(itemBean);
+									}
+									String newKey = crfVersion.getOid() + "_" + goi.groupOrdinal + "_"
+											+ itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
+											+ subjectDataBean.getSubjectOID();
 									logger.info("adding " + newKey + " to blank checks");
+									groupItemDataMap.put(newKey, itemDataBean);
 									if (metadataBean != null) {
 										displayItemBean.setData(itemDataBean);
 										displayItemBean.setMetadata(metadataBean);
@@ -536,34 +589,53 @@ public class ImportCRFDataService {
 
 								}
 							}// end item data beans
-							logger.debug(".. found blank check: " + blankCheck.toString());
 
-							for (int i = 1; i <= maxOrdinal; i++) {
-								for (ItemBean itemBean : blankCheckItems) {
-									String newKey = i + "_" + itemGroupDataBean.getItemGroupOID() + "_"
-											+ itemBean.getOid() + "_" + subjectDataBean.getSubjectOID();
-									if (blankCheck.get(newKey) == null) {
-										// if it already exists, Do Not Add It.
-										ItemDataBean itemDataCheck = getItemDataDao()
-												.findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(),
-														eventCRFBean.getId(), i);
-										logger.debug("found item data bean id: " + itemDataCheck.getId()
-												+ " for ordinal " + i);
-										if (itemDataCheck.getId() == 0) {
-											ItemDataBean blank = createItemDataBean(itemBean, eventCRFBean, "", ub, i);
-											DisplayItemBean displayItemBean = new DisplayItemBean();
-											displayItemBean.setItem(itemBean);
-											displayItemBean.setData(blank);
-											// displayItemBean.setMetadata(metadataBean);
-											// set event def crf?
-											displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
-											checkExistingData(validatorHelper, displayItemBean, itemBean, studyBean);
-											displayItemBeans.add(displayItemBean);
-											logger.debug("... adding display item bean");
+							doNotAddItems = groupItemList.size() > 0;
+
+							// process blank item groups
+							String key = crfVersion.getOid() + "_" + itemGroupDataBean.getItemGroupOID();
+							Set<Integer> ordinalList = groupOrdinalMap.get(key);
+							if (ordinalList != null) {
+								for (int i = 1; i <= goi.maxOrdinal; i++) {
+									if (ordinalList.contains(i))
+										continue;
+									ordinalList.add(i);
+									for (ItemBean itemBean : groupItemList) {
+										String newKey = crfVersion.getOid() + "_" + i + "_"
+												+ itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
+												+ subjectDataBean.getSubjectOID();
+										ItemDataBean ItemDataBean = groupItemDataMap.get(newKey);
+										if (ItemDataBean == null) {
+											// if it already exists, Do Not Add It.
+											ItemDataBean itemDataCheck = getItemDataDao()
+													.findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(),
+															eventCRFBean.getId(), i);
+											logger.debug("found item data bean id: " + itemDataCheck.getId()
+													+ " for ordinal " + i);
+											if (itemDataCheck.getId() == 0) {
+												ItemFormMetadataBean metadataBean = itemFormMetadataDAO
+														.findAllByCRFVersionIdAndItemId(crfVersion.getId(),
+																itemBean.getId());
+												if (metadataBean == null) {
+													MessageFormat mf = new MessageFormat("");
+													mf.applyPattern(respage.getString("no_metadata_could_be_found"));
+													Object[] arguments = { itemBean.getOid() };
+
+													throw new OpenClinicaException(mf.format(arguments), "");
+												}
+												ItemDataBean blank = createItemDataBean(itemBean, eventCRFBean, "", ub,
+														i);
+												DisplayItemBean displayItemBean = new DisplayItemBean();
+												displayItemBean.setItem(itemBean);
+												displayItemBean.setData(blank);
+												displayItemBean.setMetadata(metadataBean);
+												displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
+												checkExistingData(validatorHelper, displayItemBean, itemBean, studyBean);
+												displayItemBeans.add(displayItemBean);
+												logger.debug("... adding display item bean");
+											}
 										}
 									}
-									logger.debug("found a blank at " + i + ", adding " + blankCheckItems.size()
-											+ " blank items");
 								}
 							}
 						}// end item group data beans
@@ -595,7 +667,7 @@ public class ImportCRFDataService {
 							+ " count of event crfs " + totalEventCRFCount + " count of hard error checks "
 							+ hardValidator.size());
 					// possibly create the import summary here
-					logger.debug("creation of wrapper: max ordinal found " + maxOrdinal);
+
 					// check if we need to overwrite
 					DataEntryStage dataEntryStage = eventCRFBean.getStage();
 					boolean overwrite = false;

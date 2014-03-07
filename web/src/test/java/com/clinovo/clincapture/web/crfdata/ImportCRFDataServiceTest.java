@@ -2,14 +2,6 @@ package com.clinovo.clincapture.web.crfdata;
 
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.util.ValidatorHelper;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.sax.SAXSource;
 import org.akaza.openclinica.AbstractContextSentiveTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
@@ -22,20 +14,29 @@ import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.xml.sax.InputSource;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.sax.SAXSource;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
 public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 
 	protected class ObjectsHolder {
 		protected ImportCRFDataService service;
 		protected ODMContainer container;
 		protected InputStream stream;
-        protected StudySubjectIdService studySubjectIdService;
+		protected StudySubjectIdService studySubjectIdService;
 		protected MockHttpServletRequest request = new MockHttpServletRequest();
 		protected UserAccountBean ub;
 		protected ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
 		protected ValidatorHelper validatorHelper;
 		protected ConfigurationDao configurationDao;
 		{
-            studySubjectIdService = Mockito.mock(StudySubjectIdService.class);
+			studySubjectIdService = Mockito.mock(StudySubjectIdService.class);
 			configurationDao = Mockito.mock(ConfigurationDao.class);
 
 			ub = new UserAccountBean();
@@ -100,22 +101,29 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 
 	@Test
 	public void testThatGeneratedSummaryStatsBeanIsNotNull() {
-		assertNotNull(holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()));
+		assertNotNull(holder.service
+				.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()));
 	}
 
 	@Test
 	public void testThatGetEventCrfCountReturnsCorrectValue() {
-		assertEquals(1, holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()).getEventCrfCount());
+		assertEquals(1,
+				holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>())
+						.getEventCrfCount());
 	}
 
 	@Test
 	public void testThatGetDiscNoteCountReturnsCorrectValue() {
-		assertEquals(0, holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()).getDiscNoteCount());
+		assertEquals(0,
+				holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>())
+						.getDiscNoteCount());
 	}
 
 	@Test
 	public void testThatGetStudySubjectCountReturnsCorrectValue() {
-		assertEquals(1, holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>()).getStudySubjectCount());
+		assertEquals(1,
+				holder.service.generateSummaryStatsBean(holder.container, new ArrayList<DisplayItemBeanWrapper>())
+						.getStudySubjectCount());
 	}
 
 	@Test
@@ -211,7 +219,7 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 	public void testThatGetItemGroupDataFromTestFile3ReturnsCorrectSize() throws Exception {
 		assertEquals(
 				holder3.container.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0)
-						.getFormData().get(0).getItemGroupData().size(), 5);
+						.getFormData().get(0).getItemGroupData().size(), 6);
 	}
 
 	@Test
@@ -235,6 +243,6 @@ public class ImportCRFDataServiceTest extends AbstractContextSentiveTest {
 		List<DisplayItemBeanWrapper> wrappers = holder3.service.lookupValidationErrors(holder3.validatorHelper,
 				holder3.container, holder3.ub, new HashMap<String, String>(), new HashMap<String, String>(),
 				holder3.permittedEventCRFIds);
-		assertEquals(wrappers.get(0).getDisplayItemBeans().size(), 24);
+		assertEquals(wrappers.get(0).getDisplayItemBeans().size(), 34);
 	}
 }
