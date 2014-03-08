@@ -23,22 +23,6 @@ package org.akaza.openclinica.control.submit;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
 import com.clinovo.util.ValidatorHelper;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -133,6 +117,23 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.quartz.impl.StdScheduler;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author ssachs
@@ -4261,7 +4262,7 @@ public abstract class DataEntryServlet extends Controller {
 						// better way to
 						// do deep copy, like clone
 						List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(),
-								ecb, sb.getId(), edcb, 0, getServletContext());
+								ecb, sb.getId(), edcb, idb.getOrdinal(), getServletContext());
 
 						digb.setItems(dibs);
 						logger.trace("set with dibs list of : " + dibs.size());
@@ -4284,7 +4285,8 @@ public abstract class DataEntryServlet extends Controller {
 						for (DisplayItemBean dib : displayGroup.getItems()) {
 							for (int j = 0; j < data.size(); j++) {
 								ItemDataBean idb = (ItemDataBean) data.get(j);
-								if (idb.getItemId() == dib.getItem().getId() && !idb.isSelected()) {
+								if (idb.getItemId() == dib.getItem().getId()
+										&& idb.getOrdinal() == dib.getData().getOrdinal() && !idb.isSelected()) {
 									idb.setSelected(true);
 									dib.setData(idb);
 									logger.debug("--> set data " + idb.getId() + ": " + idb.getValue());
@@ -4374,7 +4376,7 @@ public abstract class DataEntryServlet extends Controller {
 				// better way to
 				// do deep copy, like clone
 				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-						sb.getId(), edcb, 0, getServletContext());
+						sb.getId(), edcb, idb.getOrdinal(), getServletContext());
 
 				digb.setItems(dibs);
 				logger.trace("set with dibs list of : " + dibs.size());

@@ -18,7 +18,6 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
-import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -42,31 +41,28 @@ import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
+import javax.servlet.ServletContext;
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.servlet.ServletContext;
-import javax.sql.DataSource;
-
 /**
  * This class builds DisplayFormGroupBeans and DisplayItemBeans in preparation for displaying a form. The
  * DisplayFormGroupBean contains the DisplayItemBeans, and is itself contained by a DisplaySectionBean.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class FormBeanUtil {
 
 	private static Logger logger = null;
 	public static final String UNGROUPED = "Ungrouped";
-	public static final String ADMIN_EDIT = "administrativeEditing";
 	private static DynamicsMetadataService itemMetadataService;
-	
+
 	private static DynamicsMetadataService getItemMetadataService(ServletContext context) {
 		itemMetadataService = itemMetadataService != null ? itemMetadataService
 				: (DynamicsMetadataService) SpringServletAccess.getApplicationContext(context).getBean(
@@ -79,8 +75,8 @@ public class FormBeanUtil {
 		if (!metadataBean.isShowItem()) {
 
 			// if the base case is not already shown, let's check it
-			boolean showItem = getItemMetadataService(context).isShown(new Integer(metadataBean.getItemId()),
-					eventCrfBean, itemDataBean);
+			boolean showItem = getItemMetadataService(context).isShown(metadataBean.getItemId(), eventCrfBean,
+					itemDataBean);
 			metadataBean.setShowItem(showItem);
 			// setting true or false here, tbh
 		}
@@ -97,7 +93,7 @@ public class FormBeanUtil {
 	 *            A List of ItemBeans that will provide the source of each DisplayItemBean
 	 * @param dataSource
 	 *            A DataSource for the DAO classes.
-	 * @param crfVersionId
+	 * @param eventCrfBean
 	 *            The CRF version Id for fetching associated ItemFormMetadataBeans.
 	 * @param sectionId
 	 *            The section ID associated with the Items.
@@ -107,7 +103,7 @@ public class FormBeanUtil {
 	 */
 	public static List<DisplayItemBean> getDisplayBeansFromItems(List<ItemBean> itemBeans, DataSource dataSource,
 			EventCRFBean eventCrfBean, int sectionId, List<String> nullValuesList, ServletContext context) {
-		
+
 		List<DisplayItemBean> disBeans = new ArrayList<DisplayItemBean>();
 		if (itemBeans == null || itemBeans.isEmpty())
 			return disBeans;
@@ -122,7 +118,7 @@ public class FormBeanUtil {
 		ResponseOptionBean respBean;
 
 		boolean hasNullValues = nullValuesList != null && !nullValuesList.isEmpty();
-		String tmpVal = "";
+		String tmpVal;
 		for (ItemBean iBean : itemBeans) {
 			displayBean = new DisplayItemBean();
 			meta = metaDao.findByItemIdAndCRFVersionId(iBean.getId(), eventCrfBean.getCRFVersionId());
@@ -189,7 +185,7 @@ public class FormBeanUtil {
 		ResponseOptionBean respBean;
 
 		boolean hasNullValues = nullValuesList != null && !nullValuesList.isEmpty();
-		String tmpVal = "";
+		String tmpVal;
 		// findByItemIdAndCRFVersionId
 		for (ItemBean iBean : itemBeans) {
 			displayBean = new DisplayItemBean();
@@ -240,8 +236,7 @@ public class FormBeanUtil {
 	}
 
 	public static List<DisplayItemBean> getDisplayBeansFromItems(List<ItemBean> itemBeans, DataSource dataSource,
-			EventCRFBean eventCrfBean, int sectionId, EventDefinitionCRFBean edcb, int test, ServletContext context) {
-		// int test is for method overloading.
+			EventCRFBean eventCrfBean, int sectionId, EventDefinitionCRFBean edcb, int ordinal, ServletContext context) {
 		List<DisplayItemBean> disBeans = new ArrayList<DisplayItemBean>();
 		if (itemBeans == null || itemBeans.isEmpty())
 			return disBeans;
@@ -253,7 +248,8 @@ public class FormBeanUtil {
 			displayBean = new DisplayItemBean();
 			displayBean.setEventDefinitionCRF(edcb);
 			meta = metaDao.findByItemIdAndCRFVersionId(iBean.getId(), eventCrfBean.getCRFVersionId());
-			ItemDataBean itemDataBean = itemDataDao.findByItemIdAndEventCRFId(iBean.getId(), eventCrfBean.getId());
+			ItemDataBean itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(iBean.getId(),
+					eventCrfBean.getId(), ordinal);
 
 			if (meta.getSectionId() == sectionId) {
 				displayBean.setItem(iBean);
@@ -268,7 +264,7 @@ public class FormBeanUtil {
 
 	public void addBeansToResponseOptions(List<String> values, List<ResponseOptionBean> respOptions) {
 		ResponseOptionBean respBean;
-		String tmpVal = "";
+		String tmpVal;
 		// Only add the values if the ResponseOptionBeans do not already contain
 		// them
 		for (String val : values) {
@@ -285,29 +281,11 @@ public class FormBeanUtil {
 		}
 	}
 
-	public List<ResponseOptionBean> getNullValuesListAsOptionBeans(List<NullValue> nullValues) {
-
-		List<ResponseOptionBean> responseOptionBeans = new ArrayList<ResponseOptionBean>();
-		if (nullValues == null || nullValues.isEmpty()) {
-			return responseOptionBeans;
-		}
-		ResponseOptionBean respBean;
-		String name;
-		for (NullValue nullVal : nullValues) {
-			name = nullVal.getName();
-			respBean = new ResponseOptionBean();
-			respBean.setText(name);
-			respBean.setValue(name);
-			responseOptionBeans.add(respBean);
-		}
-		return responseOptionBeans;
-	}
-
 	public DisplayItemBean getDisplayBeanFromSingleItem(ItemFormMetadataBean itemFBean, int sectionId,
 			DataSource dataSource, EventCRFBean eventCrfBean, List<String> nullValuesList, ServletContext context) {
 
 		DisplayItemBean disBean = new DisplayItemBean();
-		ItemBean itemBean = new ItemBean();
+		ItemBean itemBean;
 		ItemDAO itemDAO = new ItemDAO(dataSource);
 		ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
 		if (itemFBean == null)
@@ -355,7 +333,8 @@ public class FormBeanUtil {
 	 * @param hasDBValues
 	 *            'true' if the items within the table are pre-filled with database values.
 	 * @param forPrinting
-	 * @return The org.jdom Element that represents the table.
+	 *            boolean
+	 * @return Element The org.jdom Element that represents the table.
 	 */
 	public Element createXHTMLTableFromNonGroup(List<DisplayItemBean> items, Integer tabindex,
 			boolean hasDiscrepancyMgt, boolean hasDBValues, boolean forPrinting) {
@@ -440,9 +419,8 @@ public class FormBeanUtil {
 		int temp;
 		Map.Entry<Integer, List<DisplayItemBean>> me;
 		List<DisplayItemBean> beanList;
-		for (Iterator<Map.Entry<Integer, List<DisplayItemBean>>> iter = columnsMap.entrySet().iterator(); iter
-				.hasNext();) {
-			me = iter.next();
+		for (Map.Entry<Integer, List<DisplayItemBean>> integerListEntry : columnsMap.entrySet()) {
+			me = integerListEntry;
 			beanList = me.getValue();
 			temp = beanList.size();
 			highestRowNumber = temp > highestRowNumber ? temp : highestRowNumber;
@@ -508,8 +486,8 @@ public class FormBeanUtil {
 
 			// Create the row containing the item + form field
 			Element trRow = new Element("tr");
-			String leftSideTxt = "";
-			String questNumber = "";
+			String leftSideTxt;
+			String questNumber;
 			tbody.addContent(trRow);
 			String responseName = disBean.getMetadata().getResponseSet().getResponseType().getName();
 			Element tdCell = new Element("td");
@@ -571,8 +549,7 @@ public class FormBeanUtil {
 		return tr;
 	}
 
-	private Element createHeaderCellMultiColumn(DisplayItemBean disBean, boolean isHeader, Element row,
-			int numberOfColumns) {
+	private Element createHeaderCellMultiColumn(DisplayItemBean disBean, boolean isHeader, Element row) {
 		// At this point, the row could already contain td cells with headers or
 		// subheaders
 		CellFactory cellFactory = new CellFactory();
@@ -580,7 +557,7 @@ public class FormBeanUtil {
 			row = new Element("tr");
 		}
 		Element td = new Element("td");
-		String cssClassNames = "";
+		String cssClassNames;
 		// Does the row have the class attribute yet?
 		if (row.getAttribute("class") == null) {
 			cssClassNames = CssRules.getClassNamesForTag("tr header");
@@ -613,7 +590,9 @@ public class FormBeanUtil {
 	 *            An integer representing the highest number of columns with cell content in this group of rows (e.g.,
 	 *            one row has five td cells with content, the highest number of any
 	 * @param hasDBValues
+	 *            boolean
 	 * @param forPrinting
+	 *            boolean
 	 */
 	private void createMultipleCols(Element tbody, Map<Integer, List<DisplayItemBean>> displayItemRows,
 			Integer tabindex, boolean hasDiscrepancyMgt, int numberOfColumns, boolean hasDBValues, boolean forPrinting) {
@@ -625,13 +604,12 @@ public class FormBeanUtil {
 		int numberOfBeansInRow;
 
 		Element formFieldRow = new Element("tr");
-		;
+
 		Element headerRow;
 		Element subHeaderRow;
 
-		for (Iterator<Map.Entry<Integer, List<DisplayItemBean>>> iter = displayItemRows.entrySet().iterator(); iter
-				.hasNext();) {
-			me = iter.next();
+		for (Map.Entry<Integer, List<DisplayItemBean>> integerListEntry : displayItemRows.entrySet()) {
+			me = integerListEntry;
 			itemsList = me.getValue();
 			numberOfBeansInRow = itemsList.size();
 			// Each Entry points to a List of DisplayItemBeans that are in the
@@ -640,22 +618,22 @@ public class FormBeanUtil {
 
 			headerRow = new Element("tr");
 			subHeaderRow = new Element("tr");
-			String leftSideTxt = "";
+			String leftSideTxt;
 			// keep track of the last bean in the row, so we can fill the row
 			// with any necessary empty td cells
 			for (DisplayItemBean disBean : me.getValue()) {
 				// Each row has its own instance of headerRow and subHeaderRow
 				if (disBean.getMetadata().getHeader().length() > 0) {
-					headerRow = createHeaderCellMultiColumn(disBean, true, headerRow, numberOfBeansInRow);
+					headerRow = createHeaderCellMultiColumn(disBean, true, headerRow);
 				}
 				if (disBean.getMetadata().getSubHeader().length() > 0) {
-					subHeaderRow = createHeaderCellMultiColumn(disBean, false, subHeaderRow, numberOfBeansInRow);
+					subHeaderRow = createHeaderCellMultiColumn(disBean, false, subHeaderRow);
 				}
 				String responseName = disBean.getMetadata().getResponseSet().getResponseType().getName();
 				Element tdCell = new Element("td");
 				String classNames = CssRules.getClassNamesForTag("td");
 				tdCell.setAttribute("class", classNames);
-				String questNumber = "";
+				String questNumber;
 
 				questNumber = disBean.getMetadata().getQuestionNumberLabel();
 				boolean hasQuestion = questNumber.length() > 0;
@@ -758,11 +736,11 @@ public class FormBeanUtil {
 	 * @param crfVersionId
 	 *            The CRF version ID associated with the Items.
 	 * @param dataSource
+	 *            DataSource
 	 * @param eventCRFDefId
 	 *            The id for the Event CRF Definition.
-	 * @return A DisplaySectionBean with sorted ItemGroupBeans, meaning the ItemGroupBeans should be listed in the order
-	 *         that they appear on the CRF section.
-	 * @return A DisplaySectionBean representing a CRF section.
+	 * @return DisplaySectionBean A DisplaySectionBean with sorted ItemGroupBeans, meaning the ItemGroupBeans should be
+	 *         listed in the order that they appear on the CRF section.
 	 */
 	public DisplaySectionBean createDisplaySectionBWithFormGroups(int sectionId, int crfVersionId,
 			DataSource dataSource, int eventCRFDefId, EventCRFBean eventCrfBean, ServletContext context) {
@@ -1042,7 +1020,7 @@ public class FormBeanUtil {
 		// represents an
 		// ungrouped or orphaned item
 		DisplayItemGroupBean nongroupedBean;
-		ItemGroupBean itemGroup = new ItemGroupBean();
+		ItemGroupBean itemGroup;
 		ItemGroupMetadataBean metaBean = new ItemGroupMetadataBean();
 
 		metaBean.setName(UNGROUPED);
@@ -1068,10 +1046,9 @@ public class FormBeanUtil {
 		boolean isOrphaned = false;
 		// cycle through each item and create DisplayItemGroupBean(s) for
 		// any of the orphaned items
-		for (Iterator<Map.Entry<Integer, Map<ItemFormMetadataBean, Integer>>> iter = groupMapping.entrySet().iterator(); iter
-				.hasNext();) {
+		for (Map.Entry<Integer, Map<ItemFormMetadataBean, Integer>> integerMapEntry : groupMapping.entrySet()) {
 
-			entry = iter.next();
+			entry = integerMapEntry;
 			beanMap = entry.getValue(); // the ItemFormMetadataBean and any
 			// group ordinal
 			tempItemMeta = beanMap.keySet().iterator().next(); // the
@@ -1193,79 +1170,13 @@ public class FormBeanUtil {
 	}
 
 	/**
-	 * Create a DisplaySectionBean with a list of FormGroupBeans.
-	 * 
-	 * @param crfVersionId
-	 *            The CRF version ID associated with the Items.
-	 * @param sectionBean
-	 *            The SectionBean with an ID associated with the Items, which end up providing the content of the
-	 *            tables.
-	 * @param sm
-	 *            A SessionManager, from which DataSources are acquired for the DAO objects.
-	 * @return A DisplaySectionBean.
-	 */
-	public DisplaySectionBean createDisplaySectionBeanWithItemGroups(int sectionId, EventCRFBean eventCrfBean,
-			SectionBean sectionBean, SessionManager sm, ServletContext context) {
-		DisplaySectionBean dBean = new DisplaySectionBean();
-		ItemGroupDAO formGroupDAO = new ItemGroupDAO(sm.getDataSource());
-		ItemGroupMetadataDAO igMetaDAO = new ItemGroupMetadataDAO(sm.getDataSource());
-		ItemDAO itemDao = new ItemDAO(sm.getDataSource());
-		// Get a List of FormGroupBeans for each group associated with
-		// this crfVersionId.
-		List<ItemGroupBean> arrList = formGroupDAO.findLegitGroupBySectionId(sectionId);
-
-		if (arrList.isEmpty())
-			return dBean;
-
-		// Get the items associated with each group
-		List<ItemBean> itBeans;
-		List<DisplayItemBean> displayItems;
-		List<DisplayItemGroupBean> displayFormBeans = new ArrayList<DisplayItemGroupBean>();
-		DisplayItemGroupBean displayFormGBean;
-		for (ItemGroupBean itemGroup : arrList) {
-			itBeans = itemDao.findAllItemsByGroupId(itemGroup.getId(), eventCrfBean.getCRFVersionId());
-
-			List<ItemGroupMetadataBean> metadata = igMetaDAO.findMetaByGroupAndSection(itemGroup.getId(),
-					eventCrfBean.getCRFVersionId(), sectionId);
-			// Create DisplayItemBeans out of the found items; we have to
-			// further
-			// delineate the items by section label. The following method
-			// includes
-			// this requirement
-			if (!metadata.isEmpty()) {
-				// for a given crf version, all the items in the same group have
-				// the same group metadata
-				// so we can get one of them and set metadata for the group
-				ItemGroupMetadataBean meta = metadata.get(0);
-				itemGroup.setMeta(meta);
-			}
-			// TODO: the last arg is a list of null value strings
-			displayItems = getDisplayBeansFromItems(itBeans, sm.getDataSource(), eventCrfBean, sectionBean.getId(),
-					null, context);
-			displayFormGBean = this.createDisplayFormGroup(displayItems, itemGroup);
-			displayFormBeans.add(displayFormGBean);
-		}
-		// sort the list according to the ordinal of the contained
-		// FormGroupBeans
-		Collections.sort(displayFormBeans, new Comparator<DisplayItemGroupBean>() {
-
-			public int compare(DisplayItemGroupBean disFormGroupBean, DisplayItemGroupBean disFormGroupBean1) {
-				return disFormGroupBean.getGroupMetaBean().getOrdinal()
-						.compareTo(disFormGroupBean1.getGroupMetaBean().getOrdinal());
-			}
-		});
-		dBean.setDisplayFormGroups(displayFormBeans);
-		return dBean;
-	}
-
-	/**
 	 * Create a DisplaySectionBean with a list of ItemGroupBeans. NOTE: unGrouped Items are not included
 	 * 
 	 * @param study
 	 *            The StudyBean
 	 * @param sectionId
 	 *            The Section ID associated with the Items, which end up providing the content of the tables.
-	 * @param crfVersionId
+	 * @param eventCrfBean
 	 *            The CRF version ID associated with the Items.
 	 * @param studyEventId
 	 *            The Study Event ID associated with the CRF Version ID.
@@ -1369,7 +1280,7 @@ public class FormBeanUtil {
 		}
 		int size = allMetas.size();
 		int tempCount = 0;
-		String grpName = "";
+		String grpName;
 		// Only count grouped items
 		for (DisplayItemGroupBean groupBean : displayFormBeans) {
 			grpName = groupBean.getItemGroupBean().getName();
@@ -1387,7 +1298,7 @@ public class FormBeanUtil {
 		}
 		List<String> nullValuesList = new ArrayList<String>();
 		// hold the bean's return value
-		List<NullValue> nullObjectList = new ArrayList<NullValue>();
+		List<NullValue> nullObjectList;
 		EventDefinitionCRFBean eventCRFDefBean;
 		EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
 		eventCRFDefBean = (EventDefinitionCRFBean) eventDefinitionCRFDAO.findByPK(eventDefinitionCRFId);
@@ -1416,32 +1327,5 @@ public class FormBeanUtil {
 			}
 		}
 		return false;
-	}
-
-	public void addNullValuesToDisplayItemWithGroupBeans(List<DisplayItemWithGroupBean> groupBeans,
-			List<String> nullValuesList) {
-
-		if (nullValuesList == null || nullValuesList.isEmpty() || groupBeans == null || groupBeans.isEmpty()) {
-			return;
-		}
-		DisplayItemGroupBean displayItemGroupBean = null;
-		List<DisplayItemBean> disBeans = new ArrayList<DisplayItemBean>();
-		String responseName = "";
-		List<ResponseOptionBean> respOptions;
-
-		for (DisplayItemWithGroupBean withGroupBean : groupBeans) {
-			displayItemGroupBean = withGroupBean.getItemGroup();
-			disBeans = displayItemGroupBean.getItems();
-			for (DisplayItemBean singleBean : disBeans) {
-				responseName = singleBean.getMetadata().getResponseSet().getResponseType().getName();
-				respOptions = singleBean.getMetadata().getResponseSet().getOptions();
-				if (respOptions != null
-						&& ("checkbox".equalsIgnoreCase(responseName) || "radio".equalsIgnoreCase(responseName)
-								|| "single-select".equalsIgnoreCase(responseName) || "multi-select"
-									.equalsIgnoreCase(responseName))) {
-					this.addBeansToResponseOptions(nullValuesList, respOptions);
-				}
-			}
-		}
 	}
 }
