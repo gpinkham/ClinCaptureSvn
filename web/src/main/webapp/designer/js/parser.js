@@ -160,51 +160,79 @@ Parser.prototype.createNextDroppable = function(params) {
 
 			if (params.existingValue) {
 
-				var index = this.getInsertAction().targets.indexOf(params.existingValue);
+				var item = this.findItem(params.existingValue);
+				var oid = item.formOid + "." + item.group + "." + item.oid;
+				for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
 
-				if (index > -1) {
-
-					this.getInsertAction().targets.splice(index, 1);
-				}	
+					var dest = this.getInsertAction().destinations[x];
+					if (dest.oid === oid) {
+						this.getInsertAction().destinations.splice(x, 1);
+					}
+				}
 			}
-
-			this.getInsertAction().targets.push(params.ui.draggable.text());
 
 			// Destination
 			var dest = Object.create(null);
 
 			var item = this.findItem(params.ui.draggable.text());
-
 			var oid = item.formOid + "." + item.group + "." + item.oid;
-
+			 
 			dest.oid = oid;
 			dest.value = "";
 			dest.id = params.element.parents(".row").attr("id");
 
 			this.getInsertAction().destinations.push(dest);			
 
-			var newRow = $("#insert").find(".row").first().clone();
-			newRow.attr("id", $("#insert").find(".row").size() + 1);
-			newRow.find("label").remove();
+			params.element.val(params.ui.draggable.text());
 
-			var input = newRow.find(".item");
-			input.val("");
-			input.text("");
+			params.element.parent().siblings(".col-md-4").find(".value").focus();
+		}
 
-			var inputVal = newRow.find(".value");
-			inputVal.val("");
-			inputVal.text("");
+	} else if (params.element.is(".value")) {
 
-			inputVal.blur(function() {
+		var destination = null;
+		for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
 
-				parser.setDestinationValue({
+			destination = this.getInsertAction().destinations[x];
 
-					value: $(this).val(),
-					id: $(this).parents(".row").attr("id")
+			if (destination.id === params.element.parents(".row").attr("id")) {
+				break;
+			}
+		}
+
+		if (destination) {
+
+			if (!params.existingValue) {
+
+				var index = this.getInsertAction().destinations.indexOf(destination);
+
+				if (index > -1) {
+
+					this.getInsertAction().destinations.splice(index, 1);
+				}
+
+				var newRow = $("#insert").find(".row").first().clone();
+				newRow.attr("id", $("#insert").find(".row").size() + 1);
+				newRow.find("label").remove();
+
+				var input = newRow.find(".item");
+				input.val("");
+				input.text("");
+
+				var inputVal = newRow.find(".value");
+				inputVal.val("");
+				inputVal.text("");
+
+				inputVal.removeAttr("type");
+
+				inputVal.blur(function() {
+
+					parser.setDestinationValue({
+
+						value: $(this).val(),
+						id: $(this).parents(".row").attr("id")
+					})
 				})
-			})
-
-			if (!params.element.val()) {
 
 				createDroppable({
 
@@ -212,11 +240,104 @@ Parser.prototype.createNextDroppable = function(params) {
 					accept: "div[id='items'] td"
 				})
 
+				createDroppable({
+
+					element: inputVal,
+					accept: "div[id='data'] p, div[id='items'] td"
+				})
+
 				$("#insert").append(newRow);
+
+				this.getInsertAction().destinations.push(destination);
 			}
 
-			params.element.val(params.ui.draggable.text());
+			if (params.ui.draggable.prop("tagName") === "TD") {
+
+				destination.item = true;
+				destination.value = this.findItem(params.ui.draggable.text()).oid;
+
+				params.element.val(params.ui.draggable.text());
+
+			} else {
+
+				destination.item = false;
+				if (this.isText(params.ui.draggable)) {
+
+					params.element.focus();
+
+				} else if (this.isDate(params.ui.draggable)) {
+
+					params.element.attr("type", "date");
+					params.element.val($(this).text());
+
+					var msie = window.navigator.userAgent.indexOf('MSIE ');
+					var trident = window.navigator.userAgent.indexOf('Trident/');
+
+					// FF and IE
+					if (typeof InstallTrigger !== 'undefined' || msie > 0 || trident > 0) {
+
+						params.element.data({date: new Date(params.element.val())}).datepicker('update').children("input").val(new Date(params.element.val()));
+
+						params.element.datepicker({orientation:'bottom left'}).on("hide", function() {
+
+							if ($(this).val()) {
+
+								params.element.val($(this).val());
+
+							} else {
+
+								params.element.val("Select Date");
+							}
+						});
+
+						params.element.focus();
+
+					} else {
+
+						params.element.blur(function() {
+
+							if ($(this).val()) {
+								params.element.text($(this).val());
+							} else {
+								params.element.text("Select Date");
+							}
+						});
+					}
+
+				} else if (this.isNumber(params.ui.draggable)) {
+
+					params.element.attr("type", "number");
+
+					params.element.blur(function() {
+
+						if ($(this).val() && /[0-9]|\./.test($(this).val())) {
+
+							params.element.text($(this).val());
+							params.element.removeClass("invalid");
+
+						} else {
+
+							params.element.val();
+							params.element.focus();
+							params.element.select();
+							params.element.addClass("invalid");
+						}
+					})
+					
+					params.element.focus();
+
+				} else if (parser.isEmpty(params.ui.draggable)) {
+
+					params.element.removeAttr("type");
+					params.element.val('""');				
+				
+				} else {
+
+					destination.value = params.element.val();
+				}
+			}
 		}
+
 
 	} else if (params.element.is(".dest")) {
 
@@ -232,7 +353,10 @@ Parser.prototype.createNextDroppable = function(params) {
 				}
 			}
 
-			this.getShowHideAction().destinations.push(this.findItem(params.ui.draggable.text()).oid);
+			var item = this.findItem(params.ui.draggable.text());
+			var oid = item.formOid + "." + item.group + "." + item.oid;	
+
+			this.getShowHideAction().destinations.push(oid);
 
 			var newInput = params.element.clone();
 			createDroppable({
@@ -417,9 +541,7 @@ Parser.prototype.createRule = function() {
 		var item = this.findItem($(dottedBorders[x]).text());
 
 		if (item) {
-
-			// Add event oid, form oid and group oid
-			exprItem = item.eventOid + "." + item.formOid + "." + item.group + "." + item.oid;
+			exprItem = item.eventOid + "." + item.formOid + "." + item.group + "." + item.oid;	
 		}
 
 		expression.push(exprItem);
@@ -432,9 +554,9 @@ Parser.prototype.createRule = function() {
 		var tt = []
 		for (var x = 0; x < this.rule.targets.length; x++) {
 
-			var obj = this.findItem(this.rule.targets[x])
-			var itemOid = obj !== undefined ? obj.formOid + "." + obj.group + "." + obj.oid : $(".target").val();
+			var item = this.findItem(this.rule.targets[x]);
 
+			var itemOid = item.eventOid + "." + item.formOid + "." + item.group + "." + item.oid;
 			tt.push(itemOid);
 		}
 
@@ -684,7 +806,11 @@ Parser.prototype.isAddedTarget = function(target) {
 
 Parser.prototype.isAddedInsertTarget = function(target) {
 
-	return this.getInsertAction() && this.getInsertAction().targets.indexOf(target) > -1;
+	var item = this.findItem(target);
+
+	var dest = item.formOid + "." + item.group + "." + item.oid;
+
+	return this.getInsertAction() && this.getInsertAction().destinations.indexOf(dest) > -1;
 }
 
 Parser.prototype.isAddedShowHideTarget = function(target) {
@@ -1121,9 +1247,10 @@ Parser.prototype.setInsertAction = function(params) {
 				$("#actionMessages").show();
 
 				$("#insert").show();
-				$("#insert").find("textarea").val(action.message);
 
 				$("#chkData").prop("checked", params.selected);
+
+				$("#insert").find(".item").focus();
 
 			} else {
 
@@ -1152,7 +1279,6 @@ Parser.prototype.setInsertAction = function(params) {
 
 				action.message = "";
 				action.type = "insert";
-				action.targets = params.action.targets;
 				action.destinations = params.action.destinations;
 
 				// Add action targets
@@ -1161,7 +1287,6 @@ Parser.prototype.setInsertAction = function(params) {
 			} else {
 
 				action.message = "";
-				action.targets = [];
 				action.type = "insert";
 				action.destinations = [];
 			}
@@ -1294,15 +1419,15 @@ Parser.prototype.setDestinationValue = function(params) {
 
 		for (var x = 0; x < act.destinations.length; x++) {
 
-			var dest = act.destinations[x]
+			var dest = act.destinations[x];
 
-			if (dest.id === params.id) {
+			if (dest.id === params.id && !dest.item) {
 
 				dest.value = params.value;
 			}
 		}
 
-		action.render(params);
+		act.render(act);
 	}
 }
 
@@ -1326,8 +1451,11 @@ Parser.prototype.setDestinations = function(dests) {
 			input.css('font-weight', 'bold');
 
 			var inputVal = newRow.find(".value");
-			inputVal.val(dest.value);
-			input.css('font-weight', 'bold');
+			inputVal.css('font-weight', 'bold');
+
+			var inputValue = this.findItemName(dest.value) ? this.findItemName(dest.value).name : dest.value;
+			
+			inputVal.val(inputValue);
 
 			inputVal.blur(function() {
 
@@ -1335,13 +1463,19 @@ Parser.prototype.setDestinations = function(dests) {
 
 					value: $(this).val(),
 					id: $(this).parents(".row").attr("id")
-				})
-			})
+				});
+			});
 
 			createDroppable({
 
 				element: input,
-				accept: "div[id='items'] td"
+				accept: "div[id='data'] p, div[id='items'] td"
+			})
+
+			createDroppable({
+
+				element: inputVal,
+				accept: "div[id='data'] p, div[id='items'] td"
 			})
 
 			if (x === 0) {
@@ -1617,8 +1751,14 @@ Parser.prototype.render = function(rule) {
  * Fetch studies from CC. The studies come with events/crf and items added.
  * ====================================================================== */
 Parser.prototype.fetchStudies = function() {
-	
-	$("body").append(createLoader());
+		
+	// Notification
+	$("body").append(createLoader());	
+
+	// Clean up
+	sessionStorage.removeItem("id");
+	sessionStorage.removeItem("edit");
+
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 
 	$.ajax({

@@ -98,7 +98,7 @@ $(function() {
 			// If a rule failed validation
 		} else {
 
-			$("#save").hide();
+			$("#save").remove();
 			$(".success").hide();
 			$(".failure").show();
 

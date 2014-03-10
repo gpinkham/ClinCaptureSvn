@@ -946,8 +946,7 @@ public class ExpressionService {
 				if (studyEventDefinition == null || crf == null)
 					throw new OpenClinicaSystemException("OCRERR_0034");
 
-				EventDefinitionCRFBean eventDefinitionCrf = getEventDefinitionCRFDao()
-						.findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(),
+				EventDefinitionCRFBean eventDefinitionCrf = getEventDefinitionCRFDao().findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(),
 							studyEventDefinition.getId(), crf.getId());
 				if (eventDefinitionCrf == null || eventDefinitionCrf.getId() == 0)
 					throw new OpenClinicaSystemException("OCRERR_0034");

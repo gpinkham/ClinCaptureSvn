@@ -158,17 +158,14 @@ public class RulesPostImportContainerService {
 							} else if (persistentruleSetRuleBean.getStatus() != Status.DELETED
 									&& ruleSetRuleBean.getRuleBean() != null
 									&& ruleSetRuleBean.getRuleBean().equals(persistentruleSetRuleBean.getRuleBean())) {
-								// persistentruleSetRuleBean.setActions(ruleSetRuleBean.getActions());
 								persistentruleSetRuleBean
 										.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
-								// itr.remove();
 								break;
 							}
 							ruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.LINE);
 						}
 					}
 					ruleSetBeanWrapper.getAuditableBean().addRuleSetRules(importedRuleSetRules);
-					// ruleSetBeanWrapper.getAuditableBean().setId(persistentRuleSetBean.getId());
 				} else {
 					if (importContainer.getValidRuleSetExpressionValues().contains(
 							ruleSetBeanWrapper.getAuditableBean().getTarget().getValue())) {

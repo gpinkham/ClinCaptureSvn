@@ -269,7 +269,7 @@ $(function() {
 		createDraggable({
 
 			element: $(this),
-			target: $(".group")
+			target: ".group, .value"
 		});
 	})
 
@@ -294,6 +294,11 @@ $(function() {
 	createDroppable({
 		element: $(".dest"),
 		accept: "div[id='items'] td"
+	})
+
+	createDroppable({
+		element: $(".value"),
+		accept: "div[id='data'] p, div[id='items'] td"
 	})
 
 	// ======================= End of creating droppables =======================

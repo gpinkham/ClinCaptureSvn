@@ -44,6 +44,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
@@ -55,6 +56,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.ActionType;
@@ -82,10 +84,8 @@ public class StudiesServlet extends HttpServlet {
 
 		try {
 
+			DataSource datasource = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(DataSource.class);
 			if ("fetch".equals(action)) {
-
-				DataSource datasource = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(
-						DataSource.class);
 
 				JSONArray studies = new JSONArray();
 
@@ -211,10 +211,10 @@ public class StudiesServlet extends HttpServlet {
 				writer.write(xWriter.getBuffer().toString());
 
 			} else if ("edit".equals(action)) {
-
+				
 				RuleDao dao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(RuleDao.class);
 				RuleSetRuleDao rDao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(RuleSetRuleDao.class);
-
+				
 				JSONObject object = new JSONObject();
 				RuleBean rule = dao.findById(Integer.parseInt(request.getParameter("id")));
 
@@ -261,7 +261,14 @@ public class StudiesServlet extends HttpServlet {
 							
 							dest.put("id", bean.getId());
 							dest.put("oid", bean.getOid());
-							dest.put("value", bean.getValue());
+							
+							if (bean.getValue() == null && bean.getValueExpression() != null) {
+								
+								dest.put("item", true);
+								dest.put("value", bean.getValueExpression().getValue());
+							} else {
+								dest.put("value", bean.getValue());
+							}
 							
 							destinations.put(dest);
 						}
@@ -434,25 +441,27 @@ public class StudiesServlet extends HttpServlet {
 		return versions;
 	}
 
-	private JSONArray getCRFVersionItems(CRFVersionBean cf, DataSource datasource) throws Exception {
+	private JSONArray getCRFVersionItems(CRFVersionBean crfVersion, DataSource datasource) throws Exception {
 
 		JSONArray items = new JSONArray();
 		ItemDAO crfDAO = new ItemDAO(datasource);
+		
 		ItemGroupDAO itemGroupDAO = new ItemGroupDAO(datasource);
+		ItemGroupMetadataDAO itemGroupMetaDAO = new ItemGroupMetadataDAO(datasource);
 		ItemFormMetadataDAO itemFormMetaDataDAO = new ItemFormMetadataDAO(datasource);
 
-		List<ItemBean> crfItems = (List<ItemBean>) crfDAO.findAllItemsByVersionId(cf.getId());
+		List<ItemBean> crfItems = (List<ItemBean>) crfDAO.findAllItemsByVersionId(crfVersion.getId());
 
 		for (ItemBean item : crfItems) {
 
 			JSONObject obj = new JSONObject();
 
 			// Item group
-			ItemGroupBean itemGroup = itemGroupDAO.findByItemAndCRFVersion(item, cf);
+			ItemGroupBean itemGroup = itemGroupDAO.findByItemAndCRFVersion(item, crfVersion);
 
 			// Form meta data
 			ItemFormMetadataBean itemFormMetaData = itemFormMetaDataDAO.findByItemIdAndCRFVersionId(item.getId(),
-					cf.getId());
+					crfVersion.getId());
 
 			obj.put("id", item.getId());
 			obj.put("oid", item.getOid());
@@ -461,6 +470,11 @@ public class StudiesServlet extends HttpServlet {
 			obj.put("type", item.getDataType().getName());
 			obj.put("description", item.getDescription());
 			obj.put("ordinal", itemFormMetaData.getOrdinal());
+			
+			ItemGroupMetadataBean itemGroupMeta = (ItemGroupMetadataBean) itemGroupMetaDAO.findByItemAndCrfVersion(item.getId(), crfVersion.getId());
+			if (itemGroupMeta.isRepeatingGroup()) {
+				obj.put("repeat", true);
+			}
 
 			items.put(obj);
 		}
@@ -638,8 +652,20 @@ public class StudiesServlet extends HttpServlet {
 				Element destProp = document.createElement("DestinationProperty");
 
 				destProp.setAttribute("OID", dest.getString("oid"));
-				destProp.setAttribute("Value", dest.getString("value"));
-
+				
+				if (dest.has("item") && dest.getBoolean("item")) {
+					
+					Element valueExpression = document.createElement("ValueExpression");
+					
+					valueExpression.setAttribute("Context", "OC_RULES_V1");
+					valueExpression.setTextContent(dest.getString("value"));
+					
+					destProp.appendChild(valueExpression);
+					
+				} else {
+					destProp.setAttribute("Value", dest.getString("value"));
+				}
+				
 				action.appendChild(destProp);
 			}
 			

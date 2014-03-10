@@ -647,7 +647,7 @@ function createToolTip(params) {
 function createAlert(text) {
 
 	var div = createDiv({
-		divClass: "alert alert-danger"
+		divClass: "alert alert-danger input-sm"
 	}).text(text);
 
 	var a = $("<a>");
@@ -745,6 +745,10 @@ function createDroppable(params) {
 			} else if (parser.isNumber(ui.draggable)) {
 
 				handleNumberDrop(params.element);
+
+			} else if (parser.isEmpty(ui.draggable)) {
+
+				params.element.append('""');				
 
 			} else {
 
@@ -948,7 +952,7 @@ function handleDateDrop(element) {
 
 			} else {
 
-				element.text("Data");
+				element.text("Select Date");
 			}
 		})
 	} else {
@@ -1228,7 +1232,7 @@ function loadStudyEvents(study) {
 			}
 
 			var tdIdentifier = $("<td>");
-			tdIdentifier.text(studyEvent.identifier);
+			tdIdentifier.text(studyEvent.oid);
 
 			tr.append(tdName);
 			tr.append(tdDescription);

@@ -359,3 +359,7 @@ body .modal-dialog {
 div {
   word-wrap: break-word;  
 }
+
+.invalid {
+  border-color: #FF4719 !important;
+}
