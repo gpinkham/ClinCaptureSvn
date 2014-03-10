@@ -6,6 +6,8 @@ import com.clinovo.model.Widget;
 import com.clinovo.model.WidgetsLayout;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
+
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -258,6 +261,35 @@ public class WidgetsLayoutController {
 		model.addAttribute("eventCompletionHasNext", hasNext);
 		model.addAttribute("eventCompletionHasPrevious", hasPrevious);
 		model.addAttribute("eventCompletionLastElement", displayFrom);
+
+		return page;
+	}
+
+	@RequestMapping("/initSubjectStatusCount")
+	public String initSubjectStatusCountWidget(HttpServletRequest request, HttpServletResponse response, Model model)
+			throws IOException {
+
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Pragma", "no-cache");
+		response.setDateHeader("Expires", -1);
+		response.setHeader("Cache-Control", "no-store");
+
+		ResourceBundleProvider.updateLocale(request.getLocale());
+
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+
+		int availableSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.AVAILABLE);
+		int removedSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.DELETED);
+		int lockedSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.LOCKED);
+		int signedSubjects = studySubjectDAO.getCountofStudySubjectsBasedOnStatus(sb, Status.SIGNED);
+
+		model.addAttribute("countOfAvailableSubjects", availableSubjects);
+		model.addAttribute("countOfRemovedSubjects", removedSubjects);
+		model.addAttribute("countOfLockedSubjects", lockedSubjects);
+		model.addAttribute("countOfSignedSubjects", signedSubjects);
+
+		String page = "widgets/includes/subjectStatusCountChart";
 
 		return page;
 	}

@@ -26,7 +26,13 @@
 	<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/css/charts.css" type="text/css"/>
 	<link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
 	<link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
-	
+
+	<script type="text/javascript" src="includes/jmesa/jsapi"></script>
+	<script type="text/javascript">
+		google.load('visualization', '1.0', {
+			'packages' : [ 'corechart' ]
+		});
+	</script>
 	<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 	<!--<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui-1.10.4.custom.min.js"></script>-->
 	<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>

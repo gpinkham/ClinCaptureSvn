@@ -18,7 +18,13 @@ if (!Array.prototype.forEach) {
 		for ( var i = 0, len = this.length; i < len; ++i) {
 			fn.call(scope, this[i], i, this);
 		}
-	}
+	};
+}
+
+if (typeof String.prototype.trim !== 'function') {
+	String.prototype.trim = function() {
+		return this.replace(/^\s+|\s+$/g, '');
+	};
 }
 
 function inicializeDnD() {
@@ -188,6 +194,68 @@ function initEventsCompletionWidget(action) {
 		}
 	});
 }
+
+function initSubjectStatusCount() {
+	var url = getCurentUrl();
+
+	$.ajax({
+		type : "POST",
+		url : url + "initSubjectStatusCount",
+		data : {},
+		success : function(html) {
+
+		$(".subject_status_count #subject_status_count_container")
+				.html(html);
+					
+		var element = document.getElementById('toolbar');
+		var data = new google.visualization.DataTable();
+		var availableSubjects = parseInt($("form#subjects_status_count #ssc_available").val());
+		var signedSubjects = parseInt($("form#subjects_status_count #ssc_signed").val());
+		var removedSubjects = parseInt($("form#subjects_status_count #ssc_removed").val());
+		var lockedSubjects = parseInt($("form#subjects_status_count #ssc_locked").val());
+		var totalSubjectsCount = availableSubjects + signedSubjects + removedSubjects + lockedSubjects;
+
+		if (totalSubjectsCount!=0){
+			data.addColumn('string', 'Statuses');
+			data.addColumn('number', 'Count');
+	
+			data.addRows([ [ ' - Available', availableSubjects ],
+			               [ ' - Signed', signedSubjects ], 
+			               [ ' - Removed', removedSubjects ],
+			               [ ' - Locked', lockedSubjects ] ]);
+	
+	
+			var options = getPieOptions([ '#a6c1dd', '#32a656','#ff0000', '#789EC5' ]);
+			var subjectStatusChart = new google.visualization.PieChart(document.getElementById('chart_div'));
+	
+			subjectStatusChart.draw(data, options);
+	
+			if (!element) {
+	
+				function selectHandler() {
+					var selectedItem = subjectStatusChart.getSelection()[0];
+	
+					if (selectedItem) {
+						var statusName = data.getValue(selectedItem.row, 0)
+								.toString().split('-')[1].trim().toLowerCase();
+						
+						window.location.href = "ListStudySubjects?module=admin&maxRows=15&showMoreLink=false&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=15&findSubjects_f_studySubject.status="
+								+ statusName;
+					}
+				}
+	
+				google.visualization.events.addListener(subjectStatusChart, 'select', selectHandler);
+			}
+		} else {
+			$("#subject_status_count_container").attr("height","50px");
+		}
+	},
+	error : function(e) {
+			console.log("Error:" + e);
+		}
+	});
+}
+
 /* /Initialization of widgets */
 
 /* Supporting functions */
@@ -238,6 +306,42 @@ function setStacksLenghts(selector, values, captionLimit) {
 
 				counter++;
 			});
+}
+
+function getPieOptions(sliceColors) {
+	var options = {
+		width : 450,
+		height : 200,
+		legend : {
+			position : 'right',
+			alignment : 'center',
+			textStyle : {
+				color : '#4D4D4D'
+			}
+		},
+		pieSliceText : 'percents',
+		pieStartAngle : 0,
+		chartArea : {
+			left : 10,
+			top : 20,
+			right : 20,
+			width : "85%",
+			height : "85%"
+		},
+		colors : sliceColors,
+		fontSize : 11,
+		fontName : 'Tahoma',
+		tooltip : {
+			textStyle : {
+				color : '#4D4D4D',
+				fontName : 'Tahoma',
+				fontSize : 11,
+				showColorCode : false
+			}
+		}
+	};
+
+	return options;
 }
 
 function getCurentUrl() {

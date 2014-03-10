@@ -224,7 +224,7 @@ form#actionForSave input {
 	display: none;
 }
 
-.widget form#events_completion_form {
+.widget form.hidden {
 	display: none;
 }
 

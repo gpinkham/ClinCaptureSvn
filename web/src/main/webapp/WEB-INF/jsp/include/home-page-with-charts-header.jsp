@@ -26,7 +26,13 @@
 	<link rel="stylesheet" href="../includes/styles.css" type="text/css"/>
 	<link rel="stylesheet" href="../includes/css/charts.css" type="text/css"/>
 	<link rel="stylesheet" type="text/css" media="all" href="../includes/new_cal/skins/aqua/theme.css" title="Aqua" />
-	
+
+	<script type="text/javascript" src="../includes/jmesa/jsapi"></script>
+	<script type="text/javascript">
+		google.load('visualization', '1.0', {
+			'packages' : [ 'corechart' ]
+		});
+	</script>
 	<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.11.0.min.js"></script>	
 	<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-ui-1.10.4.custom.min.js"></script>
 	<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-migrate-1.2.1.min.js"></script>

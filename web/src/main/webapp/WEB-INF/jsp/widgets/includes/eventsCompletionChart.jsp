@@ -20,7 +20,7 @@
 	</c:forEach>
 </div>
 
-<form id="events_completion_form">
+<form id="events_completion_form" class="hidden">
 	<input type="text" id="ec_has_next" value="${eventCompletionHasNext}" /> 
 	<input type="text" id="ec_has_previous" value="${eventCompletionHasPrevious}" />
 	<input type="text" id="ec_last_element" value="${eventCompletionLastElement}" />
