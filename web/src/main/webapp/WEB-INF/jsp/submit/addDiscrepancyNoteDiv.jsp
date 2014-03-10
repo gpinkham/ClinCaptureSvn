@@ -105,7 +105,7 @@ $(document).ready(function() {
 	
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">
-
+<br>
 	<div class="dnBoxCol1 dnBoxText"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
 	<div class="dnBoxCol2 dnBoxText">
 		<c:if test="${isRFC}">
@@ -260,14 +260,16 @@ $(document).ready(function() {
 
     <c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 	<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
-        <c:choose>
+        <div align="right">
+		<c:choose>
             <c:when test="${writeToDB eq '1'}">
-                <div class="dnBoxCol2"><input type="button" name="SubmitExit" onclick="javascript: $('#typeId option').removeAttr('disabled');sendFormDataViaAjax();" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></div>
+                <input type="button" name="SubmitExit" onclick="javascript: $('#typeId option').removeAttr('disabled');sendFormDataViaAjax();" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');">
             </c:when>
             <c:otherwise>
-                <div class="dnBoxCol2"><input type="button" name="Submit" onclick="javascript: sendFormDataViaAjax();" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></div>
+                <input type="button" name="Submit" onclick="javascript: sendFormDataViaAjax();" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
             </c:otherwise>
         </c:choose>
+		</div>
     </c:if>
 </div>
 </div></div></div></div></div></div></div>

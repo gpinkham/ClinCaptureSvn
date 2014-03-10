@@ -229,7 +229,6 @@ $(document).ready(function() {
 	<td valign="top">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center" style="width: 580px;">
-	<table border="0">
 		<c:if test="${parentId>0}">
 			<div style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
 		</c:if>
@@ -425,22 +424,19 @@ $(document).ready(function() {
 			<div class="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>:</div>
 			<div class="dnBoxCol2"><input name="sendEmail${parentId}" value="1" type="checkbox"/></div>
 		</span>
-	<c:if test="${not showStatus}"> </div> </c:if>
+		<c:if test="${not showStatus}"> </div> </c:if>
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 		<c:if test="${(enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData')}">
-		<span id="user3${parentId}" style="display:block">
-			<div class="dnBoxCol3" style="margin-right: -10px; margin-top: -25px;">
-				<input type="button" id="submitBtn${parentId}" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled');this.form.submit();">
-				<input type="button" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled'); sendFormDataViaAjax(${parentId});">
-			</div>
-		</span>	
+		<div align="right">
+			<input type="button" id="submitBtn${parentId}" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled');this.form.submit();">
+			<input type="button" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');setYPos('<c:out value="${parentId}"/>');$('select option[selected]').removeAttr('disabled'); sendFormDataViaAjax(${parentId});">
+		</div>
 		</c:if>
 		<c:if test="${parentId==0}">
-				<div style="float:left">
-                	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${parentId}"/></jsp:include>	
-                </div>
+			<div style="float:left">
+               	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${parentId}"/></jsp:include>	
+            </div>
 		</c:if>
-	</table>
     </div>
 	</div></div></div></div></div></div></div>
 	</td>

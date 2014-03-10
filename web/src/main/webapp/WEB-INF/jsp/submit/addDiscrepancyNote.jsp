@@ -347,9 +347,10 @@ $(document).ready(function() {
 <h3 class="title_manage"><fmt:message key="add_note" bundle="${resword}"/></h3>
 
 <!-- dn box -->
-<div id="ajax-loader" style="width: 418; height: 200; display: none;" align="center"><img src="images/ajax-loader-blue.gif"/></div>
-<div id="divWithData" style="width: 418;">	
+<div id="ajax-loader" style="width: 580; height: 200; display: none;" align="center"><img src="images/ajax-loader-blue.gif"/></div>
+<div id="divWithData" style="width: 580;">	
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<br>
 <div class="textbox_center">
 
 	<div class="dnBoxCol1 dnBoxText"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
@@ -502,18 +503,20 @@ $(document).ready(function() {
 	<div class="dnBoxCol1 dnBoxText"><fmt:message key="email_assigned_user" bundle="${resword}"/>:</div>
 	<div class="dnBoxCol2 dnBoxText"><input name="sendEmail" value="1" type="checkbox"/></div>
 	</span>
-<c:if test="${not showStatus}"> </div>  </c:if>
+	<c:if test="${not showStatus}"> </div>  </c:if>
 
     <c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 	<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
-        <c:choose>
+        <div align="right">
+		<c:choose>
             <c:when test="${writeToDB eq '1'}">
-                <div class="dnBoxCol2"><input type="button" name="SubmitExit" onclick="javascript: $('#typeId option').removeAttr('disabled'); sendFormDataViaAjax();" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium"></div>
+                <input type="button" name="SubmitExit" onclick="javascript: $('#typeId option').removeAttr('disabled'); sendFormDataViaAjax();" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium">
             </c:when>
             <c:otherwise>
-                <div class="dnBoxCol2"><input type="button" name="Submit" onclick="javascript: sendFormDataViaAjax();" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></div>
+                <input type="button" name="Submit" onclick="javascript: sendFormDataViaAjax();" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
             </c:otherwise>
         </c:choose>
+		</div>
     </c:if>
 </div>
 </div></div></div></div></div></div></div>
