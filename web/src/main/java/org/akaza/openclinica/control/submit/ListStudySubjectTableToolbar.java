@@ -74,11 +74,11 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
 		public String enabled() {
 			HtmlBuilder html = new HtmlBuilder();
 			if (showMoreLink) {
-				html.a().id("showMore").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);")
+				html.a().id("showMore").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);onInvokeAction('findSubjects','filter');")
 						.close();
 				html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
 				html.a().id("hide").style("display: none;")
-						.href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);").close();
+						.href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);onInvokeAction('findSubjects','filter');").close();
 				html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
 				html.script()
@@ -87,10 +87,10 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
 						.append("$(document).ready(function(){ "
 								+ "hideCols('findSubjects',[" + getIndexes() + "],false);});").scriptEnd();
 			} else {
-				html.a().id("hide").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);").close();
+				html.a().id("hide").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);onInvokeAction('findSubjects','filter');").close();
 				html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 				html.a().id("showMore").style("display: none;")
-						.href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);").close();
+						.href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);onInvokeAction('findSubjects','filter');").close();
 				html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
 			}
 			return html.toString();
