@@ -478,6 +478,17 @@ public abstract class Controller extends BaseController {
 		StudyBean currentStudy = getCurrentStudy(request);
 		if (currentStudy != null) {
 			currentStudy = (StudyBean) getStudyDAO().findByPK(currentStudy.getId());
+			StudyDAO sdao = getStudyDAO();
+			StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
+			ArrayList studyParameters = spvdao.findParamConfigByStudy(currentStudy);
+			currentStudy.setStudyParameters(studyParameters);
+			StudyConfigService scs = getStudyConfigService();
+			if (currentStudy.getParentStudyId() <= 0) {
+				scs.setParametersForStudy(currentStudy);
+			} else {
+				currentStudy.setParentStudyName((sdao.findByPK(currentStudy.getParentStudyId())).getName());
+				scs.setParametersForSite(currentStudy);
+			}
 			request.getSession().setAttribute("study", currentStudy);
 		}
 		return currentStudy;
