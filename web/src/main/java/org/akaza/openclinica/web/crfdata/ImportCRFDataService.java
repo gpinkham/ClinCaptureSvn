@@ -136,13 +136,21 @@ public class ImportCRFDataService {
 			throws OpenClinicaException {
 		String subjectOid = subjectDataBean.getSubjectOID();
 		String studySubjectId = subjectDataBean.getStudySubjectId();
+		String idSetting = studyBean.getStudyParameterConfig().getSubjectIdGeneration();
 		if (subjectOid == null || subjectOid.trim().isEmpty()) {
+			if (!idSetting.equals("manual") && studySubjectId != null && !studySubjectId.trim().isEmpty()) {
+				MessageFormat mf = new MessageFormat("");
+				mf.applyPattern(respage.getString("study_subject_id_should_be_empty"));
+				Object[] arguments = { studySubjectId };
+				errors.add(mf.format(arguments));
+				logger.debug("Study subject id should be empty");
+				throw new OpenClinicaException("Study subject id should be empty", "");
+			}
 			studySubjectId = studySubjectIdService.getNextStudySubjectId(studyBean.getName());
 			subjectOid = "SS_" + studySubjectId.replaceAll(" |-", "").toUpperCase();
 			if (studySubjectDAO.findByOid(subjectOid) != null) {
 				return createStudySubject(ub, studyBean, subjectDataBean, subjectDAO, studySubjectDAO, errors);
 			}
-			String idSetting = studyBean.getStudyParameterConfig().getSubjectIdGeneration();
 			if (idSetting.equals("manual")) {
 				studySubjectId = subjectDataBean.getStudySubjectId();
 				if (studySubjectDAO.findByLabelAndStudy(studySubjectId, studyBean).getId() > 0) {
