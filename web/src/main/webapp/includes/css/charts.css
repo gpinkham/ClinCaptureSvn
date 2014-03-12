@@ -178,6 +178,11 @@ form#actionForSave input {
 	width: 360px;
 }
 
+.widget .events_completion table.signs {
+	margin-top: 25px;
+	margin-bottom: 27px;
+}
+
 .widget table.signs td {
 	vertical-align: middle;
 }
