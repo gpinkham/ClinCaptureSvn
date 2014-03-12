@@ -66,6 +66,7 @@ public abstract class AbstractTableFactory {
 		locale = request.getLocale();
 		TableFacade tableFacade = getTableFacadeImpl(request, response);
 		setStateAttr(tableFacade);
+		tableFacade.setStateAttr("restore");
 		setDataAndLimitVariables(tableFacade);
 		configureTableFacade(response, tableFacade);
 		if (!tableFacade.getLimit().isExported()) {

@@ -277,7 +277,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			int totalRows = getRuleSetService().getCountWithFilter(viewRuleAssignmentFilter);
 			tableFacade.setTotalRows(totalRows);
 		}
-
+		
 		int rowStart = limit.getRowSelect().getRowStart();
 		int rowEnd = limit.getRowSelect().getRowEnd();
 		Collection<RuleSetRuleBean> items = getRuleSetService().getWithFilterAndSort(viewRuleAssignmentFilter,

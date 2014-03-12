@@ -250,7 +250,7 @@
                     <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userBean.name == 'root')}">
                     </c:when>
                     <c:otherwise>
-                        <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
+                        <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true&restore=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
                     </c:otherwise>
                 </c:choose>
             </div>

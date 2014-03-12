@@ -120,7 +120,7 @@ public class ViewRuleAssignmentNewServlet extends Controller {
 
 		// Datasource needed for pulling extra model objects from db
 		factory.setDataSource(getDataSource());
-
+		
 		factory.setCurrentUser(((UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME)));
 
 		String ruleAssignmentsHtml = factory.createTable(request, response).render();

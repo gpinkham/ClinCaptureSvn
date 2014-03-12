@@ -522,7 +522,7 @@
 	<td><input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" title="<fmt:message key="test_rule2" bundle="${resword}"/>" class="button_medium" size="50""/>
 	</td>
 	
-	<td><input type="button" name="Exit" onClick="window.location.href='ViewRuleAssignment?read=true'" value="<fmt:message key="exit" bundle="${resword}"/>" title="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" size="50""/>
+	<td><input type="button" name="Exit" onClick="window.location.href='ViewRuleAssignment?read=true&restore=true'" value="<fmt:message key="exit" bundle="${resword}"/>" title="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" size="50""/>
 	</td>
     </tr>
 
