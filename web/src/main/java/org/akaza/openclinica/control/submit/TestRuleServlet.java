@@ -113,13 +113,12 @@ public class TestRuleServlet extends Controller {
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		StudyBean initialStudy = getCurrentStudy(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        
-        if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty()) && currentStudy.getId() != Integer.parseInt(request.getParameter("study"))) {
-        	
-        	currentStudy = (StudyBean) getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study")));
-        }
+		// Reset the study if RS is testing a rule for a different study
+		if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty()) && getCurrentStudy(request).getId() != Integer.parseInt(request.getParameter("study"))) {
+			request.getSession().setAttribute(STUDY, (StudyBean) getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study"))));
+		}
+
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		String action = request.getParameter("action");
@@ -141,11 +140,9 @@ public class TestRuleServlet extends Controller {
 				setPresetValues(presetValues, request);
 				request.getSession().setAttribute("testRuleActions", rsr.getActions());
                 request.getSession().setAttribute("testRulesTarget", rsr.getRuleSetBean().getTarget().getValue());
-				System.out.println("trying to set: " + rsr.getRuleSetBean().getTarget().getValue());
 				request.setAttribute("ruleSetRuleId", ruleSetRuleId);
 				request.setAttribute("ruleSetId", rsr.getRuleSetBean().getId());
-				ItemBean item = getExpressionService(currentStudy).getItemBeanFromExpression(
-						rsr.getRuleSetBean().getTarget().getValue());
+				ItemBean item = getExpressionService(currentStudy).getItemBeanFromExpression(rsr.getRuleSetBean().getTarget().getValue());
 				request.setAttribute("itemName", item.getName());
 				request.setAttribute("itemDefinition", item.getDescription());
 				request.setAttribute("ruleSetRuleAvailable", true);
@@ -183,9 +180,6 @@ public class TestRuleServlet extends Controller {
 				populateTooltip(request, result);
 				request.getSession().setAttribute("testValues", result);
 				populteFormFields(fp);
-				
-				// Reset study
-				currentStudy = initialStudy;
 				
 				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")) {
 					

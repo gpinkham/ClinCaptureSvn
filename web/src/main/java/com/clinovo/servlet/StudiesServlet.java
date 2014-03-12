@@ -506,7 +506,7 @@ public class StudiesServlet extends HttpServlet {
 		List<String> oids = ruleDAO.findRuleOIDs();
 		if (oids != null && !oids.isEmpty()) {
 			
-			oid = oid + new Random().nextInt(110 - 10 + 1) + 10;
+			oid = oid + "_" + new Random().nextInt(110 - 10 + 1) + 10;
 			oid = checkOIDAvailability(oid, oids);
 
 		} else {

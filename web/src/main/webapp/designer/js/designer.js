@@ -24,11 +24,9 @@
  *
  * ============================================= */
 function createDiv(params) {
-
 	var div = $("<div/>");
 	div.attr("id", params.id);
 	div.addClass(params.divClass);
-
 	return div;
 }
 
@@ -43,14 +41,10 @@ function createDiv(params) {
  * Returns the created button
  * ============================================== */
 function createButton(params) {
-
 	var btn = $("<button/>");
-
 	btn.attr("id", params.id);
 	btn.addClass(params.btnClass);
-
 	btn.text(params.text);
-
 	return btn;
 }
 
@@ -64,14 +58,9 @@ function createButton(params) {
  * Returns the created control
  * ========================================================================= */
 function createInput(params) {
-
-	// Question type text box
 	var input = $("<input/>");
-
 	input.attr("id", params.id);
-
 	input.attr("type", params.type);
-
 	return input;
 }
 
@@ -88,25 +77,18 @@ function createInput(params) {
 function createTable(params) {
 
 	var table = $("<table>");
-
 	table.addClass("table table-condensed table-bordered table-responsive table-hover");
-
 	var thead = $("<thead>");
-	
 	var thRow = $("<tr>");
 
 	for (var x = 0; x < params.length; x++) {
-
-		var th = $("<th>")
-		th.text(params[x])
-
-		thRow.append(th)
+		var th = $("<th>");
+		th.text(params[x]);
+		thRow.append(th);
 	}
-
-	thead.append(thRow)
-	table.append(thead)
+	thead.append(thRow);
+	table.append(thead);
 	table.append($("<tbody>"))
-
 	return table
 }
 
@@ -128,55 +110,41 @@ function createBreadCrumb(params) {
 	ol.addClass("breadcrumb");
 
 	var studyCrumb = $("<li>");
-
 	var studyLink = $("<a>");
 	studyLink.text(params.study);
 	studyLink.click(function() {
-
 		$("a[href='#studies']").tab('show');
-	})
+	});
 
 	studyCrumb.append(studyLink);
-
 	if (params.event) {
 
 		ol.find(".active").removeClass(".active");
-
 		var eventCrumb = $("<li>");
-
 		var eventLink = $("<a>");
 		eventLink.text(params.event);
 		eventLink.click(function() {
-
 			$("a[href='#events']").tab('show');
-		})
+		});
 
 		eventCrumb.addClass("active");
-
 		eventCrumb.append(eventLink);
 		ol.append(eventCrumb);
-
 	} else {
-
 		studyCrumb.addClass("active");
 	}
 
 	if (params.crf) {
 
 		ol.find(".active").removeClass(".active");
-
 		var crfCrumb = $("<li>");
-
 		var crfLink = $("<a>");
 		crfLink.text(params.crf);
 		crfLink.click(function() {
-
 			$("a[href='#crfs']").tab('show');
-		})
-
+		});
 		crfCrumb.addClass("active");
-
-		crfCrumb.append(crfLink)
+		crfCrumb.append(crfLink);
 		ol.append(crfCrumb);
 	}	
 
@@ -185,24 +153,18 @@ function createBreadCrumb(params) {
 		ol.find(".active").removeClass(".active");
 
 		var versionCrumb = $("<li>");
-
 		var versionLink = $("<a>");
 		versionLink.text(params.version);
 		versionLink.click(function() {
-
 			$("a[href='#versions']").tab('show');
-		})
-
+		});
 		versionCrumb.addClass("active");
-
-		versionCrumb.append(versionLink)
+		versionCrumb.append(versionLink);
 		ol.append(versionCrumb);
 	}
 
 	ol.prepend(studyCrumb);
-	
 	$("#data").find(".panel-body").append(ol);
-
 	return ol;
 }
 
@@ -214,7 +176,6 @@ function createBreadCrumb(params) {
  *
  * ========================================================================= */
 function resetBuildControls(parentDiv) {
-
 	parentDiv.children("div").not(".pull-right").remove();
 	parentDiv.append(createStartExpressionDroppable());
 }
@@ -233,7 +194,6 @@ function createPagination(params) {
 
 	params.div.find(".pagination").remove();
 	if (params.itemsArr.length > 1) {
-
 		var ul = $("<ul>");
 		ul.addClass("pagination");
 
@@ -243,41 +203,29 @@ function createPagination(params) {
 		var tt = unescape(JSON.parse('"\u00AB\u00AB"'));
 		aEL.text(tt);
 		aEL.click(function() {
-
 			if (currentPageIndex === 0) {
-
 				resetTable({
-
 					arr: params.itemsArr,
 					table: params.div.find("table"),
 					pagination: params.div.find(".pagination")
-					
-				})
+				});
 
 			} else if (currentPageIndex > 0) {
-		
 				currentPageIndex = currentPageIndex - 1;
-
 				resetTable({
-
 					arr: params.itemsArr,
 					table: params.div.find("table"),
 					pagination: params.div.find(".pagination")
-					
-				})
+				});
 			}
-
-		})
+		});
 
 		el.append(aEL);
 		ul.prepend(el);
 
-
 		var pager = $("<li>");
 		var pagerLink = $("<a>");
-
 		pagerLink.text(currentPageIndex + " of " + params.itemsArr.length);
-
 		pager.append(pagerLink);
 		ul.append(pager);
 
@@ -287,24 +235,18 @@ function createPagination(params) {
 		var tt = unescape(JSON.parse('"\u00BB\u00BB"'));
 		rAEL.text(tt);
 		rAEL.click(function() {
-
 			if (currentPageIndex < params.itemsArr.length - 1) {
-
 				currentPageIndex = currentPageIndex + 1;
 				resetTable({
-
 					arr: params.itemsArr,
 					table: params.div.find("table"),
 					pagination: params.div.find(".pagination")
-					
-				})
+				});
 			}
-
-		})
+		});
 
 		rEl.append(rAEL);
 		ul.append(rEl);
-
 		return ul
 	}
 }
@@ -320,19 +262,14 @@ function createPagination(params) {
 function resetTable(params) {
 
 	params.table.find("tbody > tr").remove();
-
 	var alphaArr = params.arr[currentPageIndex]
 	for (var chunk in alphaArr) {
-
 		var tr = alphaArr[chunk]
 		params.table.find("tbody").append(tr);
 	}
-
 	if (params.pagination) {
-
 		params.pagination.find("a:eq(1)").text(currentPageIndex + 1 + " of " + params.arr.length);
 	}	
-
 	$(params.table.parent()).html(params.itemsTable);
 }
 
@@ -346,16 +283,12 @@ function resetTable(params) {
  * Returns the created drop surface
  * ================================================= */
 function createDropSurface(params) {
-
 	var div = createDiv({
-
 		id: params.id,
 		divClass: "dotted-border init " + params.class
 
-	}).text(params.text)
-
+	}).text(params.text);
 	createPopover(div);
-
 	return div;	
 }
 
@@ -366,19 +299,14 @@ function createDropSurface(params) {
  * Returns the created drop surface
  * =================================================================================== */
 function createStartExpressionDroppable() {
-
 	var div = createDropSurface({
-
 		class: "group",
 		text: "Group or Data"
-	})
-
+	});
 	createDroppable({
-
 		element: div,
 		accept: "#leftParentheses, #rightParentheses, div[id='items'] td, div[id='data'] p"
-	})
-
+	});
 	return div;
 }
 
@@ -389,18 +317,14 @@ function createStartExpressionDroppable() {
  * Returns the created drop surface
  * ========================================================================= */
 function createSymbolDroppable() {
-
 	var div = createDropSurface({
-
 		class: "comp",
 		text: "Compare or Calculate"
-	})
-
+	});
 	createDroppable({
 		element: div,
 		accept: "div[id='compare'] p, div[id='calculate'] p"
-	})
-
+	});
 	return div;
 }
 
@@ -411,12 +335,10 @@ function createSymbolDroppable() {
  * Returns the created drop surface
  * =========================================================================== */
 function createRPARENDiv() {
-
 	return createDropSurface({
-
 		text: ")",
 		class: "group bordered"
-	})
+	});
 }
 
 /* =============================================================================
@@ -426,18 +348,14 @@ function createRPARENDiv() {
  * Returns the created drop surface
  * =========================================================================== */
 function createConditionDroppable() {
-
 	var div = createDropSurface({
-
 		class: "eval",
 		text: "Condition"
-	})
-
+	});
 	createDroppable({
 		element: div,
 		accept: "div[id='evaluate'] p"
-	})
-
+	});
 	return div;
 }
 
@@ -449,22 +367,16 @@ function createConditionDroppable() {
  *
  * =========================================================================== */
 function createPopover(droppable) {
-	
-	var btn = '<div type="button" class="pull-left space-right-m" onclick="addDroppable(this)"><span class="glyphicon glyphicon-pencil"></span></div><div class="pull-left space-right-m" type="button" onclick="x(this)"><span class="glyphicon glyphicon-trash"></span></div>'
-
+	var btn = '<div type="button" class="pull-left space-right-m" onclick="addDroppable(this)"><span class="glyphicon glyphicon-pencil"></span></div><div class="pull-left space-right-m" type="button" onclick="x(this)"><span class="glyphicon glyphicon-trash"></span></div>';
 	droppable.popover({
-
 		html: true,
 		content: btn,
 		placement: "top",
 		trigger: "manual",
 		container: droppable
-
 	}).click(function(evt) {
-
 		// existing
 		$(".popover").remove();
-
 		evt.stopPropagation();
 		$(this).popover('show');
 	});
@@ -481,10 +393,9 @@ function createPopover(droppable) {
 function addDroppable(popov) {
 
 	var drop = $(popov).parents(".dotted-border")[0];
-
 	var modalOuterDiv = createDiv({
 		divClass: "modal fade tops"
-	})
+	});
 
 	var modalDialog = createDiv({
 		divClass: "modal-dialog"
@@ -496,49 +407,35 @@ function addDroppable(popov) {
 
 	var div = createDiv(Object.create({
 		divClass: "modal-body"
-	}))
+	}));
 
 	var groupBtn = createButton({
-
 		text: "Group / Data",
 		btnClass: "btn btn-success space-right-m"
-
 	}).click(function() {
-
 		modalOuterDiv.remove();
-
 		var d = createStartExpressionDroppable();
-		
 		if ($(drop.previousSibling).is(".eval") || !$(drop.previousSibling).is(".dotted-border")) {
-
 			$(drop).before(d);
 			createPopover(d);
-
 		} else {
-
 			$(drop).after(d);
 			createPopover(d);
-
 		} 
-	})
+	});
 
 	var compBtn = createButton({
-
 		text: "Compare / Calculate",
 		btnClass: "btn btn-primary space-right-m"
-
 	}).click(function() {	
-
 		modalOuterDiv.remove();
 		var c = createSymbolDroppable();
 		if ($(drop).next().size() > 0) {
-
 			if (!$(drop).is(".eval") && !$(drop).is(".comp") && !$(drop).next().is(".comp") && !$(drop).next().is(".eval")) {
 				$(drop).after(c);
 				createPopover(c);
 			}
 		} else {
-
 			if (!$(drop).is(".eval") && !$(drop).is(".comp")) {
 				$(drop).after(c);
 				createPopover(c);
@@ -546,25 +443,20 @@ function addDroppable(popov) {
 				removeInsert(drop, c);
 			}
 		}
-	})
+	});
 
 	var evalBtn = createButton({
-
 		text: "Condition",
 		btnClass: "btn btn-warning"
-
 	}).click(function() {
-
 		modalOuterDiv.remove();
 		var eval = createConditionDroppable();
 		if ($(drop).next().size() > 0) {
-
 			if (!$(drop).is(".eval") && !$(drop).is(".comp") && !$(drop).next().is(".comp") && !$(drop).next().is(".eval")) {
 				$(drop).after(eval);
 				createPopover(eval);
 			}
 		} else {
-
 			if (!$(drop).is(".eval") && !$(drop).is(".comp")) {
 				$(drop).after(eval);
 				createPopover(eval);
@@ -572,26 +464,21 @@ function addDroppable(popov) {
 				removeInsert(drop, eval);
 			}
 		}
-	})
+	});
 
 	div.append(groupBtn);
 	div.append(compBtn);
 	div.append(evalBtn);
-
 	div.css("text-align", "center");
-
 	modalContent.append(div);
-
 	modalDialog.append(modalContent)
 	modalOuterDiv.append(modalDialog)
-
 	modalOuterDiv.modal({
 		backdrop: false
-	})
+	});
 }
 
 function removeInsert(drop, predicate) {
-
 	$(drop).after(predicate);
 	drop.remove();
 }
@@ -604,9 +491,7 @@ function removeInsert(drop, predicate) {
  * - popov - the pop over which invoked this function
  * =========================================================================== */
 function x(popov) {
-
 	if ($("#designSurface").find(".dotted-border").size() > 1) {
-
 		$(popov).parents(".dotted-border").remove();
 	}
 }
@@ -619,16 +504,12 @@ function x(popov) {
  * - title - the tool tip title
  * =============================================================== */
 function createToolTip(params) {
-
 	params.element.tooltip({
-		
 		container: "body",
 		title: params.title,
 		placement: "bottom",
 		trigger: "hover focus"
-
 	}).on('shown.bs.tooltip', function() {
-
 		setTimeout(function() {
 			$(".tooltip").remove();
 		}, 5000);
@@ -645,22 +526,18 @@ function createToolTip(params) {
  * * Returns the created alert
  * =============================================================== */
 function createAlert(text) {
-
 	var div = createDiv({
-		divClass: "alert alert-danger input-sm"
+		divClass: "alert alert-danger"
 	}).text(text);
 
 	var a = $("<a>");
 	a.addClass("close");
 	a.attr("data-dismiss", "alert");
 	a.text("x");
-
 	div.prepend(a);
-
 	setTimeout(function() {
 		$(".alert").alert('close');
-	}, 4000)
-
+	}, 5000);
 	return div;
 }
 
@@ -671,20 +548,15 @@ function createAlert(text) {
  * => response - The response from the server (must be a valid http response)
  * ========================================================================== */
 function handleErrorResponse(params) {
-
 	$(".spinner").remove();
-
 	if (params.response.status === 404) {
-
 		bootbox.alert({
 			backdrop: false,
 			message: "The server you are attempting to connect to appears to be unavailable at the moment. Please try again later!"
 		});
 
 	} else {
-
 		bootbox.alert({
-
 			backdrop: false,
 			message: params.response.responseText
 		});
@@ -699,9 +571,7 @@ function handleErrorResponse(params) {
  *  - target - the intend target[s] for this element
  * ========================================================================= */
 function createDraggable(params) {
-
 	$(params.element).draggable({
-
 		scroll: true,
 		cursor: "move",
 		helper: "clone",
@@ -709,7 +579,7 @@ function createDraggable(params) {
 		snapMode: "outer",
 		snap: params.target,
 		scrollSensitivity: 100
-	})
+	});
 }
 
 /* ====================================================================
@@ -722,44 +592,30 @@ function createDraggable(params) {
 function createDroppable(params) {
 
 	params.element.droppable({
-
 		accept: params.accept,
 		hoverClass: "ui-state-active",
-
-		drop: function(event, ui) {			
+		drop: function(event, ui) {	
 
 			var existingValue = params.element.val();
-
  			params.element.text("");
  			params.element.removeClass("init");
  			params.element.addClass("bordered");
 			
 			if (parser.isText(ui.draggable)) {
-
 				handleTextDrop(params.element);
-				
 			} else if (parser.isDate(ui.draggable)) {
-
 				handleDateDrop(params.element);
-
 			} else if (parser.isNumber(ui.draggable)) {
-
 				handleNumberDrop(params.element);
-
 			} else if (parser.isEmpty(ui.draggable)) {
-
 				params.element.append('""');				
-
 			} else {
-
 				params.element.append(ui.draggable.text());
 			}
 
 			params.element.tooltip("hide");
-
 			// Create the next droppable
 			parser.createNextDroppable({
-
 				ui: ui,
 				element: params.element,
 				existingValue: existingValue
@@ -771,79 +627,56 @@ function createDroppable(params) {
 
 	function isDate(val) {
 		var d = new Date(val);
-		return !isNaN(d.valueOf());
+		return !isNaN(d.valueOf()) && d.__proto__ != "Invalid Date";
 	}
 
 	params.element.dblclick(function() {
 
 		params.element.tooltip("hide");
-		params.element.removeClass("init");
  		params.element.addClass("bordered");
-
 		var input = $("<input>");
-
 		if (isDate($(this).text())) {
 
 			input.attr("type", "date");
 			input.val($(this).text());
-
 			var msie = window.navigator.userAgent.indexOf('MSIE ');
 			var trident = window.navigator.userAgent.indexOf('Trident/');
-
 			if (typeof InstallTrigger !== 'undefined' || msie > 0 || trident > 0) {
-
 				input.data({date: new Date(input.val())}).datepicker('update').children("input").val(new Date(input.val()));
-
 				input.datepicker().on("hide", function() {
-
 					if ($(this).val()) {
-
 						params.element.text($(this).val());
 					} 
 				});
 			} else {
-				
 				input.blur(function() {
-
 					if ($(this).val()) {
-
 						params.element.text($(this).val());
-
 					} else {
-
 						params.element.text("Data");
 					}
-
 					$(this).remove();
 				});
 			}
 		} else {
-
 			input.val($(this).text());
 			input.blur(function() {
-
 				if ($(this).val()) {
-
 					params.element.text($(this).val());
-
 				} else {
-
 					params.element.text("Data");
 				}
-
 				$(this).remove();
 			});
 		}
 
 		input.css({
-
 			"text-align": "center",
 			"display": "table-cell"
-		})
+		});
 
 		$(this).text("");
 		$(this).append(input);
-
 
 		// focus/select
 		input.focus(); 
@@ -870,18 +703,13 @@ function handleTextDrop(element) {
 	var newInput = $("<input>");
 	newInput.attr("type", "text");
 	newInput.addClass("input-sm");
-
 	newInput.blur(function() {
-
 		if ($(this).val()) {
-
 			element.text('"' + $(this).val() + '"');
-
 		} else {
-
 			element.text('"Data"');
 		}
-	})
+	});
 
 	element.append(newInput);
 	newInput.focus();
@@ -900,23 +728,16 @@ function handleTextDrop(element) {
 function handleNumberDrop(element) {
 
 	var newInput = $("<input>");
-
 	newInput.attr("type", "number");
-
 	newInput.addClass("input-sm");
-
 	newInput.blur(function() {
-
 		if ($(this).val() && /[0-9]|\./.test($(this).val())) {
-
 			element.text($(this).val());
-
 		} else {
-
 			element.text("Number");
 			$("#designSurface").find(".panel-body").prepend(createAlert("Please enter a number"));
 		}
-	})
+	});
 
 	element.append(newInput);
 	newInput.focus();
@@ -940,37 +761,23 @@ function handleDateDrop(element) {
 
     var msie = window.navigator.userAgent.indexOf('MSIE ');
     var trident = window.navigator.userAgent.indexOf('Trident/');
-
-	// FF
 	if (typeof InstallTrigger !== 'undefined' || msie > 0 || trident > 0) {
-
 		newInput.datepicker().on("hide", function() {
-
 			if ($(this).val()) {
-
 				element.text($(this).val());
-
 			} else {
-
 				element.text("Select Date");
 			}
-		})
+		});
 	} else {
-
-		// Webkit browsers
 		newInput.blur(function() {
-
 			if ($(this).val()) {
-
 				element.text($(this).val());
-
 			} else {
-
 				element.text("Data");
 			}
-		})
+		});
 	}
-
 	element.append(newInput);
 	newInput.focus();
 }
@@ -984,122 +791,38 @@ function handleDateDrop(element) {
  * =================================================== */
 function loadStudies(studies) {
 
-	var itemArr = []
+	var itemArr = [];
 	$("div[id='studies']").find("table").remove();
-
 	if (studies) {
-
 		// Table headers
 		var table = createTable(['Name', 'OID', 'Identifier']);
-
 		for (var x = 0; x < studies.length; x++) {
-
-			var study = studies[x]
-
+			var study = studies[x];
 			var tr = $("<tr>");
-
 			tr.attr("id", x);
 			tr.click(function() {
-
 				var row = this;
 				var data = JSON.parse(sessionStorage.getItem("studies"));
-
 				// Extract selected study
-				var currentStudy = data[$(row).attr("id")]
-
+				var currentStudy = data[$(row).attr("id")];
 				if (parser.getStudy() !== data[$(row).attr("id")].id && 
 					($("div[id='studies']").find("table > tbody > tr").size() > 1 && $(".dotted-border").size() > 2) && !editing) {
-
-					bootbox.confirm("The current rule will be lost. Are you sure you want to select another study?",
-
-						function(result) {
-
-							if (result) {
-
-								$("a[href='#events']").tab('show');
-
-								// Make bold
-								$(row).siblings(".selected").removeClass("selected");
-
-								$(row).addClass("selected");
-
-								parser.setStudy(currentStudy.id);
-
-								loadStudyEvents(currentStudy);
-
-								// Cascade load
-								var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]
-
-								loadEventCRFs({
-
-									study: currentStudy,
-									studyEvent: topEvent
-								});
-
-								loadCRFVersionItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]])
-
-								createBreadCrumb({
-
-									study: currentStudy.name
-								})
-
-								resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
-
-								$(".modal-backdrop").remove();
-							} else {
-								$(".modal-backdrop").remove();
-							}
-						});
+					createPrompt({
+						row: row,
+						study: currentStudy
+					});
 
 				} else {
-
-					// Make bold
-					$(this).siblings(".selected").removeClass("selected");
-
-					$(this).addClass("selected");
-
-					parser.setStudy(currentStudy.id);
-
-					if (currentStudy.events) {
-
-						loadStudyEvents(currentStudy);
-
-						// Cascade load
-						var topEvent = currentStudy.events[Object.keys(currentStudy.events)[0]]
-
-						if(topEvent){
-
-							loadEventCRFs({
-
-								study: currentStudy,
-								studyEvent: topEvent
-							});
-
-							var version = topEvent.crfs[0].versions[0]						
-								
-							loadCRFVersions({
-								study: study,
-								event: topEvent,
-								crf: topEvent.crfs[0]
-							});
-
-							loadCRFVersionItems(version);
-						}
-					}
-
-					createBreadCrumb({
-
-						study: currentStudy.name
-					})
-
-					$("a[href='#events']").tab('show');
+					resetStudy({
+						row: row,
+						study: currentStudy
+					});
 				}
 				editing = false;
-			})
+			});
 
 			var tdName = $("<td>");
 			tdName.text(study.name);
-
 			var tdOID = $("<td>");
 			tdOID.text(study.oid);
 
@@ -1109,27 +832,21 @@ function loadStudies(studies) {
 			tr.append(tdName);
 			tr.append(tdOID);
 			tr.append(tdIdentifier);
-
 			itemArr.push(tr);
 		}
 
-		$("div[id='studies']").append(table)
-
+		$("div[id='studies']").append(table);
 		currentPageIndex = 0;
 
 		// Global
 		var chunkedItemsArr = itemArr.chunk(10);
-
 		var pagination = createPagination({
-
 			itemsArr: chunkedItemsArr,
 			div: $("div[id='studies']")
 		});
 
 		table.after(pagination);
-
 		resetTable({
-
 			table: table,
 			arr: chunkedItemsArr,
 			pagination: pagination
@@ -1137,17 +854,13 @@ function loadStudies(studies) {
 
 		// probably editing
 		if (parser.getStudy()) {
-
 			var st = studies.filter(function(x) {
 				return x.id === parser.getStudy();
-			})
-
+			});
 			$('tr[id="'+ studies.indexOf(st[0]) +'"]').click();
-
 		} else {
 			$(".table-hover").find("tbody > tr").filter(":first").click();
 		}
-
 		// Initial load should show studies
 		$("a[href='#studies']").tab('show');
 	}
@@ -1156,38 +869,27 @@ function loadStudies(studies) {
 /* =================================================================
  * Adds the a given study's events to the events table for display.
  *
- *
  * Argument Object [study] parameters:
  *  - study - the study for whom events should be loaded
  * ============================================================== */
 function loadStudyEvents(study) {
-
-	var itemArr = []
+	var itemArr = [];
 	$("div[id='events']").find("table").remove();
-
 	if (study.events) {
-
 		var eventTable = createTable(['Name', 'Description', 'Identifier']);
-
 		for (var x = 0; x < study.events.length; x++) {
 
-			var studyEvent = study.events[x]
-
+			var studyEvent = study.events[x];
 			var tr = $("<tr>");
 			tr.attr("id", x);
 			tr.click(function() {
-
 				$("a[href='#crfs']").tab('show');
-
 				// Make bold
 				$(this).siblings(".selected").removeClass("selected");
-
 				$(this).addClass("selected");
 
 				var currentEvent = study.events[$(this).attr("id")]
-
 				loadEventCRFs({
-
 					study: study,
 					studyEvent: currentEvent
 				});
@@ -1200,64 +902,48 @@ function loadStudyEvents(study) {
 				});
 
 				createBreadCrumb({
-
 					study: study.name,
 					event: currentEvent.name
-				})
-
-			})
+				});
+			});
 
 			var tdName = $("<td>");
 			tdName.text(studyEvent.name);
-
 			var tdDescription = $("<td>");
-
 			if (studyEvent.description) {
-
 				if (studyEvent.description.length > 25) {
-
 					tdDescription.text(studyEvent.description.slice(0, 20) + "...");
-
 					tdDescription.tooltip({
-
 						placement: "top",
 						container: "body",
 						title: studyEvent.description
-					})
+					});
 
 				} else {
-
 					tdDescription.text(studyEvent.description);
 				}
 			}
 
 			var tdIdentifier = $("<td>");
 			tdIdentifier.text(studyEvent.oid);
-
 			tr.append(tdName);
 			tr.append(tdDescription);
 			tr.append(tdIdentifier);
-
 			itemArr.push(tr);
 		}
 
 		$("div[id='events']").append(eventTable);
-
 		currentPageIndex = 0;
 
 		// Global
 		var chunkedItemsArr = itemArr.chunk(10);
-
 		var pagination = createPagination({
-
 			div: $("div[id='events']"),
 			itemsArr: chunkedItemsArr
 		});
 
 		eventTable.after(pagination);
-
 		resetTable({
-
 			table: eventTable,
 			arr: chunkedItemsArr,
 			pagination: pagination
@@ -1274,117 +960,85 @@ function loadStudyEvents(study) {
  * ============================================================== */
 function loadEventCRFs(params) {
 
-	var itemArr = []
+	var itemArr = [];
 	$("div[id='crfs']").find("table").remove();
-
 	if (params.studyEvent && params.studyEvent.crfs) {
-
 		var crfTable = createTable(['Name', 'Identifier', 'Description']);
-
 		for (var cf = 0; cf < params.studyEvent.crfs.length; cf++) {
-
-			var crf = params.studyEvent.crfs[cf]
-
+			var crf = params.studyEvent.crfs[cf];
 			var tr = $("<tr>");
 			tr.attr("id", cf);
 			tr.click(function() {
-
 				$("a[href='#versions']").tab('show');
-
 				// Make bold
 				$(this).siblings(".selected").removeClass("selected");
-
 				$(this).addClass("selected");
-
 				var currentCRF = params.studyEvent.crfs[$(this).attr("id")];
-
 				loadCRFVersions({
-
 					crf: currentCRF,
 					study: params.study,
 					event: params.studyEvent
 				});
 
 				createBreadCrumb({
-
 					crf: currentCRF.name,
 					study: params.study.name,
 					event: params.studyEvent.name
 					
-				})
-			})
+				});
+			});
 
 			var tdName = $("<td>");
 			tdName.text(crf.name);
-
 			var tdDescription = $("<td>");
-
 			if (crf.description) {
-
 				if (crf.description.length > 25) {
-
 					tdDescription.text(crf.description.slice(0, 20) + "...");
-
 					tdDescription.tooltip({
-
 						placement: "top",
 						container: "body",
 						title: crf.description
-					})
-
+					});
 				} else {
-
 					tdDescription.text(crf.description);
 				}
 			}
 
 			var tdOID = $("<td>");
 			if (crf.oid) {
-
 				if (crf.oid.length > 7) {
-
 					tdOID.text(crf.oid.slice(0, 7) + "...");
-
 					tdOID.tooltip({
-
 						placement: "top",
 						container: "body",
 						title: crf.oid
-					})
+					});
 
 				} else {
-
 					tdOID.text(crf.oid);
 				}
 			}
 
 			var tdVersion = $("<td>");
 			tdVersion.text(crf.version);
-
 			tr.append(tdName);
 			tr.append(tdOID);
 			tr.append(tdDescription);
-
 			itemArr.push(tr);
 		}
 
 		$("div[id='crfs']").append(crfTable)
-
 		currentPageIndex = 0;
 
 		// Global
 		var chunkedItemsArr = itemArr.chunk(10);
-
 		var pagination = createPagination({
-
 			div: $("div[id='crfs']"),
 			itemsArr: chunkedItemsArr
 		});
 
 		crfTable.after(pagination);
-
 		resetTable({
-
 			table: crfTable,
 			arr: chunkedItemsArr,
 			pagination: pagination
@@ -1393,91 +1047,62 @@ function loadEventCRFs(params) {
 }
 
 function loadCRFVersions(params) {
-
-	var itemArr = []
+	var itemArr = [];
 	$("div[id='versions']").find("table").remove();
-
 	if (params.crf.versions) {
-
 		var versionTable = createTable(['Name', 'Identifier']);
-
 		for (var ver = 0; ver < params.crf.versions.length; ver++) {
-
-			var version = params.crf.versions[ver]
-
+			var version = params.crf.versions[ver];
 			var tr = $("<tr>");
 			tr.attr("id", ver);
 			tr.click(function() {
-
 				$("a[href='#items']").tab('show');
-
 				// Make bold
 				$(this).siblings(".selected").removeClass("selected");
-
 				$(this).addClass("selected");
-
 				var currentVersion = params.crf.versions[$(this).attr("id")];
-
 				loadCRFVersionItems(currentVersion);
-
 				createBreadCrumb({
-
 					crf: params.crf.name,
 					event: params.event.name,
 					study: params.study.name,
 					version: currentVersion.name
-
-				})
-			})
+				});
+			});
 
 			var tdName = $("<td>");
 			tdName.text(version.name);
-
-
 			var tdOID = $("<td>");
-
 			if (version.oid) {
-
 				if (version.oid.length > 7) {
-
 					tdOID.text(version.oid.slice(0, 7) + "...");
-
 					tdOID.tooltip({
-
 						placement: "top",
 						container: "body",
 						title: version.oid
-					})
-
+					});
 				} else {
-
 					tdOID.text(version.oid);
 				}
 			}
 
 			tr.append(tdName);
 			tr.append(tdOID);
-
 			itemArr.push(tr);
 		}
 
-		$("div[id='versions']").append(versionTable)
-
+		$("div[id='versions']").append(versionTable);
 		currentPageIndex = 0;
 
 		// Global
 		var chunkedItemsArr = itemArr.chunk(10);
-
 		var pagination = createPagination({
-
 			div: $("div[id='versions']"),
 			itemsArr: chunkedItemsArr
 		});
 
 		versionTable.after(pagination);
-
 		resetTable({
-
 			table: versionTable,
 			arr: chunkedItemsArr,
 			pagination: pagination
@@ -1493,81 +1118,58 @@ function loadCRFVersions(params) {
  * - crf - the crf for whom items should be loaded
  * ============================================================== */
 function loadCRFVersionItems(crf) {
-
-	var itemArr = []
+	var itemArr = [];
 	$("div[id='items']").find("table").remove();
-
 	if (crf && crf.items) {
-
 		var itemsTable = createTable(['Name', 'Description', 'Data Type']);
-
 		for (var it = 0; it < crf.items.length; it++) {
-
-			var item = crf.items[it]
-
+			var item = crf.items[it];
 			var tr = $("<tr>");
-
 			var tdName = $("<td>");
 			tdName.text(item.name);
 			tdName.addClass("group")
 			tdName.attr("oid", item.oid);
 			tdName.attr("goid", item.group);
-
 			createDraggable({
-
 				element: tdName,
 				target: ($("#dataSurface"), $("#secondDataSurface"))
 			});
 
-
 			var tdDescription = $("<td>");
-
 			if (item.description) {
-
 				if (item.description.length > 25) {
-
 					tdDescription.text(item.description.slice(0, 20) + "...");
-
 					tdDescription.tooltip({
-
 						placement: "top",
 						container: "body",
 						title: item.description
-					})
+					});
 
 				} else {
-
 					tdDescription.text(item.description);
 				}
 			}
 
 			var tdDataType = $("<td>");
 			tdDataType.text(item.type);
-
 			tr.append(tdName);
 			tr.append(tdDescription);
 			tr.append(tdDataType);
-
 			itemArr.push(tr);
 		}
 
 		$("div[id='items']").append(itemsTable);
-
 		currentPageIndex = 0;
 
 		// Global
 		var chunkedItemsArr = itemArr.chunk(10);
-
 		var pagination = createPagination({
-
 			div: $("div[id='items']"),
 			itemsArr: chunkedItemsArr
 		});
 
 		itemsTable.after(pagination);
-
 		resetTable({
-
 			table: itemsTable,
 			arr: chunkedItemsArr,
 			pagination: pagination
@@ -1576,12 +1178,85 @@ function loadCRFVersionItems(crf) {
 }
 
 function createLoader() {
-
 	var modalOuterDiv = createDiv({
 		divClass: "spinner"
-	})
-
-	modalOuterDiv.append($('<img src="images/loader.gif" alt="Loading...">'))
-
+	});
+	modalOuterDiv.append($('<img src="images/loader.gif" alt="Loading...">'));
 	return modalOuterDiv;
+}
+
+function createPrompt(params) {
+	bootbox.dialog({
+		message: "The current expresion will be lost. Are you sure you want to select another study?",
+		title: "Changing the study",
+		buttons: {
+			keep: {
+				label: "Keep",
+				className: "btn-success",
+				callback: function() {
+					params.reset = false;
+					resetStudy(params);
+					parser.setCopy(true);
+					// Add targets, insert items and show/hide items
+					var crfItems = parser.getRuleCRFItems();
+					if (crfItems) {
+						for (var x = 0; x < crfItems.length; x++) {
+							var item = parser.findStudyItem({								
+								study: params.study,
+								name: crfItems[x].itemName
+							});
+
+							if (!item) {
+								crfItems[x].holder.addClass("invalid");
+							} else {
+								crfItems[x].holder.removeClass("invalid");
+							}
+						}
+					}
+				}
+			},
+			clear: {
+				label: "Clear",
+				className: "btn-danger",
+				callback: function() {
+					params.reset = true;
+					resetStudy(params);
+				}
+			},
+			main: {
+				label: "Cancel",
+				className: "btn-primary",
+				callback: function() {
+					bootbox.hideAll();
+				}
+			}
+		}
+	});
+}
+
+function resetStudy(params) {
+	$("a[href='#events']").tab('show');
+	// Make bold
+	$(params.row).siblings(".selected").removeClass("selected");
+	$(params.row).addClass("selected");
+	parser.setStudy(params.study.id);
+	loadStudyEvents(params.study);
+	// Cascade load
+	var topEvent = params.study.events[Object.keys(params.study.events)[0]]
+	loadEventCRFs({
+		study: params.study,
+		studyEvent: topEvent
+	});
+
+	if (topEvent) {
+		loadCRFVersionItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]]);
+	}
+
+	createBreadCrumb({
+		study: params.study.name
+	});
+
+	if (params.reset) {
+		resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
+	}
 }

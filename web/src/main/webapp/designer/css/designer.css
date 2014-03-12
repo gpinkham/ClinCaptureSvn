@@ -3,13 +3,11 @@
 }
 
 .row {
-  
   margin-left: 0;
   margin-right: 0.8em;
 }
 
 .col-md-12, .col-md-3 {
-
   padding-left: 0px;
   padding-right: 0px;
 }
@@ -26,7 +24,6 @@ body .container {
 }
 
 body .panel {
-
   text-align: center;
 	min-height: 167.5px;
 	margin-right: 0.2em;
@@ -34,24 +31,20 @@ body .panel {
 }
 
 .panel-body > p {
-
  	max-width: 30%;
 }
 
 .targettable {
-
   z-index: 0;
   margin-top: -18px;
 }
 
 .bordered {
-
   border: none !important;
   background-color: #fff !important;
 }
 
 .dotted-border {
-
   margin-top: 3em;
   min-height: 43px;
   margin-right: 2px;
@@ -64,7 +57,6 @@ body .panel {
 }
 
 .dotted-border-lg {
-
   margin-top: 1em;
   padding-top: 1em;
   border: 2px dotted #357EBD;
@@ -72,9 +64,7 @@ body .panel {
 }
 
 .data {
-
   top:6.4em;
-
   right: 0;    
   height: 79.2%;
   margin-top: 1em;
@@ -84,34 +74,43 @@ body .panel {
 }
 
 .data > .panel {
-
+  width: 100%;
+  min-height: 100% !important;
   border-radius: 4px 4px 0px 0px;
   border-bottom: none !important;
 }
 
-.data > .panel {
-
-	width: 100%;
-  min-height: 100% !important;
-
-}
-
 .space-right-p {
-
   margin-top: 3em;
   padding-right: .3em;
 }
 
 .space-right-m {
-  margin-right: .5em;
+  margin-right: 1em;
 }
 
 .space-left-m {
   margin-left: 1em;
 }
 
+.space-top {
+  padding-top: 5.4em !important;
+}
+
 .space-top-sm {
   padding-top: 2.5em;
+}
+
+.space-top-m {
+  margin-top: 1em;
+}
+
+.space-bottom {
+  margin-bottom: 1em;
+}
+
+.space-left-neg {
+  margin-left: -1em;
 }
 
 .nowrap {
@@ -119,38 +118,31 @@ body .panel {
 }
 
 span {
-
-  color: #357EBD;
-  margin-top: 1em;
   white-space: nowrap;
+  color: #357EBD !important;
 }
 
 textarea {
-
   margin-top: 0.5em; 
   width: 83% !important;
 }
 
 #toField {
-
   margin-top: 15px;
   width: 83% !important;
 }
 
 .nav-cont {
-
 	padding-left: 8em;
 	padding-right: 8em;
 }
 
 .nav-justified {
-
   margin-top: 0.5em !important;
   margin-bottom: 1em !important;
 }
 
 .nav-justified li {
-
 	float: none;
 	padding-left: .5em;
 	padding-right: .5em;
@@ -161,13 +153,11 @@ textarea {
 }
 
 .nav-justified li > a {
-
 	margin-bottom: .5em !important;
   background-color: #428bca !important;
 }
 
 .login-modal {
-
   left: 0 !important;
   right: 0 !important;
   width: 99% !important;
@@ -178,7 +168,6 @@ textarea {
 }
 
 .bootbox {
-
   left: 0 !important;
   right: 0 !important;
   width: 99% !important;
@@ -188,32 +177,21 @@ textarea {
   margin-right: auto !important;
 }
 
-.space-top {
-
-  padding-top: 5.4em !important;
-}
-
 .breadcrumb {
   margin-top: 2em !important;
 }
 
 .table {
-
   border-top: 0px;
   margin-bottom: 0px;
 }
 
 .table th, .table td { 
-
   border-top: none;
  }
 
 .form-grp {
   margin-bottom: 4em;
-}
-
-input {
-  margin-bottom: 10px;
 }
 
 #variables {
@@ -237,24 +215,16 @@ input {
 }
 
 td.ui-draggable {
-
   cursor: hand;
   cursor: pointer; 
 }
 
 .init {
-
   font-style: italic;
 }
 
-.glyphicon {
-  margin-top: 0em;
-}
-
 .tops {
-
   margin-top: 10%;
-
 }
 
 .modal-content {
@@ -313,7 +283,6 @@ td.ui-draggable {
 }
 
 .img {
-
   right: 0;
   position: fixed !important;
 }
@@ -323,7 +292,6 @@ body .modal-dialog {
 }
 
 .spinner {
-
   top:0;
   left:0;
   width:100%;
@@ -335,7 +303,6 @@ body .modal-dialog {
 }
 
 .spinner * {
-  
   left: 35%;
   top: 45%;
   display: block;    
@@ -352,14 +319,21 @@ body .modal-dialog {
   margin-top: .5em;
 }
 
-.dest {
-  margin-left: -1em;
-}
-
 div {
   word-wrap: break-word;  
 }
-
+ 
 .invalid {
-  border-color: #FF4719 !important;
+  border: solid !important;
+  border-width: 1px !important;
+  border-color: #FF4719 !important; 
+}
+
+.glyphicon {
+  top: 0;
+  width: 1% !important;
+}
+
+.input-group {
+  margin-bottom: .5em;
 }

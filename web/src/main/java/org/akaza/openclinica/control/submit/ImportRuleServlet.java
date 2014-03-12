@@ -77,7 +77,14 @@ public class ImportRuleServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
 		UserAccountBean ub = getUserAccountBean(request);
+		
+		// Reset the study if RS is saving a rule for a different study
+		if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty()) && getCurrentStudy(request).getId() != Integer.parseInt(request.getParameter("study"))) {
+			request.getSession().setAttribute(STUDY, (StudyBean) getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study"))));
+		}
+
 		StudyBean currentStudy = getCurrentStudy(request);
 
 		String action = request.getParameter("action");
@@ -116,8 +123,10 @@ public class ImportRuleServlet extends Controller {
 				logger.info(ub.getFirstName());
 
 				// Editing a rule - remove existing rules
+				boolean isCopiedRule = Boolean.valueOf(request.getParameter("copy"));
 				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")
-						&& request.getParameter("edit") != null && "true".equalsIgnoreCase(request.getParameter("edit"))) {
+						&& request.getParameter("edit") != null && "true".equalsIgnoreCase(request.getParameter("edit"))
+						&& !isCopiedRule) {
 					
 					RuleSetRuleBean ruleSetRule = getRuleSetRuleDao().findById(Integer.parseInt(request.getParameter("id")));
 					
@@ -192,6 +201,7 @@ public class ImportRuleServlet extends Controller {
 				if (re.getErrorCode() != null) {
 					arguments = re.getErrorParams();
 				}
+				log.error(arguments.toString());
 				addPageMessage(mf.format(arguments), request);
 				forwardPage(Page.IMPORT_RULES, request, response);
 			}

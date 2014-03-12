@@ -19,35 +19,25 @@ $(function() {
 
 	$("a[id='back']").attr("href", c + "/designer/rule.html");
 	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true");
-
 	var rule = JSON.parse(sessionStorage.getItem("rule"));
-
 	if (sessionStorage.getItem("validation")) {
 
 		var validation = JSON.parse(sessionStorage.getItem("validation"));
-
 		sessionStorage.setItem("status", "load");
 
 		// if a rule passed validation
 		if (validation.ruleValidation === "rule_valid") {
-
 			$(".failure").hide();
 			$(".success").show();
-
 			$(".alert-success").text("Rule is valid: " + rule.expression);
-
 			if (rule.targets) {
-
 				for (var x = 0; x < rule.targets.length; x++) {
-
 					var list = $("<li class='list-group-item'>");
 					list.text(rule.targets[x]);
-
 					$("#items").append(list);
 				}
 
 				for (var x = 0; x < rule.actions.length; x++) {
-
 					var list = $("<li class='list-group-item'>");
 					if (rule.actions[x].type === "discrepancy") {
 						list.text("Discrepancy Action");
@@ -58,28 +48,22 @@ $(function() {
 					} else if (rule.actions[x].type === "showHide") {
 						list.text("Show/Hide Action");
 					}
-
 					$("#actions").append(list);
 				}
 				
 				if (rule.ide) {
-
 					var list = $("<li class='list-group-item'>");
 					list.text("Initial data entry");
-
 					$("#executions").append(list);
 				}
 
 				if (rule.dde) {
-
 					var list = $("<li class='list-group-item'>");
 					list.text("Double data entry");
-
 					$("#executions").append(list);
 				}
 
 				if (rule.ae) {
-
 					var list = $("<li class='list-group-item'>");
 					list.text("Administrative data entry");
 
@@ -87,32 +71,26 @@ $(function() {
 				}
 
 				if (rule.di) {
-
 					var list = $("<li class='list-group-item'>");
 					list.text("Import data entry");
-
 					$("#executions").append(list);
 				}
 			}
 
 			// If a rule failed validation
 		} else {
-
 			$("#save").remove();
 			$(".success").hide();
 			$(".failure").show();
-
 			$("#evaluates").text("Rule failure message");
 			$(".alert-info").text(validation.ruleValidationFailMessage);
 		}
 	} else {
-
 		// Redirect to design if no rule present
 		window.open("rule.html", '_self');
 	}
 
 	$("#save").click(function() {
-
 		saveRule(rule);
 	})
 })
@@ -128,9 +106,7 @@ function saveRule(rule) {
 
 	$("body").append(createLoader());
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
-
 	var boundary = "---------------------------7da24f2e50046";
-
 	var body = '--' + boundary + '\r\n'
 	+ 'Content-Disposition: form-data; name="file";' + 'filename="temp.xml"\r\n'
 	+ 'Content-type: text/xml\r\n\r\n'
@@ -138,50 +114,37 @@ function saveRule(rule) {
     + '--'+boundary+ '--';
 
 	$.ajax({
-
 		type: "POST",
 		contentType: "multipart/form-data; boundary="+boundary,
-
 		data: body,
-
-		url: c + "/ImportRule?action=confirm&rs=true&edit=" + sessionStorage.getItem("edit") + "&id=" + sessionStorage.getItem("id"),
-
+		url: c + "/ImportRule?action=confirm&rs=true&edit=" + sessionStorage.getItem("edit") + "&id=" + sessionStorage.getItem("id") + "&study=" + rule.study + "&copy=" + rule.copied,
 		success: function(response) {
-
 			try {
-				
 				var obj = JSON.parse(response);
 				sessionStorage.removeItem("edit");
 				sessionStorage.setItem("status", "remove");
-
 				bootbox.confirm("Rule(s) successfully saved", function(result) {
-
 					// Clean up
 					sessionStorage.removeItem("id");
 					sessionStorage.removeItem("rule");
 					sessionStorage.removeItem("validation");
-
-					//sessionStorage.removeItem("rule");
-
 					if (result) {
 						window.open(rule.submission + "/designer/rule.html", '_self');
 					}
 				});
-
-				sessionStorage.removeItem("edit");
 			} catch (e) {
 				$(".spinner").remove();
+				bootbox.alert({
+					backdrop: false,
+					message: "The rule was not saved! Check the server logs for details"
+				});
 			}
 		},
-
 		error: function(response) {
-
 			sessionStorage.setItem("status", "load");
-
 			handleErrorResponse({
-
 				response: response
-			})
+			});
 		}
 	})
 }

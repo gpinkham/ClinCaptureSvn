@@ -14,15 +14,13 @@
  * =================================================================================================================================================================================================================================================================================================================================================================================================================================================================== */
 
 function Parser() {
-
 	this.rule = Object.create(null);
-
 	this.rule.targets = [];
 	this.rule.actions = [];	
+	this.rule.copied = false;
 }
 
 Parser.prototype.getStudy = function() {
-
 	if (this.rule) {
 		return this.rule.study;
 	}
@@ -30,6 +28,14 @@ Parser.prototype.getStudy = function() {
 
 Parser.prototype.setStudy = function(study) {
 	this.rule.study = study;
+}
+
+Parser.prototype.getCopy = function() {
+	return this.rule.copied;
+}
+
+Parser.prototype.setCopy = function(copied) {
+	this.rule.copied = copied;
 }
 
 /* ===========================================================================
@@ -41,14 +47,10 @@ Parser.prototype.setStudy = function(study) {
  * Return the type for the expected next element.
  * ========================================================================== */
 Parser.prototype.validateNext = function(currentElement) {
-
 	var nextElement = "INVALID";
-
 	// The second group positionally identifies an element
 	var className = currentElement.attr('class').split(/\s+/)[1];
-
 	switch (className) {
-
 		case "cal":
 		case "comp":
 			nextElement = "DATA"
@@ -60,7 +62,6 @@ Parser.prototype.validateNext = function(currentElement) {
 			nextElement = this.determineNext(currentElement);
 			break;
 	}
-
 	return nextElement;
 }
 
@@ -74,16 +75,12 @@ Parser.prototype.validateNext = function(currentElement) {
  * Return the type for the expected next element.
  * ========================================================================== */
 Parser.prototype.determineNext = function(currentElement) {
-
 	// LPAREN
 	if (currentElement.text() == "(") {
-
-		return "ANY"
-
+		return "ANY";
 		// RPAREN
 	} else {
-
-		return "EVAL"
+		return "EVAL";
 	}
 }
 
@@ -96,206 +93,146 @@ Parser.prototype.determineNext = function(currentElement) {
  * => ui - The draggable that has been dropped
  * ============================================================================ */
 Parser.prototype.createNextDroppable = function(params) {
-
 	var __NEXT__ = this.validateNext(params.element);
-
 	if (__NEXT__ === "ANY") {
-
 		var RPAREN = createRPARENDiv();
 		var dataPredicate = createStartExpressionDroppable();
-
 		dataPredicate.text("Group or Data");
-
 		if (params.element.next().length === 0) {
-
 			params.element.after(dataPredicate);
-
 			dataPredicate.after(RPAREN);
-
 			createPopover(RPAREN);
-
 			createPopover(dataPredicate);
-
 		} 
 
 	} else if (params.element.is(".target")) {
-
 		if (!this.isAddedTarget(params.ui.draggable.text())) {
-
 			if (params.existingValue) {
-
 				var index = this.rule.targets.indexOf(params.existingValue);
-
 				if (index > -1) {
-
 					this.rule.targets.splice(index, 1);
 				}
 			}
-
 			this.rule.targets.push(params.ui.draggable.text());
-
-			var newInput = params.element.clone();
+			var div = params.element.parent().clone();
+			div.find("input").text("");
+			div.find("input").removeClass("bordered");
+			// Re-bind Event handlers
 			createDroppable({
-				element: newInput,
+				element: div.find("input"),
 				accept: "div[id='items'] td"
-			})
+			});
+
+			div.find("span").click(function() {
+				parser.deleteTarget(this);
+			});
+			// create a new input 
+			if (!params.element.val()) {
+				params.element.parent().after(div);
+			} 
+			div.find("input").focus();
+			params.element.val(params.ui.draggable.text());
+		}
+		params.element.removeClass("bordered");	
+	} else if (params.element.is(".dest")) {
+		if (!this.isAddedShowHideTarget(params.ui.draggable.text())) {
+			if (params.existingValue) {
+				this.getShowHideAction().destinations.indexOf(params.existingValue);
+				if (index > -1) {
+					this.getShowHideAction().destinations.splice(index, 1);
+				}
+			}
+
+			var oid = this.constructFormPath(params.ui.draggable.text());
+			this.getShowHideAction().destinations.push(oid);
+			var div = params.element.parent().clone();
+			div.find("input").text("");
+			div.find("input").removeClass("bordered");
+
+			div.find("span").click(function() {
+				parser.deleteTarget(this);
+			});
 
 			// create a new input 
 			if (!params.element.val()) {
-
-				params.element.after(newInput);
+				params.element.parent().after(div);
 				createDroppable({
-					element: newInput,
+					element: div.find(".dest"),
 					accept: "div[id='items'] td"
-				})
+				});
 			} 
-
-			newInput.focus();
+			div.focus();
 			params.element.val(params.ui.draggable.text());
 		}
-
+		params.element.removeClass("bordered");
 	} else if (params.element.is(".item")) {
-
 		if (!this.isAddedInsertTarget(params.ui.draggable.text())) {
-
 			if (params.existingValue) {
-
-				var item = this.findItem(params.existingValue);
-				var oid = item.formOid + "." + item.group + "." + item.oid;
 				for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
-
 					var dest = this.getInsertAction().destinations[x];
-					if (dest.oid === oid) {
+					if (dest.oid === this.constructFormPath(params.existingValue)) {
 						this.getInsertAction().destinations.splice(x, 1);
 					}
 				}
 			}
-
+			params.element.removeClass("bordered");
 			// Destination
 			var dest = Object.create(null);
-
-			var item = this.findItem(params.ui.draggable.text());
-			var oid = item.formOid + "." + item.group + "." + item.oid;
-			 
-			dest.oid = oid;
 			dest.value = "";
 			dest.id = params.element.parents(".row").attr("id");
+			dest.oid = this.constructFormPath(params.ui.draggable.text());
 
 			this.getInsertAction().destinations.push(dest);			
-
 			params.element.val(params.ui.draggable.text());
-
 			params.element.parent().siblings(".col-md-4").find(".value").focus();
 		}
-
+		params.element.removeClass("bordered");
 	} else if (params.element.is(".value")) {
-
 		var destination = null;
 		for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
-
 			destination = this.getInsertAction().destinations[x];
-
 			if (destination.id === params.element.parents(".row").attr("id")) {
 				break;
 			}
 		}
 
 		if (destination) {
-
 			if (!params.existingValue) {
-
 				var index = this.getInsertAction().destinations.indexOf(destination);
-
 				if (index > -1) {
-
 					this.getInsertAction().destinations.splice(index, 1);
 				}
-
-				var newRow = $("#insert").find(".row").first().clone();
-				newRow.attr("id", $("#insert").find(".row").size() + 1);
-				newRow.find("label").remove();
-
-				var input = newRow.find(".item");
-				input.val("");
-				input.text("");
-
-				var inputVal = newRow.find(".value");
-				inputVal.val("");
-				inputVal.text("");
-
-				inputVal.removeAttr("type");
-
-				inputVal.blur(function() {
-
-					parser.setDestinationValue({
-
-						value: $(this).val(),
-						id: $(this).parents(".row").attr("id")
-					})
-				})
-
-				createDroppable({
-
-					element: input,
-					accept: "div[id='items'] td"
-				})
-
-				createDroppable({
-
-					element: inputVal,
-					accept: "div[id='data'] p, div[id='items'] td"
-				})
-
-				$("#insert").append(newRow);
-
+				this.addNewInsertActionInputs();
 				this.getInsertAction().destinations.push(destination);
 			}
 
 			if (params.ui.draggable.prop("tagName") === "TD") {
-
 				destination.item = true;
 				destination.value = this.findItem(params.ui.draggable.text()).oid;
-
 				params.element.val(params.ui.draggable.text());
 
 			} else {
-
 				destination.item = false;
 				if (this.isText(params.ui.draggable)) {
-
 					params.element.focus();
-
 				} else if (this.isDate(params.ui.draggable)) {
-
 					params.element.attr("type", "date");
 					params.element.val($(this).text());
-
 					var msie = window.navigator.userAgent.indexOf('MSIE ');
 					var trident = window.navigator.userAgent.indexOf('Trident/');
 
-					// FF and IE
 					if (typeof InstallTrigger !== 'undefined' || msie > 0 || trident > 0) {
-
 						params.element.data({date: new Date(params.element.val())}).datepicker('update').children("input").val(new Date(params.element.val()));
-
 						params.element.datepicker({orientation:'bottom left'}).on("hide", function() {
-
 							if ($(this).val()) {
-
 								params.element.val($(this).val());
-
 							} else {
-
 								params.element.val("Select Date");
 							}
 						});
-
 						params.element.focus();
-
 					} else {
-
 						params.element.blur(function() {
-
 							if ($(this).val()) {
 								params.element.text($(this).val());
 							} else {
@@ -303,125 +240,55 @@ Parser.prototype.createNextDroppable = function(params) {
 							}
 						});
 					}
-
 				} else if (this.isNumber(params.ui.draggable)) {
-
 					params.element.attr("type", "number");
-
 					params.element.blur(function() {
-
 						if ($(this).val() && /[0-9]|\./.test($(this).val())) {
-
 							params.element.text($(this).val());
 							params.element.removeClass("invalid");
-
 						} else {
-
 							params.element.val();
 							params.element.focus();
 							params.element.select();
 							params.element.addClass("invalid");
 						}
-					})
-					
+					});
 					params.element.focus();
-
 				} else if (parser.isEmpty(params.ui.draggable)) {
-
 					params.element.removeAttr("type");
 					params.element.val('""');				
-				
 				} else {
-
 					destination.value = params.element.val();
 				}
 			}
 		}
-
-
-	} else if (params.element.is(".dest")) {
-
-		if (!this.isAddedShowHideTarget(params.ui.draggable.text())) {
-
-			if (params.existingValue) {
-
-				this.getShowHideAction().destinations.indexOf(params.existingValue);
-
-				if (index > -1) {
-
-					this.getShowHideAction().destinations.splice(index, 1);
-				}
-			}
-
-			var item = this.findItem(params.ui.draggable.text());
-			var oid = item.formOid + "." + item.group + "." + item.oid;	
-
-			this.getShowHideAction().destinations.push(oid);
-
-			var newInput = params.element.clone();
-			createDroppable({
-				element: newInput,
-				accept: "div[id='items'] td"
-			})
-
-			// create a new input 
-			if (!params.element.val()) {
-
-				params.element.after(newInput);
-				createDroppable({
-					element: newInput,
-					accept: "div[id='items'] td"
-				})
-			} 
-
-			newInput.focus();
-			params.element.val(params.ui.draggable.text());
-
-		}
+		params.element.removeClass("bordered");
 	} else {
 
 		if (params.element.is(".comp")) {
-
 			var dataPredicate = createStartExpressionDroppable();
-
 			// Avoid creating unnecessary evaluation/data/crf item/group boxes
 			if (params.element.next().size() === 0 || params.element.next().is(".pull-right") || params.element.next().is(".group")) {
-
 				if (params.element.next().is(".group") && params.element.next().text() === ")") {
-
 					params.element.after(dataPredicate);
-
 				} else if (params.element.next().length === 0) {
-
 					params.element.after(dataPredicate);
 				}
-
 			} else if (params.element.next().is(".eval")) {
-
 				params.element.after(dataPredicate);
 			}
-
 			createPopover(dataPredicate);
-
 		} else if (params.element.is(".eval")) {
-
 			if (!params.element.next().is(".dotted-border")) {
-
 				var droppable = createStartExpressionDroppable();
 				params.element.after(droppable);
-
 				createPopover(droppable);
 			}
-
 		} else {
-
 			if (!params.element.next().is(".comp")) {
-
 				if (!params.element.next().is(".dotted-border")) {
-					
 					var droppable = createSymbolDroppable();
 					params.element.after(droppable);
-
 					createPopover(droppable);
 				}
 			}
@@ -438,8 +305,7 @@ Parser.prototype.createNextDroppable = function(params) {
  * Returns true if the element has id === 'text'
  * ====================================================== */
 Parser.prototype.isText = function(element) {
-
-	return element.attr("id") === "text"
+	return element.attr("id") === "text";
 }
 
 /* ======================================================
@@ -451,8 +317,7 @@ Parser.prototype.isText = function(element) {
  * Returns true if the element has id === 'date'
  * ====================================================== */
 Parser.prototype.isDate = function(element) {
-
-	return element.attr("id") === "date"
+	return element.attr("id") === "date";
 }
 
 /* ======================================================
@@ -464,8 +329,7 @@ Parser.prototype.isDate = function(element) {
  * Returns true if the element has id === 'empty'
  * ====================================================== */
 Parser.prototype.isEmpty = function(element) {
-
-	return element.attr("id") === "empty"
+	return element.attr("id") === "empty";
 }
 
 /* ======================================================
@@ -477,8 +341,7 @@ Parser.prototype.isEmpty = function(element) {
  * Returns true if the element has id === 'number'
  * ====================================================== */
 Parser.prototype.isNumber = function(element) {
-
-	return element.attr("id") === "number"
+	return element.attr("id") === "number";
 }
 
 /* ==============================================================================
@@ -490,8 +353,7 @@ Parser.prototype.isNumber = function(element) {
  * Returns true if the element has id === 'evalSurface'
  * ============================================================================ */
 Parser.prototype.isConditionalSurface = function(element) {
-
-	return element.attr("id") === "evalSurface"
+	return element.attr("id") === "evalSurface";
 }
 
 /* ====================================================
@@ -503,8 +365,24 @@ Parser.prototype.isConditionalSurface = function(element) {
  * Returns true if the element is <td> and a draggable
  * ==================================================== */
 Parser.prototype.isCRFItem = function(element) {
+	return element.prop("tagName").toLowerCase() === "td" && element.is(".ui-draggable");
+}
 
-	return element.prop("tagName").toLowerCase() === "td" && element.is(".ui-draggable")
+Parser.prototype.getRuleCRFItems = function() {
+	var items = [];
+	var itemHolders = $(".dotted-border, .target, .item, .value, .dest");
+	for (var x = 0; x < itemHolders.size(); x++) {
+		if ($(itemHolders[x]).text().length > 0) {
+			var item = this.findItem($(itemHolders[x]).text());
+			if (item && typeof(item) !== "function") {
+				var pred = Object.create(null);
+				pred.holder = $(itemHolders[x]);
+				pred.itemName = $(itemHolders[x]).text();
+				items.push(pred);
+			}
+		}
+	}
+	return items;
 }
 
 /* ==============================================================================
@@ -523,45 +401,83 @@ Parser.prototype.isCRFItem = function(element) {
 Parser.prototype.createRule = function() {
 
 	var expression = [];
+	var study = this.extractStudy(this.getStudy());
 	var dottedBorders = $(".dotted-border");
-
 	for (var x = 0; x < dottedBorders.size(); x++) {
-
 		var exprItem = $(dottedBorders[x]).text();
-
 		if (this.isOp(exprItem)) {
-
 			if (this.isConditionalOp(exprItem)) {
 				exprItem = exprItem.toLowerCase();
 			} else {
 				exprItem = this.getOp(exprItem)
 			}
 		}
-
-		var item = this.findItem($(dottedBorders[x]).text());
-
+		var item = this.findStudyItem({
+			study: study,
+			name: $(dottedBorders[x]).text()
+		})
 		if (item) {
-			exprItem = item.eventOid + "." + item.formOid + "." + item.group + "." + item.oid;	
+			exprItem = this.constructEventPath($(dottedBorders[x]).text());
 		}
-
 		expression.push(exprItem);
 	}
 
 	this.rule.expression = expression;
-
 	if (this.isValid(expression).valid) {
-
-		var tt = []
+		var tt = [];
 		for (var x = 0; x < this.rule.targets.length; x++) {
-
-			var item = this.findItem(this.rule.targets[x]);
-
-			var itemOid = item.eventOid + "." + item.formOid + "." + item.group + "." + item.oid;
-			tt.push(itemOid);
+			tt.push(this.constructEventPath(this.rule.targets[x]));
 		}
-
 		this.rule.targets = tt;
 	} 
+}
+
+Parser.prototype.getRule = function() {
+	this.createRule();
+	if (this.isValid(this.rule.expression).valid) {
+		var rule = Object.create(null);
+
+		rule.name = this.getName();
+		rule.study = this.rule.study;
+		rule.copied = this.getCopy();
+		rule.targets = this.getTargets();
+		rule.actions = this.getActions();
+		// Evocation
+		rule.di = this.getDataImportExecute();
+		rule.dde = this.getDoubleDataEntryExecute();
+		rule.ide = this.getInitialDataEntryExecute();
+		rule.ae = this.getAdministrativeEditingExecute();
+
+		rule.evaluatesTo = this.getEvaluatesTo();
+		rule.expression = this.rule.expression.join().replace(/\,/g, " ");
+		rule.submission = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
+		return rule;
+
+	} else {
+		// Ensure one alert is displayed
+		if ($(".alert").size() == 0) {
+			$("#designSurface").find(".panel-body").prepend(createAlert(this.isValid(this.rule.expression).message));
+		}
+		return false;
+	}
+}
+
+Parser.prototype.render = function(rule) {
+	this.rule.targets = [];
+	this.setExpression(rule.expression);
+	// properties
+	this.setName(rule.name);
+	this.setStudy(rule.study);
+	this.setCopy(rule.copied);
+	this.setTargets(rule.targets);
+	this.setEvaluatesTo(rule.evaluatesTo);
+	// executions
+	this.setDataImportExecute(rule.di);
+	this.setDoubleDataEntryExecute(rule.dde);
+	this.setInitialDataEntryExecute(rule.ide);
+	this.setAdministrativeEditingExecute(rule.ae);
+	// Actions
+	parser.setActions(rule.actions);
 }
 
 /* ===========================================================================================
@@ -585,52 +501,55 @@ Parser.prototype.isValid = function(expression) {
 
 	var valid = true;
 	var message = "";
-
 	if (this.rule.actions.length === 0) {
-
 		valid = false;
 		message = "A rule is supposed to fire an action. Please select the action(s) to take if the rule evaluates as intended.";
 	}
 
 	if (!$("#ide").is(":checked") && !$("#ae").is(":checked") && !$("#dde").is(":checked") && !$("#dataImport").is(":checked")) {
-
 		valid = false;
 		message = "Please specify when the rule should be run";
 	}
 
 	if ($("input[name=ruleInvoke]:checked").length == 0) {
-
 		valid = false;
 		message = "A rule is supposed to evaluate to true or false. Please specify";
 	}
 
 	if (this.rule.targets.length === 0) {
-
 		valid = false;
 		message = "Please specify a rule target";
 	}
 
 	if ($("#ruleName").val().length == 0) {
-
 		valid = false;
 		message = "Please specify the rule description";
 	}
 
 	if ($("#chkEmail").is(":checked")) {
-
 		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
 		if (!re.test($("#toField").val().trim())) {
-
 			valid = false;
 			message = "The email address is invalid. Check the email and try again.";
 		}
 	}
 
+	if ($("#chkData").is(":checked")) {
+		if (this.getInsertAction() && this.getInsertAction().destinations.length < 1) {
+			valid = false;
+			message = "An insert action was selected but the items to insert values into are not specified.";	
+		}
+	}
+
+	if ($("input[name='ruleInvoke']").is(":checked")) {
+		if (this.getShowHideAction() && this.getShowHideAction().destinations.length < 1) {
+			valid = false;
+			message = "An show/hide action was selected but the items to show/hide are not specified.";	
+		}
+	}
+
 	for (var x = 0; x < expression.length; x++) {
-
 		if (expression[x] === "Group or Data" || expression[x] === "Compare or Calculate" || expression[x] === "Evaluate") {
-
 			var index = expression.indexOf(expression[x]);
 			expression.splice(index, 1);
 		}
@@ -638,13 +557,16 @@ Parser.prototype.isValid = function(expression) {
 
 	// It should not be empty
 	if (expression.length < 3) {
-
 		valid = false;
 		message = "Cannot validate an empty or incomplete expressions.";
 	}
 
-	return {
+	if ($(".invalid").size() > 0) {
+		valid = false;
+		message = "A rule should only contain valid items in the selected study but the current rule contains invalid items that do not exist in the selected study. Fix the items to proceed";	
+	}
 
+	return {
 		valid: valid,
 		message: message
 	}
@@ -659,32 +581,23 @@ Parser.prototype.isValid = function(expression) {
  * Returns true if the predicate is among the allowed math symbols in CC
  * ============================================================================ */
 Parser.prototype.isOp = function(predicate) {
-
 	var ops = ['=', '<', '>', '+', 'AND', 'OR', 'NOT'];
-
 	// not equals
-	ops.push(unescape(JSON.parse('"\u2260"')))
-
+	ops.push(unescape(JSON.parse('"\u2260"')));
 	// gte
-	ops.push(unescape(JSON.parse('"\u2264"')))
-
+	ops.push(unescape(JSON.parse('"\u2264"')));
 	// lte
-	ops.push(unescape(JSON.parse('"\u2265"')))
-
+	ops.push(unescape(JSON.parse('"\u2265"')));
 	// not contains
-	ops.push(unescape(JSON.parse('"\u2209"')))
-
+	ops.push(unescape(JSON.parse('"\u2209"')));
 	// contains
-	ops.push(unescape(JSON.parse('"\u220B"')))
-
+	ops.push(unescape(JSON.parse('"\u220B"')));
 	// divide
-	ops.push(unescape(JSON.parse('"\u00F7"')))
-
+	ops.push(unescape(JSON.parse('"\u00F7"')));
 	// multiply
-	ops.push(unescape(JSON.parse('"\u0078"')))
+	ops.push(unescape(JSON.parse('"\u0078"')));
 
 	var dOps = ['eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'nct', 'ct', 'and', 'or', 'not'];
-
 	return ops.indexOf(predicate) > -1 || dOps.indexOf(predicate) > -1;
 }
 
@@ -697,12 +610,9 @@ Parser.prototype.isOp = function(predicate) {
  * Returns true if the predicate is a math symbols
  * =========================================================== */
 Parser.prototype.isAllowedOp = function(predicate) {
-
 	var ops = ['+', '-'];
-
 	// Divide
-	ops.push(unescape(JSON.parse('"\u00F7"')))
-
+	ops.push(unescape(JSON.parse('"\u00F7"')));
 	return ops.indexOf(predicate) > -1;
 }
 
@@ -715,9 +625,7 @@ Parser.prototype.isAllowedOp = function(predicate) {
  * Returns true if the predicate is a 'AND' or 'OR'
  * =========================================================== */
 Parser.prototype.isConditionalOp = function(predicate) {
-
 	var ops = ['AND', 'OR'];
-
 	return ops.indexOf(predicate) > -1;
 }
 
@@ -730,11 +638,9 @@ Parser.prototype.isConditionalOp = function(predicate) {
  * Returns a CC compartible version of the operator
  * =================================================================== */
 Parser.prototype.getOp = function(predicate) {
-
 	if (this.isAllowedOp(predicate)) {
 		return predicate;
 	} else {
-
 		if (predicate === '=') {
 			return "eq";
 		} else if (predicate === unescape(JSON.parse('"\u2260"'))) {
@@ -758,11 +664,9 @@ Parser.prototype.getOp = function(predicate) {
 }
 
 Parser.prototype.getLocalOp = function(predicate) {
-
 	if (this.isAllowedOp(predicate)) {
 		return predicate;
 	} else {
-
 		if (predicate === 'eq') {
 			return "=";
 		} else if (predicate === 'ne') {
@@ -787,7 +691,6 @@ Parser.prototype.getLocalOp = function(predicate) {
 			return "OR";
 		} 
 	}
-
 	return false;
 }
 
@@ -800,26 +703,19 @@ Parser.prototype.getLocalOp = function(predicate) {
  * Returns true if target is in added array of targets, false otherwise
  * =================================================================== */
 Parser.prototype.isAddedTarget = function(target) {
-
 	return this.rule.targets.indexOf(target) > -1;
 }
 
 Parser.prototype.isAddedInsertTarget = function(target) {
-
-	var item = this.findItem(target);
-
-	var dest = item.formOid + "." + item.group + "." + item.oid;
-
-	return this.getInsertAction() && this.getInsertAction().destinations.indexOf(dest) > -1;
+	for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
+		if (this.getInsertAction().destinations[x].oid === this.constructFormPath(target)) {
+			return true;
+		}
+	}
 }
 
 Parser.prototype.isAddedShowHideTarget = function(target) {
-
-	var item = this.findItem(target);
-
-	var dest = item.formOid + "." + item.group + "." + item.oid;
-
-	return this.getShowHideAction() && this.getShowHideAction().destinations.indexOf(dest) > -1;
+	return this.getShowHideAction() && this.getShowHideAction().destinations.indexOf(this.constructFormPath(target)) > -1;
 }
 
 /* ===========================================================================
@@ -831,34 +727,25 @@ Parser.prototype.isAddedShowHideTarget = function(target) {
  * Returns the returned CRF item
  * ========================================================================= */
 Parser.prototype.findItem = function(itemName) {
-
 	var storedStudies = JSON.parse(sessionStorage.getItem("studies"));
-
 	for (var x in storedStudies) {
 
 		var study = storedStudies[x];
-
 		for (var e in study.events) {
 
 			var event = study.events[e];
-
 			for (var c in event.crfs) {
 
 				var crf = event.crfs[c];
-
 				for (var v in crf.versions) {
 
 					var ver = crf.versions[v];
-
 					for (var i in ver.items) {
 
 						var itm = ver.items[i];
-
 						if (itm.name === itemName) {
-							
 							itm.formOid = crf.oid;
 							itm.eventOid = event.oid;
-
 							return itm;
 						}
 					}
@@ -883,28 +770,21 @@ Parser.prototype.findItemName = function(itemOID) {
 	for (var x in storedStudies) {
 
 		var study = storedStudies[x];
-
 		for (var e in study.events) {
 
 			var event = study.events[e];
-
 			for (var c in event.crfs) {
 
 				var crf = event.crfs[c];
-
 				for (var v in crf.versions) {
 
 					var ver = crf.versions[v];
-
 					for (var i in ver.items) {
 
 						var itm = ver.items[i];
-
 						if (itm.oid === itemOID) {
-
 							itm.formOid = crf.oid;
 							itm.eventOid = event.oid;
-
 							return itm;
 						}
 					}
@@ -914,12 +794,34 @@ Parser.prototype.findItemName = function(itemOID) {
 	}
 }
 
+Parser.prototype.findStudyItem = function(params) {
+
+	for (var e in params.study.events) {
+
+		var event = params.study.events[e];
+		for (var c in event.crfs) {
+
+			var crf = event.crfs[c];
+			for (var v in crf.versions) {
+
+				var ver = crf.versions[v];
+				for (var i in ver.items) {
+
+					var itm = ver.items[i];
+					if (itm.name === params.name) {
+						itm.formOid = crf.oid;
+						itm.eventOid = event.oid;
+						return itm;
+					}
+				}
+			}
+		}
+	}
+}
+
 Parser.prototype.setName = function(name) {
-
 	if (name && name.length > 0) {
-
 		this.rule.name = name;
-
 		$("#ruleName").val(this.rule.name);
 	}
 }
@@ -929,31 +831,25 @@ Parser.prototype.getName = function() {
 }
 
 Parser.prototype.setTargets = function(targets) {
-
 	if (targets.length > 0) {
-
-		var currInput = $(".target");
+		var targetDiv = $(".parent-target");
 		for (var x = 0; x < targets.length; x++) {
 
-			var input = currInput.clone();
-
+			var div = targetDiv.clone();
+			div.find("input").text("");
 			createDroppable({
-				element: input,
+				element: div.find("input"),
 				accept: "div[id='items'] td"
-			})
+			});
 
-			input.val(this.findItemName(this.extractLastItem(targets[x])).name);
-			input.css('font-weight', 'bold');
+			div.find("span").click(function() {
+				parser.deleteTarget(this);
+			});
 
-			if (x === 0) {
+			div.find("input").val(this.findItemName(this.extractLastItem(targets[x])).name);
+			div.find("input").css('font-weight', 'bold');
 
-				currInput.before(input);
-
-			} else {
-
-				$(".target").last().before(input);
-			}
-
+			x === 0 ? targetDiv.before(div) : $(".parent-target").last().before(div);
 			this.rule.targets.push(this.findItemName(this.extractLastItem(targets[x])).name);
 		}
 	}
@@ -963,18 +859,52 @@ Parser.prototype.getTargets = function() {
 	return this.rule.targets;
 }
 
+Parser.prototype.deleteTarget = function(target) {
+	if ($(target).siblings("input").is(".target")) {
+		var index = this.rule.targets.indexOf($(target).siblings("input").val());
+		if (index > -1) {
+			this.rule.targets.splice(index, 1);
+			$(target).parent().remove();
+		}
+	} else if ($(target).siblings("input").is(".value")) {
+
+		var act = this.getInsertAction();
+		var oid = this.constructFormPath($(target).closest(".row").find(".item").text());
+		for (var x = 0; x < act.destinations.length; x++) {
+			var dest = act.destinations[x];
+			if(dest.oid === oid) {
+				act.destinations.splice(x, 1);
+				if ($("#insert").find(".row").size() === 1) { 
+					$(target).closest(".row").find(".item").val("");
+					$(target).closest(".row").find(".value").val("");
+				} else {
+					$(target).closest(".row").remove();
+				}
+				if ($("#insert").find("label:visible").size() === 0) {
+					$("#insert").find(".row:first").find("label").map(function() {
+						$(this).show();
+					});
+				}
+			}
+		}
+	} else {
+		if (this.getShowHideAction() && this.getShowHideAction().destinations.length > 0) {
+			var index = this.getShowHideAction().destinations.indexOf(this.constructFormPath($(target).siblings(".dest").val()));
+			if (index > -1) {
+				this.getShowHideAction().destinations.splice(index, 1);
+				$(target).parent().remove();
+			}	
+		}
+	}
+}
+
 Parser.prototype.setEvaluatesTo = function(evaluates) {
-
 	if (evaluates) {
-
 		this.rule.evaluatesTo = true;
 		$("#evaluateTrue").prop("checked", true);
-
 	} else {
-
 		this.rule.evaluatesTo = false;
 		$("#evaluateFalse").prop("checked", true);
-
 	}
 }
 
@@ -983,13 +913,10 @@ Parser.prototype.getEvaluatesTo = function() {
 }
 
 Parser.prototype.setInitialDataEntryExecute = function(execute) {
-
 	if (execute) {
-
 		this.rule.ide = true;
 		$("#ide").prop("checked", execute);
 	} else {
-
 		this.rule.ide = false;
 		$("#ide").prop("checked", execute);
 	}
@@ -1000,13 +927,10 @@ Parser.prototype.getInitialDataEntryExecute = function() {
 }
 
 Parser.prototype.setDoubleDataEntryExecute = function(execute) {
-
 	if (execute) {
-
 		this.rule.dde = true;
 		$("#dde").prop("checked", execute);
 	} else {
-
 		this.rule.dde = false;
 		$("#dde").prop("checked", execute);
 	}
@@ -1017,13 +941,10 @@ Parser.prototype.getDoubleDataEntryExecute = function() {
 }
 
 Parser.prototype.setAdministrativeEditingExecute = function(execute) {
-
 	if (execute) {
-
 		this.rule.ae = true;
 		$("#ae").prop("checked", execute);
 	} else {
-
 		this.rule.ae = false;
 		$("#ae").prop("checked", execute);
 	}
@@ -1034,13 +955,10 @@ Parser.prototype.getAdministrativeEditingExecute = function() {
 }
 
 Parser.prototype.setDataImportExecute = function(execute) {
-
 	if (execute) {
-
 		this.rule.di = true;
 		$("#dataImport").prop("checked", execute);
 	} else {
-
 		this.rule.di = false;
 		$("#dataImport").prop("checked", execute);
 	}
@@ -1051,15 +969,10 @@ Parser.prototype.getDataImportExecute = function() {
 }
 
 Parser.prototype.getDiscrepancyAction = function() {
-
 	if (this.rule.actions.length > 0) {
-
 		for (var x = 0; x < this.rule.actions.length; x++) {
-
 			var action = this.rule.actions[x];
-
 			if (action.type === "discrepancy") {
-
 				return action;
 			}
 		}
@@ -1067,77 +980,51 @@ Parser.prototype.getDiscrepancyAction = function() {
 }
 
 Parser.prototype.setDiscrepancyAction = function(params) {
-
 	if (params) {
-
 		var action = Object.create(null);
-
 		// function to toggle display
 		action.render = function(visible) {
-
 			if (visible) {
-
 				$("#message").show();
 				$("#actionMessages").show();
-
 				$("#discrepancyText").show();
 				$("#discrepancyText").find("textarea").val(action.message);
-
 				$("#chkDiscrepancyText").prop("checked", params.selected);
 
 			} else {
 
-				// Update UI
 				$("#message").hide();
 				$("#discrepancyText").hide();
-
 				$("#chkDiscrepancyText").prop("checked", params.selected);
-
 				if ($("#actionMessages").find("div:visible").length === 0) {
-
 					$("#actionMessages").hide();
 				}
 			}
 		}
 
 		if (params.selected) {
-
 			if (this.getActions().length > 0 && this.getDiscrepancyAction()) {
 				action = this.getDiscrepancyAction();
 			} else {
-
 				this.rule.actions.push(action);
 			}
-			
 			action.type = "discrepancy";
 			action.message = params.message;
-			
 			action.render(params.selected);
-
 		} else {
-
-			// Delete saved reference
-			var act = this.getDiscrepancyAction();
-			
-			if ($.inArray(act, this.rule.actions) > -1) {
-				this.rule.actions.splice($.inArray(act, this.rule.actions), 1);
+			if ($.inArray(this.getDiscrepancyAction(), this.rule.actions) > -1) {
+				this.rule.actions.splice($.inArray(this.getDiscrepancyAction(), this.rule.actions), 1);
 			}
-
 			action.render(params.selected);
 		}
 	}
 }
 
 Parser.prototype.getEmailAction = function() {
-
 	if (this.rule.actions.length > 0) {
-
 		for (var x = 0; x < this.rule.actions.length; x++) {
-
 			var action = this.rule.actions[x];
-
 			if (action.type === "email") {
-
 				return action;
 			}
 		}
@@ -1145,87 +1032,58 @@ Parser.prototype.getEmailAction = function() {
 }
 
 Parser.prototype.setEmailAction = function(params) {
-
 	if (params) {
-
 		var action = Object.create(null);
-
 		// function to toggle display
 		action.render = function(visible) {
-
 			if (visible) {
-
 				$("#actionMessages").show();
-
 				// Action controls
 				$("#email").show();
 				$("#emailTo").show();
-
 				$("#body").show();
 				$("#toField").show();
-
 				$("#toField").val(action.to);
 				$("#body").val(action.body);
-
 				$("#chkEmail").prop("checked", params.selected);
-
 			} else {
-
 				$("#email").hide();
 				$("#emailTo").hide();
-
 				$("#body").val("");
 				$("#toField").val("");
-
 				$("#chkEmail").prop("checked", params.selected);
-
 				if ($("#actionMessages").find("div:visible").length === 0) {
-
 					$("#actionMessages").hide();
 				}
 			}
 		}
 
 		if (params.selected) {
-
 			if (this.getActions().length > 0 && this.getEmailAction()) {
 				action = this.getEmailAction();
 			} else {
-
 				this.rule.actions.push(action);
 			}
 
 			action.type = "email";
-
 			action.to = params.to;
 			action.body = params.message;
-
 			action.render(params.selected);
 
 		} else {
-
-			// Delete saved reference
-			var act = this.getEmailAction();
-			if ($.inArray(act, this.rule.actions) > -1) {
-				this.rule.actions.splice($.inArray(act, this.rule.actions), 1);
+			if ($.inArray(this.getEmailAction(), this.rule.actions) > -1) {
+				this.rule.actions.splice($.inArray(this.getEmailAction(), this.rule.actions), 1);
 			}
-
 			action.render(params.selected);
-
 		}
 	}
 }
 
 Parser.prototype.getInsertAction = function() {
-
 	if (this.rule.actions.length > 0) {
-
 		for (var x = 0; x < this.rule.actions.length; x++) {
-
 			var action = this.rule.actions[x];
-
 			if (action.type === "insert") {
-
 				return action;
 			}
 		}
@@ -1233,90 +1091,77 @@ Parser.prototype.getInsertAction = function() {
 }
 
 Parser.prototype.setInsertAction = function(params) {
-
 	if (params) {
-
 		var action = Object.create(null);
-
 		// function to toggle display
 		action.render = function(visible) {
-
 			if (visible) {
-
 				$("#insert").show();
 				$("#actionMessages").show();
-
 				$("#insert").show();
-
 				$("#chkData").prop("checked", params.selected);
-
 				$("#insert").find(".item").focus();
-
 			} else {
-
 				// Update UI
 				$("#insert").hide();
-
 				$("#chkData").prop("checked", params.selected);
-
 				if ($("#actionMessages").find("div:visible").length === 0) {
-
 					$("#actionMessages").hide();
 				}
+
+				var div = $("#insert").find(".row").first().clone();
+				div.find(".item").val("");
+				div.find(".value").val("");
+				div.find(".value").attr("type", "text");
+				div.find(".value").removeClass("invalid");
+				$("#insert").find(".row").remove();
+				createDroppable({
+					element: div.find(".item"),
+					accept: "div[id='items'] td"
+				});
+
+				createDroppable({
+					element: div.find(".value"),
+					accept: "div[id='data'] p, div[id='items'] td"
+				});
+				$("#insert").append(div);
 			}
 		}
 
 		if (params.selected) {
-
 			if (this.getActions().length > 0 && this.getInsertAction()) {
 				action = this.getInsertAction();
 			} else {
-
 				this.rule.actions.push(action);
 			}
 			
 			if (params.edit) {
-
 				action.message = "";
 				action.type = "insert";
 				action.destinations = params.action.destinations;
-
 				// Add action targets
 				this.setDestinations(action.destinations)
 
 			} else {
-
 				action.message = "";
 				action.type = "insert";
 				action.destinations = [];
 			}
-			
 			action.render(params.selected);
-
 		} else {
-
-			// Delete saved reference
-			var act = this.getInsertAction();
-			
-			if ($.inArray(act, this.rule.actions) > -1) {
-				this.rule.actions.splice($.inArray(act, this.rule.actions), 1);
+			if ($.inArray(this.getInsertAction(), this.rule.actions) > -1) {
+				this.rule.actions.splice($.inArray(this.getInsertAction(), this.rule.actions), 1);
 			}
-
 			action.render(params.selected);
 		}
 	}
 }
 
 Parser.prototype.getShowHideAction = function() {
-
 	if (this.rule.actions.length > 0) {
-
 		for (var x = 0; x < this.rule.actions.length; x++) {
-
 			var action = this.rule.actions[x];
-
 			if (action.type === "showHide") {
-
 				return action;
 			}
 		}
@@ -1328,224 +1173,195 @@ Parser.prototype.setShowHideActionMessage = function(message) {
 }
 
 Parser.prototype.setShowHideAction = function(params) {
-
 	if (params) {
-
 		var action = Object.create(null);
-
 		// function to toggle display
 		action.render = function(visible) {
-
 			if (visible.show || visible.hide) {
-
 				$("#dispActions").show();
 				$("#actionMessages").show();
-
 				$("#dispActions").show();
 				$("#dispActions").find("textarea").val(action.message);
-
 				$("#dispActions").find("textarea").focus();
-
 			} else {
-
 				// Update UI
 				$("#dispActions").hide();
-
 				if ($("#actionMessages").find("div:visible").length === 0) {
-
 					$("#actionMessages").hide();
 				}
-			}
+				$("#dispActions").find("textarea").val("");
+				var div = $("#dispActions").find(".input-group").first().clone();
+				div.find(".dest").val("");
+				div.find(".dest").attr("type", "text");
+				div.find(".dest").removeClass("invalid");
+				$("#dispActions").find(".input-group").remove();
+				createDroppable({
+					element: div.find(".dest"),
+					accept: "div[id='items'] td"
+				});
 
+				$("#dispActions").find(".col-md-6").append(div);
+			}
 			$("input[action=show]").prop("checked", visible.show);
 			$("input[action=hide]").prop("checked", visible.hide);
 		}
 
 		if (params.hide || params.show) {
-
 			if (this.getActions().length > 0 && this.getShowHideAction()) {
-
 				action = this.getShowHideAction();
-				
 				action.type = "showHide";
 				action.hide = params.hide;
 				action.show = params.show;
 				action.message = action.message;
 				action.destinations = action.destinations;
-
 			} else {
-
 				action.message = "";
 				action.type = "showHide";
 				action.destinations = [];
 				action.hide = params.hide;
 				action.show = params.show;
-
 				this.rule.actions.push(action);
 			}
 
 			if (params.action) {
-
 				action.type = "showHide";
 				action.hide = params.hide;
 				action.show = params.show;
 				action.message = params.action.message;
 				action.destinations = params.action.destinations;
-
 				// Add action targets
 				this.setShowHideDestinations(action.destinations);
-
 			}
 
 		} else {
 
-			// Delete saved reference
-			var act = this.getShowHideAction();
-
-			if ($.inArray(act, this.rule.actions) > -1) {
-				this.rule.actions.splice($.inArray(act, this.rule.actions), 1);
+			if ($.inArray(this.getShowHideAction(), this.rule.actions) > -1) {
+				this.rule.actions.splice($.inArray(this.getShowHideAction(), this.rule.actions), 1);
 			}
 		}
-
 		action.render(params);
 	}
 }
 
 Parser.prototype.setDestinationValue = function(params) {
-
 	var act = this.getInsertAction();
-
 	if (act) {
-
 		for (var x = 0; x < act.destinations.length; x++) {
-
 			var dest = act.destinations[x];
-
 			if (dest.id === params.id && !dest.item) {
-
 				dest.value = params.value;
+				// Only create relevant rows
+				var row = $(".row[id="+ params.id +"]")
+				if (!row.closest(".row").next().is(".row")) {
+					this.addNewInsertActionInputs();
+				}
+				row.find(".bordered").removeClass("bordered");
 			}
 		}
-
 		act.render(act);
 	}
 }
 
+Parser.prototype.addNewInsertActionInputs = function() {
+
+	var div = $("#insert").find(".row").first().clone();
+	div.attr("id", $("#insert").find(".row").size() + 1);
+	div.find("label").hide();
+
+	var input = div.find(".item");
+	input.val("");
+	input.text("");
+	input.removeClass("bordered");
+
+	var inputVal = div.find(".value");
+	inputVal.val("");
+	inputVal.text("");
+	inputVal.removeClass("bordered");
+	inputVal.removeAttr("type");
+	inputVal.blur(function() {
+		parser.setDestinationValue({
+			value: $(this).val(),
+			id: $(this).parents(".row").attr("id")
+		});
+	});
+
+	div.find("span").click(function() {
+		parser.deleteTarget(this);
+	});
+
+	createDroppable({
+		element: input,
+		accept: "div[id='items'] td"
+	});
+
+	createDroppable({
+		element: inputVal,
+		accept: "div[id='data'] p, div[id='items'] td"
+	});
+
+	$("#insert").append(div);
+}
+
 Parser.prototype.setDestinations = function(dests) {
-
 	if (dests.length > 0) {
-
-		var newRow = $("#insert").find(".row").first().clone();
-
 		// Remove labels
-		$("#insert").find(".row").find("label").remove();
-
+		$("#insert").find("label").hide();
 		for (var x = 0; x < dests.length; x++) {
 
-			var dest = dests[x];
+			var div = $("#insert").find(".row").first().clone();			
 
-			var input = newRow.find(".item");
-			newRow.attr("id", dest.id);
+			var dest = dests[x];
+			var input = div.find(".item");
+			div.attr("id", dest.id);
 
 			input.val(this.findItemName(this.extractLastItem(dest.oid)).name);
 			input.css('font-weight', 'bold');
 
-			var inputVal = newRow.find(".value");
+			var inputVal = div.find(".value");
 			inputVal.css('font-weight', 'bold');
-
 			var inputValue = this.findItemName(dest.value) ? this.findItemName(dest.value).name : dest.value;
-			
 			inputVal.val(inputValue);
-
 			inputVal.blur(function() {
-
 				parser.setDestinationValue({
-
 					value: $(this).val(),
 					id: $(this).parents(".row").attr("id")
 				});
 			});
 
 			createDroppable({
-
 				element: input,
 				accept: "div[id='data'] p, div[id='items'] td"
-			})
+			});
 
 			createDroppable({
-
 				element: inputVal,
 				accept: "div[id='data'] p, div[id='items'] td"
-			})
+			});
 
 			if (x === 0) {
-
-				$("#insert").find(".row").before(newRow);
-
+				div.find("label").show();
+				$("#insert").find(".row").before(div)
 			} else {
-
-				$("#insert").append(newRow);
+				div.find("label").hide();
+				$("#insert").find(".row").last().before(div);
 			}
 		}
 	}
 }
 
 Parser.prototype.setShowHideDestinations = function(dests) {
-
 	if (dests.length > 0) {
-
-		var currInput = $(".dest");
+		var div = $(".space-left-neg > .input-group").first();
 		for (var x = 0; x < dests.length; x++) {
-
-			var input = currInput.clone();
-
+			var cloned = div.clone();
 			createDroppable({
-
-				element: input,
-				accept: "div[id='items'] td"
-			})
+				accept: "div[id='items'] td",
+				element: cloned.find(".dest")
+			});
 			
-			input.val(this.findItemName(dests[x]).name);
-			input.css('font-weight', 'bold');
-
-			if (x === 0) {
-
-				currInput.before(input);
-
-			} else {
-
-				$(".dest").last().before(input);
-			}
-		}
-	}
-}
-
-Parser.prototype.setShowHideDestinations = function(dests) {
-
-	if (dests.length > 0) {
-
-		var currInput = $(".dest");
-		for (var x = 0; x < dests.length; x++) {
-
-			var input = currInput.clone();
-
-			createDroppable({
-
-				element: input,
-				accept: "div[id='items'] td"
-			})
-			
-			input.val(this.findItemName(dests[x]).name);
-			input.css('font-weight', 'bold');
-
-			if (x === 0) {
-
-				currInput.before(input);
-
-			} else {
-
-				$(".dest").last().before(input);
-			}
+			cloned.find("input").val(this.findItemName(this.extractLastItem(dests[x])).name);
+			cloned.find("input").css('font-weight', 'bold');
+			x === 0 ? div.before(cloned) : $(".space-left-neg > .input-group").last().before(cloned);
 		}
 	}
 }
@@ -1557,51 +1373,31 @@ Parser.prototype.setInsertActionMessage = function(message) {
 Parser.prototype.setExpression = function(expression) {
 
 	if (expression instanceof Array) {
-
 		this.rule.expression = expression;
-
 		var currDroppable = $("#groupSurface");
-
 		for (var e = 0; e < expression.length; e++) {
-
 			if (e === 0) {
-
 				$("#groupSurface").text(expression[e]);
-
 			} else {
-
 				var predicate = expression[e];
-
 				if (parser.isConditionalOp(predicate.toUpperCase())) {
-
 					var droppable = createConditionDroppable();
 					droppable.text(predicate);
-
 					currDroppable.after(droppable);
-
 					currDroppable = droppable;
-
 				} else if (parser.isOp(predicate)) {
 
 					var droppable = createSymbolDroppable();
 					droppable.text(predicate);
-
 					currDroppable.after(droppable);
-
 					currDroppable = droppable;
-
 				} else {
-
 					var droppable = createStartExpressionDroppable();
 					droppable.text(predicate);
-
 					currDroppable.after(droppable);
-
 					currDroppable = droppable;
 				}
 			}
-
-			currDroppable.removeClass("init");
 			currDroppable.addClass("bordered");
 			currDroppable.css('font-weight', 'bold');
  			
@@ -1609,22 +1405,14 @@ Parser.prototype.setExpression = function(expression) {
 	} else if (typeof expression === "string") {
 
 		var rawExpression = [];
-
 		// The regex skips quoted strings in expression
 		var expr = expression.split(/(\()|(?=\))|\s+(?!\w+(\s+\w+)*?")/g);
-
 		for (var x = 0; x < expr.length; x++) {
-
 			if (expr[x] && expr[x].length > 0) {
-
 				if (expr[x].indexOf(".") !== -1) {
-
 					var itm = this.findItemName(this.extractLastItem(expr[x]));
-
 					rawExpression.push(itm.name);
-
 				} else {
-
 					if (this.isOp(expr[x])) {
 						rawExpression.push(this.getLocalOp(expr[x]));
 					} else {
@@ -1633,51 +1421,38 @@ Parser.prototype.setExpression = function(expression) {
 				}
 			}
 		}
-
 		this.setExpression(rawExpression);
 	}
 }
 
 Parser.prototype.setActions = function(actions) {
-
 	if (actions.length > 0) {
-
 		for (var x = 0; x < actions.length; x++) {
-
 			var action = actions[x];
-
 			if (action.type.toLowerCase() === "discrepancy") {
-
 				this.setDiscrepancyAction({
 					selected: true,
 					message: action.message
-				})
-
+				});
 			} else if (action.type.toLowerCase() === "email") {
-
 				this.setEmailAction({
-
 					selected: true,
 					to: action.to,
 					message: action.body
-				})
+				});
 			} else if (action.type.toLowerCase() === "insert") {
-
 				this.setInsertAction({
-
 					edit: true,
 					action: action,
 					selected: true
 					
-				})
+				});
 			} else if (action.type === "showHide") {
-
 				this.setShowHideAction({
-
 					action: action,
 					hide: action.hide,
 					show: action.show
-				})
+				});
 			} 
 		}
 	}
@@ -1687,107 +1462,35 @@ Parser.prototype.getActions = function() {
 	return this.rule.actions;
 }
 
-Parser.prototype.getRule = function() {
-
-	this.createRule();
-
-	if (this.isValid(this.rule.expression).valid) {
-
-		var rule = Object.create(null);
-
-		rule.expression = this.rule.expression.join().replace(/\,/g, " ");
-
-		rule.name = this.getName();
-		rule.targets = this.getTargets();
-		rule.evaluatesTo = this.getEvaluatesTo();
-		
-		// Evocation
-		rule.di = this.getDataImportExecute();
-		rule.dde = this.getDoubleDataEntryExecute();
-		rule.ide = this.getInitialDataEntryExecute();
-		rule.ae = this.getAdministrativeEditingExecute();
-
-		rule.actions = this.getActions();
-
-		rule.study = this.rule.study;
-		rule.submission = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
-
-		return rule;
-
-	} else {
-
-		// Ensure one alert is displayed
-		if ($(".alert").size() == 0) {
-
-			$("#designSurface").find(".panel-body").prepend(createAlert(this.isValid(this.rule.expression).message));
-		}
-
-		return false;
-	}
-}
-
-Parser.prototype.render = function(rule) {
-
-	this.rule.targets = [];
-	this.setExpression(rule.expression);
-
-	// properties
-	this.setName(rule.name);
-	this.setStudy(rule.study);
-	this.setTargets(rule.targets);
-	this.setEvaluatesTo(rule.evaluatesTo);
-
-	// executions
-	this.setDataImportExecute(rule.di);
-	this.setDoubleDataEntryExecute(rule.dde);
-	this.setInitialDataEntryExecute(rule.ide);
-	this.setAdministrativeEditingExecute(rule.ae);
-
-	// Actions
-	parser.setActions(rule.actions);
-}
-
 /* ========================================================================
  * Fetch studies from CC. The studies come with events/crf and items added.
  * ====================================================================== */
 Parser.prototype.fetchStudies = function() {
-		
 	// Notification
 	$("body").append(createLoader());	
-
 	// Clean up
 	sessionStorage.removeItem("id");
 	sessionStorage.removeItem("edit");
-
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
-
 	$.ajax({
 
 		type: "POST",
-
 		url: c + "/studies?action=fetch",
-
 		success: function(studies) {
-
 			// FF can return a string
 			if (typeof(studies) === "string") {
-
-				studies = JSON.parse(studies)
+				studies = JSON.parse(studies);
 			}
 
 			sessionStorage.setItem("studies", JSON.stringify(studies));
 			loadStudies(studies);
-
 			$(".spinner").remove();
 
 		},
-
 		error: function(response) {
-
 			handleErrorResponse({
-
 				response: response
-			})
+			});
 		}
 	})
 }
@@ -1805,33 +1508,23 @@ Parser.prototype.fetchRuleForEditing = function() {
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 
 	$.ajax({
-
 		type: "POST",
-
 		url: c + "/studies?action=edit&id=" + this.getParameterValue("id") + "&rId=" + this.getParameterValue("rId"),
-
 		success: function(response) {
-
 			var rule = null;
-
 			// FF can return a string
 			if (typeof(response) === "string") {
-
-				rule = JSON.parse(response)
+				rule = JSON.parse(response);
 			}
-
 			rule.study = parseInt(parser.getParameterValue("study"));
 			parser.render(rule);
-
 			$(".spinner").remove();
 		},
 
 		error: function(response) {
-
 			handleErrorResponse({
-
 				response: response
-			})
+			});
 		}
 	})
 }
@@ -1851,13 +1544,9 @@ Parser.prototype.validate = function() {
 	$("body").append(createLoader());
 
 	if (rule) {
-
 		$.ajax({
-
 			type: "POST",
-
 			data: {
-
 				rs: true,
 				rule: rule.expression,
 				target: rule.targets[0],
@@ -1865,25 +1554,18 @@ Parser.prototype.validate = function() {
 			},
 
 			url: rule.study ? rule.submission + "/TestRule?action=validate&study=" + rule.study : rule.submission + "/TestRule?action=validate",
-
 			success: function(response) {
-
 				sessionStorage.setItem("validation", response);
 				parser.displayValidationResults(rule);
-
 				$(".spinner").remove();
 			},
-
 			error: function(response) {
-
 				handleErrorResponse({
-
 					response: response
-				})
+				});
 			}
 		})
 	}
-
 	$(".spinner").remove();
 }
 
@@ -1899,53 +1581,37 @@ Parser.prototype.validate = function() {
  * => evaluateTo - What the rule should evaluate to
  * ============================================================= */
 Parser.prototype.displayValidationResults = function(rule) {
-
-		$.ajax({
-
+	$.ajax({
 		type: "POST",
-
 		data: {
-
 			action: "save",
 			rule: JSON.stringify(rule)
-			
 		},
 
 		url: rule.submission + "/studies?action=validate",
-
 		success: function(response) {
-
 			if (response) {
-
 				// To be used in validation
 				rule.xml = response;
 				sessionStorage.setItem("rule", JSON.stringify(rule));
-
 				// launch validation window
 				window.open("validation.html", '_self');
-
 			}
 		},
-
 		error: function(response) {
-
 			handleErrorResponse({
-
 				response: response
-			})
+			});
 		}
 	})
 }
 
 Parser.prototype.getParameter = function(name) {
-
 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))|| null;
 }
 
 Parser.prototype.getParameterValue = function(name) {
-
 	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-
 	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
 	var results = regex.exec(window.location.href);
 	if (results == null) {
@@ -1956,6 +1622,32 @@ Parser.prototype.getParameterValue = function(name) {
 }
 
 Parser.prototype.extractLastItem = function(predicate) {
+	return new RegExp("\.([^\.]+)$").exec(predicate)[1];
+}
 
-	return new RegExp("\.([^\.]+)$").exec(predicate)[1]
+Parser.prototype.extractStudy = function(id) {
+	var studies = JSON.parse(sessionStorage.getItem("studies"));
+	for (var x = 0; x < studies.length; x++) {
+		if (studies[x].id === id) {
+			return studies[x];
+		}
+	}
+}
+
+Parser.prototype.constructFormPath = function(itemName) {
+	var study = this.extractStudy(this.getStudy());
+	var item = this.findStudyItem({
+		study: study,
+		name: itemName
+	});
+	return item.formOid + "." + item.group + "." + item.oid;
+}
+
+Parser.prototype.constructEventPath = function(itemName) {
+	var study = this.extractStudy(this.getStudy());
+	var item = this.findStudyItem({
+		study: study,
+		name: itemName
+	});
+	return item.eventOid + "." + this.constructFormPath(itemName);
 }

@@ -118,7 +118,7 @@
             <div class="panel-body">
               <div class="pull-right space-right-p">
                 <div id="deleteButton" type="button">
-                  <span class="glyphicon glyphicon-trash pull-right"></span>
+                  <span class="glyphicon glyphicon-trash pull-right space-top-m"></span>
                 </div>
               </div>
               <div id="groupSurface" class="dotted-border group init">Group or Data</div>
@@ -132,7 +132,7 @@
           <span>Rule Description:</span>
         </div>
         <div class="col-md-7 space-top-sm">
-          <input type="text" class="form-control input-sm" id="ruleName">
+          <input type="text" class="form-control" id="ruleName">
         </div>   
       </div>
 
@@ -141,7 +141,10 @@
           <span>Apply this rule to:</span>
         </div>
         <div class="col-md-7 space-top-sm">
-            <input type="text" class="form-control input-sm target">
+            <div class="input-group parent-target">
+              <input type="text" class="target form-control">
+              <span class="glyphicon glyphicon-remove input-group-addon"></span>
+            </div>
         </div>
       </div>
 
@@ -225,9 +228,12 @@
                   <label class="lbl">Item:</label>
                   <input type="text" class="form-control input-sm col-md-3 item" style="text-align:center">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 input-group">
                   <label class="lbl">Value:</label>
-                  <input type="text" class="form-control input-sm col-md-3 value" style="text-align:center">
+                  <div class="input-group">
+                    <input type="text" class="form-control input-sm value" style="text-align:center">
+                    <span class="glyphicon glyphicon-remove input-group-addon"></span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -237,8 +243,11 @@
                 <textarea id="dActionMessage" class="form-control input-sm" rows="2"></textarea>
               </div>
               <label class="col-md-2 control-label">Destinations:</label>
-              <div class="col-md-6">
-                <input type="text" class="form-control input-sm dest">
+              <div class="col-md-6 space-bottom space-left-neg">
+                <div class="input-group">
+                  <input type="text" class="form-control input-sm dest">
+                  <span class="glyphicon glyphicon-remove input-group-addon"></span>
+                </div>
               </div>
             </div>
           </div>
