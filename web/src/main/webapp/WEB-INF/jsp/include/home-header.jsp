@@ -14,7 +14,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
+	<c:set var="contextPath" value="${pageContext.request.contextPath}" />
 	<c:set var="color" scope="session" value="${newThemeColor}"/>
 	
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />

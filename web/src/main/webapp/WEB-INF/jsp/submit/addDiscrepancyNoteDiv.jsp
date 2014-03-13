@@ -10,7 +10,7 @@
 
 <html>   
 <head>
-<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
     <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
     <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
 <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css">

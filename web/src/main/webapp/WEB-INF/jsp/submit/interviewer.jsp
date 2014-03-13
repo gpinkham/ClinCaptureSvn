@@ -4,7 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions"
     prefix="fn" %>
 
-<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
 
 <link rel="shortcut icon" type="image/x-icon" href="${pageContext.request.contextPath}/images/favicon.ico">
@@ -192,7 +192,6 @@ function callTip(html)
 
 </script>
 
-<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 <c:forEach var="presetValue" items="${presetValues}">
     <c:if test='${presetValue.key == "interviewer"}'>
         <c:set var="interviewer" value="${presetValue.value}" />

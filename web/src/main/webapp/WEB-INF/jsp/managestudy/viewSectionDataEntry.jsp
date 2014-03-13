@@ -45,8 +45,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 
-<c:set var="contextPath"
-	value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
 <title>ClinCapture <fmt:message key="view_data_entry"
 		bundle="${resword}" /></title>
