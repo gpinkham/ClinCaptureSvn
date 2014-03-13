@@ -31,6 +31,17 @@
         </sql>
     </query>
     <query>
+        <name>getCountOfEventsBasedOnEventStatusNoRepeats</name>
+        <sql>
+            select count (*) from (select distinct se.* from study_event se, study_subject ss, study s where
+            se.study_subject_id = ss.study_subject_id AND
+            ss.study_id = s.study_id AND
+            se.sample_ordinal = 1 AND
+            ( s.study_id = ? or s.parent_study_id = ? )AND
+            subject_event_status_id = ?) as ss
+        </sql>
+    </query>
+    <query>
         <name>getCountofEventsBasedOnEventStatusAndStudyEventDefinitionId</name>
         <sql>
             select count (*) from (select distinct se.* from study_event se, study_subject ss, study s, study_event_definition sd 

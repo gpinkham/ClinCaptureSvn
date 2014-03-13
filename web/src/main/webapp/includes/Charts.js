@@ -215,18 +215,17 @@ function initSubjectStatusCount() {
 		var lockedSubjects = parseInt($("form#subjects_status_count #ssc_locked").val());
 		var totalSubjectsCount = availableSubjects + signedSubjects + removedSubjects + lockedSubjects;
 
-		if (totalSubjectsCount!=0){
+		if (totalSubjectsCount != 0 ) {
 			data.addColumn('string', 'Statuses');
 			data.addColumn('number', 'Count');
-	
 			data.addRows([ [ ' - Available', availableSubjects ],
 			               [ ' - Signed', signedSubjects ], 
 			               [ ' - Removed', removedSubjects ],
 			               [ ' - Locked', lockedSubjects ] ]);
 	
 	
-			var options = getPieOptions([ '#a6c1dd', '#32a656','#ff0000', '#789EC5' ]);
-			var subjectStatusChart = new google.visualization.PieChart(document.getElementById('chart_div'));
+			var options = getPieOptions([ '#a6c1dd', '#32a656','#ff0000', '#868686' ]);
+			var subjectStatusChart = new google.visualization.PieChart(document.getElementById('subject_status_count_chart'));
 	
 			subjectStatusChart.draw(data, options);
 	
@@ -256,6 +255,114 @@ function initSubjectStatusCount() {
 	});
 }
 
+function initStudyProgress() {
+	var url = getCurentUrl();
+
+	$.ajax({
+		type : "POST",
+		url : url + "initStudyProgress",
+		data : {},
+		success : function(html) {
+
+			$(".study_progress #study_progress_container").html(html);
+
+			var spScheduled = parseInt($(
+					"#study_progress #sp_scheduled_count").val());
+			var spDES = parseInt($(
+					"#study_progress #sp_data_entry_started_count")
+					.val());
+			var spSDV = parseInt($(
+					"#study_progress #sp_source_data_verified_count")
+					.val());
+			var spSigned = parseInt($(
+					"#study_progress #sp_signed_count").val());
+			var spCompleted = parseInt($(
+					"#study_progress #sp_completed_count").val());
+			var spSkipped = parseInt($(
+					"#study_progress #sp_skipped_count").val());
+			var spStopped = parseInt($(
+					"#study_progress #sp_stopped_count").val());
+			var spLocked = parseInt($(
+					"#study_progress #sp_locked_count").val());
+			var totalCount = spScheduled + spDES + spSDV + spSigned
+					+ spCompleted + spSkipped + spStopped + spLocked;
+			var element = document.getElementById('toolbar');
+			var spData = new google.visualization.DataTable();
+
+			if (totalCount != 0) {
+				spData.addColumn('string', 'Statuses');
+				spData.addColumn('number', 'Count');
+				spData.addColumn('number', 'StatusId');
+				spData.addRows([ [ ' - Scheduled', spScheduled, 1 ],
+								[ ' - Data Entry Started', spDES, 3 ],
+								[ ' - SDV-ed', spSDV, 9 ],
+								[ ' - Signed', spSigned, 8 ],
+								[ ' - Completed', spCompleted, 4 ],
+								[ ' - Skipped', spSkipped, 6 ],
+								[ ' - Stopped', spStopped, 5 ],
+								[ ' - Locked', spLocked, 7 ] ]);
+
+				var options = getPieOptions([ '#12d2ff', '#ffc700',
+						'#8ac819', '#029f32', '#9439c4', '#ff6301',
+						'#ff0000', '#868686' ]);
+				var subjectStatusChart = new google.visualization.PieChart(
+						document.getElementById('study_progress_chart'));
+
+				subjectStatusChart.draw(spData, options);
+
+				if (!element) {
+					var d = new Date();
+					var months = [ "Jan", "Feb", "Mar", "Apr", "May",
+							"Jun", "Jul", "Aug", "Sep", "Oct", "Nov",
+							"Dec" ];
+					var curr_date = d.getDate();
+					var curr_month = months[parseInt(d.getMonth())];
+					var curr_year = d.getFullYear();
+					var startYear = parseInt(curr_year) - 10;
+					var endDate = (('' + curr_date).length < 2 ? '0'
+							: '')
+							+ curr_date
+							+ "-"
+							+ curr_month
+							+ "-"
+							+ curr_year;
+					var startDate = (('' + curr_date).length < 2 ? '0'
+							: '')
+							+ curr_date
+							+ "-"
+							+ curr_month
+							+ "-"
+							+ startYear;
+
+					function selectHandler() {
+						var selectedItem = subjectStatusChart
+								.getSelection()[0];
+
+						if (selectedItem) {
+							window.location.href = "ViewStudyEvents?startDate="
+									+ startDate
+									+ "&endDate="
+									+ endDate
+									+ "&statusId="
+									+ spData.getValue(selectedItem.row,
+											2).toString()
+									+ "&submitted=1";
+						}
+					}
+
+					google.visualization.events
+							.addListener(subjectStatusChart, 'select',
+							selectHandler);
+				}
+			} else {
+				$("#study_progress_container").attr("height", "50px");
+			}
+		},
+		error : function(e) {
+			console.log("Error:" + e);
+		}
+	});
+}
 /* /Initialization of widgets */
 
 /* Supporting functions */

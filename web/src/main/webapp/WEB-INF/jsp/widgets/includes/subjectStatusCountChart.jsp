@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 
 <div class="pie_chart_wrapper" align="left" style="overflow:hidden">
-	<div id="chart_div"></div>
+	<div id="subject_status_count_chart"></div>
 </div>
 
 <form class="hidden" id="subjects_status_count">

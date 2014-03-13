@@ -175,7 +175,6 @@ public class WidgetsLayoutController {
 		response.getWriter().println(result);
 	}
 
-	@SuppressWarnings("unchecked")
 	@RequestMapping("/initEventsCompletionWidget")
 	public String initEventsCompletionWidget(HttpServletRequest request, HttpServletResponse response, Model model)
 			throws IOException {
@@ -191,9 +190,6 @@ public class WidgetsLayoutController {
 		String action = request.getParameter("action");
 
 		StudyEventDAO studyEventDAO = new StudyEventDAO(datasource);
-		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
-		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(datasource);
-
 		boolean hasPrevious;
 		boolean hasNext;
 		int displayFrom = Integer.parseInt(request.getParameter("lastElement"));
@@ -214,16 +210,8 @@ public class WidgetsLayoutController {
 				SubjectEventStatus.STOPPED, SubjectEventStatus.LOCKED };
 
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
-		List<StudyEventDefinitionBean> studyEventDefinitions;
-		int countOfSubject;
-
-		if (sb.isSite(sb.getParentStudyId())) {
-			countOfSubject = studySubjectDAO.getCountofStudySubjectsAtStudyOrSite(sb);
-			studyEventDefinitions = studyEventDefinitionDAO.findAllActiveByParentStudyId(sb.getParentStudyId());
-		} else {
-			studyEventDefinitions = studyEventDefinitionDAO.findAllActiveByStudyId(sb.getId());
-			countOfSubject = studySubjectDAO.getCountofStudySubjectsAtStudy(sb);
-		}
+		List<StudyEventDefinitionBean> studyEventDefinitions = getListOfEventsDefinitions(sb);
+		int countOfSubject = getCountOfSubjects(sb);
 
 		List<DisplayWidgetsRowWithName> eventCompletionRows = new ArrayList<DisplayWidgetsRowWithName>();
 
@@ -292,5 +280,76 @@ public class WidgetsLayoutController {
 		String page = "widgets/includes/subjectStatusCountChart";
 
 		return page;
+	}
+
+	@RequestMapping("/initStudyProgress")
+	public String initStudyProgressWidget(HttpServletRequest request, HttpServletResponse response, Model model)
+			throws IOException {
+
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Pragma", "no-cache");
+		response.setDateHeader("Expires", -1);
+		response.setHeader("Cache-Control", "no-store");
+
+		ResourceBundleProvider.updateLocale(request.getLocale());
+
+		StudyEventDAO studyEventDAO = new StudyEventDAO(datasource);
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+
+		SubjectEventStatus[] subjectEventStatuses = { SubjectEventStatus.SCHEDULED,
+				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.SOURCE_DATA_VERIFIED,
+				SubjectEventStatus.SIGNED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SKIPPED,
+				SubjectEventStatus.STOPPED, SubjectEventStatus.LOCKED };
+
+		List<StudyEventDefinitionBean> studyEventDefinitions = getListOfEventsDefinitions(sb);
+		int countOfSubject = getCountOfSubjects(sb);
+		int countOfStartedEvents = 0;
+		int countOfNotStartedEvents = 0;
+		LinkedHashMap<String, Integer> mapOfEventsWithStatuses = new LinkedHashMap<String, Integer>();
+
+		for (SubjectEventStatus eventStatus : subjectEventStatuses) {
+			int countOfEventsWithStatus = studyEventDAO.getCountofEventsBasedOnEventStatus(sb, eventStatus);
+			int countOfEventsNoRepeats = studyEventDAO.getCountOfEventsBasedOnEventStatusNoRepeats(sb, eventStatus);
+			mapOfEventsWithStatuses.put(eventStatus.getName(), countOfEventsWithStatus);
+			countOfStartedEvents += countOfEventsNoRepeats;
+		}
+
+		countOfNotStartedEvents = countOfSubject * studyEventDefinitions.size() - countOfStartedEvents;
+		mapOfEventsWithStatuses.put(SubjectEventStatus.NOT_SCHEDULED.getName(), countOfNotStartedEvents);
+
+		model.addAttribute("studyProgressMap", mapOfEventsWithStatuses);
+
+		String page = "widgets/includes/studyProgressChart";
+
+		return page;
+	}
+
+	private Integer getCountOfSubjects(StudyBean sb) {
+
+		int countOfSubjects = 0;
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
+
+		if (sb.isSite(sb.getParentStudyId())) {
+			countOfSubjects = studySubjectDAO.getCountofStudySubjectsAtStudyOrSite(sb);
+		} else {
+			countOfSubjects = studySubjectDAO.getCountofStudySubjectsAtStudy(sb);
+		}
+
+		return countOfSubjects;
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<StudyEventDefinitionBean> getListOfEventsDefinitions(StudyBean sb) {
+
+		List<StudyEventDefinitionBean> studyEventDefinitions = new ArrayList<StudyEventDefinitionBean>();
+		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(datasource);
+
+		if (sb.isSite(sb.getParentStudyId())) {
+			studyEventDefinitions = studyEventDefinitionDAO.findAllActiveByParentStudyId(sb.getParentStudyId());
+		} else {
+			studyEventDefinitions = studyEventDefinitionDAO.findAllActiveByStudyId(sb.getId());
+		}
+
+		return studyEventDefinitions;
 	}
 }
