@@ -20,17 +20,6 @@
  */
 package org.akaza.openclinica.service.rule;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -85,10 +74,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 @Service
-@Transactional
 @SuppressWarnings("rawtypes")
 public class RuleSetService implements RuleSetServiceInterface {
 
@@ -99,7 +96,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 	private RuleDao ruleDao;
 	private RuleSetRuleDao ruleSetRuleDao;
 	private JavaMailSenderImpl mailSender;
-	
+
 	private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
 	private ExpressionService expressionService;
 	private String requestURLMinusServletPath;
@@ -170,7 +167,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 		return ruleSetBean;
 
 	}
-	
+
 	private RuleSetAuditBean createRuleSetAuditBean(RuleSetBean ruleSetBean, UserAccountBean user, Status status) {
 		RuleSetAuditBean ruleSetAuditBean = new RuleSetAuditBean();
 		ruleSetAuditBean.setRuleSetBean(ruleSetBean);
@@ -264,14 +261,15 @@ public class RuleSetService implements RuleSetServiceInterface {
 	public MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy,
 			UserAccountBean ub, HashMap<String, String> variableAndValue, Phase phase, EventCRFBean ecb,
 			HttpServletRequest request) {
-		DataEntryRuleRunner ruleRunner = new DataEntryRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender, ecb);
+		DataEntryRuleRunner ruleRunner = new DataEntryRuleRunner(dataSource, requestURLMinusServletPath, contextPath,
+				mailSender, ecb);
 		dynamicsMetadataService.setExpressionService(getExpressionService());
-        ruleRunner.setPhase(phase);
-        ruleRunner.setRequest(request);
-        ruleRunner.setCurrentStudy(currentStudy);
-        ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
-        ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
-        ruleRunner.setExecutionMode(dryRun == true ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE);
+		ruleRunner.setPhase(phase);
+		ruleRunner.setRequest(request);
+		ruleRunner.setCurrentStudy(currentStudy);
+		ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
+		ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
+		ruleRunner.setExecutionMode(dryRun == true ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE);
 		return ruleRunner.runRules(ub, ruleSets, variableAndValue);
 	}
 
@@ -286,7 +284,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 		return runRulesInImportData(optimiseRuleValidator, connection, containers, new HashSet<Integer>(), study, ub,
 				executionMode);
 	}
-    
+
 	public HashMap<String, ArrayList<String>> runRulesInImportData(Boolean optimiseRuleValidator,
 			Connection connection, List<ImportDataRuleRunnerContainer> containers, Set<Integer> skippedItemIds,
 			StudyBean study, UserAccountBean ub, ExecutionMode executionMode) {
@@ -319,24 +317,17 @@ public class RuleSetService implements RuleSetServiceInterface {
 	}
 
 	public int getCountWithFilter(ViewRuleAssignmentFilter viewRuleAssignmentFilter) {
-		int count = getRuleSetRuleDao().getCountWithFilter(viewRuleAssignmentFilter);
-		return count;
-
+		return getRuleSetRuleDao().getCountWithFilter(viewRuleAssignmentFilter);
 	}
 
 	public int getCountByStudy(StudyBean study) {
-		int count = getRuleSetRuleDao().getCountByStudy(study);
-		return count;
-
+		return getRuleSetRuleDao().getCountByStudy(study);
 	}
 
 	public List<RuleSetRuleBean> getWithFilterAndSort(ViewRuleAssignmentFilter viewRuleAssignmentFilter,
 			ViewRuleAssignmentSort viewRuleAssignmentSort, int rowStart, int rowEnd) {
-
-		List<RuleSetRuleBean> ruleSetRules = getRuleSetRuleDao().getWithFilterAndSort(viewRuleAssignmentFilter,
-				viewRuleAssignmentSort, rowStart, rowEnd);
-		return ruleSetRules;
-
+		return getRuleSetRuleDao().getWithFilterAndSort(viewRuleAssignmentFilter, viewRuleAssignmentSort, rowStart,
+				rowEnd);
 	}
 
 	public List<RuleSetBean> getRuleSetsByStudy(StudyBean study) {
@@ -348,7 +339,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 		logger.info("getRuleSetsByStudy() : ruleSets Size : {}", ruleSets.size());
 		return ruleSets;
 	}
-	
+
 	public RuleSetBean getRuleSetById(StudyBean study, String id) {
 		logger.debug(" Study Id {} ", study.getId());
 		RuleSetBean ruleSetBean = getRuleSetDao().findById(Integer.valueOf(id));

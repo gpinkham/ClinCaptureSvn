@@ -13,14 +13,6 @@
 
 package org.akaza.openclinica.service.rule;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -48,21 +40,36 @@ import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 public interface RuleSetServiceInterface {
 
+	@Transactional
 	public abstract RuleSetBean saveRuleSet(RuleSetBean ruleSetBean);
 
+	@Transactional
 	public abstract void saveImportFromDesigner(RulesPostImportContainer rulesContainer);
 
+	@Transactional
 	public abstract void saveImport(RulesPostImportContainer rulesContainer);
 
+	@Transactional
 	public void saveImport(RuleSetRuleBean ruleSetRule);
 
+	@Transactional
 	public abstract RuleSetBean updateRuleSet(RuleSetBean ruleSetBean, UserAccountBean user, Status status);
 
+	@Transactional
 	public abstract void loadRuleSetRuleWithPersistentRules(RuleSetBean ruleSetBean);
 
+	@Transactional
 	public abstract RuleSetBean replaceRuleSet(RuleSetBean ruleSetBean);
 
 	public abstract HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(
@@ -81,7 +88,7 @@ public interface RuleSetServiceInterface {
 
 	/**
 	 * @param containers
-     * @param skippedItemIds
+	 * @param skippedItemIds
 	 * @param study
 	 * @param ub
 	 * @param executionMode
@@ -94,7 +101,7 @@ public interface RuleSetServiceInterface {
 	public abstract HashMap<String, ArrayList<String>> runRulesInImportData(Boolean optimiseRuleValidator,
 			Connection connection, List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub,
 			ExecutionMode executionMode);
-    
+
 	public abstract HashMap<String, ArrayList<String>> runRulesInImportData(Boolean optimiseRuleValidator,
 			Connection connection, List<ImportDataRuleRunnerContainer> containers, Set<Integer> skippedItemIds,
 			StudyBean study, UserAccountBean ub, ExecutionMode executionMode);
@@ -107,24 +114,31 @@ public interface RuleSetServiceInterface {
 	 */
 	public abstract List<RuleSetBean> getRuleSetsByStudy(StudyBean study);
 
+	@Transactional
 	public int getCountWithFilter(ViewRuleAssignmentFilter viewRuleAssignmentFilter);
 
+	@Transactional
 	public int getCountByStudy(StudyBean study);
 
+	@Transactional
 	public List<RuleSetRuleBean> getWithFilterAndSort(ViewRuleAssignmentFilter viewRuleAssignmentFilter,
 			ViewRuleAssignmentSort viewRuleAssignmentSort, int rowStart, int rowEnd);
 
 	// . TODO: why are we including study but not using it in query
 	public abstract RuleSetBean getRuleSetById(StudyBean study, String id);
 
+	@Transactional
 	public abstract List<RuleSetRuleBean> getRuleSetById(StudyBean study, String id, RuleBean ruleBean);
 
 	public abstract List<RuleSetBean> getRuleSetsByCrfAndStudy(CRFBean crfBean, StudyBean study);
 
+	@Transactional
 	public abstract List<RuleSetBean> filterByStatusEqualsAvailableOnlyRuleSetRules(List<RuleSetBean> ruleSets);
 
+	@Transactional
 	public abstract List<RuleSetBean> filterByStatusEqualsAvailable(List<RuleSetBean> ruleSets);
 
+	@Transactional
 	public abstract RuleSetBean filterByRules(RuleSetBean ruleSet, Integer ruleBeanId);
 
 	public RuleSetBean getObjects(RuleSetBean ruleSetBean);
@@ -146,6 +160,7 @@ public interface RuleSetServiceInterface {
 	 *            TODO
 	 * @return
 	 */
+	@Transactional
 	public abstract List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets,
 			StudyEventBean studyEvent, CRFVersionBean crfVersion, StudyEventDefinitionBean studyEventDefinition);
 
@@ -160,9 +175,11 @@ public interface RuleSetServiceInterface {
 	 * @param grouped
 	 * @return
 	 */
+	@Transactional
 	public abstract List<RuleSetBean> solidifyGroupOrdinalsUsingFormProperties(List<RuleSetBean> ruleSets,
 			HashMap<String, Integer> grouped);
 
+	@Transactional
 	public abstract List<RuleSetBean> filterRuleSetsBySectionAndGroupOrdinal(List<RuleSetBean> ruleSets,
 			HashMap<String, Integer> grouped);
 
@@ -185,8 +202,10 @@ public interface RuleSetServiceInterface {
 	 */
 	public abstract List<RuleSetBean> filterRuleSetsByGroupOrdinal(List<RuleSetBean> ruleSets);
 
+	@Transactional
 	public abstract List<String> getGroupOrdinalPlusItemOids(List<RuleSetBean> ruleSets);
 
+	@Transactional
 	public abstract RuleSetBean replaceCrfOidInTargetExpression(RuleSetBean ruleSetBean, String replacementCrfOid);
 
 	public String getContextPath();
@@ -245,6 +264,7 @@ public interface RuleSetServiceInterface {
 	 * @param phase
 	 * @return
 	 */
+	@Transactional
 	public boolean shouldRunRulesForRuleSets(List<RuleSetBean> ruleSets, Phase phase);
 
 }

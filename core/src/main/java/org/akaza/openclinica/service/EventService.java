@@ -31,21 +31,15 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.sql.DataSource;
-
-@SuppressWarnings({"rawtypes"})
+@SuppressWarnings({ "rawtypes" })
 public class EventService implements EventServiceInterface {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	SubjectDAO subjectDao;
-	StudySubjectDAO studySubjectDao;
-	UserAccountDAO userAccountDao;
-	StudyEventDefinitionDAO studyEventDefinitionDao;
-	StudyEventDAO studyEventDao;
-	StudyDAO studyDao;
+
 	DataSource dataSource;
 
 	public EventService(DataSource dataSource) {
@@ -70,7 +64,7 @@ public class EventService implements EventServiceInterface {
 				eventDefinitionOID, study.getId(), parentStudyId);
 		StudySubjectBean studySubject = getStudySubjectDao().findByLabelAndStudy(studySubjectId, study);
 
-		Integer studyEventOrdinal = null;
+		Integer studyEventOrdinal;
 		if (canSubjectScheduleAnEvent(studyEventDefinition, studySubject)) {
 
 			StudyEventBean studyEvent = new StudyEventBean();
@@ -100,63 +94,50 @@ public class EventService implements EventServiceInterface {
 
 	public boolean canSubjectScheduleAnEvent(StudyEventDefinitionBean studyEventDefinition,
 			StudySubjectBean studySubject) {
-
-		if (studyEventDefinition.isRepeating()) {
-			return true;
-		}
-		if (getStudyEventDao().findAllByDefinitionAndSubject(studyEventDefinition, studySubject).size() > 0) {
-			return false;
-		}
-		return true;
+		return studyEventDefinition.isRepeating()
+				|| getStudyEventDao().findAllByDefinitionAndSubject(studyEventDefinition, studySubject).size() <= 0;
 	}
 
 	/**
 	 * @return the subjectDao
 	 */
 	public SubjectDAO getSubjectDao() {
-		subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
-		return subjectDao;
+		return new SubjectDAO(dataSource);
 	}
 
 	/**
 	 * @return the subjectDao
 	 */
 	public StudyDAO getStudyDao() {
-		studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-		return studyDao;
+		return new StudyDAO(dataSource);
 	}
 
 	/**
 	 * @return the subjectDao
 	 */
 	public StudySubjectDAO getStudySubjectDao() {
-		studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
-		return studySubjectDao;
+		return new StudySubjectDAO(dataSource);
 	}
 
 	/**
 	 * @return the UserAccountDao
 	 */
 	public UserAccountDAO getUserAccountDao() {
-		userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
-		return userAccountDao;
+		return new UserAccountDAO(dataSource);
 	}
 
 	/**
 	 * @return the StudyEventDefinitionDao
 	 */
 	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-		studyEventDefinitionDao = studyEventDefinitionDao != null ? studyEventDefinitionDao
-				: new StudyEventDefinitionDAO(dataSource);
-		return studyEventDefinitionDao;
+		return new StudyEventDefinitionDAO(dataSource);
 	}
 
 	/**
 	 * @return the StudyEventDao
 	 */
 	public StudyEventDAO getStudyEventDao() {
-		studyEventDao = studyEventDao != null ? studyEventDao : new StudyEventDAO(dataSource);
-		return studyEventDao;
+		return new StudyEventDAO(dataSource);
 	}
 
 	/**
@@ -167,7 +148,7 @@ public class EventService implements EventServiceInterface {
 	}
 
 	/**
-	 * @param datasource
+	 * @param dataSource
 	 *            the datasource to set
 	 */
 	public void setDatasource(DataSource dataSource) {

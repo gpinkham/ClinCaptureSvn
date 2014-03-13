@@ -27,19 +27,14 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.util.Date;
 import java.util.List;
 
-import javax.sql.DataSource;
-
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({ "unchecked" })
 public class SubjectService implements SubjectServiceInterface {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	SubjectDAO subjectDao;
-	StudySubjectDAO studySubjectDao;
-	UserAccountDAO userAccountDao;
-	StudyDAO studyDao;
 	DataSource dataSource;
 
 	public SubjectService(DataSource dataSource) {
@@ -86,7 +81,7 @@ public class SubjectService implements SubjectServiceInterface {
 	}
 
 	public void validateSubjectTransfer(SubjectTransferBean subjectTransferBean) {
-		// TODO: Validate here
+		//
 	}
 
 	/**
@@ -106,32 +101,28 @@ public class SubjectService implements SubjectServiceInterface {
 	 * @return the subjectDao
 	 */
 	public SubjectDAO getSubjectDao() {
-		subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
-		return subjectDao;
+		return new SubjectDAO(dataSource);
 	}
 
 	/**
 	 * @return the subjectDao
 	 */
 	public StudyDAO getStudyDao() {
-		studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-		return studyDao;
+		return new StudyDAO(dataSource);
 	}
 
 	/**
 	 * @return the subjectDao
 	 */
 	public StudySubjectDAO getStudySubjectDao() {
-		studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
-		return studySubjectDao;
+		return new StudySubjectDAO(dataSource);
 	}
 
 	/**
 	 * @return the UserAccountDao
 	 */
 	public UserAccountDAO getUserAccountDao() {
-		userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
-		return userAccountDao;
+		return new UserAccountDAO(dataSource);
 	}
 
 	/**
@@ -142,7 +133,7 @@ public class SubjectService implements SubjectServiceInterface {
 	}
 
 	/**
-	 * @param datasource
+	 * @param dataSource
 	 *            the datasource to set
 	 */
 	public void setDatasource(DataSource dataSource) {

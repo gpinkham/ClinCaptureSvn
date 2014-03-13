@@ -51,7 +51,6 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
-import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
@@ -183,8 +182,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 	@Autowired
 	private StudyConfigService studyConfigService;
 	@Autowired
-	private DynamicsMetadataService dynamicsMetadataService;
-	@Autowired
 	private OpenClinicaJdbcService openClinicaJdbcService;
 	@Autowired
 	private OpenClinicaSchedulerFactoryBean scheduler;
@@ -300,10 +297,6 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public CoreResources getCoreResources() {
 		return coreResources;
-	}
-
-	public DynamicsMetadataService getDynamicsMetadataService() {
-		return dynamicsMetadataService;
 	}
 
 	public SecurityManager getSecurityManager() {

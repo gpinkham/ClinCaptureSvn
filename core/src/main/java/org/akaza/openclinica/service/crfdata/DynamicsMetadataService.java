@@ -13,12 +13,6 @@
 
 package org.akaza.openclinica.service.crfdata;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -56,14 +50,18 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class DynamicsMetadataService implements MetadataServiceInterface {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private final String ESCAPED_SEPERATOR = "\\.";
 	private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
 	private DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
-	DataSource ds;
-	private EventDefinitionCRFDAO eventDefinitionCRFDAO;
+	private DataSource ds;
 	private ExpressionService expressionService;
 
 	public DynamicsMetadataService(DataSource ds) {
@@ -487,7 +485,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 	}
 
-	public void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet, Connection con) {
+	public void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet,
+			Connection con) {
 		ItemDataBean itemDataBeanA = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
 		EventCRFBean eventCrfBeanA = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBeanA.getEventCRFId());
 		StudyEventBean studyEventBeanA = (StudyEventBean) getStudyEventDAO().findByPK(eventCrfBeanA.getStudyEventId());
@@ -515,7 +514,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 					CRFVersionBean crfVersion = getExpressionService().getCRFVersionFromExpression(expression);
 					CRFBean crf = getExpressionService().getCRFFromExpression(expression);
 					int crfVersionId = 0;
-					EventDefinitionCRFBean eventDefinitionCRFBean = getEventDefinitionCRfDAO()
+					EventDefinitionCRFBean eventDefinitionCRFBean = new EventDefinitionCRFDAO(ds)
 							.findByStudyEventDefinitionIdAndCRFId(studyEventBeanA.getStudyEventDefinitionId(),
 									crf.getId());
 					if (eventDefinitionCRFBean.getId() != 0) {
@@ -599,7 +598,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 	}
 
-	public void hideNew(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet, Connection con) {
+	public void hideNew(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet,
+			Connection con) {
 		ItemDataBean itemDataBeanA = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
 		EventCRFBean eventCrfBeanA = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBeanA.getEventCRFId());
 		ItemGroupMetadataBean itemGroupMetadataBeanA = (ItemGroupMetadataBean) getItemGroupMetadataDAO()
@@ -709,7 +709,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		}
 	}
 
-	public void showNew(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet, Connection con) {
+	public void showNew(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet,
+			Connection con) {
 		ItemDataBean itemDataBeanA = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
 		EventCRFBean eventCrfBeanA = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBeanA.getEventCRFId());
 		ItemGroupMetadataBean itemGroupMetadataBeanA = (ItemGroupMetadataBean) getItemGroupMetadataDAO()
@@ -999,12 +1000,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
 	public StudyEventDAO getStudyEventDAO() {
 		return new StudyEventDAO(ds);
-	}
-
-	public EventDefinitionCRFDAO getEventDefinitionCRfDAO() {
-		eventDefinitionCRFDAO = this.eventDefinitionCRFDAO != null ? eventDefinitionCRFDAO : new EventDefinitionCRFDAO(
-				ds);
-		return eventDefinitionCRFDAO;
 	}
 
 	public ExpressionService getExpressionService() {

@@ -30,6 +30,7 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
+import javax.sql.DataSource;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,12 +38,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import javax.sql.DataSource;
-
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SubjectTransferDAO extends EntityDAO {
-
-	UserAccountDAO userAccountDao;
 
 	public SubjectTransferDAO(DataSource ds) {
 		super(ds);
@@ -64,14 +61,14 @@ public class SubjectTransferDAO extends EntityDAO {
 
 		if (al.size() > 0) {
 			HashMap h = (HashMap) al.get(0);
-			answer = ((Integer) h.get("key")).intValue();
+			answer = (Integer) h.get("key");
 		}
 
 		return answer;
 	}
 
 	private UserAccountDAO getUserAccountDao() {
-		return this.userAccountDao != null ? this.userAccountDao : new UserAccountDAO(ds);
+		return new UserAccountDAO(ds);
 	}
 
 	@Override
@@ -125,7 +122,7 @@ public class SubjectTransferDAO extends EntityDAO {
 
 		this.setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), id);
+		variables.put(1, id);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList<?> alist = this.select(sql, variables);
@@ -138,24 +135,24 @@ public class SubjectTransferDAO extends EntityDAO {
 		return transfer;
 	}
 
-	public EntityBean create(EntityBean eb, UserAccountBean ub) {
+	public EntityBean create(EntityBean eb) {
 		SubjectTransferBean subjectTransferBean = (SubjectTransferBean) eb;
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
 		HashMap<Integer, Object> nullVars = new HashMap<Integer, Object>();
 
 		if (subjectTransferBean.getDateOfBirth() == null) {
-			nullVars.put(new Integer(1), new Integer(Types.DATE));
-			variables.put(new Integer(1), null);
+			nullVars.put(1, Types.DATE);
+			variables.put(1, null);
 		} else {
-			variables.put(new Integer(1), subjectTransferBean.getDateOfBirth());
+			variables.put(1, subjectTransferBean.getDateOfBirth());
 		}
 
 		if (subjectTransferBean.getGender() != 'm' && subjectTransferBean.getGender() != 'f') {
-			nullVars.put(new Integer(2), new Integer(Types.CHAR));
-			variables.put(new Integer(2), null);
+			nullVars.put(2, Types.CHAR);
+			variables.put(2, null);
 		} else {
 			char[] ch = { subjectTransferBean.getGender() };
-			variables.put(new Integer(2), new String(ch));
+			variables.put(2, new String(ch));
 		}
 
 		variables.put(3, subjectTransferBean.getPersonId());
@@ -170,11 +167,6 @@ public class SubjectTransferDAO extends EntityDAO {
 			subjectTransferBean.setId(getLatestPK());
 		}
 		return subjectTransferBean;
-	}
-
-	public EntityBean create(EntityBean eb) throws OpenClinicaException {
-		SubjectTransferBean subjectTransferBean = (SubjectTransferBean) eb;
-		return create(eb, subjectTransferBean.getOwner());
 	}
 
 	public EntityBean update(EntityBean eb) throws OpenClinicaException {

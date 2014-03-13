@@ -27,7 +27,6 @@ import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -45,41 +44,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
 @SuppressWarnings("rawtypes")
 public class RuleRunner {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	
 
-	private CRFDAO crfDao;
-	private CRFVersionDAO crfVersionDao;
-	private StudyEventDAO studyEventDao;
-	private ItemDataDAO itemDataDao;
 	private ExpressionService expressionService;
-	private EventCRFDAO eventCrfDao;
-	private StudySubjectDAO studySubjectDao;
-	private StudyDAO studyDao;
-	private ItemFormMetadataDAO itemFormMetadataDao;
-	private SectionDAO sectionDao;
 	private final JavaMailSenderImpl mailSender;
-	protected RuleRunnerMode ruleRunnerMode;
 	protected DynamicsMetadataService dynamicsMetadataService;
 	protected RuleActionRunLogDao ruleActionRunLogDao;
-	DataSource ds;
+	protected DataSource ds;
 
 	String requestURLMinusServletPath;
 	String contextPath;
 
 	public enum RuleRunnerMode {
 		DATA_ENTRY, CRF_BULK, RULSET_BULK, IMPORT_DATA
-	};
+	}
 
 	public RuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath,
 			JavaMailSenderImpl mailSender) {
@@ -153,7 +140,7 @@ public class RuleRunner {
 				getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemBean.getId(), crfVersion.getId())
 						.getSectionId());
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
 
 		sb.append(respage.getString("email_header_1"));
@@ -219,50 +206,39 @@ public class RuleRunner {
 	}
 
 	CRFDAO getCrfDao() {
-		crfDao = this.crfDao != null ? crfDao : new CRFDAO(ds);
-		return crfDao;
+		return new CRFDAO(ds);
 	}
 
-
-
 	StudyEventDAO getStudyEventDao() {
-		studyEventDao = this.studyEventDao != null ? studyEventDao : new StudyEventDAO(ds);
-		return studyEventDao;
+		return new StudyEventDAO(ds);
 	}
 
 	ItemDataDAO getItemDataDao() {
-		itemDataDao = this.itemDataDao != null ? itemDataDao : new ItemDataDAO(ds);
-		return itemDataDao;
+		return new ItemDataDAO(ds);
 	}
 
 	EventCRFDAO getEventCrfDao() {
-		eventCrfDao = this.eventCrfDao != null ? eventCrfDao : new EventCRFDAO(ds);
-		return eventCrfDao;
+		return new EventCRFDAO(ds);
 	}
 
 	CRFVersionDAO getCrfVersionDao() {
-		crfVersionDao = this.crfVersionDao != null ? crfVersionDao : new CRFVersionDAO(ds);
-		return crfVersionDao;
+		return new CRFVersionDAO(ds);
 	}
 
 	StudySubjectDAO getStudySubjectDao() {
-		studySubjectDao = this.studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(ds);
-		return studySubjectDao;
+		return new StudySubjectDAO(ds);
 	}
 
 	ItemFormMetadataDAO getItemFormMetadataDAO() {
-		itemFormMetadataDao = this.itemFormMetadataDao != null ? itemFormMetadataDao : new ItemFormMetadataDAO(ds);
-		return itemFormMetadataDao;
+		return new ItemFormMetadataDAO(ds);
 	}
 
 	SectionDAO getSectionDAO() {
-		sectionDao = this.sectionDao != null ? sectionDao : new SectionDAO(ds);
-		return sectionDao;
+		return new SectionDAO(ds);
 	}
 
 	StudyDAO getStudyDao() {
-		studyDao = this.studyDao != null ? studyDao : new StudyDAO(ds);
-		return studyDao;
+		return new StudyDAO(ds);
 	}
 
 	public JavaMailSenderImpl getMailSender() {

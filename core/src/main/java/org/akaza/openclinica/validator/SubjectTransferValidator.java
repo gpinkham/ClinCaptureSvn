@@ -25,19 +25,15 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import javax.sql.DataSource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.sql.DataSource;
-
-@SuppressWarnings({"rawtypes"})
+@SuppressWarnings({ "rawtypes" })
 public class SubjectTransferValidator implements Validator {
 
 	DataSource dataSource;
-	StudyDAO studyDAO;
-	StudySubjectDAO studySubjectDAO;
-	StudyParameterValueDAO studyParameterValueDAO;
 
 	public SubjectTransferValidator(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -93,13 +89,13 @@ public class SubjectTransferValidator implements Validator {
 			return;
 		}
 
-		String idSetting = "";
+		String idSetting;
 		StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(
 				handleStudyId, "subjectIdGeneration");
 		idSetting = subjectIdGenerationParameter.getValue();
 		if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
 			int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
-			subjectTransferBean.setStudySubjectId(new Integer(nextLabel).toString());
+			subjectTransferBean.setStudySubjectId(Integer.toString(nextLabel));
 		}
 		String studySubjectId = subjectTransferBean.getStudySubjectId();
 		if (studySubjectId == null || studySubjectId.length() < 1) {
@@ -119,7 +115,7 @@ public class SubjectTransferValidator implements Validator {
 		}
 		String gender = subjectTransferBean.getGender() + "";
 		studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "genderRequired");
-		if ("true".equals(studyParameter.getValue()) && (gender == null || gender.length() < 1)) {
+		if ("true".equals(studyParameter.getValue()) && (gender.length() < 1)) {
 			e.reject("subjectTransferValidator.gender_required", new Object[] { study.getName() },
 					"Gender is required for the study: " + study.getName());
 			return;
@@ -160,25 +156,23 @@ public class SubjectTransferValidator implements Validator {
 		Date enrollmentDate = subjectTransferBean.getEnrollmentDate();
 		if (enrollmentDate == null) {
 			e.reject("subjectTransferValidator.enrollmentDate_required");
-			return;
 		} else {
 			if ((new Date()).compareTo(enrollmentDate) < 0) {
 				e.reject("subjectTransferValidator.enrollmentDate_should_be_in_past");
-				return;
 			}
 		}
 	}
 
 	public StudyDAO getStudyDAO() {
-		return this.studyDAO != null ? studyDAO : new StudyDAO(dataSource);
+		return new StudyDAO(dataSource);
 	}
 
 	public StudySubjectDAO getStudySubjectDAO() {
-		return this.studySubjectDAO != null ? studySubjectDAO : new StudySubjectDAO(dataSource);
+		return new StudySubjectDAO(dataSource);
 	}
 
 	public StudyParameterValueDAO getStudyParameterValueDAO() {
-		return this.studyParameterValueDAO != null ? studyParameterValueDAO : new StudyParameterValueDAO(dataSource);
+		return new StudyParameterValueDAO(dataSource);
 	}
 
 }

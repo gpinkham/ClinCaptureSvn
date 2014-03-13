@@ -112,11 +112,9 @@ public class ImportRuleServlet extends Controller {
 			try {
 
 				FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties("xml"));
-				File ruleFile = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn())
-						.get(0);
+				File ruleFile = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn()).get(0);
 
 				InputStream xsdFile = getCoreResources().getInputStream("rules.xsd");
-
 				XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
 				schemaValidator.validateAgainstSchema(ruleFile, xsdFile);
 				RulesPostImportContainer importedRules = handleLoadCastor(ruleFile);

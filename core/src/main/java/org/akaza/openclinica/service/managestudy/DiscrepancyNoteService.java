@@ -20,13 +20,12 @@
  */
 package org.akaza.openclinica.service.managestudy;
 
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 
 /**
@@ -38,32 +37,33 @@ import java.sql.Connection;
 public class DiscrepancyNoteService implements IDiscrepancyNoteService {
 
 	private DataSource ds;
-	private DiscrepancyNoteDAO discrepancyNoteDao;
 
 	public DiscrepancyNoteService(DataSource ds) {
 		this.ds = ds;
 	}
 
-    public void saveFieldNotes(String description, int entityId, String entityType, StudyBean sb, UserAccountBean ub,
-                               boolean assignToUser) {
-        saveFieldNotes(description, entityId, entityType, null, sb, ub, assignToUser);
-    }
-
-	public void saveFieldNotes(String description, int entityId, String entityType, Connection connection, StudyBean sb, UserAccountBean ub,
+	public void saveFieldNotes(String description, int entityId, String entityType, StudyBean sb, UserAccountBean ub,
 			boolean assignToUser) {
+		saveFieldNotes(description, entityId, entityType, null, sb, ub, assignToUser);
+	}
+
+	public void saveFieldNotes(String description, int entityId, String entityType, Connection connection,
+			StudyBean sb, UserAccountBean ub, boolean assignToUser) {
 		// Create a new thread each time
-		DiscrepancyNoteBean parent = createDiscrepancyNoteBean(description, entityId, entityType, connection, sb, ub, null,
-				assignToUser);
+		DiscrepancyNoteBean parent = createDiscrepancyNoteBean(description, entityId, entityType, connection, sb, ub,
+				null, assignToUser);
 		createDiscrepancyNoteBean(description, entityId, entityType, connection, sb, ub, parent.getId(), assignToUser);
 	}
 
-    public void saveFieldNotes(String description, int entityId, String entityType, StudyBean sb, UserAccountBean ub) {
-        saveFieldNotes(description, entityId, entityType, null, sb, ub);
-    }
+	public void saveFieldNotes(String description, int entityId, String entityType, StudyBean sb, UserAccountBean ub) {
+		saveFieldNotes(description, entityId, entityType, null, sb, ub);
+	}
 
-    public void saveFieldNotes(String description, int entityId, String entityType, Connection connection, StudyBean sb, UserAccountBean ub) {
+	public void saveFieldNotes(String description, int entityId, String entityType, Connection connection,
+			StudyBean sb, UserAccountBean ub) {
 		// Create a new thread each time
-		DiscrepancyNoteBean parent = createDiscrepancyNoteBean(description, entityId, entityType, connection, sb, ub, null, false);
+		DiscrepancyNoteBean parent = createDiscrepancyNoteBean(description, entityId, entityType, connection, sb, ub,
+				null, false);
 		createDiscrepancyNoteBean(description, entityId, entityType, connection, sb, ub, parent.getId(), false);
 	}
 
@@ -86,14 +86,10 @@ public class DiscrepancyNoteService implements IDiscrepancyNoteService {
 		if (parentId != null) {
 			dnb.setParentDnId(parentId);
 		}
-		dnb = (DiscrepancyNoteBean) getDiscrepancyNoteDao().create(dnb, connection);
-		getDiscrepancyNoteDao().createMapping(dnb, connection);
+		DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(ds);
+		dnb = (DiscrepancyNoteBean) discrepancyNoteDao.create(dnb, connection);
+		discrepancyNoteDao.createMapping(dnb, connection);
 		return dnb;
-	}
-
-	private DiscrepancyNoteDAO getDiscrepancyNoteDao() {
-		discrepancyNoteDao = this.discrepancyNoteDao != null ? discrepancyNoteDao : new DiscrepancyNoteDAO(ds);
-		return discrepancyNoteDao;
 	}
 
 }
