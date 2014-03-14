@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.model.DiscrepancyDescription;
+import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.util.ValidatorHelper;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -38,6 +40,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.InterventionBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -311,6 +314,7 @@ public class CreateStudyServlet extends Controller {
 				studyBean.setCreatedDate(new Date());
 				studyBean.setStatus(Status.PENDING);
 				studyBean = (StudyBean) sdao.create(studyBean);
+				createDefaultDiscrepancyDescriptions(studyBean.getId(), request);
 				StudyBean newstudyBean = (StudyBean) sdao.findByName(studyBean.getName());
 
 				UserAccountDAO udao = new UserAccountDAO(getDataSource());
@@ -361,6 +365,41 @@ public class CreateStudyServlet extends Controller {
 			forwardPage(Page.CREATE_STUDY1, request, response);
 		}
 
+	}
+
+	private void createDefaultDiscrepancyDescriptions(int studyId, HttpServletRequest request) {
+		DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess
+				.getApplicationContext(getServletContext()).getBean("discrepancyDescriptionService");
+		
+		// create default update discrepancy descriptions
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("corrected_CRF_data"), "", studyId, "Study and Site", 1));
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("CRF_data_was_correctly_entered"), "", studyId, "Study and Site", 1));
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("need_additional_clarification"), "", studyId, "Study and Site", 1));
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("requested_information_is_provided"), "", studyId, "Study and Site", 1));
+
+		// create default close discrepancy descriptions
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("query_response_monitored"), "", studyId, "Study and Site", 2));
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("CRF_data_change_monitored"), "", studyId, "Study and Site", 2));
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("calendared_event_monitored"), "", studyId, "Study and Site", 2));
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("failed_edit_check_monitored"), "", studyId, "Study and Site", 2));	
+
+		// create default RFC discrepancy descriptions
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("corrected_CRF_data_entry_error"), "", studyId, "Study and Site", 3));
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("source_data_was_missing"), "", studyId, "Study and Site", 3));
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("source_data_was_incorrect"), "", studyId, "Study and Site", 3));
+		dDescriptionService.saveDiscrepancyDescription(
+				new DiscrepancyDescription(respage.getString("information_was_not_available"), "", studyId, "Study and Site", 3));
 	}
 
 	private void addValidatorIfParamPresented(HttpServletRequest request, String paramName, Validator v,

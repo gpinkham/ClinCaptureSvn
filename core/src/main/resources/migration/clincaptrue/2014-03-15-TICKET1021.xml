@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="igor" id="2014-03-15-TICKET1021-01">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0"> select count(*) from audit_user_login </sqlCheck>
+        </preConditions>
+		<sql splitStatements="false">
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('Query response monitored', '', '1', 'Study and Site', '1');
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('CRF data was correctly entered', '','1', 'Study and Site','1');
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('Need additional clarification', '','1', 'Study and Site','1');
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('Requested information is provided', '','1', 'Study and Site','1');
+		
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('Corrected CRF data', '','1', 'Study and Site','2');
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('CRF data change monitored', '','1', 'Study and Site','2');
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('Calendared event monitored', '','1', 'Study and Site','2');
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('Failed edit check monitored', '','1', 'Study and Site','2');
+		
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('Corrected CRF data entry error', '','1', 'Study and Site','3');
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('Source data was missing', '','1', 'Study and Site','3');
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('Source data was incorrect', '','1', 'Study and Site','3');
+			INSERT INTO discrepancy_description(name, description, study_id, visibility_level, type_id) VALUES ('Information was not available', '','1', 'Study and Site','3');			
+		</sql>
+	</changeSet>
+</databaseChangeLog>

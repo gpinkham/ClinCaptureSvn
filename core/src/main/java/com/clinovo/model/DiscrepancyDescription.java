@@ -25,12 +25,22 @@ import javax.persistence.Table;
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "discrepancy_description_id_seq") })
 public class DiscrepancyDescription extends AbstractMutableDomainObject {
 
+	private int typeId = 0;
+	private int studyId = 0;
 	private String name = "";
 	private String description = "";
-	private int studyId = 0;
 	private String visibilityLevel = "";
-	private int typeId = 0;
 	
+	public DiscrepancyDescription() {}
+	
+	public DiscrepancyDescription(String name, String description, int studyId, String visibilityLevel, int typeId) {
+		this.name = name;
+		this.description = description;
+		this.studyId = studyId;
+		this.visibilityLevel = visibilityLevel;
+		this.typeId = typeId;
+	}
+
 	public String getDescription() {
 		return description;
 	}
