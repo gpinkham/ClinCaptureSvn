@@ -1566,7 +1566,11 @@ var popupForEventsMouseDown = function(ev) {
   if (ev.target.nodeName.toLowerCase() != "html") {
     if (currentPopupUid != undefined && jQuery(ev.target).closest("#" + currentPopupUid).length == 0) {
       jQuery(".calendar").remove();
-      jQuery("#" + currentPopupUid).css("visibility", "hidden");
+      var eventDiv = jQuery("div[id^='Event_" + currentPopupUid + "']");
+      eventDiv.css("visibility", "hidden");
+      if (eventDiv.find(".popupShadow").length == 1) {
+        eventDiv.html(eventDiv.find(".popupShadow").html());
+      }
       currentPopupUid = undefined;
       subjectMatrixPopupStick = undefined;
       jQuery("*").unbind("mousedown", popupForEventsMouseDown);
@@ -1921,7 +1925,11 @@ var hideCurrentPopup = function(ev) {
     if (ev.target.nodeName.toLowerCase() != "html") {
         if (currentPopupUid != undefined && jQuery(ev.target).closest("#Event_" + currentPopupUid).length == 0) {
             jQuery(".calendar").remove();
-            jQuery("#Event_" + currentPopupUid).css("visibility", "hidden");
+            var eventDiv = jQuery("#Event_" + currentPopupUid);
+            eventDiv.css("visibility", "hidden");
+            if (eventDiv.find(".popupShadow").length == 1) {
+                eventDiv.html(eventDiv.find(".popupShadow").html());
+            }
             jQuery("#" + currentPopupUid).html("");
             jQuery("#" + currentPopupUid).html("");
             currentPopupUid = undefined;
@@ -2054,15 +2062,11 @@ function getScheduledEventContent(params, top, left, localDivId, localDivRel) {
         data: paramsForReqest,
         cache: false,
         success: function (data) {
-   
             var localDiv = jQuery("#" + localDivId);
-  
             localDiv.get(0).innerHTML = data;
-         
             if (localDiv[0].repeatingEvent && parseInt(localDiv[0].totalEvents) > 1) {
                 localDiv.attr("style", localDiv.attr("style").replace("width: 608px;", "width: 658px;"));
             }
-            
             hideAllTooltips(params, top, left);
         }
     });
@@ -2071,9 +2075,15 @@ function getScheduledEventContent(params, top, left, localDivId, localDivRel) {
 function hideAllTooltips(params, top, left) {
     try {
         jQuery(".calendar").remove();
-        jQuery("div[id^='Event_']").css("visibility", "hidden");
-        jQuery("div[id^='crfListWrapper_']").html("");
-        jQuery("div[id^='eventScheduleWrapper_']").html("");
+        if (currentPopupUid != undefined) {
+            var eventDiv = jQuery("div[id^='Event_" + currentPopupUid + "']");
+            eventDiv.css("visibility", "hidden");
+            if (eventDiv.find(".popupShadow").length == 1) {
+                eventDiv.html(eventDiv.find(".popupShadow").html());
+            }
+            jQuery("div[id^='crfListWrapper_" + currentPopupUid + "']").html("");
+            jQuery("div[id^='eventScheduleWrapper_" + currentPopupUid + "']").html("");
+        }
 
         var objHolder = document.getElementById("Event_" + params.statusBoxId);
         if (objHolder == undefined || top == undefined || left == undefined) return;
@@ -2087,6 +2097,10 @@ function hideAllTooltips(params, top, left) {
 
             var eventDiv = jQuery("#Event_" + params.statusBoxId);
             if (eventDiv.length > 0) {
+                var prevHtml = eventDiv.html();
+                eventDiv.html(jQuery("#popupShadowWrapper").html());
+                eventDiv.find(".popupShadow").html(prevHtml);
+
                 if (eventDiv[0].repeatingEvent && parseInt(eventDiv[0].totalEvents) > 1) {
                 	params.statusBoxNum = eventDiv[0].totalEvents;
                 }
@@ -2189,9 +2203,11 @@ function createNewEvent(page, event) {
                             var eventDef = result.eventDefs[h];
                             if (eventDef != undefined && eventDef.eventDivId != undefined) {
                                 var eventDiv = jQuery("div[id^='" + eventDef.eventDivId + "']");
-              
+                                if (eventDiv.find(".popupShadow").length == 1 ) {
+                                    eventDiv.html(eventDiv.find(".popupShadow").html());
+                                }
                                 if (eventDiv.length > 0 && eventDef.eventIds.length > 0) {
-                                    var aElement = eventDiv.next();
+                                    var aElement = eventDiv.parent().find("a:last");
                                     var eventId = eventDef.eventIds[0];
                      
                                     eventDiv[0].totalEvents = eventDef.totalEvents;

@@ -47,10 +47,7 @@
 	
 	<c:set var="color" scope="session" value="${newThemeColor}"/>
 	<c:if test="${(color == 'violet') || (color == 'green')}">
-	<script>
-	document.write( '<style class="hideStuff" ' +
-              'type="text/css">body {display:none;}<\/style>');
-	</script>
+	<style class="hideStuff" type="text/css">body {display:none;}</style>
 	</c:if>
 	
 </head>

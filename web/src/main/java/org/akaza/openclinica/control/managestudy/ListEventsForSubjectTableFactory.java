@@ -20,7 +20,13 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
@@ -29,7 +35,16 @@ import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.ListEventsForSubjectFilter;
+import org.akaza.openclinica.dao.managestudy.ListEventsForSubjectSort;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
@@ -43,11 +58,11 @@ import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
-import org.jmesa.limit.Limit;
-import org.jmesa.limit.FilterSet;
 import org.jmesa.limit.Filter;
-import org.jmesa.limit.SortSet;
+import org.jmesa.limit.FilterSet;
+import org.jmesa.limit.Limit;
 import org.jmesa.limit.Sort;
+import org.jmesa.limit.SortSet;
 import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
@@ -58,13 +73,13 @@ import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.ResourceBundle;
-import java.util.Collection;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
@@ -200,8 +215,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 					new SubjectEventCRFStatusFilterMatcher());
 		}
 
-		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "studySubject.createdDate"), 
-				new DateFilterMatcher(getDateFormat()));
+		tableFacade.addFilterMatcher(new MatcherKey(Date.class, "studySubject.createdDate"), new DateFilterMatcher(
+				getDateFormat()));
 	}
 
 	@Override
@@ -239,7 +254,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 			theItem.put("studySubject", studySubjectBean);
 			theItem.put("studySubject.label", studySubjectBean.getLabel());
 			theItem.put("studySubject.status", studySubjectBean.getStatus());
-			theItem.put("enrolledAt", ((StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId())).getIdentifier());
+			theItem.put("enrolledAt",
+					((StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId())).getIdentifier());
 
 			SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
 			theItem.put("subject", subjectBean);
@@ -765,6 +781,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 			StringBuilder url = new StringBuilder();
 			for (int i = 0; i < events.size(); i++) {
+				if (!url.toString().isEmpty()) {
+					url.append("<div class=\"newLine\"></div>");
+				}
 				DisplayBean display = events.get(i);
 				subjectEventStatus = (SubjectEventStatus) display.getProps().get("event.status");
 				studyEvent = (StudyEventBean) display.getProps().get("event");
@@ -785,7 +804,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 				}
 
 				url.append("<img src='" + imageIconPath + "' border='0' style=''>");
-				url.append("</a></td></tr></table>");
+				url.append("</a>");
 			}
 
 			return url.toString();
@@ -830,7 +849,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 			StringBuilder url = new StringBuilder();
 			for (int i = 0; i < events.size(); i++) {
-
+				if (!url.toString().isEmpty()) {
+					url.append("<div class=\"newLine\"></div>");
+				}
 				DisplayBean display = events.get(i);
 				eventCRFStatusId = (Integer) display.getProps().get(property);
 				eventDefintionCrf = (EventDefinitionCRFBean) display.getProps().get(property + "_eventDefinitionCrf");
@@ -847,7 +868,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
 				url.append("<img src='" + crfColumnImageIconPaths.get(eventCRFStatusId) + "' border='0'>");
 
-				url.append("</a></td></tr></table>");
+				url.append("</a>");
 
 			}
 
@@ -911,35 +932,18 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		HtmlBuilder eventDiv = new HtmlBuilder();
 
 		if (goingToReplaceHtmlContent) {
-
 			resword = ResourceBundleProvider.getWordsBundle();
 			resformat = ResourceBundleProvider.getFormatBundle();
-
-			// Event Div
-			eventDiv.div().close();
-
 		} else {
-
-			eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();
-
-			eventDiv.tr(0).valign("top").close().td(0).close();
 			// Event Div
 			eventDiv.div()
 					.id("Event_" + studySubjectLabel + "_"
 							+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_" + rowCount)
-					.style("position: absolute; visibility: hidden; white-space: normal; z-index: 3;width:" + divWidth
-							+ "px; top: 0px; float: left;").rel("" + studySubject.getId()).close();
-
+					.styleClass("eventDivWrapper ViewSubjectsPopup").style("width:" + divWidth + "px;")
+					.rel("" + studySubject.getId()).close();
 		}
 
-		eventDiv.div().styleClass("box_T").close().div().styleClass("box_L").close().div().styleClass("box_R").close()
-				.div().styleClass("box_B").close().div().styleClass("box_TL").close().div().styleClass("box_TR")
-				.close().div().styleClass("box_BL").close().div().styleClass("box_BR").close();
-
-		eventDiv.div().styleClass("tablebox_center").close();
-		eventDiv.div().styleClass("ViewSubjectsPopup").style("color: rgb(91, 91, 91);").close();
-
-		eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").style("width: 100%;").close();
+		eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();
 
 		singleEventDivBuilder(eventDiv, subject, rowCount, studyEvents, eventOccurrencesNumber, sed, studySubject,
 				eventCRFId, eventDefintionCRFId, goingToReplaceHtmlContent);
@@ -967,7 +971,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		if (sed.isRepeating()) {
 
 			eventDiv.tr(0).valign("top").close();
-			eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).style("border-bottom: none").colspan("2").close();
+			eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass + " wrapper_ptl").colspan("2").close();
 			eventDiv.bold()
 					.append(occurrence_x_of)
 					.append(studyEvents.isEmpty() ? "#1 of 1" : "#" + studyEvents.get(0).getSampleOrdinal() + " of "
@@ -994,7 +998,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 						+ (eventDefintionCRFId == null ? sed.getId() + "ev" : eventDefintionCRFId) + "_" + rowCount)
 				.style("display: all").close();
 		eventDiv.td(0).colspan("2").close();
-		eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 
 		if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED
 				|| eventSysStatus == Status.LOCKED) {
@@ -1030,10 +1033,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 					.style(POPUP_BASE_WIDTH_PX).close().divEnd();
 			eventDiv.tdEnd().trEnd(0);
 		}
-		eventDiv.tableEnd(0).tdEnd().trEnd(0);
 
 		eventDiv.tableEnd(0);
-		eventDiv.divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd();
+		eventDiv.divEnd();
 
 		if (eventStatus != SubjectEventStatus.NOT_SCHEDULED
 				|| (eventStatus == SubjectEventStatus.NOT_SCHEDULED && canScheduleStudySubject(studySubject)
@@ -1069,9 +1071,10 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 		}
 
 		builder.a().style("cursor: pointer;");
-		builder.append(" onmouseover = 'if (canShowPopup()) { showPopup(eval(" + params.toString() + "), event); }' ");
+		builder.append(" onmouseover=\"if (canShowPopup()) { showPopup(eval(" + params.toString().replaceAll("\"", "'")
+				+ "), event); }\"");
 		builder.onmouseout("clearInterval(popupInterval);");
-		builder.append(" onclick = 'justShowPopup(eval(" + params.toString() + "), event);' ");
+		builder.append(" onclick=\"justShowPopup(eval(" + params.toString().replaceAll("\"", "'") + "), event);\"");
 		builder.close();
 	}
 

@@ -149,6 +149,7 @@
 			});
 		});
 	    </script>
+        <div id="popupShadowWrapper"><div class="box_T_a"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR"><div class="popupShadow"></div></div></div></div></div></div></div></div></div></div>
 	    <form action="${pageContext.request.contextPath}/ListStudySubjects">
 	      <input type="hidden" name="module" value="admin">
 	        ${findSubjectsHtml}

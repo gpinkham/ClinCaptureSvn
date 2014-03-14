@@ -13,11 +13,6 @@
 
 package org.akaza.openclinica.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -31,6 +26,12 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 // be careful when you change the logic of this class (talk with Marc or Sergey) !
 @SuppressWarnings({ "unchecked" })
@@ -94,6 +95,7 @@ public final class SubjectEventStatusUtil {
 									.getString("message_for_not_scheduled_event_if_study_is_not_available") : "")
 							.append("\">");
 				} else {
+					url.delete(0, url.length());
 					url.append("<img src='' border='0' style='position: relative; display: none;'>");
 				}
 			}

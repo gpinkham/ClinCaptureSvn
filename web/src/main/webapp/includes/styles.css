@@ -1392,7 +1392,108 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     height: 23px;
 }
 
-.ViewSubjectsPopup { background-color: #FFFFE5;
+.ViewSubjectsPopup {
+    background-color: #FFFFE5;
+    color: rgb(91, 91, 91);
+}
+
+.width49 {
+    width: 49%;
+    float: right;
+    text-align: right;
+}
+
+.thrl_border {
+    border-left: 1px solid #CCCCCC !important;
+}
+
+.wrapper_ptl {
+    padding-top: 2px !important;
+    padding-left: 2px !important;
+    border-bottom: none;
+}
+
+.wrapper_pl {
+    padding-left: 2px !important;;
+}
+
+.wrapper {
+    padding: 2px 2px 2px 2px;
+}
+
+.eventDivWrapper {
+    position: absolute;
+    visibility: hidden;
+    z-index: 6;
+    top: 0px;
+    float: left;
+}
+
+#listEventsForSubject tr.statusBar > td {
+    text-align: left;
+}
+
+#listEventsForSubject div.newLine {
+    height: 4px;
+}
+
+#listEventsForSubject tr.header td {
+    text-align: center;
+}
+
+#listEventsForSubject > tbody > tr > td {
+    text-align: center;
+}
+
+#listEventsForSubject > tbody > tr > td > table {
+    width: 100%;
+}
+
+#listEventsForSubject > tbody > tr > td > table > tbody > tr > td {
+    text-align: center;
+    white-space: nowrap;
+}
+
+#listEventsForSubject div.actions {
+    padding-top: 2px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+#listEventsForSubject a {
+    cursor: pointer;
+}
+
+#findSubjects tr.statusBar > td {
+    text-align: left;
+}
+
+#findSubjects > tbody > tr > td {
+    text-align: center;
+}
+
+#findSubjects a {
+    cursor: pointer;
+}
+
+.popupShadow > table {
+    width: 100%;
+    margin-left: -5px;
+    border-top: 1px solid silver;
+    border-left: 1px solid silver;
+}
+
+.popupShadow > table > tbody > tr > td {
+    padding: 0px;
+    margin: 0px;
+}
+
+.popupShadow {
+    padding-bottom: 5px;
+}
+
+#popupShadowWrapper {
+    display: none;
 }
 
 .tab_BG { font-weight: bold;
@@ -2098,9 +2199,17 @@ span.re_indicator {
     white-space: nowrap;
 }
 
+table.crfListTable {
+    width: 100%;
+    border: none;
+    box-shadow: none;
+}
+
 table.crfListTable td {
     border-left: #CCCCCC 1px solid !important;
     padding-left: 2px !important;
+    border: none;
+    box-shadow: none;
 }
 
 #s_sdv tr input[name=sdvSubmit] {
@@ -2125,28 +2234,6 @@ table.crfListTable td {
 }
 
 #sdv > tbody > tr > td:last-of-type {
-    white-space: nowrap;
-}
-#listEventsForSubject tr.header td {
-    text-align: center;
-}
-
-#listEventsForSubject > tbody > tr > td {
-    text-align: left;
-}
-
-#listEventsForSubject > tbody > tr > td > table {
-    width: 100%;
-}
-
-#listEventsForSubject > tbody > tr > td > table > tbody > tr > td {
-    text-align: center;
-    white-space: nowrap;
-}
-
-#listEventsForSubject div.actions {
-    padding-top: 2px;
-    text-align: left;
     white-space: nowrap;
 }
 

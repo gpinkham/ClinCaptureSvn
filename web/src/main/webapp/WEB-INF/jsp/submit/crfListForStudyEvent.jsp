@@ -47,7 +47,7 @@
 
 <!--#start-->
 <!-- *JSP* submit/crfListForStudyEvent.jsp -->
-<table class="crfListTable" border="0" cellpadding="0" cellspacing="0" width="100%">
+<table class="crfListTable" border="0" cellpadding="0" cellspacing="0">
     <tr>
         <td class="table_header_row popupHeaderBlock" class="table_header_row" colspan="4" align="left">&nbsp;</td>
         <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
