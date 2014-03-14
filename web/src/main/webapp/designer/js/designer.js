@@ -609,6 +609,8 @@ function createDroppable(params) {
 				handleNumberDrop(params.element);
 			} else if (parser.isEmpty(ui.draggable)) {
 				params.element.append('""');				
+			} else if (parser.isCurrentDate(ui.draggable)) {
+				params.element.append(" _CURRENT_DATE");
 			} else {
 				params.element.append(ui.draggable.text());
 			}
@@ -683,8 +685,9 @@ function createDroppable(params) {
 		input.select();
 
 		params.element.css('font-weight', 'bold');
-	})
 
+	});
+	
 	return params.element;
 }
 

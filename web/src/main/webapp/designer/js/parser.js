@@ -344,6 +344,18 @@ Parser.prototype.isNumber = function(element) {
 	return element.attr("id") === "number";
 }
 
+/* =============================================================
+ * Determines if the element is of type 'current-date' on the UI
+ *
+ * Arguments [element]:
+ * => element - the element to check on
+ *
+ * Returns true if the element has id === 'currentDate'
+ * ====================================================== */
+Parser.prototype.isCurrentDate = function(element) {
+	return element.attr("id") === "currentDate";
+}
+
 /* ==============================================================================
  * Determines if the drop surface is of type that accepts conditional draggables
  *

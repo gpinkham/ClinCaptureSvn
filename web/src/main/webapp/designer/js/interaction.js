@@ -149,6 +149,11 @@ $(function() {
 	});
 
 	createToolTip({
+		title: "Current system date",
+		element: $("#currentDate")
+	});
+
+	createToolTip({
 		title: "Select a study",
 		element: $("#studiesLink")
 	});

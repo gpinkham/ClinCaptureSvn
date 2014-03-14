@@ -30,10 +30,6 @@ body .panel {
 
 }
 
-.panel-body > p {
- 	max-width: 30%;
-}
-
 .targettable {
   z-index: 0;
   margin-top: -18px;
@@ -91,10 +87,6 @@ body .panel {
 
 .space-left-m {
   margin-left: 1em;
-}
-
-.space-top {
-  padding-top: 5.4em !important;
 }
 
 .space-top-sm {
@@ -196,10 +188,10 @@ textarea {
 
 #variables {
   overflow: hidden;
+  padding-top: 4em !important;
 }
 
 .group {
-
   color: #009933;
   background-color: #F5F5EF;
 }
