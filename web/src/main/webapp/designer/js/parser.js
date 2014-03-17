@@ -561,7 +561,7 @@ Parser.prototype.isValid = function(expression) {
 	}
 
 	for (var x = 0; x < expression.length; x++) {
-		if (expression[x] === "Group or Data" || expression[x] === "Compare or Calculate" || expression[x] === "Evaluate") {
+		if (expression[x] === "Group or Data" || expression[x] === "Compare or Calculate" || expression[x] === "Condition") {
 			var index = expression.indexOf(expression[x]);
 			expression.splice(index, 1);
 		}
