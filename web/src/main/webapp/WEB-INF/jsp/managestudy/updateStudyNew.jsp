@@ -117,8 +117,8 @@
 	}	
 	
 	$(document).ready(function() { 
-		var sections = new Array(3, 4, 5, 6, '6_1', '6_2', '6_3', '7');
-		for (var j=1; j < sections.length; j++){
+		var sections = new Array('3', '4', '5', '6', '6_1', '6_2', '6_3', '7');
+		for (var j=0; j < sections.length; j++){
 			if ($("div#section" + sections[j] + " span.alert").text() != '') {
 				leftnavExpand("section" + sections[j]);
 			}	
