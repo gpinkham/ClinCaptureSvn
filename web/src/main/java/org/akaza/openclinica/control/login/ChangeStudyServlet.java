@@ -21,13 +21,6 @@
 package org.akaza.openclinica.control.login;
 
 import com.clinovo.util.ValidatorHelper;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -51,31 +44,37 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * Processes the request of changing current study
  * 
  * @author jxu
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ChangeStudyServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        //
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		//
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 
-        String action = request.getParameter("action");// action sent by user
+		String action = request.getParameter("action");// action sent by user
 		UserAccountDAO udao = getUserAccountDAO();
 		StudyDAO sdao = getStudyDAO();
 
-		ArrayList studies = udao.findStudyByUser(ub, (ArrayList) sdao.findAllNotRemoved());
-        request.setAttribute("roleMap", Role.roleMap);
+		ArrayList<StudyUserRoleBean> studies = udao.findStudyByUser(ub, (ArrayList) sdao.findAllNotRemoved());
+		request.setAttribute("roleMap", Role.roleMap);
 		if (request.getAttribute("label") != null) {
 			String label = (String) request.getAttribute("label");
 			if (label.length() > 0) {
@@ -84,8 +83,7 @@ public class ChangeStudyServlet extends Controller {
 		}
 
 		ArrayList validStudies = new ArrayList();
-		for (int i = 0; i < studies.size(); i++) {
-			StudyUserRoleBean sr = (StudyUserRoleBean) studies.get(i);
+		for (StudyUserRoleBean sr : studies) {
 			StudyBean study = (StudyBean) sdao.findByPK(sr.getStudyId());
 			// FIXME too many queries to the DB
 			if (study != null && study.getStatus().equals(Status.PENDING)) {
@@ -112,8 +110,9 @@ public class ChangeStudyServlet extends Controller {
 
 	}
 
-	private void confirmChangeStudy(HttpServletRequest request, HttpServletResponse response, ArrayList studies) throws Exception {
-        StudyBean currentStudy = getCurrentStudy(request);
+	private void confirmChangeStudy(HttpServletRequest request, HttpServletResponse response,
+			ArrayList<StudyUserRoleBean> studies) throws Exception {
+		StudyBean currentStudy = getCurrentStudy(request);
 
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
@@ -127,10 +126,14 @@ public class ChangeStudyServlet extends Controller {
 		} else {
 			int studyId = fp.getInt("studyId");
 			logger.info("new study id:" + studyId);
-			for (int i = 0; i < studies.size(); i++) {
-				StudyUserRoleBean studyWithRole = (StudyUserRoleBean) studies.get(i);
+			for (StudyUserRoleBean studyWithRole : studies) {
 				if (studyWithRole.getStudyId() == studyId) {
-					request.setAttribute("studyId", new Integer(studyId));
+					if (studyWithRole.getParentStudyId() > 0) {
+						StudyDAO studyDAO = getStudyDAO();
+						StudyBean parentStudy = (StudyBean) studyDAO.findByPK(studyWithRole.getParentStudyId());
+						request.setAttribute("parentStudyName", parentStudy.getName());
+					}
+					request.setAttribute("studyId", studyId);
 					request.getSession().setAttribute("studyWithRole", studyWithRole);
 					request.setAttribute("currentStudy", currentStudy);
 					forwardPage(Page.CHANGE_STUDY_CONFIRM, request, response);
@@ -144,15 +147,15 @@ public class ChangeStudyServlet extends Controller {
 	}
 
 	private void changeStudy(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		int studyId = fp.getInt("studyId");
 		int prevStudyId = currentStudy.getId();
 
-        ub.updateSysAdminRole(studyId, prevStudyId);
+		ub.updateSysAdminRole(studyId, prevStudyId);
 
 		StudyDAO sdao = getStudyDAO();
 		StudyBean current = (StudyBean) sdao.findByPK(studyId);
@@ -168,7 +171,7 @@ public class ChangeStudyServlet extends Controller {
 		String idSetting = current.getStudyParameterConfig().getSubjectIdGeneration();
 		if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
 			int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
-			request.setAttribute("label", new Integer(nextLabel).toString());
+			request.setAttribute("label", Integer.toString(nextLabel));
 		}
 
 		StudyConfigService scs = getStudyConfigService();
@@ -178,7 +181,7 @@ public class ChangeStudyServlet extends Controller {
 		} else {
 			// YW <<
 			if (current.getParentStudyId() > 0) {
-				current.setParentStudyName(((StudyBean) sdao.findByPK(current.getParentStudyId())).getName());
+				current.setParentStudyName(sdao.findByPK(current.getParentStudyId()).getName());
 
 			}
 			// YW 06-12-2007>>
@@ -189,7 +192,7 @@ public class ChangeStudyServlet extends Controller {
 			request.getSession().removeAttribute("studyWithRole");
 			addPageMessage(restext.getString("study_choosed_removed_restore_first"), request);
 		} else {
-            request.getSession().setAttribute("study", current);
+			request.getSession().setAttribute("study", current);
 			currentStudy = current;
 			// change user's active study id
 			UserAccountDAO udao = getUserAccountDAO();
@@ -199,19 +202,19 @@ public class ChangeStudyServlet extends Controller {
 			udao.update(ub);
 
 			currentRole = (StudyUserRoleBean) request.getSession().getAttribute("studyWithRole");
-            if (currentRole == null) {
-                response.sendRedirect(request.getContextPath() + "/ChangeStudy");
-                return;
-            }
-            request.getSession().setAttribute("userRole", currentRole);
-            request.getSession().removeAttribute("studyWithRole");
+			if (currentRole == null) {
+				response.sendRedirect(request.getContextPath() + "/ChangeStudy");
+				return;
+			}
+			request.getSession().setAttribute("userRole", currentRole);
+			request.getSession().removeAttribute("studyWithRole");
 			addPageMessage(restext.getString("current_study_changed_succesfully"), request);
 		}
 		ub.incNumVisitsToMainMenu();
 		// YW 2-18-2008, if study has been really changed <<
 		if (prevStudyId != studyId) {
-            request.getSession().removeAttribute("eventsForCreateDataset");
-            request.getSession().setAttribute("tableFacadeRestore", "false");
+			request.getSession().removeAttribute("eventsForCreateDataset");
+			request.getSession().setAttribute("tableFacadeRestore", "false");
 		}
 		request.setAttribute("studyJustChanged", "yes");
 		// YW >>
@@ -247,14 +250,14 @@ public class ChangeStudyServlet extends Controller {
 	}
 
 	private void setupSubjectSDVTable(HttpServletRequest request) {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		request.setAttribute("studyId", currentStudy.getId());
 		String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
 		request.setAttribute("sdvMatrix", sdvMatrix);
 	}
 
 	private void setupStudySubjectStatusStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		StudySubjectStatusStatisticsTableFactory factory = new StudySubjectStatusStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -264,7 +267,7 @@ public class ChangeStudyServlet extends Controller {
 	}
 
 	private void setupSubjectEventStatusStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		EventStatusStatisticsTableFactory factory = new EventStatusStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -275,7 +278,7 @@ public class ChangeStudyServlet extends Controller {
 	}
 
 	private void setupStudySiteStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		SiteStatisticsTableFactory factory = new SiteStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -286,7 +289,7 @@ public class ChangeStudyServlet extends Controller {
 	}
 
 	private void setupStudyStatisticsTable(HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = getCurrentStudy(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		StudyStatisticsTableFactory factory = new StudyStatisticsTableFactory();
 		factory.setStudySubjectDao(getStudySubjectDAO());
 		factory.setCurrentStudy(currentStudy);
@@ -296,9 +299,9 @@ public class ChangeStudyServlet extends Controller {
 	}
 
 	private void setupListStudySubjectTable(HttpServletRequest request, HttpServletResponse response) {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 		ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(true);
 		factory.setStudyEventDefinitionDao(getStudyEventDefinitionDAO());
 		factory.setSubjectDAO(getSubjectDAO());

@@ -91,7 +91,7 @@
         <fmt:message key="welcome_to" bundle="${restext}"/>
             <c:choose>
               <c:when test='${study.parentStudyId > 0}'>
-                <c:out value='${study.parentStudyName}'/>
+                <c:out value='${study.parentStudyName}'/>: <c:out value='${study.name}'/>
               </c:when>
               <c:otherwise>
                 <c:out value='${study.name}'/>
