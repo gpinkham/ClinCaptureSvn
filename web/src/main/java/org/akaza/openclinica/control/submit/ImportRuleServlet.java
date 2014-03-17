@@ -167,16 +167,8 @@ public class ImportRuleServlet extends Controller {
 					try {
 
 						getRuleSetService().saveImport(importedRules);
-						MessageFormat mf = new MessageFormat("");
-						mf.applyPattern(resword.getString("successful_rule_upload"));
-
-						Object[] arguments = {
-								importedRules.getValidRuleDefs().size() + importedRules.getDuplicateRuleDefs().size(),
-								importedRules.getValidRuleSetDefs().size() + importedRules.getDuplicateRuleSetDefs().size() };
-
+						
 						JsonObject obj = new JsonObject();
-
-						obj.addProperty("argument", arguments.toString());
 						obj.addProperty("message", resword.getString("successful_rule_upload"));
 
 						response.getWriter().write(obj.toString());

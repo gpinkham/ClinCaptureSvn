@@ -367,7 +367,7 @@ function createConditionDroppable() {
  *
  * =========================================================================== */
 function createPopover(droppable) {
-	var btn = '<div type="button" class="pull-left space-right-m" onclick="addDroppable(this)"><span class="glyphicon glyphicon-pencil"></span></div><div class="pull-left space-right-m" type="button" onclick="x(this)"><span class="glyphicon glyphicon-trash"></span></div>';
+	var btn = '<div id="edit-pop" type="button" class="pull-left space-right-m" onclick="addDroppable(this)"><span class="glyphicon glyphicon-pencil"></span></div><div id="del-pop" class="pull-left space-right-m" type="button" onclick="x(this)"><span class="glyphicon glyphicon-trash"></span></div>';
 	droppable.popover({
 		html: true,
 		content: btn,
@@ -379,6 +379,32 @@ function createPopover(droppable) {
 		$(".popover").remove();
 		evt.stopPropagation();
 		$(this).popover('show');
+	}).on('shown.bs.popover', function (x) {
+  		$(".tooltip").each(function() {
+  			$(this).remove();
+  		});
+  		// Edit tool-tip
+  		createToolTip({
+  			element: $(this).find("#edit-pop"),
+  			title: "Click to add a new drop surface"
+  		});
+		$(this).find("#edit-pop").on('show.bs.tooltip', function(x) {
+			$(".tooltip").each(function() {
+				$(this).remove();
+			});
+		});
+  		// Delete tool-tip
+  		createToolTip({
+  			element: $(this).find("#del-pop"),
+  			title: "Click to remove the current element from the expression"
+  		});
+  		$(this).find("#del-pop").on('show.bs.tooltip', function(x) {
+			$(".tooltip").each(function() {
+				$(this).remove();
+			});
+		});
+  		// kill event
+  		x.stopPropagation();
 	});
 }
 
@@ -487,7 +513,7 @@ function removeInsert(drop, predicate) {
  * Invoked from the drop surface popover, deletes drop surface from which it was
  * invoked
  *
- * Argument Object [popov] parameters:
+ * Argument Object [params] parameters:
  * - popov - the pop over which invoked this function
  * =========================================================================== */
 function x(popov) {
@@ -509,10 +535,6 @@ function createToolTip(params) {
 		title: params.title,
 		placement: "bottom",
 		trigger: "hover focus"
-	}).on('shown.bs.tooltip', function() {
-		setTimeout(function() {
-			$(".tooltip").remove();
-		}, 5000);
 	});
 }
 

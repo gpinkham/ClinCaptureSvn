@@ -1383,7 +1383,6 @@ Parser.prototype.setInsertActionMessage = function(message) {
 }
 
 Parser.prototype.setExpression = function(expression) {
-
 	if (expression instanceof Array) {
 		this.rule.expression = expression;
 		var currDroppable = $("#groupSurface");
@@ -1398,7 +1397,6 @@ Parser.prototype.setExpression = function(expression) {
 					currDroppable.after(droppable);
 					currDroppable = droppable;
 				} else if (parser.isOp(predicate)) {
-
 					var droppable = createSymbolDroppable();
 					droppable.text(predicate);
 					currDroppable.after(droppable);
@@ -1411,11 +1409,10 @@ Parser.prototype.setExpression = function(expression) {
 				}
 			}
 			currDroppable.addClass("bordered");
+			currDroppable.removeClass("init");
 			currDroppable.css('font-weight', 'bold');
- 			
 		}
 	} else if (typeof expression === "string") {
-
 		var rawExpression = [];
 		// The regex skips quoted strings in expression
 		var expr = expression.split(/(\()|(?=\))|\s+(?!\w+(\s+\w+)*?")/g);
