@@ -76,8 +76,9 @@ body .panel {
   border-bottom: none !important;
 }
 
-.space-right-p {
+.trash {
   margin-top: 3em;
+  margin-right: 1em;
   padding-right: .3em;
 }
 
@@ -206,7 +207,7 @@ textarea {
   background-color: #F5F5EF; 
 }
 
-td.ui-draggable {
+td {
   cursor: hand;
   cursor: pointer; 
 }

@@ -695,8 +695,8 @@ function createDroppable(params) {
 		}
 
 		input.css({
-			"text-align": "center",
-			"display": "table-cell"
+			"display": "inline",
+			"text-align": "center"
 		});
 
 		$(this).text("");
