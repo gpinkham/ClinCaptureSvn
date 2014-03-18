@@ -466,7 +466,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		if (property.getValueExpression() == null) {
 			logger.info("There is no ValueExpression for property =" + property.getOid());
 		} else {
-			String expression = getExpressionService().constructFullExpressionIfPartialProvided(
+			String expression = getExpressionService().constructFullExpressionFromPartial(
 					property.getValueExpression().getValue(), ruleSet.getTarget().getValue());
 			if (expression != null) {
 				ItemBean itemBean = getExpressionService().getItemBeanFromExpression(expression);
@@ -496,7 +496,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		String itemGroupAOrdinal = getExpressionService().getGroupOrdninalCurated(ruleSet.getTarget().getValue());
 
 		for (PropertyBean propertyBean : properties) {
-			String expression = getExpressionService().constructFullExpressionIfPartialProvided(propertyBean.getOid(),
+			String expression = getExpressionService().constructFullExpressionFromPartial(propertyBean.getOid(),
 					ruleSet.getTarget().getValue());
 			ItemBean itemBeanB = getExpressionService().getItemBeanFromExpression(expression);
 			ItemGroupBean itemGroupBeanB = getExpressionService().getItemGroupExpression(expression);
@@ -612,7 +612,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 			ItemOrItemGroupHolder itemOrItemGroup = getItemOrItemGroup(oid);
 			// OID is an item
 			if (itemOrItemGroup.getItemBean() != null) {
-				String expression = getExpressionService().constructFullExpressionIfPartialProvided(
+				String expression = getExpressionService().constructFullExpressionFromPartial(
 						propertyBean.getOid(), ruleSet.getTarget().getValue());
 				ItemBean itemBeanB = getExpressionService().getItemBeanFromExpression(expression);
 				ItemGroupBean itemGroupBeanB = getExpressionService().getItemGroupExpression(expression);
@@ -723,7 +723,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 			ItemOrItemGroupHolder itemOrItemGroup = getItemOrItemGroup(oid);
 			// OID is an item
 			if (itemOrItemGroup.getItemBean() != null) {
-				String expression = getExpressionService().constructFullExpressionIfPartialProvided(
+				String expression = getExpressionService().constructFullExpressionFromPartial(
 						propertyBean.getOid(), ruleSet.getTarget().getValue());
 				ItemBean itemBeanB = getExpressionService().getItemBeanFromExpression(expression);
 				ItemGroupBean itemGroupBeanB = getExpressionService().getItemGroupExpression(expression);

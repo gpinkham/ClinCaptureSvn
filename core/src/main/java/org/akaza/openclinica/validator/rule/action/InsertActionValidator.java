@@ -106,7 +106,7 @@ public class InsertActionValidator implements Validator {
 				e.rejectValue(p + "oid", "oid.invalid", "OID: " + propertyBean.getOid() + " is Invalid.");
 			}
 		} else {
-			String expression = getExpressionService().constructFullExpressionIfPartialProvided(propertyBean.getOid(),
+			String expression = getExpressionService().constructFullExpressionFromPartial(propertyBean.getOid(),
 					ruleSetBean.getTarget().getValue());
 			ItemBean item = getExpressionService().getItemBeanFromExpression(expression);
 
@@ -147,7 +147,7 @@ public class InsertActionValidator implements Validator {
 						"Value provided for ValueExpression is Invalid");
 			}
 		} else {
-			String valueExpression = getExpressionService().constructFullExpressionIfPartialProvided(
+			String valueExpression = getExpressionService().constructFullExpressionFromPartial(
 					propertyBean.getValueExpression().getValue(), ruleSetBean.getTarget().getValue());
 			ItemBean item = getExpressionService().getItemBeanFromExpression(valueExpression);
 			if (!getExpressionService().isExpressionValid(propertyBean.getValueExpression().getValue(), ruleSetBean, 2)

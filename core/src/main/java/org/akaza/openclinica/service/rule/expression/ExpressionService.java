@@ -20,15 +20,6 @@
  */
 package org.akaza.openclinica.service.rule.expression;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -62,7 +53,15 @@ import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ExpressionService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -100,41 +99,23 @@ public class ExpressionService {
 
 	private void init(DataSource ds, ExpressionObjectWrapper expressionWrapper) {
 		pattern = new Pattern[4];
-		pattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID
-																					// +
-																					// ordinal
-		pattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID
-																	// or
-																	// CRF_VERSION_OID
-		pattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // ITEM_GROUP_DATA_OID
-																					// +
-																					// ordinal
+		pattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID + ordinal
+		pattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID or CRF_VERSION_OID
+		pattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // ITEM_GROUP_DATA_OID + ordinal
 		pattern[0] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // ITEM_DATA_OID
 
 		// [ALL] ordinals are not accepted in Rule Expressions
 		rulePattern = new Pattern[4];
-		rulePattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // STUDY_EVENT_DEFINITION_OID
-																								// +
-																								// ordinal
-		rulePattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID
-																		// or
-																		// CRF_VERSION_OID
-		rulePattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // ITEM_GROUP_DATA_OID
-																								// +
-																								// ordinal
+		rulePattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // STUDY_EVENT_DEFINITION_OID+ ordinal
+		rulePattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID or CRF_VERSION_OID
+		rulePattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // ITEM_GROUP_DATA_OID + ordinal
 		rulePattern[0] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // ITEM_DATA_OID
 
 		// [END] support added
 		ruleActionPattern = new Pattern[4];
-		ruleActionPattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID
-																								// +
-																								// ordinal
-		ruleActionPattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID
-																				// or
-																				// CRF_VERSION_OID
-		ruleActionPattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_WITH_END); // ITEM_GROUP_DATA_OID
-																										// +
-																										// ordinal
+		ruleActionPattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID + ordinal
+		ruleActionPattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID or CRF_VERSION_OID
+		ruleActionPattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_WITH_END); // ITEM_GROUP_DATA_OID + ordinal
 		ruleActionPattern[0] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // ITEM_DATA_OID
 
 		this.studyEventDefinitions = new HashMap<String, StudyEventDefinitionBean>();
@@ -322,47 +303,38 @@ public class ExpressionService {
 
 	public String evaluateExpression(String expression) throws OpenClinicaSystemException {
 		String value = null;
+		String fullExpression = expression;
+		List<ItemDataBean> itemDatas = new ArrayList<ItemDataBean>();
+		Map<Integer, ItemBean> itemBeansI = new HashMap<Integer, ItemBean>();
 		if (expressionWrapper.getRuleSet() != null) {
-			if (isExpressionPartial(expression)) {
-				String fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper
-						.getRuleSet().getTarget().getValue());
-				List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
-				Map<Integer, ItemBean> itemBeansI = new HashMap<Integer, ItemBean>();
+			boolean expressionIsPartial = isExpressionPartial(expression);
+			if (expressionIsPartial) {
+				fullExpression = constructFullExpressionFromPartial(expression, expressionWrapper.getRuleSet().getTarget().getValue());
+				itemDatas = getItemDatas(fullExpression);
+				itemBeansI = new HashMap<Integer, ItemBean>();
 				if (items != null) {
-					Iterator<ItemBean> iter = items.values().iterator();
-					while (iter.hasNext()) {
-						ItemBean item = iter.next();
+					for (ItemBean item : items.values()) {
 						itemBeansI.put(item.getId(), item);
 					}
 				}
-				fullExpression = fixGroupOrdinal(fullExpression, expressionWrapper.getRuleSet().getTarget().getValue(),
-						itemDatas, expressionWrapper.getEventCrf());
-				if (checkSyntax(fullExpression)) {
-					String valueFromForm = null;
-					if (items == null) {
-						valueFromForm = getValueFromForm(fullExpression);
-					} else {
-						valueFromForm = getValueFromForm(fullExpression, items);
-					}
-					String valueFromDb = null;
-					valueFromDb = getValueFromDb(fullExpression, itemDatas, itemBeansI);
-					logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
-					if (valueFromForm == null && valueFromDb == null) {
-						throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { fullExpression,
-								expressionWrapper.getRuleSet().getTarget().getValue() });
-					}
-					value = valueFromForm == null ? valueFromDb : valueFromForm;
+			}
+			fullExpression = fixGroupOrdinal(fullExpression, expressionWrapper.getRuleSet().getTarget().getValue(),
+					itemDatas, expressionWrapper.getEventCrf());
+			if (checkSyntax(fullExpression)) {
+				String valueFromForm = null;
+				if (items == null) {
+					valueFromForm = getValueFromForm(fullExpression);
+				} else {
+					valueFromForm = getValueFromForm(fullExpression, items);
 				}
-			} else {
-				// So Expression is not Partial
-				if (checkSyntax(expression)) {
-					String valueFromDb = getValueFromDbb(expression);
-					if (valueFromDb == null) {
-						throw new OpenClinicaSystemException("OCRERR_0018", new Object[] { expression });
-					}
-					logger.debug("valueFromDb : {}", valueFromDb);
-					value = valueFromDb;
+				String valueFromDb = null;
+				valueFromDb = expressionIsPartial ? getValueFromDb(fullExpression, itemDatas, itemBeansI) : getValueFromDbb(expression);
+				logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
+				if (valueFromForm == null && valueFromDb == null) {
+					throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { fullExpression,
+							expressionWrapper.getRuleSet().getTarget().getValue() });
 				}
+				value = valueFromForm == null ? valueFromDb : valueFromForm;
 			}
 		}
 		return value;
@@ -380,7 +352,6 @@ public class ExpressionService {
 			EventCRFBean eventCrf) {
 
 		String returnedRuleExpression = ruleExpression;
-
 		if (getItemGroupOid(ruleExpression).equals(getItemGroupOid(targetExpression))) {
 			if (getGroupOrdninalCurated(ruleExpression).equals("")
 					&& !getGroupOrdninalCurated(targetExpression).equals("")) {
@@ -425,7 +396,7 @@ public class ExpressionService {
 		}
 
 		if (ruleSet != null) {
-			String fullExpression = constructFullExpressionIfPartialProvided(expression, ruleSet.getTarget().getValue());
+			String fullExpression = constructFullExpressionFromPartial(expression, ruleSet.getTarget().getValue());
 			isRuleExpressionValid = checkInsertActionExpressionSyntax(fullExpression);
 
 			if (isRuleExpressionValid) {
@@ -447,7 +418,7 @@ public class ExpressionService {
 		}
 
 		if (ruleSet != null) {
-			String fullExpression = constructFullExpressionIfPartialProvided(expression, ruleSet.getTarget().getValue());
+			String fullExpression = constructFullExpressionFromPartial(expression, ruleSet.getTarget().getValue());
 			isRuleExpressionValid = checkSyntax(fullExpression);
 
 			if (isRuleExpressionValid) {
@@ -466,7 +437,7 @@ public class ExpressionService {
 			if (isExpressionPartial(expressionWrapper.getRuleSet().getTarget().getValue())) {
 				return true;
 			}
-			String fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper.getRuleSet()
+			String fullExpression = constructFullExpressionFromPartial(expression, expressionWrapper.getRuleSet()
 					.getTarget().getValue());
 
 			if (isExpressionPartial(expression)) {
@@ -512,11 +483,7 @@ public class ExpressionService {
 	}
 
 	public Boolean isExpressionPartial(String expression) {
-		String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
-		if (splitExpression.length == 4)
-			return false;
-		else
-			return true;
+		return expression.split(ESCAPED_SEPERATOR).length == 4;
 	}
 
 	public String constructFullExpressionIfPartialProvided(String expression, CRFVersionBean crfVersion,
@@ -540,7 +507,7 @@ public class ExpressionService {
 		return resultingExpression;
 	}
 
-	public String constructFullExpressionIfPartialProvided(String expression, String ruleSetTargetExpression) {
+	public String constructFullExpressionFromPartial(String expression, String ruleSetTargetExpression) {
 		if (expression == null) {
 			logger.info("expression is null.");
 			return expression;
@@ -774,9 +741,8 @@ public class ExpressionService {
 		if (studyEventDefinitions.get(studyEventDefinitionKey) != null) {
 			return studyEventDefinitions.get(studyEventDefinitionKey);
 		} else {
-			
+
 			StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOid(studyEventDefinitionKey);
-			
 			if (studyEventDefinition != null) {
 				studyEventDefinitions.put(studyEventDefinitionKey, studyEventDefinition);
 				return studyEventDefinition;
@@ -914,7 +880,7 @@ public class ExpressionService {
 	public void isExpressionValid(String expression) {
 		isExpressionValidWithOptimiseRuleValidator(expression, false);
 	}
-	
+
 	public void isExpressionValidWithOptimiseRuleValidator(String expression, Boolean optimiseRuleValidator) {
 		int length = expression.split(ESCAPED_SEPERATOR).length;
 		ItemBean item = null;
@@ -946,8 +912,9 @@ public class ExpressionService {
 				if (studyEventDefinition == null || crf == null)
 					throw new OpenClinicaSystemException("OCRERR_0034");
 
-				EventDefinitionCRFBean eventDefinitionCrf = getEventDefinitionCRFDao().findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(),
-							studyEventDefinition.getId(), crf.getId());
+				EventDefinitionCRFBean eventDefinitionCrf = getEventDefinitionCRFDao()
+						.findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(),
+								studyEventDefinition.getId(), crf.getId());
 				if (eventDefinitionCrf == null || eventDefinitionCrf.getId() == 0)
 					throw new OpenClinicaSystemException("OCRERR_0034");
 			}
@@ -988,7 +955,6 @@ public class ExpressionService {
 					return "OK";
 				}
 			}
-
 		}
 		if (theOid.length == 1) {
 			ItemGroupBean itemGroup = getItemGroupDao().findByOid(oid);
@@ -1140,5 +1106,4 @@ public class ExpressionService {
 	public void setExpressionWrapper(ExpressionObjectWrapper expressionWrapper) {
 		this.expressionWrapper = expressionWrapper;
 	}
-
 }
