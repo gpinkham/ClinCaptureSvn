@@ -21,6 +21,21 @@
 
 package org.akaza.openclinica.dao.submit;
 
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.dao.EventCRFSDVFilter;
+import org.akaza.openclinica.dao.EventCRFSDVSort;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -37,22 +52,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.dao.EventCRFSDVFilter;
-import org.akaza.openclinica.dao.EventCRFSDVSort;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
 
 /**
  * <P>
@@ -712,7 +711,6 @@ public class EventCRFDAO extends AuditableEntityDAO {
 
 		String sql = digester.getQuery("getAvailableWithFilterAndSort");
 		sql = sql + filter.execute("");
-		sql = sql + sort.execute("");
 
 		if (!allowSdvWithOpenQueries) {
 			variables.put(3, studyId);
@@ -720,6 +718,8 @@ public class EventCRFDAO extends AuditableEntityDAO {
 
 			sql = sql + digester.getQuery("notAllowSdvWithOpenQueries");
 		}
+
+		sql = sql + sort.execute("");
 
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
