@@ -206,9 +206,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>viewLogMessageServlet</servlet-name>
-        <description>ViewLogMessageServlet</description>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-name>ViewLogMessage</servlet-name>
+        <description>ViewLogMessage</description>
+        <servlet-class>org.akaza.openclinica.control.admin.ViewLogMessageServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RssReaderServlet</servlet-name>
@@ -224,13 +224,13 @@
         <description>AuditUserActivityServlet</description>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
-        <servlet-name>systemStatusServlet</servlet-name>
+        <servlet-name>SystemStatusServlet</servlet-name>
         <description>SystemStatusServlet</description>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.SystemStatusServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>auditDatabaseServlet</servlet-name>
         <description>AuditDatabaseServlet</description>
@@ -301,10 +301,10 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>viewAllJobsServlet</servlet-name>
+        <servlet-name>ViewAllJobsServlet</servlet-name>
         <display-name>ViewAllJobsServlet</display-name>
         <description>ViewAllJobsServlet</description>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.ViewAllJobsServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>viewImportJobServlet</servlet-name>
@@ -313,10 +313,10 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>viewSingleJobServlet</servlet-name>
+        <servlet-name>ViewSingleJobServlet</servlet-name>
         <display-name>ViewSingleJobServlet</display-name>
         <description>ViewSingleJobServlet</description>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.ViewSingleJobServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>pauseJobServlet</servlet-name>
@@ -442,9 +442,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>viewUserAccountServlet</servlet-name>
+        <servlet-name>ViewUserAccountServlet</servlet-name>
         <display-name>ViewUserAccount</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.ViewUserAccountServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>addNewSubjectServlet</servlet-name>
@@ -492,9 +492,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>unLockUserServlet</servlet-name>
+        <servlet-name>UnLockUserServlet</servlet-name>
         <display-name>UnLockUser</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.UnLockUserServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>createStudyServlet</servlet-name>
@@ -622,14 +622,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>viewCRFServlet</servlet-name>
+        <servlet-name>ViewCRFServlet</servlet-name>
         <display-name>ViewCRF</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.ViewCRFServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>updateCRFServlet</servlet-name>
+        <servlet-name>UpdateCRFServlet</servlet-name>
         <display-name>UpdateCRF</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.UpdateCRFServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>initUpdateCRFServlet</servlet-name>
@@ -854,14 +854,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>removeStudyServlet</servlet-name>
+        <servlet-name>RemoveStudyServlet</servlet-name>
         <display-name>RemoveStudy</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.RemoveStudyServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>restoreStudyServlet</servlet-name>
+        <servlet-name>RestoreStudyServlet</servlet-name>
         <display-name>RestoreStudy</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.RestoreStudyServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>listSubjectServlet</servlet-name>
@@ -869,24 +869,24 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>updateSubjectServlet</servlet-name>
+        <servlet-name>UpdateSubjectServlet</servlet-name>
         <display-name>UpdateSubject</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.UpdateSubjectServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>viewStudyServlet</servlet-name>
+        <servlet-name>ViewStudyServlet</servlet-name>
         <display-name>ViewStudy</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.ViewStudyServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>removeCRFServlet</servlet-name>
+        <servlet-name>RemoveCRFServlet</servlet-name>
         <display-name>RemoveCRF</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.RemoveCRFServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>restoreCRFServlet</servlet-name>
+        <servlet-name>RestoreCRFServlet</servlet-name>
         <display-name>RestoreCRF</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.RestoreCRFServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>removeSubjectServlet</servlet-name>
@@ -894,29 +894,29 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>restoreSubjectServlet</servlet-name>
+        <servlet-name>RestoreSubjectServlet</servlet-name>
         <display-name>RestoreSubject</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.RestoreSubjectServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>removeCRFVersionServlet</servlet-name>
+        <servlet-name>RemoveCRFVersionServlet</servlet-name>
         <display-name>RemoveCRFVersion</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.RemoveCRFVersionServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>restoreCRFVersionServlet</servlet-name>
+        <servlet-name>RestoreCRFVersionServlet</servlet-name>
         <display-name>RestoreCRFVersion</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.RestoreCRFVersionServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>viewSubjectServlet</servlet-name>
+        <servlet-name>ViewSubjectServlet</servlet-name>
         <display-name>ViewSubjectVersion</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.ViewSubjectServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>setUserRoleServlet</servlet-name>
+        <servlet-name>SetUserRoleServlet</servlet-name>
         <display-name>SetUserRole</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.admin.SetUserRoleServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>viewTableOfContentServlet</servlet-name>
@@ -1323,7 +1323,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>viewAllJobsServlet</servlet-name>
+        <servlet-name>ViewAllJobsServlet</servlet-name>
         <url-pattern>/ViewAllJobs</url-pattern>
     </servlet-mapping>
 
@@ -1333,7 +1333,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>viewSingleJobServlet</servlet-name>
+        <servlet-name>ViewSingleJobServlet</servlet-name>
         <url-pattern>/ViewSingleJob</url-pattern>
     </servlet-mapping>
 
@@ -1554,7 +1554,7 @@
         <url-pattern>/DeleteUser</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>unLockUserServlet</servlet-name>
+        <servlet-name>UnLockUserServlet</servlet-name>
         <url-pattern>/UnLockUser</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1562,7 +1562,7 @@
         <url-pattern>/EditStudyUserRole</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>viewUserAccountServlet</servlet-name>
+        <servlet-name>ViewUserAccountServlet</servlet-name>
         <url-pattern>/ViewUserAccount</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1727,7 +1727,7 @@
         <url-pattern>/CreateDataset</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>viewCRFServlet</servlet-name>
+        <servlet-name>ViewCRFServlet</servlet-name>
         <url-pattern>/ViewCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1735,7 +1735,7 @@
         <url-pattern>/InitUpdateCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>updateCRFServlet</servlet-name>
+        <servlet-name>UpdateCRFServlet</servlet-name>
         <url-pattern>/UpdateCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1847,11 +1847,11 @@
         <url-pattern>/ReassignStudySubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>removeStudyServlet</servlet-name>
+        <servlet-name>RemoveStudyServlet</servlet-name>
         <url-pattern>/RemoveStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>restoreStudyServlet</servlet-name>
+        <servlet-name>RestoreStudyServlet</servlet-name>
         <url-pattern>/RestoreStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1863,27 +1863,27 @@
         <url-pattern>/ListSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>updateSubjectServlet</servlet-name>
+        <servlet-name>UpdateSubjectServlet</servlet-name>
         <url-pattern>/UpdateSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>viewStudyServlet</servlet-name>
+        <servlet-name>ViewStudyServlet</servlet-name>
         <url-pattern>/ViewStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>removeCRFServlet</servlet-name>
+        <servlet-name>RemoveCRFServlet</servlet-name>
         <url-pattern>/RemoveCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>restoreCRFServlet</servlet-name>
+        <servlet-name>RestoreCRFServlet</servlet-name>
         <url-pattern>/RestoreCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>removeCRFVersionServlet</servlet-name>
+        <servlet-name>RemoveCRFVersionServlet</servlet-name>
         <url-pattern>/RemoveCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>restoreCRFVersionServlet</servlet-name>
+        <servlet-name>RestoreCRFVersionServlet</servlet-name>
         <url-pattern>/RestoreCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1891,15 +1891,15 @@
         <url-pattern>/RemoveSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>restoreSubjectServlet</servlet-name>
+        <servlet-name>RestoreSubjectServlet</servlet-name>
         <url-pattern>/RestoreSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>viewSubjectServlet</servlet-name>
+        <servlet-name>ViewSubjectServlet</servlet-name>
         <url-pattern>/ViewSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>setUserRoleServlet</servlet-name>
+        <servlet-name>SetUserRoleServlet</servlet-name>
         <url-pattern>/SetUserRole</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2093,7 +2093,7 @@
         <url-pattern>/AuditUserActivity</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>systemStatusServlet</servlet-name>
+        <servlet-name>SystemStatusServlet</servlet-name>
         <url-pattern>/SystemStatus</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -2117,7 +2117,7 @@
         <url-pattern>/ChooseDownloadFormat</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>viewLogMessageServlet</servlet-name>
+        <servlet-name>ViewLogMessage</servlet-name>
         <url-pattern>/ViewLogMessage</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

@@ -14,17 +14,12 @@
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -36,8 +31,7 @@ import java.io.FileReader;
  * 
  */
 @SuppressWarnings({ "serial" })
-@Component
-public class ViewLogMessageServlet extends Controller {
+public class ViewLogMessageServlet extends SecureController {
 
 	public static final String DEST_DIR = "Event_CRF_Data";
 	public static final String IMPORT_DIR = SQLInitServlet.getField("filePath") + DEST_DIR + File.separator;
@@ -48,11 +42,7 @@ public class ViewLogMessageServlet extends Controller {
 	private static final String GROUP_NAME = "gname";
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
-
+	protected void mayProceed() throws InsufficientPermissionException {
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -61,16 +51,16 @@ public class ViewLogMessageServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"));
 		throw new InsufficientPermissionException(Page.MENU,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+
 
 	}
 
 	@Override
-	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	protected void processRequest() throws Exception {
 		try {
 			File destDirectory = new File(IMPORT_DIR);
 			FormProcessor fp = new FormProcessor(request);
@@ -90,20 +80,19 @@ public class ViewLogMessageServlet extends Controller {
 			// need to also set the information back to the original view jobs
 			// so we have to get back to this type of page:
 			// http://localhost:8081/OpenClinica-3.0-SNAPSHOT/ViewSingleJob?tname=test%20job%2001&gname=1
-			forwardPage(Page.VIEW_LOG_MESSAGE, request, response);
+			forwardPage(Page.VIEW_LOG_MESSAGE);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study")
-							+ respage.getString("change_study_contact_sysadmin"), request);
-			forwardPage(Page.MENU, request, response);
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+					+ respage.getString("change_study_contact_sysadmin"));
+			forwardPage(Page.MENU);
 		}
 	}
 
-	public static String readFromFile(File filename) throws java.io.IOException {
+	public static String readFromFile(File filename) throws java.io.FileNotFoundException, java.io.IOException {
 
-		StringBuilder readBuffer = new StringBuilder();
+		StringBuffer readBuffer = new StringBuffer();
 		BufferedReader fileReader = new BufferedReader(new FileReader(filename));
 
 		char[] readChars = new char[1024];

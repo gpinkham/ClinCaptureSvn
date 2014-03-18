@@ -20,37 +20,33 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
-import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
 /**
  * @author jxu
@@ -59,83 +55,73 @@ import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
  *         Code Templates
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-@Component
-public class ViewCRFServlet extends Controller {
+public class ViewCRFServlet extends SecureController {
 
-	public static String CRF = "crf";
-	public static String CRF_ID = "crfId";
+	private static String CRF = "crf";
+	private static String CRF_ID = "crfId";
+	private RuleSetServiceInterface ruleSetService;
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
-
+	public void mayProceed() throws InsufficientPermissionException {
 		if (ub.isSysAdmin() || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"));
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
 	}
 
 	@Override
-	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyBean currentStudy = getCurrentStudy(request);
-
-		StudyInfoPanel panel = getStudyInfoPanel(request);
-		panel.reset();
+	public void processRequest() throws Exception {
+		resetPanel();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 		panel.setSubmitDataModule(false);
 		panel.setExtractData(false);
 		panel.setCreateDataset(false);
 
-		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
-		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"), request);
-		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"), request);
+		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"));
+		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"));
+		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"));
 		setToPanel(resword.getString("CRF_spreadsheet_template"),
-				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
+				respage.getString("br_download_blank_CRF_spreadsheet_from"));
 		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
-				respage.getString("br_download_example_CRF_instructions_from"), request);
+				respage.getString("br_download_example_CRF_instructions_from"));
 
 		FormProcessor fp = new FormProcessor(request);
 
-		List<StudyBean> studyBeans;
 		int crfId = fp.getInt(CRF_ID);
+		List<StudyBean> studyBeans = null;
 		if (crfId == 0) {
-			addPageMessage(respage.getString("please_choose_a_CRF_to_view"), request);
-			forwardPage(Page.CRF_LIST, request, response);
+			addPageMessage(respage.getString("please_choose_a_CRF_to_view"));
+			forwardPage(Page.CRF_LIST);
 		} else {
-			CRFDAO cdao = getCRFDAO();
-			CRFVersionDAO vdao = getCRFVersionDAO();
+			CRFDAO cdao = new CRFDAO(sm.getDataSource());
+			CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
 			CRFBean crf = (CRFBean) cdao.findByPK(crfId);
 			request.setAttribute("crfName", crf.getName());
 			ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) vdao.findAllByCRF(crfId);
 			crf.setVersions(versions);
 			if (ub.isSysAdmin()) {
 				// Generate a table showing a list of studies associated with the CRF>>
-				StudyDAO studyDAO = getStudyDAO();
+				StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
 
 				studyBeans = findStudiesForCRFId(crfId, studyDAO);
 				// Create the Jmesa table for the studies associated with the CRF
-				String studyHtml = renderStudiesTable(studyBeans, request);
+				String studyHtml = renderStudiesTable(studyBeans);
 				request.setAttribute("studiesTableHTML", studyHtml);
 			}
 
 			request.setAttribute(CRF, crf);
-			forwardPage(Page.VIEW_CRF, request, response);
+			forwardPage(Page.VIEW_CRF);
 
-			populate(crf, currentStudy, versions);
+			populate(crf, versions);
 		}
 	}
 
-	private Collection<TableColumnHolder> populate(CRFBean crf, StudyBean currentStudy,
-			ArrayList<CRFVersionBean> versions) {
+	private Collection<TableColumnHolder> populate(CRFBean crf, ArrayList<CRFVersionBean> versions) {
 		HashMap<CRFVersionBean, ArrayList<TableColumnHolder>> hm = new HashMap<CRFVersionBean, ArrayList<TableColumnHolder>>();
 		List<TableColumnHolder> tableColumnHolders = new ArrayList<TableColumnHolder>();
 		for (CRFVersionBean versionBean : versions) {
@@ -179,7 +165,8 @@ public class ViewCRFServlet extends Controller {
 		return tchs;
 	}
 
-	private String renderStudiesTable(List<StudyBean> studyBeans, HttpServletRequest request) {
+	private String renderStudiesTable(List<StudyBean> studyBeans) {
+
 		Collection<StudyRowContainer> items = getStudyRows(studyBeans);
 		TableFacade tableFacade = createTableFacade("studies", request);
 		tableFacade.setColumnProperties("name", "uniqueProtocolid", "actions");
@@ -212,7 +199,7 @@ public class ViewCRFServlet extends Controller {
 	private Collection<StudyRowContainer> getStudyRows(List<StudyBean> studyBeans) {
 
 		Collection<StudyRowContainer> allRows = new ArrayList<StudyRowContainer>();
-		StudyRowContainer tempBean;
+		StudyRowContainer tempBean = null;
 		StringBuilder actions = new StringBuilder("");
 		for (StudyBean studBean : studyBeans) {
 			tempBean = new StudyRowContainer();
@@ -240,7 +227,7 @@ public class ViewCRFServlet extends Controller {
 		}
 
 		ArrayList<Integer> studyIds = studyDao.getStudyIdsByCRF(crfId);
-		StudyBean tempBean;
+		StudyBean tempBean = new StudyBean();
 
 		for (Integer id : studyIds) {
 			tempBean = (StudyBean) studyDao.findByPK(id);
@@ -251,12 +238,18 @@ public class ViewCRFServlet extends Controller {
 	}
 
 	@Override
-	protected String getAdminServlet(HttpServletRequest request) {
-		UserAccountBean ub = getUserAccountBean(request);
+	protected String getAdminServlet() {
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SecureController.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}
 	}
+
+	private RuleSetServiceInterface getRuleSetService() {
+		ruleSetService = this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess
+				.getApplicationContext(context).getBean("ruleSetService");
+		return ruleSetService;
+	}
+
 }

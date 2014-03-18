@@ -20,38 +20,49 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.control.core.Controller;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
+
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
+import org.akaza.openclinica.web.InsufficientPermissionException;
 
 // allows both deletion and restoration of a study user role
 
-@Component
-public class SystemStatusServlet extends Controller {
+public class SystemStatusServlet extends SecureController {
 
 	private static final long serialVersionUID = 1722670001851393612L;
+	private DatabaseChangeLogDao databaseChangeLogDao;
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	protected void mayProceed() throws InsufficientPermissionException {
+
 		request.getLocale();
+		return;
 	}
 
 	@Override
-	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	protected void processRequest() throws Exception {
 
 		Long databaseChangelLogCount = getDatabaseChangeLogDao().count();
 		String applicationStatus = "OK";
-		if (request.getSession().getAttribute("ome") != null) {
+		if (session.getAttribute("ome") != null) {
 			applicationStatus = "OutOfMemory.";
 		}
 
 		PrintWriter out = response.getWriter();
 		out.println(applicationStatus);
 		out.println(String.valueOf(databaseChangelLogCount));
+	}
+
+	public DatabaseChangeLogDao getDatabaseChangeLogDao() {
+		databaseChangeLogDao = this.databaseChangeLogDao != null ? databaseChangeLogDao
+				: (DatabaseChangeLogDao) SpringServletAccess.getApplicationContext(context).getBean(
+						"databaseChangeLogDao");
+		return databaseChangeLogDao;
+	}
+
+	public void setDatabaseChangeLogDao(DatabaseChangeLogDao databaseChangeLogDao) {
+		this.databaseChangeLogDao = databaseChangeLogDao;
 	}
 }

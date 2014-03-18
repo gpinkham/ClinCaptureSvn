@@ -20,11 +20,13 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -34,7 +36,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -49,12 +51,6 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * @author jxu
@@ -63,38 +59,25 @@ import java.util.Date;
  *         restored
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-@Component
-public class RestoreStudyServlet extends Controller {
+public class RestoreStudyServlet extends SecureController {
 	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
+     *
+     */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
-
+	public void mayProceed() throws InsufficientPermissionException {
 		if (ub.isSysAdmin()) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"));
 		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
 
 	@Override
-	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyBean currentStudy = getCurrentStudy(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
-
-		StudyDAO sdao = getStudyDAO();
+	public void processRequest() throws Exception {
+		StudyDAO sdao = new StudyDAO(sm.getDataSource());
 		FormProcessor fp = new FormProcessor(request);
 		int studyId = fp.getInt("id");
 
@@ -103,21 +86,21 @@ public class RestoreStudyServlet extends Controller {
 		ArrayList sites = (ArrayList) sdao.findAllByParent(studyId);
 
 		// find all user and roles in the study, include ones in sites
-		UserAccountDAO udao = getUserAccountDAO();
+		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 		ArrayList userRoles = udao.findAllByStudyId(studyId);
 
 		// find all subjects in the study, include ones in sites
-		StudySubjectDAO ssdao = getStudySubjectDAO();
+		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
 		ArrayList subjects = ssdao.findAllByStudy(study);
 
 		// find all events in the study, include ones in sites
-		StudyEventDefinitionDAO sefdao = getStudyEventDefinitionDAO();
+		StudyEventDefinitionDAO sefdao = new StudyEventDefinitionDAO(sm.getDataSource());
 		ArrayList definitions = sefdao.findAllByStudy(study);
 
 		String action = request.getParameter("action");
 		if (studyId == 0) {
-			addPageMessage(respage.getString("please_choose_a_study_to_restore"), request);
-			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
+			addPageMessage(respage.getString("please_choose_a_study_to_restore"));
+			forwardPage(Page.STUDY_LIST_SERVLET);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 				request.setAttribute("studyToRestore", study);
@@ -129,19 +112,19 @@ public class RestoreStudyServlet extends Controller {
 				request.setAttribute("subjectsToRestore", subjects);
 
 				request.setAttribute("definitionsToRRestore", definitions);
-				forwardPage(Page.RESTORE_STUDY, request, response);
+				forwardPage(Page.RESTORE_STUDY);
 			} else {
 				logger.info("submit to restore the study");
 				// change all statuses to unavailable
-				StudyDAO studao = getStudyDAO();
+				StudyDAO studao = new StudyDAO(sm.getDataSource());
 				study.setStatus(study.getOldStatus());
 				study.setUpdater(ub);
 				study.setUpdatedDate(new Date());
 				studao.update(study);
 
 				// YW 09-27-2007 << restore auto-removed sites
-				for (Object site1 : sites) {
-					StudyBean site = (StudyBean) site1;
+				for (int i = 0; i < sites.size(); i++) {
+					StudyBean site = (StudyBean) sites.get(i);
 					if (site.getStatus() == Status.AUTO_DELETED) {
 						site.setStatus(site.getOldStatus());
 						site.setUpdater(ub);
@@ -151,8 +134,8 @@ public class RestoreStudyServlet extends Controller {
 				}
 
 				// restore all users and roles
-				for (Object userRole : userRoles) {
-					StudyUserRoleBean role = (StudyUserRoleBean) userRole;
+				for (int i = 0; i < userRoles.size(); i++) {
+					StudyUserRoleBean role = (StudyUserRoleBean) userRoles.get(i);
 					if (role.getStatus().equals(Status.AUTO_DELETED)) {
 						role.setStatus(Status.AVAILABLE);
 						role.setUpdater(ub);
@@ -166,8 +149,8 @@ public class RestoreStudyServlet extends Controller {
 				if (study.getId() == currentStudy.getId()) {
 					currentStudy.setStatus(Status.AVAILABLE);
 
-					StudyUserRoleBean r = (getUserAccountDAO()).findRoleByUserNameAndStudyId(ub.getName(),
-							currentStudy.getId());
+					StudyUserRoleBean r = (new UserAccountDAO(sm.getDataSource())).findRoleByUserNameAndStudyId(
+							ub.getName(), currentStudy.getId());
 					currentRole.setRole(r.getRole());
 				}
 				// when an active site's parent study has been restored, this
@@ -176,19 +159,19 @@ public class RestoreStudyServlet extends Controller {
 						&& currentStudy.getStatus() == Status.AUTO_DELETED) {
 					currentStudy.setStatus(Status.AVAILABLE);
 
-					StudyUserRoleBean r = (getUserAccountDAO()).findRoleByUserNameAndStudyId(ub.getName(),
-							currentStudy.getId());
-					StudyUserRoleBean rInParent = (getUserAccountDAO()).findRoleByUserNameAndStudyId(ub.getName(),
-							currentStudy.getParentStudyId());
-					// according to logic in Controller.java: inherited
+					StudyUserRoleBean r = (new UserAccountDAO(sm.getDataSource())).findRoleByUserNameAndStudyId(
+							ub.getName(), currentStudy.getId());
+					StudyUserRoleBean rInParent = (new UserAccountDAO(sm.getDataSource()))
+							.findRoleByUserNameAndStudyId(ub.getName(), currentStudy.getParentStudyId());
+					// according to logic in SecureController.java: inherited
 					// role from parent study, pick the higher role
 					currentRole.setRole(Role.get(Role.max(r.getRole(), rInParent.getRole()).getId()));
 				}
 				// YW 06-18-2007 >>
 
 				// restore all subjects
-				for (Object subject1 : subjects) {
-					StudySubjectBean subject = (StudySubjectBean) subject1;
+				for (int i = 0; i < subjects.size(); i++) {
+					StudySubjectBean subject = (StudySubjectBean) subjects.get(i);
 					if (subject.getStatus().equals(Status.AUTO_DELETED)) {
 						subject.setStatus(Status.AVAILABLE);
 						subject.setUpdater(ub);
@@ -197,11 +180,11 @@ public class RestoreStudyServlet extends Controller {
 					}
 				}
 
-				StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
-				SubjectGroupMapDAO sgmdao = getSubjectGroupMapDAO();
+				StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
+				SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
 				ArrayList groups = sgcdao.findAllByStudy(study);
-				for (Object group1 : groups) {
-					StudyGroupClassBean group = (StudyGroupClassBean) group1;
+				for (int i = 0; i < groups.size(); i++) {
+					StudyGroupClassBean group = (StudyGroupClassBean) groups.get(i);
 					if (group.getStatus().equals(Status.AUTO_DELETED)) {
 						group.setStatus(Status.AVAILABLE);
 						group.setUpdater(ub);
@@ -209,8 +192,8 @@ public class RestoreStudyServlet extends Controller {
 						sgcdao.update(group);
 						// all subject_group_map
 						ArrayList subjectGroupMaps = sgmdao.findAllByStudyGroupClassId(group.getId());
-						for (Object subjectGroupMap : subjectGroupMaps) {
-							SubjectGroupMapBean sgMap = (SubjectGroupMapBean) subjectGroupMap;
+						for (int j = 0; j < subjectGroupMaps.size(); j++) {
+							SubjectGroupMapBean sgMap = (SubjectGroupMapBean) subjectGroupMaps.get(j);
 							if (sgMap.getStatus().equals(Status.AUTO_DELETED)) {
 								sgMap.setStatus(Status.AVAILABLE);
 								sgMap.setUpdater(ub);
@@ -222,18 +205,18 @@ public class RestoreStudyServlet extends Controller {
 				}
 
 				// restore all event definitions and event
-				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
-				StudyEventDAO sedao = getStudyEventDAO();
-				for (Object definition1 : definitions) {
-					StudyEventDefinitionBean definition = (StudyEventDefinitionBean) definition1;
+				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+				StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+				for (int i = 0; i < definitions.size(); i++) {
+					StudyEventDefinitionBean definition = (StudyEventDefinitionBean) definitions.get(i);
 					if (definition.getStatus().equals(Status.AUTO_DELETED)) {
 						definition.setStatus(Status.AVAILABLE);
 						definition.setUpdater(ub);
 						definition.setUpdatedDate(new Date());
 						sefdao.update(definition);
 						ArrayList edcs = (ArrayList) edcdao.findAllByDefinition(definition.getId());
-						for (Object edc1 : edcs) {
-							EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edc1;
+						for (int j = 0; j < edcs.size(); j++) {
+							EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcs.get(j);
 							if (edc.getStatus().equals(Status.AUTO_DELETED)) {
 								edc.setStatus(Status.AVAILABLE);
 								edc.setUpdater(ub);
@@ -243,10 +226,10 @@ public class RestoreStudyServlet extends Controller {
 						}
 
 						ArrayList events = (ArrayList) sedao.findAllByDefinition(definition.getId());
-						EventCRFDAO ecdao = getEventCRFDAO();
+						EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
-						for (Object event1 : events) {
-							StudyEventBean event = (StudyEventBean) event1;
+						for (int j = 0; j < events.size(); j++) {
+							StudyEventBean event = (StudyEventBean) events.get(j);
 							if (event.getStatus().equals(Status.AUTO_DELETED)) {
 								event.setStatus(Status.AVAILABLE);
 								event.setUpdater(ub);
@@ -255,9 +238,9 @@ public class RestoreStudyServlet extends Controller {
 
 								ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
-								ItemDataDAO iddao = getItemDataDAO();
-								for (Object eventCRF1 : eventCRFs) {
-									EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
+								ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+								for (int k = 0; k < eventCRFs.size(); k++) {
+									EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
 									if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
 										eventCRF.setStatus(eventCRF.getOldStatus());
 										eventCRF.setUpdater(ub);
@@ -265,8 +248,8 @@ public class RestoreStudyServlet extends Controller {
 										ecdao.update(eventCRF);
 
 										ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-										for (Object itemData : itemDatas) {
-											ItemDataBean item = (ItemDataBean) itemData;
+										for (int a = 0; a < itemDatas.size(); a++) {
+											ItemDataBean item = (ItemDataBean) itemDatas.get(a);
 											if (item.getStatus().equals(Status.AUTO_DELETED)) {
 												item.setStatus(item.getOldStatus());
 												item.setUpdater(ub);
@@ -281,10 +264,10 @@ public class RestoreStudyServlet extends Controller {
 					}
 				}// for definitions
 
-				DatasetDAO datadao = getDatasetDAO();
+				DatasetDAO datadao = new DatasetDAO(sm.getDataSource());
 				ArrayList dataset = datadao.findAllByStudyId(study.getId());
-				for (Object aDataset : dataset) {
-					DatasetBean data = (DatasetBean) aDataset;
+				for (int i = 0; i < dataset.size(); i++) {
+					DatasetBean data = (DatasetBean) dataset.get(i);
 					if (data.getStatus().equals(Status.AUTO_DELETED)) {
 						data.setStatus(Status.AVAILABLE);
 						data.setUpdater(ub);
@@ -293,8 +276,8 @@ public class RestoreStudyServlet extends Controller {
 					}
 				}
 
-				addPageMessage(respage.getString("this_study_has_been_restored_succesfully"), request);
-				forwardPage(Page.STUDY_LIST_SERVLET, request, response);
+				addPageMessage(respage.getString("this_study_has_been_restored_succesfully"));
+				forwardPage(Page.STUDY_LIST_SERVLET);
 
 			}
 		}
@@ -302,10 +285,9 @@ public class RestoreStudyServlet extends Controller {
 	}
 
 	@Override
-	protected String getAdminServlet(HttpServletRequest request) {
-		UserAccountBean ub = getUserAccountBean(request);
+	protected String getAdminServlet() {
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SecureController.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

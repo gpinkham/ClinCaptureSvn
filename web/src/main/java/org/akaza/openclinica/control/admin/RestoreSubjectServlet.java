@@ -21,21 +21,16 @@
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -43,10 +38,7 @@ import org.akaza.openclinica.util.DAOWrapper;
 import org.akaza.openclinica.util.SubjectEventStatusUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -56,64 +48,54 @@ import java.util.Date;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
-@Component
-public class RestoreSubjectServlet extends Controller {
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+public class RestoreSubjectServlet extends SecureController {
 	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
+     *
+     */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
-
-		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+	public void mayProceed() throws InsufficientPermissionException {
+		checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
+		checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
 
 		if (ub.isSysAdmin()) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"));
 		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
 
 	@Override
-	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
+	public void processRequest() throws Exception {
 
-		SubjectDAO sdao = getSubjectDAO();
+		SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
 		FormProcessor fp = new FormProcessor(request);
 		int subjectId = fp.getInt("id");
 
 		String action = fp.getString("action");
 		if (subjectId == 0 || StringUtil.isBlank(action)) {
-			addPageMessage(respage.getString("please_choose_a_subject_to_restore"), request);
-			forwardPage(Page.SUBJECT_LIST_SERVLET, request, response);
+			addPageMessage(respage.getString("please_choose_a_subject_to_restore"));
+			forwardPage(Page.SUBJECT_LIST_SERVLET);
 		} else {
 
 			SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);
 
 			// find all study subjects
-			StudySubjectDAO ssdao = getStudySubjectDAO();
+			StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
 			ArrayList studySubs = ssdao.findAllBySubjectId(subjectId);
-			StudyDAO studydao = getStudyDAO();
+			StudyDAO studydao = new StudyDAO(sm.getDataSource());
 
 			// find study events
-			StudyEventDAO sedao = getStudyEventDAO();
+			StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 			ArrayList events = sedao.findAllBySubjectId(subjectId);
 			if ("confirm".equalsIgnoreCase(action)) {
 				request.setAttribute("subjectToRestore", subject);
 				request.setAttribute("studySubs", studySubs);
 				request.setAttribute("events", events);
-				forwardPage(Page.RESTORE_SUBJECT, request, response);
+				forwardPage(Page.RESTORE_SUBJECT);
 			} else {
 				logger.info("submit to restore the subject");
 				// change all statuses to AVAILABLE
@@ -123,8 +105,8 @@ public class RestoreSubjectServlet extends Controller {
 				sdao.update(subject);
 
 				// remove subject references from study
-				for (Object studySub1 : studySubs) {
-					StudySubjectBean studySub = (StudySubjectBean) studySub1;
+				for (int i = 0; i < studySubs.size(); i++) {
+					StudySubjectBean studySub = (StudySubjectBean) studySubs.get(i);
 					if (studySub.getStatus().equals(Status.AUTO_DELETED)) {
 						studySub.setStatus(Status.AVAILABLE);
 						studySub.setUpdater(ub);
@@ -133,13 +115,13 @@ public class RestoreSubjectServlet extends Controller {
 					}
 				}
 
-				EventCRFDAO ecdao = getEventCRFDAO();
-				StudySubjectDAO subdao = getStudySubjectDAO();
-				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
-				DiscrepancyNoteDAO discDao = getDiscrepancyNoteDAO();
+				EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+				StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
+				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+				DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(sm.getDataSource());
 
-				for (Object event1 : events) {
-					StudyEventBean event = (StudyEventBean) event1;
+				for (int j = 0; j < events.size(); j++) {
+					StudyEventBean event = (StudyEventBean) events.get(j);
 					if (event.getStatus().equals(Status.AUTO_DELETED)) {
 						event.setStatus(Status.AVAILABLE);
 						event.setUpdater(ub);
@@ -153,9 +135,9 @@ public class RestoreSubjectServlet extends Controller {
 						SubjectEventStatusUtil.determineSubjectEventState(event, study, eventCRFs, new DAOWrapper(
 								studydao, sedao, subdao, ecdao, edcdao, discDao));
 
-						ItemDataDAO iddao = getItemDataDAO();
-						for (Object eventCRF1 : eventCRFs) {
-							EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
+						ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+						for (int k = 0; k < eventCRFs.size(); k++) {
+							EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
 							if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
 								eventCRF.setStatus(Status.AVAILABLE);
 								eventCRF.setUpdater(ub);
@@ -163,8 +145,8 @@ public class RestoreSubjectServlet extends Controller {
 								ecdao.update(eventCRF);
 								// restore all the item data
 								ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-								for (Object itemData : itemDatas) {
-									ItemDataBean item = (ItemDataBean) itemData;
+								for (int a = 0; a < itemDatas.size(); a++) {
+									ItemDataBean item = (ItemDataBean) itemDatas.get(a);
 									if (item.getStatus().equals(Status.AUTO_DELETED)) {
 										item.setStatus(Status.AVAILABLE);
 										item.setUpdater(ub);
@@ -180,19 +162,18 @@ public class RestoreSubjectServlet extends Controller {
 				String emailBody = respage.getString("the_subject") + subject.getName() + " "
 						+ respage.getString("has_been_restored_succesfully");
 
-				addPageMessage(emailBody, request);
+				addPageMessage(emailBody);
 
-				forwardPage(Page.SUBJECT_LIST_SERVLET, request, response);
+				forwardPage(Page.SUBJECT_LIST_SERVLET);
 
 			}
 		}
 	}
 
 	@Override
-	protected String getAdminServlet(HttpServletRequest request) {
-		UserAccountBean ub = getUserAccountBean(request);
+	protected String getAdminServlet() {
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SecureController.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

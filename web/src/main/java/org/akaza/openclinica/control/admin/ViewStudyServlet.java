@@ -20,13 +20,12 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import com.clinovo.model.DiscrepancyDescriptionType;
-import com.clinovo.service.DiscrepancyDescriptionService;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -36,11 +35,8 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
+import com.clinovo.model.DiscrepancyDescriptionType;
+import com.clinovo.service.DiscrepancyDescriptionService;
 
 /**
  * Processes the reuqest of 'view study details'
@@ -48,23 +44,13 @@ import java.util.ArrayList;
  * @author jxu
  * 
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
-@Component
-public class ViewStudyServlet extends Controller {
+@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+public class ViewStudyServlet extends SecureController {
 	/**
 	 * Checks whether the user has the correct privilege
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
 	 */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
-
+	public void mayProceed() throws InsufficientPermissionException {
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -73,43 +59,39 @@ public class ViewStudyServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"));
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
 
 	@Override
-	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyBean currentStudy = getCurrentStudy(request);
-		StudyUserRoleBean currentRole = getCurrentRole(request);
+	public void processRequest() throws Exception {
 
-		StudyDAO sdao = getStudyDAO();
+		StudyDAO sdao = new StudyDAO(sm.getDataSource());
 		FormProcessor fp = new FormProcessor(request);
 		int studyId = fp.getInt("id");
 		if (studyId == 0) {
-			addPageMessage(respage.getString("please_choose_a_study_to_view"), request);
-			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
+			addPageMessage(respage.getString("please_choose_a_study_to_view"));
+			forwardPage(Page.STUDY_LIST_SERVLET);
 		} else {
 			if (currentStudy.getId() != studyId && currentStudy.getParentStudyId() != studyId) {
-				checkRoleByUserAndStudy(request, response, ub, studyId, 0);
+				checkRoleByUserAndStudy(ub, studyId, 0);
 			}
 
 			String viewFullRecords = fp.getString("viewFull");
 			StudyBean study = (StudyBean) sdao.findByPK(studyId);
 
-			StudyConfigService scs = getStudyConfigService();
+			StudyConfigService scs = new StudyConfigService(sm.getDataSource());
 			study = scs.setParametersForStudy(study);
 
 			request.setAttribute("studyToView", study);
 			if ("yes".equalsIgnoreCase(viewFullRecords)) {
-				UserAccountDAO udao = getUserAccountDAO();
+				UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 				ArrayList sites = new ArrayList();
-				ArrayList userRoles;
-				if (currentStudy.getParentStudyId() > 0 && currentRole.getRole().getId() > 3) {
-					sites.add(currentStudy);
+				ArrayList userRoles = new ArrayList();
+				if (this.currentStudy.getParentStudyId() > 0 && this.currentRole.getRole().getId() > 3) {
+					sites.add(this.currentStudy);
 					userRoles = udao.findAllUsersByStudy(currentStudy.getId());
 				} else {
 					sites = (ArrayList) sdao.findAllByParent(studyId);
@@ -117,16 +99,18 @@ public class ViewStudyServlet extends Controller {
 				}
 
 				// find all subjects in the study, include ones in sites
-				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
-				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
-				DiscrepancyDescriptionService dDescriptionService = getDiscrepancyDescriptionService();
-
+				StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+				DiscrepancyDescriptionService dDescriptionService = (DiscrepancyDescriptionService) SpringServletAccess.getApplicationContext(context)
+						.getBean("discrepancyDescriptionService");
+				
 				// find all events in the study, include ones in sites
-				ArrayList<StudyEventDefinitionBean> definitions = seddao.findAllAvailableByStudy(study);
-				ArrayList dRFCDescriptions = (ArrayList) dDescriptionService.findAllByStudyIdAndTypeId(studyId,
+				ArrayList definitions = seddao.findAllAvailableByStudy(study);
+				ArrayList dRFCDescriptions = (ArrayList) dDescriptionService.findAllByStudyIdAndTypeId(studyId, 
 						DiscrepancyDescriptionType.DescriptionType.RFC_DESCRIPTION.getId());
 
-				for (StudyEventDefinitionBean def : definitions) {
+				for (int i = 0; i < definitions.size(); i++) {
+					StudyEventDefinitionBean def = (StudyEventDefinitionBean) definitions.get(i);
 					ArrayList crfs = (ArrayList) edcdao.findAllActiveParentsByEventDefinitionId(def.getId());
 					def.setCrfNum(crfs.size());
 
@@ -141,19 +125,18 @@ public class ViewStudyServlet extends Controller {
 
 				request.setAttribute("definitionsToView", definitions);
 				request.setAttribute("defNum", definitions.size() + "");
-				forwardPage(Page.VIEW_FULL_STUDY, request, response);
+				forwardPage(Page.VIEW_FULL_STUDY);
 
 			} else {
-				forwardPage(Page.VIEW_STUDY, request, response);
+				forwardPage(Page.VIEW_STUDY);
 			}
 		}
 	}
 
 	@Override
-	protected String getAdminServlet(HttpServletRequest request) {
-		UserAccountBean ub = getUserAccountBean(request);
+	protected String getAdminServlet() {
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SecureController.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

@@ -14,8 +14,10 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -35,42 +37,47 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 @Component
 public class UpdateJobImportServlet extends Controller {
 
-	public static String TRIGGER_IMPORT_GROUP = "importTrigger";
+	private static String SCHEDULER = "schedulerFactoryBean";
+	private static String TRIGGER_IMPORT_GROUP = "importTrigger";
 
 	private static final String IMPORT_DIR = SQLInitServlet.getField(ImportSpringJob.FILE_PATH)
 			+ ImportSpringJob.DIR_PATH + File.separator;
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
-
+  
 		if (ub.isSysAdmin() || ub.isTechAdmin()) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET,
 				resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
 
 	}
 
-	private void setUpServlet(Trigger trigger, HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	private StdScheduler getScheduler(HttpServletRequest request) {
+		StdScheduler scheduler = (StdScheduler) SpringServletAccess.getApplicationContext(getServletContext()).getBean(SCHEDULER);  
+
+		return scheduler;
+	}
+
+	private void setUpServlet(Trigger trigger, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		FormProcessor fp2 = new FormProcessor(request);
 
 		StudyDAO sdao = getStudyDAO();
@@ -95,8 +102,8 @@ public class UpdateJobImportServlet extends Controller {
 			request.setAttribute(ImportSpringJob.EMAIL, contactEmail);
 			request.setAttribute(ImportSpringJob.STUDY_NAME, studyName);
 			request.setAttribute(ImportSpringJob.FILE_PATH, directory);
-			request.setAttribute(ImportSpringJob.HOURS, Integer.toString(hours));
-			request.setAttribute(ImportSpringJob.MINUTES, Integer.toString(minutes));
+			request.setAttribute(ImportSpringJob.HOURS, new Integer(hours).toString());
+			request.setAttribute(ImportSpringJob.MINUTES, new Integer(minutes).toString());
 
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(trigger.getStartTime());
@@ -117,8 +124,8 @@ public class UpdateJobImportServlet extends Controller {
 			request.setAttribute(ImportSpringJob.JOB_DESC, fp2.getString(ImportSpringJob.JOB_DESC));
 			request.setAttribute(ImportSpringJob.JOB_HOUR, fp2.getString(ImportSpringJob.JOB_HOUR));
 			request.setAttribute(ImportSpringJob.JOB_MINUTE, fp2.getString(ImportSpringJob.JOB_MINUTE));
-			request.setAttribute(ImportSpringJob.HOURS, Integer.toString(fp2.getInt(ImportSpringJob.HOURS)));
-			request.setAttribute(ImportSpringJob.MINUTES, Integer.toString(fp2.getInt(ImportSpringJob.MINUTES)));
+			request.setAttribute(ImportSpringJob.HOURS, new Integer(fp2.getInt(ImportSpringJob.HOURS)).toString());
+			request.setAttribute(ImportSpringJob.MINUTES, new Integer(fp2.getInt(ImportSpringJob.MINUTES)).toString());
 			request.setAttribute(ImportSpringJob.EMAIL, fp2.getString(ImportSpringJob.EMAIL));
 			request.setAttribute(ImportSpringJob.FILE_PATH_DIR, fp2.getString(ImportSpringJob.FILE_PATH_DIR));
 		}
@@ -138,12 +145,12 @@ public class UpdateJobImportServlet extends Controller {
 
 	@Override
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+	
 		FormProcessor fp = new FormProcessor(request);
 		TriggerService triggerService = new TriggerService();
 		String action = fp.getString("action");
 		String triggerName = fp.getString("tname");
-		StdScheduler scheduler = getStdScheduler();
+		StdScheduler scheduler = getScheduler(request);
 		logger.trace("found trigger name " + triggerName);
 		Trigger updatingTrigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName, TRIGGER_IMPORT_GROUP));
 		if (StringUtil.isBlank(action)) {
@@ -159,16 +166,15 @@ public class UpdateJobImportServlet extends Controller {
 			if (!errors.isEmpty()) {
 				// send back
 				request.setAttribute("formMessages", errors);
-				addPageMessage("Your modifications caused an error, please see the messages for more information.",
-						request);
+				addPageMessage("Your modifications caused an error, please see the messages for more information.", request);
 				setUpServlet(null, request, response);
 				forwardPage(Page.UPDATE_JOB_IMPORT, request, response);
 			} else {
 				StudyDAO studyDAO = getStudyDAO();
 				int studyId = fp.getInt(ImportSpringJob.STUDY_ID);
 				StudyBean study = (StudyBean) studyDAO.findByPK(studyId);
-				SimpleTriggerImpl newTrigger = triggerService.generateImportTrigger(fp, getUserAccountBean(request),
-						study, startTime, request.getLocale().getLanguage());
+                SimpleTriggerImpl newTrigger = triggerService.generateImportTrigger(fp, getUserAccountBean(request), study, startTime, request
+						.getLocale().getLanguage());
 				JobDetailImpl jobDetailBean = new JobDetailImpl();
 				jobDetailBean.setGroup(TRIGGER_IMPORT_GROUP);
 				jobDetailBean.setName(newTrigger.getKey().getName());
@@ -187,9 +193,7 @@ public class UpdateJobImportServlet extends Controller {
 					se.printStackTrace();
 					// set a message here with the exception message
 					setUpServlet(newTrigger, request, response);
-					addPageMessage(
-							"There was an unspecified error with your creation, please contact an administrator.",
-							request);
+					addPageMessage("There was an unspecified error with your creation, please contact an administrator.", request);
 					forwardPage(Page.UPDATE_JOB_IMPORT, request, response);
 				}
 			}

@@ -20,18 +20,14 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
 /**
@@ -41,60 +37,51 @@ import java.util.ArrayList;
  *         Generation&gt;Code and Comments
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-@Component
-public class ViewSubjectServlet extends Controller {
+public class ViewSubjectServlet extends SecureController {
 	/**
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 */
+     *
+     */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
-
+	public void mayProceed() throws InsufficientPermissionException {
 		if (ub.isSysAdmin()) {
 			return;
 		}
 
-		addPageMessage(
-				respage.getString("no_have_correct_privilege_current_study")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+				+ respage.getString("change_study_contact_sysadmin"));
 		throw new InsufficientPermissionException(Page.SUBJECT_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
 
 	@Override
-	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		SubjectDAO sdao = getSubjectDAO();
+	public void processRequest() throws Exception {
+
+		SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
 		FormProcessor fp = new FormProcessor(request);
 		int subjectId = fp.getInt("id");
 
 		if (subjectId == 0) {
-			addPageMessage(respage.getString("please_choose_a_subject_to_view"), request);
-			forwardPage(Page.SUBJECT_LIST_SERVLET, request, response);
+			addPageMessage(respage.getString("please_choose_a_subject_to_view"));
+			forwardPage(Page.SUBJECT_LIST_SERVLET);
 		} else {
 			SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);
 
 			// find all study subjects
-			StudySubjectDAO ssdao = getStudySubjectDAO();
+			StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
 			ArrayList studySubs = ssdao.findAllBySubjectId(subjectId);
 
 			request.setAttribute("subject", subject);
 			request.setAttribute("studySubs", studySubs);
-			forwardPage(Page.VIEW_SUBJECT, request, response);
+			forwardPage(Page.VIEW_SUBJECT);
 
 		}
 
 	}
 
 	@Override
-	protected String getAdminServlet(HttpServletRequest request) {
-		UserAccountBean ub = getUserAccountBean(request);
+	protected String getAdminServlet() {
 		if (ub.isSysAdmin()) {
-			return Controller.ADMIN_SERVLET_CODE;
+			return SecureController.ADMIN_SERVLET_CODE;
 		} else {
 			return "";
 		}

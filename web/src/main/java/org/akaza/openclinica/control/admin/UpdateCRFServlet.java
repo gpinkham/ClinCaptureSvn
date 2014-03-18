@@ -21,32 +21,25 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings({ "rawtypes", "serial" })
-@Component
-public class UpdateCRFServlet extends Controller {
+public class UpdateCRFServlet extends SecureController {
 
 	private static String CRF = "crf";
 
@@ -54,11 +47,7 @@ public class UpdateCRFServlet extends Controller {
      *
      */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
-		UserAccountBean ub = getUserAccountBean(request);
-		StudyBean currentStudy = getCurrentStudy(request);
-
+	public void mayProceed() throws InsufficientPermissionException {
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -81,46 +70,44 @@ public class UpdateCRFServlet extends Controller {
 			}
 		}
 
-		addPageMessage(
-				respage.getString("you_not_have_permission_update_a_CRF")
-						+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(respage.getString("you_not_have_permission_update_a_CRF")
+				+ respage.getString("change_study_contact_sysadmin"));
 		throw new InsufficientPermissionException(Page.CRF_LIST_SERVLET, resexception.getString("not_study_director"),
 				"1");
 
 	}
 
 	@Override
-	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public void processRequest() throws Exception {
 
-		StudyInfoPanel panel = getStudyInfoPanel(request);
-		panel.reset();
+        resetPanel();
 		panel.setStudyInfoShown(false);
 		panel.setOrderedData(true);
 
-		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"), request);
-		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"), request);
-		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"), request);
+		setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"));
+		setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"));
+		setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"));
 		setToPanel(resword.getString("CRF_spreadsheet_template"),
-				respage.getString("br_download_blank_CRF_spreadsheet_from"), request);
+				respage.getString("br_download_blank_CRF_spreadsheet_from"));
 		setToPanel(resword.getString("example_CRF_br_spreadsheets"),
-				respage.getString("br_download_example_CRF_instructions_from"), request);
+				respage.getString("br_download_example_CRF_instructions_from"));
 
 		FormProcessor fp = new FormProcessor(request);
 
 		String action = fp.getString("action");
 
-		CRFBean crf = (CRFBean) request.getSession().getAttribute(CRF);
+		CRFBean crf = (CRFBean) session.getAttribute(CRF);
 		if (StringUtil.isBlank(action)) {
-			request.getSession().setAttribute(CRF, crf);
-			forwardPage(Page.UPDATE_CRF, request, response);
+			session.setAttribute(CRF, crf);
+			forwardPage(Page.UPDATE_CRF);
 
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
-				confirmCRF(request, response);
+				confirmCRF();
 
 			} else if ("submit".equalsIgnoreCase(action)) {
 
-				submitCRF(request, response);
+				submitCRF();
 			}
 		}
 	}
@@ -129,7 +116,7 @@ public class UpdateCRFServlet extends Controller {
 	 * 
 	 * @throws Exception
 	 */
-	private void confirmCRF(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	private void confirmCRF() throws Exception {
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
 		FormProcessor fp = new FormProcessor(request);
 
@@ -140,12 +127,12 @@ public class UpdateCRFServlet extends Controller {
 		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON,
 				NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2048);
 
-		HashMap errors = v.validate();
+		errors = v.validate();
 
 		if (!StringUtil.isBlank(fp.getString("name"))) {
-			CRFDAO cdao = getCRFDAO();
+			CRFDAO cdao = new CRFDAO(sm.getDataSource());
 
-			CRFBean crf = (CRFBean) request.getSession().getAttribute(CRF);
+			CRFBean crf = (CRFBean) session.getAttribute(CRF);
 			CRFBean crf1 = (CRFBean) cdao.findAnotherByName(fp.getString("name").trim(), crf.getId());
 			logger.info("crf:" + crf.getName() + crf.getId());
 			logger.info("crf1:" + crf1.getName() + crf1.getId());
@@ -158,17 +145,17 @@ public class UpdateCRFServlet extends Controller {
 		if (!errors.isEmpty()) {
 			logger.info("has errors");
 			request.setAttribute("formMessages", errors);
-			forwardPage(Page.UPDATE_CRF, request, response);
+			forwardPage(Page.UPDATE_CRF);
 
 		} else {
 			logger.info("no errors");
-			CRFBean crf = (CRFBean) request.getSession().getAttribute(CRF);
+			CRFBean crf = (CRFBean) session.getAttribute(CRF);
 			crf.setName(fp.getString("name"));
 			crf.setDescription(fp.getString("description"));
 
-			request.getSession().setAttribute(CRF, crf);
+			session.setAttribute(CRF, crf);
 
-			forwardPage(Page.UPDATE_CRF_CONFIRM, request, response);
+			forwardPage(Page.UPDATE_CRF_CONFIRM);
 		}
 
 	}
@@ -178,35 +165,32 @@ public class UpdateCRFServlet extends Controller {
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
-	private void submitCRF(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		UserAccountBean ub = getUserAccountBean(request);
-
-		CRFDAO cdao = new CRFDAO(getDataSource());
-		CRFBean crf = (CRFBean) request.getSession().getAttribute(CRF);
-		String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
-		logger.info("CRF bean to be updated:" + crf.getName());
+	private void submitCRF() throws Exception {
+		CRFDAO cdao = new CRFDAO(sm.getDataSource());
+		CRFBean crf = (CRFBean) session.getAttribute(CRF);
+        String keyValue = (String) request.getSession().getAttribute("savedListCRFsUrl");
+        logger.info("CRF bean to be updated:" + crf.getName());
 
 		crf.setUpdater(ub);
 		crf.setUpdatedDate(new Date());
 		crf.setStatus(Status.AVAILABLE);
 		cdao.update(crf);
 
-		request.getSession().removeAttribute(CRF);
-		addPageMessage(respage.getString("the_CRF_has_been_updated_succesfully"), request);
+		session.removeAttribute(CRF);
+		addPageMessage(respage.getString("the_CRF_has_been_updated_succesfully"));
 
-		if (keyValue != null) {
-			Map storedAttributes = new HashMap();
-			storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
-			request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
-			response.sendRedirect(response.encodeRedirectURL(keyValue));
-		} else {
-			forwardPage(Page.CRF_LIST_SERVLET, request, response);
-		}
+        if (keyValue != null) {
+            Map storedAttributes = new HashMap();
+            storedAttributes.put(SecureController.PAGE_MESSAGE, request.getAttribute(SecureController.PAGE_MESSAGE));
+            request.getSession().setAttribute(STORED_ATTRIBUTES, storedAttributes);
+            response.sendRedirect(response.encodeRedirectURL(keyValue));
+        } else {
+            forwardPage(Page.CRF_LIST_SERVLET);
+        }
 	}
 
 	@Override
-	protected String getAdminServlet(HttpServletRequest request) {
-		UserAccountBean ub = getUserAccountBean(request);
+	protected String getAdminServlet() {
 		if (ub.isSysAdmin()) {
 			return SecureController.ADMIN_SERVLET_CODE;
 		} else {
