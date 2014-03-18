@@ -67,17 +67,17 @@ $(document).ready(function() {
 	$('select[name="type"]').change(function() {
 		if($(this).find(":selected").val() == '') {
 			$('tr[name="repeating"]').hide();
-			$(".showHide").fadeOut('medium');
+			$(".showHide").css('display', 'none');
 			$('input[name*="Day"]').attr('value','').attr('readonly','');
 			$('.showHide input[type="checkbox"]').attr('checked', false);
 			$('input[name="emailUser"]').attr('value','').attr('readonly','');
 		}
 		if($(this).find(":selected").val() == 'calendared_visit') {
-			$(".showHide").fadeIn('medium');
-			$('tr[name="repeating"]').fadeOut('medium');
+			$(".showHide").css('display', '');
+			$('tr[name="repeating"]').css('display', 'none');
 		} else if($(this).find(":selected").val() != '') {
-			$('tr[name="repeating"]').fadeIn('medium');
-			$(".showHide").fadeOut('medium');
+			$('tr[name="repeating"]').css('display', '');
+			$(".showHide").css('display', 'none');
 			$('input[name*="Day"]').attr('value','').attr('readonly','');
 			$('.showHide input[type="checkbox"]').attr('checked', false);
 			$('input[name="emailUser"]').attr('value','').attr('readonly','');
@@ -88,12 +88,12 @@ $(document).ready(function() {
 		if ($(this).is(':checked')) {
 			$('input[name*="Day"]').attr('value','0').attr('readonly','true');
 			$('input[name="emailUser"]').attr('value','').attr('readonly','true');
-			$("tr[id^='email']").fadeOut('medium');
+			$("tr[name^='email']").css('display', 'none');
 
 		} else {
 			$('input[name*="Day"]').attr('value','').attr('readonly','');
 			$('input[name="emailUser"]').attr('readonly','');
-			$("tr[id^='email']").fadeIn('medium');
+			$("tr[name^='email']").css('display', '');
 
 		}
 	});
@@ -103,12 +103,12 @@ $(document).ready(function() {
 			$(".showHide").css('display', '');
 		} else if($(this).find(":selected").val() == '') {
 			$('tr[name="repeating"]').hide();
-			$(".showHide").fadeOut('medium');
+			$(".showHide").css('display', 'none');
 			$('input[name*="Day"]').attr('value','').attr('readonly','');
 			$('.showHide input[type="checkbox"]').attr('checked', false);
 			$('input[name="emailUser"]').attr('value','').attr('readonly','');
 		} else {
-			$('tr[name="repeating"]').fadeIn('medium');
+			$('tr[name="repeating"]').css('display', '');
 		}
 	});
 	$('input[name="isReference"]').each(function() {
@@ -116,7 +116,7 @@ $(document).ready(function() {
 			$('tr[name="repeating"]').hide();
 			$('input[name*="Day"]').attr('value','0').attr('readonly','true');
 			$('input[name="emailUser"]').attr('value','').attr('readonly','true');
-			$("tr[id^='email']").hide();
+			$("tr[name^='email']").hide();
 		}
 	});
 });
@@ -149,19 +149,6 @@ $(document).ready(function() {
   <textarea class="formtextareaXL4" name="description" onchange="javascript:changeIcon();" onchange="javascript:changeIcon();" rows="4" cols="50"><c:out value="${definition.description}"/></textarea>
   </div>  
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
-  </td></tr>
- 
- <tr valign="top" name="repeating"><td class="formlabel"><fmt:message key="repeating" bundle="${resword}"/>:</td><td>
-  <c:choose>
-   <c:when test="${definition.repeating == true}">
-    <input type="radio" checked name="repeating" onchange="javascript:changeIcon();" value="1"><fmt:message key="yes" bundle="${resword}"/>
-    <input type="radio" name="repeating" onchange="javascript:changeIcon();" value="0"><fmt:message key="no" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-    <input type="radio" name="repeating" onchange="javascript:changeIcon();" value="1"><fmt:message key="yes" bundle="${resword}"/>
-    <input type="radio" checked name="repeating" onchange="javascript:changeIcon();" value="0"><fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
   </td></tr>
   
   <tr valign="top"><td class="formlabel"><fmt:message key="type" bundle="${resword}"/>:</td><td><table><tr><td>
@@ -205,7 +192,20 @@ $(document).ready(function() {
        </c:choose>       
     </select></div>
    </td><td class="formlabel">*</td><td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="type"/></jsp:include></td></tr></table></td></tr>
-  
+
+    <tr valign="top" name="repeating" style="height: 25px;"><td align="right"><fmt:message key="repeating" bundle="${resword}"/>:</td><td align="left">
+        <c:choose>
+            <c:when test="${definition.repeating == true}">
+                <input type="radio" checked name="repeating" onchange="javascript:changeIcon();" value="1"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" name="repeating" onchange="javascript:changeIcon();" value="0"><fmt:message key="no" bundle="${resword}"/>
+            </c:when>
+            <c:otherwise>
+                <input type="radio" name="repeating" onchange="javascript:changeIcon();" value="1"><fmt:message key="yes" bundle="${resword}"/>
+                <input type="radio" checked name="repeating" onchange="javascript:changeIcon();" value="0"><fmt:message key="no" bundle="${resword}"/>
+            </c:otherwise>
+        </c:choose>
+    </td></tr>
+
   <tr valign="top"><td class="formlabel"><fmt:message key="category" bundle="${resword}"/>:</td><td>  
    <div class="formfieldXL_BG"><input type="text" name="category" onchange="javascript:changeIcon();" value="<c:out value="${definition.category}"/>" class="formfieldXL"></div>
    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="category"/></jsp:include>
@@ -244,15 +244,17 @@ $(document).ready(function() {
 		</td><td style="padding-bottom:20px">*</td><td width="250px"><fmt:message key="the_day_a_reminder_email_is" bundle="${resword}"/></td><td width=290px><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="emailDay"/></jsp:include></td></tr></table></td>
     </tr>
 
-   <tr valign="top" class='showHide' id='email'>
-  		<td class="formlabel"><fmt:message key="user_name" bundle="${resword}"/>:</td><td><table><tr><td><div class="formfieldXL_BG" ><input class="formfieldXL" value="<c:out value="${emailUser}"/>" type="text" size="3" name="emailUser"/></div><td style="padding-bottom:20px">*</td></td></tr></table></td></tr>
-		<tr class='showHide' id='email'><td>&nbsp</td><td><fmt:message key="use_only_a_valid_user_name" bundle="${resword}"/></tr>
-		<tr class='showHide' id='email'><td>&nbsp</td><td width="250px"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="emailUser"/></jsp:include></td></tr>
-
- <!--  Clinovo end -->
-  
-  <!-- end -->
- 
+   <tr valign="top" class='showHide' name='email'>
+  		<td class="formlabel"><fmt:message key="user_name" bundle="${resword}"/>:</td><td><table><tr><td><div class="formfieldXL_BG" ><input class="formfieldXL" value="<c:out value="${emailUser}"/>" type="text" size="3" name="emailUser"/></div></td><td style="padding-bottom:20px">*</td></tr></table></td>
+   </tr>
+   <tr class='showHide' name='email'>
+       <td>&nbsp</td>
+       <td><fmt:message key="use_only_a_valid_user_name" bundle="${resword}"/>
+   </tr>
+   <tr class='showHide' name='email'>
+       <td>&nbsp</td>
+       <td width="250px"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="emailUser"/></jsp:include></td>
+   </tr>
 
 </table>
 </div>
