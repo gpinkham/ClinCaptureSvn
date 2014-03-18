@@ -221,19 +221,20 @@ public class WidgetsLayoutController {
 			int countOfSubjectsStartedEvent = 0;
 
 			for (SubjectEventStatus subjectEventStatus : subjectEventStatuses) {
-				int eventsWithStatus = studyEventDAO.getCountofEventsBasedOnEventStatusAndStudyEventDefinitionId(sb,
-						subjectEventStatus, studyEventDefinitions.get(i));
 
 				int eventsWithStatusNoRepeats = studyEventDAO
 						.getEventCountFromEventStatusAndStudyEventDefinitionIdNoRepeats(sb, subjectEventStatus,
 								studyEventDefinitions.get(i));
 
 				countOfSubjectEventStatuses.put(subjectEventStatus.getName().toLowerCase().replaceAll(" ", "_"),
-						eventsWithStatus);
+						eventsWithStatusNoRepeats);
 
 				countOfSubjectsStartedEvent += eventsWithStatusNoRepeats;
 			}
 
+			int removedEvents = studyEventDAO.getCountOfEventsBasedOnEventStatusNoRepeats(sb,
+					SubjectEventStatus.REMOVED);
+			countOfSubjectsStartedEvent += removedEvents;
 			countOfSubjectEventStatuses.put("not_scheduled", countOfSubject - countOfSubjectsStartedEvent);
 			currentRow.setId(studyEventDefinitions.get(i).getId());
 			currentRow.setRowName(studyEventDefinitions.get(i).getName());
