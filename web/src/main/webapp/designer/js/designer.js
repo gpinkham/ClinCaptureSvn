@@ -506,7 +506,7 @@ function addDroppable(popov) {
 
 function removeInsert(drop, predicate) {
 	$(drop).after(predicate);
-	drop.remove();
+	$(drop).remove();
 }
 
 /* =============================================================================
@@ -517,6 +517,9 @@ function removeInsert(drop, predicate) {
  * - popov - the pop over which invoked this function
  * =========================================================================== */
 function x(popov) {
+	$(".tooltip").each(function() {
+		$(this).remove();
+	});
 	if ($("#designSurface").find(".dotted-border").size() > 1) {
 		$(popov).parents(".dotted-border").remove();
 	}
