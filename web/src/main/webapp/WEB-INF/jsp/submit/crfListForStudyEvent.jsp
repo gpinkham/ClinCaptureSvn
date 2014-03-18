@@ -261,7 +261,7 @@
                                     </c:if>
                                 </td>
                                 <td class="table_cell_left">
-                                    <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
+                                    <form name="startForm${studyEvent.id}${dedc.edc.crf.id}" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
                                         <c:set var="versionCount" value="0"/>
 										                    <c:set var="firstVersionId" value="0"/>
                                         <c:forEach var="version" items="${dedc.edc.versions}">
@@ -329,8 +329,8 @@
                                                 </select>
                                                 <SCRIPT LANGUAGE="JavaScript">
                                                     function changeQuery<c:out value="${dedc.edc.crf.id}"/>() {
-                                                        var qer = document.startForm<c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${dedc.edc.crf.id}"/>.value;
-                                                        document.startForm<c:out value="${dedc.edc.crf.id}"/>.crfVersionId.value=qer;
+                                                        var qer = document.startForm${studyEvent.id}${dedc.edc.crf.id}.versionId<c:out value="${dedc.edc.crf.id}"/>.value;
+                                                        document.startForm${studyEvent.id}${dedc.edc.crf.id}.crfVersionId.value=qer;
                                                     }
                                                 </SCRIPT>
                                             </c:when>
@@ -389,7 +389,7 @@
                                         </c:when>
                                         <c:when test="${not studySubject.status.deleted and studyEvent.subjectEventStatus.id ne 10 and studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && (study.status.available) && !studyEvent.status.deleted && userRole.role.id ne 6}">
                                                 <c:set var="hideCol1" value="false"/>
-                                                <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>',document.startForm<c:out value="${dedc.edc.crf.id}"/>);"
+                                                <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>',document.startForm${studyEvent.id}${dedc.edc.crf.id});"
                                                    onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                                                    onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');">
                                                    <img name="bt_EnterData<c:out value="${rowCount}"/>" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="4"></a>
