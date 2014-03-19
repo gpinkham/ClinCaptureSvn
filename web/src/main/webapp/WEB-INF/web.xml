@@ -1169,12 +1169,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>viewRuleAssignmentServlet</servlet-name>
-        <display-name>ViewRuleAssignment</display-name>
-        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>runRuleServlet</servlet-name>
         <display-name>RunRule</display-name>
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
@@ -1386,11 +1380,6 @@
     <servlet-mapping>
         <servlet-name>viewRuleSetServlet</servlet-name>
         <url-pattern>/ViewRuleSet</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>viewRuleAssignmentServlet</servlet-name>
-        <url-pattern>/ViewRuleAssignmentNew</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

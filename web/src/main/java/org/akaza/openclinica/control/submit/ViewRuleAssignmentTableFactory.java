@@ -13,19 +13,6 @@
 
 package org.akaza.openclinica.control.submit;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -69,6 +56,18 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
@@ -273,11 +272,12 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		 * row start and row end variables. Very important to set the totalRow before trying to get the row start and
 		 * row end variables.
 		 */
-		if (!limit.isComplete()) {
-			int totalRows = getRuleSetService().getCountWithFilter(viewRuleAssignmentFilter);
-			tableFacade.setTotalRows(totalRows);
+		int newTotalRows = getRuleSetService().getCountWithFilter(viewRuleAssignmentFilter);
+		if (!limit.isComplete()
+				|| (limit.getRowSelect() != null && limit.getRowSelect().getTotalRows() != newTotalRows)) {
+			tableFacade.setTotalRows(newTotalRows);
 		}
-		
+
 		int rowStart = limit.getRowSelect().getRowStart();
 		int rowEnd = limit.getRowSelect().getRowEnd();
 		Collection<RuleSetRuleBean> items = getRuleSetService().getWithFilterAndSort(viewRuleAssignmentFilter,
@@ -903,7 +903,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 				.append("hspace=\"2\"").end().aEnd();
 		actionLink.append("&nbsp;&nbsp;&nbsp;");
 		return actionLink.toString();
-
 
 	}
 
