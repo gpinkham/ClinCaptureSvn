@@ -99,23 +99,28 @@ public class ExpressionService {
 
 	private void init(DataSource ds, ExpressionObjectWrapper expressionWrapper) {
 		pattern = new Pattern[4];
-		pattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID + ordinal
+		pattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID +
+																					// ordinal
 		pattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID or CRF_VERSION_OID
 		pattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // ITEM_GROUP_DATA_OID + ordinal
 		pattern[0] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // ITEM_DATA_OID
 
 		// [ALL] ordinals are not accepted in Rule Expressions
 		rulePattern = new Pattern[4];
-		rulePattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // STUDY_EVENT_DEFINITION_OID+ ordinal
+		rulePattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // STUDY_EVENT_DEFINITION_OID+
+																								// ordinal
 		rulePattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID or CRF_VERSION_OID
-		rulePattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // ITEM_GROUP_DATA_OID + ordinal
+		rulePattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // ITEM_GROUP_DATA_OID +
+																								// ordinal
 		rulePattern[0] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // ITEM_DATA_OID
 
 		// [END] support added
 		ruleActionPattern = new Pattern[4];
-		ruleActionPattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID + ordinal
+		ruleActionPattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID
+																								// + ordinal
 		ruleActionPattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID or CRF_VERSION_OID
-		ruleActionPattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_WITH_END); // ITEM_GROUP_DATA_OID + ordinal
+		ruleActionPattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_WITH_END); // ITEM_GROUP_DATA_OID
+																										// + ordinal
 		ruleActionPattern[0] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // ITEM_DATA_OID
 
 		this.studyEventDefinitions = new HashMap<String, StudyEventDefinitionBean>();
@@ -309,7 +314,8 @@ public class ExpressionService {
 		if (expressionWrapper.getRuleSet() != null) {
 			boolean expressionIsPartial = isExpressionPartial(expression);
 			if (expressionIsPartial) {
-				fullExpression = constructFullExpressionFromPartial(expression, expressionWrapper.getRuleSet().getTarget().getValue());
+				fullExpression = constructFullExpressionFromPartial(expression, expressionWrapper.getRuleSet()
+						.getTarget().getValue());
 				itemDatas = getItemDatas(fullExpression);
 				itemBeansI = new HashMap<Integer, ItemBean>();
 				if (items != null) {
@@ -328,7 +334,8 @@ public class ExpressionService {
 					valueFromForm = getValueFromForm(fullExpression, items);
 				}
 				String valueFromDb = null;
-				valueFromDb = expressionIsPartial ? getValueFromDb(fullExpression, itemDatas, itemBeansI) : getValueFromDbb(expression);
+				valueFromDb = expressionIsPartial ? getValueFromDb(fullExpression, itemDatas, itemBeansI)
+						: getValueFromDbb(expression);
 				logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
 				if (valueFromForm == null && valueFromDb == null) {
 					throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { fullExpression,
@@ -488,8 +495,8 @@ public class ExpressionService {
 
 	public String constructFullExpressionIfPartialProvided(String expression, CRFVersionBean crfVersion,
 			StudyEventDefinitionBean studyEventDefinition) {
+		String resultingExpression = expression;
 		String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
-		String resultingExpression = null;
 		if (splitExpression.length == 1) {
 			ItemGroupMetadataBean itemGroupMetadata = (ItemGroupMetadataBean) getItemGroupMetadataDao()
 					.findByItemAndCrfVersion(getItemBeanFromExpression(expression).getId(), crfVersion.getId());
@@ -742,7 +749,8 @@ public class ExpressionService {
 			return studyEventDefinitions.get(studyEventDefinitionKey);
 		} else {
 
-			StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOid(studyEventDefinitionKey);
+			StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOid(
+					studyEventDefinitionKey);
 			if (studyEventDefinition != null) {
 				studyEventDefinitions.put(studyEventDefinitionKey, studyEventDefinition);
 				return studyEventDefinition;
