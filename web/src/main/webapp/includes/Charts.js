@@ -224,7 +224,7 @@ function initSubjectStatusCount() {
 			               [ ' - Locked', lockedSubjects ] ]);
 	
 	
-			var options = getPieOptions([ '#a6c1dd', '#32a656','#ff0000', '#868686' ]);
+			var options = getPieOptions([ '#7fd0ff', '#32a656','#ff0000', '#868686' ]);
 			var subjectStatusChart = new google.visualization.PieChart(document.getElementById('subject_status_count_chart'));
 	
 			subjectStatusChart.draw(data, options);
