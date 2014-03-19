@@ -2110,7 +2110,7 @@ div#sumBox table tr:first-child td { border-top-width: 0px;
     font-family: Tahoma, Arial, Helvetica, sans-serif;
     font-size: 11px;
     line-height: 13px;
-    z-index: 6;
+    z-index: 11;
     }
 
 .dropdown_BG { background: url(../images/dropdown_BG.png) no-repeat bottom left; margin-top: 10px; padding: 0px 10px 9px 2px;}
