@@ -19,7 +19,7 @@ var parser = new Parser();
 $(function() {
 	// Get url component
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
-	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment");
+	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true&restore=true");
 
 	// ======================= Tool tip creation =======================
 	$("#deleteButton").tooltip({
