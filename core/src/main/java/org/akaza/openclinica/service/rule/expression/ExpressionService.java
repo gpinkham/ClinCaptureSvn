@@ -490,7 +490,7 @@ public class ExpressionService {
 	}
 
 	public Boolean isExpressionPartial(String expression) {
-		return expression.split(ESCAPED_SEPERATOR).length == 4;
+		return !(expression.split(ESCAPED_SEPERATOR).length == 4);
 	}
 
 	public String constructFullExpressionIfPartialProvided(String expression, CRFVersionBean crfVersion,
