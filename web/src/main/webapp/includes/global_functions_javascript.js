@@ -1536,70 +1536,6 @@ function leftnavExpand_ext(strLeftNavRowElementName, isHeader, themeColor){
 	}
 }
 
-function showPopupForEvents(obj, e) {
-  if (!subjectMatrixPopupStick) {
-    clearInterval(popupInterval);
-    var coords = analyzeEvent(e);
-    popupInterval = setInterval(function() {
-      currentPopupUid = obj;
-      processPopupForEvents(coords.top, coords.left);
-    }, 1000);
-  }
-}
-
-function justShowPopupForEvents(obj, e) {
-  clearInterval(popupInterval);
-  var coords = analyzeEvent(e);
-  setTimeout(function() {
-    currentPopupUid = obj;
-    processPopupForEvents(coords.top, coords.left);
-  }, 200);
-}
-
-function closePopupForEvents() {
-  clearInterval(popupInterval);
-  subjectMatrixPopupStick = undefined;
-}
-
-var popupForEventsMouseDown = function(ev) {
-  var element =  ev.target || ev.srcElement;
-  if (ev.target.nodeName.toLowerCase() != "html") {
-    if (currentPopupUid != undefined && jQuery(ev.target).closest("#" + currentPopupUid).length == 0) {
-      jQuery(".calendar").remove();
-      var eventDiv = jQuery("div[id^='Event_" + currentPopupUid + "']");
-      eventDiv.css("visibility", "hidden");
-      if (eventDiv.find(".popupShadow").length == 1) {
-        eventDiv.html(eventDiv.find(".popupShadow").html());
-      }
-      currentPopupUid = undefined;
-      subjectMatrixPopupStick = undefined;
-      jQuery("*").unbind("mousedown", popupForEventsMouseDown);
-    } else {
-      subjectMatrixPopupStick = true;
-    }
-  }
-}
-
-function processPopupForEvents(top, left) {
-  $("div[id^=Lock_]").css("display", "none");
-  $("div[id^=Event_]").css("display", "none");
-  $("div[id^=S_Lock_]").css("display", "none");
-  $("div[id^=S_Event_]").css("display", "none");
-  $("#" + currentPopupUid + " tr[id^=Menu_off_]").css("display", "none");
-  $("#" + currentPopupUid + " tr[id^=Menu_on_]").css("display", "");
-  $("#" + currentPopupUid + " tr[id^=S_Menu_off_]").css("display", "none");
-  $("#" + currentPopupUid + " tr[id^=S_Menu_on_]").css("display", "");
-  var objLayer = $("#" + currentPopupUid);
-  if (objLayer.length > 0) {
-    objLayer.css("display", "");
-    objLayer.css("visibility", "visible");
-    objLayer.css("z-index", "9999");
-    objLayer.css("left", left);
-    objLayer.css("top", top);
-    jQuery("*").unbind("mousedown", popupForEventsMouseDown).bind("mousedown", popupForEventsMouseDown);
-  }
-}
-
 function layersShowOrHide() {
   var arrayArgs = layersShowOrHide.arguments;
   var objLayer;
@@ -1920,20 +1856,24 @@ function hideSubnavs()
 	layersShowOrHide('hidden', 'nav_hide');
 }
 
+var hideContentForCurrentPopup = function() {
+    jQuery(".calendar").remove();
+    var eventDiv = jQuery("div[id^='Event_" + currentPopupUid + "']");
+    eventDiv.css("visibility", "hidden");
+    if (eventDiv.find(".popupShadow").length == 1) {
+        eventDiv.html(eventDiv.find(".popupShadow").html());
+    }
+    jQuery("div[id^='crfListWrapper_" + currentPopupUid + "']").html("");
+    jQuery("div[id^='eventScheduleWrapper_" + currentPopupUid + "']").html("");
+    currentPopupUid = undefined;
+    subjectMatrixPopupStick = undefined;
+}
+
 var hideCurrentPopup = function(ev) {
     var element =  ev.target || ev.srcElement;
     if (ev.target.nodeName.toLowerCase() != "html") {
         if (currentPopupUid != undefined && jQuery(ev.target).closest("#Event_" + currentPopupUid).length == 0) {
-            jQuery(".calendar").remove();
-            var eventDiv = jQuery("#Event_" + currentPopupUid);
-            eventDiv.css("visibility", "hidden");
-            if (eventDiv.find(".popupShadow").length == 1) {
-                eventDiv.html(eventDiv.find(".popupShadow").html());
-            }
-            jQuery("#" + currentPopupUid).html("");
-            jQuery("#" + currentPopupUid).html("");
-            currentPopupUid = undefined;
-            subjectMatrixPopupStick = undefined;
+            hideContentForCurrentPopup();
             jQuery("*").unbind("mousedown", hideCurrentPopup);
         } else {
             subjectMatrixPopupStick = true;
@@ -2075,15 +2015,7 @@ function getScheduledEventContent(params, top, left, localDivId, localDivRel) {
 function hideAllTooltips(params, top, left) {
     try {
         jQuery(".calendar").remove();
-        if (currentPopupUid != undefined) {
-            var eventDiv = jQuery("div[id^='Event_" + currentPopupUid + "']");
-            eventDiv.css("visibility", "hidden");
-            if (eventDiv.find(".popupShadow").length == 1) {
-                eventDiv.html(eventDiv.find(".popupShadow").html());
-            }
-            jQuery("div[id^='crfListWrapper_" + currentPopupUid + "']").html("");
-            jQuery("div[id^='eventScheduleWrapper_" + currentPopupUid + "']").html("");
-        }
+        hideContentForCurrentPopup();
 
         var objHolder = document.getElementById("Event_" + params.statusBoxId);
         if (objHolder == undefined || top == undefined || left == undefined) return;
@@ -2203,9 +2135,6 @@ function createNewEvent(page, event) {
                             var eventDef = result.eventDefs[h];
                             if (eventDef != undefined && eventDef.eventDivId != undefined) {
                                 var eventDiv = jQuery("div[id^='" + eventDef.eventDivId + "']");
-                                if (eventDiv.find(".popupShadow").length == 1 ) {
-                                    eventDiv.html(eventDiv.find(".popupShadow").html());
-                                }
                                 if (eventDiv.length > 0 && eventDef.eventIds.length > 0) {
                                     var aElement = eventDiv.parent().find("a:last");
                                     var eventId = eventDef.eventIds[0];
@@ -2251,12 +2180,12 @@ function createNewEvent(page, event) {
                         }
                         gfRemoveOverlay();
                         if (result.pageMessages.length > 0) {
-                            jQuery("#sidebar_Alerts_open").css("sidebar_Alerts_closed", "none");
-                            jQuery("#sidebar_Alerts_open").css("display", "all");
+                            jQuery("#sidebar_Alerts_closed").attr("style", "display: none;");
+                            jQuery("#sidebar_Alerts_open").attr("style", "display: block;");
                             jQuery("#sidebar_Alerts_open div.sidebar_tab_content").html("");
                             jQuery("#sidebar_Alerts_open div.sidebar_tab_content").get(0).innerHTML = "";
-                            for (pageMessage in result.pageMessages) {
-                                jQuery("#sidebar_Alerts_open div.sidebar_tab_content").append("<i><div class=\"alert\">" + pageMessage + "<br><br></div></i>");
+                            for (var mPos = 0; mPos < result.pageMessages.length; mPos++) {
+                                jQuery("#sidebar_Alerts_open div.sidebar_tab_content").append("<i><div class=\"alert\">" + result.pageMessages[mPos] + "<br><br></div></i>");
                             }
                             jQuery("#sidebar_Alerts_open div.sidebar_tab_content").append("<br>");
                         }
