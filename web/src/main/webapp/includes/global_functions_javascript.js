@@ -3537,14 +3537,16 @@ function switchOnElement(elementName){
 function switchOffElement(elementName){
 	setDisabledProperty(elementName, 'disabled');
 }
-		
+
 function setParameterForDNWithPath(toOverwrite, field, parameterName, value, contextPath) {
-	$.ajax({
-		url: contextPath+'/ChangeParametersForDNote',
-		type: 'GET',
-		data: 'field='+field+'&parameterName='+parameterName+'&value='+value+'&toOverwrite='+toOverwrite,
-		dataType: 'text'
-	});
+    if (contextPath) {
+        $.ajax({
+            url: contextPath + '/ChangeParametersForDNote',
+            type: 'GET',
+            data: 'field=' + field + '&parameterName=' + parameterName + '&value=' + value + '&toOverwrite=' + toOverwrite,
+            dataType: 'text'
+        });
+    }
 }
 
 function turnOffIsInRFCErrorParamOfDN(field) {
