@@ -517,7 +517,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		sql.append(") dns ");
 		// additional filters crfName, eventName, entityName
 		sql.append(filter.getAdditionalFilter());
-		sql.append(sortPart);
+		if (!sortPart.isEmpty()) {
+			sql.append(sortPart);
+		} else {
+			sql.append(" order by label asc, age asc ");
+		}
 
 		sql.append(" offset ").append(offset).append(" limit ").append(limit);
 
