@@ -20,19 +20,6 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
-import java.sql.Connection;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -53,6 +40,18 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class DiscrepancyNoteDAO extends AuditableEntityDAO {
@@ -2118,8 +2117,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return count != null && count == 0;
 	}
 
-	public boolean doesSubjectHaveSomeNDsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
-		//NDs for subject only (like "Date of birth" and etc., not for event's NDs)
+	public boolean doesSubjectHaveNDsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
+		// NDs for subject only (like "Date of birth" and etc., not for event's NDs)
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
@@ -2129,23 +2128,23 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 	}
 
 	public boolean doesSubjectHaveNewNDsInStudy(StudyBean study, String subjectLabel) {
-		return doesSubjectHaveSomeNDsInStudy(study, subjectLabel, "1");
+		return doesSubjectHaveNDsInStudy(study, subjectLabel, "1");
 	}
 
 	public boolean doesSubjectHaveUnclosedNDsInStudy(StudyBean study, String subjectLabel) {
-		return doesSubjectHaveSomeNDsInStudy(study, subjectLabel, "123");
+		return doesSubjectHaveNDsInStudy(study, subjectLabel, "123");
 	}
-	
+
 	public boolean doesSubjectHaveAnyNDsInStudy(StudyBean study, String subjectLabel, String resolutionStatus) {
-		//all NDs for subject (like "Date of birth" and etc., for event's NDs too)
+		// all NDs for subject (like "Date of birth" and etc., for event's NDs too)
 		ListNotesFilter listNotesFilter = new ListNotesFilter();
 		listNotesFilter.addFilter("studySubject.label", subjectLabel);
 		listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", resolutionStatus);
-		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(
-				study, listNotesFilter, new ListNotesSort(), 0, 100);
+		List<DiscrepancyNoteBean> noteBeans = this.getViewNotesWithFilterAndSortLimits(study, listNotesFilter,
+				new ListNotesSort(), 0, 100);
 		return noteBeans.size() > 0;
 	}
-	
+
 	public boolean doesSubjectHaveAnyNewNDsInStudy(StudyBean study, String subjectLabel) {
 		return doesSubjectHaveAnyNDsInStudy(study, subjectLabel, "1");
 	}
