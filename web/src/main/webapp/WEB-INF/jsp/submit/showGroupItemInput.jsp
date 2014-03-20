@@ -381,7 +381,7 @@ function changeImage(obj) {
         </c:when>
         <c:otherwise>
             <input id="show<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
-                    "this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); manualChange('<c:out value="${inputName}"/>'); changeImage(this);"
+                    "this.className='changedField'; manualChange('<c:out value="${inputName}"/>'); changeImage(this);"
                    type="text" name="show<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
         </c:otherwise>
     </c:choose>
@@ -398,7 +398,7 @@ function changeImage(obj) {
     </c:when>
     <c:otherwise>
       <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-             onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
+             onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" type="text" name="<c:out value="${inputName}"/>" <c:out value="${respLayout}"/> value="<c:out value="${inputTxtValue}"/>" />
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
@@ -423,7 +423,7 @@ function changeImage(obj) {
     </c:when>
     <c:otherwise>
       <textarea id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-                onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');  changeImage(this);" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+                onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');  changeImage(this);" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:otherwise>
   </c:choose>
 </c:if>
@@ -450,7 +450,7 @@ function changeImage(obj) {
         </c:when>
         <c:otherwise>
           <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-                 onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage(this);" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
+                 onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage(this);" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
         </c:otherwise>
       </c:choose>
     </c:forEach>
@@ -477,7 +477,7 @@ function changeImage(obj) {
       </c:when>
       <c:otherwise>
         <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-               onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage(this);" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
+               onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); changeImage(this);" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:otherwise>
     </c:choose>
 
@@ -524,7 +524,7 @@ function changeImage(obj) {
       </c:when>
       <c:otherwise>
         <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'horizontal');} radioButtonOnClick(event);"
-               onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';}; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
+               onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';}; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" onmouseup="radioButtonOnMouseUp(event);" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:otherwise>
     </c:choose>
   </c:if>
@@ -585,7 +585,7 @@ function changeImage(obj) {
         <c:set var="count" value="${count+1}"/>
       </c:forEach>
       <select id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-              onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" name="<c:out value="${inputName}"/>" class="formfield">
+              onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);" name="<c:out value="${inputName}"/>" class="formfield">
         <c:choose>
           <c:when test="${printDefault == 'true'}">
             <c:set var="count" value="0"/>
@@ -624,7 +624,7 @@ function changeImage(obj) {
     </c:when>
     <c:otherwise>
       <select id="<c:out value="${inputName}"/>" multiple  tabindex=
-      "<c:out value="${tabNum}"/>" name="<c:out value="${inputName}"/>" onChange="this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);">
+      "<c:out value="${tabNum}"/>" name="<c:out value="${inputName}"/>" onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); changeImage(this);">
     </c:otherwise>
   </c:choose>
   <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
@@ -703,7 +703,7 @@ function changeImage(obj) {
 		        </c:when>
 		        <c:otherwise>
 		            <input class="aka_input_readonly" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" readonly="readonly" onChange=
-		              "this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); javascript:turnOnIsDataChangedParamOfDN(this.name); changeImage(this);" type="text" name="<c:out value="${inputName}" />" value="<c:out value="${inputTxtValue}"/>" />
+		              "this.className='changedField'; changeImage(this);" type="text" name="<c:out value="${inputName}" />" value="<c:out value="${inputTxtValue}"/>" />
 		        </c:otherwise>
 		    </c:choose>
 		</c:when>
@@ -716,7 +716,7 @@ function changeImage(obj) {
 				</c:when>
 				<c:otherwise>
 					<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
-							"this.className='changedField'; javascript:turnOnIsDataChangedParamOfDN(this.name); javascript:turnOnIsDataChangedParamOfDN(this.name); changeImage(this);" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+							"this.className='changedField'; changeImage(this);" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
     			</c:otherwise>
 			</c:choose>
 		</c:otherwise>

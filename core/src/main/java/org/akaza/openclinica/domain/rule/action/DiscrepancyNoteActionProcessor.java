@@ -30,16 +30,16 @@ import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 
 public class DiscrepancyNoteActionProcessor implements ActionProcessor {
 
-    Connection connection;
-    DataSource ds;
+	Connection connection;
+	DataSource ds;
 	DiscrepancyNoteService discrepancyNoteService;
 	RuleActionRunLogDao ruleActionRunLogDao;
 	RuleSetRuleBean ruleSetRule;
 
-	public DiscrepancyNoteActionProcessor(Connection connection, DataSource ds, RuleActionRunLogDao ruleActionRunLogDao,
-			RuleSetRuleBean ruleSetRule) {
-        this.connection = connection;
-        this.ds = ds;
+	public DiscrepancyNoteActionProcessor(Connection connection, DataSource ds,
+			RuleActionRunLogDao ruleActionRunLogDao, RuleSetRuleBean ruleSetRule) {
+		this.connection = connection;
+		this.ds = ds;
 		this.ruleActionRunLogDao = ruleActionRunLogDao;
 		this.ruleSetRule = ruleSetRule;
 	}
@@ -47,28 +47,32 @@ public class DiscrepancyNoteActionProcessor implements ActionProcessor {
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode,
 			RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy,
 			UserAccountBean ub, Object... arguments) {
+		boolean shouldCreateDNForItem = arguments.length > 1 ? (Boolean) arguments[0] : true;
 		switch (executionMode) {
 		case DRY_RUN: {
 			return dryRun(ruleAction, itemDataBean, itemData, currentStudy, ub);
 		}
 
 		case SAVE: {
-			return save(ruleAction, itemDataBean, itemData, currentStudy, ub);
+			return save(shouldCreateDNForItem, ruleAction, itemDataBean, itemData, currentStudy, ub);
 		}
+
 		default:
 			return null;
 		}
 	}
 
-	private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData,
-			StudyBean currentStudy, UserAccountBean ub) {
-        if (itemDataBean != null) {
-            getDiscrepancyNoteService().saveFieldNotes(ruleAction.getCuratedMessage(), itemDataBean.getId(), itemData,
-                    connection, currentStudy, ub, true);
-            RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean,
-                    itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
-            ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
-        }
+	private RuleActionBean save(boolean shouldCreateDNForItem, RuleActionBean ruleAction, ItemDataBean itemDataBean,
+			String itemData, StudyBean currentStudy, UserAccountBean ub) {
+		if (itemDataBean != null) {
+			if (shouldCreateDNForItem) {
+				getDiscrepancyNoteService().saveFieldNotes(ruleAction.getCuratedMessage(), itemDataBean.getId(),
+						itemData, connection, currentStudy, ub, true);
+			}
+			RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean,
+					itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
+			ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
+		}
 		return null;
 	}
 
@@ -89,7 +93,7 @@ public class DiscrepancyNoteActionProcessor implements ActionProcessor {
 	}
 
 	public Object execute(SubmissionContext context) {
-		
+
 		// Do nothing
 		return null;
 	}

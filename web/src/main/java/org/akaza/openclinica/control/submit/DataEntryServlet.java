@@ -127,6 +127,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -455,8 +456,7 @@ public abstract class DataEntryServlet extends Controller {
 			return;
 		}
 		logMe("Entering some EVENT CRF CHECK DONE" + System.currentTimeMillis());
-		// checks if the section has items in item group
-		// for repeating items
+		// checks if the section has items in item group for repeating items
 		// hasGroup = getInputBeans();
 		hasGroup = checkGroups(fp, ecb);
 
@@ -602,8 +602,7 @@ public abstract class DataEntryServlet extends Controller {
 		logMe("Entering Checks !submitted  " + System.currentTimeMillis());
 		if (!isSubmitted) {
 			// TODO: prevent data enterer from seeing results of first round of
-			// data
-			// entry, if this is second round
+			// data entry, if this is second round
 			logMe("Entering Checks !submitted entered  " + System.currentTimeMillis());
 			long t = System.currentTimeMillis();
 			request.setAttribute(BEAN_DISPLAY, section);
@@ -611,6 +610,7 @@ public abstract class DataEntryServlet extends Controller {
 			session.setAttribute("shouldRunValidation", null);
 			session.setAttribute("rulesErrors", null);
 			session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, null);
+			clearSession(request);
 
 			discNotes = new FormDiscrepancyNotes();
 			session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
@@ -687,7 +687,7 @@ public abstract class DataEntryServlet extends Controller {
 				discNotes = new FormDiscrepancyNotes();
 			}
 
-			// all items- inlcude items in item groups and other single items
+			// all items- include items in item groups and other single items
 			List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
 			String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
 
@@ -733,11 +733,7 @@ public abstract class DataEntryServlet extends Controller {
 						// string as parameter for inputName
 
 						dib = validateDisplayItemBean(v, dib, "", request);// this
-						// should be
-						// used,
-						// otherwise,
-						// DDE not
-						// working-jxu
+						// should be used, otherwise, DDE not working-jxu
 
 						logger.debug("&&& found name: " + itemName);
 						logger.debug("input VALIDATE " + itemName + ": " + fp.getString(itemName));
@@ -1178,10 +1174,8 @@ public abstract class DataEntryServlet extends Controller {
 
 			logMe("allItems 3 Loop end  " + System.currentTimeMillis());
 
-			// we have to do this since we loaded all the form values into the
-			// display
-			// item beans above
-			// section.setItems(items);
+			// we have to do this since we loaded all the form values into the display
+			// item beans above section.setItems(items);
 			// setting this AFTER we populate notes - will that make a difference?
 			section.setDisplayItemGroups(allItems);
 
@@ -1205,19 +1199,10 @@ public abstract class DataEntryServlet extends Controller {
 								|| this.getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)
 								&& !this.isAdminForcedReasonForChange(request));
 			}
+			
+			removeFieldsValidationsForSubmittedDN(v, request);
 
-			if (session.getAttribute(DataEntryServlet.NOTE_SUBMITTED) != null) {
-				Map<Object, Boolean> newNotesMap = (Map<Object, Boolean>) session
-						.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
-				for (Object fieldName : newNotesMap.keySet()) {
-					if (fieldName instanceof String && !StringUtil.isBlank((String) fieldName)) {
-						v.removeFieldValidations((String) fieldName);
-						ruleValidator.removeFieldValidations((String) fieldName);
-					}
-				}
-			}
-
-			// get hardrules. skip soft if errors > 0
+			// get hard rules, skip soft if errors > 0
 			errors = v.validate();
 			if (errors.size() > 0 && !checkDobleDataEntryErrors(errors)) {
 				request.setAttribute("Hardrules", true);
@@ -1229,8 +1214,7 @@ public abstract class DataEntryServlet extends Controller {
 				// +
 				// "You must provide a Reason For Change discrepancy note for this item before you can save this updated information."
 				String error = respage.getString("reason_for_change_error");
-				// change everything here from changed items list to changed
-				// items map
+				// change everything here from changed items list to changed items map
 				if (changedItemsMap.size() > 0) {
 					request.setAttribute("Hardrules", true);
 					logger.debug("found admin force reason for change: changed items " + changedItems.toString()
@@ -1265,6 +1249,11 @@ public abstract class DataEntryServlet extends Controller {
 			logger.debug("errors here: " + errors.toString());
 			logMe("error check  Loop begin  " + System.currentTimeMillis());
 			if (errors.isEmpty() && shouldRunRules) {
+				// we should transform submitted DNs to FVC, close them and turn off
+				// ruleValidator for corresponding fields
+				transformSubmittedDNsToFVC(ruleValidator, dndao, request);
+				// old logic of removing validations from rule validator
+				removeFieldsValidationsForSubmittedDN(ruleValidator, request);
 				logger.debug("Errors was empty");
 				if (session.getAttribute("rulesErrors") != null) {
 					// rules have already generated errors, Let's compare old
@@ -1300,7 +1289,7 @@ public abstract class DataEntryServlet extends Controller {
 					session.setAttribute("shouldRunValidation", null);
 					session.setAttribute("rulesErrors", null);
 				} else {
-					// get softrules
+					// get soft rules
 					errors = ruleValidator.validate();
 					reshuffleErrorGroupNamesKK(errors, allItems, request);
 					if (errors.size() > 0) {
@@ -1389,8 +1378,7 @@ public abstract class DataEntryServlet extends Controller {
 					seDao.update(studyEventBean);
 				}
 
-				// If the Study Subject's Satus is signed and we save a section
-				// , change status to available
+				// If the Study Subject's Satus is signed and we save a section, change status to available
 				logger.debug("Status of Study Subject {}", ssb.getStatus().getName());
 				if (ssb.getStatus() == Status.SIGNED && changedItemsList.size() > 0) {
 					logger.debug("Status of Study Subject is Signed we are updating");
@@ -1915,6 +1903,69 @@ public abstract class DataEntryServlet extends Controller {
 						ssdao, ecdao, edcdao, dndao));
 			}
 		}
+	}
+
+	private void removeFieldsValidationsForSubmittedDN(Validator v, HttpServletRequest request) {
+		if (request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED) != null) {
+			Map<Object, Boolean> newNotesMap = (Map<Object, Boolean>) request.getSession()
+					.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
+			for (Object fieldName : newNotesMap.keySet()) {
+				if (fieldName instanceof String && !StringUtil.isBlank((String) fieldName)) {
+					v.removeFieldValidations((String) fieldName);
+				}
+			}
+		}	
+	}
+
+	private void clearSession(HttpServletRequest request) {
+		request.getSession().removeAttribute(CreateDiscrepancyNoteServlet.SUBMITTED_DNS_MAP);
+		request.getSession().removeAttribute(CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS);
+	}
+
+	private void transformSubmittedDNsToFVC(RuleValidator ruleValidator, DiscrepancyNoteDAO dndao,
+			HttpServletRequest request) {
+		// we should transform submitted DNs to FVC, close them and turn off
+		// ruleValidator for corresponding fields
+
+		HashMap<String, DiscrepancyNoteBean> submittedDNs = (HashMap) request.getSession().getAttribute(
+				CreateDiscrepancyNoteServlet.SUBMITTED_DNS_MAP);
+		if (submittedDNs == null || submittedDNs.isEmpty())
+			return;
+
+		HashMap ruleErrors = ruleValidator.validate();
+		Set<String> fieldNames = new HashSet(submittedDNs.keySet());
+		fieldNames.retainAll(ruleErrors.keySet());
+		ruleValidator.dropErrors();
+		List<DiscrepancyNoteBean> transformedDNs = (List<DiscrepancyNoteBean>) request.getSession().getAttribute(
+				CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS);
+		transformedDNs = transformedDNs == null ? new ArrayList<DiscrepancyNoteBean>() : transformedDNs;
+		Set<Integer> transformedSavedDNIds = new HashSet<Integer>();
+		Set<String> transformedUnSavedDNFieldNames = new HashSet<String>();
+		for (DiscrepancyNoteBean dn : transformedDNs) {
+			if (dn.getId() > 0) {
+				// DN is already in DB
+				transformedSavedDNIds.add(dn.getId());
+			} else {
+				// DN is not in DB yet (initial data entry)
+				transformedUnSavedDNFieldNames.add(dn.getField());
+			}
+		}
+
+		for (String fieldName : fieldNames) {
+			ruleValidator.removeFieldValidations(fieldName);
+			DiscrepancyNoteBean dn = submittedDNs.get(fieldName);
+			if (!transformedSavedDNIds.contains(dn.getId()) && dn.getId() > 0) {
+				DiscrepancyNoteUtil.transformSavedAnnotationToFVC(dn, (String) ruleErrors.get(fieldName),
+						ResolutionStatus.CLOSED.getId(), dndao);
+				transformedDNs.add(dn);
+			} else if (!transformedUnSavedDNFieldNames.contains(fieldName) && !StringUtil.isBlank(dn.getField())) {
+				DiscrepancyNoteUtil.transformAnnotationToFVC(dn, (String) ruleErrors.get(fieldName),
+						ResolutionStatus.CLOSED.getId());
+				transformedDNs.add(dn);
+			}
+		}
+
+		request.getSession().setAttribute(CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS, transformedDNs);
 	}
 
 	private void resetCodedItemTerms(List<DisplayItemWithGroupBean> allItems, ItemDataDAO iddao, EventCRFBean ecrfBean,

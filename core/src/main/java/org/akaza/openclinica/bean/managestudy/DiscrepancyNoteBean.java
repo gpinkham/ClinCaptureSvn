@@ -135,11 +135,11 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 	}
 
 	public DiscrepancyNoteBean() {
-		disType = DiscrepancyNoteType.QUERY;
-		resStatus = ResolutionStatus.OPEN;
-		children = new ArrayList();
-		lastUpdator = new UserAccountBean();
-		updatedDate = null;
+		this.disType = DiscrepancyNoteType.QUERY;
+		this.resStatus = ResolutionStatus.OPEN;
+		this.children = new ArrayList();
+		this.lastUpdator = new UserAccountBean();
+		this.updatedDate = null;
 	}
 	
 	public DiscrepancyNoteBean(DiscrepancyNoteBean dnb) {

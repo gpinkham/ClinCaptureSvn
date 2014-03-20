@@ -132,6 +132,10 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 	public static final String WHICH_RES_STATUSES = "whichResStatus";
 
+	public static final String SUBMITTED_DNS_MAP = "submittedDNs";
+
+	public static final String TRANSFORMED_SUBMITTED_DNS = "transformedSubmittedDNs";
+
 	public static final String EVENT_CRF_ID = "eventCRFId";
 	public static final String PARENT_ROW_COUNT = "rowCount";
 
@@ -188,7 +192,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		request.setAttribute("originJSP", originJSP);
 		request.setAttribute(IS_REASON_FOR_CHANGE, isRFC);
 
-		boolean writeToDB = fp.getBoolean(WRITE_TO_DB, true); // this should be set based on a new property of DisplayItemBean
+		boolean writeToDB = fp.getBoolean(WRITE_TO_DB, true); // this should be set based on a new property of
+																// DisplayItemBean
 		boolean isNew = fp.getBoolean(NEW_NOTE);
 		request.setAttribute(NEW_NOTE, isNew ? "1" : "0");
 
@@ -399,13 +404,14 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			}
 			dndao.setFetchMapping(false);
 		}
-		
-		FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(FORM_DISCREPANCY_NOTES_NAME);
+
+		FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(
+				FORM_DISCREPANCY_NOTES_NAME);
 
 		if (newNotes == null) {
 			newNotes = new FormDiscrepancyNotes();
 		}
-		
+
 		boolean isNotesExistInSession = !newNotes.getNotes(field).isEmpty();
 		if (!notes.isEmpty() || isNotesExistInSession) {
 			request.setAttribute("hasNotes", "yes");
@@ -509,7 +515,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 					dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
 					dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
 					if (isRFC) {
-						request.setAttribute("dDescriptionsMap", dDescriptionService.getAssignedToStudySortedDescriptions(currentStudy));
+						request.setAttribute("dDescriptionsMap",
+								dDescriptionService.getAssignedToStudySortedDescriptions(currentStudy));
 					}
 					request.setAttribute("autoView", "0");
 					// above set to automatically open up the user panel
@@ -746,6 +753,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 						manageReasonForChangeState(request.getSession(), field);
 					}
 
+					saveNoteToSubmittedDNsMap(note, request);
 					request.setAttribute(UPDATED_DISCREPANCY_NOTE, note);
 					request.setAttribute("responseMessage", "Show pop-up");
 					forwardPage(Page.ADD_DISCREPANCY_NOTE_DIV, request, response);
@@ -819,88 +827,13 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 					logger.debug("found email: " + email);
 					if (note.getAssignedUserId() > 0 && "1".equals(email.trim())
 							&& DiscrepancyNoteType.QUERY.getId() == note.getDiscrepancyNoteTypeId()) {
-
-						logger.debug("++++++ found our way here: " + note.getDiscrepancyNoteTypeId()
-								+ " id number and " + note.getDisType().getName());
-						// generate email for user here
-						StringBuilder message = new StringBuilder();
-
-						// generate message here
-						UserAccountDAO userAccountDAO = getUserAccountDAO();
-						ItemDAO itemDAO = getItemDAO();
-						ItemDataDAO iddao = getItemDataDAO();
-						ItemBean item = new ItemBean();
-						SectionBean section = new SectionBean();
-
-						StudyDAO studyDAO = getStudyDAO();
-						UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(note
-								.getAssignedUserId());
-						String alertEmail = assignedUser.getEmail();
-						message.append(MessageFormat.format(respage.getString("mailDNHeader"),
-								assignedUser.getFirstName(), assignedUser.getLastName()));
-						message.append("<A HREF='").append(SQLInitServlet.getSystemURL())
-								.append("ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=")
-								.append(assignedUser.getName()).append("&listNotes_f_entityName=")
-								.append(note.getEntityName()).append("'>").append(SQLInitServlet.getField("sysURL"))
-								.append("</A><BR/>");
-						message.append(respage.getString("you_received_this_from"));
-						StudyBean study = (StudyBean) studyDAO.findByPK(note.getStudyId());
-						SectionDAO sectionDAO = getSectionDAO();
-
-						if ("itemData".equalsIgnoreCase(entityType)) {
-							ItemDataBean itemData = (ItemDataBean) iddao.findByPK(note.getEntityId());
-							item = (ItemBean) itemDAO.findByPK(itemData.getItemId());
-							if (sectionId > 0) {
-								section = (SectionBean) sectionDAO.findByPK(sectionId);
-							}
-						}
-
-						message.append(respage.getString("email_body_separator"));
-						message.append(respage.getString("disc_note_info"));
-						message.append(respage.getString("email_body_separator"));
-						message.append(MessageFormat.format(respage.getString("mailDNParameters1"),
-								note.getDescription(), note.getDetailedNotes(), ub.getName()));
-						message.append(respage.getString("email_body_separator"));
-						message.append(respage.getString("entity_information"));
-						message.append(respage.getString("email_body_separator"));
-						message.append(MessageFormat.format(respage.getString("mailDNParameters2"), study.getName(),
-								note.getSubjectName()));
-
-						if (!("studySub".equalsIgnoreCase(entityType) || "subject".equalsIgnoreCase(entityType))) {
-							message.append(MessageFormat.format(respage.getString("mailDNParameters3"),
-									note.getEventName()));
-							if (!"studyEvent".equalsIgnoreCase(note.getEntityType())) {
-								message.append(MessageFormat.format(respage.getString("mailDNParameters4"),
-										note.getCrfName()));
-								if (!"eventCrf".equalsIgnoreCase(note.getEntityType())) {
-									if (sectionId > 0) {
-										message.append(MessageFormat.format(respage.getString("mailDNParameters5"),
-												section.getName()));
-									}
-									message.append(MessageFormat.format(respage.getString("mailDNParameters6"),
-											item.getName()));
-								}
-							}
-						}
-
-						message.append(respage.getString("email_body_separator"));
-						message.append(MessageFormat.format(respage.getString("mailDNThanks"), study.getName()));
-						message.append(respage.getString("email_body_separator"));
-						message.append(respage.getString("disclaimer"));
-						message.append(respage.getString("email_body_separator"));
-						message.append(respage.getString("email_footer"));
-
-						String emailBodyString = message.toString();
-						sendEmail(
-								alertEmail.trim(),
-								EmailEngine.getAdminEmail(),
-								MessageFormat.format(respage.getString("mailDNSubject"), study.getName(),
-										note.getEntityName()), emailBodyString, true, null, null, true, request);
+						sendDNEmail(sectionId, entityType, ub.getName(), note, request);
 					} else {
 						logger.debug("did not send email, but did save DN");
 					}
+
 					addPageMessage(respage.getString("note_saved_into_db"), request);
-					addPageMessage(respage.getString("page_close_automatically"), request);
+					saveNoteToSubmittedDNsMap(note, request);
 					request.setAttribute(UPDATED_DISCREPANCY_NOTE, note);
 					request.setAttribute("responseMessage", "Save Done");
 					forwardPage(Page.ADD_DISCREPANCY_NOTE_DIV, request, response);
@@ -917,9 +850,10 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 						request.setAttribute("autoView", "0");
 					}
 				}
-				
+
 				if (isRFC) {
-					request.setAttribute("dDescriptionsMap", dDescriptionService.getAssignedToStudySortedDescriptions(currentStudy));
+					request.setAttribute("dDescriptionsMap",
+							dDescriptionService.getAssignedToStudySortedDescriptions(currentStudy));
 				}
 
 				setInputMessages(errors, request);
@@ -927,6 +861,19 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				forwardPage(Page.ADD_DISCREPANCY_NOTE_DIV, request, response);
 			}
 		}
+	}
+
+	public static void saveNoteToSubmittedDNsMap(DiscrepancyNoteBean note, HttpServletRequest request) {
+		if (note.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.FAILEDVAL.getId())
+			return;
+		HashMap<String, DiscrepancyNoteBean> submittedDNs = (HashMap) request.getSession().getAttribute(
+				SUBMITTED_DNS_MAP);
+		if (submittedDNs == null)
+			submittedDNs = new HashMap<String, DiscrepancyNoteBean>();
+		if (submittedDNs.get(note.getField()) == null) {
+			submittedDNs.put(note.getField(), note);
+		}
+		request.getSession().setAttribute(SUBMITTED_DNS_MAP, submittedDNs);
 	}
 
 	public static void turnOffIsDataChangedParamOfDN(String field, HttpServletRequest request) {
@@ -940,12 +887,13 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 	public static void turnOffIsInErrorParamOfDN(String field, HttpServletRequest request) {
 		setParameterForDN(field, "isInError", "0", request);
 	}
-	
+
 	public static void setParameterForDN(String field, String parameterName, String value, HttpServletRequest request) {
 		setParameterForDN("1", field, parameterName, value, request);
 	}
 
-	public static void setParameterForDN(String toOverwrite, String field, String parameterName, String value, HttpServletRequest request) {
+	public static void setParameterForDN(String toOverwrite, String field, String parameterName, String value,
+			HttpServletRequest request) {
 		if (request.getSession().getAttribute("dnAdditionalCreatingParameters") != null) {
 			Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request
 					.getSession().getAttribute("dnAdditionalCreatingParameters");
@@ -955,24 +903,27 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		}
 	}
 
-	private static void changeParameter(String toOverwrite, String field, String parameterName, String value, Map<String, HashMap<String, String>> dnAdditionalCreatingParameters) {
-		// logic of changing parameter is there
+	private static void changeParameter(String toOverwrite, String field, String parameterName, String value,
+			Map<String, HashMap<String, String>> dnAdditionalCreatingParameters) {
+		// logic of changing parameter is here
 		if ("0".equals(toOverwrite)) {
-			if (dnAdditionalCreatingParameters.get(field).get(parameterName) == null || 
-					"".equals(dnAdditionalCreatingParameters.get(field).get(parameterName))) {
+			if (dnAdditionalCreatingParameters.get(field).get(parameterName) == null
+					|| "".equals(dnAdditionalCreatingParameters.get(field).get(parameterName))) {
 				dnAdditionalCreatingParameters.get(field).put(parameterName, value);
 			}
 		} else {
 			dnAdditionalCreatingParameters.get(field).put(parameterName, value);
 		}
 	}
-	
+
 	public static Map<String, String> getMapWithParameters(String field, HttpServletRequest request) {
 		if (request.getSession().getAttribute("dnAdditionalCreatingParameters") != null) {
-			
-			Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request.getSession().getAttribute("dnAdditionalCreatingParameters");
-			return dnAdditionalCreatingParameters.containsKey(field) ? dnAdditionalCreatingParameters.get(field): new HashMap<String, String>();
-			
+
+			Map<String, HashMap<String, String>> dnAdditionalCreatingParameters = (Map<String, HashMap<String, String>>) request
+					.getSession().getAttribute("dnAdditionalCreatingParameters");
+			return dnAdditionalCreatingParameters.containsKey(field) ? dnAdditionalCreatingParameters.get(field)
+					: new HashMap<String, String>();
+
 		} else {
 			return new HashMap<String, String>();
 		}
@@ -1052,13 +1003,13 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		return userAccounts;
 	}
 
-	private void manageReasonForChangeState(HttpSession session, String itemDataBeanId) {
+	private void manageReasonForChangeState(HttpSession session, String field) {
 		HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) session
 				.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
 		if (noteSubmitted == null) {
 			noteSubmitted = new HashMap<String, Boolean>();
 		}
-		noteSubmitted.put(itemDataBeanId, Boolean.TRUE);
+		noteSubmitted.put(field, Boolean.TRUE);
 		session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
 	}
 
@@ -1088,7 +1039,8 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		return 0;
 	}
 
-	public int calculateOrdinal(HttpServletRequest request, int isGroup, String field_name, int event_crf_id, int rowCount) {
+	public int calculateOrdinal(HttpServletRequest request, int isGroup, String field_name, int event_crf_id,
+			int rowCount) {
 		int ordinal = 0;
 		int start;
 		int end;
@@ -1151,7 +1103,82 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		boolean isDataChanged = "1".equals(additionalParameters.get("isDataChanged"));
 
 		String originJSP = request.getParameter("originJSP") == null ? "" : request.getParameter("originJSP");
-		return originJSP.equals("administrativeEditing") && (isDataChanged || isInRFCError)
-				&& CreateDiscrepancyNoteServlet.isStudyParamForRFCSwitchOn((StudyBean) request.getSession().getAttribute("study"), sm);
+		return originJSP.equals("administrativeEditing")
+				&& (isDataChanged || isInRFCError)
+				&& CreateDiscrepancyNoteServlet.isStudyParamForRFCSwitchOn((StudyBean) request.getSession()
+						.getAttribute("study"), sm);
+	}
+
+	private void sendDNEmail(int sectionId, String entityType, String userName, DiscrepancyNoteBean note,
+			HttpServletRequest request) throws Exception {
+		// logic of changing parameter is there
+		logger.debug("++++++ found our way here: " + note.getDiscrepancyNoteTypeId() + " id number and "
+				+ note.getDisType().getName());
+		// generate email for user here
+		StringBuilder message = new StringBuilder();
+
+		// generate message here
+		UserAccountDAO userAccountDAO = getUserAccountDAO();
+		ItemDAO itemDAO = getItemDAO();
+		ItemDataDAO iddao = getItemDataDAO();
+		ItemBean item = new ItemBean();
+		SectionBean section = new SectionBean();
+
+		StudyDAO studyDAO = getStudyDAO();
+		UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(note.getAssignedUserId());
+		String alertEmail = assignedUser.getEmail();
+		message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(),
+				assignedUser.getLastName()));
+		message.append("<A HREF='").append(SQLInitServlet.getSystemURL())
+				.append("ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=").append(assignedUser.getName())
+				.append("&listNotes_f_entityName=").append(note.getEntityName()).append("'>")
+				.append(SQLInitServlet.getField("sysURL")).append("</A><BR/>");
+		message.append(respage.getString("you_received_this_from"));
+		StudyBean study = (StudyBean) studyDAO.findByPK(note.getStudyId());
+		SectionDAO sectionDAO = getSectionDAO();
+
+		if ("itemData".equalsIgnoreCase(entityType)) {
+			ItemDataBean itemData = (ItemDataBean) iddao.findByPK(note.getEntityId());
+			item = (ItemBean) itemDAO.findByPK(itemData.getItemId());
+			if (sectionId > 0) {
+				section = (SectionBean) sectionDAO.findByPK(sectionId);
+			}
+		}
+
+		message.append(respage.getString("email_body_separator"));
+		message.append(respage.getString("disc_note_info"));
+		message.append(respage.getString("email_body_separator"));
+		message.append(MessageFormat.format(respage.getString("mailDNParameters1"), note.getDescription(),
+				note.getDetailedNotes(), userName));
+		message.append(respage.getString("email_body_separator"));
+		message.append(respage.getString("entity_information"));
+		message.append(respage.getString("email_body_separator"));
+		message.append(MessageFormat.format(respage.getString("mailDNParameters2"), study.getName(),
+				note.getSubjectName()));
+
+		if (!("studySub".equalsIgnoreCase(entityType) || "subject".equalsIgnoreCase(entityType))) {
+			message.append(MessageFormat.format(respage.getString("mailDNParameters3"), note.getEventName()));
+			if (!"studyEvent".equalsIgnoreCase(note.getEntityType())) {
+				message.append(MessageFormat.format(respage.getString("mailDNParameters4"), note.getCrfName()));
+				if (!"eventCrf".equalsIgnoreCase(note.getEntityType())) {
+					if (sectionId > 0) {
+						message.append(MessageFormat.format(respage.getString("mailDNParameters5"), section.getName()));
+					}
+					message.append(MessageFormat.format(respage.getString("mailDNParameters6"), item.getName()));
+				}
+			}
+		}
+
+		message.append(respage.getString("email_body_separator"));
+		message.append(MessageFormat.format(respage.getString("mailDNThanks"), study.getName()));
+		message.append(respage.getString("email_body_separator"));
+		message.append(respage.getString("disclaimer"));
+		message.append(respage.getString("email_body_separator"));
+		message.append(respage.getString("email_footer"));
+
+		String emailBodyString = message.toString();
+		sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(),
+				MessageFormat.format(respage.getString("mailDNSubject"), study.getName(), note.getEntityName()),
+				emailBodyString, true, null, null, true, request);
 	}
 }

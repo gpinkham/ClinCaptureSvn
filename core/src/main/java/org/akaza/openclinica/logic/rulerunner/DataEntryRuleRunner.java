@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
@@ -217,7 +216,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 					((EmailActionBean) ruleActionContainer.getRuleAction()).setExceptionMessage(resexception
 							.getString("email_action_processor_exception"));
 				}
-
+				
 				RuleActionBean rab = ap.execute(
 						RuleRunnerMode.DATA_ENTRY,
 						executionMode,
@@ -226,6 +225,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 						DiscrepancyNoteBean.ITEM_DATA,
 						currentStudy,
 						ub,
+						shouldCreateDNForItem(itemData, request),
 						prepareEmailContents(ruleActionContainer
 								.getRuleSetBean(), ruleActionContainer
 								.getRuleAction().getRuleSetRule(),
@@ -257,6 +257,19 @@ public class DataEntryRuleRunner extends RuleRunner {
 			}
 		}
 		return messageContainer;
+	}
+
+	public static boolean shouldCreateDNForItem(ItemDataBean itemData, HttpServletRequest request) {
+		// some DNs have been already created from Annotations, so we should skip them to prevent duplicating
+		List<DiscrepancyNoteBean> transformedDNs = (List<DiscrepancyNoteBean>) request.getSession().getAttribute(
+				"transformedSubmittedDNs");
+		if (transformedDNs == null || itemData == null || transformedDNs.isEmpty())
+			return true;
+		for (DiscrepancyNoteBean dn : transformedDNs) {
+			if (dn.getEntityId() == itemData.getId())
+				return false;
+		}
+		return true;
 	}
 
 	private boolean doesTheRuleActionRunLogExist(ItemDataBean itemData,

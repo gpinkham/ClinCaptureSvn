@@ -55,4 +55,8 @@ public class RuleValidator extends Validator {
 
 		return super.validate(fieldName, v);
 	}
+	
+	public void dropErrors() {
+		this.errors.clear();
+	}
 }

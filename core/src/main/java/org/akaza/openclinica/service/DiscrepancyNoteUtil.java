@@ -27,6 +27,7 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
@@ -36,6 +37,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.core.SessionManager;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -46,7 +48,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
  * DiscrepancyNoteUtil is a convenience class for managing discrepancy notes, such as getting all notes for a study, or
  * filtering them by subject or resolution status.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class DiscrepancyNoteUtil {
 	// TODO: initialize these static members from the database.
 	public static final Map<String, Integer> TYPES = new HashMap<String, Integer>();
@@ -1475,8 +1477,9 @@ public class DiscrepancyNoteUtil {
 		}
 		return dnThreads;
 	}
-	
-	public static List<DiscrepancyNoteBean> getAllNotesforSubjectAndEvent(StudySubjectBean studySubjectBean, StudyBean currentStudy, SessionManager sm) {
+
+	public static List<DiscrepancyNoteBean> getAllNotesforSubjectAndEvent(StudySubjectBean studySubjectBean,
+			StudyBean currentStudy, SessionManager sm) {
 		int studyId = studySubjectBean.getStudyId();
 		StudyDAO studydao = new StudyDAO(sm.getDataSource());
 		StudyBean study = (StudyBean) studydao.findByPK(studyId);
@@ -1501,7 +1504,7 @@ public class DiscrepancyNoteUtil {
 			if (!isParentStudy) {
 				StudyBean stParent = (StudyBean) studydao.findByPK(study.getParentStudyId());
 				allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(stParent, study,
-					studySubjectBean.getId());
+						studySubjectBean.getId());
 			} else {
 				allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(currentStudy,
 						study, studySubjectBean.getId());
@@ -1509,26 +1512,32 @@ public class DiscrepancyNoteUtil {
 		}
 		return allNotesforSubjectAndEvent;
 	}
-	
+
 	public static String getImageFileNameForFlagByResolutionStatusId(int resolutionStatusId) {
 		String result = "icon_noNote";
 		switch (resolutionStatusId) {
-        case 1:  result = "icon_Note";
-                 break;
-        case 2:  result = "icon_flagYellow";
-                 break;
-        case 3:  result = "icon_flagBlack";
-                 break;
-        case 4:  result = "icon_flagGreen";
-                 break;
-        case 5:  result = "icon_flagWhite";
-                 break;
-        default: result = "icon_noNote";
-                 break;
+		case 1:
+			result = "icon_Note";
+			break;
+		case 2:
+			result = "icon_flagYellow";
+			break;
+		case 3:
+			result = "icon_flagBlack";
+			break;
+		case 4:
+			result = "icon_flagGreen";
+			break;
+		case 5:
+			result = "icon_flagWhite";
+			break;
+		default:
+			result = "icon_noNote";
+			break;
 		}
 		return result;
 	}
-	
+
 	public static int getDiscrepancyNoteResolutionStatus(List existingNotes) {
 		int resolutionStatus = 0;
 		boolean hasOtherThread = false;
@@ -1551,5 +1560,66 @@ public class DiscrepancyNoteUtil {
 		}
 		return resolutionStatus;
 	}
-	
+
+	public static void transformSavedAnnotationToFVC(DiscrepancyNoteBean dn, String detailedNote, Integer resStatusId,
+			DiscrepancyNoteDAO dndao) {
+		transformSavedDNTo(dn, "", "", DiscrepancyNoteType.ANNOTATION.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
+				resStatusId, dndao);
+	}
+
+	public static void transformSavedAnnotationToFVC(int dnId, String detailedNote, Integer resStatusId,
+			DiscrepancyNoteDAO dndao) {
+		DiscrepancyNoteBean dn = (DiscrepancyNoteBean) dndao.findByPK(dnId);
+		transformSavedDNTo(dn, "", "", DiscrepancyNoteType.ANNOTATION.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
+				resStatusId, dndao);
+	}
+
+	private static void transformSavedDNTo(DiscrepancyNoteBean dn, String description, String detailedNotes,
+			Integer oldTypeId, Integer typeId, Integer resStatusId, DiscrepancyNoteDAO dndao) {
+
+		if (oldTypeId != dn.getDiscrepancyNoteTypeId())
+			return;
+
+		if (!StringUtil.isBlank(description))
+			dn.setDescription(description);
+		if (!StringUtil.isBlank(detailedNotes))
+			dn.setDetailedNotes(detailedNotes);
+		if (typeId != null && typeId != 0)
+			dn.setDiscrepancyNoteTypeId(typeId);
+		if (resStatusId != null && resStatusId != 0)
+			dn.setResolutionStatusId(resStatusId);
+
+		DiscrepancyNoteBean parentDN = null;
+		if (dn.getParentDnId() > 0) {
+			parentDN = (DiscrepancyNoteBean) dndao.findByPK(dn.getParentDnId());
+			if (typeId != null && typeId != 0)
+				parentDN.setDiscrepancyNoteTypeId(typeId);
+			if (resStatusId != null && resStatusId != 0)
+				parentDN.setResolutionStatusId(resStatusId);
+		}
+		dndao.update(dn);
+		dndao.update(parentDN);
+	}
+
+	public static void transformAnnotationToFVC(DiscrepancyNoteBean dn, String detailedNote, Integer resStatusId) {
+		transformDNTo(dn, "", "", DiscrepancyNoteType.ANNOTATION.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
+				resStatusId);
+	}
+
+	private static DiscrepancyNoteBean transformDNTo(DiscrepancyNoteBean dn, String description, String detailedNotes,
+			Integer oldTypeId, Integer typeId, Integer resStatusId) {
+		if (oldTypeId != dn.getDiscrepancyNoteTypeId())
+			return dn;
+
+		if (!StringUtil.isBlank(description))
+			dn.setDescription(description);
+		if (!StringUtil.isBlank(detailedNotes))
+			dn.setDetailedNotes(detailedNotes);
+		if (typeId != null && typeId != 0)
+			dn.setDiscrepancyNoteTypeId(typeId);
+		if (resStatusId != null && resStatusId != 0)
+			dn.setResolutionStatusId(resStatusId);
+
+		return dn;
+	}
 }
