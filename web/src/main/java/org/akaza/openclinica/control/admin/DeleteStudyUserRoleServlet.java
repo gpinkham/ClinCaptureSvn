@@ -20,12 +20,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.text.MessageFormat;
-import java.util.Stack;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -34,12 +28,18 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.navigation.Navigation;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.MessageFormat;
+import java.util.Stack;
 
 // allows both deletion and remove/restore of a study user role
 @SuppressWarnings({ "unchecked", "serial" })
@@ -162,9 +162,9 @@ public class DeleteStudyUserRoleServlet extends Controller {
 		StudyDAO sdao = new StudyDAO(getDataSource());
 		StudyBean study = (StudyBean) sdao.findByPK(sub.getStudyId());
 		String subject = null;
-		String body = null;
+		String body;
 		MessageFormat msg = new MessageFormat("");
-		Object args[] = {};
+		Object args[];
 		logger.info("Sending email...");
 
 		if (action.equals(EntityAction.DELETE)) {
@@ -178,7 +178,8 @@ public class DeleteStudyUserRoleServlet extends Controller {
 			msg.applyPattern(restext.getString("restore_role_email_message_htm"));
 		}
 
-		args = new Object[] {u.getFirstName() + " " + u.getLastName(), u.getName(), sub.getRoleName(), study.getName()};
+		args = new Object[] { u.getFirstName() + " " + u.getLastName(), CoreResources.getField("sysURL.base"),
+				study.getName(), u.getName(), sub.getRoleName() };
 		body = msg.format(args);
 		sendEmail(u.getEmail().trim(), subject, body, false, request);
 
