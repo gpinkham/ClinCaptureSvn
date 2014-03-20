@@ -554,7 +554,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 			}
 			dnb.setOwnerId(parent.getOwnerId());
 			String detailedDes = fp.getString("strErrMsg");
-			if (detailedDes != null) {
+			if (detailedDes != null && !detailedDes.contains(respage.getString("reason_for_change_error"))) {
 				dnb.setDetailedNotes(detailedDes);
 				logger.debug("found strErrMsg: " + fp.getString("strErrMsg"));
 			}

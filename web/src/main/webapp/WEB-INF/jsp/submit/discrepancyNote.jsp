@@ -286,7 +286,7 @@ $(document).ready(function() {
 		<div class="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
 		<div class="dnBoxCol2">
 			<c:choose>
-				<c:when test="${parentId == 0 && param.isInError}">
+				<c:when test="${parentId == 0 && param.isInError && !isRFC}">
 					<div class="formtextareaXL4_BG">
 						<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4 textarea_fixed_size"><c:out value="${param.strErrMsg}"/></textarea>
 					</div>
