@@ -258,6 +258,23 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
+	public EventDefinitionCRFBean findByOid(String oid) {
+		EventDefinitionCRFBean eb = null;
+		this.setTypesExpected();
+
+		HashMap variables = new HashMap();
+		variables.put(1, oid);
+
+		String sql = digester.getQuery("findByOid");
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
+
+		if (it.hasNext()) {
+			eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		}
+		return eb;
+	}
+	
 	public EntityBean findByPK(int ID) {
 		EventDefinitionCRFBean eb = new EventDefinitionCRFBean();
 		this.setTypesExpected();

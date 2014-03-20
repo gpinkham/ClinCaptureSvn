@@ -612,8 +612,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 			ItemOrItemGroupHolder itemOrItemGroup = getItemOrItemGroup(oid);
 			// OID is an item
 			if (itemOrItemGroup.getItemBean() != null) {
-				String expression = getExpressionService().constructFullExpressionFromPartial(
-						propertyBean.getOid(), ruleSet.getTarget().getValue());
+				String expression = getExpressionService().constructFullExpressionFromPartial(propertyBean.getOid(),
+						ruleSet.getTarget().getValue());
 				ItemBean itemBeanB = getExpressionService().getItemBeanFromExpression(expression);
 				ItemGroupBean itemGroupBeanB = getExpressionService().getItemGroupExpression(expression);
 				EventCRFBean eventCrfBeanB = eventCrfBeanA;
@@ -723,8 +723,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 			ItemOrItemGroupHolder itemOrItemGroup = getItemOrItemGroup(oid);
 			// OID is an item
 			if (itemOrItemGroup.getItemBean() != null) {
-				String expression = getExpressionService().constructFullExpressionFromPartial(
-						propertyBean.getOid(), ruleSet.getTarget().getValue());
+				String expression = getExpressionService().constructFullExpressionFromPartial(propertyBean.getOid(),
+						ruleSet.getTarget().getValue());
 				ItemBean itemBeanB = getExpressionService().getItemBeanFromExpression(expression);
 				ItemGroupBean itemGroupBeanB = getExpressionService().getItemGroupExpression(expression);
 				EventCRFBean eventCrfBeanB = eventCrfBeanA;
@@ -825,30 +825,35 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 	}
 
 	private ItemOrItemGroupHolder getItemOrItemGroup(String oid) {
-
+		int igPos = 0;
 		String[] theOid = oid.split(ESCAPED_SEPERATOR);
-		if (theOid.length == 2) {
-			ItemGroupBean itemGroup = getItemGroupDAO().findByOid(theOid[0].trim());
+		switch (theOid.length) {
+		case 4:
+			igPos++;
+		case 3:
+			igPos++;
+		case 2: {
+			ItemGroupBean itemGroup = getItemGroupDAO().findByOid(theOid[igPos].trim());
 			if (itemGroup != null) {
-				ItemBean item = getItemDAO().findItemByGroupIdandItemOid(itemGroup.getId(), theOid[1].trim());
+				ItemBean item = getItemDAO().findItemByGroupIdandItemOid(itemGroup.getId(), theOid[igPos + 1].trim());
 				if (item != null) {
 					return new ItemOrItemGroupHolder(item, itemGroup);
 				}
 			}
 		}
-		if (theOid.length == 1) {
-			ItemGroupBean itemGroup = getItemGroupDAO().findByOid(oid.trim());
+		case 1: {
+			ItemGroupBean itemGroup = getItemGroupDAO().findByOid(theOid[igPos]);
 			if (itemGroup != null) {
 				return new ItemOrItemGroupHolder(null, itemGroup);
 			}
 
-			List<ItemBean> items = getItemDAO().findByOid(oid.trim());
+			List<ItemBean> items = getItemDAO().findByOid(theOid[igPos]);
 			ItemBean item = items.size() > 0 ? items.get(0) : null;
 			if (item != null) {
 				return new ItemOrItemGroupHolder(item, null);
 			}
 		}
-
+		}
 		return new ItemOrItemGroupHolder(null, null);
 	}
 

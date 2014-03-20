@@ -124,6 +124,7 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1574,6 +1575,8 @@ public abstract class DataEntryServlet extends Controller {
 						int ordinal = -1;
 						String newFieldName = fieldName;
 						String[] fieldNames = fieldName.split("\\.");
+						fieldNames = Arrays.copyOfRange(fieldNames, fieldNames.length == 3 ? 1
+								: (fieldNames.length == 4 ? 2 : 0), fieldNames.length);
 						if (fieldNames.length == 2) {
 							newFieldName = fieldNames[1];
 							// check items in item groups here?
