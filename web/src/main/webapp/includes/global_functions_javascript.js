@@ -3034,15 +3034,15 @@ function Pager(tableName, itemsPerPage) {
 
     this.showRecords = function (from, to) {
 
-        var rows = document.getElementById(tableName).rows;
-        var rowLength = rows.length;
+        var tableBodies = document.getElementById(tableName).tBodies;
+        var rowLength = tableBodies.length;
         var tableObj = document.getElementById(tableName);
 
-        for (var i = 0; i < rows.length; i++) {
+        for (var i = 0; i < tableBodies.length; i++) {
             if (i < from || i > to)
-                rows[i].style.display = 'none';
+                tableBodies[i].style.display = 'none';
             else
-                rows[i].style.display = '';
+                tableBodies[i].style.display = '';
         }
 
     }
@@ -3082,8 +3082,8 @@ function Pager(tableName, itemsPerPage) {
 
     this.init = function () {
 
-        var rows = document.getElementById(tableName).rows;
-        var records = (rows.length - 1);
+        var tableBodies = document.getElementById(tableName).tBodies;
+        var records = (tableBodies.length - 1);
         this.pages = Math.ceil(records / itemsPerPage);
         this.inited = true;
 
@@ -3131,6 +3131,35 @@ deleteTerm = function(item) {
                 return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary; }).attr('term', '').attr('pref', '');
 
             console.log("Term successfully deleted")
+        },
+        error: function(e) {
+
+            console.log("Error:" + e);
+        }
+    })
+}
+
+codeItemFields = function(item) {
+
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var term = $(item).closest('tbody').find('td').filter(function () {
+        return $.trim($(this).text()) == "EXT:" || $.trim($(this).text()) == "LLT:";}).next().text();
+
+    $.ajax({
+
+        type: "POST",
+        url: url + "/codeItemFields",
+        data: {
+
+            term: $.trim(term),
+            codedItemUrl: $.trim($(item).closest('tbody').find('a').text())
+        },
+
+        success: function(data) {
+
+            $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () { return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text())}).closest('tbody').find('input').css('visibility', 'visible');
+            $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () { return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text())}).parent('tr').after(data);
+            $(item).css('visibility', 'hidden');
         },
         error: function(e) {
 

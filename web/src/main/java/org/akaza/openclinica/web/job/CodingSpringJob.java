@@ -64,7 +64,7 @@ public class CodingSpringJob extends QuartzJobBean {
             //get codes for all verb terms & save it in classification
             search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "), bioontologyUrl, bioontologyApiKey);
             //replace all terms & codes from classification to coded elements
-            generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement(), codedItem.getDictionary());
+            generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement());
 
             //if isAlias is true, create term using completed classification
             if (isAlias) {
@@ -135,65 +135,25 @@ public class CodingSpringJob extends QuartzJobBean {
         return termElementList;
     }
 
-	private void generateCodedItemFields(List<CodedItemElement> codedItemElements,
-			List<ClassificationElement> classificationElements, String dictionary) {
-
-		String ptCode = "";
-		String ptcCode = "";
+	private void generateCodedItemFields(List<CodedItemElement> codedItemElements, List<ClassificationElement> classificationElements) {
 
 		for (CodedItemElement codedItemElement : codedItemElements) {
 
 			for (ClassificationElement classificationElement : classificationElements) {
 
-				// code items with values
 				String name = codedItemElement.getItemName();
 
 				if (name.equals(classificationElement.getElementName())) {
 
-					if (name.equalsIgnoreCase("pt")) {
-						ptCode = classificationElement.getCodeName();
-					}
-
 					codedItemElement.setItemCode(classificationElement.getCodeName());
 					break;
-					// code items with code
+
 				} else if (name.equals(classificationElement.getElementName() + "C")) {
 
-					if (name.equalsIgnoreCase("ptc")) {
-						ptcCode = classificationElement.getCodeValue();
-					}
-
 					codedItemElement.setItemCode(classificationElement.getCodeValue());
-					break;
+				    break;
 				}
-
 			}
 		}
-
-        if (dictionary.equals("MEDDRA")) {
-
-            // Copy over the PT to LLT
-            CodedItemElement lltElement = getClassificationElement("llt", codedItemElements);
-            lltElement.setItemCode(ptCode);
-
-            // Copy over the PTC to LLTC
-            CodedItemElement lltcElement = getClassificationElement("lltc", codedItemElements);
-            lltcElement.setItemCode(ptcCode);
-        }
-    }
-    
-    private CodedItemElement getClassificationElement(String name, List<CodedItemElement> codedItemElements) {
-    	
-    	CodedItemElement element = null;
-    	for (CodedItemElement codedItemElement : codedItemElements) {
-    		
-    		if (codedItemElement.getItemName().equalsIgnoreCase(name)) {
-    			
-    			element = codedItemElement;
-    			break;
-    		}
-    	}
-    	
-		return element;
-    }
+	}
 }

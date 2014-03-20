@@ -10,4 +10,5 @@ public interface SearchInterface {
 
     public void getClassificationCodes (Classification classification, String dictionary, String bioontologyUrl, String bioontologyApiKey) throws Exception;
 
+	public Classification getClassificationTerms (String termUrl, String bioontologyUrl, String bioontologyApiKey) throws Exception;
 }

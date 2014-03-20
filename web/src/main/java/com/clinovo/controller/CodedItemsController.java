@@ -385,15 +385,55 @@ public class CodedItemsController {
 
         return "codedItems";
     }
-    
+
+	/**
+	 * Handle for getting specified item additional fields
+	 *
+	 * @param request The request containing the term url to getting additional fields.
+	 *
+	 * @return Map with attributes to be used on the UX-
+	 *
+	 * @throws Exception For all exceptions
+	 */
+	@RequestMapping("/codeItemFields")
+	public ModelMap termAdditinalFieldsHandler(HttpServletRequest request) throws Exception {
+
+		ResourceBundleProvider.updateLocale(request.getLocale());
+
+ 		String codedItemUrl = request.getParameter("codedItemUrl");
+		String term = request.getParameter("term");
+
+		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
+
+		search.setSearchInterface(new BioPortalSearchInterface());
+
+		StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "defaultBioontologyURL");
+		StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApiKey");
+
+		Classification classificationWithTerms = search.getClassificationWithTerms(codedItemUrl, bioontologyUrl.getValue(), bioontologyApiKey.getValue());
+
+		if (codedItemUrl.indexOf("MEDDRA") > 0 || codedItemUrl.indexOf("MDR") > 0) {
+			ClassificationElement ptElement = new ClassificationElement();
+			ptElement.setCodeName(term);
+			ptElement.setElementName("PT");
+			classificationWithTerms.addClassificationElement(ptElement);
+		}
+
+		ModelMap model = new ModelMap();
+
+		model.addAttribute("codedElement", classificationWithTerms);
+
+		return model;
+	}
+
 	/**
 	 * Handle for coding and aliasing a given coded item.
-	 * 
+	 *
 	 * @param request
 	 *            The request containing the item to code and alias.
-	 * 
+	 *
 	 * @return Redirects to coded items.
-	 * 
+	 *
 	 * @throws Exception
 	 *             For all exceptions
 	 */
@@ -403,32 +443,32 @@ public class CodedItemsController {
 		ResourceBundleProvider.updateLocale(request.getLocale());
 
 		boolean isAlias = false;
- 		String item = request.getParameter("item");
- 		String categoryList = request.getParameter("categoryList");
- 		String verbatimTerm = request.getParameter("verbatimTerm");
-        String codeSearchTerm = request.getParameter("coderSearchTerm");
+		String item = request.getParameter("item");
+		String categoryList = request.getParameter("categoryList");
+		String verbatimTerm = request.getParameter("verbatimTerm");
+		String codeSearchTerm = request.getParameter("coderSearchTerm");
 
-        StudyBean study = (StudyBean) request.getSession().getAttribute("study");
+		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
 
- 		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "autoCodeDictionaryName");
-        StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "defaultBioontologyURL");
-        StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApiKey");
-  		
- 		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(item));
-  
- 		if (configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
-  
- 			isAlias = true;
- 		}
+		StudyParameterValueBean configuredDictionary = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "autoCodeDictionaryName");
+		StudyParameterValueBean bioontologyUrl = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "defaultBioontologyURL");
+		StudyParameterValueBean bioontologyApiKey = getStudyParameterValueDAO().findByHandleAndStudy(study.getId(), "medicalCodingApiKey");
 
-        if (codedItem != null) {
+		CodedItem codedItem = codedItemService.findCodedItem(Integer.parseInt(item));
 
-            codedItem.setStatus((String.valueOf(CodeStatus.IN_PROCESS)));
-            codedItem.setPreferredTerm(codeSearchTerm);
-            codedItemService.saveCodedItem(codedItem);
+		if (configuredDictionary.getValue() != null && !configuredDictionary.getValue().isEmpty()) {
 
-            createCodeItemJob(item, verbatimTerm, categoryList, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), isAlias);
-        }
+			isAlias = true;
+		}
+
+		if (codedItem != null) {
+
+			codedItem.setStatus((String.valueOf(CodeStatus.IN_PROCESS)));
+			codedItem.setPreferredTerm(codeSearchTerm);
+			codedItemService.saveCodedItem(codedItem);
+
+			createCodeItemJob(item, verbatimTerm, categoryList, codeSearchTerm, bioontologyUrl.getValue(), bioontologyApiKey.getValue(), isAlias);
+		}
 
 		return "codedItems";
 	}

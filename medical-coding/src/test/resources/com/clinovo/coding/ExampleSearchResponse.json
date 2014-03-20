@@ -11,35 +11,19 @@
         {
             "prefLabel":"Leukaemia plasmacytic (in remission)",
             "@id":"http://purl.bioontology.org/ontology/MDR/10024319",
-            "@type":"http://www.w3.org/2002/07/owl#Class",
-            "links":{
-                "self":"http://data.bioontology.org/ontologies/MEDDRA/classes/http%3A%2F%2Fpurl.bioontology.org%2Fontology%2FMDR%2F10024319",
-                "ontology":"http://data.bioontology.org/ontologies/MEDDRA",
-                "children":"http://data.bioontology.org/ontologies/MEDDRA/classes/http%3A%2F%2Fpurl.bioontology.org%2Fontology%2FMDR%2F10024319/children",
-                "parents":"http://data.bioontology.org/ontologies/MEDDRA/classes/http%3A%2F%2Fpurl.bioontology.org%2Fontology%2FMDR%2F10024319/parents",
-                "descendants":"http://data.bioontology.org/ontologies/MEDDRA/classes/http%3A%2F%2Fpurl.bioontology.org%2Fontology%2FMDR%2F10024319/descendants",
-                "ancestors":"http://data.bioontology.org/ontologies/MEDDRA/classes/http%3A%2F%2Fpurl.bioontology.org%2Fontology%2FMDR%2F10024319/ancestors",
-                "tree":"http://data.bioontology.org/ontologies/MEDDRA/classes/http%3A%2F%2Fpurl.bioontology.org%2Fontology%2FMDR%2F10024319/tree",
-                "notes":"http://data.bioontology.org/ontologies/MEDDRA/classes/http%3A%2F%2Fpurl.bioontology.org%2Fontology%2FMDR%2F10024319/notes",
-                "mappings":"http://data.bioontology.org/ontologies/MEDDRA/classes/http%3A%2F%2Fpurl.bioontology.org%2Fontology%2FMDR%2F10024319/mappings",
-                "ui":"http://bioportal.bioontology.org/ontologies/MEDDRA?p=classes&conceptid=http%3A%2F%2Fpurl.bioontology.org%2Fontology%2FMDR%2F10024319",
-                "@context":{
-                    "self":"http://www.w3.org/2002/07/owl#Class",
-                    "ontology":"http://data.bioontology.org/metadata/Ontology",
-                    "children":"http://www.w3.org/2002/07/owl#Class",
-                    "parents":"http://www.w3.org/2002/07/owl#Class",
-                    "descendants":"http://www.w3.org/2002/07/owl#Class",
-                    "ancestors":"http://www.w3.org/2002/07/owl#Class",
-                    "tree":"http://www.w3.org/2002/07/owl#Class",
-                    "notes":"http://data.bioontology.org/metadata/Note",
-                    "mappings":"http://data.bioontology.org/metadata/Mapping",
-                    "ui":"http://www.w3.org/2002/07/owl#Class"
-                }
-            },
-            "@context":{
-                "@vocab":"http://data.bioontology.org/metadata/",
-                "prefLabel":"http://data.bioontology.org/metadata/skosprefLabel"
-            }
+            "@type":"http://www.w3.org/2002/07/owl#Class"
+        },
+
+        {
+            "prefLabel":"Leukaemia",
+            "@id":"http://purl.bioontology.org/ontology/MDR/10024319",
+            "@type":"http://www.w3.org/2002/07/owl#Class"
+        },
+
+        {
+            "prefLabel":"Plasmacytic",
+            "@id":"http://purl.bioontology.org/ontology/MDR/10024319",
+            "@type":"http://www.w3.org/2002/07/owl#Class"
         }
     ]
 }

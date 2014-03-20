@@ -66,15 +66,17 @@
                                 </td>
                             </c:when>
                             <c:otherwise>
-                                <td colspan="2"></td>
                                 <td></td>
                                 <td>
                                     <c:if test="${configuredDictionaryIsAvailable}">
-                                        <input type="button" id="<c:out value="${counter}"/>" name="codeAndAliasBtn" class="button" value="Code & Alias" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="codeAndAlias($(this))" />
+                                        <input type="button" id="<c:out value="${counter}"/>" name="codeAndAliasBtn" class="button" value="Code & Alias" style="background-image: url(<c:out value="${codeButtonColor}"/>); float: right; visibility:hidden;" onclick="codeAndAlias($(this))" />
                                     </c:if>
                                 </td>
                                 <td>
-                                    <input type="button" id="<c:out value="${counter}"/>" name="codeItemBtn" class="button" value="Code" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="saveCodedItem($(this))" />
+                                    <input type="button" id="<c:out value="${counter}"/>" name="codeItemBtn" class="button" value="Code" style="background-image: url(<c:out value="${codeButtonColor}"/>); visibility:hidden;" onclick="saveCodedItem($(this))" />
+                                </td>
+                                <td>
+                                    <input type="button" id="<c:out value="${counter}"/>" name="getInfoItemBtn" class="button" value="Get full info" style="background-image: url(<c:out value="${codeButtonColor}"/>);" onclick="codeItemFields($(this))" />
                                 </td>
                             </c:otherwise>
                         </c:choose>
@@ -96,18 +98,7 @@
 <script type="text/javascript">
 
     var dictionary = $("#dictionary").attr('name');
-    var rowsToDisplay;
-
-    if(dictionary == "MedDRA") {
-
-        rowsToDisplay = 14;
-    } else if (dictionary == "ICD 10" || dictionary == "ICD 9CM") {
-
-        rowsToDisplay = 15;
-    } else {
-
-        rowsToDisplay = 10;
-    }
+    var rowsToDisplay = 6;
 
     var pager = new Pager('tablepaging_result', rowsToDisplay);
     pager.init();

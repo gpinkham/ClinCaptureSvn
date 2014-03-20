@@ -25,6 +25,14 @@ public class Search {
 
     }
 
+	public Classification getClassificationWithTerms(String termUrl, String bioontologyUrl, String bioontologyApiKey) throws Exception {
+
+		if (searchInterface != null)
+			return searchInterface.getClassificationTerms(termUrl, bioontologyUrl, bioontologyApiKey);
+
+		return new Classification();
+	}
+
 	public void setSearchInterface(SearchInterface searchInterface) {
 
 		this.searchInterface = searchInterface;

@@ -12,6 +12,7 @@ public class BaseTest {
 
 	protected static String searchResult;
     protected static String treeResult;
+	protected static String termCodeResult;
 
 	private final static Logger log = LoggerFactory.getLogger(BaseTest.class.getName());
 
@@ -21,6 +22,7 @@ public class BaseTest {
 
             searchResult = readFile("src/test/resources/com/clinovo/coding/ExampleSearchResponse.json");
             treeResult = readFile("src/test/resources/com/clinovo/coding/ExampleTreeResponse.json");
+			termCodeResult = readFile("src/test/resources/com/clinovo/coding/ExampleTermCodeResponse.json");
 
 		} catch (Exception ex) {
 

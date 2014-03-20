@@ -1,0 +1,18 @@
+{
+    "page": 1,
+    "pageCount": 1,
+    "prevPage": null,
+    "nextPage": null,
+    "links": {
+        "nextPage": null,
+        "prevPage": null
+    },
+    "collection": [
+        {
+            "prefLabel": "Pain",
+            "notation": "10033371",
+            "@id": "http://purl.bioontology.org/ontology/MDR/10033371",
+            "@type": "http://www.w3.org/2002/07/owl#Class"
+        }
+    ]
+}

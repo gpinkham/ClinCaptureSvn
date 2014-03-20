@@ -8,45 +8,46 @@ import java.util.Arrays;
 
 public class CompleteClassificationFieldsUtil {
 
-    enum ICD910 {CAT, GRP, EXT}
+	enum ICD910 {CAT, GRP}
 
-    enum MEDDRA {SOC, HLGT, HLT, PT, LLT}
+	enum MEDDRA {SOC, HLGT, HLT}
 
-    @SuppressWarnings("rawtypes")
+	@SuppressWarnings("rawtypes")
 	public static void completeClassificationNameFields(ArrayList<ClassificationElement> classificationElements, String dictionary) throws SearchException {
 
-        ArrayList dictionaryValuesList;
+		ArrayList dictionaryValuesList;
 
-        if (dictionary.equals("ICD9CM") || dictionary.equals("ICD10")) {
+		if (dictionary.equals("ICD9CM") || dictionary.equals("ICD10")) {
 
-            dictionaryValuesList = new ArrayList<ICD910>(Arrays.asList(ICD910.values()));
+			dictionaryValuesList = new ArrayList<ICD910>(Arrays.asList(ICD910.values()));
 
-        } else if (dictionary.equals("MEDDRA")) {
+		} else if (dictionary.equals("MEDDRA")) {
 
-            if (classificationElements.size() == 4) {
-                ClassificationElement lltElement = new ClassificationElement();
-                lltElement.setCodeName("");
-                classificationElements.add(lltElement);
-            }
-            dictionaryValuesList = new ArrayList<MEDDRA>(Arrays.asList(MEDDRA.values()));
+			dictionaryValuesList = new ArrayList<MEDDRA>(Arrays.asList(MEDDRA.values()));
 
-        } else {
+		} else {
 
-            throw new SearchException("Unknown dictionary type specified");
-        }
+			throw new SearchException("Unknown dictionary type specified");
+		}
 
-        if (dictionaryValuesList.size() == classificationElements.size()) {
-            for (int i = 0; i < classificationElements.size(); i++) {
-                classificationElements.get(i).setElementName(dictionaryValuesList.get(i).toString());
-            }
-        }
-        
-        // Copy over PT to LTT
-        if (dictionary.equals("MEDDRA")) {
-        	
-        	if (classificationElements.get(4).getCodeName().isEmpty()) {
-        		classificationElements.get(4).setCodeName(classificationElements.get(3).getCodeName());
-        	}
-        }
-    }
+		if (classificationElements.size() != 0) {
+
+			if (dictionaryValuesList.size() < classificationElements.size()) {
+
+				int numberElementsToRemove = classificationElements.size() - dictionaryValuesList.size();
+
+				for (int removeIndex = 0; removeIndex < numberElementsToRemove; removeIndex++) {
+					classificationElements.remove(removeIndex);
+				}
+			}
+
+			for (int i = 0; i < dictionaryValuesList.size(); i++) {
+
+				if (i < classificationElements.size()) {
+
+					classificationElements.get(i).setElementName(dictionaryValuesList.get(i).toString());
+				}
+			}
+		}
+	}
 }
