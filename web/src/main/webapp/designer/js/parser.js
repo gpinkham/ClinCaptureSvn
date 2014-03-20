@@ -108,29 +108,39 @@ Parser.prototype.createNextDroppable = function(params) {
 	} else if (params.element.is(".target")) {
 		if (!this.isAddedTarget(params.ui.draggable.text())) {
 			if (params.existingValue) {
-				var index = this.rule.targets.indexOf(params.existingValue);
-				if (index > -1) {
-					this.rule.targets.splice(index, 1);
+				for (var x = 0; x < this.rule.targets.length; x++) {
+					var t = this.rule.targets[x];
+					if (t.name === params.existingValue) {
+						this.rule.targets.splice(x, 1);
+					}
 				}
 			}
-			this.rule.targets.push(params.ui.draggable.text());
+			// Target
+			var target = Object.create(null);
+			target.name = params.ui.draggable.text();
+			target.eventify = params.element.siblings("span").find(".target").is(":checked");
+			this.rule.targets.push(target);
+			//Reset UI
 			var div = params.element.parent().clone();
-			div.find("input").text("");
-			div.find("input").removeClass("bordered");
+			div.find(".target").text("");
+			div.find(".target").removeClass("bordered");
 			// Re-bind Event handlers
 			createDroppable({
-				element: div.find("input"),
-				accept: "div[id='items'] td"
+				accept: "div[id='items'] td",
+				element: div.find(".target")
 			});
-
-			div.find("span").click(function() {
+			// Reset event handlers
+			div.find(".eventify").change(function() {
+				parser.eventify(this);
+			})
+			div.find(".glyphicon-remove").click(function() {
 				parser.deleteTarget(this);
 			});
 			// create a new input 
 			if (!params.element.val()) {
 				params.element.parent().after(div);
 			} 
-			div.find("input").focus();
+			div.find(".target").focus();
 			params.element.val(params.ui.draggable.text());
 		}
 		params.element.removeClass("bordered");	
@@ -149,7 +159,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			div.find("input").text("");
 			div.find("input").removeClass("bordered");
 
-			div.find("span").click(function() {
+			div.find(".glyphicon-remove").click(function() {
 				parser.deleteTarget(this);
 			});
 
@@ -264,7 +274,6 @@ Parser.prototype.createNextDroppable = function(params) {
 		}
 		params.element.removeClass("bordered");
 	} else {
-
 		if (params.element.is(".comp")) {
 			var dataPredicate = createStartExpressionDroppable();
 			// Avoid creating unnecessary evaluation/data/crf item/group boxes
@@ -412,36 +421,67 @@ Parser.prototype.getRuleCRFItems = function() {
  * ============================================================================ */
 Parser.prototype.createRule = function() {
 
-	var expression = [];
-	var study = this.extractStudy(this.getStudy());
-	var dottedBorders = $(".dotted-border");
-	for (var x = 0; x < dottedBorders.size(); x++) {
-		var exprItem = $(dottedBorders[x]).text();
-		if (this.isOp(exprItem)) {
-			if (this.isConditionalOp(exprItem)) {
-				exprItem = exprItem.toLowerCase();
-			} else {
-				exprItem = this.getOp(exprItem)
+	this.quantify = function(element, index, array) {
+		if (array.length > 1) {
+			for (var x = 0; x < array.length; x++) {
+				if (array[x] !== array[0]) {
+					return false;
+				}
 			}
 		}
-		var item = this.findStudyItem({
-			study: study,
-			name: $(dottedBorders[x]).text()
-		})
-		if (item) {
-			exprItem = this.constructEventPath($(dottedBorders[x]).text());
-		}
-		expression.push(exprItem);
+		return true;
 	}
-
-	this.rule.expression = expression;
-	if (this.isValid(expression).valid) {
-		var tt = [];
-		for (var x = 0; x < this.rule.targets.length; x++) {
-			tt.push(this.constructEventPath(this.rule.targets[x]));
+	var expressionPredicates = $(".dotted-border:not(:empty), .target:not(:empty)");
+	var study = this.extractStudy(this.getStudy());
+	var oids = expressionPredicates.toArray().map(function(x) {
+		if ($(x).is(".group") || $(x).is(".target")) {
+			var tar = parser.findStudyItem({
+				study: study,
+				name: $(x).text()
+			});
+			if (tar && typeof(tar) !== "function") {
+				return tar.eventOid;
+			}
 		}
-		this.rule.targets = tt;
-	} 
+	}).filter(function(x) {
+		if (x) {
+			return x;
+		}
+	});
+	var expression = [];
+	var quantified = oids.every(this.quantify);
+	$(".dotted-border").each(function(index) {
+		var pred = $($(".dotted-border")[index]).text();
+		if (parser.isOp(pred)) {
+			if (parser.isConditionalOp(pred)) {
+				pred = pred.toLowerCase();
+			} else {
+				pred = parser.getOp(pred)
+			}
+		}
+		var item = parser.findStudyItem({
+			name: pred,
+			study: study
+		});
+
+		if (item) {
+			pred = quantified ? parser.constructFormPath(pred) : parser.constructEventPath(pred);
+		}
+		expression.push(pred);
+	});
+	parser.rule.expression = expression;
+	if (parser.isValid(expression).valid) {
+		var tt = [];
+		for (var x = 0; x < parser.rule.targets.length; x++) {
+			var target = parser.rule.targets[x];
+			if (target.eventify) {
+				tt.push(parser.constructEventPath(target.name));
+			} else {
+				tt.push(parser.constructFormPath(target.name));
+			}
+		}
+		parser.rule.targets = tt;
+	}
 }
 
 Parser.prototype.getRule = function() {
@@ -459,7 +499,7 @@ Parser.prototype.getRule = function() {
 		rule.dde = this.getDoubleDataEntryExecute();
 		rule.ide = this.getInitialDataEntryExecute();
 		rule.ae = this.getAdministrativeEditingExecute();
-
+		
 		rule.evaluatesTo = this.getEvaluatesTo();
 		rule.expression = this.rule.expression.join().replace(/\,/g, " ");
 		rule.submission = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
@@ -715,7 +755,12 @@ Parser.prototype.getLocalOp = function(predicate) {
  * Returns true if target is in added array of targets, false otherwise
  * =================================================================== */
 Parser.prototype.isAddedTarget = function(target) {
-	return this.rule.targets.indexOf(target) > -1;
+	for (var x = 0; x < this.rule.targets.length; x++) {
+		var tar = this.rule.targets[x];
+		if (tar.name === target) {
+			return true;
+		}
+	}
 }
 
 Parser.prototype.isAddedInsertTarget = function(target) {
@@ -847,22 +892,41 @@ Parser.prototype.setTargets = function(targets) {
 		var targetDiv = $(".parent-target");
 		for (var x = 0; x < targets.length; x++) {
 
+			var targetName = this.findItemName(this.extractLastItem(targets[x])).name;
 			var div = targetDiv.clone();
-			div.find("input").text("");
+			div.find(".target").text("");
 			createDroppable({
-				element: div.find("input"),
+				element: div.find(".target"),
 				accept: "div[id='items'] td"
 			});
 
-			div.find("span").click(function() {
+			div.find(".glyphicon-remove").click(function() {
 				parser.deleteTarget(this);
 			});
 
-			div.find("input").val(this.findItemName(this.extractLastItem(targets[x])).name);
-			div.find("input").css('font-weight', 'bold');
+			div.find(".target").val(targetName);
+			div.find(".target").text(targetName);
+			div.find(".target").css('font-weight', 'bold');
+			div.find(".eventify").change(function() {
+				parser.eventify(this);
+			});
+
+			createToolTip({
+				element: div.find(".eventify"),
+				title: "Click to bind the target to only the event."
+			});
 
 			x === 0 ? targetDiv.before(div) : $(".parent-target").last().before(div);
-			this.rule.targets.push(this.findItemName(this.extractLastItem(targets[x])).name);
+			var target = Object.create(null);
+			target.name = targetName;
+			// Eventify
+			if (this.isEventified(targets[x])) {
+				target.eventify = true;
+				div.find(".eventify").prop("checked", target.eventify);
+			} else {
+				target.eventify = false;
+			}
+			this.rule.targets.push(target);
 		}
 	}
 }
@@ -873,13 +937,15 @@ Parser.prototype.getTargets = function() {
 
 Parser.prototype.deleteTarget = function(target) {
 	if ($(target).siblings("input").is(".target")) {
-		var index = this.rule.targets.indexOf($(target).siblings("input").val());
-		if (index > -1) {
-			this.rule.targets.splice(index, 1);
-			$(target).parent().remove();
+		for (var x = 0; x < this.rule.targets.length; x++) {
+			var index = this.rule.targets.indexOf(this.rule.targets[x]);
+			if (index > -1 && this.rule.targets[x].name === $(target).siblings("input").val()) {
+				this.rule.targets.splice(index, 1);
+				$(target).parent().remove();
+				break;
+			}
 		}
 	} else if ($(target).siblings("input").is(".value")) {
-
 		var act = this.getInsertAction();
 		var oid = this.constructFormPath($(target).closest(".row").find(".item").text());
 		for (var x = 0; x < act.destinations.length; x++) {
@@ -1297,7 +1363,7 @@ Parser.prototype.addNewInsertActionInputs = function() {
 		});
 	});
 
-	div.find("span").click(function() {
+	div.find(".glyphicon-remove").click(function() {
 		parser.deleteTarget(this);
 	});
 
@@ -1659,4 +1725,19 @@ Parser.prototype.constructEventPath = function(itemName) {
 		name: itemName
 	});
 	return item.eventOid + "." + this.constructFormPath(itemName);
+}
+
+Parser.prototype.eventify = function(targetEvent) {
+	var targetName = $(targetEvent).parent().siblings(".target").val();
+	for (var x = 0; x < this.rule.targets.length; x++) {
+		var tar = this.rule.targets[x];
+		if (tar.name === targetName) {
+			tar.eventify = $(targetEvent).is(":checked");
+			break;
+		}
+	}
+}
+
+Parser.prototype.isEventified = function(targetName) {
+	return targetName.slice(0, "SE_".length) == "SE_";
 }

@@ -188,6 +188,11 @@ $(function() {
 		title: "Drag and drop a CRF item."
 	});
 
+	createToolTip({
+		element: $(".eventify"),
+		title: "Click to bind the target to only the event."
+	});
+
 	// ======================= End of tool tip creation =======================
 	// Hide action messages parameter divs
 	$("div[id='actionMessages']").hide();
@@ -261,6 +266,7 @@ $(function() {
 	});
 
 	// ======================= End of creating droppables =======================
+
 	// ============================= Event handlers =============================
 	$("#ruleName").blur(function() {
 		parser.setName($(this).val());
@@ -290,8 +296,13 @@ $(function() {
 		parser.setDataImportExecute($(this).is(":checked"));
 	});
 
-	$(".input-group > span").click(function() {
+	$(".glyphicon-remove").click(function() {
 		parser.deleteTarget(this);
+	});
+
+	// === Enable addition event OID to targets ===
+	$(".eventify").change(function() {
+		parser.eventify(this);
 	});
 
 	// === Discrepancy action ====
