@@ -463,4 +463,47 @@ function getCurentUrl() {
 	}
 	return url;
 }
+
+function checkCookiesDialog() {
+	var cookieEnabled = (navigator.cookieEnabled) ? true : false;
+    if (typeof navigator.cookieEnabled == "undefined" && !cookieEnabled) { 
+        document.cookie="testcookie";
+        cookieEnabled = (document.cookie.indexOf("testcookie") != -1) ? true : false;
+    }
+	if (!cookieEnabled) {
+		$(".widget>div>div").remove();
+		$(".widget>div>table").remove();
+		displayCookiesErrorMessage();
+	}
+}
+
+function displayCookiesErrorMessage() {
+	if ($("#confirmation").length == 0) {
+		$("body").append("<div id=\"confirmation\" style=\"display: none;\">"
+							+ "<div style=\"clear: both; text-align: justify;\">"
+							+ "Cookies are disabled in your browser, some of widgets will not be shown. Please enable cookies."
+							+ "</div>" + 
+						"</div>");
+
+		$("#confirmation").dialog({
+			autoOpen : false,
+			modal : true,
+			resizable : false,
+			height : 80,
+			minHeight : 80,
+			width : 450
+		});
+	}
+
+	$("#confirmation").dialog("open");
+	var color = $('*').find('a').css('color');
+	if (color == 'rgb(170, 98, 198)' || color == '#AA62C6'
+			|| color == '#aa62c6') {
+		$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
+	}
+	if (color == 'rgb(117, 184, 148)' || color == '#75b894'
+			|| color == '#75B894') {
+		$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
+	}
+}
 /* /Supporting functions */

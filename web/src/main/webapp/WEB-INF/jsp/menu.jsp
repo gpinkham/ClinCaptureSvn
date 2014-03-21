@@ -51,6 +51,7 @@
   jQuery(document).ready(function () {
     jQuery("div[id^='Event_']").parent().parent().parent().parent().parent().attr("align", "center");
     jQuery("tr.header").attr("align", "center");
+	checkCookiesDialog();
   });
 </script>
 
