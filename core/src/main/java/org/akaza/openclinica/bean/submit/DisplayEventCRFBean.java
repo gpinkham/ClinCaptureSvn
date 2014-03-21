@@ -165,7 +165,8 @@ public class DisplayEventCRFBean implements Comparable {
 		} else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
 			if (doubleDataEntryPermitted) {
 				if (eventCRF.getOwner().equals(user)) {
-					if (initialDataEntryCompletedMoreThanTwelveHoursAgo(eventCRF) || isSuper) {
+					if (eventCRF.isNotStarted()
+							&& (initialDataEntryCompletedMoreThanTwelveHoursAgo(eventCRF) || isSuper)) {
 						startDoubleDataEntryPermitted = true;
 					} else {
 						startDoubleDataEntryPermitted = false;
@@ -201,7 +202,8 @@ public class DisplayEventCRFBean implements Comparable {
 	 *         <code>false</code> otherwise.
 	 */
 	public static boolean isSuper(UserAccountBean user, Role studyRole) {
-		return studyRole.equals(Role.SYSTEM_ADMINISTRATOR) || studyRole.equals(Role.STUDY_DIRECTOR) || studyRole.equals(Role.STUDY_ADMINISTRATOR);
+		return studyRole.equals(Role.SYSTEM_ADMINISTRATOR) || studyRole.equals(Role.STUDY_DIRECTOR)
+				|| studyRole.equals(Role.STUDY_ADMINISTRATOR);
 	}
 
 	public static boolean isEditor(UserAccountBean user, Role studyRole) {
