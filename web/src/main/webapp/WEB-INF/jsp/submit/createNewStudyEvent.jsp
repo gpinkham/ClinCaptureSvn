@@ -160,6 +160,7 @@
 
 <form action="CreateNewStudyEvent" method="post">
 <input type="hidden" id="openFirstCrf" name="openFirstCrf" value="false"/>
+<input type="hidden" id="formWithStateFlag" value=""/>
 <jsp:include page="../include/showSubmitted.jsp" />
 
 <fmt:message key="study_subject_ID" bundle="${resword}" var="studySubjectLabel"/>
@@ -976,43 +977,16 @@
 </div>
 </div><br>
 
-
 <table border="0" cellpadding="0" cellspacing="0">
-<tr>
-<td>
-<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-</td>
-<td>
- <input type="submit" name="BTN_Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" />
-</td>
-<td>
- <input type="button" name="BTN_Cancel" id="GoToSubjectMatrix" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onclick="window.location.href=('ListStudySubjects');"/>
-</td>
-<td>
- <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">
-</td>
-</tr></table>
+    <tr>
+        <td>
+            <input type="submit" name="Schedule" value="<fmt:message key="schedule_event" bundle="${resword}"/>" class="button_medium"/>
+            <input type="button" name="StartDataEntry" value="<fmt:message key="start_data_entry" bundle="${resword}"/>" class="button_medium" onClick="$('#openFirstCrf').val('true'); $('input[name=Schedule]').click();"/>
+            <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="formWithStateGoBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');" "/>
+        </td>
+    </tr>
+</table>
 </form>
-<c:set var="role" value="${userRole.role}" />
-<c:if test="${userRole.manageStudy}">
-<c:if test="${requestStudySubject == requestStudySubjectFalse}">
-<p>	<form method="POST" action="UpdateStudySubject">
-	<input type="hidden" name="id" value="<c:out value="${chosenSubject.id}"/>" />
-	<input type="hidden" name="action" value="show" />
-	<input type="submit" name="editstudy" value="<fmt:message key="edit_subject_properties1" bundle="${resword}"/>" class="button_xlong" />
-	</form>
-
-<p>	<form method="POST" action="UpdateSubject">
-	<input type="hidden" name="id" value="<c:out value="${chosenSubject.subjectId}"/>" />
-	<input type="hidden" name="studySubjId" value="<c:out value="${chosenSubject.id}"/>" />
-	<input type="hidden" name="action" value="show" />
-	<input type="submit" name="editstudy" value="<fmt:message key="edit_subject_properties2" bundle="${resword}"/>" class="button_xlong" />
-	</form>
-</c:if>
-</c:if>
 
 <script>
     jQuery("img[class='showCalendar']").each(function() {
