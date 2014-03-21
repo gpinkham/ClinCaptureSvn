@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -54,12 +54,12 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * <P>
+ * <p/>
  * EventCRFDAO.java, data access object for an instance of an event being filled out on a subject. Was originally
  * individual_instrument table in OpenClinica v.1.
  * 
  * @author thickerson
- * 
+ *         <p/>
  *         TODO test create and update first thing
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -719,7 +719,12 @@ public class EventCRFDAO extends AuditableEntityDAO {
 			sql = sql + digester.getQuery("notAllowSdvWithOpenQueries");
 		}
 
-		sql = sql + sort.execute("");
+		String sortQuery = sort.execute("");
+		if (sortQuery.isEmpty()) {
+			sql = sql + " order by ec.study_event_id asc";
+		} else {
+			sql = sql + sortQuery;
+		}
 
 		if ("oracle".equalsIgnoreCase(CoreResources.getDBType())) {
 			sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
