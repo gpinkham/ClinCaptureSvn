@@ -33,7 +33,7 @@ $(function() {
 			if (rule.targets) {
 				for (var x = 0; x < rule.targets.length; x++) {
 					var list = $("<li class='list-group-item'>");
-					list.text(rule.targets[x]);
+					list.text(rule.targets[x].name);
 					$("#items").append(list);
 				}
 

@@ -12,7 +12,6 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO‚ÄôS ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  * =================================================================================================================================================================================================================================================================================================================================================================================================================================================================== */
-
 function Parser() {
 	this.rule = Object.create(null);
 	this.rule.targets = [];
@@ -36,33 +35,6 @@ Parser.prototype.getCopy = function() {
 
 Parser.prototype.setCopy = function(copied) {
 	this.rule.copied = copied;
-}
-
-/* ===========================================================================
- * Validates what the next droppable should be given a droppable with a type
- *
- * Arguments [currentElement]:
- * => currentElement - The current droppable
- *
- * Return the type for the expected next element.
- * ========================================================================== */
-Parser.prototype.validateNext = function(currentElement) {
-	var nextElement = "INVALID";
-	// The second group positionally identifies an element
-	var className = currentElement.attr('class').split(/\s+/)[1];
-	switch (className) {
-		case "cal":
-		case "comp":
-			nextElement = "DATA"
-			break;
-		case "data":
-			nextElement = "COMPUTE";
-			break;
-		case "group":
-			nextElement = this.determineNext(currentElement);
-			break;
-	}
-	return nextElement;
 }
 
 /* ===========================================================================
@@ -93,7 +65,7 @@ Parser.prototype.determineNext = function(currentElement) {
  * => ui - The draggable that has been dropped
  * ============================================================================ */
 Parser.prototype.createNextDroppable = function(params) {
-	var __NEXT__ = this.validateNext(params.element);
+	var __NEXT__ = this.determineNext(params.element);
 	if (__NEXT__ === "ANY") {
 		var RPAREN = createRPARENDiv();
 		var dataPredicate = createStartExpressionDroppable();
@@ -118,6 +90,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			// Target
 			var target = Object.create(null);
 			target.name = params.ui.draggable.text();
+			target.evt = $("div[id=events]").find(".selected").find("td").last().text();
 			target.eventify = params.element.siblings("span").find(".target").is(":checked");
 			this.rule.targets.push(target);
 			//Reset UI
@@ -420,7 +393,6 @@ Parser.prototype.getRuleCRFItems = function() {
  * - The evaluate to predicate
  * ============================================================================ */
 Parser.prototype.createRule = function() {
-
 	this.quantify = function(element, index, array) {
 		if (array.length > 1) {
 			for (var x = 0; x < array.length; x++) {
@@ -431,14 +403,11 @@ Parser.prototype.createRule = function() {
 		}
 		return true;
 	}
-	var expressionPredicates = $(".dotted-border:not(:empty), .target:not(:empty)");
 	var study = this.extractStudy(this.getStudy());
+	var expressionPredicates = $(".dotted-border:not(:empty), .target:not(:empty)");
 	var oids = expressionPredicates.toArray().map(function(x) {
 		if ($(x).is(".group") || $(x).is(".target")) {
-			var tar = parser.findStudyItem({
-				study: study,
-				name: $(x).text()
-			});
+			var tar = parser.getItem($(x).text());
 			if (tar && typeof(tar) !== "function") {
 				return tar.eventOid;
 			}
@@ -453,17 +422,9 @@ Parser.prototype.createRule = function() {
 	$(".dotted-border").each(function(index) {
 		var pred = $($(".dotted-border")[index]).text();
 		if (parser.isOp(pred)) {
-			if (parser.isConditionalOp(pred)) {
-				pred = pred.toLowerCase();
-			} else {
-				pred = parser.getOp(pred)
-			}
+			pred = parser.isConditionalOp(pred) ? pred = pred.toLowerCase() : pred = parser.getOp(pred);
 		}
-		var item = parser.findStudyItem({
-			name: pred,
-			study: study
-		});
-
+		var item = parser.getItem(pred);
 		if (item) {
 			pred = quantified ? parser.constructFormPath(pred) : parser.constructEventPath(pred);
 		}
@@ -471,16 +432,10 @@ Parser.prototype.createRule = function() {
 	});
 	parser.rule.expression = expression;
 	if (parser.isValid(expression).valid) {
-		var tt = [];
 		for (var x = 0; x < parser.rule.targets.length; x++) {
 			var target = parser.rule.targets[x];
-			if (target.eventify) {
-				tt.push(parser.constructEventPath(target.name));
-			} else {
-				tt.push(parser.constructFormPath(target.name));
-			}
+			target.name = target.eventify ? target.evt + "." + parser.constructFormPath(target.name) : target.name = parser.constructFormPath(target.name);
 		}
-		parser.rule.targets = tt;
 	}
 }
 
@@ -516,11 +471,11 @@ Parser.prototype.getRule = function() {
 
 Parser.prototype.render = function(rule) {
 	this.rule.targets = [];
-	this.setExpression(rule.expression);
 	// properties
 	this.setName(rule.name);
 	this.setStudy(rule.study);
 	this.setCopy(rule.copied);
+	this.setExpression(rule.expression);
 	this.setTargets(rule.targets);
 	this.setEvaluatesTo(rule.evaluatesTo);
 	// executions
@@ -530,6 +485,8 @@ Parser.prototype.render = function(rule) {
 	this.setAdministrativeEditingExecute(rule.ae);
 	// Actions
 	parser.setActions(rule.actions);
+	// Select target items
+	parser.selectTarget();
 }
 
 /* ===========================================================================================
@@ -852,23 +809,42 @@ Parser.prototype.findItemName = function(itemOID) {
 }
 
 Parser.prototype.findStudyItem = function(params) {
-
 	for (var e in params.study.events) {
-
-		var event = params.study.events[e];
-		for (var c in event.crfs) {
-
-			var crf = event.crfs[c];
-			for (var v in crf.versions) {
-
-				var ver = crf.versions[v];
-				for (var i in ver.items) {
-
-					var itm = ver.items[i];
-					if (itm.name === params.name) {
-						itm.formOid = crf.oid;
-						itm.eventOid = event.oid;
-						return itm;
+		var evt = params.study.events[e];
+		if (params.evt) {
+			if (evt.oid === params.evt) {
+				for (var c in evt.crfs) {
+					var crf = evt.crfs[c];
+					for (var v in crf.versions) {
+						var ver = crf.versions[v];
+						for (var i in ver.items) {
+							var itm = ver.items[i];
+							if (itm.name == params.name || itm.oid == params.name) {
+								itm.formOid = crf.oid;
+								itm.eventOid = evt.oid;
+								itm.crfVersionOid = ver.oid;
+								return itm;
+							}
+						}
+					}
+				}
+			}
+		} else {
+			var selectedEvent = $("div[id=events]").find(".selected").find("td").last().text();
+			if (evt.oid === selectedEvent) {
+				for (var c in evt.crfs) {
+					var crf = evt.crfs[c];
+					for (var v in crf.versions) {
+						var ver = crf.versions[v];
+						for (var i in ver.items) {
+							var itm = ver.items[i];
+							if (itm.name == params.name || itm.oid == params.name) {
+								itm.formOid = crf.oid;
+								itm.crfVersionOid = ver.oid;
+								itm.eventOid = selectedEvent;
+								return itm;
+							}
+						}
 					}
 				}
 			}
@@ -885,95 +861,6 @@ Parser.prototype.setName = function(name) {
 
 Parser.prototype.getName = function() {
 	return this.rule.name;
-}
-
-Parser.prototype.setTargets = function(targets) {
-	if (targets.length > 0) {
-		var targetDiv = $(".parent-target");
-		for (var x = 0; x < targets.length; x++) {
-
-			var targetName = this.findItemName(this.extractLastItem(targets[x])).name;
-			var div = targetDiv.clone();
-			div.find(".target").text("");
-			createDroppable({
-				element: div.find(".target"),
-				accept: "div[id='items'] td"
-			});
-
-			div.find(".glyphicon-remove").click(function() {
-				parser.deleteTarget(this);
-			});
-
-			div.find(".target").val(targetName);
-			div.find(".target").text(targetName);
-			div.find(".target").css('font-weight', 'bold');
-			div.find(".eventify").change(function() {
-				parser.eventify(this);
-			});
-
-			createToolTip({
-				element: div.find(".eventify"),
-				title: "Click to bind the target to only the event."
-			});
-
-			x === 0 ? targetDiv.before(div) : $(".parent-target").last().before(div);
-			var target = Object.create(null);
-			target.name = targetName;
-			// Eventify
-			if (this.isEventified(targets[x])) {
-				target.eventify = true;
-				div.find(".eventify").prop("checked", target.eventify);
-			} else {
-				target.eventify = false;
-			}
-			this.rule.targets.push(target);
-		}
-	}
-}
-
-Parser.prototype.getTargets = function() {
-	return this.rule.targets;
-}
-
-Parser.prototype.deleteTarget = function(target) {
-	if ($(target).siblings("input").is(".target")) {
-		for (var x = 0; x < this.rule.targets.length; x++) {
-			var index = this.rule.targets.indexOf(this.rule.targets[x]);
-			if (index > -1 && this.rule.targets[x].name === $(target).siblings("input").val()) {
-				this.rule.targets.splice(index, 1);
-				$(target).parent().remove();
-				break;
-			}
-		}
-	} else if ($(target).siblings("input").is(".value")) {
-		var act = this.getInsertAction();
-		var oid = this.constructFormPath($(target).closest(".row").find(".item").text());
-		for (var x = 0; x < act.destinations.length; x++) {
-			var dest = act.destinations[x];
-			if(dest.oid === oid) {
-				act.destinations.splice(x, 1);
-				if ($("#insert").find(".row").size() === 1) { 
-					$(target).closest(".row").find(".item").val("");
-					$(target).closest(".row").find(".value").val("");
-				} else {
-					$(target).closest(".row").remove();
-				}
-				if ($("#insert").find("label:visible").size() === 0) {
-					$("#insert").find(".row:first").find("label").map(function() {
-						$(this).show();
-					});
-				}
-			}
-		}
-	} else {
-		if (this.getShowHideAction() && this.getShowHideAction().destinations.length > 0) {
-			var index = this.getShowHideAction().destinations.indexOf(this.constructFormPath($(target).siblings(".dest").val()));
-			if (index > -1) {
-				this.getShowHideAction().destinations.splice(index, 1);
-				$(target).parent().remove();
-			}	
-		}
-	}
 }
 
 Parser.prototype.setEvaluatesTo = function(evaluates) {
@@ -1392,7 +1279,7 @@ Parser.prototype.setDestinations = function(dests) {
 			var input = div.find(".item");
 			div.attr("id", dest.id);
 
-			input.val(this.findItemName(this.extractLastItem(dest.oid)).name);
+			input.val(this.findItemName(this.extractItemOIDFromExpression(dest.oid)).name);
 			input.css('font-weight', 'bold');
 
 			var inputVal = div.find(".value");
@@ -1437,7 +1324,7 @@ Parser.prototype.setShowHideDestinations = function(dests) {
 				element: cloned.find(".dest")
 			});
 			
-			cloned.find("input").val(this.findItemName(this.extractLastItem(dests[x])).name);
+			cloned.find("input").val(this.findItemName(this.extractItemOIDFromExpression(dests[x])).name);
 			cloned.find("input").css('font-weight', 'bold');
 			x === 0 ? div.before(cloned) : $(".space-left-neg > .input-group").last().before(cloned);
 		}
@@ -1481,22 +1368,163 @@ Parser.prototype.setExpression = function(expression) {
 	} else if (typeof expression === "string") {
 		var rawExpression = [];
 		// The regex skips quoted strings in expression
-		var expr = expression.split(/(\()|(?=\))|\s+(?!\w+(\s+\w+)*?")/g);
+		var expr = expression.split(/(\()|(?=\))|\s+(?!\w+(\s+\w+)*?")/g).filter(function(x) {
+			if (x) {
+				return x;
+			}
+		});
 		for (var x = 0; x < expr.length; x++) {
-			if (expr[x] && expr[x].length > 0) {
-				if (expr[x].indexOf(".") !== -1) {
-					var itm = this.findItemName(this.extractLastItem(expr[x]));
-					rawExpression.push(itm.name);
-				} else {
-					if (this.isOp(expr[x])) {
-						rawExpression.push(this.getLocalOp(expr[x]));
-					} else {
-						rawExpression.push(expr[x]);
-					}
-				}
+			var itm = this.getItem(expr[x]);
+			if (itm) {
+				rawExpression.push(itm.name);
+			} else if (expr[x].indexOf(".") !== -1) {
+				itm = this.getItem(this.extractItemOIDFromExpression(expr[x]));
+				rawExpression.push(itm.name);
+			} else {
+				var pred = this.isOp(expr[x]) ? this.getLocalOp(expr[x]) : expr[x];
+				rawExpression.push(pred);
 			}
 		}
 		this.setExpression(rawExpression);
+	}
+}
+
+Parser.prototype.setTargets = function(targets) {
+	if (targets.length > 0) {
+		var targetDiv = $(".parent-target");
+		for (var x = 0; x < targets.length; x++) {
+			var target = Object.create(null);
+			if (typeof targets[x] === "object") {
+				target.name = this.getItem(targets[x].name).name;
+				target.evt = targets[x].evt;
+			} else {
+				target.name = this.getItem(targets[x]).name;
+				target.evt = this.getItem(targets[x]).eventOid;
+			}
+			var div = targetDiv.clone();
+			div.find(".target").text("");
+			createDroppable({
+				element: div.find(".target"),
+				accept: "div[id='items'] td"
+			});
+
+			div.find(".glyphicon-remove").click(function() {
+				parser.deleteTarget(this);
+			});
+
+			div.find(".target").val(target.name);
+			div.find(".target").text(target.name);
+			div.find(".target").css('font-weight', 'bold');
+			div.find(".eventify").change(function() {
+				parser.eventify(this);
+			});
+
+			createToolTip({
+				element: div.find(".eventify"),
+				title: "Click to bind the target to only the event."
+			});
+
+			x === 0 ? targetDiv.before(div) : $(".parent-target").last().before(div);
+			// Eventify
+			if (targets[x].eventify) {
+				target.eventify = true;
+				div.find(".eventify").prop("checked", target.eventify);
+			} else {
+				target.eventify = false;
+			}
+			this.rule.targets.push(target);
+		}
+	}
+}
+
+Parser.prototype.getTargets = function() {
+	return this.rule.targets;
+}
+
+Parser.prototype.selectTarget = function() {
+	var study = this.extractStudy(this.rule.study);
+	if (this.rule.targets) {
+		var item = this.findStudyItem({
+			evt: this.rule.targets[0].evt,
+			name: this.rule.targets[0].name,
+			study: this.extractStudy(this.rule.study)
+		});
+		if (item) {
+			var row = $("td:contains(" + study.oid + ")");
+			if (row) {
+				$("tr.selected").each(function() {
+					$(this).removeClass("selected");
+				});
+				row.parent().click()
+				// Event
+				this.recursiveSelect({
+					click: true,
+					type: "event",
+					candidate: item.eventOid
+				});
+				// CRF
+				this.recursiveSelect({
+					type: "crf",
+					click: true,
+					selector: true,
+					candidate: item.formOid
+				});
+				// CRF version
+				this.recursiveSelect({
+					click: true,
+					type: "version",
+					selector: true,
+					candidate: item.crfVersionOid
+				});
+				// Item
+				this.recursiveSelect({
+					click: false,
+					type: "items",
+					candidate: item.name
+				});
+			}
+		}
+	}
+}
+
+Parser.prototype.deleteTarget = function(target) {
+	if ($(target).siblings("input").is(".target")) {
+		for (var x = 0; x < this.rule.targets.length; x++) {
+			var index = this.rule.targets.indexOf(this.rule.targets[x]);
+			if (index > -1 && this.rule.targets[x].name === $(target).siblings("input").val()) {
+				this.rule.targets.splice(index, 1);
+				$(target).parent().remove();
+				break;
+			}
+		}
+	} else if ($(target).siblings("input").is(".value")) {
+		var act = this.getInsertAction();
+		var oid = this.constructFormPath($(target).closest(".row").find(".item").text());
+		for (var x = 0; x < act.destinations.length; x++) {
+			var dest = act.destinations[x];
+			if(dest.oid === oid) {
+				act.destinations.splice(x, 1);
+				if ($("#insert").find(".row").size() === 1) { 
+					$(target).closest(".row").find(".item").val("");
+					$(target).closest(".row").find(".value").val("");
+				} else {
+					$(target).closest(".row").remove();
+				}
+				if ($("#insert").find("label:visible").size() === 0) {
+					$("#insert").find(".row:first").find("label").map(function() {
+						$(this).show();
+					});
+				}
+			}
+		}
+	} else {
+		if (this.getShowHideAction() && this.getShowHideAction().destinations.length > 0) {
+			var index = this.getShowHideAction().destinations.indexOf(this.constructFormPath($(target).siblings(".dest").val()));
+			if (index > -1) {
+				this.getShowHideAction().destinations.splice(index, 1);
+				$(target).parent().remove();
+			}	
+		}
 	}
 }
 
@@ -1556,11 +1584,18 @@ Parser.prototype.fetchStudies = function() {
 			if (typeof(studies) === "string") {
 				studies = JSON.parse(studies);
 			}
-
 			sessionStorage.setItem("studies", JSON.stringify(studies));
 			loadStudies(studies);
+			// If editing a rule
+			if (parser.getParameter("action") === "edit") {
+				parser.fetchRuleForEditing();
+			} 
+			if (sessionStorage.getItem("status") && sessionStorage.getItem("status") === "load") {
+				var rule = JSON.parse(sessionStorage.getItem("rule"));
+				parser.render(rule);
+				sessionStorage.removeItem("status");
+			}
 			$(".spinner").remove();
-
 		},
 		error: function(response) {
 			handleErrorResponse({
@@ -1593,7 +1628,6 @@ Parser.prototype.fetchRuleForEditing = function() {
 			}
 			rule.study = parseInt(parser.getParameterValue("study"));
 			parser.render(rule);
-			$(".spinner").remove();
 		},
 
 		error: function(response) {
@@ -1602,6 +1636,7 @@ Parser.prototype.fetchRuleForEditing = function() {
 			});
 		}
 	})
+	return true;
 }
 
 /* =================================================================
@@ -1624,7 +1659,7 @@ Parser.prototype.validate = function() {
 			data: {
 				rs: true,
 				rule: rule.expression,
-				target: rule.targets[0],
+				target: rule.targets[0].name,
 				testRuleActions: rule.evaluateTo
 			},
 
@@ -1696,7 +1731,11 @@ Parser.prototype.getParameterValue = function(name) {
 	}
 }
 
-Parser.prototype.extractLastItem = function(predicate) {
+Parser.prototype.extractEventNameFromExpression = function(predicate) {
+	return new RegExp("^(\\w+)(?=\.)").exec(predicate)[1];
+}
+
+Parser.prototype.extractItemOIDFromExpression = function(predicate) {
 	return new RegExp("\.([^\.]+)$").exec(predicate)[1];
 }
 
@@ -1711,19 +1750,13 @@ Parser.prototype.extractStudy = function(id) {
 
 Parser.prototype.constructFormPath = function(itemName) {
 	var study = this.extractStudy(this.getStudy());
-	var item = this.findStudyItem({
-		study: study,
-		name: itemName
-	});
+	var item = this.getItem(itemName);
 	return item.formOid + "." + item.group + "." + item.oid;
 }
 
 Parser.prototype.constructEventPath = function(itemName) {
 	var study = this.extractStudy(this.getStudy());
-	var item = this.findStudyItem({
-		study: study,
-		name: itemName
-	});
+	var item = this.getItem(itemName);
 	return item.eventOid + "." + this.constructFormPath(itemName);
 }
 
@@ -1733,11 +1766,65 @@ Parser.prototype.eventify = function(targetEvent) {
 		var tar = this.rule.targets[x];
 		if (tar.name === targetName) {
 			tar.eventify = $(targetEvent).is(":checked");
+			tar.evt = $("div[id=events]").find(".selected").find("td").last().text();
 			break;
 		}
 	}
 }
 
-Parser.prototype.isEventified = function(targetName) {
-	return targetName.slice(0, "SE_".length) == "SE_";
+Parser.prototype.isEventified = function(expression) {
+	return expression.slice(0, "SE_".length) == "SE_";
+}
+
+// This function is a bit involved - consider refactoring
+Parser.prototype.recursiveSelect = function(params) {
+	var next = $("div[id="+ params.type + "]").find("a:contains(" + unescape(JSON.parse('"\u00BB\u00BB"')) + ")");
+	if (params.selector) {
+		if ($("td[oid=" + params.candidate + "]").length > 0) {
+			$("td:contains(" + params.candidate + ")").parent().addClass("selected");
+		} else {
+			if ($(".pagination").length > 0) {
+				next[0].click();
+				if ($("td[oid=" + params.candidate + "]").length == 0) {
+					next[0].click();
+				} else {
+					$("td[oid=" + params.candidate + "]").parent().addClass("selected");
+				}
+			}
+		}
+
+		if (params.click) {
+			$("td[oid=" + params.candidate + "]").parent().click();
+		}
+	} else {
+		if ($("td:contains(" + params.candidate + ")").length > 0) {
+			$("td:contains(" + params.candidate + ")").parent().addClass("selected");
+		} else {
+			if ($(".pagination").length > 0) {
+				next[0].click();
+				if ($("td:contains(" + params.candidate + ")").length == 0) {
+					next[0].click();
+				} else {
+					$("td:contains(" + params.candidate + ")").parent().addClass("selected");
+				}
+			}
+		}
+		if (params.click) {
+			$("td:contains(" + params.candidate + ")").parent().click();
+		}
+	}
+}
+
+Parser.prototype.getItem = function(expression) {
+	if (expression.indexOf(".") == -1) {
+		return this.findItem(expression);
+	} else if (this.isEventified(expression)) {
+		return this.findStudyItem({
+			study: this.extractStudy(this.rule.study),
+			name: this.extractItemOIDFromExpression(expression),
+			evt: this.extractEventNameFromExpression(expression)
+		});
+	} else {
+		return this.findItemName(this.extractItemOIDFromExpression(expression));
+	}
 }

@@ -190,7 +190,7 @@ $(function() {
 
 	createToolTip({
 		element: $(".eventify"),
-		title: "Click to bind the target to only the event."
+		title: "Click to bind the target to the event."
 	});
 
 	// ======================= End of tool tip creation =======================
@@ -464,16 +464,6 @@ $(function() {
 	// If a rule already exists in a session, display it
 	$(document).ready(function() {
 		parser.fetchStudies();
-		// If editing a rule
-		if (parser.getParameter("action") === "edit") {
-			parser.fetchRuleForEditing();
-		}
-
-		if (sessionStorage.getItem("status") && sessionStorage.getItem("status") === "load") {
-			var rule = JSON.parse(sessionStorage.getItem("rule"));
-			parser.render(rule);
-		}
-		sessionStorage.removeItem("status");
 	});
 
 	$('body').click(function(e) {

@@ -922,13 +922,6 @@ function loadStudyEvents(study) {
 					studyEvent: currentEvent
 				});
 
-				// Cascade load
-				loadCRFVersions({
-					study: study,
-					event: currentEvent,
-					crf: currentEvent.crfs[Object.keys(currentEvent.crfs)[0]]
-				});
-
 				createBreadCrumb({
 					study: study.name,
 					event: currentEvent.name
@@ -962,7 +955,6 @@ function loadStudyEvents(study) {
 
 		$("div[id='events']").append(eventTable);
 		currentPageIndex = 0;
-
 		// Global
 		var chunkedItemsArr = itemArr.chunk(10);
 		var pagination = createPagination({
@@ -1007,12 +999,10 @@ function loadEventCRFs(params) {
 					study: params.study,
 					event: params.studyEvent
 				});
-
 				createBreadCrumb({
 					crf: currentCRF.name,
 					study: params.study.name,
 					event: params.studyEvent.name
-					
 				});
 			});
 
@@ -1031,7 +1021,6 @@ function loadEventCRFs(params) {
 					tdDescription.text(crf.description);
 				}
 			}
-
 			var tdOID = $("<td>");
 			if (crf.oid) {
 				if (crf.oid.length > 7) {
@@ -1046,6 +1035,7 @@ function loadEventCRFs(params) {
 					tdOID.text(crf.oid);
 				}
 			}
+			tdOID.attr("oid", crf.oid);
 
 			var tdVersion = $("<td>");
 			tdVersion.text(crf.version);
@@ -1113,6 +1103,7 @@ function loadCRFVersions(params) {
 					tdOID.text(version.oid);
 				}
 			}
+			tdOID.attr("oid", version.oid);
 
 			tr.append(tdName);
 			tr.append(tdOID);
@@ -1121,8 +1112,6 @@ function loadCRFVersions(params) {
 
 		$("div[id='versions']").append(versionTable);
 		currentPageIndex = 0;
-
-		// Global
 		var chunkedItemsArr = itemArr.chunk(10);
 		var pagination = createPagination({
 			div: $("div[id='versions']"),
@@ -1229,11 +1218,7 @@ function createPrompt(params) {
 					var crfItems = parser.getRuleCRFItems();
 					if (crfItems) {
 						for (var x = 0; x < crfItems.length; x++) {
-							var item = parser.findStudyItem({								
-								study: params.study,
-								name: crfItems[x].itemName
-							});
-
+							var item = parser.getItem(crfItems[x].itemName);
 							if (!item) {
 								crfItems[x].holder.addClass("invalid");
 							} else {
@@ -1275,11 +1260,33 @@ function resetStudy(params) {
 		study: params.study,
 		studyEvent: topEvent
 	});
+	// bold event
+	parser.recursiveSelect({
+		type: "event",
+		candidate: topEvent.oid
+	});
 
 	if (topEvent) {
-		loadCRFVersionItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]]);
+		loadCRFVersions({
+			event: topEvent,
+			study: params.study,
+			crf: topEvent.crfs[Object.keys(topEvent.crfs)[0]]
+		});
+		// bold crf
+		parser.recursiveSelect({
+			type: "crf",
+			selector: true,
+			candidate: topEvent.crfs[Object.keys(topEvent.crfs)[0]].oid
+		});
+		loadCRFVersionItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0]);
+		// bold crf version
+		parser.recursiveSelect({
+			selector: true,
+			type: "version",
+			candidate: topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0].oid
+		});
 	}
-
+	// boot-strap crumb
 	createBreadCrumb({
 		study: params.study.name
 	});

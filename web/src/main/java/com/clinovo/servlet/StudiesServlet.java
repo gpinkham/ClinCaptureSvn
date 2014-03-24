@@ -140,36 +140,26 @@ public class StudiesServlet extends HttpServlet {
 
 					JSONArray actions = rule.getJSONArray("actions");
 					Element rAssigment = document.createElement("RuleAssignment");
-
 					// Target
 					Element rTarget = document.createElement("Target");
 					rTarget.setAttribute("Context", "OC_RULES_V1");
-
 					// Content
-					rTarget.setTextContent(rTargets.getString(x));
-
+					rTarget.setTextContent(rTargets.getJSONObject(x).getString("name"));
 					// Rule target children
 					rAssigment.appendChild(rTarget);
-
-					for (int r = 0; r < actions.length(); r++) {
-
+					for (int act = 0; act < actions.length(); act++) {
 						// Rule Def
 						Element ruleDef = document.createElement("RuleDef");
-
 						// attributes
 						ruleDef.setAttribute("Name", rule.getString("name"));
 						ruleDef.setAttribute("OID", generateOID(rule.getString("expression"), currentCount));
-
 						// Increment the count
 						currentCount = currentCount + 1;
-
 						Element expr = document.createElement("Expression");
 						expr.setTextContent(rule.getString("expression"));
-
+						// Description - it comes before expression
 						Element description = document.createElement("Description");
 						description.setTextContent(rule.getString("name"));
-
-						// desc comes first
 						ruleDef.appendChild(description);
 						ruleDef.appendChild(expr);
 
@@ -177,15 +167,13 @@ public class StudiesServlet extends HttpServlet {
 						Element ref = document.createElement("RuleRef");
 						ref.setAttribute("OID", ruleDef.getAttribute("OID"));
 						
-						List<Element> acts = createAction(actions.getString(r), rule, document);
-						
+						List<Element> acts = createAction(actions.getString(act), rule, document);
 						for (Element el : acts) {
 							ref.appendChild(el);
 						}
 
 						// Append ref
 						rAssigment.appendChild(ref);
-
 						// Append to root
 						ruleDefs.add(ruleDef);
 					}

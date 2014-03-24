@@ -342,21 +342,6 @@ div {
   margin-bottom: .5em;
 }
 
-::-webkit-scrollbar {
-  width: 5px;
-  height: 30px;
-}
- 
-::-webkit-scrollbar-track {
-  border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
-}
- 
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
-}
-
 .inner-scrollbar {
   overflow-y: auto; 
   width: 98%; 
