@@ -360,7 +360,7 @@ div {
 .inner-scrollbar {
   overflow-y: auto; 
   width: 98%; 
-  height: 250px;
+  height: 200px;
 }
 
 .footer-container {
