@@ -30,17 +30,17 @@ $(document).ready(function($) {
 		</tr>
 	</table>
 	<table class="signs">
-		<tr>
+		<tr align="left">
 			<td><div class="scheduled sign"></div> - Scheduled</td>
 			<td><div class="data_entry_started sign"></div> - Data Entry Started</td>
 			<td><div class="completed sign"></div> - Completed</td>
 		</tr>
-		<tr>
+		<tr align="left">
 			<td><div class="signed sign"></div> - Signed</td>		
 			<td><div class="locked sign"></div> - Locked</td>
 			<td><div class="skipped sign"></div> - Skipped</td>
 		</tr>
-		<tr>
+		<tr align="left">
 			<td><div class="stopped sign"></div> - Stopped</td>
 			<td><div class="not_scheduled sign"></div> - Not Scheduled</td>
 			<td><div class="sdved sign"></div> - Source Data Verified</td>
