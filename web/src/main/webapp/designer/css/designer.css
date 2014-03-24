@@ -12,22 +12,25 @@
   padding-right: 0px;
 }
 
+body {
+  overflow: hidden;
+}
+
 body .container {
   top: 0;
   left: 0;
-  width: 70%;
+  width: 69.5%;
   bottom: 15%;
   position: fixed;
-  overflow-y: auto;
-  padding-right: 1px;
   margin-top: 1em;
+  overflow-y: hidden;
+  padding-right: 1px;
 }
 
 body .panel {
   text-align: center;
 	min-height: 167.5px;
 	margin-right: 0.2em;
-
 }
 
 .target {
@@ -129,6 +132,10 @@ textarea {
   width: 83% !important;
 }
 
+.pont {
+  cursor: default !important;
+}
+
 .nav-cont {
 	padding-left: 8em;
 	padding-right: 8em;
@@ -141,17 +148,17 @@ textarea {
 
 .nav-justified li {
 	float: none;
+  width: 201px;
 	padding-left: .5em;
 	padding-right: .5em;
 }
 
-.pont {
-  cursor: default !important;
-}
-
 .nav-justified li > a {
-	margin-bottom: .5em !important;
-  background-color: #428bca !important;
+  width:180px;
+  height: 49px;
+  line-height:30px;
+  margin-bottom:0.5em !important;
+  background-color:#428BCA !important;
 }
 
 .login-modal {
@@ -333,4 +340,29 @@ div {
 
 .input-group {
   margin-bottom: .5em;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 30px;
+}
+ 
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+}
+ 
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+
+.inner-scrollbar {
+  overflow-y: auto; 
+  width: 98%; 
+  height: 250px;
+}
+
+.footer-container {
+  height: 50px;
 }

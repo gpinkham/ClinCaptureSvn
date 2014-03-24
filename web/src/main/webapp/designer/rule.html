@@ -1,55 +1,43 @@
 <!DOCTYPE html>
 <html>
   <head>
-  
     <title>Rule Designer</title>
-  
     <meta charset="utf-8">
     <meta http-equiv='expires' content='0'>
     <meta http-equiv='pragma' content='no-cache'>
     <meta http-equiv='cache-control' content='no-cache'>
     <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="shortcut icon" href="https://www.clinovo.com/favicon.ico"> 
-
+    <link rel="shortcut icon" href="https://www.clinovo.com/favicon.ico">
     <!-- Bootstrap -->
     <link href="css/jquery-ui-1.10.3.min.css" rel="stylesheet" media="screen">
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="css/datepicker.css" rel="stylesheet" media="screen">
-
     <link href="css/designer.css" rel="stylesheet" media="screen">
-
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-      <script src="js/json2.js"></script>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <script src="js/json2.js"></script>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
-
     <script src="js/jquery.min.js"></script>
     <script src="js/jquery-ui-1.10.3.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/bootbox.js"></script>
     <script src="js/bootstrap-datepicker.js"></script>
-
     <script src="js/parser.js"></script>
     <script src="js/designer.js"></script>
     <script src="js/interaction.js"></script>
-
   </head>
   <body>
     <div class="container">
       <div class="col-md-12">
-        <div class="col-md-4">
+        <div class="col-md-8">
           <img src="images/rs-logo.png">
         </div>
-        <div class="col-md-4 col-md-offset-3">
+        <div class="col-md-3 img col-md-offset-12">
           <img src="images/brand2.png">
-        </div>
-        <div class="col-md-4 img col-md-offset-4">
-          <img src="images/brand3.png">
         </div>
       </div>
       <div class="row">
@@ -124,89 +112,84 @@
           </div>
         </div>
       </div>
-
-      <div class="row">
-        <div class="col-md-3 space-top-sm">
-          <span>Rule Description:</span>
+      <div class="inner-scrollbar">
+        <div class="row">
+          <div class="col-md-3 space-top-sm">
+            <span>Rule Description:</span>
+          </div>
+          <div class="col-md-7 space-top-sm">
+            <input type="text" class="form-control" id="ruleName">
+          </div>
         </div>
-        <div class="col-md-7 space-top-sm">
-          <input type="text" class="form-control" id="ruleName">
-        </div>   
-      </div>
-
-      <div class="row">
-        <div class="col-md-3 space-top-sm">
-          <span>Apply this rule to:</span>
-        </div>
-        <div class="col-md-7 space-top-sm">
+        <div class="row">
+          <div class="col-md-3 space-top-sm">
+            <span>Apply this rule to:</span>
+          </div>
+          <div class="col-md-7 space-top-sm">
             <div class="input-group parent-target">
               <input type="text" class="target form-control">
               <span class="input-group-addon">
-                <input class="eventify" type="checkbox">
+              <input class="eventify" type="checkbox">
               </span>
               <span class="glyphicon glyphicon-remove input-group-addon"></span>
             </div>
+          </div>
         </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-3 space-top-sm">
-          <span>If the rule evaluates to:</span>
+        <div class="row">
+          <div class="col-md-3 space-top-sm">
+            <span>If the rule evaluates to:</span>
+          </div>
+          <div class="col-md-2 space-top-sm">
+            <input id="evaluateTrue" type="radio" name="ruleInvoke"> True
+          </div>
+          <div class="col-md-7 space-top-sm">
+            <input id="evaluateFalse" type="radio" name="ruleInvoke"> False
+          </div>
         </div>
-        <div class="col-md-2 space-top-sm">
-          <input id="evaluateTrue" type="radio" name="ruleInvoke"> True
+        <div class="row">
+          <div class="col-md-3 space-top-sm">
+            <span>Execute the rule upon:</span>
+          </div>
+          <div class="col-md-2 space-top-sm">
+            <input id='ide' type="checkbox"> Initial data entry
+          </div>
+          <div class="col-md-2 space-top-sm">
+            <input id='ae' type="checkbox"> Administrative editing
+          </div>
+          <div class="col-md-2 space-top-sm">
+            <input id='dde' type="checkbox"> Double data entry
+          </div>
+          <div class="col-md-3 space-top-sm">
+            <input id='dataImport' type="checkbox"> Data import
+          </div>
         </div>
-        <div class="col-md-7 space-top-sm">
-          <input id="evaluateFalse" type="radio" name="ruleInvoke"> False
+        <div class="row">
+          <div class="col-md-3 space-top-sm">
+            <span>Take the following action(s):</span>
+          </div>
+          <div class="col-md-2 space-top-sm">
+            <input id="chkDiscrepancyText" type="checkbox" action="discrepancy" class="action"> Create discrepancy
+          </div>
+          <div class="col-md-2 space-top-sm">
+            <input id="chkEmail" type="checkbox" action="email" class="action"> Send email
+          </div>
+          <div class="col-md-3 space-top-sm">
+            <input id="chkData" type="checkbox" action="insert" class="action"> Insert data
+          </div>
         </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-3 space-top-sm">
-          <span>Execute the rule upon:</span>
+        <div class="row">
+          <div class="col-md-3 space-top-sm">
+            &nbsp;
+          </div>
+          <div class="col-md-2 space-top-sm">
+            <input name='tItem' type="radio" action="show" class="action"> Show CRF Item
+          </div>
+          <div class="col-md-7 space-top-sm">
+            <input name='tItem' type="radio" action="hide" class="action"> Hide CRF Item
+          </div>
         </div>
-        <div class="col-md-2 space-top-sm">
-          <input id='ide' type="checkbox"> Initial data entry
-        </div>
-        <div class="col-md-2 space-top-sm">
-          <input id='ae' type="checkbox"> Administrative editing
-        </div>
-        <div class="col-md-2 space-top-sm">
-          <input id='dde' type="checkbox"> Double data entry
-        </div>
-        <div class="col-md-3 space-top-sm">
-          <input id='dataImport' type="checkbox"> Data import
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-3 space-top-sm">
-          <span>Take the following action(s):</span>
-        </div>
-        <div class="col-md-2 space-top-sm">
-          <input id="chkDiscrepancyText" type="checkbox" action="discrepancy" class="action"> Create discrepancy
-        </div>
-        <div class="col-md-2 space-top-sm">
-          <input id="chkEmail" type="checkbox" action="email" class="action"> Send email
-        </div>
-        <div class="col-md-3 space-top-sm">
-          <input id="chkData" type="checkbox" action="insert" class="action"> Insert data
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-3 space-top-sm">
-          &nbsp;
-        </div>
-        <div class="col-md-2 space-top-sm">
-          <input name='tItem' type="radio" action="show" class="action"> Show CRF Item
-        </div>
-        <div class="col-md-7 space-top-sm">
-          <input name='tItem' type="radio" action="hide" class="action"> Hide CRF Item
-        </div>
-      </div>
-
-      <div class="row">
-        <div id="actionMessages" class="col-md-12 pull-left dotted-border-lg">
+        <div class="row">
+          <div id="actionMessages" class="col-md-12 pull-left dotted-border-lg">
             <div id="discrepancyText" class="form-group">
               <label for="discrepancyText" class="col-md-2 control-label">Discrepancy text:</label>
               <textarea class="form-control input-sm" rows="2"></textarea>
@@ -252,11 +235,11 @@
               </div>
             </div>
           </div>
+        </div>
       </div>
-      <div class="row">
+      <div class="row footer-container">
         <div class="col-md-12">
           <nav class="navbar navbar-default nav-cont navbar-fixed-bottom" role="navigation">
-            <a class="navbar-brand pull-right" href="http://trac.clinovo.com"><img style="max-width:100px" src="images/brand1.png"></a>
             <ul class="nav nav-justified">
               <li><a id='validate' class="btn btn-primary navbar-btn">Validate Rule</a></li>
               <li><a id="exit" href="" class="btn btn-warning navbar-btn">Exit</a></li>
