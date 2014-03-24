@@ -145,6 +145,28 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <input id="hasPopUp" type="hidden" name="hasPopUp" value="${requestScope['hasPopUp']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
 <input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
+<c:if test="${study.parentStudyId > 0}">
+	<!-- Site information -->
+	<input type="hidden" name="siteUniqId" value="${study.identifier}"/>
+	<input type="hidden" name="siteName" value="${study.name}"/>
+	<input type="hidden" name="sitePI" value="${study.principalInvestigator}"/>	
+	<!-- /Site information -->
+	<!-- Facility information -->
+	<input type="hidden" name="facilityName" value="${study.facilityName}"/>
+	<input type="hidden" name="facilityCity" value="${study.facilityCity}"/>
+	<input type="hidden" name="facilityState" value="${study.facilityState}"/>
+	<input type="hidden" name="facilityZip" value="${study.facilityZip}"/>
+	<input type="hidden" name="facilityContactPhone" value="${study.facilityContactPhone}"/>
+	<input type="hidden" name="facilityCountry" value="${study.facilityCountry}"/>
+	<input type="hidden" name="facilityContactEmail" value="${study.facilityContactEmail}"/>	
+	<!-- /Facility information -->
+	<!-- Interviewer information -->
+	<input type="hidden" name="userName" value="${userBean.firstName}"/>
+	<input type="hidden" name="userLastName" value="${userBean.lastName}"/>
+	<input type="hidden" name="userEmail" value="${userBean.email}"/>
+	<input type="hidden" name="userPhone" value="${userBean.phone}"/>
+	<!-- /Interviewer information -->
+</c:if>
 <script type="text/javascript" language="JavaScript">
     // <![CDATA[
     function getSib(theSibling){
