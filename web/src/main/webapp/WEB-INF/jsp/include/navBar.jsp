@@ -294,7 +294,9 @@
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_administration" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
-                <div class="taskLink"><a href="${urlPrefix}ListStudy"><fmt:message key="nav_studies" bundle="${resword}"/></a></div>
+                <c:if test="${userBean.name == 'root'}">
+                    <div class="taskLink"><a href="${urlPrefix}ListStudy"><fmt:message key="nav_studies" bundle="${resword}"/></a></div>
+                </c:if>
                 <c:if test="${study.parentStudyId <= 0}">
                 	<div class="taskLink"><a href="${urlPrefix}ListSite"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
                 </c:if>
