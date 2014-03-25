@@ -1502,7 +1502,7 @@ Parser.prototype.deleteTarget = function(target) {
 		var oid = this.constructFormPath($(target).closest(".row").find(".item").text());
 		for (var x = 0; x < act.destinations.length; x++) {
 			var dest = act.destinations[x];
-			if(dest.oid === oid) {
+			if (dest.oid === oid) {
 				act.destinations.splice(x, 1);
 				if ($("#insert").find(".row").size() === 1) { 
 					$(target).closest(".row").find(".item").val("");
@@ -1548,7 +1548,6 @@ Parser.prototype.setActions = function(actions) {
 					edit: true,
 					action: action,
 					selected: true
-					
 				});
 			} else if (action.type === "showHide") {
 				this.setShowHideAction({
@@ -1576,7 +1575,6 @@ Parser.prototype.fetchStudies = function() {
 	sessionStorage.removeItem("edit");
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 	$.ajax({
-
 		type: "POST",
 		url: c + "/studies?action=fetch",
 		success: function(studies) {
@@ -1610,7 +1608,6 @@ Parser.prototype.fetchStudies = function() {
  * passed as an id on the url with a parameter action=editing
  * ====================================================================== */
 Parser.prototype.fetchRuleForEditing = function() {
-
 	editing = true;
 	$("body").append(createLoader());
 	sessionStorage.setItem("edit", true);
@@ -1629,14 +1626,12 @@ Parser.prototype.fetchRuleForEditing = function() {
 			rule.study = parseInt(parser.getParameterValue("study"));
 			parser.render(rule);
 		},
-
 		error: function(response) {
 			handleErrorResponse({
 				response: response
 			});
 		}
-	})
-	return true;
+	});
 }
 
 /* =================================================================
@@ -1648,11 +1643,8 @@ Parser.prototype.fetchRuleForEditing = function() {
  * => evaluateTo - What the rule should evaluate to
  * ============================================================= */
 Parser.prototype.validate = function() {
-
 	var rule = this.getRule();
-
 	$("body").append(createLoader());
-
 	if (rule) {
 		$.ajax({
 			type: "POST",
@@ -1662,7 +1654,6 @@ Parser.prototype.validate = function() {
 				target: rule.targets[0].name,
 				testRuleActions: rule.evaluateTo
 			},
-
 			url: rule.study ? rule.submission + "/TestRule?action=validate&study=" + rule.study : rule.submission + "/TestRule?action=validate",
 			success: function(response) {
 				sessionStorage.setItem("validation", response);
@@ -1697,7 +1688,6 @@ Parser.prototype.displayValidationResults = function(rule) {
 			action: "save",
 			rule: JSON.stringify(rule)
 		},
-
 		url: rule.submission + "/studies?action=validate",
 		success: function(response) {
 			if (response) {
@@ -1792,7 +1782,6 @@ Parser.prototype.recursiveSelect = function(params) {
 				}
 			}
 		}
-
 		if (params.click) {
 			$("td[oid=" + params.candidate + "]").parent().click();
 		}

@@ -586,10 +586,9 @@ public class StudiesServlet extends HttpServlet {
 			Element showAction = document.createElement("ShowAction");
 			
 			// children
-			showAction.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
+			showAction.setAttribute("IfExpressionEvaluates", act.getString("show"));
 			showAction.appendChild(run);
 			showAction.appendChild(message);
-			
 			JSONArray targets = act.getJSONArray("destinations");
 			for (int x = 0; x < targets.length(); x++) {
 
@@ -605,19 +604,9 @@ public class StudiesServlet extends HttpServlet {
 			// clone node
 			Element hideAction = (Element) showAction.cloneNode(true);
 			document.renameNode(hideAction, null, "HideAction");
-			
 			// Remove message node
 			hideAction.getElementsByTagName("Message").item(0).setTextContent(null);
-			
-			Boolean eval = Boolean.valueOf(rule.getString("evaluatesTo"));
-			
-			// Hide action opposite of show
-			if (eval) {
-				hideAction.setAttribute("IfExpressionEvaluates", Boolean.FALSE.toString());
-			} else {
-				hideAction.setAttribute("IfExpressionEvaluates", Boolean.TRUE.toString());
-			}
-			
+			hideAction.setAttribute("IfExpressionEvaluates", act.getString("hide"));
 			actions.add(hideAction);
 
 		} else if (act.getString("type").equalsIgnoreCase("insert")) {
