@@ -221,7 +221,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		if (eventCRFId > 0) {
 			// for event crf, the input crfVersionId from url =0
 			ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
-
+			if (ecb != null && ecb.getId() > 0) {
+				request.setAttribute("eventCRF", ecb);
+			}
 			StudyEventDAO sedao = getStudyEventDAO();
 			StudyEventBean event = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 			if (event.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)) {
