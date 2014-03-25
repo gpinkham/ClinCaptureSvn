@@ -130,6 +130,15 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 		}
 	}
 
+	public DynamicsItemFormMetadataBean getDynamicsItemFormMetadataBean(Integer itemId, EventCRFBean eventCrfBean,
+			ItemDataBean itemDataBean) {
+		DynamicsItemFormMetadataBean dynamicsMetadataBean;
+		ItemFormMetadataBean itemFormMetadataBean = getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemId,
+				eventCrfBean.getCRFVersionId());
+		dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
+		return dynamicsMetadataBean;
+	}
+
 	public boolean isGroupShown(int metadataId, EventCRFBean eventCrfBean) throws OpenClinicaException {
 		ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean) getItemGroupMetadataDAO().findByPK(
 				metadataId);
@@ -229,9 +238,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 	}
 
 	public boolean hideNewItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
-		ItemFormMetadataBean itemFormMetadataBean = metadataBean;
-		DynamicsItemFormMetadataBean dynamicsMetadataBean = new DynamicsItemFormMetadataBean(itemFormMetadataBean,
-				eventCrfBean);
+		metadataBean.setShowItem(false);
+		DynamicsItemFormMetadataBean dynamicsMetadataBean = new DynamicsItemFormMetadataBean(metadataBean, eventCrfBean);
 		dynamicsMetadataBean.setItemDataId(itemDataBean.getId());
 		dynamicsMetadataBean.setShowItem(false);
 		getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
@@ -664,10 +672,9 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 							itemOrItemGroup.getItemBean().getId(), eventCrfBeanA.getCRFVersionId());
 					DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(
 							itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
-					if (dynamicsMetadataBean == null && oidBasedItemData.getValue().equals("")) {
+					if (dynamicsMetadataBean == null) {
 						hideNewItem(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
-					} else if (dynamicsMetadataBean != null && dynamicsMetadataBean.isShowItem()
-							&& oidBasedItemData.getValue().equals("")) {
+					} else if (dynamicsMetadataBean != null && dynamicsMetadataBean.isShowItem()) {
 						// tbh #5287: add an additional check here to see if it should be hidden
 						dynamicsMetadataBean.setShowItem(false);
 						getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean, con);

@@ -91,6 +91,7 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -3457,6 +3458,11 @@ public abstract class DataEntryServlet extends Controller {
 					logger.debug("DID NOT set show item " + ifmb.getItemId() + " idb " + dib.getData().getId()
 							+ " show item " + showItem + " passed dde " + passedDDE + " value "
 							+ dib.getData().getValue());
+				}
+				DynamicsItemFormMetadataBean dynamicsMetadataBean = getItemMetadataService()
+						.getDynamicsItemFormMetadataBean(ifmb.getItemId(), ecb, dib.getData());
+				if (dynamicsMetadataBean != null) {
+					ifmb.setShowItem(dynamicsMetadataBean.isShowItem());
 				}
 				dib.setMetadata(ifmb);
 				displayItems.put(new Integer(ifmb.getItemId()), dib);
