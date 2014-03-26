@@ -123,15 +123,11 @@ function saveRule(rule) {
 				var obj = JSON.parse(response);
 				sessionStorage.removeItem("edit");
 				sessionStorage.setItem("status", "remove");
-				bootbox.confirm("Rule(s) successfully saved", function(result) {
-					// Clean up
-					sessionStorage.removeItem("id");
-					sessionStorage.removeItem("rule");
-					sessionStorage.removeItem("validation");
-					if (result) {
-						window.open(rule.submission + "/designer/rule.html", '_self');
-					}
-				});
+				// Clean up
+				sessionStorage.removeItem("id");
+				sessionStorage.removeItem("rule");
+				sessionStorage.removeItem("validation");
+				window.open(rule.submission + "/designer/rule.html", '_self');
 			} catch (e) {
 				$(".spinner").remove();
 				bootbox.alert({
