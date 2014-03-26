@@ -30,7 +30,11 @@ body .container {
 body .panel {
   text-align: center;
 	min-height: 167.5px;
-	margin-right: 0.2em;
+	margin-right: 2px;
+}
+
+body .panel-body {
+  padding: 10px;
 }
 
 .target {
@@ -39,7 +43,7 @@ body .panel {
 
 .targettable {
   z-index: 0;
-  margin-top: -18px;
+  margin-top: -17.5px;
 }
 
 .bordered {
@@ -67,11 +71,10 @@ body .panel {
 }
 
 .data {
-  top:6.4em;
-  right: 0;    
+  top: 90px;
+  right: 12px;    
   height: 79.2%;
   margin-top: 1em;
-  margin-right: 1em;
   width: 30.5% !important;
   position: fixed !important;
 }
