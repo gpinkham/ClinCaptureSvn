@@ -1201,7 +1201,7 @@ public abstract class DataEntryServlet extends Controller {
 								|| this.getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)
 								&& !this.isAdminForcedReasonForChange(request));
 			}
-			
+
 			removeFieldsValidationsForSubmittedDN(v, request);
 
 			// get hard rules, skip soft if errors > 0
@@ -1911,14 +1911,14 @@ public abstract class DataEntryServlet extends Controller {
 
 	private void removeFieldsValidationsForSubmittedDN(Validator v, HttpServletRequest request) {
 		if (request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED) != null) {
-			Map<Object, Boolean> newNotesMap = (Map<Object, Boolean>) request.getSession()
-					.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
+			Map<Object, Boolean> newNotesMap = (Map<Object, Boolean>) request.getSession().getAttribute(
+					DataEntryServlet.NOTE_SUBMITTED);
 			for (Object fieldName : newNotesMap.keySet()) {
 				if (fieldName instanceof String && !StringUtil.isBlank((String) fieldName)) {
 					v.removeFieldValidations((String) fieldName);
 				}
 			}
-		}	
+		}
 	}
 
 	private void clearSession(HttpServletRequest request) {
@@ -4664,9 +4664,12 @@ public abstract class DataEntryServlet extends Controller {
 
 	protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata) {
 		String value = idb.getValue();
-		if (!oldItemdata.containsKey(idb.getId()))
+		if (!oldItemdata.containsKey(idb.getId())) {
+			if (isAdministrativeEditing() && "".equals(value)) {
+				return false;
+			}
 			return true;
-		else {
+		} else {
 			String oldValue = oldItemdata.get(idb.getId());
 			if (oldValue != null) {
 				if (value == null)
@@ -4684,6 +4687,9 @@ public abstract class DataEntryServlet extends Controller {
 		String value = idb.getValue();
 		if (!dib.getItem().getDataType().equals(ItemDataType.CODE)) {
 			if (!oldItemdata.containsKey(idb.getId())) {
+				if (isAdministrativeEditing() && "".equals(value)) {
+					return false;
+				}
 				return true;
 			} else {
 				String oldValue = oldItemdata.get(idb.getId());

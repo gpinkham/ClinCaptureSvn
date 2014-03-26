@@ -215,6 +215,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		if (!StringUtil.isBlank(entityType) && "itemData".equalsIgnoreCase(entityType) && isGroup != 0
 				&& eventCRFId != 0) {
 			int ordinal_for_repeating_group_field = calculateOrdinal(request, isGroup, field, eventCRFId, rowCount);
+			logger.info("*** found entity id: " + entityId);
 			int writeToDBStatus = isWriteToDB(request, isGroup, field, entityId, itemId,
 					ordinal_for_repeating_group_field, eventCRFId);
 			writeToDB = writeToDBStatus != -1 && (writeToDBStatus == 1 || writeToDB);
@@ -941,6 +942,9 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 				note.setEventCRFId(eventCRFId);
 				ItemDataBean itemDataBean = iddao.findByItemIdAndEventCRFIdAndOrdinal(itemId, eventCRFId, ++order);
 				result = !(itemDataBean == null || itemDataBean.getId() == 0);
+			}
+			if (note.getEntityId() == 0) {
+				result = false;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

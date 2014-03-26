@@ -119,7 +119,7 @@ public class UsageStatsServiceDAO extends AbstractDomainDao<LogUsageStatsBean> {
 					parsedStopDate = dateFormat.parse(stopTime);
 				}
 			} catch (ParseException pe) {
-				logger.error("Last OpenClinica stop time from database cannot be parsed");
+				logger.error("Last ClinCapture stop time from database cannot be parsed");
 			}
 			try {
 				if (null != startTime) {
@@ -127,7 +127,7 @@ public class UsageStatsServiceDAO extends AbstractDomainDao<LogUsageStatsBean> {
 					parsedStartDate = dateFormat.parse(startTime);
 				}
 			} catch (ParseException pe) {
-				logger.error("Last OpenClinica start time from database cannot be parsed");
+				logger.error("Last ClinCapture start time from database cannot be parsed");
 			}
 			if ((null != parsedStopDate) && (null != parsedStartDate)) {
 				long diff = (parsedStopDate.getTime()) - (parsedStartDate.getTime());
