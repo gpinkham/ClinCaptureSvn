@@ -685,9 +685,9 @@ Parser.prototype.getLocalOp = function(predicate) {
 		} else if (predicate === 'gt') {
 			return ">";
 		} else if (predicate === 'lte') {
-			return unescape(JSON.parse('"\u2265"'));
-		} else if (predicate === 'gte') {
 			return unescape(JSON.parse('"\u2264"'));
+		} else if (predicate === 'gte') {
+			return unescape(JSON.parse('"\u2265"'));
 		} else if (predicate === 'nct') {
 			return unescape(JSON.parse('"\u2209"'));
 		} else if (predicate === "ct") {
