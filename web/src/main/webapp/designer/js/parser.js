@@ -1213,7 +1213,7 @@ Parser.prototype.setDestinationValue = function(params) {
 	if (act) {
 		for (var x = 0; x < act.destinations.length; x++) {
 			var dest = act.destinations[x];
-			if (dest.id === params.id && !dest.item) {
+			if (parseInt(dest.id) === parseInt(params.id) && !dest.item) {
 				dest.value = params.value;
 				// Only create relevant rows
 				var row = $(".row[id="+ params.id +"]")
@@ -1274,7 +1274,6 @@ Parser.prototype.setDestinations = function(dests) {
 		for (var x = 0; x < dests.length; x++) {
 
 			var div = $("#insert").find(".row").first().clone();			
-
 			var dest = dests[x];
 			var input = div.find(".item");
 			div.attr("id", dest.id);
@@ -1291,6 +1290,10 @@ Parser.prototype.setDestinations = function(dests) {
 					value: $(this).val(),
 					id: $(this).parents(".row").attr("id")
 				});
+			});
+
+			div.find(".glyphicon-remove").click(function() {
+				parser.deleteTarget(this);
 			});
 
 			createDroppable({
@@ -1499,7 +1502,7 @@ Parser.prototype.deleteTarget = function(target) {
 		}
 	} else if ($(target).siblings("input").is(".value")) {
 		var act = this.getInsertAction();
-		var oid = this.constructFormPath($(target).closest(".row").find(".item").text());
+		var oid = this.constructFormPath($(target).closest(".row").find(".item").val());
 		for (var x = 0; x < act.destinations.length; x++) {
 			var dest = act.destinations[x];
 			if (dest.oid === oid) {
