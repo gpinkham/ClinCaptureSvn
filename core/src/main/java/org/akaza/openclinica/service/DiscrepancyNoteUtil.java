@@ -1561,6 +1561,12 @@ public class DiscrepancyNoteUtil {
 		return resolutionStatus;
 	}
 
+	public static void transformSavedRFCToFVC(DiscrepancyNoteBean dn, String detailedNote, Integer resStatusId,
+			DiscrepancyNoteDAO dndao) {
+		transformSavedDNTo(dn, "", "", DiscrepancyNoteType.REASON_FOR_CHANGE.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
+				resStatusId, dndao);
+	}
+	
 	public static void transformSavedAnnotationToFVC(DiscrepancyNoteBean dn, String detailedNote, Integer resStatusId,
 			DiscrepancyNoteDAO dndao) {
 		transformSavedDNTo(dn, "", "", DiscrepancyNoteType.ANNOTATION.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
@@ -1606,6 +1612,11 @@ public class DiscrepancyNoteUtil {
 				resStatusId);
 	}
 
+	public static void transformRFCToFVC(DiscrepancyNoteBean dn, String detailedNote, Integer resStatusId) {
+		transformDNTo(dn, "", "", DiscrepancyNoteType.REASON_FOR_CHANGE.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
+				resStatusId);
+	}
+	
 	private static DiscrepancyNoteBean transformDNTo(DiscrepancyNoteBean dn, String description, String detailedNotes,
 			Integer oldTypeId, Integer typeId, Integer resStatusId) {
 		if (oldTypeId != dn.getDiscrepancyNoteTypeId())

@@ -865,7 +865,9 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 	}
 
 	public static void saveNoteToSubmittedDNsMap(DiscrepancyNoteBean note, HttpServletRequest request) {
-		if (note.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.FAILEDVAL.getId())
+		if (note.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.ANNOTATION.getId()
+				&& note.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()
+				&& note.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.FAILEDVAL.getId())
 			return;
 		HashMap<String, DiscrepancyNoteBean> submittedDNs = (HashMap) request.getSession().getAttribute(
 				SUBMITTED_DNS_MAP);

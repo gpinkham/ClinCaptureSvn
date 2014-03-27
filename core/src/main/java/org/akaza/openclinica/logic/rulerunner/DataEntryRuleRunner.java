@@ -260,7 +260,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 	}
 
 	public static boolean shouldCreateDNForItem(ItemDataBean itemData, HttpServletRequest request) {
-		// some DNs have been already created from Annotations, so we should skip them to prevent duplicating
+		// some DNs have been already transformed from Annotations, so we should skip them to prevent duplicating
 		List<DiscrepancyNoteBean> transformedDNs = (List<DiscrepancyNoteBean>) request.getSession().getAttribute(
 				"transformedSubmittedDNs");
 		if (transformedDNs == null || itemData == null || transformedDNs.isEmpty())
@@ -292,7 +292,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 		
 			String key = getExpressionService().getItemOid(
 					ruleSet.getOriginalTarget().getValue());
-			String itemDataValueFromForm = "";
+			String itemDataValueFromForm;
 			if (variableAndValue.containsKey(key)) {
 				itemDataValueFromForm = variableAndValue.get(key);
 			} else {

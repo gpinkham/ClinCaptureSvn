@@ -27,6 +27,7 @@ import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
@@ -244,6 +245,8 @@ public abstract class DataEntryServlet extends Controller {
 	public static final String ALL_ITEMS_LIST = "all_items_list";
 
 	public static final String CV_INSTANT_META = "cvInstantMeta";
+	
+	private static final String DNS_TO_TRANSFORM = "listOfDNsToTransform";
 
 	@Override
 	protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response)
@@ -1253,9 +1256,9 @@ public abstract class DataEntryServlet extends Controller {
 			if (errors.isEmpty() && shouldRunRules) {
 				// we should transform submitted DNs to FVC, close them and turn off
 				// ruleValidator for corresponding fields
-				transformSubmittedDNsToFVC(ruleValidator, dndao, request);
+				createListOfDNsForTransformation(ruleValidator, dndao, request);
 				// old logic of removing validations from rule validator
-				removeFieldsValidationsForSubmittedDN(ruleValidator, request);
+				//removeFieldsValidationsForSubmittedDN(ruleValidator, request);
 				logger.debug("Errors was empty");
 				if (session.getAttribute("rulesErrors") != null) {
 					// rules have already generated errors, Let's compare old
@@ -1426,7 +1429,7 @@ public abstract class DataEntryServlet extends Controller {
 						currentStudy);
 				AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEW_DATE, fdn, dndao, ecb.getId(), "EventCRF",
 						currentStudy);
-
+				transformSubmittedDNsToFVC(dndao, request);
 				allItems = section.getDisplayItemGroups();
 
 				logger.debug("all items before saving into DB" + allItems.size());
@@ -1924,9 +1927,10 @@ public abstract class DataEntryServlet extends Controller {
 	private void clearSession(HttpServletRequest request) {
 		request.getSession().removeAttribute(CreateDiscrepancyNoteServlet.SUBMITTED_DNS_MAP);
 		request.getSession().removeAttribute(CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS);
+		request.getSession().removeAttribute(DNS_TO_TRANSFORM);
 	}
 
-	private void transformSubmittedDNsToFVC(RuleValidator ruleValidator, DiscrepancyNoteDAO dndao,
+	private void createListOfDNsForTransformation(RuleValidator ruleValidator, DiscrepancyNoteDAO dndao,
 			HttpServletRequest request) {
 		// we should transform submitted DNs to FVC, close them and turn off
 		// ruleValidator for corresponding fields
@@ -1935,7 +1939,12 @@ public abstract class DataEntryServlet extends Controller {
 				CreateDiscrepancyNoteServlet.SUBMITTED_DNS_MAP);
 		if (submittedDNs == null || submittedDNs.isEmpty())
 			return;
-
+		
+		List<DiscrepancyNoteBean> listOfDNsToTransform = (ArrayList<DiscrepancyNoteBean>) request.getSession().getAttribute(
+				DNS_TO_TRANSFORM);
+		if (listOfDNsToTransform ==  null) 
+			listOfDNsToTransform = new ArrayList<DiscrepancyNoteBean>();
+		
 		HashMap ruleErrors = ruleValidator.validate();
 		Set<String> fieldNames = new HashSet(submittedDNs.keySet());
 		fieldNames.retainAll(ruleErrors.keySet());
@@ -1956,16 +1965,59 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		for (String fieldName : fieldNames) {
-			ruleValidator.removeFieldValidations(fieldName);
 			DiscrepancyNoteBean dn = submittedDNs.get(fieldName);
+			// for RFC we need to show validation error-message
+			if (dn.getDiscrepancyNoteTypeId() != DiscrepancyNoteType.REASON_FOR_CHANGE.getId())
+				ruleValidator.removeFieldValidations(fieldName);
+			if ((!transformedSavedDNIds.contains(dn.getId()) && dn.getId() > 0)
+					|| (!transformedUnSavedDNFieldNames.contains(fieldName) && !StringUtil.isBlank(dn.getField()))) {
+				listOfDNsToTransform.add(dn);
+			}
+		}
+
+		request.getSession().setAttribute(DNS_TO_TRANSFORM, listOfDNsToTransform);
+	}
+
+	private void transformSubmittedDNsToFVC(DiscrepancyNoteDAO dndao, HttpServletRequest request) {
+		// we should transform submitted DNs to FVC, close them
+
+		List<DiscrepancyNoteBean> listDNsToTransform = (ArrayList<DiscrepancyNoteBean>) request.getSession().getAttribute(
+				DNS_TO_TRANSFORM);
+		if (listDNsToTransform == null || listDNsToTransform.isEmpty())
+			return;
+		
+		List<DiscrepancyNoteBean> transformedDNs = (List<DiscrepancyNoteBean>) request.getSession().getAttribute(
+				CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS);
+		transformedDNs = transformedDNs == null ? new ArrayList<DiscrepancyNoteBean>() : transformedDNs;
+
+		Set<Integer> transformedSavedDNIds = new HashSet<Integer>();
+		Set<String> transformedUnSavedDNFieldNames = new HashSet<String>();
+		for (DiscrepancyNoteBean dn : transformedDNs) {
+			if (dn.getId() > 0) {
+				// DN is already in DB
+				transformedSavedDNIds.add(dn.getId());
+			} else {
+				// DN is not in DB yet (initial data entry)
+				transformedUnSavedDNFieldNames.add(dn.getField());
+			}
+		}
+		
+		for (DiscrepancyNoteBean dn : listDNsToTransform) {
+			// for RFC we need to show validation error-message
 			if (!transformedSavedDNIds.contains(dn.getId()) && dn.getId() > 0) {
-				DiscrepancyNoteUtil.transformSavedAnnotationToFVC(dn, (String) ruleErrors.get(fieldName),
-						ResolutionStatus.CLOSED.getId(), dndao);
+				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.ANNOTATION.getId())
+					DiscrepancyNoteUtil.transformSavedAnnotationToFVC(dn, "", ResolutionStatus.CLOSED.getId(), dndao);
+				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId())
+					DiscrepancyNoteUtil.transformSavedRFCToFVC(dn, "", ResolutionStatus.CLOSED.getId(), dndao);
 				transformedDNs.add(dn);
-			} else if (!transformedUnSavedDNFieldNames.contains(fieldName) && !StringUtil.isBlank(dn.getField())) {
-				DiscrepancyNoteUtil.transformAnnotationToFVC(dn, (String) ruleErrors.get(fieldName),
-						ResolutionStatus.CLOSED.getId());
-				transformedDNs.add(dn);
+			} else if (!transformedUnSavedDNFieldNames.contains(dn.getField()) && !StringUtil.isBlank(dn.getField())) {
+				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.ANNOTATION.getId()) {
+					DiscrepancyNoteUtil.transformAnnotationToFVC(dn, "", ResolutionStatus.CLOSED.getId());
+					transformedDNs.add(dn);
+				}
+				if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.FAILEDVAL.getId()) {
+					transformedDNs.add(dn);
+				}
 			}
 		}
 
