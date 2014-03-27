@@ -24,7 +24,7 @@ public class ChangeParametersForDNoteServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = -4816885601345300667L;
 	@Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
 		String field = request.getParameter("field");
 		String parameterName = request.getParameter("parameterName");
 		String value = request.getParameter("value");

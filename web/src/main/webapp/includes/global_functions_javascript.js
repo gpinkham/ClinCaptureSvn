@@ -3471,7 +3471,7 @@ function setParameterForDNWithPath(toOverwrite, field, parameterName, value, con
     if (contextPath) {
         $.ajax({
             url: contextPath + '/ChangeParametersForDNote',
-            type: 'GET',
+            type: 'POST',
             data: 'field=' + field + '&parameterName=' + parameterName + '&value=' + value + '&toOverwrite=' + toOverwrite,
             dataType: 'text'
         });
