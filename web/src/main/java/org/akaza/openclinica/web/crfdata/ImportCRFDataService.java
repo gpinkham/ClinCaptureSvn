@@ -290,8 +290,8 @@ public class ImportCRFDataService {
 							// spell out criteria and create a bean if
 							// necessary, avoiding false-positives
 							if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
-									|| studyEventBean.getSubjectEventStatus().equals(
-											SubjectEventStatus.DATA_ENTRY_STARTED)
+									|| studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
+									|| studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED)
 									|| studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
 								EventCRFBean newEventCrfBean = new EventCRFBean();
 								newEventCrfBean.setStudyEventId(studyEventBean.getId());
@@ -492,8 +492,6 @@ public class ImportCRFDataService {
 					// instead work on sections
 					CRFBean crfBean = ((CRFBean) crfDAO.findByPK(crfVersion.getCrfId()));
 
-					// System.out.println("running check on an event bean with seid " + studyEvent.getId() + " and " +
-					// crfBean.getOid());
 					EventCRFBean eventCRFBean = null;
 					ArrayList<EventCRFBean> eventCrfBeans = eventCRFDAO.findAllByStudyEventAndCrfOrCrfVersionOid(
 							studyEvent, crfBean.getOid());
