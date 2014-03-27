@@ -271,6 +271,7 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 				EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
 				preUserId = ec.getOwnerId() > 0 ? ec.getOwnerId() : 0;
 				request.setAttribute("entityCreatedDate", sdf.format(ec.getCreatedDate()));
+				request.setAttribute("eventCrfOwnerId", ec.getOwnerId());
 
 				if (field.isEmpty()) {
 					ItemGroupDAO igdao = new ItemGroupDAO(getDataSource());

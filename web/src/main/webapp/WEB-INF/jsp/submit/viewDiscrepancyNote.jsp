@@ -357,6 +357,11 @@
         <tr>
             <td>        
         		<c:if test="${showDNBox eq 'y'}">
+					<c:forEach var="child" items="${note.value.children}">
+						<c:if test="${child.owner.id != userBean.id}">
+							<c:set var="previousDNUpdaterId" value="${child.owner.id}"/>
+						</c:if>
+					</c:forEach>
 					<div id="ajax-loader_${note.value.id}" style="width: 580; height: 270; display: none;" align="center"><img src="images/ajax-loader-blue.gif"/></div>
 					<div id="divWithData_${note.value.id}">
 						<c:import url="./discrepancyNote.jsp">
@@ -369,6 +374,7 @@
 							<c:param name="boxId" value="box${note.value.id}"/>
 							<c:param name="typeId" value="${note.value.discrepancyNoteTypeId}"/>
 							<c:param name="typeName" value="${note.value.disType.name}"/>
+							<c:param name="previousDNUpdaterId" value="${previousDNUpdaterId}"/>
 						</c:import>
 					</div>
         		</c:if>
@@ -405,6 +411,7 @@
 			<c:param name="isRFC" value="${isRFC}"/>
 			<c:param name="isInError" value="${isInError}"/>
 			<c:param name="strErrMsg" value="${strErrMsg}"/>
+			<c:param name="previousDNUpdaterId" value="${0}"/>
 		</c:import> 
 	</div>
 </c:if>  

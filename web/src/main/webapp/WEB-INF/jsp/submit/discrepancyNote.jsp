@@ -77,8 +77,8 @@ function addText(id,text) {
 					linkColor = '#AA62C6';
 					break
 				case 'green':
-					break
 					linkColor = '#75b894';
+					break
 				default:
 			}
 			a.innerHTML = text;
@@ -199,11 +199,13 @@ $(document).ready(function() {
 <c:set var="displayAll" value="none" />
 <c:set var="discrepancyNote" value="${boxDNMap[parentId]}"/>
 <c:set var="autoView" value=""/>
+<c:set var="previousDNUpdaterId" value="${param.previousDNUpdaterId}"/>
 <c:forEach var="boxDN" items="${boxDNMap}">
 	<c:if test="${parentId==boxDN.key}">
 		<c:set var="discrepancyNote" value="${boxDNMap[boxDN.key]}"/>
 	</c:if>
 </c:forEach>
+
 <c:forEach var="av" items="${autoViews}"> 
 	<c:if test="${parentId==av.key}">
 		<c:set var="autoView" value="${autoViews[av.key]}"/>
@@ -385,13 +387,13 @@ $(document).ready(function() {
 			<div class="dnBoxCol2" class="formfieldL_BG">
 				<div class="formfieldL_BG">
 					<c:choose>
-					<c:when test='${not empty discrepancyNote.assignedUserId and not (discrepancyNote.assignedUserId eq 0)}'>
-						<c:set var="userAccountId1" value="${discrepancyNote.assignedUserId}"/>
+					<c:when test='${not empty previousDNUpdaterId and not (previousDNUpdaterId eq 0)}'>
+						<c:set var="userAccountId1" value="${previousDNUpdaterId}"/>
 					</c:when>
                     <c:when test='${not empty eventCrfOwnerId}'>
                         <c:set var="userAccountId1" value="${eventCrfOwnerId}"/>
                     </c:when>
-					<c:otherwise>
+					<c:otherwise> 
 						<c:set var="userAccountId1" value="0"/>
 					</c:otherwise>
 					</c:choose>
