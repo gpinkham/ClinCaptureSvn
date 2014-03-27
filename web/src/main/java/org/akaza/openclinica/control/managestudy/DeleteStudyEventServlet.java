@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -45,8 +46,7 @@ import org.springframework.stereotype.Component;
 public class DeleteStudyEventServlet extends Controller {
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -74,6 +74,11 @@ public class DeleteStudyEventServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		int studyEventId = fp.getInt("id");// studyEventId
 		int studySubId = fp.getInt("studySubId");// studySubjectId
+
+		if (request.getAttribute("deletedDurringUpdateStudyEvent")!=null){
+			studyEventId = fp.getInt("event_id", true);
+			studySubId = fp.getInt("id", true);
+		}
 
 		StudyEventDAO sedao = new StudyEventDAO(getDataSource());
 		StudySubjectDAO subdao = new StudySubjectDAO(getDataSource());
@@ -138,8 +143,12 @@ public class DeleteStudyEventServlet extends Controller {
 
 				sedao.deleteByPK(event.getId());
 
-				response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
-						+ studySubId);
+				if (request.getAttribute("deletedDurringUpdateStudyEvent")!=null){
+					forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
+				} else {
+					response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
+							+ studySubId);
+				}
 			}
 		}
 	}

@@ -685,6 +685,8 @@ public class Page {
 			"Restore Event to a study");
 	public final static Page DELETE_STUDY_EVENT = new Page(path + "managestudy/deleteStudyEvent.jsp",
 			"Delete Event from a study");
+	public final static Page DELETE_STUDY_EVENT_SERVLET = new Page("/DeleteStudyEvent",
+			"Delete Event from a study servlet");
 
 	public final static Page REMOVE_EVENT_CRF = new Page(path + "managestudy/removeEventCRF.jsp",
 			"Remove CRF from event");

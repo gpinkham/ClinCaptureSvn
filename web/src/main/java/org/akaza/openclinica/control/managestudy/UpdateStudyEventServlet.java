@@ -113,8 +113,7 @@ public class UpdateStudyEventServlet extends Controller {
 	public static final String INPUT_LOCATION = "location";
 
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
@@ -129,8 +128,7 @@ public class UpdateStudyEventServlet extends Controller {
 
 	}
 
-	private void redirectToStudySubjectView(HttpServletRequest request, HttpServletResponse response, int studySubjectId)
-			throws Exception {
+	private void redirectToStudySubjectView(HttpServletRequest request, HttpServletResponse response, int studySubjectId) throws Exception {
 		Map storedAttributes = new HashMap();
 		storedAttributes.put(Controller.PAGE_MESSAGE, request.getAttribute(Controller.PAGE_MESSAGE));
 		request.getSession().setAttribute(BaseController.STORED_ATTRIBUTES, storedAttributes);
@@ -183,10 +181,7 @@ public class UpdateStudyEventServlet extends Controller {
 		if (studySubjectId > 0) {
 			ssub = (StudySubjectBean) ssdao.findByPK(studySubjectId);
 			request.setAttribute("studySubject", ssub);
-			request.setAttribute("id", studySubjectId + "");// for the workflow
-			// box, so it can
-			// link back to view
-			// study subject
+			request.setAttribute("id", studySubjectId + "");// for the workflow box, so it can link back to view study subject
 		}
 
 		Status s = ssub.getStatus();
@@ -228,16 +223,11 @@ public class UpdateStudyEventServlet extends Controller {
 				|| study.getStatus().isPending()) {
 			statuses.remove(SubjectEventStatus.SIGNED);
 		}
-
-		if (!studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.NOT_SCHEDULED)) {
-			statuses.remove(SubjectEventStatus.NOT_SCHEDULED);
-		}
 		if (!studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)) {
 			// can't lock a non-completed CRF, but removed above
 			statuses.remove(SubjectEventStatus.SCHEDULED);
-			// statuses.remove(SubjectEventStatus.SKIPPED);
-			// addl rule: skipped should only be present before data starts
-			// being entered
+			statuses.remove(SubjectEventStatus.NOT_SCHEDULED);
+			// addl rule: skipped should only be present before data starts being entered
 		}
 		if (studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)) {
 			statuses.remove(SubjectEventStatus.SKIPPED);
@@ -285,8 +275,7 @@ public class UpdateStudyEventServlet extends Controller {
 			statuses.remove(SubjectEventStatus.LOCKED);
 		}
 
-		// also, if data entry is started, can't move back to scheduled or not
-		// scheduled
+		// also, if data entry is started, can't move back to scheduled or not scheduled
 		if (studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)) {
 			statuses.remove(SubjectEventStatus.NOT_SCHEDULED);
 			statuses.remove(SubjectEventStatus.SCHEDULED);
@@ -309,6 +298,11 @@ public class UpdateStudyEventServlet extends Controller {
 				studyEvent.setSubjectEventStatus(SubjectEventStatus.LOCKED);
 			} else if (ses == SubjectEventStatus.UNLOCK) {
 				studyEvent.setSubjectEventStatus(studyEvent.getPrevSubjectEventStatus());
+			} else if (ses.equals(SubjectEventStatus.NOT_SCHEDULED)){
+				request.setAttribute("enent_id", studyEventId);
+				request.setAttribute("deletedDurringUpdateStudyEvent", "true");
+				forwardPage(Page.DELETE_STUDY_EVENT_SERVLET, request, response);
+				return;
 			} else {
 				studyEvent.setSubjectEventStatus(ses);
 			}
