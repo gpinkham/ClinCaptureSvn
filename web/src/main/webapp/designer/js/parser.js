@@ -535,11 +535,28 @@ Parser.prototype.isValid = function(expression) {
 		message = "Please specify the rule description";
 	}
 
+	if ($("#chkDiscrepancyText").is(":checked")) {
+		if ($("#discrepancyText").find("textarea").val().length <= 0) {
+			valid = false;
+			message = "A discrepancy action was selected but no discrepancy text has been specified.";
+			$("#discrepancyText").find("textarea").focus();
+		}
+	}
+
+	if ($("#chkEmail").is(":checked")) {
+		if ($("#email").find("textarea").val().length <= 0) {
+			valid = false;
+			message = "Please provide a valid email message";
+			$("#email").find("textarea").focus();
+		}
+	}
+
 	if ($("#chkEmail").is(":checked")) {
 		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		if (!re.test($("#toField").val().trim())) {
 			valid = false;
 			message = "The email address is invalid. Check the email and try again.";
+			$("#toField").focus();
 		}
 	}
 
