@@ -633,11 +633,17 @@ function createDroppable(params) {
 			} else if (parser.isNumber(ui.draggable)) {
 				handleNumberDrop(params.element);
 			} else if (parser.isEmpty(ui.draggable)) {
-				params.element.append('""');				
+				params.element.append('""');
 			} else if (parser.isCurrentDate(ui.draggable)) {
 				params.element.append(" _CURRENT_DATE");
 			} else {
-				params.element.append(ui.draggable.text());
+				if (ui.draggable.text() == "<") {
+					params.element.append("&lt;");
+				} else if (ui.draggable.text() == ">") {
+					params.element.append("&gt;");
+				} else {
+					params.element.append(ui.draggable.text());
+				}
 			}
 
 			params.element.tooltip("hide");
