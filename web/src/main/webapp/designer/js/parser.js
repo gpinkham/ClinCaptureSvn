@@ -90,7 +90,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			// Target
 			var target = Object.create(null);
 			target.name = params.ui.draggable.text();
-			target.evt = $("div[id=events]").find(".selected").find("td").last().text();
+			target.evt = $("div[id=events]").find(".selected").find("td[oid]").attr("oid");
 			target.eventify = params.element.siblings("span").find(".target").is(":checked");
 			this.rule.targets.push(target);
 			//Reset UI
@@ -830,7 +830,7 @@ Parser.prototype.findStudyItem = function(params) {
 				}
 			}
 		} else {
-			var selectedEvent = $("div[id=events]").find(".selected").find("td").last().text();
+			var selectedEvent = $("div[id=events]").find(".selected").find("td[oid]").attr("oid");
 			if (evt.oid === selectedEvent) {
 				for (var c in evt.crfs) {
 					var crf = evt.crfs[c];
@@ -1453,7 +1453,7 @@ Parser.prototype.selectTarget = function() {
 			study: this.extractStudy(this.rule.study)
 		});
 		if (item) {
-			var row = $("td:contains(" + study.oid + ")");
+			var row = $("td[oid=" + study.oid + "]");
 			if (row) {
 				$("tr.selected").each(function() {
 					$(this).removeClass("selected");
@@ -1469,21 +1469,19 @@ Parser.prototype.selectTarget = function() {
 				this.recursiveSelect({
 					type: "crf",
 					click: true,
-					selector: true,
 					candidate: item.formOid
 				});
 				// CRF version
 				this.recursiveSelect({
 					click: true,
 					type: "version",
-					selector: true,
 					candidate: item.crfVersionOid
 				});
 				// Item
 				this.recursiveSelect({
 					click: false,
 					type: "items",
-					candidate: item.name
+					candidate: item.oid
 				});
 			}
 		}
@@ -1759,7 +1757,7 @@ Parser.prototype.eventify = function(targetEvent) {
 		var tar = this.rule.targets[x];
 		if (tar.name === targetName) {
 			tar.eventify = $(targetEvent).is(":checked");
-			tar.evt = $("div[id=events]").find(".selected").find("td").last().text();
+			tar.evt = $("div[id=events]").find(".selected").find("td[oid]").attr("oid");
 			break;
 		}
 	}
@@ -1771,39 +1769,21 @@ Parser.prototype.isEventified = function(expression) {
 
 // This function is a bit involved - consider refactoring
 Parser.prototype.recursiveSelect = function(params) {
-	var next = $("div[id="+ params.type + "]").find("a:contains(" + unescape(JSON.parse('"\u00BB\u00BB"')) + ")");
-	if (params.selector) {
-		if ($("td[oid=" + params.candidate + "]").length > 0) {
-			$("td:contains(" + params.candidate + ")").parent().addClass("selected");
-		} else {
-			if ($(".pagination").length > 0) {
-				next[0].click();
-				if ($("td[oid=" + params.candidate + "]").length == 0) {
-					next[0].click();
-				} else {
-					$("td[oid=" + params.candidate + "]").parent().addClass("selected");
-				}
-			}
-		}
-		if (params.click) {
-			$("td[oid=" + params.candidate + "]").parent().click();
-		}
+	var next = $("div[id=" + params.type + "]").find("a:contains(" + unescape(JSON.parse('"\u00BB\u00BB"')) + ")");
+	if ($("td[oid=" + params.candidate + "]").length > 0) {
+		$("td[oid=" + params.candidate + "]").parent().addClass("selected");
 	} else {
-		if ($("td:contains(" + params.candidate + ")").length > 0) {
-			$("td:contains(" + params.candidate + ")").parent().addClass("selected");
-		} else {
-			if ($(".pagination").length > 0) {
+		if ($(".pagination").length > 0) {
+			next[0].click();
+			if ($("td[oid=" + params.candidate + "]").length == 0) {
 				next[0].click();
-				if ($("td:contains(" + params.candidate + ")").length == 0) {
-					next[0].click();
-				} else {
-					$("td:contains(" + params.candidate + ")").parent().addClass("selected");
-				}
+			} else {
+				$("td[oid=" + params.candidate + "]").parent().addClass("selected");
 			}
 		}
-		if (params.click) {
-			$("td:contains(" + params.candidate + ")").parent().click();
-		}
+	}
+	if (params.click) {
+		$("td[oid=" + params.candidate + "]").parent().click();
 	}
 }
 

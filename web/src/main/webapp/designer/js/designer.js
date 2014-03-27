@@ -823,7 +823,7 @@ function loadStudies(studies) {
 	$("div[id='studies']").find("table").remove();
 	if (studies) {
 		// Table headers
-		var table = createTable(['Name', 'OID', 'Identifier']);
+		var table = createTable(['Name', 'Identifier']);
 		for (var x = 0; x < studies.length; x++) {
 			var study = studies[x];
 			var tr = $("<tr>");
@@ -851,14 +851,12 @@ function loadStudies(studies) {
 
 			var tdName = $("<td>");
 			tdName.text(study.name);
-			var tdOID = $("<td>");
-			tdOID.text(study.oid);
+			tdName.attr("oid", study.oid);
 
 			var tdIdentifier = $("<td>");
 			tdIdentifier.text(study.identifier);
 
 			tr.append(tdName);
-			tr.append(tdOID);
 			tr.append(tdIdentifier);
 			itemArr.push(tr);
 		}
@@ -904,7 +902,7 @@ function loadStudyEvents(study) {
 	var itemArr = [];
 	$("div[id='events']").find("table").remove();
 	if (study.events) {
-		var eventTable = createTable(['Name', 'Description', 'Identifier']);
+		var eventTable = createTable(['Name', 'Description']);
 		for (var x = 0; x < study.events.length; x++) {
 
 			var studyEvent = study.events[x];
@@ -930,6 +928,8 @@ function loadStudyEvents(study) {
 
 			var tdName = $("<td>");
 			tdName.text(studyEvent.name);
+			tdName.attr("oid", studyEvent.oid);
+
 			var tdDescription = $("<td>");
 			if (studyEvent.description) {
 				if (studyEvent.description.length > 25) {
@@ -944,12 +944,8 @@ function loadStudyEvents(study) {
 					tdDescription.text(studyEvent.description);
 				}
 			}
-
-			var tdIdentifier = $("<td>");
-			tdIdentifier.text(studyEvent.oid);
 			tr.append(tdName);
 			tr.append(tdDescription);
-			tr.append(tdIdentifier);
 			itemArr.push(tr);
 		}
 
@@ -983,7 +979,7 @@ function loadEventCRFs(params) {
 	var itemArr = [];
 	$("div[id='crfs']").find("table").remove();
 	if (params.studyEvent && params.studyEvent.crfs) {
-		var crfTable = createTable(['Name', 'Identifier', 'Description']);
+		var crfTable = createTable(['Name', 'Description']);
 		for (var cf = 0; cf < params.studyEvent.crfs.length; cf++) {
 			var crf = params.studyEvent.crfs[cf];
 			var tr = $("<tr>");
@@ -1008,6 +1004,7 @@ function loadEventCRFs(params) {
 
 			var tdName = $("<td>");
 			tdName.text(crf.name);
+			tdName.attr("oid", crf.oid);
 			var tdDescription = $("<td>");
 			if (crf.description) {
 				if (crf.description.length > 25) {
@@ -1021,26 +1018,7 @@ function loadEventCRFs(params) {
 					tdDescription.text(crf.description);
 				}
 			}
-			var tdOID = $("<td>");
-			if (crf.oid) {
-				if (crf.oid.length > 7) {
-					tdOID.text(crf.oid.slice(0, 7) + "...");
-					tdOID.tooltip({
-						placement: "top",
-						container: "body",
-						title: crf.oid
-					});
-
-				} else {
-					tdOID.text(crf.oid);
-				}
-			}
-			tdOID.attr("oid", crf.oid);
-
-			var tdVersion = $("<td>");
-			tdVersion.text(crf.version);
-			tr.append(tdName);
-			tr.append(tdOID);
+			tr.append(tdName); 
 			tr.append(tdDescription);
 			itemArr.push(tr);
 		}
@@ -1068,7 +1046,7 @@ function loadCRFVersions(params) {
 	var itemArr = [];
 	$("div[id='versions']").find("table").remove();
 	if (params.crf.versions) {
-		var versionTable = createTable(['Name', 'Identifier']);
+		var versionTable = createTable(['Name']);
 		for (var ver = 0; ver < params.crf.versions.length; ver++) {
 			var version = params.crf.versions[ver];
 			var tr = $("<tr>");
@@ -1090,23 +1068,9 @@ function loadCRFVersions(params) {
 
 			var tdName = $("<td>");
 			tdName.text(version.name);
-			var tdOID = $("<td>");
-			if (version.oid) {
-				if (version.oid.length > 7) {
-					tdOID.text(version.oid.slice(0, 7) + "...");
-					tdOID.tooltip({
-						placement: "top",
-						container: "body",
-						title: version.oid
-					});
-				} else {
-					tdOID.text(version.oid);
-				}
-			}
-			tdOID.attr("oid", version.oid);
+			tdName.attr("oid", version.oid);
 
 			tr.append(tdName);
-			tr.append(tdOID);
 			itemArr.push(tr);
 		}
 
@@ -1275,13 +1239,11 @@ function resetStudy(params) {
 		// bold crf
 		parser.recursiveSelect({
 			type: "crf",
-			selector: true,
 			candidate: topEvent.crfs[Object.keys(topEvent.crfs)[0]].oid
 		});
 		loadCRFVersionItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0]);
 		// bold crf version
 		parser.recursiveSelect({
-			selector: true,
 			type: "version",
 			candidate: topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0].oid
 		});
