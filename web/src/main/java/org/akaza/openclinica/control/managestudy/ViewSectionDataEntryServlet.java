@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -19,16 +19,6 @@
  * copyright 2003-2005 Akaza Research
  */
 package org.akaza.openclinica.control.managestudy;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -77,12 +67,21 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 /**
- *  View a CRF version section data entry
- *  
+ * View a CRF version section data entry
+ *
  * @author jxu
  */
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 @Component
 public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
@@ -100,7 +99,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		
+
 		mayAccess(request);
 		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 		StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
@@ -114,33 +113,35 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_study_contact_sysadmin"), request);
+						+ respage.getString("change_study_contact_sysadmin"), request
+		);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+
 		FormProcessor fp = new FormProcessor(request);
 
-        request.setAttribute("expandCrfInfo", false);
+		request.setAttribute("expandCrfInfo", false);
 
 		String cw = request.getParameter("cw");
 		if (cw != null) {
 			request.setAttribute(JUST_CLOSE_WINDOW, true);
 		} else {
 			String referer = request.getHeader(REFERER);
-			if (referer != null && !referer.contains(VIEW_SECTION_DATA_ENTRY) && !referer.contains(RESOLVE_DISCREPANCY)) {
+			if (referer != null && !referer.contains(VIEW_SECTION_DATA_ENTRY) && !referer
+					.contains(RESOLVE_DISCREPANCY)) {
 				request.getSession().setAttribute(VIEW_SECTION_DATA_ENTRY_REFERER, referer);
 			}
 		}
 
-        SimpleDateFormat local_df = getLocalDf(request);
+		SimpleDateFormat local_df = getLocalDf(request);
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
 		SectionBean sb;
-        EventCRFBean ecb;
+		EventCRFBean ecb;
 		boolean isSubmitted = false;
 		EventDefinitionCRFBean edcb;
 
@@ -164,7 +165,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		request.setAttribute("crfListPage", fp.getString("crfListPage"));
 
 		request.setAttribute("eventId", fp.getString("eventId"));
-		
+
 		int sedId = fp.getInt("sedId");
 		request.setAttribute("sedId", sedId + "");
 		int crfId = fp.getInt("crfId");
@@ -179,11 +180,13 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		int eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
 		EventDefinitionCRFDAO eventCrfDao = getEventDefinitionCRFDAO();
 		edcb = (EventDefinitionCRFBean) eventCrfDao.findByPK(eventDefinitionCRFId);
-		if (eventCRFId == 0
-				&& (edcb.getStudyId() != currentStudy.getParentStudyId() && edcb.getStudyId() != currentStudy.getId())) {
+
+		List<Integer> studyIds = new ArrayList<Integer>(getStudyDAO().findAllSiteIdsByStudy(currentStudy));
+		if (eventCRFId == 0 && !studyIds.contains(edcb.getStudyId())) {
 			addPageMessage(
 					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_study_contact_sysadmin"), request);
+							+ respage.getString("change_study_contact_sysadmin"), request
+			);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 		}
 
@@ -199,8 +202,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		// for a particular event
 		session.removeAttribute("presetValues");
 
-        ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
+		EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 		SectionDAO sdao = new SectionDAO(getDataSource());
 		String age = "";
 		if (sectionId == 0 && crfVersionId == 0 && eventCRFId == 0) {
@@ -214,9 +217,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			request.setAttribute("studySubject", sub);
 		}
 
-        List<DiscrepancyNoteBean> allNotes;
-        List<DiscrepancyNoteBean> eventCrfNotes;
-        List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
+		List<DiscrepancyNoteBean> allNotes;
+		List<DiscrepancyNoteBean> eventCrfNotes;
+		List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
 
 		if (eventCRFId > 0) {
 			// for event crf, the input crfVersionId from url =0
@@ -242,9 +245,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 
 			allNotes = dndao.findAllTopNotesByEventCRF(eventCRFId);
-			
+
 			allNotes = extractCoderNotes(allNotes, request);
-			
+
 			// add interviewer.jsp related notes to this Collection
 			eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
 			if (!eventCrfNotes.isEmpty()) {
@@ -257,12 +260,12 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 			noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
 
-            List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
+			List<SectionBean> allSections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
 			DiscrepancyShortcutsAnalyzer.prepareDnShortcutLinks(request, ecb, ifmdao, eventDefinitionCRFId,
 					allSections, noteThreads);
 
 			DisplayTableOfContentsBean displayBean = getDisplayBean(ecb);
-			
+
 			Date tmpDate = displayBean.getEventCRF().getDateInterviewed();
 			String formattedInterviewerDate;
 			try {
@@ -450,13 +453,13 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 							currentStudy);
 
 					ArrayList childItems = dib.getChildren();
-                    for (Object childItem : childItems) {
-                        DisplayItemBean child = (DisplayItemBean) childItem;
-                        inputName = getInputName(child);
-                        AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(),
-                                "ItemData", currentStudy);
+					for (Object childItem : childItems) {
+						DisplayItemBean child = (DisplayItemBean) childItem;
+						inputName = getInputName(child);
+						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(),
+								"ItemData", currentStudy);
 
-                    }
+					}
 				}
 			}
 
@@ -531,7 +534,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		return true;
 	}
 
-	 /** 
+	/**
 	 * @see org.akaza.openclinica.control.submit.DataEntryServlet#validateDisplayItemBean
 	 * (org.akaza.openclinica.core.form.Validator, org.akaza.openclinica.bean.submit.DisplayItemBean)
 	 */
@@ -578,9 +581,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 	/**
 	 * Current User may access a requested event CRF in the current user's studies
-	 * 
-	 * @param request
-	 *            TODO
+	 *
+	 * @param request TODO
 	 */
 
 	private void setAttributeForInterviewerDNotes(List<DiscrepancyNoteBean> eventCrfNotes, HttpServletRequest request) {
