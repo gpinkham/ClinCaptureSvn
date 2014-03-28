@@ -94,7 +94,7 @@ public class EmailActionProcessorTest {
 		emailActionProcessor1 = Mockito.mock(EmailActionProcessor.class);
 		Mockito.when(
 				emailActionProcessor1.execute(RuleRunner.RuleRunnerMode.DATA_ENTRY, ExecutionMode.SAVE,
-						emailActionBean, itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, map))
+						emailActionBean, itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, true, map))
 				.thenCallRealMethod();
 		mimeMessage = Mockito.mock(MimeMessage.class);
 		mailSender = Mockito.mock(JavaMailSenderImpl.class);
@@ -108,7 +108,7 @@ public class EmailActionProcessorTest {
 		emailActionProcessor2 = Mockito.mock(EmailActionProcessor.class);
 		Mockito.when(
 				emailActionProcessor2.execute(RuleRunner.RuleRunnerMode.DATA_ENTRY, ExecutionMode.SAVE,
-						emailActionBean, itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, map))
+						emailActionBean, itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, true, map))
 				.thenCallRealMethod();
 		Whitebox.setInternalState(emailActionProcessor2, "discrepancyNoteService", customDiscrepancyNoteService);
 		Whitebox.setInternalState(emailActionProcessor2, "ruleActionRunLogDao", ruleActionRunLogDao);
@@ -122,7 +122,7 @@ public class EmailActionProcessorTest {
 		emailActionProcessorResult = false;
 		PowerMockito.when(EmailEngine.getAdminEmail()).thenReturn("");
 		emailActionProcessor1.execute(RuleRunner.RuleRunnerMode.DATA_ENTRY, ExecutionMode.SAVE, emailActionBean,
-				itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, map);
+				itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, true, map);
 		assertTrue(emailActionProcessorResult);
 	}
 
@@ -131,7 +131,7 @@ public class EmailActionProcessorTest {
 		emailActionProcessorResult = false;
 		PowerMockito.when(EmailEngine.getAdminEmail()).thenReturn("admin@test.com");
 		emailActionProcessor2.execute(RuleRunner.RuleRunnerMode.DATA_ENTRY, ExecutionMode.SAVE, emailActionBean,
-				itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, map);
+				itemDataBean, DiscrepancyNoteBean.ITEM_DATA, studyBean, ub, true, map);
 		assertFalse(emailActionProcessorResult);
 	}
 }
