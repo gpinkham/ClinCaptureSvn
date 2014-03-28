@@ -186,7 +186,7 @@
 				<td>
 					<h1>
 						<span class="first_level_header"> 
-						<c:out value="${studySubject.label}" />&nbsp;&nbsp;
+						<fmt:message key="subject_ID" bundle="${resword}"/>: <c:out value="${studySubject.label}" />&nbsp;&nbsp;
 						</span>
 					</h1>
 				</td>
