@@ -1,12 +1,12 @@
 /*******************************************************************************
  * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the Lesser GNU General Public License along with this program.  
  \* If not, see <http://www.gnu.org/licenses/>. Modified by Clinovo Inc 01/29/2013.
  ******************************************************************************/
@@ -26,7 +26,12 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -35,7 +40,11 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.managestudy.ListEventsForSubjectTableFactory;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.util.SubjectLabelNormalizer;
 import org.akaza.openclinica.view.Page;
@@ -48,12 +57,12 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 @Component
@@ -97,6 +106,7 @@ public class CreateNewStudyEventServlet extends Controller {
 	private void processEvents(JSONArray eventDefs, String eventDivId, int studyEventId,
 			StudyEventDefinitionBean definition, StudySubjectBean studySubject, StudyEventDAO sed,
 			String pageToShowPopup, int selectedEventDefId) throws Exception {
+		
 		String eventCRFDivId;
 		JSONObject jsonObject = null;
 		JSONArray eventIds = null;
@@ -127,9 +137,7 @@ public class CreateNewStudyEventServlet extends Controller {
 					for (EventDefinitionCRFBean eventDefBean : (ArrayList<EventDefinitionCRFBean>) getEventDefinitionCRFDAO()
 							.findAllActiveByEventDefinitionId(definition.getId())) {
 
-						eventCRFDivId = "Event_" + SubjectLabelNormalizer.normalizeSubjectLabel(studySubject.getLabel()) + "_"
-								+ eventDefBean.getId() + "_";
-
+						eventCRFDivId = "Event_" + SubjectLabelNormalizer.normalizeSubjectLabel(studySubject.getLabel()) + "_" + eventDefBean.getId() + "_";
 						eventIds = new JSONArray();
 						eventIds.put(studyEventId);
 						jsonObject = new JSONObject();
@@ -177,7 +185,6 @@ public class CreateNewStudyEventServlet extends Controller {
 		int studyEventDefinitionId = fp.getInt(INPUT_STUDY_EVENT_DEFINITION);
 
 		StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
-
 		String pageToShowPopup = fp.getString(INPUT_PAGE_TO_SHOW_POPUP);
 		int selectedEventDefId = fp.getInt(INPUT_SELECTED_EVENT_DEF_ID);
 		String eventCRFId = fp.getString(INPUT_EVENT_CRF_ID);
@@ -197,8 +204,7 @@ public class CreateNewStudyEventServlet extends Controller {
 		String returnScheduledEvenContent = request.getParameter("returnScheduledEvenContent");
 		if (returnScheduledEvenContent != null) {
 
-			String eventDiv = getEventDivForScheduledEvent(request, pageToShowPopup, returnScheduledEvenContent,
-					selectedEventDefId, eventCRFId, eventDefintionCRFId);
+			String eventDiv = getEventDivForScheduledEvent(request, pageToShowPopup, returnScheduledEvenContent, selectedEventDefId, eventCRFId, eventDefintionCRFId);
 			response.setContentType("text/html");
 			response.getWriter().write(eventDiv);
 			getServletContext().getRequestDispatcher("/WEB-INF/jsp/include/changeTheme.jsp").include(request, response);
@@ -216,8 +222,8 @@ public class CreateNewStudyEventServlet extends Controller {
 			Status s = ssb.getStatus();
 			if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
 				addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be")
-								+ resterm.getString("added") + "."
-								+ respage.getString("study_subject_has_been_deleted"), request);
+						+ resterm.getString("added") + "."
+						+ respage.getString("study_subject_has_been_deleted"), request);
 				request.setAttribute("id", Integer.toString(studySubjectId));
 				forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
 			}
@@ -225,7 +231,6 @@ public class CreateNewStudyEventServlet extends Controller {
 		}
 
 		// TODO: make this sensitive to permissions
-
 		StudyBean studyWithEventDefinitions = currentStudy;
 		if (currentStudy.getParentStudyId() > 0) {
 			studyWithEventDefinitions = new StudyBean();
@@ -241,17 +246,12 @@ public class CreateNewStudyEventServlet extends Controller {
 		} else {
 			StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
 			StudyEventDAO sedao = getStudyEventDAO();
-			eventDefinitions = selectNotStartedOrRepeatingSortedEventDefs(ssb, studyWithEventDefinitions.getId(),
-					seddao, sgcdao, sedao);
+			eventDefinitions = selectNotStartedOrRepeatingSortedEventDefs(ssb, studyWithEventDefinitions.getId(), seddao, sgcdao, sedao);
 		}
 		eventDefinitionsScheduled = eventDefinitions;
-
 		SimpleDateFormat local_df = getLocalDf(request);
-
 		if (!fp.isSubmitted()) {
-
 			HashMap presetValues = new HashMap();
-
 			presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", -1);
 			presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", -1);
 			presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
@@ -282,11 +282,9 @@ public class CreateNewStudyEventServlet extends Controller {
 
 			if (ssb != null && ssb.isActive()) {
 				presetValues.put(INPUT_STUDY_SUBJECT, ssb);
-
 				String requestStudySubject = (String) request.getAttribute(INPUT_REQUEST_STUDY_SUBJECT);
 				if (requestStudySubject != null) {
 					presetValues.put(INPUT_REQUEST_STUDY_SUBJECT, requestStudySubject);
-
 					dateValue = local_df.format(new Date());
 					presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
 				}
@@ -328,15 +326,13 @@ public class CreateNewStudyEventServlet extends Controller {
 			}
 			Date[] endScheduled = new Date[ADDITIONAL_SCHEDULED_NUM];
 
-			discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(
-					AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+			discNotes = (FormDiscrepancyNotes) request.getSession().getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 			if (discNotes == null) {
 				discNotes = new FormDiscrepancyNotes();
 				request.getSession().setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 			}
-			DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()),
-					discNotes);
-
+			
+			DiscrepancyValidator v = new DiscrepancyValidator(new ValidatorHelper(request, getConfigurationDao()), discNotes);
 			String strStart = fp.getDateTimeInputString(INPUT_STARTDATE_PREFIX);
 			if (!strStart.equals("")) {
 				v.addValidation(INPUT_STARTDATE_PREFIX, Validator.IS_DATE_TIME);
@@ -365,15 +361,13 @@ public class CreateNewStudyEventServlet extends Controller {
 
 			boolean hasScheduledEvent = false;
 			for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
-				if (!StringUtil.isBlank(fp
-						.getString(CreateNewStudyEventServlet.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]))) {
+				if (!StringUtil.isBlank(fp.getString(CreateNewStudyEventServlet.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]))) {
 
 					v.addValidation(CreateNewStudyEventServlet.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i],
 							Validator.ENTITY_EXISTS_IN_STUDY, seddao, studyWithEventDefinitions);
 					if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
 						v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.NO_BLANKS);
-						v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.LENGTH_NUMERIC_COMPARISON,
-								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+						v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
 						v.alwaysExecuteLastValidation(INPUT_SCHEDULED_LOCATION[i]);
 					}
 					v.addValidation(INPUT_STARTDATE_PREFIX_SCHEDULED[i], Validator.IS_DATE_TIME);
@@ -399,20 +393,14 @@ public class CreateNewStudyEventServlet extends Controller {
 				Validator.addError(errors, INPUT_LOCATION, restext.getString("not_a_valid_location"));
 			}
 
-			StudyEventDefinitionBean definition = (StudyEventDefinitionBean) seddao.findByPK(fp
-					.getInt(INPUT_STUDY_EVENT_DEFINITION));
-
-			StudySubjectBean studySubject = sdao.findByLabelAndStudy(fp.getString(INPUT_STUDY_SUBJECT_LABEL),
-					currentStudy);
+			StudyEventDefinitionBean definition = (StudyEventDefinitionBean) seddao.findByPK(fp.getInt(INPUT_STUDY_EVENT_DEFINITION));
+			StudySubjectBean studySubject = sdao.findByLabelAndStudy(fp.getString(INPUT_STUDY_SUBJECT_LABEL), currentStudy);
 			// what if we are sent here from AddNewSubjectServlet.java??? we need to get that study subject bean
 			if (request.getAttribute(INPUT_STUDY_SUBJECT) != null) {
 				studySubject = (StudySubjectBean) request.getAttribute(INPUT_STUDY_SUBJECT);
 			}
 			if (studySubject.getLabel().equals("")) {
-				// add an error here, tbh
-				System.out.println("tripped the error here 20091109");
-				Validator.addError(errors, INPUT_STUDY_SUBJECT,
-						respage.getString("must_enter_subject_ID_for_identifying"));
+				Validator.addError(errors, INPUT_STUDY_SUBJECT, respage.getString("must_enter_subject_ID_for_identifying"));
 			}
 
 			if (!subjectMayReceiveStudyEvent(getStudyEventDAO(), definition, studySubject)) {
@@ -427,13 +415,10 @@ public class CreateNewStudyEventServlet extends Controller {
 					int pk = fp.getInt(INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]);
 					if (pk > 0) {
 						StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(pk);
-						System.out.println("scheduled def:" + pk + " " + INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]
-								+ " " + sedb.getName());
 						definitionScheduleds.add(sedb);
 						scheduledDefinitionIds[i] = pk;
 						if (!subjectMayReceiveStudyEvent(getStudyEventDAO(), sedb, studySubject)) {
-							Validator.addError(errors, INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i],
-									restext.getString("not_added_since_event_not_repeating"));
+							Validator.addError(errors, INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i], restext.getString("not_added_since_event_not_repeating"));
 						}
 					} else {
 						definitionScheduleds.add(new StudyEventDefinitionBean());
@@ -471,8 +456,7 @@ public class CreateNewStudyEventServlet extends Controller {
 						prevStartPrefix = prevStart == -1 ? INPUT_STARTDATE_PREFIX
 								: INPUT_STARTDATE_PREFIX_SCHEDULED[prevStart];
 						Date prevStartDate = prevStart == -1 ? this.getInputStartDate(fp) : this
-								.getInputStartDateScheduled(fp,
-										Integer.parseInt(prevStartPrefix.charAt(prevStartPrefix.length() - 1) + ""));
+								.getInputStartDateScheduled(fp, Integer.parseInt(prevStartPrefix.charAt(prevStartPrefix.length() - 1) + ""));
 						if (fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date").equals(
 								fp.getString(prevStartPrefix + "Date"))) {
 							// if in same day, only check when both have time
@@ -499,8 +483,7 @@ public class CreateNewStudyEventServlet extends Controller {
 						if (!fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date").equals(
 								fp.getString(prevEndPrefix + "Date"))) {
 							if (endScheduled[i].before(startScheduled[i])) {
-								Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i], resexception
-										.getString("input_provided_not_occure_after_previous_start_date_time"));
+								Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i], resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
 							}
 						} else {
 							// if in same date, only check when both had time
@@ -509,8 +492,7 @@ public class CreateNewStudyEventServlet extends Controller {
 									&& fp.timeEntered(INPUT_ENDDATE_PREFIX_SCHEDULED[i])) {
 								if (endScheduled[i].before(startScheduled[i])
 										|| endScheduled[i].equals(startScheduled[i])) {
-									Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i], resexception
-											.getString("input_provided_not_occure_after_previous_start_date_time"));
+									Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i], resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
 								}
 							}
 						}
@@ -520,10 +502,8 @@ public class CreateNewStudyEventServlet extends Controller {
 
 			if (!errors.isEmpty()) {
 				logger.info("we have errors; number of this; " + errors.size());
-				System.out.println("found request study subject: " + fp.getString(INPUT_REQUEST_STUDY_SUBJECT));
 				addPageMessage(respage.getString("errors_in_submission_see_below"), request);
 				setInputMessages(errors, request);
-
 				fp.addPresetValue(INPUT_STUDY_EVENT_DEFINITION, definition);
 				fp.addPresetValue(INPUT_STUDY_SUBJECT, studySubject);
 				fp.addPresetValue(INPUT_STUDY_SUBJECT_LABEL, fp.getString(INPUT_STUDY_SUBJECT_LABEL));
@@ -538,9 +518,8 @@ public class CreateNewStudyEventServlet extends Controller {
 				prefixes[1] = INPUT_ENDDATE_PREFIX;
 				int b = ADDITIONAL_SCHEDULED_NUM + 2;
 				System.arraycopy(INPUT_STARTDATE_PREFIX_SCHEDULED, 0, prefixes, 2, b - 2);
-				System.arraycopy(INPUT_ENDDATE_PREFIX_SCHEDULED, b - b, prefixes, b, ADDITIONAL_SCHEDULED_NUM + b - b);
+				System.arraycopy(INPUT_ENDDATE_PREFIX_SCHEDULED, 0, prefixes, b, ADDITIONAL_SCHEDULED_NUM + b - b);
 				fp.setCurrentDateTimeValuesAsPreset(prefixes);
-
 				if (hasScheduledEvent) {
 					for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 						fp.addPresetValue(INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i], definitionScheduleds.get(i));
@@ -560,15 +539,13 @@ public class CreateNewStudyEventServlet extends Controller {
 					forwardPage(Page.CREATE_NEW_STUDY_EVENT, request, response);
 				}
 			} else {
-				System.out.println("error is empty");
+				
 				StudyEventDAO sed = getStudyEventDAO();
-
 				StudyEventBean studyEvent = new StudyEventBean();
 				studyEvent.setStudyEventDefinitionId(definition.getId());
 				studyEvent.setStudySubjectId(studySubject.getId());
 
-				if ("-1".equals(getInputStartHour(fp)) && "-1".equals(getInputStartMinute(fp))
-						&& "".equals(getInputStartHalf(fp))) {
+				if ("-1".equals(getInputStartHour(fp)) && "-1".equals(getInputStartMinute(fp)) && "".equals(getInputStartHalf(fp))) {
 					studyEvent.setStartTimeFlag(false);
 				} else {
 					studyEvent.setStartTimeFlag(true);
@@ -581,8 +558,7 @@ public class CreateNewStudyEventServlet extends Controller {
 					startScheduled2[i] = getInputStartDateScheduled(fp, i);
 				}
 				if (!"".equals(strEnd)) {
-					if ("-1".equals(getInputEndHour(fp)) && "-1".equals(getInputEndMinute(fp))
-							&& "".equals(getInputEndHalf(fp))) {
+					if ("-1".equals(getInputEndHour(fp)) && "-1".equals(getInputEndMinute(fp)) && "".equals(getInputEndHalf(fp))) {
 						studyEvent.setEndTimeFlag(false);
 					} else {
 						studyEvent.setEndTimeFlag(true);
@@ -593,9 +569,7 @@ public class CreateNewStudyEventServlet extends Controller {
 				studyEvent.setStatus(Status.AVAILABLE);
 				studyEvent.setLocation(fp.getString(INPUT_LOCATION));
 				studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
-
 				studyEvent.setSampleOrdinal(sed.getMaxSampleOrdinal(definition, studySubject) + 1);
-
 				studyEvent = (StudyEventBean) sed.create(studyEvent);
 
 				if (!studyEvent.isActive()) {
@@ -604,7 +578,8 @@ public class CreateNewStudyEventServlet extends Controller {
 				addPageMessage(
 						restext.getString("X_event_wiht_definition") + definition.getName()
 								+ restext.getString("X_and_subject") + studySubject.getName()
-								+ respage.getString("X_was_created_succesfully"), request);
+								+ respage.getString("X_was_created_succesfully"), request
+				);
 
 				// save discrepancy notes into DB
 				FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) request.getSession().getAttribute(
@@ -621,7 +596,9 @@ public class CreateNewStudyEventServlet extends Controller {
 							+ SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel)
 							+ "_"
 							+ definition.getId()
-							+ (pageToShowPopup.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName()) ? "ev" : "") 
+							+ (pageToShowPopup.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName()) ?
+							"ev" :
+							"")
 							+ "_";
 					processEvents(eventDefs, eventDivId, studyEvent.getId(), definition, studySubject, sed,
 							pageToShowPopup, selectedEventDefId);
@@ -665,8 +642,7 @@ public class CreateNewStudyEventServlet extends Controller {
 								studyEventScheduled.setLocation(fp.getString(INPUT_SCHEDULED_LOCATION[i]));
 								studyEventScheduled.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 
-								studyEventScheduled.setSampleOrdinal(sed.getMaxSampleOrdinal(
-										definitionScheduleds.get(i), studySubject) + 1);
+								studyEventScheduled.setSampleOrdinal(sed.getMaxSampleOrdinal(definitionScheduleds.get(i), studySubject) + 1);
 								studyEventScheduled = (StudyEventBean) sed.create(studyEventScheduled);
 								if (!studyEventScheduled.isActive()) {
 									throw new OpenClinicaException(
@@ -684,7 +660,10 @@ public class CreateNewStudyEventServlet extends Controller {
 									String eventDivId = "Event_"
 											+ SubjectLabelNormalizer.normalizeSubjectLabel(popupSubjectLabel) + "_"
 											+ scheduledDefinitionIds[i]
-											+ (pageToShowPopup.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName()) ? "ev" : "")
+											+ (pageToShowPopup
+											.equalsIgnoreCase(Page.LIST_EVENTS_FOR_SUBJECTS_SERVLET.getFileName()) ?
+											"ev" :
+											"")
 											+ "_";
 									processEvents(eventDefs, eventDivId, studyEventScheduled.getId(),
 											(StudyEventDefinitionBean) seddao.findByPK(scheduledDefinitionIds[i]),
@@ -708,7 +687,6 @@ public class CreateNewStudyEventServlet extends Controller {
 
 				request.getSession().removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 				request.setAttribute(EnterDataForStudyEventServlet.INPUT_EVENT_ID, String.valueOf(studyEvent.getId()));
-				response.encodeRedirectURL("EnterDataForStudyEvent?eventId=" + studyEvent.getId());
 
 				if (popupQuery) {
 					response.setContentType("application/json");
@@ -717,7 +695,8 @@ public class CreateNewStudyEventServlet extends Controller {
 					jsonObject.put("pageMessages", pageMessages);
 					response.getWriter().write(jsonObject.toString());
 				} else {
-					forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET, request, response);
+					response.sendRedirect(request.getContextPath() + Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET.getFileName() + "?eventId=" + studyEvent.getId()
+					);
 				}
 			}
 		}
@@ -753,11 +732,11 @@ public class CreateNewStudyEventServlet extends Controller {
 			studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubject, sed);
 			Collections.reverse(studyEvents);
 
-			return factory
-					.eventDivBuilder(subject, rowCount, studyEvents, studyEvents.size(), sed, studySubject,
+			return factory.eventDivBuilder(subject, rowCount, studyEvents, studyEvents.size(), sed, studySubject,
 							((StringUtil.isBlank(eventCRFId) || eventCRFId.equalsIgnoreCase("undefined")) ? null
 									: eventCRFId), ((StringUtil.isBlank(eventDefintionCRFId) || eventDefintionCRFId
-									.equalsIgnoreCase("undefined")) ? null : eventDefintionCRFId), true);
+									.equalsIgnoreCase("undefined")) ? null : eventDefintionCRFId), true
+					);
 
 		} else {
 
@@ -785,19 +764,15 @@ public class CreateNewStudyEventServlet extends Controller {
 			Collections.reverse(studyEvents);
 
 			return factory.eventDivBuilder(subject, rowCount, studyEvents, sed, studySubject, request.getLocale());
-
 		}
 	}
 
 	@Override
-	protected void mayProceed(HttpServletRequest request, HttpServletResponse response)
-			throws InsufficientPermissionException {
+	protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
-
 		String exceptionName = resexception.getString("no_permission_to_add_new_study_event");
-		String noAccessMessage = respage.getString("not_create_new_event") + " "
-				+ respage.getString("change_study_contact_sysadmin");
+		String noAccessMessage = respage.getString("not_create_new_event") + " " + respage.getString("change_study_contact_sysadmin");
 
 		if (SubmitDataServlet.maySubmitData(ub, currentRole)) {
 			return;
@@ -813,13 +788,10 @@ public class CreateNewStudyEventServlet extends Controller {
 	 * <li>The study event definition is repeating; or
 	 * <li>The subject does not yet have a study event for the given study event definition
 	 * </ul>
-	 * 
-	 * @param sedao
-	 *            StudyEventDAO
-	 * @param studyEventDefinition
-	 *            The definition of the study event which is to be added for the subject.
-	 * @param studySubject
-	 *            The subject for which the study event is to be added.
+	 *
+	 * @param sedao                StudyEventDAO
+	 * @param studyEventDefinition The definition of the study event which is to be added for the subject.
+	 * @param studySubject         The subject for which the study event is to be added.
 	 * @return <code>true</code> if the subject may receive an additional study event, <code>false</code> otherwise.
 	 */
 	public static boolean subjectMayReceiveStudyEvent(StudyEventDAO sedao,
@@ -881,40 +853,30 @@ public class CreateNewStudyEventServlet extends Controller {
 
 	public static ArrayList<StudyEventDefinitionBean> selectNotStartedOrRepeatingSortedEventDefs(StudySubjectBean ssb,
 			int parentStudyId, StudyEventDefinitionDAO seddao, StudyGroupClassDAO sgcdao, StudyEventDAO sedao) {
-		/*
-		 * notStarted or repeating eventDefs ordered like on Subject Matrix
-		 */
-
+		
 		ArrayList<StudyEventDefinitionBean> result = new ArrayList<StudyEventDefinitionBean>();
-
 		Map<Integer, StudyEventBean> StudyEventDefinitionIdToStudyEvent = new HashMap<Integer, StudyEventBean>();
 		ArrayList<StudyEventBean> studyEvents = sedao.findAllByStudySubject(ssb);
 		for (StudyEventBean studyEvent : studyEvents) {
 			StudyEventDefinitionIdToStudyEvent.put(studyEvent.getStudyEventDefinitionId(), studyEvent);
 		}
 
-		StudyGroupClassBean defaultStudyGroupClassBean = (StudyGroupClassBean) sgcdao
-				.findDefaultByStudyId(parentStudyId);
-		boolean defaultStudyGroupClassBeanExist = defaultStudyGroupClassBean == null
-				|| defaultStudyGroupClassBean.getId() == 0 ? false : true;
+		StudyGroupClassBean defaultStudyGroupClassBean = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(parentStudyId);
+		boolean defaultStudyGroupClassBeanExist = !(defaultStudyGroupClassBean == null || defaultStudyGroupClassBean.getId() == 0);
 
-		ArrayList<StudyGroupClassBean> allActiveDynGroupClasses = sgcdao
-				.findAllActiveDynamicGroupsByStudyId(parentStudyId);
+		ArrayList<StudyGroupClassBean> allActiveDynGroupClasses = sgcdao.findAllActiveDynamicGroupsByStudyId(parentStudyId);
 		Collections.sort(allActiveDynGroupClasses, StudyGroupClassBean.comparatorForDynGroupClasses);
 
 		// ordered eventDefs from dynGroups
 		if (defaultStudyGroupClassBeanExist || ssb.getDynamicGroupClassId() != 0) {
 			for (StudyGroupClassBean dynGroup : allActiveDynGroupClasses) {
-				ArrayList<StudyEventDefinitionBean> orderedEventDefinitionsFromDynGroup = seddao
-						.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId());
+				ArrayList<StudyEventDefinitionBean> orderedEventDefinitionsFromDynGroup = seddao.findAllAvailableAndOrderedByStudyGroupClassId(dynGroup.getId());
 				for (StudyEventDefinitionBean eventDefinition : orderedEventDefinitionsFromDynGroup) {
 					if (dynGroup.isDefault()
 							|| (ssb.getDynamicGroupClassId() != 0 && dynGroup.getId() == ssb.getDynamicGroupClassId())) {
 						// eventDefs from defDynGroup and subject's dynGroup
 						if (StudyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())) {
-							if (StudyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus()
-									.isNotScheduled()
-									|| eventDefinition.isRepeating()) {
+							if (StudyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus().isNotScheduled() || eventDefinition.isRepeating()) {
 								result.add(eventDefinition);
 							}
 						} else {
@@ -938,9 +900,7 @@ public class CreateNewStudyEventServlet extends Controller {
 		for (Object anEventDefinitionsNotFromDynGroup : eventDefinitionsNotFromDynGroup) {
 			StudyEventDefinitionBean eventDefinition = (StudyEventDefinitionBean) anEventDefinitionsNotFromDynGroup;
 			if (StudyEventDefinitionIdToStudyEvent.keySet().contains(eventDefinition.getId())) {
-				if (StudyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus()
-						.isNotScheduled()
-						|| eventDefinition.isRepeating()) {
+				if (StudyEventDefinitionIdToStudyEvent.get(eventDefinition.getId()).getSubjectEventStatus().isNotScheduled() || eventDefinition.isRepeating()) {
 					notStartedAndRepeatingEventDefinitions.add(eventDefinition);
 				}
 			} else {
