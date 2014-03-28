@@ -264,7 +264,14 @@ function resetTable(params) {
 	params.table.find("tbody > tr").remove();
 	var alphaArr = params.arr[currentPageIndex]
 	for (var chunk in alphaArr) {
-		var tr = alphaArr[chunk]
+		var tr = alphaArr[chunk];
+		$(tr).find("td").toArray().map(function(x) {
+			if (!$(x).is(".ui-draggable")) {
+				createDraggable({
+					element: $(x)
+				});
+			}
+		});
 		params.table.find("tbody").append(tr);
 	}
 	if (params.pagination) {
