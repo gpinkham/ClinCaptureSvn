@@ -23,9 +23,13 @@ package org.akaza.openclinica.control.admin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -43,6 +47,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
+
+import com.clinovo.util.UserAccountUtil;
 
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
@@ -71,9 +77,23 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		FormProcessor fp = new FormProcessor(request);
 
 		UserAccountDAO udao = getUserAccountDAO();
+		StudyDAO sdao = getStudyDAO();
 		EntityBeanTable table = fp.getEntityBeanTable();
-
-		ArrayList allUsers = getAllUsers(udao);
+		UserAccountBean currentUser = getUserAccountBean(request);
+		List<StudyBean> studyListCurrentUserHasAccessTo = sdao.findAllActiveStudiesWhereUserHasRole(currentUser.getName());
+		List<UserAccountBean> allUsers = getAllUsers(udao);
+		ListIterator<UserAccountBean> iterateUser;
+	
+		if (!currentUser.getName().equals(UserAccountBean.ROOT)) {
+			iterateUser = allUsers.listIterator();
+			while (iterateUser.hasNext()) {
+				if (!UserAccountUtil.doesUserHaveRoleInStydies(iterateUser.next(),
+						studyListCurrentUserHasAccessTo, sdao)) {
+					iterateUser.remove();			
+				}
+			}
+		}
+		
 		setStudyNamesInStudyUserRoles(allUsers);
 
 		for (Object allUser : allUsers) {
@@ -93,12 +113,11 @@ public class ListUserAccountsServlet extends RememberLastPage {
 			}
 			userRolesRemovedCountMap.put(uab.getName(), removedRolesCount);
 		}
-
-		StudyDAO sdao = getStudyDAO();
+		
 		StudyBean sb = (StudyBean) sdao.findByPK(((UserAccountBean) (request.getSession().getAttribute("userBean")))
 				.getActiveStudyId());
 
-		ArrayList allUserRows = UserAccountRow.generateRowsFromBeans(allUsers);
+		ArrayList allUserRows = UserAccountRow.generateRowsFromBeans((ArrayList) allUsers);
 
 		String[] columns = { resword.getString("user_name"), resword.getString("user_type"),
 				resword.getString("first_name"), resword.getString("last_name"), resword.getString("status"),
@@ -130,8 +149,8 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		forwardPage(Page.LIST_USER_ACCOUNTS, request, response);
 	}
 
-	private ArrayList getAllUsers(UserAccountDAO udao) {
-		return (ArrayList) udao.findAll();
+	private List<UserAccountBean> getAllUsers(UserAccountDAO udao) {
+		return (ArrayList<UserAccountBean>) udao.findAll();
 	}
 
 	/**
@@ -140,7 +159,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 	 * @param users
 	 *            The users to display in the table of users. Each element is a UserAccountBean.
 	 */
-	private void setStudyNamesInStudyUserRoles(ArrayList users) {
+	private void setStudyNamesInStudyUserRoles(List<UserAccountBean> users) {
 		StudyDAO sdao = getStudyDAO();
 		ArrayList allStudies = (ArrayList) sdao.findAll();
 		HashMap studiesById = new HashMap();
@@ -186,15 +205,17 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
 		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
 		String eblSortAscending = fp.getString("ebl_sortAscending");
-		return "?submitted=1&module=" + fp.getString("module") + "&ebl_page=1&ebl_sortColumnInd="
-				+ (!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0") + "&ebl_sortAscending="
-				+ (!eblSortAscending.isEmpty() ? eblSortAscending : "1") + "&ebl_filtered="
-				+ (!eblFiltered.isEmpty() ? eblFiltered : "0") + "&ebl_filterKeyword="
-				+ (!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "") + "&&ebl_paginated=1";
+		return new StringBuilder("").append("?submitted=1&module=").append(fp.getString("module"))
+				.append("&ebl_page=1&ebl_sortColumnInd=").append((!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0"))
+				.append("&ebl_sortAscending=").append((!eblSortAscending.isEmpty() ? eblSortAscending : "1"))
+				.append("&ebl_filtered=").append((!eblFiltered.isEmpty() ? eblFiltered : "0"))
+				.append("&ebl_filterKeyword=").append((!eblFilterKeyword.isEmpty() ? eblFilterKeyword : ""))
+				.append("&&ebl_paginated=1").toString();
 	}
 
 	@Override
 	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
 		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 	}
+	
 }

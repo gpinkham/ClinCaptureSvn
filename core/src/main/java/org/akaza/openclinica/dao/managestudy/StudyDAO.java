@@ -605,6 +605,37 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		return al;
 	}
 
+	public List<StudyBean> findAllActiveStudiesWhereUserHasRole(String username) {
+		this.unsetTypeExpected();
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), username);
+		variables.put(new Integer(2), username);
+		List<HashMap> alist = this.select(digester.getQuery("findAllActiveStudiesWhereUserHasRole"), variables);
+		List<StudyBean> al = new ArrayList<StudyBean>();
+		Iterator<HashMap> it = alist.iterator();
+		while (it.hasNext()) {
+			StudyBean eb = (StudyBean) this.getEntityFromHashMap(it.next());
+			al.add(eb);
+		}
+		return al;
+	}
+	
+	public List<StudyBean> findAllActiveWhereUserHasRole(String username) {
+		this.unsetTypeExpected();
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), username);
+		List<HashMap> alist = this.select(digester.getQuery("findAllActiveWhereUserHasRole"), variables);
+		List<StudyBean> al = new ArrayList<StudyBean>();
+		Iterator<HashMap> it = alist.iterator();
+		while (it.hasNext()) {
+			StudyBean eb = (StudyBean) this.getEntityFromHashMap(it.next());
+			al.add(eb);
+		}
+		return al;
+	}
+
 	public ArrayList findAllByStatus(Status status) {
 		this.unsetTypeExpected();
 		this.setTypesExpected();
@@ -649,18 +680,18 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		return al;
 	}
 
-    public Collection findAllNotRemoved() {
-        this.setTypesExpected();
-        String sql = digester.getQuery("findAllNotRemoved");
-        ArrayList alist = this.select(sql);
-        ArrayList al = new ArrayList();
-        Iterator it = alist.iterator();
-        while (it.hasNext()) {
-            StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
-            al.add(eb);
-        }
-        return al;
-    }
+	public Collection findAllNotRemoved() {
+		this.setTypesExpected();
+		String sql = digester.getQuery("findAllNotRemoved");
+		ArrayList alist = this.select(sql);
+		ArrayList al = new ArrayList();
+		Iterator it = alist.iterator();
+		while (it.hasNext()) {
+			StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
+		}
+		return al;
+	}
 
 	public Collection findAllParents() {
 		this.setTypesExpected();
@@ -708,6 +739,21 @@ public class StudyDAO extends AuditableEntityDAO implements IStudyDAO {
 		Iterator it = alist.iterator();
 		while (it.hasNext()) {
 			StudyBean eb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+			al.add(eb);
+		}
+		return al;
+
+	}
+
+	public List<StudyBean> findAllByParentAndActive(int parentStudyId) {
+		this.setTypesExpected();
+		HashMap variables = new HashMap();
+		variables.put(new Integer(1), new Integer(parentStudyId));
+		List<HashMap> alist = this.select(digester.getQuery("findAllByParentAndActive"), variables);
+		List<StudyBean> al = new ArrayList<StudyBean>();
+		Iterator<HashMap> it = alist.iterator();
+		while (it.hasNext()) {
+			StudyBean eb = (StudyBean) this.getEntityFromHashMap(it.next());
 			al.add(eb);
 		}
 		return al;

@@ -69,11 +69,22 @@
                 </sql>
         </query>
         <query>
-                <name>findAllByUser</name>
-                <sql>SELECT s.* FROM study s, study_user_role sur
-           WHERE sur.user_name = ?
-           AND s.study_id=sur.study_id
-         </sql>
+			<name>findAllByParentAndActive</name>
+			<sql>
+				SELECT * 
+				FROM study 
+				WHERE parent_study_id = ?
+				AND status_id NOT IN (5,7) 
+				ORDER BY name
+			</sql>
+		</query>
+        <query>
+        	<name>findAllByUser</name>
+            <sql>
+            	SELECT s.* FROM study s, study_user_role sur
+          		WHERE sur.user_name = ?
+           		AND s.study_id=sur.study_id
+         	</sql>
         </query>
         <!-- YW 10-18-2007 find studies belonging to a user whose study user role status is not removed or auto-removed -->
         <query>
@@ -86,6 +97,37 @@
                 AND sur.status_id != 7
             </sql>
         </query>
+        <query>
+			<name>findAllActiveWhereUserHasRole</name>
+			<sql>
+	            SELECT s.* FROM study s, study_user_role sur
+	            WHERE sur.user_name = ?
+	            AND s.study_id = sur.study_id
+	            AND s.status_id NOT IN (5,7)
+	        </sql>
+		</query>
+        <query>
+			<name>findAllActiveStudiesWhereUserHasRole</name>
+			<sql>
+				SELECT *
+				FROM study
+				WHERE study.study_id IN (SELECT DISTINCT s.parent_study_id 
+											FROM study s, study_user_role sur
+											WHERE sur.user_name = ?
+											AND s.study_id = sur.study_id
+											AND s.parent_study_id IS NOT NULL
+											AND sur.status_id NOT IN (5,7)
+											AND s.status_id NOT IN (5,7)) 
+					OR study.study_id IN (SELECT s.study_id 
+											FROM study s, study_user_role sur
+											WHERE sur.user_name = ?
+											AND (s.study_id = sur.study_id OR (sur.study_id IS NULL AND sur.role_name = 'system administrator'))
+											AND s.parent_study_id IS NULL
+											AND sur.status_id NOT IN (5,7)
+											AND s.status_id NOT IN (5,7))
+				ORDER BY study.name
+	        </sql>
+		</query>
         <query>
                 <name>updateStepOne</name>
                 <sql>UPDATE STUDY SET PARENT_STUDY_ID=?, NAME=?, official_title=?, UNIQUE_IDENTIFIER=?,

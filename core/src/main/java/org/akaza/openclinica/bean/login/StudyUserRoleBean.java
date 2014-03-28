@@ -277,4 +277,9 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 	public void setCanCode(boolean canCode) {
 		this.canCode = canCode;
 	}
+	
+	public boolean isStudyLevelRole() {
+		return this.role == Role.SYSTEM_ADMINISTRATOR || this.role == Role.STUDY_ADMINISTRATOR
+				|| this.role == Role.STUDY_MONITOR || this.role == Role.STUDY_CODER;
+	}
 }

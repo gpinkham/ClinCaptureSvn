@@ -21,6 +21,7 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
+
 import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -42,8 +43,10 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,7 +54,7 @@ import java.util.Map;
  * 
  * @author ssachs
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({ "rawtypes", "serial" })
 @Component
 public class CreateUserAccountServlet extends Controller {
 
@@ -88,14 +91,14 @@ public class CreateUserAccountServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 
 		StudyDAO sdao = getStudyDAO();
-		ArrayList<StudyBean> all = (ArrayList<StudyBean>) sdao.findAllNotRemoved();
-		ArrayList<StudyBean> finalList = new ArrayList<StudyBean>();
+		List<StudyBean> all = sdao.findAllActiveStudiesWhereUserHasRole(ub.getName());
+		
+		List<StudyBean> finalList = new ArrayList<StudyBean>();
 		for (StudyBean sb : all) {
-			if (!(sb.getParentStudyId() > 0)) {
-				finalList.add(sb);
-				finalList.addAll(sdao.findAllByParent(sb.getId()));
-			}
+			finalList.add(sb);
+			finalList.addAll(sdao.findAllByParentAndActive(sb.getId()));
 		}
+		
 		addEntityList("studies", finalList, respage.getString("a_user_cannot_be_created_no_study_as_active"),
 				Page.ADMIN_SYSTEM, request, response);
 
@@ -294,17 +297,17 @@ public class CreateUserAccountServlet extends Controller {
 	private void sendNewAccountEmail(HttpServletRequest request, UserAccountBean createdUserAccountBean,
 			String password, String studyName) throws Exception {
 		logger.info("Sending account creation notification to " + createdUserAccountBean.getName());
-		String body = "<html><body>";
-		body += resword.getString("dear") + " " + createdUserAccountBean.getFirstName() + " "
-				+ createdUserAccountBean.getLastName() + ",<br><br>";
-		body += restext.getString("a_new_user_account_has_been_created_for_you") + "<br><br>";
-		body += resword.getString("user_name") + ": " + createdUserAccountBean.getName() + "<br>";
-		body += resword.getString("password") + ": " + password + "<br><br>";
-		body += restext.getString("please_test_your_login_information_and_let") + "<br>";
-		body += SQLInitServlet.getSystemURL();
-		body += " . <br><br> ";
-		body += respage.getString("best_system_administrator").replace("{0}", studyName);
-		body += "</body></html>";
+		String body = new StringBuilder("").append("<html><body>").append(resword.getString("dear")).append(" ")
+				.append(createdUserAccountBean.getFirstName()).append(" ").append(createdUserAccountBean.getLastName())
+				.append(",<br><br>").append(restext.getString("a_new_user_account_has_been_created_for_you"))
+				.append("<br><br>").append(resword.getString("user_name")).append(": ")
+				.append(createdUserAccountBean.getName()).append("<br>").append(resword.getString("password"))
+				.append(": ").append(password).append("<br><br>")
+				.append(restext.getString("please_test_your_login_information_and_let")).append("<br>")
+				.append(SQLInitServlet.getSystemURL()).append(" . <br><br> ")
+				.append(respage.getString("best_system_administrator").replace("{0}", studyName))
+				.append("</body></html>").toString();
+
 		sendEmail(createdUserAccountBean.getEmail().trim(), restext.getString("your_new_openclinica_account"), body,
 				false, request);
 	}

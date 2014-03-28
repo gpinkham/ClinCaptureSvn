@@ -25,10 +25,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -46,6 +49,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
+
+import com.clinovo.util.UserAccountUtil;
 
 /**
  * Processes request to assign a user to a study
@@ -83,7 +88,7 @@ public class AssignUserToStudyServlet extends Controller {
 		StudyBean currentStudy = getCurrentStudy(request);
 
 		String action = request.getParameter("action");
-		ArrayList users = findUsers(currentStudy);
+		ArrayList users = findUsers(request);
 		String nextListPage = request.getParameter("next_list_page");
 		if (StringUtil.isBlank(action) || (nextListPage != null && nextListPage.equalsIgnoreCase("true"))) {
 			FormProcessor fp = new FormProcessor(request);
@@ -266,10 +271,12 @@ public class AssignUserToStudyServlet extends Controller {
 	 * 
 	 * @return currentStudy StudyBean
 	 */
-	private ArrayList findUsers(StudyBean currentStudy) {
+	private ArrayList findUsers(HttpServletRequest request) {
 
-		UserAccountDAO udao = new UserAccountDAO(getDataSource());
-		StudyDAO sdao = new StudyDAO(getDataSource());
+		UserAccountBean currentUser = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountDAO udao = getUserAccountDAO();
+		StudyDAO sdao = getStudyDAO();
 		StudyBean site;
 		StudyBean study;
 		List<UserAccountBean> userAvailable = new ArrayList<UserAccountBean>();
@@ -277,6 +284,8 @@ public class AssignUserToStudyServlet extends Controller {
 		String notes;
 		boolean hasRoleInCurrentStudy;
 		boolean hasRoleWithStatusRemovedInCurrentStudy;
+		List<StudyBean> studyListCurrentUserHasAccessTo = sdao.findAllActiveStudiesWhereUserHasRole(currentUser.getName());
+		ListIterator<UserAccountBean> iterateUser;
 
 		if (currentStudy.getParentStudyId() > 0) {
 			userListbyRoles = (ArrayList<UserAccountBean>) udao.findAllByRole(
@@ -284,6 +293,14 @@ public class AssignUserToStudyServlet extends Controller {
 		} else {
 			userListbyRoles = (ArrayList<UserAccountBean>) udao.findAllByRole(Role.STUDY_ADMINISTRATOR.getName(),
 					Role.STUDY_MONITOR.getName());
+		}
+		
+		iterateUser = userListbyRoles.listIterator();
+		while (iterateUser.hasNext()) {
+			if (!UserAccountUtil.doesUserHaveRoleInStydies(iterateUser.next(),
+					studyListCurrentUserHasAccessTo, sdao)) {
+				iterateUser.remove();				
+			}
 		}
 
 		for (UserAccountBean accountBean : userListbyRoles) {
@@ -305,12 +322,15 @@ public class AssignUserToStudyServlet extends Controller {
 				} else if (currentStudy.getParentStudyId() > 0 && !roleBean.getStatus().equals(Status.DELETED)) {
 					site = (StudyBean) sdao.findByPK(roleBean.getStudyId());
 					study = (StudyBean) sdao.findByPK(site.getParentStudyId());
-					notes = notes + roleBean.getRole().getDescription() + respage.getString("in_site") + ": "
-							+ site.getName() + "," + respage.getString("in_the_study") + ": " + study.getName() + "; ";
+					notes = new StringBuilder("").append(notes).append(roleBean.getRole().getDescription())
+							.append(respage.getString("in_site")).append(": ").append(site.getName()).append(",")
+							.append(respage.getString("in_the_study")).append(": ").append(study.getName())
+							.append("; ").toString();
 				} else if (currentStudy.getParentStudyId() == 0 && !roleBean.getStatus().equals(Status.DELETED)) {
 					study = (StudyBean) sdao.findByPK(roleBean.getStudyId());
-					notes = notes + roleBean.getRole().getDescription() + respage.getString("in_the_study") + ": "
-							+ study.getName() + "; ";
+					notes = new StringBuilder("").append(notes).append(roleBean.getRole().getDescription())
+							.append(respage.getString("in_the_study")).append(": ").append(study.getName())
+							.append("; ").toString();
 				}
 
 			}
@@ -336,18 +356,20 @@ public class AssignUserToStudyServlet extends Controller {
 
 	private String sendEmail(UserAccountBean u, StudyBean currentStudy, StudyUserRoleBean sub) throws Exception {
 		logger.info("Sending email...");
-		String body = u.getFirstName() + " " + u.getLastName() + "(" + resword.getString("username") + ": "
-				+ u.getName() + ") " + respage.getString("has_been_assigned_to_the_study") + currentStudy.getName()
-				+ " " + resword.getString("as") + " \"" + sub.getRole().getDescription() + "\". ";
 
 		if (currentStudy.getParentStudyId() > 0) {
-			body = u.getFirstName() + " " + u.getLastName() + "(" + resword.getString("username") + ": " + u.getName()
-					+ ") " + respage.getString("has_been_assigned_to_the_site") + currentStudy.getName()
-					+ " under the Study " + currentStudy.getParentStudyName() + " " + resword.getString("as") + " \""
-					+ sub.getRole().getDescription() + "\". ";
+			return new StringBuilder("").append(u.getFirstName()).append(" ").append(u.getLastName()).append("(")
+					.append(resword.getString("username")).append(": ").append(u.getName()).append(") ")
+					.append(respage.getString("has_been_assigned_to_the_site")).append(currentStudy.getName())
+					.append(" under the Study ").append(currentStudy.getParentStudyName()).append(" ")
+					.append(resword.getString("as")).append(" \"").append(sub.getRole().getDescription())
+					.append("\". ").toString();
+		} else {
+			return new StringBuilder("").append(u.getFirstName()).append(" ").append(u.getLastName()).append("(")
+					.append(resword.getString("username")).append(": ").append(u.getName()).append(") ")
+					.append(respage.getString("has_been_assigned_to_the_study")).append(currentStudy.getName())
+					.append(" ").append(resword.getString("as")).append(" \"").append(sub.getRole().getDescription())
+					.append("\". ").toString();
 		}
-
-		return body;
-
 	}
 }

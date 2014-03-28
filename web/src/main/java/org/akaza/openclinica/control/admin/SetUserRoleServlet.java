@@ -34,7 +34,6 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -45,7 +44,7 @@ import java.util.List;
  *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
  *         Code Templates
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
+@SuppressWarnings({ "serial" })
 public class SetUserRoleServlet extends SecureController {
 
 	@Override
@@ -68,38 +67,23 @@ public class SetUserRoleServlet extends SecureController {
 		FormProcessor fp = new FormProcessor(request);
 		int userId = fp.getInt("userId");
 		String pageIsChanged = request.getParameter("pageIsChanged");
+		UserAccountBean userLoggedInSystem = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+		List<StudyBean> finalStudyListNotHaveRole;
+		List<StudyBean> studyListRoleCanBeAssignedTo;
+		List<StudyBean> studyListWithRoleAssigned;
+		List<StudyBean> siteListByParent;
+		boolean isStudyLevelUser;
+		
 		if (pageIsChanged != null) {
 			request.setAttribute("pageIsChanged", pageIsChanged);
 		}
+		
 		if (userId == 0) {
 			addPageMessage(respage.getString("please_choose_a_user_to_set_role_for"));
 			forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
 		} else {
 			String action = request.getParameter("action");
 			UserAccountBean user = (UserAccountBean) udao.findByPK(userId);
-			ArrayList<StudyBean> studies = (ArrayList) sdao.findAllNotRemoved();
-			ArrayList<StudyBean> studiesHaveRole = (ArrayList) sdao.findAllByUser(user.getName());
-			studies.removeAll(studiesHaveRole);
-			HashSet<StudyBean> studiesNotHaveRole = new HashSet<StudyBean>();
-			HashSet<StudyBean> sitesNotHaveRole = new HashSet<StudyBean>();
-			for (StudyBean study1 : studies) {
-
-				// TODO: implement equal() according to id
-				boolean hasStudy = false;
-				for (StudyBean study2 : studiesHaveRole) {
-					if (study2.getId() == study1.getId()) {
-						hasStudy = true;
-						break;
-					}
-				}
-				if (!hasStudy) {
-					if (study1.getParentStudyId() > 0) {
-						sitesNotHaveRole.add(study1);
-					} else {
-						studiesNotHaveRole.add(study1);
-					}
-				}
-			}
 
 			Boolean changeRoles = request.getParameter("changeRoles") != null
 					&& Boolean.parseBoolean(request.getParameter("changeRoles"));
@@ -107,50 +91,30 @@ public class SetUserRoleServlet extends SecureController {
 			request.setAttribute("roles", Role.roleMapWithDescriptions);
 			request.setAttribute("studyId", studyId);
 
-			// Re-order studiesNotHaveRole so that sites
-			// under their studies;
-			List<Integer> cantAddRoleForStudies = new ArrayList<Integer>();
-			List<Integer> excludeSitesForStudies = new ArrayList<Integer>();
-			ArrayList<StudyUserRoleBean> userRolesBean = user.getRoles();
-			for (StudyUserRoleBean userRoleBean : userRolesBean) {
-				StudyBean studyBean = (StudyBean) sdao.findByPK(userRoleBean.getStudyId());
-				if (studyBean.getParentStudyId() == 0) {
-					excludeSitesForStudies.add(userRoleBean.getStudyId());
-				}
-				if (studyBean.getParentStudyId() != 0 && !excludeSitesForStudies.contains(userRoleBean.getStudyId())) {
-					cantAddRoleForStudies.add(studyBean.getParentStudyId());
-				}
-			}
-
 			if ("confirm".equalsIgnoreCase(action) || changeRoles) {
-				ArrayList finalStudiesNotHaveRole = new ArrayList();
-				for (StudyBean s : studiesNotHaveRole) {
-					if (!excludeSitesForStudies.contains(s.getId())) {
-						finalStudiesNotHaveRole.add(s);
-					}
-					for (StudyBean site : sitesNotHaveRole) {
-						if (site.getParentStudyId() == s.getId()) {
-							if (!excludeSitesForStudies.contains(site.getParentStudyId())) {
-								finalStudiesNotHaveRole.add(site);
-							}
+				
+				studyListRoleCanBeAssignedTo = sdao.findAllActiveStudiesWhereUserHasRole(userLoggedInSystem.getName());
+				studyListWithRoleAssigned = sdao.findAllActiveWhereUserHasRole(user.getName());
+				isStudyLevelUser = user.getRoles().get(0).isStudyLevelRole();
+				
+				if (isStudyLevelUser) {
+					studyListRoleCanBeAssignedTo.removeAll(studyListWithRoleAssigned);
+					finalStudyListNotHaveRole = studyListRoleCanBeAssignedTo;
+				} else {
+					finalStudyListNotHaveRole = new ArrayList<StudyBean>();
+					for (StudyBean sb: studyListRoleCanBeAssignedTo) {
+						siteListByParent = sdao.findAllByParentAndActive(sb.getId());
+						siteListByParent.removeAll(studyListWithRoleAssigned);
+						if(!siteListByParent.isEmpty()) {
+							finalStudyListNotHaveRole.add(sb);
+							finalStudyListNotHaveRole.addAll(siteListByParent);
 						}
 					}
 				}
 
-				StudyBean studyBean = studyId > 0 ? (StudyBean) sdao.findByPK(studyId) : (finalStudiesNotHaveRole
-						.size() > 0 ? (StudyBean) finalStudiesNotHaveRole.get(0) : null);
-				if (studyBean != null) {
-					if (studyBean.getParentStudyId() == 0 && cantAddRoleForStudies.contains(studyBean.getId())) {
-						String message = resexception
-								.getString("error.toAddRoleForTheStudyRemoveTheSiteLevelRoleFirst");
-						addPageMessage(message.replace("{0}", studyBean.getName()));
-					}
-				}
-
-				request.setAttribute("isThisStudy", ((StudyBean) sdao.findByPK(studyId)).getParentStudyId() == 0);
-
 				request.setAttribute("user", user);
-				request.setAttribute("studies", finalStudiesNotHaveRole);
+				request.setAttribute("isStudyLevelUser", isStudyLevelUser);
+				request.setAttribute("studies", finalStudyListNotHaveRole);
 				StudyUserRoleBean uRole = new StudyUserRoleBean();
 				uRole.setFirstName(user.getFirstName());
 				uRole.setLastName(user.getLastName());
@@ -159,40 +123,36 @@ public class SetUserRoleServlet extends SecureController {
 
 				forwardPage(Page.SET_USER_ROLE);
 			} else {
-				StudyBean studyBean = (StudyBean) sdao.findByPK(studyId);
-				if (!cantAddRoleForStudies.contains(studyBean.getId())) {
-					// set role
-					String userName = fp.getString("name");
-					studyId = fp.getInt("studyId");
-					StudyBean userStudy = (StudyBean) sdao.findByPK(studyId);
-					int roleId = fp.getInt("roleId");
-					// new user role
-					StudyUserRoleBean sur = new StudyUserRoleBean();
-					sur.setName(userName);
-					sur.setRole(Role.get(roleId));
-					sur.setStudyId(studyId);
-					sur.setStudyName(userStudy.getName());
-					sur.setStatus(Status.AVAILABLE);
-					sur.setOwner(ub);
-					sur.setCreatedDate(new Date());
+				// set role
+				String userName = fp.getString("name");
+				studyId = fp.getInt("studyId");
+				StudyBean userStudy = (StudyBean) sdao.findByPK(studyId);
+				int roleId = fp.getInt("roleId");
+				// new user role
+				StudyUserRoleBean sur = new StudyUserRoleBean();
+				sur.setName(userName);
+				sur.setRole(Role.get(roleId));
+				sur.setStudyId(studyId);
+				sur.setStudyName(userStudy.getName());
+				sur.setStatus(Status.AVAILABLE);
+				sur.setOwner(ub);
+				sur.setCreatedDate(new Date());
 
-					if (studyId > 0) {
-						udao.createStudyUserRole(user, sur);
-						if (ub.getId() == user.getId()) {
-							session.setAttribute("reloadUserBean", true);
-						}
-						addPageMessage(user.getFirstName() + " " + user.getLastName() + " ("
-								+ resword.getString("username") + ": " + user.getName() + ") "
-								+ respage.getString("has_been_granted_the_role") + " \""
-								+ sur.getRole().getDescription() + "\" " + respage.getString("in_the_study_site") + " "
-								+ userStudy.getName() + ".");
+				if (studyId > 0) {
+					udao.createStudyUserRole(user, sur);
+					if (ub.getId() == user.getId()) {
+						session.setAttribute("reloadUserBean", true);
 					}
-				} else {
-					String message = resexception.getString("error.toAddRoleForTheStudyRemoveTheSiteLevelRoleFirst");
-					addPageMessage(message.replace("{0}", sdao.findByPK(studyId).getName()));
+					addPageMessage(new StringBuilder("").append(user.getFirstName()).append(" ")
+							.append(user.getLastName()).append(" (").append(resword.getString("username"))
+							.append(": ").append(user.getName()).append(") ")
+							.append(respage.getString("has_been_granted_the_role")).append(" \"")
+							.append(sur.getRole().getDescription()).append("\" ")
+							.append(respage.getString("in_the_study_site")).append(" ")
+							.append(userStudy.getName()).append(".").toString());
 				}
+		
 				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
-
 			}
 
 		}
