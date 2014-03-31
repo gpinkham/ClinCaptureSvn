@@ -181,7 +181,13 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		EventDefinitionCRFDAO eventCrfDao = getEventDefinitionCRFDAO();
 		edcb = (EventDefinitionCRFBean) eventCrfDao.findByPK(eventDefinitionCRFId);
 
-		List<Integer> studyIds = new ArrayList<Integer>(getStudyDAO().findAllSiteIdsByStudy(currentStudy));
+		List<Integer> studyIds = new ArrayList<Integer>();
+		if (currentStudy.getParentStudyId() > 0) {
+			studyIds.add(currentStudy.getId());
+			studyIds.add(currentStudy.getParentStudyId());
+		} else {
+			studyIds.addAll(getStudyDAO().findAllSiteIdsByStudy(currentStudy));
+		}
 		if (eventCRFId == 0 && !studyIds.contains(edcb.getStudyId())) {
 			addPageMessage(
 					respage.getString("no_have_correct_privilege_current_study") + " "
