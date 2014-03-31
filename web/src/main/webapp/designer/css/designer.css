@@ -41,6 +41,10 @@ body .panel-body {
   border-right: none;
 }
 
+.linefy {
+  width: 11% !important;
+}
+
 .targettable {
   z-index: 0;
   margin-top: -17.5px;
@@ -162,16 +166,6 @@ textarea {
   line-height:30px;
   margin-bottom:0.5em !important;
   background-color:#428BCA !important;
-}
-
-.login-modal {
-  left: 0 !important;
-  right: 0 !important;
-  width: 99% !important;
-  display: block !important;
-  position: fixed !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
 }
 
 .bootbox {
@@ -345,10 +339,10 @@ div {
   margin-bottom: .5em;
 }
 
-.inner-scrollbar {
-  overflow-y: auto; 
+.inner-scrollbar { 
   width: 98%; 
   height: 200px;
+  overflow-y: auto;
 }
 
 .footer-container {

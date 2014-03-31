@@ -21,7 +21,7 @@ $(function() {
 	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true");
 	var rule = JSON.parse(sessionStorage.getItem("rule"));
 	if (sessionStorage.getItem("validation")) {
-
+		console.log(rule.xml)
 		var validation = JSON.parse(sessionStorage.getItem("validation"));
 		sessionStorage.setItem("status", "load");
 

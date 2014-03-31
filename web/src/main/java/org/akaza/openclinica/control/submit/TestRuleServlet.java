@@ -115,15 +115,13 @@ public class TestRuleServlet extends Controller {
 		
 		// Reset the study if RS is testing a rule for a different study
 		if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty()) && getCurrentStudy(request).getId() != Integer.parseInt(request.getParameter("study"))) {
-			request.getSession().setAttribute(STUDY, (StudyBean) getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study"))));
+			request.getSession().setAttribute(STUDY, getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study"))));
 		}
 
 		StudyBean currentStudy = getCurrentStudy(request);
-
 		FormProcessor fp = new FormProcessor(request);
 		String action = request.getParameter("action");
 		Validator v = new Validator(new ValidatorHelper(request, getConfigurationDao()));
-
 		if (StringUtil.isBlank(action)) {
 			request.setAttribute("result", resword.getString("test_rule_default_result"));
 			Integer ruleSetRuleId = fp.getInt("ruleSetRuleId");
@@ -157,12 +155,9 @@ public class TestRuleServlet extends Controller {
 		} else if (action.equals("validate")) {
 			
 			try {
-				
 				HashMap<String, String> result = validate(request, v, currentStudy);
-				
 				// do not modify
 				Map serialResult = new HashMap(result);
-
 				if (result.get("ruleValidation").equals("rule_valid")) {
 					addPageMessage(resword.getString("test_rules_message_valid"), request);
 				} else {

@@ -103,7 +103,7 @@
           <div class="panel panel-primary">
             <div class="panel-body">
               <div class="pull-right trash">
-                <div id="deleteButton" type="button">
+                <div id="deleteButton" type="button" class="hidden">
                   <span class="glyphicon glyphicon-trash pull-right space-top-m"></span>
                 </div>
               </div>
@@ -128,8 +128,12 @@
           <div class="col-md-7 space-top-sm">
             <div class="input-group parent-target">
               <input type="text" class="target form-control">
-              <span class="input-group-addon">
-              <input class="eventify" type="checkbox">
+              <input type="text" class="linefy form-control input-group hidden">
+              <span class="input-group-addon hidden">
+                <input class="eventify" type="checkbox">
+              </span>
+              <span class="input-group-addon hidden">
+                <input class="versionify" type="checkbox">
               </span>
               <span class="glyphicon glyphicon-remove input-group-addon"></span>
             </div>

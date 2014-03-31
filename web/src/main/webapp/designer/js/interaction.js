@@ -20,7 +20,6 @@ $(function() {
 	// Get url component
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true&restore=true");
-
 	// ======================= Tool tip creation =======================
 	$("#deleteButton").tooltip({
 		container: "body",
@@ -28,169 +27,145 @@ $(function() {
 		trigger: "hover focus",
 		title: "Press to clear the current rule expression"
 	});
-
 	$(".target").tooltip({
 		container: "body",
 		placement: "auto",
 		trigger: "hover focus",
 		title: "Apply the rule to the selected CRF item(s). Drag and drop CRF item(s) to target the rule.  Multiple targets can be selected. To replace a target, drop another target on it."
 	});
-
 	$("#ruleName").tooltip({
 		container: "body",
 		placement: "bottom",
 		trigger: "hover focus",
 		title: "Enter a description for the new rule"
 	});
-
 	createToolTip({
 		title: "Start grouping",
 		element: $("#leftParentheses")
 	});
-
 	createToolTip({
 		title: "End grouping",
 		element: $("#rightParentheses")
 	});
-
 	createToolTip({
 		title: "And...",
 		element: $("#and")
 	});
-
 	createToolTip({
 		title: "Or...",
 		element: $("#or")
 	});
-
 	createToolTip({
 		title: "Not",
 		element: $("#not")
 	});
-
 	createToolTip({
 		title: "Equal",
 		element: $("#equal")
 	});
-
 	createToolTip({
 		title: "Not equal",
 		element: $("#notEqual")
 	});
-
 	createToolTip({
 		title: "Less than",
 		element: $("#lessThan")
 	});
-
 	createToolTip({
 		title: "Greater than",
 		element: $("#greaterThan")
 	});
-
 	createToolTip({
 		title: "Less than or equal to",
 		element: $("#lessThanOrEqual")
 	});
-
 	createToolTip({
 		title: "Greater than or equal to",
 		element: $("#greaterThanOrEqual")
 	});
-
 	createToolTip({
 		title: "Contain",
 		element: $("#contain")
 	});
-
 	createToolTip({
 		title: "Does not contain",
 		element: $("#notContain")
 	});
-
 	createToolTip({
 		title: "Plus",
 		element: $("#plus")
 	});
-
 	createToolTip({
 		title: "Minus",
 		element: $("#minus")
 	});
-
 	createToolTip({
 		title: "Divide by",
 		element: $("#divide")
 	});
-
 	createToolTip({
 		title: "Multiplied by",
 		element: $("#multiply")
 	});
-
 	createToolTip({
 		element: $("#number"),
 		title: "Integer and float number field"
 	});
-
 	createToolTip({
 		title: "Null field",
 		element: $("#empty")
 	});
-
 	createToolTip({
 		title: "Date field",
 		element: $("#date")
 	});
-
 	createToolTip({
 		title: "Text field",
 		element: $("#text")
 	});
-
 	createToolTip({
 		title: "Current system date",
 		element: $("#currentDate")
 	});
-
 	createToolTip({
 		title: "Select a study",
 		element: $("#studiesLink")
 	});
-
 	createToolTip({
 		element: $("#eventsLink"),
 		title: "Select a study event"
 	});
-
 	createToolTip({
 		element: $("#crfsLink"),
 		title: "Select an event CRF"
 	});
-
 	createToolTip({
 		element: $("#versionsLink"),
 		title: "Select a CRF Version"
 	});
-
 	createToolTip({
 		element: $("#itemsLink"),
 		title: "Select a CRF item"
 	});
-
 	createToolTip({
 		element: $("#groupSurface"),
 		title: "Drag and drop an item from the Group tool box, the data toolbox or a CRF item."
 	});
-
 	createToolTip({
 		element: $(".item"),
 		title: "Drag and drop a CRF item."
 	});
-
 	createToolTip({
 		element: $(".eventify"),
 		title: "Click to bind the target to the event."
+	});
+	createToolTip({
+		element: $(".versionify"),
+		title: "Click to bind the target to the crf version."
+	});
+	createToolTip({
+		element: $(".linefy"),
+		title: "Specify the line number in the repeating group to which the rule will apply"
 	});
 
 	// ======================= End of tool tip creation =======================
@@ -305,6 +280,13 @@ $(function() {
 		parser.eventify(this);
 	});
 
+	$(".versionify").change(function() {
+		parser.versionify(this);
+	});
+
+	$(".linefy").blur(function() {
+		parser.linefy(this);
+	});
 	// === Discrepancy action ====
 	$("#chkDiscrepancyText").change(function() {
 		parser.setDiscrepancyAction({
@@ -434,7 +416,6 @@ $(function() {
 	$("a[href=#items]").click(function() {
 		var selected = $("table").find(".selected").length;
 		var data = JSON.parse(sessionStorage.getItem("studies"));
-
 		// Only study
 		if (selected === 1) {
 			var study = data[$("table").find(".selected").attr("id")]

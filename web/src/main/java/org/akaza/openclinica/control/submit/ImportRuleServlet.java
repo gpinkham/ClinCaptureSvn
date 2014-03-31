@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -82,15 +83,13 @@ public class ImportRuleServlet extends Controller {
 		
 		// Reset the study if RS is saving a rule for a different study
 		if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty()) && getCurrentStudy(request).getId() != Integer.parseInt(request.getParameter("study"))) {
-			request.getSession().setAttribute(STUDY, (StudyBean) getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study"))));
+			request.getSession().setAttribute(STUDY, getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study"))));
 		}
 
 		StudyBean currentStudy = getCurrentStudy(request);
-
 		String action = request.getParameter("action");
 		request.setAttribute("contextPath", getContextPath(request));
 		request.setAttribute("hostPath", getHostPath(request));
-
 		if (StringUtil.isBlank(action)) {
 			forwardPage(Page.IMPORT_RULES, request, response);
 
@@ -112,7 +111,8 @@ public class ImportRuleServlet extends Controller {
 			try {
 
 				FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties("xml"));
-				File ruleFile = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn()).get(0);
+				File ruleFile = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn()).get(
+						0);
 
 				InputStream xsdFile = getCoreResources().getInputStream("rules.xsd");
 				XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
@@ -191,7 +191,7 @@ public class ImportRuleServlet extends Controller {
 				if (re.getErrorCode() != null) {
 					arguments = re.getErrorParams();
 				}
-				log.error(arguments.toString());
+				log.error(Arrays.toString(arguments));
 				addPageMessage(mf.format(arguments), request);
 				forwardPage(Page.IMPORT_RULES, request, response);
 			}
@@ -223,13 +223,12 @@ public class ImportRuleServlet extends Controller {
 		if (!new File(dir).exists()) {
 			throw new OpenClinicaSystemException(respage.getString("filepath_you_defined_not_seem_valid"));
 		}
-		String theDir = dir + "rules" + File.separator + "original" + File.separator;
-		return theDir;
+		return dir + "rules" + File.separator + "original" + File.separator;
 	}
 
 	private RulesPostImportContainer handleLoadCastor(File xmlFile) {
 
-		RulesPostImportContainer ruleImport = null;
+		RulesPostImportContainer ruleImport;
 		try {
 			// create an XMLContext instance
 			XMLContext xmlContext = new XMLContext();

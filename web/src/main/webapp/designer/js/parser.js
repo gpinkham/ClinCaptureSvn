@@ -76,7 +76,6 @@ Parser.prototype.createNextDroppable = function(params) {
 			createPopover(RPAREN);
 			createPopover(dataPredicate);
 		} 
-
 	} else if (params.element.is(".target")) {
 		if (!this.isAddedTarget(params.ui.draggable.text())) {
 			if (params.existingValue) {
@@ -88,10 +87,20 @@ Parser.prototype.createNextDroppable = function(params) {
 				}
 			}
 			// Target
+			var eTarget = this.findItemBySelectedProperties({
+				identifier: params.ui.draggable.text(),
+				study: this.extractStudy(this.getStudy()),
+				crf : $("div[id=crfs]").find(".selected").find("td[oid]").attr("oid"), 
+				evt: $("div[id=events]").find(".selected").find("td[oid]").attr("oid"),
+				version: $("div[id=versions]").find(".selected").find("td[oid]").attr("oid")
+			});
 			var target = Object.create(null);
-			target.name = params.ui.draggable.text();
-			target.evt = $("div[id=events]").find(".selected").find("td[oid]").attr("oid");
-			target.eventify = params.element.siblings("span").find(".target").is(":checked");
+			target.oid = eTarget.oid;
+			target.name = eTarget.name;
+			target.crf = eTarget.crfOid;
+			target.group = eTarget.group;
+			target.evt = eTarget.eventOid;
+			target.version = eTarget.crfVersionOid;
 			this.rule.targets.push(target);
 			//Reset UI
 			var div = params.element.parent().clone();
@@ -105,7 +114,13 @@ Parser.prototype.createNextDroppable = function(params) {
 			// Reset event handlers
 			div.find(".eventify").change(function() {
 				parser.eventify(this);
-			})
+			});
+			div.find(".versionify").change(function() {
+				parser.versionify(this);
+			});
+			div.find(".linefy").blur(function() {
+				parser.linefy(this);
+			});
 			div.find(".glyphicon-remove").click(function() {
 				parser.deleteTarget(this);
 			});
@@ -115,6 +130,29 @@ Parser.prototype.createNextDroppable = function(params) {
 			} 
 			div.find(".target").focus();
 			params.element.val(params.ui.draggable.text());
+			// Check event duplication
+			var eventDuplex = this.isDuplicated({
+				type: "eventOid",
+				name: params.ui.draggable.text()
+			});
+			if (!eventDuplex) {
+				params.element.parent().find(".eventify").parent().removeClass("hidden");
+			} 
+			// Check version duplication
+			var versionDuplex = this.isDuplicated({
+				type: "crfVersionOid",
+				name: params.ui.draggable.text()
+			});
+			if (!versionDuplex) {
+				params.element.parent().find(".versionify").parent().removeClass("hidden");
+			} 
+			// Check version duplication
+			if (this.isRepeatItem(params.ui.draggable.text())) {
+				var liner = params.element.parent().find(".linefy");
+				liner.removeClass("hidden");
+				liner.focus();
+				liner.siblings(".target").css("width", "89%");
+			} 
 		}
 		params.element.removeClass("bordered");	
 	} else if (params.element.is(".dest")) {
@@ -126,7 +164,7 @@ Parser.prototype.createNextDroppable = function(params) {
 				}
 			}
 
-			var oid = this.constructFormPath(params.ui.draggable.text());
+			var oid = this.constructCRFPath(params.ui.draggable.text());
 			this.getShowHideAction().destinations.push(oid);
 			var div = params.element.parent().clone();
 			div.find("input").text("");
@@ -153,7 +191,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			if (params.existingValue) {
 				for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
 					var dest = this.getInsertAction().destinations[x];
-					if (dest.oid === this.constructFormPath(params.existingValue)) {
+					if (dest.oid === this.constructCRFPath(params.existingValue)) {
 						this.getInsertAction().destinations.splice(x, 1);
 					}
 				}
@@ -163,7 +201,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			var dest = Object.create(null);
 			dest.value = "";
 			dest.id = params.element.parents(".row").attr("id");
-			dest.oid = this.constructFormPath(params.ui.draggable.text());
+			dest.oid = this.constructCRFPath(params.ui.draggable.text());
 
 			this.getInsertAction().destinations.push(dest);			
 			params.element.val(params.ui.draggable.text());
@@ -362,6 +400,45 @@ Parser.prototype.isCRFItem = function(element) {
 	return element.prop("tagName").toLowerCase() === "td" && element.is(".ui-draggable");
 }
 
+Parser.prototype.getItemDuplicates = function(itemName) {
+	var duplicates = [];
+	var storedStudies = JSON.parse(sessionStorage.getItem("studies"));
+	storedStudies.forEach(function(study) {
+		study.events.forEach(function(evt) {
+			evt.crfs.forEach(function(crf) {
+				crf.versions.forEach(function(version) {
+					version.items.forEach(function(item) {
+						if (item.name == itemName) {
+							item.crfOid = crf.oid;
+							item.eventOid = evt.oid;
+							item.crfVersionOid = version.oid;
+							duplicates.push(item);
+						}
+					});
+				});
+			});
+		});
+	});
+	return duplicates;
+}
+
+Parser.prototype.isDuplicated = function(params) {
+	var duped = this.getItemDuplicates(params.name).map(function(x) {
+		return x[params.type];
+	}).every(function(element, index, array){
+		return array[0] === array[index];
+	});
+	return duped;
+}
+
+Parser.prototype.isRepeatItem = function(itemName) {
+	var item = this.getItem(itemName);
+	if (item.repeat) {
+		return true;
+	}
+	return false;
+}
+
 Parser.prototype.getRuleCRFItems = function() {
 	var items = [];
 	var itemHolders = $(".dotted-border, .target, .item, .value, .dest");
@@ -426,7 +503,7 @@ Parser.prototype.createRule = function() {
 		}
 		var item = parser.getItem(pred);
 		if (item) {
-			pred = quantified ? parser.constructFormPath(pred) : parser.constructEventPath(pred);
+			pred = quantified ? parser.constructCRFPath(pred) : parser.constructEventPath(pred);
 		}
 		expression.push(pred);
 	});
@@ -434,7 +511,14 @@ Parser.prototype.createRule = function() {
 	if (parser.isValid(expression).valid) {
 		for (var x = 0; x < parser.rule.targets.length; x++) {
 			var target = parser.rule.targets[x];
-			target.name = target.eventify ? target.evt + "." + parser.constructFormPath(target.name) : target.name = parser.constructFormPath(target.name);
+			if (target.linefy) {
+				target.name = this.constructRepeatItemPath(target);
+			} else if (target.versionify) {
+				target.name = this.constructCRFVersionPath(target);
+			} else {
+				var formPath = target.crf + "." + target.group + "." + target.oid;
+				target.name = target.eventify ? (target.evt + "." + formPath) : formPath;
+			}
 		}
 	}
 }
@@ -459,7 +543,6 @@ Parser.prototype.getRule = function() {
 		rule.expression = this.rule.expression.join().replace(/\,/g, " ");
 		rule.submission = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 		return rule;
-
 	} else {
 		// Ensure one alert is displayed
 		if ($(".alert").size() == 0) {
@@ -739,14 +822,14 @@ Parser.prototype.isAddedTarget = function(target) {
 
 Parser.prototype.isAddedInsertTarget = function(target) {
 	for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
-		if (this.getInsertAction().destinations[x].oid === this.constructFormPath(target)) {
+		if (this.getInsertAction().destinations[x].oid === this.constructCRFPath(target)) {
 			return true;
 		}
 	}
 }
 
 Parser.prototype.isAddedShowHideTarget = function(target) {
-	return this.getShowHideAction() && this.getShowHideAction().destinations.indexOf(this.constructFormPath(target)) > -1;
+	return this.getShowHideAction() && this.getShowHideAction().destinations.indexOf(this.constructCRFPath(target)) > -1;
 }
 
 /* ===========================================================================
@@ -757,72 +840,25 @@ Parser.prototype.isAddedShowHideTarget = function(target) {
  *
  * Returns the returned CRF item
  * ========================================================================= */
-Parser.prototype.findItem = function(itemName) {
-	var storedStudies = JSON.parse(sessionStorage.getItem("studies"));
-	for (var x in storedStudies) {
-
-		var study = storedStudies[x];
-		for (var e in study.events) {
-
-			var event = study.events[e];
-			for (var c in event.crfs) {
-
-				var crf = event.crfs[c];
-				for (var v in crf.versions) {
-
-					var ver = crf.versions[v];
-					for (var i in ver.items) {
-
-						var itm = ver.items[i];
-						if (itm.name === itemName) {
-							itm.formOid = crf.oid;
-							itm.eventOid = event.oid;
-							return itm;
-						}
+Parser.prototype.findItem = function(identifier) {
+	var item = null;
+	var study = this.extractStudy(this.getStudy());
+	study.events.forEach(function(evt) {
+		evt.crfs.forEach(function(crf) {
+			crf.versions.forEach(function(ver) {
+				ver.items.forEach(function(itm) {
+					if (itm.oid === identifier || itm.name == identifier) {
+						itm.crfOid = crf.oid;
+						itm.eventOid = evt.oid;
+						itm.crfVersionOid = ver.oid;
+						item = itm;
+						return;
 					}
-				}
-			}
-		}
-	}
-}
-
-/* ==========================================================================
- * Finds a CRF item from the original data returns from CC given an item oid
- *
- * Arguments [itemOID]:
- * => itemOID - the itemOID of the crf item to extract from a study
- *
- * Returns the returned CRF item
- * ======================================================================== */
-Parser.prototype.findItemName = function(itemOID) {
-
-	var storedStudies = JSON.parse(sessionStorage.getItem("studies"));
-
-	for (var x in storedStudies) {
-
-		var study = storedStudies[x];
-		for (var e in study.events) {
-
-			var event = study.events[e];
-			for (var c in event.crfs) {
-
-				var crf = event.crfs[c];
-				for (var v in crf.versions) {
-
-					var ver = crf.versions[v];
-					for (var i in ver.items) {
-
-						var itm = ver.items[i];
-						if (itm.oid === itemOID) {
-							itm.formOid = crf.oid;
-							itm.eventOid = event.oid;
-							return itm;
-						}
-					}
-				}
-			}
-		}
-	}
+				});
+			});
+		});
+	});
+	return item;
 }
 
 Parser.prototype.findStudyItem = function(params) {
@@ -837,7 +873,7 @@ Parser.prototype.findStudyItem = function(params) {
 						for (var i in ver.items) {
 							var itm = ver.items[i];
 							if (itm.name == params.name || itm.oid == params.name) {
-								itm.formOid = crf.oid;
+								itm.crfOid = crf.oid;
 								itm.eventOid = evt.oid;
 								itm.crfVersionOid = ver.oid;
 								return itm;
@@ -856,7 +892,7 @@ Parser.prototype.findStudyItem = function(params) {
 						for (var i in ver.items) {
 							var itm = ver.items[i];
 							if (itm.name == params.name || itm.oid == params.name) {
-								itm.formOid = crf.oid;
+								itm.crfOid = crf.oid;
 								itm.crfVersionOid = ver.oid;
 								itm.eventOid = selectedEvent;
 								return itm;
@@ -867,6 +903,47 @@ Parser.prototype.findStudyItem = function(params) {
 			}
 		}
 	}
+}
+
+Parser.prototype.findItemBySelectedProperties = function(params) {
+	var item = null;
+	var study = this.extractStudy(this.getStudy());
+	study.events.forEach(function(evt) {
+		if (evt.oid == params.evt) {
+			evt.crfs.forEach(function(crf) {
+				if (crf.oid == params.crf) {
+					crf.versions.forEach(function(ver) {
+						if (ver.oid == params.version) {
+							ver.items.forEach(function(itm) {
+								if (itm.oid === params.identifier || itm.name == params.identifier) {
+									itm.crfOid = crf.oid;
+									itm.eventOid = evt.oid;
+									itm.crfVersionOid = ver.oid;
+									item = itm;
+									return;
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+	});
+	return item;
+}
+
+Parser.prototype.getVersionCRF = function(params) {
+	var cf = null;
+	params.study.events.forEach(function(evt) {
+		evt.crfs.forEach(function(crf) {
+			crf.versions.forEach(function(ver) {
+				if (ver.oid == params.ver) {
+					cf = crf
+				}
+			});
+		});
+	});
+	return cf;
 }
 
 Parser.prototype.setName = function(name) {
@@ -1295,12 +1372,12 @@ Parser.prototype.setDestinations = function(dests) {
 			var input = div.find(".item");
 			div.attr("id", dest.id);
 
-			input.val(this.findItemName(this.extractItemOIDFromExpression(dest.oid)).name);
+			input.val(this.findItem(this.extractItemOIDFromExpression(dest.oid)).name);
 			input.css('font-weight', 'bold');
 
 			var inputVal = div.find(".value");
 			inputVal.css('font-weight', 'bold');
-			var inputValue = this.findItemName(dest.value) ? this.findItemName(dest.value).name : dest.value;
+			var inputValue = this.findItem(dest.value) ? this.findItem(dest.value).name : dest.value;
 			inputVal.val(inputValue);
 			inputVal.blur(function() {
 				parser.setDestinationValue({
@@ -1344,7 +1421,7 @@ Parser.prototype.setShowHideDestinations = function(dests) {
 				element: cloned.find(".dest")
 			});
 			
-			cloned.find("input").val(this.findItemName(this.extractItemOIDFromExpression(dests[x])).name);
+			cloned.find("input").val(this.findItem(this.extractItemOIDFromExpression(dests[x])).name);
 			cloned.find("input").css('font-weight', 'bold');
 			x === 0 ? div.before(cloned) : $(".space-left-neg > .input-group").last().before(cloned);
 		}
@@ -1413,48 +1490,101 @@ Parser.prototype.setTargets = function(targets) {
 	if (targets.length > 0) {
 		var targetDiv = $(".parent-target");
 		for (var x = 0; x < targets.length; x++) {
-			var target = Object.create(null);
-			if (typeof targets[x] === "object") {
-				target.name = this.getItem(targets[x].name).name;
-				target.evt = targets[x].evt;
-			} else {
-				target.name = this.getItem(targets[x]).name;
-				target.evt = this.getItem(targets[x]).eventOid;
-			}
+			var tar = this.extractTarget({
+				target: targets[x],
+				name: targets[x].name
+			});
 			var div = targetDiv.clone();
 			div.find(".target").text("");
 			createDroppable({
 				element: div.find(".target"),
 				accept: "div[id='items'] td"
 			});
-
 			div.find(".glyphicon-remove").click(function() {
 				parser.deleteTarget(this);
 			});
-
-			div.find(".target").val(target.name);
-			div.find(".target").text(target.name);
+			div.find(".target").val(tar.name);
+			div.find(".target").text(tar.name);
 			div.find(".target").css('font-weight', 'bold');
 			div.find(".eventify").change(function() {
 				parser.eventify(this);
 			});
-
+			div.find(".versionify").change(function() {
+				parser.versionify(this);
+			});
+			div.find(".linefy").blur(function() {
+				parser.linefy(this);
+			});
 			createToolTip({
 				element: div.find(".eventify"),
 				title: "Click to bind the target to only the event."
 			});
-
+			createToolTip({
+				element: div.find(".versionify"),
+				title: "Click to bind the target to the crf version."
+			});
+			createToolTip({
+				element: div.find(".linefy"),
+				title: "Specify the line number in the repeating group to which the rule will apply"
+			});
 			x === 0 ? targetDiv.before(div) : $(".parent-target").last().before(div);
 			// Eventify
-			if (targets[x].eventify) {
-				target.eventify = true;
-				div.find(".eventify").prop("checked", target.eventify);
-			} else {
-				target.eventify = false;
+			var eventDuplex = this.isDuplicated({
+				type: "eventOid",
+				name: tar.name
+			});
+			if (!eventDuplex) {
+				tar.eventify = false;
+				div.find(".eventify").parent().removeClass("hidden");
+				if (targets[x].eventify) {
+					tar.eventify = true;
+					div.find(".eventify").parent().removeClass("hidden");
+					div.find(".eventify").prop("checked", tar.eventify);
+				}
 			}
-			this.rule.targets.push(target);
+			// Versionify
+			var versionDuplex = this.isDuplicated({
+				name: tar.name,
+				type: "crfVersionOid"
+			});
+			if (!versionDuplex) {
+				tar.versionify = false;
+				div.find(".versionify").parent().removeClass("hidden");
+				if (targets[x].versionify) {
+					tar.versionify = true;
+					div.find(".versionify").parent().removeClass("hidden");
+					div.find(".versionify").prop("checked", tar.versionify);
+				}
+			}
+			// linefy
+			if (targets[x].linefy) {
+				tar.linefy = true;
+				tar.line = targets[x].line;
+				div.find(".linefy").removeClass("hidden");
+				div.find(".linefy").val(tar.line);
+				div.find(".linefy").siblings(".target").css("width", "89%");
+			}
+			this.rule.targets.push(tar);
 		}
 	}
+}
+
+Parser.prototype.extractTarget = function(params) {
+	var target = Object.create(null);
+	var tt = this.getItem(params.name);
+	target.oid = tt.oid;
+	target.name = tt.name;
+	target.crf = params.target.crf;
+	target.group = params.target.group;
+	target.evt = params.target.eventify ? params.target.evt : tt.eventOid;
+	target.version = params.target.versionify ? params.target.version : tt.crfVersionOid;
+	if (params.target.versionify) {
+		target.crf = this.getVersionCRF({
+			ver: target.version,
+			study: this.extractStudy(this.getStudy())
+		}).oid;
+	}	
+	return target;
 }
 
 Parser.prototype.getTargets = function() {
@@ -1464,43 +1594,36 @@ Parser.prototype.getTargets = function() {
 Parser.prototype.selectTarget = function() {
 	var study = this.extractStudy(this.rule.study);
 	if (this.rule.targets) {
-		var item = this.findStudyItem({
-			evt: this.rule.targets[0].evt,
-			name: this.rule.targets[0].name,
-			study: this.extractStudy(this.rule.study)
-		});
-		if (item) {
-			var row = $("td[oid=" + study.oid + "]");
-			if (row) {
-				$("tr.selected").each(function() {
-					$(this).removeClass("selected");
-				});
-				row.parent().click()
-				// Event
-				this.recursiveSelect({
-					click: true,
-					type: "event",
-					candidate: item.eventOid
-				});
-				// CRF
-				this.recursiveSelect({
-					type: "crf",
-					click: true,
-					candidate: item.formOid
-				});
-				// CRF version
-				this.recursiveSelect({
-					click: true,
-					type: "version",
-					candidate: item.crfVersionOid
-				});
-				// Item
-				this.recursiveSelect({
-					click: false,
-					type: "items",
-					candidate: item.oid
-				});
-			}
+		var row = $("td[oid=" + study.oid + "]");
+		if (row) {
+			$("tr.selected").each(function() {
+				$(this).removeClass("selected");
+			});
+			row.parent().click()
+			// Event
+			this.recursiveSelect({
+				click: true,
+				type: "event",
+				candidate: this.rule.targets[0].evt
+			});
+			// CRF
+			this.recursiveSelect({
+				type: "crf",
+				click: true,
+				candidate: this.rule.targets[0].crf
+			});
+			// CRF version
+			this.recursiveSelect({
+				click: true,
+				type: "version",
+				candidate: this.rule.targets[0].version
+			});
+			// Item
+			this.recursiveSelect({
+				click: false,
+				type: "items",
+				candidate: this.rule.targets[0].oid
+			});
 		}
 	}
 }
@@ -1517,7 +1640,7 @@ Parser.prototype.deleteTarget = function(target) {
 		}
 	} else if ($(target).siblings("input").is(".value")) {
 		var act = this.getInsertAction();
-		var oid = this.constructFormPath($(target).closest(".row").find(".item").val());
+		var oid = this.constructCRFPath($(target).closest(".row").find(".item").text());
 		for (var x = 0; x < act.destinations.length; x++) {
 			var dest = act.destinations[x];
 			if (dest.oid === oid) {
@@ -1537,7 +1660,7 @@ Parser.prototype.deleteTarget = function(target) {
 		}
 	} else {
 		if (this.getShowHideAction() && this.getShowHideAction().destinations.length > 0) {
-			var index = this.getShowHideAction().destinations.indexOf(this.constructFormPath($(target).siblings(".dest").val()));
+			var index = this.getShowHideAction().destinations.indexOf(this.constructCRFPath($(target).siblings(".dest").val()));
 			if (index > -1) {
 				this.getShowHideAction().destinations.splice(index, 1);
 				$(target).parent().remove();
@@ -1756,16 +1879,30 @@ Parser.prototype.extractStudy = function(id) {
 	}
 }
 
-Parser.prototype.constructFormPath = function(itemName) {
-	var study = this.extractStudy(this.getStudy());
+Parser.prototype.constructCRFPath = function(itemName) {
 	var item = this.getItem(itemName);
-	return item.formOid + "." + item.group + "." + item.oid;
+	return item.crfOid + "." + item.group + "." + item.oid;
+}
+
+Parser.prototype.constructCRFVersionPath = function(target) {
+	return target.versionify ? target.version + "." + target.group + "." + target.oid : this.constructCRFPath(target.name);
 }
 
 Parser.prototype.constructEventPath = function(itemName) {
-	var study = this.extractStudy(this.getStudy());
 	var item = this.getItem(itemName);
-	return item.eventOid + "." + this.constructFormPath(itemName);
+	return item.eventOid + "." + this.constructCRFPath(itemName);
+}
+
+Parser.prototype.constructRepeatItemPath = function(target) {
+	// event oid?
+	var name = target.eventify ? target.eventOid : "";
+	// version oid?
+	if (target.versionify) {
+		name = name.length > 0 ? name + "." + target.version : target.version;
+	} else {
+		name = name.length > 0 ? name + "." + target.crf : target.crf;
+	}
+	return name + "." + target.group + "[" + target.line + "]" + "." + target.oid;
 }
 
 Parser.prototype.eventify = function(targetEvent) {
@@ -1774,7 +1911,6 @@ Parser.prototype.eventify = function(targetEvent) {
 		var tar = this.rule.targets[x];
 		if (tar.name === targetName) {
 			tar.eventify = $(targetEvent).is(":checked");
-			tar.evt = $("div[id=events]").find(".selected").find("td[oid]").attr("oid");
 			break;
 		}
 	}
@@ -1784,6 +1920,32 @@ Parser.prototype.isEventified = function(expression) {
 	return expression.slice(0, "SE_".length) == "SE_";
 }
 
+Parser.prototype.versionify = function(targetEvent) {
+	var targetName = $(targetEvent).parent().siblings(".target").val();
+	for (var x = 0; x < this.rule.targets.length; x++) {
+		var tar = this.rule.targets[x];
+		if (tar.name === targetName) {
+			tar.versionify = $(targetEvent).is(":checked");
+			break;
+		}
+	}
+}
+
+Parser.prototype.linefy = function(targetEvent) {
+	var targetName = $(targetEvent).siblings(".target").val();
+	for (var x = 0; x < this.rule.targets.length; x++) {
+		var tar = this.rule.targets[x];
+		if (tar.name === targetName) {
+			if ($(targetEvent).val().length > 0) {
+				tar.linefy = true;
+				tar.line = $(targetEvent).val();
+			} else {
+				tar.linefy = false;
+			}
+			break;
+		}
+	}
+}
 // This function is a bit involved - consider refactoring
 Parser.prototype.recursiveSelect = function(params) {
 	var next = $("div[id=" + params.type + "]").find("a:contains(" + unescape(JSON.parse('"\u00BB\u00BB"')) + ")");
@@ -1814,6 +1976,6 @@ Parser.prototype.getItem = function(expression) {
 			evt: this.extractEventNameFromExpression(expression)
 		});
 	} else {
-		return this.findItemName(this.extractItemOIDFromExpression(expression));
+		return this.findItem(this.extractItemOIDFromExpression(expression));
 	}
 }

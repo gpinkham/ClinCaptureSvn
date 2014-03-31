@@ -176,6 +176,7 @@ function createBreadCrumb(params) {
  *
  * ========================================================================= */
 function resetBuildControls(parentDiv) {
+	$("#deleteButton").hide();
 	parentDiv.children("div").not(".pull-right").remove();
 	parentDiv.append(createStartExpressionDroppable());
 }
@@ -660,8 +661,8 @@ function createDroppable(params) {
 				element: params.element,
 				existingValue: existingValue
 			});
-
 			params.element.css('font-weight', 'bold');
+			$("#deleteButton").removeClass("hidden");
 		}
 	})
 

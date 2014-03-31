@@ -311,8 +311,23 @@ public class StudiesServlet extends HttpServlet {
 				
 				// Targets
 				JSONArray targets = new JSONArray();
-				targets.put(rule.getRuleSetRules().get(0).getRuleSetBean().getOriginalTarget().getValue());
+				JSONObject tar = new JSONObject();
 				
+				String targetPath = rule.getRuleSetRules().get(0).getRuleSetBean().getOriginalTarget().getValue();
+				tar.put("name", targetPath);
+				if (targetPath.split("\\.").length > 3) {
+					tar.put("evt", getItemEvent(targetPath, tar));
+				}
+				if (isVersionified(targetPath)) {
+					tar.put("versionify", true);
+					tar.put("version", getItemVersion(targetPath));
+				}
+				if (getItemLine(targetPath, tar) != null) {
+					tar.put("line", getItemLine(targetPath, tar));
+				}
+				tar.put("crf", getItemVersion(targetPath));
+				tar.put("group", getItemGroup(targetPath));
+				targets.put(tar);
 				// Rule properties
 				object.put("targets", targets);
 				object.put("oid", rule.getOid());
@@ -477,7 +492,6 @@ public class StudiesServlet extends HttpServlet {
 		Matcher matcher = pattern.matcher(expression.trim());
 
 		RuleDao ruleDAO = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(RuleDao.class);
-
 		if (matcher.find()) {
 
 			oid = matcher.group(0);
@@ -650,5 +664,60 @@ public class StudiesServlet extends HttpServlet {
 		}
 
 		return actions;
+	}
+	
+	private String getItemEvent(String targetPath, JSONObject tar) throws JSONException {
+		String[] preds = targetPath.split("\\.");
+		if (preds.length == 4) {
+			tar.put("eventify", true);
+			return preds[0];
+		} else {
+			return targetPath;
+		}
+	}
+	
+	private String getItemLine(String targetPath, JSONObject tar) throws JSONException {
+		Pattern pattern = Pattern.compile("\\[(\\w+)\\]");
+		Matcher matcher = pattern.matcher(targetPath);
+		if (matcher.find()) {
+			tar.put("linefy", true);
+			return matcher.group(0);
+		}
+		return null;
+	}
+	
+	private boolean isVersionified(String targetPath) {
+		String crf = "";
+		String[] preds = targetPath.split("\\.");
+		if (preds.length == 3) {
+			crf = preds[0];
+		} else if (preds.length > 3) {
+			crf = preds[preds.length - 2];
+		}
+		Pattern pattern = Pattern.compile("V\\d+$");
+		Matcher matcher = pattern.matcher(crf);
+		return matcher.find();
+	}
+	
+	private String getItemVersion(String targetPath) {
+		String[] preds = targetPath.split("\\.");
+		if (preds.length == 3) {
+			return preds[0];
+		} else if (preds.length > 3) {
+			return preds[preds.length - 3];
+		} else {
+			return targetPath;
+		}
+	}
+	
+	private String getItemGroup(String targetPath) throws JSONException {
+		String[] preds = targetPath.split("\\.");
+		if (preds.length == 2) {
+			return preds[0];
+		} else if (preds.length > 2) {
+			return preds[preds.length - 2];
+		} else {
+			return targetPath;
+		}
 	}
 }
