@@ -24,6 +24,7 @@ public class DisplayWidgetsLayoutBean extends EntityBean {
 	private String widgetName;
 	private int widgetId;
 	private int ordinal;
+	private boolean twoColumnWidget;
 
 	public static ComparatorForDisplayWidgetsLayout comparatorForDisplayWidgetsLayout = new ComparatorForDisplayWidgetsLayout();
 
@@ -49,6 +50,14 @@ public class DisplayWidgetsLayoutBean extends EntityBean {
 
 	public void setWidgetId(int widgetId) {
 		this.widgetId = widgetId;
+	}
+
+	public boolean isTwoColumnWidget() {
+		return twoColumnWidget;
+	}
+
+	public void setTwoColumnWidget(boolean twoColumnWidget) {
+		this.twoColumnWidget = twoColumnWidget;
 	}
 }
 

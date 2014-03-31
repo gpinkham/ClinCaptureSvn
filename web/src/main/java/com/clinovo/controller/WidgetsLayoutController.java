@@ -76,6 +76,7 @@ public class WidgetsLayoutController {
 			currentDisplay.setWidgetName(widgetName + ".jsp");
 			currentDisplay.setOrdinal(currentLayout.getOrdinal());
 			currentDisplay.setWidgetId(currentWidget.getId());
+			currentDisplay.setTwoColumnWidget(currentWidget.isTwoColumnWidget());
 
 			dispayWidgetsLayout.add(currentDisplay);
 		}
@@ -93,6 +94,7 @@ public class WidgetsLayoutController {
 		String orderInColumn1 = request.getParameter("orderInColumn1");
 		String orderInColumn2 = request.getParameter("orderInColumn2");
 		String unusedWidgets = request.getParameter("unusedWidgets");
+		String orderOfBigWidgets = request.getParameter("bigWidgets");
 		int userId = Integer.parseInt(request.getParameter("userId"));
 		int studyId = Integer.parseInt(request.getParameter("studyId"));
 
@@ -120,6 +122,20 @@ public class WidgetsLayoutController {
 				currentWidgetLayout.setOrdinal(ordinalCounter2);
 				widgetLayoutService.saveWidgetLayout(currentWidgetLayout);
 				ordinalCounter2 = ordinalCounter2 + 2;
+			}
+		}
+
+		if (!orderOfBigWidgets.isEmpty()){
+			int ordinalCounter3 = 1;
+			List <String> bigWidgetsIds = Arrays.asList(orderOfBigWidgets.split("\\s*,\\s*"));
+			
+			for (String bigWidgetId : bigWidgetsIds) {
+
+				WidgetsLayout currentWidgetLayout = widgetLayoutService.findByWidgetIdAndStudyIdAndUserId(
+						Integer.parseInt(bigWidgetId), studyId, userId);
+				currentWidgetLayout.setOrdinal(ordinalCounter3);
+				widgetLayoutService.saveWidgetLayout(currentWidgetLayout);
+				ordinalCounter3 = ordinalCounter3 + 1;
 			}
 		}
 

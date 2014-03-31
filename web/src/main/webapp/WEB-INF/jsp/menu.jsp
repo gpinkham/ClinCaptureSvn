@@ -332,7 +332,7 @@
 			<tr>
 				<td>
 					<c:forEach var="widget" items="${dispayWidgetsLayout}">
-						<c:if test="${widget.ordinal ne 0 && widget.ordinal%2 ne 0}">
+						<c:if test="${widget.ordinal ne 0 and widget.ordinal%2 ne 0 and not widget.twoColumnWidget}">
 							<div class="widget">
 								<c:catch var="e">
 									<c:import url="widgets/${widget.widgetName}" />
@@ -352,8 +352,30 @@
 				</td>
 				<td>
 					<c:forEach var="widget" items="${dispayWidgetsLayout}">
-						<c:if test="${widget.ordinal ne 0 && widget.ordinal%2 eq 0}">
+						<c:if test="${widget.ordinal ne 0 and widget.ordinal%2 eq 0 and not widget.twoColumnWidget}">
 							<div class="widget">
+								<c:catch var="e">
+									<c:import url="widgets/${widget.widgetName}" />
+								</c:catch>
+								<c:if test="${!empty e}">
+									<div class="widget_error_message">
+										<fmt:message key="widget_error_message_cannot_load_widget" bundle="${restext}">
+											<fmt:param>
+												<c:out value="${widget.widgetName}" />
+											</fmt:param>
+										</fmt:message>
+									</div>
+								</c:if>
+							</div>
+						</c:if>
+					</c:forEach>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<c:forEach var="widget" items="${dispayWidgetsLayout}">
+						<c:if test="${widget.ordinal ne 0 and widget.twoColumnWidget}">
+							<div class="widget_big">
 								<c:catch var="e">
 									<c:import url="widgets/${widget.widgetName}" />
 								</c:catch>
@@ -376,6 +398,7 @@
 	</span>
 	<!--//New home page layout-->
 </c:if>
+
 
  <br>
  	<table>

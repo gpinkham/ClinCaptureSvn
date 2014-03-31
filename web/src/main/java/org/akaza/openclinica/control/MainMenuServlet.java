@@ -76,7 +76,7 @@ public class MainMenuServlet extends Controller {
         StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		ub.incNumVisitsToMainMenu();
-		
+
 		request.getSession().setAttribute(USER_BEAN_NAME, ub);
 		request.getSession().setAttribute("userRole", currentRole);
 		request.setAttribute("iconInfoShown", true);
@@ -87,7 +87,7 @@ public class MainMenuServlet extends Controller {
 			forwardPage(Page.MENU, false, request, response);
 			return;
 		}
-		
+
 		StudyDAO sdao = new StudyDAO(getDataSource());
 		ArrayList studies;
 
@@ -111,7 +111,7 @@ public class MainMenuServlet extends Controller {
 		// Event Definition list and Group Class list for add suybject window.
 		request.setAttribute("allDefsArray", getEventDefinitionsByCurrentStudy(request));
 		request.setAttribute("studyGroupClasses", getStudyGroupClassesByCurrentStudy(request));
-		
+
 		// not a new user
 		if (lastPwdChangeDate != null || pwdChangeRequired == 0) {
 			if (lastPwdChangeDate == null) {
@@ -142,7 +142,7 @@ public class MainMenuServlet extends Controller {
 				}
 				forwardPage(Page.RESET_PASSWORD, request, response);
 			} else {
-				
+
 				if (ub.getNumVisitsToMainMenu() <= 1) {
 					if (ub.getLastVisitDate() != null) {
 						addPageMessage(
@@ -197,6 +197,7 @@ public class MainMenuServlet extends Controller {
 					List<WidgetsLayout> widgetsLayout = getWidgetsLayoutService().findAllByStudyIdAndUserId(studyId, userId);
 					List<DisplayWidgetsLayoutBean> dispayWidgetsLayout = new ArrayList<DisplayWidgetsLayoutBean>();
 					int widgetsOrdinalCounter = 1;
+					int tcWidgetsOrdinalCounter = 1;
 					List<Widget> widgets = getWidgetService().findAll();
 
 					if (widgetsLayout == null || widgetsLayout.size() == 0) {
@@ -206,7 +207,7 @@ public class MainMenuServlet extends Controller {
 							boolean hasWidgetAccess = userHasAccessToWidget(currentWidget, currentRole, currentStudy);
 
 							if (hasWidgetAccess) {
-								
+
 								WidgetsLayout currentWidgetsLayout = new WidgetsLayout();
 								currentWidgetsLayout.setStudyId(studyId);
 								currentWidgetsLayout.setUserId(userId);
@@ -214,8 +215,14 @@ public class MainMenuServlet extends Controller {
 								String defaultFor = currentWidget.getDisplayAsDefault();
 
 								if (defaultFor.contains(Integer.toString(currentRole.getRole().getId()))) {
-									currentWidgetsLayout.setOrdinal(widgetsOrdinalCounter);
-									widgetsOrdinalCounter++;
+
+									if (currentWidget.isTwoColumnWidget()) {
+										currentWidgetsLayout.setOrdinal(tcWidgetsOrdinalCounter);
+										tcWidgetsOrdinalCounter++;
+									} else {
+										currentWidgetsLayout.setOrdinal(widgetsOrdinalCounter);
+										widgetsOrdinalCounter++;
+									}
 
 								} else {
 									currentWidgetsLayout.setOrdinal(0);
@@ -240,6 +247,7 @@ public class MainMenuServlet extends Controller {
 						currentDisplay.setWidgetName(widgetName + ".jsp");
 						currentDisplay.setOrdinal(currentLayout.getOrdinal());
 						currentDisplay.setWidgetId(currentWidget.getId());
+						currentDisplay.setTwoColumnWidget(currentWidget.isTwoColumnWidget());
 
 						dispayWidgetsLayout.add(currentDisplay);
 					}

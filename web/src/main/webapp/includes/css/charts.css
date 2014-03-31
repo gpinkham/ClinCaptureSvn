@@ -9,24 +9,34 @@ table.widgets_container td {
 	width: 400px;
 }
 
-.widget {
-	width: 380px;
+.widget,.widget_big {
 	height: auto;
 	padding: 5px;
-	margin: 6px 0px;
 	border: 1px solid gray;
+	background-color: white;
 }
 
-.widget .widget_error_message {
+.widget {
+	width: 380px;
+	margin: 6px 0px;
+}
+
+.widget_big {
+	width: 778px;
+	margin-bottom: 6px;
+}
+
+.widget .widget_error_message,.widget_big .widget_error_message {
 	color: red;
 	font-weight: bold;
 	margin: 15px;
 }
 
 .toolbar_wrapper {
+	height: 98%;
 	position: fixed;
 	right: 0px;
-	top: 100px;
+	top: 0px;
 	vertical-align: top;
 	width: 420px;
 	padding: 5px;
@@ -51,15 +61,18 @@ table.widgets_container td {
 	background-position: bottom;
 }
 
-.toolbar_wrapper #toolbar {
+.toolbar_wrapper #scroll-container {
 	overflow-x: hidden;
 	overflow-y: scroll;
-	max-height: 500px;
+	max-height: 87%;
+	height: 87%;
+	border: 1px;
+	border-style: solid;
+	border-color: gray;
+	padding: 3px;
 }
 
 #show_hide {
-	position: relative;
-	left: -65px;
 	width: 60px;
 	height: 20px;
 	text-align: center;
@@ -67,7 +80,13 @@ table.widgets_container td {
 	color: white;
 }
 
-.widget h2 {
+.show_hide_link {
+	position: absolute;
+	left: -60px;
+	bottom: 10px;
+}
+
+.widget h2,.widget_big h2 {
 	margin: 3px 3px;
 	padding: 1px 10px;
 	width: auto;
@@ -77,7 +96,7 @@ table.widgets_container td {
 	text-align: center;
 }
 
-.widget .remove {
+.widget .remove,.widget_big  .remove {
 	display: none;
 }
 
@@ -86,13 +105,20 @@ table.widgets_container td {
 	padding-top: 5px;
 }
 
-.configure .widget:hover .remove {
+.configure .widget:hover .remove,.configure .widget_big:hover .remove {
 	width: 20px;
 	height: 20px;
 	display: block;
 	position: absolute;
-	margin-left: 360px;
 	border: none;
+}
+
+.configure .widget:hover .remove {
+	margin-left: 360px;
+}
+
+.configure .widget_big:hover .remove {
+	margin-left: 760px;
 }
 
 form#actionForSave input {
@@ -106,8 +132,20 @@ form#actionForSave input {
 	margin: 1px 0px;
 }
 
-.toolbar_wrapper #filler {
-	height: 5px;
+#toolbar_tc,#toolbar {
+	min-height: 40px;
+	padding-bottom: 5px;
+}
+
+.ui-sortable-placeholder {
+	visibility: visible !important;
+	border: 1px dashed !important;
+}
+
+.ui-placeholder-big {
+	visibility: visible;
+	border: 1px dashed;
+	height: 100%;
 }
 
 /*Charts*/
@@ -133,8 +171,9 @@ form#actionForSave input {
 	margin-right: -3px;
 }
 
-@-moz-document url-prefix () { .stacked_bar li { 
-	display:inline-block!important;
+@
+-moz-document url-prefix () { .stacked_bar li {
+	display: inline-block !important;
 	width: 0px;
 	height: 20px;
 	margin-left: 0px;
@@ -187,7 +226,7 @@ form#actionForSave input {
 	vertical-align: middle;
 }
 
-.widget table.signs td.optional, .dns_assigned_to_me a.optional {
+.widget table.signs td.optional,.dns_assigned_to_me a.optional {
 	display: none;
 }
 
@@ -229,6 +268,14 @@ form#actionForSave input {
 	display: none;
 }
 
+.widget_big .description {
+	display: none;
+}
+
+.widget_big .tc_content {
+	display: block;
+}
+
 .widget form.hidden {
 	display: none;
 }
@@ -258,10 +305,10 @@ form#actionForSave input {
 
 /* Events Completion */
 .events_completion .signs td {
-	width:auto;
+	width: auto;
 }
 
-.events_completion ul.stacked_bar,  .events_completion .not_cheduled{
+.events_completion ul.stacked_bar,.events_completion .not_cheduled {
 	background-color: #ecf8ff;
 }
 

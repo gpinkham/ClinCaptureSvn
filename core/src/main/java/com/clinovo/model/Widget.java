@@ -41,6 +41,7 @@ public class Widget extends AbstractMutableDomainObject {
 	private String displayAsDefault = "";
 	private boolean studyMetrics = false;
 	private boolean siteMetrics = false;
+	private boolean twoColumnWidget = false;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
@@ -99,5 +100,13 @@ public class Widget extends AbstractMutableDomainObject {
 
 	public void setSiteMetrics(boolean siteMetrics) {
 		this.siteMetrics = siteMetrics;
+	}
+
+	public boolean isTwoColumnWidget() {
+		return twoColumnWidget;
+	}
+
+	public void setTwoColumnWidget(boolean twoColumnWidget) {
+		this.twoColumnWidget = twoColumnWidget;
 	}
 }

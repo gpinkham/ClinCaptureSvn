@@ -1,4 +1,4 @@
-.widget h2 {
+.widget h2, .widget_big h2 {
 	background-color:#75b894;
 }
 
@@ -6,9 +6,8 @@
 	background-color:#75b894;
 }
 
-.ui-sortable-placeholder {
-  visibility:visible !important;
-  border: 1px dashed #75b894!important;
+.ui-sortable-placeholder, .ui-placeholder-big {
+  border-color: #75b894!important;
 }
 
 #show_hide {
