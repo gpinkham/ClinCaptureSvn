@@ -1895,7 +1895,7 @@ Parser.prototype.constructEventPath = function(itemName) {
 
 Parser.prototype.constructRepeatItemPath = function(target) {
 	// event oid?
-	var name = target.eventify ? target.eventOid : "";
+	var name = target.eventify ? target.evt : "";
 	// version oid?
 	if (target.versionify) {
 		name = name.length > 0 ? name + "." + target.version : target.version;

@@ -692,7 +692,7 @@ public class StudiesServlet extends HttpServlet {
 		if (preds.length == 3) {
 			crf = preds[0];
 		} else if (preds.length > 3) {
-			crf = preds[preds.length - 2];
+			crf = preds[preds.length - 3];
 		}
 		Pattern pattern = Pattern.compile("V\\d+$");
 		Matcher matcher = pattern.matcher(crf);
