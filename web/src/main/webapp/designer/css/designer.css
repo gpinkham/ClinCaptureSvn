@@ -348,3 +348,8 @@ div {
 .footer-container {
   height: 50px;
 }
+
+.alert-success {
+  overflow-y: auto;
+  max-height: 150px;
+}

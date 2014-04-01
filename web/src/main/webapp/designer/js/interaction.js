@@ -425,7 +425,7 @@ $(function() {
 				createBreadCrumb({
 					crf: crf.name,
 					study: study.name,
-					event: studyEvent.name,
+					evt: studyEvent.name,
 					version: crf.versions[0].name
 				});
 

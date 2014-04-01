@@ -117,12 +117,12 @@ function createBreadCrumb(params) {
 	});
 
 	studyCrumb.append(studyLink);
-	if (params.event) {
+	if (params.evt) {
 
 		ol.find(".active").removeClass(".active");
 		var eventCrumb = $("<li>");
 		var eventLink = $("<a>");
-		eventLink.text(params.event);
+		eventLink.text(params.evt);
 		eventLink.click(function() {
 			$("a[href='#events']").tab('show');
 		});
@@ -651,6 +651,12 @@ function createDroppable(params) {
 					params.element.append("&gt;");
 				} else {
 					params.element.append(ui.draggable.text());
+					// Persist attrinutes
+					params.element.attr("item-oid", ui.draggable.attr("oid"));
+					params.element.attr("crf-oid", ui.draggable.attr("crf-oid"));
+					params.element.attr("event-oid", ui.draggable.attr("event-oid"));
+					params.element.attr("group-oid", ui.draggable.attr("group-oid"));
+					params.element.attr("version-oid", ui.draggable.attr("version-oid"));
 				}
 			}
 
@@ -936,7 +942,7 @@ function loadStudyEvents(study) {
 
 				createBreadCrumb({
 					study: study.name,
-					event: currentEvent.name
+					evt: currentEvent.name
 				});
 			});
 
@@ -1007,12 +1013,12 @@ function loadEventCRFs(params) {
 				loadCRFVersions({
 					crf: currentCRF,
 					study: params.study,
-					event: params.studyEvent
+					evt: params.studyEvent
 				});
 				createBreadCrumb({
 					crf: currentCRF.name,
 					study: params.study.name,
-					event: params.studyEvent.name
+					evt: params.studyEvent.name
 				});
 			});
 
@@ -1071,10 +1077,14 @@ function loadCRFVersions(params) {
 				$(this).siblings(".selected").removeClass("selected");
 				$(this).addClass("selected");
 				var currentVersion = params.crf.versions[$(this).attr("id")];
-				loadCRFVersionItems(currentVersion);
+				loadCRFVersionItems({
+					crf: params.crf.oid,
+					evt: params.evt.oid,
+					version: currentVersion
+				});
 				createBreadCrumb({
 					crf: params.crf.name,
-					event: params.event.name,
+					evt: params.evt.name,
 					study: params.study.name,
 					version: currentVersion.name
 				});
@@ -1112,19 +1122,23 @@ function loadCRFVersions(params) {
  * Argument Object [params] parameters:
  * - crf - the crf for whom items should be loaded
  * ============================================================== */
-function loadCRFVersionItems(crf) {
+function loadCRFVersionItems(params) {
 	var itemArr = [];
 	$("div[id='items']").find("table").remove();
-	if (crf && crf.items) {
+	if (params.version && params.version.items) {
 		var itemsTable = createTable(['Name', 'Description', 'Data Type']);
-		for (var it = 0; it < crf.items.length; it++) {
-			var item = crf.items[it];
+		for (var it = 0; it < params.version.items.length; it++) {
+			var item = params.version.items[it];
 			var tr = $("<tr>");
 			var tdName = $("<td>");
 			tdName.text(item.name);
-			tdName.addClass("group")
+			tdName.addClass("group");
+			// Attributes
 			tdName.attr("oid", item.oid);
-			tdName.attr("goid", item.group);
+			tdName.attr("crf-oid", params.crf);
+			tdName.attr("event-oid", params.evt);
+			tdName.attr("group-oid", item.group);
+			tdName.attr("version-oid", params.version.oid);
 			createDraggable({
 				element: tdName,
 				target: ($("#dataSurface"), $("#secondDataSurface"))
@@ -1246,7 +1260,7 @@ function resetStudy(params) {
 
 	if (topEvent) {
 		loadCRFVersions({
-			event: topEvent,
+			evt: topEvent,
 			study: params.study,
 			crf: topEvent.crfs[Object.keys(topEvent.crfs)[0]]
 		});
@@ -1255,7 +1269,11 @@ function resetStudy(params) {
 			type: "crf",
 			candidate: topEvent.crfs[Object.keys(topEvent.crfs)[0]].oid
 		});
-		loadCRFVersionItems(topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0]);
+		loadCRFVersionItems({
+			evt: topEvent.oid,
+			crf: topEvent.crfs[Object.keys(topEvent.crfs)[0]].oid,
+			version: topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0]
+		});
 		// bold crf version
 		parser.recursiveSelect({
 			type: "version",

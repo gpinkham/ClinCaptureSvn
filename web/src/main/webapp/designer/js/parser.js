@@ -503,7 +503,10 @@ Parser.prototype.createRule = function() {
 		}
 		var item = parser.getItem(pred);
 		if (item) {
-			pred = quantified ? parser.constructCRFPath(pred) : parser.constructEventPath(pred);
+			pred = parser.constructExpressionPath({
+				quantified: quantified,
+				ele: $(".dotted-border")[index]
+			})
 		}
 		expression.push(pred);
 	});
@@ -520,6 +523,14 @@ Parser.prototype.createRule = function() {
 				target.name = target.eventify ? (target.evt + "." + formPath) : formPath;
 			}
 		}
+	}
+}
+
+Parser.prototype.constructExpressionPath = function(params) {
+	if (params.quantified) {
+		return  $(params.ele).attr("crf-oid") + "." + $(params.ele).attr("group-oid") + "." + $(params.ele).attr("item-oid");
+	} else {
+		return $(params.ele).attr("event-oid") + "." + $(params.ele).attr("crf-oid") + "." + $(params.ele).attr("group-oid") + "." + $(params.ele).attr("item-oid");
 	}
 }
 
@@ -1437,8 +1448,31 @@ Parser.prototype.setExpression = function(expression) {
 		this.rule.expression = expression;
 		var currDroppable = $("#groupSurface");
 		for (var e = 0; e < expression.length; e++) {
+			var itm = this.getItem(expression[e]);
 			if (e === 0) {
-				$("#groupSurface").text(expression[e]);
+				if (itm) {
+					var preds = expression[e].split(".");
+					if (preds.length == 4) {
+						$("#groupSurface").attr("event-oid", preds[3]);
+						$("#groupSurface").attr("crf-oid", preds[preds.length - 3]);
+						$("#groupSurface").attr("item-oid", preds[preds.length - 1]);
+						$("#groupSurface").attr("group-oid", preds[preds.length - 2]);
+					} else if (preds.length == 3) {
+						$("#groupSurface").attr("crf-oid", preds[0]);
+						$("#groupSurface").attr("item-oid", preds[2]);
+						$("#groupSurface").attr("group-oid", preds[1]);
+						$("#groupSurface").attr("event-oid", itm.eventOid);
+					} else {
+						$("#groupSurface").attr("item-oid", itm.oid);
+						$("#groupSurface").attr("crf-oid", itm.crfOid);
+						$("#groupSurface").attr("group-oid", itm.group);
+						$("#groupSurface").attr("event-oid", itm.eventOid);
+					}
+					$("#groupSurface").attr("version-oid", itm.crfVersionOid);
+					$("#groupSurface").text(itm.name);
+				} else {
+					$("#groupSurface").text(expression[e]);
+				}
 			} else {
 				var predicate = expression[e];
 				if (parser.isConditionalOp(predicate.toUpperCase())) {
@@ -1453,7 +1487,30 @@ Parser.prototype.setExpression = function(expression) {
 					currDroppable = droppable;
 				} else {
 					var droppable = createStartExpressionDroppable();
-					droppable.text(predicate);
+					if (itm) {
+						var itm = this.getItem(expression[e]);
+						var preds = expression[e].split(".");
+						if (preds.length == 4) {
+							droppable.attr("event-oid", preds[3]);
+							droppable.attr("crf-oid", preds[preds.length - 3]);
+							droppable.attr("item-oid", preds[preds.length - 1]);
+							droppable.attr("group-oid", preds[preds.length - 2]);
+						} else if (preds.length == 3) {
+							droppable.attr("crf-oid", preds[0]);
+							droppable.attr("item-oid", preds[2]);
+							droppable.attr("group-oid", preds[1]);
+							droppable.attr("event-oid", itm.eventOid);
+						} else {
+							droppable.attr("item-oid", itm.oid);
+							droppable.attr("group-oid", itm.group);
+							droppable.attr("crf-oid", itm.crfOid);
+							droppable.attr("event-oid", itm.eventOid);
+						} 
+						droppable.attr("version-oid", itm.crfVersionOid);
+						droppable.text(itm.name);
+					} else {
+						droppable.text(expression[e]);
+					}
 					currDroppable.after(droppable);
 					currDroppable = droppable;
 				}
@@ -1473,10 +1530,7 @@ Parser.prototype.setExpression = function(expression) {
 		for (var x = 0; x < expr.length; x++) {
 			var itm = this.getItem(expr[x]);
 			if (itm) {
-				rawExpression.push(itm.name);
-			} else if (expr[x].indexOf(".") !== -1) {
-				itm = this.getItem(this.extractItemOIDFromExpression(expr[x]));
-				rawExpression.push(itm.name);
+				rawExpression.push(expr[x]);
 			} else {
 				var pred = this.isOp(expr[x]) ? this.getLocalOp(expr[x]) : expr[x];
 				rawExpression.push(pred);
