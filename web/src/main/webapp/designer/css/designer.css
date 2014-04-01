@@ -25,7 +25,6 @@ body .container {
   margin-top: 1em;
   overflow-y: hidden;
   padding-right: 1px;
-  height: 100%;
 }
 
 body .panel {
@@ -107,7 +106,6 @@ body .panel-body {
 
 .space-top-sm {
   padding-top: 2.5em;
-  white-space: nowrap;
 }
 
 .space-top-m {
@@ -342,12 +340,8 @@ div {
 }
 
 .inner-scrollbar { 
-  width: 98%;
-}
-
-.inner-scrollbar-wrapper {
-  width: 98%;
-  height: 360px;
+  width: 98%; 
+  height: 200px;
   overflow-y: auto;
 }
 
