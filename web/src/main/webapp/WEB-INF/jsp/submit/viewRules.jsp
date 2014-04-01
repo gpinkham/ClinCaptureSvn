@@ -5,13 +5,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
-<script type="text/javascript" language="javascript">
-function confirmRemove(){
-	if (confirm("<fmt:message key="rule_if_you_remove_this_all" bundle="${resword}"/>")){
-		window.location.href='UpdateRuleSetRule?action=remove&ruleSetId=<c:out value="${ruleSet.id}"/>&source=ViewRuleSet';
-	}
-}
-</script>
+
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
  <c:import url="../include/admin-header.jsp"/>
@@ -21,6 +15,17 @@ function confirmRemove(){
 </c:otherwise>
 </c:choose>
 
+<script type="text/javascript" language="javascript">
+function confirmRemove(){
+	
+	confirmDialog({ 
+		message: "<fmt:message key="rule_if_you_remove_this_all" bundle="${resword}"/>",
+		height: 150, 
+		width: 500, 
+		redirectLink: 'UpdateRuleSetRule?action=remove&ruleSetId=<c:out value="${ruleSet.id}"/>&source=ViewRuleSet'
+	});
+}
+</script>
 <!-- *JSP* submit/viewRules.jsp -->
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -145,7 +150,7 @@ function confirmRemove(){
       <td><a href="UpdateRuleSetRule?action=remove&ruleSetRuleId=<c:out value="${ruleSetRule.id}"/>&ruleSetId=<c:out value="${ruleSet.id}"/>&source=ViewRuleSet"
       onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
       onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
-      onClick='return confirm("<fmt:message key="rule_if_you_remove_this" bundle="${resword}"/>");'><img
+      onClick='return confirmDialog({ message: "<fmt:message key="rule_if_you_remove_this" bundle="${resword}"/>", height: 150, width: 500, aLink: this });'><img
       name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
       </td>
       </c:if>
@@ -154,7 +159,7 @@ function confirmRemove(){
       <a href="UpdateRuleSetRule?action=restore&ruleSetRuleId=<c:out value="${ruleSetRule.id}"/>&ruleSetId=<c:out value="${ruleSet.id}"/>&source=ViewRuleSet"
       onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
       onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
-      onClick='return confirm("<fmt:message key="rule_if_you_restore_this" bundle="${resword}"/>");'><img
+      onClick='return confirmDialog({ message: "<fmt:message key="rule_if_you_restore_this" bundle="${resword}"/>", height: 150, width: 500, aLink: this });'><img
       name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
       </td>
       </c:if>

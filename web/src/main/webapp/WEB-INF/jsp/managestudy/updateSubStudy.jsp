@@ -8,7 +8,6 @@
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
 <jsp:include page="../include/sidebar.jsp"/>
 <jsp:useBean scope='request' id='parentStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>

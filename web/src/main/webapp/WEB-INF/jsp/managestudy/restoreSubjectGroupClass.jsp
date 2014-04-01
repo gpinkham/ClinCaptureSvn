@@ -7,7 +7,6 @@
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
@@ -183,7 +182,7 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-    <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="restore_subject_group_class" bundle="${resword}"/>");'>
+    <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="restore_subject_group_class" bundle="${resword}"/>", height: 150, width: 500, submit: this });'>
  </form> 
 <br><br>
 

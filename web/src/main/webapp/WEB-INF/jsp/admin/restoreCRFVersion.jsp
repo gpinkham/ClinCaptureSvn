@@ -100,7 +100,7 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-	<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="if_you_restore_this_CRF_version" bundle="${restext}"/>");'>
+	<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="if_you_restore_this_CRF_version" bundle="${restext}"/>", height: 150, width: 500, submit: this });'>
 	<input type = "hidden" name = "confirmPagePassed" value = "true" />
 </form>
 

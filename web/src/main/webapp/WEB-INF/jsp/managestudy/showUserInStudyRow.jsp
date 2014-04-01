@@ -57,8 +57,8 @@
                </fmt:message>
          	</c:set>
          	
-           	<c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
-               
+           	<c:set var="onClick" value="return confirmDialog({ message:'${confirmQuestion}', height:150, width:500, aLink:this });"/>
+           	  
             <c:if test="${currRow.bean.status.deleted}">
             	<td>
             		<img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6">

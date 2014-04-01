@@ -14,8 +14,6 @@
 	<jsp:include page="../include/home-header.jsp"/>
 </c:otherwise>
 </c:choose>
-<%-- <jsp:include page="../include/managestudy-header.jsp"/> --%>
-
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>

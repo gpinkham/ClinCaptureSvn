@@ -129,7 +129,7 @@
 
 
 <script language="JavaScript">
-<!--
+
 
 // Total number of tabs (one for each CRF)
 var TabsNumber = <c:out value="${sectionNum}"/>;
@@ -194,25 +194,24 @@ function DisplaySectionTabs()
 		}
 	}
 
-function checkDataStatus() {
-
-    objImage=document.getElementById('status_top');
-    if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-       return confirm('<fmt:message key="you_have_unsaved_data" bundle="${resword}"/>');
-    }
-
-    return true;
-}
 function gotoLink() {
 
-var OptionIndex=document.crfForm.sectionName.selectedIndex;
-if (checkDataStatus()) {
-  window.location = document.crfForm.sectionName.options[OptionIndex].value;
-}
+	objImage=document.getElementById('status_top');
+	
+    if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
+    	
+		var OptionIndex=document.crfForm.sectionName.selectedIndex;
+		confirmDialog({
+			message: '<fmt:message key="you_have_unsaved_data" bundle="${resword}"/>',
+			height: 150,
+			width: 500,
+			pageName: document.crfForm.sectionName.options[OptionIndex].value
+		});
+    }
 }
 
 
-//-->
+
 </script>
 
 	<td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"></td>

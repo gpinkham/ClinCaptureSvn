@@ -7,15 +7,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
-<script type="text/javascript" language="JavaScript">
-  <!--
-  function checkOverwriteStatus() {
-      //return confirm('<fmt:message key="you_will_overwrite_event_CRFs_continue" bundle="${resword}"/>');
-      return confirm('<fmt:message key="you_will_overwrite_event_CRFs_continue" bundle="${resword}"/>');
-  }
- //-->
-</script>
-
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
  <c:import url="../include/admin-header.jsp"/>
@@ -24,6 +15,14 @@
  <c:import url="../include/submit-header.jsp"/>
 </c:otherwise>
 </c:choose>
+
+<script type="text/javascript" language="JavaScript">
+  
+  function checkOverwriteStatus() {
+      return confirm('<fmt:message key="you_will_overwrite_event_CRFs_continue" bundle="${resword}"/>');
+  }
+ 
+</script>
 
 <!-- *JSP* submit/verifyImport.jsp -->
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
@@ -497,7 +496,8 @@
 			<c:if test="${overwriteCount > 0 }">
 				<input type="submit"
 					value="<fmt:message key="continue" bundle="${resword}"/>"
-					class="button_medium" onClick="return checkOverwriteStatus();">
+					class="button_medium" 
+					onClick="return confirmSubmit({ message: '<fmt:message key="you_will_overwrite_event_CRFs_continue" bundle="${resword}"/>', height: 150, width: 500, submit: this });">
 			</c:if>	
 		</td>
 			<%-- added an alert above --%>

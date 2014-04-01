@@ -10,7 +10,6 @@
 
 <jsp:include page="../include/admin-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->

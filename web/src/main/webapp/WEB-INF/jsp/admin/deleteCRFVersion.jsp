@@ -138,7 +138,7 @@
 <c:choose>
  <c:when test="${empty eventsForVersion && empty definitions}">
   <form action='DeleteCRFVersion?action=submit&verId=<c:out value="${version.id}"/>' method="POST">
-   <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="if_you_delete_this_CRF_version" bundle="${restext}"/>");'>
+   <input type="submit" name="BTN_Submit"  value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="if_you_delete_this_CRF_version" bundle="${restext}"/>", height: 150, width: 500, submit: this });'>
    <input type = "hidden" name = "confirmPagePassed" value = "true" />
       &nbsp;
    <%-- <input type="button" onclick="confirmCancel('ListCRF');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>--%>

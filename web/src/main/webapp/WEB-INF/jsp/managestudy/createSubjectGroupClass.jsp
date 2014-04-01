@@ -7,7 +7,7 @@
 
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
- 
+
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
 		<td class="sidebar_tab">

@@ -8,9 +8,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-
-
-
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
@@ -27,8 +24,10 @@
 
 <title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
-<link rel="stylesheet" href="../../includes/styles.css" type="text/css">
+<link rel="stylesheet" href="../../includes/styles.css" type="text/css" />
+<link rel="stylesheet" href="../../includes/jquery-ui.css"  type="text/css" />
 <script type="text/JavaScript" language="JavaScript" src="../../includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="../../includes/jmesa/jquery-ui.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="../../includes/global_functions_javascript.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="../../includes/Tabs.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="../../includes/CalendarPopup.js"></script>

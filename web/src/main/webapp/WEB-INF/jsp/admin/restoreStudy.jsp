@@ -5,7 +5,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="../include/admin-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -178,7 +177,7 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
- <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_restore_this_study" bundle="${restext}"/>");'>
+ <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onClick='return confirmSubmit({ message: "<fmt:message key="are_you_sure_you_want_to_restore_this_study" bundle="${restext}"/>", height: 150, width: 500, submit: this });'>
 </form>
 
 <c:import url="../include/workflow.jsp">

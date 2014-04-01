@@ -844,9 +844,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
 	private String removeLinkBuilder(Integer ruleSetRuleId, Integer ruleSetId) {
 		HtmlBuilder actionLink = new HtmlBuilder();
-		actionLink.a().href(
-				"UpdateRuleSetRule?action=remove&ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
-		actionLink.append("onClick='return confirm(\"" + resword.getString("rule_if_you_remove_this") + "\");'");
+		actionLink.a().href("UpdateRuleSetRule?action=remove&ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
+		actionLink.append("onClick=\"return confirmDialog({ message:'" + resword.getString("rule_if_you_remove_this") + "', height:150, width:500, aLink:this });\"");
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');\"");
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"").close();
 		actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt("Remove").title("Remove")
@@ -860,7 +859,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href(
 				"UpdateRuleSetRule?action=restore&ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
-		actionLink.append("onClick='return confirm(\"" + resword.getString("rule_if_you_restore_this") + "\");'");
+		actionLink.append("onClick=\"return confirmDialog({ message:'" + resword.getString("rule_if_you_restore_this") + "', height:150, width:500, aLink:this });\"");
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Restore3','images/bt_Restore_d.gif');\"");
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_Restore3','images/bt_Restore.gif');\"").close();
 		actionLink.img().name("bt_Restore3").src("images/bt_Restore.gif").border("0").alt("Restore").title("Restore")

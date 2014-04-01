@@ -9,7 +9,6 @@
 
 <jsp:include page="../include/admin-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -305,21 +304,17 @@
     }
 
     function back_checkEditUserFormState() {
-        var ok = undefined;
-        var newState = {};
+        
+    	var newState = {};
         saveEditUserFormState(newState);
         if ((updateSubjectFormState.uniqueIdentifier != undefined && updateSubjectFormState.uniqueIdentifier != newState.uniqueIdentifier) ||
             (updateSubjectFormState.gender != undefined && updateSubjectFormState.gender != newState.gender) ||
             (updateSubjectFormState.dateOfBirth != undefined && updateSubjectFormState.dateOfBirth != newState.dateOfBirth) ||
             (updateSubjectFormState.yearOfBirth != undefined && updateSubjectFormState.yearOfBirth != newState.yearOfBirth) ||
 			($("input[name=isDataChanged]").val() == 'true')) {
-            ok = confirm('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>');
-        } else {
-            ok = true;
-        }
-        if (ok) {
-        	goBackSmart('${navigationURL}', '${defaultURL}');
-        }
+        	confirmBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');
+        } 
+        goBackSmart('${navigationURL}', '${defaultURL}');
     }
  
     saveEditUserFormState(updateSubjectFormState);

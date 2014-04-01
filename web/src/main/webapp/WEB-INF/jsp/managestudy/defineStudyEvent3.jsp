@@ -8,7 +8,6 @@
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
@@ -47,22 +46,23 @@
 	</span>
 </h1>
 <script type="text/JavaScript" language="JavaScript">
-    <!--
+    
     function myCancel() {
 
         cancelButton=document.getElementById('cancel');
         if ( cancelButton != null) {
-            if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-                window.location.href="ListEventDefinition";
-                return true;
-            } else {
-                return false;
-            }
-        }
+        	confirmDialog({ 
+        		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
+        		height: 150,
+        		width: 500,
+        		redirectLink: 'ListEventDefinition'
+        		});      
+         	return false;
+         }
         return true;
 
     }
-    //-->
+    
 </script>
 
 <form action="DefineStudyEvent" method="post">

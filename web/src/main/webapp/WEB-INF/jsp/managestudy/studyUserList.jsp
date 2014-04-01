@@ -7,7 +7,6 @@
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -46,15 +45,15 @@
  
     cancelButton=document.getElementById('cancel');
     if ( cancelButton != null) {
-      if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-        window.location.href="ListStudyUser";
-       return true;
-      } else {
-        return false;
-       }
-     }
-     return true;    
-   
+       	confirmDialog({ 
+       		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
+       		height: 150,
+       		width: 500,
+       		redirectLink: 'ListStudyUser'
+       		});      
+        	return false;
+    }
+    return true; 
   }
    //-->
 </script>

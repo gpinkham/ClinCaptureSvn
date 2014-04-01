@@ -8,7 +8,6 @@
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
@@ -193,7 +192,7 @@
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
  
- <input type="submit" name="submit" title="<fmt:message key="restore_event_definition" bundle="${resword}"/>" value="<fmt:message key="submit" bundle="${resword}"/>" onClick='return confirm("<fmt:message key="if_you_restore_this_definition" bundle="${resword}"/>");' class="button_medium">
+ <input type="submit" name="submit" title="<fmt:message key="restore_event_definition" bundle="${resword}"/>" value="<fmt:message key="submit" bundle="${resword}"/>" onClick='return confirmSubmit({ message: "<fmt:message key="if_you_restore_this_definition" bundle="${resword}"/>", height: 150, width: 500, submit: this });' class="button_medium">
  <%-- <input type="button" onclick="confirmCancel('ListEventDefinition');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>--%>    
 </form>
 

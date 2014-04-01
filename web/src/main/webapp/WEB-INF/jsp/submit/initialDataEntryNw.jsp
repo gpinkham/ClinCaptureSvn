@@ -361,7 +361,7 @@ function DisplaySectionTabs()
 
         if (TabID != currTabID) {
             document.write('<div id="Tab' + TabID + 'NotSelected" style="display:all"><div class="tab_BG"><div class="tab_L"><div class="tab_R">');
-            document.write('<a class="tabtext" title="' + TabFullName[(TabID-1)] + '" href=' + url + ' onclick="return checkSectionStatus();">' + TabLabel[(TabID-1)] + '</a></div></div></div></div>');
+            document.write('<a class="tabtext" title="' + TabFullName[(TabID-1)] + '" href=' + url + ' onclick="return checkSectionStatus(this);">' + TabLabel[(TabID-1)] + '</a></div></div></div></div>');
             document.write('<div id="Tab' + TabID + 'Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">' + TabLabel[(TabID-1)] + '</span></div></div></div></div>');
             document.write('</td>');
         }
@@ -410,20 +410,19 @@ function reverseRowsOrder() {
     }
 }
 
-function checkDataStatus() {
-
-    objImage=document.getElementById('status_top');
-    if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-        return confirm('<fmt:message key="you_have_unsaved_data" bundle="${resword}"/>');
-    }
-
-    return true;
-}
 function gotoLink() {
 
-    var OptionIndex=document.crfForm.sectionName.selectedIndex;
-    if (checkDataStatus()) {
-        window.location = document.crfForm.sectionName.options[OptionIndex].value;
+	objImage=document.getElementById('status_top');
+	
+    if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
+    	
+		var OptionIndex=document.crfForm.sectionName.selectedIndex;
+		confirmDialog({
+			message: '<fmt:message key="you_have_unsaved_data" bundle="${resword}"/>',
+			height: 150,
+			width: 500,
+			pageName: document.crfForm.sectionName.options[OptionIndex].value
+		});
     }
 }
 
@@ -465,29 +464,38 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
 <input type="hidden" name="submitted" value="1" />
 
 <script type="text/javascript" language="JavaScript">
-    <!--
-    function checkSectionStatus() {
-        closing = false;
+    
+    function checkSectionStatus(aLink) {
+
         objImage=document.getElementById('status_top');
-    //alert(objImage.src);
         if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-            return confirm('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');
+        	confirmDialog({
+        		message: '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>',
+        		height: 150,
+        		width: 500,
+        		aLink: aLink
+        	});
+        	return false
         }
-
-        return true;
+        return true
     }
-
-
-    function checkEntryStatus(strImageName) {
-        closing = false;        
+    
+	function checkEntryStatus(strImageName, submit) {
+    	
         objImage = MM_findObj(strImageName);
-    //alert(objImage.src);
         if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-            return confirm('<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>');
+        	confirmSubmit({
+        		message: '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>',
+        		height: 150,
+        		width: 500,
+        		submit: submit
+        	});
+        	return false
         }
+    	
         return true;
-    }
-    //-->
+    } 
+    
 </script>
 
 <c:set var="stage" value="${param.stage}"/>
@@ -570,7 +578,7 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                                   "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
                                 <td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                                  "button_medium" onClick="return checkEntryStatus('DataStatus_top');" />
+                                  "button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" />
                                   <%--<input type="button" id="seh" name="BTN_Exit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
                                   "button_medium" onClick="javascript: return checkGoBackEntryStatus('DataStatus_top', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');" /> --%></td>
                                 <c:choose>
@@ -632,7 +640,7 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                     <%--
 
                                             <td><input type="submit" name="submittedResume" value="Save" class="button_medium" /></td>
-                                            <td><input type="submit" name="submittedExit" value="Exit" class="button_medium" onClick="return checkEntryStatus('DataStatus_top');" /></td>
+                                            <td><input type="submit" name="submittedExit" value="Exit" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" /></td>
 
                                     --%>
 
@@ -1631,7 +1639,7 @@ table-->
                     </c:choose>
                     <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                       "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
-                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom');" />
+                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" />
                     <%-- <input type="button" id="srl" name="BTN_Exit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
                                   "button_medium" onClick="javascript: return checkGoBackEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');" />--%></td>
                     

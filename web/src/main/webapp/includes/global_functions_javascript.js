@@ -45,17 +45,12 @@ function checkGoToEntryStatus(strImageName, Message, Adress) {
     return true;
 }
 function confirmGoTo(Message, Adress){
-    var confirm1 = confirm(Message);
-    if(confirm1){
-    	window.location.href=(Adress);
-    }
+	confirmDialog({ message: Message, height: 150, width: 500, redirectLink: Address });
 }
 function confirmBack(Message){
-    var confirm1 = confirm(Message);
-    if(confirm1){
-       history.go(-1);
-    }
+	confirmSubmit({ message: Message, height: 150, width: 500, goBack: true });
 }
+
 function changeIcon(){
 	setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');
 }
@@ -81,7 +76,7 @@ function checkGoBackSmartEntryStatus(strImageName, Message, servletURL, defaultU
     objImage = MM_findObj(strImageName);
     //alert(objImage.src);
     if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-        return confirmBackSmart(Message, servletURL, defaultURL);
+        return confirmBackSmart(Message, servletURL, defaultURL, undefined);
     } else {
         goBackSmart(servletURL, defaultURL);
     }
@@ -89,47 +84,124 @@ function checkGoBackSmartEntryStatus(strImageName, Message, servletURL, defaultU
 }
 
 function confirmBackSmart(Message, servletURL, defaultURL){
-    var confirm1 = confirm(Message);
-    if(confirm1){
-        goBackSmart(servletURL, defaultURL);
-    }
+	
+	$("<div id='confirmDialog' title='Confirm Action'>" +
+	        "<div style='clear: both; margin-top: 2%; text-align: justify'>" +
+	        Message +
+	        "</div></div>").appendTo("body");
+	
+    $("#confirmDialog").dialog({
+        autoOpen : true,
+        closeOnEscape: false,
+        modal : true,
+        height: 150,
+        width: 500,
+        buttons:{ 
+        	'Yes': function() {
+            	$("#confirmDialog").remove();
+            	goBackSmart(servletURL, defaultURL);
+        	},
+            'No': function() { 
+            	$("#confirmDialog").remove(); 
+            }
+        },
+
+        open: function(event, ui) {
+
+            openDialog({ 
+            	dialogDiv: this, 
+            	cancelButtonValue: "No", 
+            	okButtonValue: "Yes", 
+            	imagesFolderPath: determineImagesPath()
+    		});
+        }
+    });
+    return false;
 }
 
 function datasetConfirmBack(message, formId, address, action) {
-  var newFormState = $("#" + formId).serialize();
-  var confirm1 = $("#" + formId).length != 0
-      && newFormState != firstFormState ? confirm(message) : true;
-  if (confirm1) {
-    $("#" + formId)[0].setAttribute("action", address);
+	var newFormState = $("#" + formId).serialize();
+	var confirm1 = $("#" + formId).length != 0
+    && newFormState != firstFormState;
+	
+	if(!confirm1){
+		confirmBackSubmitForm(formId, address, action);
+		return true;
+	}		
+	
+	$("<div id='confirmDialog' title='Confirm Action'>" +
+	        "<div style='clear: both; margin-top: 2%; text-align: justify'>" +
+	        message +
+	        "</div></div>").appendTo("body");
+	
+    $("#confirmDialog").dialog({
+        autoOpen : true,
+        closeOnEscape: false,
+        modal : true,
+        height: 150,
+        width: 500,
+        buttons:{ 
+        	'Yes': function() {
+        		confirmBackSubmitForm(formId, address, action);
+        	},
+            'No': function() { 
+            	$("#confirmDialog").remove(); 
+            }
+        },
+
+        open: function(event, ui) {
+
+            openDialog({ 
+            	dialogDiv: this, 
+            	cancelButtonValue: "No", 
+            	okButtonValue: "Yes", 
+            	imagesFolderPath: determineImagesPath()
+    		});
+        }
+    });
+    return false;
+}
+
+function confirmBackSubmitForm(formId, address, action) {
+	
+	$("#" + formId)[0].setAttribute("action", address);
     $("#" + formId + " input[name=action]").val(action);
     $("#" + formId + " input[id=btnSubmit]")[0].setAttribute("onclick", "");
     $("#" + formId + " input[id=btnSubmit]").click();
-  }
 }
 
 function formWithStateGoBackSmart(message, servletURL, defaultURL) {
   var newFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea").serialize();
-  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed" ? confirm(message) : true;
+  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed";
   if (confirm1) {
-    goBackSmart(servletURL, defaultURL);
+	  confirmBackSmart(message, servletURL, defaultURL);
+  }
+  else{
+	  goBackSmart(servletURL, defaultURL);	  
   }
   return true;
 }
 
 function formWithStateCancelSmart(message, servletURL, defaultURL) {
   var newFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea").serialize();
-  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed" ? confirm(message) : true;
+  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed";
   if (confirm1) {
-    goBackSmart(servletURL, defaultURL);
+	  confirmBackSmart(message, servletURL, defaultURL);
+  }
+  else {
+	  goBackSmart(servletURL, defaultURL);
   }
   return true;
 }
 
 function formWithStateConfirmGoTo(message, address) {
   var newFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea").serialize();
-  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed" ? confirm(message) : true;
+  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed";
   if (confirm1) {
-    window.location.href = address;
+	  confirmDialog({ message: message, height: 150, width: 500, redirectLink: address });
+  }
+  else {
+	  window.location.href = address;
   }
   return true;
 }
@@ -3114,26 +3186,13 @@ function showMedicalCodingAlertBox(item, ajaxResponse){
             buttons: { 'Cancel': function() { hideMedicalCodingAlertBox(ajaxResponse) }},
             open: function(event, ui) {
 
-                $(".ui-dialog-titlebar-close", $(this).parent()).hide();
-                $('.ui-widget-content').css('border', '0');
-                $('.ui-dialog-buttonpane').find('button:contains("Cancel")')
-                    .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0').css('padding-top', '0.4em').css('padding-bottom', '0.4em');
-                $('.ui-dialog-buttonpane').find('button:contains("Cancel")')
-                    .mouseover(function() {$(this).removeClass("ui-state-hover");})
-                    .focus(function () {$(this).removeClass("ui-state-focus");});
-                $('.ui-dialog-buttonpane').find('button:contains("Cancel")').blur();
+            	openDialog({ 
+            		dialogDiv: this, 
+            		cancelButtonValue: "Cancel",
+            		imagesFolderPath: determineImagesPath() 
+    			});
             }
         });
-    }
-
-    var color = $('*').find('a').css('color');
-    if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
-        $('.ui-dialog-buttonpane').find('button:contains("Cancel")').css('background-image', 'url(../images/violet/button_medium_BG.gif)');
-        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
-    }
-    if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
-        $('.ui-dialog-buttonpane').find('button:contains("Cancel")').css('background-image', 'url(../images/green/button_medium_BG.gif)');
-        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
     }
 }
 
@@ -3167,6 +3226,7 @@ function showMedicalCodingUncodeAlertBox(item) {
 
             $("#alertBox").dialog({
                 autoOpen : true,
+                closeOnEscape: false,
                 modal : true,
                 height: 150,
                 width: 500,
@@ -3186,15 +3246,13 @@ function showMedicalCodingUncodeAlertBox(item) {
                 },
 
                 open: function(event, ui) {
-
-                    $(".ui-dialog-titlebar-close", $(this).parent()).hide();
-                    $('.ui-widget-content').css('border', '0');
-                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
-                        .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0').css('padding-top', '0.4em').css('padding-bottom', '0.4em');
-                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
-                        .mouseover(function() {$(this).removeClass("ui-state-hover");})
-                        .focus(function () {$(this).removeClass("ui-state-focus");});
-                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")').blur();
+                	
+                	openDialog({ 
+                		dialogDiv: this, 
+                		cancelButtonValue: "Cancel", 
+                		okButtonValue: "Submit", 
+                		imagesFolderPath: determineImagesPath() 
+        			});
                 }
             });
         } else {
@@ -3205,33 +3263,22 @@ function showMedicalCodingUncodeAlertBox(item) {
 
             $("#alertBox").dialog({
                 autoOpen : true,
+                closeOnEscape: false,
                 modal : true,
                 height: 150,
                 width: 450,
                 buttons: { 'Submit': function() { uncodeCodeItem(item); $("#alertBox").remove(); }, 'Cancel': function() { $("#alertBox").remove(); }},
                 open: function(event, ui) {
 
-                    $(".ui-dialog-titlebar-close", $(this).parent()).hide();
-                    $('.ui-widget-content').css('border', '0');
-                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
-                        .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0').css('padding-top', '0.4em').css('padding-bottom', '0.4em');
-                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")')
-                        .mouseover(function() {$(this).removeClass("ui-state-hover");})
-                        .focus(function () {$(this).removeClass("ui-state-focus");});
-                    $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")').blur();
+                	openDialog({ 
+                		dialogDiv: this, 
+                		cancelButtonValue: "Cancel", 
+                		okButtonValue: "Submit", 
+                		imagesFolderPath: determineImagesPath() 
+        			});
                 }
             });
         }
-    }
-
-    var color = $('*').find('a').css('color');
-    if (color == 'rgb(170, 98, 198)' || color == '#AA62C6' || color == '#aa62c6') {
-        $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")').css('background-image', 'url(../images/violet/button_medium_BG.gif)');
-        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
-    }
-    if (color == 'rgb(117, 184, 148)' || color == '#75b894' || color == '#75B894') {
-        $('.ui-dialog-buttonpane').find('button:contains("Cancel"), button:contains("Submit")').css('background-image', 'url(../images/green/button_medium_BG.gif)');
-        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
     }
 }
 
@@ -3521,4 +3568,240 @@ function chooseHomePageVersion(){
 	} else {
 		$(".old_home_page").remove();
 	}
+}
+
+function alertDialog(params){
+	
+	$("<div id='alertDialog' title='Message Alert'>" +
+        "<div style='clear: both; margin-top: 2%; text-align: justify'>" +
+        params.message +
+        "</div></div>").appendTo("body");
+	
+    $("#alertDialog").dialog({
+        autoOpen : true,
+        closeOnEscape: false,
+        modal : true,
+        height: params.height,
+        width: params.width,
+        buttons:{ 
+        	'Ok': function() {
+            	$("#alertDialog").remove();
+        	}
+        },
+
+        open: function(event, ui) {
+
+            openDialog({ 
+            	dialogDiv: this, 
+            	okButtonValue: "Ok", 
+            	imagesFolderPath: determineImagesPath()
+    		});
+        }
+    });
+    return false;
+}
+
+function confirmDialog(params){
+	
+	$("<div id='confirmDialog' title='Confirm Action'>" +
+        "<div style='clear: both; margin-top: 2%; text-align: justify'>" +
+        params.message +
+        "</div></div>").appendTo("body");
+	
+    $("#confirmDialog").dialog({
+        autoOpen : true,
+        closeOnEscape: false,
+        modal : true,
+        height: params.height,
+        width: params.width,
+        buttons:{ 
+        	'Yes': function() {
+            	$("#confirmDialog").remove();
+            	if(params.aLink){
+            		var href = $(params.aLink).attr('href');
+                	window.location.href = href;
+            	} else if (params.redirectLink){
+            		window.location.href = params.redirectLink;
+            	} else if (params.checkbox) {
+            		var isChecked = $(params.checkbox).is(':checked');
+            		$(params.checkbox).attr("checked", !isChecked);
+            	}            	
+        	},
+            'No': function() { 
+            	$("#confirmDialog").remove(); 
+            }
+        },
+
+        open: function(event, ui) {
+
+            openDialog({ 
+            	dialogDiv: this, 
+            	cancelButtonValue: "No", 
+            	okButtonValue: "Yes", 
+            	imagesFolderPath: determineImagesPath()
+    		});
+        }
+    });
+    return false;
+}
+
+function openDialog(params) {
+	
+	var themeColorCode = $("#themeColorCode").val();
+	$(".ui-dialog-titlebar-close", $(params.dialogDiv).parent()).hide();
+    $('.ui-dialog-titlebar').css('border', '1px Solid ' + themeColorCode);
+    $('.ui-widget-content').css('border', '0');
+    
+    if(params.cancelButtonValue)
+    	setButtonAttributes(params.cancelButtonValue);
+    
+    if(params.okButtonValue)
+    	setButtonAttributes(params.okButtonValue);    
+    
+    setDialogTheme(params);
+    
+}
+
+function setButtonAttributes(buttonValue){
+	
+	$('.ui-dialog-buttonpane').find('button:contains("' + buttonValue + '")')
+    .removeAttr('class').addClass('button_medium').css('width', '120px').css('float', 'left').css('line-height', '0').css('padding-top', '0.4em').css('padding-bottom', '0.4em');
+    $('.ui-dialog-buttonpane').find('button:contains("' + buttonValue + '")')
+        .mouseover(function() {$(this).removeClass("ui-state-hover");})
+        .focus(function () {$(this).removeClass("ui-state-focus");});
+    $('.ui-dialog-buttonpane').find('button:contains("' + buttonValue + '")').blur();
+}
+
+function setDialogTheme(params) {
+	
+	var themeColorCode = $("#themeColorCode").val();
+	
+	//Violet Color Theme
+    if (themeColorCode == '#AA62C6' || themeColorCode == '#aa62c6') {
+    	
+    	if(params.cancelButtonValue)
+    		$('.ui-dialog-buttonpane').find('button:contains("' + params.cancelButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + 'violet/button_medium_BG.gif)');
+    	if(params.okButtonValue)
+    		$('.ui-dialog-buttonpane').find('button:contains("' + params.okButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + 'violet/button_medium_BG.gif)');
+    	
+        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
+    }
+    
+    //Green Color Theme
+    if (themeColorCode == '#75b894' || themeColorCode == '#75B894') {
+    	
+    	if(params.cancelButtonValue)
+    		$('.ui-dialog-buttonpane').find('button:contains("' + params.cancelButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + 'green/button_medium_BG.gif)');
+    	if(params.okButtonValue)
+    		$('.ui-dialog-buttonpane').find('button:contains("' + params.okButtonValue + '")').css('background-image', 'url(' + params.imagesFolderPath + 'green/button_medium_BG.gif)');
+    	
+        $('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
+    }
+}
+
+function confirmMarkAsComplete(params){
+	
+	$("<div id='confirmDialog' title='Confirm Action'>" +
+        "<div style='clear: both; margin-top: 2%; text-align: justify'>" +
+        params.message +
+        "</div></div>").appendTo("body");
+	
+    $("#confirmDialog").dialog({
+        autoOpen : true,
+        closeOnEscape: false,
+        modal : true,
+        height: params.height,
+        width: params.width,
+        buttons:{ 
+        	'Yes': function() {
+            	$("#confirmDialog").remove();
+            	document.getElementById(params.elementName).value=2;
+                document.forms[1].action=params.formAction;
+                document.forms[1].method="POST";
+                document.forms[1].submit();
+        	},
+            'No': function() { 
+            	$("#confirmDialog").remove(); 
+            }
+        },
+
+        open: function(event, ui) {
+
+            openDialog({ 
+            	dialogDiv: this, 
+            	cancelButtonValue: "No", 
+            	okButtonValue: "Yes", 
+            	imagesFolderPath: determineImagesPath()
+    		});
+        }
+    });
+    return false;
+}
+
+function confirmSubmit(params){
+	
+	$("<div id='confirmDialog' title='Confirm Action'>" +
+        "<div style='clear: both; margin-top: 2%; text-align: justify'>" +
+        params.message +
+        "</div></div>").appendTo("body");
+	
+    $("#confirmDialog").dialog({
+        autoOpen : true,
+        closeOnEscape: false,
+        modal : true,
+        height: params.height,
+        width: params.width,
+        buttons:{ 
+        	'Yes': function() {
+            	$("#confirmDialog").remove();
+            	if(params.form) {
+            		params.form.submit();
+            	} else if(params.submit) {
+            		params.submit.setAttribute("onClick", "");
+            		params.submit.click();
+            	} else if(params.pageName) {
+            		window.location = params.pageName;
+            	} else if(params.goBack) {
+            		history.go(-1);
+            	}
+            		
+        	},
+            'No': function() { 
+            	$("#confirmDialog").remove(); 
+            }
+        },
+
+        open: function(event, ui) {
+
+            openDialog({ 
+            	dialogDiv: this, 
+            	cancelButtonValue: "No", 
+            	okButtonValue: "Yes", 
+            	imagesFolderPath: determineImagesPath()
+    		});
+        }
+    });
+    return false;
+}
+
+function determineImagesPath() {
+	
+	var slashesInPath = window.location.pathname.split('/').length - 1;
+	var imagesPath = "images/";
+	
+	for(var i = 2; i < slashesInPath; i++ ) {
+		imagesPath = "../" + imagesPath;
+	}		
+	
+	return imagesPath;
+}
+
+function checkFileUpload(fileUploadId, message){
+    var fileUpload = document.getElementById(fileUploadId);
+    //Does the user browse or select a file or not
+    if (fileUpload.value =='' ){
+    	alertDialog({ message: message, height: 150, width: 400 });
+        return false;
+    }
+    return true;
 }

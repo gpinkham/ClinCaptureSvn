@@ -11,6 +11,9 @@
 
 <jsp:include page="../include/managestudy_top_pages_new.jsp"/>
 
+<link rel="stylesheet" href="../../includes/jquery-ui.css"  type="text/css"/>
+
+<script type="text/JavaScript" language="JavaScript" src="../../includes/jmesa/jquery-ui.min.js"></script>
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 <tr id="sidebar_Instructions_open" style="display: all">

@@ -22,7 +22,7 @@
         <a href="ExportDataset?action=delete&datasetId=<c:out value="${currRow.bean.datasetId}"/>&adfId=<c:out value="${currRow.bean.id}"/>">
             <img name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>"
                  title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"
-                 onClick='return confirm("<fmt:message key="if_you_delete_this_dataset" bundle="${restext}"/>");'>
+                 onClick='return confirmDialog({ message: "<fmt:message key="if_you_delete_this_dataset" bundle="${restext}"/>", height: 150, width: 500, aLink: this });'>
         </a>
     </td>
 </tr>

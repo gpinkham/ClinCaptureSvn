@@ -36,7 +36,7 @@
           <td>
             <c:choose>
                 <c:when test="${(study.parentStudyId > 0 && study.parentStudyId == currRow.bean.parent.id) || (study.id == currRow.bean.parent.id)}">
-                    <a href="#" onclick="alert('<fmt:message key="you_are_trying_to_remove_the_current_study" bundle="${resword}"/>');"/>
+                    <a href="#" onclick="return alertDialog({message: '<fmt:message key="you_are_trying_to_remove_the_current_study" bundle="${resword}"/>', height: 150, width: 500 });"/>
                     <img name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6">
                     </a>
                 </c:when>

@@ -50,7 +50,7 @@
 					  </fmt:message>
 					</c:set>
 					
-					<c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
+					<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this });"/>
 					<%-- <img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>
 					<img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a>
 					<img name="spaceIcon" src="images/bt_Restore.gif" style="visibility:hidden;" border="0" align="left" hspace="6"></a> --%>
@@ -81,7 +81,7 @@
 				 </fmt:message>
 				</c:set> 
 				
-				<c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
+				<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this });"/>
                 <c:choose>
                     <c:when test="${currRow.bean.name eq 'root'}"></c:when>
                     <c:when test="${currRow.bean.id eq userBean.id}"></c:when>
@@ -147,7 +147,7 @@
 				<fmt:param value="${study}"/>
 			</fmt:message>
 			</c:set>
-			<c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
+			<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this });"/>
 			<tr valign="top">
 				<td class="table_cell_left">&nbsp;</td>
                 <td class="table_cell_left">&nbsp;</td>
@@ -218,7 +218,7 @@
 									<fmt:param value="${study}"/>
 								</fmt:message>
 							</c:set>
-							<c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
+							<c:set var="onClick" value="return confirmDialog({ message: '${confirmQuestion}', height: 150, width: 500, aLink: this });"/>
 					
                         	<a href="DeleteStudyUserRole?studyId=<c:out value="${sur.studyId}" />&userName=<c:out value="${currRow.bean.name}"/>&action=3" onClick="<c:out value="${onClick}" />"
                         		onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"

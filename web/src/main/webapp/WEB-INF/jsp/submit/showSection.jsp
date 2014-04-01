@@ -12,28 +12,39 @@
 
 <!-- *JSP* submit/showSection.jsp -->
 <script type="text/javascript" language="JavaScript">
-  <!--
-  function checkSectionStatus() {
+  
+  function checkSectionStatus(aLink) {
 
-    objImage=document.getElementById('status_top');
-    //alert(objImage.src);
-    if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-      return confirm('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');
-    }
-
-    return true;
+      objImage=document.getElementById('status_top');
+      if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
+      	confirmDialog({
+      		message: '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>',
+      		height: 150,
+      		width: 500,
+      		aLink: aLink
+      	});
+      	return false
+      }
+      return true
   }
 
 
-  function checkEntryStatus(strImageName) {
-    objImage = MM_findObj(strImageName);
-    //alert(objImage.src);
-    if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
-      return confirm('<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>');
-    }
-    return true;
+   function checkEntryStatus(strImageName, submit) {
+  	
+      objImage = MM_findObj(strImageName);
+      if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
+      	confirmSubmit({
+      		message: '<fmt:message key="you_have_unsaved_data_exit" bundle="${resword}"/>',
+      		height: 150,
+      		width: 500,
+      		submit: submit
+      	});
+      	return false
+      }
+  	
+      return true;
   }
-  //-->
+  
 </script>
 
 
@@ -93,7 +104,7 @@
                 <c:choose>
                   <c:when test="${stage !='adminEdit' && section.lastSection}">
                     <td valign="bottom"><input type="checkbox" name="markComplete" value="Yes"
-                                               onClick='return confirm("<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>");'>
+                                               onClick='return confirmDialog({ message: "<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>", height: 150, width: 500, checkbox: this });'>
                     </td>
                     <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/> &nbsp;&nbsp;&nbsp;</td>
                   </c:when>
@@ -104,7 +115,7 @@
                 <td><input type="submit" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                   "button_medium" /></td>
                 <td><input type="submit" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
-                  "button_medium" onClick="return checkEntryStatus('DataStatus_top');" /></td>
+                  "button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" /></td>
 
                 <td valign="bottom"><img name=
                   "DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnchangedData.gif"></td>
@@ -137,7 +148,7 @@
                 <c:choose>
                   <c:when test="${stage !='adminEdit' && section.lastSection}">
                     <td valign="bottom"><input type="checkbox" name="markComplete" value="Yes"
-                                               onClick='return confirm("<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>");'>
+                                               onClick='return confirmDialog({ message: "<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>", height: 150, width: 500, checkbox: this });'>
                     </td>
                     <td valign="bottom" nowrap>&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/> &nbsp;&nbsp;&nbsp;</td>
                   </c:when>
@@ -146,7 +157,7 @@
                   </c:otherwise>
                 </c:choose>
                 <td><input type="submit" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class="button_medium" /></td>
-                <td><input type="submit" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_top');" /></td>
+                <td><input type="submit" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_top', this);" /></td>
 
                   <%--<td valign="bottom"><img name="DataStatus_top" src="images/icon_UnchangedData.gif"></td>--%>
               </tr>
@@ -312,7 +323,7 @@
             <c:when test="${stage !='adminEdit' && section.lastSection}">
               <td valign="bottom">
                 <input type="checkbox" name="markComplete" value="Yes"
-                       onClick='return confirm(<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>);'>
+                       onClick='return confirmDialog({ message: "<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>", height: 150, width: 500, checkbox: this });'>
               </td>
               <td valign="bottom" nowrap>&nbsp; <fmt:message key="mark_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
             </c:when>
@@ -322,7 +333,7 @@
           </c:choose>
           <td><input type="submit" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
             "button_medium" /></td>
-          <td><input type="submit" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom');" /></td>
+          <td><input type="submit" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom', this);" /></td>
 
           <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnchangedData.gif">&nbsp;</td>
 

@@ -91,7 +91,7 @@
     <form id="selectAllItems" action="EditSelected" method="post" name="selectAllItems">
         <input type="hidden" name="all" value="1">
     </form>
-     <c:if test="${! EditSelectedSubmitted}"><a href='javascript:void 0' onclick="if(confirm('<fmt:message key="there_a_total_of" bundle="${resword}"><fmt:param value="${numberOfStudyItems}"/></fmt:message>')){document.getElementById('selectAllItems').submit();}"><b><fmt:message key="select_all_items_in_study" bundle="${resword}"/></b></a>
+     <c:if test="${! EditSelectedSubmitted}"><a href='javascript:void 0' onclick="confirmSubmit({ message: '<fmt:message key="there_a_total_of" bundle="${resword}"><fmt:param value="${numberOfStudyItems}"/></fmt:message>', height: 150, width: 500, form: document.getElementById('selectAllItems')});"><b><fmt:message key="select_all_items_in_study" bundle="${resword}"/></b></a>
         </c:if> 
 </c:otherwise>
 </c:choose>

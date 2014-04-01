@@ -349,8 +349,9 @@
     height: 200px; /*must have*/
 }/* Dialog
 ----------------------------------*/
-.ui-dialog { position: relative; padding: .2em; width: 300px; font-size: 12px; }
+.ui-dialog { position: relative; padding: .2em; width: 300px; font-size: 12px; box-shadow: 1px 1px 5px #333; }
 .ui-dialog .ui-dialog-titlebar { padding: 4px; position: relative; color: #5B91C9; }
+.ui-dialog > .ui-widget-header {border: 1px solid #5B91C9/*{borderColorHeader}*/; background: #5B91C9 url(images/ui-bg_highlight-soft_75_cccccc_1x100.png)/*{bgImgUrlHeader}*/ 50%/*{bgHeaderXPos}*/ 50%/*{bgHeaderYPos}*/ repeat-x/*{bgHeaderRepeat}*/;}
 .ui-dialog .ui-dialog-title { float: left; margin: .1em 0 .2em; } 
 .ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
 .ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }

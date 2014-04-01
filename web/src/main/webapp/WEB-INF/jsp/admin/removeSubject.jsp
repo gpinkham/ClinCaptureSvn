@@ -8,7 +8,6 @@
 
 <c:import url="../include/admin-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -178,7 +177,7 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="if_you_remove_this_subject" bundle="${restext}"/>");'>
+<input type="submit" name="BTN_Submit"  value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="if_you_remove_this_subject" bundle="${restext}"/>", height: 150, width: 500, submit: this });'>
 </form>
 <br><br>
 

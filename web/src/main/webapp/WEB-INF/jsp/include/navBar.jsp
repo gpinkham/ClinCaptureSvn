@@ -12,47 +12,68 @@
             bugtrack = bugtrack + user+ "&url=" + window.location.href;
             openDocWindow(bugtrack);
         }
+        
         function confirmCancel(pageName){
-            var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
-            if(confirm1){
-                window.location = pageName;
-            }
+        	
+        	confirmSubmit({
+        		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
+        		height: 150,
+        		width: 500,
+        		pageName: pageName
+        	});
         }
+        
         function confirmCancelAction( pageName, contextPath){
-            var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
-            if(confirm1){
-            	 var tform = document.forms["fr_cancel_button"];
-            	tform.action=contextPath+"/"+pageName;
-            	tform.submit();
-
-            }
+        	
+        	var tform = document.forms["fr_cancel_button"];
+        	tform.action=contextPath+"/"+pageName;
+        	confirmSubmit({
+        		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
+        		height: 150,
+        		width: 500,
+        		form: tform
+        	});
         }
+        
         function confirmExit(pageName){
-            var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
-            if(confirm1){
-                window.location = pageName;
-            }
+        	
+        	confirmSubmit({
+        		message: '<fmt:message key="sure_to_exit" bundle="${resword}"/>',
+        		height: 150,
+        		width: 500,
+        		pageName: pageName
+        	});
         }
+        
         function goBack(){
-            var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
-            if(confirm1){
-                return history.go(-1);
-            }
+        	
+        	confirmSubmit({
+        		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
+        		height: 150,
+        		width: 500,
+        		goBack: true
+        	});
         }
         function lockedCRFAlert(userName){
-            alert('<fmt:message key="CRF_unavailable" bundle="${resword}"/>'+'\n'
-                    +'          '+userName+' '+'<fmt:message key="Currently_entering_data" bundle="${resword}"/>'+'\n'
-                    +'<fmt:message key="Leave_the_CRF" bundle="${resword}"/>');
+
+            alertDialog({
+        		message: message,
+        		height: 150,
+        		width: 500
+        	});
             return false;
         }
+        
         function confirmExitAction( pageName, contextPath){
-            var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
-            if(confirm1){
-            	 var tform = document.forms["fr_cancel_button"];
-            	tform.action=contextPath+"/"+pageName;
-            	tform.submit();
-
-            }
+        	
+        	var tform = document.forms["fr_cancel_button"];
+        	tform.action=contextPath+"/"+pageName;
+        	confirmSubmit({
+        		message: '<fmt:message key="sure_to_exit" bundle="${resword}"/>',
+        		height: 150,
+        		width: 500,
+        		form: tform
+        	});
         }
 </script>
 
@@ -127,7 +148,7 @@
                                         <ul>
                                         <c:choose>
                                             <c:when test="${userRole.sysAdmin || userBean.techAdmin}">
-                                                <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                                <li><a href="${urlPrefix}MainMenu" onclick="alert('${pageContext.request.servletPath}');"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                                 <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
 
                                                 <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">

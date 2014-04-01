@@ -28,7 +28,6 @@
     </c:otherwise>
 </c:choose>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <script type="text/JavaScript" language="JavaScript">
@@ -36,13 +35,14 @@
 
         cancelButton=document.getElementById('cancel');
         if ( cancelButton != null) {
-            if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-                window.location.href="ListStudySubjects";
-                return true;
-            } else {
-                return false;
-            }
-        }
+        	confirmDialog({ 
+        		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
+        		height: 150,
+        		width: 500,
+        		redirectLink: 'ListStudySubjects'
+        		});      
+         	return false;
+       	}
         return true;
 
     }

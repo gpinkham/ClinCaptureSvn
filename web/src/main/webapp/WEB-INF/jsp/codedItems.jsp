@@ -66,10 +66,8 @@
 </tr>
 <jsp:include page="include/sideInfo.jsp"/>
 <link rel="stylesheet" href="../includes/jmesa/jmesa.css" type="text/css">
-<link rel="stylesheet" href="../includes/jquery-ui.css"  type="text/css"/>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-ui.min.js"></script>
 
 <script type="text/javascript">
 

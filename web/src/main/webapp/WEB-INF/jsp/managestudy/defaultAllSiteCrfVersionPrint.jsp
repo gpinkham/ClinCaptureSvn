@@ -19,6 +19,7 @@
       "includes/repetition-model/repetition-model.js"></script>
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
     <link rel="stylesheet" href="includes/print_crf.css" type="text/css">
+    <link rel="stylesheet" href="includes/jquery-ui.css"  type="text/css"/>
     <style>
         .infotab{border-top:1px #CCCCCC solid; border-left:1px #CCCCCC solid}
         .infotab tr td{border-right:1px #000000 solid;border-bottom:1px #000000 solid; padding:2px 4px 2px 4px}
@@ -30,6 +31,7 @@
 <jsp:useBean scope="session" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
 <jsp:useBean scope="request" id="sedCrfBeans" class="java.util.LinkedHashMap" />
 <!-- Clinovo ticket #134 start -->
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-ui.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
 <script type="text/JavaScript">
@@ -60,8 +62,10 @@ for ( var i = 0; i < els.length ; i ++ ) {
  });
 </script>
 <c:if test="${sessionScope.firstPrint=='true'}">
-	<script>
-		alert('<fmt:message key="alert_to_print" bundle="${restext}"/>');
+	<script type="text/javascript">
+		$(document).ready(function() {
+		alertDialog({ message: '<fmt:message key="alert_to_print" bundle="${restext}"/>', height: 150, width: 400 });
+		});
 	</script>
 </c:if>
 <!-- end -->

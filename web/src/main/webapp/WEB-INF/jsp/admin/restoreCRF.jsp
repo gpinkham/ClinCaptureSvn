@@ -13,7 +13,6 @@
 	</c:otherwise>
 </c:choose>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -131,7 +130,7 @@
 					value="<fmt:message key="back" bundle="${resword}"/>"
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-	<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="if_you_restore_this_CRF" bundle="${restext}"/>");'>
+	<input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="if_you_restore_this_CRF" bundle="${restext}"/>", height: 150, width: 500, submit: this });'>
 	<input type = "hidden" name = "confirmPagePassed" value = "true" />
 </form>
 

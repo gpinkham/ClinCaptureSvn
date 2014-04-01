@@ -8,7 +8,6 @@
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
@@ -171,7 +170,7 @@
 </div> 
 <br>
 <form action='LockEventDefinition?action=submit&id=<c:out value="${definitionToLock.id}"/>' method="POST">
-<input type="submit" name="submit" value="<fmt:message key="lock_event_definition" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="if_you_lock_this_definition" bundle="${resword}"/>");'>
+<input type="submit" name="submit" value="<fmt:message key="lock_event_definition" bundle="${resword}"/>" class="button_xlong" onClick='return confirmSubmit({ message: "<fmt:message key="if_you_lock_this_definition" bundle="${resword}"/>", height: 150, width: 500, submit: this });'>
 </form>
 
 <c:import url="../include/workflow.jsp">

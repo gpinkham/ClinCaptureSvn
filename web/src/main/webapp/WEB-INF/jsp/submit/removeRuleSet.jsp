@@ -19,7 +19,6 @@
 </c:otherwise>
 </c:choose>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- *JSP* submit/removeRuleSet.jsp -->
@@ -151,7 +150,7 @@
 
 </div>
 <form action='ViewRuleSet?ruleSetId=<c:out value="${ruleSet.id}"/>' method="POST">
-<input type="submit" name="Submit" value="<fmt:message key="rule_remove_rule_assignments_button" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="rule_if_you_remove_this_assignments" bundle="${resword}"/>");'>
+<input type="submit" name="Submit" value="<fmt:message key="rule_remove_rule_assignments_button" bundle="${resword}"/>" class="button_xlong" onClick='return confirmSubmit({ message: "<fmt:message key="rule_if_you_remove_this_assignments" bundle="${resword}"/>", height: 150, width: 500, submit: this });'>
 <input type="button" name="Cancel" id="cancel" value="<fmt:message key='cancel' bundle='${resword}'/>" class="button_long" onClick="window.location.href='ViewRuleAssignment';"/>
 </form>
 

@@ -8,7 +8,6 @@
 
 <jsp:include page="../include/admin-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -66,7 +65,7 @@
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 <input type="button" name="<fmt:message key="create_export_job" bundle="${resword}"/>" value="<fmt:message key="create_export_job" bundle="${resword}"/>" class="button_medium" onClick="window.location.href='CreateJobExport'"/>
-
+           
 <br><br>
 
 <jsp:include page="../include/footer.jsp"/>

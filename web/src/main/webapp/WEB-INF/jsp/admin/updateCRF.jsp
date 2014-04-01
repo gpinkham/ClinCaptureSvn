@@ -12,7 +12,6 @@
 </c:otherwise>
 </c:choose>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->

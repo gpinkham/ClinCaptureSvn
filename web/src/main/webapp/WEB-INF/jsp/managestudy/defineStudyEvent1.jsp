@@ -8,7 +8,6 @@
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
@@ -41,19 +40,19 @@
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='definition' class='org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean'/>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript">
   <!--
  function myCancel() {
  
     cancelButton=document.getElementById('cancel');
     if ( cancelButton != null) {
-      if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-        window.location.href="ListEventDefinition";
-       return true;
-      } else {
-        return false;
-       }
+    	confirmDialog({ 
+    		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
+    		height: 150,
+    		width: 500,
+    		redirectLink: 'ListEventDefinition'
+    		});      
+     	return false;
      }
      return true;       
   }
@@ -131,7 +130,7 @@ $(document).ready(function() {
 	</ol>
 	<br>
 
-* <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
+<fmt:message key="indicates_required_field" bundle="${resword}"/><br>
 <form action="DefineStudyEvent" method="post">
 <input type="hidden" name="actionName" value="next">
 <input type="hidden" name="pageNum" value="1">

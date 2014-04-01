@@ -19,11 +19,14 @@
 
 <script type="text/javascript">
    function proceed(){
-            var confirm1 = confirm('<fmt:message key="rule_verify_import_rule_message" bundle="${resword}"/>');
-            if(confirm1){
-                document.forms["verifyImportedRule"].submit();
-            }
-        }
+	   	
+	   confirmSubmit({
+		   message: '<fmt:message key="rule_verify_import_rule_message" bundle="${resword}"/>',
+		   height: 150,
+		   width: 500,
+		   form: document.forms["verifyImportedRule"]
+	   });
+   }
 </script>
 <!-- *JSP* submit/verifyImportRule.jsp -->
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->

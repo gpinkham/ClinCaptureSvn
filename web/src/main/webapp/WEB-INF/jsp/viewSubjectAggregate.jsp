@@ -41,7 +41,7 @@
 </tr>
 <jsp:include page="include/sideInfo.jsp"/>
 <link rel="stylesheet" href="../includes/jmesa/jmesa.css" type="text/css">
-<!--script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.3.2.min.js"></script-->
+
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/javascript">
@@ -92,13 +92,15 @@
 
 <script type="text/javascript">
     function prompt(formObj,theStudySubjectId){
-        var bool = confirm(
-                "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>");
-        if(bool){
-            formObj.action='${pageContext.request.contextPath}/pages/unSdvStudySubject';
-            formObj.theStudySubjectId.value=theStudySubjectId;
-            formObj.submit();
-        }
+    	
+    	formObj.action='${pageContext.request.contextPath}/pages/unSdvStudySubject';
+        formObj.theStudySubjectId.value=theStudySubjectId;
+        confirmSubmit({
+    		message: '<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>',
+    		height: 150,
+    		width: 500,
+    		form: formObj
+    	});
     }
 </script>
 <div id="subjectSDV">

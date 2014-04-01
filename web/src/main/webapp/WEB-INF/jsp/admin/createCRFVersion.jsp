@@ -16,7 +16,6 @@
 </c:otherwise>
 </c:choose>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -81,17 +80,13 @@
 </h1>
 
 <script type="text/JavaScript" language="JavaScript">
-  <!--
+ 
  function myCancel() {
 
     cancelButton=document.getElementById('cancel');
     if ( cancelButton != null) {
-      if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-       window.location.href="ListCRF";
-       return true;
-      } else {
-        return false;
-       }
+    	confirmDialog({ message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>', height: 150, width: 500, redirectLink: 'ListCRF' });
+      	return false;
      }
      return true;
 
@@ -102,12 +97,12 @@ function submitform(){
     //Does the user browse or select a file or not
     if (crfUpload.value =='' )
     {
-        alert("Select a file to upload!");
+    	alertDialog({ message: "Select a file to upload!", height: 150, width: 500 });
         return false;
     }
+    return true;
 }
 
-   //-->
 </script>
 
 <p><fmt:message key="can_download_blank_CRF_excel" bundle="${restext}"/><a href="DownloadVersionSpreadSheet?template=1"><b><fmt:message key="here" bundle="${resword}"/></b></a>.</p>
@@ -132,7 +127,7 @@ function submitform(){
 
 <tr>
 <td class="formlabel"><fmt:message key="ms_excel_file_to_upload" bundle="${resword}"/>:</td>
-<td><input type="file" name="excel_file" id="excel_file_path"onchange="javascript:changeIcon()">
+<td><input type="file" name="excel_file" id="excel_file_path" onchange="javascript:changeIcon()">
 <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="excel_file"/></jsp:include></td>
 </tr>
 <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
@@ -155,7 +150,7 @@ function submitform(){
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </td>
 <td>
-  <input type="submit" onclick="return submitform();" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+  <input type="submit" onclick="return checkFileUpload('excel_file_path', '<fmt:message key="select_a_file_to_upload" bundle="${restext}"/>');" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
 </td>
 <td>
   <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this CRF section." alt="Data Status" name="DataStatus_bottom">

@@ -64,12 +64,12 @@
 
 
   function cancel() {
-    if (confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-      window.location.href = "ListEventDefinition";
-      return true;
-    } else {
-      return false;
-    }
+	  confirmDialog({
+		  message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
+		  height: 150,
+		  width: 500,
+		  redirectLink: "ListEventDefinition"
+	  });
   }
 
 </script>

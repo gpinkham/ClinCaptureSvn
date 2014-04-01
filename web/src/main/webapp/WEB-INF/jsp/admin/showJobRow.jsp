@@ -30,16 +30,16 @@
 		<td>
 		<c:choose>
 			<c:when test="${currRow.bean.active}">
-				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=0" onClick='return confirm("<fmt:message key="confirm_pausing_this_job" bundle="${restext}"/>");'><img border="0" title="<fmt:message key="remove" bundle="${resword}"/>" src="images/bt_Remove.gif" alt="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="2"/></a> 
+				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=0" onClick='return confirmDialog({ message: "<fmt:message key="confirm_pausing_this_job" bundle="${restext}"/>", height: 150, width: 500, aLink: this });'><img border="0" title="<fmt:message key="remove" bundle="${resword}"/>" src="images/bt_Remove.gif" alt="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="2"/></a> 
 			</c:when>
 			<c:otherwise>
-				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=0" onClick='return confirm("<fmt:message key="confirm_restoring_this_job" bundle="${restext}"/>");'><img border="0" title="<fmt:message key="restore" bundle="${resword}"/>" src="images/bt_Restore.gif" alt="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="2"/></a>
+				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=0" onClick='return confirmDialog({ message: "<fmt:message key="confirm_restoring_this_job" bundle="${restext}"/>", height: 150, width: 500, aLink: this });'><img border="0" title="<fmt:message key="restore" bundle="${resword}"/>" src="images/bt_Restore.gif" alt="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="2"/></a>
 			</c:otherwise>
 		</c:choose>
 		</td>&nbsp;
 		<c:if test="${userBean.sysAdmin}">
 			<td>
-				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&del=y&gname=0" onClick='return confirm("<fmt:message key="confirm_deleting_this_job" bundle="${restext}"/>");'><img border="0" title="<fmt:message key="delete" bundle="${resword}"/>" src="images/bt_Delete.gif" alt="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="2"/></a>
+				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&del=y&gname=0" onClick='return confirmDialog({ message: "<fmt:message key="confirm_deleting_this_job" bundle="${restext}"/>", height: 150, width: 500, aLink: this });'><img border="0" title="<fmt:message key="delete" bundle="${resword}"/>" src="images/bt_Delete.gif" alt="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="2"/></a>
 			</td>
 		</c:if>
 	 </tr>

@@ -15,7 +15,6 @@
  </c:otherwise>
 </c:choose>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
@@ -155,7 +154,7 @@
            value="<fmt:message key="back" bundle="${resword}"/>"
            class="button_medium"
            onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
-    <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="if_you_remove_this_site" bundle="${resword}"/>");'>
+    <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="if_you_remove_this_site" bundle="${resword}"/>", height: 150, width: 500, submit: this });'>
     <%--input type="button" onclick="confirmCancel('ListSite');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/--%>
 </form>
 

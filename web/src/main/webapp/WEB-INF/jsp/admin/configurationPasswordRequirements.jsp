@@ -6,6 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="../include/admin-header.jsp"/>
+
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 
 <!-- move the alert message to the sidebar-->

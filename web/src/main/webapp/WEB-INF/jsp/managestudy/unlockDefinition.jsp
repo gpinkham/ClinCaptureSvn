@@ -8,7 +8,6 @@
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 
@@ -180,7 +179,7 @@
 </c:if>
 <br>
 <form action="UnlockEventDefinition?action=submit&id=<c:out value="${definitionToUnlock.id}"/>" method="POST">
- <input type="submit" name="submit" value="<fmt:message key="unlock_event_definition" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_unlock" bundle="${resword}"/>");'>
+ <input type="submit" name="submit" value="<fmt:message key="unlock_event_definition" bundle="${resword}"/>" class="button_xlong" onClick='return confirmSubmit({ message: "<fmt:message key="are_you_sure_you_want_to_unlock" bundle="${resword}"/>", height: 150, width: 500, submit: this });'>
 </form>
 
 <c:import url="../include/workflow.jsp">

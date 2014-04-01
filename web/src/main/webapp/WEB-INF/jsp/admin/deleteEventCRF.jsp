@@ -7,7 +7,6 @@
 
 <jsp:include page="../include/admin-header.jsp"/>
 
-
 <jsp:include page="../include/sidebar.jsp"/>
 
 <jsp:useBean scope="request" id="displayEventCRF" class="org.akaza.openclinica.bean.submit.DisplayEventCRFBean"/>
@@ -123,7 +122,7 @@
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 
-      <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="this_CRF_has_data_want_delete" bundle="${restext}"/>");'>
+      <input type="submit" name="BTN_Submit"  value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="this_CRF_has_data_want_delete" bundle="${restext}"/>", height: 150, width: 500, submit: this });'>
      </form>
     </c:when>
     <c:otherwise>
@@ -134,7 +133,7 @@
 					class="button_medium"
 					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
       
-      <input type="submit" name="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_delete_it" bundle="${restext}"/>");'>
+      <input type="submit" name="BTN_Submit"  value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onClick='return confirmSubmit({ message: "<fmt:message key="are_you_sure_you_want_to_delete_it" bundle="${restext}"/>", height: 150, width: 500, submit: this });'>
      </form>
     </c:otherwise>
    </c:choose>

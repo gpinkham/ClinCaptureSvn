@@ -68,7 +68,7 @@
 					<tr>
 						<td class="formlabel"><fmt:message key="xml_file_to_upload" bundle="${resterms}"/>:</td>
 						<td>
-							<input type="file" name="xml_file" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
+							<input type="file" name="xml_file" id="xml_file_path" onChange="javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', 'Data has been entered, but not saved. ');">
 							<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="xml_file"/></jsp:include>
 						</td>
 					</tr>
@@ -83,7 +83,7 @@
 						value="<fmt:message key="back" bundle="${resword}"/>" 
 						class="button_medium" 
 						onClick="javascript: checkGoBackSmartEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');"/>
-	<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+	<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" onclick="return checkFileUpload('xml_file_path', '<fmt:message key="select_a_file_to_upload" bundle="${restext}"/>');" class="button_medium" />
 	<img src="images/icon_UnchangedData.gif" style="visibility:hidden" alt="Data Status" name="DataStatus_bottom">
 </form>
 

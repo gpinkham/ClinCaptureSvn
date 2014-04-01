@@ -9,7 +9,6 @@
     <c:param name="profilePage" value="yes"/>
 </c:import>
 
-
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->

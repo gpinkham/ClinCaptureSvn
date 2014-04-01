@@ -9,7 +9,6 @@
 
 <jsp:include page="include/managestudy_top_pages.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -65,14 +64,13 @@
 
 <script type="text/javascript">
     function prompt(elementName){
-        var bool = confirm(
-                "<fmt:message key="study_module_uncheck" bundle="${pagemessage}"/>");
-        if(bool){
-            document.getElementById(elementName).value=2;
-            document.forms[1].action='${pageContext.request.contextPath}/pages/studymodule';
-            document.forms[1].method="POST";
-            document.forms[1].submit();
-        }
+    	confirmMarkAsComplete({ 
+    		message: "<fmt:message key="study_module_uncheck" bundle="${pagemessage}"/>",
+    		height: 150,
+    		width: 500,
+    		elementName: elementName,
+    		formAction: '${pageContext.request.contextPath}/pages/studymodule'
+   		});
     }
 
 <%-- Added by Clinovo --%>
@@ -80,7 +78,7 @@
         msg1 = 'Edit functionality is available only when the study status is "Design".\n\n ';
         msg2 = 'WARNING: Changing parameter configuration after data entry has started \n';
         msg3 = 'can cause the system becomes unstable.';
-        alert(msg1 + msg2 + msg3);
+        alertDialog({ message: msg1 + msg2 + msg3, height: 150, width: 500 });
     }
 <%-- END --%>
 </script>

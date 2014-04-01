@@ -6,7 +6,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="../include/admin-header.jsp"/>
 
-
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">

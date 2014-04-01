@@ -16,7 +16,6 @@
 	<jsp:include page="../include/home-header.jsp"/>
 </c:otherwise>
 </c:choose>
-<%-- <jsp:include page="../include/managestudy-header.jsp"/> --%>
 
 <script type="text/JavaScript" language="JavaScript">
   function showDynamicEventsSection(defaultDynGroupClassId) {

@@ -16,7 +16,6 @@
 </c:otherwise>
 </c:choose>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- *JSP* submit/listRuleSets2.jsp -->
@@ -26,8 +25,6 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-ui-1.8.2.custom.min.js"></script>
-
-
 
 <script type="text/javascript">
     function onInvokeAction(id,action) {

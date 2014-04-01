@@ -63,13 +63,16 @@
 
 <script type="text/javascript">
     function prompt(formObj,theStudySubjectId){
-        var bool = confirm(
-                "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>");
-        if(bool){
-            formObj.action='${pageContext.request.contextPath}/pages/unSdvStudySubject';
-            formObj.theStudySubjectId.value=theStudySubjectId;
-            formObj.submit();
-        }
+    	
+    	formObj.action='${pageContext.request.contextPath}/pages/unSdvStudySubject';
+        formObj.theStudySubjectId.value=theStudySubjectId;
+        
+        confirmSubmit({
+        	message: "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>",
+        	height: 150, 
+        	width: 500,
+        	form: formObj
+        });
     }
 </script>
 <div id="subjectSDV">

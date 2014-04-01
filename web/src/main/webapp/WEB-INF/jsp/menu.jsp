@@ -222,13 +222,16 @@
 	      var parameterString = createParameterStringForLimit(id);
 	    }
 	    function prompt(formObj, crfId) {
-	      var bool = confirm(
-	          "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>");
-	      if (bool) {
-	        formObj.action = '${pageContext.request.contextPath}/pages/handleSDVRemove';
+	    	
+	    	formObj.action = '${pageContext.request.contextPath}/pages/handleSDVRemove';
 	        formObj.crfId.value = crfId;
-	        formObj.submit();
-	      }
+	        
+	        confirmSubmit({
+	        	message: "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>",
+	        	height: 150,
+	        	width: 500,
+	        	form: formObj
+	        });
 	    }
 	  </script>
 	

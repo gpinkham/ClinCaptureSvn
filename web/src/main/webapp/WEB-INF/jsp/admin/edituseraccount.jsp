@@ -5,7 +5,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="../include/admin-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -303,18 +302,13 @@
      }
 
      function back_checkEditUserFormState() {
-         var ok = undefined;
+         
          var newState = {};
          saveEditUserFormState(newState);
          if (editUserFormState.firstName != newState.firstName || editUserFormState.lastName != newState.lastName || editUserFormState.phone != newState.phone || editUserFormState.email != newState.email ||
                  editUserFormState.institutionalAffiliation != newState.institutionalAffiliation || editUserFormState.userType != newState.userType || editUserFormState.runWebServices != newState.runWebServices ||
                  editUserFormState.resetPassword != newState.resetPassword) {
-             ok = confirm('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');
-         } else {
-             ok = true;
-         }
-         if (ok) {
-        	 goBackSmart('${navigationURL}', '${defaultURL}');
+             confirmBackSmart('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');
          }
      }
     </SCRIPT>

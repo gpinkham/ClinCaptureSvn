@@ -387,7 +387,10 @@
 </script>
 
 				</tr>
-			</table> <script type="text/javascript" language="JavaScript">    function checkSectionStatus() {
+			</table> 
+<script type="text/javascript" language="JavaScript">    
+	
+	function checkSectionStatus() {
 
         objImage = document.getElementById('status_top');
         if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif') > 0) {
