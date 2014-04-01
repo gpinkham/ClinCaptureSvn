@@ -37,6 +37,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -88,22 +89,13 @@ public class StudiesServlet extends HttpServlet {
 			if ("fetch".equals(action)) {
 
 				JSONArray studies = new JSONArray();
-
 				StudyDAO studyDAO = new StudyDAO(datasource);
-
-				// Get studies DESIGN and AVAILABLE
-				List<StudyBean> pendingStudies = (List<StudyBean>) studyDAO.findAllByStatus(Status.PENDING);
-				List<StudyBean> availableStudies = (List<StudyBean>) studyDAO.findAllByStatus(Status.AVAILABLE);
-
-				// Merge
-				availableStudies.addAll(pendingStudies);
-
+				UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+				List<StudyBean> availableStudies = studyDAO.findAllActiveStudiesWhereUserHasRole(userAccountBean.getName());
 				for (StudyBean x : availableStudies) {
-
 					if (!x.isSite(x.getParentStudyId())) {
 
 						JSONObject study = new JSONObject();
-
 						study.put("id", x.getId());
 						study.put("oid", x.getOid());
 						study.put("name", x.getName());
@@ -111,9 +103,7 @@ public class StudiesServlet extends HttpServlet {
 						study.put("identifier", x.getIdentifier());
 
 						JSONArray events = getStudyEvents(x, datasource);
-
 						study.put("events", events);
-
 						studies.put(study);
 					}
 				}

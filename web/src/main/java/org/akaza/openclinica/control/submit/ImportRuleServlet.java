@@ -64,8 +64,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.JsonObject;
-
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
  * 
@@ -80,9 +78,9 @@ public class ImportRuleServlet extends Controller {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		UserAccountBean ub = getUserAccountBean(request);
-		
 		// Reset the study if RS is saving a rule for a different study
 		if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty()) && getCurrentStudy(request).getId() != Integer.parseInt(request.getParameter("study"))) {
+			originalScope = (StudyBean) request.getSession().getAttribute(STUDY);
 			request.getSession().setAttribute(STUDY, getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study"))));
 		}
 
@@ -92,7 +90,6 @@ public class ImportRuleServlet extends Controller {
 		request.setAttribute("hostPath", getHostPath(request));
 		if (StringUtil.isBlank(action)) {
 			forwardPage(Page.IMPORT_RULES, request, response);
-
 		}
 		if ("downloadrulesxsd".equalsIgnoreCase(action)) {
 			File xsdFile = getCoreResources().getFile("rules.xsd", "rules" + File.separator);
@@ -107,9 +104,7 @@ public class ImportRuleServlet extends Controller {
 			dowloadFile(file, "text/xml", request, response);
 		}
 		if ("confirm".equalsIgnoreCase(action)) {
-
 			try {
-
 				FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties("xml"));
 				File ruleFile = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn()).get(
 						0);
@@ -119,7 +114,6 @@ public class ImportRuleServlet extends Controller {
 				schemaValidator.validateAgainstSchema(ruleFile, xsdFile);
 				RulesPostImportContainer importedRules = handleLoadCastor(ruleFile);
 				logger.info(ub.getFirstName());
-
 				// Editing a rule - remove existing rules
 				boolean isCopiedRule = Boolean.valueOf(request.getParameter("copy"));
 				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")
@@ -127,29 +121,23 @@ public class ImportRuleServlet extends Controller {
 						&& !isCopiedRule) {
 					
 					RuleSetRuleBean ruleSetRule = getRuleSetRuleDao().findById(Integer.parseInt(request.getParameter("id")));
-					
 					RuleBean rule = ruleSetRule.getRuleBean();
 					ExpressionBean expression = rule.getExpression();
 					RuleSetBean ruleSet = ruleSetRule.getRuleSetBean();
-					
 					if (ruleSetRule != null) {
 						Session session = getRuleDao().getSessionFactory().getCurrentSession();
 						Transaction transaction = session.beginTransaction();
-
 						for (RuleActionBean act : ruleSetRule.getActions()) {
 							session.delete(act);
 							session.delete(act.getRuleActionRun());
 						}
-						
 						// Remove current rule and props
 						session.delete(ruleSetRule);
 						session.delete(ruleSet);
 						session.delete(rule);
-						
 						// Expressions can't be deleted
 						expression.setStatus(Status.DELETED);
 						session.save(expression);
-
 						transaction.commit();
 						session.flush();
 					}
@@ -158,35 +146,22 @@ public class ImportRuleServlet extends Controller {
 				RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(currentStudy, ub);
 				importedRules = rulesPostImportContainerService.validateRuleDefs(importedRules);
 				importedRules = rulesPostImportContainerService.validateRuleSetDefs(importedRules);
-
 				provideMessage(importedRules, request);
-
 				// If request is coming from rule studio
 				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")) {
-
 					try {
-
 						getRuleSetService().saveImport(importedRules);
-						
-						JsonObject obj = new JsonObject();
-						obj.addProperty("message", resword.getString("successful_rule_upload"));
-
-						response.getWriter().write(obj.toString());
-
 					} catch (Exception ex) {
 						logger.error("RS save error.", ex);
 						response.sendError(500, ex.getMessage());
 					}
-
 				} else {
-
 					request.getSession().setAttribute("importedData", importedRules);
 					forwardPage(Page.VERIFY_RULES_IMPORT_SERVLET, request, response);
 				}
 			} catch (OpenClinicaSystemException re) {
 				MessageFormat mf = new MessageFormat("");
-				mf.applyPattern(re.getErrorCode() == null ? respage.getString("OCRERR_0016") : respage.getString(re
-						.getErrorCode()));
+				mf.applyPattern(re.getErrorCode() == null ? respage.getString("OCRERR_0016") : respage.getString(re.getErrorCode()));
 				Object[] arguments = { re.getMessage() };
 				if (re.getErrorCode() != null) {
 					arguments = re.getErrorParams();
@@ -195,6 +170,10 @@ public class ImportRuleServlet extends Controller {
 				addPageMessage(mf.format(arguments), request);
 				forwardPage(Page.IMPORT_RULES, request, response);
 			}
+		}
+		// reset back to original scope
+		if (originalScope != null) {
+			request.getSession().setAttribute(STUDY, originalScope);
 		}
 	}
 

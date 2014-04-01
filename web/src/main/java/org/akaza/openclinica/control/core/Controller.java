@@ -129,7 +129,8 @@ import java.util.StringTokenizer;
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public abstract class Controller extends BaseController {
-
+	
+	protected StudyBean originalScope = null;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	protected void addPageMessage(String message, HttpServletRequest request) {

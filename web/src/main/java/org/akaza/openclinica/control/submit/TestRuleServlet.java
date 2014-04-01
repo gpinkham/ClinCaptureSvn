@@ -115,6 +115,7 @@ public class TestRuleServlet extends Controller {
 		
 		// Reset the study if RS is testing a rule for a different study
 		if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty()) && getCurrentStudy(request).getId() != Integer.parseInt(request.getParameter("study"))) {
+			originalScope = (StudyBean) request.getSession().getAttribute(STUDY);
 			request.getSession().setAttribute(STUDY, getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study"))));
 		}
 
@@ -153,7 +154,6 @@ public class TestRuleServlet extends Controller {
 			forwardPage(Page.TEST_RULES, request, response);
 
 		} else if (action.equals("validate")) {
-			
 			try {
 				HashMap<String, String> result = validate(request, v, currentStudy);
 				// do not modify
@@ -177,9 +177,7 @@ public class TestRuleServlet extends Controller {
 				populteFormFields(fp);
 				
 				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")) {
-					
 					response.getWriter().write(new Gson().toJson(serialResult));
-					
 				} else {
 					forwardPage(Page.TEST_RULES, request, response);
 				}
@@ -235,6 +233,10 @@ public class TestRuleServlet extends Controller {
 			populteFormFields(fp);
 
 			forwardPage(Page.TEST_RULES, request, response);
+		}
+		// reset back to original scope 
+		if (originalScope != null) {
+			request.getSession().setAttribute(STUDY, originalScope);
 		}
 	}
 

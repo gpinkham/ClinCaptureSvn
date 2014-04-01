@@ -120,7 +120,6 @@ function saveRule(rule) {
 		url: c + "/ImportRule?action=confirm&rs=true&edit=" + sessionStorage.getItem("edit") + "&id=" + sessionStorage.getItem("id") + "&study=" + rule.study + "&copy=" + rule.copied,
 		success: function(response) {
 			try {
-				var obj = JSON.parse(response);
 				sessionStorage.removeItem("edit");
 				sessionStorage.setItem("status", "remove");
 				// Clean up
