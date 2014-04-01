@@ -189,99 +189,64 @@ public class StudiesServlet extends HttpServlet {
 				writer.write(xWriter.getBuffer().toString());
 
 			} else if ("edit".equals(action)) {
-				
 				RuleDao dao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(RuleDao.class);
 				RuleSetRuleDao rDao = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(RuleSetRuleDao.class);
 				
 				JSONObject object = new JSONObject();
 				RuleBean rule = dao.findById(Integer.parseInt(request.getParameter("id")));
-
 				JSONArray ruleActions = new JSONArray();
-				
 				RuleSetRuleBean ruleSetRule = rDao.findById(Integer.parseInt(request.getParameter("rId")));
-
 				try {
-
 					JSONObject act = new JSONObject();
-
 					act.put("type", ruleSetRule.getActions().get(0).getActionType());
 					act.put("select", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
-
 					object.put("evaluatesTo", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
-
 					if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.EMAIL)) {
-
 						EmailActionBean emailAction = (EmailActionBean) ruleSetRule.getActions().get(0);
-
 						act.put("to", emailAction.getTo());
 						act.put("body", emailAction.getMessage());
-
 					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.FILE_DISCREPANCY_NOTE)) {
-
 						DiscrepancyNoteActionBean discrepancyAction = (DiscrepancyNoteActionBean) ruleSetRule.getActions().get(0);
-
 						act.put("type", "discrepancy");
 						act.put("message", discrepancyAction.getMessage());
-						
 					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.INSERT)) {
-						
 						InsertActionBean insertAction = (InsertActionBean) ruleSetRule.getActions().get(0);
-						
 						act.put("type","insert");
 						act.put("message", insertAction.getCuratedMessage());
-						
 						// Destinations
 						JSONArray destinations = new JSONArray();
 						for (int x = 0; x < insertAction.getProperties().size(); x++) {
-							
 							JSONObject dest = new JSONObject();
 							PropertyBean bean = insertAction.getProperties().get(x);
-							
 							dest.put("id", bean.getId());
 							dest.put("oid", bean.getOid());
-							
 							if (bean.getValue() == null && bean.getValueExpression() != null) {
-								
 								dest.put("item", true);
 								dest.put("value", bean.getValueExpression().getValue());
 							} else {
 								dest.put("value", bean.getValue());
 							}
-							
 							destinations.put(dest);
 						}
-						
 						act.put("destinations", destinations);
-						
 					} else if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.SHOW) || ruleSetRule.getActions().get(0).getActionType().equals(ActionType.HIDE)) {
-						
 						act.put("type", "showHide");
-						
 						for (int x = 0; x < ruleSetRule.getActions().size(); x++) {
-							
 							RuleActionBean vAction = ruleSetRule.getActions().get(x);
-							
 							if (vAction.getActionType().equals(ActionType.SHOW)) {
-								
 								ShowActionBean showAction = (ShowActionBean) ruleSetRule.getActions().get(x);
-								
 								act.put("type", "showHide");
 								act.put("message", showAction.getMessage());
 								act.put("show", showAction.getExpressionEvaluatesTo());
-								
 								object.put("evaluatesTo", showAction.getExpressionEvaluatesTo());
-								
 							} else {
 								
 								HideActionBean hideAction = (HideActionBean) ruleSetRule.getActions().get(x);
 								act.put("hide", hideAction.getExpressionEvaluatesTo());
-								
 								JSONArray destinations = new JSONArray();
 								for (int d = 0; d < hideAction.getProperties().size(); d++) {
-									
 									destinations.put(hideAction.getProperties().get(d).getOid());
 								}
-								
 								act.put("destinations", destinations);
 							}
 						}
@@ -292,19 +257,18 @@ public class StudiesServlet extends HttpServlet {
 				} catch (JSONException e) {
 					response.sendError(500, e.getMessage());
 				}
-				
 				// Rule run
 				object.put("di", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getImportDataEntry());
 				object.put("dde", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getDoubleDataEntry());
 				object.put("ide", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getInitialDataEntry());
 				object.put("ae", rule.getRuleSetRules().get(0).getActions().get(0).getRuleActionRun().getAdministrativeDataEntry());
-				
 				// Targets
-				JSONArray targets = new JSONArray();
 				JSONObject tar = new JSONObject();
+				JSONArray targets = new JSONArray();
 				
 				String targetPath = rule.getRuleSetRules().get(0).getRuleSetBean().getOriginalTarget().getValue();
-				tar.put("name", targetPath);
+				String name = targetPath.replaceAll("\\[\\w+\\]", "").trim();
+				tar.put("name", name);
 				if (targetPath.split("\\.").length > 3) {
 					tar.put("evt", getItemEvent(targetPath, tar));
 				}
@@ -328,18 +292,13 @@ public class StudiesServlet extends HttpServlet {
 				} else {
 					object.put("name", rule.getName());
 				}
-				
 				object.put("expression", rule.getExpression().getValue());
-
 				response.getWriter().write(object.toString());
 			}
 
 		} catch (Exception ex) {
-
 			response.sendError(500, ex.getMessage());
-
 		} finally {
-
 			writer.flush();
 			writer.close();
 		}
@@ -667,7 +626,7 @@ public class StudiesServlet extends HttpServlet {
 	}
 	
 	private String getItemLine(String targetPath, JSONObject tar) throws JSONException {
-		Pattern pattern = Pattern.compile("\\[(\\w+)\\]");
+		Pattern pattern = Pattern.compile("(?<=\\[)(\\w+)(?=\\])");
 		Matcher matcher = pattern.matcher(targetPath);
 		if (matcher.find()) {
 			tar.put("linefy", true);
@@ -701,6 +660,7 @@ public class StudiesServlet extends HttpServlet {
 	}
 	
 	private String getItemGroup(String targetPath) throws JSONException {
+		targetPath = targetPath.replaceAll("\\[\\w+\\]", "").trim();
 		String[] preds = targetPath.split("\\.");
 		if (preds.length == 2) {
 			return preds[0];

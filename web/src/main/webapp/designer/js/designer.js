@@ -633,7 +633,6 @@ function createDroppable(params) {
  			params.element.text("");
  			params.element.removeClass("init");
  			params.element.addClass("bordered");
-			
 			if (parser.isText(ui.draggable)) {
 				handleTextDrop(params.element);
 			} else if (parser.isDate(ui.draggable)) {
@@ -649,14 +648,16 @@ function createDroppable(params) {
 					params.element.append("&lt;");
 				} else if (ui.draggable.text() == ">") {
 					params.element.append("&gt;");
-				} else {
-					params.element.append(ui.draggable.text());
+				} else if (ui.draggable.is("td.group")) {
+					params.element.append(ui.draggable.attr("itemName"));
 					// Persist attrinutes
 					params.element.attr("item-oid", ui.draggable.attr("oid"));
 					params.element.attr("crf-oid", ui.draggable.attr("crf-oid"));
 					params.element.attr("event-oid", ui.draggable.attr("event-oid"));
 					params.element.attr("group-oid", ui.draggable.attr("group-oid"));
 					params.element.attr("version-oid", ui.draggable.attr("version-oid"));
+				} else {
+					params.element.append(ui.draggable.text());
 				}
 			}
 
@@ -1131,8 +1132,19 @@ function loadCRFVersionItems(params) {
 			var item = params.version.items[it];
 			var tr = $("<tr>");
 			var tdName = $("<td>");
+			if (item.name.length > 25) {
+ 				tdName.text(item.description.slice(0, 20) + "...");
+ 				tdName.tooltip({
+ 					placement: "top",
+ 					container: "body",
+ 					title: item.name
+ 				});
+ 			} else {
+ 				tdName.text(item.name);
+ 			}
 			tdName.text(item.name);
 			tdName.addClass("group");
+			tdName.attr("itemName", item.name);
 			// Attributes
 			tdName.attr("oid", item.oid);
 			tdName.attr("crf-oid", params.crf);

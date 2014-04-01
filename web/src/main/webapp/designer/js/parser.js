@@ -77,7 +77,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			createPopover(dataPredicate);
 		} 
 	} else if (params.element.is(".target")) {
-		if (!this.isAddedTarget(params.ui.draggable.text())) {
+		if (!this.isAddedTarget(params.ui.draggable.attr("itemName"))) {
 			if (params.existingValue) {
 				for (var x = 0; x < this.rule.targets.length; x++) {
 					var t = this.rule.targets[x];
@@ -88,8 +88,8 @@ Parser.prototype.createNextDroppable = function(params) {
 			}
 			// Target
 			var eTarget = this.findItemBySelectedProperties({
-				identifier: params.ui.draggable.text(),
 				study: this.extractStudy(this.getStudy()),
+				identifier: params.ui.draggable.attr("itemName"),
 				crf : $("div[id=crfs]").find(".selected").find("td[oid]").attr("oid"), 
 				evt: $("div[id=events]").find(".selected").find("td[oid]").attr("oid"),
 				version: $("div[id=versions]").find(".selected").find("td[oid]").attr("oid")
@@ -129,11 +129,10 @@ Parser.prototype.createNextDroppable = function(params) {
 				params.element.parent().after(div);
 			} 
 			div.find(".target").focus();
-			params.element.val(params.ui.draggable.text());
 			// Check event duplication
 			var eventDuplex = this.isDuplicated({
 				type: "eventOid",
-				name: params.ui.draggable.text()
+				name: params.ui.draggable.attr("itemName")
 			});
 			if (!eventDuplex) {
 				params.element.parent().find(".eventify").parent().removeClass("hidden");
@@ -141,13 +140,13 @@ Parser.prototype.createNextDroppable = function(params) {
 			// Check version duplication
 			var versionDuplex = this.isDuplicated({
 				type: "crfVersionOid",
-				name: params.ui.draggable.text()
+				name: params.ui.draggable.attr("itemName")
 			});
 			if (!versionDuplex) {
 				params.element.parent().find(".versionify").parent().removeClass("hidden");
 			} 
 			// Check version duplication
-			if (this.isRepeatItem(params.ui.draggable.text())) {
+			if (this.isRepeatItem(params.ui.draggable.attr("itemName"))) {
 				var liner = params.element.parent().find(".linefy");
 				liner.removeClass("hidden");
 				liner.focus();
@@ -155,8 +154,9 @@ Parser.prototype.createNextDroppable = function(params) {
 			} 
 		}
 		params.element.removeClass("bordered");	
+		params.element.val(params.ui.draggable.attr("itemName"));
 	} else if (params.element.is(".dest")) {
-		if (!this.isAddedShowHideTarget(params.ui.draggable.text())) {
+		if (!this.isAddedShowHideTarget(params.ui.draggable.attr("itemName"))) {
 			if (params.existingValue) {
 				this.getShowHideAction().destinations.indexOf(params.existingValue);
 				if (index > -1) {
@@ -164,7 +164,7 @@ Parser.prototype.createNextDroppable = function(params) {
 				}
 			}
 
-			var oid = this.constructCRFPath(params.ui.draggable.text());
+			var oid = this.constructCRFPath(params.ui.draggable.attr("itemName"));
 			this.getShowHideAction().destinations.push(oid);
 			var div = params.element.parent().clone();
 			div.find("input").text("");
@@ -183,11 +183,11 @@ Parser.prototype.createNextDroppable = function(params) {
 				});
 			} 
 			div.focus();
-			params.element.val(params.ui.draggable.text());
+			params.element.val(params.ui.draggable.attr("itemName"));
 		}
 		params.element.removeClass("bordered");
 	} else if (params.element.is(".item")) {
-		if (!this.isAddedInsertTarget(params.ui.draggable.text())) {
+		if (!this.isAddedInsertTarget(params.ui.draggable.attr("itemName"))) {
 			if (params.existingValue) {
 				for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
 					var dest = this.getInsertAction().destinations[x];
@@ -198,25 +198,33 @@ Parser.prototype.createNextDroppable = function(params) {
 			}
 			params.element.removeClass("bordered");
 			// Destination
-			var dest = Object.create(null);
-			dest.value = "";
-			dest.id = params.element.parents(".row").attr("id");
-			dest.oid = this.constructCRFPath(params.ui.draggable.text());
-
-			this.getInsertAction().destinations.push(dest);			
-			params.element.val(params.ui.draggable.text());
+			if (this.getInsertActionDestination(params.element.parents(".row").attr("id"))) {
+ 				dest = this.getInsertActionDestination(params.element.parents(".row").attr("id"));
+ 				dest.oid = this.constructCRFPath(params.ui.draggable.attr("itemName"));
+ 			} else {
+ 				dest = Object.create(null);
+ 				dest.id = params.element.parents(".row").attr("id");
+ 				dest.oid = this.constructCRFPath(params.ui.draggable.attr("itemName"));
+ 				this.getInsertAction().destinations.push(dest);
+ 			}
+ 			params.element.val(params.ui.draggable.attr("itemName"));
 			params.element.parent().siblings(".col-md-4").find(".value").focus();
 		}
 		params.element.removeClass("bordered");
 	} else if (params.element.is(".value")) {
 		var destination = null;
-		for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
-			destination = this.getInsertAction().destinations[x];
-			if (destination.id === params.element.parents(".row").attr("id")) {
-				break;
+		if (this.getInsertAction().destinations.length > 0) {
+			for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
+				destination = this.getInsertAction().destinations[x];
+				if (destination.id === params.element.parents(".row").attr("id")) {
+					break;
+				}
 			}
+		} else {
+			destination = Object.create(null);
+			destination.id = params.element.parents(".row").attr("id");
+			this.getInsertAction().destinations.push(destination);
 		}
-
 		if (destination) {
 			if (!params.existingValue) {
 				var index = this.getInsertAction().destinations.indexOf(destination);
@@ -227,11 +235,10 @@ Parser.prototype.createNextDroppable = function(params) {
 				this.getInsertAction().destinations.push(destination);
 			}
 
-			if (params.ui.draggable.prop("tagName") === "TD") {
+			if (params.ui.draggable.is("td.group")) {
 				destination.item = true;
-				destination.value = this.findItem(params.ui.draggable.text()).oid;
-				params.element.val(params.ui.draggable.text());
-
+				destination.value = this.findItem(params.ui.draggable.attr("itemName")).oid;
+				params.element.val(params.ui.draggable.attr("itemName"));
 			} else {
 				destination.item = false;
 				if (this.isText(params.ui.draggable)) {
@@ -241,7 +248,6 @@ Parser.prototype.createNextDroppable = function(params) {
 					params.element.val($(this).text());
 					var msie = window.navigator.userAgent.indexOf('MSIE ');
 					var trident = window.navigator.userAgent.indexOf('Trident/');
-
 					if (typeof InstallTrigger !== 'undefined' || msie > 0 || trident > 0) {
 						params.element.data({date: new Date(params.element.val())}).datepicker('update').children("input").val(new Date(params.element.val()));
 						params.element.datepicker({orientation:'bottom left'}).on("hide", function() {
@@ -312,6 +318,15 @@ Parser.prototype.createNextDroppable = function(params) {
 					createPopover(droppable);
 				}
 			}
+		}
+	}
+}
+
+Parser.prototype.getInsertActionDestination = function(id) {
+	for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
+		var dest = this.getInsertAction().destinations[x];
+		if (dest.id == id) {
+			return dest;
 		}
 	}
 }
@@ -1315,18 +1330,25 @@ Parser.prototype.setShowHideAction = function(params) {
 
 Parser.prototype.setDestinationValue = function(params) {
 	var act = this.getInsertAction();
+	var row = $(".row[id=" + params.id + "]");
 	if (act) {
-		for (var x = 0; x < act.destinations.length; x++) {
-			var dest = act.destinations[x];
-			if (parseInt(dest.id) === parseInt(params.id) && !dest.item) {
-				dest.value = params.value;
-				// Only create relevant rows
-				var row = $(".row[id="+ params.id +"]")
-				if (!row.closest(".row").next().is(".row")) {
-					this.addNewInsertActionInputs();
+		if (act.destinations.length > 0) {
+			for (var x = 0; x < act.destinations.length; x++) {
+				var dest = act.destinations[x];
+				if (parseInt(dest.id) === parseInt(params.id) && !dest.item) {
+					dest.item = false;
+					dest.value = params.value;
+					if (!row.closest(".row").next().is(".row")) {
+						this.addNewInsertActionInputs();
+					}
+					row.find(".bordered").removeClass("bordered");
 				}
-				row.find(".bordered").removeClass("bordered");
 			}
+		} else {
+			var dest = Object.create(null);
+			dest.id = params.id;
+			dest.value = params.value;
+			act.destinations.push(dest);
 		}
 		act.render(act);
 	}
@@ -1694,7 +1716,7 @@ Parser.prototype.deleteTarget = function(target) {
 		}
 	} else if ($(target).siblings("input").is(".value")) {
 		var act = this.getInsertAction();
-		var oid = this.constructCRFPath($(target).closest(".row").find(".item").text());
+		var oid = this.constructCRFPath($(target).closest(".row").find(".item").val());
 		for (var x = 0; x < act.destinations.length; x++) {
 			var dest = act.destinations[x];
 			if (dest.oid === oid) {
