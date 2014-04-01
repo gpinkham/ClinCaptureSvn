@@ -74,11 +74,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * View a CRF version section data entry
- *
+ * 
  * @author jxu
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
@@ -113,8 +115,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 		addPageMessage(
 				respage.getString("no_have_correct_privilege_current_study") + " "
-						+ respage.getString("change_study_contact_sysadmin"), request
-		);
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 
 	}
@@ -123,16 +124,13 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		FormProcessor fp = new FormProcessor(request);
-
 		request.setAttribute("expandCrfInfo", false);
-
 		String cw = request.getParameter("cw");
 		if (cw != null) {
 			request.setAttribute(JUST_CLOSE_WINDOW, true);
 		} else {
 			String referer = request.getHeader(REFERER);
-			if (referer != null && !referer.contains(VIEW_SECTION_DATA_ENTRY) && !referer
-					.contains(RESOLVE_DISCREPANCY)) {
+			if (referer != null && !referer.contains(VIEW_SECTION_DATA_ENTRY) && !referer.contains(RESOLVE_DISCREPANCY)) {
 				request.getSession().setAttribute(VIEW_SECTION_DATA_ENTRY_REFERER, referer);
 			}
 		}
@@ -160,15 +158,13 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
 		}
 
+		request.setAttribute("eventId", fp.getString("eventId"));
 		request.setAttribute("studySubjectId", studySubjectId + "");
-
 		request.setAttribute("crfListPage", fp.getString("crfListPage"));
 
-		request.setAttribute("eventId", fp.getString("eventId"));
-
 		int sedId = fp.getInt("sedId");
-		request.setAttribute("sedId", sedId + "");
 		int crfId = fp.getInt("crfId");
+		request.setAttribute("sedId", sedId + "");
 		if (crfId == 0 && crfVersionId > 0) {
 			CRFVersionDAO crfVDao = getCRFVersionDAO();
 			CRFVersionBean crvVBean = (CRFVersionBean) crfVDao.findByPK(crfVersionId);
@@ -177,23 +173,25 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			}
 		}
 
+		StudyDAO studydao = getStudyDAO();
 		int eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
 		EventDefinitionCRFDAO eventCrfDao = getEventDefinitionCRFDAO();
 		edcb = (EventDefinitionCRFBean) eventCrfDao.findByPK(eventDefinitionCRFId);
 
-		List<Integer> studyIds = new ArrayList<Integer>();
-		if (currentStudy.getParentStudyId() > 0) {
-			studyIds.add(currentStudy.getId());
-			studyIds.add(currentStudy.getParentStudyId());
-		} else {
-			studyIds.addAll(getStudyDAO().findAllSiteIdsByStudy(currentStudy));
-		}
-		if (eventCRFId == 0 && !studyIds.contains(edcb.getStudyId())) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_study_contact_sysadmin"), request
-			);
-			throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
+		if (edcb.getId() > 0) {
+			Set<Integer> studyIds = new HashSet<Integer>();
+			if (currentStudy.getParentStudyId() > 0) {
+				studyIds.add(currentStudy.getId());
+				studyIds.add(currentStudy.getParentStudyId());
+			} else {
+				studyIds.addAll(getStudyDAO().findAllSiteIdsByStudy(currentStudy));
+			}
+			if (eventCRFId == 0 && !studyIds.contains(edcb.getStudyId())) {
+				addPageMessage(
+						respage.getString("no_have_correct_privilege_current_study") + " "
+								+ respage.getString("change_study_contact_sysadmin"), request);
+				throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
+			}
 		}
 
 		if (crfId == 0 && eventDefinitionCRFId > 0) {
@@ -249,17 +247,14 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			}
 			// Get the status/number of item discrepancy notes
 			DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-
 			allNotes = dndao.findAllTopNotesByEventCRF(eventCRFId);
-
 			allNotes = extractCoderNotes(allNotes, request);
 
 			// add interviewer.jsp related notes to this Collection
 			eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
 			if (!eventCrfNotes.isEmpty()) {
 				allNotes.addAll(eventCrfNotes);
-				// make sure a necessary request attribute "hasNameNote" is set
-				// properly
+				// make sure a necessary request attribute "hasNameNote" is set properly
 				this.setAttributeForInterviewerDNotes(eventCrfNotes, request);
 			}
 			// Create disc note threads out of the various notes
@@ -329,7 +324,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 			ecb.setCRFVersionId(sb.getCRFVersionId());
 			if (currentStudy.getParentStudyId() > 0) {
 				// this is a site,find parent
-				StudyDAO studydao = getStudyDAO();
 				StudyBean parentStudy = (StudyBean) studydao.findByPK(currentStudy.getParentStudyId());
 				request.setAttribute("studyTitle", parentStudy.getName());
 				request.setAttribute("siteTitle", currentStudy.getName());
@@ -357,8 +351,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				StudyEventDAO sedao = getStudyEventDAO();
 				StudyEventBean se = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 				StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
-				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se
-						.getStudyEventDefinitionId());
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
 				se.setStudyEventDefinition(sed);
 				request.setAttribute("studyEvent", se);
 
@@ -366,7 +359,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 				age = Utils.getInstance().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
 			}
 			// Get the study then the parent study
-			StudyDAO studydao = getStudyDAO();
 			StudyBean study = (StudyBean) studydao.findByPK(studyId);
 
 			if (study.getParentStudyId() > 0) {
@@ -391,7 +383,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 		List<ItemGroupBean> itemGroups = igdao.findLegitGroupBySectionId(sectionId);
 		if (!itemGroups.isEmpty()) {
 			hasItemGroup = true;
-
 		}
 
 		// if the List of DisplayFormGroups is empty, then the servlet defers to
@@ -455,16 +446,13 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 					// TODO work on this line
 
 					String inputName = getInputName(dib);
-					AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), "ItemData",
-							currentStudy);
+					AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), "ItemData", currentStudy);
 
 					ArrayList childItems = dib.getChildren();
 					for (Object childItem : childItems) {
 						DisplayItemBean child = (DisplayItemBean) childItem;
 						inputName = getInputName(child);
-						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(),
-								"ItemData", currentStudy);
-
+						AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), "ItemData", currentStudy);
 					}
 				}
 			}
@@ -542,7 +530,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 	/**
 	 * @see org.akaza.openclinica.control.submit.DataEntryServlet#validateDisplayItemBean
-	 * (org.akaza.openclinica.core.form.Validator, org.akaza.openclinica.bean.submit.DisplayItemBean)
+	 *      (org.akaza.openclinica.core.form.Validator, org.akaza.openclinica.bean.submit.DisplayItemBean)
 	 */
 	@Override
 	protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName,
@@ -587,8 +575,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 	/**
 	 * Current User may access a requested event CRF in the current user's studies
-	 *
-	 * @param request TODO
+	 * 
+	 * @param request
+	 *            TODO
 	 */
 
 	private void setAttributeForInterviewerDNotes(List<DiscrepancyNoteBean> eventCrfNotes, HttpServletRequest request) {
