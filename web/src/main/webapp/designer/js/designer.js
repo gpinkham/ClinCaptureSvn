@@ -1252,13 +1252,13 @@ function resetStudy(params) {
 		study: params.study,
 		studyEvent: topEvent
 	});
-	// bold event
-	parser.recursiveSelect({
-		type: "event",
-		candidate: topEvent.oid
-	});
 
 	if (topEvent) {
+		// bold event
+		parser.recursiveSelect({
+			type: "event",
+			candidate: topEvent.oid
+		});
 		loadCRFVersions({
 			evt: topEvent,
 			study: params.study,
