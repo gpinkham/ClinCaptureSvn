@@ -1702,19 +1702,19 @@ Parser.prototype.selectTarget = function() {
 			// Event
 			this.recursiveSelect({
 				click: true,
-				type: "event",
+				type: "events",
 				candidate: this.rule.targets[0].evt
 			});
 			// CRF
 			this.recursiveSelect({
-				type: "crf",
+				type: "crfs",
 				click: true,
 				candidate: this.rule.targets[0].crf
 			});
 			// CRF version
 			this.recursiveSelect({
 				click: true,
-				type: "version",
+				type: "versions",
 				candidate: this.rule.targets[0].version
 			});
 			// Item
@@ -1813,7 +1813,7 @@ Parser.prototype.fetchStudies = function() {
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 	$.ajax({
 		type: "POST",
-		url: c + "/studies?action=fetch",
+		url: c + "/rules?action=fetch",
 		success: function(studies) {
 			// FF can return a string
 			if (typeof(studies) === "string") {
@@ -1851,7 +1851,7 @@ Parser.prototype.fetchRuleForEditing = function() {
 
 	$.ajax({
 		type: "POST",
-		url: c + "/studies?action=edit&id=" + this.getParameterValue("id") + "&rId=" + this.getParameterValue("rId"),
+		url: c + "/rules?action=edit&id=" + this.getParameterValue("id") + "&rId=" + this.getParameterValue("rId"),
 		success: function(response) {
 			var rule = null;
 			// FF can return a string
@@ -1925,7 +1925,7 @@ Parser.prototype.displayValidationResults = function(rule) {
 			action: "save",
 			rule: JSON.stringify(rule)
 		},
-		url: rule.submission + "/studies?action=validate",
+		url: rule.submission + "/rules?action=validate",
 		success: function(response) {
 			if (response) {
 				// To be used in validation

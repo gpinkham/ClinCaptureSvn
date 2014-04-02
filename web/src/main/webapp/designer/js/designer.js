@@ -1268,7 +1268,7 @@ function resetStudy(params) {
 	if (topEvent) {
 		// bold event
 		parser.recursiveSelect({
-			type: "event",
+			type: "events",
 			candidate: topEvent.oid
 		});
 		loadCRFVersions({
@@ -1278,7 +1278,7 @@ function resetStudy(params) {
 		});
 		// bold crf
 		parser.recursiveSelect({
-			type: "crf",
+			type: "crfs",
 			candidate: topEvent.crfs[Object.keys(topEvent.crfs)[0]].oid
 		});
 		loadCRFVersionItems({
@@ -1288,7 +1288,7 @@ function resetStudy(params) {
 		});
 		// bold crf version
 		parser.recursiveSelect({
-			type: "version",
+			type: "versions",
 			candidate: topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0].oid
 		});
 	}

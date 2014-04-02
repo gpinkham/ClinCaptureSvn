@@ -2168,22 +2168,12 @@
     </servlet-mapping>
     
     <servlet>
-		<servlet-name>studiesServlet</servlet-name>
-        <servlet-class>com.clinovo.servlet.StudiesServlet</servlet-class>
+		<servlet-name>rules</servlet-name>
+        <servlet-class>com.clinovo.servlet.RulesServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>studiesServlet</servlet-name>
-        <url-pattern>/studies</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
-		<servlet-name>ruleValidationServlet</servlet-name>
-        <servlet-class>com.clinovo.servlet.RuleValidationServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>ruleValidationServlet</servlet-name>
+        <servlet-name>rules</servlet-name>
         <url-pattern>/rules</url-pattern>
     </servlet-mapping>
 </web-app>

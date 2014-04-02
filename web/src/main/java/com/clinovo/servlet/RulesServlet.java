@@ -75,7 +75,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class StudiesServlet extends HttpServlet {
+public class RulesServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -309,112 +309,73 @@ public class StudiesServlet extends HttpServlet {
 		JSONArray events = new JSONArray();
 
 		StudyEventDefinitionDAO eventDAO = new StudyEventDefinitionDAO(datasource);
-
-		List<StudyEventDefinitionBean> studyEvents = eventDAO.findAllActiveByStudyId(study.getId());
-
+		List<StudyEventDefinitionBean> studyEvents = eventDAO.findAllByStudy(study);
 		for (StudyEventDefinitionBean evt : studyEvents) {
-
 			JSONObject obj = new JSONObject();
-
 			obj.put("id", evt.getId());
 			obj.put("oid", evt.getOid());
 			obj.put("name", evt.getName());
 			obj.put("ordinal", evt.getOrdinal());
 			obj.put("description", evt.getDescription());
-
 			JSONArray crfs = getStudyEventCRFs(evt, study, datasource);
-
 			obj.put("crfs", crfs);
-
 			events.put(obj);
 		}
-
 		return events;
-
 	}
 
 	private JSONArray getStudyEventCRFs(StudyEventDefinitionBean evt, StudyBean study, DataSource datasource) throws Exception {
-
 		JSONArray crfs = new JSONArray();
-
 		CRFDAO crfDAO = new CRFDAO(datasource);
 		EventDefinitionCRFDAO eCrfDAO = new EventDefinitionCRFDAO(datasource);
-
 		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eCrfDAO.findAllByDefinition(study,
 				evt.getId());
-
 		for (EventDefinitionCRFBean crf : eventCRFs) {
-
 			JSONObject obj = new JSONObject();
-
 			CRFBean cf = (CRFBean) crfDAO.findByPK(crf.getCrfId());
-			
 			if (!cf.getStatus().equals(Status.DELETED)) {
-				
 				obj.put("id", cf.getId());
 				obj.put("oid", cf.getOid());
 				obj.put("name", cf.getName());
 				obj.put("version", cf.getVersionNumber());
-
 				JSONArray versions = getCRFVersions(cf, datasource);
-
 				obj.put("versions", versions);
-
 				crfs.put(obj);
 			}
 		}
-
 		return crfs;
 	}
 
 	private JSONArray getCRFVersions(CRFBean cf, DataSource datasource) throws Exception {
-
 		JSONArray versions = new JSONArray();
-
 		CRFVersionDAO crfVersionDAO = new CRFVersionDAO(datasource);
-		List<CRFVersionBean> vers = (List<CRFVersionBean>) crfVersionDAO.findAllActiveByCRF(cf.getId());
-
+		List<CRFVersionBean> vers = (List<CRFVersionBean>) crfVersionDAO.findAllByCRFId(cf.getId());
 		for (CRFVersionBean ver : vers) {
-
 			JSONObject obj = new JSONObject();
-
 			obj.put("id", ver.getId());
 			obj.put("oid", ver.getOid());
 			obj.put("name", ver.getName());
-
 			JSONArray items = getCRFVersionItems(ver, datasource);
-
 			obj.put("items", items);
-
 			versions.put(obj);
-
 		}
-
 		return versions;
 	}
 
 	private JSONArray getCRFVersionItems(CRFVersionBean crfVersion, DataSource datasource) throws Exception {
-
 		JSONArray items = new JSONArray();
 		ItemDAO crfDAO = new ItemDAO(datasource);
-		
 		ItemGroupDAO itemGroupDAO = new ItemGroupDAO(datasource);
 		ItemGroupMetadataDAO itemGroupMetaDAO = new ItemGroupMetadataDAO(datasource);
 		ItemFormMetadataDAO itemFormMetaDataDAO = new ItemFormMetadataDAO(datasource);
-
 		List<ItemBean> crfItems = (List<ItemBean>) crfDAO.findAllItemsByVersionId(crfVersion.getId());
-
 		for (ItemBean item : crfItems) {
-
 			JSONObject obj = new JSONObject();
-
 			// Item group
 			ItemGroupBean itemGroup = itemGroupDAO.findByItemAndCRFVersion(item, crfVersion);
-
 			// Form meta data
 			ItemFormMetadataBean itemFormMetaData = itemFormMetaDataDAO.findByItemIdAndCRFVersionId(item.getId(),
 					crfVersion.getId());
-
 			obj.put("id", item.getId());
 			obj.put("oid", item.getOid());
 			obj.put("name", item.getName());
@@ -422,33 +383,25 @@ public class StudiesServlet extends HttpServlet {
 			obj.put("type", item.getDataType().getName());
 			obj.put("description", item.getDescription());
 			obj.put("ordinal", itemFormMetaData.getOrdinal());
-			
+			// Repeat item?
 			ItemGroupMetadataBean itemGroupMeta = (ItemGroupMetadataBean) itemGroupMetaDAO.findByItemAndCrfVersion(item.getId(), crfVersion.getId());
 			if (itemGroupMeta.isRepeatingGroup()) {
 				obj.put("repeat", true);
 			}
-
 			items.put(obj);
 		}
-
 		return items;
 	}
 
 	private String generateOID(String expression, int x) {
-
 		String oid = "";
 		Pattern pattern = Pattern.compile("^\\w+?_(\\w{2})");
 		Matcher matcher = pattern.matcher(expression.trim());
-
 		RuleDao ruleDAO = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(RuleDao.class);
 		if (matcher.find()) {
-
 			oid = matcher.group(0);
-
 			Pattern sPattern = Pattern.compile("(?<=_)([A-z]{2})");
-
 			Matcher sMatcher = sPattern.matcher(oid.trim());
-
 			if (sMatcher.find()) {
 				oid = sMatcher.group(0);
 			}
@@ -456,12 +409,10 @@ public class StudiesServlet extends HttpServlet {
 
 		List<String> oids = ruleDAO.findRuleOIDs();
 		if (oids != null && !oids.isEmpty()) {
-			
 			oid = oid + "_" + new Random().nextInt(110 - 10 + 1) + 10;
 			oid = checkOIDAvailability(oid, oids);
 
 		} else {
-
 			oid = oid + "_0" + x;
 		}
 
@@ -469,101 +420,69 @@ public class StudiesServlet extends HttpServlet {
 	}
 
 	private String checkOIDAvailability(String oid, List<String> oids) {
-		
 		if (oids.contains(oid)) {
-			
 			Pattern pattern = Pattern.compile("(\\d+)");
 			Matcher matcher = pattern.matcher(oid);
-			
 			if (matcher.find()) {
-				
 				oid = oid.substring(0, oid.length() - 1) + (Integer.valueOf(matcher.group(0)) + 1);
 				return checkOIDAvailability(oid, oids);
 			}
 		} 
-		
 		return oid;
 	}
 
 	private List<Element> createAction(String actString, JSONObject rule, Document document) throws Exception {
-		
 		List<Element> actions = new LinkedList<Element>();
-		
 		JSONObject act = new JSONObject(actString);
-
 		// Run
 		Element run = document.createElement("Run");
-
 		run.setAttribute("ImportDataEntry", rule.getString("di"));
 		run.setAttribute("InitialDataEntry", rule.getString("ide"));
 		run.setAttribute("DoubleDataEntry", rule.getString("dde"));
 		run.setAttribute("AdministrativeDataEntry", rule.getString("ae"));
-
 		if (act.getString("type").equalsIgnoreCase("discrepancy")) {
-			
 			run.setAttribute("Batch", "true");
-			
 			Element discrepancyText = document.createElement("Message");
 			discrepancyText.setTextContent(act.getString("message"));
-
 			Element action = document.createElement("DiscrepancyNoteAction");
 			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
-
 			action.appendChild(run);
 			action.appendChild(discrepancyText);
-			
 			actions.add(action);
-
 		} else if (act.getString("type").equalsIgnoreCase("email")) {
-			
 			run.setAttribute("Batch", "true");
-			
 			// Message element
 			Element message = document.createElement("Message");
 			message.setTextContent(act.getString("body"));
-
 			Element action = document.createElement("EmailAction");
 			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
-
 			// To element
 			Element to = document.createElement("To");
 			to.setTextContent(act.getString("to"));
-
 			action.appendChild(run);
-
 			// Email props
 			action.appendChild(message);
 			action.appendChild(to);
-			
 			actions.add(action);
-
 		} else if (act.getString("type").equalsIgnoreCase("showHide")) {
-				
 			run.setAttribute("Batch", "false");
-			
 			// Message element	
 			Element message = document.createElement("Message");
 			message.setTextContent(act.getString("message"));
-			
 			// Show action
 			Element showAction = document.createElement("ShowAction");
-			
 			// children
 			showAction.setAttribute("IfExpressionEvaluates", act.getString("show"));
 			showAction.appendChild(run);
 			showAction.appendChild(message);
 			JSONArray targets = act.getJSONArray("destinations");
 			for (int x = 0; x < targets.length(); x++) {
-
 				// Target
 				Element destProp = document.createElement("DestinationProperty");
 				destProp.setAttribute("OID", targets.getString(x));
-
 				showAction.appendChild(destProp);
 			}
-			
 			actions.add(showAction);
-			
 			// clone node
 			Element hideAction = (Element) showAction.cloneNode(true);
 			document.renameNode(hideAction, null, "HideAction");
@@ -571,47 +490,31 @@ public class StudiesServlet extends HttpServlet {
 			hideAction.getElementsByTagName("Message").item(0).setTextContent(null);
 			hideAction.setAttribute("IfExpressionEvaluates", act.getString("hide"));
 			actions.add(hideAction);
-
 		} else if (act.getString("type").equalsIgnoreCase("insert")) {
-			
 			run.setAttribute("Batch", "false");
-			
 			Element action = document.createElement("InsertAction");
 			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
-			
 			Element msg = document.createElement("Message");
 			msg.setTextContent(act.getString("message"));
-			
 			JSONArray destinations = act.getJSONArray("destinations");
 			action.appendChild(run);
-
 			for (int x = 0; x < destinations.length(); x++) {
-				
 				JSONObject dest = destinations.getJSONObject(x);
 				// Target
 				Element destProp = document.createElement("DestinationProperty");
-
 				destProp.setAttribute("OID", dest.getString("oid"));
-				
 				if (dest.has("item") && dest.getBoolean("item")) {
-					
 					Element valueExpression = document.createElement("ValueExpression");
-					
 					valueExpression.setAttribute("Context", "OC_RULES_V1");
 					valueExpression.setTextContent(dest.getString("value"));
-					
 					destProp.appendChild(valueExpression);
-					
 				} else {
 					destProp.setAttribute("Value", dest.getString("value"));
 				}
-				
 				action.appendChild(destProp);
 			}
-			
 			actions.add(action);
 		}
-
 		return actions;
 	}
 	
