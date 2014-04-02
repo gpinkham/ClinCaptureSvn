@@ -12,6 +12,8 @@ public class CompleteClassificationFieldsUtil {
 
 	enum MEDDRA {SOC, HLGT, HLT}
 
+	enum WHOD {ATC7, ATC6, ATC5, ATC4, ATC3, ATC2, ATC1, CMP, CNTR}
+
 	@SuppressWarnings("rawtypes")
 	public static void completeClassificationNameFields(ArrayList<ClassificationElement> classificationElements, String dictionary) throws SearchException {
 
@@ -25,6 +27,17 @@ public class CompleteClassificationFieldsUtil {
 
 			dictionaryValuesList = new ArrayList<MEDDRA>(Arrays.asList(MEDDRA.values()));
 
+		} else if (dictionary.equals("WHOD")) {
+
+			//remove VA uniq key
+			classificationElements.remove(0);
+			dictionaryValuesList = new ArrayList<WHOD>(Arrays.asList(WHOD.values()));
+
+			for (ClassificationElement whodClassificationElement : classificationElements) {
+				String classificationElement = whodClassificationElement.getCodeName().replaceAll("_", " ").replaceAll(" and ", " & ");
+				whodClassificationElement.setCodeName(classificationElement.substring(0, classificationElement.indexOf("@")));
+			}
+
 		} else {
 
 			throw new SearchException("Unknown dictionary type specified");
@@ -37,16 +50,20 @@ public class CompleteClassificationFieldsUtil {
 				int numberElementsToRemove = classificationElements.size() - dictionaryValuesList.size();
 
 				for (int removeIndex = 0; removeIndex < numberElementsToRemove; removeIndex++) {
-					classificationElements.remove(removeIndex);
+					classificationElements.remove(0);
+				}
+			} else if (dictionaryValuesList.size() > classificationElements.size()) {
+
+				int numberElementsToRemove = dictionaryValuesList.size() - classificationElements.size();
+
+				for (int removeIndex = 0; removeIndex < numberElementsToRemove; removeIndex++) {
+					dictionaryValuesList.remove(0);
 				}
 			}
 
 			for (int i = 0; i < dictionaryValuesList.size(); i++) {
 
-				if (i < classificationElements.size()) {
-
-					classificationElements.get(i).setElementName(dictionaryValuesList.get(i).toString());
-				}
+				classificationElements.get(i).setElementName(dictionaryValuesList.get(i).toString());
 			}
 		}
 	}

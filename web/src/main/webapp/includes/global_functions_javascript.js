@@ -3144,7 +3144,8 @@ codeItemFields = function(item) {
 
     var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
     var term = $(item).closest('tbody').find('td').filter(function () {
-        return $.trim($(this).text()) == "EXT:" || $.trim($(this).text()) == "LLT:";}).next().text();
+        return $.trim($(this).text()) == "EXT:" || $.trim($(this).text()) == "LLT:" || $.trim($(this).text()) == "MPN:";
+    }).next().text();
 
     $.ajax({
 

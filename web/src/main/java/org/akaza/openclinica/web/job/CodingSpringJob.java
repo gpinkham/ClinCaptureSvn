@@ -61,7 +61,21 @@ public class CodingSpringJob extends QuartzJobBean {
             Classification classificationResult = getClassificationFromCategoryString(categoryList);
             search.setSearchInterface(new BioPortalSearchInterface());
 
-            //get codes for all verb terms & save it in classification
+			if (codedItem.getDictionary().equals("WHOD")) {
+
+				String termUniqKey = classificationResult.getHttpPath();
+				termUniqKey = termUniqKey.substring(termUniqKey.indexOf("@"), termUniqKey.length());
+
+				for (ClassificationElement whodClassElement : classificationResult.getClassificationElement()) {
+					whodClassElement.setCodeName(whodClassElement.getCodeName().replaceAll(" &amp; ", " and ").replaceAll(" ", "_") + termUniqKey);
+				}
+
+				int componentElementIndex = classificationResult.getClassificationElement().size() - 3;
+				String componentField = classificationResult.getClassificationElement().get(componentElementIndex).getCodeName() + "_com";
+				classificationResult.getClassificationElement().get(componentElementIndex).setCodeName(componentField);
+			}
+
+			//get codes for all verb terms & save it in classification
             search.getClassificationWithCodes(classificationResult, codedItem.getDictionary().replace("_", " "), bioontologyUrl, bioontologyApiKey);
             //replace all terms & codes from classification to coded elements
             generateCodedItemFields(codedItem.getCodedItemElements(), classificationResult.getClassificationElement());
@@ -119,6 +133,15 @@ public class CodingSpringJob extends QuartzJobBean {
             }
         }
 
+		if (classification.getHttpPath().indexOf("whod") > 0) {
+
+			String whodKey = classification.getHttpPath().substring(classification.getHttpPath().indexOf("@"), classification.getHttpPath().length());
+
+			for (ClassificationElement classificationElement : classification.getClassificationElement()) {
+				classificationElement.setCodeName(classificationElement.getCodeName().replaceAll(" ", "_").replaceAll(" & ", "_and_") + whodKey);
+			}
+		}
+
         return classification;
     }
 
@@ -146,12 +169,14 @@ public class CodingSpringJob extends QuartzJobBean {
 				if (name.equals(classificationElement.getElementName())) {
 
 					codedItemElement.setItemCode(classificationElement.getCodeName());
-					break;
 
 				} else if (name.equals(classificationElement.getElementName() + "C")) {
 
 					codedItemElement.setItemCode(classificationElement.getCodeValue());
-				    break;
+
+				} else if (name.equals("MPSEQ") && classificationElement.getElementName().equals("CMP")) {
+
+					codedItemElement.setItemCode(classificationElement.getCodeValue());
 				}
 			}
 		}

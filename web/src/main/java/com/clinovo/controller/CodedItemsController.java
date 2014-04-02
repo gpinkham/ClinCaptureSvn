@@ -417,6 +417,12 @@ public class CodedItemsController {
 			ptElement.setCodeName(term);
 			ptElement.setElementName("PT");
 			classificationWithTerms.addClassificationElement(ptElement);
+		} else if (codedItemUrl.indexOf("whod") > 0) {
+
+			for (ClassificationElement classification : classificationWithTerms.getClassificationElement()) {
+				String classificationCodeName = classification.getCodeName();
+				classification.setCodeName(classificationCodeName.substring(0, classificationCodeName.indexOf("@")).replaceAll("_", " ").replaceAll(" and ", " & "));
+			}
 		}
 
 		ModelMap model = new ModelMap();
@@ -553,17 +559,19 @@ public class CodedItemsController {
         for (CodedItemElement codedItemElement : codedItemElements) {
 
             for (ClassificationElement classificationElement : classificationElements) {
-                //code items with values
+
                 if (codedItemElement.getItemName().equals(classificationElement.getElementName())) {
 
                     codedItemElement.setItemCode(classificationElement.getCodeName());
-                    break;
-                    //code items with code
+
                 } else if (codedItemElement.getItemName().equals(classificationElement.getElementName() + "C")) {
 
                     codedItemElement.setItemCode(classificationElement.getCodeValue());
-                    break;
-                }
+
+                }  else if (codedItemElement.getItemName().equals("MPSEQ") && classificationElement.getElementName().equals("CMP")) {
+
+					codedItemElement.setItemCode(classificationElement.getCodeValue());
+				}
             }
         }
     }

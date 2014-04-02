@@ -30,12 +30,15 @@ public class BioPortalSearchInterface implements SearchInterface {
     private static final String MEDDRA = "MEDDRA";
     private static final String ICD9CM = "ICD9CM";
     private static final String ICD10 = "ICD10";
+	private static final String WHOD = "WHOD";
 
 	public List<Classification> search(String term, String termDictionary, String bioontologyUrl, String bioontologyApiKey) throws Exception {
 
 		Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 		dictionary = getDictionary(termDictionary);
+		term = dictionary.equals(WHOD) ? term.replaceAll(" & ", "_and_").replaceAll(" ", "_") : term;
+
 		List<Classification> classifications = new ArrayList<Classification>();
 
 		String responseTerms = termListRequest(term, bioontologyUrl, bioontologyApiKey);
@@ -50,15 +53,20 @@ public class BioPortalSearchInterface implements SearchInterface {
 			String codeHttpPath = jsonObjectElement.get("@id").getAsString();
 			String prefLabel = jsonObjectElement.get("prefLabel").getAsString();
 
-			ClassificationElement classificationElement = new ClassificationElement();
-			classificationElement.setElementName(getFirstElementName(termDictionary));
-			classificationElement.setCodeName(prefLabel);
+			if (prefLabel.indexOf("_com") < 0) {
 
-			Classification classification = new Classification();
-			classification.setHttpPath(codeHttpPath);
-			classification.addClassificationElement(classificationElement);
+				prefLabel = dictionary.equals(WHOD) ? prefLabel.substring(0, prefLabel.indexOf("@")).replaceAll("_and_", "_&_").replaceAll("_", " ") : prefLabel;
 
-			classifications.add(classification);
+				ClassificationElement classificationElement = new ClassificationElement();
+				classificationElement.setElementName(getFirstElementName(termDictionary));
+				classificationElement.setCodeName(prefLabel);
+
+				Classification classification = new Classification();
+				classification.setHttpPath(codeHttpPath);
+				classification.addClassificationElement(classificationElement);
+
+				classifications.add(classification);
+			}
 		}
 
 		return classifications;
@@ -108,18 +116,27 @@ public class BioPortalSearchInterface implements SearchInterface {
 			logger.error("Get code threads didn't finish in 30 seconds");
 			throw new SearchException(e.getMessage());
 		}
+
+		if (dictionary.equals(WHOD)) {
+			for (ClassificationElement classificationElement : classification.getClassificationElement()) {
+				String codeName = classificationElement.getCodeName();
+				String codeValue = classificationElement.getCodeValue();
+				classificationElement.setCodeName(!codeName.isEmpty() ? codeName.substring(0, codeName.indexOf("@")).replaceAll("_and_", "_&_").replaceAll("_", " ") : "");
+				classificationElement.setCodeValue(!codeValue.isEmpty() ? codeValue.substring(0, codeValue.indexOf("@")).replaceAll("_and_", "_&_").replaceAll("_", " ") : "");
+			}
+		}
 	}
 
 	public Classification getClassificationTerms(String termUrl, String bioontologyUrl, String bioontologyApiKey) throws Exception {
 
 		dictionary = getDictionary(termUrl);
-		String treePath = bioontologyUrl + "/ontologies/" + dictionary + "/classes/" + termUrl.replace("://", "%3A%2F%2F").replaceAll("/", "%2F") + "/tree"
+		String treePath = bioontologyUrl + "/ontologies/" + dictionary + "/classes/" + termUrl.replace("://", "%3A%2F%2F").replaceAll("/", "%2F").replaceAll("@", "%40").replaceAll("#", "%23") + "/tree"
 				+ "?no_links=true&no_context=true&api_key=" + bioontologyApiKey;
 
 		String termTree = getPageDataRequest(treePath, bioontologyApiKey);
 
 		Classification classification = new Classification();
-		recursiveTreeResponseParser(termTree, "", classification);
+		recursiveTreeResponseParser(termTree, classification);
 		CompleteClassificationFieldsUtil.completeClassificationNameFields(classification.getClassificationElement(), dictionary);
 
 		return classification;
@@ -136,7 +153,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 		return transport.processRequest();
 	}
 
-	private void recursiveTreeResponseParser(String treeResponse, String prefLabel, Classification classification) throws SearchException {
+	private void recursiveTreeResponseParser(String treeResponse, Classification classification) throws SearchException {
 
 		JsonArray jarray = new JsonParser().parse(treeResponse).getAsJsonArray();
 
@@ -146,12 +163,17 @@ public class BioPortalSearchInterface implements SearchInterface {
 			JsonArray jsonArrayWithChildItem = jsonObject.getAsJsonArray("children");
 			ClassificationElement classificationElement = new ClassificationElement();
 
-			if (jsonArrayWithChildItem != null & jsonArrayWithChildItem.size() > 0) {
+			if (jsonArrayWithChildItem != null && jsonArrayWithChildItem.size() > 0) {
 
-				classificationElement.setCodeName(jsonObject.get("prefLabel").getAsString());
-				classification.addClassificationElement(classificationElement);
+				String term = jsonObject.get("prefLabel").getAsString();
 
-				recursiveTreeResponseParser(jsonObject.get("children").toString(), prefLabel, classification);
+				if (!term.isEmpty()) {
+
+					classificationElement.setCodeName(term);
+					classification.addClassificationElement(classificationElement);
+				}
+
+				recursiveTreeResponseParser(jsonObject.get("children").toString(), classification);
 			}
 		}
 	}
@@ -228,6 +250,8 @@ public class BioPortalSearchInterface implements SearchInterface {
 			return ICD10;
 		} else if (term.contains("icd9") || term.contains("icd 9")) {
 			return ICD9CM;
+		} else if (term.contains("whod")) {
+			return WHOD;
 		}
 
 		throw new SearchException("Unknown dictionary type specified");
@@ -241,6 +265,9 @@ public class BioPortalSearchInterface implements SearchInterface {
 		} else if ("icd 10".equalsIgnoreCase(termDictionary) || "icd 9cm".equalsIgnoreCase(termDictionary)) {
 
 			return "EXT";
+		} else if ("whod".equalsIgnoreCase(termDictionary)) {
+
+			return "MPN";
 		}
 
 		throw new SearchException("Unknown dictionary type specified");

@@ -199,9 +199,9 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
         } else if (codedItemDictionary.equalsIgnoreCase("MEDDRA")) {
 
             return "MedDRA";
-        } else if (codedItemDictionary.equalsIgnoreCase("WHODRUG")) {
+        } else if (codedItemDictionary.equalsIgnoreCase("WHOD")) {
 
-            return "WhoDRUG";
+            return "WHOD";
         }
         return "Dictionary Not Found";
     }
@@ -288,7 +288,11 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
 
                         codedItemWithFilterFields.addCodedItemElements(codedItemElement);
                         break;
-                    }
+                    } else if (codedItemElement.getItemName().equals("CMP")) {
+
+						codedItemWithFilterFields.addCodedItemElements(codedItemElement);
+						break;
+					}
                 }
             }
 
@@ -553,7 +557,7 @@ public class CodedItemsTableFactory extends AbstractTableFactory {
             options.add(new Option("ICD 9CM", "ICD 9CM"));
             options.add(new Option("ICD 10", " ICD 10"));
             options.add(new Option("MedDRA", "MedDRA"));
-            options.add(new Option("WHO Drug", "WHO Drug"));
+            options.add(new Option("WHOD", "WHOD"));
 
             return options;
         }

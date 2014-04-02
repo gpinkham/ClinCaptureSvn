@@ -149,17 +149,21 @@ public class CodedItemAutoUpdater {
 
         CodedItem codedItemWithFilterFields = new CodedItem();
 
-        for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
+		for (CodedItemElement codedItemElement : codedItem.getCodedItemElements()) {
 
-            for (CodedItemElement codedItemIteration : codedItem.getCodedItemElements()) {
+			for (CodedItemElement codedItemIteration : codedItem.getCodedItemElements()) {
 
-                if ((codedItemElement.getItemName() + "C").equals(codedItemIteration.getItemName())) {
+				if ((codedItemElement.getItemName() + "C").equals(codedItemIteration.getItemName())) {
 
-                    codedItemWithFilterFields.addCodedItemElements(codedItemElement);
-                    break;
-                }
-            }
-        }
+					codedItemWithFilterFields.addCodedItemElements(codedItemElement);
+					break;
+				} else if (codedItemElement.getItemName().equals("CMP")) {
+
+					codedItemWithFilterFields.addCodedItemElements(codedItemElement);
+					break;
+				}
+			}
+		}
 
         Collections.sort(codedItemWithFilterFields.getCodedItemElements(), new codedElementSortByItemDataId());
 

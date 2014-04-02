@@ -18,18 +18,19 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 
     BioPortalSearchInterface searchInterface = Mockito.mock(BioPortalSearchInterface.class);
 
-    @Before
-    public void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 
-		Mockito.doReturn(searchResult).when(searchInterface).termListRequest(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.doReturn(treeResult).when(searchInterface).getPageDataRequest(Mockito.anyString(), Mockito.anyString());
+		Mockito.doReturn(searchResult).when(searchInterface).termListRequest(Mockito.eq("Leukaemia plasmacytic (in remission)"), Mockito.anyString(), Mockito.anyString());
+		Mockito.doReturn(whodSearchResult).when(searchInterface).termListRequest(Mockito.eq("Benzalkonium"), Mockito.anyString(), Mockito.anyString());
+		Mockito.doReturn(treeResult).when(searchInterface).getPageDataRequest(Mockito.anyString(), Mockito.anyString());
 		Mockito.doReturn(termCodeResult).when(searchInterface).getTermCodeRequest(Mockito.any(ClassificationElement.class), Mockito.anyString(), Mockito.anyString());
 
 		Mockito.doCallRealMethod().when(searchInterface).search(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 		Mockito.doCallRealMethod().when(searchInterface).getClassificationTerms(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 		Mockito.doCallRealMethod().when(searchInterface).getClassificationCodes(Mockito.any(Classification.class), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
-    }
+	}
 
 	@Test
 	public void testThatSearchDoesNotReturnNull() throws Exception {
@@ -115,7 +116,7 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 		ClassificationElement classificationElement = new ClassificationElement();
 		ClassificationElement classificationElement1 = new ClassificationElement();
 		classificationElement.setElementName("PAIN");
-		classificationElement.setElementName("PAIN");
+		classificationElement1.setElementName("PAIN");
 
 		classification.addClassificationElement(classificationElement);
 		classification.addClassificationElement(classificationElement1);
@@ -124,5 +125,34 @@ public class BioPortalSearchInterfaceTest extends BaseTest {
 
 		assertEquals("10033371", classification.getClassificationElement().get(0).getCodeValue());
 		assertEquals("10033371", classification.getClassificationElement().get(1).getCodeValue());
+	}
+
+	@Test
+	public void testThatWHODSearchDoesNotReturnNull() throws Exception {
+
+		assertNotNull(searchInterface.search("Benzalkonium", "WHOD", "http://1.1.1.1", "api key"));
+	}
+
+	@Test
+	public void testThatWHODSearchReturnsExpectedNumberOfTerms() throws Exception {
+
+		assertEquals(2, searchInterface.search("Benzalkonium", "WHOD", "http://1.1.1.1", "api key").size());
+	}
+
+	@Test
+	public void testThatWhodSearchReturnsCorrectTermNames() throws Exception {
+
+		List<Classification> classifications = searchInterface.search("Benzalkonium", "WHOD", "http://1.1.1.1", "api key");
+		assertEquals("Benzalkonium", classifications.get(0).getClassificationElement().get(0).getCodeName());
+		assertEquals("Benzalkonium chloride", classifications.get(1).getClassificationElement().get(0).getCodeName());
+	}
+
+	@Test
+	public void testThatWhodSearchReturnsClassificationEachHavingElementNames() throws Exception {
+
+		List<Classification> classifications = searchInterface.search("Benzalkonium", "WHOD", "http://1.1.1.1", "api key");
+
+		assertEquals("MPN", classifications.get(0).getClassificationElement().get(0).getElementName());
+		assertEquals("MPN", classifications.get(1).getClassificationElement().get(0).getElementName());
 	}
 }

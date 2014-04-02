@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 public class BaseTest {
 
 	protected static String searchResult;
+	protected static String whodSearchResult;
     protected static String treeResult;
 	protected static String termCodeResult;
 
@@ -21,6 +22,7 @@ public class BaseTest {
 		try {
 
             searchResult = readFile("src/test/resources/com/clinovo/coding/ExampleSearchResponse.json");
+			whodSearchResult = readFile("src/test/resources/com/clinovo/coding/ExampleWHODSearchResponse.json");
             treeResult = readFile("src/test/resources/com/clinovo/coding/ExampleTreeResponse.json");
 			termCodeResult = readFile("src/test/resources/com/clinovo/coding/ExampleTermCodeResponse.json");
 

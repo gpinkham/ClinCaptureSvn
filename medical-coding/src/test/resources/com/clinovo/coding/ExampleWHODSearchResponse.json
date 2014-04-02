@@ -1,0 +1,27 @@
+{
+    "page": 1,
+    "pageCount": 1,
+    "prevPage": null,
+    "nextPage": null,
+    "links": {
+        "nextPage": null,
+        "prevPage": null
+    },
+    "collection": [
+        {
+            "prefLabel": "Benzalkonium@00088301001",
+            "@id": "http://ontology.clinovo.com/ontology/WHOD/000883@00088301001",
+            "@type": "http://www.w3.org/2002/07/owl#Class"
+        },
+        {
+            "prefLabel": "Benzalkonium_chloride@00088301001",
+            "@id": "http://ontology.clinovo.com/ontology/WHOD/000883@00088303201",
+            "@type": "http://www.w3.org/2002/07/owl#Class"
+        },
+        {
+            "prefLabel": "Benzalkonium@00088301001_com",
+            "@id": "http://ontology.clinovo.com/ontology/WHOD/01_001@00088301001",
+            "@type": "http://www.w3.org/2002/07/owl#Class"
+        }
+    ]
+}
