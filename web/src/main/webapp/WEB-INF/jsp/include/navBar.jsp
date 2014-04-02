@@ -264,27 +264,29 @@
             </div>
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
-            <c:set var="countOfElementsOnTheRightSide" value="${(includeReporting ? 1 : 0) + (study.parentStudyId > 0 && (userRole.studyAdministrator || userBean.name == 'root') ? 0 : (study.studyParameterConfig.allowCodingVerification eq 'yes' ? 2 : 1))}"/>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
-                <c:if test="${!(study.parentStudyId > 0 && (userRole.studyAdministrator || userBean.name == 'root'))}">
-                    <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true&restore=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
-                    <c:if test="${countOfElementsOnTheRightSide >= 3}">
-                        <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
-                    </c:if>
-                </c:if>
+                <c:choose>
+                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userBean.name == 'root')}">
+                    </c:when>
+                    <c:otherwise>
+                        <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true&restore=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
+                    </c:otherwise>
+                </c:choose>
             </div>
             <div class="taskRightColumn">
-                <c:if test="${!(study.parentStudyId > 0 && (userRole.studyAdministrator || userBean.name == 'root'))}">
-                    <c:if test="${countOfElementsOnTheRightSide < 3}">
+                <c:choose>
+                    <c:when test="${study.parentStudyId > 0 && (userRole.studyAdministrator || userBean.name == 'root')}">
+                    </c:when>
+                    <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
-                    </c:if>
-                    <div class="taskLink"><a href="${urlPrefix}ListCRF"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-                    <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
-                        <div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
-                    </c:if>
-                </c:if>
+                        <div class="taskLink"><a href="${urlPrefix}ListCRF"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
+                        <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
+                            <div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
+                        </c:if>
+                    </c:otherwise>
+                </c:choose>
                 <c:if test="${includeReporting}">
                     <div class="taskLink"><a href="${urlPrefix}reports" target="_blank"><fmt:message key="reporting" bundle="${resword}"/></a></div>
                 </c:if>
@@ -415,30 +417,32 @@
             </div>
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
-            <c:set var="countOfElementsOnTheRightSide" value="${(includeReporting ? 1 : 0) + (study.parentStudyId > 0 && userRole.studyAdministrator ? 0 : (study.studyParameterConfig.allowCodingVerification eq 'yes' ? 2 : 1))}"/>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
-                <c:if test="${!(study.parentStudyId > 0 && userRole.studyAdministrator)}">
-                    <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
-                    <c:if test="${countOfElementsOnTheRightSide >= 3}">
-                        <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
-                    </c:if>
-                </c:if>
+                <c:choose>
+                    <c:when test="${study.parentStudyId > 0 && userRole.studyAdministrator}">
+                    </c:when>
+                    <c:otherwise>
+                        <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
+                    </c:otherwise>
+                </c:choose>
             </div>
             <div class="taskRightColumn">
-                <c:if test="${!(study.parentStudyId > 0 && userRole.studyAdministrator)}">
-                    <c:if test="${countOfElementsOnTheRightSide < 3}">
-                        <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
-                    </c:if>
+            <c:choose>
+                <c:when test="${study.parentStudyId > 0 && userRole.studyAdministrator}">
+                </c:when>
+                <c:otherwise>
+                    <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
                     <div class="taskLink"><a href="${urlPrefix}ListCRF"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
                     <c:if test="${study.studyParameterConfig.allowCodingVerification eq 'yes'}">
                         <div class="taskLink"><a href="${urlPrefix}pages/codedItems"><fmt:message key="code" bundle="${resword}"/></a></div>
                     </c:if>
-                </c:if>
-                <c:if test="${includeReporting}">
+                </c:otherwise>
+            </c:choose>
+            <c:if test="${includeReporting}">
                     <div class="taskLink"><a href="${urlPrefix}reports" target="_blank"><fmt:message key="reporting" bundle="${resword}"/></a></div>
-                </c:if>
+            </c:if>
             </div>
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>

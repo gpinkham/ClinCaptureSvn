@@ -43,7 +43,6 @@
 <jsp:useBean scope='session' id='definition' class='org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean'/>
 <jsp:useBean scope='session' id='eventDefinitionCRFs' class='java.util.ArrayList'/>
 <jsp:useBean scope='session' id='sdvOptions' class='java.util.ArrayList'/>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript">
     <!--
     function myCancel() {

@@ -44,7 +44,7 @@ function checkGoToEntryStatus(strImageName, Message, Adress) {
     }
     return true;
 }
-function confirmGoTo(Message, Adress){
+function confirmGoTo(Message, Address){
 	confirmDialog({ message: Message, height: 150, width: 500, redirectLink: Address });
 }
 function confirmBack(Message){
@@ -74,7 +74,6 @@ function goBackSmart(servletURL, defaultURL) {
 function checkGoBackSmartEntryStatus(strImageName, Message, servletURL, defaultURL) {
     closing = false;
     objImage = MM_findObj(strImageName);
-    //alert(objImage.src);
     if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
         return confirmBackSmart(Message, servletURL, defaultURL, undefined);
     } else {
@@ -972,13 +971,14 @@ function displayMessageFromCheckbox(checkboxObject, dde){
                                       : "<div style=\"clear: both; text-align: justify;\">Marking this CRF complete will prepare it for Double Data Entry, where another user will enter data and then be able to finally complete this CRF.</div>") +
                     "<div style=\"clear: both; padding: 6px;\"><input type=\"checkbox\" id=\"ignoreMarkCRFCompleteMSG\"/> Do not show this message anymore.</div>" +
                     "<div style=\"clear: both;\">" +
-                        "<input type=\"button\" value=\"OK\" class=\"button_medium\" onclick=\"markCRFCompleteOk('" + checkboxObject.name + "');\" style=\"float: left;\">" +
-                        "<input type=\"button\" value=\"Cancel\" class=\"button_medium\" onclick=\"markCRFCompleteCancel('" + checkboxObject.name + "');\" style=\"float: left; margin-left: 6px;\">" +
+                        "<input type=\"button\" value=\"Yes\" class=\"button_medium\" onclick=\"markCRFCompleteOk('" + checkboxObject.name + "');\" style=\"float: left;\">" +
+                        "<input type=\"button\" value=\"No\" class=\"button_medium\" onclick=\"markCRFCompleteCancel('" + checkboxObject.name + "');\" style=\"float: left; margin-left: 6px;\">" +
                     "</div>" +
                 "</div>");
 
             $("#confirmation").dialog({
                 autoOpen : false,
+                closeOnEscape: false,
                 modal : true,
                 height: (dde == undefined ? 180 : 150),
                 width: 450}
@@ -1149,7 +1149,7 @@ function submitFormReportCheck (theformlist) {
     }
     //if (isNaN(number)) number = 0;
     if (number > 50) {
-        alert("You are only allowed to choose up to a maximum of fifty (50) variables.  You have picked "+number+".  Please go back to the form and remove some of your selections.  For Data Dumps of more than 50 variables, please contact your Project Administrator or DBA.");
+        alertDialog({ message: "You are only allowed to choose up to a maximum of fifty (50) variables.  You have picked "+number+".  Please go back to the form and remove some of your selections.  For Data Dumps of more than 50 variables, please contact your Project Administrator or DBA.", height: 150, width: 550 });
         return false;
     } else {
         return true;
@@ -1808,7 +1808,7 @@ function createRequestObject(){
         req = new ActiveXObject("Microsoft.XMLHTTP");
     }else{
         //Error for an old browser
-        alert('Your browser is not IE 5 or higher, or Firefox or Safari or Opera');
+        alertDialog({ message: 'Your browser is not IE 5 or higher, or Firefox or Safari or Opera', height: 150, width: 500 });
     }
 
     return req;
@@ -1829,7 +1829,8 @@ function handleResponse(){
     if(http.readyState == 4 && http.status == 200){
         var response = http.responseText;
         if(response == null || response != 'true') {
-            checkboxObject.checked=false; alert('Your password did not match. Please try again.');
+            checkboxObject.checked=false; 
+            alertDialog({ message: 'Your password did not match. Please try again.', height: 150, width: 400 });
         }
     }
 }
@@ -1837,7 +1838,7 @@ function handleResponse(){
 function requestSignatureFromCheckbox(password, checkbox){
 	checkboxObject = checkbox;
 	if (password==null || password==''){
-		alert('Your password did not match. Please try again.');
+		alertDialog({ message: 'Your password did not match. Please try again.', height: 150, width: 400 });
 		checkbox.checked=false;
 		return;
 	}
@@ -1847,7 +1848,6 @@ function requestSignatureFromCheckbox(password, checkbox){
 }
 
 function numberGroupRows(){
-	alert("test");
 	var allGroupDivs = prt$$("div.tableDiv");
 	var allTrTags;
 	var rowCounter;
@@ -2385,7 +2385,7 @@ function randomizeSubject() {
 
         } else {
             
-            alert($("input:hidden[name='requiredParam3Missing']").val());
+            alertDialog({ message: $("input:hidden[name='requiredParam3Missing']").val(), height: 150, width: 500 });
 
             return false;
         }
@@ -2415,38 +2415,38 @@ function randomizeSubject() {
             if(data.match(/UnknownHostException/)) {
 
                 disableRandomizeCRFButtons(false)
-                alert("The randomization service is not available. Consult your system administrator")
+                alertDialog({ message: "The randomization service is not available. Consult your system administrator", height: 150, width: 500 })
 
             } else if(data.match(/Invalid Site/)) {
 
                 disableRandomizeCRFButtons(false)
-                alert("The Site Id configured is invalid. Please contact your system administrator")
+                alertDialog({ message: "The Site Id configured is invalid. Please contact your system administrator", height: 150, width: 500 })
 
             } else if(data.match(/Invalid Trial/)) {
 
                 disableRandomizeCRFButtons(false)
-                alert("The Trial Id configured is invalid. Please contact your system administrator")
+                alertDialog({ message: "The Trial Id configured is invalid. Please contact your system administrator", height: 150, width: 500 })
 
             } else if(data.match(/Invalid Strata/)) {
 
                 disableRandomizeCRFButtons(false)
-                alert("The Stratification level missing. Please contact your system administrator")
+                alertDialog({ message: "The Stratification level missing. Please contact your system administrator", height: 150, width: 500 })
 
             } else if(data.match(/^\</)) {
 
                 disableRandomizeCRFButtons(false)
-                alert("An error occurred during the randomization call. Please contact your system administrator")
+                alertDialog({ message: "An error occurred during the randomization call. Please contact your system administrator", height: 150, width: 500 })
 
             } else if(data.match(/Site is not auth/)) {
 
                 disableRandomizeCRFButtons(false)
-                alert("The Site configured is not authorized to randomize subjects . Please contact your system administrator")
+                alertDialog({ message: "The Site configured is not authorized to randomize subjects . Please contact your system administrator", height: 150, width: 500 })
 
             } else if(data.match(/Exception/)) {
 
                 disableRandomizeCRFButtons(false)
                 var exceptionPattern = new RegExp("^.*:(.*)")
-                alert(exceptionPattern.exec(data)[1])
+                alertDialog({ message: exceptionPattern.exec(data)[1], height: 150, width: 500 });
 
             } else {
                 
@@ -3051,7 +3051,7 @@ function Pager(tableName, itemsPerPage) {
     this.showPage = function (pageNumber) {
 
         if (!this.inited) {
-            alert("not inited");
+            alertDialog({ message: "not inited", height: 150, width: 500 });
             return;
         }
 
@@ -3093,7 +3093,7 @@ function Pager(tableName, itemsPerPage) {
     this.showPageNav = function (pagerName, positionId) {
 
         if (!this.inited) {
-            alert("not inited");
+        	alertDialog({ message: "not inited", height: 150, width: 500 });
             return;
         }
 
@@ -3600,6 +3600,51 @@ function alertDialog(params){
         }
     });
     return false;
+}
+
+function crfCompleteAuthorize(params){
+	
+	if(params.checkbox.checked == false){
+		return true;
+	}
+	$("<div id='crfPasswordDialog' title='Authorization'>" +
+	        "<div style='clear: both; margin-top: 2%; text-align: justify'>" +
+	        params.message +
+	        "</div>" +
+	        "<div style='text-align:left; width:100%;'>" +
+	        "<input align='left' type='password' name='password' id='passwordIdNew'/>" +
+	        "</div>" +
+	        "</div>").appendTo("body");
+	
+	$("#crfPasswordDialog").dialog({
+        autoOpen : true,
+        closeOnEscape: false,
+        modal : true,
+        height: params.height,
+        width: params.width,
+        buttons:{ 
+        	'Ok': function() {
+        		params.checkbox.checked = true;
+        		requestSignatureFromCheckbox(document.getElementById('passwordIdNew').value, params.checkbox);
+            	$("#crfPasswordDialog").remove();
+        	}, 
+        	'Cancel': function() {
+        		$("#crfPasswordDialog").remove();
+        	}
+        },
+
+        open: function(event, ui) {
+
+            openDialog({ 
+            	dialogDiv: this, 
+            	okButtonValue: "Ok", 
+            	cancelButtonValue: "Cancel",
+            	imagesFolderPath: determineImagesPath()
+    		});
+        }
+    });
+    return false;
+	
 }
 
 function confirmDialog(params){

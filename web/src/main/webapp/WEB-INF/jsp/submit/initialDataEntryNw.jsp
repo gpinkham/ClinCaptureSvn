@@ -559,7 +559,7 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                         <c:choose>
                                             <c:when test="${section.eventDefinitionCRF.electronicSignature == true}">
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="sm('box', this, 730,100);">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="return crfCompleteAuthorize({ message: '<fmt:message key="crf_data_entry_password_required" bundle="${restext}"/>', height: 190, width: 730, checkbox: this });">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:when>
@@ -619,7 +619,7 @@ function initmb(){var ab='absolute';var n='none';var obody=document.getElementsB
                                         <c:choose>
                                             <c:when test="${section.eventDefinitionCRF.electronicSignature == true}">
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="sm('box', this, 730,100);">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="return crfCompleteAuthorize({ message: '<fmt:message key="crf_data_entry_password_required" bundle="${restext}"/>', height: 190, width: 730, checkbox: this });">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:when>
@@ -1621,7 +1621,7 @@ table-->
                             <c:choose>
                                 <c:when test="${section.eventDefinitionCRF.electronicSignature == true}">
                                     <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="sm('box', this, 730,100);">
+                                                                <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="return crfCompleteAuthorize({ message: '<fmt:message key="crf_data_entry_password_required" bundle="${restext}"/>', height: 190, width: 730, checkbox: this });">
                                     </td>
                                     <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                 </c:when>
