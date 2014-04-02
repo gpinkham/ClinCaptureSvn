@@ -19,9 +19,9 @@ $(function() {
 	$("a[id='back']").attr("href", c + "/designer/rule.html");
 	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true&restore=true");
 	var rule = JSON.parse(sessionStorage.getItem("rule"));
-	if (sessionStorage.getItem("validation")) {
+	if (rule.validation) {
 		console.log(rule.xml)
-		var validation = JSON.parse(sessionStorage.getItem("validation"));
+		var validation = JSON.parse(rule.validation);
 		sessionStorage.setItem("status", "load");
 
 		// if a rule passed validation
@@ -91,7 +91,7 @@ $(function() {
 
 	$("#save").click(function() {
 		saveRule(rule);
-	})
+	});
 })
 
 /* =================================================================
@@ -116,15 +116,12 @@ function saveRule(rule) {
 		type: "POST",
 		contentType: "multipart/form-data; boundary="+boundary,
 		data: body,
-		url: c + "/ImportRule?action=confirm&rs=true&edit=" + sessionStorage.getItem("edit") + "&id=" + sessionStorage.getItem("id") + "&study=" + rule.study + "&copy=" + rule.copied,
+		url: c + "/ImportRule?action=confirm&rs=true&edit=" + rule.editing + "&id=" + rule.ruleSet + "&study=" + rule.study + "&copy=" + rule.copied,
 		success: function(response) {
 			try {
-				sessionStorage.removeItem("edit");
 				sessionStorage.setItem("status", "remove");
 				// Clean up
-				sessionStorage.removeItem("id");
 				sessionStorage.removeItem("rule");
-				sessionStorage.removeItem("validation");
 				window.open(rule.submission + "/designer/rule.html", '_self');
 			} catch (e) {
 				$(".spinner").remove();

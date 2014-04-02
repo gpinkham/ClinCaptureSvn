@@ -17,6 +17,7 @@ function Parser() {
 	this.rule.targets = [];
 	this.rule.actions = [];	
 	this.rule.copied = false;
+	this.rule.editing = false;
 }
 
 Parser.prototype.getStudy = function() {
@@ -35,6 +36,22 @@ Parser.prototype.getCopy = function() {
 
 Parser.prototype.setCopy = function(copied) {
 	this.rule.copied = copied;
+}
+
+Parser.prototype.getEditing = function() {
+	return this.rule.editing;
+}
+
+Parser.prototype.setEditing = function(editing) {
+	this.rule.editing = editing;
+}
+
+Parser.prototype.getRuleSet = function() {
+	return this.rule.ruleSet;
+}
+
+Parser.prototype.setRuleSet = function(ruleSet) {
+	this.rule.ruleSet = ruleSet;
 }
 
 /* ===========================================================================
@@ -557,6 +574,10 @@ Parser.prototype.getRule = function() {
 		rule.name = this.getName();
 		rule.study = this.rule.study;
 		rule.copied = this.getCopy();
+		rule.editing = this.getEditing();
+		if (rule.editing) {
+			rule.ruleSet = this.getRuleSet();
+		}
 		rule.targets = this.getTargets();
 		rule.actions = this.getActions();
 		// Evocation
@@ -584,6 +605,8 @@ Parser.prototype.render = function(rule) {
 	this.setName(rule.name);
 	this.setStudy(rule.study);
 	this.setCopy(rule.copied);
+	this.setEditing(rule.editing);
+	this.setRuleSet(rule.ruleSet);
 	this.setExpression(rule.expression);
 	this.setTargets(rule.targets);
 	this.setEvaluatesTo(rule.evaluatesTo);
@@ -1787,9 +1810,6 @@ Parser.prototype.getActions = function() {
 Parser.prototype.fetchStudies = function() {
 	// Notification
 	$("body").append(createLoader());	
-	// Clean up
-	sessionStorage.removeItem("id");
-	sessionStorage.removeItem("edit");
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 	$.ajax({
 		type: "POST",
@@ -1827,8 +1847,6 @@ Parser.prototype.fetchStudies = function() {
 Parser.prototype.fetchRuleForEditing = function() {
 	editing = true;
 	$("body").append(createLoader());
-	sessionStorage.setItem("edit", true);
-	sessionStorage.setItem("id", this.getParameterValue("rId"));
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 
 	$.ajax({
@@ -1840,6 +1858,8 @@ Parser.prototype.fetchRuleForEditing = function() {
 			if (typeof(response) === "string") {
 				rule = JSON.parse(response);
 			}
+			rule.editing = true;
+			rule.ruleSet = parser.getParameterValue("rId");
 			rule.study = parseInt(parser.getParameterValue("study"));
 			parser.render(rule);
 		},
@@ -1873,7 +1893,7 @@ Parser.prototype.validate = function() {
 			},
 			url: rule.study ? rule.submission + "/TestRule?action=validate&study=" + rule.study : rule.submission + "/TestRule?action=validate",
 			success: function(response) {
-				sessionStorage.setItem("validation", response);
+				rule.validation = response;
 				parser.displayValidationResults(rule);
 				$(".spinner").remove();
 			},
