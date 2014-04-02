@@ -16,12 +16,12 @@ package com.clinovo.service;
 
 public interface StudySubjectIdService {
 
-    /**
-     * Retrieve a next StudySubjectId (label) for study name.
-     *
-     * @param studyName Name of the study / site.
-     *
-     * @return StudySubjectId
-     */
-    String getNextStudySubjectId(String studyName);
+	/**
+	 * Retrieve a next StudySubjectId (label) for study name.
+	 * 
+	 * @param studyIdentifier
+	 *            Unique identifier of the study / site.
+	 * @return next study subject id
+	 */
+	String getNextStudySubjectId(String studyIdentifier);
 }

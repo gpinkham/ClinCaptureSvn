@@ -15,45 +15,45 @@
 package com.clinovo.dao;
 
 import com.clinovo.model.StudySubjectId;
-
 import org.akaza.openclinica.dao.hibernate.AbstractDomainDao;
 import org.springframework.stereotype.Repository;
 
 /**
  * This class is the database interface for StudySubjectId's that CC generates during import.
- *
+ * 
  */
 @Repository
 public class StudySubjectIdDAO extends AbstractDomainDao<StudySubjectId> {
 
-    @Override
-    public Class<StudySubjectId> domainClass() {
-        return StudySubjectId.class;
-    }
+	@Override
+	public Class<StudySubjectId> domainClass() {
+		return StudySubjectId.class;
+	}
 
-    /**
-     * Retrieve a next StudySubjectId (label) for study name.
-     *
-     * @param studyName Name of the study / site.
-     *
-     * @return StudySubjectId
-     */
-    public synchronized String getNextStudySubjectId(String studyName) {
-        String query = "from " + getDomainClassName() + " do  where do.name = :name";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setString("name", studyName);
-        StudySubjectId studySubjectId = (StudySubjectId)q.uniqueResult();
-
-        if (studySubjectId == null) {
-            studySubjectId = new StudySubjectId();
-            studySubjectId.setName(studyName);
-            studySubjectId.setIndex(0);
-            saveOrUpdate(studySubjectId);
-        }
-
-        studySubjectId.setIndex(studySubjectId.getIndex() + 1);
-        saveOrUpdate(studySubjectId);
-
-        return studyName + "-" + studySubjectId.getIndex();
-    }
+	/**
+	 * Retrieve a next StudySubjectId (label) for study name.
+	 * 
+	 * @param studyIdentifier
+	 *            Unique identifier of the study / site.
+	 * @return next study subject id
+	 */
+	public synchronized String getNextStudySubjectId(String studyIdentifier) {
+		String query = "from " + getDomainClassName() + " do  where do.name = :name";
+		org.hibernate.Query q = getCurrentSession().createQuery(query);
+		q.setString("name", studyIdentifier);
+		StudySubjectId studySubjectId = (StudySubjectId) q.uniqueResult();
+		if (studySubjectId == null) {
+			studySubjectId = new StudySubjectId();
+			studySubjectId.setName(studyIdentifier);
+			studySubjectId.setIndex(0);
+			saveOrUpdate(studySubjectId);
+		}
+		studySubjectId.setIndex(studySubjectId.getIndex() + 1);
+		saveOrUpdate(studySubjectId);
+		return studyIdentifier
+				+ "-"
+				+ (studySubjectId.getIndex() < 10 ? ("00" + studySubjectId.getIndex())
+						: (studySubjectId.getIndex() < 100 ? ("0" + studySubjectId.getIndex()) : studySubjectId
+								.getIndex()));
+	}
 }

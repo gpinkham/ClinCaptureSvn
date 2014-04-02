@@ -10,10 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class StudySubjectIdServiceImpl implements StudySubjectIdService {
 
-    @Autowired
-    private StudySubjectIdDAO studySubjectIdDAO;
+	@Autowired
+	private StudySubjectIdDAO studySubjectIdDAO;
 
-    public String getNextStudySubjectId(String studyName) {
-        return studySubjectIdDAO.getNextStudySubjectId(studyName);
-    }
+	public String getNextStudySubjectId(String studyIdentifier) {
+		return studySubjectIdDAO.getNextStudySubjectId(studyIdentifier);
+	}
 }

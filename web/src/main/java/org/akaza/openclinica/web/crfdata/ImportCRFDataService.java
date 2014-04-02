@@ -146,14 +146,14 @@ public class ImportCRFDataService {
 				logger.debug("Study subject id should be empty");
 				throw new OpenClinicaException("Study subject id should be empty", "");
 			}
-			studySubjectId = studySubjectIdService.getNextStudySubjectId(studyBean.getName());
+			studySubjectId = idSetting.equals("manual") ? subjectDataBean.getStudySubjectId() : studySubjectIdService
+					.getNextStudySubjectId(studyBean.getIdentifier());
 			subjectOid = "SS_" + studySubjectId.replaceAll(" |-", "").toUpperCase();
 			if (studySubjectDAO.findByOid(subjectOid) != null) {
 				return createStudySubject(ub, studyBean, subjectDataBean, subjectDAO, studySubjectDAO, errors);
 			}
-			if (idSetting.equals("manual")) {
-				studySubjectId = subjectDataBean.getStudySubjectId();
-				if (studySubjectDAO.findByLabelAndStudy(studySubjectId, studyBean).getId() > 0) {
+			if (studySubjectDAO.findByLabelAndStudy(studySubjectId, studyBean).getId() > 0) {
+				if (idSetting.equals("manual")) {
 					MessageFormat mf = new MessageFormat("");
 					mf.applyPattern(respage
 							.getString("study_subject_id_is_not_unique_in_the_study_you_may_change_the_study_param"));
@@ -161,9 +161,7 @@ public class ImportCRFDataService {
 					errors.add(mf.format(arguments));
 					logger.debug("Study subject id is not unique");
 					throw new OpenClinicaException("Study subject id is not unique", "");
-				}
-			} else {
-				if (studySubjectDAO.findByLabelAndStudy(studySubjectId, studyBean).getId() > 0) {
+				} else {
 					return createStudySubject(ub, studyBean, subjectDataBean, subjectDAO, studySubjectDAO, errors);
 				}
 			}
@@ -290,8 +288,10 @@ public class ImportCRFDataService {
 							// spell out criteria and create a bean if
 							// necessary, avoiding false-positives
 							if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
-									|| studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
-									|| studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SOURCE_DATA_VERIFIED)
+									|| studyEventBean.getSubjectEventStatus().equals(
+											SubjectEventStatus.DATA_ENTRY_STARTED)
+									|| studyEventBean.getSubjectEventStatus().equals(
+											SubjectEventStatus.SOURCE_DATA_VERIFIED)
 									|| studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
 								EventCRFBean newEventCrfBean = new EventCRFBean();
 								newEventCrfBean.setStudyEventId(studyEventBean.getId());
@@ -991,7 +991,7 @@ public class ImportCRFDataService {
 									.equalsIgnoreCase("yes")) {
 						studySubjectBean = createStudySubject(ub, studyBean, subjectDataBean, subjectDAO,
 								studySubjectDAO, errors);
-						createdOidsMap.put(subjectDataBean.getStudySubjectId(), studySubjectBean.getOid());
+						createdOidsMap.put(studySubjectBean.getLabel(), studySubjectBean.getOid());
 					}
 					if (studySubjectBean == null) {
 						mf.applyPattern(respage.getString("your_subject_oid_does_not_reference"));
