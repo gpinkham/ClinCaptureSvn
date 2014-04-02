@@ -359,3 +359,8 @@ div {
   overflow-y: auto;
   max-height: 150px;
 }
+
+.sort {
+  border-color: #357EBD !important;
+  background-color: #F5F5EF !important;
+}

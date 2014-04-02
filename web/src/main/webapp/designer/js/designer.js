@@ -668,8 +668,11 @@ function createDroppable(params) {
 				element: params.element,
 				existingValue: existingValue
 			});
-			params.element.css('font-weight', 'bold');
 			$("#deleteButton").removeClass("hidden");
+			params.element.css('font-weight', 'bold');
+			if (!$(".sortable").is(".ui-sortable")) {
+				createSortable(params.element);
+			}
 		}
 	})
 
@@ -679,12 +682,10 @@ function createDroppable(params) {
 	}
 
 	params.element.dblclick(function() {
-
 		params.element.tooltip("hide");
  		params.element.addClass("bordered");
 		var input = $("<input>");
 		if (isDate($(this).text())) {
-
 			input.attr("type", "date");
 			input.val($(this).text());
 			var msie = window.navigator.userAgent.indexOf('MSIE ');
@@ -717,24 +718,33 @@ function createDroppable(params) {
 				$(this).remove();
 			});
 		}
-
 		input.css({
 			"display": "inline",
 			"text-align": "center"
 		});
-
 		$(this).text("");
 		$(this).append(input);
-
 		// focus/select
 		input.focus(); 
 		input.select();
 
 		params.element.css('font-weight', 'bold');
-
 	});
-	
 	return params.element;
+}
+
+function createSortable() {
+	placeholder: "ui-state-highlight",
+	$(".sortable").sortable({
+		start: function(event, ui) {
+			$(".tooltip").remove();
+			ui.item.addClass("sort");
+		},
+		stop: function(event, ui) {
+			ui.item.removeClass("sort");
+		}
+	});
+	$(".sortable").disableSelection();
 }
 
 /* ======================================================================

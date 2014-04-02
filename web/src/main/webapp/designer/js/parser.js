@@ -1563,6 +1563,7 @@ Parser.prototype.setExpression = function(expression) {
 			currDroppable.addClass("bordered");
 			currDroppable.removeClass("init");
 			currDroppable.css('font-weight', 'bold');
+			createSortable();
 		}
 	} else if (typeof expression === "string") {
 		var rawExpression = [];
@@ -1582,6 +1583,10 @@ Parser.prototype.setExpression = function(expression) {
 			}
 		}
 		this.setExpression(rawExpression);
+	}
+	// Make them sortable
+	if (!$(".sortable").is(".ui-sortable")) {
+		createSortable();
 	}
 }
 
