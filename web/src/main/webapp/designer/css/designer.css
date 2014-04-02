@@ -19,6 +19,7 @@ body {
 body .container {
   top: 0;
   left: 0;
+  height: 100%;
   width: 69.5%;
   bottom: 15%;
   position: fixed;
@@ -70,6 +71,7 @@ body .panel-body {
 .dotted-border-lg {
   margin-top: 1em;
   padding-top: 1em;
+  margin-bottom: 1px;
   border: 2px dotted #357EBD;
   border-radius: 5px 5px 5px 5px;
 }
@@ -106,6 +108,7 @@ body .panel-body {
 
 .space-top-sm {
   padding-top: 2.5em;
+  white-space: nowrap;
 }
 
 .space-top-m {
@@ -339,10 +342,13 @@ div {
   margin-bottom: .5em;
 }
 
-.inner-scrollbar { 
-  width: 98%; 
-  height: 200px;
-  overflow-y: auto;
+.inner-scrollbar-wrapper {
+    width: 98%;
+    overflow-y: auto;
+}
+
+.inner-scrollbar {
+    width: 98%;
 }
 
 .footer-container {
