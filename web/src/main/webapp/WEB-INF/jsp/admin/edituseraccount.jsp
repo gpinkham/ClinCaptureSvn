@@ -310,6 +310,9 @@
                  editUserFormState.resetPassword != newState.resetPassword) {
              confirmBackSmart('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');
          }
+         else{
+        	 goBackSmart('${navigationURL}', '${defaultURL}');
+         }
      }
     </SCRIPT>
     <tr>
