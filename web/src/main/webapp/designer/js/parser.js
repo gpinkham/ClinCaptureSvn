@@ -83,6 +83,18 @@ Parser.prototype.determineNext = function(currentElement) {
  * ============================================================================ */
 Parser.prototype.createNextDroppable = function(params) {
 	var __NEXT__ = this.determineNext(params.element);
+	// Selected item
+	var selectedItem = this.findItemBySelectedProperties({
+		study: this.extractStudy(this.getStudy()),
+		identifier: params.ui.draggable.attr("itemName"),
+		crf: $("div[id=crfs]").find(".selected").find("td[oid]").attr("oid"),
+		evt: $("div[id=events]").find(".selected").find("td[oid]").attr("oid"),
+		version: $("div[id=versions]").find(".selected").find("td[oid]").attr("oid")
+	});
+	var path = null;
+	if (selectedItem) {
+		path = selectedItem.crfOid + "." + selectedItem.group + "." + selectedItem.oid;
+	}
 	if (__NEXT__ === "ANY") {
 		var RPAREN = createRPARENDiv();
 		var dataPredicate = createStartExpressionDroppable();
@@ -103,21 +115,13 @@ Parser.prototype.createNextDroppable = function(params) {
 					}
 				}
 			}
-			// Target
-			var eTarget = this.findItemBySelectedProperties({
-				study: this.extractStudy(this.getStudy()),
-				identifier: params.ui.draggable.attr("itemName"),
-				crf : $("div[id=crfs]").find(".selected").find("td[oid]").attr("oid"), 
-				evt: $("div[id=events]").find(".selected").find("td[oid]").attr("oid"),
-				version: $("div[id=versions]").find(".selected").find("td[oid]").attr("oid")
-			});
 			var target = Object.create(null);
-			target.oid = eTarget.oid;
-			target.name = eTarget.name;
-			target.crf = eTarget.crfOid;
-			target.group = eTarget.group;
-			target.evt = eTarget.eventOid;
-			target.version = eTarget.crfVersionOid;
+			target.oid = selectedItem.oid;
+			target.name = selectedItem.name;
+			target.crf = selectedItem.crfOid;
+			target.group = selectedItem.group;
+			target.evt = selectedItem.eventOid;
+			target.version = selectedItem.crfVersionOid;
 			this.rule.targets.push(target);
 			//Reset UI
 			var div = params.element.parent().clone();
@@ -180,9 +184,7 @@ Parser.prototype.createNextDroppable = function(params) {
 					this.getShowHideAction().destinations.splice(index, 1);
 				}
 			}
-
-			var oid = this.constructCRFPath(params.ui.draggable.attr("itemName"));
-			this.getShowHideAction().destinations.push(oid);
+			this.getShowHideAction().destinations.push(path);
 			var div = params.element.parent().clone();
 			div.find("input").text("");
 			div.find("input").removeClass("bordered");
@@ -190,7 +192,6 @@ Parser.prototype.createNextDroppable = function(params) {
 			div.find(".glyphicon-remove").click(function() {
 				parser.deleteTarget(this);
 			});
-
 			// create a new input 
 			if (!params.element.val()) {
 				params.element.parent().after(div);
@@ -199,7 +200,6 @@ Parser.prototype.createNextDroppable = function(params) {
 					accept: "div[id='items'] td"
 				});
 			} 
-			div.focus();
 			params.element.val(params.ui.draggable.attr("itemName"));
 		}
 		params.element.removeClass("bordered");
@@ -215,15 +215,19 @@ Parser.prototype.createNextDroppable = function(params) {
 			}
 			params.element.removeClass("bordered");
 			// Destination
+			var dest = null;
 			if (this.getInsertActionDestination(params.element.parents(".row").attr("id"))) {
  				dest = this.getInsertActionDestination(params.element.parents(".row").attr("id"));
- 				dest.oid = this.constructCRFPath(params.ui.draggable.attr("itemName"));
+ 				dest.oid = path;
  			} else {
  				dest = Object.create(null);
+ 				dest.oid = path;
  				dest.id = params.element.parents(".row").attr("id");
- 				dest.oid = this.constructCRFPath(params.ui.draggable.attr("itemName"));
  				this.getInsertAction().destinations.push(dest);
  			}
+ 			if (dest.value && dest.value.length > 0) {
+				this.addNewInsertActionInputs();
+			}
  			params.element.val(params.ui.draggable.attr("itemName"));
 			params.element.parent().siblings(".col-md-4").find(".value").focus();
 		}
@@ -248,13 +252,15 @@ Parser.prototype.createNextDroppable = function(params) {
 				if (index > -1) {
 					this.getInsertAction().destinations.splice(index, 1);
 				}
-				this.addNewInsertActionInputs();
+				if (destination.oid && destination.oid.length > 0) {
+					this.addNewInsertActionInputs();
+				}
 				this.getInsertAction().destinations.push(destination);
 			}
 
 			if (params.ui.draggable.is("td.group")) {
 				destination.item = true;
-				destination.value = this.findItem(params.ui.draggable.attr("itemName")).oid;
+				destination.value = selectedItem.oid;
 				params.element.val(params.ui.draggable.attr("itemName"));
 			} else {
 				destination.item = false;
@@ -337,6 +343,9 @@ Parser.prototype.createNextDroppable = function(params) {
 			}
 		}
 	}
+	params.element.click(function() {
+		showCRFItem(this);
+	});
 }
 
 Parser.prototype.getInsertActionDestination = function(id) {
@@ -1208,7 +1217,6 @@ Parser.prototype.setInsertAction = function(params) {
 				$("#actionMessages").show();
 				$("#insert").show();
 				$("#chkData").prop("checked", params.selected);
-				$("#insert").find(".item").focus();
 			} else {
 				// Update UI
 				$("#insert").hide();
@@ -1422,19 +1430,38 @@ Parser.prototype.setDestinations = function(dests) {
 		// Remove labels
 		$("#insert").find("label").hide();
 		for (var x = 0; x < dests.length; x++) {
-
-			var div = $("#insert").find(".row").first().clone();			
 			var dest = dests[x];
+			var div = $("#insert").find(".row").first().clone();
+			var item = this.getItem(dest.oid);
 			var input = div.find(".item");
 			div.attr("id", dest.id);
-
-			input.val(this.findItem(this.extractItemOIDFromExpression(dest.oid)).name);
+			input.attr("item-oid", item.oid);
+			input.attr("group-oid", item.group);
+			input.attr("crf-oid", item.crfOid);
+			input.attr("event-oid", item.eventOid);
+			input.attr("version-oid", item.crfVersionOid);
+			input.attr("study-oid", this.extractStudy(this.getStudy()).oid);
+			input.click(function() {
+				showCRFItem(this);
+			});
+			input.val(item.name);
 			input.css('font-weight', 'bold');
 
 			var inputVal = div.find(".value");
 			inputVal.css('font-weight', 'bold');
-			var inputValue = this.findItem(dest.value) ? this.findItem(dest.value).name : dest.value;
-			inputVal.val(inputValue);
+			if (this.findItem(dest.value)) {
+				var item = this.getItem(dest.value);
+				inputVal.attr("item-oid", item.oid);
+				inputVal.attr("group-oid", item.group);
+				inputVal.attr("crf-oid", item.crfOid);
+				inputVal.attr("event-oid", item.eventOid);
+				inputVal.attr("version-oid", item.crfVersionOid);
+				inputVal.attr("study-oid", this.extractStudy(this.getStudy()).oid);
+				inputVal.click(function() {
+					showCRFItem(this);
+				});
+			}
+			inputVal.val(this.findItem(dest.value) ? this.findItem(dest.value).name : dest.value);
 			inputVal.blur(function() {
 				parser.setDestinationValue({
 					value: $(this).val(),
@@ -1445,7 +1472,6 @@ Parser.prototype.setDestinations = function(dests) {
 			div.find(".glyphicon-remove").click(function() {
 				parser.deleteTarget(this);
 			});
-
 			createDroppable({
 				element: input,
 				accept: "div[id='data'] p, div[id='items'] td"
@@ -1476,8 +1502,17 @@ Parser.prototype.setShowHideDestinations = function(dests) {
 				accept: "div[id='items'] td",
 				element: cloned.find(".dest")
 			});
-			
-			cloned.find("input").val(this.findItem(this.extractItemOIDFromExpression(dests[x])).name);
+			cloned.find(".dest").click(function() {
+				showCRFItem(this);
+			});
+			var item = this.getItem(dests[x]);
+			cloned.find("input").val(item.name);
+			cloned.find(".dest").attr("item-oid", item.oid);
+			cloned.find(".dest").attr("group-oid", item.group);
+			cloned.find(".dest").attr("crf-oid", item.crfOid);
+			cloned.find(".dest").attr("event-oid", item.eventOid);
+			cloned.find(".dest").attr("version-oid", item.crfVersionOid);
+			cloned.find(".dest").attr("study-oid", this.extractStudy(this.getStudy()).oid);
 			cloned.find("input").css('font-weight', 'bold');
 			x === 0 ? div.before(cloned) : $(".space-left-neg > .input-group").last().before(cloned);
 		}
@@ -1514,10 +1549,14 @@ Parser.prototype.setExpression = function(expression) {
 						$("#groupSurface").attr("event-oid", itm.eventOid);
 					}
 					$("#groupSurface").attr("version-oid", itm.crfVersionOid);
+					$("#groupSurface").attr("study-oid", this.extractStudy(this.getStudy()).oid);
 					$("#groupSurface").text(itm.name);
 				} else {
 					$("#groupSurface").text(expression[e]);
 				}
+				$("#groupSurface").click(function() {
+					showCRFItem(this);
+				});
 			} else {
 				var predicate = expression[e];
 				if (parser.isConditionalOp(predicate.toUpperCase())) {
@@ -1552,6 +1591,7 @@ Parser.prototype.setExpression = function(expression) {
 							droppable.attr("event-oid", itm.eventOid);
 						} 
 						droppable.attr("version-oid", itm.crfVersionOid);
+						droppable.attr("study-oid", this.extractStudy(this.getStudy()).oid);
 						droppable.text(itm.name);
 					} else {
 						droppable.text(expression[e]);
@@ -1563,7 +1603,9 @@ Parser.prototype.setExpression = function(expression) {
 			currDroppable.addClass("bordered");
 			currDroppable.removeClass("init");
 			currDroppable.css('font-weight', 'bold');
-			createSortable();
+			currDroppable.click(function() {
+				showCRFItem(this);
+			});
 		}
 	} else if (typeof expression === "string") {
 		var rawExpression = [];
@@ -1609,7 +1651,14 @@ Parser.prototype.setTargets = function(targets) {
 			});
 			div.find(".target").val(tar.name);
 			div.find(".target").text(tar.name);
+			// Item attributes
 			div.find(".target").css('font-weight', 'bold');
+			div.find(".target").attr("item-oid", tar.oid);
+			div.find(".target").attr("group-oid", tar.group);
+			div.find(".target").attr("crf-oid", tar.crf);
+			div.find(".target").attr("event-oid", tar.evt);
+			div.find(".target").attr("version-oid", tar.version);
+			div.find(".target").attr("study-oid", this.extractStudy(this.getStudy()).oid);
 			div.find(".eventify").change(function() {
 				parser.eventify(this);
 			});
@@ -1618,6 +1667,9 @@ Parser.prototype.setTargets = function(targets) {
 			});
 			div.find(".linefy").blur(function() {
 				parser.linefy(this);
+			});
+			div.find(".target").click(function() {
+				showCRFItem(this);
 			});
 			createToolTip({
 				element: div.find(".eventify"),
@@ -2063,7 +2115,7 @@ Parser.prototype.recursiveSelect = function(params) {
 		}
 	}
 	if (params.click) {
-		$("td[oid=" + params.candidate + "]").parent().click();
+		$("td[oid=" + params.candidate + "]").parent().trigger('click', [{x:false}]);
 	}
 }
 

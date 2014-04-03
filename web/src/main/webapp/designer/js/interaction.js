@@ -442,14 +442,15 @@ $(function() {
 	});
 
 	createPopover($("#groupSurface"));
-	// If a rule already exists in a session, display it
 	$(document).ready(function() {
 		parser.fetchStudies();
 	});
 
-	$('body').click(function(e) {
-		$(".tops").remove();
-		$(".popover").remove();
+	$('body').on('click', function(e, data){
+		if (!data) {
+			$(".tops").remove();
+			$(".popover").remove();
+		}
 	});
 });
 

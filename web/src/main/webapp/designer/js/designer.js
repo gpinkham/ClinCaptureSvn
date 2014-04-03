@@ -655,6 +655,7 @@ function createDroppable(params) {
 					params.element.attr("crf-oid", ui.draggable.attr("crf-oid"));
 					params.element.attr("event-oid", ui.draggable.attr("event-oid"));
 					params.element.attr("group-oid", ui.draggable.attr("group-oid"));
+					params.element.attr("study-oid", ui.draggable.attr("study-oid"));
 					params.element.attr("version-oid", ui.draggable.attr("version-oid"));
 				} else {
 					params.element.append(ui.draggable.text());
@@ -1091,7 +1092,8 @@ function loadCRFVersions(params) {
 				loadCRFVersionItems({
 					crf: params.crf.oid,
 					evt: params.evt.oid,
-					version: currentVersion
+					version: currentVersion,
+					study: params.study.oid
 				});
 				createBreadCrumb({
 					crf: params.crf.name,
@@ -1160,6 +1162,7 @@ function loadCRFVersionItems(params) {
 			tdName.attr("crf-oid", params.crf);
 			tdName.attr("event-oid", params.evt);
 			tdName.attr("group-oid", item.group);
+			tdName.attr("study-oid", params.study);
 			tdName.attr("version-oid", params.version.oid);
 			createDraggable({
 				element: tdName,
@@ -1293,6 +1296,7 @@ function resetStudy(params) {
 		});
 		loadCRFVersionItems({
 			evt: topEvent.oid,
+			study: params.study.oid,
 			crf: topEvent.crfs[Object.keys(topEvent.crfs)[0]].oid,
 			version: topEvent.crfs[Object.keys(topEvent.crfs)[0]].versions[0]
 		});
@@ -1310,4 +1314,34 @@ function resetStudy(params) {
 	if (params.reset) {
 		resetBuildControls($("#designSurface > .panel > .panel-body").filter(":first"));
 	}
+}
+
+function showCRFItem(ele) {
+	parser.recursiveSelect({
+		click: true,
+		type: "studies",
+		candidate: $(ele).attr("study-oid")
+	});
+	parser.recursiveSelect({
+		click: true,
+		type: "events",
+		candidate: $(ele).attr("event-oid")
+	});
+	// bold crf
+	parser.recursiveSelect({
+		click: true,
+		type: "crfs",
+		candidate: $(ele).attr("crf-oid")
+	});
+	// bold crf version
+	parser.recursiveSelect({
+		click: true,
+		type: "versions",
+		candidate: $(ele).attr("version-oid")
+	});
+	parser.recursiveSelect({
+		click: true,
+		type: "items",
+		candidate: $(ele).attr("item-oid")
+	});
 }
