@@ -2835,7 +2835,7 @@ public abstract class DataEntryServlet extends Controller {
 					// the db field length
 					if (ibMeta.getResponseSet().getResponseType() == org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) {
 						v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
-								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1024);
+								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3800);
 					} else {
 						v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON,
 								NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
