@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
-  
-  <property resource="datainfo.properties" />
-  
+
   <!-- APPENDERS -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
      <encoder>

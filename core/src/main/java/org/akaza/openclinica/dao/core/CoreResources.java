@@ -13,6 +13,7 @@
 
 package org.akaza.openclinica.dao.core;
 
+import com.clinovo.util.SystemEnvironmentUtil;
 import liquibase.spring.SpringLiquibase;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
@@ -32,23 +33,26 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Properties;
 
 @Component
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class CoreResources implements ResourceLoaderAware {
 
-	protected final static Logger logger = LoggerFactory.getLogger("org.akaza.openclinica.dao.core.CoreResources");
+	protected final static Logger logger = LoggerFactory.getLogger(CoreResources.class);
 
-	private ResourceLoader resourceLoader;
 	public static String PROPERTIES_DIR;
+	private ResourceLoader resourceLoader;
 
 	private static Properties dataInfo;
 	private static Properties extractInfo;
@@ -61,12 +65,9 @@ public class CoreResources implements ResourceLoaderAware {
 	public static final Integer SPSS_ID = 9;
 
 	private static String webapp;
-	private static boolean shouldBeRestarted;
-
-	// private MessageSource messageSource;
-	private static ArrayList<ExtractPropertyBean> extractProperties;
-
 	public static String ODM_MAPPING_DIR;
+	private static boolean shouldBeRestarted;
+	private static ArrayList<ExtractPropertyBean> extractProperties;
 
 	private static boolean loadPropertiesFromDB(Connection connection) throws Exception {
 		boolean result = false;
@@ -86,6 +87,7 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	private void setDatabaseProperties(String dbType) {
+		logger.info("Initializing web application properties");
 		dataInfo.setProperty("username", dataInfo.getProperty("dbUser"));
 		dataInfo.setProperty("password", dataInfo.getProperty("dbPass"));
 		String url, driver, hibernateDialect;
@@ -114,25 +116,25 @@ public class CoreResources implements ResourceLoaderAware {
 		Connection connection = null;
 		ExtendedBasicDataSource dataSource = null;
 		try {
-			String path = resourceLoader.getResource("/").exists() ? resourceLoader.getResource("/").getURI().getPath()
-					: "";
+			
+			String path = resourceLoader.getResource("/").exists() ? resourceLoader.getResource("/").getURI().getPath() : "";
 			webapp = getWebAppName(path);
-
-			String logDir = dataInfo.getProperty("log.dir");
-			String filePath = dataInfo.getProperty("filePath");
+			String logDir = System.getProperty("log.dir") == null ? "" : System.getProperty("log.dir");
 			String dbType = dataInfo.getProperty("dbType").trim();
 			String attachedFileLocation = dataInfo.getProperty("attached_file_location");
-			dataInfo.setProperty("log.dir", logDir != null ? logDir.replace("\\", "\\\\") : "");
-			dataInfo.setProperty("filePath", filePath != null ? filePath.replace("\\", "\\\\") : "");
-			dataInfo.setProperty("attached_file_location",
-					attachedFileLocation != null ? attachedFileLocation.replace("\\", "\\\\") : "");
-
+			dataInfo.setProperty("log.dir", logDir);
+			
+			StringBuilder filePath = new StringBuilder(SystemEnvironmentUtil.getCatalinaHome());
+			filePath.append(webapp + "-data");
+			filePath.append(File.separator);
+			
+			dataInfo.setProperty("filePath", filePath.toString());
+			dataInfo.setProperty("attached_file_location", attachedFileLocation != null ? attachedFileLocation.replace("\\", "\\\\") : "");
 			dataInfo.setProperty("currentWebAppName", webapp);
 			dataInfo.setProperty("currentWebAppContext", "/" + webapp);
 			dataInfo.setProperty("currentDBName", dataInfo.getProperty("db").trim());
-
+			
 			setDatabaseProperties(dbType);
-
 			// setup dataSource
 			dataSource = new ExtendedBasicDataSource();
 			dataSource.setUrl(dataInfo.getProperty("url"));
@@ -218,68 +220,6 @@ public class CoreResources implements ResourceLoaderAware {
 		}
 	}
 
-	/**
-	 * For changing values which are applicable to all properties, for ex webapp name can be used in any properties
-	 */
-	private static void prepareDataInfoVals() {
-
-		Enumeration<String> properties = (Enumeration<String>) dataInfo.propertyNames();
-		String vals, key;
-		while (properties.hasMoreElements()) {
-			key = properties.nextElement();
-			vals = dataInfo.getProperty(key);
-			// replacePaths(vals);
-			vals = replaceWebapp(vals);
-			vals = replaceCatHome(vals);
-			dataInfo.setProperty(key, vals);
-		}
-
-	}
-
-	private static String replaceWebapp(String value) {
-
-		if (value.contains("${WEBAPP}")) {
-			value = value.replace("${WEBAPP}", webapp);
-		}
-
-		else if (value.contains("${WEBAPP.lower}")) {
-			value = value.replace("${WEBAPP.lower}", webapp.toLowerCase());
-		}
-		if (value.contains("$WEBAPP.lower")) {
-			value = value.replace("$WEBAPP.lower", webapp.toLowerCase());
-		} else if (value.contains("$WEBAPP")) {
-			value = value.replace("$WEBAPP", webapp);
-		}
-
-		return value;
-	}
-
-	private static String replaceCatHome(String value) {
-		String catalina = System.getProperty("CATALINA_HOME");
-
-		if (catalina == null) {
-			catalina = System.getProperty("catalina.home");
-		}
-
-		if (catalina == null) {
-			catalina = System.getenv("CATALINA_HOME");
-		}
-
-		if (catalina == null) {
-			catalina = System.getenv("catalina.home");
-		}
-
-		if (value.contains("${catalina.home}") && catalina != null) {
-			value = value.replace("${catalina.home}", catalina);
-		}
-
-		if (value.contains("$catalina.home") && catalina != null) {
-			value = value.replace("$catalina.home", catalina);
-		}
-
-		return value;
-	}
-
 	private static String replacePaths(String vals) {
 		if (vals != null) {
 			if (vals.contains("/")) {
@@ -294,22 +234,16 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	public static void prepareDataInfoProperties() {
-		String filePath = dataInfo.getProperty("filePath");
-		if (filePath == null || filePath.isEmpty())
-			filePath = "$catalina.home/$WEBAPP.lower.data";
 		String dbType = dataInfo.getProperty("dbType");
-
-		prepareDataInfoVals();
-		if (dataInfo.getProperty("filePath") == null || dataInfo.getProperty("filePath").length() <= 0)
-			dataInfo.setProperty("filePath", filePath);
 
 		dataInfo.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
 		// sysURL.base
 		String sysURLBase = dataInfo.getProperty("sysURL").replace("/MainMenu", "");
 		dataInfo.setProperty("sysURL.base", sysURLBase);
 
-		if (dataInfo.getProperty("org.quartz.jobStore.misfireThreshold") == null)
+		if (dataInfo.getProperty("org.quartz.jobStore.misfireThreshold") == null) {
 			dataInfo.setProperty("org.quartz.jobStore.misfireThreshold", "60000");
+		}
 		dataInfo.setProperty("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
 
 		if (dbType.equalsIgnoreCase("oracle")) {
@@ -322,10 +256,12 @@ public class CoreResources implements ResourceLoaderAware {
 
 		dataInfo.setProperty("org.quartz.jobStore.useProperties", "false");
 		dataInfo.setProperty("org.quartz.jobStore.tablePrefix", "oc_qrtz_");
-		if (dataInfo.getProperty("org.quartz.threadPool.threadCount") == null)
+		if (dataInfo.getProperty("org.quartz.threadPool.threadCount") == null) {
 			dataInfo.setProperty("org.quartz.threadPool.threadCount", "1");
-		if (dataInfo.getProperty("org.quartz.threadPool.threadPriority") == null)
+		}
+		if (dataInfo.getProperty("org.quartz.threadPool.threadPriority") == null) {
 			dataInfo.setProperty("org.quartz.threadPool.threadPriority", "5");
+		}
 
 		// Clinovo Ticket #188 start
 		String themeColor = dataInfo.getProperty("themeColor");
@@ -337,18 +273,22 @@ public class CoreResources implements ResourceLoaderAware {
 
 		prepareMailProps();
 		// setRuleDesignerProps();
-		if (dataInfo.getProperty("crfFileExtensions") != null)
+		if (dataInfo.getProperty("crfFileExtensions") != null) {
 			dataInfo.setProperty("crf_file_extensions", dataInfo.getProperty("crfFileExtensions"));
-		if (dataInfo.getProperty("crfFileExtensionSettings") != null)
+		}
+		if (dataInfo.getProperty("crfFileExtensionSettings") != null) {
 			dataInfo.setProperty("crf_file_extension_settings", dataInfo.getProperty("crfFileExtensionSettings"));
+		}
 
 		String dataset_file_delete = dataInfo.getProperty("dataset_file_delete");
-		if (dataset_file_delete == null)
+		if (dataset_file_delete == null) {
 			dataInfo.setProperty("dataset_file_delete", "true");
+		}
 		// TODO:Revisit me!
 
-		if (dataInfo.getProperty("maxInactiveInterval") != null)
+		if (dataInfo.getProperty("maxInactiveInterval") != null) {
 			dataInfo.setProperty("max_inactive_interval", dataInfo.getProperty("maxInactiveInterval"));
+		}
 
 		dataInfo.setProperty("clinical_research_coordinator", "Clinical_Research_Coordinator");
 		dataInfo.setProperty("investigator", "Investigator");
@@ -359,24 +299,28 @@ public class CoreResources implements ResourceLoaderAware {
 		dataInfo.setProperty("ccts.waitBeforeCommit", "6000");
 
 		String rss_url = dataInfo.getProperty("rssUrl");
-		if (rss_url == null || rss_url.isEmpty())
+		if (rss_url == null || rss_url.isEmpty()) {
 			rss_url = "http://clinicalresearch.wordpress.com/feed/";
+		}
 		dataInfo.setProperty("rss.url", rss_url);
 		String rss_more = dataInfo.getProperty("rssMore");
-		if (rss_more == null || rss_more.isEmpty())
+		if (rss_more == null || rss_more.isEmpty()) {
 			rss_more = "http://clinicalresearch.wordpress.com/";
+		}
 		dataInfo.setProperty("rss.more", rss_more);
 
 		String supportURL = dataInfo.getProperty("supportURL");
-		if (supportURL == null || supportURL.isEmpty())
+		if (supportURL == null || supportURL.isEmpty()) {
 			supportURL = "http://www.openclinica.org/OpenClinica/3.0/support/";
+		}
 		dataInfo.setProperty("supportURL", supportURL);
 
 		dataInfo.setProperty("show_unique_id", "1");
 
 		dataInfo.setProperty("auth_mode", "password");
-		if (dataInfo.getProperty("userAccountNotification") != null)
+		if (dataInfo.getProperty("userAccountNotification") != null) {
 			dataInfo.setProperty("user_account_notification", dataInfo.getProperty("userAccountNotification"));
+		}
 	}
 
 	private static void prepareMailProps() {
@@ -449,8 +393,9 @@ public class CoreResources implements ResourceLoaderAware {
 		}
 		for (int i = 0; i < listSrcFiles.length; i++) {
 			File dest1 = new File(dest, fileNames[i]);
-			if (listSrcFiles[i] != null)
+			if (listSrcFiles[i] != null) {
 				copyFiles(listSrcFiles[i], dest1);
+			}
 		}
 
 	}
@@ -558,8 +503,9 @@ public class CoreResources implements ResourceLoaderAware {
 			File dest1 = new File(dest, fileNames[i]);
 			// File src1 = listSrcFiles[i];
 			// switch with IOUtils.copy?
-			if (listSrcFiles[i] != null)
+			if (listSrcFiles[i] != null) {
 				copyFiles(listSrcFiles[i], dest1);
+			}
 		}
 
 	}
@@ -609,10 +555,11 @@ public class CoreResources implements ResourceLoaderAware {
 			epbean.setSuccessMessage(getExtractField("extract." + i + ".success"));
 			epbean.setFailureMessage(getExtractField("extract." + i + ".failure"));
 			epbean.setZipName(getExtractField("extract." + i + ".zipName"));
-			if (epbean.getFileName().length != epbean.getExportFileName().length)
+			if (epbean.getFileName().length != epbean.getExportFileName().length) {
 				throw new OpenClinicaSystemException(
 						"The comma seperated values of file names and export file names should correspond 1 on 1 for the property number"
 								+ i);
+			}
 
 			if ("sql".equals(whichFunction)) {
 				// set the bean within, so that we can access the file locations etc
@@ -685,8 +632,9 @@ public class CoreResources implements ResourceLoaderAware {
 		while (i < cnt) {
 
 			File f = new File(getField("filePath") + "xslt" + File.separator + extractFields[i]);
-			if (!f.exists())
+			if (!f.exists()) {
 				throw new OpenClinicaSystemException("FileNotFound -- Please make sure" + extractFields[i] + "exists");
+			}
 
 			i++;
 
@@ -704,7 +652,7 @@ public class CoreResources implements ResourceLoaderAware {
 
 	/**
 	 * @throws IOException
-	 * @deprecated Use {@link #getFile(String,String)} instead
+	 * @deprecated Use {@link #getFile(String, String)} instead
 	 */
 	public File getFile(String fileName) throws IOException {
 		return getFile(fileName, "filePath");
@@ -759,8 +707,9 @@ public class CoreResources implements ResourceLoaderAware {
 	}
 
 	public static String getField(String key) {
-		if (dataInfo == null)
+		if (dataInfo == null) {
 			return "";
+		}
 		String value = dataInfo.getProperty(key);
 		if (value != null) {
 			value = value.trim();
@@ -864,5 +813,4 @@ public class CoreResources implements ResourceLoaderAware {
 	public static void setShouldBeRestarted(boolean shouldBeRestarted) {
 		CoreResources.shouldBeRestarted = shouldBeRestarted;
 	}
-
 }
