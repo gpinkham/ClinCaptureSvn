@@ -2,16 +2,13 @@ package com.clinovo.command;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class SystemCommand implements Serializable {
+public class SystemCommand extends BaseCommand {
 
 	private boolean backMode;
-
-	private boolean dataChanged;
 
 	private String newLogoUrl;
 
@@ -25,14 +22,6 @@ public class SystemCommand implements Serializable {
 
 	public void setBackMode(boolean backMode) {
 		this.backMode = backMode;
-	}
-
-	public boolean isDataChanged() {
-		return dataChanged;
-	}
-
-	public void setDataChanged(boolean dataChanged) {
-		this.dataChanged = dataChanged;
 	}
 
 	public MultipartFile getLogoFile() {

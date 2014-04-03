@@ -129,7 +129,8 @@ import java.util.StringTokenizer;
  */
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public abstract class Controller extends BaseController {
-	
+
+	public static final String FORM_WITH_STATE_FLAG = "formWithStateFlag";
 	protected StudyBean originalScope = null;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -334,6 +335,7 @@ public abstract class Controller extends BaseController {
 		initMaps();
 		getErrorsHolder(request);
 
+		request.setAttribute(FORM_WITH_STATE_FLAG, request.getParameter(FORM_WITH_STATE_FLAG));
 		try {
 			String userName = request.getRemoteUser();
 			SessionManager sm = new SessionManager(ub, userName, applicationContext);

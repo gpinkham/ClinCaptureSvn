@@ -162,28 +162,21 @@ function datasetConfirmBack(message, formId, address, action) {
 }
 
 function confirmBackSubmitForm(formId, address, action) {
-	
 	$("#" + formId)[0].setAttribute("action", address);
     $("#" + formId + " input[name=action]").val(action);
     $("#" + formId + " input[id=btnSubmit]")[0].setAttribute("onclick", "");
     $("#" + formId + " input[id=btnSubmit]").click();
 }
 
-function formWithStateGoBackSmart(message, servletURL, defaultURL) {
-  var newFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea").serialize();
-  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed";
-  if (confirm1) {
-	  confirmBackSmart(message, servletURL, defaultURL);
-  }
-  else{
-	  goBackSmart(servletURL, defaultURL);	  
-  }
-  return true;
+function submitFormWithState() {
+    if ($("#formWithStateFlag").length > 0) {
+        $("#formWithStateFlag").parent("form").submit();
+    }
 }
 
-function formWithStateCancelSmart(message, servletURL, defaultURL) {
-  var newFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea").serialize();
-  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed";
+function formWithStateGoBackSmart(message, servletURL, defaultURL) {
+  var newFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea,select").serialize();
+  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() != "";
   if (confirm1) {
 	  confirmBackSmart(message, servletURL, defaultURL);
   }
@@ -194,8 +187,8 @@ function formWithStateCancelSmart(message, servletURL, defaultURL) {
 }
 
 function formWithStateConfirmGoTo(message, address) {
-  var newFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea").serialize();
-  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() == "changed";
+  var newFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea,select").serialize();
+  var confirm1 = newFormState != firstFormState || $("#formWithStateFlag").val().toLowerCase() != "";
   if (confirm1) {
 	  confirmDialog({ message: message, height: 150, width: 500, redirectLink: address });
   }
@@ -2480,10 +2473,13 @@ $(function() {
     // enable the ability to uncheck the radio buttons in the CRF's
     bindRadioButtons();
     if ($("#datasetForm").length > 0) {
-      firstFormState = $("#datasetForm").serialize();
+        firstFormState = $("#datasetForm").serialize();
     } else
     if ($("#formWithStateFlag").length > 0) {
-      firstFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea").serialize();
+        firstFormState = $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea,select").serialize();
+        $("#formWithStateFlag").parent("form").find("input[type=checkbox],input[type=radio],input[type=text],input[type=password],input[type=file],textarea,select").change(function(){
+            $("#formWithStateFlag").val("changed");
+        });
     }
 });
 
