@@ -79,10 +79,8 @@ public class RulesServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
 		String action = request.getParameter("action");
 		PrintWriter writer = response.getWriter();
-
 		try {
 
 			DataSource datasource = SpringServletAccess.getApplicationContext(this.getServletContext()).getBean(DataSource.class);
@@ -200,7 +198,7 @@ public class RulesServlet extends HttpServlet {
 					JSONObject act = new JSONObject();
 					act.put("type", ruleSetRule.getActions().get(0).getActionType());
 					act.put("select", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
-					object.put("evaluatesTo", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
+					object.put("evaluates", ruleSetRule.getActions().get(0).getExpressionEvaluatesTo());
 					if (ruleSetRule.getActions().get(0).getActionType().equals(ActionType.EMAIL)) {
 						EmailActionBean emailAction = (EmailActionBean) ruleSetRule.getActions().get(0);
 						act.put("to", emailAction.getTo());
@@ -238,7 +236,7 @@ public class RulesServlet extends HttpServlet {
 								act.put("type", "showHide");
 								act.put("message", showAction.getMessage());
 								act.put("show", showAction.getExpressionEvaluatesTo());
-								object.put("evaluatesTo", showAction.getExpressionEvaluatesTo());
+								object.put("evaluates", showAction.getExpressionEvaluatesTo());
 							} else {
 								
 								HideActionBean hideAction = (HideActionBean) ruleSetRule.getActions().get(x);
@@ -445,7 +443,7 @@ public class RulesServlet extends HttpServlet {
 			Element discrepancyText = document.createElement("Message");
 			discrepancyText.setTextContent(act.getString("message"));
 			Element action = document.createElement("DiscrepancyNoteAction");
-			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
+			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluates"));
 			action.appendChild(run);
 			action.appendChild(discrepancyText);
 			actions.add(action);
@@ -455,7 +453,7 @@ public class RulesServlet extends HttpServlet {
 			Element message = document.createElement("Message");
 			message.setTextContent(act.getString("body"));
 			Element action = document.createElement("EmailAction");
-			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
+			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluates"));
 			// To element
 			Element to = document.createElement("To");
 			to.setTextContent(act.getString("to"));
@@ -493,7 +491,7 @@ public class RulesServlet extends HttpServlet {
 		} else if (act.getString("type").equalsIgnoreCase("insert")) {
 			run.setAttribute("Batch", "false");
 			Element action = document.createElement("InsertAction");
-			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluatesTo"));
+			action.setAttribute("IfExpressionEvaluates", rule.getString("evaluates"));
 			Element msg = document.createElement("Message");
 			msg.setTextContent(act.getString("message"));
 			JSONArray destinations = act.getJSONArray("destinations");

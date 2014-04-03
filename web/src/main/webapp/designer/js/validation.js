@@ -119,9 +119,23 @@ function saveRule(rule) {
 		url: c + "/ImportRule?action=confirm&rs=true&edit=" + rule.editing + "&id=" + rule.ruleSet + "&study=" + rule.study + "&copy=" + rule.copied,
 		success: function(response) {
 			try {
-				sessionStorage.setItem("status", "remove");
+				// Context
+				var ctx = Object.create(null);
+
+				ctx.ae = rule.ae;
+				ctx.di = rule.di;
+				ctx.dde = rule.dde;
+				ctx.ide = rule.ide;
+				ctx.context = true;
+				ctx.study = rule.study;
+				ctx.targets = rule.targets;
+				ctx.actions = rule.actions;
+				ctx.evaluates = rule.evaluates;
+				// Persist in sessin
+				sessionStorage.setItem("context", JSON.stringify(ctx));
 				// Clean up
 				sessionStorage.removeItem("rule");
+				sessionStorage.removeItem("status");
 				window.open(rule.submission + "/designer/rule.html", '_self');
 			} catch (e) {
 				$(".spinner").remove();

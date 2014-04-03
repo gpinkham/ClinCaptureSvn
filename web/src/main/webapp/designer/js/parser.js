@@ -54,6 +54,78 @@ Parser.prototype.setRuleSet = function(ruleSet) {
 	this.rule.ruleSet = ruleSet;
 }
 
+/* ========================================================================
+ * Fetch studies from CC. The studies come with events/crf and items added.
+ * ====================================================================== */
+Parser.prototype.fetchStudies = function() {
+	// Notification
+	$("body").append(createLoader());	
+	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
+	$.ajax({
+		type: "POST",
+		url: c + "/rules?action=fetch",
+		success: function(studies) {
+			// FF can return a string
+			if (typeof(studies) === "string") {
+				studies = JSON.parse(studies);
+			}
+			sessionStorage.setItem("studies", JSON.stringify(studies));
+			loadStudies(studies);
+			// If editing a rule
+			if (parser.getParameter("action") === "edit") {
+				parser.fetchRuleForEditing();
+			} 
+			// A back action from validation page
+			if (sessionStorage.getItem("status") && sessionStorage.getItem("status") === "load") {
+				parser.render(JSON.parse(sessionStorage.getItem("rule")));
+				sessionStorage.removeItem("status");
+			}
+			// Successful save - load previous context
+			if (sessionStorage.getItem("context")) {
+				parser.render(JSON.parse(sessionStorage.getItem("context")));
+				sessionStorage.removeItem("context");
+			}
+			$(".spinner").remove();
+		},
+		error: function(response) {
+			handleErrorResponse({
+				response: response
+			});
+		}
+	});
+}
+
+/* ========================================================================
+ * Fetch a specific rule from CC for editing in the designer. The rule is
+ * passed as an id on the url with a parameter action=editing
+ * ====================================================================== */
+Parser.prototype.fetchRuleForEditing = function() {
+	editing = true;
+	$("body").append(createLoader());
+	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
+
+	$.ajax({
+		type: "POST",
+		url: c + "/rules?action=edit&id=" + this.getParameterValue("id") + "&rId=" + this.getParameterValue("rId"),
+		success: function(response) {
+			var rule = null;
+			// FF can return a string
+			if (typeof(response) === "string") {
+				rule = JSON.parse(response);
+			}
+			rule.editing = true;
+			rule.ruleSet = parser.getParameterValue("rId");
+			rule.study = parseInt(parser.getParameterValue("study"));
+			parser.render(rule);
+		},
+		error: function(response) {
+			handleErrorResponse({
+				response: response
+			});
+		}
+	});
+}
+
 /* ===========================================================================
  * For start groups and conditinal drop surface, this functions determines what
  * should come next.
@@ -86,7 +158,7 @@ Parser.prototype.createNextDroppable = function(params) {
 	// Selected item
 	var selectedItem = this.findItemBySelectedProperties({
 		study: this.extractStudy(this.getStudy()),
-		identifier: params.ui.draggable.attr("itemName"),
+		identifier: params.ui.draggable.attr("item-name"),
 		crf: $("div[id=crfs]").find(".selected").find("td[oid]").attr("oid"),
 		evt: $("div[id=events]").find(".selected").find("td[oid]").attr("oid"),
 		version: $("div[id=versions]").find(".selected").find("td[oid]").attr("oid")
@@ -106,7 +178,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			createPopover(dataPredicate);
 		} 
 	} else if (params.element.is(".target")) {
-		if (!this.isAddedTarget(params.ui.draggable.attr("itemName"))) {
+		if (!this.isAddedTarget(params.ui.draggable.attr("item-name"))) {
 			if (params.existingValue) {
 				for (var x = 0; x < this.rule.targets.length; x++) {
 					var t = this.rule.targets[x];
@@ -153,7 +225,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			// Check event duplication
 			var eventDuplex = this.isDuplicated({
 				type: "eventOid",
-				name: params.ui.draggable.attr("itemName")
+				name: params.ui.draggable.attr("item-name")
 			});
 			if (!eventDuplex) {
 				params.element.parent().find(".eventify").parent().removeClass("hidden");
@@ -161,13 +233,13 @@ Parser.prototype.createNextDroppable = function(params) {
 			// Check version duplication
 			var versionDuplex = this.isDuplicated({
 				type: "crfVersionOid",
-				name: params.ui.draggable.attr("itemName")
+				name: params.ui.draggable.attr("item-name")
 			});
 			if (!versionDuplex) {
 				params.element.parent().find(".versionify").parent().removeClass("hidden");
 			} 
 			// Check version duplication
-			if (this.isRepeatItem(params.ui.draggable.attr("itemName"))) {
+			if (this.isRepeatItem(params.ui.draggable.attr("item-name"))) {
 				var liner = params.element.parent().find(".linefy");
 				liner.removeClass("hidden");
 				liner.focus();
@@ -175,9 +247,9 @@ Parser.prototype.createNextDroppable = function(params) {
 			} 
 		}
 		params.element.removeClass("bordered");	
-		params.element.val(params.ui.draggable.attr("itemName"));
+		params.element.val(params.ui.draggable.attr("item-name"));
 	} else if (params.element.is(".dest")) {
-		if (!this.isAddedShowHideTarget(params.ui.draggable.attr("itemName"))) {
+		if (!this.isAddedShowHideTarget(params.ui.draggable.attr("item-name"))) {
 			if (params.existingValue) {
 				this.getShowHideAction().destinations.indexOf(params.existingValue);
 				if (index > -1) {
@@ -200,11 +272,11 @@ Parser.prototype.createNextDroppable = function(params) {
 					accept: "div[id='items'] td"
 				});
 			} 
-			params.element.val(params.ui.draggable.attr("itemName"));
+			params.element.val(params.ui.draggable.attr("item-name"));
 		}
 		params.element.removeClass("bordered");
 	} else if (params.element.is(".item")) {
-		if (!this.isAddedInsertTarget(params.ui.draggable.attr("itemName"))) {
+		if (!this.isAddedInsertTarget(params.ui.draggable.attr("item-name"))) {
 			if (params.existingValue) {
 				for (var x = 0; x < this.getInsertAction().destinations.length; x++) {
 					var dest = this.getInsertAction().destinations[x];
@@ -228,7 +300,7 @@ Parser.prototype.createNextDroppable = function(params) {
  			if (dest.value && dest.value.length > 0) {
 				this.addNewInsertActionInputs();
 			}
- 			params.element.val(params.ui.draggable.attr("itemName"));
+ 			params.element.val(params.ui.draggable.attr("item-name"));
 			params.element.parent().siblings(".col-md-4").find(".value").focus();
 		}
 		params.element.removeClass("bordered");
@@ -261,7 +333,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			if (params.ui.draggable.is("td.group")) {
 				destination.item = true;
 				destination.value = selectedItem.oid;
-				params.element.val(params.ui.draggable.attr("itemName"));
+				params.element.val(params.ui.draggable.attr("item-name"));
 			} else {
 				destination.item = false;
 				if (this.isText(params.ui.draggable)) {
@@ -595,7 +667,7 @@ Parser.prototype.getRule = function() {
 		rule.ide = this.getInitialDataEntryExecute();
 		rule.ae = this.getAdministrativeEditingExecute();
 		
-		rule.evaluatesTo = this.getEvaluatesTo();
+		rule.evaluates = this.getEvaluates();
 		rule.expression = this.rule.expression.join().replace(/\,/g, " ");
 		rule.submission = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 		return rule;
@@ -611,23 +683,33 @@ Parser.prototype.getRule = function() {
 Parser.prototype.render = function(rule) {
 	this.rule.targets = [];
 	// properties
-	this.setName(rule.name);
+	if (rule.context) {
+		this.setActions({
+			context: true,
+			actions: rule.actions
+		});
+	} else {
+		this.setName(rule.name);
+		this.setCopy(rule.copied);
+		this.setEditing(rule.editing);
+		this.setRuleSet(rule.ruleSet);
+		this.setExpression(rule.expression);
+		// Actions
+		this.setActions({
+			context: false,
+			actions: rule.actions
+		});
+	}
 	this.setStudy(rule.study);
-	this.setCopy(rule.copied);
-	this.setEditing(rule.editing);
-	this.setRuleSet(rule.ruleSet);
-	this.setExpression(rule.expression);
 	this.setTargets(rule.targets);
-	this.setEvaluatesTo(rule.evaluatesTo);
+	// Select target item
+	parser.selectTarget();
+	this.setEvaluates(rule.evaluates);
 	// executions
 	this.setDataImportExecute(rule.di);
 	this.setDoubleDataEntryExecute(rule.dde);
 	this.setInitialDataEntryExecute(rule.ide);
 	this.setAdministrativeEditingExecute(rule.ae);
-	// Actions
-	parser.setActions(rule.actions);
-	// Select target items
-	parser.selectTarget();
 }
 
 /* ===========================================================================================
@@ -1015,18 +1097,18 @@ Parser.prototype.getName = function() {
 	return this.rule.name;
 }
 
-Parser.prototype.setEvaluatesTo = function(evaluates) {
+Parser.prototype.setEvaluates = function(evaluates) {
 	if (evaluates) {
-		this.rule.evaluatesTo = true;
+		this.rule.evaluates = true;
 		$("#evaluateTrue").prop("checked", true);
 	} else {
-		this.rule.evaluatesTo = false;
+		this.rule.evaluates = false;
 		$("#evaluateFalse").prop("checked", true);
 	}
 }
 
-Parser.prototype.getEvaluatesTo = function() {
-	return this.rule.evaluatesTo;
+Parser.prototype.getEvaluates = function() {
+	return this.rule.evaluates;
 }
 
 Parser.prototype.setInitialDataEntryExecute = function(execute) {
@@ -1085,6 +1167,46 @@ Parser.prototype.getDataImportExecute = function() {
 	return this.rule.di ? this.rule.di : false;
 }
 
+Parser.prototype.setActions = function(params) {
+	if (params.actions.length > 0) {
+		for (var x = 0; x < params.actions.length; x++) {
+			var action = params.actions[x];
+			if (action.type.toLowerCase() === "discrepancy") {
+				this.setDiscrepancyAction({
+					selected: true,
+					message: action.message,
+					context: params.context
+				});
+			} else if (action.type.toLowerCase() === "email") {
+				this.setEmailAction({
+					selected: true,
+					to: action.to,
+					message: action.body,
+					context: params.context
+				});
+			} else if (action.type.toLowerCase() === "insert") {
+				this.setInsertAction({
+					edit: true,
+					action: action,
+					selected: true,
+					context: params.context
+				});
+			} else if (action.type === "showHide") {
+				this.setShowHideAction({
+					action: action,
+					hide: action.hide,
+					show: action.show,
+					context: params.context
+				});
+			} 
+		}
+	}
+}
+
+Parser.prototype.getActions = function() {
+	return this.rule.actions;
+}
+
 Parser.prototype.getDiscrepancyAction = function() {
 	if (this.rule.actions.length > 0) {
 		for (var x = 0; x < this.rule.actions.length; x++) {
@@ -1105,11 +1227,11 @@ Parser.prototype.setDiscrepancyAction = function(params) {
 				$("#message").show();
 				$("#actionMessages").show();
 				$("#discrepancyText").show();
-				$("#discrepancyText").find("textarea").val(action.message);
 				$("#chkDiscrepancyText").prop("checked", params.selected);
-
+				if (!params.context) {
+					$("#discrepancyText").find("textarea").val(action.message);
+				}
 			} else {
-
 				$("#message").hide();
 				$("#discrepancyText").hide();
 				$("#chkDiscrepancyText").prop("checked", params.selected);
@@ -1118,7 +1240,6 @@ Parser.prototype.setDiscrepancyAction = function(params) {
 				}
 			}
 		}
-
 		if (params.selected) {
 			if (this.getActions().length > 0 && this.getDiscrepancyAction()) {
 				action = this.getDiscrepancyAction();
@@ -1127,13 +1248,12 @@ Parser.prototype.setDiscrepancyAction = function(params) {
 			}
 			action.type = "discrepancy";
 			action.message = params.message;
-			action.render(params.selected);
 		} else {
 			if ($.inArray(this.getDiscrepancyAction(), this.rule.actions) > -1) {
 				this.rule.actions.splice($.inArray(this.getDiscrepancyAction(), this.rule.actions), 1);
 			}
-			action.render(params.selected);
 		}
+		action.render(params.selected);
 	}
 }
 
@@ -1160,9 +1280,11 @@ Parser.prototype.setEmailAction = function(params) {
 				$("#emailTo").show();
 				$("#body").show();
 				$("#toField").show();
-				$("#toField").val(action.to);
-				$("#body").val(action.body);
 				$("#chkEmail").prop("checked", params.selected);
+				if (!params.context) {
+					$("#toField").val(action.to);
+					$("#body").val(action.body);
+				}
 			} else {
 				$("#email").hide();
 				$("#emailTo").hide();
@@ -1174,25 +1296,21 @@ Parser.prototype.setEmailAction = function(params) {
 				}
 			}
 		}
-
-		if (params.selected) {
+		if (params.selected && !params.context) {
 			if (this.getActions().length > 0 && this.getEmailAction()) {
 				action = this.getEmailAction();
 			} else {
 				this.rule.actions.push(action);
 			}
-
 			action.type = "email";
 			action.to = params.to;
 			action.body = params.message;
-			action.render(params.selected);
-
 		} else {
 			if ($.inArray(this.getEmailAction(), this.rule.actions) > -1) {
 				this.rule.actions.splice($.inArray(this.getEmailAction(), this.rule.actions), 1);
 			}
-			action.render(params.selected);
 		}
+		action.render(params.selected);
 	}
 }
 
@@ -1224,7 +1342,6 @@ Parser.prototype.setInsertAction = function(params) {
 				if ($("#actionMessages").find("div:visible").length === 0) {
 					$("#actionMessages").hide();
 				}
-
 				var div = $("#insert").find(".row").first().clone();
 				div.find(".item").val("");
 				div.find(".value").val("");
@@ -1235,7 +1352,6 @@ Parser.prototype.setInsertAction = function(params) {
 					element: div.find(".item"),
 					accept: "div[id='items'] td"
 				});
-
 				createDroppable({
 					element: div.find(".value"),
 					accept: "div[id='data'] p, div[id='items'] td"
@@ -1243,33 +1359,31 @@ Parser.prototype.setInsertAction = function(params) {
 				$("#insert").append(div);
 			}
 		}
-
 		if (params.selected) {
 			if (this.getActions().length > 0 && this.getInsertAction()) {
 				action = this.getInsertAction();
 			} else {
 				this.rule.actions.push(action);
 			}
-			
 			if (params.edit) {
 				action.message = "";
 				action.type = "insert";
 				action.destinations = params.action.destinations;
 				// Add action targets
-				this.setDestinations(action.destinations)
-
+				if (!params.context) {
+					this.setDestinations(action.destinations);
+				}
 			} else {
 				action.message = "";
 				action.type = "insert";
 				action.destinations = [];
 			}
-			action.render(params.selected);
 		} else {
 			if ($.inArray(this.getInsertAction(), this.rule.actions) > -1) {
 				this.rule.actions.splice($.inArray(this.getInsertAction(), this.rule.actions), 1);
 			}
-			action.render(params.selected);
 		}
+		action.render(params.selected);
 	}
 }
 
@@ -1297,8 +1411,10 @@ Parser.prototype.setShowHideAction = function(params) {
 				$("#dispActions").show();
 				$("#actionMessages").show();
 				$("#dispActions").show();
-				$("#dispActions").find("textarea").val(action.message);
-				$("#dispActions").find("textarea").focus();
+				if (!params.context) {
+					$("#dispActions").find("textarea").val(action.message);
+					$("#dispActions").find("textarea").focus();
+				}
 			} else {
 				// Update UI
 				$("#dispActions").hide();
@@ -1321,7 +1437,6 @@ Parser.prototype.setShowHideAction = function(params) {
 			$("input[action=show]").prop("checked", visible.show);
 			$("input[action=hide]").prop("checked", visible.hide);
 		}
-
 		if (params.hide || params.show) {
 			if (this.getActions().length > 0 && this.getShowHideAction()) {
 				action = this.getShowHideAction();
@@ -1338,8 +1453,7 @@ Parser.prototype.setShowHideAction = function(params) {
 				action.show = params.show;
 				this.rule.actions.push(action);
 			}
-
-			if (params.action) {
+			if (params.action && !params.context) {
 				action.type = "showHide";
 				action.hide = params.hide;
 				action.show = params.show;
@@ -1348,9 +1462,7 @@ Parser.prototype.setShowHideAction = function(params) {
 				// Add action targets
 				this.setShowHideDestinations(action.destinations);
 			}
-
 		} else {
-
 			if ($.inArray(this.getShowHideAction(), this.rule.actions) > -1) {
 				this.rule.actions.splice($.inArray(this.getShowHideAction(), this.rule.actions), 1);
 			}
@@ -1823,109 +1935,6 @@ Parser.prototype.deleteTarget = function(target) {
 			}	
 		}
 	}
-}
-
-Parser.prototype.setActions = function(actions) {
-	if (actions.length > 0) {
-		for (var x = 0; x < actions.length; x++) {
-			var action = actions[x];
-			if (action.type.toLowerCase() === "discrepancy") {
-				this.setDiscrepancyAction({
-					selected: true,
-					message: action.message
-				});
-			} else if (action.type.toLowerCase() === "email") {
-				this.setEmailAction({
-					selected: true,
-					to: action.to,
-					message: action.body
-				});
-			} else if (action.type.toLowerCase() === "insert") {
-				this.setInsertAction({
-					edit: true,
-					action: action,
-					selected: true
-				});
-			} else if (action.type === "showHide") {
-				this.setShowHideAction({
-					action: action,
-					hide: action.hide,
-					show: action.show
-				});
-			} 
-		}
-	}
-}
-
-Parser.prototype.getActions = function() {
-	return this.rule.actions;
-}
-
-/* ========================================================================
- * Fetch studies from CC. The studies come with events/crf and items added.
- * ====================================================================== */
-Parser.prototype.fetchStudies = function() {
-	// Notification
-	$("body").append(createLoader());	
-	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
-	$.ajax({
-		type: "POST",
-		url: c + "/rules?action=fetch",
-		success: function(studies) {
-			// FF can return a string
-			if (typeof(studies) === "string") {
-				studies = JSON.parse(studies);
-			}
-			sessionStorage.setItem("studies", JSON.stringify(studies));
-			loadStudies(studies);
-			// If editing a rule
-			if (parser.getParameter("action") === "edit") {
-				parser.fetchRuleForEditing();
-			} 
-			if (sessionStorage.getItem("status") && sessionStorage.getItem("status") === "load") {
-				var rule = JSON.parse(sessionStorage.getItem("rule"));
-				parser.render(rule);
-				sessionStorage.removeItem("status");
-			}
-			$(".spinner").remove();
-		},
-		error: function(response) {
-			handleErrorResponse({
-				response: response
-			});
-		}
-	})
-}
-
-/* ========================================================================
- * Fetch a specific rule from CC for editing in the designer. The rule is
- * passed as an id on the url with a parameter action=editing
- * ====================================================================== */
-Parser.prototype.fetchRuleForEditing = function() {
-	editing = true;
-	$("body").append(createLoader());
-	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
-
-	$.ajax({
-		type: "POST",
-		url: c + "/rules?action=edit&id=" + this.getParameterValue("id") + "&rId=" + this.getParameterValue("rId"),
-		success: function(response) {
-			var rule = null;
-			// FF can return a string
-			if (typeof(response) === "string") {
-				rule = JSON.parse(response);
-			}
-			rule.editing = true;
-			rule.ruleSet = parser.getParameterValue("rId");
-			rule.study = parseInt(parser.getParameterValue("study"));
-			parser.render(rule);
-		},
-		error: function(response) {
-			handleErrorResponse({
-				response: response
-			});
-		}
-	});
 }
 
 /* =================================================================

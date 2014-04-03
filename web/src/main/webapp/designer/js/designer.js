@@ -649,7 +649,7 @@ function createDroppable(params) {
 				} else if (ui.draggable.text() == ">") {
 					params.element.append("&gt;");
 				} else if (ui.draggable.is("td.group")) {
-					params.element.append(ui.draggable.attr("itemName"));
+					params.element.append(ui.draggable.attr("item-name"));
 					// Persist attrinutes
 					params.element.attr("item-oid", ui.draggable.attr("oid"));
 					params.element.attr("crf-oid", ui.draggable.attr("crf-oid"));
@@ -1156,7 +1156,7 @@ function loadCRFVersionItems(params) {
  			}
 			tdName.text(item.name);
 			tdName.addClass("group");
-			tdName.attr("itemName", item.name);
+			tdName.attr("item-name", item.name);
 			// Attributes
 			tdName.attr("oid", item.oid);
 			tdName.attr("crf-oid", params.crf);

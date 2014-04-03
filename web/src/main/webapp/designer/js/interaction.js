@@ -249,9 +249,9 @@ $(function() {
 
 	$("input[name='ruleInvoke']").change(function() {
 		if ($("#evaluateTrue").is(":checked")) {
-			parser.setEvaluatesTo(true);
+			parser.setEvaluates(true);
 		} else {
-			parser.setEvaluatesTo(false);
+			parser.setEvaluates(false);
 		}
 	});
 
