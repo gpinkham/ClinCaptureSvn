@@ -33,7 +33,7 @@ import java.util.Properties;
 
 public class OCContextLoaderListener extends ContextLoaderListener {
 
-	private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+	private org.slf4j.Logger logger;
 	public OCContextLoaderListener() {
 		super();
 		initLoggerFactory();
@@ -41,7 +41,6 @@ public class OCContextLoaderListener extends ContextLoaderListener {
 
 	private void initLoggerFactory() {
 		try {
-			logger.info("Initializing logger factory");
 			DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
 			String webAppName = defaultResourceLoader.getResource("../../").getFile().getName();
 			Properties props = PropertiesLoaderUtils.loadProperties(defaultResourceLoader.getResource("datainfo.properties"));
@@ -69,6 +68,7 @@ public class OCContextLoaderListener extends ContextLoaderListener {
 				JoranConfigurator configurator = new JoranConfigurator();
 				configurator.setContext(loggerContext);
 				configurator.doConfigure(defaultResourceLoader.getResource("logback.xml").getURL());
+				logger = LoggerFactory.getLogger(this.getClass().getName());
 			}
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
