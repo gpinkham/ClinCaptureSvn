@@ -43,7 +43,7 @@ import java.util.TreeMap;
  * code will reproduce rows that are saved in the database. The markup, a large String generated from a JDOM Document
  * object (HTML, basically) is then output to a Web browser by a custom JSP tag.
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 	private int maxColRow = 4;
 	// The sections that make up the print version of the form
@@ -273,7 +273,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 				// add the thead element
 				Element thead = new Element("tr");
 				tableDiv.addContent(table);
-				
+
 				// Does this group involve a Horizontal checkbox or radio
 				// button?
 				boolean hasResponseLayout = builderUtil.hasResponseLayout(currentDisplayItems);
@@ -335,6 +335,15 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 							el = builderUtil.setClassNames(el);
 							row.addContent(el);
 						}
+
+						if (j % maxColRow == 0) {
+							bodylist.add(row);
+							row = new Element("tr");
+							if (repeatFlag) {
+								repeatParentId = repeatParentId + uniqueId++;
+							}
+						}
+
 						// move to the next item
 						continue;
 					}
@@ -343,8 +352,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 					// Create cells within each row
 					td = cellFactory.createCellContents(td, responseName, displayBean, ++tabindex, hasDiscrepancyMgt,
 							hasDbFormValues, true);
-					if (repeatFlag) {
-					}
+
 					row.addContent(td);
 					if (j % maxColRow == 0) {
 						bodylist.add(row);
@@ -688,6 +696,15 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 							}
 							row.addContent(el);
 						}
+
+						if (j % maxColRow == 0) {
+							bodylist.add(row);
+							row = new Element("tr");
+							if (repeatFlag) {
+								repeatParentId = repeatParentId + uniqueId++;
+							}
+						}
+
 						// move to the next item
 						continue;
 					}
@@ -696,8 +713,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 					// Create cells within each row
 					td = cellFactory.createCellContents(td, responseName, displayBean, ++tabindex, hasDiscrepancyMgt,
 							hasDbFormValues, true);
-					if (repeatFlag) {
-					}
+
 					row.addContent(td);
 					if (j % maxColRow == 0) {
 						bodylist.add(row);
