@@ -25,17 +25,6 @@ import com.clinovo.model.DiscrepancyDescription;
 import com.clinovo.model.DiscrepancyDescriptionType;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.util.ValidatorHelper;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -56,6 +45,18 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
@@ -267,6 +268,15 @@ public class UpdateStudyServletNew extends Controller {
 		if (fp.getString("endDateTimeLabel").trim().length() > 255) {
 			Validator.addError(errors, "endDateTimeLabel",
 					resexception.getString("maximum_lenght_endDateTimeLabel_255"));
+		}
+		if (fp.getString("defaultBioontologyURL").trim().endsWith("/")) {
+			Validator
+					.addError(errors, "defaultBioontologyURL", resexception.getString("please_remove_the_final_slash"));
+		}
+		if (!fp.getString("defaultBioontologyURL").trim().isEmpty()
+				&& fp.getString("medicalCodingApiKey").trim().isEmpty()) {
+			Validator.addError(errors, "medicalCodingApiKey",
+					resexception.getString("please_supply_the_biootology_api_key"));
 		}
 
 		createStudyBean(fp, study);
@@ -511,10 +521,11 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
 		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
-        study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
+		study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
-		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(fp.getString("replaceExisitingDataDuringImport"));
-		
+		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
+				fp.getString("replaceExisitingDataDuringImport"));
+
 		// Medical coding
 		study.getStudyParameterConfig().setMedicalCodingApiKey(fp.getString("medicalCodingApiKey"));
 		study.getStudyParameterConfig().setDefaultBioontologyURL(fp.getString("defaultBioontologyURL"));
@@ -854,9 +865,9 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport());
 		updateParameter(spvdao, spv);
 
-        spv.setParameter("autoCreateSubjectDuringImport");
-        spv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
-        updateParameter(spvdao, spv);
+		spv.setParameter("autoCreateSubjectDuringImport");
+		spv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
+		updateParameter(spvdao, spv);
 
 		spv.setParameter("allowSdvWithOpenQueries");
 		spv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
@@ -874,13 +885,13 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getDefaultBioontologyURL());
 		updateParameter(spvdao, spv);
 
-        spv.setParameter("medicalCodingApiKey");
-        spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApiKey());
-        updateParameter(spvdao, spv);
+		spv.setParameter("medicalCodingApiKey");
+		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApiKey());
+		updateParameter(spvdao, spv);
 
-        spv.setParameter("medicalCodingApiKey");
-        spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApiKey());
-        updateParameter(spvdao, spv);
+		spv.setParameter("medicalCodingApiKey");
+		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApiKey());
+		updateParameter(spvdao, spv);
 
 		spv.setParameter("autoCodeDictionaryName");
 		spv.setValue(study1.getStudyParameterConfig().getAutoCodeDictionaryName());
@@ -890,9 +901,9 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApprovalNeeded());
 		updateParameter(spvdao, spv);
 
-        spv.setParameter("medicalCodingContextNeeded");
-        spv.setValue(study1.getStudyParameterConfig().getMedicalCodingContextNeeded());
-        updateParameter(spvdao, spv);
+		spv.setParameter("medicalCodingContextNeeded");
+		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingContextNeeded());
+		updateParameter(spvdao, spv);
 
 		try {
 
@@ -1022,9 +1033,9 @@ public class UpdateStudyServletNew extends Controller {
 			childspv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport());
 			updateParameter(spvdao, childspv);
 
-            childspv.setParameter("autoCreateSubjectDuringImport");
-            childspv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
-            updateParameter(spvdao, childspv);
+			childspv.setParameter("autoCreateSubjectDuringImport");
+			childspv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
+			updateParameter(spvdao, childspv);
 
 			childspv.setParameter("allowSdvWithOpenQueries");
 			childspv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());

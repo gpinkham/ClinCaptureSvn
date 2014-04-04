@@ -163,7 +163,7 @@
 <a href="javascript:leftnavExpand('section1');">
     <img id="excl_section1" src="images/bt_Collapse.gif" border="0"> <span class="table_title_Admin">
     <fmt:message key="study_description_status" bundle="${resword}"/>  </span></a>
-<div id="section1" style="display: ">
+<div id="section1" style="">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
@@ -2120,6 +2120,7 @@
             </td>
             <td>
                 <input onchange="javascript:changeIcon()" id="bioontologyURL" name="defaultBioontologyURL" value="${bioontologyURL}"/>
+                <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="defaultBioontologyURL"/></jsp:include>
             </td>
         </tr>
 
@@ -2132,14 +2133,13 @@
                 <fmt:message key="medicalCodingApiKey" bundle="${resword}"/>:
             </td>
             <td>
-                <input onchange="javascript:changeIcon()" id="medicalCodingApiKey" name="medicalCodingApiKey" value="${medicalCodingApiKey}"/>
+                <input onchange="javascript:changeIcon()" id="medicalCodingApiKey" name="medicalCodingApiKey" value="${medicalCodingApiKey}" size="35"/>
+                </br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="medicalCodingApiKey"/></jsp:include>
             </td>
         </tr>
-
         <tr>
             <td>&nbsp;</td>
         </tr>
-
         <tr valign="top">
 		    <td class="formlabel">
 		        <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>:
