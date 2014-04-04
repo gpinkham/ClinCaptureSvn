@@ -20,17 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.Arrays;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -63,6 +52,16 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.MessageFormat;
+import java.util.Arrays;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
@@ -149,6 +148,7 @@ public class ImportRuleServlet extends Controller {
 				// If request is coming from rule studio
 				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")) {
 					try {
+						getRuleDao().getSessionFactory().getCurrentSession().clear();
 						getRuleSetService().saveImport(importedRules);
 					} catch (Exception ex) {
 						logger.error("RS save error.", ex);
