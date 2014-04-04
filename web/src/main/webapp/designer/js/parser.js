@@ -691,6 +691,7 @@ Parser.prototype.render = function(rule) {
 	} else {
 		this.setName(rule.name);
 		this.setCopy(rule.copied);
+		this.setStudy(rule.study);
 		this.setEditing(rule.editing);
 		this.setRuleSet(rule.ruleSet);
 		this.setExpression(rule.expression);
@@ -700,7 +701,6 @@ Parser.prototype.render = function(rule) {
 			actions: rule.actions
 		});
 	}
-	this.setStudy(rule.study);
 	this.setTargets(rule.targets);
 	// Select target item
 	parser.selectTarget();
