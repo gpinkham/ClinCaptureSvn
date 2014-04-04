@@ -15,7 +15,6 @@ package org.akaza.openclinica.dao.core;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
-import com.clinovo.util.SystemEnvironmentUtil;
 import liquibase.log.LogFactory;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,7 @@ import java.util.Properties;
 public class OCContextLoaderListener extends ContextLoaderListener {
 
 	private org.slf4j.Logger logger;
+
 	public OCContextLoaderListener() {
 		super();
 		initLoggerFactory();
@@ -41,11 +41,14 @@ public class OCContextLoaderListener extends ContextLoaderListener {
 
 	private void initLoggerFactory() {
 		try {
+			String catalinaHome = new File(getClass().getClassLoader().getResource(".").getPath()).getParent();
+			System.setProperty("catalina.home", catalinaHome);
 			DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
 			String webAppName = defaultResourceLoader.getResource("../../").getFile().getName();
 			Properties props = PropertiesLoaderUtils.loadProperties(defaultResourceLoader.getResource("datainfo.properties"));
 			// Log directory path
-			StringBuilder logPath = new StringBuilder(SystemEnvironmentUtil.getCatalinaHome());
+			StringBuilder logPath = new StringBuilder(catalinaHome);
+			logPath.append(File.separator);
 			logPath.append("logs");
 			logPath.append(File.separator);
 			logPath.append(webAppName);
@@ -107,7 +110,6 @@ public class OCContextLoaderListener extends ContextLoaderListener {
 
 	public String getHostName() throws UnknownHostException {
 		InetAddress addr = InetAddress.getLocalHost();
-		String cHostName = addr.getCanonicalHostName();
-		return cHostName;
+		return addr.getCanonicalHostName();
 	}
 }

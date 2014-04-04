@@ -13,7 +13,6 @@
 
 package org.akaza.openclinica.dao.core;
 
-import com.clinovo.util.SystemEnvironmentUtil;
 import liquibase.spring.SpringLiquibase;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
@@ -116,24 +115,27 @@ public class CoreResources implements ResourceLoaderAware {
 		Connection connection = null;
 		ExtendedBasicDataSource dataSource = null;
 		try {
-			
+
 			String path = resourceLoader.getResource("/").exists() ? resourceLoader.getResource("/").getURI().getPath() : "";
 			webapp = getWebAppName(path);
 			String logDir = System.getProperty("log.dir") == null ? "" : System.getProperty("log.dir");
 			String dbType = dataInfo.getProperty("dbType").trim();
 			String attachedFileLocation = dataInfo.getProperty("attached_file_location");
-			dataInfo.setProperty("log.dir", logDir);
-			
-			StringBuilder filePath = new StringBuilder(SystemEnvironmentUtil.getCatalinaHome());
-			filePath.append(webapp + "-data");
+			String catalinaHome = System.getProperty("catalina.home") == null ? new File(getClass().getClassLoader()
+					.getResource(".").getPath()).getPath() : System.getProperty("catalina.home");
+			StringBuilder filePath = new StringBuilder(catalinaHome);
 			filePath.append(File.separator);
-			
-			dataInfo.setProperty("filePath", filePath.toString());
-			dataInfo.setProperty("attached_file_location", attachedFileLocation != null ? attachedFileLocation.replace("\\", "\\\\") : "");
+			filePath.append(webapp);
+			filePath.append("-data");
+			filePath.append(File.separator);
+			// Set properties
+			dataInfo.setProperty("log.dir", logDir);
 			dataInfo.setProperty("currentWebAppName", webapp);
+			dataInfo.setProperty("filePath", filePath.toString());
 			dataInfo.setProperty("currentWebAppContext", "/" + webapp);
 			dataInfo.setProperty("currentDBName", dataInfo.getProperty("db").trim());
-			
+			dataInfo.setProperty("attached_file_location", attachedFileLocation != null ? attachedFileLocation.replace("\\", "\\\\") : "");
+
 			setDatabaseProperties(dbType);
 			// setup dataSource
 			dataSource = new ExtendedBasicDataSource();
