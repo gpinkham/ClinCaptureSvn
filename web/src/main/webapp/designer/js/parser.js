@@ -682,6 +682,7 @@ Parser.prototype.getRule = function() {
 
 Parser.prototype.render = function(rule) {
 	this.rule.targets = [];
+	this.setStudy(rule.study);
 	// properties
 	if (rule.context) {
 		this.setActions({
@@ -691,7 +692,6 @@ Parser.prototype.render = function(rule) {
 	} else {
 		this.setName(rule.name);
 		this.setCopy(rule.copied);
-		this.setStudy(rule.study);
 		this.setEditing(rule.editing);
 		this.setRuleSet(rule.ruleSet);
 		this.setExpression(rule.expression);
@@ -2117,7 +2117,9 @@ Parser.prototype.recursiveSelect = function(params) {
 		if ($(".pagination").length > 0) {
 			next[0].click();
 			if ($("td[oid=" + params.candidate + "]").length == 0) {
-				next[0].click();
+				if (next[0]) {
+					next[0].click();
+				}
 			} else {
 				$("td[oid=" + params.candidate + "]").parent().addClass("selected");
 			}
