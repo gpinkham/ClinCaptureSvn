@@ -375,7 +375,7 @@ function createConditionDroppable() {
  *
  * =========================================================================== */
 function createPopover(droppable) {
-	var btn = '<div id="edit-pop" type="button" class="pull-left space-right-m" onclick="addDroppable(this)"><span class="glyphicon glyphicon-pencil"></span></div><div id="del-pop" class="pull-left space-right-m" type="button" onclick="x(this)"><span class="glyphicon glyphicon-trash"></span></div>';
+	var btn = '<div id="edit-pop" type="button" class="pull-left space-right-m" onclick="addDroppable(this)"><span class="glyphicon glyphicon-plus"></span></div><div id="del-pop" class="pull-left space-right-m" type="button" onclick="x(this)"><span class="glyphicon glyphicon-trash"></span></div>';
 	droppable.popover({
 		html: true,
 		content: btn,
@@ -394,7 +394,7 @@ function createPopover(droppable) {
   		// Edit tool-tip
   		createToolTip({
   			element: $(this).find("#edit-pop"),
-  			title: "Click to add a new drop surface"
+  			title: "Add a new box"
   		});
 		$(this).find("#edit-pop").on('show.bs.tooltip', function(x) {
 			$(".tooltip").each(function() {
@@ -404,7 +404,7 @@ function createPopover(droppable) {
   		// Delete tool-tip
   		createToolTip({
   			element: $(this).find("#del-pop"),
-  			title: "Click to remove the current element from the expression"
+  			title: "Remove the current element from the expression"
   		});
   		$(this).find("#del-pop").on('show.bs.tooltip', function(x) {
 			$(".tooltip").each(function() {
