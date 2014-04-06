@@ -30,10 +30,10 @@ public class StudyRow extends EntityBeanRow {
 	// columns:
 	public static final int COL_NAME = 0;
 	public static final int COL_UNIQUEIDENTIFIER = 1;
-	public static final int COL_PRINCIPAL_INVESTIGATOR = 2;
-	public static final int COL_FACILITY_NAME = 3;
-	public static final int COL_DATE_CREATED = 4;
-	public static final int COL_STATUS = 5;
+	public static final int COL_PRINCIPAL_INVESTIGATOR = 3;
+	public static final int COL_FACILITY_NAME = 4;
+	public static final int COL_DATE_CREATED = 5;
+	public static final int COL_STATUS = 6;
 
 	@Override
 	protected int compareColumn(Object row, int sortingColumn) {

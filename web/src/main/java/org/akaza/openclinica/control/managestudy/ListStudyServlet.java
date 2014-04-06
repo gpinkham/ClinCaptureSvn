@@ -29,6 +29,7 @@ import org.akaza.openclinica.bean.admin.DisplayStudyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.control.core.RememberLastPage;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
@@ -40,7 +41,7 @@ import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
-public class ListStudyServlet extends Controller {
+public class ListStudyServlet extends RememberLastPage {
 	/**
 	 * 
 	 * @param request
@@ -72,6 +73,11 @@ public class ListStudyServlet extends Controller {
 	 */
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		if (shouldRedirect(request, response)) {
+			return;
+		}
+
 		StudyDAO sdao = getStudyDAO();
 		ArrayList studies = (ArrayList) sdao.findAll();
 		// find all parent studies
@@ -98,7 +104,7 @@ public class ListStudyServlet extends Controller {
 				resword.getString("actions") };
 		table.setColumns(new ArrayList(Arrays.asList(columns)));
 		table.hideColumnLink(2);
-		table.hideColumnLink(6);
+		table.hideColumnLink(7);
 		table.setQuery("ListStudy", new HashMap());
 		table.setRows(allStudyRows);
 		table.computeDisplay();
@@ -126,4 +132,27 @@ public class ListStudyServlet extends Controller {
 		return Controller.ADMIN_SERVLET_CODE;
 	}
 
+	@Override
+	protected String getUrlKey(HttpServletRequest request) {
+		return "savedStudyListUrl";
+	}
+
+	@Override
+	protected String getDefaultUrl(HttpServletRequest request) {
+		FormProcessor fp = new FormProcessor(request);
+		String eblFiltered = fp.getString("ebl_filtered");
+		String eblFilterKeyword = fp.getString("ebl_filterKeyword");
+		String eblSortColumnInd = fp.getString("ebl_sortColumnInd");
+		String eblSortAscending = fp.getString("ebl_sortAscending");
+		return "?submitted=1&module=" + fp.getString("module") + "&ebl_page=1&ebl_sortColumnInd="
+				+ (!eblSortColumnInd.isEmpty() ? eblSortColumnInd : "0") + "&ebl_sortAscending="
+				+ (!eblSortAscending.isEmpty() ? eblSortAscending : "1") + "&ebl_filtered="
+				+ (!eblFiltered.isEmpty() ? eblFiltered : "0") + "&ebl_filterKeyword="
+				+ (!eblFilterKeyword.isEmpty() ? eblFilterKeyword : "") + "&ebl_paginated=1";
+	}
+
+	@Override
+	protected boolean userDoesNotUseJmesaTableForNavigation(HttpServletRequest request) {
+		return request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
+	}
 }

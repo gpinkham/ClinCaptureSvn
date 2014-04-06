@@ -123,7 +123,7 @@ public class ListSiteServlet extends RememberLastPage {
 					resword.getString("actions") };
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(2);
-			table.hideColumnLink(6);
+			table.hideColumnLink(7);
 			table.setQuery("ListSite", new HashMap());
 			// if (!currentStudy.getStatus().isLocked()) {
 			// table.addLink(resword.getString("create_a_new_site"),
