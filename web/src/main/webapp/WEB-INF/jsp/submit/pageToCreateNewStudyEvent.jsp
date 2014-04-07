@@ -6,16 +6,8 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
-<jsp:useBean scope="session" id="userRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean" />
-<jsp:useBean scope="request" id="pageMessages" class="java.util.ArrayList" />
-<jsp:useBean scope="request" id="formMessages" class="java.util.HashMap" />
-<jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
-
-<jsp:useBean scope="request" id="subjects" class="java.util.ArrayList" />
-<jsp:useBean scope="request" id="eventDefinitions" class="java.util.ArrayList" />
-
 <style>
-    div.formfieldS_BG input[type='text'] {
+    div.formfieldS_BG input[type='text'], div.formfieldXL_BG input[type='text'] {
         left: 4px;
         top: 2px;
         position: relative;
@@ -100,43 +92,7 @@
 </h1>
 
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
-<script type="text/JavaScript" language="JavaScript">
-  <!--
- function myCancel() {
 
-	 cancelButton=document.getElementById('cancel');
-	 if ( cancelButton != null) {
-	 	confirmDialog({ 
-	 		message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
-	 		height: 150,
-	 		width: 500,
-	 		redirectLink: 'ListStudySubjects'
-	 		});      
-	  	return false;
-	  }
-	  return true;
-  }
-
-  function leftnavExpand(strLeftNavRowElementName){
-    var objLeftNavRowElement;
-
-    objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-    if (objLeftNavRowElement != null) {
-      if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-        objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
-        objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-        if (objExCl != undefined) {
-            if(objLeftNavRowElement.display == "none"){
-                objExCl.src = "images/bt_Expand.gif";
-            } else {
-                objExCl.src = "images/bt_Collapse.gif";
-            }
-        }
-      }
-    }
-  
-   //-->
-</script>
 <P><fmt:message key="field_required" bundle="${resword}"/></P>
 
 <form id="CreateNewStudyEvent" action="CreateNewStudyEvent" method="post">
@@ -229,6 +185,32 @@
 			</table>
 		</td>
 	</tr>
+	
+	<c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
+    <tr>
+        <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
+          <td valign="top">
+              <table border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td valign="top">
+                <div class="formfieldXL_BG">
+                    <input type="text" name="location" value="<c:out value="${location}"/>" size="50" class="formfieldXL">
+                </div>
+                </td>
+                <td><c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=location&column=location','spanAlert-location'); return false;">
+                    <img name="flag_location" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+            </tr>
+            <tr>
+                <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include></td>
+            </tr>
+            </table>
+        </td>
+    </tr>
+    </c:if>
+    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
+        <input type="hidden" name="location" value="">
+    </c:if>
 
     <c:set var="additionalStyle" value=""/>
     <c:if test="${study.studyParameterConfig.startDateTimeRequired == 'not_used'}"><c:set var="additionalStyle" value="display: none;"/></c:if>
@@ -296,31 +278,6 @@
 			</table>
 		</td>
 	</tr>
-    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
-    <tr>
-        <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
-          <td valign="top">
-              <table border="0" cellpadding="0" cellspacing="0">
-            <tr>
-                <td valign="top">
-                <div class="formfieldXL_BG">
-                    <input type="text" name="location" value="<c:out value="${location}"/>" size="50" class="formfieldXL">
-                </div>
-                </td>
-                <td><c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=location&column=location','spanAlert-location'); return false;">
-                    <img name="flag_location" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
-            </tr>
-            <tr>
-                <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include></td>
-            </tr>
-            </table>
-        </td>
-    </tr>
-    </c:if>
-    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
-        <input type="hidden" name="location" value="">
-    </c:if>
 </table>
 
 </div>
