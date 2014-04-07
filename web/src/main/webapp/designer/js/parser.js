@@ -178,7 +178,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			createPopover(dataPredicate);
 		} 
 	} else if (params.element.is(".target")) {
-		if (!this.isAddedTarget(params.ui.draggable.attr("item-name"))) {
+		if (!this.isAddedTarget(selectedItem)) {
 			if (params.existingValue) {
 				for (var x = 0; x < this.rule.targets.length; x++) {
 					var t = this.rule.targets[x];
@@ -954,7 +954,8 @@ Parser.prototype.getLocalOp = function(predicate) {
 Parser.prototype.isAddedTarget = function(target) {
 	for (var x = 0; x < this.rule.targets.length; x++) {
 		var tar = this.rule.targets[x];
-		if (tar.name === target) {
+		if (tar.name === target.name && tar.eventOid === target.eventOid && 
+			tar.crfOid === target.crfOid && tar.crfVersionOid === target.crfVersionOid) {
 			return true;
 		}
 	}

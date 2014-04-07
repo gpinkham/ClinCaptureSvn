@@ -23,11 +23,12 @@ $(function() {
 		console.log(rule.xml)
 		var validation = JSON.parse(rule.validation);
 		sessionStorage.setItem("status", "load");
-
 		// if a rule passed validation
 		if (validation.ruleValidation === "rule_valid") {
 			$(".failure").hide();
 			$(".success").show();
+			$("#failure").hide();
+			$(".alert-info").hide();
 			$(".alert-success").text("Rule is valid: " + rule.expression);
 			if (rule.targets) {
 				for (var x = 0; x < rule.targets.length; x++) {
@@ -35,7 +36,7 @@ $(function() {
 					list.text(rule.targets[x].name);
 					$("#items").append(list);
 				}
-
+				// Rule actions
 				for (var x = 0; x < rule.actions.length; x++) {
 					var list = $("<li class='list-group-item'>");
 					if (rule.actions[x].type === "discrepancy") {
@@ -49,34 +50,33 @@ $(function() {
 					}
 					$("#actions").append(list);
 				}
-				
+				// Initial data entry action
 				if (rule.ide) {
 					var list = $("<li class='list-group-item'>");
 					list.text("Initial data entry");
 					$("#executions").append(list);
 				}
-
+				// Double data entry action
 				if (rule.dde) {
 					var list = $("<li class='list-group-item'>");
 					list.text("Double data entry");
 					$("#executions").append(list);
 				}
-
+				// Administrative data entry action
 				if (rule.ae) {
 					var list = $("<li class='list-group-item'>");
 					list.text("Administrative data entry");
 
 					$("#executions").append(list);
 				}
-
+				// Data import action
 				if (rule.di) {
 					var list = $("<li class='list-group-item'>");
 					list.text("Import data entry");
 					$("#executions").append(list);
 				}
 			}
-
-			// If a rule failed validation
+		// If a rule failed validation
 		} else {
 			$("#save").remove();
 			$(".success").hide();
