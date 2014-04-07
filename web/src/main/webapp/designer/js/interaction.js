@@ -467,6 +467,7 @@ var resizeBody = function() {
     var wrapperHeight = parseInt($(".navbar").offset().top) - parseInt($(".inner-scrollbar-wrapper").offset().top) - 20;
     var percent = parseInt((wrapperHeight / height) * 100);
     $(".inner-scrollbar-wrapper").css("height", percent + "%");
+    $(".data-scrollbar").css("height", wrapperHeight + 20 + "px");
 }
 
 $( window ).load(function() {

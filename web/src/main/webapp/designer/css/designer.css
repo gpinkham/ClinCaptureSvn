@@ -364,3 +364,8 @@ div {
   border-color: #357EBD !important;
   background-color: #F5F5EF !important;
 }
+
+.data-scrollbar {
+  overflow-y: scroll;
+  overflow: auto;
+}
