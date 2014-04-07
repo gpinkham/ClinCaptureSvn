@@ -133,9 +133,7 @@ public class ImportRuleServlet extends Controller {
 						session.delete(ruleSetRule);
 						session.delete(ruleSet);
 						session.delete(rule);
-						// Expressions can't be deleted
-						expression.setStatus(Status.DELETED);
-						session.save(expression);
+						session.delete(expression);
 						transaction.commit();
 						session.flush();
 					}
