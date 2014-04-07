@@ -27,10 +27,13 @@ import org.springframework.web.context.ContextLoaderListener;
 import javax.servlet.ServletContextEvent;
 import java.io.File;
 import java.net.InetAddress;
+import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
 public class OCContextLoaderListener extends ContextLoaderListener {
+
+	public static final String UTF_8 = "utf-8";
 
 	private org.slf4j.Logger logger;
 
@@ -41,11 +44,13 @@ public class OCContextLoaderListener extends ContextLoaderListener {
 
 	private void initLoggerFactory() {
 		try {
-			String catalinaHome = new File(getClass().getClassLoader().getResource(".").getPath()).getParent();
+			String catalinaHome = new File(URLDecoder.decode(getClass().getClassLoader().getResource(".").getPath(),
+					UTF_8)).getParent();
 			System.setProperty("catalina.home", catalinaHome);
 			DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
 			String webAppName = defaultResourceLoader.getResource("../../").getFile().getName();
-			Properties props = PropertiesLoaderUtils.loadProperties(defaultResourceLoader.getResource("datainfo.properties"));
+			Properties props = PropertiesLoaderUtils.loadProperties(defaultResourceLoader
+					.getResource("datainfo.properties"));
 			// Log directory path
 			StringBuilder logPath = new StringBuilder(catalinaHome);
 			logPath.append(File.separator);

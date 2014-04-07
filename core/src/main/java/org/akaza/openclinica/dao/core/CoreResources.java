@@ -38,6 +38,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -49,6 +50,8 @@ import java.util.Properties;
 public class CoreResources implements ResourceLoaderAware {
 
 	protected final static Logger logger = LoggerFactory.getLogger(CoreResources.class);
+
+	public static final String UTF_8 = "utf-8";
 
 	public static String PROPERTIES_DIR;
 	private ResourceLoader resourceLoader;
@@ -116,13 +119,15 @@ public class CoreResources implements ResourceLoaderAware {
 		ExtendedBasicDataSource dataSource = null;
 		try {
 
-			String path = resourceLoader.getResource("/").exists() ? resourceLoader.getResource("/").getURI().getPath() : "";
+			String path = resourceLoader.getResource("/").exists() ? resourceLoader.getResource("/").getURI().getPath()
+					: "";
 			webapp = getWebAppName(path);
 			String logDir = System.getProperty("log.dir") == null ? "" : System.getProperty("log.dir");
 			String dbType = dataInfo.getProperty("dbType").trim();
 			String attachedFileLocation = dataInfo.getProperty("attached_file_location");
-			String catalinaHome = System.getProperty("catalina.home") == null ? new File(getClass().getClassLoader()
-					.getResource(".").getPath()).getPath() : System.getProperty("catalina.home");
+			String catalinaHome = System.getProperty("catalina.home") == null ? new File(URLDecoder.decode(getClass()
+					.getClassLoader().getResource(".").getPath(), UTF_8)).getPath() : System
+					.getProperty("catalina.home");
 			StringBuilder filePath = new StringBuilder(catalinaHome);
 			filePath.append(File.separator);
 			filePath.append(webapp);
@@ -134,7 +139,8 @@ public class CoreResources implements ResourceLoaderAware {
 			dataInfo.setProperty("filePath", filePath.toString());
 			dataInfo.setProperty("currentWebAppContext", "/" + webapp);
 			dataInfo.setProperty("currentDBName", dataInfo.getProperty("db").trim());
-			dataInfo.setProperty("attached_file_location", attachedFileLocation != null ? attachedFileLocation.replace("\\", "\\\\") : "");
+			dataInfo.setProperty("attached_file_location",
+					attachedFileLocation != null ? attachedFileLocation.replace("\\", "\\\\") : "");
 
 			setDatabaseProperties(dbType);
 			// setup dataSource
@@ -479,7 +485,7 @@ public class CoreResources implements ResourceLoaderAware {
 			File placeholder_file = new File(resourceLoader
 					.getResource("classpath:org/akaza/openclinica/applicationContext-web-beans.xml").getURL().getFile());
 
-			String placeholder_file_path = placeholder_file.getPath();
+			String placeholder_file_path = URLDecoder.decode(placeholder_file.getPath(), UTF_8);
 
 			String tmp2 = placeholder_file_path.substring(0, placeholder_file_path.indexOf("WEB-INF") - 1);
 			String tmp3 = tmp2 + File.separator + "WEB-INF" + File.separator + "classes";
