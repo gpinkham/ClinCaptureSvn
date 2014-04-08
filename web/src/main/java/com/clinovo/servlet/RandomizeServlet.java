@@ -135,8 +135,19 @@ public class RandomizeServlet extends SecureController {
 		RandomizationUtil.setCurrentStudy(currentStudy);
 
 		// Assign subject to group
-		RandomizationUtil.assignSubjectToGroup(result);
+		String assignRandomizationResultTo = (String) request.getSession().getAttribute("assignRandomizationResultTo");
 
+		if (assignRandomizationResultTo.equals("dngroup")) {
+
+			RandomizationUtil.assignSubjectToGroup(result);
+		} else if (assignRandomizationResultTo.equals("ssid")) {
+
+			RandomizationUtil.addRandomizationResultToSSID(result);
+		} else {
+
+			log.info("Subject" + result.getPatientId() + "was randomized successfully");
+		}
+	
 		JSONObject randomizationResult = new JSONObject();
 
 		DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");

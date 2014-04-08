@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2014-04-07-TICKET1135-1">
+		<preConditions onFail="MARK_RAN">
+			<dbms type="postgresql" />
+		</preConditions>
+		<sql splitStatements="false">
+			SELECT nextval('system_id_seq')
+		</sql>
+	</changeSet>
+
+	<changeSet author="denis" id="2014-04-07-TICKET1135-2">
+		<insert tableName="system">
+			<column name="name" value="assignRandomizationResultTo" />
+			<column name="value" value="dngroup" />
+			<column name="value_type" value="STRING" />
+			<column name="type" value="RADIO" />
+			<column name="type_values"
+				value="dngroup,ssid,none" />
+			<column name="size" value="60" />
+			<column name="required" valueBoolean="false" />
+			<column name="group_id" value="9" />
+			<column name="order_id" value="6" />
+			<column name="show_description" valueBoolean="false" />
+			<column name="show_measurements" valueBoolean="false" />
+		</insert>
+	</changeSet>
+
+</databaseChangeLog>

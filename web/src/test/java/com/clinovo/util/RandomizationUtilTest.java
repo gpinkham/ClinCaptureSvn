@@ -22,19 +22,35 @@ import com.clinovo.exception.RandomizationException;
 import com.clinovo.model.RandomizationResult;
 
 public class RandomizationUtilTest {
-	
+
 	@Before
 	public void setUp() {
-		
+
+		StudyBean currentStudy = new StudyBean();
+		currentStudy.setId(1);
+
+		StudySubjectBean subject = new StudySubjectBean();
+		subject.setLabel("S001");
+
+		StudySubjectBean subjectWithSameLabel = new StudySubjectBean();
+		subjectWithSameLabel.setLabel("S001-test-group");
+		subjectWithSameLabel.setActive(true);
+
 		StudySubjectDAO studySubjectDAO = createStudySubjectDAOMock();
 		StudyGroupClassDAO studyGroupDAO = createStudyGroupDAOMock(createSubjectGroup());
-		
+
 		RandomizationUtil.setStudyGroupDAO(studyGroupDAO);
 		RandomizationUtil.setStudySubjectDAO(studySubjectDAO);
-		
+		RandomizationUtil.setCurrentStudy(currentStudy);
+
 		SessionManager manager = Mockito.mock(SessionManager.class);
 		Mockito.when(manager.getDataSource()).thenReturn(null);
 		RandomizationUtil.setSessionManager(manager);
+
+		Mockito.doReturn(subject).when(studySubjectDAO)
+				.findByLabelAndStudy(createRandomizationResult().getPatientId(), currentStudy);
+		Mockito.doReturn(subjectWithSameLabel).when(studySubjectDAO)
+				.findByLabelAndStudy(subjectWithSameLabel.getLabel(), currentStudy);
 	}
 
 	@Test
@@ -125,44 +141,51 @@ public class RandomizationUtilTest {
 
 	@Test
 	public void testThatAssignSubjectToGroupDoesNotReturnNull() throws RandomizationException {
-		
+
 		assertNotNull(RandomizationUtil.assignSubjectToGroup(createRandomizationResult()));
 	}
 
 	@Test
 	public void testThatAssignSubjectToGroupReturnsTheAssignedGroup() throws RandomizationException {
-		
+
 		assertEquals("Should return assigned group, having the same name as the rando result", "test-group",
 				RandomizationUtil.assignSubjectToGroup(createRandomizationResult()).getName());
 
 	}
-	
-	@Test(expected=RandomizationException.class)
+
+	@Test(expected = RandomizationException.class)
 	public void testThatRandomizationExceptionIsThrownWhenNoMatchingGroupIsFound() throws RandomizationException {
-		
+
 		RandomizationUtil.setStudyGroupDAO(createStudyGroupDAOMock(null));
 		RandomizationUtil.assignSubjectToGroup(createRandomizationResult());
 	}
-	
-	@Test(expected=RandomizationException.class)
+
+	@Test(expected = RandomizationException.class)
 	public void testThatFailedQueryRaisesException() throws RandomizationException {
-		
+
 		StudySubjectDAO dao = createStudySubjectDAOMock();
 		Mockito.when(dao.isQuerySuccessful()).thenReturn(Boolean.FALSE);
 		Mockito.when(dao.getFailureDetails()).thenReturn(new SQLException("some-failure-message-from-the-db"));
-		
+
 		RandomizationUtil.setStudySubjectDAO(dao);
 		RandomizationUtil.assignSubjectToGroup(createRandomizationResult());
 	}
-	
+
+	@Test(expected = RandomizationException.class)
+	public void testThatRandomizationExceptionIsThrownWhenSubjectWithGeneratedSSIDAlreadyExists()
+			throws RandomizationException {
+
+		RandomizationUtil.addRandomizationResultToSSID(createRandomizationResult());
+	}
+
 	private RandomizationResult createRandomizationResult() {
-		
+
 		RandomizationResult result = new RandomizationResult();
-		
+
 		result.setStudyId("0");
 		result.setPatientId("some-subject-oid");
 		result.setRandomizationResult("test-group");
-		
+
 		return result;
 	}
 
@@ -170,16 +193,17 @@ public class RandomizationUtilTest {
 
 		StudyGroupClassDAO dao = Mockito.mock(StudyGroupClassDAO.class);
 
-		Mockito.when(dao.findByNameAndStudyId(Mockito.anyString(), Mockito.anyInt())).thenReturn((StudyGroupClassBean) result);
+		Mockito.when(dao.findByNameAndStudyId(Mockito.anyString(), Mockito.anyInt())).thenReturn(
+				(StudyGroupClassBean) result);
 
 		return dao;
 	}
-	
+
 	private StudySubjectDAO createStudySubjectDAOMock() {
 
 		StudySubjectBean subject = new StudySubjectBean();
 		subject.setName("some-subject-label");
-		
+
 		StudySubjectDAO dao = Mockito.mock(StudySubjectDAO.class);
 
 		Mockito.when(dao.isQuerySuccessful()).thenReturn(Boolean.TRUE);

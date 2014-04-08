@@ -234,7 +234,7 @@ function hideCols(tableId,columnNumArray,showTable){
     
     var thead = theads[0];
     
-    var theadRows = thead.getElementsByTagName('tr')
+    var theadRows = thead.getElementsByTagName('tr');
 
 	
     for (var th=0; th<theadRows.length;th++) {
@@ -514,7 +514,7 @@ function setNewIconInParentWin(idOfImageElement, imageLocation){
     imgObject.title = 'Refresh or re-enter this form to view any new discrepancy notes.';
     imgObject.parentNode.onclick=function(){
         return false;
-    }
+    };
 }
 
 function showSummaryBox(divObject, parentLinkObj, showText, hideText) {
@@ -906,7 +906,7 @@ var setCookie = function(c_name, value, exdays) {
     exdate.setDate(exdate.getDate() + exdays);
     var c_value = escape(value) + (exdays == null ? "" : "; expires="+exdate.toUTCString());
     document.cookie = c_name + "=" + c_value;
-}
+};
 
 var getCookie = function(c_name) {
     var i, x, y, ARRcookies = document.cookie.split(";");
@@ -918,7 +918,7 @@ var getCookie = function(c_name) {
             return unescape(y);
         }
     }
-}
+};
 
 var markCRFCompleteOk = function(checkboxObjectName) {
     $("#confirmation").dialog("close");
@@ -929,7 +929,7 @@ var markCRFCompleteOk = function(checkboxObjectName) {
     if(checkboxObjects[1]){
         checkboxObjects[1].checked=true;
     }
-}
+};
 
 var markCRFCompleteCancel = function(checkboxObjectName) {
     $("#confirmation").dialog("close");
@@ -940,7 +940,7 @@ var markCRFCompleteCancel = function(checkboxObjectName) {
     if(checkboxObjects[1]){
         checkboxObjects[1].checked=false;
     }
-}
+};
 
 var shouldShowDialog = function() {
     var result = true;
@@ -949,7 +949,7 @@ var shouldShowDialog = function() {
         result = false;
     }
     return result;
-}
+};
 
 /* Only display the confirm dialogue box if the checkbox was checked
  when the user clicked it; then uncheck the checkbox if the user chooses "cancel"
@@ -1054,56 +1054,56 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
  hour - once per hour (repeats the next day)
  request - once per browser request (default)
  */
-var updatePeriods = new Array("month","date","weekday","hour","request")
+var updatePeriods = new Array("month","date","weekday","hour","request");
 
 // Invoked to display rotated HTML content in a Web page. The period
 // argument should be an element of the updatePeriods array.
 
 function displayRotatedContent(period) {
-    var updatePeriod = -1
+    var updatePeriod = -1;
     for(var i=0;i<content.length;++i) {
         if(period.toLowerCase() == updatePeriods[i].toLowerCase()) {
-            updatePeriod = i
-            break
+            updatePeriod = i;
+            break;
         }
     }
-    var s = selectHTML(updatePeriod)
-    document.write(s)
+    var s = selectHTML(updatePeriod);
+    document.write(s);
 }
 
 function selectHTML(updatePeriod) {
-    var n = 0
-    var max = content.length
-    var d = new Date()
+    var n = 0;
+    var max = content.length;
+    var d = new Date();
     switch(updatePeriod) {
         case 0: // Month (0 - 11)
-            n = d.getMonth()
-            break
+            n = d.getMonth();
+            break;
         case 1: // Date (1 - 31 scaled to 0 - 30)
-            n = d.getDate() - 1
-            break
+            n = d.getDate() - 1;
+            break;
         case 2: // Weekday (0 - 6)
-            n = d.getDay()
-            break
+            n = d.getDay();
+            break;
         case 3: // Hour (0 - 23)
-            n = d.getHours()
-            break
+            n = d.getHours();
+            break;
         case 4: // Request (Default)
         default:
-            n = selectRandom(max)
+            n = selectRandom(max);
     }
-    n %= max
-    return content[n]
+    n %= max;
+    return content[n];
 }
 
 // Select a random integer that is between 0 (inclusive) and max (exclusive)
 function selectRandom(max) {
-    var r = Math.random()
-    r *= max
-    r = parseInt(r)
-    if(isNaN(r)) r = 0
-    else r %= max
-    return r
+    var r = Math.random();
+    r *= max;
+    r = parseInt(r);
+    if(isNaN(r)) r = 0;
+    else r %= max;
+    return r;
 }
 
 function confirmSaveAndContinue () {
@@ -1698,8 +1698,8 @@ function LockObject( obj, e ) {
     }
 
     // step 4
-    if (tempX < 0){tempX = 0}
-    if (tempY < 0){tempY = 0}
+    if (tempX < 0){tempX = 0;}
+    if (tempY < 0){tempY = 0;}
 
     // step 5
     obj.style.top  = (tempY + offsety) + 'px';
@@ -1732,8 +1732,8 @@ function analyzeEvent(e) {
             + document.documentElement.scrollTop;
     }
 
-    if (tempX < 0){tempX = 0}
-    if (tempY < 0){tempY = 0}
+    if (tempX < 0){tempX = 0;}
+    if (tempY < 0){tempY = 0;}
 
     result.top  = (tempY + offsety) + 'px';
     result.left = (tempX + offsetx) + 'px';
@@ -1768,8 +1768,8 @@ function moveObject( obj, e ) {
                 + document.documentElement.scrollTop;
     }
     // step 4
-    if (tempX < 0){tempX = 0}
-    if (tempY < 0){tempY = 0}
+    if (tempX < 0){tempX = 0;}
+    if (tempY < 0){tempY = 0;}
 
     // step 5
     obj.style.top  = (tempY + offsety) + 'px';
@@ -1892,7 +1892,7 @@ function findPos(navElement) {
 	{
 		posX=posX+parentobj.offsetParent.offsetLeft;
 		posY=posY+parentobj.offsetParent.offsetTop;
-		if(parentobj==document.getElementsByTagName('body')[0]){break}
+		if(parentobj==document.getElementsByTagName('body')[0]){break;}
 		else
 		{
 			parentobj=parentobj.offsetParent;
@@ -1932,7 +1932,7 @@ var hideContentForCurrentPopup = function() {
     jQuery("div[id^='eventScheduleWrapper_" + currentPopupUid + "']").html("");
     currentPopupUid = undefined;
     subjectMatrixPopupStick = undefined;
-}
+};
 
 var hideCurrentPopup = function(ev) {
     var element =  ev.target || ev.srcElement;
@@ -1944,7 +1944,7 @@ var hideCurrentPopup = function(ev) {
             subjectMatrixPopupStick = true;
         }
     }
-}
+};
 
 function getSchedulePage(params) {
     var element = jQuery('#eventScheduleWrapper_' + params.statusBoxId);
@@ -1980,7 +1980,7 @@ function adjustCrfListTable(studyEventId, statusBoxId) {
     $(".crfListTable tr").find("td:last").find("img:eq(" + (num - wereRemoved) + ")").remove();
     popupTotalColumns--;
     wereRemoved++;
-  }
+  };
 
   if ($("#crfListWrapper_" + statusBoxId + " #hideCol1").val() == 'true') hideCol(0);
   if ($("#crfListWrapper_" + statusBoxId + " #hideCol2").val() == 'true') hideCol(1);
@@ -2217,7 +2217,7 @@ function createNewEvent(page, event) {
                                         element.unbind("mouseover").bind("mouseover", function(event){
                                             eval(funcBody);
                                         });
-                                    }
+                                    };
                                     confEvent(aElement, newMOFuncBody);
                     
                                     var newCLFuncBody = jQuery.trim(aElement.attr("onclick").toString().match(/{((?:.|\n)+)}/)[1]).toString();
@@ -2229,7 +2229,7 @@ function createNewEvent(page, event) {
                                         element.unbind("click").bind("click", function(event){
                                             eval(funcBody);
                                         });
-                                    }
+                                    };
                                     confEvent(aElement, newCLFuncBody);
                                     
                                     if (eventDef.popupToDisplayEntireEvent && aElement.find("img").attr("src").indexOf("icon_NotStarted.gif") > 0) {
@@ -2276,7 +2276,7 @@ var radioButtonOnClick = function(event) {
             }
         }
     }
-}
+};
 
 var radioButtonOnMouseUp = function(event) {
     crfRadioButtonChecked = false;
@@ -2285,7 +2285,7 @@ var radioButtonOnMouseUp = function(event) {
     if (element != undefined && element.checked) {
         crfRadioButtonChecked = true;
     }
-}
+};
 
 var bindRadioButtons = function() {
     if (radioButtonsWereBinded == false) {
@@ -2305,7 +2305,7 @@ var bindRadioButtons = function() {
             }
         }
     }
-}
+};
 
 /* =======================================================================
  * Disable the Randomization result field and the randomization date field
@@ -2313,12 +2313,12 @@ var bindRadioButtons = function() {
  ========================================================================= */
 $(function() {
 	
-	var dateInput = $("#Rand_Date").find(":input")
-	var resultInput = $("#Rand_Result").find(":input")
+	var dateInput = $("#Rand_Date").find(":input");
+	var resultInput = $("#Rand_Result").find(":input");
 
 	$(dateInput).attr("readonly", "readonly");
 	$(resultInput).attr("readonly", "readonly");
-})
+});
 
 /* =======================================================================================
 * Randomize the current subject for whom data entry is being executed on.
@@ -2334,7 +2334,7 @@ $(function() {
 ========================================================================================== */
 function randomizeSubject() {
 
-      disableRandomizeCRFButtons(true)
+      disableRandomizeCRFButtons(true);
 
     var crf = $("input:hidden[name='crfId']").val();
     
@@ -2351,7 +2351,7 @@ function randomizeSubject() {
         } 
     }
 
-   var strataLevels = []
+   var strataLevels = [];
     $.each($("div[id^=Rand_StrataData]").find(":selected"), function(index, element) {
 
         var strata = {
@@ -2359,12 +2359,12 @@ function randomizeSubject() {
             // ordering
             StratificationID: index + 1,
             Level: $("input[eleid^='"+ $(this).parents("div").attr("id") +"']").attr($(this).text())
-        }
+        };
 
-        strataLevels.push(strata)
-    })
+        strataLevels.push(strata);
+    });
 
-    var trialId = null
+    var trialId = null;
 
     // Check if the trial Id is defined
     if($("#Rand_TrialIDs :select").size() > 0) {
@@ -2374,7 +2374,7 @@ function randomizeSubject() {
 
             var opt3 = $("#Rand_TrialIDs :select").find(":selected").text();
            
-           trialId = $("input:hidden[eleid='requiredParam3']").attr(opt3)
+           trialId = $("input:hidden[eleid='requiredParam3']").attr(opt3);
 
         } else {
             
@@ -2384,10 +2384,19 @@ function randomizeSubject() {
         }
     } else {
         
-        trialId = $("input[eleid='randomize']").attr("trialId")
+        trialId = $("input[eleid='randomize']").attr("trialId");
     }
     
-    var subject = $("input:hidden[name='subjectLabel']").val()
+	var subject = $("input:hidden[name='subjectLabel']").val();
+
+	if ($("input:hidden[name='assignRandomizationResultTo']").val() == "ssid"
+		&& (subject == "" || subject == undefined)) {
+
+		alert($("input[name=personIdMissing]").val());
+
+		return false;
+
+	}
 
     $.ajax({
 
@@ -2407,46 +2416,46 @@ function randomizeSubject() {
             
             if(data.match(/UnknownHostException/)) {
 
-                disableRandomizeCRFButtons(false)
-                alertDialog({ message: "The randomization service is not available. Consult your system administrator", height: 150, width: 500 })
+                disableRandomizeCRFButtons(false);
+                alertDialog({ message: "The randomization service is not available. Consult your system administrator", height: 150, width: 500 });
 
             } else if(data.match(/Invalid Site/)) {
 
-                disableRandomizeCRFButtons(false)
-                alertDialog({ message: "The Site Id configured is invalid. Please contact your system administrator", height: 150, width: 500 })
+                disableRandomizeCRFButtons(false);
+                alertDialog({ message: "The Site Id configured is invalid. Please contact your system administrator", height: 150, width: 500 });
 
             } else if(data.match(/Invalid Trial/)) {
 
-                disableRandomizeCRFButtons(false)
-                alertDialog({ message: "The Trial Id configured is invalid. Please contact your system administrator", height: 150, width: 500 })
+                disableRandomizeCRFButtons(false);
+                alertDialog({ message: "The Trial Id configured is invalid. Please contact your system administrator", height: 150, width: 500 });
 
             } else if(data.match(/Invalid Strata/)) {
 
-                disableRandomizeCRFButtons(false)
-                alertDialog({ message: "The Stratification level missing. Please contact your system administrator", height: 150, width: 500 })
+                disableRandomizeCRFButtons(false);
+                alertDialog({ message: "The Stratification level missing. Please contact your system administrator", height: 150, width: 500 });
 
             } else if(data.match(/^\</)) {
 
-                disableRandomizeCRFButtons(false)
-                alertDialog({ message: "An error occurred during the randomization call. Please contact your system administrator", height: 150, width: 500 })
+                disableRandomizeCRFButtons(false);
+                alertDialog({ message: "An error occurred during the randomization call. Please contact your system administrator", height: 150, width: 500 });
 
             } else if(data.match(/Site is not auth/)) {
 
-                disableRandomizeCRFButtons(false)
-                alertDialog({ message: "The Site configured is not authorized to randomize subjects . Please contact your system administrator", height: 150, width: 500 })
+                disableRandomizeCRFButtons(false);
+                alertDialog({ message: "The Site configured is not authorized to randomize subjects . Please contact your system administrator", height: 150, width: 500 });
 
             } else if(data.match(/Exception/)) {
 
-                disableRandomizeCRFButtons(false)
-                var exceptionPattern = new RegExp("^.*:(.*)")
+                disableRandomizeCRFButtons(false);
+                var exceptionPattern = new RegExp("^.*:(.*)");
                 alertDialog({ message: exceptionPattern.exec(data)[1], height: 150, width: 500 });
 
             } else {
                 
-                var result = JSON.parse(data)
+                var result = JSON.parse(data);
                 
-                var dateInput = $("#Rand_Date").find(":input")
-                var resultInput = $("#Rand_Result").find(":input")
+                var dateInput = $("#Rand_Date").find(":input");
+                var resultInput = $("#Rand_Result").find(":input");
 
                 $(dateInput).attr("readonly", "");
                 $(resultInput).attr("readonly", "");
@@ -2457,10 +2466,10 @@ function randomizeSubject() {
                 $(dateInput).attr("readonly", "readonly");
                 $(resultInput).attr("readonly", "readonly");
 
-                $("input[type='submit']").removeAttr("disabled")
+                $("input[type='submit']").removeAttr("disabled");
             }
         }
-    })
+    });
 }
 
 function urlParam(name){
@@ -2487,15 +2496,15 @@ disableRandomizeCRFButtons = function(flag) {
 
     if (flag) {
 
-        $("input[type='submit']").attr("disabled", "disabled")
-        $("input[eleid='randomize']").attr("disabled", "disabled")
+        $("input[type='submit']").attr("disabled", "disabled");
+        $("input[eleid='randomize']").attr("disabled", "disabled");
 
     } else {
 
-        $("input[type='submit']").removeAttr("disabled")
-        $("input[eleid='randomize']").removeAttr("disabled")
+        $("input[type='submit']").removeAttr("disabled");
+        $("input[eleid='randomize']").removeAttr("disabled");
     }
-}
+};
 
 function updateExpandCollapseCodedItemsInput(value) {
 
@@ -2535,7 +2544,7 @@ codeItem = function(item) {
         return;
     }
 
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
 
     var ajaxRequest = $.ajax({
 
@@ -2608,7 +2617,7 @@ codeItem = function(item) {
 
                         $(this).attr('src', '../images/icon_DEcomplete_long.gif');
                     }
-                })
+                });
 
                 //update coded item status
                 $(item).parent().siblings("td").find("div[name='itemStatus']").text("Coded");
@@ -2651,8 +2660,8 @@ codeItem = function(item) {
 
             console.log("Error:" + e);
         }
-    })
-}
+    });
+};
 
 getMedicalCodingCategoryList = function(item) {
 
@@ -2679,11 +2688,11 @@ getMedicalCodingCategoryList = function(item) {
     });
 
     return categoryList;
-}
+};
 
 saveCodedItem = function(item) {
 
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
     var categoryList = getMedicalCodingCategoryList(item).join("|");
 
     $.ajax({
@@ -2702,18 +2711,18 @@ saveCodedItem = function(item) {
 
             manualUpdateMedicalCodingUX(item);
 
-            console.log("Medical coding executed successfully")
+            console.log("Medical coding executed successfully");
         },
         error: function(e) {
 
             console.log("Error:" + e);
         }
-    })
-}
+    });
+};
 
 uncodeCodeItem = function(item) {
 
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
 
         $.ajax({
 
@@ -2742,7 +2751,7 @@ uncodeCodeItem = function(item) {
             $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").attr('block', 'false');
 
             //change completed code icon to available
-            $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc)
+            $(item).siblings("a[name='Code'][itemid=" + $(item).attr("itemid") + "]").children('img').attr('src', codeItemButtonSrc);
 
             //update coded item status
             $(item).parent().siblings("td").find("div[name='itemStatus']").text("Not Coded");
@@ -2773,7 +2782,7 @@ uncodeCodeItem = function(item) {
 
                      $(this).attr('src', '../images/icon_DEcomplete_long.gif');
                  }
-             })
+             });
 
              console.log("Medical uncoding executed successfully");
          },
@@ -2781,14 +2790,14 @@ uncodeCodeItem = function(item) {
 
              console.log("Error:" + e);
          }
-    })
+    });
 
     return false;
-}
+};
 
 codeAndAlias = function(item) {
 
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
     var categoryList = getMedicalCodingCategoryList(item).join("|");
 
     $.ajax({
@@ -2808,14 +2817,14 @@ codeAndAlias = function(item) {
 
             manualUpdateMedicalCodingUX(item);
 
-            console.log("Medical coding executed successfully")
+            console.log("Medical coding executed successfully");
         },
         error: function(e) {
 
             console.log("Error:" + e);
         }
-    })
-}
+    });
+};
 
 function codedItemAutoUpdate() {
     $(document).ready(function () {
@@ -2846,7 +2855,7 @@ function codedItemAutoUpdate() {
 
 function codedItemAutoUpdateAjax(arr) {
 
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
 
     $.ajax({
         type: "POST",
@@ -2907,7 +2916,7 @@ function autoUpdateMedicalCodingUX(itemsToUpdate) {
 
                     $(this).attr('src', '../images/icon_DEcomplete_long.gif');
                 }
-            })
+            });
 
             //change coded item status
             $("div[id=" + id + "]").parent().siblings("td").find("div[name='itemStatus']").text('Coded');
@@ -2979,7 +2988,7 @@ function manualUpdateMedicalCodingUX(item) {
 
 autoCode = function() {
 
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
 
     $.ajax({
 
@@ -2994,8 +3003,8 @@ autoCode = function() {
 
             console.log("Error:" + e);
         }
-    })
-}
+    });
+};
 
 function initCrfMoreInfo() {
   if (window.expandCrfInfo != undefined && window.expandCrfInfo == 'true' && $('#CRF_infobox_open').css('display') == 'none') {
@@ -3042,7 +3051,7 @@ function Pager(tableName, itemsPerPage) {
                 tableBodies[i].style.display = '';
         }
 
-    }
+    };
 
     this.showPage = function (pageNumber) {
 
@@ -3060,14 +3069,14 @@ function Pager(tableName, itemsPerPage) {
         var to = from + itemsPerPage - 1;
         this.showRecords(from, to);
 
-    }
+    };
 
     this.prev = function () {
 
         if (this.currentPage > 1)
             this.showPage(this.currentPage - 1);
 
-    }
+    };
 
     this.next = function () {
 
@@ -3075,7 +3084,7 @@ function Pager(tableName, itemsPerPage) {
             this.showPage(this.currentPage + 1);
         }
 
-    }
+    };
 
     this.init = function () {
 
@@ -3084,7 +3093,7 @@ function Pager(tableName, itemsPerPage) {
         this.pages = Math.ceil(records / itemsPerPage);
         this.inited = true;
 
-    }
+    };
 
     this.showPageNav = function (pagerName, positionId) {
 
@@ -3103,12 +3112,12 @@ function Pager(tableName, itemsPerPage) {
         pagerHtml += '<span onclick="' + pagerName + '.next();" class="pg-normal pointed-span"> Next »</span>';
         element.innerHTML = pagerHtml;
 
-    }
+    };
 }
 
 deleteTerm = function(item) {
 
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+	var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
 
     $.ajax({
 
@@ -3127,18 +3136,18 @@ deleteTerm = function(item) {
             $("a[name='unCode'][term=" + $(item).attr("term").toLowerCase() + "][pref=" + $(item).attr("pref").toLowerCase() + "]").filter(function () {
                 return $(this).parents().siblings("td").find("div[name='termDictionary']").text() == dictionary; }).attr('term', '').attr('pref', '');
 
-            console.log("Term successfully deleted")
+            console.log("Term successfully deleted");
         },
         error: function(e) {
 
             console.log("Error:" + e);
         }
-    })
-}
+    });
+};
 
 codeItemFields = function(item) {
 
-    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0]
+    var url = new RegExp("^.*(pages)").exec(window.location.href.toString())[0];
     var term = $(item).closest('tbody').find('td').filter(function () {
         return $.trim($(this).text()) == "EXT:" || $.trim($(this).text()) == "LLT:" || $.trim($(this).text()) == "MPN:";
     }).next().text();
@@ -3155,16 +3164,16 @@ codeItemFields = function(item) {
 
         success: function(data) {
 
-            $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () { return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text())}).closest('tbody').find('input').css('visibility', 'visible');
-            $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () { return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text())}).parent('tr').after(data);
+            $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () { return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());}).closest('tbody').find('input').css('visibility', 'visible');
+            $("div[id=" + $(item).parents('div').attr("id") + "]").find('td').filter(function () { return $.trim($(this).text()) == $.trim($(item).closest('tbody').find('a').text());}).parent('tr').after(data);
             $(item).css('visibility', 'hidden');
         },
         error: function(e) {
 
             console.log("Error:" + e);
         }
-    })
-}
+    });
+};
 
 function showMedicalCodingAlertBox(item, ajaxResponse){
 
@@ -3180,7 +3189,7 @@ function showMedicalCodingAlertBox(item, ajaxResponse){
             modal : true,
             height: 150,
             width: 450,
-            buttons: { 'Cancel': function() { hideMedicalCodingAlertBox(ajaxResponse) }},
+            buttons: { 'Cancel': function() { hideMedicalCodingAlertBox(ajaxResponse); }},
             open: function(event, ui) {
 
             	openDialog({ 
@@ -3208,7 +3217,7 @@ function showMedicalCodingUncodeAlertBox(item) {
 
     var isLocked = $("a[name='goToEcrf'][itemid=" + $(item).attr("itemid") + "]").children('img').filter(function () {
         return $(this).attr('src').indexOf('icon_Locked_long.gif') > 0;});
-    if(isLocked.size() > 0) { return };
+    if(isLocked.size() > 0) { return; };
 
     if ($("#alertBox").length == 0) {
 
@@ -3458,7 +3467,7 @@ function removeAnchorIfItsBelowThanCurrent(id, parametersHolder) {
 }
 
 function addDNShortcutAnchor(parametersHolder) {
-  var id = getDNShortcutAnchorId(parametersHolder.resolutionStatusId)
+  var id = getDNShortcutAnchorId(parametersHolder.resolutionStatusId);
   if (id != "") {
     resetHighlightedFieldsForDNShortcutAnchors();
     removeAnchorIfItsBelowThanCurrent(id, parametersHolder);

@@ -279,6 +279,15 @@ public class CoreResources implements ResourceLoaderAware {
 		}
 		// end
 
+		String assignRandomizationResultTo = dataInfo
+				.getProperty("assignRandomizationResultTo");
+		if (assignRandomizationResultTo == null
+				|| assignRandomizationResultTo.isEmpty()) {
+			assignRandomizationResultTo = "dnfroup";
+			dataInfo.setProperty("assignRandomizationResultTo",
+					assignRandomizationResultTo);
+		}
+
 		prepareMailProps();
 		// setRuleDesignerProps();
 		if (dataInfo.getProperty("crfFileExtensions") != null) {

@@ -133,6 +133,51 @@ public class RandomizationUtil {
 		}
 	}
 
+	/**
+	 * Add the returned randomization to a Study Subject ID
+	 * 
+	 * @param randomizationResult
+	 *            The randomization to added to SSID.
+	 * 
+	 * @return 4 digits code that will be added to SSID.
+	 * 
+	 * @throws RandomizationException
+	 *             If generated SSID already exists in Study.
+	 */
+	public static void addRandomizationResultToSSID(RandomizationResult randomizationResult)
+			throws RandomizationException {
+
+		if (RandomizationUtil.studySubjectDAO == null) {
+			RandomizationUtil.studySubjectDAO = new StudySubjectDAO(sessionManager.getDataSource());
+		}
+
+		StudySubjectBean subject = RandomizationUtil.studySubjectDAO.findByLabelAndStudy(
+				randomizationResult.getPatientId(), RandomizationUtil.currentStudy);
+
+		String newSubjectId = subject.getLabel() + "-" + randomizationResult.getRandomizationResult();
+
+		StudySubjectBean subjectWithSameId = RandomizationUtil.studySubjectDAO.findByLabelAndStudy(newSubjectId,
+				RandomizationUtil.currentStudy);
+
+		if (!subjectWithSameId.isActive()) {
+
+			subject.setLabel(newSubjectId);
+			studySubjectDAO.update(subject);
+
+			if (studySubjectDAO.isQuerySuccessful()) {
+
+				return;
+			} else {
+
+				log.error(studySubjectDAO.getFailureDetails().getMessage());
+				throw new RandomizationException("Exception occurred during randomization");
+			}
+		} else {
+
+			throw new RandomizationException("Subject with unique person ID " + newSubjectId + " alredy exists");
+		}
+	}
+
 	public static void setStudyGroupDAO(StudyGroupClassDAO studyGroupDAO) {
 		RandomizationUtil.studyGroupDAO = studyGroupDAO;
 

@@ -146,7 +146,17 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="occurenceNumber" value="<c:out value="${studyEvent.sampleOrdinal}"/>" />
 <!-- For randomization -->
 <input type="hidden" name="crfId" value="<c:out value="${section.crf.id}"/>" />
-<input type="hidden" name="subjectLabel" value="<c:out value="${studySubject.label}"/>" />
+<input type="hidden" name="assignRandomizationResultTo" value="${assignRandomizationResultTo}"/>
+<c:choose>
+	<c:when test="${assignRandomizationResultTo == ssid}">
+		<input type="hidden" name="subjectLabel" value="${studySubject.label}" />
+	</c:when>
+	<c:otherwise>
+		<input type="hidden" name="subjectLabel" value="${subject.uniqueIdentifier}" />
+		<input type="hidden" name="personIdMissing" value="<fmt:message key="person_id_should_be_specifyed" bundle="${restext}"/>"/>
+	</c:otherwise>
+</c:choose>
+
 <c:if test="${study.parentStudyId > 0}">
 	<!-- Site information -->
 	<input type="hidden" name="siteUniqId" value="${study.identifier}"/>

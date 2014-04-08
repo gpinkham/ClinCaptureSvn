@@ -399,6 +399,8 @@ public abstract class SecureController extends HttpServlet {
 				.getBean("dataSource")));
 		String newThemeColor = CoreResources.getField("themeColor");
 		session.setAttribute("newThemeColor", newThemeColor);
+		String assignRandomizationResultTo = CoreResources.getField("assignRandomizationResultTo");
+		session.setAttribute("assignRandomizationResultTo", assignRandomizationResultTo);
 		try {
 			session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
 		} catch (NumberFormatException nfe) {
