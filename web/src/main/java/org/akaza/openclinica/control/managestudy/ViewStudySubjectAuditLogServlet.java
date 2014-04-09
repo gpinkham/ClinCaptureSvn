@@ -21,11 +21,6 @@
 
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
@@ -54,7 +49,11 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class ViewStudySubjectAuditLogServlet extends SecureController {
 
 	/**
@@ -62,7 +61,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 	 */
 	@Override
 	public void mayProceed() throws InsufficientPermissionException {
-		
+
 		if (ub.isSysAdmin()) {
 			return;
 		}
@@ -102,7 +101,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 
 		int studySubId = fp.getInt("id", true);// studySubjectId
 		request.setAttribute("id", studySubId);
-		
+
 		if (studySubId == 0) {
 			addPageMessage(respage.getString("please_choose_a_subject_to_view"));
 			forwardPage(Page.LIST_STUDY_SUBJECTS);
@@ -143,14 +142,13 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 			Collection studySubjectAuditEvents = adao.findStudySubjectAuditEvents(studySubject.getId());
 			// Text values will be shown on the page for the corresponding
 			// integer values.
-			for (Iterator iterator = studySubjectAuditEvents.iterator(); iterator.hasNext();) {
-				AuditBean auditBean = (AuditBean) iterator.next();
+			for (Object studySubjectAuditEvent : studySubjectAuditEvents) {
+				AuditBean auditBean = (AuditBean) studySubjectAuditEvent;
 				if (auditBean.getAuditEventTypeId() == 3) {
 					auditBean.setOldValue(Status.get(Integer.parseInt(auditBean.getOldValue())).getName());
 					auditBean.setNewValue(Status.get(Integer.parseInt(auditBean.getNewValue())).getName());
 				}
 			}
-			
 
 			// Global subject value changed
 			studySubjectAudits.addAll(adao.findSubjectAuditEvents(subject.getId()));
@@ -160,9 +158,9 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 
 			// Get the list of events
 			ArrayList events = sedao.findAllByStudySubject(studySubject);
-			for (int i = 0; i < events.size(); i++) {
+			for (Object event : events) {
 				// Link study event definitions
-				StudyEventBean studyEvent = (StudyEventBean) events.get(i);
+				StudyEventBean studyEvent = (StudyEventBean) event;
 				studyEvent.setStudyEventDefinition((StudyEventDefinitionBean) seddao.findByPK(studyEvent
 						.getStudyEventDefinitionId()));
 
@@ -175,14 +173,14 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 				logger.info("deletedEventCRFs size[" + deletedEventCRFs.size() + "]");
 			}
 
-			for (int i = 0; i < events.size(); i++) {
-				StudyEventBean studyEvent = (StudyEventBean) events.get(i);
+			for (Object event : events) {
+				StudyEventBean studyEvent = (StudyEventBean) event;
 				studyEventAudits.addAll(adao.findStudyEventAuditEvents(studyEvent.getId()));
 
 				ArrayList eventCRFs = studyEvent.getEventCRFs();
-				for (int j = 0; j < eventCRFs.size(); j++) {
+				for (Object eventCRF1 : eventCRFs) {
 					// Link CRF and CRF Versions
-					EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(j);
+					EventCRFBean eventCRF = (EventCRFBean) eventCRF1;
 					eventCRF.setCrfVersion((CRFVersionBean) cvdao.findByPK(eventCRF.getCRFVersionId()));
 					eventCRF.setCrf(cdao.findByVersionId(eventCRF.getCRFVersionId()));
 					// Get the event crf audits

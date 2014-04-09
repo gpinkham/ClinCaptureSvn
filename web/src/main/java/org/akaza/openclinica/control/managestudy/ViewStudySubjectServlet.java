@@ -20,17 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.StudyEventAuditBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -71,16 +60,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * @author jxu
  * 
- * Processes 'view subject' request
+ *         Processes 'view subject' request
  */
-@SuppressWarnings({"rawtypes", "unchecked",  "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ViewStudySubjectServlet extends RememberLastPage {
 
-    public static final Logger logger = LoggerFactory.getLogger(ViewStudySubjectServlet.class);
+	public static final Logger logger = LoggerFactory.getLogger(ViewStudySubjectServlet.class);
 
 	// The study subject has an existing discrepancy note related to their
 	// unique identifier; this
@@ -112,10 +111,11 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 	 * Checks whether the user has the right permission to proceed function
 	 */
 	@Override
-	public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
-        
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
 		// If a study subject with passing parameter does not
 		// belong to user's studies, it can not be viewed
 		// mayAccess();
@@ -128,8 +128,9 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-				+ respage.getString("change_study_contact_sysadmin"), request);
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study") + " "
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS,
 				resexception.getString("not_study_director"), "1");
 	}
@@ -169,18 +170,19 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 			StudyEventDAO sedao = getStudyEventDAO();
 			StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
-			
+
 			int studyId = studySub.getStudyId();
 			StudyDAO studydao = getStudyDAO();
 			StudyBean study = (StudyBean) studydao.findByPK(studyId);
-			
+
 			StudyGroupClassBean subjDynGroup = new StudyGroupClassBean();
 			String studyEventDefinitionsString = "";
 			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
 			if (studySub.getDynamicGroupClassId() == 0) {
 				request.setAttribute("subjDynGroupIsDefault", true);
-				StudyGroupClassBean defaultGroup = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(study.getParentStudyId() > 0? study.getParentStudyId() : study.getId());
-				if (defaultGroup.getId() > 0){
+				StudyGroupClassBean defaultGroup = (StudyGroupClassBean) sgcdao.findDefaultByStudyId(study
+						.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId());
+				if (defaultGroup.getId() > 0) {
 					subjDynGroup = defaultGroup;
 				} else {
 					request.setAttribute("defaultGroupNotExist", true);
@@ -188,20 +190,20 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			} else {
 				subjDynGroup = (StudyGroupClassBean) sgcdao.findByPK(studySub.getDynamicGroupClassId());
 			}
-			ArrayList<StudyEventDefinitionBean> listSEDBeans = seddao.findAllActiveOrderedByStudyGroupClassId(subjDynGroup.getId());
-			for (StudyEventDefinitionBean sedBean: listSEDBeans){
-				studyEventDefinitionsString = studyEventDefinitionsString + ", " + sedBean.getName() ;
+			ArrayList<StudyEventDefinitionBean> listSEDBeans = seddao
+					.findAllActiveOrderedByStudyGroupClassId(subjDynGroup.getId());
+			for (StudyEventDefinitionBean sedBean : listSEDBeans) {
+				studyEventDefinitionsString = studyEventDefinitionsString + ", " + sedBean.getName();
 			}
 			request.setAttribute("subjDynGroup", subjDynGroup);
 			request.setAttribute("studyEventDefinitionsString", studyEventDefinitionsString.replaceFirst(", ", ""));
-			
+
 			List<StudyEventBean> studyEventBeanList = sedao.findAllByStudySubject(studySub);
 			if (studyEventBeanList.size() > 0) {
 				boolean allLocked = true;
 				boolean hasLockedBy = false;
 				for (StudyEventBean studyEventBean : studyEventBeanList) {
-					hasLockedBy = !hasLockedBy ? studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED
-							: hasLockedBy;
+					hasLockedBy = hasLockedBy || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED;
 					if (studyEventBean.getSubjectEventStatus() != SubjectEventStatus.LOCKED) {
 						allLocked = false;
 					}
@@ -216,20 +218,22 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			request.setAttribute("studySub", studySub);
 
 			int subjectId = studySub.getSubjectId();
-			
+
 			// Check if this StudySubject would be accessed from the Current Study
 			if (studySub.getStudyId() != currentStudy.getId()) {
 				if (currentStudy.getParentStudyId() > 0) {
-					addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-							+ respage.getString("change_active_study_or_contact"), request);
+					addPageMessage(
+							respage.getString("no_have_correct_privilege_current_study") + " "
+									+ respage.getString("change_active_study_or_contact"), request);
 					forwardPage(Page.MENU_SERVLET, request, response);
 					return;
 				} else {
 					// The SubjectStudy is not belong to currentstudy and current study is not a site.
 					Collection sites = studydao.findOlnySiteIdsByStudy(currentStudy);
 					if (!sites.contains(study.getId())) {
-						addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " "
-								+ respage.getString("change_active_study_or_contact"), request);
+						addPageMessage(
+								respage.getString("no_have_correct_privilege_current_study") + " "
+										+ respage.getString("change_active_study_or_contact"), request);
 						forwardPage(Page.MENU_SERVLET, request, response);
 						return;
 					}
@@ -324,14 +328,15 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 			// find study events
 
-			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,getDataSource(), ub, currentRole, true);
-			
-            for (DisplayStudyEventBean decb : displayEvents) {
-                if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator())
-                        && decb.getStudyEvent().getSubjectEventStatus().isLocked()) {
-                    decb.getStudyEvent().setEditable(false);
-                }
-            }
+			ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub,
+					getDataSource(), ub, currentRole, true);
+
+			for (DisplayStudyEventBean decb : displayEvents) {
+				if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator())
+						&& decb.getStudyEvent().getSubjectEventStatus().isLocked()) {
+					decb.getStudyEvent().setEditable(false);
+				}
+			}
 
 			if (currentStudy.getParentStudyId() > 0) {
 				HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
@@ -341,9 +346,9 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 					hideCRFManager.removeHiddenEventCRF(displayStudyEventBean);
 				}
 			}
-			
+
 			EntityBeanTable table = fp.getEntityBeanTable();
-			
+
 			table.setSortingIfNotExplicitlySet(0, true);
 
 			ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
@@ -354,17 +359,17 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			table.setColumns(new ArrayList(Arrays.asList(columns)));
 			table.hideColumnLink(4);
 			table.hideColumnLink(5);
-			
+
 			if (!"removed".equalsIgnoreCase(studySub.getStatus().getName())
 					&& !"auto-removed".equalsIgnoreCase(studySub.getStatus().getName())) {
 				if (currentStudy.getStatus().isAvailable() && !currentRole.getRole().equals(Role.STUDY_MONITOR)) {
-					
+
 					request.setAttribute("link_schedule_new_event",
 							"CreateNewStudyEvent?" + CreateNewStudyEventServlet.INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT
 									+ "=" + studySub.getId());
 				}
 			}
-			
+
 			HashMap args = new HashMap();
 			args.put("id", Integer.toString(studySubId));
 			table.setQuery("ViewStudySubject", args);
@@ -383,33 +388,33 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			ArrayList logs = aedao.findEventStatusLogByStudySubject(studySubId);
 			UserAccountDAO udao = getUserAccountDAO();
 			ArrayList eventLogs = new ArrayList();
-            for (Object log : logs) {
-                // FIXME is there a way to fix this loop so that we only have 2-3 hits to the DB?
-                AuditEventBean avb = (AuditEventBean) log;
-                StudyEventAuditBean sea = new StudyEventAuditBean();
-                sea.setAuditEvent(avb);
-                StudyEventBean se = (StudyEventBean) sedao.findByPK(avb.getEntityId());
-                StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se
-                        .getStudyEventDefinitionId());
-                sea.setDefinition(sed);
-                String old = avb.getOldValue().trim();
-                try {
-                    if (!StringUtil.isBlank(old)) {
-                        SubjectEventStatus oldStatus = SubjectEventStatus.get(Integer.parseInt(old));
-                        sea.setOldSubjectEventStatus(oldStatus);
-                    }
-                    String newValue = avb.getNewValue().trim();
-                    if (!StringUtil.isBlank(newValue)) {
-                        SubjectEventStatus newStatus = SubjectEventStatus.get(Integer.parseInt(newValue));
-                        sea.setNewSubjectEventStatus(newStatus);
-                    }
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                    logger.error(e.getMessage());
-                }
-                UserAccountBean updater = (UserAccountBean) udao.findByPK(avb.getUserId());
-                sea.setUpdater(updater);
-                eventLogs.add(sea);
+			for (Object log : logs) {
+				// FIXME is there a way to fix this loop so that we only have 2-3 hits to the DB?
+				AuditEventBean avb = (AuditEventBean) log;
+				StudyEventAuditBean sea = new StudyEventAuditBean();
+				sea.setAuditEvent(avb);
+				StudyEventBean se = (StudyEventBean) sedao.findByPK(avb.getEntityId());
+				StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se
+						.getStudyEventDefinitionId());
+				sea.setDefinition(sed);
+				String old = avb.getOldValue().trim();
+				try {
+					if (!StringUtil.isBlank(old)) {
+						SubjectEventStatus oldStatus = SubjectEventStatus.get(Integer.parseInt(old));
+						sea.setOldSubjectEventStatus(oldStatus);
+					}
+					String newValue = avb.getNewValue().trim();
+					if (!StringUtil.isBlank(newValue)) {
+						SubjectEventStatus newStatus = SubjectEventStatus.get(Integer.parseInt(newValue));
+						sea.setNewSubjectEventStatus(newStatus);
+					}
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+					logger.error(e.getMessage());
+				}
+				UserAccountBean updater = (UserAccountBean) udao.findByPK(avb.getUserId());
+				sea.setUpdater(updater);
+				eventLogs.add(sea);
 
 			}
 			request.setAttribute("eventLogs", eventLogs);
@@ -420,7 +425,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 	@Override
 	protected String getAdminServlet(HttpServletRequest request) {
-        UserAccountBean ub = getUserAccountBean(request);
+		UserAccountBean ub = getUserAccountBean(request);
 		if (ub.isSysAdmin()) {
 			return ADMIN_SERVLET_CODE;
 		} else {
@@ -430,13 +435,13 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 
 	/**
 	 * Current User may access a requested study subject in the current user's studies
-	 *
+	 * 
 	 */
 	@SuppressWarnings("unused")
 	public void mayAccess(HttpServletRequest request) throws InsufficientPermissionException {
-        UserAccountBean ub = getUserAccountBean(request);
-        StudyBean currentStudy = getCurrentStudy(request);
-        StudyUserRoleBean currentRole = getCurrentRole(request);
+		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		FormProcessor fp = new FormProcessor(request);
 		StudySubjectDAO subdao = new StudySubjectDAO(getDataSource());
@@ -451,7 +456,8 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 		}
 	}
 
-	private void setRequestAttributesForNotes(HttpServletRequest request, DiscrepancyNoteDAO discrepancyNoteDAO, List<DiscrepancyNoteBean> discBeans) {
+	private void setRequestAttributesForNotes(HttpServletRequest request, DiscrepancyNoteDAO discrepancyNoteDAO,
+			List<DiscrepancyNoteBean> discBeans) {
 		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
 			ArrayList notes = (ArrayList) discrepancyNoteDAO.findAllByEntityAndColumn(
 					discrepancyNoteBean.getEntityType(), discrepancyNoteBean.getEntityId(),
@@ -492,8 +498,8 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 		String id = request.getParameter("id");
 		if (request.getQueryString() != null && request.getQueryString().equalsIgnoreCase("id=" + id)) {
 			String savedUrl = (String) request.getSession().getAttribute(getUrlKey(request));
-            result = savedUrl != null && savedUrl.contains("id=" + id)
-                    && !savedUrl.equalsIgnoreCase(request.getRequestURL() + "?" + request.getQueryString());
+			result = savedUrl != null && savedUrl.contains("id=" + id)
+					&& !savedUrl.equalsIgnoreCase(request.getRequestURL() + "?" + request.getQueryString());
 		} else {
 			result = request.getQueryString() == null || !request.getQueryString().contains("&ebl_page=");
 		}

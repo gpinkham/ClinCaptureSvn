@@ -13,16 +13,6 @@
 
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -30,7 +20,6 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
-import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -53,9 +42,17 @@ import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 public class ListSubjectTableFactory extends AbstractTableFactory {
 
-	private AuditUserLoginDao auditUserLoginDao;
 	private StudySubjectDAO studySubjectDao;
 	private UserAccountDAO userAccountDao;
 	private StudyDAO studyDao;
@@ -104,8 +101,8 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 				null, true, false);
 
 		if (currentStudy != null && currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
-			configureColumn(row.getColumn("subject.gender"), currentStudy == null ? resword.getString("gender")
-					: currentStudy.getStudyParameterConfig().getGenderLabel(), null, null);
+			configureColumn(row.getColumn("subject.gender"), currentStudy.getStudyParameterConfig().getGenderLabel(),
+					null, null);
 		}
 
 		configureColumn(row.getColumn("subject.createdDate"), resword.getString("date_created"), new DateCellEditor(
@@ -118,10 +115,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 				new UpdaterCellEditor(), null, true, false);
 		configureColumn(row.getColumn("subject.status"), resword.getString("status"), new StatusCellEditor(),
 				new StatusDroplistFilterEditor());
-		configureColumn(
-				row.getColumn("actions"),
-				resword.getString("actions")
-						+ "<div style='width:85px'></div>",
+		configureColumn(row.getColumn("actions"), resword.getString("actions") + "<div style='width:85px'></div>",
 				new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
 
 	}
@@ -232,14 +226,6 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 		}
 
 		return listSubjectSort;
-	}
-
-	public AuditUserLoginDao getAuditUserLoginDao() {
-		return auditUserLoginDao;
-	}
-
-	public void setAuditUserLoginDao(AuditUserLoginDao auditUserLoginDao) {
-		this.auditUserLoginDao = auditUserLoginDao;
 	}
 
 	private class StatusDroplistFilterEditor extends DroplistFilterEditor {
