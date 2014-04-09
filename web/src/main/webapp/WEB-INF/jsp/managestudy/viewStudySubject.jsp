@@ -250,8 +250,8 @@
                                     <td class="table_cell"><c:out value="${studySub.secondaryLabel}"/></td>
                                 </c:when>
                                 <c:otherwise>
-                                    <td class="table_header_column">&nbsp;</td>
-                                    <td class="table_cell">&nbsp;</td>
+                                	<td class="table_header_column"><fmt:message key="status" bundle="${resword}"/></td>
+                    				<td class="table_cell"><c:out value="${studySub.status.name}"/></td>
                                 </c:otherwise>
                             </c:choose>
 							<c:choose>
@@ -326,10 +326,48 @@
 							</c:choose>
 						</tr>
                         <tr>
-							<td class="table_header_column"><fmt:message key="status" bundle="${resword}"/></td>
-                    		<td class="table_cell"><c:out value="${studySub.status.name}"/></td>
+                        	<c:choose>
+                        		<c:when test="${!secondaryIdShow && genderShow}"> 
+                        			<td class="table_header_column">${genderLabel}
+                                        <%-- DN for Gender goes here --%>
+                                        <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                            <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
+                                            <c:choose>
+                                                <c:when test="${hasGenderNote eq 'yes'}">
+                                                    <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender', '', event); return false;">
+                                                        <img id="flag_gender" name="flag_gender" src="${genderNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                                    </a>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${subject.id}&writeToDB=1&name=subject&field=gender&column=gender','spanAlert-gender', '', event); return false;">
+                                                        <img id="flag_gender" name="flag_gender" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                                                        <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=gender&column=gender">
+                                                    </a>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:if>
+                                    </td>
+                                    <td class="table_cell">
+                                        <c:choose>
+                                            <c:when test="${subject.gender==32}">
+                                                &nbsp;
+                                            </c:when>
+                                            <c:when test="${subject.gender==109 ||subject.gender==77}">
+                                                <fmt:message key="male" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <fmt:message key="female" bundle="${resword}"/>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                        		</c:when>
+                        		<c:otherwise>
+                        			<td class="table_header_column"><fmt:message key="status" bundle="${resword}"/></td>
+                    				<td class="table_cell"><c:out value="${studySub.status.name}"/></td>
+                        		</c:otherwise>
+                        	</c:choose>							
                             <c:choose>
-                                <c:when test="${genderShow}">
+                                <c:when test="${genderShow && secondaryIdShow}">
                                     <td class="table_header_row">${genderLabel}
                                         <%-- DN for Gender goes here --%>
                                         <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
@@ -363,16 +401,6 @@
                                         </c:choose>
                                     </td>
                                 </c:when>
-                                <c:otherwise>
-                                    <td class="table_header_row">&nbsp;</td>
-                                    <td class="table_cell">&nbsp;</td>
-                                </c:otherwise>
-                            </c:choose>
-						</tr>
-						<tr>
-							<td class="table_header_column"> </td>
-                    		<td class="table_cell"> </td>
-                            <c:choose>
                                 <c:when test="${enrollmentDateShow}">
                                     <td class="table_header_row">${enrollmentDateLabel}
                                             &nbsp;
@@ -394,8 +422,7 @@
                                             </c:choose>
                                         </c:if>
                                     </td>
-                                    <td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}"/>&nbsp;
-                                    </td>
+                                    <td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}"/>&nbsp;</td>
                                 </c:when>
                                 <c:otherwise>
                                     <td class="table_header_row">&nbsp;</td>
@@ -403,6 +430,33 @@
                                 </c:otherwise>
                             </c:choose>
 						</tr>
+						<c:if test="${ enrollmentDateShow and genderShow and secondaryIdShow }">
+							<tr>
+								<td class="table_header_column"> </td>
+	                    		<td class="table_cell"> </td>
+	                            <td class="table_header_row">${enrollmentDateLabel}
+	                                            &nbsp;
+                                            <%-- DN for enrollment date goes here --%>
+                                    <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                        <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
+                                        <c:choose>
+                                            <c:when test="${hasEnrollmentNote eq 'yes'}">
+                                                <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate', '', event); return false;">
+                                                    <img id="flag_enrollmentDate" name="flag_enrollmentDate" src="${enrollmentNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                                </a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${studySub.id}&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate', '', event); return false;">
+                                                    <img id="flag_enrollmentDate" name="flag_enrollmentDate" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                                                    <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date">
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:if>
+                                </td>
+                                <td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}"/>&nbsp;</td>	                              
+							</tr>
+						</c:if>
                         <tr>
 							<td class="table_divider" colspan="4">&nbsp;</td>
 						</tr>
@@ -446,7 +500,7 @@
             <!-- These DIVs define shaded box borders -->
             <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
                 <div class="tablebox_center">
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <table border="0" cellpadding="0" cellspacing="0" style="min-width: 598px">
                         <tr>
                             <td valign="top">
 
@@ -506,7 +560,7 @@
           <!-- These DIVs define shaded box borders -->
           <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
               <div class="tablebox_center">
-                  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <table border="0" cellpadding="0" cellspacing="0" style="min-width: 598px">
                       <tr>
                           <td valign="top">
 
