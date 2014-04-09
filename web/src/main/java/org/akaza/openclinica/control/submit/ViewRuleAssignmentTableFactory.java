@@ -69,6 +69,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+@SuppressWarnings("unchecked")
 public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
 	private RuleSetServiceInterface ruleSetService;
@@ -77,7 +78,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 	private ResourceBundle resword;
 	private final boolean showMoreLink;
 	private final boolean isDesignerRequest;
-	private ItemFormMetadataDAO<?, ?> itemFormMetadataDAO;
+	private ItemFormMetadataDAO itemFormMetadataDAO;
 
 	private List<Integer> ruleSetRuleIds;
 	private String[] columnNames = new String[] {};
@@ -147,7 +148,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 				new ExecuteOnCellEditor(false), new ExpressionEvaluatesToDroplistFilterEditor(), true, false);
 		configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_action_type"),
 				new ActionTypeCellEditor(false), new ActionTypeDroplistFilterEditor(), true, false);
-		configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_action_summary"),
+		configureColumn(row.getColumn(columnNames[index]), resword.getString("view_rule_assignment_action_summary"),
 				new ActionSummaryCellEditor(false), null, true, false);
 
 		// Configure the drop-down for the study event control
@@ -205,7 +206,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 				new ExecuteOnCellEditor(true), new ExpressionEvaluatesToDroplistFilterEditor(), true, false);
 		configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_action_type"),
 				new ActionTypeCellEditor(true), new ActionTypeDroplistFilterEditor(), true, false);
-		configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_action_summary"),
+		configureColumn(row.getColumn(columnNames[index]), resword.getString("view_rule_assignment_action_summary"),
 				new ActionSummaryCellEditor(true), null, true, false);
 	}
 
@@ -266,6 +267,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			viewRuleAssignmentFilter.addFilter("ruleSetRuleStatus", "1");
 		}
 
+		viewRuleAssignmentFilter.addFilter("ignoreWrongRules", true);
+
 		/*
 		 * Because we are using the State feature (via stateAttr) we can do a check to see if we have a complete limit
 		 * already. See the State feature for more details Very important to set the totalRow before trying to get the
@@ -278,8 +281,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			tableFacade.setTotalRows(newTotalRows);
 		}
 
-		int rowStart = limit.getRowSelect().getRowStart();
-		int rowEnd = limit.getRowSelect().getRowEnd();
+		int rowStart = limit.getRowSelect() != null ? limit.getRowSelect().getRowStart() : 0;
+		int rowEnd = limit.getRowSelect() != null ? limit.getRowSelect().getRowEnd() : 0;
 		Collection<RuleSetRuleBean> items = getRuleSetService().getWithFilterAndSort(viewRuleAssignmentFilter,
 				viewRuleAssignmentSort, rowStart, rowEnd);
 		HashMap<Integer, RuleSetBean> ruleSets = new HashMap<Integer, RuleSetBean>();
@@ -288,7 +291,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		ruleSetRuleIds = new ArrayList<Integer>();
 		for (RuleSetRuleBean ruleSetRuleBean : items) {
 
-			RuleSetBean ruleSetBean = null;
+			RuleSetBean ruleSetBean;
 			ruleSetRuleIds.add(ruleSetRuleBean.getId());
 			if (ruleSets.containsKey(ruleSetRuleBean.getRuleSetBean().getId())) {
 				ruleSetBean = ruleSets.get(ruleSetRuleBean.getRuleSetBean().getId());
@@ -416,35 +419,28 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		this.currentStudy = currentStudy;
 	}
 
-	public ItemFormMetadataDAO<?, ?> getItemFormMetadataDAO() {
+	public ItemFormMetadataDAO getItemFormMetadataDAO() {
 		return itemFormMetadataDAO;
 	}
 
-	public void setItemFormMetadataDAO(ItemFormMetadataDAO<?, ?> itemFormMetadataDAO) {
+	public void setItemFormMetadataDAO(ItemFormMetadataDAO itemFormMetadataDAO) {
 		this.itemFormMetadataDAO = itemFormMetadataDAO;
 	}
 
 	private class AvailableFilterMatcher implements FilterMatcher {
 		public boolean evaluate(Object itemValue, String filterValue) {
-
 			Status filter = Status.getByCode(Integer.valueOf(filterValue));
 			Status item = (Status) itemValue;
-
-			if (item.equals(filter)) {
-				return true;
-			}
-
-			return false;
+			return item.equals(filter);
 		}
 	}
 
 	private class ItemCellEditor implements CellEditor {
 		ItemBean theItem;
 
-		@SuppressWarnings("unchecked")
 		public Object getValue(Object item, String property, int rowcount) {
 
-			String value = null;
+			String value;
 			HtmlBuilder builder = new HtmlBuilder();
 			String mouseOver = "this.style.textDecoration='underline';";
 			String mouseOut = "this.style.textDecoration='none';";
@@ -475,10 +471,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
 		}
 
-		@SuppressWarnings("unchecked")
 		public Object renderExportValue(Object item, String property, int rowcount) {
 
-			String value = null;
+			String value;
 			HtmlBuilder builder = new HtmlBuilder();
 			theItem = (ItemBean) ((HashMap<Object, Object>) item).get("item");
 			crf = (CRFBean) ((HashMap<Object, Object>) item).get("crf");
@@ -518,10 +513,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			return value;
 		}
 
-		@SuppressWarnings("unchecked")
 		public Object renderHtmlValue(Object item, String property, int rowcount) {
 
-			String value = null;
+			String value;
 			HtmlBuilder builder = new HtmlBuilder();
 			theItem = (ItemBean) ((HashMap<Object, Object>) item).get("item");
 			crf = (CRFBean) ((HashMap<Object, Object>) item).get("crf");
@@ -581,7 +575,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			}
 		}
 
-		@SuppressWarnings("unchecked")
 		public Object renderHtmlValue(Object item, String property, int rowcount) {
 
 			HtmlBuilder builder = new HtmlBuilder();
@@ -594,7 +587,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			return builder.toString();
 		}
 
-		@SuppressWarnings("unchecked")
 		public Object renderExportValue(Object item, String property, int rowcount) {
 
 			actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
@@ -626,7 +618,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			}
 		}
 
-		@SuppressWarnings("unchecked")
 		public Object renderHtmlValue(Object item, String property, int rowcount) {
 
 			HtmlBuilder builder = new HtmlBuilder();
@@ -639,7 +630,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			return builder.toString();
 		}
 
-		@SuppressWarnings("unchecked")
 		public Object renderExportValue(Object item, String property, int rowcount) {
 
 			actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
@@ -669,7 +659,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			}
 		}
 
-		@SuppressWarnings("unchecked")
 		public Object renderHtmlValue(Object item, String property, int rowcount) {
 
 			HtmlBuilder builder = new HtmlBuilder();
@@ -689,7 +678,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			return builder.toString();
 		}
 
-		@SuppressWarnings("unchecked")
 		public Object renderExportValue(Object item, String property, int rowcount) {
 
 			actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
@@ -776,7 +764,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 	}
 
 	private class ActionsCellEditor implements CellEditor {
-		@SuppressWarnings("unchecked")
 		public Object getValue(Object item, String property, int rowcount) {
 			String value = "";
 			Integer ruleSetId = (Integer) ((HashMap<Object, Object>) item).get("ruleSetId");
@@ -844,11 +831,13 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
 	private String removeLinkBuilder(Integer ruleSetRuleId, Integer ruleSetId) {
 		HtmlBuilder actionLink = new HtmlBuilder();
-		actionLink.a().href("UpdateRuleSetRule?action=remove&ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
-		actionLink.append("onClick=\"return confirmDialog({ message:'" + resword.getString("rule_if_you_remove_this") + "', height:150, width:500, aLink:this });\"");
-		actionLink.append("onMouseDown=\"javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"").close();
-		actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt("Remove").title("Remove")
+		actionLink.a().href(
+				"UpdateRuleSetRule?action=delete&ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
+		actionLink.append("onClick=\"return confirmDialog({ message:'"
+				+ resword.getString("are_you_sure_to_delete_this_rule") + "', height:150, width:500, aLink:this });\"");
+		actionLink.append("onMouseDown=\"javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');\"");
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_Delete1','images/bt_Delete.Delete');\"").close();
+		actionLink.img().name("bt_Delete1").src("images/bt_Delete.gif").border("0").alt("Delete").title("Delete")
 				.append("hspace=\"2\"").end().aEnd();
 		actionLink.append("&nbsp;&nbsp;&nbsp;");
 		return actionLink.toString();
@@ -859,7 +848,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href(
 				"UpdateRuleSetRule?action=restore&ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
-		actionLink.append("onClick=\"return confirmDialog({ message:'" + resword.getString("rule_if_you_restore_this") + "', height:150, width:500, aLink:this });\"");
+		actionLink.append("onClick=\"return confirmDialog({ message:'" + resword.getString("rule_if_you_restore_this")
+				+ "', height:150, width:500, aLink:this });\"");
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Restore3','images/bt_Restore_d.gif');\"");
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_Restore3','images/bt_Restore.gif');\"").close();
 		actionLink.img().name("bt_Restore3").src("images/bt_Restore.gif").border("0").alt("Restore").title("Restore")
@@ -895,7 +885,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
 	private String buildEditRuleLink(Integer ruleId, Integer ruleSetRuleId, Integer study) {
 		HtmlBuilder actionLink = new HtmlBuilder();
-		actionLink.a().href("designer/rule.html?action=edit&id=" + ruleId + "&rId=" + ruleSetRuleId + "&study=" + study);
+		actionLink.a()
+				.href("designer/rule.html?action=edit&id=" + ruleId + "&rId=" + ruleSetRuleId + "&study=" + study);
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Edit1','images/bt_Edit.gif');\"");
 		actionLink.append("onMouseUp=\"javascript:setImage('bt_Edit1','images/bt_Edit.gif');\"").close();
 		actionLink.img().name("bt_Edit1").src("images/bt_Edit.gif").border("0").alt("Edit").title("Edit")

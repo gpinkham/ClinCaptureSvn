@@ -74,7 +74,7 @@ import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({ "unchecked", "serial" })
 public class RulesServlet extends HttpServlet {
 
 	@Override

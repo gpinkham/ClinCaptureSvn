@@ -42,6 +42,7 @@ public class ViewRuleAssignmentFilter implements CriteriaCommand {
 		columnMapping.put("actionExecuteOn", "ra.expression_evaluates_to");
 		columnMapping.put("actionType", "ra.action_type");
 		columnMapping.put("actionSummary", "ra.message");
+		columnMapping.put("ignoreWrongRules", "(c is not null or cv is not null)");
 
 	}
 
@@ -75,8 +76,10 @@ public class ViewRuleAssignmentFilter implements CriteriaCommand {
 	private String buildCriteria(String criteria, String property, Object value) {
 		value = StringEscapeUtils.escapeSql(value.toString());
 		if (value != null) {
-			if (property.equals("studyId") || property.equals("actionType") || property.equals("actionExecuteOn")
-					|| property.equals("ruleSetRuleStatus")) {
+			if (property.equals("ignoreWrongRules")) {
+				criteria = criteria + " " + columnMapping.get(property) + " ";
+			} else if (property.equals("studyId") || property.equals("actionType")
+					|| property.equals("actionExecuteOn") || property.equals("ruleSetRuleStatus")) {
 				criteria = criteria + " " + columnMapping.get(property) + " = " + value.toString() + " ";
 			} else {
 				criteria += " UPPER(" + columnMapping.get(property) + ") = UPPER('" + value.toString() + "')" + " ";

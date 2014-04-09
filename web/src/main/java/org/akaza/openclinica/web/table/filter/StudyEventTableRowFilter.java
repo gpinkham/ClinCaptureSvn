@@ -53,7 +53,7 @@ public class StudyEventTableRowFilter extends DroplistFilterEditor {
 		return options;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	private List<StudyEventDefinitionBean> getStudyEvents() {
 
 		log.trace("Extracting events for study: " + study.getName());

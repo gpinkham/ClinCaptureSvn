@@ -1,10 +1,5 @@
 package org.akaza.openclinica.web.table.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -12,16 +7,21 @@ import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A select row filter for a table that binds to the CRF names in the database.
  * 
  */
+@SuppressWarnings({ "unused" })
 public class CRFFilter extends DroplistFilterEditor {
 
-	private StudyBean study;
-	private DataSource dataSource;
+	public static final Logger LOGGER = LoggerFactory.getLogger(StudyEventTableRowFilter.class);
 
-	private Logger log = LoggerFactory.getLogger(StudyEventTableRowFilter.class);
+	private DataSource dataSource;
+	private StudyBean study;
 
 	/**
 	 * Constructs an instance of the filter. It assumes that the supplied data source and study are valid and
@@ -33,36 +33,22 @@ public class CRFFilter extends DroplistFilterEditor {
 	 *            The current study the user is working with.
 	 */
 	public CRFFilter(DataSource dataSource, StudyBean currentStudy) {
-
 		this.dataSource = dataSource;
 		this.study = currentStudy;
 	}
 
 	@Override
 	protected List<Option> getOptions() {
-
 		List<CRFBean> crfs = getCRFs();
 		List<Option> options = new ArrayList<Option>();
-
 		for (CRFBean crf : crfs) {
-
 			// Build with id and name
 			options.add(new Option(crf.getName() + "", crf.getName()));
 		}
-
 		return options;
-
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private List<CRFBean> getCRFs() {
-
-		log.trace("Extracting crfs");
-
-		CRFDAO crfDAO = new CRFDAO(dataSource);
-		List<CRFBean> crfs = (List<CRFBean>) crfDAO.findAllByStudy(study.getParentStudyId() == 0 ? study.getId()
-				: study.getParentStudyId());
-
-		return crfs;
+		return new CRFDAO(dataSource).findAllActiveCrfs();
 	}
 }

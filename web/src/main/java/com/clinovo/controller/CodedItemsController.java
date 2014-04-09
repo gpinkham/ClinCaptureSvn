@@ -61,7 +61,6 @@ import com.clinovo.service.TermService;
  * 
  */
 @Controller
-@SuppressWarnings("rawtypes")
 public class CodedItemsController {
 
 	private StudyDAO studyDAO;

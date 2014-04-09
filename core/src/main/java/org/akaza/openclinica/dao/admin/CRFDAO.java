@@ -29,13 +29,12 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.sql.DataSource;
 
 /**
  * the data access object for instruments in the database.
@@ -43,8 +42,8 @@ import javax.sql.DataSource;
  * @author thickerson
  * 
  */
-@SuppressWarnings({"rawtypes","unchecked"})
-public class CRFDAO<K, V> extends AuditableEntityDAO {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public class CRFDAO extends AuditableEntityDAO {
 
 	@Override
 	protected void setDigesterName() {
@@ -79,11 +78,11 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 	public EntityBean update(EntityBean eb) {
 		CRFBean cb = (CRFBean) eb;
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(cb.getStatus().getId()));
-		variables.put(Integer.valueOf(2), cb.getName());
-		variables.put(Integer.valueOf(3), cb.getDescription());
-		variables.put(Integer.valueOf(4), Integer.valueOf(cb.getUpdater().getId()));
-		variables.put(Integer.valueOf(5), Integer.valueOf(cb.getId()));
+		variables.put(1, cb.getStatus().getId());
+		variables.put(2, cb.getName());
+		variables.put(3, cb.getDescription());
+		variables.put(4, cb.getUpdater().getId());
+		variables.put(5, cb.getId());
 		this.execute(digester.getQuery("update"), variables);
 		return eb;
 	}
@@ -91,11 +90,11 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 	public EntityBean create(EntityBean eb) {
 		CRFBean cb = (CRFBean) eb;
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(cb.getStatus().getId()));
-		variables.put(Integer.valueOf(2), cb.getName());
-		variables.put(Integer.valueOf(3), cb.getDescription());
-		variables.put(Integer.valueOf(4), Integer.valueOf(cb.getOwner().getId()));
-		variables.put(Integer.valueOf(5), getValidOid(cb, cb.getName()));
+		variables.put(1, cb.getStatus().getId());
+		variables.put(2, cb.getName());
+		variables.put(3, cb.getDescription());
+		variables.put(4, cb.getOwner().getId());
+		variables.put(5, getValidOid(cb, cb.getName()));
 		this.execute(digester.getQuery("create"), variables);
 		if (isQuerySuccessful()) {
 			cb.setActive(true);
@@ -106,11 +105,11 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 	public Object getEntityFromHashMap(HashMap hm) {
 		CRFBean eb = new CRFBean();
 		this.setEntityAuditInformation(eb, hm);
-		eb.setId(((Integer) hm.get("crf_id")).intValue());
+		eb.setId((Integer) hm.get("crf_id"));
 		eb.setName((String) hm.get("name"));
 		eb.setDescription((String) hm.get("description"));
 		eb.setOid((String) hm.get("oc_oid"));
-		eb.setStudyId(((Integer) hm.get("source_study_id")).intValue());
+		eb.setStudyId((Integer) hm.get("source_study_id"));
 		return eb;
 	}
 
@@ -128,8 +127,7 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return null;
 		}
@@ -138,13 +136,12 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 	public Collection findAllByStudy(int studyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
+		variables.put(1, studyId);
 		ArrayList alist = this.select(digester.getQuery("findAllByStudy"), variables);
 		ArrayList al = new ArrayList();
 
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
@@ -153,31 +150,39 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 
 	public Collection findAllByLimit(boolean hasLimit) {
 		this.setTypesExpected();
-		ArrayList alist = null;
+		ArrayList alist;
 		if (hasLimit) {
 			alist = this.select(digester.getQuery("findAllByLimit"));
 		} else {
 			alist = this.select(digester.getQuery("findAll"));
 		}
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
+	public List<CRFBean> findAllActiveCrfs() {
+		List result = new ArrayList<CRFBean>();
+		this.setTypesExpected();
+		ArrayList objList = select(digester.getQuery("findAllActiveCrfs"), new HashMap());
+		for (Object object : objList) {
+			result.add(getEntityFromHashMap((HashMap) object));
+		}
+		return result;
+	}
+
 	public Collection findAllByStatus(Status status) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(status.getId()));
+		variables.put(1, status.getId());
 		ArrayList alist = this.select(digester.getQuery("findAllByStatus"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
@@ -186,13 +191,12 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 	public Collection findAllActiveByDefinition(StudyEventDefinitionBean definition) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(definition.getId()));
+		variables.put(1, definition.getId());
 		ArrayList alist = this.select(digester.getQuery("findAllActiveByDefinition"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
@@ -201,31 +205,28 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 	public Collection findAllActiveByDefinitions(int studyId) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
-		variables.put(Integer.valueOf(2), Integer.valueOf(studyId));
+		variables.put(1, studyId);
+		variables.put(2, studyId);
 		ArrayList alist = this.select(digester.getQuery("findAllActiveByDefinitions"), variables);
 
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			CRFBean eb = (CRFBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
-	public EntityBean findByPK(int ID) {
+	public EntityBean findByPK(int id) {
 		CRFBean eb = new CRFBean();
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(ID));
+		variables.put(1, id);
 
 		ArrayList alist = this.select(digester.getQuery("findByPK"), variables);
 		Iterator it = alist.iterator();
@@ -241,7 +242,7 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), itemOid);
+		variables.put(1, itemOid);
 
 		ArrayList alist = this.select(digester.getQuery("findByItemOid"), variables);
 		Iterator it = alist.iterator();
@@ -257,7 +258,7 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), name);
+		variables.put(1, name);
 
 		String sql = digester.getQuery("findByName");
 		ArrayList alist = this.select(sql, variables);
@@ -274,8 +275,8 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), name);
-		variables.put(Integer.valueOf(2), Integer.valueOf(crfId));
+		variables.put(1, name);
+		variables.put(2, crfId);
 
 		String sql = digester.getQuery("findAnotherByName");
 		ArrayList alist = this.select(sql, variables);
@@ -289,15 +290,11 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public CRFBean findByVersionId(int crfVersionId) {
@@ -307,7 +304,7 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 		this.setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), Integer.valueOf(crfVersionId));
+		variables.put(1, crfVersionId);
 
 		String sql = digester.getQuery("findByVersionId");
 		ArrayList rows = select(sql, variables);
@@ -344,26 +341,24 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 
 	public ArrayList<CRFBean> findAllByOid(String oid) {
 		HashMap<Integer, String> variables = new HashMap<Integer, String>();
-		variables.put(Integer.valueOf(1), oid);
+		variables.put(1, oid);
 
 		return executeFindAllQuery("findByOID", variables);
 	}
 
 	public CRFBean findByOid(String oid) {
-		CRFBean crf = new CRFBean();
 		this.unsetTypeExpected();
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(Integer.valueOf(1), oid);
+		variables.put(1, oid);
 		String sql = digester.getQuery("findByOID");
 
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			crf = (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
-			return crf;
+			return (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
 		} else {
 			return null;
 		}
@@ -374,13 +369,12 @@ public class CRFDAO<K, V> extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.STRING);
 		this.setTypeExpected(2, TypeNames.STRING);
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyId));
+		variables.put(1, studyId);
 		ArrayList alist = this.select(digester.getQuery("getAllCRFNamesFromStudy"), variables);
 		ArrayList al = new ArrayList();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			HashMap h = (HashMap) it.next();
-			al.add((String) h.get("name"));
+		for (Object anAlist : alist) {
+			HashMap h = (HashMap) anAlist;
+			al.add(h.get("name"));
 		}
 		return al;
 	}

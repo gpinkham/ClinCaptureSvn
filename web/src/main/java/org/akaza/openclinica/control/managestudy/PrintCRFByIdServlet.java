@@ -20,9 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -31,12 +28,14 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Builds on top of PrintCRFServlet
  * 
  * @author Krikor Krumlian
  */
-@SuppressWarnings({ "rawtypes" })
 @Component
 public class PrintCRFByIdServlet extends PrintCRFServlet {
 
@@ -45,15 +44,13 @@ public class PrintCRFByIdServlet extends PrintCRFServlet {
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		return;
+		//
 	}
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 		StudyDAO studyDao = new StudyDAO(getDataSource());
-		currentStudy = (StudyBean) studyDao.findByPK(1);
+		StudyBean currentStudy = (StudyBean) studyDao.findByPK(1);
 		CRFVersionDAO crfVersionDao = new CRFVersionDAO(getDataSource());
 		if (request.getParameter("id") == null) {
 			forwardPage(Page.LOGIN, request, response);

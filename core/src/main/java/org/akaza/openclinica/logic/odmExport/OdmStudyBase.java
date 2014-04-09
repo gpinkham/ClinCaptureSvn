@@ -37,7 +37,6 @@ import javax.sql.DataSource;
  * 
  * @author ywang
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class OdmStudyBase {
 	private StudyBean study;
 	private List<StudyEventDefinitionBean> sedBeansInStudy;

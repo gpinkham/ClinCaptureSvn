@@ -20,9 +20,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -31,12 +28,14 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Builds on top of ViewSectionDataEntryServlet, Doesn't add much other than using OIDs to get to the View Screen.
  * 
  * @author Krikor Krumlian
  */
-@SuppressWarnings({ "rawtypes" })
 @Component
 public class ViewSectionDataEntryByIdServlet extends ViewSectionDataEntryServlet {
 
@@ -45,7 +44,7 @@ public class ViewSectionDataEntryByIdServlet extends ViewSectionDataEntryServlet
 	@Override
 	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException {
-		return;
+		//
 	}
 
 	@Override

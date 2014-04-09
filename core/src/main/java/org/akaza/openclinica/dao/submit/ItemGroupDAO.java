@@ -13,6 +13,18 @@
 
 package org.akaza.openclinica.dao.submit;
 
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.exception.OpenClinicaException;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,21 +37,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.PreparedStatementFactory;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.exception.OpenClinicaException;
-
-@SuppressWarnings({"rawtypes","unchecked"})
-public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public class ItemGroupDAO extends AuditableEntityDAO {
 
 	public ItemGroupDAO(DataSource ds) {
 		super(ds);
@@ -94,7 +93,7 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		 * date, date_updated date, owner_id numeric, update_id numeric,
 		 */
 		variables.put(1, formGroupBean.getName());
-		variables.put(2, new Integer(formGroupBean.getCrfId()));
+		variables.put(2, formGroupBean.getCrfId());
 		variables.put(3, formGroupBean.getStatus().getId());
 		variables.put(4, formGroupBean.getUpdater().getId());
 		variables.put(5, formGroupBean.getId());
@@ -145,7 +144,7 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		variables.put(1, id);
 		variables.put(2, formGroupBean.getName());
 		variables.put(3, formGroupBean.getCrfId());
-		variables.put(4, new Integer(formGroupBean.getStatus().getId()));
+		variables.put(4, formGroupBean.getStatus().getId());
 		variables.put(5, formGroupBean.getOwner().getId());
 
 		this.execute(digester.getQuery("create"), variables);
@@ -183,22 +182,6 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 
 	}
 
-	public List<ItemGroupBean> findGroupByCRFVersionIDMap(int Id) {
-		this.setTypesExpected();
-		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(1, Id);
-		List listofMaps = this.select(digester.getQuery("findGroupByCRFVersionIDMap"), variables);
-
-		List<ItemGroupBean> beanList = new ArrayList<ItemGroupBean>();
-		ItemGroupBean bean;
-		for (Object map : listofMaps) {
-			bean = (ItemGroupBean) this.getEntityFromHashMap((HashMap) map);
-			beanList.add(bean);
-		}
-		return beanList;
-
-	}
-
 	public EntityBean findByPK(int ID) {
 		ItemGroupBean formGroupB = new ItemGroupBean();
 		this.setTypesExpected();
@@ -232,12 +215,12 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 	}
 
 	public List<ItemGroupBean> findAllByOid(String oid) {
-		
+
 		this.unsetTypeExpected();
 		setTypesExpected();
 
 		HashMap<Integer, String> variables = new HashMap<Integer, String>();
-		variables.put(new Integer(1), oid);
+		variables.put(1, oid);
 		String sql = digester.getQuery("findGroupByOid");
 
 		ArrayList rows = this.select(sql, variables);
@@ -252,12 +235,12 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 	}
 
 	public ItemGroupBean findByOid(String oid) {
-		ItemGroupBean itemGroup = new ItemGroupBean();
+		ItemGroupBean itemGroup;
 		this.unsetTypeExpected();
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), oid);
+		variables.put(1, oid);
 		String sql = digester.getQuery("findGroupByOid");
 
 		ArrayList rows = this.select(sql, variables);
@@ -272,21 +255,19 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 	}
 
 	public ItemGroupBean findByOidAndCrf(String oid, int crfId) {
-		ItemGroupBean itemGroup = new ItemGroupBean();
 		this.unsetTypeExpected();
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), oid);
-		variables.put(new Integer(2), new Integer(crfId));
+		variables.put(1, oid);
+		variables.put(2, crfId);
 		String sql = digester.getQuery("findGroupByOidAndCrfId");
 
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			itemGroup = (ItemGroupBean) this.getEntityFromHashMap((HashMap) it.next());
-			return itemGroup;
+			return (ItemGroupBean) this.getEntityFromHashMap((HashMap) it.next());
 		} else {
 			return null;
 		}
@@ -306,24 +287,21 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 		}
 		return beanList;
 	}
-	
-	public ItemGroupBean findByItemAndCRFVersion(ItemBean item, CRFVersionBean crfVersion) {
 
-		ItemGroupBean itemGroup = new ItemGroupBean();
+	public ItemGroupBean findByItemAndCRFVersion(ItemBean item, CRFVersionBean crfVersion) {
 		this.unsetTypeExpected();
 		setTypesExpected();
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), item.getId());
-		variables.put(new Integer(2), crfVersion.getId());
+		variables.put(1, item.getId());
+		variables.put(2, crfVersion.getId());
 		String sql = digester.getQuery("findByItemAndCRFVersion");
 
 		ArrayList rows = this.select(sql, variables);
 		Iterator it = rows.iterator();
 
 		if (it.hasNext()) {
-			itemGroup = (ItemGroupBean) this.getEntityFromHashMap((HashMap) it.next());
-			return itemGroup;
+			return (ItemGroupBean) this.getEntityFromHashMap((HashMap) it.next());
 		} else {
 			return null;
 		}
@@ -406,7 +384,7 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 
 	public void deleteTestGroup(String name) {
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), name);
+		variables.put(1, name);
 		this.execute(digester.getQuery("deleteTestGroup"), variables);
 	}
 
@@ -423,7 +401,7 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 
 		if (it.hasNext()) {
 			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			result = count > 0 ? true : false;
+			result = count > 0;
 		}
 		return result;
 	}
@@ -442,7 +420,7 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 
 		if (it.hasNext()) {
 			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			result = count > 0 ? true : false;
+			result = count > 0;
 		}
 		return result;
 	}
@@ -464,11 +442,11 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 	}
 
 	@Override
-	public ArrayList<V> select(String query, Map variables) {
+	public ArrayList select(String query, Map variables) {
 		clearSignals();
 
 		ArrayList results = new ArrayList();
-		K key;
+		Object key;
 		ResultSet rs = null;
 		Connection con = null;
 		PreparedStatementFactory psf = new PreparedStatementFactory(variables);
@@ -485,8 +463,8 @@ public class ItemGroupDAO<K, V extends ArrayList> extends AuditableEntityDAO {
 			ps = con.prepareStatement(query);
 
 			ps = psf.generate(ps);// enter variables here!
-			key = (K) ps.toString();
-			if ((results = (V) cache.get(key)) == null) {
+			key = ps.toString();
+			if ((results = (ArrayList) cache.get(key)) == null) {
 				rs = ps.executeQuery();
 				results = this.processResultRows(rs);
 				if (results != null) {

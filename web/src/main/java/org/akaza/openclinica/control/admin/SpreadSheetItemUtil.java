@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
 public class SpreadSheetItemUtil {
 
 	private String itemName;// 1

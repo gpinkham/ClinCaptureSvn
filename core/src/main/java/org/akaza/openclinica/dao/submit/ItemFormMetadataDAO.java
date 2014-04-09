@@ -20,18 +20,9 @@
  */
 package org.akaza.openclinica.dao.submit;
 
-import javax.sql.DataSource;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
-
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.PreparedStatementFactory;
@@ -40,8 +31,21 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.domain.crfdata.InstantOnChangePairContainer;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
-@SuppressWarnings({"rawtypes","unchecked"})
-public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public class ItemFormMetadataDAO extends EntityDAO {
 
 	@Override
 	protected void setDigesterName() {
@@ -65,61 +69,23 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.locale = locale;
 	}
 
-	/**
-	 * Search for a set of ItemFormMetadataBean objects.
-	 * 
-	 * @param ints
-	 *            An array of primary keys.
-	 * @return An ArrayList of ItemFormMetadataBean, each one corresponding to the primary key in <code>ints</code>.
-	 * @throws OpenClinicaException
-	 */
-	public ArrayList<ItemFormMetadataBean> findByMultiplePKs(ArrayList ints) throws OpenClinicaException {
-		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
-
-		this.setTypesExpected();
-
-		Iterator it = ints.iterator();
-		while (it.hasNext()) {
-			Integer newInt = (Integer) it.next();
-			ItemFormMetadataBean ifmBean = (ItemFormMetadataBean) this.findByPK(newInt.intValue());
-			// check to make sure we have what we need
-			logger.info("options: " + ifmBean.getResponseSetId() + " bean options list: "
-					+ ifmBean.getResponseSet().getOptions().toString());
-
-			answer.add(ifmBean);
-		}
-		return answer;
-	}
-
 	private int getIntFromRow(HashMap row, String column) {
 		Integer i = (Integer) row.get(column);
-		if (i == null) {
-			return 0;
-		} else {
-			return i.intValue();
-		}
+		return i == null ? 0 : i;
 	}
 
 	private boolean getBooleanFromRow(HashMap row, String column) {
 		Boolean i = (Boolean) row.get(column);
-		if (i == null) {
-			return false;
-		} else {
-			return i.booleanValue();
-		}
+		return i != null && i;
 	}
 
 	private String getStringFromRow(HashMap row, String column) {
 		String s = (String) row.get(column);
-		if (s == null) {
-			return "";
-		} else {
-			return s;
-		}
+		return s == null ? "" : s;
 	}
 
 	public Object getEntityFromHashMap(HashMap hm) {
-		
+
 		ItemFormMetadataBean answer = new ItemFormMetadataBean();
 
 		answer.setId(getIntFromRow(hm, "item_form_metadata_id"));
@@ -145,7 +111,7 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		answer.setResponseLayout(getStringFromRow(hm, "response_layout"));
 		answer.setWidthDecimal(getStringFromRow(hm, "width_decimal"));
 		answer.setShowItem(getBooleanFromRow(hm, "show_item"));
-        answer.setCodeRef(getStringFromRow(hm, "code_ref"));
+		answer.setCodeRef(getStringFromRow(hm, "code_ref"));
 		ResponseSetBean rsb = new ResponseSetBean();
 
 		rsb.setId(getIntFromRow(hm, "response_set_id"));
@@ -209,18 +175,18 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypeExpected(ind, TypeNames.STRING); // width_decimal 22
 		ind++; // 23
 		// will need to set the boolean value here, tbh 23
-        this.setTypeExpected(ind, TypeNames.BOOL);
-        ind++; // show_item 24
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // code_ref 25
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // response_set.response_type_id 26
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // response_set.label 27
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // response_set.options_text 28
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // response_set.options_values // 29
+		this.setTypeExpected(ind, TypeNames.BOOL);
+		ind++; // show_item 24
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; // code_ref 25
+		this.setTypeExpected(ind, TypeNames.INT);
+		ind++; // response_set.response_type_id 26
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; // response_set.label 27
+		this.setTypeExpected(ind, TypeNames.STRING);
+		ind++; // response_set.options_text 28
+		this.setTypeExpected(ind, TypeNames.STRING);
+		// response_set.options_values // 29
 	}
 
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase)
@@ -236,10 +202,9 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 
 		String sql = digester.getQuery("findAll");
 		ArrayList alist = this.select(sql);
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(ifmb);
 		}
 
@@ -252,14 +217,14 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(crfVersionId));
+		variables.put(1, crfVersionId);
 		String sql = digester.getQuery("findAllCountHiddenByCRFVersionId");
 
 		ArrayList rows = select(sql, variables);
 
 		if (rows.size() > 0) {
 			HashMap row = (HashMap) rows.get(0);
-			answer = ((Integer) row.get("number")).intValue();
+			answer = (Integer) row.get("number");
 		}
 
 		int answer2 = 0;
@@ -268,7 +233,7 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		rows = select(sql2, variables);
 		if (rows.size() > 0) {
 			HashMap row = (HashMap) rows.get(0);
-			answer2 = ((Integer) row.get("number")).intValue();
+			answer2 = (Integer) row.get("number");
 		}
 		return answer + answer2;
 	}
@@ -279,14 +244,14 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(eventCrfId));
+		variables.put(1, eventCrfId);
 		String sql = digester.getQuery("findAllCountHiddenButShownByEventCrfId");
 
 		ArrayList rows = select(sql, variables);
 
 		if (rows.size() > 0) {
 			HashMap row = (HashMap) rows.get(0);
-			answer = ((Integer) row.get("number")).intValue();
+			answer = (Integer) row.get("number");
 		}
 
 		return answer;
@@ -298,39 +263,38 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypesExpected();
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(crfVersionId));
+		variables.put(1, crfVersionId);
 
 		String sql = digester.getQuery("findAllByCRFVersionId");
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(ifmb);
 		}
 
 		return answer;
 	}
 
-    public ItemFormMetadataBean findAllByCRFVersionIdAndItemId(int crfVersionId, int itemId) {
-        ItemFormMetadataBean answer = null;
+	public ItemFormMetadataBean findAllByCRFVersionIdAndItemId(int crfVersionId, int itemId) {
+		ItemFormMetadataBean answer = null;
 
-        this.setTypesExpected();
+		this.setTypesExpected();
 
-        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), new Integer(itemId));
-        variables.put(new Integer(2), new Integer(crfVersionId));
+		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+		variables.put(1, itemId);
+		variables.put(2, crfVersionId);
 
-        String sql = digester.getQuery("findAllByCRFVersionIdAndItemId");
-        ArrayList alist = this.select(sql, variables);
-        Iterator it = alist.iterator();
+		String sql = digester.getQuery("findAllByCRFVersionIdAndItemId");
+		ArrayList alist = this.select(sql, variables);
+		Iterator it = alist.iterator();
 
-        if (it.hasNext()) {
-            answer = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
-        }
+		if (it.hasNext()) {
+			answer = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+		}
 
-        return answer;
-    }
+		return answer;
+	}
 
 	public ArrayList<ItemFormMetadataBean> findAllByCRFIdItemIdAndHasValidations(int crfId, int itemId) {
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
@@ -338,15 +302,14 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypesExpected();
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(crfId));
-		variables.put(new Integer(2), new Integer(itemId));
+		variables.put(1, crfId);
+		variables.put(2, itemId);
 
 		String sql = digester.getQuery("findAllByCRFIdItemIdAndHasValidations");
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(ifmb);
 		}
 
@@ -355,32 +318,32 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 
 	public ArrayList<ItemFormMetadataBean> findAllByCRFVersionIdAndResponseTypeId(int crfVersionId, int responseTypeId)
 			throws OpenClinicaException {
-		K key;
+		Object key;
 
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
 		this.setTypesExpected();
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(crfVersionId));
-		variables.put(new Integer(2), new Integer(responseTypeId));
+		variables.put(1, crfVersionId);
+		variables.put(2, responseTypeId);
 		ArrayList alist;
 
 		String sql = digester.getQuery("findAllByCRFVersionIdAndResponseTypeId");
 
-		key = (K) (sql + "," + crfVersionId + "," + responseTypeId);
+		key = (sql + "," + crfVersionId + "," + responseTypeId);
 
-		if ((alist = (V) cache.get(key)) == null) {
+		if ((alist = (ArrayList) cache.get(key)) == null) {
 			alist = this.select(sql, variables);
 			if (alist != null)
 				cache.put(key, alist);
 		}
 
-		Iterator it = alist.iterator();
-
-		while (it.hasNext()) {
-			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
-			answer.add(ifmb);
+		if (alist != null) {
+			for (Object anAlist : alist) {
+				ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) anAlist);
+				answer.add(ifmb);
+			}
 		}
 
 		return answer;
@@ -397,19 +360,18 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypeExpected(31, TypeNames.INT);// repeat_max
 		this.setTypeExpected(32, TypeNames.STRING);// section_name
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(itemId));
+		variables.put(1, itemId);
 
 		String sql = digester.getQuery("findAllByItemId");
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap(hm);
 			String versionName = (String) hm.get("cvname");
 			String groupLabel = (String) hm.get("group_label");
 			String sectionName = (String) hm.get("section_name");
-			int repeatMax = new Integer((Integer) hm.get("repeat_max")).intValue();
+			int repeatMax = (Integer) hm.get("repeat_max");
 			ifmb.setCrfVersionName(versionName);
 			ifmb.setGroupLabel(groupLabel);
 			ifmb.setSectionName(sectionName);
@@ -431,19 +393,18 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypeExpected(31, TypeNames.INT);// repeat_max
 		this.setTypeExpected(32, TypeNames.STRING);// section_name
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(itemId));
+		variables.put(1, itemId);
 
 		String sql = digester.getQuery("findAllByItemIdAndHasValidations");
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap hm = (HashMap) anAlist;
 			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap(hm);
 			String versionName = (String) hm.get("cvname");
 			String groupLabel = (String) hm.get("group_label");
 			String sectionName = (String) hm.get("section_name");
-			int repeatMax = new Integer((Integer) hm.get("repeat_max")).intValue();
+			int repeatMax = (Integer) hm.get("repeat_max");
 			ifmb.setCrfVersionName(versionName);
 			ifmb.setGroupLabel(groupLabel);
 			ifmb.setSectionName(sectionName);
@@ -460,15 +421,14 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypesExpected();
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(sectionId));
+		variables.put(1, sectionId);
 
 		String sql = digester.getQuery("findAllBySectionId");
 
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(ifmb);
 		}
 
@@ -482,15 +442,14 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypesExpected();
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(crfVersionId));
-		variables.put(new Integer(2), new Integer(sectionId));
+		variables.put(1, crfVersionId);
+		variables.put(2, sectionId);
 
 		String sql = digester.getQuery("findAllByCRFVersionIdAndSectionId");
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
 
-		while (it.hasNext()) {
-			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(ifmb);
 		}
 
@@ -503,7 +462,7 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 
 		// TODO place holder to return here, tbh
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(id));
+		variables.put(1, id);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList alist = this.select(sql, variables);
@@ -522,53 +481,53 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 
 		int ind = 0;
 		int id = getNextPK();
-		variables.put(new Integer(ind), new Integer(id));
+		variables.put(ind, id);
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getItemId()));
+		variables.put(ind, ifmb.getItemId());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getCrfVersionId()));
+		variables.put(ind, ifmb.getCrfVersionId());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getHeader());
+		variables.put(ind, ifmb.getHeader());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getSubHeader());
+		variables.put(ind, ifmb.getSubHeader());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getParentId()));
+		variables.put(ind, ifmb.getParentId());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getParentLabel());
+		variables.put(ind, ifmb.getParentLabel());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getColumnNumber()));
+		variables.put(ind, ifmb.getColumnNumber());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getPageNumberLabel());
+		variables.put(ind, ifmb.getPageNumberLabel());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getQuestionNumberLabel());
+		variables.put(ind, ifmb.getQuestionNumberLabel());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getLeftItemText());
+		variables.put(ind, ifmb.getLeftItemText());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getRightItemText());
+		variables.put(ind, ifmb.getRightItemText());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getSectionId()));
+		variables.put(ind, ifmb.getSectionId());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getDescisionConditionId()));
+		variables.put(ind, ifmb.getDescisionConditionId());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getResponseSetId()));
+		variables.put(ind, ifmb.getResponseSetId());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getRegexp());
+		variables.put(ind, ifmb.getRegexp());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getRegexpErrorMsg());
+		variables.put(ind, ifmb.getRegexpErrorMsg());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getOrdinal()));
+		variables.put(ind, ifmb.getOrdinal());
 		ind++;
-		variables.put(new Integer(ind), new Boolean(ifmb.isRequired()));
+		variables.put(ind, ifmb.isRequired());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getDefaultValue());
+		variables.put(ind, ifmb.getDefaultValue());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getResponseLayout());
+		variables.put(ind, ifmb.getResponseLayout());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getWidthDecimal());
+		variables.put(ind, ifmb.getWidthDecimal());
 		ind++;
-		variables.put(new Integer(ind), new Boolean(ifmb.isShowItem()));
+		variables.put(ind, ifmb.isShowItem());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getCodeRef());
+		variables.put(ind, ifmb.getCodeRef());
 
 		execute("create", variables);
 
@@ -585,55 +544,55 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 
 		int ind = 0;
 
-		variables.put(new Integer(ind), new Integer(ifmb.getItemId()));
+		variables.put(ind, ifmb.getItemId());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getCrfVersionId()));
+		variables.put(ind, ifmb.getCrfVersionId());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getHeader());
+		variables.put(ind, ifmb.getHeader());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getSubHeader());
+		variables.put(ind, ifmb.getSubHeader());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getParentId()));
+		variables.put(ind, ifmb.getParentId());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getParentLabel());
+		variables.put(ind, ifmb.getParentLabel());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getColumnNumber()));
+		variables.put(ind, ifmb.getColumnNumber());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getPageNumberLabel());
+		variables.put(ind, ifmb.getPageNumberLabel());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getQuestionNumberLabel());
+		variables.put(ind, ifmb.getQuestionNumberLabel());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getLeftItemText());
+		variables.put(ind, ifmb.getLeftItemText());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getRightItemText());
+		variables.put(ind, ifmb.getRightItemText());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getSectionId()));
+		variables.put(ind, ifmb.getSectionId());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getDescisionConditionId()));
+		variables.put(ind, ifmb.getDescisionConditionId());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getResponseSetId()));
+		variables.put(ind, ifmb.getResponseSetId());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getRegexp());
+		variables.put(ind, ifmb.getRegexp());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getRegexpErrorMsg());
+		variables.put(ind, ifmb.getRegexpErrorMsg());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getOrdinal()));
+		variables.put(ind, ifmb.getOrdinal());
 		ind++;
-		variables.put(new Integer(ind), new Boolean(ifmb.isRequired()));
+		variables.put(ind, ifmb.isRequired());
 		ind++;
-		variables.put(new Integer(ind), new Integer(ifmb.getId()));
+		variables.put(ind, ifmb.getId());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getDefaultValue());
+		variables.put(ind, ifmb.getDefaultValue());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getResponseLayout());
+		variables.put(ind, ifmb.getResponseLayout());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getWidthDecimal());
+		variables.put(ind, ifmb.getWidthDecimal());
 		ind++;
-		variables.put(new Integer(ind), new Boolean(ifmb.isShowItem()));
+		variables.put(ind, ifmb.isShowItem());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getId());
+		variables.put(ind, ifmb.getId());
 		ind++;
-		variables.put(new Integer(ind), ifmb.getCodeRef());
+		variables.put(ind, ifmb.getCodeRef());
 
 		execute("update", variables);
 
@@ -670,8 +629,8 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 
 		logMe("Current Thread:::" + Thread.currentThread() + "types Expected?");
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(itemId));
-		variables.put(new Integer(2), new Integer(crfVersionId));
+		variables.put(1, itemId);
+		variables.put(2, crfVersionId);
 
 		String sql = digester.getQuery("findByItemIdAndCRFVersionId");
 
@@ -692,7 +651,7 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		String groupLabel = (String) hm.get("group_label");
 		String sectionName = (String) hm.get("section_name");
 		Integer repeatMax = (Integer) hm.get("repeat_max");
-		int repeatMaxInt = repeatMax != null ? repeatMax.intValue() : 0;
+		int repeatMaxInt = repeatMax != null ? repeatMax : 0;
 		ifmb.setCrfVersionName(versionName);
 		ifmb.setGroupLabel(groupLabel);
 		ifmb.setSectionName(sectionName);
@@ -704,8 +663,8 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypesExpected();
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(itemId));
-		variables.put(new Integer(2), new Integer(crfVersionId));
+		variables.put(1, itemId);
+		variables.put(2, crfVersionId);
 
 		EntityBean eb = this.executeFindByPKQuery("findByItemIdAndCRFVersionIdNotInIGM", variables);
 
@@ -734,10 +693,9 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypeExpected(ind, TypeNames.STRING);// name
 		ind++;
 		this.setTypeExpected(ind, TypeNames.STRING);// description
-		ind++;
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(id));
+		variables.put(1, id);
 
 		return (ResponseSetBean) this.executeFindByPKQuery("findResponseSetByPK", variables);
 	}
@@ -746,36 +704,22 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 	 * Find all ItemFormMetadataBean which is simple_conditional_display
 	 * 
 	 * @param sectionId
-	 * @return
+	 *            Integer
+	 * @return ArrayList<ItemFormMetadataBean>
 	 */
 	public ArrayList<ItemFormMetadataBean> findSCDItemsBySectionId(Integer sectionId) {
 		ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 		this.unsetTypeExpected();
 		this.setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), sectionId);
+		variables.put(1, sectionId);
 
 		String sql = digester.getQuery("findSCDItemsBySectionId");
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) anAlist);
 			answer.add(ifmb);
 		}
-		return answer;
-	}
-
-	public int findMaxId() {
-		int answer = 0;
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.INT);
-		String sql = "select max(ifm.item_form_metadata_id) as max_id from item_form_metadata ifm";
-		ArrayList rows = this.select(sql);
-		if (rows.size() > 0) {
-			HashMap row = (HashMap) rows.get(0);
-			answer = ((Integer) row.get("max_id")).intValue();
-		}
-
 		return answer;
 	}
 
@@ -783,11 +727,11 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 	 * need to use this method when you want the results to be cached. i.e they do not get updated.
 	 */
 	@Override
-	public ArrayList<V> select(String query, Map variables) {
+	public ArrayList select(String query, Map variables) {
 		clearSignals();
 
 		ArrayList results = new ArrayList();
-		K key;
+		Object key;
 		ResultSet rs = null;
 		Connection con = null;
 		PreparedStatementFactory psf = new PreparedStatementFactory(variables);
@@ -804,8 +748,8 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 			ps = con.prepareStatement(query);
 
 			ps = psf.generate(ps);// enter variables here!
-			key = (K) ps.toString();
-			if ((results = (V) cache.get(key)) == null) {
+			key = ps.toString();
+			if ((results = (ArrayList) cache.get(key)) == null) {
 				rs = ps.executeQuery();
 				results = this.processResultRows(rs);
 				if (results != null) {
@@ -864,7 +808,7 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.setTypeExpected(ind, TypeNames.INT);
 		ind++; // option_name 12
 		this.setTypeExpected(ind, TypeNames.STRING);
-		ind++; 
+		ind++;
 		this.setTypeExpected(ind, TypeNames.STRING);
 	}
 
@@ -873,10 +817,10 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), sectionId);
+		variables.put(1, sectionId);
 		ArrayList alist = this.select(digester.getQuery("instantTypeExistsInSection"), variables);
-		for (Iterator it = alist.iterator(); it.hasNext();) {
-			HashMap row = (HashMap) it.next();
+		for (Object anAlist : alist) {
+			HashMap row = (HashMap) anAlist;
 			id = (Integer) row.get("item_form_metadata_id");
 		}
 		return id != null && id > 0;
@@ -886,17 +830,16 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		Map<Integer, List<InstantOnChangePairContainer>> pairs = new HashMap<Integer, List<InstantOnChangePairContainer>>();
 		this.setInstantTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), crfVersionId);
-		variables.put(new Integer(2), crfVersionId);
-		variables.put(new Integer(3), crfVersionId);
-		variables.put(new Integer(4), crfVersionId);
-		variables.put(new Integer(5), crfVersionId);
+		variables.put(1, crfVersionId);
+		variables.put(2, crfVersionId);
+		variables.put(3, crfVersionId);
+		variables.put(4, crfVersionId);
+		variables.put(5, crfVersionId);
 		String sql = digester.getQuery("findInstantItemsByCrfVersionId");
 		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
+		for (Object anAlist : alist) {
 			InstantOnChangePairContainer instantItemPair = new InstantOnChangePairContainer();
-			HashMap row = (HashMap) it.next();
+			HashMap row = (HashMap) anAlist;
 			Integer sectionId = (Integer) row.get("o_sec_id");
 			instantItemPair.setOriginSectionId(sectionId);
 			instantItemPair.setOriginItemId((Integer) row.get("o_item_id"));
@@ -923,7 +866,7 @@ public class ItemFormMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 			instantItemPair.setDestItemFormMetadataId((Integer) row.get("d_ifm_id"));
 			instantItemPair.setOptionValue((String) row.get("option_name"));
 			if (pairs.containsKey(sectionId)) {
-				((ArrayList<InstantOnChangePairContainer>) pairs.get(sectionId)).add(instantItemPair);
+				pairs.get(sectionId).add(instantItemPair);
 			} else {
 				List<InstantOnChangePairContainer> ins = new ArrayList<InstantOnChangePairContainer>();
 				ins.add(instantItemPair);

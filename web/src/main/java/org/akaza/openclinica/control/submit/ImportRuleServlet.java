@@ -29,13 +29,9 @@ import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.view.Page;
@@ -75,12 +71,14 @@ public class ImportRuleServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+
 		UserAccountBean ub = getUserAccountBean(request);
 		// Reset the study if RS is saving a rule for a different study
-		if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty()) && getCurrentStudy(request).getId() != Integer.parseInt(request.getParameter("study"))) {
+		if ((request.getParameter("study") != null && !request.getParameter("study").isEmpty())
+				&& getCurrentStudy(request).getId() != Integer.parseInt(request.getParameter("study"))) {
 			originalScope = (StudyBean) request.getSession().getAttribute(STUDY);
-			request.getSession().setAttribute(STUDY, getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study"))));
+			request.getSession().setAttribute(STUDY,
+					getStudyDAO().findByPK(Integer.valueOf(request.getParameter("study"))));
 		}
 
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -104,9 +102,10 @@ public class ImportRuleServlet extends Controller {
 		}
 		if ("confirm".equalsIgnoreCase(action)) {
 			try {
-				
+
 				FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties("xml"));
-				File ruleFile = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn()).get(0);
+				File ruleFile = uploadHelper.returnFiles(request, getServletContext(), getDirToSaveUploadedFileIn())
+						.get(0);
 				InputStream xsdFile = getCoreResources().getInputStream("rules.xsd");
 				XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
 				schemaValidator.validateAgainstSchema(ruleFile, xsdFile);
@@ -115,31 +114,27 @@ public class ImportRuleServlet extends Controller {
 				// Editing a rule - remove existing rules
 				boolean isCopiedRule = Boolean.valueOf(request.getParameter("copy"));
 				if (request.getParameter("rs") != null && request.getParameter("rs").equals("true")
-						&& request.getParameter("edit") != null && "true".equalsIgnoreCase(request.getParameter("edit"))
-						&& !isCopiedRule) {
-					
-					RuleSetRuleBean ruleSetRule = getRuleSetRuleDao().findById(Integer.parseInt(request.getParameter("id")));
-					RuleBean rule = ruleSetRule.getRuleBean();
-					ExpressionBean expression = rule.getExpression();
+						&& request.getParameter("edit") != null
+						&& "true".equalsIgnoreCase(request.getParameter("edit")) && !isCopiedRule) {
+
+					RuleSetRuleBean ruleSetRule = getRuleSetRuleDao().findById(
+							Integer.parseInt(request.getParameter("id")));
 					RuleSetBean ruleSet = ruleSetRule.getRuleSetBean();
 					if (ruleSetRule != null) {
+						getRuleDao().getSessionFactory().getCurrentSession().clear();
 						Session session = getRuleDao().getSessionFactory().getCurrentSession();
 						Transaction transaction = session.beginTransaction();
-						for (RuleActionBean act : ruleSetRule.getActions()) {
-							session.delete(act);
-							session.delete(act.getRuleActionRun());
-						}
-						// Remove current rule and props
 						session.delete(ruleSetRule);
-						session.delete(ruleSet);
-						session.delete(rule);
-						session.delete(expression);
+						if (ruleSet.getRuleSetRuleSize() <= 1) {
+							session.delete(ruleSet);
+						}
 						transaction.commit();
 						session.flush();
 					}
 				}
 
-				RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(currentStudy, ub);
+				RulesPostImportContainerService rulesPostImportContainerService = getRulesPostImportContainerService(
+						currentStudy, ub);
 				importedRules = rulesPostImportContainerService.validateRuleDefs(importedRules);
 				importedRules = rulesPostImportContainerService.validateRuleSetDefs(importedRules);
 				provideMessage(importedRules, request);
@@ -158,7 +153,8 @@ public class ImportRuleServlet extends Controller {
 				}
 			} catch (OpenClinicaSystemException re) {
 				MessageFormat mf = new MessageFormat("");
-				mf.applyPattern(re.getErrorCode() == null ? respage.getString("OCRERR_0016") : respage.getString(re.getErrorCode()));
+				mf.applyPattern(re.getErrorCode() == null ? respage.getString("OCRERR_0016") : respage.getString(re
+						.getErrorCode()));
 				Object[] arguments = { re.getMessage() };
 				if (re.getErrorCode() != null) {
 					arguments = re.getErrorParams();

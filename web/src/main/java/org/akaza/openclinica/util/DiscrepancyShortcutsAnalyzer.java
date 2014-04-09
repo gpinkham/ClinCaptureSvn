@@ -237,7 +237,6 @@ public class DiscrepancyShortcutsAnalyzer {
 		return link;
 	}
 
-	@SuppressWarnings("rawtypes")
 	public static void prepareDnShortcutLinks(HttpServletRequest request, EventCRFBean eventCrfBean,
 			ItemFormMetadataDAO ifmdao, int eventDefinitionCRFId, List<SectionBean> sections,
 			List<DiscrepancyNoteThread> noteThreads) {

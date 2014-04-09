@@ -26,8 +26,8 @@ import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
+import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
 import org.hibernate.annotations.Cache;
@@ -37,22 +37,22 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Entity
 @Table(name = "rule_set_rule")
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({ "unchecked" })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_set_rule_id_seq") })
 public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
@@ -197,7 +197,7 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
 		this.ruleSetBean = ruleSetBean;
 	}
 
-	@ManyToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "rule_id", nullable = false)
 	public RuleBean getRuleBean() {
 		return ruleBean;

@@ -74,10 +74,14 @@ public class CRFDaoTest extends DefaultAppContextTest {
 	public void testGetAllCRFNamesFromStudyNotReturnNull() throws OpenClinicaException {
 		assertNotNull(crfdao.getAllCRFNamesFromStudy(1));
 	}
-	
+
 	@Test
 	public void testGetAllCRFNamesFromStudyReturnCorrectSize() throws OpenClinicaException {
 		assertEquals(2, crfdao.getAllCRFNamesFromStudy(1).size());
 	}
-	
+
+	@Test
+	public void testThatFindAllActiveCrfsReturnsCorrectSize() throws OpenClinicaException {
+		assertEquals(3, crfdao.findAllActiveCrfs().size());
+	}
 }

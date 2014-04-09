@@ -38,7 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @Controller
-@SuppressWarnings({ "unused", "rawtypes" })
+@SuppressWarnings({ "unused" })
 public class WidgetsLayoutController {
 
 	@Autowired

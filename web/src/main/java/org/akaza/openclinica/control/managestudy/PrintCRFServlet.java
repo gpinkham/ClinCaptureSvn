@@ -57,7 +57,7 @@ import org.springframework.stereotype.Component;
  * @author Krikor Krumlian 
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "serial"})
 @Component
 public class PrintCRFServlet extends DataEntryServlet {
 

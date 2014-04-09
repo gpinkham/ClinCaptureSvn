@@ -71,7 +71,7 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked" })
 public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
 
 	private StudyEventDefinitionDAO studyEventDefinitionDao;

@@ -10,21 +10,20 @@
 
 package org.akaza.openclinica.dao.rule;
 
-import java.util.List;
-
 import org.akaza.openclinica.DefaultAppContextTest;
+import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.junit.Test;
 
+import java.util.List;
+
 public class RuleSetRuleDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testFindById() {
-		RuleSetRuleBean ruleSetRuleBean = null;
-		ruleSetRuleBean = ruleSetRuleDao.findById(3);
-
+		RuleSetRuleBean ruleSetRuleBean = ruleSetRuleDao.findById(3);
 		// Test RuleSetRule
 		assertNotNull("RuleSet is null", ruleSetRuleBean);
 		assertEquals("The id of the retrieved RuleSet should be 1", new Integer(3), ruleSetRuleBean.getId());
@@ -33,10 +32,7 @@ public class RuleSetRuleDaoTest extends DefaultAppContextTest {
 
 	@Test
 	public void testFindByIdEmptyResultSet() {
-
-		RuleSetRuleBean ruleSetRuleBean = null;
-		ruleSetRuleBean = ruleSetRuleDao.findById(1);
-
+		RuleSetRuleBean ruleSetRuleBean = ruleSetRuleDao.findById(1);
 		// Test Rule
 		assertNull("RuleSet is null", ruleSetRuleBean);
 	}
@@ -50,5 +46,12 @@ public class RuleSetRuleDaoTest extends DefaultAppContextTest {
 
 		assertNotNull("RuleSetRules is null", ruleSetRules);
 		assertEquals("The size of RuleSetRules should be 1", new Integer(1), new Integer(ruleSetRules.size()));
+	}
+
+	@Test
+	public void testThatGetCountWithFilterReturnsCorrectSize() {
+		ViewRuleAssignmentFilter filter = new ViewRuleAssignmentFilter();
+		filter.addFilter("ignoreWrongRules", true);
+		assertEquals(0, ruleSetRuleDao.getCountWithFilter(filter));
 	}
 }

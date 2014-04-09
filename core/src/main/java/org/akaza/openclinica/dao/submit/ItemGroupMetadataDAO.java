@@ -21,16 +21,19 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
-import javax.sql.DataSource;
-
-@SuppressWarnings({"rawtypes","unchecked"})
-public class ItemGroupMetadataDAO<K, V extends ArrayList> extends EntityDAO {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public class ItemGroupMetadataDAO extends EntityDAO {
 	public ItemGroupMetadataDAO(DataSource ds) {
 		super(ds);
 		this.getNextPKName = "getNextPK";
@@ -75,8 +78,8 @@ public class ItemGroupMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		meta.setItemId((Integer) hm.get("item_id"));
 		meta.setOrdinal((Integer) hm.get("ordinal"));
 		meta.setBorders((Integer) hm.get("borders"));
-		meta.setShowGroup(((Boolean) hm.get("show_group")).booleanValue());
-		meta.setRepeatingGroup(((Boolean) hm.get("repeating_group")).booleanValue());
+		meta.setShowGroup((Boolean) hm.get("show_group"));
+		meta.setRepeatingGroup((Boolean) hm.get("repeating_group"));
 		return meta;
 	}
 
@@ -140,7 +143,7 @@ public class ItemGroupMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 		variables.put(11, igMetaBean.getItemId());
 		variables.put(12, igMetaBean.getOrdinal());
 		variables.put(13, igMetaBean.getBorders());
-		variables.put(14, new Boolean(igMetaBean.isShowGroup()));
+		variables.put(14, igMetaBean.isShowGroup());
 
 		this.execute(digester.getQuery("create"), variables);
 		if (isQuerySuccessful()) {
@@ -205,20 +208,21 @@ public class ItemGroupMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 	/**
 	 * 
 	 * @param crfVersionId
-	 * @return
+	 *            int
+	 * @return boolean
 	 */
 	public boolean versionIncluded(int crfVersionId) {
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(crfVersionId));
+		variables.put(1, crfVersionId);
 
 		ArrayList al = this.select(digester.getQuery("findThisCrfVersionId"), variables);
 
 		if (al.size() > 0) {
 			HashMap h = (HashMap) al.get(0);
-			if (((Integer) h.get("crf_version_id")).intValue() == crfVersionId) {
+			if ((Integer) h.get("crf_version_id") == crfVersionId) {
 				return true;
 			}
 		}
@@ -227,11 +231,11 @@ public class ItemGroupMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 	}
 
 	@Override
-	public ArrayList<V> select(String query, HashMap variables) {
+	public ArrayList select(String query, HashMap variables) {
 		clearSignals();
 
 		ArrayList results = new ArrayList();
-		K key;
+		Object key;
 		ResultSet rs = null;
 		Connection con = null;
 		PreparedStatementFactory psf = new PreparedStatementFactory(variables);
@@ -248,8 +252,8 @@ public class ItemGroupMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 			ps = con.prepareStatement(query);
 
 			ps = psf.generate(ps);// enter variables here!
-			key = (K) ps.toString();
-			if ((results = (V) cache.get(key)) == null) {
+			key = ps.toString();
+			if ((results = (ArrayList) cache.get(key)) == null) {
 				rs = ps.executeQuery();
 				results = this.processResultRows(rs);
 				if (results != null) {
@@ -334,17 +338,17 @@ public class ItemGroupMetadataDAO<K, V extends ArrayList> extends EntityDAO {
 	 * findByCrfVersion, added by clinovo for #121, 12/2012
 	 * 
 	 * @param crfVersionId
-	 * @return
+	 *            Integer
+	 * @return List<ItemGroupMetadataBean>
 	 */
 	public List<ItemGroupMetadataBean> findByCrfVersion(Integer crfVersionId) {
-		// ItemGroupMetadataBean eb = new ItemGroupMetadataBean();
 		this.setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
 		variables.put(1, crfVersionId);
 		String sql = digester.getQuery("findByCrfVersionId");
 		ArrayList alist = this.select(sql, variables);
 		List<ItemGroupMetadataBean> beanList = new ArrayList<ItemGroupMetadataBean>();
-		ItemGroupMetadataBean bean = new ItemGroupMetadataBean();
+		ItemGroupMetadataBean bean;
 		for (Object map : alist) {
 			bean = (ItemGroupMetadataBean) this.getEntityFromHashMap((HashMap) map);
 			beanList.add(bean);

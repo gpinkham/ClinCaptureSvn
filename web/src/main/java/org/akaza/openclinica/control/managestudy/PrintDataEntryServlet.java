@@ -69,7 +69,7 @@ import org.springframework.stereotype.Component;
  * @author Krikor Krumlian 10/26/2006
  * 
  */
-@SuppressWarnings({"rawtypes", "unchecked", "serial"})
+@SuppressWarnings({"rawtypes", "serial"})
 @Component
 public class PrintDataEntryServlet extends DataEntryServlet {
 

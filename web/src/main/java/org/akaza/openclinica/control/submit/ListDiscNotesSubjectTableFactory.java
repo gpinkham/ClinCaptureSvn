@@ -65,7 +65,7 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
 	private StudyEventDefinitionDAO studyEventDefinitionDao;

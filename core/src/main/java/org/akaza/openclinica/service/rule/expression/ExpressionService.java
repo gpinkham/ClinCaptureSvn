@@ -61,7 +61,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ExpressionService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

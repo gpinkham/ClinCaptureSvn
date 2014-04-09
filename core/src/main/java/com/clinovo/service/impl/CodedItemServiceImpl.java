@@ -34,7 +34,6 @@ import com.clinovo.service.CodedItemService;
 
 @Service
 @Transactional
-@SuppressWarnings("rawtypes")
 public class CodedItemServiceImpl implements CodedItemService {
 
 	private ItemDataDAO itemDataDAO;

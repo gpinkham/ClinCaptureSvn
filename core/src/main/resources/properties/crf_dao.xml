@@ -44,6 +44,10 @@
 		<name>findAllByStatus</name>
 		<sql>SELECT * FROM CRF where status_id=?</sql>
 	</query>
+    <query>
+        <name>findAllActiveCrfs</name>
+        <sql>SELECT c.* FROM crf_version cv join crf c on c.crf_id = cv.crf_id where c.status_id = 1 and cv.status_id = 1 order by c.name</sql>
+    </query>
 	<query>
 		<name>findAllByLimit</name>
 		<sql>SELECT * FROM CRF limit 5</sql>

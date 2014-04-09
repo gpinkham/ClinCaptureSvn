@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked" })
 public class CalendarLogic {
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

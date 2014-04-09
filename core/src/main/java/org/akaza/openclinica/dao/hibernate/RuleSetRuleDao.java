@@ -13,8 +13,6 @@
 
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.ArrayList;
-
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RuleBean;
@@ -29,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 
 @Repository
 @Transactional
@@ -57,6 +57,7 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 	 * from Quartz threads.
 	 * 
 	 * @param studyId
+	 *            Integer
 	 * @return List of RuleSetRuleBeans
 	 */
 	@SuppressWarnings("unchecked")
@@ -102,8 +103,8 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 		String query = "select COUNT(DISTINCT(rsr.id)) from rule_set_rule rsr "
 				+ " join rule_set rs on rs.id = rsr.rule_set_id "
 				+ " left outer join study_event_definition sed on rs.study_event_definition_id = sed.study_event_definition_id "
-				+ " left outer join crf_version cv on rs.crf_version_id = cv.crf_version_id "
-				+ " left outer join crf c on rs.crf_id = c.crf_id "
+				+ " left outer join crf_version cv on rs.crf_version_id = cv.crf_version_id and cv.status_id = 1 "
+				+ " left outer join (SELECT c2.* FROM crf_version cv2 join crf c2 on c2.crf_id = cv2.crf_id where cv2.status_id = 1) c on rs.crf_id = c.crf_id and c.status_id = 1 "
 				+ " left outer join item i on rs.item_id = i.item_id "
 				+ " left outer join item_group ig on rs.item_group_id = ig.item_group_id "
 				+ " join rule_expression re on rs.rule_expression_id = re.id " + " join rule r on r.id = rsr.rule_id "
@@ -128,8 +129,8 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 		String query = select
 				+ " join rule_set rs on rs.id = rsr.rule_set_id "
 				+ " left outer join study_event_definition sed on rs.study_event_definition_id = sed.study_event_definition_id "
-				+ " left outer join crf_version cv on rs.crf_version_id = cv.crf_version_id "
-				+ " left outer join crf c on rs.crf_id = c.crf_id "
+				+ " left outer join crf_version cv on rs.crf_version_id = cv.crf_version_id and cv.status_id = 1 "
+				+ " left outer join (SELECT c2.* FROM crf_version cv2 join crf c2 on c2.crf_id = cv2.crf_id where cv2.status_id = 1) c on rs.crf_id = c.crf_id and c.status_id = 1 "
 				+ " left outer join item i on rs.item_id = i.item_id "
 				+ " left outer join item_group ig on rs.item_group_id = ig.item_group_id "
 				+ " join rule_expression re on rs.rule_expression_id = re.id " + " join rule r on r.id = rsr.rule_id "

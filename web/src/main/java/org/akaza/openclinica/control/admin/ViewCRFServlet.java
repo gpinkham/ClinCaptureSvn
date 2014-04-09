@@ -20,13 +20,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -48,17 +41,24 @@ import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
+
 /**
  * @author jxu
  * 
  *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
  *         Code Templates
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings({ "unchecked", "serial" })
 public class ViewCRFServlet extends SecureController {
 
-	private static String CRF = "crf";
-	private static String CRF_ID = "crfId";
+	private static final String CRF = "crf";
+	private static final String CRF_ID = "crfId";
 	private RuleSetServiceInterface ruleSetService;
 
 	@Override
@@ -93,7 +93,7 @@ public class ViewCRFServlet extends SecureController {
 		FormProcessor fp = new FormProcessor(request);
 
 		int crfId = fp.getInt(CRF_ID);
-		List<StudyBean> studyBeans = null;
+		List<StudyBean> studyBeans;
 		if (crfId == 0) {
 			addPageMessage(respage.getString("please_choose_a_CRF_to_view"));
 			forwardPage(Page.CRF_LIST);
@@ -199,7 +199,7 @@ public class ViewCRFServlet extends SecureController {
 	private Collection<StudyRowContainer> getStudyRows(List<StudyBean> studyBeans) {
 
 		Collection<StudyRowContainer> allRows = new ArrayList<StudyRowContainer>();
-		StudyRowContainer tempBean = null;
+		StudyRowContainer tempBean;
 		StringBuilder actions = new StringBuilder("");
 		for (StudyBean studBean : studyBeans) {
 			tempBean = new StudyRowContainer();
@@ -227,7 +227,7 @@ public class ViewCRFServlet extends SecureController {
 		}
 
 		ArrayList<Integer> studyIds = studyDao.getStudyIdsByCRF(crfId);
-		StudyBean tempBean = new StudyBean();
+		StudyBean tempBean;
 
 		for (Integer id : studyIds) {
 			tempBean = (StudyBean) studyDao.findByPK(id);

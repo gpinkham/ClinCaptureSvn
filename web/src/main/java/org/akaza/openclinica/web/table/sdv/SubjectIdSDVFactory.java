@@ -72,7 +72,7 @@ import org.springframework.stereotype.Component;
  * A Jmesa table that represents study subjects in each row.
  */
 @Component
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "unchecked" })
 public class SubjectIdSDVFactory extends AbstractTableFactory {
 
 	private DataSource dataSource;

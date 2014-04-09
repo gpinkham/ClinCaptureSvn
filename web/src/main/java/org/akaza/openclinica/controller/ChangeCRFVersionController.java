@@ -71,7 +71,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
  * multiaction Controller.
  */
 @Controller("changeCRFVersionController")
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked" })
 public class ChangeCRFVersionController {
 	@Autowired
 	@Qualifier("dataSource")

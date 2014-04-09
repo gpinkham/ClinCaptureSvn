@@ -18,7 +18,6 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 
 import javax.sql.DataSource;
 
-@SuppressWarnings({ "rawtypes" })
 public class DAOWrapper {
 
 	private StudyDAO sdao;

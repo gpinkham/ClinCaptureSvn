@@ -50,7 +50,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-@SuppressWarnings("rawtypes")
 public class RuleRunner {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

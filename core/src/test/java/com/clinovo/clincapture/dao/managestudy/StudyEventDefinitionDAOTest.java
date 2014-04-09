@@ -23,10 +23,10 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
 
+@SuppressWarnings("unchecked")
 public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testFindAllActiveNotClassGroupedByStudyId() throws OpenClinicaException {
 		int studyId = 1;
 		ArrayList<StudyEventDefinitionBean> result = studyEventDefinitionDAO
@@ -34,8 +34,7 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 		assertEquals(3, result.size());
 	}
 
-	@Test
-	@SuppressWarnings("unchecked")
+	@Test	
 	public void testFindAllActiveBySubjectAndStudyId() throws OpenClinicaException {
 		int studyId = 1;
 		StudySubjectBean ssb = new StudySubjectBean();
@@ -46,7 +45,6 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testFindAllActiveBySubjectFromActiveDynGroupAndStudyId_1() throws OpenClinicaException {
 		int studyId = 1;
 		StudySubjectBean ssb = new StudySubjectBean();
@@ -57,7 +55,6 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testFindAllActiveBySubjectFromActiveDynGroupAndStudyId_2() throws OpenClinicaException {
 		int studyId = 1;
 		StudySubjectBean ssb = new StudySubjectBean();
@@ -68,7 +65,6 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testGetEventNamesFromStudyNotReturnNull() throws OpenClinicaException {
 		int studyId = 1;
 		List<String> result = studyEventDefinitionDAO.getEventNamesFromStudy(studyId);
@@ -76,7 +72,6 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testGetEventNamesFromStudyCorrectSize() throws OpenClinicaException {
 		int studyId = 1;
 		List<String> result = studyEventDefinitionDAO.getEventNamesFromStudy(studyId);
@@ -84,7 +79,6 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testFindAllAvailableByStudy_excludingEventDefinitionsRemoved() throws OpenClinicaException {
 		final int studyId = 1;
 		final int expactedSize = 6;
@@ -95,7 +89,6 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	}
 		
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testFindAllAvailableAndOrderedByStudyGroupClassId_excludingEventDefinitionsRemoved_Test1() throws OpenClinicaException {
 		final int studyGroupClassId = 1;
 		final int expactedSize = 2;
@@ -105,7 +98,6 @@ public class StudyEventDefinitionDAOTest extends DefaultAppContextTest {
 	}	
 		
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testFindAllAvailableAndOrderedByStudyGroupClassId_excludingEventDefinitionsRemoved_Test2() throws OpenClinicaException {
 		final int studyGroupClassId = 2;
 		final int expactedSize = 3;

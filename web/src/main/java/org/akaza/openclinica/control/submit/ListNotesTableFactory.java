@@ -13,21 +13,7 @@
 
 package org.akaza.openclinica.control.submit;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
+import com.clinovo.web.table.filter.UserAccountNameDroplistFilterEditor;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -87,7 +73,18 @@ import org.jmesa.view.html.editor.HtmlFilterEditor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.clinovo.web.table.filter.UserAccountNameDroplistFilterEditor;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 @SuppressWarnings({ "unchecked", "unused" })
 public class ListNotesTableFactory extends AbstractTableFactory {
@@ -106,13 +103,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	private DiscrepancyNoteDAO discrepancyNoteDao;
 	private StudyDAO studyDao;
 	private SubjectDAO subjectDao;
-	private CRFVersionDAO<?, ?> crfVersionDao;
-	private CRFDAO<?, ?> crfDao;
+	private CRFVersionDAO crfVersionDao;
+	private CRFDAO crfDao;
 	private StudyEventDAO studyEventDao;
-	private StudyEventDefinitionDAO<?, ?> studyEventDefinitionDao;
+	private StudyEventDefinitionDAO studyEventDefinitionDao;
 	private EventDefinitionCRFDAO eventDefinitionCRFDao;
 	private ItemDataDAO itemDataDao;
-	private ItemDAO<?, ?> itemDao;
+	private ItemDAO itemDao;
 	private EventCRFDAO eventCRFDao;
 	private StudyBean currentStudy;
 	private ResourceBundle resword;
@@ -177,7 +174,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"),
 				new AssignedUserCellEditor(), new UserAccountNameDroplistFilterEditor(dataSource), true, false);
 		configureColumn(row.getColumn(DISCREPANCY_NOTE_BEAN_RESOLUTION_STATUS), resword.getString("resolution_status"),
-				new ResolutionStatusCellEditor(), new ResolutionStatusDroplistFilterEditor(getExclusions()), true, false);
+				new ResolutionStatusCellEditor(), new ResolutionStatusDroplistFilterEditor(getExclusions()), true,
+				false);
 		configureColumn(row.getColumn(DISCREPANCY_NOTE_BEAN_DIS_TYPE), resword.getString("type"),
 				new DiscrepancyNoteTypeCellEditor(), new TypeDroplistFilterEditor(), true, false);
 		configureColumn(row.getColumn("discrepancyNoteBean.entityType"), resword.getString("entity_type"), null, null,
@@ -192,7 +190,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	private List<String> getExclusions() {
 		List<String> result = new ArrayList<String>();
-		if (getDiscrepancyNoteDao().countViewNotesByStatusId(getCurrentStudy().getId(), ResolutionStatus.RESOLVED.getId()) == 0){
+		if (getDiscrepancyNoteDao().countViewNotesByStatusId(getCurrentStudy().getId(),
+				ResolutionStatus.RESOLVED.getId()) == 0) {
 			result.add(ResolutionStatus.RESOLVED.getName());
 		}
 		return result;
@@ -343,7 +342,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		// site
 		if (getCurrentStudy().isSite(getCurrentStudy().getParentStudyId())) {
 
-			return loggedInUser.getRoleByStudy(getCurrentStudy().getParentStudyId()).getName().equalsIgnoreCase("study coder");
+			return loggedInUser.getRoleByStudy(getCurrentStudy().getParentStudyId()).getName()
+					.equalsIgnoreCase("study coder");
 		}
 
 		// Otherwise, study
@@ -430,8 +430,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					StudyEventBean se = (StudyEventBean) sed.findByPK(dnb.getEntityId());
 
 					EventCRFBean ecb = (EventCRFBean) aeb;
-					CRFVersionDAO<?, ?> cvdao = getCrfVersionDao();
-					CRFDAO<?, ?> cdao = getCrfDao();
+					CRFVersionDAO cvdao = getCrfVersionDao();
+					CRFDAO cdao = getCrfDao();
 					CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
 					CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
 
@@ -470,7 +470,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 					StudyEventDAO sed = getStudyEventDao();
 					StudyEventBean se = (StudyEventBean) sed.findByPK(dnb.getEntityId());
-					StudyEventDefinitionDAO<?, ?> seddao = getStudyEventDefinitionDao();
+					StudyEventDefinitionDAO seddao = getStudyEventDefinitionDao();
 					StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se
 							.getStudyEventDefinitionId());
 					se.setName(sedb.getName());
@@ -498,7 +498,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					}
 				} else if (entityType.equalsIgnoreCase("itemData")) {
 					ItemDataDAO iddao = getItemDataDao();
-					ItemDAO<?, ?> idao = getItemDao();
+					ItemDAO idao = getItemDao();
 
 					ItemDataBean idb = (ItemDataBean) iddao.findByPK(dnb.getEntityId());
 					ItemBean ib = (ItemBean) idao.findByPK(idb.getItemId());
@@ -506,8 +506,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					EventCRFDAO ecdao = getEventCRFDao();
 					EventCRFBean ec = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
 
-					CRFVersionDAO<?, ?> cvdao = getCrfVersionDao();
-					CRFDAO<?, ?> cdao = getCrfDao();
+					CRFVersionDAO cvdao = getCrfVersionDao();
+					CRFDAO cdao = getCrfDao();
 					CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ec.getCRFVersionId());
 					CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
 
@@ -519,7 +519,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					StudyEventDAO sed = getStudyEventDao();
 					StudyEventBean se = (StudyEventBean) sed.findByPK(ec.getStudyEventId());
 
-					StudyEventDefinitionDAO<?, ?> seddao = getStudyEventDefinitionDao();
+					StudyEventDefinitionDAO seddao = getStudyEventDefinitionDao();
 					StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se
 							.getStudyEventDefinitionId());
 
@@ -677,15 +677,16 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	}
 
 	private class ResolutionStatusDroplistFilterEditor extends DroplistFilterEditor {
-		private List<String> exceptions; 
-		public ResolutionStatusDroplistFilterEditor(List<String> exceptions){
+		private List<String> exceptions;
+
+		public ResolutionStatusDroplistFilterEditor(List<String> exceptions) {
 			this.exceptions = exceptions;
 		}
-		
-		public ResolutionStatusDroplistFilterEditor(){
+
+		public ResolutionStatusDroplistFilterEditor() {
 			this.exceptions = new ArrayList<String>();
 		}
-		
+
 		@Override
 		protected List<Option> getOptions() {
 			List<Option> options = new ArrayList<Option>();
@@ -785,16 +786,16 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	private class AssignedUserCellEditor implements CellEditor {
 		public Object getValue(Object item, String property, int rowcount) {
-			String value = "";
+			String value;
 			ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
 			UserAccountBean user = (UserAccountBean) ((HashMap<Object, Object>) item).get("discrepancyNoteBean.user");
-			
+
 			if (user != null && !user.getName().trim().equals("")) {
 				value = user.getFirstName() + " " + user.getLastName() + " (" + user.getName() + ")";
 			} else {
 				value = reterm.getString("not_assigned");
 			}
-			
+
 			return value;
 		}
 	}
@@ -962,19 +963,19 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		this.discrepancyNoteDao = discrepancyNoteDao;
 	}
 
-	public CRFVersionDAO<?, ?> getCrfVersionDao() {
+	public CRFVersionDAO getCrfVersionDao() {
 		return crfVersionDao;
 	}
 
-	public void setCrfVersionDao(CRFVersionDAO<?, ?> crfVersionDao) {
+	public void setCrfVersionDao(CRFVersionDAO crfVersionDao) {
 		this.crfVersionDao = crfVersionDao;
 	}
 
-	public CRFDAO<?, ?> getCrfDao() {
+	public CRFDAO getCrfDao() {
 		return crfDao;
 	}
 
-	public void setCrfDao(CRFDAO<?, ?> crfDao) {
+	public void setCrfDao(CRFDAO crfDao) {
 		this.crfDao = crfDao;
 	}
 
@@ -1002,11 +1003,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		this.itemDataDao = itemDataDao;
 	}
 
-	public ItemDAO<?, ?> getItemDao() {
+	public ItemDAO getItemDao() {
 		return itemDao;
 	}
 
-	public void setItemDao(ItemDAO<?, ?> itemDao) {
+	public void setItemDao(ItemDAO itemDao) {
 		this.itemDao = itemDao;
 	}
 
@@ -1018,11 +1019,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 		this.eventCRFDao = eventCRFDao;
 	}
 
-	public StudyEventDefinitionDAO<?, ?> getStudyEventDefinitionDao() {
+	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
 		return studyEventDefinitionDao;
 	}
 
-	public void setStudyEventDefinitionDao(StudyEventDefinitionDAO<?, ?> studyEventDefinitionDao) {
+	public void setStudyEventDefinitionDao(StudyEventDefinitionDAO studyEventDefinitionDao) {
 		this.studyEventDefinitionDao = studyEventDefinitionDao;
 	}
 
@@ -1080,9 +1081,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 		this.dataSource = dataSource;
 	}
-	
+
 	/**
-	 * Filters the notes and discrepancies statics and returns only those issues by a user with the coder role. 
+	 * Filters the notes and discrepancies statics and returns only those issues by a user with the coder role.
 	 * <p>
 	 * It is assumed that the logged in user is the coder user.
 	 * 
@@ -1096,13 +1097,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 		List<DiscrepancyNoteBean> coderNotes = extractCoderNotes(discrepancyNotes);
 		Map<String, Integer> noteTypes = extractFilteredNoteTypes(coderNotes);
-		
+
 		for (DiscrepancyNoteBean discrepancyNote : coderNotes) {
 
 			DiscrepancyNoteStatisticBean stat = createDiscrepancyStatistic(discrepancyNote, noteTypes);
-			
+
 			if (!added(stat, dnStatics)) {
-				
+
 				dnStatics.add(stat);
 			}
 		}
@@ -1111,35 +1112,35 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	}
 
 	private Boolean added(DiscrepancyNoteStatisticBean stat, List<DiscrepancyNoteStatisticBean> notes) {
-		
+
 		for (DiscrepancyNoteStatisticBean st : notes) {
-			
+
 			if (st.getDiscrepancyNoteTypeId() == stat.getDiscrepancyNoteTypeId()
 					&& st.getResolutionStatusId() == stat.getResolutionStatusId()) {
-				
+
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
 	private Map<String, Integer> extractFilteredNoteTypes(List<DiscrepancyNoteBean> notes) {
-		
+
 		Map<String, Integer> noteTypes = new HashMap<String, Integer>();
 		for (DiscrepancyNoteBean note : notes) {
-			
+
 			if (noteTypes.containsKey(note.getResStatus().getName())) {
-				
+
 				int currentValue = noteTypes.get(note.getResStatus().getName());
 				noteTypes.put(note.getResStatus().getName(), currentValue + 1);
-				
+
 			} else {
-				
+
 				noteTypes.put(note.getResStatus().getName(), 1);
 			}
 		}
-		
+
 		return noteTypes;
 	}
 

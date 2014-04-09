@@ -20,17 +20,6 @@
  */
 package org.akaza.openclinica.dao.submit;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.sql.Connection;
-import java.text.SimpleDateFormat;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
@@ -40,12 +29,22 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * <P>
@@ -56,12 +55,11 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
  * 
  * 
  */
-@SuppressWarnings({"rawtypes","unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ItemDataDAO extends AuditableEntityDAO {
 
 	public Collection findMinMaxDates() {
-		ArrayList al = new ArrayList();
-		return al;
+		return new ArrayList();
 	}
 
 	private void setQueryNames() {
@@ -76,7 +74,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 			this.locale = ResourceBundleProvider.getLocale(); // locale still might be null.
 		}
 	}
-	
+
 	public ItemDataDAO(DataSource ds, Connection con) {
 		super(ds, con);
 		setQueryNames();
@@ -129,12 +127,11 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(10, TypeNames.INT);// ordinal
 		this.setTypeExpected(11, TypeNames.INT);// ordinal
 	}
-	
+
 	public EntityBean update(EntityBean eb) {
-		Connection con = null;
-		return update(eb, con);
+		return update(eb, null);
 	}
-	
+
 	public EntityBean update(EntityBean eb, Connection con) {
 		ItemDataBean idb = (ItemDataBean) eb;
 
@@ -142,8 +139,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		// inserting into database
 		ItemDataType dataType = getDataType(idb.getItemId());
 		if (dataType.equals(ItemDataType.DATE)) {
-			idb.setValue(Utils.convertedItemDateValue(idb.getValue(),
-					local_df_string, oc_df_string, locale));
+			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
 		} else if (dataType.equals(ItemDataType.PDATE)) {
 			idb.setValue(formatPDate(idb.getValue()));
 		}
@@ -151,14 +147,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		idb.setActive(false);
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(new Integer(1), new Integer(idb.getEventCRFId()));
-		variables.put(new Integer(2), new Integer(idb.getItemId()));
-		variables.put(new Integer(3), new Integer(idb.getStatus().getId()));
-		variables.put(new Integer(4), idb.getValue());
-		variables.put(new Integer(5), new Integer(idb.getUpdaterId()));
-		variables.put(new Integer(6), new Integer(idb.getOrdinal()));
-		variables.put(new Integer(7), new Integer(idb.getOldStatus().getId()));
-		variables.put(new Integer(8), new Integer(idb.getId()));
+		variables.put(1, idb.getEventCRFId());
+		variables.put(2, idb.getItemId());
+		variables.put(3, idb.getStatus().getId());
+		variables.put(4, idb.getValue());
+		variables.put(5, idb.getUpdaterId());
+		variables.put(6, idb.getOrdinal());
+		variables.put(7, idb.getOldStatus().getId());
+		variables.put(8, idb.getId());
 		this.execute(digester.getQuery("update"), variables, con);
 		if (isQuerySuccessful()) {
 			idb.setActive(true);
@@ -166,13 +162,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 		return idb;
 	}
-	
 
 	/**
 	 * This will update item data value
 	 * 
-	 * @param eb
-	 * @return
 	 */
 	public EntityBean updateValue(EntityBean eb) {
 		ItemDataBean idb = (ItemDataBean) eb;
@@ -189,10 +182,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		idb.setActive(false);
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(new Integer(1), new Integer(idb.getStatus().getId()));
-		variables.put(new Integer(2), idb.getValue());
-		variables.put(new Integer(3), new Integer(idb.getUpdaterId()));
-		variables.put(new Integer(4), new Integer(idb.getId()));
+		variables.put(1, idb.getStatus().getId());
+		variables.put(2, idb.getValue());
+		variables.put(3, idb.getUpdaterId());
+		variables.put(4, idb.getId());
 		this.execute(digester.getQuery("updateValue"), variables);
 
 		if (isQuerySuccessful()) {
@@ -217,10 +210,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		idb.setActive(false);
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(new Integer(1), new Integer(idb.getStatus().getId()));
-		variables.put(new Integer(2), idb.getValue());
-		variables.put(new Integer(3), new Integer(idb.getUpdaterId()));
-		variables.put(new Integer(4), new Integer(idb.getId()));
+		variables.put(1, idb.getStatus().getId());
+		variables.put(2, idb.getValue());
+		variables.put(3, idb.getUpdaterId());
+		variables.put(4, idb.getId());
 		this.execute(digester.getQuery("updateValueForRemoved"), variables);
 
 		if (isQuerySuccessful()) {
@@ -237,8 +230,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		ItemDataBean idb = (ItemDataBean) eb;
 		idb.setActive(false);
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(new Integer(1), new Integer(idb.getStatus().getId()));
-		variables.put(new Integer(2), new Integer(idb.getId()));
+		variables.put(1, idb.getStatus().getId());
+		variables.put(2, idb.getId());
 		this.execute(digester.getQuery("updateStatus"), variables);
 
 		if (isQuerySuccessful()) {
@@ -251,13 +244,11 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	/**
 	 * This will update item data value
 	 * 
-	 * @param eb
-	 * @return
 	 */
 	public EntityBean updateValue(EntityBean eb, String current_df_string) {
 		return updateValue(eb, current_df_string, null);
 	}
-	
+
 	public EntityBean updateValue(EntityBean eb, String current_df_string, Connection con) {
 		ItemDataBean idb = (ItemDataBean) eb;
 
@@ -268,10 +259,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		idb.setActive(false);
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(new Integer(1), new Integer(idb.getStatus().getId()));
-		variables.put(new Integer(2), idb.getValue());
-		variables.put(new Integer(3), new Integer(idb.getUpdaterId()));
-		variables.put(new Integer(4), new Integer(idb.getId()));
+		variables.put(1, idb.getStatus().getId());
+		variables.put(2, idb.getValue());
+		variables.put(3, idb.getUpdaterId());
+		variables.put(4, idb.getId());
 		this.execute(digester.getQuery("updateValue"), variables, con);
 
 		if (isQuerySuccessful()) {
@@ -287,8 +278,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		idb.setActive(false);
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(new Integer(1), new Integer(idb.getUpdaterId()));
-		variables.put(new Integer(2), new Integer(idb.getId()));
+		variables.put(1, idb.getUpdaterId());
+		variables.put(2, idb.getId());
 		this.execute(digester.getQuery("updateUser"), variables);
 
 		if (isQuerySuccessful()) {
@@ -297,10 +288,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 		return idb;
 	}
-	
+
 	public EntityBean create(EntityBean eb) {
-		Connection con = null;
-		return create(eb, con);
+		return create(eb, null);
 	}
 
 	public EntityBean create(EntityBean eb, Connection con) {
@@ -309,22 +299,21 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		// inserting into database
 		ItemDataType dataType = getDataType(idb.getItemId());
 		if (dataType.equals(ItemDataType.DATE)) {
-			idb.setValue(Utils.convertedItemDateValue(idb.getValue(),
-					local_df_string, oc_df_string, locale));
+			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
 		} else if (dataType.equals(ItemDataType.PDATE)) {
 			idb.setValue(formatPDate(idb.getValue()));
 		}
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 		int id = getNextPK();
-		variables.put(new Integer(1), new Integer(id));
-		variables.put(new Integer(2), new Integer(idb.getEventCRFId()));
-		variables.put(new Integer(3), new Integer(idb.getItemId()));
-		variables.put(new Integer(4), new Integer(idb.getStatus().getId()));
-		variables.put(new Integer(5), idb.getValue());
-		variables.put(new Integer(6), new Integer(idb.getOwnerId()));
-		variables.put(new Integer(7), new Integer(idb.getOrdinal()));
-		variables.put(new Integer(8), new Integer(idb.getStatus().getId()));
+		variables.put(1, id);
+		variables.put(2, idb.getEventCRFId());
+		variables.put(3, idb.getItemId());
+		variables.put(4, idb.getStatus().getId());
+		variables.put(5, idb.getValue());
+		variables.put(6, idb.getOwnerId());
+		variables.put(7, idb.getOrdinal());
+		variables.put(8, idb.getStatus().getId());
 		this.execute(digester.getQuery("create"), variables, con);
 		if (isQuerySuccessful()) {
 			idb.setId(id);
@@ -332,7 +321,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 		return idb;
 	}
-	
+
 	public EntityBean upsert(EntityBean eb) {
 		ItemDataBean idb = (ItemDataBean) eb;
 		// Convert to oc_date_format_string pattern before
@@ -346,14 +335,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 		int id = getNextPK();
-		variables.put(new Integer(1), new Integer(id));
-		variables.put(new Integer(2), new Integer(idb.getEventCRFId()));
-		variables.put(new Integer(3), new Integer(idb.getItemId()));
-		variables.put(new Integer(4), new Integer(idb.getStatus().getId()));
-		variables.put(new Integer(5), idb.getValue());
-		variables.put(new Integer(6), new Integer(idb.getOwnerId()));
-		variables.put(new Integer(7), new Integer(idb.getOrdinal()));
-		variables.put(new Integer(8), new Integer(idb.getUpdaterId()));
+		variables.put(1, id);
+		variables.put(2, idb.getEventCRFId());
+		variables.put(3, idb.getItemId());
+		variables.put(4, idb.getStatus().getId());
+		variables.put(5, idb.getValue());
+		variables.put(6, idb.getOwnerId());
+		variables.put(7, idb.getOrdinal());
+		variables.put(8, idb.getUpdaterId());
 		this.execute(digester.getQuery("upsert"), variables);
 
 		if (isQuerySuccessful()) {
@@ -374,12 +363,12 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 	public String formatPDate(String pDate) {
 		String temp = "";
-        String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-                "date_format_year_month"));
-        String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-                "date_format_year"));
-        String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-                "date_format_string"));
+		String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+				"date_format_year_month"));
+		String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+				"date_format_year"));
+		String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+				"date_format_string"));
 		try {
 			if (StringUtil.isFormatDate(pDate, "yyyy-MM-dd") || StringUtil.isFormatDate(pDate, "yyyy-MM")
 					|| StringUtil.isFormatDate(pDate, "yyyy")) {
@@ -400,13 +389,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 	public String reFormatPDate(String pDate) {
 		String temp = "";
-        String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-                "date_format_year_month"));
-        String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-                "date_format_year"));
-        String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
-                "date_format_string"));
-        try {
+		String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+				"date_format_year_month"));
+		String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+				"date_format_year"));
+		String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString(
+				"date_format_string"));
+		try {
 			if (StringUtil.isFormatDate(pDate, dateFormat, locale)
 					|| StringUtil.isFormatDate(pDate, yearMonthFormat, locale)
 					|| StringUtil.isFormatDate(pDate, yearFormat, locale)) {
@@ -419,18 +408,18 @@ public class ItemDataDAO extends AuditableEntityDAO {
 				temp = new SimpleDateFormat(yearMonthFormat, locale).format(new SimpleDateFormat("yyyy-MM")
 						.parse(pDate));
 			}
-        } catch (Exception ex) {
-            logger.warn("Partial Date Parsing Exception........");
-        }
+		} catch (Exception ex) {
+			logger.warn("Partial Date Parsing Exception........");
+		}
 		return temp;
 	}
 
 	public Object getEntityFromHashMap(HashMap hm) {
 		ItemDataBean eb = new ItemDataBean();
 		this.setEntityAuditInformation(eb, hm);
-		eb.setId(((Integer) hm.get("item_data_id")).intValue());
-		eb.setEventCRFId(((Integer) hm.get("event_crf_id")).intValue());
-		eb.setItemId(((Integer) hm.get("item_id")).intValue());
+		eb.setId((Integer) hm.get("item_data_id"));
+		eb.setEventCRFId((Integer) hm.get("event_crf_id"));
+		eb.setItemId((Integer) hm.get("item_id"));
 		eb.setValue((String) hm.get("value"));
 		// Since "getEntityFromHashMap" only be used for find
 		// right now,
@@ -442,9 +431,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		} else if (dataType.equals(ItemDataType.PDATE)) {
 			eb.setValue(reFormatPDate(eb.getValue()));
 		}
-		eb.setStatus(Status.get(((Integer) hm.get("status_id")).intValue()));
-		eb.setOrdinal(((Integer) hm.get("ordinal")).intValue());
-		eb.setOldStatus(Status.get(hm.get("old_status_id") == null ? 1 : ((Integer) hm.get("old_status_id")).intValue()));
+		eb.setStatus(Status.get((Integer) hm.get("status_id")));
+		eb.setOrdinal((Integer) hm.get("ordinal"));
+		eb.setOldStatus(Status.get(hm.get("old_status_id") == null ? 1 : (Integer) hm.get("old_status_id")));
 		return eb;
 	}
 
@@ -452,14 +441,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		setTypesExpected();
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), studyEventId);
-		variables.put(new Integer(2), itemOid);
-		variables.put(new Integer(3), itemGroupOid);
-		variables.put(new Integer(4), Status.DELETED.getId());
-		variables.put(new Integer(5), Status.AUTO_DELETED.getId());
+		variables.put(1, studyEventId);
+		variables.put(2, itemOid);
+		variables.put(3, itemGroupOid);
+		variables.put(4, Status.DELETED.getId());
+		variables.put(5, Status.AUTO_DELETED.getId());
 
-		ArrayList<ItemDataBean> dataItems = this.executeFindAllQuery("findByStudyEventAndOIDs", variables);
-		return dataItems;
+		return this.executeFindAllQuery("findByStudyEventAndOIDs", variables);
 	}
 
 	public Collection<ItemDataBean> findAll() {
@@ -467,26 +455,23 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 		ArrayList alist = this.select(digester.getQuery("findAll"));
 		ArrayList<ItemDataBean> al = new ArrayList<ItemDataBean>();
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			ItemDataBean eb = (ItemDataBean) this.getEntityFromHashMap((HashMap) it.next());
+		for (Object anAlist : alist) {
+			ItemDataBean eb = (ItemDataBean) this.getEntityFromHashMap((HashMap) anAlist);
 			al.add(eb);
 		}
 		return al;
 	}
 
 	public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
-	public EntityBean findByPK(int ID) {
+	public EntityBean findByPK(int id) {
 		ItemDataBean eb = new ItemDataBean();
 		this.setTypesExpected();
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(ID));
+		variables.put(1, id);
 
 		String sql = digester.getQuery("findByPK");
 		ArrayList alist = this.select(sql, variables);
@@ -500,40 +485,32 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 	public void delete(int itemDataId) {
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(new Integer(1), new Integer(itemDataId));
+		variables.put(1, itemDataId);
 
 		this.execute(digester.getQuery("delete"), variables);
-		return;
-
 	}
 
 	public void deleteDnMap(int itemDataId) {
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(new Integer(1), new Integer(itemDataId));
+		variables.put(1, itemDataId);
 
 		this.execute(digester.getQuery("deleteDn"), variables);
-		return;
-
 	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn,
 			boolean blnAscendingSort, String strSearchPhrase) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
-		ArrayList al = new ArrayList();
-
-		return al;
+		return new ArrayList();
 	}
 
 	public ArrayList<ItemDataBean> findAllBySectionIdAndEventCRFId(int sectionId, int eventCRFId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(sectionId));
-		variables.put(new Integer(2), new Integer(eventCRFId));
+		variables.put(1, sectionId);
+		variables.put(2, eventCRFId);
 
 		return this.executeFindAllQuery("findAllBySectionIdAndEventCRFId", variables);
 	}
@@ -541,8 +518,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	public ArrayList<ItemDataBean> findAllActiveBySectionIdAndEventCRFId(int sectionId, int eventCRFId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(sectionId));
-		variables.put(new Integer(2), new Integer(eventCRFId));
+		variables.put(1, sectionId);
+		variables.put(2, eventCRFId);
 
 		return this.executeFindAllQuery("findAllActiveBySectionIdAndEventCRFId", variables);
 	}
@@ -552,7 +529,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(eventCRFId));
+		variables.put(1, eventCRFId);
 
 		ArrayList list = this.select(digester.getQuery("doesDataExistByEventCRFId"), variables);
 		Iterator it = list.iterator();
@@ -560,8 +537,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
 			try {
 				HashMap hm = (HashMap) it.next();
 				Integer val = (Integer) hm.get("val");
-				return val.intValue() == 1;
+				return val == 1;
 			} catch (Exception e) {
+				//
 			}
 		}
 
@@ -571,7 +549,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	public ArrayList<ItemDataBean> findAllByEventCRFId(int eventCRFId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(eventCRFId));
+		variables.put(1, eventCRFId);
 
 		return this.executeFindAllQuery("findAllByEventCRFId", variables);
 	}
@@ -579,8 +557,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	public ArrayList<ItemDataBean> findAllByEventCRFIdAndItemId(int eventCRFId, int itemId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(eventCRFId));
-		variables.put(new Integer(2), new Integer(itemId));
+		variables.put(1, eventCRFId);
+		variables.put(2, itemId);
 
 		return this.executeFindAllQuery("findAllByEventCRFIdAndItemId", variables);
 	}
@@ -588,8 +566,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	public ArrayList<ItemDataBean> findAllByEventCRFIdAndItemIdNoStatus(int eventCRFId, int itemId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(eventCRFId));
-		variables.put(new Integer(2), new Integer(itemId));
+		variables.put(1, eventCRFId);
+		variables.put(2, itemId);
 
 		return this.executeFindAllQuery("findAllByEventCRFIdAndItemIdNoStatus", variables);
 	}
@@ -597,45 +575,31 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	public ArrayList<ItemDataBean> findAllBlankRequiredByEventCRFId(int eventCRFId, int crfVersionId) {
 		setTypesExpected();
 		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(eventCRFId));
-		variables.put(new Integer(2), new Integer(crfVersionId));
+		variables.put(1, eventCRFId);
+		variables.put(2, crfVersionId);
 
 		return this.executeFindAllQuery("findAllBlankRequiredByEventCRFId", variables);
 	}
 
-	public ItemDataBean findByEventCRFIdAndItemName(EventCRFBean eventCrfBean, String itemName) {
-
-		setTypesExpected();
-		HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-		variables.put(new Integer(1), new Integer(eventCrfBean.getId()));
-		variables.put(new Integer(2), itemName);
-
-		ArrayList<ItemDataBean> itemDataBeans = this.executeFindAllQuery("findAllByEventCRFIdAndItemName", variables);
-		return !itemDataBeans.isEmpty() && itemDataBeans.size() == 1 ? itemDataBeans.get(0) : null;
-	}
-	
 	public void updateStatusByEventCRF(EventCRFBean eventCRF, Status s) {
-		Connection con = null;
-		updateStatusByEventCRF(eventCRF, s, con);
+		updateStatusByEventCRF(eventCRF, s, null);
 	}
 
-	public void updateStatusByEventCRF(EventCRFBean eventCRF, Status s,
-			Connection con) {
+	public void updateStatusByEventCRF(EventCRFBean eventCRF, Status s, Connection con) {
 		HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-		variables.put(new Integer(1), new Integer(s.getId()));
-		variables.put(new Integer(2), new Integer(eventCRF.getId()));
+		variables.put(1, s.getId());
+		variables.put(2, eventCRF.getId());
 
 		String sql = digester.getQuery("updateStatusByEventCRF");
 
 		execute(sql, variables, con);
-		return;
 	}
 
 	public ItemDataBean findByItemIdAndEventCRFId(int itemId, int eventCRFId) {
 		setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(itemId));
-		variables.put(new Integer(2), new Integer(eventCRFId));
+		variables.put(1, itemId);
+		variables.put(2, eventCRFId);
 
 		EntityBean eb = this.executeFindByPKQuery("findByItemIdAndEventCRFId", variables);
 
@@ -649,9 +613,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	public ItemDataBean findByItemIdAndEventCRFIdAndOrdinal(int itemId, int eventCRFId, int ordinal) {
 		setTypesExpected();
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(itemId));
-		variables.put(new Integer(2), new Integer(eventCRFId));
-		variables.put(new Integer(3), new Integer(ordinal));
+		variables.put(1, itemId);
+		variables.put(2, eventCRFId);
+		variables.put(3, ordinal);
 
 		EntityBean eb = this.executeFindByPKQuery("findByItemIdAndEventCRFIdAndOrdinal", variables);
 
@@ -666,7 +630,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		setTypesExpected();
 		int answer = 0;
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(ecb.getId()));
+		variables.put(1, ecb.getId());
 		String sql = digester.getQuery("findAllRequiredByEventCRFId");
 		ArrayList rows = this.select(sql, variables);
 
@@ -680,10 +644,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	/**
 	 * Gets the maximum ordinal for item data in a given item group in a given section and event crf
 	 * 
-	 * @param ecb
-	 * @param sb
-	 * @param igb
-	 * @return
 	 */
 	public int getMaxOrdinalForGroup(EventCRFBean ecb, SectionBean sb, ItemGroupBean igb) {
 
@@ -691,18 +651,18 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(ecb.getId()));
-		variables.put(new Integer(2), new Integer(sb.getId()));
-		variables.put(new Integer(3), new Integer(igb.getId()));
+		variables.put(1, ecb.getId());
+		variables.put(2, sb.getId());
+		variables.put(3, igb.getId());
 
 		ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroup"), variables);
 		Iterator it = alist.iterator();
 		if (it.hasNext()) {
 			try {
 				HashMap hm = (HashMap) it.next();
-				Integer max = (Integer) hm.get("max_ord");
-				return max.intValue();
+				return (Integer) hm.get("max_ord");
 			} catch (Exception e) {
+				//
 			}
 		}
 
@@ -712,9 +672,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
 	/**
 	 * Gets the maximum ordinal for item data in a given item group in a given section and event crf
 	 * 
-	 * @param item_group_oid
-	 * 
-	 * @return
 	 */
 	public int getMaxOrdinalForGroupByGroupOID(String item_group_oid, int event_crf_id) {
 
@@ -723,17 +680,17 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(2, TypeNames.STRING);
 
 		HashMap variables = new HashMap(1);
-		variables.put(new Integer(1), new Integer(event_crf_id));
-		variables.put(new Integer(2), item_group_oid);
+		variables.put(1, event_crf_id);
+		variables.put(2, item_group_oid);
 
 		ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroupByGroupOID"), variables);
 		Iterator it = alist.iterator();
 		if (it.hasNext()) {
 			try {
 				HashMap hm = (HashMap) it.next();
-				Integer max = (Integer) hm.get("max_ord");
-				return max.intValue();
+				return (Integer) hm.get("max_ord");
 			} catch (Exception e) {
+				//
 			}
 		}
 
@@ -746,17 +703,17 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(ib.getId()));
-		variables.put(new Integer(2), new Integer(ec.getId()));
+		variables.put(1, ib.getId());
+		variables.put(2, ec.getId());
 
 		ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroupByItemAndEventCrf"), variables);
 		Iterator it = alist.iterator();
 		if (it.hasNext()) {
 			try {
 				HashMap hm = (HashMap) it.next();
-				Integer max = (Integer) hm.get("max_ord");
-				return max.intValue();
+				return (Integer) hm.get("max_ord");
 			} catch (Exception e) {
+				//
 			}
 		}
 
@@ -771,17 +728,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(3, TypeNames.INT);
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(item_id));
-		variables.put(new Integer(2), new Integer(ordinal_for_repeating_group_field));
-		variables.put(new Integer(3), new Integer(event_crf_id));
+		variables.put(1, item_id);
+		variables.put(2, ordinal_for_repeating_group_field);
+		variables.put(3, event_crf_id);
 
 		ArrayList alist = this.select(digester.getQuery("isItemExists"), variables);
 		Iterator it = alist.iterator();
-		if (it.hasNext()) {
-			return true;
-		}
+		return it.hasNext();
 
-		return false;
 	}
 
 	public int getGroupSize(int itemId, int eventcrfId) {
@@ -789,14 +743,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		this.setTypeExpected(1, TypeNames.INT);
 
 		HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-		variables.put(new Integer(1), new Integer(itemId));
-		variables.put(new Integer(2), new Integer(eventcrfId));
+		variables.put(1, itemId);
+		variables.put(2, eventcrfId);
 
 		ArrayList alist = this.select(digester.getQuery("getGroupSize"), variables);
 		Iterator it = alist.iterator();
 		if (it.hasNext()) {
-			Integer count = (Integer) ((HashMap) it.next()).get("count");
-			return count;
+			return (Integer) ((HashMap) it.next()).get("count");
 		} else {
 			return 0;
 		}
@@ -809,9 +762,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 		HashMap<Integer, String> variables = new HashMap<Integer, String>();
 		variables.put(1, itoid);
 		ArrayList alist = this.select(digester.getQuery("findValuesByItemOID"), variables);
-		Iterator it = alist.iterator();
-		while (it.hasNext()) {
-			vals.add((String) ((HashMap) it.next()).get("value"));
+		for (Object anAlist : alist) {
+			vals.add((String) ((HashMap) anAlist).get("value"));
 		}
 		return vals;
 	}

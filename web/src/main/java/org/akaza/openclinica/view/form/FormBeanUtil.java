@@ -56,7 +56,7 @@ import java.util.TreeMap;
  * This class builds DisplayFormGroupBeans and DisplayItemBeans in preparation for displaying a form. The
  * DisplayFormGroupBean contains the DisplayItemBeans, and is itself contained by a DisplaySectionBean.
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked" })
 public class FormBeanUtil {
 
 	private static Logger logger = null;

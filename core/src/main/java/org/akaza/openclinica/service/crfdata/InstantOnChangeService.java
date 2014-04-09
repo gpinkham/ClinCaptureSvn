@@ -42,7 +42,6 @@ import javax.sql.DataSource;
 /**
  * For instant-calculation func:onchange
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class InstantOnChangeService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
