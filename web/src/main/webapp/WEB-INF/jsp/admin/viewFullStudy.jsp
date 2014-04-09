@@ -23,29 +23,25 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
-
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
+	<td class="sidebar_tab">
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+			<img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10">
+		</a>
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+		<div class="sidebar_tab_content"></div>
+	</td>
+</tr>
 
-		<div class="sidebar_tab_content">
-
-		</div>
-
-		</td>
-
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
-
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
+<tr id="sidebar_Instructions_closed" style="display: all">
+	<td class="sidebar_tab">
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+			<img src="images/sidebar_expand.gif" border="0" align="right" hspace="10">
+		</a>
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
-		</td>
-  </tr>
+	</td>
+</tr>
 <jsp:include page="../include/sideInfo.jsp"/>
+
 <jsp:useBean scope='request' id='studyToView' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='request' id='sitesToView' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='userRolesToView' class='java.util.ArrayList'/>
@@ -79,57 +75,97 @@
 	</span>
 </h1>
 
-<strong><fmt:message key="download_study_meta" bundle="${restext}"/>
-<a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"> 
-<fmt:message key="here" bundle="${restext}"/></a>.  
-<fmt:message key="opening_finished_may_save" bundle="${restext}"/>
- </strong>
+<strong>
+	<fmt:message key="download_study_meta" bundle="${restext}"/>
+	<a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"> 
+		<fmt:message key="here" bundle="${restext}"/>
+	</a>.  
+	<fmt:message key="opening_finished_may_save" bundle="${restext}"/>
+</strong>
+
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
+
 <br><br>
+
 <a href="javascript:leftnavExpand('overview');">
-    <img id="excl_overview" src="images/bt_Collapse.gif" border="0">
-    <span class="table_title_Admin">
-    <fmt:message key="overview" bundle="${resword}"/></span></a>
+	<img id="excl_overview" src="images/bt_Collapse.gif" border="0">
+	<span class="table_title_Admin"><fmt:message key="overview" bundle="${resword}"/></span>
+</a>
+
 <div id="overview" style="">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
 <div class="tablebox_center">
+
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-  <tr valign="top"><td class="table_header_column"><fmt:message key="name" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.name}"/>
-  </td></tr>
-  <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><fmt:message key="unique_protocol_ID" bundle="${resword}"/></a>:</td><td class="table_cell">
-  <c:out value="${studyToView.identifier}"/>
-  </td></tr>
-   <tr valign="top"><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.oid}"/>
-  </td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.principalInvestigator}"/>
-  </td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="brief_summary" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.summary}"/>&nbsp;
-  </td></tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="name" bundle="${resword}" />:</td>
+		<td class="table_cell">
+			<c:out value="${studyToView.name}" />
+		</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="owner" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.owner.name}"/>
-  </td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td><td class="table_cell">
-  <fmt:formatDate value="${studyToView.createdDate}" pattern="${dteFormat}"/>
-  </td></tr>
- </table>
+	<tr valign="top">
+		<td class="table_header_column">
+			<a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;">
+				<fmt:message key="unique_protocol_ID" bundle="${resword}"/>
+			</a>:</td>
+		<td class="table_cell">
+		<c:out value="${studyToView.identifier}" /></td>
+	</tr>
 
- </div>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="OID" bundle="${resword}" />:</td>
+		<td class="table_cell">
+			<c:out value="${studyToView.oid}" /></td>
+	</tr>
+
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="principal_investigator" bundle="${resword}" />:</td>
+		<td class="table_cell">
+			<c:out value="${studyToView.principalInvestigator}" />
+		</td>
+	</tr>
+
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="brief_summary" bundle="${resword}" />:</td>
+		<td class="table_cell">
+			<c:out value="${studyToView.summary}" />&nbsp;</td>
+	</tr>
+
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="owner" bundle="${resword}" />:</td>
+		<td class="table_cell">
+			<c:out value="${studyToView.owner.name}" />
+		</td>
+	</tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="date_created" bundle="${resword}" />:</td>
+		<td class="table_cell">
+			<fmt:formatDate value="${studyToView.createdDate}" pattern="${dteFormat}" />
+		</td>
+	</tr>
+</table>
+
+</div>
 </div></div></div></div></div></div></div></div>
-
 </div>
 </div>
 <br>
 
 <a href="javascript:leftnavExpand('sectiona');">
-    <img id="excl_sectiona" src="images/bt_Expand.gif" border="0">
-    <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> A: <fmt:message key="study_description" bundle="${resword}"/>]</span></a>
+	<img id="excl_sectiona" src="images/bt_Expand.gif" border="0">
+	<span class="table_title_Admin">
+		<fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> A: <fmt:message key="study_description" bundle="${resword}"/>]
+	</span>
+</a>
+
 <div id="sectiona" style="display:none ">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -292,6 +328,7 @@
   </c:otherwise>
   </c:choose>
 </table>
+
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
@@ -471,531 +508,558 @@
   </div></div></div></div></div></div></div></div></div></div>
 	</div>
 	<br>
-	
+
 <a href="javascript:leftnavExpand('sectionf');">
-    <img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> G: <fmt:message key="study_parameter_configuration" bundle="${resword}"/>]</span></a>
+	<img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> 
+	<span class="table_title_Admin">
+		<fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> G: <fmt:message key="study_parameter_configuration" bundle="${resword}"/>]
+	</span>
+</a>
+
 <div id="sectionf" style="display:none ">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
+
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="collect_subject" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.collectDob == '1'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:when test="${studyToView.studyParameterConfig.collectDob == '2'}">
+					<fmt:message key="only_year_of_birth" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="not_used" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject" bundle="${resword}"/></td>
-   <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.collectDob == '1'}">
-  <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:when test="${studyToView.studyParameterConfig.collectDob == '2'}">
-     <fmt:message key="only_year_of_birth" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-      <fmt:message key="not_used" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="allow_discrepancy_management" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.discrepancyManagement == 'true'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  </td></tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="subject_person_ID_required" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'required'}">
+					<fmt:message key="required" bundle="${resword}" />
+				</c:when>
+				<c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
+					<fmt:message key="optional" bundle="${resword}" />
+				</c:when>
+				<c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'copyFromSSID'}">
+					<fmt:message key="copy_from_ssid" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="not_used" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="allow_discrepancy_management" bundle="${resword}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.discrepancyManagement == 'true'}">
-  <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="how_generete_study_subject_ID" bundle="${restext}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.subjectIdGeneration == 'manual'}">
+					<fmt:message key="manual_entry" bundle="${resword}" />
+				</c:when>
+				<c:when test="${studyToView.studyParameterConfig.subjectIdGeneration == 'auto editable'}">
+					<fmt:message key="auto_generated_and_editable" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="auto_generated_and_non_editable" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'required'}">
-    <fmt:message key="required" bundle="${resword}"/>
-   </c:when>
-    <c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
-    <fmt:message key="optional" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-     <fmt:message key="not_used" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="show_person_id_on_crf_header" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.personIdShownOnCRF == 'true'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-   <tr valign="top"><td class="table_header_column"><fmt:message key="how_generete_study_subject_ID" bundle="${restext}"/></td>
-   <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.subjectIdGeneration == 'manual'}">
-    <fmt:message key="manual_entry" bundle="${resword}"/>
-   </c:when>
-    <c:when test="${studyToView.studyParameterConfig.subjectIdGeneration == 'auto editable'}">
-    <fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-     <fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<fmt:message key="${studyToView.studyParameterConfig.interviewerNameRequired}" bundle="${resword}" />
+		</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="show_person_id_on_crf_header" bundle="${resword}"/></td>
-   <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.personIdShownOnCRF == 'true'}">
-    <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-    <fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-   <tr valign="top">
-       <td class="table_header_column"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td>
-       <td class="table_cell">
-           <fmt:message key="${studyToView.studyParameterConfig.interviewerNameRequired}" bundle="${resword}"/>
-      </td>
-   </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="interviewer_name_default_as_blank" bundle="${restext}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.interviewerNameDefault== 'blank'}">
+					<fmt:message key="blank" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="pre_populated_from_active_user" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="interviewer_name_editable" bundle="${restext}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.interviewerNameEditable== 'true'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_default_as_blank" bundle="${restext}"/></td>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="forced_reason_for_change" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.adminForcedReasonForChange == 'true'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewerNameDefault== 'blank'}">
-   <fmt:message key="blank" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="studySubjectIdLabel" bundle="${resword}" />
+		</td>
+		<td class="table_cell">${studyToView.studyParameterConfig.studySubjectIdLabel}</td>
+	</tr>
 
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="secondaryIdLabel" bundle="${resword}" />
+		</td>
+		<td class="table_cell">${studyToView.studyParameterConfig.secondaryIdLabel}</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_editable" bundle="${restext}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewerNameEditable== 'true'}">
-  <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="secondaryIDRequired" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.secondaryIdRequired == 'yes'}">
+					<fmt:message key="required" bundle="${resword}" />
+				</c:when>
+				<c:when test="${studyToView.studyParameterConfig.secondaryIdRequired == 'no'}">
+					<fmt:message key="optional" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="not_used" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="forced_reason_for_change" bundle="${resword}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.adminForcedReasonForChange == 'true'}">
-  <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="dateOfEnrollmentForStudyLabel" bundle="${resword}" />
+		</td>
+		<td class="table_cell">${studyToView.studyParameterConfig.dateOfEnrollmentForStudyLabel}</td>
+	</tr>
 
-  <tr valign="top">
-    <td class="table_header_column">
-        <fmt:message key="studySubjectIdLabel" bundle="${resword}"/>
-    </td>
-    <td class="table_cell">
-        ${studyToView.studyParameterConfig.studySubjectIdLabel}
-    </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="dateOfEnrollmentForStudyRequired" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'yes'}">
+					<fmt:message key="required" bundle="${resword}" />
+				</c:when>
+				<c:when test="${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'no'}">
+					<fmt:message key="optional" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="not_used" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-    <td class="table_header_column">
-        <fmt:message key="secondaryIdLabel" bundle="${resword}"/>
-    </td>
-    <td class="table_cell">
-        ${studyToView.studyParameterConfig.secondaryIdLabel}
-    </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="genderLabel" bundle="${resword}" />
+		</td>
+		<td class="table_cell">${studyToView.studyParameterConfig.genderLabel}</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="secondaryIDRequired" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.secondaryIdRequired == 'yes'}">
-                  <fmt:message key="required" bundle="${resword}"/>
-              </c:when>
-              <c:when test="${studyToView.studyParameterConfig.secondaryIdRequired == 'no'}">
-                  <fmt:message key="optional" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="not_used" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="gender_required2" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.genderRequired == 'false'}">
+					<fmt:message key="no" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="dateOfEnrollmentForStudyLabel" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          ${studyToView.studyParameterConfig.dateOfEnrollmentForStudyLabel}
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="startDateTimeLabel" bundle="${resword}" />
+		</td>
+		<td class="table_cell">${studyToView.studyParameterConfig.startDateTimeLabel}</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="dateOfEnrollmentForStudyRequired" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'yes'}">
-                  <fmt:message key="required" bundle="${resword}"/>
-              </c:when>
-              <c:when test="${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'no'}">
-                  <fmt:message key="optional" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="not_used" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="endDateTimeLabel" bundle="${resword}" />
+		</td>
+		<td class="table_cell">${studyToView.studyParameterConfig.endDateTimeLabel}</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="genderLabel" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          ${studyToView.studyParameterConfig.genderLabel}
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="startDateTimeRequired" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.startDateTimeRequired == 'yes'}">
+					<fmt:message key="required" bundle="${resword}" />
+				</c:when>
+				<c:when test="${studyToView.studyParameterConfig.startDateTimeRequired == 'no'}">
+					<fmt:message key="optional" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="not_used" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="gender_required2" bundle="${resword}"/></td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.genderRequired == 'false'}">
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
-  <%-- clinovo - end --%>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="endDateTimeRequired" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.endDateTimeRequired == 'yes'}">
+					<fmt:message key="required" bundle="${resword}" />
+				</c:when>
+				<c:when test="${studyToView.studyParameterConfig.endDateTimeRequired == 'no'}">
+					<fmt:message key="optional" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="not_used" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <%-- clinovo - start (ticket #12) --%>
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="startDateTimeLabel" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          ${studyToView.studyParameterConfig.startDateTimeLabel}
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="useStartTime" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.useStartTime == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="endDateTimeLabel" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          ${studyToView.studyParameterConfig.endDateTimeLabel}
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="useEndTime" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.useEndTime == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="startDateTimeRequired" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.startDateTimeRequired == 'yes'}">
-                  <fmt:message key="required" bundle="${resword}"/>
-              </c:when>
-              <c:when test="${studyToView.studyParameterConfig.startDateTimeRequired == 'no'}">
-                  <fmt:message key="optional" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="not_used" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="markImportedCRFAsCompleted" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.markImportedCRFAsCompleted == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="endDateTimeRequired" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.endDateTimeRequired == 'yes'}">
-                  <fmt:message key="required" bundle="${resword}"/>
-              </c:when>
-              <c:when test="${studyToView.studyParameterConfig.endDateTimeRequired == 'no'}">
-                  <fmt:message key="optional" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="not_used" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="autoScheduleEventDuringImport" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.autoScheduleEventDuringImport == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="useStartTime" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.useStartTime == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="autoCreateSubjectDuringImport" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.autoCreateSubjectDuringImport == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="useEndTime" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.useEndTime == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="allowSdvWithOpenQueries" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="markImportedCRFAsCompleted" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.markImportedCRFAsCompleted == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="replaceExisitingDataDuringImport" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.replaceExisitingDataDuringImport == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-    <td class="table_header_column">
-      <fmt:message key="autoScheduleEventDuringImport" bundle="${resword}"/>
-    </td>
-    <td class="table_cell">
-      <c:choose>
-        <c:when test="${studyToView.studyParameterConfig.autoScheduleEventDuringImport == 'yes'}">
-          <fmt:message key="yes" bundle="${resword}"/>
-        </c:when>
-        <c:otherwise>
-          <fmt:message key="no" bundle="${resword}"/>
-        </c:otherwise>
-      </c:choose>
-    </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="interview_date_required" bundle="${restext}" />
+		</td>
+		<td class="table_cell">
+			<fmt:message key="${studyToView.studyParameterConfig.interviewDateRequired}" bundle="${resword}" />
+		</td>
+	</tr>
 
-  <tr valign="top">
-    <td class="table_header_column">
-      <fmt:message key="autoCreateSubjectDuringImport" bundle="${resword}"/>
-    </td>
-    <td class="table_cell">
-      <c:choose>
-        <c:when test="${studyToView.studyParameterConfig.autoCreateSubjectDuringImport == 'yes'}">
-          <fmt:message key="yes" bundle="${resword}"/>
-        </c:when>
-        <c:otherwise>
-          <fmt:message key="no" bundle="${resword}"/>
-        </c:otherwise>
-      </c:choose>
-    </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="interview_date_default_as_blank" bundle="${restext}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.interviewDateDefault== 'blank'}">
+					<fmt:message key="blank" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="pre_populated_from_study_event" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="allowSdvWithOpenQueries" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.allowSdvWithOpenQueries == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="interview_date_editable" bundle="${restext}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.interviewDateEditable== 'true'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="replaceExisitingDataDuringImport" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.replaceExisitingDataDuringImport == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>  
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="event_location_required" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<fmt:message key="${studyToView.studyParameterConfig.eventLocationRequired}" bundle="${resword}" />
+		</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column"><fmt:message key="interview_date_required" bundle="${restext}"/></td>
-      <td class="table_cell">
-          <fmt:message key="${studyToView.studyParameterConfig.interviewDateRequired}" bundle="${resword}"/>
-      </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="allowCodingVerification" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.allowCodingVerification == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_default_as_blank" bundle="${restext}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewDateDefault== 'blank'}">
-   <fmt:message key="blank" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="pre_populated_from_study_event" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="defaultBioontologyURL" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:out value="${bioontologyURL}" />&nbsp;</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_editable" bundle="${restext}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewDateEditable== 'true'}">
-  <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-  <tr valign="top">
-      <td class="table_header_column"><fmt:message key="event_location_required" bundle="${resword}"/></td>
-      <td class="table_cell">
-          <fmt:message key="${studyToView.studyParameterConfig.eventLocationRequired}" bundle="${resword}"/>
-     </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="medicalCodingApiKey" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:out value="${medicalCodingApiKey}" />&nbsp;</td>
+	</tr>
 
-  <tr valign="top">
-    <td class="table_header_column">
-        <fmt:message key="allowCodingVerification" bundle="${resword}"/>
-    </td>
-    <td class="table_cell">
-        <c:choose>
-            <c:when test="${studyToView.studyParameterConfig.allowCodingVerification == 'yes'}">
-                <fmt:message key="yes" bundle="${resword}"/>
-            </c:when>
-            <c:otherwise>
-                <fmt:message key="no" bundle="${resword}"/>
-            </c:otherwise>
-        </c:choose>
-    </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="autoCodeDictionaryName" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.autoCodeDictionaryName== ''}">
+					<fmt:message key="blank" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>${studyToView.studyParameterConfig.autoCodeDictionaryName}</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-    <td class="table_header_column">
-      <fmt:message key="defaultBioontologyURL" bundle="${resword}"/>
-    </td>
-    <td class="table_cell">
-      <c:out value="${bioontologyURL}"/>&nbsp;
-    </td>
-  </tr>
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="medicalCodingApprovalNeeded" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == ''}">
+					<fmt:message key="blank" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<c:choose>
+						<c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == 'yes'}">
+							<fmt:message key="no" bundle="${resword}" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="no" bundle="${resword}" />
+						</c:otherwise>
+					</c:choose>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="medicalCodingApiKey" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:out value="${medicalCodingApiKey}"/>&nbsp;
-      </td>
-  </tr>
-
-  <tr valign="top">
-    <td class="table_header_column">
-      <fmt:message key="autoCodeDictionaryName" bundle="${resword}"/>
-    </td>
-    <td class="table_cell">
-      <c:choose>
-        <c:when test="${studyToView.studyParameterConfig.autoCodeDictionaryName== ''}">
-          <fmt:message key="blank" bundle="${resword}"/>
-        </c:when>
-        <c:otherwise>
-          ${studyToView.studyParameterConfig.autoCodeDictionaryName}
-        </c:otherwise>
-      </c:choose>
-    </td>
-  </tr>
-
-  <tr valign="top">
-    <td class="table_header_column">
-      <fmt:message key="medicalCodingApprovalNeeded" bundle="${resword}"/>
-    </td>
-    <td class="table_cell">
-      <c:choose>
-        <c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == ''}">
-          <fmt:message key="blank" bundle="${resword}"/>
-        </c:when>
-        <c:otherwise>
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.medicalCodingApprovalNeeded == 'yes'}">
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-        </c:otherwise>
-      </c:choose>
-    </td>
-  </tr>
-
-  <tr valign="top">
-      <td class="table_header_column">
-          <fmt:message key="medicalCodingContextNeeded" bundle="${resword}"/>
-      </td>
-      <td class="table_cell">
-          <c:choose>
-              <c:when test="${studyToView.studyParameterConfig.medicalCodingContextNeeded == 'yes'}">
-                  <fmt:message key="yes" bundle="${resword}"/>
-              </c:when>
-              <c:otherwise>
-                  <fmt:message key="no" bundle="${resword}"/>
-              </c:otherwise>
-          </c:choose>
-      </td>
-  </tr>
-    
+	<tr valign="top">
+		<td class="table_header_column">
+			<fmt:message key="medicalCodingContextNeeded" bundle="${resword}" />
+		</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${studyToView.studyParameterConfig.medicalCodingContextNeeded == 'yes'}">
+					<fmt:message key="yes" bundle="${resword}" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="no" bundle="${resword}" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
 </table>
 
 </div>
 </div></div></div></div></div></div></div></div>
-
 </div>
 </div>
 <br>
- <a href="javascript:leftnavExpand('sites');">
+
+<a href="javascript:leftnavExpand('sites');">
      <img id="excl_sites" src="images/bt_Collapse.gif" border="0"> <span class="table_title_Admin"><fmt:message key="sites" bundle="${resword}"/>: (<c:out value="${siteNum}"/> <fmt:message key="sites" bundle="${resword}"/>)</span></a>
 <div id="sites" style="display: ">
  <div style="width: 600px">
@@ -1003,77 +1067,80 @@
 
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-  <tr valign="top">
-  <td class="table_header_row_left"><fmt:message key="name" bundle="${resword}"/></td>
-  <td class="table_header_row"><fmt:message key="OID" bundle="${resword}"/></td>
-  <td class="table_header_row"><fmt:message key="principal_investigator" bundle="${resword}"/></td>
-  <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
-  <td class="table_header_row">&nbsp;</td>
-  <td></td>
-  </tr>
-  <c:forEach var="site" items="${sitesToView}">
-  <tr valign="top">
-   <td class="table_cell_left"><c:out value="${site.name}"/></td>
-   <td class="table_cell"><c:out value="${site.oid}"/></td>
-   <td class="table_cell">
-    <c:out value="${site.principalInvestigator}"/>
-   </td>
-   <td class="table_cell"><c:out value="${site.status.name}"/></td>
-   <td class="table_cell">
-     <c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
-     <a href="ViewSite?id=<c:out value="${site.id}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-			name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-     </c:if>
-   </td>
-  </tr>
-  </c:forEach>
-  </table>
+	<tr valign="top">
+		<td class="table_header_row_left"><fmt:message key="name" bundle="${resword}"/></td>
+		<td class="table_header_row"><fmt:message key="OID" bundle="${resword}"/></td>
+		<td class="table_header_row"><fmt:message key="principal_investigator" bundle="${resword}"/></td>
+		<td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
+		<td class="table_header_row">&nbsp;</td>
+		<td></td>
+	</tr>
+
+	<c:forEach var="site" items="${sitesToView}">
+	<tr valign="top">
+		<td class="table_cell_left">
+			<c:out value="${site.name}"/></td>
+		<td class="table_cell">
+			<c:out value="${site.oid}"/></td>
+		<td class="table_cell">
+			<c:out value="${site.principalInvestigator}"/></td>
+		<td class="table_cell">
+			<c:out value="${site.status.name}"/></td>
+		<td class="table_cell">
+			<c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
+				<a href="ViewSite?id=<c:out value="${site.id}"/>"
+					onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+					onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
+					name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+			</c:if>
+		</td>
+	</tr>
+	</c:forEach>
+</table>
+
 </div>
 </div></div></div></div></div></div></div></div>
-
 </div>
 </div>
 <br>
 
- <a href="javascript:leftnavExpand('definitions');">
-     <img id="excl_definitions" src="images/bt_Collapse.gif" border="0"> <span class="table_title_Admin"><fmt:message key="event_definitions" bundle="${resword}"/>: (<c:out value="${defNum}"/> <fmt:message key="definitions" bundle="${resword}"/>)</span></a>
- <div id="definitions" style="display: ">
- <div style="width: 600px">
- <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<a href="javascript:leftnavExpand('definitions');">
+	<img id="excl_definitions" src="images/bt_Collapse.gif" border="0"> <span class="table_title_Admin"><fmt:message key="event_definitions" bundle="${resword}"/>: (<c:out value="${defNum}"/> <fmt:message key="definitions" bundle="${resword}"/>)</span></a>
 
+<div id="definitions" style="display: ">
+<div style="width: 600px">
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
+
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
- <tr valign="top">
-   <td class="table_header_row_left"><fmt:message key="name" bundle="${resword}"/></td>
-   <td class="table_header_row"><fmt:message key="OID" bundle="${resword}"/></td>
-   <td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
-   <td class="table_header_row"><fmt:message key="of_CRFs" bundle="${resword}"/></td>
-   <td class="table_header_row">&nbsp;</td>
-   <td></td>
-  </tr>
-  <c:forEach var="definition" items="${definitionsToView}">
-   <tr>
-   <td class="table_cell_left">
-    <c:out value="${definition.name}"/>
-   </td>
-   <td class="table_cell"><c:out value="${definition.oid}"/></td>
-  <td class="table_cell">
-    <c:out value="${definition.description}"/>&nbsp;
-   </td>
-  <td class="table_cell">
-   <c:out value="${definition.crfNum}"/>&nbsp;
-   </td>
-   <td class="table_cell">
-	   <a href="ViewEventDefinitionReadOnly?id=<c:out value="${definition.id}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-		    name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-	</td>
-  </tr>
-  </c:forEach>
-  </table>
+	<tr valign="top">
+		<td class="table_header_row_left"><fmt:message key="name" bundle="${resword}"/></td>
+		<td class="table_header_row"><fmt:message key="OID" bundle="${resword}"/></td>
+		<td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
+		<td class="table_header_row"><fmt:message key="of_CRFs" bundle="${resword}"/></td>
+		<td class="table_header_row">&nbsp;</td>
+		<td></td>
+	</tr>
+	<c:forEach var="definition" items="${definitionsToView}">
+	<tr>
+		<td class="table_cell_left">
+			<c:out value="${definition.name}"/></td>
+		<td class="table_cell">
+			<c:out value="${definition.oid}"/></td>
+		<td class="table_cell">
+			<c:out value="${definition.description}"/>&nbsp;</td>
+		<td class="table_cell">
+			<c:out value="${definition.crfNum}"/>&nbsp;</td>
+		<td class="table_cell">
+			<a href="ViewEventDefinitionReadOnly?id=<c:out value="${definition.id}"/>"
+				onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+				onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
+				name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+		</td>
+	</tr>
+	</c:forEach>
+</table>
+
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
@@ -1083,54 +1150,75 @@
 <br>
 <a href="javascript:leftnavExpand('users');">
     <img id="excl_users" src="images/bt_Expand.gif" border="0">  <span class="table_title_Admin"><fmt:message key="users" bundle="${resword}"/>: (<c:out value="${userNum}"/> <fmt:message key="users" bundle="${resword}"/>)</span></a>
+
 <div id="users" style="display:none ">
-
- <div style="width: 600px">
- <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
+<div style="width: 600px">
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
+
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
- <tr valign="top">
-   <td class="table_header_row_left"><fmt:message key="user_name" bundle="${resword}"/></td>
-   <td class="table_header_row"><fmt:message key="first_name" bundle="${resword}"/></td>
-   <td class="table_header_row"><fmt:message key="last_name" bundle="${resword}"/></td>
-   <td class="table_header_row"><fmt:message key="role" bundle="${resword}"/></td>
-   <td class="table_header_row"><fmt:message key="study_name" bundle="${resword}"/></td>
-   <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
-   <td class="table_header_row">&nbsp;</td>
-  </tr>
-  <c:forEach var="user" items="${userRolesToView}">
-  <tr valign="top">
-   <td class="table_cell_left">
-    <c:out value="${user.userName}"/>
-   </td>
-    <td class="table_cell"><c:out value="${user.firstName}"/></td>
-      <td class="table_cell"><c:out value="${user.lastName}"/></td>
-      <td class="table_cell"><c:out value="${user.role.description}"/></td>
-      <td class="table_cell"><c:out value="${user.studyName}"/></td>
-      <td class="table_cell"><c:out value="${user.status.name}"/></td>
-      <td class="table_cell">
-        <c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
-         <a href="ViewStudyUser?name=<c:out value="${user.userName}"/>&studyId=<c:out value="${user.studyId}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-			name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-		</c:if>
-      </td>
-  </tr>
-  </c:forEach>
-  </table>     
+	<tr valign="top">
+		<td class="table_header_row_left">
+			<fmt:message key="user_name" bundle="${resword}" />
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="first_name" bundle="${resword}" />
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="last_name" bundle="${resword}" />
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="role" bundle="${resword}" />
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="study_name" bundle="${resword}" />
+		</td>
+		<td class="table_header_row">
+			<fmt:message key="status" bundle="${resword}" />
+		</td>
+		<td class="table_header_row">&nbsp;</td>
+	</tr>
+
+	<c:forEach var="user" items="${userRolesToView}">
+	<tr valign="top">
+		<td class="table_cell_left">
+			<c:out value="${user.userName}" />
+		</td>
+		<td class="table_cell">
+			<c:out value="${user.firstName}" />
+		</td>
+		<td class="table_cell">
+			<c:out value="${user.lastName}" />
+		</td>
+		<td class="table_cell">
+			<c:out value="${user.role.description}" />
+		</td>
+		<td class="table_cell">
+			<c:out value="${user.studyName}" />
+		</td>
+		<td class="table_cell">
+			<c:out value="${user.status.name}" />
+		</td>
+		<td class="table_cell">
+			<c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
+				<a href="ViewStudyUser?name=<c:out value=" ${user.userName} "/>&studyId=<c:out value="${user.studyId} "/>" onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');" onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');">
+					<img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+			</c:if>
+		</td>
+	</tr>
+	</c:forEach>
+</table>
+
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
 </div>
-<br>
-</br>
-<br>
-       <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+
+<br></br><br>
+<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+		value="<fmt:message key="back" bundle="${resword}"/>"
+		class="button_medium"
+		onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
 </br>
 
 <jsp:include page="../include/footer.jsp"/>

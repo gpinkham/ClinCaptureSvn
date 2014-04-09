@@ -326,21 +326,24 @@
   </td>
   </tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'required'}">
-    <fmt:message key="required" bundle="${resword}"/>
-   </c:when>
-    <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
-     <fmt:message key="optional" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-    <fmt:message key="not_used" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
+	<tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'required'}">
+					<fmt:message key="required" bundle="${resword}"/>
+				</c:when>
+			<c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
+				<fmt:message key="optional" bundle="${resword}"/>
+			</c:when>
+			<c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'copyFromSSID'}">
+				<fmt:message key="copy_from_ssid" bundle="${resword}"/>
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="not_used" bundle="${resword}"/>
+			</c:otherwise>
+		</c:choose>
+		</td>
+	</tr>
 
    <tr valign="top"><td class="table_header_column"><fmt:message key="how_to_generate_the_study_subject_ID" bundle="${resword}"/>:</td>
    <td class="table_cell">
@@ -570,9 +573,7 @@
           </c:choose>
       </td>
   </tr>
-  <%-- clinovo - end --%>
 
-  <%-- clinovo - start (ticket #12) --%>
   <tr valign="top">
       <td class="table_header_column">
           <fmt:message key="startDateTimeLabel" bundle="${resword}"/>
@@ -827,13 +828,13 @@
           </c:choose>
       </td>
   </tr>
-
 </table>
+
 </div>
 </div></div></div></div></div></div></div></div>
-
 </div>
 <br>
+
 <table border="0" cellpadding="0" cellspacing="0">
  <tr>
   <td>

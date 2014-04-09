@@ -219,7 +219,9 @@
 						<tr>
 							<td class="table_header_column_top">${studySubjectLabel}</td>
 							<td class="table_cell_top"><c:out value="${studySub.label}"/></td>
-							<td class="table_header_row"><fmt:message key="person_ID" bundle="${resword}"/>
+							<td class="table_header_row">
+							<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired !='copyFromSSID'}">
+							<fmt:message key="person_ID" bundle="${resword}"/>
 							
 							<%-- DN for person ID goes here --%>
 							<c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
@@ -238,9 +240,12 @@
 					                </c:otherwise>
 					            </c:choose>
 					        </c:if>
+					        </c:if>
 							</td>
     						<td class="table_cell_top">
-								<c:out value="${subject.uniqueIdentifier}"/>
+    							<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired !='copyFromSSID'}">
+									<c:out value="${subject.uniqueIdentifier}"/>
+								</c:if>
 					      	</td>
 						</tr>
 						<tr>

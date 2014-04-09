@@ -307,6 +307,8 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 			study.getStudyParameterConfig()
 					.setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
+			study.getStudyParameterConfig().setSubjectPersonIdRequired(
+					spvdao.findByHandleAndStudy(studyId, "subjectPersonIdRequired").getValue());
 			request.setAttribute("subjectStudy", study);
 
 			if (study.getParentStudyId() > 0) {// this is a site,find parent

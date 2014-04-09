@@ -63,25 +63,28 @@
 
 <%-- Subject Summary --%>
 <table border="0" cellpadding="0" cellspacing="0" width="650" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
-    <tr>
+	<tr>
         <td class="table_header_column_top" style="color: #789EC5"><b>${studySubjectLabel}</b></td>
         <c:if test="${secondaryIdShow}">
             <td class="table_header_column_top" style="color: #789EC5"><b>${secondaryIdLabel}</b></td>
         </c:if>
-        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="date_of_birth" bundle="${resword}"/></b></td>
-        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="person_ID" bundle="${resword}"/></b></td>
-        <!--  <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="date_record_created" bundle="${resword}"/></b></td> -->
-        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="created_by" bundle="${resword}"/></b></td>
-        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="status" bundle="${resword}"/></b></td>
-    </tr>
-    <tr>
+		<td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="date_of_birth" bundle="${resword}"/></b></td>
+		<c:if test="${study.studyParameterConfig.subjectPersonIdRequired !='copyFromSSID'}">
+			<td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="person_ID" bundle="${resword}"/></b></td>
+		</c:if>
+		<td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="created_by" bundle="${resword}"/></b></td>
+		<td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="status" bundle="${resword}"/></b></td>
+	</tr>
+
+	<tr>
         <td class="table_header_column"><c:out value="${studySub.label}"/></td>
         <c:if test="${secondaryIdShow}">
             <td class="table_header_column"><c:out value="${studySub.secondaryLabel}"/></td>
         </c:if>
         <td class="table_header_column"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}" /></td>
-        <td class="table_header_column"><c:out value="${subject.uniqueIdentifier}"/></td>
-        <!--   <td class="table_header_column"><fmt:formatDate value="${studySub.createdDate}" pattern="${dteFormat}"/></td> -->
+        <c:if test="${study.studyParameterConfig.subjectPersonIdRequired !='copyFromSSID'}">
+        	<td class="table_header_column"><c:out value="${subject.uniqueIdentifier}"/></td>
+        </c:if>
         <td class="table_header_column"><c:out value="${studySub.owner.name}"/></td>
         <td class="table_header_column"><c:out value="${studySub.status.name}"/></td>
 

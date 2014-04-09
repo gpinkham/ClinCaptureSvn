@@ -321,29 +321,40 @@
 		  </c:choose>
 		  </td>
 		  </tr>
-	</c:when>	  
-    <c:when test="${config.parameter.handle=='subjectPersonIdRequired'}">		
-		  <tr valign="top"><td class="formlabel"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td><td>
-		   <c:choose>
-		   <c:when test="${config.value.value == 'required'}">
-		    <input type="radio" checked name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
-		    <input type="radio" name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
-		    <input type="radio" name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
-		   </c:when>
-		    <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
-		    <input type="radio" name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
-		    <input type="radio" checked name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
-		    <input type="radio" name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
-		   </c:when>
-		   <c:otherwise>
-		    <input type="radio" name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
-		    <input type="radio" name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
-		    <input type="radio" checked name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
 	</c:when>
+
+	<c:when test="${config.parameter.handle=='subjectPersonIdRequired'}">		
+		<tr valign="top">
+			<td class="formlabel"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td>
+			<td>
+				<c:set var="subjectPersonIdRequired" value=""/>
+				<c:set var="subjectPersonIdOptional" value=""/>
+				<c:set var="subjectPersonIdCopy" value=""/>
+				<c:set var="subjectPersonIdNotUsed" value=""/>
+
+				<c:choose>
+					<c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'required'}">\
+						<c:set var="subjectPersonIdRequired" value="checked"/>
+					</c:when>
+					<c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
+						<c:set var="subjectPersonIdOptional" value="checked"/>
+					</c:when>
+					<c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'copyFromSSID'}">
+						<c:set var="subjectPersonIdCopy" value="checked"/>
+					</c:when>
+					<c:otherwise>
+						<c:set var="subjectPersonIdNotUsed" value="checked"/>
+					</c:otherwise>
+				</c:choose>
+
+				<input type="radio" onchange="javascript:changeIcon()" ${subjectPersonIdRequired} name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" ${subjectPersonIdOptional} name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" ${subjectPersonIdCopy} name="subjectPersonIdRequired" value="copyFromSSID"><fmt:message key="copy_from_ssid" bundle="${resword}"/>
+				<input type="radio" onchange="javascript:changeIcon()" ${subjectPersonIdNotUsed} name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
+			</td>
+		</tr>
+	</c:when>
+
 	<c:when test="${config.parameter.handle=='subjectIdGeneration'}">	  
 		   <tr valign="top"><td class="formlabel"><fmt:message key="how_to_generate_the_study_subject_ID" bundle="${resword}"/>:</td><td>
 		   <c:choose>
@@ -352,7 +363,7 @@
 		    <input type="radio" name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
 		    <input type="radio" name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
 		   </c:when>
-		    <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'auto editable'}">
+		    <c:when test="${newStudy.studyParameterConfig.subjectIdGeneration == 'auto editable'}">
 		    <input type="radio" name="subjectIdGeneration" value="manual"><fmt:message key="manual_entry" bundle="${resword}"/>
 		    <input type="radio" checked name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
 		    <input type="radio" name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>

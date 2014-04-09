@@ -194,8 +194,16 @@ function formWithStateConfirmGoTo(message, address) {
   }
   else {
 	  window.location.href = address;
-  }
-  return true;
+    }
+    return true;
+}
+
+function initFieldCopying(item, target) {
+
+	$(target).val($(item).val());
+	$(item).blur(function() {
+		$(target).val($(item).val());
+	});
 }
 
 function hideCols(tableId,columnNumArray,showTable){

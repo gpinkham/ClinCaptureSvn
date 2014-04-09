@@ -215,6 +215,14 @@
 		</td>
 	</tr>
 	</c:when>
+	<c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='copyFromSSID'}">
+		<script>
+			$(document).ready(function() {
+				initFieldCopying("[name=label]","[name=uniqueIdentifier]");
+			});
+		</script>
+		<input type="hidden" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>">
+	</c:when>
 	<c:otherwise>
 	  <input type="hidden" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>">
 	</c:otherwise>

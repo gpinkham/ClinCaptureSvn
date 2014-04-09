@@ -72,28 +72,42 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	@Override
 	protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-		String[] propertyColumns = new String[] { "subject.uniqueIdentifier", "studySubjectIdAndStudy",
-				"subject.gender", "subject.createdDate", "subject.owner", "subject.updatedDate", "subject.updater",
-				"subject.status", "actions" };
+		String columnsList = "subject.createdDate,subject.owner,subject.updatedDate,subject.updater,subject.status,actions";
 
-		if (currentStudy != null
-				&& !currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
-			propertyColumns = new String[] { "subject.uniqueIdentifier", "studySubjectIdAndStudy",
-					"subject.createdDate", "subject.owner", "subject.updatedDate", "subject.updater", "subject.status",
-					"actions" };
+		if (currentStudy != null && currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
+			columnsList = "subject.gender," + columnsList;
 		}
+
+		if (currentStudy != null) {
+			if (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equalsIgnoreCase("required")
+					|| currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equalsIgnoreCase("optional")) {
+				columnsList = "subject.uniqueIdentifier,studySubjectIdAndStudy," + columnsList;
+			} else {
+				columnsList = "studySubjectIdAndStudy," + columnsList;
+			}
+		}
+
+		String[] propertyColumns = columnsList.split(",");
 
 		tableFacade.setColumnProperties(propertyColumns);
 
 		Row row = tableFacade.getTable().getRow();
 		StudyBean currentStudy = (StudyBean) tableFacade.getWebContext().getSessionAttribute("study");
-		configureColumn(row.getColumn("subject.uniqueIdentifier"), resword.getString("person_ID"), null, null);
+
+		if (currentStudy != null
+				&& (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equalsIgnoreCase("required") || currentStudy
+						.getStudyParameterConfig().getSubjectPersonIdRequired().equalsIgnoreCase("optional"))) {
+			configureColumn(row.getColumn("subject.uniqueIdentifier"), resword.getString("person_ID"), null, null);
+		}
+
 		configureColumn(row.getColumn("studySubjectIdAndStudy"), resword.getString("Protocol_Study_subject_IDs"), null,
 				null, true, false);
-		if (currentStudy == null || currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
+
+		if (currentStudy != null && currentStudy.getStudyParameterConfig().getGenderRequired().equalsIgnoreCase("true")) {
 			configureColumn(row.getColumn("subject.gender"), currentStudy == null ? resword.getString("gender")
 					: currentStudy.getStudyParameterConfig().getGenderLabel(), null, null);
 		}
+
 		configureColumn(row.getColumn("subject.createdDate"), resword.getString("date_created"), new DateCellEditor(
 				getDateFormat()), null);
 		configureColumn(row.getColumn("subject.owner"), resword.getString("owner"), new OwnerCellEditor(), null, true,
@@ -107,11 +121,8 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 		configureColumn(
 				row.getColumn("actions"),
 				resword.getString("actions")
-				// +
-				// "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-						+ "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;",
+						+ "<div style='width:85px'></div>",
 				new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
-		// >> tbh #4003, 08/2009
 
 	}
 
@@ -317,9 +328,9 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 	private String updateSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
 		builder.a().href("UpdateSubject?action=show&id=" + subjectId);
-		//if you really need use builder.onmouseout("javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');");
-		//or builder.onmouseover("javascript:setImage('bt_Edit1','images/bt_Edit.gif');");
-		//but don't forget about color theme - you can brake it!
+		// if you really need use builder.onmouseout("javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');");
+		// or builder.onmouseover("javascript:setImage('bt_Edit1','images/bt_Edit.gif');");
+		// but don't forget about color theme - you can brake it!
 		builder.close();
 		builder.img().name("bt_Edit1").src("images/bt_Edit.gif").border("0").alt(resword.getString("edit"))
 				.title(resword.getString("edit")).align("left").append("hspace=\"6\"").close();

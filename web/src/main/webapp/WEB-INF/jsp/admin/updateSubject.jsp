@@ -45,8 +45,8 @@
 <c:set var="genderShow" value="${true}"/>
 <fmt:message key="gender" bundle="${resword}" var="genderLabel"/>
 <c:if test="${study ne null}">
-    <c:set var="genderShow" value="${!(study.studyParameterConfig.genderRequired == 'false')}"/>
-    <c:set var="genderLabel" value="${study.studyParameterConfig.genderLabel}"/>
+	<c:set var="genderShow" value="${!(study.studyParameterConfig.genderRequired == 'false')}"/>
+	<c:set var="genderLabel" value="${study.studyParameterConfig.genderLabel}"/>
 </c:if>
 
 <h1>
@@ -54,54 +54,63 @@
 		<fmt:message key="update_subject_details" bundle="${resword}"/>
 	</span>
 </h1>
+
 <P><fmt:message key="field_required" bundle="${resword}"/></P>
 <form action="UpdateSubject" method="post">
+
 <input type="hidden" name="action" value="confirm">
 <input type="hidden" name="id" value="<c:out value="${subjectToUpdate.id}"/>">
 <input type="hidden" name="studySubId" value="<c:out value="${studySubId}"/>">
 <input type="hidden" name="isDataChanged" value="<c:out value="${isDataChanged}"/>">
 <!-- These DIVs define shaded box borders -->
+
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
-<table border="0" cellpadding="0" cellspacing="10">
-	<tr valign="top">
-	  	<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
-		<td>
-			 <c:choose>
+<table border="0" cellspacing="10">
+	<c:choose>
+		<c:when test="${parameters['subjectPersonIdRequired'] != 'copyFromSSID'}">
+			<c:set var="showPID" value="table-row"/>
+		</c:when>
+		<c:otherwise>
+			<c:set var="showPID" value="none"/>
+		</c:otherwise>
+	</c:choose>
+	
+	<tr valign="top" style="display:${showPID}">
+		<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
+		<td><c:choose>
 				<c:when test="${parameters['subjectPersonIdRequired'] == 'required'}">
-					<table>
-						<tr>
-							<td>
-								<div class="formfieldXL_BG">
-									<input type="text" name="uniqueIdentifier" value="<c:out value="${fields['personId']}"/>" class="formfieldXL">
-								</div>
-							</td>
-							<td>
-								 *
-								<c:if test="${parameters['discrepancyManagement']}">
-                  <c:choose>
-                    <c:when test="${hasUniqueIDNote eq 'yes'}">
-                      <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
-                        <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="${uniqueIDNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                      </a>
-                    </c:when>
-                    <c:otherwise>
-                      <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
-                        <img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
-                        <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier">
-                      </a>
-                    </c:otherwise>
-                  </c:choose>
-								</c:if>
-							</td>
-						</tr>
-					</table>
+					<table><tr>
+						<td>
+							<div class="formfieldXL_BG">
+								<input type="text" name="uniqueIdentifier" value="<c:out value="${fields['personId']}"/>" class="formfieldXL">
+							</div>
+						</td>
+						<td> *
+							<c:if test="${parameters['discrepancyManagement']}">
+							
+							<c:choose>
+								<c:when test="${hasUniqueIDNote eq 'yes'}">
+									<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
+										<img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="${uniqueIDNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+									</a>
+								</c:when>
+								<c:otherwise>
+									<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
+										<img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+										<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier">
+									</a>
+								</c:otherwise>
+							</c:choose>
+							</c:if>
+						</td>
+					</tr></table>
 				</c:when>
-				<c:when test="${parameters['subjectPersonIdRequired'] == 'optional'}">
-					<table>
-						<tr>
+				
+				<c:when test="${parameters['subjectPersonIdRequired'] == 'optional' || parameters['subjectPersonIdRequired'] == 'copyFromSSID'}">
+					<table><tr>
 							<td>
 								<div class="formfieldXL_BG">
 									<input type="text" name="uniqueIdentifier" value="<c:out value="${fields['personId']}"/>" class="formfieldXL">
@@ -109,38 +118,38 @@
 							</td>
 							<td>
 								<c:if test="${parameters['discrepancyManagement']}">
-                  <c:choose>
-                    <c:when test="${hasUniqueIDNote eq 'yes'}">
-                      <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
-                        <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="${uniqueIDNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                      </a>
-                    </c:when>
-                    <c:otherwise>
-                      <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
-                        <img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
-                        <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier">
-                      </a>
-                    </c:otherwise>
-                  </c:choose>
+								<c:choose>
+									<c:when test="${hasUniqueIDNote eq 'yes'}">
+										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
+											<img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="${uniqueIDNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+										</a>
+									</c:when>
+									<c:otherwise>
+										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier', '', event); return false;">
+											<img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+											<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=uniqueIdentifier&column=unique_identifier">
+										</a>
+									</c:otherwise>
+								</c:choose>
 								</c:if>
 							</td>
-						</tr>
-					</table>
+						</tr></table>
 				</c:when>
+
 				<c:otherwise>
 					<div class="formfieldXL_BG">
 						<input type="text" name="uniqueIdentifier" disabled="true" value="<fmt:message key="not_used" bundle="${resword}"/>" class="formfieldXL">
 					</div>
 				</c:otherwise>
-            </c:choose>
+			</c:choose>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include>
 		</td>
 	</tr>
-	
-    <c:if test="${parameters['genderRequired']}">
-    <tr valign="top">
+
+	<c:if test="${parameters['genderRequired']}">
+	<tr valign="top">
 		<td class="formlabel">${parameters['genderLabel']}:</td>
-        <td>
+		<td>
 			<table style="padding-bottom: 4px">
 				<tr>
 					<td>
@@ -162,33 +171,34 @@
 							</c:otherwise>
 						</c:choose>
 					</td>
+
 					<td>
-						<c:if test="${parameters['genderRequired']}">
-							*
-						</c:if>
+						<c:if test="${parameters['genderRequired']}">*</c:if>
 						<c:if test="${parameters['discrepancyManagement']}">
-              <c:choose>
-                <c:when test="${hasGenderNote eq 'yes'}">
-                  <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=gender&column=gender','spanAlert-gender', '', event); return false;">
-                    <img id="flag_gender" name="flag_gender" src="${genderNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                  </a>
-                </c:when>
-                <c:otherwise>
-                  <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=gender&column=gender','spanAlert-gender', '', event); return false;">
-                    <img name="flag_gender" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
-                    <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=gender&column=gender">
-                  </a>
-                </c:otherwise>
-              </c:choose>
+
+							<c:choose>
+								<c:when test="${hasGenderNote eq 'yes'}">
+									<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=gender&column=gender','spanAlert-gender', '', event); return false;">
+										<img id="flag_gender" name="flag_gender" src="${genderNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+									</a>
+								</c:when>
+								<c:otherwise>
+									<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=gender&column=gender','spanAlert-gender', '', event); return false;">
+										<img name="flag_gender" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+										<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=gender&column=gender">
+									</a>
+								</c:otherwise>
+							</c:choose>
+
 						</c:if>
 					</td>
 				</tr>
 			</table>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include>
 		</td>
-    </tr>
-	</c:if>	
-	
+	</tr>
+	</c:if>
+
 	<c:choose>
 	<c:when test="${parameters['collectDob'] == '1'}">
 		<tr valign="top">
@@ -284,8 +294,9 @@
 			</td>
 		</tr>
 	</c:otherwise>
-    </c:choose>
+	</c:choose>
 </table>
+
 </div>
 </div></div></div></div></div></div></div></div>
 
@@ -319,15 +330,17 @@
  
     saveEditUserFormState(updateSubjectFormState);
 </script>
+
 </br>
 </div>
- <input type="button" onclick="back_checkEditUserFormState();"  name="BTN_Smart_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/>
- <c:if test="${parameters['genderRequired'] || parameters['collectDob'] != 3 || parameters['subjectPersonIdRequired'] != 'not used'}">
-	<input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
- </c:if>
- <img src="images/icon_UnchangedData.gif" style="visibility:hidden" alt="Data Status" name="DataStatus_bottom">
- </form>
+<input type="button" onclick="back_checkEditUserFormState();"  name="BTN_Smart_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/>
 
+<c:if test="${parameters['genderRequired'] || parameters['collectDob'] != 3 || parameters['subjectPersonIdRequired'] != 'not used'}">
+	<input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
+</c:if>
+
+<img src="images/icon_UnchangedData.gif" style="visibility:hidden" alt="Data Status" name="DataStatus_bottom">
+</form>
 </body>
 
 <jsp:include page="../include/footer.jsp"/>

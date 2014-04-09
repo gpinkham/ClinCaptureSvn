@@ -151,9 +151,20 @@
         </td>
     </tr>
     </c:when>
+    <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='copyFromSSID'}">
+        <script>
+			$(document).ready(function() {
+				initFieldCopying("[name=label]","[name=uniqueIdentifier]");
+			});
+		</script>
+	</c:when>
+	</script>
+	&nbsp;<input type="hidden" name="uniqueIdentifier" value="<fmt:message key="person_ID" bundle="${resword}"/>" size="12" tabindex="<c:out value="${tabCount}"/>" class="formfield">
+	
     <c:otherwise>
       <input type="hidden" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>">
     </c:otherwise>
+
     </c:choose>
 
     <c:set var="additionalStyle" value=""/>

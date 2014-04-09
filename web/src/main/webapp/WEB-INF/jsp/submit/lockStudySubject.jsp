@@ -105,29 +105,35 @@
 <tbody><tr>
     <td class="table_header_column_top">${studySubjectLabel}</td>
     <td class="table_cell_top"><c:out value="${studySubjectBean.label}"/></td>
-    <td class="table_header_row"><fmt:message key="person_ID" bundle="${resword}"/>
-
-        <%-- DN for person ID goes here --%>
-        <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-            <c:set var="isNew" value="${hasUniqueIDNote eq 'yes' ? 0 : 1}"/>
-
-            <c:choose>
-                <c:when test="${hasUniqueIDNote eq 'yes'}">
-                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
-                        <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                    </a>
-
-                </c:when>
-                <c:otherwise>
-
-                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
-                        <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                    </a>
-                </c:otherwise>
-            </c:choose>
+    <td class="table_header_row">
+    	<c:if test="${study.studyParameterConfig.subjectPersonIdRequired != 'copyFromSSID'}">
+			<fmt:message key="person_ID" bundle="${resword}"/>
+	
+	        <%-- DN for person ID goes here --%>
+	        <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+	            <c:set var="isNew" value="${hasUniqueIDNote eq 'yes' ? 0 : 1}"/>
+	
+	            <c:choose>
+	                <c:when test="${hasUniqueIDNote eq 'yes'}">
+	                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+	                        <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+	                    </a>
+	
+	                </c:when>
+	                <c:otherwise>
+	
+	                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+	                        <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+	                    </a>
+	                </c:otherwise>
+	            </c:choose>
+	        </c:if>
         </c:if>
     </td>
-    <td class="table_cell_top"><c:out value="${subject.uniqueIdentifier}"/>
+    <td class="table_cell_top">
+    	<c:if test="${study.studyParameterConfig.subjectPersonIdRequired != 'copyFromSSID'}">
+    		<c:out value="${subject.uniqueIdentifier}"/>
+    	</c:if>
     </td>
 </tr>
 

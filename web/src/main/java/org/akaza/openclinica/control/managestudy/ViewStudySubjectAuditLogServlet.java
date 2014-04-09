@@ -46,6 +46,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -91,6 +92,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 		StudyDAO studydao = new StudyDAO(sm.getDataSource());
 		CRFDAO cdao = new CRFDAO(sm.getDataSource());
 		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
 
 		ArrayList studySubjectAudits = new ArrayList();
 		ArrayList eventCRFAudits = new ArrayList();
@@ -107,6 +109,10 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 		} else {
 			StudySubjectBean studySubject = (StudySubjectBean) subdao.findByPK(studySubId);
 			StudyBean study = (StudyBean) studydao.findByPK(studySubject.getStudyId());
+
+			study.getStudyParameterConfig().setSubjectPersonIdRequired(
+					spvdao.findByHandleAndStudy(study.getId(), "subjectPersonIdRequired").getValue());
+
 			// Check if this StudySubject would be accessed from the Current Study
 			if (studySubject.getStudyId() != currentStudy.getId()) {
 				if (currentStudy.getParentStudyId() > 0) {

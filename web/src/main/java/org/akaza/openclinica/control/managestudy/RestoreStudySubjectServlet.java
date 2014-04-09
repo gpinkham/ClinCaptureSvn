@@ -44,6 +44,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -113,7 +114,10 @@ public class RestoreStudySubjectServlet extends Controller {
 			StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 
 			StudyDAO studydao = getStudyDAO();
+			StudyParameterValueDAO spvdao = getStudyParameterValueDAO();
 			StudyBean study = (StudyBean) studydao.findByPK(studyId);
+			study.getStudyParameterConfig().setSubjectPersonIdRequired(
+					spvdao.findByHandleAndStudy(study.getId(), "subjectPersonIdRequired").getValue());
 
 			// find study events
 			StudyEventDAO sedao = getStudyEventDAO();

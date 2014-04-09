@@ -34,7 +34,7 @@ public class StudyParameterConfig {
 
 	private String genderRequired;// true or false
 
-	private String subjectPersonIdRequired; // required, optional or not used
+	private String subjectPersonIdRequired; // required, optional, copy from SSID or not used
 
 	private String interviewerNameRequired;// required, optional
 

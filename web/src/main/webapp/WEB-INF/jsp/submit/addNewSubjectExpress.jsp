@@ -118,6 +118,14 @@
 			   <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='optional'}">
 			    &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="person_ID" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="uniqueIdentifier" value="<fmt:message key="person_ID" bundle="${resword}"/>" size="12" tabindex="<c:out value="${tabCount}"/>" class="formfield">
 			   </c:when>
+			   <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='copyFromSSID'}">
+				<script>
+					$(document).ready(function() {
+						initFieldCopying("[name=label]","[name=uniqueIdentifier]");
+					});
+				</script>
+			    &nbsp;<input type="hidden" name="uniqueIdentifier" value="<fmt:message key="person_ID" bundle="${resword}"/>" size="12" tabindex="<c:out value="${tabCount}"/>" class="formfield">
+			   </c:when>
 			   <c:otherwise>
 			    &nbsp;<input type="hidden" name="uniqueIdentifier" value="">
 			   </c:otherwise>

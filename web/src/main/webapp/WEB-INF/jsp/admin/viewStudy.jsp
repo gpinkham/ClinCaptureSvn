@@ -345,6 +345,9 @@
     <c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
     <fmt:message key="optional" bundle="${resword}"/>
    </c:when>
+   <c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'copyFromSSID'}">
+    <fmt:message key="copy_from_ssid" bundle="${resword}"/>
+   </c:when>
    <c:otherwise>
      <fmt:message key="not_used" bundle="${resword}"/>
    </c:otherwise>
