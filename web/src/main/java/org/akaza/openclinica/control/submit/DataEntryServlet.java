@@ -2313,7 +2313,8 @@ public abstract class DataEntryServlet extends Controller {
 				+ "; Subject: " + subjectId);
 
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
-		StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
+		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(subjectId);
+		StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(studySubjectBean.getSubjectId(), currentStudy);
 
 		if (ssb.getId() <= 0) {
 			logger.trace("throwing ISE with study subject bean id of " + ssb.getId());
