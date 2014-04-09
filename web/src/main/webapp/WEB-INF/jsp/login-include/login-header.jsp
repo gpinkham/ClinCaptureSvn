@@ -21,7 +21,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <link rel="icon" href="<c:url value='/images/favicon.ico'/>" />
 <link rel="shortcut icon" href="<c:url value='/images/favicon.ico'/>" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
