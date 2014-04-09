@@ -57,14 +57,14 @@
 
     <c:set var="color" scope="session" value="${newThemeColor}"/>
 	<c:if test="${(color == 'violet') || (color == 'green')}">
-	<script>
-	document.write( '<style class="hideStuff" ' +
-              'type="text/css">body {display:none;}<\/style>');
-	</script>
+        <style class="hideStuff" type="text/css">body {display:none;}</style>
 	</c:if>
 
 </head>
 <body class="aka_bodywidth" onload="document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';" onunload="javascript:clsWin();">
+<c:if test='${popUpURL != ""}'>
+    <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script>
+</c:if>
 <%-- BWP:  onload=
   "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});} TabsForwardByNum(<c:out value="${tabId}"/>);"
   alert(self.screen.availWidth);
@@ -141,6 +141,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
+<input type="hidden" name="fromViewNotes" value="<c:out value="${fromViewNotes}"/>" />
 <input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
 <c:if test="${study.parentStudyId > 0}">
 	<!-- Site information -->

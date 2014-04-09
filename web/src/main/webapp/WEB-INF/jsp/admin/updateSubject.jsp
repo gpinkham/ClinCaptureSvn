@@ -214,13 +214,13 @@
 							<c:if test="${parameters['discrepancyManagement']}">
                 <c:choose>
                   <c:when test="${hasDOBNote eq 'yes'}">
-                    <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dateOfBirth', '', event); return false;">
-                      <img id="flag_dateOfBirth" name="flag_dateOfBirth" src="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                    <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
+                      <img id="flag_dob" name="flag_dob" src="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                     </a>
                   </c:when>
                   <c:otherwise>
-                    <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=dob&column=date_of_birth','spanAlert-dateOfBirth', '', event); return false;">
-                      <img name="flag_dateOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                    <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
+                      <img name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
                       <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth">
                     </a>
                   </c:otherwise>
@@ -249,13 +249,13 @@
 							<c:if test="${parameters['discrepancyManagement']}">
                 <c:choose>
                   <c:when test="${hasDOBNote eq 'yes'}">
-                    <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dateOfBirth', '', event); return false;">
-                      <img id="flag_dateOfBirth" name="flag_dateOfBirth" src="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                    <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
+                      <img id="flag_dob" name="flag_dob" src="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                     </a>
                   </c:when>
                   <c:otherwise>
-                    <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=dob&column=date_of_birth','spanAlert-dateOfBirth', '', event); return false;">
-                      <img name="flag_dateOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                    <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${subjectToUpdate.id}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&writeToDB=1&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
+                      <img name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
                       <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${subjectToUpdate.id}&id=${subjectToUpdate.id}&name=subject&field=dob&column=date_of_birth">
                     </a>
                   </c:otherwise>

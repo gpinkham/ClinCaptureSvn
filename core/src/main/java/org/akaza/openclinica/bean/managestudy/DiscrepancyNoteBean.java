@@ -27,6 +27,8 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings({ "rawtypes", "serial" })
 public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparable {
@@ -83,6 +85,21 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
 	private int days = 0;
 	private int age = 0;
+
+	public static final Map<String, String> columnToFieldMap = new HashMap<String, String>();
+	static {
+		columnToFieldMap.put("unique_identifier", "uniqueIdentifier");
+		columnToFieldMap.put("date_of_birth", "dob");
+		columnToFieldMap.put("gender", "gender");
+		columnToFieldMap.put("enrollment_date", "enrollmentDate");
+		columnToFieldMap.put("location", "location");
+		columnToFieldMap.put("date_start", "date_start");
+		columnToFieldMap.put("date_end", "date_end");
+	}
+
+	public static Map<String, String> getColumnToFieldMap() {
+		return columnToFieldMap;
+	}
 
 	private StudyBean study = new StudyBean();
 
@@ -141,7 +158,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 		this.lastUpdator = new UserAccountBean();
 		this.updatedDate = null;
 	}
-	
+
 	public DiscrepancyNoteBean(DiscrepancyNoteBean dnb) {
 		// simple fields are copied
 		this.description = dnb.getDescription();
@@ -157,7 +174,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 		this.studyId = dnb.getStudyId();
 		this.isSaved = dnb.isSaved();
 		this.active = dnb.isActive();
-		
+
 		// bean-fields are copied
 		this.disType = dnb.getDisType();
 		this.resStatus = dnb.getResStatus();

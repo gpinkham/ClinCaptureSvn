@@ -53,15 +53,13 @@
     <!-- *JSP* submit/administrativeEditing.jsp -->
     <c:set var="color" scope="session" value="${newThemeColor}"/>
 	<c:if test="${(color == 'violet') ||(color == 'green')}">
-	<script>
-	document.write( '<style class="hideStuff" ' +
-              'type="text/css">body {display:none;}<\/style>');
-	</script>
+        <style class="hideStuff" type="text/css">body {display:none;}</style>
 	</c:if>
 </head>
-<body class="aka_bodywidth" onload="
-        <c:if test='${popUpURL != ""}'>openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>" onunload="javascript:clsWin();">
-
+<body class="aka_bodywidth" onload="" onunload="javascript:clsWin();">
+<c:if test='${popUpURL != ""}'>
+    <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script>
+</c:if>
 <%-- BWP:
  onload=
   "document.getElementById('centralContainer').style.display='none'; new Effect.Appear('centralContainer', {duration:1});<jsp:include page="../include/showPopUp2.jsp"/>"
@@ -138,12 +136,12 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
 <input type="hidden" name="tabId" value="<c:out value="${tabId}"/>" />
-<input type="hidden" name="fromViewNotes" value="<c:out value="${fromViewNotes}"/>" />
 <input type="hidden" name="occurenceNumber" value="<c:out value="${studyEvent.sampleOrdinal}"/>" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input id="hasPopUp" type="hidden" name="hasPopUp" value="${requestScope['hasPopUp']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
+<input type="hidden" name="fromViewNotes" value="<c:out value="${fromViewNotes}"/>" />
 <input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />
 <c:if test="${study.parentStudyId > 0}">
 	<!-- Site information -->

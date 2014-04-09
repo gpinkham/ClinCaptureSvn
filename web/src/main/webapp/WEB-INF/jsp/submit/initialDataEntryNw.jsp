@@ -56,13 +56,13 @@
     <!-- End -->
     <c:set var="color" scope="session" value="${newThemeColor}"/>
 	<c:if test="${(color == 'violet') || (color == 'green')}">
-	<script>
-	document.write( '<style class="hideStuff" ' +
-              'type="text/css">body {display:none;}<\/style>');
-	</script>
+	    <style class="hideStuff" type="text/css">body {display:none;}</style>
 	</c:if>
 </head>
 <body class="aka_bodywidth" onload="document.getElementById('here').style.display='none'; document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';"  onunload="javascript:clsWin();" >
+<c:if test='${popUpURL != ""}'>
+    <script>executeWhenDOMIsReady("openDNoteWindow('${popUpURL}');");</script>
+</c:if>
 <%-- onload="if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});}"
 giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <div id="centralContainer" style=
@@ -122,7 +122,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
                 <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
             </c:when>
             <c:otherwise>
-              
+
             </c:otherwise>
         </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
 		<h1><span class="first_level_header"><fmt:message key="subject_ID" bundle="${resword}"/>: <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
@@ -140,6 +140,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
+<input type="hidden" name="fromViewNotes" value="<c:out value="${fromViewNotes}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="isFirstTimeOnSection" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="currentUserRole" value="<c:out value="${userRole.role.name}"/>" />

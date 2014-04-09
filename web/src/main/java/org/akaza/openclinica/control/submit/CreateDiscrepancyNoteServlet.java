@@ -20,21 +20,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -71,8 +58,19 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.service.DiscrepancyDescriptionService;
-import com.clinovo.util.ValidatorHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Create a discrepancy note for a data entity
@@ -980,6 +978,10 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 
 		if (toView) {
 			String columnValue = "".equalsIgnoreCase(note.getColumn()) ? "value" : note.getColumn();
+			arguments.add(ENTITY_FIELD
+					+ "="
+					+ (note.getEntityType().equalsIgnoreCase("itemData") ? note.getField() : DiscrepancyNoteBean
+							.getColumnToFieldMap().get(note.getColumn())));
 			arguments.add(ENTITY_COLUMN + "=" + columnValue);
 			arguments.add(SUBJECT_ID + "=" + note.getSubjectId());
 			arguments.add(ITEM_ID + "=" + note.getItemId());

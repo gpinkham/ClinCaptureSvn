@@ -2492,6 +2492,12 @@ $(function() {
     }
 });
 
+executeWhenDOMIsReady = function(code) {
+    $(function() {
+        eval(code);
+    });
+}
+
 disableRandomizeCRFButtons = function(flag) {
 
     if (flag) {

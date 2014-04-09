@@ -29,12 +29,18 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -78,8 +84,9 @@ public class ResolveDiscrepancyServlet extends Controller {
 	public static final String SECTION_ID = "sectionId";
 	public static final String FIELD = "field";
 
-	public Page getPageForForwarding(HttpServletRequest request, DiscrepancyNoteBean note, boolean isCompleted) {
+	public Page getPageForForwarding(HttpServletRequest request, DiscrepancyNoteBean note) {
 		UserAccountBean ub = getUserAccountBean(request);
+		StudyBean currentStudy = getCurrentStudy(request);
 		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		String entityType = note.getEntityType().toLowerCase();
@@ -104,12 +111,34 @@ public class ResolveDiscrepancyServlet extends Controller {
 				return Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET;
 			}
 		} else if ("itemdata".equalsIgnoreCase(entityType) || "eventcrf".equalsIgnoreCase(entityType)) {
-			if (currentRole.getRole().equals(Role.STUDY_CODER) || currentRole.getRole().equals(Role.STUDY_MONITOR)
-					|| !isCompleted) {
-				return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
-			} else {
-				return Page.ADMIN_EDIT_SERVLET;
+			ItemDataBean idb = (ItemDataBean) getItemDataDAO().findByPK(note.getEntityId());
+			EventCRFBean ecb = (EventCRFBean) getEventCRFDAO().findByPK(idb.getEventCRFId());
+			CRFVersionBean crfvb = (CRFVersionBean) getCRFVersionDAO().findByPK(ecb.getCRFVersionId());
+			StudyEventBean seb = (StudyEventBean) getStudyEventDAO().findByPK(ecb.getStudyEventId());
+			EventDefinitionCRFBean edcb = getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFId(
+					seb.getStudyEventDefinitionId(), crfvb.getCrfId());
+			DisplayEventCRFBean dec = new DisplayEventCRFBean();
+			dec.setEventDefinitionCRF(edcb);
+			dec.setFlags(ecb, ub, currentRole, edcb.isDoubleEntry());
+			request.setAttribute(EVENT_CRF_ID, Integer.toString(ecb.getId()));
+			if (currentStudy.getStatus().equals(Status.AVAILABLE)
+					&& (ecb.getStatus().equals(Status.AVAILABLE) || ecb.getStatus().equals(Status.UNAVAILABLE))
+					&& (ub.getActiveStudyRole().equals(Role.SYSTEM_ADMINISTRATOR)
+							|| ub.getActiveStudyRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
+							|| ub.getActiveStudyRole().equals(Role.INVESTIGATOR)
+							|| ub.getActiveStudyRole().equals(Role.STUDY_MONITOR) || ub.getActiveStudyRole().equals(
+							Role.STUDY_ADMINISTRATOR))) {
+				if (dec.isContinueInitialDataEntryPermitted()) {
+					return Page.INITIAL_DATA_ENTRY_SERVLET;
+				} else if (dec.isStartDoubleDataEntryPermitted()) {
+					return Page.DOUBLE_DATA_ENTRY_SERVLET;
+				} else if (dec.isContinueDoubleDataEntryPermitted()) {
+					return Page.DOUBLE_DATA_ENTRY_SERVLET;
+				} else if (dec.isPerformAdministrativeEditingPermitted()) {
+					return Page.ADMIN_EDIT_SERVLET;
+				}
 			}
+			return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
 		}
 		return null;
 	}
@@ -223,14 +252,20 @@ public class ResolveDiscrepancyServlet extends Controller {
 		if ("itemdata".equalsIgnoreCase(entityType)) {
 			ItemDataDAO iddao = new ItemDataDAO(getDataSource());
 			ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
-
-			EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-
-			EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
+			ItemBean ib = (ItemBean) getItemDAO().findByPK(idb.getItemId());
+			EventCRFBean ecb = (EventCRFBean) getEventCRFDAO().findByPK(idb.getEventCRFId());
+			CRFVersionBean crfvb = (CRFVersionBean) getCRFVersionDAO().findByPK(ecb.getCRFVersionId());
+			ItemGroupBean ig = getItemGroupDAO().findByItemAndCRFVersion(ib, crfvb);
+			ItemGroupMetadataBean igmb = (ItemGroupMetadataBean) getItemGroupMetadataDAO().findByItemAndCrfVersion(
+					ib.getId(), crfvb.getId());
 
 			discrepancyNoteBean.setSubjectId(ecb.getStudySubjectId());
 			discrepancyNoteBean.setItemId(idb.getItemId());
-
+			if (igmb.isRepeatingGroup()) {
+				discrepancyNoteBean.setField(ig.getOid() + "_" + (idb.getOrdinal() - 1) + "input" + ib.getId());
+			} else {
+				discrepancyNoteBean.setField("input" + ib.getId());
+			}
 			if (ecb.getStatus().equals(Status.UNAVAILABLE)) {
 				isCompleted = true;
 			}
@@ -266,7 +301,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 		boolean goNext = prepareRequestForResolution(request, getDataSource(), currentStudy, discrepancyNoteBean,
 				isCompleted);
 
-		Page p = getPageForForwarding(request, discrepancyNoteBean, isCompleted);
+		Page p = getPageForForwarding(request, discrepancyNoteBean);
 
 		if (p == null) {
 			throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET,
@@ -284,11 +319,18 @@ public class ResolveDiscrepancyServlet extends Controller {
 			setPopUpURL(request, createNoteURL);
 		}
 
+		if (p.equals(Page.INITIAL_DATA_ENTRY_SERVLET) || p.equals(Page.DOUBLE_DATA_ENTRY_SERVLET)
+				|| p.equals(Page.ADMIN_EDIT_SERVLET)) {
+			request.getSession().setAttribute(POP_UP_URL, request.getAttribute(POP_UP_URL));
+			response.sendRedirect(request.getContextPath() + p.getFileName()
+					+ (p.getFileName().contains("?") ? "&" : "?") + "eventCRFId=" + request.getAttribute(EVENT_CRF_ID));
+			return;
+		}
+
 		if (!goNext) {
 			setPopUpURL(request, "");
 			addPageMessage(respage.getString("you_may_not_perform_admin_edit_on_CRF_not_completed_by_user"), request);
 			p = Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET;
-
 		}
 
 		forwardPage(p, request, response);

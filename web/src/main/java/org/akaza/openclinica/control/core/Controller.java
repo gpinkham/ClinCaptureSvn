@@ -353,6 +353,12 @@ public abstract class Controller extends BaseController {
 				request.setAttribute(includeReportingVar, false);
 			}
 
+			String popUpUrl = (String) request.getSession().getAttribute(POP_UP_URL);
+			if (popUpUrl != null) {
+				request.setAttribute(POP_UP_URL, popUpUrl);
+				request.getSession().removeAttribute(POP_UP_URL);
+			}
+
 			StudyDAO sdao = getStudyDAO();
 			if (currentStudy == null || currentStudy.getId() <= 0) {
 				if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
