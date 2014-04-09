@@ -5,6 +5,9 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <c:set var="color" scope="session" value="${newThemeColor}"/>
+<c:if test="${itemDictionary == 'WHOD'}">
+    <c:set var="displayHttp" value="style=display:none"/>
+</c:if>
 
 <c:choose>
     <c:when test="${fn:length(codedElementList) eq 0}">
@@ -21,34 +24,35 @@
             <c:forEach items="${codedElementList}" var="obj">
                 <c:set var="counter" value="${counter + 1}"/>
                 <tbody>
+                <tr <c:out value="${displayHttp}"/>>
+                    <td>HTTP:</td>
+                    <c:set var="hyperlinkColor" value="#789EC5"/>
+                    <c:if test="${(color == 'violet')}">
+                        <c:set var="hyperlinkColor" value="#aa62c6"/>
+                    </c:if>
+                    <c:if test="${(color == 'green')}">
+                        <c:set var="hyperlinkColor" value="#75b894"/>
+                    </c:if>
+                    <td>
+                        <c:set var="bioportalUrl" value="${(fn:replace(obj.httpPath, '/MDR/', '/MEDDRA/'))}"/>
+                        <a target="_blank" style="color:<c:out value="${hyperlinkColor}"/>"
+                           href="http://bioportal.bioontology.org/ontologies/<c:out value="${fn:toUpperCase(fn:replace(itemDictionary, ' ', ''))}"/>?p=classes&conceptid=<c:out value="${bioportalUrl}"/>">
+                            <c:out value="${obj.httpPath}"/>
+                        </a>
+                    </td>
+                    <td width="360px" colspan="2"></td>
+                    <td></td>
+                </tr>
+                <c:forEach items="${obj.classificationElement}" var="classElement">
                     <tr>
-                         <td>HTTP:</td>
-                         <c:set var="hyperlinkColor" value="#789EC5"/>
-                         <c:if test="${(color == 'violet')}">
-                            <c:set var="hyperlinkColor" value="#aa62c6"/>
-                        </c:if>
-                        <c:if test="${(color == 'green')}">
-                            <c:set var="hyperlinkColor" value="#75b894"/>
-                        </c:if>
                         <td>
-                            <a target="_blank" style="color:<c:out value="${hyperlinkColor}"/>"
-                               href="http://bioportal.bioontology.org/ontologies/<c:out value="${fn:toUpperCase(fn:replace(itemDictionary, ' ', ''))}"/>?p=classes&conceptid=<c:out value="${obj.httpPath}"/>">
-                               <c:out value="${obj.httpPath}"/>
-                            </a>
+                            <c:out value="${classElement.elementName}"/>:
                         </td>
-                        <td width=360px colspan="2"></td>
-                         <td></td>
-                     </tr>
-                    <c:forEach items="${obj.classificationElement}" var="classElement">
-                        <tr>
-                            <td>
-                              <c:out value="${classElement.elementName}"/>:
-                            </td>
-                            <td><c:out value="${classElement.codeName}"/></td>
-                            <td width=360px colspan="2"></td>
-                            <td></td>
-                        </tr>
-                    </c:forEach>
+                        <td width="360px"><c:out value="${classElement.codeName}"/></td>
+                        <td colspan="2"></td>
+                        <td></td>
+                    </tr>
+                </c:forEach>
                     <tr>
                         <c:set var="codeButtonColor" value="../images/button_BG.gif"/>
                         <c:if test="${(color == 'violet')}">

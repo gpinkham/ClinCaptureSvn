@@ -120,18 +120,18 @@ public class CodingSpringJob extends QuartzJobBean {
 
         for (int i = 0; i < list.size(); i++) {
 
-            if (list.get(i).equals("HTTP")) {
-                classification.setHttpPath(list.get(i + 1));
-                i++;
-            } else {
+			if (list.get(i).equals("HTTP")) {
+				classification.setHttpPath(list.get(i + 1));
+				i++;
+			} else if (!list.get(i).isEmpty()) {
 
-                ClassificationElement classificationElement = new ClassificationElement();
-                classificationElement.setElementName(list.get(i));
-                classificationElement.setCodeName(list.get(i + 1));
-                classification.addClassificationElement(classificationElement);
-                i++;
-            }
-        }
+				ClassificationElement classificationElement = new ClassificationElement();
+				classificationElement.setElementName(list.get(i));
+				classificationElement.setCodeName(list.get(i + 1));
+				classification.addClassificationElement(classificationElement);
+				i++;
+			}
+		}
 
 		if (classification.getHttpPath().indexOf("whod") > 0) {
 

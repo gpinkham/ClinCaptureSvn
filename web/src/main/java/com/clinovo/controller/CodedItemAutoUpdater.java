@@ -104,6 +104,7 @@ public class CodedItemAutoUpdater {
         String termToAppend = "";
         String prefToAppend = "";
         String displayStyle = "display:none;";
+		String httpPathDisplay = codedItem.getDictionary().equals("WHOD") ? "display:none;" : "";
 
         if(!alise.isEmpty() && !prefTerm.isEmpty()) {
 
@@ -123,7 +124,7 @@ public class CodedItemAutoUpdater {
                     .append(" termToAppend=\"" + termToAppend + "\" ")
                     .append(" prefToAppend=\"" + prefToAppend + "\" ")
                     .close()
-                    .tr(1).close()
+                    .tr(1).style(httpPathDisplay).close()
                     .td(1).close().append("HTTP: ").tdEnd()
 					.td(2).close().a().style("color:" + getThemeColor() + "").append(" target=\"_blank\" ").href("http://bioportal.bioontology.org/ontologies/"
 					+ codedItem.getDictionary().replace("_", "") + "?p=classes&conceptid=" + codedItem.getHttpPath()).close().append(codedItem.getHttpPath()).aEnd().tdEnd()
