@@ -133,8 +133,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 				new ItemCellEditor(), null);
 		configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_name"), null,
 				null);
-		configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_oid"), null,
-				null);
 		configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_status"),
 				new StatusCellEditor(), new StatusDroplistFilterEditor());
 		configureColumn(row.getColumn(columnNames[index++]),
@@ -191,8 +189,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_item_name"), null,
 				null);
 		configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_name"), null,
-				null);
-		configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_oid"), null,
 				null);
 		configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_status"),
 				new StatusCellEditor(), new StatusDroplistFilterEditor());
@@ -343,7 +339,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 		columnNamesList.add("groupLabel");
 		columnNamesList.add("itemName");
 		columnNamesList.add("ruleName");
-		columnNamesList.add("ruleOid");
 		columnNamesList.add("ruleSetRuleStatus");
 		columnNamesList.add("ruleDescription");
 		columnNamesList.add("ruleExpressionValue");

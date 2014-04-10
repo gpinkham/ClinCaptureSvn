@@ -30,6 +30,7 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
 
 	List<Integer> ruleSetRuleIds;
 	private final ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
+
 	public ViewRuleAssignmentTableToolbar(List<Integer> ruleSetRuleIds, boolean showMoreLink, boolean isDesignerRequest) {
 		super();
 		this.ruleSetRuleIds = ruleSetRuleIds;
@@ -75,11 +76,11 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
 				html.script()
 						.type("text/javascript")
 						.close()
-						.append("$(document).ready(function(){ "
-								+ "hideCols('ruleAssignments',[" + getIndexes() + "],false);" + " if($.browser.msie){"
-								+ " $('tr.header td div:last').each(function(){" + " $(this).click();"
-								+ "var ah = $(this).height();" + "$('tr.header td div').each(function(){"
-								+ "$(this).css('height',ah);" + "});" + "});" + "}" + "});").scriptEnd();
+						.append("$(document).ready(function(){ " + "hideCols('ruleAssignments',[" + getIndexes()
+								+ "],false);" + " if($.browser.msie){" + " $('tr.header td div:last').each(function(){"
+								+ " $(this).click();" + "var ah = $(this).height();"
+								+ "$('tr.header td div').each(function(){" + "$(this).css('height',ah);" + "});"
+								+ "});" + "}" + "});").scriptEnd();
 			} else {
 				html.a().id("hide").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],false);")
 						.close();
@@ -97,8 +98,7 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
 		 * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade, java.util.Locale)
 		 */
 		String getIndexes() {
-			String result = "0,1,3,4,8,9,11,13";
-			return result;
+			return "0,1,3,4,8,10,12";
 		}
 
 	}
