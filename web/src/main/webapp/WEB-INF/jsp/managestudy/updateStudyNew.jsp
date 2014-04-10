@@ -82,10 +82,12 @@
 		}
 		objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
 		if (objExCl != null) {
+            var newThemeColor = "${newThemeColor}";
+            newThemeColor = newThemeColor == "green" || newThemeColor == "violet" ? ("/" + newThemeColor) : "";
 			if(objLeftNavRowElement.display == "none"){
-				objExCl.src = "images/${newThemeColor}/bt_Expand.gif";
+				objExCl.src = "images" + newThemeColor + "/bt_Expand.gif";
 			}else{
-				objExCl.src = "images/${newThemeColor}/bt_Collapse.gif";
+				objExCl.src = "images" + newThemeColor + "/bt_Collapse.gif";
 			}
 		}
 	}

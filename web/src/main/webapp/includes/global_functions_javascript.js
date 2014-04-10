@@ -1592,8 +1592,7 @@ function leftnavExpand(strLeftNavRowElementName){
 function leftnavExpand_ext(strLeftNavRowElementName, isHeader, themeColor){
 	var objLeftNavRowElement;
 	var color = "";
-	if (themeColor) { color = "/" + themeColor; }
-	
+	if (themeColor == "green" || themeColor == "violet") { color = "/" + themeColor; }
 	objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
 	if (objLeftNavRowElement != null) {
 		if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
