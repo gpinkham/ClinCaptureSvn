@@ -13,6 +13,15 @@
 
 package org.akaza.openclinica.control.admin;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,24 +30,15 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @SuppressWarnings({ "rawtypes" })
 public final class SpreadsheetPreview implements Preview {
 
-	public static final String ITEMS = "Items";
-	public static final String SECTIONS = "Sections";
-	public static final String GROUPS = "Groups";
-
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-	public Map<String, Map> createCrfMetaObject(HSSFWorkbook workbook) {
+	public static final String ITEMS = "Items";
+	public static final String SECTIONS = "Sections";
+
+	public Map<String, Map> createCrfMetaObject(Workbook workbook) {
 		if (workbook == null)
 			return new HashMap<String, Map>();
 		Map<String, Map> spreadSheetMap = new HashMap<String, Map>();
@@ -69,7 +69,7 @@ public final class SpreadsheetPreview implements Preview {
 	 * @param itemsOrSection
 	 *            should specify "items" or "sections" or the associated static variable, i.e. SpreadsheetPreview.ITEMS
 	 */
-	public Map<Integer, Map<String, String>> createItemsOrSectionMap(HSSFWorkbook workbook, String itemsOrSection) {
+	public Map<Integer, Map<String, String>> createItemsOrSectionMap(Workbook workbook, String itemsOrSection) {
 		if (workbook == null || workbook.getNumberOfSheets() == 0) {
 			return new HashMap<Integer, Map<String, String>>();
 		}
@@ -77,10 +77,10 @@ public final class SpreadsheetPreview implements Preview {
 				&& !itemsOrSection.equalsIgnoreCase(SECTIONS)) {
 			return new HashMap<Integer, Map<String, String>>();
 		}
-		HSSFSheet sheet;
-		HSSFRow row;
-		HSSFCell cell;
-		
+		Sheet sheet;
+		Row row;
+		Cell cell;
+
 		String[] itemHeaders = { "item_name", "description_label", "left_item_text", "units", "right_item_text",
 				"section_label", "header", "subheader", "parent_item", "column_number", "page_number",
 				"question_number", "response_type", "response_label", "response_options_text", "response_values",
@@ -89,7 +89,7 @@ public final class SpreadsheetPreview implements Preview {
 				"parent_section" };
 		Map<String, String> rowCells = new HashMap<String, String>();
 		SortedMap<Integer, Map<String, String>> allRows = new TreeMap<Integer, Map<String, String>>();
-		String str = "";
+		String str;
 		for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
 			sheet = workbook.getSheetAt(i);
 			str = workbook.getSheetName(i);
@@ -121,27 +121,27 @@ public final class SpreadsheetPreview implements Preview {
 					}
 					// item_name
 
-					allRows.put(new Integer(j), rowCells);
+					allRows.put(j, rowCells);
 				}// end inner for loop
 			}// end if
 		}// end outer for
 		return allRows;
 	}
 
-	public Map<Integer, Map<String, String>> createGroupsMap(HSSFWorkbook workbook) {
+	public Map<Integer, Map<String, String>> createGroupsMap(Workbook workbook) {
 		if (workbook == null || workbook.getNumberOfSheets() == 0) {
 			return new HashMap<Integer, Map<String, String>>();
 		}
-		HSSFSheet sheet;
-		HSSFRow row;
-		HSSFCell cell;
+		Sheet sheet;
+		Row row;
+		Cell cell;
 		// static group headers for a CRF; TODO: change these so they are not
 		// static and hard-coded
 		String[] groupHeaders = { "group_label", "group_layout", "group_header", "group_sub_header",
 				"group_repeat_number", "group_repeat_max", "group_repeat_array", "group_row_start_number" };
 		Map<String, String> rowCells = new HashMap<String, String>();
 		SortedMap<Integer, Map<String, String>> allRows = new TreeMap<Integer, Map<String, String>>();
-		String str = "";
+		String str;
 		for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
 			sheet = workbook.getSheetAt(i);
 			str = workbook.getSheetName(i);
@@ -159,8 +159,6 @@ public final class SpreadsheetPreview implements Preview {
 						cell = row.getCell((short) k);
 						if (groupHeaders[k].equalsIgnoreCase("group_header")) {
 							rowCells.put(groupHeaders[k], getCellValue(cell).replaceAll("<[^>]*>", ""));
-						} else {
-
 						}
 					}
 
@@ -171,19 +169,18 @@ public final class SpreadsheetPreview implements Preview {
 		return allRows;
 	}
 
-	@SuppressWarnings("deprecation")
-	private String getCellValue(HSSFCell cell) {
+	private String getCellValue(Cell cell) {
 		if (cell == null)
 			return "";
 		switch (cell.getCellType()) {
-		case HSSFCell.CELL_TYPE_STRING:
+		case Cell.CELL_TYPE_STRING:
 			return cell.getStringCellValue();
-		case HSSFCell.CELL_TYPE_NUMERIC:
+		case Cell.CELL_TYPE_NUMERIC:
 			return Double.toString(cell.getNumericCellValue());
-		case HSSFCell.CELL_TYPE_BOOLEAN:
-			return new Boolean(cell.getBooleanCellValue()).toString();
-		case HSSFCell.CELL_TYPE_FORMULA:
-			return cell.getCellFormula().toString();
+		case Cell.CELL_TYPE_BOOLEAN:
+			return Boolean.toString(cell.getBooleanCellValue());
+		case Cell.CELL_TYPE_FORMULA:
+			return cell.getCellFormula();
 		}
 		return "";
 	}
@@ -194,7 +191,7 @@ public final class SpreadsheetPreview implements Preview {
 		// Simple3.xls , Cancer_History5.xls , Can3.xls
 		POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(new File(
 				"/Users/bruceperry/work/OpenClinica-Cancer-Demo-Study/Cancer_History5.xls")));
-		HSSFWorkbook wb = new HSSFWorkbook(fs);
+		Workbook wb = new HSSFWorkbook(fs);
 		SpreadsheetPreview prev = new SpreadsheetPreview();
 	}
 
@@ -208,18 +205,17 @@ public final class SpreadsheetPreview implements Preview {
 	 * @author Bruce Perry @returns A HashMap containing CRF section names as keys. Returns an empty HashMap if the
 	 * spreadsheet does not contain any sheets named "Sections."
 	 */
-	@SuppressWarnings("deprecation")
-	public Map<String, String> createCrfMap(HSSFWorkbook workbook) {
+	public Map<String, String> createCrfMap(Workbook workbook) {
 		if (workbook == null || workbook.getNumberOfSheets() == 0) {
 			return new HashMap<String, String>();
 		}
-		HSSFSheet sheet;
-		HSSFRow row;
-		HSSFCell cell;
+		Sheet sheet;
+		Row row;
+		Cell cell;
 		Map<String, String> crfInfo = new HashMap<String, String>();
-		String mapKey = "";
+		String mapKey;
 		String val = "";
-		String str = "";
+		String str;
 		String[] crfHeaders = { "crf_name", "version", "version_description", "revision_notes" };
 		for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
 			sheet = workbook.getSheetAt(i);
@@ -234,17 +230,17 @@ public final class SpreadsheetPreview implements Preview {
 						// Set the Map key to the crf header
 
 						switch (cell.getCellType()) {
-						case HSSFCell.CELL_TYPE_STRING:
+						case Cell.CELL_TYPE_STRING:
 							val = cell.getStringCellValue();
 							break;
-						case HSSFCell.CELL_TYPE_NUMERIC:
+						case Cell.CELL_TYPE_NUMERIC:
 							val = Double.toString(cell.getNumericCellValue());
 							break;
-						case HSSFCell.CELL_TYPE_BOOLEAN:
-							val = new Boolean(cell.getBooleanCellValue()).toString();
+						case Cell.CELL_TYPE_BOOLEAN:
+							val = Boolean.toString(cell.getBooleanCellValue());
 							break;
-						case HSSFCell.CELL_TYPE_FORMULA:
-							cell.getCellFormula().toString();
+						case Cell.CELL_TYPE_FORMULA:
+							cell.getCellFormula();
 							break;
 						}
 					}

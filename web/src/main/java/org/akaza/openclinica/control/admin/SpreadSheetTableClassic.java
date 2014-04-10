@@ -20,21 +20,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.PatternSyntaxException;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -58,12 +43,29 @@ import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.exception.CRFReadingException;
 import org.akaza.openclinica.logic.score.ScoreValidator;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * <P>
@@ -78,6 +80,12 @@ import org.slf4j.LoggerFactory;
 public class SpreadSheetTableClassic implements SpreadSheetTable {
 
 	private POIFSFileSystem fs = null;
+
+	private boolean isXlsx = false;
+
+	private Workbook workbook = null;
+
+	private FileInputStream xssfInputStream = null;
 
 	private UserAccountBean ub = null;
 
@@ -101,12 +109,19 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	public SpreadSheetTableClassic(FileInputStream parseStream, UserAccountBean ub, String versionName, Locale locale,
-			int studyId) throws IOException {
+			int studyId, boolean isXlsx) throws IOException {
 		// super();
-		this.fs = new POIFSFileSystem(parseStream);
 		this.ub = ub;
+		this.isXlsx = isXlsx;
 		this.locale = locale;
 		this.studyId = studyId;
+		if (!this.isXlsx) {
+			this.fs = new POIFSFileSystem(parseStream);
+			workbook = new HSSFWorkbook(fs);
+		} else {
+			xssfInputStream = parseStream;
+			workbook = new XSSFWorkbook(xssfInputStream);
+		}
 	}
 
 	public void setCrfId(int id) {
@@ -117,7 +132,6 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 		return this.crfId;
 	}
 
-	@SuppressWarnings("deprecation")
 	public NewCRFBean toNewCRF(javax.sql.DataSource ds, ResourceBundle resPageMsg) throws IOException,
 			CRFReadingException {
 
@@ -127,8 +141,13 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 		ncrf.setCrfId(crfId);// set crf id
 
 		StringBuffer buf = new StringBuffer();
-		HSSFWorkbook wb = new HSSFWorkbook(fs);
-		int numSheets = wb.getNumberOfSheets();
+		if (!this.isXlsx) {
+			workbook = new HSSFWorkbook(fs);
+		} else {
+			workbook = new XSSFWorkbook(xssfInputStream);
+		}
+
+		int numSheets = workbook.getNumberOfSheets();
 		ArrayList queries = new ArrayList();
 		ArrayList errors = new ArrayList();
 		ArrayList repeats = new ArrayList();
@@ -154,7 +173,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 
 		int validSheetNum = 0;
 		for (int j = 0; j < numSheets; j++) {
-			String sheetName = wb.getSheetName(j);
+			String sheetName = workbook.getSheetName(j);
 			if (sheetName.equalsIgnoreCase("CRF") || sheetName.equalsIgnoreCase("Sections")
 					|| sheetName.equalsIgnoreCase("Items")) {
 				validSheetNum++;
@@ -164,8 +183,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 			errors.add(resPageMsg.getString("excel_not_have_valid_worksheet"));
 		}
 		for (int j = 0; j < numSheets; j++) {
-			HSSFSheet sheet = wb.getSheetAt(j);// sheetIndex);
-			String sheetName = wb.getSheetName(j);
+			Sheet sheet = workbook.getSheetAt(j);// sheetIndex);
+			String sheetName = workbook.getSheetName(j);
 			if (sheetName.equalsIgnoreCase("Instructions")) {
 				// totally ignore instructions
 			} else {
@@ -226,7 +245,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 					// Adding itemnames for further use
 					HashMap itemNames = new HashMap();
 					for (int k = 1; k < numRows; k++) {
-						HSSFCell cell = sheet.getRow(k).getCell((short) 0);
+						Cell cell = sheet.getRow(k).getCell(0);
 						String itemName = getValue(cell);
 						itemName = itemName.replaceAll("<[^>]*>", "");
 						itemNames.put(k, itemName);
@@ -240,7 +259,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							blankRowCount++;
 							continue;
 						}
-						HSSFCell cell = sheet.getRow(k).getCell((short) 0);
+						Cell cell = sheet.getRow(k).getCell(0);
 						String itemName = getValue(cell);
 
 						itemName = itemName.replaceAll("<[^>]*>", "");
@@ -274,7 +293,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 						}
 						repeats.add(itemName);
 
-						cell = sheet.getRow(k).getCell((short) 1);
+						cell = sheet.getRow(k).getCell(1);
 						String descLabel = getValue(cell);
 						descLabel = descLabel.replaceAll("<[^>]*>", "");
 
@@ -290,13 +309,13 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							errors.add(resPageMsg.getString("item_desc_length_error"));
 						}
 
-						cell = sheet.getRow(k).getCell((short) 2);
+						cell = sheet.getRow(k).getCell(2);
 						String leftItemText = getValue(cell);
 						if (leftItemText != null && leftItemText.length() > 4000) {
 							errors.add(resPageMsg.getString("left_item_length_error"));
 						}
 
-						cell = sheet.getRow(k).getCell((short) 3);
+						cell = sheet.getRow(k).getCell(3);
 						String unit = getValue(cell).trim();
 						if (unit != null && unit.length() > 0) {
 							String muSql = "";
@@ -336,13 +355,13 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							}
 						}
 
-						cell = sheet.getRow(k).getCell((short) 4);
+						cell = sheet.getRow(k).getCell(4);
 						String rightItemText = getValue(cell);
 						if (rightItemText != null && rightItemText.length() > 2000) {
 							errors.add(resPageMsg.getString("right_item_length_error"));
 						}
 
-						cell = sheet.getRow(k).getCell((short) 5);
+						cell = sheet.getRow(k).getCell(5);
 						if (cell != null) {
 							secName = getValue(cell);
 							secName = secName.replaceAll("<[^>]*>", "");
@@ -359,19 +378,19 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 									+ resPageMsg.getString("check_to_see_that_there_is_valid_LABEL"));
 							htmlErrors.put(j + "," + k + ",5", resPageMsg.getString("NOT_A_VALID_LABEL"));
 						}
-						cell = sheet.getRow(k).getCell((short) 6);
+						cell = sheet.getRow(k).getCell(6);
 						String header = getValue(cell);
 						if (header != null && header.length() > 2000) {
 							errors.add(resPageMsg.getString("item_header_length_error"));
 						}
 
-						cell = sheet.getRow(k).getCell((short) 7);
+						cell = sheet.getRow(k).getCell(7);
 						String subHeader = getValue(cell);
 						if (subHeader != null && subHeader.length() > 240) {
 							errors.add(resPageMsg.getString("item_subheader_length_error"));
 						}
 
-						cell = sheet.getRow(k).getCell((short) 8);
+						cell = sheet.getRow(k).getCell(8);
 						String parentItem = getValue(cell);
 						parentItem = parentItem.replaceAll("<[^>]*>", "");
 						// Checking for a valid paren item name
@@ -386,7 +405,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							parentItem = "";
 						}
 
-						cell = sheet.getRow(k).getCell((short) 9);
+						cell = sheet.getRow(k).getCell(9);
 						int columnNum = 0;
 						String column = getValue(cell);
 						if (!StringUtil.isBlank(column)) {
@@ -397,15 +416,15 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							}
 						}
 
-						cell = sheet.getRow(k).getCell((short) 10);
+						cell = sheet.getRow(k).getCell(10);
 						if (cell != null) {
 							page = getValue(cell);
 						}
 
-						cell = sheet.getRow(k).getCell((short) 11);
+						cell = sheet.getRow(k).getCell(11);
 						String questionNum = getValue(cell);
 
-						cell = sheet.getRow(k).getCell((short) 12);
+						cell = sheet.getRow(k).getCell(12);
 						String responseType = getValue(cell);
 						int responseTypeId = 1;
 						if (StringUtil.isBlank(responseType)) {
@@ -426,7 +445,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							}
 						}
 
-						cell = sheet.getRow(k).getCell((short) 13);
+						cell = sheet.getRow(k).getCell(13);
 						String responseLabel = getValue(cell);
 						if (StringUtil.isBlank(responseLabel) && responseTypeId != ResponseType.TEXT.getId()
 								&& responseTypeId != ResponseType.TEXTAREA.getId()) {
@@ -443,7 +462,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							htmlErrors.put(j + "," + k + ",13", resPageMsg.getString("should_be_file"));
 						}
 
-						cell = sheet.getRow(k).getCell((short) 14);
+						cell = sheet.getRow(k).getCell(14);
 						String resOptions = getValue(cell);
 						if (responseLabel.equalsIgnoreCase("text") || responseLabel.equalsIgnoreCase("textarea")) {
 							resOptions = "text";
@@ -476,7 +495,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 								numberOfOptions = resArray.length;
 							}
 						}
-						cell = sheet.getRow(k).getCell((short) 15);
+						cell = sheet.getRow(k).getCell(15);
 						String resValues = getValue(cell);
 						String value1 = resValues.replaceAll("\\\\,", "##");
 						String[] resValArray = value1.split(",");
@@ -550,7 +569,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							}
 						}
 
-						cell = sheet.getRow(k).getCell((short) 16);
+						cell = sheet.getRow(k).getCell(16);
 						String dataType = getValue(cell);
 						dataType = dataType.replaceAll("<[^>]*>", "");
 						String dataTypeIdString = "1";
@@ -646,7 +665,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							}
 						}
 
-						cell = sheet.getRow(k).getCell((short) 17);
+						cell = sheet.getRow(k).getCell(17);
 						String regexp = getValue(cell);
 						String regexp1 = "";
 						if (!StringUtil.isBlank(regexp)) {
@@ -714,7 +733,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 
 						}
 
-						cell = sheet.getRow(k).getCell((short) 18);
+						cell = sheet.getRow(k).getCell(18);
 						String regexpError = getValue(cell);
 						regexpError = regexpError.replaceAll("<[^>]*>", "");
 						if (!StringUtil.isBlank(regexp) && StringUtil.isBlank(regexpError)) {
@@ -730,9 +749,9 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 						}
 
 						boolean phiBoolean = false;
-						cell = sheet.getRow(k).getCell((short) 19);
+						cell = sheet.getRow(k).getCell(19);
 						String phi = "";
-						if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+						if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
 							double dphi = cell.getNumericCellValue();
 							if ((dphi - (int) dphi) * 1000 == 0) {
 								phi = (int) dphi + "";
@@ -750,14 +769,14 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 						}
 
 						boolean isRequired = false;
-						cell = sheet.getRow(k).getCell((short) 20);
+						cell = sheet.getRow(k).getCell(20);
 						String required = getValue(cell);
 						logger.info(getValue(cell));
 						// does the above no longer work???
 						// String required = "";
 						if (StringUtil.isBlank(required)) {
 							required = "0";
-						} else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+						} else if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
 							double dr = cell.getNumericCellValue();
 							if ((dr - (int) dr) * 1000 == 0) {
 								required = (int) dr + "";
@@ -776,7 +795,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 						}
 
 						String codeRef = "";
-						cell = sheet.getRow(k).getCell((short) 27);
+						cell = sheet.getRow(k).getCell(27);
 						codeRef = getValue(cell);
 
 						// Create oid for Item Bean
@@ -1145,7 +1164,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							blankRowCount++;
 							continue;
 						}
-						HSSFCell cell = sheet.getRow(k).getCell((short) 0);
+						Cell cell = sheet.getRow(k).getCell(0);
 						String secLabel = getValue(cell);
 						secLabel = secLabel.replaceAll("<[^>]*>", "");
 						if (StringUtil.isBlank(secLabel)) {
@@ -1166,7 +1185,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							htmlErrors.put(j + "," + k + ",0", resPageMsg.getString("DUPLICATE_FIELD"));
 						}
 						secNames.add(secLabel);
-						cell = sheet.getRow(k).getCell((short) 1);
+						cell = sheet.getRow(k).getCell(1);
 						String title = getValue(cell);
 						title = title.replaceAll("<[^>]*>", "");
 						if (StringUtil.isBlank(title)) {
@@ -1180,24 +1199,24 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							errors.add(resPageMsg.getString("section_title_length_error"));
 						}
 
-						cell = sheet.getRow(k).getCell((short) 2);
+						cell = sheet.getRow(k).getCell(2);
 						String subtitle = getValue(cell);
 						if (subtitle != null && subtitle.length() > 2000) {
 							errors.add(resPageMsg.getString("section_subtitle_length_error"));
 						}
 
-						cell = sheet.getRow(k).getCell((short) 3);
+						cell = sheet.getRow(k).getCell(3);
 						String instructions = getValue(cell);
 						if (instructions != null && instructions.length() > 2000) {
 							errors.add(resPageMsg.getString("section_instruction_length_error"));
 						}
-						cell = sheet.getRow(k).getCell((short) 4);
+						cell = sheet.getRow(k).getCell(4);
 						String pageNumber = getValue(cell);
 						if (pageNumber != null && pageNumber.length() > 5) {
 							errors.add(resPageMsg.getString("section_page_number_length_error"));
 						}
 
-						cell = sheet.getRow(k).getCell((short) 5);
+						cell = sheet.getRow(k).getCell(5);
 						String parentSection = getValue(cell);
 						parentSection = parentSection.replaceAll("<[^>]*>", "");
 						if (!StringUtil.isBlank(parentSection)) {
@@ -1232,7 +1251,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 						throw new CRFReadingException("Blank row found in sheet CRF.");
 					}
 
-					HSSFCell cell = sheet.getRow(1).getCell((short) 0);
+					Cell cell = sheet.getRow(1).getCell(0);
 					crfName = getValue(cell);
 					crfName = crfName.replaceAll("<[^>]*>", "");
 					if (StringUtil.isBlank(crfName)) {
@@ -1250,7 +1269,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 						}
 					}
 
-					cell = sheet.getRow(1).getCell((short) 1);
+					cell = sheet.getRow(1).getCell(1);
 					String version = getValue(cell);
 					version = version.replaceAll("<[^>]*>", "");
 					ncrf.setVersionName(version);
@@ -1258,7 +1277,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 						errors.add(resPageMsg.getString("version_length_error"));
 					}
 
-					cell = sheet.getRow(1).getCell((short) 2);
+					cell = sheet.getRow(1).getCell(2);
 					String versionDesc = getValue(cell);
 					versionDesc = versionDesc.replaceAll("<[^>]*>", "");
 
@@ -1266,7 +1285,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 						errors.add(resPageMsg.getString("version_description_length_error"));
 					}
 
-					cell = sheet.getRow(1).getCell((short) 3);
+					cell = sheet.getRow(1).getCell(3);
 					String revisionNotes = getValue(cell);
 					revisionNotes = revisionNotes.replaceAll("<[^>]*>", "");
 					if (revisionNotes != null && revisionNotes.length() > 255) {
@@ -1409,7 +1428,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 
 				buf.append("<div class=\"textbox_center\">");
 				buf.append("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"");
-				buf.append("caption=\"" + wb.getSheetName(j) + "\"" + ">");
+				buf.append("caption=\"" + workbook.getSheetName(j) + "\"" + ">");
 
 				for (int i = 0; i < numRows; i++) {
 					buf.append("<tr>");
@@ -1421,7 +1440,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 					int numCells = sheet.getRow(i).getLastCellNum();
 
 					for (int y = 0; y < numCells; y++) {
-						HSSFCell cell = sheet.getRow(i).getCell((short) y);
+						Cell cell = sheet.getRow(i).getCell((short) y);
 						int cellType = 0;
 						String error = "&nbsp;";
 						String errorKey = j + "," + i + "," + y;
@@ -1429,18 +1448,18 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 							error = "<span class=\"alert\">" + htmlErrors.get(errorKey) + "</span>";
 						}
 						if (cell == null) {
-							cellType = HSSFCell.CELL_TYPE_BLANK;
+							cellType = Cell.CELL_TYPE_BLANK;
 						} else {
 							cellType = cell.getCellType();
 						}
 						switch (cellType) {
-						case HSSFCell.CELL_TYPE_BLANK:
+						case Cell.CELL_TYPE_BLANK:
 							buf.append("<td class=\"table_cell\">" + error + "</td>");
 							break;
-						case HSSFCell.CELL_TYPE_NUMERIC:
+						case Cell.CELL_TYPE_NUMERIC:
 							buf.append("<td class=\"table_cell\">" + cell.getNumericCellValue() + " " + error + "</td>");
 							break;
-						case HSSFCell.CELL_TYPE_STRING:
+						case Cell.CELL_TYPE_STRING:
 							buf.append("<td class=\"table_cell\">" + cell.getStringCellValue() + " " + error + "</td>");
 							break;
 						default:
@@ -1493,21 +1512,20 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 		return returnme;
 	}
 
-	@SuppressWarnings("deprecation")
-	public String getValue(HSSFCell cell) {
+	public String getValue(Cell cell) {
 		String val = null;
 		int cellType = 0;
 		if (cell == null) {
-			cellType = HSSFCell.CELL_TYPE_BLANK;
+			cellType = Cell.CELL_TYPE_BLANK;
 		} else {
 			cellType = cell.getCellType();
 		}
 
 		switch (cellType) {
-		case HSSFCell.CELL_TYPE_BLANK:
+		case Cell.CELL_TYPE_BLANK:
 			val = "";
 			break;
-		case HSSFCell.CELL_TYPE_NUMERIC:
+		case Cell.CELL_TYPE_NUMERIC:
 			// Modify code so that floating number alone can be used for
 			// CRF version. Before it must use, e.g. v1.1
 			// Meanwhile modification has been done for read PHI cell and
@@ -1525,7 +1543,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 			}
 			logger.info("found a numeric cell after transfer: " + val);
 			break;
-		case HSSFCell.CELL_TYPE_STRING:
+		case Cell.CELL_TYPE_STRING:
 			val = cell.getStringCellValue();
 			if (val.matches("'")) {
 				val.replaceAll("'", "''");
@@ -1537,17 +1555,21 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 		return val.trim();
 	}
 
-	@SuppressWarnings("deprecation")
 	public String toHTML(int sheetIndex) throws IOException {
 		StringBuffer buf = new StringBuffer();
-		HSSFWorkbook wb = new HSSFWorkbook(fs);
-		int numSheets = wb.getNumberOfSheets();
+		if (!this.isXlsx) {
+			workbook = new HSSFWorkbook(fs);
+		} else {
+			workbook = new XSSFWorkbook(xssfInputStream);
+		}
+
+		int numSheets = workbook.getNumberOfSheets();
 		for (int j = 0; j < numSheets; j++) {
-			HSSFSheet sheet = wb.getSheetAt(j);
-			String sheetName = wb.getSheetName(j);
+			Sheet sheet = workbook.getSheetAt(j);
+			String sheetName = workbook.getSheetName(j);
 			buf.append(sheetName + "<br>");
 			buf.append("<table border=\"2\"");
-			buf.append("caption=\"" + wb.getSheetName(sheetIndex) + "\"" + ">");
+			buf.append("caption=\"" + workbook.getSheetName(sheetIndex) + "\"" + ">");
 			int numCols = sheet.getPhysicalNumberOfRows();
 
 			for (int i = 0; i < numCols; i++) {
@@ -1561,22 +1583,22 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 
 				for (int y = 0; y < numCells; y++) {
 
-					HSSFCell cell = sheet.getRow(i).getCell((short) y);
+					Cell cell = sheet.getRow(i).getCell((short) y);
 					int cellType = 0;
 					if (cell == null) {
-						cellType = HSSFCell.CELL_TYPE_BLANK;
+						cellType = Cell.CELL_TYPE_BLANK;
 					} else {
 						cellType = cell.getCellType();
 					}
 
 					switch (cellType) {
-					case HSSFCell.CELL_TYPE_BLANK:
+					case Cell.CELL_TYPE_BLANK:
 						buf.append("<td> </td>");
 						break;
-					case HSSFCell.CELL_TYPE_NUMERIC:
+					case Cell.CELL_TYPE_NUMERIC:
 						buf.append("<td>" + cell.getNumericCellValue() + "</td>");
 						break;
-					case HSSFCell.CELL_TYPE_STRING:
+					case Cell.CELL_TYPE_STRING:
 						buf.append("<td>" + cell.getStringCellValue() + "</td>");
 						break;
 					default:
@@ -1610,5 +1632,9 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {
 
 	public void setMeasurementUnitDao(MeasurementUnitDao measurementUnitDao) {
 		this.measurementUnitDao = measurementUnitDao;
+	}
+
+	public Workbook getWorkbook() {
+		return this.workbook;
 	}
 }

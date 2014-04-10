@@ -22,6 +22,8 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.exception.CRFReadingException;
+import org.apache.poi.ss.usermodel.Workbook;
+
 import java.io.IOException;
 import java.util.ResourceBundle;
 
@@ -32,8 +34,11 @@ import java.util.ResourceBundle;
  * 
  */
 public interface SpreadSheetTable {
+
 	public NewCRFBean toNewCRF(javax.sql.DataSource ds, ResourceBundle bundle) throws IOException, CRFReadingException;
 
 	public void setCrfId(int id);
+
+	public Workbook getWorkbook();
 
 }
