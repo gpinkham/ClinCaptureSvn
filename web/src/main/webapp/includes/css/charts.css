@@ -171,15 +171,15 @@ form#actionForSave input {
 	margin-right: -3px;
 }
 
-@
--moz-document url-prefix () { .stacked_bar li {
-	display: inline-block !important;
-	width: 0px;
-	height: 20px;
-	margin-left: 0px;
+@-moz-document url-prefix () {
+    .stacked_bar li {
+	    display: inline-block !important;
+	    width: 0px;
+    	height: 20px;
+	    margin-left: 0px;
+    }
 }
 
-}
 .widget .stack .pop-up {
 	display: none;
 }
@@ -194,6 +194,13 @@ form#actionForSave input {
 	margin-top: -10px;
 	text-align: center;
 	font-weight: bold;
+}
+
+.widget .stack .pop-up-visible {
+    color: white;
+    position: absolute;
+    display: block;
+    text-align: center;
 }
 
 .widget table.captions {

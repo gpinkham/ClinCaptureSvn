@@ -53,7 +53,7 @@ function inicializeDnD() {
 		stop : function(e, ui) {
 			disableHighlight();
 			scrollTrigger = true;
-		},
+		}
 	});
 
 	$(".droptrue_tc").sortable({
@@ -301,6 +301,8 @@ function initEventsCompletionWidget(action) {
 			var hasNext = $("#events_completion_form #ec_has_next").val();
 			var hasPrevious = $("#events_completion_form #ec_has_previous").val();
 
+            $(".pop-up").css('display', 'none');
+
 			if (hasNext == "true") {
 				$(".events_completion input#next").css("display", "block");
 			} else {
@@ -312,7 +314,10 @@ function initEventsCompletionWidget(action) {
 			} else {
 				$(".events_completion input#previous").css("display", "none");
 			}
-			$(".events_completion #events_completion_container").show(500);
+            $(".events_completion #events_completion_container").show(500, function () {
+                $(".pop-up-visible").css('display', '');
+                $(".pop-up").css('display', '');
+            });
 
 			var stack = $("#events_completion_container .stacked_bar");
 			stack.each(function(entry) {
@@ -550,19 +555,22 @@ function setCaption(selector, maxValue) {
 function setStacksLenghts(selector, values, captionLimit) {
 	var barWidth = parseInt($(selector).parent().parent().width());
 	var unitSize = barWidth / captionLimit;
-	var counter = 0;
 	$(selector).each(
 			function(index) {
-				var stackWidth = parseInt(values[counter], 10) * unitSize;
+				var stackWidth = parseInt(values[index], 10) * unitSize;
 				$(this).animate({
 					width : stackWidth
 				}, 500);
 
-				$(this).find(".pop-up").css("margin-left",
-						(parseInt(values[counter]) * unitSize) / 2).html(
-						parseInt(values[counter]));
+                $(this).find(".pop-up").css("margin-left",
+                    ((parseInt(values[index]) / 2) * unitSize) - (values[index].toString().length * 7 / 2)).html(parseInt(values[index]));
 
-				counter++;
+                if (values[index].toString().length * 15 < stackWidth) {
+                    $(this).find('.pop-up').removeClass('pop-up').addClass('pop-up-visible');
+                    if ($(this).hasClass('not_scheduled')) {
+                        $(this).find('.pop-up-visible').css('color', '#4D4D4D');
+                    }
+                }
 			});
 }
 
