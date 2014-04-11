@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2014-04-11-TICKET990-1-1">
+		<comment>Update access to widgets for Medical Coder</comment>
+		<update tableName="widget">
+			<column name="have_access" value="1,2,3,4,5,6" />
+			<column name="display_as_default" value="1,2,3,4,5,6" />
+			<where>widget_name in ('Events Completion', 'Subject Status Count', 'Study Progress')</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="denis" id="2014-04-11-TICKET990-1-2">
+		<comment>Clear widgets layout for medical coder</comment>
+		<sql>Delete from widgets_layout where
+			user_id in (Select user_id from
+			user_account where user_name in (Select distinct user_name from
+			study_user_role where role_name = 'Study Coder'))
+		</sql>
+	</changeSet>
+</databaseChangeLog>
