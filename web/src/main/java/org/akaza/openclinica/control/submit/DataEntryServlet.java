@@ -33,6 +33,7 @@ import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
@@ -872,7 +873,7 @@ public abstract class DataEntryServlet extends Controller {
 				}
 			}
 			logMe("allItems  Loop end  " + System.currentTimeMillis());
-			// A map from item name to item bean object.
+			// A map from item name to item bean object.			
 			HashMap<String, ItemBean> scoreItems = new HashMap<String, ItemBean>();
 			HashMap<String, String> scoreItemdata = new HashMap<String, String>();
 			HashMap<Integer, String> oldItemdata = prepareSectionItemdata(sb.getId(), request);
@@ -886,6 +887,7 @@ public abstract class DataEntryServlet extends Controller {
 			HashMap<String, DisplayItemGroupBean> changedItemsMap = new HashMap<String, DisplayItemGroupBean>();
 			// key is itemid, value is set of itemdata-ordinal
 			HashMap<Integer, TreeSet<Integer>> itemOrdinals = prepareItemdataOrdinals(request);
+			HashMap<String, Boolean> rfcForNewRows = new HashMap<String, Boolean>();
 
 			// prepare item data for scoring
 			updateDataOrdinals(allItems);
@@ -933,9 +935,15 @@ public abstract class DataEntryServlet extends Controller {
 					HashMap<Integer, Integer> maxOrdinals = new HashMap<Integer, Integer>();
 					boolean first = true;
 					for (int j = 0; j < dgbs.size(); j++) {
+						boolean newRow = false;
 						DisplayItemGroupBean displayGroup = dgbs.get(j);
 						List<DisplayItemBean> items = displayGroup.getItems();
 						boolean isAdd = "add".equalsIgnoreCase(displayGroup.getEditFlag()) ? true : false;
+						if (dgbs.indexOf(displayGroup) > dbGroups.size() - 1) {
+							newRow = true;
+							rfcForNewRows.put(
+									displayGroup.getItemGroupBean().getId() + "_" + displayGroup.getOrdinal(), false);
+						}						
 						for (DisplayItemBean displayItem : items) {
 							ItemBean ib = displayItem.getItem();
 							String itemName = ib.getName();
@@ -968,7 +976,7 @@ public abstract class DataEntryServlet extends Controller {
 								ordinalSet.add(ordinal);
 								itemOrdinals.put(itemId, ordinalSet);
 							}
-							if (isChanged(displayItem, oldItemdata, attachedFilePath)) {
+							if (newRow || isChanged(displayItem, oldItemdata, attachedFilePath)) {
 								String formName;
 								if (j == 0) {
 									formName = getGroupItemInputName(displayGroup, 0, displayItem);
@@ -983,10 +991,6 @@ public abstract class DataEntryServlet extends Controller {
 								changedItemNamesList.add(formName);
 								changedItemsMap.put(formName, displayGroup);
 								logger.debug("adding to changed items map: " + formName);
-								if (j > diwb.getDbItemGroups().size() - 1) {
-									break; // for new added row we have to show only one '!' for first input if the
-											// "reason for change" is active
-								}
 							}
 						}
 						first = false;
@@ -1227,20 +1231,33 @@ public abstract class DataEntryServlet extends Controller {
 							+ changedItemsMap.toString());
 					logMe("DisplayItemBean  Loop begin  " + System.currentTimeMillis());
 					for (DisplayItemBean displayItem : changedItemsList) {
+						if (displayItem.getMetadata().getResponseSet().getResponseType()
+								.equals(ResponseType.CALCULATION))
+							continue;
 						int index = changedItemsList.indexOf(displayItem);
 						String formName = changedItemNamesList.get(index);
 
 						ItemDataBean idb = displayItem.getData();
 						ItemFormMetadataBean ifmb = displayItem.getMetadata();
+						DisplayItemGroupBean digb = changedItemsMap.get(formName);
+						String newRowRfcKey = digb != null ? digb.getItemGroupBean().getId() + "_" + digb.getOrdinal()
+								: null;
+						Boolean rfcWasAdded = rfcForNewRows.get(newRowRfcKey);
+						if (rfcWasAdded != null && rfcWasAdded)
+							continue;				
 						logger.debug("-- found group label " + ifmb.getGroupLabel());
 						if (!ifmb.getGroupLabel().equalsIgnoreCase("Ungrouped")
 								&& !ifmb.getGroupLabel().equalsIgnoreCase("")) {
-							DisplayItemGroupBean digb = changedItemsMap.remove(formName);
+							changedItemsMap.remove(formName);
 							if (digb != null) {
 								this.setReasonForChangeError(errors, idb, formName, error, request);
+								if (rfcWasAdded != null)
+									rfcForNewRows.put(newRowRfcKey, true);
 							}
 						} else {
 							this.setReasonForChangeError(errors, idb, formName, error, request);
+							if (rfcWasAdded != null)
+								rfcForNewRows.put(newRowRfcKey, true);
 							logger.debug("form name added: " + formName);
 						}
 					}
