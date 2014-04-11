@@ -282,6 +282,9 @@ function initEventsCompletionWidget(action) {
 	var url = getCurentUrl();
 	var lastElement = $(".events_completion input#ec_last_element").val();
 
+	$(".events_completion .pop-up-visible").css('display', 'none');
+	$(".events_completion .pop-up").css('display', 'none');
+
 	if (lastElement == undefined) {
 		lastElement = 0;
 	}
@@ -315,8 +318,8 @@ function initEventsCompletionWidget(action) {
 				$(".events_completion input#previous").css("display", "none");
 			}
             $(".events_completion #events_completion_container").show(500, function () {
-                $(".pop-up-visible").css('display', '');
-                $(".pop-up").css('display', '');
+                $(".events_completion .pop-up-visible").css('display', '');
+                $(".events_completion .pop-up").css('display', '');
             });
 
 			var stack = $("#events_completion_container .stacked_bar");
@@ -325,12 +328,19 @@ function initEventsCompletionWidget(action) {
 				var total = 0;
 				var stack = $(this).find("li");
 				stack.each(function(index) {
+
 					var currentValue = $(this).find(".hidden").html();
+
+					if (currentValue < 0) {
+						currentValue = 0;
+					}
+
 					if (currentValue) {
 						values[index] = parseInt(currentValue);
 						total += parseInt(currentValue);
 					}
 				});
+
 				if (parseInt(total) != 0) {
 					var currentBarClass = $(this).attr("barnumber");
 					var selector = "#events_completion_container .stacked_bar[barnumber="
@@ -623,13 +633,35 @@ function getCurentUrl() {
 	return url;
 }
 
+function setCookie(c_name, value, exdays) {
+	var exdate = new Date();
+	exdate.setDate(exdate.getDate() + exdays);
+	var c_value = escape(value)
+			+ ((exdays == null) ? "" : ("; expires=" + exdate.toUTCString()));
+	document.cookie = c_name + "=" + c_value;
+}
+
+function getCookie(c_name) {
+	if (document.cookie.length > 0) {
+		c_start = document.cookie.indexOf(c_name + "=");
+		if (c_start != -1) {
+			c_start = c_start + c_name.length + 1;
+			c_end = document.cookie.indexOf(";", c_start);
+			if (c_end == -1) {
+				c_end = document.cookie.length;
+			}
+			return unescape(document.cookie.substring(c_start, c_end));
+		}
+	}
+	return "";
+}
+
 function checkCookiesDialog() {
-	var cookieEnabled = (navigator.cookieEnabled) ? true : false;
-    if (typeof navigator.cookieEnabled == "undefined" && !cookieEnabled) { 
-        document.cookie="testcookie";
-        cookieEnabled = (document.cookie.indexOf("testcookie") != -1) ? true : false;
-    }
-	if (!cookieEnabled) {
+
+	setCookie("testCookie", "test");
+	var result = getCookie("testCookie");
+
+	if (result != "test") {
 		$(".widget>div>div").remove();
 		$(".widget>div>table").remove();
 		displayCookiesErrorMessage();
