@@ -79,21 +79,15 @@
 <div class="textbox_center_admin">
 	<table class="table_horizontal">
 		<tr>
-			<td><fmt:message key="study_subject_label" bundle="${resword}"/></td>
-			<td><fmt:message key="study_event" bundle="${resword}"/></td>
-			<td><fmt:message key="repeat_number" bundle="${resword}"/></td>
+			<td><fmt:message key="SE_ID" bundle="${resword}"/></td>
 			<td><fmt:message key="date_interviewed" bundle="${resword}"/></td>
+			<td><fmt:message key="status" bundle="${resword}"/></td>
 		</tr>
 		<c:forEach var="eventCRF" items="${eventCRFs}">
 		<tr>
-			<td><c:out value="${eventCRF.studySubjectName}"/></td>
-			<td><c:out value="${eventCRF.eventName}"/></td>
-			<td><c:out value="${eventCRF.eventOrdinal}"/></td>
-			<td>
-				<c:if test="${eventCRF.dateInterviewed != null}">
-					<fmt:formatDate value="${eventCRF.dateInterviewed}" pattern="${dteFormat}"/>
-				</c:if>&nbsp;
-			</td>
+			<td><c:out value="${eventCRF.studyEventId}"/></td>
+			<td><c:out value="${eventCRF.dateInterviewed}"/></td>
+			<td><c:out value="${eventCRF.status.name}"/></td>
 		</tr>
 		</c:forEach>
 	</table>

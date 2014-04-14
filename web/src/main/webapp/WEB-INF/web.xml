@@ -899,14 +899,14 @@
         <servlet-class>org.akaza.openclinica.control.admin.RestoreSubjectServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RemoveCRFVersionServlet</servlet-name>
+        <servlet-name>removeCRFVersionServlet</servlet-name>
         <display-name>RemoveCRFVersion</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.RemoveCRFVersionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RestoreCRFVersionServlet</servlet-name>
+        <servlet-name>restoreCRFVersionServlet</servlet-name>
         <display-name>RestoreCRFVersion</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.RestoreCRFVersionServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewSubjectServlet</servlet-name>
@@ -1868,11 +1868,11 @@
         <url-pattern>/RestoreCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveCRFVersionServlet</servlet-name>
+        <servlet-name>removeCRFVersionServlet</servlet-name>
         <url-pattern>/RemoveCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestoreCRFVersionServlet</servlet-name>
+        <servlet-name>restoreCRFVersionServlet</servlet-name>
         <url-pattern>/RestoreCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
