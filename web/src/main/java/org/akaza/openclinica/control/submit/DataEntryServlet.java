@@ -333,8 +333,6 @@ public abstract class DataEntryServlet extends Controller {
 		logMe("Enterting DataEntry Servlet" + System.currentTimeMillis());
 		EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
 
-		FormDiscrepancyNotes discNotes;
-
 		StudyInfoPanel panel = getStudyInfoPanel(request);
 		panel.setStudyInfoShown(false);
 		String age = "";
@@ -387,8 +385,7 @@ public abstract class DataEntryServlet extends Controller {
 			allNotes.addAll(eventCrfNotes);
 
 		}
-		logMe("Entering DataEntry Create disc note threads out of the various notes" + System.currentTimeMillis());
-		// Create disc note threads out of the various notes
+
 		DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
 		prepareSessionNotesIfValidationsWillFail(request, hasGroup, isSubmitted, allNotes);
 		noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
@@ -398,7 +395,6 @@ public abstract class DataEntryServlet extends Controller {
 			request.setAttribute("fromViewNotes", fromViewNotes);
 		}
 
-		logMe("Entering Create studySubjDao.. ++++stuff" + System.currentTimeMillis());
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
 		StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
 		Status s = ssb.getStatus();
@@ -418,8 +414,7 @@ public abstract class DataEntryServlet extends Controller {
 		if (!fp.getString("exitTo").equals("")) {
 			request.setAttribute("exitTo", fp.getString("exitTo"));
 		}
-		// some EVENT CRF CHECK
-		logMe("Entering some EVENT CRF CHECK" + System.currentTimeMillis());
+
 		if (!fp.getString(GO_EXIT).equals("")) {
 			session.removeAttribute(GROUP_HAS_DATA);
 			session.removeAttribute("to_create_crf");
@@ -461,9 +456,7 @@ public abstract class DataEntryServlet extends Controller {
 			}
 			return;
 		}
-		logMe("Entering some EVENT CRF CHECK DONE" + System.currentTimeMillis());
-		// checks if the section has items in item group for repeating items
-		// hasGroup = getInputBeans();
+
 		hasGroup = checkGroups(fp, ecb);
 
 		Boolean b = (Boolean) request.getAttribute(INPUT_IGNORE_PARAMETERS);
@@ -475,8 +468,6 @@ public abstract class DataEntryServlet extends Controller {
 		}
 
 		StudyBean study = (StudyBean) session.getAttribute("study");
-		// constructs the list of items used on UI
-		logMe("Entering some EVENT DEF CRF CHECK " + System.currentTimeMillis());
 
 		if (eventDefinitionCRFId <= 0) {
 			// TODO we have to get that id before we can continue
@@ -520,18 +511,13 @@ public abstract class DataEntryServlet extends Controller {
 		} else if (getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)) {
 			phase2 = Phase.ADMIN_EDITING;
 		}
-		logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::" + Thread.currentThread());
-		logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::" + Thread.currentThread() + "currentStudy?"
-				+ currentStudy + "studyEventDefinition" + studyEventDefinition + "crfVersionBean" + crfVersionBean
-				+ "studyEventBean" + studyEventBean + "ecb" + ecb);
-		logMe("Entering getDisplayBean:::::Thread::::" + Thread.currentThread());
+
 		DisplaySectionBean section = getDisplayBean(hasGroup, false, request, isSubmitted);
 		if (section.getSection().hasSCDItem()) {
 			SimpleConditionalDisplayService cds0 = (SimpleConditionalDisplayService) SpringServletAccess
 					.getApplicationContext(getServletContext()).getBean("simpleConditionalDisplayService");
 			section = cds0.initConditionalDisplays(section);
 		}
-		logMe("Entering  Find out the id of the section's first field " + System.currentTimeMillis());
 
 		// Find out the id of the section's first field
 		String firstFieldId = getSectionFirstFieldId(section.getSection().getId());
@@ -541,8 +527,7 @@ public abstract class DataEntryServlet extends Controller {
 		List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup,
 				eventDefinitionCRFId, request);
 		logMe("Entering  displayItemWithGroups end " + System.currentTimeMillis());
-		this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(),
-				ecb);
+		this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(), ecb);
 		section.setDisplayItemGroups(displayItemWithGroups);
 		DisplayTableOfContentsBean toc = getDisplayBeanWithShownSections(
 				(DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY),
@@ -618,7 +603,7 @@ public abstract class DataEntryServlet extends Controller {
 			session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, null);
 			clearSession(request);
 
-			discNotes = new FormDiscrepancyNotes();
+			FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
 			session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 			section = populateNotesWithDBNoteCounts(discNotes, noteThreads, section, request);
 			populateInstantOnChange(request.getSession(), ecb, section);
@@ -688,7 +673,7 @@ public abstract class DataEntryServlet extends Controller {
 
 			HashMap errors = new HashMap();
 
-			discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+			FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 			if (discNotes == null) {
 				discNotes = new FormDiscrepancyNotes();
 			}
@@ -699,8 +684,7 @@ public abstract class DataEntryServlet extends Controller {
 
 			DiscrepancyValidator v = new DiscrepancyValidator(validatorHelper, discNotes);
 			RuleValidator ruleValidator = new RuleValidator(validatorHelper);
-			logger.debug("SZE 1  :: " + allItems.size());
-			logMe("Looping inside !submitted  " + System.currentTimeMillis());
+
 			for (int i = 0; i < allItems.size(); i++) {
 				logger.trace("===itering through items: " + i);
 				DisplayItemWithGroupBean diwg = allItems.get(i);
@@ -709,18 +693,13 @@ public abstract class DataEntryServlet extends Controller {
 					DisplayItemGroupBean dgb = diwg.getItemGroup();
 					List<DisplayItemGroupBean> dbGroups = diwg.getDbItemGroups();
 					List<DisplayItemGroupBean> formGroups = new ArrayList<DisplayItemGroupBean>();
-					logger.info("got db item group size " + dbGroups.size());
 
 					if (validate) {
-						logger.debug("===IF VALIDATE NOT A SINGLE ITEM: got to this part in the validation loop: "
-								+ dgb.getGroupMetaBean().getName());
+						logger.debug("SINGLE ITEM");
 						formGroups = validateDisplayItemGroupBean(v, dgb, dbGroups, formGroups, request, response);
-						logger.debug("form group size after validation " + formGroups.size());
 					} else {
-						logger.debug("+++ELSE NOT A SINGLE ITEM: got to this part in the validation loop: "
-								+ dgb.getGroupMetaBean().getName());
+						logger.debug("NOT A SINGLE ITEM");
 						formGroups = loadFormValueForItemGroup(dgb, dbGroups, formGroups, eventDefinitionCRFId, request);
-						logger.debug("form group size without validation " + formGroups.size());
 					}
 
 					diwg.setItemGroup(dgb);
@@ -728,30 +707,19 @@ public abstract class DataEntryServlet extends Controller {
 
 					allItems.set(i, diwg);
 
-				} else {// other single items
+				} else {
 					DisplayItemBean dib = diwg.getSingleItem();
-
 					if (validate) {
-						// generate input name here?
-						// DisplayItemGroupBean dgb = diwg.getItemGroup();
+
 						String itemName = getInputName(dib);
-						// no Item group for single item, so just use blank
-						// string as parameter for inputName
-
-						dib = validateDisplayItemBean(v, dib, "", request);// this
-						// should be used, otherwise, DDE not working-jxu
-
-						logger.debug("&&& found name: " + itemName);
-						logger.debug("input VALIDATE " + itemName + ": " + fp.getString(itemName));
-						logger.debug("input " + itemName + " has a response set of "
-								+ dib.getMetadata().getResponseSet().getOptions().size() + " options");
+						dib = validateDisplayItemBean(v, dib, "", request);
 					} else {
 						String itemName = getInputName(dib);
-						logger.debug("input NONVALIDATE " + itemName + ": " + fp.getString(itemName));
 						dib = loadFormValue(dib, request);
 					}
 
 					ArrayList children = dib.getChildren();
+
 					for (int j = 0; j < children.size(); j++) {
 						DisplayItemBean child = (DisplayItemBean) children.get(j);
 						String itemName = getInputName(child);
@@ -761,22 +729,17 @@ public abstract class DataEntryServlet extends Controller {
 						} else {
 							child = loadFormValue(child, request);
 						}
-						logger.debug("Checking child value for " + itemName + ": " + child.getData().getValue());
 						children.set(j, child);
 					}
-
 					dib.setChildren(children);
 					diwg.setSingleItem(runDynamicsItemCheck(dib, null, request));
-					logger.debug(" I : " + i);
 					allItems.set(i, diwg);
 
 				}
 			}
-			logMe("Loop ended  " + System.currentTimeMillis());
+
 			List<ItemBean> itemBeansWithSCDShown = new ArrayList<ItemBean>();
 			if (validate && section.getSection().hasSCDItem()) {
-				logMe(" Validate and Loop  " + System.currentTimeMillis());
-
 				for (int i = 0; i < allItems.size(); ++i) {
 					DisplayItemBean dib = allItems.get(i).getSingleItem();
 					ItemFormMetadataBean ifmb = dib.getMetadata();
@@ -816,10 +779,7 @@ public abstract class DataEntryServlet extends Controller {
 						}
 					}
 				}
-				logMe(" Validate and Loop end  " + System.currentTimeMillis());
 			}
-			logMe(" Validate and Loop end  " + System.currentTimeMillis());
-			// JN:calling again here, for the items with simple conditional display and rules.
 			List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean,
 					studyEventBean, ecb, true, request, response, itemBeansWithSCDShown);
 			boolean shouldRunRules = getRuleSetService(request).shouldRunRulesForRuleSets(ruleSets, phase2);
@@ -827,7 +787,6 @@ public abstract class DataEntryServlet extends Controller {
 			HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = null;
 			groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules, MessageType.ERROR, phase2,
 					ecb, request);
-			logMe("allItems  Loop begin  " + System.currentTimeMillis());
 
 			for (int i = 0; i < allItems.size(); i++) {
 				DisplayItemWithGroupBean diwg = allItems.get(i);
@@ -846,11 +805,10 @@ public abstract class DataEntryServlet extends Controller {
 
 					allItems.set(i, diwg);
 
-				} else {// other single items
+				} else {
 					DisplayItemBean dib = diwg.getSingleItem();
 					if (validate) {
-						dib = validateDisplayItemBean(v, dib, "", ruleValidator, groupOrdinalPLusItemOid, false, null,
-								request);//
+						dib = validateDisplayItemBean(v, dib, "", ruleValidator, groupOrdinalPLusItemOid, false, null, request);
 					}
 					ArrayList children = dib.getChildren();
 					for (int j = 0; j < children.size(); j++) {
@@ -859,20 +817,17 @@ public abstract class DataEntryServlet extends Controller {
 						String itemName = getInputName(child);
 						child.loadFormValue(fp.getString(itemName));
 						if (validate) {
-							child = validateDisplayItemBean(v, child, "", ruleValidator, groupOrdinalPLusItemOid,
-									false, null, request);
+							child = validateDisplayItemBean(v, child, "", ruleValidator, groupOrdinalPLusItemOid, false, null, request);
 						}
 						children.set(j, child);
-						logger.debug(" J (children): " + j);
 					}
 
 					dib.setChildren(children);
 					diwg.setSingleItem(runDynamicsItemCheck(dib, null, request));
-					logger.debug(" I : " + i);
 					allItems.set(i, diwg);
 				}
 			}
-			logMe("allItems  Loop end  " + System.currentTimeMillis());
+
 			// A map from item name to item bean object.			
 			HashMap<String, ItemBean> scoreItems = new HashMap<String, ItemBean>();
 			HashMap<String, String> scoreItemdata = new HashMap<String, String>();
@@ -894,7 +849,7 @@ public abstract class DataEntryServlet extends Controller {
 			section.setDisplayItemGroups(allItems);
 			scoreItems = prepareScoreItems(request);
 			scoreItemdata = prepareScoreItemdata(request);
-			logMe("allItems 2 Loop begin  " + System.currentTimeMillis());
+
 			for (int i = 0; i < allItems.size(); i++) {
 				DisplayItemWithGroupBean diwb = allItems.get(i);
 				if (diwb.isInGroup()) {
@@ -1034,7 +989,6 @@ public abstract class DataEntryServlet extends Controller {
 					}
 				}
 			}
-			logMe("allItems 2 Loop end  " + System.currentTimeMillis());
 			// do calculation for 'calculation' and 'group-calculation' type
 			// items
 			// and write the result in DisplayItemBean's ItemDateBean - data
@@ -1042,7 +996,7 @@ public abstract class DataEntryServlet extends Controller {
 			// *** doing calc here, load it where? ***
 			SessionManager sm = getSessionManager(request);
 			ScoreCalculator sc = new ScoreCalculator(sm, ecb, ub);
-			logMe("allItems 3 Loop begin  " + System.currentTimeMillis());
+
 			for (int i = 0; i < allItems.size(); i++) {
 				DisplayItemWithGroupBean diwb = allItems.get(i);
 				if (diwb.isInGroup()) {
@@ -1181,11 +1135,6 @@ public abstract class DataEntryServlet extends Controller {
 				}
 			}
 
-			logMe("allItems 3 Loop end  " + System.currentTimeMillis());
-
-			// we have to do this since we loaded all the form values into the display
-			// item beans above section.setItems(items);
-			// setting this AFTER we populate notes - will that make a difference?
 			section.setDisplayItemGroups(allItems);
 
 			if (currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes")) {
@@ -1202,11 +1151,9 @@ public abstract class DataEntryServlet extends Controller {
 			}
 
 			if (section.getSection().hasSCDItem()) {
-				section = SCDItemDisplayInfo.generateSCDDisplayInfo(
-						section,
-						this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY)
-								|| this.getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)
-								&& !this.isAdminForcedReasonForChange(request));
+				section = SCDItemDisplayInfo.generateSCDDisplayInfo(section, this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY)
+						|| this.getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)
+						&& !this.isAdminForcedReasonForChange(request));
 			}
 
 			removeFieldsValidationsForSubmittedDN(v, request);
@@ -1226,10 +1173,7 @@ public abstract class DataEntryServlet extends Controller {
 				// change everything here from changed items list to changed items map
 				if (changedItemsMap.size() > 0) {
 					request.setAttribute("Hardrules", true);
-					logger.debug("found admin force reason for change: changed items " + changedItems.toString()
-							+ " and changed items list: " + changedItemsList.toString() + " changed items map: "
-							+ changedItemsMap.toString());
-					logMe("DisplayItemBean  Loop begin  " + System.currentTimeMillis());
+
 					for (DisplayItemBean displayItem : changedItemsList) {
 						if (displayItem.getMetadata().getResponseSet().getResponseType()
 								.equals(ResponseType.CALCULATION))
@@ -1261,7 +1205,6 @@ public abstract class DataEntryServlet extends Controller {
 							logger.debug("form name added: " + formName);
 						}
 					}
-					logMe("DisplayItemBean  Loop end  " + System.currentTimeMillis());
 				}
 				reshuffleErrorGroupNamesKK(errors, allItems, request);
 			}
@@ -1269,7 +1212,7 @@ public abstract class DataEntryServlet extends Controller {
 			populateNotesWithDBNoteCounts(discNotes, noteThreads, section, request);
 
 			logger.debug("errors here: " + errors.toString());
-			logMe("error check  Loop begin  " + System.currentTimeMillis());
+
 			if (errors.isEmpty() && shouldRunRules) {
 				// we should transform submitted DNs to FVC, close them and turn off
 				// ruleValidator for corresponding fields
@@ -1341,19 +1284,6 @@ public abstract class DataEntryServlet extends Controller {
 						errors.put(fieldName, siErrors.get(fieldName));
 					}
 				}
-				// we should 'shift' the names here, tbh 02/2010
-				// need: total number of rows, manual rows, all row names
-				// plus: error names
-				Iterator iter2 = errors.keySet().iterator();
-				while (iter2.hasNext()) {
-					String fieldName = iter2.next().toString();
-					logger.debug("found error " + fieldName);
-				}
-				Iterator iter3 = errors.keySet().iterator();
-				while (iter3.hasNext()) {
-					String fieldName = iter3.next().toString();
-					logger.debug("found error after shuffle " + fieldName);
-				}
 
 				request.setAttribute("markComplete", fp.getString(INPUT_MARK_COMPLETE));
 				request.setAttribute(BEAN_DISPLAY, section);
@@ -1367,8 +1297,6 @@ public abstract class DataEntryServlet extends Controller {
 						createDNParametersMap(request, section));
 				forwardPage(getJSPPage(), request, response);
 			} else {
-				logger.debug("Do we hit this in save ?????");
-				logMe("Do we hit this in save ????  " + System.currentTimeMillis());
 
 				boolean success = true;
 				boolean temp = true;
@@ -1453,28 +1381,19 @@ public abstract class DataEntryServlet extends Controller {
 
 				resetCodedItemTerms(allItems, iddao, ecb, changedItemsList);
 
-				this.output(allItems);
-				// TODO:Seems longer here, check this
-				logMe("DisplayItemWithGroupBean allitems4 " + System.currentTimeMillis());
 				for (int i = 0; i < allItems.size(); i++) {
+
 					DisplayItemWithGroupBean diwb = allItems.get(i);
 
-					// we don't write success = success && writeToDB here
-					// since the short-circuit mechanism may prevent Java
-					// from executing writeToDB.
 					if (diwb.isInGroup()) {
 
 						List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
-						// using the above gets us the correct number of manual groups, tbh 01/2010
-						List<DisplayItemGroupBean> dbGroups = diwb.getDbItemGroups();
-						logger.debug("item group size: " + dgbs.size());
-						logger.debug("item db-group size: " + dbGroups.size());
+
 						for (int j = 0; j < dgbs.size(); j++) {
+
 							DisplayItemGroupBean displayGroup = dgbs.get(j);
 							List<DisplayItemBean> items = displayGroup.getItems();
-							// this ordinal will only useful to create a new
-							// item data
-							// update an item data won't touch its ordinal
+
 							int nextOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, displayGroup.getItemGroupBean()) + 1;
 
 							for (DisplayItemBean displayItem : items) {
@@ -1499,13 +1418,13 @@ public abstract class DataEntryServlet extends Controller {
 									inputName = this.getGroupItemManualInputName(displayGroup,
 											displayGroup.getFormInputOrdinal(), displayItem);
 								}
-								logger.trace("&&& we get previous looking at input name: " + inputName);
-								// input name 2 removed from below
-								AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, displayItem.getData()
-										.getId(), "itemData", currentStudy);
+
+								AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, displayItem.getData().getId(), "itemData", currentStudy);
 								success = success && temp;
 							}
 						}
+
+						List<DisplayItemGroupBean> dbGroups = diwb.getDbItemGroups();
 						for (int j = 0; j < dbGroups.size(); j++) {
 							DisplayItemGroupBean displayGroup = dbGroups.get(j);
 							if ("remove".equalsIgnoreCase(displayGroup.getEditFlag())) {
@@ -1523,8 +1442,6 @@ public abstract class DataEntryServlet extends Controller {
 									if (temp && newUploadedFiles.containsKey(fileName)) {
 										newUploadedFiles.remove(fileName);
 									}
-									// just use 0 here since update doesn't
-									// touch ordinal
 									success = success && temp;
 								}
 							}
@@ -1532,7 +1449,6 @@ public abstract class DataEntryServlet extends Controller {
 
 					} else {
 						DisplayItemBean dib = diwb.getSingleItem();
-						// TODO work on this line
 
 						this.addAttachedFilePath(dib, attachedFilePath);
 						temp = writeToDB(dib, iddao, 1, request);
@@ -1585,7 +1501,6 @@ public abstract class DataEntryServlet extends Controller {
 				logMe("DisplayItemWithGroupBean allitems4 " + System.currentTimeMillis());
 				if (!rulesPostDryRun.isEmpty()) {
 					// in same section?
-
 					// iterate through the OIDs and see if any of them belong to this section
 					Iterator iter3 = rulesPostDryRun.keySet().iterator();
 					while (iter3.hasNext()) {
@@ -1750,6 +1665,7 @@ public abstract class DataEntryServlet extends Controller {
 					boolean markSuccessfully = false; // if the CRF was marked
 					// complete
 					// successfully
+
 					if (markComplete && section.isLastSection()) {
 						logger.debug("need to mark CRF as complete");
 						markSuccessfully = markCRFComplete(request);
@@ -1931,8 +1847,7 @@ public abstract class DataEntryServlet extends Controller {
 
 	private void removeFieldsValidationsForSubmittedDN(Validator v, HttpServletRequest request) {
 		if (request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED) != null) {
-			Map<Object, Boolean> newNotesMap = (Map<Object, Boolean>) request.getSession().getAttribute(
-					DataEntryServlet.NOTE_SUBMITTED);
+			Map<Object, Boolean> newNotesMap = (Map<Object, Boolean>) request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED);
 			for (Object fieldName : newNotesMap.keySet()) {
 				if (fieldName instanceof String && !StringUtil.isBlank((String) fieldName)) {
 					v.removeFieldValidations((String) fieldName);
@@ -2136,13 +2051,8 @@ public abstract class DataEntryServlet extends Controller {
 							.get(idb.getId()))) {
 				errors.put(formName, error);
 				setOfItemNamesWithRFCErrors.add(formName);
-			} else {
-				logger.debug("found note in session");
-				logger.debug("has a note in db: entered an error here: " + formName + ": " + errors.toString());
 			}
 
-		} else if (fieldNotes.containsKey(formName)) {
-			System.out.println("has note in session");
 		} else {
 			logger.debug("setting an error for " + formName);
 			errors.put(formName, error);
@@ -2487,152 +2397,87 @@ public abstract class DataEntryServlet extends Controller {
 	protected List<DisplayItemGroupBean> loadFormValueForItemGroup(DisplayItemGroupBean digb,
 			List<DisplayItemGroupBean> dbGroups, List<DisplayItemGroupBean> formGroups, int eventDefCRFId,
 			HttpServletRequest request) {
+
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 		int manualRows = 0;
 		int repeatMax = digb.getGroupMetaBean().getRepeatMax();
 		FormProcessor fp = new FormProcessor(request);
 		ItemDAO idao = new ItemDAO(getDataSource());
 		List<ItemBean> itBeans = idao.findAllItemsByGroupId(digb.getItemGroupBean().getId(), sb.getCRFVersionId());
-		logger.debug("+++ starting to review groups: " + repeatMax);
-
-		long timeCheck = System.currentTimeMillis();
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
-		// adding this code from below, since we want to pass a null values list
-		// in all cases of getDisplayBeansFromItems().
-		// For adding null values to display items
 		FormBeanUtil formBeanUtil = new FormBeanUtil();
 		List<String> nullValuesList = new ArrayList<String>();
-		// Get a List<String> of any null values such as NA or NI
-		// method returns null values as a List<String>
 		nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(eventDefCRFId, getDataSource());
-		long two = System.currentTimeMillis() - timeCheck;
-		int firstLoopBreak = 0;
-		int secondLoopBreak = 0;
-		for (int i = 0; i < repeatMax; i++) {
-			DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
-			formGroup.setItemGroupBean(digb.getItemGroupBean());
-			formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
 
+		for (int i = 0; i < repeatMax; i++) {
+
+			DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
 			ItemGroupBean igb = digb.getItemGroupBean();
 
-			// want to do deep copy here, so always get a fresh copy for items,
-			// may use other better way to do, like clone
-			List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-					sb.getId(), nullValuesList, getServletContext());
+			if (fp.getStartsWith(igb.getOid() + "_manual" + i + "input") || !StringUtil.isBlank(fp.getString(igb.getOid() + "_manual" + i + ".newRow"))) {
 
-			// get the values from the manually created rows first- not from the
-			// rep model
-			// second half of the if line is here to protect against looping
-			// split the if loop into two parts, so that we can get what's existing first
-			// and then get newly created rows later
-			if (fp.getStartsWith(igb.getOid() + "_manual" + i + "input")) {
-				formGroup.setOrdinal(i);
-				formGroup.setFormInputOrdinal(i);
-				formGroup.setAuto(false);
-				formGroup.setInputId(igb.getOid() + "_manual" + i);
-				logger.debug("1: set auto to false for " + igb.getOid() + " " + i);
+				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
+						sb.getId(), nullValuesList, getServletContext());
 
 				dibs = processInputForGroupItem(fp, dibs, i, digb, false);
 
-				formGroup.setItems(dibs);
-				formGroups.add(formGroup);
-				manualRows++;
-			} else if (!StringUtil.isBlank(fp.getString(igb.getOid() + "_manual" + i + ".newRow"))) {
+				formGroup.setItemGroupBean(digb.getItemGroupBean());
+				formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
 				formGroup.setOrdinal(i);
 				formGroup.setFormInputOrdinal(i);
-				formGroup.setInputId(igb.getOid() + "_manual" + i + ".newRow");
-
 				formGroup.setAuto(false);
-
-				logger.debug("2: set auto to false for " + igb.getOid() + " " + i);
-
-				dibs = processInputForGroupItem(fp, dibs, i, digb, false);
-
 				formGroup.setItems(dibs);
+
+				if (!StringUtil.isBlank(fp.getString(igb.getOid() + "_manual" + i + ".newRow"))) {
+					formGroup.setInputId(igb.getOid() + "_manual" + i + ".newRow");
+				} else {
+					formGroup.setInputId(igb.getOid() + "_manual" + i);
+				}
+
 				formGroups.add(formGroup);
 				manualRows++;
-
-			} else {
-				firstLoopBreak++;
 			}
 		}
-
-		logger.trace("+++ starting to review groups 3: " + repeatMax);
-		two = System.currentTimeMillis() - timeCheck;
-		logger.trace("time 3: " + two + "ms");
 
 		int ordinal = 0;
-		// had the call to form bean utils here
+
 		for (int i = 0; i < repeatMax; i++) {
+
 			DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
-			formGroup.setItemGroupBean(digb.getItemGroupBean());
-			formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
 			ItemGroupBean igb = digb.getItemGroupBean();
-			List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-					sb.getId(), nullValuesList, getServletContext());
-			logger.trace("+++count for dibs after deep copy: " + dibs.size());
-			two = System.currentTimeMillis() - timeCheck;
-			if (fp.getStartsWith(igb.getOid() + "_" + i + "input")) {
+
+			if (fp.getStartsWith(igb.getOid() + "_" + i + "input") || !StringUtil.isBlank(fp.getString(igb.getOid() + "_" + i + ".newRow"))) {
+
+				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
+
+				dibs = processInputForGroupItem(fp, dibs, i, digb, true);
+
+				formGroup.setItemGroupBean(digb.getItemGroupBean());
+				formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
 				formGroup.setInputId(igb.getOid() + "_" + i);
+				formGroup.setAuto(true);
+				formGroup.setItems(dibs);
+
 				if (i != 0) {
 					formGroup.setOrdinal(++ordinal + manualRows);
 					formGroup.setFormInputOrdinal(i);
 				}
-				formGroup.setAuto(true);
-				logger.debug("1: set auto to TRUE for " + igb.getOid() + " " + i);
-				dibs = processInputForGroupItem(fp, dibs, i, digb, true);
-				logger.trace("+++ group ordinal: " + i + " igb name " + igb.getName());
 
-				formGroup.setItems(dibs);
 				formGroups.add(formGroup);
-			} else if (!StringUtil.isBlank(fp.getString(igb.getOid() + "_" + i + ".newRow"))) {
-				formGroup.setInputId(igb.getOid() + "_" + i);
-				if (i != 0) {
-					formGroup.setOrdinal(++ordinal + manualRows);
-					formGroup.setFormInputOrdinal(i);
-				}
-				formGroup.setAuto(true);
-
-				logger.debug("2: set auto to TRUE for " + igb.getOid() + " " + i);
-
-				dibs = processInputForGroupItem(fp, dibs, i, digb, true);
-				logger.trace("+++ group ordinal: " + i + " igb name " + igb.getName());
-
-				formGroup.setItems(dibs);
-				formGroups.add(formGroup);
-			} else {
-				secondLoopBreak++;
 			}
-
 		}
-		logger.debug("first loop: " + firstLoopBreak);
-		logger.debug("second loop: " + secondLoopBreak);
-		logger.trace("+++ starting to review groups 4: " + repeatMax);
-		two = System.currentTimeMillis() - timeCheck;
-		logger.trace("time 4: " + two + "ms");
-		logger.debug(" manual rows " + manualRows + " formGroup size " + formGroups.size());
 
 		request.setAttribute("manualRows", new Integer(manualRows));
-		logger.trace("+++ starting to review groups 5: " + repeatMax);
-		two = System.currentTimeMillis() - timeCheck;
-		logger.trace("time 5: " + two + "ms");
-		Collections.sort(formGroups);// sort all the rows by ordinal
+		Collections.sort(formGroups);
 
-		logger.trace("group row size:" + formGroups.size());
-		// suppose we have 3 rows of data from db, the orginal order is 0,1,2,
-		// repetition model will submit row number in [ ] like the following:
-		// 0,1,2.. consecutive numbers, means no row removed in between
-		// 0,1,3,4.. the 2rd row is removed, 3 and 4 are new rows
 		int previous = -1;
 		for (int j = 0; j < formGroups.size(); j++) {
+
 			DisplayItemGroupBean formItemGroup = formGroups.get(j);
-			logger.trace("formGroup Ordinal:" + formItemGroup.getOrdinal());
-			// the below if loop addresses a specific problem with the repeating model
-			// if we cut a row out of a long list, the repeater returns double ordinals of another row
-			// and a second row gets deleted by mistake.
+
 			if (formItemGroup.getOrdinal() == previous) {
-				logger.debug("found a match btw previous and ordinal");
+
 				formItemGroup.setEditFlag("edit");
 				formItemGroup.setOrdinal(previous + 1);
 			}
@@ -2642,9 +2487,7 @@ public abstract class DataEntryServlet extends Controller {
 				for (int i = 0; i < dbGroups.size(); i++) {
 					DisplayItemGroupBean dbItemGroup = dbGroups.get(i);
 					if (formItemGroup.getOrdinal() == i) {
-						// the first row is different, it could be blank on page
-						// just for
-						// display, so need to insert this row, not update
+
 						if ("initial".equalsIgnoreCase(dbItemGroup.getEditFlag())) {
 							formItemGroup.setEditFlag("add");
 						} else {
@@ -2655,10 +2498,7 @@ public abstract class DataEntryServlet extends Controller {
 								for (DisplayItemBean formDib : formItemGroup.getItems()) {
 									if (formDib.getItem().getId() == dib.getItem().getId()) {
 										formDib.getData().setId(data.getId());
-										// this will save the data from IDE
-										// complete, used only for DDE
 										formDib.setDbData(dib.getData());
-										logger.debug("+++ +++ form dib get data set id " + data.getId());
 										break;
 									}
 								}
@@ -2674,32 +2514,21 @@ public abstract class DataEntryServlet extends Controller {
 
 		}
 
-		logger.trace("+++ === DB group row:" + dbGroups.size());
-
-		logger.trace("+++ === DB group contents: " + dbGroups.toString());
-
-		// why do we need to remove this one row below?
-		// For the existing rows in dbGroups,if cannot get the edit flag or
-		// initial flag for a row,
-		// it means the row is removed on the front-end, so the back-end servlet
-		// cannot get it.
 		for (int i = 0; i < dbGroups.size(); i++) {
 			DisplayItemGroupBean dbItemGroup = dbGroups.get(i);
-			logger.trace("+++ found edit flag of " + dbItemGroup.getEditFlag() + " for #" + dbItemGroup.getOrdinal());
+
 			if (!"edit".equalsIgnoreCase(dbItemGroup.getEditFlag())
 					&& !"initial".equalsIgnoreCase(dbItemGroup.getEditFlag())) {
 				if (dbItemGroup.getGroupMetaBean().isShowGroup()) {
-					logger.trace("+++ one row removed, edit flag was " + dbItemGroup.getEditFlag());
-					logger.debug("+++ one row removed, edit flag was " + dbItemGroup.getEditFlag());
 					dbItemGroup.setEditFlag("remove");
 				}
 			}
 		}
-		logger.debug("+++ about to return form groups: " + formGroups.toString());
 		for (int j = 0; j < formGroups.size(); j++) {
 			DisplayItemGroupBean formGroup = formGroups.get(j);
 			formGroup.setIndex(j);
 		}
+
 		return formGroups;
 	}
 
@@ -3047,13 +2876,10 @@ public abstract class DataEntryServlet extends Controller {
 						&& idb.getValue().equals("")
 						&& !getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {
 
-					logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id "
-							+ dib.getItem().getId());
 					return true;
 				}
 			} else {
 
-				// We should skip coded items
 				if (!dib.getMetadata().isShowItem() && idb.getValue().equals("")
 						&& !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())
 						&& !(dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId() > 0)
@@ -3266,7 +3092,7 @@ public abstract class DataEntryServlet extends Controller {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-		SectionDAO sdao;
+
 		// Find out whether there are ungrouped items in this section
 		boolean hasUngroupedItems = false;
 		int eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
@@ -3302,7 +3128,7 @@ public abstract class DataEntryServlet extends Controller {
 		// Find out whether any display items are *not* grouped; see issue 1689
 		hasUngroupedItems = formBeanUtil.sectionHasUngroupedItems(getDataSource(), sb.getId(), itemGroups);
 
-		sdao = new SectionDAO(getDataSource());
+		SectionDAO sdao = new SectionDAO(getDataSource());
 		sb.setHasSCDItem(hasUngroupedItems ? sdao.hasSCDItem(sb.getId()) : false);
 
 		section.setEventCRF(ecb);
@@ -3332,10 +3158,8 @@ public abstract class DataEntryServlet extends Controller {
 		// Use itemGroups to determine if there are any ungrouped items
 
 		// get all the parent display item beans not in group
-		logMe("Entering getParentDisplayItems::: Thread is? " + Thread.currentThread());
 		ArrayList displayItems = getParentDisplayItems(hasGroup, sb, edcb, idao, ifmdao, iddao, hasUngroupedItems,
 				request);
-		logMe("Entering getParentDisplayItems::: Done and Thread is? " + Thread.currentThread());
 
 		logger.debug("just ran get parent display, has group " + hasGroup + " has ungrouped " + hasUngroupedItems);
 		// now sort them by ordinal
@@ -3477,18 +3301,14 @@ public abstract class DataEntryServlet extends Controller {
 		// while hitting the database only three times
 		HashMap displayItems = new HashMap();
 
-		ArrayList items = new ArrayList();
 		ArrayList itemsUngrped = new ArrayList();
-		if (hasGroup) {
-			if (hasUngroupedItems) {
-				itemsUngrped = idao.findAllUngroupedParentsBySectionId(sb.getId(), sb.getCRFVersionId());
-			}
+		if (hasGroup && hasUngroupedItems) {
+			itemsUngrped = idao.findAllUngroupedParentsBySectionId(sb.getId(), sb.getCRFVersionId());
 		}
 
-		logger.trace("no item groups");
-		items = idao.findAllNonRepeatingParentsBySectionId(sb.getId());
+		ArrayList items = idao.findAllNonRepeatingParentsBySectionId(sb.getId());
 		items.addAll(itemsUngrped);
-		// }
+
 		logger.debug("items size" + items.size());
 		for (int i = 0; i < items.size(); i++) {
 			DisplayItemBean dib = new DisplayItemBean();
@@ -3518,16 +3338,10 @@ public abstract class DataEntryServlet extends Controller {
 				if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
 					showItem = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
 				}
-				// is the above needed for children items too?
+
 				boolean passedDDE = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
-				if (showItem) { // we are only showing, not hiding
-					logger.debug("set show item " + ifmb.getItemId() + " idb " + dib.getData().getId() + " show item "
-							+ showItem + " passed dde " + passedDDE);
+				if (showItem) {
 					ifmb.setShowItem(true);
-				} else {
-					logger.debug("DID NOT set show item " + ifmb.getItemId() + " idb " + dib.getData().getId()
-							+ " show item " + showItem + " passed dde " + passedDDE + " value "
-							+ dib.getData().getValue());
 				}
 				DynamicsItemFormMetadataBean dynamicsMetadataBean = getItemMetadataService()
 						.getDynamicsItemFormMetadataBean(ifmb.getItemId(), ecb, dib.getData());
@@ -3544,9 +3358,7 @@ public abstract class DataEntryServlet extends Controller {
 			Integer key = (Integer) hmIt.next();
 			DisplayItemBean dib = (DisplayItemBean) displayItems.get(key);
 			answer.add(dib);
-			logger.debug("*** getting with key: " + key + " display item bean with value: " + dib.getData().getValue());
 		}
-		logger.debug("*** test of the display items: " + displayItems.toString());
 
 		return answer;
 	}
@@ -3658,11 +3470,9 @@ public abstract class DataEntryServlet extends Controller {
 		List<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesFromEventCRF(ecb);
 		List<DiscrepancyNoteBean> existingNameNotes = new ArrayList();
 		List<DiscrepancyNoteBean> existingIntrvDateNotes = new ArrayList();
-		long t = System.currentTimeMillis();
 
 		ecNotes = extractCoderNotes(ecNotes, request);
 
-		logMe("Method:populateNotesWithDBNoteCounts" + t);
 		for (int i = 0; i < ecNotes.size(); i++) {
 			DiscrepancyNoteBean dn = ecNotes.get(i);
 			if (INTERVIEWER_NAME.equalsIgnoreCase(dn.getColumn())) {
@@ -3682,8 +3492,7 @@ public abstract class DataEntryServlet extends Controller {
 					existingIntrvDateNotes.add(dn);
 			}
 		}
-		logMe("Method:populateNotesWithDBNoteCounts before calling setToolTipEventNotes" + System.currentTimeMillis()
-				+ "time took:" + (System.currentTimeMillis() - t));
+
 		setToolTipEventNotes(request);
 
 		request.setAttribute("existingNameNotes", existingNameNotes);
@@ -3698,9 +3507,6 @@ public abstract class DataEntryServlet extends Controller {
 
 		List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
 		logger.debug("start to populate notes: " + section.getDisplayItemGroups().size());
-		this.output(allItems);
-		logMe("Looping through allItems time:" + System.currentTimeMillis() + "time took from the begining"
-				+ (System.currentTimeMillis() - t));
 		for (int k = 0; k < allItems.size(); k++) {
 			DisplayItemWithGroupBean itemWithGroup = allItems.get(k);
 
@@ -3753,13 +3559,6 @@ public abstract class DataEntryServlet extends Controller {
 			} else {
 				logger.trace("single item db note");
 				DisplayItemBean dib = itemWithGroup.getSingleItem();
-				try {
-					ResponseOptionBean rob = (ResponseOptionBean) dib.getMetadata().getResponseSet().getOptions()
-							.get(0);
-					logger.trace("test print of options for coding: " + rob.getValue());
-				} catch (NullPointerException e) {
-					logger.error(e.getMessage());
-				}
 				int itemDataId = dib.getData().getId();
 				int itemId = dib.getItem().getId();
 				String inputFieldName = "input" + itemId;
@@ -3793,8 +3592,7 @@ public abstract class DataEntryServlet extends Controller {
 					dbChildNotes = extractCoderNotes(dbChildNotes, request);
 
 					childNotes.addAll(dbNotes);
-					noteThreads = dNoteUtil
-							.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
+					noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
 					discNotes.setNumExistingFieldNotes(childInputFieldName, dbChildNotes.size());
 					child.setNumDiscrepancyNotes(dbChildNotes.size() + childNotes.size());
 					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, childItemDataId,
@@ -3815,9 +3613,7 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	private void setToolTipEventNotes(HttpServletRequest request) {
-		long t = System.currentTimeMillis();
 
-		logMe("Method:setToolTipEventNotes" + t);
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		List<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesToolTips(ecb);
@@ -3839,7 +3635,6 @@ public abstract class DataEntryServlet extends Controller {
 		}
 		request.setAttribute("nameNotes", nameNotes);
 		request.setAttribute("intrvDates", dateNotes);
-		logMe("existing Method:setToolTipEventNotes, time took" + (System.currentTimeMillis() - t));
 	}
 
 	/**
@@ -3852,8 +3647,7 @@ public abstract class DataEntryServlet extends Controller {
 	 */
 	private DisplayItemBean setTotals(DisplayItemBean dib, int itemDataId, ArrayList<DiscrepancyNoteBean> notes,
 			int ecbId, HttpServletRequest request) {
-		long t = System.currentTimeMillis();
-		logMe("Method::::::setTotals" + t);
+
 		int totNew = 0, totRes = 0, totClosed = 0, totUpdated = 0, totNA = 0;
 		boolean hasOtherThread = false;
 
@@ -3889,8 +3683,6 @@ public abstract class DataEntryServlet extends Controller {
 			}
 		}
 
-		logMe("time taken thus far, before audit log check" + (System.currentTimeMillis() - t));
-		long t1 = System.currentTimeMillis();
 		AuditDAO adao = new AuditDAO(getDataSource());
 		ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(dib.getItem().getId(), "item_data", ecbId);
 		if (itemAuditEvents.size() > 0) {
@@ -3904,15 +3696,13 @@ public abstract class DataEntryServlet extends Controller {
 				dib.getData().setAuditLog(true);
 			}
 		}
-		logMe("time taken thus far, after audit log check" + (System.currentTimeMillis() - t));
-		logMe("Only for audit check::" + (System.currentTimeMillis() - t1));
+
 		dib.setTotNew(totNew);// totNew is used for parent thread count
 		dib.setTotRes(totRes);
 		dib.setTotUpdated(totUpdated);
 		dib.setTotClosed(totClosed);
 		dib.setTotNA(totNA);
 
-		logMe("returning back..time taken" + (System.currentTimeMillis() - t));
 		return dib;
 	}
 
@@ -4789,47 +4579,6 @@ public abstract class DataEntryServlet extends Controller {
 		return isChanged(dib, oldItemdata, attachedFilePath);
 	}
 
-	/**
-	 * Output, just logs all contents of the allItems list. tbh, 01/2010
-	 * 
-	 * @param displayItemWithGroups
-	 */
-	protected void output(List<DisplayItemWithGroupBean> displayItemWithGroups) {
-		for (int i = 0; i < displayItemWithGroups.size(); ++i) {
-			DisplayItemWithGroupBean diwb = displayItemWithGroups.get(i);
-
-			if (diwb.isInGroup()) {
-				List<DisplayItemGroupBean> dbGroups = diwb.getDbItemGroups();
-				logger.trace("+++++++ DB ITEM GROUPS ++++++++");
-				for (int j = 0; j < dbGroups.size(); j++) {
-					DisplayItemGroupBean displayGroup = dbGroups.get(j);
-					List<DisplayItemBean> items = displayGroup.getItems();
-					for (DisplayItemBean displayItem : items) {
-						int itemId = displayItem.getItem().getId();
-						int ordinal = displayItem.getData().getOrdinal();
-						if ("initial".equalsIgnoreCase(displayGroup.getEditFlag())) {
-							logger.trace("* found initial: " + itemId + " " + ordinal);
-						} else {
-							logger.trace("** found NOT initial: " + itemId + " " + ordinal);
-						}
-					}
-				}
-
-				List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
-				logger.trace("+++++++++ ITEM GROUPS ++++++++++");
-				for (int j = 0; j < dgbs.size(); j++) {
-					DisplayItemGroupBean displayGroup = dgbs.get(j);
-					List<DisplayItemBean> oItems = displayGroup.getItems();
-					String editFlag = displayGroup.getEditFlag();
-					for (DisplayItemBean displayItem : oItems) {
-						int itemId = displayItem.getItem().getId();
-						logger.trace("*** found edit Flag " + itemId + ": " + editFlag);
-					}
-				}
-			}
-		}
-	}
-
 	protected void updateDataOrdinals(List<DisplayItemWithGroupBean> displayItemWithGroups) {
 		for (int i = 0; i < displayItemWithGroups.size(); ++i) {
 			DisplayItemWithGroupBean diwb = displayItemWithGroups.get(i);
@@ -4957,11 +4706,6 @@ public abstract class DataEntryServlet extends Controller {
 
 					}
 				}
-				logger.debug("Item Name : {} , Item Value : {} , Item Data Ordinal : {} , Item OID : {} ",
-						new Object[] { displayItemWithGroupBean.getSingleItem().getItem().getName(),
-								displayItemWithGroupBean.getSingleItem().getData().getValue(),
-								displayItemWithGroupBean.getSingleItem().getData().getOrdinal(),
-								displayItemWithGroupBean.getSingleItem().getItem().getOid() });
 			}
 			// Items in repeating groups
 			for (DisplayItemGroupBean itemGroupBean : displayItemWithGroupBean.getItemGroups()) {
@@ -4979,18 +4723,7 @@ public abstract class DataEntryServlet extends Controller {
 					} else {
 						c.grouped.put(key, 1);
 					}
-					logger.debug("Item Name : {} , Item Value : {} , Item OID : {} ", new Object[] {
-							displayItemBean.getItem().getName(), displayItemBean.getData().getValue(),
-							displayItemBean.getItem().getOid() });
 				}
-			}
-		}
-		if (logger.isDebugEnabled()) {
-			for (String key : c.grouped.keySet()) {
-				logger.debug("key : {} , value : {}", key, c.grouped.get(key));
-			}
-			for (String key : c.variableAndValue.keySet()) {
-				logger.debug("key : {} , value : {}", key, c.variableAndValue.get(key));
 			}
 		}
 		return c;
@@ -5143,32 +4876,27 @@ public abstract class DataEntryServlet extends Controller {
 				if (diwb.isInGroup()) {
 					List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
 					for (int j = 0; j < dgbs.size(); j++) {
-						DisplayItemGroupBean digb = dgbs.get(j);
 
+						DisplayItemGroupBean digb = dgbs.get(j);
 						List<DisplayItemBean> dibs = digb.getItems();
 
-						if (j == 0) { // first repeat
+						if (j == 0) {
 							for (DisplayItemBean dib : dibs) {
 								String intendedKey = digb.getInputId() + getInputName(dib);
 								String replacementKey = digb.getItemGroupBean().getOid() + "_" + j + getInputName(dib);
 								if (!replacementKey.equals(intendedKey) && errors.containsKey(intendedKey)) {
 									errors.put(replacementKey, errors.get(intendedKey));
 									errors.remove(intendedKey);
-									logger.debug("removing: " + intendedKey + " and replacing it with "
-											+ replacementKey);
 								}
 							}
-						} else { // everything
+						} else {
 							manualRows++;
 							for (DisplayItemBean dib : dibs) {
 								String intendedKey = digb.getInputId() + getInputName(dib);
-								String replacementKey = digb.getItemGroupBean().getOid() + "_manual"
-										+ digb.getOrdinal() + getInputName(dib);
+								String replacementKey = digb.getItemGroupBean().getOid() + "_manual" + digb.getOrdinal() + getInputName(dib);
 								if (!replacementKey.equals(intendedKey) && errors.containsKey(intendedKey)) {
 									errors.put(replacementKey, errors.get(intendedKey));
 									errors.remove(intendedKey);
-									logger.debug("removing: " + intendedKey + " and replacing it with "
-											+ replacementKey);
 								}
 							}
 						}

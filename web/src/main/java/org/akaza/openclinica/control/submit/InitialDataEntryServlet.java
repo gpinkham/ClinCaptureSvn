@@ -121,24 +121,15 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
 			List<DisplayItemBean> items = displayGroup.getItems();
 			int order = displayGroup.getOrdinal();
-			/*
-			 * if (displayGroup.isAuto() && displayGroup.getFormInputOrdinal() > 0) { order =
-			 * displayGroup.getFormInputOrdinal(); }
-			 */
+
 			for (DisplayItemBean displayItem : items) {
-				// int manualcount = 0;
-				// tbh trying to set this correctly 01/2010
-				// CLINOVO - start
 				if (displayGroup.isAuto()) {
+
 					inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
 				} else {
-					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-							displayItem);
-					// manualcount++;
+
+					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
 				}
-				// CLINOVO - end
-				logger.debug("THe oid is " + displayItem.getItem().getOid() + " order : " + order + " inputName : "
-						+ inputName);
 
 				if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
 						|| groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1)
@@ -203,8 +194,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 				if (displayGroup.isAuto()) {
 					inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
 				} else {
-					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(),
-							displayItem);
+					inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
 				}
 				validateDisplayItemBean(v, displayItem, inputName, request);
 			}
