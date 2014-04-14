@@ -23,6 +23,14 @@ function selectAllChecks(formObj,value){
     } 
 }
 
+if (!Array.prototype.forEach) {
+	Array.prototype.forEach = function(fn, scope) {
+		for ( var i = 0, len = this.length; i < len; ++i) {
+			fn.call(scope, this[i], i, this);
+		}
+	};
+}
+
 function checkGoBackEntryStatus(strImageName, Message) {
     closing = false;        
     objImage = MM_findObj(strImageName);
@@ -3586,6 +3594,119 @@ function chooseHomePageVersion(){
 		$(".new_home_page").remove();
 	} else {
 		$(".old_home_page").remove();
+	}
+}
+
+/* =======================================================================================
+* Adding an ability to uncheck radiobuttons on all pages
+* To make radiobutton uncheckable, you should add class "uncheckable_radio" to it
+========================================================================================== */
+$(document).ready(function() {
+	$("input[type='radio'].uncheckable_radio").click(function() {
+		var previousValue = $(this).attr('previousValue');
+		var name = $(this).attr('name');
+
+		if (previousValue == 'checked') {
+			$(this).removeAttr('checked');
+			$(this).attr('previousValue', false);
+		} else {
+			$("input[name=" + name + "]:radio").attr('previousValue', false);
+			$(this).attr('previousValue', 'checked');
+		}
+	});
+});
+
+
+function showEmailField(element) {
+	if ($(element).attr('previousValue') == 'checked') {
+		$(element).parent().parent().find(".email_wrapper").css("display",
+				"none");
+		$(element).parent().parent().find(".email_wrapper input").val("");
+	} else {
+		$(element).parent().parent().find(".email_wrapper").css("display",
+				"table-cell");
+	}
+}
+
+function FieldChecker(selector, checkType) {
+	this.selector = selector;
+	this.checkType = checkType;
+	var numberOfErrors = 0;
+	this.errorsExists = false;
+
+	this.check = function() {
+
+		$(this.selector)
+				.each(
+						function(index) {
+
+							if ($(this).parent().css("display") != "none") {
+								var currentValue = $(this).val();
+
+								switch (checkType) {
+								case "email":
+									var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+									if (!re.test(currentValue)) {
+										numberOfErrors++;
+										$(this).focus();
+										$(this).parent().parent()
+												.find(".alert").css("display",
+														"block");
+									} else {
+										$(this).parent().parent()
+												.find(".alert").css("display",
+														"none")
+									}
+									break
+								default:
+									numberOfErrors = 0;
+								}
+							}
+						});
+
+		if (numberOfErrors != 0) {
+			this.errorsExists = true;
+		} else {
+			this.errorsExists = false;
+		}
+
+		return this.errorsExists;
+	}
+}
+
+/* =======================================================================================
+* Using this function we can add dinamic validation to different number of the fields.
+* Expected values:
+* "expectedValues" - identifiers for regular expressions that need to be run for every selector;
+* "selectors" - array of fields that will be checked;
+* "formName" - name of form that will be submitted on success.
+* 
+* Item block need to have folowing srtructure, for correct errors displaying:
+* <wrapper>
+* 	<item-block-wrapper>
+* 		...
+* 		<item class="selector">
+* 		...
+* 	</item-clock-wrapper>
+* 	<alert-block class="alert"> Error message </alert-block>
+* </wrapper>
+========================================================================================== */
+function validateCustomFields(expectedValues, selectors, formToSubmit) {
+	var errorsExists = false;
+
+	selectors
+			.forEach(function(entry, index) {
+				var currentFieldChecker = new FieldChecker(entry,
+						expectedValues[index]);
+				var checkResult = currentFieldChecker.check();
+
+				if (checkResult == true) {
+					errorsExists = true;
+				}
+			});
+
+	if (!errorsExists) {
+		$(formToSubmit).submit();
 	}
 }
 

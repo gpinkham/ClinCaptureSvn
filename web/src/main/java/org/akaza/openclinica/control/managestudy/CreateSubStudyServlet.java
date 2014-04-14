@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -14,6 +14,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,8 +22,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -145,17 +148,16 @@ public class CreateSubStudyServlet extends Controller {
 								scg.getValue().setValue(fp.getString("markImportedCRFAsCompleted"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoScheduleEventDuringImport")) {
 								scg.getValue().setValue(fp.getString("autoScheduleEventDuringImport"));
-                            } else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCreateSubjectDuringImport")) {
-                                scg.getValue().setValue(fp.getString("autoCreateSubjectDuringImport"));
-                            } else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")) {
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCreateSubjectDuringImport")) {
+								scg.getValue().setValue(fp.getString("autoCreateSubjectDuringImport"));
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")) {
 								scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));
 							} else if (scg.getParameter().getHandle()
 									.equalsIgnoreCase("replaceExisitingDataDuringImport")) {
 								scg.getValue().setValue(fp.getString("replaceExisitingDataDuringImport"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowCodingVerification")) {
 								scg.getValue().setValue(fp.getString("allowCodingVerification"));
-							} else if (scg.getParameter().getHandle()
-									.equalsIgnoreCase("defaultBioontologyURL")) {
+							} else if (scg.getParameter().getHandle().equalsIgnoreCase("defaultBioontologyURL")) {
 								scg.getValue().setValue(fp.getString("defaultBioontologyURL"));
 							} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCodeDictionaryName")) {
 								scg.getValue().setValue(fp.getString("autoCodeDictionaryName"));
@@ -431,12 +433,12 @@ public class CreateSubStudyServlet extends Controller {
 					scg.getValue().setValue(fp.getString("autoScheduleEventDuringImport"));
 					study.getStudyParameterConfig().setAutoScheduleEventDuringImport(
 							fp.getString("autoScheduleEventDuringImport"));
-                } else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCreateSubjectDuringImport")
-                        && !fp.getString("autoCreateSubjectDuringImport").isEmpty()) {
-                    scg.getValue().setValue(fp.getString("autoCreateSubjectDuringImport"));
-                    study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(
-                            fp.getString("autoCreateSubjectDuringImport"));
-                } else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCreateSubjectDuringImport")
+						&& !fp.getString("autoCreateSubjectDuringImport").isEmpty()) {
+					scg.getValue().setValue(fp.getString("autoCreateSubjectDuringImport"));
+					study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(
+							fp.getString("autoCreateSubjectDuringImport"));
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("allowSdvWithOpenQueries")
 						&& !fp.getString("allowSdvWithOpenQueries").isEmpty()) {
 					scg.getValue().setValue(fp.getString("allowSdvWithOpenQueries"));
 					study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
@@ -452,8 +454,7 @@ public class CreateSubStudyServlet extends Controller {
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("defaultBioontologyURL")
 						&& !fp.getString("defaultBioontologyURL").isEmpty()) {
 					scg.getValue().setValue(fp.getString("defaultBioontologyURL"));
-					study.getStudyParameterConfig().setDefaultBioontologyURL(
-							fp.getString("defaultBioontologyURL"));
+					study.getStudyParameterConfig().setDefaultBioontologyURL(fp.getString("defaultBioontologyURL"));
 				} else if (scg.getParameter().getHandle().equalsIgnoreCase("autoCodeDictionaryName")
 						&& !fp.getString("autoCodeDictionaryName").isEmpty()) {
 					scg.getValue().setValue(fp.getString("autoCodeDictionaryName"));
@@ -542,6 +543,8 @@ public class CreateSubStudyServlet extends Controller {
 					String electronicSignature = fp.getString("electronicSignature" + order);
 					String hideCRF = fp.getString("hideCRF" + order);
 					int sdvId = fp.getInt("sdvOption" + order);
+					String emailCRFTo = fp.getString("mailTo" + order);
+					String emailOnStep = fp.getString("emailOnStep" + order);
 					ArrayList<String> selectedVersionIdList = fp.getStringArray("versionSelection" + order);
 					int selectedVersionIdListSize = selectedVersionIdList.size();
 					String selectedVersionIds = "";
@@ -558,97 +561,60 @@ public class CreateSubStudyServlet extends Controller {
 					boolean hasPassword = !StringUtil.isBlank(electronicSignature)
 							&& "yes".equalsIgnoreCase(electronicSignature.trim());
 					boolean isHide = !StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim());
-					if (edcBean.getParentId() > 0) {
-						int dbDefaultVersionId = edcBean.getDefaultVersionId();
-						if (defaultVersionId != dbDefaultVersionId) {
-							changed = true;
-							CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultVersionId);
-							edcBean.setDefaultVersionId(defaultVersionId);
-							edcBean.setDefaultVersionName(defaultVersion.getName());
+
+					int dbDefaultVersionId = edcBean.getDefaultVersionId();
+					if (defaultVersionId != dbDefaultVersionId) {
+						changed = true;
+						CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultVersionId);
+						edcBean.setDefaultVersionId(defaultVersionId);
+						edcBean.setDefaultVersionName(defaultVersion.getName());
+					}
+					if (isRequired != edcBean.isRequiredCRF()) {
+						changed = true;
+						edcBean.setRequiredCRF(isRequired);
+					}
+					if (isDouble != edcBean.isDoubleEntry()) {
+						changed = true;
+						edcBean.setDoubleEntry(isDouble);
+					}
+					if (hasPassword != edcBean.isElectronicSignature()) {
+						changed = true;
+						edcBean.setElectronicSignature(hasPassword);
+					}
+					if (isHide != edcBean.isHideCrf()) {
+						changed = true;
+						edcBean.setHideCrf(isHide);
+					}
+					if ((!StringUtil.isBlank(selectedVersionIds)
+							&& !selectedVersionIds.equals(edcBean.getSelectedVersionIds()) && (edcBean.getParentId() > 0))
+							|| (selectedVersionIdListSize != edcBean.getVersions().size() && !(edcBean.getParentId() > 0))) {
+						changed = true;
+						String[] ids = selectedVersionIds.split(",");
+						ArrayList<Integer> idList = new ArrayList<Integer>();
+						for (String id : ids) {
+							idList.add(Integer.valueOf(id));
 						}
-						if (isRequired != edcBean.isRequiredCRF()) {
-							changed = true;
-							edcBean.setRequiredCRF(isRequired);
-						}
-						if (isDouble != edcBean.isDoubleEntry()) {
-							changed = true;
-							edcBean.setDoubleEntry(isDouble);
-						}
-						if (hasPassword != edcBean.isElectronicSignature()) {
-							changed = true;
-							edcBean.setElectronicSignature(hasPassword);
-						}
-						if (isHide != edcBean.isHideCrf()) {
-							changed = true;
-							edcBean.setHideCrf(isHide);
-						}
-						if (!StringUtil.isBlank(selectedVersionIds)
-								&& !selectedVersionIds.equals(edcBean.getSelectedVersionIds())) {
-							changed = true;
-							String[] ids = selectedVersionIds.split(",");
-							ArrayList<Integer> idList = new ArrayList<Integer>();
-							for (String id : ids) {
-								idList.add(Integer.valueOf(id));
-							}
-							edcBean.setSelectedVersionIdList(idList);
-							edcBean.setSelectedVersionIds(selectedVersionIds);
-						}
-						if (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode()) {
-							changed = true;
-							edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
-						}
-					} else {
-						// only if definition-crf has been modified, will it be
-						// saved for the site
-						int defaultId = defaultVersionId > 0 ? defaultVersionId : edcBean.getDefaultVersionId();
-						if (defaultId == defaultVersionId) {
-							if (isRequired == edcBean.isRequiredCRF()) {
-								if (isDouble == edcBean.isDoubleEntry()) {
-									if (hasPassword == edcBean.isElectronicSignature()) {
-										if (isHide == edcBean.isHideCrf()) {
-											if (selectedVersionIdListSize > 0) {
-												if (selectedVersionIdListSize == edcBean.getVersions().size()) {
-													if (sdvId > 0) {
-														if (sdvId != edcBean.getSourceDataVerification().getCode()) {
-															changed = true;
-															edcBean.setSourceDataVerification(SourceDataVerification
-																	.getByCode(sdvId));
-														}
-													}
-												} else {
-													changed = true;
-													String[] ids = selectedVersionIds.split(",");
-													ArrayList<Integer> idList = new ArrayList<Integer>();
-													for (String id : ids) {
-														idList.add(Integer.valueOf(id));
-													}
-													edcBean.setSelectedVersionIdList(idList);
-													edcBean.setSelectedVersionIds(selectedVersionIds);
-												}
-											}
-										} else {
-											changed = true;
-											edcBean.setHideCrf(isHide);
-										}
-									} else {
-										changed = true;
-										edcBean.setElectronicSignature(hasPassword);
-									}
-								} else {
-									changed = true;
-									edcBean.setDoubleEntry(isDouble);
-								}
-							} else {
-								changed = true;
-								edcBean.setRequiredCRF(isRequired);
-							}
+						edcBean.setSelectedVersionIdList(idList);
+						edcBean.setSelectedVersionIds(selectedVersionIds);
+					}
+					if (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode()) {
+						changed = true;
+						edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
+					}
+					if (!emailOnStep.equals(edcBean.getEmailStep())) {
+						changed = true;
+						edcBean.setEmailStep(emailOnStep);
+					}
+					if (!emailCRFTo.equals(edcBean.getEmailTo())) {
+						changed = true;
+
+						if (StringUtil.isBlank(emailOnStep)) {
+							edcBean.setEmailTo("");
 						} else {
-							changed = true;
-							CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultVersionId);
-							edcBean.setDefaultVersionId(defaultVersionId);
-							edcBean.setDefaultVersionName(defaultVersion.getName());
+							edcBean.setEmailTo(emailCRFTo);
 						}
 					}
+
 					changes.put(sed.getId() + "-" + edcBean.getId(), changed);
 					++start;
 				}

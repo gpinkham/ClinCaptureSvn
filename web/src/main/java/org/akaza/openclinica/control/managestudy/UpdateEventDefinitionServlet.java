@@ -444,6 +444,8 @@ public class UpdateEventDefinitionServlet extends Controller {
 				String electronicSignature = fp.getString("electronicSignature" + i);
 				String hideCRF = fp.getString("hideCRF" + i);
 				int sdvId = fp.getInt("sdvOption" + i);
+				String emailStep = fp.getString("emailOnStep" + i);
+				String emailTo = fp.getString("mailTo" + i);
 
 				if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
 					edcBean.setHideCrf(true);
@@ -456,6 +458,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 				} else {
 					edcBean.setRequiredCRF(false);
 				}
+
 				if (!StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
 					edcBean.setDoubleEntry(true);
 				} else {
@@ -473,6 +476,7 @@ public class UpdateEventDefinitionServlet extends Controller {
 				} else {
 					edcBean.setDecisionCondition(false);
 				}
+
 				String nullString = "";
 				// process null values
 				ArrayList nulls = NullValue.toArrayList();
@@ -490,6 +494,18 @@ public class UpdateEventDefinitionServlet extends Controller {
 						&& (edcBean.getSourceDataVerification() == null || sdvId != edcBean.getSourceDataVerification()
 								.getCode())) {
 					edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
+				}
+
+				if (!StringUtil.isBlank(emailTo)) {
+					edcBean.setEmailTo(emailTo);
+				} else {
+					edcBean.setEmailTo("");
+				}
+
+				if (!StringUtil.isBlank(emailStep)) {
+					edcBean.setEmailStep(emailStep);
+				} else {
+					edcBean.setEmailStep("");
 				}
 
 				edcBean.setNullValues(nullString);

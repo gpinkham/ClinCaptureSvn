@@ -4,36 +4,30 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>	
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterms"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="resnotes"/>
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
 <jsp:include page="../include/sideAlert.jsp"/>
-
 <c:set var="bioontologyURL" value="${studyToView.studyParameterConfig.defaultBioontologyURL}"/>
-
 <tr id="sidebar_Instructions_open" style="display: all">
-		<td class="sidebar_tab">
-
+	<td class="sidebar_tab">
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
 		<div class="sidebar_tab_content">
-        <fmt:message key="enter_the_study_information_requested" bundle="${resword}"/> 
+			<fmt:message key="enter_the_study_information_requested" bundle="${resword}"/> 
 		</div>
+	</td>
 
-		</td>
-	
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: none">
-		<td class="sidebar_tab">
+</tr>
 
+<tr id="sidebar_Instructions_closed" style="display: none">
+	<td class="sidebar_tab">
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
-		</td>
-  </tr>
+	</td>
+</tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
@@ -44,6 +38,7 @@
 <jsp:useBean scope="request" id="facRecruitStatusMap" class="java.util.HashMap"/>
 <jsp:useBean scope="request" id="statuses" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap"/>
+
 <c:set var="startDate" value="" />
 <c:set var="endDate" value="" />
 <c:set var="protocolDateVerification" value="" />
@@ -56,9 +51,10 @@
 		<c:set var="endDate" value="${presetValue.value}" />
 	</c:if>
 	<c:if test='${presetValue.key == "protocolDateVerification"}'>
-		<c:set var="protocolDateVerification" value="${presetValue.value}" />	
-	</c:if>	
+		<c:set var="protocolDateVerification" value="${presetValue.value}" />
+	</c:if>
 </c:forEach>
+
 <script type="text/JavaScript" language="JavaScript">
   
   function updateVersionSelection(vsIds, index, count) {
@@ -117,12 +113,16 @@
   </span>
 </h1>
 
-<form action="CreateSubStudy" method="post">
+<form action="CreateSubStudy" method="post" id="createSubStudyForm">
 * <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
 <input type="hidden" name="action" value="confirm">
 
-<div class="table_title_Manage"><a href="javascript:leftnavExpand('siteProperties');">
-    <img id="excl_siteProperties" src="images/bt_Collapse.gif" border="0"> <fmt:message key="create_site_properties" bundle="${resword}"/> </a></div>
+<div class="table_title_Manage">
+	<a href="javascript:leftnavExpand('siteProperties');">
+		<img id="excl_siteProperties" src="images/bt_Collapse.gif" border="0"> 
+		<fmt:message key="create_site_properties" bundle="${resword}"/> 
+	</a>
+</div>
 
 <div id="siteProperties" style="display:">
 
@@ -584,13 +584,15 @@
 	<div id="sed<c:out value="${defCount}"/>" style="display: none">
 
 	<!-- These DIVs define shaded box borders -->
- 	<div style="width: 100%">
+ 	<div style="width: 500px">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-	<div class="textbox_center">
-	<table border="0" cellpadding="0" cellspacing="0">
-		<tr><td class="table_header_column" colspan="3">Name</td><td><c:out value="${def.name}"/></td></tr>
-		<tr><td class="table_header_column" colspan="3">Description</td><td><c:out value="${def.description}"/></td></tr>
+	<div class="tablebox_center">
+
+	<table border="0" >
+		<tr><td class="table_header_column" colspan="3" width="100px">Name</td><td class="table_cell" width="400px"><c:out value="${def.name}"/></td></tr>
+		<tr><td class="table_header_column" colspan="3">Description</td><td class="table_cell"><c:out value="${def.description}"/></td></tr>
 	</table>
+
 	</div>
   	</div></div></div></div></div></div></div></div>
 	</div>
@@ -600,158 +602,216 @@
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B">
 	<div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
+
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 		<c:set var="count" value="0"/>
 		<c:forEach var="edc" items="${def.crfs}">
-		<c:set var="num" value="${count}-${edc.id}" />
-		<tr valign="top" bgcolor="#F5F5F5">
-		    <td class="table_header_column" colspan="3"><c:out value="${edc.crfName}"/></td>
-		</tr>
 
-		<c:if test="${edc.status.id==1}">
-		<c:choose>
-	    <c:when test="${fn:length(edc.selectedVersionIds)>0}">
-			<c:set var="idList" value="${edc.selectedVersionIdList}"/>
-			<c:set var="selectedIds" value=",${edc.selectedVersionIds},"/>
-	    </c:when>
-	    <c:otherwise>
-			<c:set var="idList" value=""/>
-			<c:set var="selectedIds" value=""/>
-		</c:otherwise>
-		</c:choose>
-		<tr valign="top">
-	    	<td class="table_cell"><fmt:message key="required" bundle="${resword}"/>:
-		    <c:choose>
-	            <c:when test="${edc.requiredCRF == true}">
-	                <input type="checkbox" checked name="requiredCRF<c:out value="${num}"/>" value="yes">
-	            </c:when>
-	            <c:otherwise>
-	                <input type="checkbox" name="requiredCRF<c:out value="${num}"/>" value="yes">
-	            </c:otherwise>
-	        </c:choose>
-	    	</td>
-	    	<td></td>
+			<c:set var="num" value="${count}-${edc.id}" />
+			<tr valign="top" bgcolor="#F5F5F5">
+				<td class="table_header_column" colspan="4"><c:out value="${edc.crfName}"/></td>
+			</tr>
 
-		    <td class="table_cell"><fmt:message key="double_data_entry" bundle="${resword}"/>:
-		    <c:choose>
-	            <c:when test="${edc.doubleEntry == true}">
-	                <input type="checkbox" checked name="doubleEntry<c:out value="${num}"/>" value="yes">
-	            </c:when>
-	            <c:otherwise>
-	                <input type="checkbox" name="doubleEntry<c:out value="${num}"/>" value="yes">
-            	</c:otherwise>
-        	</c:choose>
-		    </td>
+			<c:if test="${edc.status.id==1}">
+			<c:choose>
+				<c:when test="${fn:length(edc.selectedVersionIds)>0}">
+					<c:set var="idList" value="${edc.selectedVersionIdList}"/>
+					<c:set var="selectedIds" value=",${edc.selectedVersionIds},"/>
+				</c:when>
+				<c:otherwise>
+					<c:set var="idList" value=""/>
+					<c:set var="selectedIds" value=""/>
+				</c:otherwise>
+			</c:choose>
 
-		    <td class="table_cell"><fmt:message key="password_required" bundle="${resword}"/>:
-		    <c:choose>
-	            <c:when test="${edc.electronicSignature == true}">
-	                <input type="checkbox" checked name="electronicSignature<c:out value="${num}"/>" value="yes">
-	            </c:when>
-	            <c:otherwise>
-	                <input type="checkbox" name="electronicSignature<c:out value="${num}"/>" value="yes">
-	            </c:otherwise>
-        	</c:choose>
-		    </td>
+			<tr valign="top">
+				<td class="table_cell"><fmt:message key="required" bundle="${resword}"/>:
+					<c:choose>
+						<c:when test="${edc.requiredCRF == true}">
+							<input type="checkbox" checked name="requiredCRF<c:out value="${num}"/>" value="yes">
+						</c:when>
+						<c:otherwise>
+							<input type="checkbox" name="requiredCRF<c:out value="${num}"/>" value="yes">
+						</c:otherwise>
+					</c:choose>
+				</td>
+	
+				<td class="table_cell"><fmt:message key="double_data_entry" bundle="${resword}"/>:
+					<c:choose>
+						<c:when test="${edc.doubleEntry == true}">
+							<input type="checkbox" checked name="doubleEntry<c:out value="${num}"/>" value="yes">
+						</c:when>
+						<c:otherwise>
+							<input type="checkbox" name="doubleEntry<c:out value="${num}"/>" value="yes">
+						</c:otherwise>
+					</c:choose>
+				</td>
+	
+				<td class="table_cell"><fmt:message key="password_required" bundle="${resword}"/>: 
+					<c:choose>
+						<c:when test="${edc.electronicSignature == true}">
+							<input type="checkbox" checked name="electronicSignature<c:out value="${num}"/>" value="yes">
+						</c:when>
+						<c:otherwise>
+							<input type="checkbox" name="electronicSignature<c:out value="${num}"/>" value="yes">
+						</c:otherwise>
+					</c:choose>
+				</td>
+	
+				<td class="table_cell"><fmt:message key="default_version" bundle="${resword}"/>:
+				<select name="defaultVersionId<c:out value="${num}"/>" id="dv<c:out value="${num}"/>" onclick="updateVersionSelection('<c:out value="${selectedIds}"/>',document.getElementById('dv<c:out value="${num}"/>').selectedIndex, '<c:out value="${num}"/>')">
+					<c:forEach var="version" items="${edc.versions}">
+						<c:choose>
+							<c:when test="${edc.defaultVersionId == version.id}">
+								<option value="<c:out value="${version.id}"/>" selected><c:out value="${version.name}"/>
+							</c:when>
+							<c:otherwise>
+								<option value="<c:out value="${version.id}"/>"><c:out value="${version.name}"/>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
+				</select>
+				</td>
+			</tr>
 
-		    <td class="table_cell" colspan="2"><fmt:message key="default_version" bundle="${resword}"/>:
-		    <select name="defaultVersionId<c:out value="${num}"/>" id="dv<c:out value="${num}"/>" onclick="updateVersionSelection('<c:out value="${selectedIds}"/>',document.getElementById('dv<c:out value="${num}"/>').selectedIndex, '<c:out value="${num}"/>')">
-	            <c:forEach var="version" items="${edc.versions}">
-	            <c:choose>
-	            <c:when test="${edc.defaultVersionId == version.id}">
-	            <option value="<c:out value="${version.id}"/>" selected><c:out value="${version.name}"/>
-	                </c:when>
-	                <c:otherwise>
-	            <option value="<c:out value="${version.id}"/>"><c:out value="${version.name}"/>
-	                </c:otherwise>
-	                </c:choose>
-	                </c:forEach>
-        	</select>
-		    </td>
-		</tr>
-		<tr valign="top">
-		    <td class="table_cell" colspan="3"><fmt:message key="version_selection" bundle="${resword}"/>&nbsp:
-		    <select multiple name="versionSelection<c:out value="${num}"/>" id="vs<c:out value="${num}"/>" onclick="updateThis(document.getElementById('vs<c:out value="${num}"/>'), '<c:out value="${num}"/>')" size="${fn:length(edc.versions)}">
-	            <c:forEach var="version" items="${edc.versions}">
-	            	<c:choose>
-		            <c:when test="${fn:length(idList) > 0}">
-		            	<c:set var="versionid" value=",${version.id},"/>
-			            <c:choose>
-		            	<c:when test="${version.id == defaultVersionId}">
-		            		<option value="<c:out value="${version.id}"/>" selected><c:out value="${version.name}"/>
-		            	</c:when>
-		            	<c:otherwise>
-		            		<c:choose>
-					        <c:when test="${fn:contains(selectedIds,versionid)}">
-					            <option value="<c:out value="${version.id}"/>" selected><c:out value="${version.name}"/>
-					        </c:when>
-					        <c:otherwise>
-					            <option value="<c:out value="${version.id}"/>"><c:out value="${version.name}"/>
-					        </c:otherwise>
-					        </c:choose>
-					    </c:otherwise>
-				        </c:choose>
-				    </c:when>
-		            <c:otherwise>
-		            	<option value="<c:out value="${version.id}"/>" selected><c:out value="${version.name}"/>
-			        </c:otherwise>
-			        </c:choose>
-	            </c:forEach>
-        	</select>
-		    </td>
+			<tr valign="top">
+				<td class="table_cell" colspan="2"><fmt:message key="version_selection" bundle="${resword}"/>&nbsp:
+				<select multiple name="versionSelection<c:out value="${num}"/>" id="vs<c:out value="${num}"/>" onclick="updateThis(document.getElementById('vs<c:out value="${num}"/>'), '<c:out value="${num}"/>')" size="${fn:length(edc.versions)}">
+					<c:forEach var="version" items="${edc.versions}">
+						<c:choose>
+						<c:when test="${fn:length(idList) > 0}">
+							<c:set var="versionid" value=",${version.id},"/>
+							<c:choose>
+								<c:when test="${version.id == defaultVersionId}">
+									<option value="<c:out value="${version.id}"/>" selected><c:out value="${version.name}"/>
+								</c:when>
+								<c:otherwise>
+									<c:choose>
+										<c:when test="${fn:contains(selectedIds,versionid)}">
+											<option value="<c:out value="${version.id}"/>" selected><c:out value="${version.name}"/>
+										</c:when>
+										<c:otherwise>
+											<option value="<c:out value="${version.id}"/>"><c:out value="${version.name}"/>
+										</c:otherwise>
+									</c:choose>
+								</c:otherwise>
+							</c:choose>
+						</c:when>
+						<c:otherwise>
+							<option value="<c:out value="${version.id}"/>" selected><c:out value="${version.name}"/>
+						</c:otherwise>
+						</c:choose>
+					</c:forEach>
+				</select>
+				</td>
 
-		    <td class="table_cell" colspan="1"><fmt:message key="hidden_crf" bundle="${resword}"/> :
-		    <c:choose>
-	            <c:when test="${!edc.hideCrf}">
-	                <input type="checkbox" name="hideCRF<c:out value="${num}"/>" value="yes">
-	            </c:when>
-	            <c:otherwise><input checked="checked" type="checkbox" name="hideCRF<c:out value="${num}"/>" value="yes"></c:otherwise>
-	        </c:choose>
-		    </td>
+				<td class="table_cell" colspan="2"></td>
+			</tr>
 
-		    <td class="table_cell" colspan="6"><fmt:message key="sdv_option" bundle="${resword}"/>:
-		    <select name="sdvOption<c:out value="${num}"/>">
-	            <c:set var="index" value="1"/>
-	            <c:forEach var="sdv" items="${sdvOptions}">
-	            	<c:choose>
-	            	<c:when test="${edc.sourceDataVerification.code == index}">
-	            		<option value="${index}" selected><c:out value="${sdv}"/>
-	                </c:when>
-	                <c:otherwise>
-	            		<option value="${index}"><c:out value="${sdv}"/>
-	                </c:otherwise>
-	                </c:choose>
-	            	<c:set var="index" value="${index+1}"/>
-	            </c:forEach>
-        	</select>
-		    </td>
-		</tr>
-		<c:set var="count" value="${count+1}"/>
-		</c:if>
-		<tr><td class="table_divider" colspan="8">&nbsp;</td></tr>
+			<tr>
+				<td class="table_cell" colspan="2"><fmt:message key="hidden_crf" bundle="${resword}"/> :
+					<c:choose>
+						<c:when test="${!edc.hideCrf}"><input type="checkbox" name="hideCRF<c:out value="${num}"/>" value="yes"></c:when>
+						<c:otherwise><input checked="checked" type="checkbox" name="hideCRF<c:out value="${num}"/>" value="yes"></c:otherwise>
+					</c:choose>
+				</td>
+
+				<td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
+					<select name="sdvOption<c:out value="${num}"/>">
+
+					<c:set var="index" value="1"/>
+					<c:forEach var="sdv" items="${sdvOptions}">
+						<c:choose>
+							<c:when test="${edc.sourceDataVerification.code == index}">
+								<option value="${index}" selected><c:out value="${sdv}"/>
+							</c:when>
+							<c:otherwise>
+								<option value="${index}"><c:out value="${sdv}"/>
+							</c:otherwise>
+						</c:choose>
+						<c:set var="index" value="${index+1}"/>
+					</c:forEach>
+					</select>
+				</td>
+			</tr>
+
+			<tr valign="top">
+				<td class="table_cell" colspan="2">
+					
+					<fmt:message key="send_email_on" bundle="${resword}"/>: 
+					<c:choose>
+						<c:when test="${edc.emailStep eq 'complete'}">
+							<c:set var="emailStepComplete" value="checked"/>
+						</c:when>
+						<c:otherwise>
+							<c:set var="emailStepComplete" value=""/>
+						</c:otherwise>
+					</c:choose>
+
+					<input type="radio" name="emailOnStep<c:out value="${num}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="complete" class="email_field_trigger uncheckable_radio" ${emailStepComplete}/>
+					<fmt:message key="complete" bundle="${resterms}"/>
+		
+					<c:choose>
+						<c:when test="${edc.emailStep eq 'sign'}">
+							<c:set var="emailStepSign" value="checked"/>
+						</c:when>
+						<c:otherwise>
+							<c:set var="emailStepSign" value=""/>
+						</c:otherwise>
+					</c:choose>
+					
+					<input type="radio" name="emailOnStep<c:out value="${num}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="sign" class="email_field_trigger uncheckable_radio" ${emailStepSign}/>
+					<fmt:message key="sign" bundle="${resterms}"/>
+				</td>
+
+				<td class="table_cell" colspan="2">
+					<c:choose>
+						<c:when test="${empty edc.emailTo}">
+							<c:set var="display" value="none"/>
+						</c:when>
+						<c:otherwise>
+							<c:set var="display" value="block"/>
+						</c:otherwise>
+					</c:choose>
+
+					<span class="email_wrapper" style="display:${display}">
+						<fmt:message key="email_crf_to" bundle="${resword}"/>: 
+						<input type="text" name="mailTo${num}" onchange="javascript:changeIcon();" style="width:115px;margin-left:79px" class="email_to_check_field" value="${edc.emailTo}"/>
+					</span>
+					<span class="alert" style="display:none"><fmt:message key="enter_valid_email" bundle="${resnotes}"/></span>
+				</td>
+			</tr>
+
+			<c:set var="count" value="${count+1}"/>
+			</c:if>
+
+			<tr><td class="table_divider" colspan="8">&nbsp;</td></tr>
 		</c:forEach>
 	</table>
+
 	</div>
-  	</div></div></div></div></div></div></div></div>
+	</div></div></div></div></div></div></div></div>
 	</div>
-	</div><br>
+	</div>
+	<br>
 </c:forEach>
 
 <br><br>
 
 
 <table border="0" cellpadding="0" cellspacing="0">
-<tr>
-<td>
-  <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}')" />
-</td>
-<td>
-  <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
-</td>
-</tr>
+	<tr>
+		<td>
+			<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+							value="<fmt:message key="back" bundle="${resword}"/>"
+							class="button_medium"
+							onClick="javascript: confirmBackSmart('<fmt:message key="sure_to_cancel" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}')" />
+		</td>
+
+		<td>
+			<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#createSubStudyForm');">
+		</td>
+	</tr>
 </table>
 
 </form>

@@ -13,28 +13,22 @@
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
-		<td class="sidebar_tab">
-
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
+	<td class="sidebar_tab">
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+			<img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10">
+		</a>
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
 		<div class="sidebar_tab_content">
-        <fmt:message key="please_choose_CRFs" bundle="${resword}"/>
+			<fmt:message key="please_choose_CRFs" bundle="${resword}"/>
 		</div>
-
-		</td>
-	
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: none">
-		<td class="sidebar_tab">
-
+	</td>
+</tr>
+<tr id="sidebar_Instructions_closed" style="display: none">
+	<td class="sidebar_tab">
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
-		</td>
-  </tr>
+	</td>
+</tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
@@ -58,6 +52,7 @@
   }
    //-->
 </script>
+
 <h1>
 	<span class="first_level_header">
 		<fmt:message key="update_SED" bundle="${resword}"/> - <fmt:message key="add_CRFs" bundle="${resword}"/>
@@ -65,23 +60,26 @@
 </h1>
 
 <form id="addCRFToDefinition" name="crfForm" action="AddCRFToDefinition"  method="post">
-    <input type="hidden" name="actionName" value="">
-    <input type="hidden" name="pageNum" value="2">
+	<input type="hidden" name="actionName" value="">
+	<input type="hidden" name="pageNum" value="2">
 
-    <c:import url="../include/showTableForEventDefinitionCRFList.jsp">
-        <c:param name="rowURL" value="showDefineEventCRFRow.jsp" />
-        <c:param name="outerFormName" value="crfForm" />
-    </c:import>
+	<c:import url="../include/showTableForEventDefinitionCRFList.jsp">
+		<c:param name="rowURL" value="showDefineEventCRFRow.jsp" />
+		<c:param name="outerFormName" value="crfForm" />
+	</c:import>
 
-<table border="0" cellpadding="0" cellspacing="0">
-<tr>
-<td>
-    <input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'UpdateEventDefinition');"/>
-    <img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
-</td>
-<td>
-    <input type="button" name="SubmitButton" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" onclick="$('input[name=actionName]').val('next'); $('#addCRFToDefinition').append('<input type=\'hidden\' name=\'Submit\'/>'); $('#addCRFToDefinition').submit();">
-</tr></table>
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td>
+				<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'UpdateEventDefinition');"/>
+				<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
+			</td>
+
+			<td>
+				<input type="button" name="SubmitButton" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" onclick="$('input[name=actionName]').val('next'); $('#addCRFToDefinition').append('<input type=\'hidden\' name=\'Submit\'/>'); $('#addCRFToDefinition').submit();">
+			</td>
+		</tr>
+	</table>
 </form>
 <br><br>
 

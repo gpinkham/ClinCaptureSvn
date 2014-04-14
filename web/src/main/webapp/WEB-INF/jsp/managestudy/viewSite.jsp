@@ -454,100 +454,125 @@
 
 
 <div class="tablebox_center">
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
- <tr valign="top">
-    <td width="90px" class="table_header_row"><fmt:message key="name" bundle="${resword}"/></td>
-    <td valign="top" class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
-    <td valign="top" class="table_header_row"><fmt:message key="double_data_entry" bundle="${resword}"/></td>
-    <td valign="top" class="table_header_row"><fmt:message key="password_required" bundle="${resword}"/></td>
-    <td valign="top" class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
-     <td valign="top" class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>
-     <td valign="top" class="table_header_row"><fmt:message key="null_values" bundle="${resword}"/></td>
-     <td valign="top" class="table_header_row"><fmt:message key="selected_verions" bundle="${resword}"/></td>
-     <td valign="top" class="table_header_row"><fmt:message key="sdv_option" bundle="${resword}"/></td>
-    <td valign="top" class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
-    <td valign="top" class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
-  </tr>
+<table border="0" cellpadding="0" cellspacing="0" width="900px">
+	<tr valign="top">
+		<td width="90px" class="table_header_row"><fmt:message key="name" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="double_data_entry" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="password_required" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="null_values" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="selected_verions" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="sdv_option" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="send_email_on" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="email_crf_to" bundle="${resword}"/></td>
+		<td valign="top" class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
+	</tr>
 
-  <c:set var="prevCrf" value=""/>
-  <c:set var="count" value="0"/>
-  <c:set var="defSize" value="${fn:length(eventDefinitionCRFs)}"/>
-  <c:set var="last" value="${defSize-1}"/>
- <c:forEach var ="crf" items="${eventDefinitionCRFs}" varStatus="status">
-  <c:choose>
-    <c:when test="${count == last}">
-      <c:set var="nextCrf" value="${eventDefinitionCRFs[count]}"/>
-    </c:when>
-    <c:otherwise>
-     <c:set var="nextCrf" value="${eventDefinitionCRFs[count+1]}"/>
-    </c:otherwise>
-  </c:choose>
-   <tr valign="top">
-    <td class="table_cell" width="90px"><c:out value="${crf.crfName}"/></td>
+	<c:set var="prevCrf" value=""/>
+	<c:set var="count" value="0"/>
+	<c:set var="defSize" value="${fn:length(eventDefinitionCRFs)}"/>
+	<c:set var="last" value="${defSize-1}"/>
 
-    <c:choose>
-    <c:when test="${fn:length(crf.selectedVersionIds)>0}">
-		<c:set var="selectedVersionNames" value="${crf.selectedVersionNames}"/>
-    </c:when>
-    <c:otherwise>
-		<c:set var="selectedVersionNames" value=""/>
-		<c:forEach var="v" items="${crf.versions}">
-			<c:set var="selectedVersionNames" value="${selectedVersionNames}${v.name},"/>
-		</c:forEach>
-		<c:set var="selectedVersionNames" value="${fn:substring(selectedVersionNames,0,fn:length(selectedVersionNames)-1)}"/>
-	</c:otherwise>
+	<c:forEach var ="crf" items="${eventDefinitionCRFs}" varStatus="status">
+	<c:choose>
+		<c:when test="${count == last}">
+			<c:set var="nextCrf" value="${eventDefinitionCRFs[count]}"/>
+		</c:when>
+		<c:otherwise>
+			<c:set var="nextCrf" value="${eventDefinitionCRFs[count+1]}"/>
+		</c:otherwise>
 	</c:choose>
 
+	<tr valign="top">
+		<td class="table_cell" width="90px"><c:out value="${crf.crfName}"/></td>
 
-    <td class="table_cell">
-    <c:choose>
-    <c:when test="${crf.requiredCRF == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
-     <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
-    </c:choose>
-   </td>
+		<c:choose>
+			<c:when test="${fn:length(crf.selectedVersionIds)>0}">
+				<c:set var="selectedVersionNames" value="${crf.selectedVersionNames}"/>
+			</c:when>
+			<c:otherwise>
+				<c:set var="selectedVersionNames" value=""/>
+				<c:forEach var="v" items="${crf.versions}">
+					<c:set var="selectedVersionNames" value="${selectedVersionNames}${v.name},"/>
+				</c:forEach>
+				<c:set var="selectedVersionNames" value="${fn:substring(selectedVersionNames,0,fn:length(selectedVersionNames)-1)}"/>
+			</c:otherwise>
+		</c:choose>
 
-    <td class="table_cell">
-     <c:choose>
-      <c:when test="${crf.doubleEntry == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
-      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
-     </c:choose>
-    </td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${crf.requiredCRF == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+				<c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+			</c:choose>
+		</td>
 
-    <td class="table_cell">
-     <c:choose>
-      <c:when test="${crf.electronicSignature == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
-      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
-     </c:choose>
-    </td>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${crf.doubleEntry == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+				<c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+			</c:choose>
+		</td>
 
-   <td class="table_cell">
-    <c:out value="${crf.defaultVersionName}"/>
-   </td>
-   <td class="table_cell">
-    <c:out value="${crf.hideCrf}"/>
-   </td>
-   <td class="table_cell">
-    <c:out value="${crf.nullValues}"/> &nbsp;
-  </td>
-  <td class="table_cell"><c:out value="${selectedVersionNames}"/></td>
-  <td class="table_cell"><fmt:message key="${crf.sourceDataVerification.description}" bundle="${resterm}"/></td>
-   <td class="table_cell"><c:out value="${crf.status.name}"/></td>
-   <td class="table_cell">
-     <table border="0" cellpadding="0" cellspacing="0">
-	  <tr>
-        <td>
-            <a href="ViewCRF?crfId=<c:out value="${crf.crfId}"/>"
-                 onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                 onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-                name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-        </td>
-	  </tr>
-	 </table>
-   </td>
-   </tr>
-   <c:set var="prevCrf" value="${crf}"/>
-   <c:set var="count" value="${count+1}"/>
- </c:forEach>
+		<td class="table_cell">
+			<c:choose>
+				<c:when test="${crf.electronicSignature == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+				<c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+			</c:choose>
+		</td>
+
+		<td class="table_cell">
+			<c:out value="${crf.defaultVersionName}"/>
+		</td>
+
+		<td class="table_cell">
+			<c:out value="${crf.hideCrf}"/>
+		</td>
+
+		<td class="table_cell">
+			<c:out value="${crf.nullValues}"/> &nbsp;
+		</td>
+
+		<td class="table_cell">
+			<c:out value="${selectedVersionNames}"/>
+		</td>
+
+		<td class="table_cell">
+			<fmt:message key="${crf.sourceDataVerification.description}" bundle="${resterm}"/>
+		</td>
+
+		<td class="table_cell">
+			<c:out value="${crf.status.name}"/>
+		</td>
+
+		<td class="table_cell">
+			<c:out value="${crf.emailStep}"/>&nbsp;
+		</td>
+
+		<td class="table_cell">
+			<c:out value="${crf.emailTo}"/>&nbsp;
+		</td>
+
+		<td class="table_cell">
+			<table border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td>
+						<a href="ViewCRF?crfId=<c:out value="${crf.crfId}"/>"
+								onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+								onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
+								name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" 
+								bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+
+	<c:set var="prevCrf" value="${crf}"/>
+	<c:set var="count" value="${count+1}"/>
+	</c:forEach>
 
 </table>
 </div>

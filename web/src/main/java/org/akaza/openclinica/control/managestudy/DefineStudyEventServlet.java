@@ -372,7 +372,6 @@ public class DefineStudyEventServlet extends Controller {
 
 		fp.getRequest().setAttribute("table", table);
 		forwardPage(Page.DEFINE_STUDY_EVENT2, fp.getRequest(), response);
-
 	}
 
 	/**
@@ -402,6 +401,8 @@ public class DefineStudyEventServlet extends Controller {
 			String doubleEntry = fp.getString("doubleEntry" + i);
 			String decisionCondition = fp.getString("decisionCondition" + i);
 			String electronicSignature = fp.getString("electronicSignature" + i);
+			String emailCRFTo = fp.getString("mailTo" + i);
+			String emailOnStep = fp.getString("emailOnStep" + i);
 
 			String hiddenCrf = fp.getString("hiddenCrf" + i);
 			// hideCRF is false by default in the bean
@@ -434,6 +435,18 @@ public class DefineStudyEventServlet extends Controller {
 				edcBean.setElectronicSignature(true);
 			} else {
 				edcBean.setElectronicSignature(false);
+			}
+			
+			if (!StringUtil.isBlank(emailCRFTo)) {
+				edcBean.setEmailTo(emailCRFTo);
+			} else {
+				edcBean.setEmailTo("");
+			}
+
+			if (!StringUtil.isBlank(emailOnStep)) {
+				edcBean.setEmailStep(emailOnStep);
+			} else {
+				edcBean.setEmailStep("");
 			}
 
 			String nullString = "";

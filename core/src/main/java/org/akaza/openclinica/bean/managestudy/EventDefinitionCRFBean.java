@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -72,6 +72,8 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		result = prime * result + studyEventDefinitionId;
 		result = prime * result + studyId;
 		result = prime * result + ((versions == null) ? 0 : versions.hashCode());
+		result = prime * result + ((emailTo == null) ? 0 : emailTo.hashCode());
+		result = prime * result + ((emailStep == null) ? 0 : emailStep.hashCode());
 		return result;
 	}
 
@@ -162,6 +164,16 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 			return false;
 		if (studyId != other.studyId)
 			return false;
+		if (emailTo == null) {
+			if (other.emailTo != null)
+				return false;
+		} else if (!emailTo.equals(other.emailTo))
+				return false;
+		if (emailStep == null) {
+			if (other.emailStep != null)
+				return false;
+		} else if (!emailStep.equals(other.emailStep))
+				return false;
 		if (versions == null) {
 			if (other.versions != null)
 				return false;
@@ -192,6 +204,11 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	// Not in db
 	private String eventName;
+
+	private String emailTo = "";
+	
+	// If this value is not empty - CRF will be mailed on Completion or on Sign
+	private String emailStep = "";
 
 	public String getSelectedVersionIds() {
 		return selectedVersionIds;
@@ -580,5 +597,21 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	public void setEventName(String eventName) {
 		this.eventName = eventName;
+	}
+
+	public String getEmailTo() {
+		return emailTo;
+	}
+
+	public void setEmailTo(String emailTo) {
+		this.emailTo = emailTo;
+	}
+
+	public String getEmailStep() {
+		return emailStep;
+	}
+
+	public void setEmailStep(String emailStep) {
+		this.emailStep = emailStep;
 	}
 }

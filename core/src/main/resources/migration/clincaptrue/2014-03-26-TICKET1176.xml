@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="denis" id="2014-03-26-TICKET1176-ADD-EMAILING-STEP-COLUMN">
+		<comment>Add column to event_definiton_crf table for ability to specify step on which email will be send.</comment>
+		<addColumn tableName="event_definition_crf">
+			<column name="email_step" type="VARCHAR(50)"/>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="denis" id="2014-03-26-TICKET1176-ADD-EMAIL-COLUMN">
+		<comment>Add column to event_definiton_crf table for ability to email CRF.</comment>
+		<addColumn tableName="event_definition_crf">
+			<column name="email_to" type="VARCHAR(150)"/>
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>

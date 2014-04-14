@@ -3,7 +3,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="resnotes"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterms"/>
 
 
 <jsp:include page="../include/managestudy-header.jsp"/>
@@ -65,14 +67,14 @@
     
 </script>
 
-<form action="DefineStudyEvent" method="post">
+<form action="DefineStudyEvent" method="post" id="defineStudyEventForm">
     <input type="hidden" name="actionName" value="confirm">
     
     <div style="width: 600px">
         <!-- These DIVs define shaded box borders -->
         <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-            <div class="textbox_center">
+            <div class="tablebox_center">
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                     <c:set var="count" value="0"/>
 
@@ -101,7 +103,7 @@
                             	<input type="checkbox" onchange="javascript:changeIcon();" name="electronicSignature<c:out value="${count}"/>" value="yes">
                             </td>
 
-                            <td class="table_cell" colspan="2"><fmt:message key="default_version" bundle="${resword}"/>:
+                            <td class="table_cell"><fmt:message key="default_version" bundle="${resword}"/>:
 
                                 <select name="defaultVersionId<c:out value="${count}"/>" onchange="javascript:changeIcon();">
                                     <c:forEach var="version" items="${crf.versions}">
@@ -114,7 +116,7 @@
                             	<fmt:message key="hidden_crf" bundle="${resword}"/>:<input type="checkbox" name="hiddenCrf<c:out value="${count}"/>" onchange="javascript:changeIcon();" value="yes">
                             </td>
                     		
-                            <td class="table_cell" colspan="6"><fmt:message key="sdv_option" bundle="${resword}"/>:
+                            <td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
 							    <select name="sdvOption<c:out value="${count}"/>" onchange="javascript:changeIcon();">
 						        	<c:set var="index" value="1"/>
 						            <c:forEach var="sdv" items="${sdvOptions}">
@@ -129,15 +131,32 @@
 						            	<c:set var="index" value="${index+1}"/>
 						            </c:forEach>
 					        	</select>
-							    </td>                      
+							    </td>
                         </tr>
+
+						<tr valign="top">
+							<td class="table_cell" colspan="2" style="padding-bottom:9px;">
+								<fmt:message key="send_email_on" bundle="${resword}"/>: 
+								<input type="radio" name="emailOnStep<c:out value="${count}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="complete" class="email_field_trigger uncheckable_radio">
+								<fmt:message key="complete" bundle="${resterms}"/>
+								<input type="radio" name="emailOnStep<c:out value="${count}"/>" onclick="javascript:showEmailField(this);" onchange="javascript:changeIcon();" value="sign" class="email_field_trigger uncheckable_radio">
+								<fmt:message key="sign" bundle="${resterms}"/>
+							</td>
+							<td class="table_cell" colspan="2">
+								<span class="email_wrapper" style="display:none">
+									<fmt:message key="email_crf_to" bundle="${resword}"/>: 
+									<input type="text" name="mailTo${count}" onchange="javascript:changeIcon();" style="width:115px;margin-left:79px" class="email_to_check_field"/>
+								</span>
+								<span class="alert" style="display:none"><fmt:message key="enter_valid_email" bundle="${resnotes}"/></span>
+							</td>
+						</tr>
+
                         <tr valign="top">
                             <td class="table_header_column" colspan="4"><fmt:message key="choose_null_values"  bundle="${resword}"/> (<a href="<fmt:message key="nullValue" bundle="${resformat}"/>" target="def_win" onClick="openDefWindow('<fmt:message key="nullValue" bundle="${resformat}"/>'); return false;"><fmt:message key="what_is_null_value"  bundle="${resword}"/></a>)</td>
                         </tr>
 
                         <tr valign="top">
-
-                            <td class="table_cell">
+							<td class="table_cell">
                             	<fmt:message key="NI" bundle="${resword}"/>
                             	<input type="checkbox" onchange="javascript:changeIcon();" name="ni<c:out value="${count}"/>" value="yes"></td>
 
@@ -188,8 +207,6 @@
                             <td class="table_cell">
                             	<fmt:message key="NPE" bundle="${resword}"/>
                             	<input type="checkbox" onchange="javascript:changeIcon();" name="npe<c:out value="${count}"/>" value="yes"></td>
-
-                            <td class="table_cell">&nbsp;</td>
                         </tr>
                         <c:set var="count" value="${count+1}"/>
                         <tr><td class="table_divider" colspan="4">&nbsp;</td></tr>
@@ -200,22 +217,22 @@
         </div></div></div></div></div></div></div></div>
     </div>
 
-    <table border="0" cellpadding="0" cellspacing="0">
-        <tr>
-        	<td>
-         		<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'DefineStudyEvent?actionName=back1');"/> 
-        	</td>
-            <td>
-                <input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
-            </td>
-            <td>
-            	<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="javascript:myCancel();"/>
-            </td>
-            <td>
-            	<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom">
-            </td>
-        </tr>
-    </table>
+	<table border="0">
+		<tr>
+			<td>
+				<input type="button" name="BTN_Back" id="GoToPreviousPage" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium" onClick="javascript: return checkGoToEntryStatus('DataStatus_bottom', '<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>', 'DefineStudyEvent?actionName=back1');"/> 
+			</td>
+			<td>
+				<input type="button" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium" onClick="javascript:validateCustomFields(['email'],['.email_to_check_field'],'#defineStudyEventForm');">
+			</td>
+			<td>
+				<input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="javascript:myCancel();"/>
+			</td>
+			<td>
+				<img src="images/icon_UnchangedData.gif" style="visibility:hidden" title="You have not changed any data in this page." alt="Data Status" name="DataStatus_bottom"/>
+			</td>
+		</tr>
+	</table>
 </form>
 <br><br>
 
@@ -234,9 +251,7 @@
                             <tr>
                                 <td class="workflow_tab">
                                     <a href="javascript:leftnavExpand('sidebar_Workflow_closed'); leftnavExpand('sidebar_Workflow_open');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
                                     <b><fmt:message key="workflow" bundle="${resword}"/></b>
-
                                 </td>
                             </tr>
                         </table>
@@ -247,81 +262,55 @@
                     <td colspan="2" class="workflowbox_B">
                         <div class="box_R"><div class="box_B"><div class="box_BR">
                             <div class="workflowBox_center">
-
-
+                                
                                 <!-- Workflow items -->
-
                                 <table border="0" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td>
-
                                             <!-- These DIVs define shaded box borders -->
                                             <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
                                                 <div class="textbox_center" align="center">
-	
-							<span class="title_manage">			
-						
-							<fmt:message key="enter_definition_name_and_description" bundle="${resword}"/><br><br>
-									
-							</span>
-
+													<span class="title_manage">
+														<fmt:message key="enter_definition_name_and_description" bundle="${resword}"/><br><br>
+													</span>
+                                                </div>
+                                   			</div></div></div></div></div></div></div></div>
+		                                </td>
+		                                <td><img src="images/arrow.gif"></td>
+		                                <td>
+	                                    	<!-- These DIVs define shaded box borders -->
+	                                        <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+                                                <div class="textbox_center" align="center">
+													<span class="title_manage">
+										            	<fmt:message key="add_CRFs_to_definition" bundle="${resword}"/><br><br>
+													</span>
                                                 </div>
                                             </div></div></div></div></div></div></div></div>
-
                                         </td>
                                         <td><img src="images/arrow.gif"></td>
                                         <td>
-
                                             <!-- These DIVs define shaded box borders -->
                                             <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
                                                 <div class="textbox_center" align="center">
-
-							<span class="title_manage">
-				             <fmt:message key="add_CRFs_to_definition" bundle="${resword}"/><br><br>
-							</span>
-
+													<span class="title_manage">
+										            	<b><fmt:message key="edit_properties_for_each_CRF" bundle="${resword}"/><br><br></b>
+													</span>
                                                 </div>
                                             </div></div></div></div></div></div></div></div>
-
                                         </td>
                                         <td><img src="images/arrow.gif"></td>
                                         <td>
-
                                             <!-- These DIVs define shaded box borders -->
                                             <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
                                                 <div class="textbox_center" align="center">
-
-							<span class="title_manage">
-				             <b><fmt:message key="edit_properties_for_each_CRF" bundle="${resword}"/><br><br></b>
-							</span>
-
+													<span class="title_manage">
+										            	<fmt:message key="confirm_and_submit_definition" bundle="${resword}"/><br><br>
+													</span>
                                                 </div>
                                             </div></div></div></div></div></div></div></div>
-
-                                        </td>
-                                        <td><img src="images/arrow.gif"></td>
-                                        <td>
-
-                                            <!-- These DIVs define shaded box borders -->
-                                            <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-                                                <div class="textbox_center" align="center">
-
-							<span class="title_manage">
-				             <fmt:message key="confirm_and_submit_definition" bundle="${resword}"/><br><br>
-							</span>
-
-                                                </div>
-                                            </div></div></div></div></div></div></div></div>
-
                                         </td>
                                     </tr>
                                 </table>
-
-
                                 <!-- end Workflow items -->
 
                             </div>

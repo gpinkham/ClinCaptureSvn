@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ClinCapture, Copyright (C) 2009-2013 Clinovo Inc.
+ * ClinCapture, Copyright (C) 2009-2014 Clinovo Inc.
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the Lesser GNU General Public License 
  * as published by the Free Software Foundation, either version 2.1 of the License, or(at your option) any later version.
@@ -28,7 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -91,6 +93,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		this.setTypeExpected(19, TypeNames.INT); // source_data_verification_id
 		this.setTypeExpected(20, TypeNames.STRING); // selected_version_ids
 		this.setTypeExpected(21, TypeNames.INT); // parent_id
+		this.setTypeExpected(22, TypeNames.STRING); // email_step
+		this.setTypeExpected(23, TypeNames.STRING); // email_to
 	}
 
 	/**
@@ -126,6 +130,10 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		eb.setSelectedVersionIds(selectedVersionIds != null ? selectedVersionIds : "");
 		int parentId = (Integer) hm.get("parent_id");
 		eb.setParentId(parentId > 0 ? parentId : 0);
+		String emailTo = (String) hm.get("email_to");
+		eb.setEmailTo(emailTo != null ? emailTo : "");
+		String emailStep = (String) hm.get("email_step");
+		eb.setEmailStep(emailStep != null ? emailStep : "");
 		return eb;
 	}
 
@@ -333,6 +341,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		} else {
 			variables.put(new Integer(18), new Integer(sb.getParentId()));
 		}
+		variables.put(new Integer(19), new String(sb.getEmailStep()));
+		variables.put(new Integer(20), new String(sb.getEmailTo()));
 		this.execute(digester.getQuery("create"), variables, nullVars);
 
 		if (isQuerySuccessful()) {
@@ -380,7 +390,10 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		} else {
 			variables.put(new Integer(18), new Integer(sb.getParentId()));
 		}
-		variables.put(new Integer(19), new Integer(sb.getId()));
+		variables.put(new Integer (19), new String(sb.getEmailStep()));
+		variables.put(new Integer (20), new String(sb.getEmailTo()));
+		variables.put(new Integer(21), new Integer(sb.getId()));
+
 
 		String sql = digester.getQuery("update");
 		this.execute(sql, variables, nullVars);

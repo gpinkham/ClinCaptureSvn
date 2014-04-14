@@ -21,14 +21,17 @@
 package org.akaza.openclinica.control.managestudy;
 
 import com.clinovo.util.ValidatorHelper;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -361,6 +364,8 @@ public class UpdateSubStudyServlet extends Controller {
 					int defaultVersionId = fp.getInt("defaultVersionId" + order);
 					String requiredCRF = fp.getString("requiredCRF" + order);
 					String doubleEntry = fp.getString("doubleEntry" + order);
+					String emailCRFTo = fp.getString("mailTo" + order);
+					String emailOnStep = fp.getString("emailOnStep" + order);
 					String electronicSignature = fp.getString("electronicSignature" + order);
 					String hideCRF = fp.getString("hideCRF" + order);
 					int sdvId = fp.getInt("sdvOption" + order);
@@ -419,6 +424,19 @@ public class UpdateSubStudyServlet extends Controller {
 							changed = true;
 							edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
 						}
+						if (!emailOnStep.equals(edcBean.getEmailStep())) {
+							changed = true;
+							edcBean.setEmailStep(emailOnStep);
+						}
+						if (!emailCRFTo.equals(edcBean.getEmailTo())) {
+							changed = true;
+
+							if (StringUtil.isBlank(emailOnStep)) {
+								edcBean.setEmailTo("");
+							} else {
+								edcBean.setEmailTo(emailCRFTo);
+							}
+						}
 						if (changed) {
 							edcBean.setUpdater(ub);
 							edcBean.setUpdatedDate(new Date());
@@ -437,10 +455,18 @@ public class UpdateSubStudyServlet extends Controller {
 										if (isHide == edcBean.isHideCrf()) {
 											if (selectedVersionIdListSize > 0) {
 												if (selectedVersionIdListSize == edcBean.getVersions().size()) {
-													if (sdvId > 0) {
-														if (sdvId != edcBean.getSourceDataVerification().getCode()) {
+													if (emailOnStep.equals(edcBean.getEmailStep())){
+														if (emailCRFTo.equals(edcBean.getEmailTo())){
+															if (sdvId > 0) {
+																if (sdvId != edcBean.getSourceDataVerification().getCode()) {
+																	changed = true;
+																}
+															}
+														} else {
 															changed = true;
 														}
+													} else {
+														changed = true;
 													}
 												} else {
 													changed = true;
@@ -471,6 +497,13 @@ public class UpdateSubStudyServlet extends Controller {
 							edcBean.setDoubleEntry(isDouble);
 							edcBean.setElectronicSignature(hasPassword);
 							edcBean.setHideCrf(isHide);
+							edcBean.setEmailStep(emailOnStep);
+
+							if (StringUtil.isBlank(emailOnStep)) {
+								edcBean.setEmailTo("");
+							} else {
+								edcBean.setEmailTo(emailCRFTo);
+							}
 
 							if (selectedVersionIdListSize > 0
 									&& selectedVersionIdListSize != edcBean.getVersions().size()) {
