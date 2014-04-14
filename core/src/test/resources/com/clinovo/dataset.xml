@@ -110,6 +110,11 @@
                  status_id="1" date_created="2008-07-02" date_updated="2008-07-02" update_id="1"
                  subject_event_status_id="3" start_time_flag="false" end_time_flag="false" prev_subject_event_status="0"
                  reference_visit_id="0"/>
+    <study_event study_event_id="12" study_event_definition_id="1" study_subject_id="1" location="Cambridge"
+                 sample_ordinal="2" date_start="2008-07-11 00:00:00.0" date_end="2008-07-11 00:00:00.0" owner_id="1"
+                 status_id="5" date_created="2008-07-02" date_updated="2008-07-02" update_id="1"
+                 subject_event_status_id="10" start_time_flag="false" end_time_flag="false" prev_subject_event_status="0"
+                 reference_visit_id="0"/>
 
     <event_crf event_crf_id="1" study_event_id="1" crf_version_id="1" date_interviewed="2001-12-12"
                interviewer_name="Krikor" completion_status_id="1" status_id="1" annotations="" validator_id="0"

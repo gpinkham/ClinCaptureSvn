@@ -792,14 +792,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RemoveStudyEventServlet</servlet-name>
+        <servlet-name>removeStudyEventServlet</servlet-name>
         <display-name>RemoveStudyEvent</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RemoveStudyEventServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RestoreStudyEventServlet</servlet-name>
+        <servlet-name>restoreStudyEventServlet</servlet-name>
         <display-name>RestoreStudyEvent</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RestoreStudyEventServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>deleteStudyEventServlet</servlet-name>
@@ -1800,11 +1800,11 @@
         <url-pattern>/RestoreStudySubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveStudyEventServlet</servlet-name>
+        <servlet-name>removeStudyEventServlet</servlet-name>
         <url-pattern>/RemoveStudyEvent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestoreStudyEventServlet</servlet-name>
+        <servlet-name>restoreStudyEventServlet</servlet-name>
         <url-pattern>/RestoreStudyEvent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

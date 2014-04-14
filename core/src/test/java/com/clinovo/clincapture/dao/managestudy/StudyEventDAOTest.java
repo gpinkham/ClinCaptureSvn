@@ -23,7 +23,7 @@ public class StudyEventDAOTest extends DefaultAppContextTest {
 
 	@Test
 	public void testFindAll() throws OpenClinicaException {
-		assertEquals(5, studyEventDao.findAll().size());
+		assertEquals(6, studyEventDao.findAll().size());
 	}
 
 	@Test
