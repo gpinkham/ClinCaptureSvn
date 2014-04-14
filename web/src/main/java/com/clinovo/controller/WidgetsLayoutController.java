@@ -6,15 +6,19 @@ import com.clinovo.model.Widget;
 import com.clinovo.model.WidgetsLayout;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
-
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.ListEventsForSubjectFilter;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +33,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @Controller
-@SuppressWarnings({ "unused" })
+@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 public class WidgetsLayoutController {
 
 	@Autowired
@@ -60,7 +63,6 @@ public class WidgetsLayoutController {
 
 		int studyId = sb.getId();
 		int userId = ub.getId();
-		int id = 1;
 
 		List<WidgetsLayout> widgetsLayout = widgetLayoutService.findAllByStudyIdAndUserId(studyId, userId);
 		List<DisplayWidgetsLayoutBean> dispayWidgetsLayout = new ArrayList<DisplayWidgetsLayoutBean>();
@@ -88,8 +90,8 @@ public class WidgetsLayoutController {
 
 	@RequestMapping("/saveHomePage")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public @ResponseBody
-	void saveHomePage(HttpServletRequest request) {
+	@ResponseBody
+	public void saveHomePage(HttpServletRequest request) {
 
 		String orderInColumn1 = request.getParameter("orderInColumn1");
 		String orderInColumn2 = request.getParameter("orderInColumn2");
@@ -125,10 +127,10 @@ public class WidgetsLayoutController {
 			}
 		}
 
-		if (!orderOfBigWidgets.isEmpty()){
+		if (!orderOfBigWidgets.isEmpty()) {
 			int ordinalCounter3 = 1;
-			List <String> bigWidgetsIds = Arrays.asList(orderOfBigWidgets.split("\\s*,\\s*"));
-			
+			List<String> bigWidgetsIds = Arrays.asList(orderOfBigWidgets.split("\\s*,\\s*"));
+
 			for (String bigWidgetId : bigWidgetsIds) {
 
 				WidgetsLayout currentWidgetLayout = widgetLayoutService.findByWidgetIdAndStudyIdAndUserId(
@@ -205,7 +207,6 @@ public class WidgetsLayoutController {
 		String page = "widgets/includes/eventsCompletionChart";
 		String action = request.getParameter("action");
 
-		StudyEventDAO studyEventDAO = new StudyEventDAO(datasource);
 		boolean hasPrevious;
 		boolean hasNext;
 		int displayFrom = Integer.parseInt(request.getParameter("lastElement"));
@@ -223,24 +224,46 @@ public class WidgetsLayoutController {
 		SubjectEventStatus[] subjectEventStatuses = { SubjectEventStatus.SCHEDULED,
 				SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.SOURCE_DATA_VERIFIED,
 				SubjectEventStatus.SIGNED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SKIPPED,
-				SubjectEventStatus.STOPPED, SubjectEventStatus.LOCKED };
+				SubjectEventStatus.STOPPED, SubjectEventStatus.LOCKED, SubjectEventStatus.NOT_SCHEDULED };
 
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
 		List<StudyEventDefinitionBean> studyEventDefinitions = getListOfEventsDefinitions(sb);
-		int countOfSubject = getCountOfSubjects(sb);
+		DynamicEventDao dedao = new DynamicEventDao(datasource);
+		StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(datasource);
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
 
 		List<DisplayWidgetsRowWithName> eventCompletionRows = new ArrayList<DisplayWidgetsRowWithName>();
 
 		for (int i = displayFrom; i < studyEventDefinitions.size() && i < displayFrom + maxDisplayNumber; i++) {
 			DisplayWidgetsRowWithName currentRow = new DisplayWidgetsRowWithName();
+			int dynamicGroupClassIdToFilterBy = 0;
+			DynamicEventBean dynamicEventBean = dedao
+					.findByStudyEventDefinitionId(studyEventDefinitions.get(i).getId());
+
+			if (dynamicEventBean != null) {
+
+				for (StudyGroupClassBean studyGroupClassBean : (ArrayList<StudyGroupClassBean>) sgcdao
+						.findAllActiveDynamicGroupsByStudyId(studyId)) {
+					if (studyGroupClassBean.getId() == dynamicEventBean.getStudyGroupClassId()
+							&& !studyGroupClassBean.isDefault()) {
+						dynamicGroupClassIdToFilterBy = studyGroupClassBean.getId();
+						break;
+					}
+				}
+			}
+
 			LinkedHashMap<String, Integer> countOfSubjectEventStatuses = new LinkedHashMap<String, Integer>();
 			int countOfSubjectsStartedEvent = 0;
 
 			for (SubjectEventStatus subjectEventStatus : subjectEventStatuses) {
 
-				int eventsWithStatusNoRepeats = studyEventDAO
-						.getEventCountFromEventStatusAndStudyEventDefinitionIdNoRepeats(sb, subjectEventStatus,
-								studyEventDefinitions.get(i));
+				ListEventsForSubjectFilter listEventsForSubjectFilter = new ListEventsForSubjectFilter(
+						studyEventDefinitions.get(i).getId(), dynamicGroupClassIdToFilterBy);
+				String property = "event.status";
+				String value = subjectEventStatus.getId() + "";
+				listEventsForSubjectFilter.addFilter(property, value);
+
+				int eventsWithStatusNoRepeats = studySubjectDAO.getCountWithFilter(listEventsForSubjectFilter, sb);
 
 				countOfSubjectEventStatuses.put(subjectEventStatus.getName().toLowerCase().replaceAll(" ", "_"),
 						eventsWithStatusNoRepeats);
@@ -248,10 +271,6 @@ public class WidgetsLayoutController {
 				countOfSubjectsStartedEvent += eventsWithStatusNoRepeats;
 			}
 
-			int removedEvents = studyEventDAO.getCountOfEventsBasedOnEventStatusNoRepeats(sb,
-					SubjectEventStatus.REMOVED);
-			countOfSubjectsStartedEvent += removedEvents;
-			countOfSubjectEventStatuses.put("not_scheduled", countOfSubject - countOfSubjectsStartedEvent);
 			currentRow.setId(studyEventDefinitions.get(i).getId());
 			currentRow.setRowName(studyEventDefinitions.get(i).getName());
 			currentRow.setRowValues(countOfSubjectEventStatuses);
@@ -294,9 +313,7 @@ public class WidgetsLayoutController {
 		model.addAttribute("countOfLockedSubjects", lockedSubjects);
 		model.addAttribute("countOfSignedSubjects", signedSubjects);
 
-		String page = "widgets/includes/subjectStatusCountChart";
-
-		return page;
+		return "widgets/includes/subjectStatusCountChart";
 	}
 
 	@RequestMapping("/initStudyProgress")
@@ -321,7 +338,7 @@ public class WidgetsLayoutController {
 		List<StudyEventDefinitionBean> studyEventDefinitions = getListOfEventsDefinitions(sb);
 		int countOfSubject = getCountOfSubjects(sb);
 		int countOfStartedEvents = 0;
-		int countOfNotStartedEvents = 0;
+		int countOfNotStartedEvents;
 		LinkedHashMap<String, Integer> mapOfEventsWithStatuses = new LinkedHashMap<String, Integer>();
 
 		for (SubjectEventStatus eventStatus : subjectEventStatuses) {
@@ -336,14 +353,12 @@ public class WidgetsLayoutController {
 
 		model.addAttribute("studyProgressMap", mapOfEventsWithStatuses);
 
-		String page = "widgets/includes/studyProgressChart";
-
-		return page;
+		return "widgets/includes/studyProgressChart";
 	}
 
 	private Integer getCountOfSubjects(StudyBean sb) {
 
-		int countOfSubjects = 0;
+		int countOfSubjects;
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
 
 		if (sb.isSite(sb.getParentStudyId())) {
@@ -355,10 +370,9 @@ public class WidgetsLayoutController {
 		return countOfSubjects;
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<StudyEventDefinitionBean> getListOfEventsDefinitions(StudyBean sb) {
 
-		List<StudyEventDefinitionBean> studyEventDefinitions = new ArrayList<StudyEventDefinitionBean>();
+		List<StudyEventDefinitionBean> studyEventDefinitions;
 		StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(datasource);
 
 		if (sb.isSite(sb.getParentStudyId())) {
