@@ -56,12 +56,10 @@
 <div class="tablebox_center">
 
 <table border="0" cellpadding="0">
-  <c:if test="${study.studyParameterConfig.subjectPersonIdRequired != 'copyFromSSID'}">
   <tr valign="top" >
 	  <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
 	  <td class="table_cell"><c:out value="${subjectToRestore.uniqueIdentifier}"/></td>
   </tr>
-  </c:if>
 
   <c:set var="genderShow" value="${true}"/>
   <fmt:message key="gender" bundle="${resword}" var="genderLabel"/>

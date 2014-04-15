@@ -69,16 +69,8 @@
 
 <div class="textbox_center">
 <table border="0" cellspacing="10">
-	<c:choose>
-		<c:when test="${parameters['subjectPersonIdRequired'] != 'copyFromSSID'}">
-			<c:set var="showPID" value="table-row"/>
-		</c:when>
-		<c:otherwise>
-			<c:set var="showPID" value="none"/>
-		</c:otherwise>
-	</c:choose>
-	
-	<tr valign="top" style="display:${showPID}">
+
+	<tr valign="top">
 		<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
 		<td><c:choose>
 				<c:when test="${parameters['subjectPersonIdRequired'] == 'required'}">
@@ -109,7 +101,7 @@
 					</tr></table>
 				</c:when>
 				
-				<c:when test="${parameters['subjectPersonIdRequired'] == 'optional' || parameters['subjectPersonIdRequired'] == 'copyFromSSID'}">
+				<c:when test="${parameters['subjectPersonIdRequired'] == 'optional'}">
 					<table><tr>
 							<td>
 								<div class="formfieldXL_BG">
@@ -134,6 +126,17 @@
 								</c:if>
 							</td>
 						</tr></table>
+				</c:when>
+
+				<c:when test="${parameters['subjectPersonIdRequired'] == 'copyFromSSID'}">
+					<table><tr>
+							<td>
+								<div class="formfieldXL_BG">
+									<input type="text" name="uniqueIdentifier" value="<c:out value="${fields['personId']}"/>" class="formfieldXL" readonly/>
+								</div>
+							</td>
+						</tr>
+					</table>
 				</c:when>
 
 				<c:otherwise>

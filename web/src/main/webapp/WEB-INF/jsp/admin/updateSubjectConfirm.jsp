@@ -55,17 +55,15 @@
 
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-	<c:if test="${parameters['subjectPersonIdRequired'] != 'copyFromSSID'}">
-		<tr valign="top">
-		  	<td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
-			<td class="table_cell">
-				<c:out value="${fields['personId']}"/>
-			</td>
-		</tr>
-	</c:if>
+	<tr valign="top">
+	  	<td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
+		<td class="table_cell">
+			<c:out value="${fields['personId']}"/>
+		</td>
+	</tr>
 
 	<tr valign="top">
-        <td class="table_header_column">${parameters['genderLabel']}:</td>				
+		<td class="table_header_column">${parameters['genderLabel']}:</td>				
 		<td class="table_cell">
 		<c:if test="${parameters['genderRequired']}">
 			<c:choose>

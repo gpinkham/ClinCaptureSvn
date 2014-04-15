@@ -220,7 +220,6 @@
 							<td class="table_header_column_top">${studySubjectLabel}</td>
 							<td class="table_cell_top"><c:out value="${studySub.label}"/></td>
 							<td class="table_header_row">
-							<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired !='copyFromSSID'}">
 							<fmt:message key="person_ID" bundle="${resword}"/>
 							
 							<%-- DN for person ID goes here --%>
@@ -240,12 +239,9 @@
 					                </c:otherwise>
 					            </c:choose>
 					        </c:if>
-					        </c:if>
 							</td>
     						<td class="table_cell_top">
-    							<c:if test="${subjectStudy.studyParameterConfig.subjectPersonIdRequired !='copyFromSSID'}">
-									<c:out value="${subject.uniqueIdentifier}"/>
-								</c:if>
+								<c:out value="${subject.uniqueIdentifier}"/>
 					      	</td>
 						</tr>
 						<tr>

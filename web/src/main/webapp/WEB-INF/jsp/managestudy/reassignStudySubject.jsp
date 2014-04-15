@@ -79,12 +79,10 @@
    <td class="table_cell"><c:out value="${studySub.label}"/></td>
  </tr>
 
-<c:if test="${study.studyParameterConfig.subjectPersonIdRequired != 'copyFromSSID'}">
  <tr>
    <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/></td>
    <td class="table_cell"><c:out value="${subject.uniqueIdentifier}"/></td>
  </tr>
-</c:if>
 
  <c:if test="${genderShow}">
      <tr>
