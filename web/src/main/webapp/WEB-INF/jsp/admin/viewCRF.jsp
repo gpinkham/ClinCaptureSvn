@@ -99,7 +99,7 @@
     </c:otherwise>
 </c:choose>
 <fmt:message key="versions" bundle="${resword}"/></span>
-<div style="width: 600px">
+<div style="width: 100%">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
         <div class="tablebox_center">
