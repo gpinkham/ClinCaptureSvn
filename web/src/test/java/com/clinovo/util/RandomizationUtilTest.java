@@ -26,31 +26,16 @@ public class RandomizationUtilTest {
 	@Before
 	public void setUp() {
 
-		StudyBean currentStudy = new StudyBean();
-		currentStudy.setId(1);
-
-		StudySubjectBean subject = new StudySubjectBean();
-		subject.setLabel("S001");
-
-		StudySubjectBean subjectWithSameLabel = new StudySubjectBean();
-		subjectWithSameLabel.setLabel("S001-test-group");
-		subjectWithSameLabel.setActive(true);
 
 		StudySubjectDAO studySubjectDAO = createStudySubjectDAOMock();
 		StudyGroupClassDAO studyGroupDAO = createStudyGroupDAOMock(createSubjectGroup());
 
 		RandomizationUtil.setStudyGroupDAO(studyGroupDAO);
 		RandomizationUtil.setStudySubjectDAO(studySubjectDAO);
-		RandomizationUtil.setCurrentStudy(currentStudy);
 
 		SessionManager manager = Mockito.mock(SessionManager.class);
 		Mockito.when(manager.getDataSource()).thenReturn(null);
 		RandomizationUtil.setSessionManager(manager);
-
-		Mockito.doReturn(subject).when(studySubjectDAO)
-				.findByLabelAndStudy(createRandomizationResult().getPatientId(), currentStudy);
-		Mockito.doReturn(subjectWithSameLabel).when(studySubjectDAO)
-				.findByLabelAndStudy(subjectWithSameLabel.getLabel(), currentStudy);
 	}
 
 	@Test
@@ -169,13 +154,6 @@ public class RandomizationUtilTest {
 
 		RandomizationUtil.setStudySubjectDAO(dao);
 		RandomizationUtil.assignSubjectToGroup(createRandomizationResult());
-	}
-
-	@Test(expected = RandomizationException.class)
-	public void testThatRandomizationExceptionIsThrownWhenSubjectWithGeneratedSSIDAlreadyExists()
-			throws RandomizationException {
-
-		RandomizationUtil.addRandomizationResultToSSID(createRandomizationResult());
 	}
 
 	private RandomizationResult createRandomizationResult() {

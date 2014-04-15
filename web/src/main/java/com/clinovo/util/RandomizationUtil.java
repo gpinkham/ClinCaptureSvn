@@ -17,9 +17,11 @@ package com.clinovo.util;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +30,7 @@ import com.clinovo.model.RandomizationResult;
 
 /**
  * Utilities to help with randomization at the servlet layer -
- *
+ * 
  */
 public class RandomizationUtil {
 
@@ -37,14 +39,17 @@ public class RandomizationUtil {
 	private static SessionManager sessionManager;
 	private static StudySubjectDAO studySubjectDAO;
 	private static StudyGroupClassDAO studyGroupDAO;
-	
+	private static SubjectDAO subjectDAO;
+
 	private final static Logger log = LoggerFactory.getLogger(RandomizationUtil.class);
 
 	/**
 	 * Ascertains whether the trial has been configured in both the crf and the properties
 	 * 
-	 * @param configuredTrialId property file configured trial Id
-	 * @param crfSpecifiedId crf configured trial id
+	 * @param configuredTrialId
+	 *            property file configured trial Id
+	 * @param crfSpecifiedId
+	 *            crf configured trial id
 	 * 
 	 * @return True if trial match, false otherwise
 	 */
@@ -60,7 +65,8 @@ public class RandomizationUtil {
 	/**
 	 * Checks If the property file configured trial Id configured is valid
 	 * 
-	 * @param trialId The trial id to check
+	 * @param trialId
+	 *            The trial id to check
 	 * 
 	 * @return If it is not null or empty, otherwise false.
 	 */
@@ -72,7 +78,8 @@ public class RandomizationUtil {
 	/**
 	 * Checks If the crf configured trial Id configured is valid
 	 * 
-	 * @param trialId The trial id to check
+	 * @param trialId
+	 *            The trial id to check
 	 * 
 	 * @return If it is not null or empty, otherwise false.
 	 */
@@ -84,11 +91,13 @@ public class RandomizationUtil {
 	/**
 	 * Assigns the returned randomization to a study group -
 	 * 
-	 * @param randomizationResult The randomization to assign to group.
+	 * @param randomizationResult
+	 *            The randomization to assign to group.
 	 * 
 	 * @return Group that the randomization was assigned to.
 	 * 
-	 * @throws RandomizationException If the group does not exist.
+	 * @throws RandomizationException
+	 *             If the group does not exist.
 	 */
 	public static StudyGroupClassBean assignSubjectToGroup(RandomizationResult randomizationResult)
 			throws RandomizationException {
@@ -113,15 +122,15 @@ public class RandomizationUtil {
 					randomizationResult.getPatientId(), RandomizationUtil.currentStudy);
 
 			subject.setDynamicGroupClassId(studyGroupClass.getId());
-			
+
 			studySubjectDAO.update(subject);
-			
-			if(studySubjectDAO.isQuerySuccessful()) {
-				
+
+			if (studySubjectDAO.isQuerySuccessful()) {
+
 				return studyGroupClass;
-				
+
 			} else {
-				
+
 				log.error(studySubjectDAO.getFailureDetails().getMessage());
 				throw new RandomizationException("Exception occurred during randomization");
 			}
@@ -151,31 +160,30 @@ public class RandomizationUtil {
 			RandomizationUtil.studySubjectDAO = new StudySubjectDAO(sessionManager.getDataSource());
 		}
 
-		StudySubjectBean subject = RandomizationUtil.studySubjectDAO.findByLabelAndStudy(
-				randomizationResult.getPatientId(), RandomizationUtil.currentStudy);
+		if (RandomizationUtil.subjectDAO == null) {
+			RandomizationUtil.subjectDAO = new SubjectDAO(sessionManager.getDataSource());
+		}
 
-		String newSubjectId = subject.getLabel() + "-" + randomizationResult.getRandomizationResult();
+		SubjectBean subjectBean = RandomizationUtil.subjectDAO.findByUniqueIdentifierAndStudy(
+				randomizationResult.getPatientId(), RandomizationUtil.currentStudy.getId());
 
-		StudySubjectBean subjectWithSameId = RandomizationUtil.studySubjectDAO.findByLabelAndStudy(newSubjectId,
+		StudySubjectBean subject = RandomizationUtil.studySubjectDAO.findBySubjectIdAndStudy(subjectBean.getId(),
 				RandomizationUtil.currentStudy);
 
-		if (!subjectWithSameId.isActive()) {
+		String newSubjectId = randomizationResult.getRandomizationResult();
 
-			subject.setLabel(newSubjectId);
-			studySubjectDAO.update(subject);
+		subject.setLabel(newSubjectId);
+		studySubjectDAO.update(subject);
 
-			if (studySubjectDAO.isQuerySuccessful()) {
+		if (studySubjectDAO.isQuerySuccessful()) {
 
-				return;
-			} else {
-
-				log.error(studySubjectDAO.getFailureDetails().getMessage());
-				throw new RandomizationException("Exception occurred during randomization");
-			}
+			return;
 		} else {
 
-			throw new RandomizationException("Subject with unique person ID " + newSubjectId + " alredy exists");
+			log.error(studySubjectDAO.getFailureDetails().getMessage());
+			throw new RandomizationException("Exception occurred during randomization");
 		}
+
 	}
 
 	public static void setStudyGroupDAO(StudyGroupClassDAO studyGroupDAO) {
