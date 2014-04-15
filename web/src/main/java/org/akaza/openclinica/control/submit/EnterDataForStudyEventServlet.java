@@ -20,16 +20,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -67,6 +57,15 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author ssachs
@@ -216,7 +215,8 @@ public class EnterDataForStudyEventServlet extends Controller {
 		prepareCRFVersionForLockedCRFs(fullCrfList, crfvdao, logger);
 
 		// this is for generating side info panel
-		ArrayList beans = getDisplayStudyEventsForStudySubject(studySubjectBean, getDataSource(), ub, currentRole, false);
+		ArrayList beans = getDisplayStudyEventsForStudySubject(studySubjectBean, getDataSource(), ub, currentRole,
+				false);
 		request.setAttribute("beans", beans);
 		EventCRFBean ecb = new EventCRFBean();
 		ecb.setStudyEventId(eventId);
@@ -232,7 +232,7 @@ public class EnterDataForStudyEventServlet extends Controller {
 						+ "?studyEventId="
 						+ ecb.getStudyEventId()
 						+ "&eventCRFId=0&subjectId="
-						+ seb.getStudySubjectId()
+						+ studySubjectBean.getSubjectId()
 						+ "&eventDefinitionCRFId="
 						+ dedcb.getEdc().getId()
 						+ "&crfVersionId="

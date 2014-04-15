@@ -86,11 +86,11 @@
                     <c:choose>
                         <c:when test="${not studySubject.status.deleted}">
                             <c:set var="hideCol3" value="false"/>
-                            <a href="RemoveStudySubject?action=confirm&id=${studySubject.id}&subjectId=${studySubject.id}&studyId=${studyId}"><img src="images/bt_Remove.gif" border="0" align="left" alt="<fmt:message key="remove_study_subject" bundle="${resword}"/>" title="<fmt:message key="remove_study_subject" bundle="${resword}"/>" hspace="4"/></a>
+                            <a href="RemoveStudySubject?action=confirm&id=${studySubject.id}&subjectId=${studySubject.subjectId}&studyId=${studyId}"><img src="images/bt_Remove.gif" border="0" align="left" alt="<fmt:message key="remove_study_subject" bundle="${resword}"/>" title="<fmt:message key="remove_study_subject" bundle="${resword}"/>" hspace="4"/></a>
                         </c:when>
                         <c:otherwise>
                             <c:set var="hideCol3" value="false"/>
-                            <a href="RestoreStudySubject?action=confirm&id=${studySubject.id}&subjectId=${studySubject.id}&studyId=${studyId}"><img src="images/bt_Restore.gif" border="0" align="left" alt="<fmt:message key="restore_study_subject" bundle="${resword}"/>" title="<fmt:message key="restore_study_subject" bundle="${resword}"/>" hspace="4"/></a>
+                            <a href="RestoreStudySubject?action=confirm&id=${studySubject.id}&subjectId=${studySubject.subjectId}&studyId=${studyId}"><img src="images/bt_Restore.gif" border="0" align="left" alt="<fmt:message key="restore_study_subject" bundle="${resword}"/>" title="<fmt:message key="restore_study_subject" bundle="${resword}"/>" hspace="4"/></a>
                         </c:otherwise>
                     </c:choose>
                 </c:when>

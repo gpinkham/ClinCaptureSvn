@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="skirpichenok" id="2014-04-15-TICKET1004-1" dbms="postgresql">
+        <comment>updating wrong study_subject_id in event_crf table</comment>
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION fix_wrong_ssid_in_event_crfs() RETURNS void AS
+            'DECLARE
+            ecrf RECORD;
+            BEGIN
+            FOR ecrf in select ec.event_crf_id as ecid, se.study_subject_id as ssid from event_crf ec, study_event se where se.study_event_id = ec.study_event_id and ec.study_subject_id != se.study_subject_id
+                    LOOP
+                        UPDATE event_crf set study_subject_id = ecrf.ssid where event_crf_id = ecrf.ecid;
+                    END LOOP;
+            END;
+            ' LANGUAGE plpgsql VOLATILE;
+            COMMIT;
+            Select fix_wrong_ssid_in_event_crfs();
+            DROP FUNCTION fix_wrong_ssid_in_event_crfs();
+        </sql>
+    </changeSet>
+
+    <changeSet author="skirpichenok" id="2014-04-15-TICKET1004-2" dbms="oracle">
+        <comment>updating wrong study_subject_id in event_crf table</comment>
+        <sql splitStatements="false">
+            CREATE OR REPLACE Procedure fix_wrong_ssid_in_event_crfs
+            IS
+            cursor ecrfs is select ec.event_crf_id as ecid, se.study_subject_id as ssid from event_crf ec, study_event se where se.study_event_id = ec.study_event_id and ec.study_subject_id != se.study_subject_id;
+            BEGIN
+                FOR ecrf in ecrfs
+                    LOOP
+                        UPDATE event_crf set study_subject_id = ecrf.ssid where event_crf_id = ecrf.ecid;
+                    END LOOP;
+                RETURN;
+            END;
+            EXECUTE fix_wrong_ssid_in_event_crfs();
+            DROP PROCEDURE fix_wrong_ssid_in_event_crfs;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

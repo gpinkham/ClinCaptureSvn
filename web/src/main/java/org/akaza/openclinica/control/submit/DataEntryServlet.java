@@ -246,7 +246,7 @@ public abstract class DataEntryServlet extends Controller {
 	public static final String ALL_ITEMS_LIST = "all_items_list";
 
 	public static final String CV_INSTANT_META = "cvInstantMeta";
-	
+
 	private static final String DNS_TO_TRANSFORM = "listOfDNsToTransform";
 
 	@Override
@@ -527,7 +527,8 @@ public abstract class DataEntryServlet extends Controller {
 		List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup,
 				eventDefinitionCRFId, request);
 		logMe("Entering  displayItemWithGroups end " + System.currentTimeMillis());
-		this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(), ecb);
+		this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(),
+				ecb);
 		section.setDisplayItemGroups(displayItemWithGroups);
 		DisplayTableOfContentsBean toc = getDisplayBeanWithShownSections(
 				(DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY),
@@ -673,7 +674,8 @@ public abstract class DataEntryServlet extends Controller {
 
 			HashMap errors = new HashMap();
 
-			FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+			FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session
+					.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 			if (discNotes == null) {
 				discNotes = new FormDiscrepancyNotes();
 			}
@@ -808,7 +810,8 @@ public abstract class DataEntryServlet extends Controller {
 				} else {
 					DisplayItemBean dib = diwg.getSingleItem();
 					if (validate) {
-						dib = validateDisplayItemBean(v, dib, "", ruleValidator, groupOrdinalPLusItemOid, false, null, request);
+						dib = validateDisplayItemBean(v, dib, "", ruleValidator, groupOrdinalPLusItemOid, false, null,
+								request);
 					}
 					ArrayList children = dib.getChildren();
 					for (int j = 0; j < children.size(); j++) {
@@ -817,7 +820,8 @@ public abstract class DataEntryServlet extends Controller {
 						String itemName = getInputName(child);
 						child.loadFormValue(fp.getString(itemName));
 						if (validate) {
-							child = validateDisplayItemBean(v, child, "", ruleValidator, groupOrdinalPLusItemOid, false, null, request);
+							child = validateDisplayItemBean(v, child, "", ruleValidator, groupOrdinalPLusItemOid,
+									false, null, request);
 						}
 						children.set(j, child);
 					}
@@ -828,7 +832,7 @@ public abstract class DataEntryServlet extends Controller {
 				}
 			}
 
-			// A map from item name to item bean object.			
+			// A map from item name to item bean object.
 			HashMap<String, ItemBean> scoreItems = new HashMap<String, ItemBean>();
 			HashMap<String, String> scoreItemdata = new HashMap<String, String>();
 			HashMap<Integer, String> oldItemdata = prepareSectionItemdata(sb.getId(), request);
@@ -898,7 +902,7 @@ public abstract class DataEntryServlet extends Controller {
 							newRow = true;
 							rfcForNewRows.put(
 									displayGroup.getItemGroupBean().getId() + "_" + displayGroup.getOrdinal(), false);
-						}						
+						}
 						for (DisplayItemBean displayItem : items) {
 							ItemBean ib = displayItem.getItem();
 							String itemName = ib.getName();
@@ -1151,9 +1155,11 @@ public abstract class DataEntryServlet extends Controller {
 			}
 
 			if (section.getSection().hasSCDItem()) {
-				section = SCDItemDisplayInfo.generateSCDDisplayInfo(section, this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY)
-						|| this.getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)
-						&& !this.isAdminForcedReasonForChange(request));
+				section = SCDItemDisplayInfo.generateSCDDisplayInfo(
+						section,
+						this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY)
+								|| this.getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)
+								&& !this.isAdminForcedReasonForChange(request));
 			}
 
 			removeFieldsValidationsForSubmittedDN(v, request);
@@ -1188,7 +1194,7 @@ public abstract class DataEntryServlet extends Controller {
 								: null;
 						Boolean rfcWasAdded = rfcForNewRows.get(newRowRfcKey);
 						if (rfcWasAdded != null && rfcWasAdded)
-							continue;				
+							continue;
 						logger.debug("-- found group label " + ifmb.getGroupLabel());
 						if (!ifmb.getGroupLabel().equalsIgnoreCase("Ungrouped")
 								&& !ifmb.getGroupLabel().equalsIgnoreCase("")) {
@@ -1218,7 +1224,7 @@ public abstract class DataEntryServlet extends Controller {
 				// ruleValidator for corresponding fields
 				createListOfDNsForTransformation(ruleValidator, dndao, request);
 				// old logic of removing validations from rule validator
-				//removeFieldsValidationsForSubmittedDN(ruleValidator, request);
+				// removeFieldsValidationsForSubmittedDN(ruleValidator, request);
 				logger.debug("Errors was empty");
 				if (session.getAttribute("rulesErrors") != null) {
 					// rules have already generated errors, Let's compare old
@@ -1419,7 +1425,8 @@ public abstract class DataEntryServlet extends Controller {
 											displayGroup.getFormInputOrdinal(), displayItem);
 								}
 
-								AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, displayItem.getData().getId(), "itemData", currentStudy);
+								AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, displayItem.getData()
+										.getId(), "itemData", currentStudy);
 								success = success && temp;
 							}
 						}
@@ -1847,7 +1854,8 @@ public abstract class DataEntryServlet extends Controller {
 
 	private void removeFieldsValidationsForSubmittedDN(Validator v, HttpServletRequest request) {
 		if (request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED) != null) {
-			Map<Object, Boolean> newNotesMap = (Map<Object, Boolean>) request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED);
+			Map<Object, Boolean> newNotesMap = (Map<Object, Boolean>) request.getSession().getAttribute(
+					DataEntryServlet.NOTE_SUBMITTED);
 			for (Object fieldName : newNotesMap.keySet()) {
 				if (fieldName instanceof String && !StringUtil.isBlank((String) fieldName)) {
 					v.removeFieldValidations((String) fieldName);
@@ -1871,12 +1879,12 @@ public abstract class DataEntryServlet extends Controller {
 				CreateDiscrepancyNoteServlet.SUBMITTED_DNS_MAP);
 		if (submittedDNs == null || submittedDNs.isEmpty())
 			return;
-		
-		List<DiscrepancyNoteBean> listOfDNsToTransform = (ArrayList<DiscrepancyNoteBean>) request.getSession().getAttribute(
-				DNS_TO_TRANSFORM);
-		if (listOfDNsToTransform ==  null) 
+
+		List<DiscrepancyNoteBean> listOfDNsToTransform = (ArrayList<DiscrepancyNoteBean>) request.getSession()
+				.getAttribute(DNS_TO_TRANSFORM);
+		if (listOfDNsToTransform == null)
 			listOfDNsToTransform = new ArrayList<DiscrepancyNoteBean>();
-		
+
 		HashMap ruleErrors = ruleValidator.validate();
 		Set<String> fieldNames = new HashSet(submittedDNs.keySet());
 		fieldNames.retainAll(ruleErrors.keySet());
@@ -1913,11 +1921,11 @@ public abstract class DataEntryServlet extends Controller {
 	private void transformSubmittedDNsToFVC(DiscrepancyNoteDAO dndao, HttpServletRequest request) {
 		// we should transform submitted DNs to FVC, close them
 
-		List<DiscrepancyNoteBean> listDNsToTransform = (ArrayList<DiscrepancyNoteBean>) request.getSession().getAttribute(
-				DNS_TO_TRANSFORM);
+		List<DiscrepancyNoteBean> listDNsToTransform = (ArrayList<DiscrepancyNoteBean>) request.getSession()
+				.getAttribute(DNS_TO_TRANSFORM);
 		if (listDNsToTransform == null || listDNsToTransform.isEmpty())
 			return;
-		
+
 		List<DiscrepancyNoteBean> transformedDNs = (List<DiscrepancyNoteBean>) request.getSession().getAttribute(
 				CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS);
 		transformedDNs = transformedDNs == null ? new ArrayList<DiscrepancyNoteBean>() : transformedDNs;
@@ -1933,7 +1941,7 @@ public abstract class DataEntryServlet extends Controller {
 				transformedUnSavedDNFieldNames.add(dn.getField());
 			}
 		}
-		
+
 		for (DiscrepancyNoteBean dn : listDNsToTransform) {
 			// for RFC we need to show validation error-message
 			if (!transformedSavedDNIds.contains(dn.getId()) && dn.getId() > 0) {
@@ -2240,8 +2248,7 @@ public abstract class DataEntryServlet extends Controller {
 				+ "; Subject: " + subjectId);
 
 		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
-		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(subjectId);
-		StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(studySubjectBean.getSubjectId(), currentStudy);
+		StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
 
 		if (ssb.getId() <= 0) {
 			logger.trace("throwing ISE with study subject bean id of " + ssb.getId());
@@ -2415,7 +2422,8 @@ public abstract class DataEntryServlet extends Controller {
 			DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
 			ItemGroupBean igb = digb.getItemGroupBean();
 
-			if (fp.getStartsWith(igb.getOid() + "_manual" + i + "input") || !StringUtil.isBlank(fp.getString(igb.getOid() + "_manual" + i + ".newRow"))) {
+			if (fp.getStartsWith(igb.getOid() + "_manual" + i + "input")
+					|| !StringUtil.isBlank(fp.getString(igb.getOid() + "_manual" + i + ".newRow"))) {
 
 				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
 						sb.getId(), nullValuesList, getServletContext());
@@ -2447,9 +2455,11 @@ public abstract class DataEntryServlet extends Controller {
 			DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
 			ItemGroupBean igb = digb.getItemGroupBean();
 
-			if (fp.getStartsWith(igb.getOid() + "_" + i + "input") || !StringUtil.isBlank(fp.getString(igb.getOid() + "_" + i + ".newRow"))) {
+			if (fp.getStartsWith(igb.getOid() + "_" + i + "input")
+					|| !StringUtil.isBlank(fp.getString(igb.getOid() + "_" + i + ".newRow"))) {
 
-				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
+				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
+						sb.getId(), nullValuesList, getServletContext());
 
 				dibs = processInputForGroupItem(fp, dibs, i, digb, true);
 
@@ -3592,7 +3602,8 @@ public abstract class DataEntryServlet extends Controller {
 					dbChildNotes = extractCoderNotes(dbChildNotes, request);
 
 					childNotes.addAll(dbNotes);
-					noteThreads = dNoteUtil.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
+					noteThreads = dNoteUtil
+							.createThreadsOfParents(notes, getDataSource(), currentStudy, null, -1, true);
 					discNotes.setNumExistingFieldNotes(childInputFieldName, dbChildNotes.size());
 					child.setNumDiscrepancyNotes(dbChildNotes.size() + childNotes.size());
 					child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(dndao, childItemDataId,
@@ -4893,7 +4904,8 @@ public abstract class DataEntryServlet extends Controller {
 							manualRows++;
 							for (DisplayItemBean dib : dibs) {
 								String intendedKey = digb.getInputId() + getInputName(dib);
-								String replacementKey = digb.getItemGroupBean().getOid() + "_manual" + digb.getOrdinal() + getInputName(dib);
+								String replacementKey = digb.getItemGroupBean().getOid() + "_manual"
+										+ digb.getOrdinal() + getInputName(dib);
 								if (!replacementKey.equals(intendedKey) && errors.containsKey(intendedKey)) {
 									errors.put(replacementKey, errors.get(intendedKey));
 									errors.remove(intendedKey);
