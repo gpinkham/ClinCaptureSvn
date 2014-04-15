@@ -113,6 +113,7 @@ public class ResolveDiscrepancyServlet extends Controller {
 		} else if ("itemdata".equalsIgnoreCase(entityType) || "eventcrf".equalsIgnoreCase(entityType)) {
 			ItemDataBean idb = (ItemDataBean) getItemDataDAO().findByPK(note.getEntityId());
 			EventCRFBean ecb = (EventCRFBean) getEventCRFDAO().findByPK(idb.getEventCRFId());
+			StudySubjectBean ssb = (StudySubjectBean) getStudySubjectDAO().findByPK(ecb.getStudySubjectId());
 			CRFVersionBean crfvb = (CRFVersionBean) getCRFVersionDAO().findByPK(ecb.getCRFVersionId());
 			StudyEventBean seb = (StudyEventBean) getStudyEventDAO().findByPK(ecb.getStudyEventId());
 			EventDefinitionCRFBean edcb = getEventDefinitionCRFDAO().findByStudyEventDefinitionIdAndCRFId(
@@ -121,7 +122,8 @@ public class ResolveDiscrepancyServlet extends Controller {
 			dec.setEventDefinitionCRF(edcb);
 			dec.setFlags(ecb, ub, currentRole, edcb.isDoubleEntry());
 			request.setAttribute(EVENT_CRF_ID, Integer.toString(ecb.getId()));
-			if (currentStudy.getStatus().equals(Status.AVAILABLE)
+			if (!ssb.getStatus().equals(Status.LOCKED)
+					&& currentStudy.getStatus().equals(Status.AVAILABLE)
 					&& (ecb.getStatus().equals(Status.AVAILABLE) || ecb.getStatus().equals(Status.UNAVAILABLE))
 					&& (ub.getActiveStudyRole().equals(Role.SYSTEM_ADMINISTRATOR)
 							|| ub.getActiveStudyRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
