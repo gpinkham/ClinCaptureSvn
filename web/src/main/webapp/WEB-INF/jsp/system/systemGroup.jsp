@@ -25,6 +25,6 @@
 
 <div class="group"><img id="img_group_id_${grp.group.id}"
                         src="../images/${themeColor}${grp.opened ? "bt_Collapse" : "bt_Expand"}.gif" border="0"
-                        class="mousePointer" onclick="changeGroupState('${grp.group.id}');"/><span
-    class="table_title_Admin mousePointer" onclick="changeGroupState('${grp.group.id}');"><fmt:message
+                        class="mousePointer" onclick="changeGroupState('${themeColor}', ${grp.group.id}');"/><span
+    class="table_title_Admin mousePointer" onclick="changeGroupState('${themeColor}','${grp.group.id}');"><fmt:message
     key="systemProperty.${grp.group.name}.name" bundle="${resword}"/></span></div>

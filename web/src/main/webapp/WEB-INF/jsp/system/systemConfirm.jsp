@@ -12,6 +12,8 @@
 
 <jsp:include page="../include/managestudy_top_pages.jsp" />
 
+<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jspfunctions.js'/>"></script>
+
 <jsp:include page="../include/sideAlert.jsp" />
 
 <tr id="sidebar_Instructions_open">
@@ -37,37 +39,6 @@
 </tr>
 
 <jsp:include page="../include/sideInfo.jsp" />
-
-<script>
-
-	function changeGroupState(id) {
-    	if ($("#img_group_id_" + id).attr("src").indexOf("bt_Expand") >= 0) {
-	    	$("#img_group_id_" + id).attr("src", "../images/${themeColor}bt_Collapse.gif");
-	      	$("#div_group_id_" + id).removeClass("hidden");
-	      	$("#div_sub_group_id_" + id).removeClass("hidden");
-	      	$("#state_group_id_" + id).val("true");
-	    } else {
-	      	$("#img_group_id_" + id).attr("src", "../images/${themeColor}bt_Expand.gif");
-	      	$("#div_group_id_" + id + " div[id^=div_sub_group_id_] img[id^=img_group_id_]").attr("src", "../images/${themeColor}bt_Expand.gif");
-	      	$("#div_group_id_" + id).addClass("hidden");
-	      	$("#div_sub_group_id_" + id).addClass("hidden");
-	      	$("#div_group_id_" + id + " div[id^=div_sub_group_id_] div[id^=div_group_id_]").addClass("hidden");
-	      	$("#state_group_id_" + id).val("false");
-	      	$("#div_group_id_" + id + " div[id^=div_sub_group_id_] input[id^=state_group_id_]").val("false");
-	    }
-	}
-	
-	
-	function cancel() {
-		confirmDialog({
-			message: '<fmt:message key="sure_to_cancel" bundle="${resword}"/>',
-			height: 150,
-			width: 500,
-			redirectLink: "ListEventDefinition"
-		});
-	}
-
-</script>
 
 <div class="sysProps">
 	<form:form id="systemForm" method="post" commandName="systemCommand">
