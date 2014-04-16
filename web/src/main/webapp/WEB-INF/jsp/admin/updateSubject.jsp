@@ -132,7 +132,8 @@
 					<table><tr>
 							<td>
 								<div class="formfieldXL_BG">
-									<input type="text" name="uniqueIdentifier" value="<c:out value="${fields['personId']}"/>" class="formfieldXL" readonly/>
+									<input type="text" value="<c:out value="${fields['personId']}"/>" class="formfieldXL" disabled/>
+									<input type="hidden" name="uniqueIdentifier" value="<c:out value="${fields['personId']}"/>"/>
 								</div>
 							</td>
 						</tr>
@@ -338,7 +339,7 @@
 </div>
 <input type="button" onclick="back_checkEditUserFormState();"  name="BTN_Smart_Back" value="<fmt:message key="back" bundle="${resword}"/>" class="button_medium"/>
 
-<c:if test="${parameters['genderRequired'] || parameters['collectDob'] != 3 || parameters['subjectPersonIdRequired'] != 'not used'}">
+<c:if test="${parameters['genderRequired'] || parameters['collectDob'] != 3 || (parameters['subjectPersonIdRequired'] != 'not used' && parameters['subjectPersonIdRequired'] != 'copyFromSSID')}">
 	<input type="submit" name="Submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_medium">
 </c:if>
 
