@@ -1393,6 +1393,14 @@ Parser.prototype.setShowHideAction = function(params) {
 					$(".show-hide-properties").find("textarea").val(action.message);
 					$(".show-hide-properties").find("textarea").focus();
 				}
+				if (visible.hide) {
+					$(".show-hide-properties").find("textarea").hide();
+					$(".show-hide-properties").find("textarea").val("");
+					$(".show-hide-properties").find(".control-label").first().hide();
+				} else {
+					$(".show-hide-properties").find("textarea").show();
+					$(".show-hide-properties").find(".control-label").show();
+				}
 			} else {
 				// Update UI
 				$(".show-hide-properties").hide();

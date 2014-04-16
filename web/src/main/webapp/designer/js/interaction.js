@@ -402,7 +402,7 @@ $(function() {
 		}
 	});
 
-	$("input[action=hide]").change(function() {
+	$("input[action=hide]").click(function() {
 		parser.resetActions(this);
 		var checked = $(this).attr("previous-state");
 		if (checked == 'checked') {
