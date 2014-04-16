@@ -148,7 +148,7 @@ $(function() {
 		title: "Select a CRF item"
 	});
 	createToolTip({
-		element: $("#groupSurface"),
+		element: $(".dotted-border"),
 		title: "Drag and drop an item from the Group tool box, the data toolbox or a CRF item."
 	});
 	createToolTip({
@@ -170,12 +170,12 @@ $(function() {
 
 	// ======================= End of tool tip creation =======================
 	// Hide action messages parameter divs
-	$("div[id='actionMessages']").hide();
-	$("div[id='actionMessages'] > *").hide();
+	$(".dotted-border-lg").hide();
+	$(".dotted-border-lg").children().hide();
 
 	// ======================= Draggables =======================
 	createDraggable({
-		target: $("#groupSurface"),
+		target: $(".dotted-border"),
 		element: $("#leftParentheses")
 	});
 
@@ -216,7 +216,7 @@ $(function() {
 
 	// ======================= Droppables =======================
 	createDroppable({
-		element: $("#groupSurface"),
+		element: $(".dotted-border"),
 		accept: "#leftParentheses, div[id='data'] p, div[id='items'] td"
 	});
 
@@ -243,113 +243,137 @@ $(function() {
 	// ======================= End of creating droppables =======================
 
 	// ============================= Event handlers =============================
-	$("#ruleName").blur(function() {
+	$(document).on('blur', '#ruleName', function() {
 		parser.setName($(this).val());
 	})
-
-	$("input[name='ruleInvoke']").change(function() {
+	// Handles the setting of what the rule evaluates to
+	$(document).on('change', 'input[name="ruleInvoke"]', function() {
 		if ($("#evaluateTrue").is(":checked")) {
 			parser.setEvaluates(true);
 		} else {
 			parser.setEvaluates(false);
 		}
 	});
-
-	$("#ide").change(function() {
+	// Handles the setting of initial data entry action
+	$(document).on('change', '#ide', function() {
 		parser.setInitialDataEntryExecute($(this).is(":checked"));
 	});
-
-	$("#ae").change(function() {
+	// Handles the setting of administrative editing action
+	$(document).on('change', '#ae', function() {
 		parser.setAdministrativeEditingExecute($(this).is(":checked"));	
 	});
-
-	$("#dde").change(function() {
+	// Handles the setting of double data entry action
+	$(document).on('change', '#dde', function() {
 		parser.setDoubleDataEntryExecute($(this).is(":checked"));
 	});
-
-	$("#dataImport").change(function() {
+	// Handles the setting of data import action
+	$(document).on('change', '#dataimport', function() {
 		parser.setDataImportExecute($(this).is(":checked"));
 	});
-
-	$(".glyphicon-remove").click(function() {
+	// handles the setting of target delete action
+	$(document).on('click', '.glyphicon-remove', function() {
 		parser.deleteTarget(this);
 	});
-
 	// === Enable addition event OID to targets ===
-	$(".eventify").change(function() {
+	$(document).on('change', '.eventify', function() {
 		parser.eventify(this);
 	});
-
-	$(".versionify").change(function() {
+	// handles the setting of a specific version to a target
+	$(document).on('change', '.versionify', function() {
 		parser.versionify(this);
 	});
-
-	$(".linefy").blur(function() {
+	// Handles the setting of a specific line in a repeating item
+	$(document).on('blur', '.linefy', function() {
 		parser.linefy(this);
 	});
+	// Handles clicks on item draggable
+	$(document).on('click', '.target, .dest, .value, .item', function() {
+		showCRFItem(this);
+	});
 	// === Discrepancy action ====
-	$("#chkDiscrepancyText").change(function() {
-		parser.setDiscrepancyAction({
-			selected: $(this).is(":checked"),
-			message: $("#discrepancyText").val()
-		});
-
-		$("#discrepancyText").find("textarea").focus();
+	$('input[action=discrepancy]').click(function() {
+		parser.resetActions(this);
+		var checked = $(this).attr("previous-state");
+		if (checked == 'checked') {
+			parser.setDiscrepancyAction({
+				selected: false
+			});
+			$(this).attr("previous-state", false);
+		} else {
+			parser.setDiscrepancyAction({
+				selected: true,
+				message: $('.discrepancy-properties').find('textarea').val()
+			});
+			$(this).attr("previous-state", 'checked');
+			$('.discrepancy-properties').find('textarea').focus();
+		}
 	});
 
-	$("#discrepancyText").find("textarea").blur(function() {
+	$('.discrepancy-properties').find('textarea').blur(function() {
 		parser.setDiscrepancyAction({
 			message: $(this).val(),
-			selected: $("#chkDiscrepancyText").is(":checked")
+			selected: $('input[action=discrepancy]').is(":checked")
 		});
 	});
 
 	// === Email action ====
-	$("#chkEmail").change(function() {
-		parser.setEmailAction({
-			to: $("#toField").val(),
-			message: $("#body").val(),
-			selected: $(this).is(":checked")
-		});
-
-		$("#toField").focus();
+	$("input[action=email]").click(function() {
+		parser.resetActions(this);
+		var checked = $(this).attr("previous-state");
+		if (checked == 'checked') {
+			parser.setEmailAction({
+				selected: false
+			});
+			$(this).attr("previous-state", false);
+		} else {
+			parser.setEmailAction({
+				to: $(".to").val(),
+				message: $(".body").val(),
+				selected: $(this).is(":checked")
+			});
+			$(".to").focus();
+			$(this).attr("previous-state", 'checked');
+		}
 	});
 
-	$("#toField").blur(function() {
+	$(".to").blur(function() {
 		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		if (!re.test($(this).val().trim())) {
 			$(this).parent().addClass("has-error");
 		} else {
 			parser.setEmailAction({
-				to: $("#toField").val(),
-				message: $("#body").val(),
-				selected: $("#chkEmail").is(":checked")
+				to: $(".to").val(),
+				message: $(".body").val(),
+				selected: $("input[action=email]").is(":checked")
 			});
-
 			$(this).parent().removeClass("has-error");
 		}
 	});
 
-	$("#body").blur(function() {
+	$(".body").blur(function() {
 		parser.setEmailAction({
-			to: $("#toField").val(),
-			message: $("#body").val(),
-			selected: $("#chkEmail").is(":checked")
+			to: $(".to").val(),
+			message: $(".body").val(),
+			selected: $("input[action=email]").is(":checked")
 		});
 	});
 
 	// === Insert action ====
-	$("#chkData").change(function() {
-		parser.setInsertAction({
-			selected: $(this).is(":checked")
-		});
-
-		$("#insert").find("textarea").focus();
-	});
-
-	// Not used
-	$("#insert").find("textarea").blur(function() {
-		parser.setInsertActionMessage($(this).val());
+	$("input[action=insert]").click(function() {
+		parser.resetActions(this);
+		var checked = $(this).attr("previous-state");
+		if (checked == 'checked') {
+			parser.setInsertAction({
+				selected: false
+			});
+			$(this).attr("previous-state", false);
+		} else {
+			parser.setInsertAction({
+				selected: $(this).is(":checked")
+			});
+			$(".insert").find("textarea").focus();
+			$(this).attr("previous-state", 'checked');
+		}
 	});
 
 	$(".value").blur(function() {
@@ -360,43 +384,47 @@ $(function() {
 	});
 
 	// === Show/Hide action ====
-	$("input[action=show]").change(function() {
-		parser.setShowHideAction({
-			show: true,
-			hide: false
-		});
-	});
-
 	$("input[action=show]").click(function() {
-		if (this.getAttribute('checked')) {
-			$(this).removeAttr('checked');
-			parser.setShowHideAction(Object.create(null));
+		parser.resetActions(this);
+		var checked = $(this).attr("previous-state");
+		if (checked == 'checked') {
+			parser.setShowHideAction({
+				show: false,
+				hide: false
+			});
+			$(this).attr("previous-state", false);
 		} else {
-			$(this).attr('checked', true);
+			parser.setShowHideAction({
+				show: true,
+				hide: false
+			});
+			$(this).attr("previous-state", 'checked');
 		}
 	});
 
 	$("input[action=hide]").change(function() {
-		parser.setShowHideAction({
-			hide: true,
-			show: false
-		});
-	});
-
-	$("input[action=hide]").click(function() {
-		if (this.getAttribute('checked')) {
-			$(this).removeAttr('checked');
-			parser.setShowHideAction(Object.create(null));
+		parser.resetActions(this);
+		var checked = $(this).attr("previous-state");
+		if (checked == 'checked') {
+			parser.setShowHideAction({
+				hide: false,
+				show: false
+			});
+			$(this).attr("previous-state", false);
 		} else {
-			$(this).attr('checked', true);
+			parser.setShowHideAction({
+				hide: true,
+				show: false
+			});
+			$(this).attr("previous-state", 'checked');
 		}
 	});
 
-	$("#dActionMessage").blur(function() {
+	$(".message").blur(function() {
 		parser.setShowHideActionMessage($(this).val());
 	});
 
-	$("#deleteButton").click(function() {
+	$(".deleteButton").click(function() {
 		if ($("#designSurface").find(".panel-body").children().size() > 2) {
 			bootbox.confirm("Are you sure you want to clear the entire expression?", function(result) {
 				if (result) {
@@ -441,7 +469,7 @@ $(function() {
 		parser.validate();
 	});
 
-	createPopover($("#groupSurface"));
+	createPopover($(".dotted-border"));
 	$(document).ready(function() {
 		parser.fetchStudies();
 	});

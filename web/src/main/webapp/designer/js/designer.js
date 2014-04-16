@@ -384,6 +384,7 @@ function createPopover(droppable) {
 		container: droppable
 	}).click(function(evt) {
 		// existing
+		showCRFItem(this);
 		$(".popover").remove();
 		evt.stopPropagation();
 		$(this).popover('show');
@@ -669,7 +670,7 @@ function createDroppable(params) {
 				element: params.element,
 				existingValue: existingValue
 			});
-			$("#deleteButton").removeClass("hidden");
+			$("#deleteButton").show("hidden");
 			params.element.css('font-weight', 'bold');
 			if (!$(".sortable").is(".ui-sortable")) {
 				createSortable(params.element);

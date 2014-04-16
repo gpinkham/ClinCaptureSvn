@@ -107,7 +107,7 @@
                   <span class="glyphicon glyphicon-trash pull-right space-top-m"></span>
                 </div>
               </div>
-              <div id="groupSurface" class="dotted-border group init">Group or Data</div>
+              <div class="dotted-border group init">Group or Data</div>
             </div>
           </div>
         </div>
@@ -165,7 +165,7 @@
             <input id='dde' type="checkbox"> Double data entry
           </div>
           <div class="col-md-3 space-top-sm">
-            <input id='dataImport' type="checkbox"> Data import
+            <input id='dataimport' type="checkbox"> Data import
           </div>
         </div>
         <div class="row">
@@ -173,13 +173,13 @@
             <span>Take the following action(s):</span>
           </div>
           <div class="col-md-2 space-top-sm">
-            <input id="chkDiscrepancyText" type="checkbox" action="discrepancy" class="action"> Create discrepancy
+            <input type="radio" action="discrepancy" name="action"> Create discrepancy
           </div>
           <div class="col-md-2 space-top-sm">
-            <input id="chkEmail" type="checkbox" action="email" class="action"> Send email
+            <input type="radio" action="email" name="action"> Send email
           </div>
           <div class="col-md-3 space-top-sm">
-            <input id="chkData" type="checkbox" action="insert" class="action"> Insert data
+            <input type="radio" action="insert" name="action"> Insert data
           </div>
         </div>
         <div class="row">
@@ -187,28 +187,28 @@
             &nbsp;
           </div>
           <div class="col-md-2 space-top-sm">
-            <input name='tItem' type="radio" action="show" class="action"> Show CRF Item
+            <input type="radio" action="show" name="action"> Show CRF Item
           </div>
           <div class="col-md-7 space-top-sm">
-            <input name='tItem' type="radio" action="hide" class="action"> Hide CRF Item
+            <input type="radio" action="hide" name="action"> Hide CRF Item
           </div>
         </div>
         <div class="row">
-          <div id="actionMessages" class="col-md-12 pull-left dotted-border-lg">
-            <div id="discrepancyText" class="form-group">
-              <label for="discrepancyText" class="col-md-2 control-label">Discrepancy text:</label>
+          <div class="col-md-12 pull-left dotted-border-lg">
+            <div class="discrepancy-properties form-group">
+              <label class="col-md-2 control-label">Discrepancy text:</label>
               <textarea class="form-control input-sm" rows="2"></textarea>
             </div>
-            <div id="emailTo" class="form-group">
-              <label for="toField" class="col-md-2 control-label">Email to:</label>
-              <input type="text" class="form-control input-sm" id="toField">
+            <div class="email-properties form-group">
+              <label class="col-md-2 control-label">Email to:</label>
+              <input type="text" class="to form-control input-sm">
             </div>
-            <div id="email" class="form-group">
+            <div class="form-group email-properties">
               <label for="email" class="col-md-2 control-label">Email message:</label>
-              <textarea id="body" class="form-control" rows="2"></textarea>
+              <textarea class="body form-control" rows="2"></textarea>
             </div>
             <span class="space-left-m">With the following information:</span>
-            <div id="insert" class="form-group">
+            <div class="insert-properties form-group">
               <div id="1" class="row">
                 <div class="col-md-2">
                   &nbsp;
@@ -226,10 +226,10 @@
                 </div>
               </div>
             </div>
-            <div id="dispActions" class="form-group">
+            <div class="show-hide-properties form-group">
               <div class="form-group">
                 <label class="col-md-2 control-label">Message:</label>
-                <textarea id="dActionMessage" class="form-control input-sm" rows="2"></textarea>
+                <textarea class="message form-control input-sm" rows="2"></textarea>
               </div>
               <label class="col-md-2 control-label">Destinations:</label>
               <div class="col-md-6 space-bottom space-left-neg">

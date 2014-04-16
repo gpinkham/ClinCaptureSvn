@@ -37,19 +37,17 @@ $(function() {
 					$("#items").append(list);
 				}
 				// Rule actions
-				for (var x = 0; x < rule.actions.length; x++) {
-					var list = $("<li class='list-group-item'>");
-					if (rule.actions[x].type === "discrepancy") {
-						list.text("Discrepancy Action");
-					} else if (rule.actions[x].type === "email") {
-						list.text("Email Action");
-					} else if (rule.actions[x].type === "insert") {
-						list.text("Insert Action");
-					} else if (rule.actions[x].type === "showHide") {
-						list.text("Show/Hide Action");
-					}
-					$("#actions").append(list);
+				var list = $("<li class='list-group-item'>");
+				if (rule.actions[0].type === "discrepancy") {
+					list.text("Discrepancy Action");
+				} else if (rule.actions[0].type === "email") {
+					list.text("Email Action");
+				} else if (rule.actions[0].type === "insert") {
+					list.text("Insert Action");
+				} else if (rule.actions[0].type === "showHide") {
+					list.text("Show/Hide Action");
 				}
+				$("#action").append(list);
 				// Initial data entry action
 				if (rule.ide) {
 					var list = $("<li class='list-group-item'>");

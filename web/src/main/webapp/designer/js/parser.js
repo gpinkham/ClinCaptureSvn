@@ -204,19 +204,6 @@ Parser.prototype.createNextDroppable = function(params) {
 				accept: "div[id='items'] td",
 				element: div.find(".target")
 			});
-			// Reset event handlers
-			div.find(".eventify").change(function() {
-				parser.eventify(this);
-			});
-			div.find(".versionify").change(function() {
-				parser.versionify(this);
-			});
-			div.find(".linefy").blur(function() {
-				parser.linefy(this);
-			});
-			div.find(".glyphicon-remove").click(function() {
-				parser.deleteTarget(this);
-			});
 			// create a new input 
 			if (!params.element.val()) {
 				params.element.parent().after(div);
@@ -260,10 +247,6 @@ Parser.prototype.createNextDroppable = function(params) {
 			var div = params.element.parent().clone();
 			div.find("input").text("");
 			div.find("input").removeClass("bordered");
-
-			div.find(".glyphicon-remove").click(function() {
-				parser.deleteTarget(this);
-			});
 			// create a new input 
 			if (!params.element.val()) {
 				params.element.parent().after(div);
@@ -415,9 +398,6 @@ Parser.prototype.createNextDroppable = function(params) {
 			}
 		}
 	}
-	params.element.click(function() {
-		showCRFItem(this);
-	});
 }
 
 Parser.prototype.getInsertActionDestination = function(id) {
@@ -710,6 +690,7 @@ Parser.prototype.render = function(rule) {
 	this.setDoubleDataEntryExecute(rule.dde);
 	this.setInitialDataEntryExecute(rule.ide);
 	this.setAdministrativeEditingExecute(rule.ae);
+	$("#deleteButton").removeClass("hidden");
 }
 
 /* ===========================================================================================
@@ -738,7 +719,7 @@ Parser.prototype.isValid = function(expression) {
 		message = "A rule is supposed to fire an action. Please select the action(s) to take if the rule evaluates as intended.";
 	}
 
-	if (!$("#ide").is(":checked") && !$("#ae").is(":checked") && !$("#dde").is(":checked") && !$("#dataImport").is(":checked")) {
+	if (!$("#ide").is(":checked") && !$("#ae").is(":checked") && !$("#dde").is(":checked") && !$("#dataimport").is(":checked")) {
 		valid = false;
 		message = "Please specify when the rule should be run";
 	}
@@ -758,32 +739,32 @@ Parser.prototype.isValid = function(expression) {
 		message = "Please specify the rule description";
 	}
 
-	if ($("#chkDiscrepancyText").is(":checked")) {
-		if ($("#discrepancyText").find("textarea").val().length <= 0) {
+	if ($("input[action=discrepancy]").is(":checked")) {
+		if ($(".discrepancy-properties").find("textarea").val().length <= 0) {
 			valid = false;
 			message = "A discrepancy action was selected but no discrepancy text has been specified.";
-			$("#discrepancyText").find("textarea").focus();
+			$(".discrepancy-properties").find("textarea").focus();
 		}
 	}
 
-	if ($("#chkEmail").is(":checked")) {
-		if ($("#email").find("textarea").val().length <= 0) {
+	if ($("input[action=email]").is(":checked")) {
+		if ($(".email-properties").find("textarea").val().length <= 0) {
 			valid = false;
 			message = "Please provide a valid email message";
-			$("#email").find("textarea").focus();
+			$(".email-properties").find("textarea").focus();
 		}
 	}
 
-	if ($("#chkEmail").is(":checked")) {
+	if ($("input[action=email]").is(":checked")) {
 		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-		if (!re.test($("#toField").val().trim())) {
+		if (!re.test($(".to").val().trim())) {
 			valid = false;
 			message = "The email address is invalid. Check the email and try again.";
-			$("#toField").focus();
+			$(".to").focus();
 		}
 	}
 
-	if ($("#chkData").is(":checked")) {
+	if ($("input[action=insert]").is(":checked")) {
 		if (this.getInsertAction() && this.getInsertAction().destinations.length < 1) {
 			valid = false;
 			message = "An insert action was selected but the items to insert values into are not specified.";	
@@ -1157,10 +1138,10 @@ Parser.prototype.getAdministrativeEditingExecute = function() {
 Parser.prototype.setDataImportExecute = function(execute) {
 	if (execute) {
 		this.rule.di = true;
-		$("#dataImport").prop("checked", execute);
+		$("#dataimport").prop("checked", execute);
 	} else {
 		this.rule.di = false;
-		$("#dataImport").prop("checked", execute);
+		$("#dataimport").prop("checked", execute);
 	}
 }
 
@@ -1226,18 +1207,18 @@ Parser.prototype.setDiscrepancyAction = function(params) {
 		action.render = function(visible) {
 			if (visible) {
 				$("#message").show();
-				$("#actionMessages").show();
-				$("#discrepancyText").show();
-				$("#chkDiscrepancyText").prop("checked", params.selected);
+				$(".dotted-border-lg").show();
+				$(".discrepancy-properties").show();
+				$("input[action=discrepancy]").prop("checked", params.selected);
 				if (!params.context) {
-					$("#discrepancyText").find("textarea").val(action.message);
+					$(".discrepancy-properties").find("textarea").val(action.message);
 				}
 			} else {
 				$("#message").hide();
-				$("#discrepancyText").hide();
-				$("#chkDiscrepancyText").prop("checked", params.selected);
-				if ($("#actionMessages").find("div:visible").length === 0) {
-					$("#actionMessages").hide();
+				$(".discrepancy-properties").hide();
+				$("input[action=discrepancy]").prop("checked", params.selected);
+				if ($(".dotted-border-lg").find("div:visible").length === 0) {
+					$(".dotted-border-lg").hide();
 				}
 			}
 		}
@@ -1275,25 +1256,23 @@ Parser.prototype.setEmailAction = function(params) {
 		// function to toggle display
 		action.render = function(visible) {
 			if (visible) {
-				$("#actionMessages").show();
+				$(".dotted-border-lg").show();
 				// Action controls
-				$("#email").show();
-				$("#emailTo").show();
-				$("#body").show();
-				$("#toField").show();
-				$("#chkEmail").prop("checked", params.selected);
+				$(".email-properties").show();
+				$(".to").show();
+				$(".body").show();
+				$("input[action=email]").prop("checked", params.selected);
 				if (!params.context) {
-					$("#toField").val(action.to);
-					$("#body").val(action.body);
+					$(".to").val(action.to);
+					$(".body").val(action.body);
 				}
 			} else {
-				$("#email").hide();
-				$("#emailTo").hide();
-				$("#body").val("");
-				$("#toField").val("");
-				$("#chkEmail").prop("checked", params.selected);
-				if ($("#actionMessages").find("div:visible").length === 0) {
-					$("#actionMessages").hide();
+				$(".email-properties").hide();
+				$(".to").val("");
+				$(".body").val("");
+				$("input[action=email]").prop("checked", params.selected);
+				if ($(".dotted-border-lg").find("div:visible").length === 0) {
+					$(".dotted-border-lg").hide();
 				}
 			}
 		}
@@ -1332,23 +1311,22 @@ Parser.prototype.setInsertAction = function(params) {
 		// function to toggle display
 		action.render = function(visible) {
 			if (visible) {
-				$("#insert").show();
-				$("#actionMessages").show();
-				$("#insert").show();
-				$("#chkData").prop("checked", params.selected);
+				$(".dotted-border-lg").show();
+				$(".insert-properties").show();
+				$("input[action=insert]").prop("checked", params.selected);
 			} else {
 				// Update UI
-				$("#insert").hide();
-				$("#chkData").prop("checked", params.selected);
-				if ($("#actionMessages").find("div:visible").length === 0) {
-					$("#actionMessages").hide();
+				$(".insert-properties").hide();
+				$("input[action=insert]").prop("checked", params.selected);
+				if ($(".dotted-border-lg").find("div:visible").length === 0) {
+					$(".dotted-border-lg").hide();
 				}
-				var div = $("#insert").find(".row").first().clone();
+				var div = $(".insert-properties").find(".row").first().clone();
 				div.find(".item").val("");
 				div.find(".value").val("");
 				div.find(".value").attr("type", "text");
 				div.find(".value").removeClass("invalid");
-				$("#insert").find(".row").remove();
+				$(".insert-properties").find(".row").remove();
 				createDroppable({
 					element: div.find(".item"),
 					accept: "div[id='items'] td"
@@ -1357,7 +1335,7 @@ Parser.prototype.setInsertAction = function(params) {
 					element: div.find(".value"),
 					accept: "div[id='data'] p, div[id='items'] td"
 				});
-				$("#insert").append(div);
+				$(".insert-properties").append(div);
 			}
 		}
 		if (params.selected) {
@@ -1409,31 +1387,30 @@ Parser.prototype.setShowHideAction = function(params) {
 		// function to toggle display
 		action.render = function(visible) {
 			if (visible.show || visible.hide) {
-				$("#dispActions").show();
-				$("#actionMessages").show();
-				$("#dispActions").show();
+				$(".dotted-border-lg").show();
+				$(".show-hide-properties").show();
 				if (!params.context) {
-					$("#dispActions").find("textarea").val(action.message);
-					$("#dispActions").find("textarea").focus();
+					$(".show-hide-properties").find("textarea").val(action.message);
+					$(".show-hide-properties").find("textarea").focus();
 				}
 			} else {
 				// Update UI
-				$("#dispActions").hide();
-				if ($("#actionMessages").find("div:visible").length === 0) {
-					$("#actionMessages").hide();
+				$(".show-hide-properties").hide();
+				if ($(".dotted-border-lg").find("div:visible").length === 0) {
+					$(".dotted-border-lg").hide();
 				}
-				$("#dispActions").find("textarea").val("");
-				var div = $("#dispActions").find(".input-group").first().clone();
+				$(".show-hide-properties").find("textarea").val("");
+				var div = $(".show-hide-properties").find(".input-group").first().clone();
 				div.find(".dest").val("");
 				div.find(".dest").attr("type", "text");
 				div.find(".dest").removeClass("invalid");
-				$("#dispActions").find(".input-group").remove();
+				$(".show-hide-properties").find(".input-group").remove();
 				createDroppable({
 					element: div.find(".dest"),
 					accept: "div[id='items'] td"
 				});
 
-				$("#dispActions").find(".col-md-6").append(div);
+				$(".show-hide-properties").find(".col-md-6").append(div);
 			}
 			$("input[action=show]").prop("checked", visible.show);
 			$("input[action=hide]").prop("checked", visible.hide);
@@ -1500,8 +1477,8 @@ Parser.prototype.setDestinationValue = function(params) {
 
 Parser.prototype.addNewInsertActionInputs = function() {
 
-	var div = $("#insert").find(".row").first().clone();
-	div.attr("id", $("#insert").find(".row").size() + 1);
+	var div = $(".insert-properties").find(".row").first().clone();
+	div.attr("id", $(".insert-properties").find(".row").size() + 1);
 	div.find("label").hide();
 
 	var input = div.find(".item");
@@ -1520,31 +1497,25 @@ Parser.prototype.addNewInsertActionInputs = function() {
 			id: $(this).parents(".row").attr("id")
 		});
 	});
-
-	div.find(".glyphicon-remove").click(function() {
-		parser.deleteTarget(this);
-	});
-
 	createDroppable({
 		element: input,
 		accept: "div[id='items'] td"
 	});
-
 	createDroppable({
 		element: inputVal,
 		accept: "div[id='data'] p, div[id='items'] td"
 	});
 
-	$("#insert").append(div);
+	$(".insert-properties").append(div);
 }
 
 Parser.prototype.setDestinations = function(dests) {
 	if (dests.length > 0) {
 		// Remove labels
-		$("#insert").find("label").hide();
+		$(".insert-properties").find("label").hide();
 		for (var x = 0; x < dests.length; x++) {
 			var dest = dests[x];
-			var div = $("#insert").find(".row").first().clone();
+			var div = $(".insert-properties").find(".row").first().clone();
 			var item = this.getItem(dest.oid);
 			var input = div.find(".item");
 			div.attr("id", dest.id);
@@ -1554,9 +1525,6 @@ Parser.prototype.setDestinations = function(dests) {
 			input.attr("event-oid", item.eventOid);
 			input.attr("version-oid", item.crfVersionOid);
 			input.attr("study-oid", this.extractStudy(this.getStudy()).oid);
-			input.click(function() {
-				showCRFItem(this);
-			});
 			input.val(item.name);
 			input.css('font-weight', 'bold');
 
@@ -1570,9 +1538,6 @@ Parser.prototype.setDestinations = function(dests) {
 				inputVal.attr("event-oid", item.eventOid);
 				inputVal.attr("version-oid", item.crfVersionOid);
 				inputVal.attr("study-oid", this.extractStudy(this.getStudy()).oid);
-				inputVal.click(function() {
-					showCRFItem(this);
-				});
 			}
 			inputVal.val(this.findItem(dest.value) ? this.findItem(dest.value).name : dest.value);
 			inputVal.blur(function() {
@@ -1581,26 +1546,20 @@ Parser.prototype.setDestinations = function(dests) {
 					id: $(this).parents(".row").attr("id")
 				});
 			});
-
-			div.find(".glyphicon-remove").click(function() {
-				parser.deleteTarget(this);
-			});
 			createDroppable({
 				element: input,
 				accept: "div[id='data'] p, div[id='items'] td"
 			});
-
 			createDroppable({
 				element: inputVal,
 				accept: "div[id='data'] p, div[id='items'] td"
 			});
-
 			if (x === 0) {
 				div.find("label").show();
-				$("#insert").find(".row").before(div)
+				$(".insert-properties").find(".row").before(div)
 			} else {
 				div.find("label").hide();
-				$("#insert").find(".row").last().before(div);
+				$(".insert-properties").find(".row").last().before(div);
 			}
 		}
 	}
@@ -1614,9 +1573,6 @@ Parser.prototype.setShowHideDestinations = function(dests) {
 			createDroppable({
 				accept: "div[id='items'] td",
 				element: cloned.find(".dest")
-			});
-			cloned.find(".dest").click(function() {
-				showCRFItem(this);
 			});
 			var item = this.getItem(dests[x]);
 			cloned.find("input").val(item.name);
@@ -1639,37 +1595,34 @@ Parser.prototype.setInsertActionMessage = function(message) {
 Parser.prototype.setExpression = function(expression) {
 	if (expression instanceof Array) {
 		this.rule.expression = expression;
-		var currDroppable = $("#groupSurface");
+		var currDroppable = $(".dotted-border");
 		for (var e = 0; e < expression.length; e++) {
 			var itm = this.getItem(expression[e]);
 			if (e === 0) {
 				if (itm) {
 					var preds = expression[e].split(".");
 					if (preds.length == 4) {
-						$("#groupSurface").attr("event-oid", preds[3]);
-						$("#groupSurface").attr("crf-oid", preds[preds.length - 3]);
-						$("#groupSurface").attr("item-oid", preds[preds.length - 1]);
-						$("#groupSurface").attr("group-oid", preds[preds.length - 2]);
+						$(".dotted-border").attr("event-oid", preds[3]);
+						$(".dotted-border").attr("crf-oid", preds[preds.length - 3]);
+						$(".dotted-border").attr("item-oid", preds[preds.length - 1]);
+						$(".dotted-border").attr("group-oid", preds[preds.length - 2]);
 					} else if (preds.length == 3) {
-						$("#groupSurface").attr("crf-oid", preds[0]);
-						$("#groupSurface").attr("item-oid", preds[2]);
-						$("#groupSurface").attr("group-oid", preds[1]);
-						$("#groupSurface").attr("event-oid", itm.eventOid);
+						$(".dotted-border").attr("crf-oid", preds[0]);
+						$(".dotted-border").attr("item-oid", preds[2]);
+						$(".dotted-border").attr("group-oid", preds[1]);
+						$(".dotted-border").attr("event-oid", itm.eventOid);
 					} else {
-						$("#groupSurface").attr("item-oid", itm.oid);
-						$("#groupSurface").attr("crf-oid", itm.crfOid);
-						$("#groupSurface").attr("group-oid", itm.group);
-						$("#groupSurface").attr("event-oid", itm.eventOid);
+						$(".dotted-border").attr("item-oid", itm.oid);
+						$(".dotted-border").attr("crf-oid", itm.crfOid);
+						$(".dotted-border").attr("group-oid", itm.group);
+						$(".dotted-border").attr("event-oid", itm.eventOid);
 					}
-					$("#groupSurface").attr("version-oid", itm.crfVersionOid);
-					$("#groupSurface").attr("study-oid", this.extractStudy(this.getStudy()).oid);
-					$("#groupSurface").text(itm.name);
+					$(".dotted-border").attr("version-oid", itm.crfVersionOid);
+					$(".dotted-border").attr("study-oid", this.extractStudy(this.getStudy()).oid);
+					$(".dotted-border").text(itm.name);
 				} else {
-					$("#groupSurface").text(expression[e]);
+					$(".dotted-border").text(expression[e]);
 				}
-				$("#groupSurface").click(function() {
-					showCRFItem(this);
-				});
 			} else {
 				var predicate = expression[e];
 				if (parser.isConditionalOp(predicate.toUpperCase())) {
@@ -1716,9 +1669,6 @@ Parser.prototype.setExpression = function(expression) {
 			currDroppable.addClass("bordered");
 			currDroppable.removeClass("init");
 			currDroppable.css('font-weight', 'bold');
-			currDroppable.click(function() {
-				showCRFItem(this);
-			});
 		}
 	} else if (typeof expression === "string") {
 		var rawExpression = [];
@@ -1759,9 +1709,6 @@ Parser.prototype.setTargets = function(targets) {
 				element: div.find(".target"),
 				accept: "div[id='items'] td"
 			});
-			div.find(".glyphicon-remove").click(function() {
-				parser.deleteTarget(this);
-			});
 			div.find(".target").val(tar.name);
 			div.find(".target").text(tar.name);
 			// Item attributes
@@ -1772,18 +1719,6 @@ Parser.prototype.setTargets = function(targets) {
 			div.find(".target").attr("event-oid", tar.evt);
 			div.find(".target").attr("version-oid", tar.version);
 			div.find(".target").attr("study-oid", this.extractStudy(this.getStudy()).oid);
-			div.find(".eventify").change(function() {
-				parser.eventify(this);
-			});
-			div.find(".versionify").change(function() {
-				parser.versionify(this);
-			});
-			div.find(".linefy").blur(function() {
-				parser.linefy(this);
-			});
-			div.find(".target").click(function() {
-				showCRFItem(this);
-			});
 			createToolTip({
 				element: div.find(".eventify"),
 				title: "Click to bind the target to only the event."
@@ -1914,14 +1849,14 @@ Parser.prototype.deleteTarget = function(target) {
 			var dest = act.destinations[x];
 			if (dest.oid === oid) {
 				act.destinations.splice(x, 1);
-				if ($("#insert").find(".row").size() === 1) { 
+				if ($(".insert-properties").find(".row").size() === 1) { 
 					$(target).closest(".row").find(".item").val("");
 					$(target).closest(".row").find(".value").val("");
 				} else {
 					$(target).closest(".row").remove();
 				}
-				if ($("#insert").find("label:visible").size() === 0) {
-					$("#insert").find(".row:first").find("label").map(function() {
+				if ($(".insert-properties").find("label:visible").size() === 0) {
+					$(".insert-properties").find(".row:first").find("label").map(function() {
 						$(this).show();
 					});
 				}
@@ -2143,4 +2078,21 @@ Parser.prototype.getItem = function(expression) {
 	} else {
 		return this.findItem(this.extractItemOIDFromExpression(expression));
 	}
+}
+
+Parser.prototype.resetActions = function(target) {
+	function isShowHideTarget(item) {
+		return $(item).attr("action") == 'show' || $(item).attr("action") == 'hide';
+	}
+	this.rule.actions = [];
+	$(".dotted-border-lg").find("input, textarea").each(function() {
+		if (!isShowHideTarget(target)) {
+			$(this).val("");
+			$(this).text("");
+			$(".space-left-neg > .input-group").not(":first").remove();
+		}
+	});
+	$(".dotted-border-lg").hide();
+	$(".dotted-border-lg").children().hide();
+	$("input[name='action']").not(target).attr("previous-state", false);
 }
