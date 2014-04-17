@@ -195,6 +195,10 @@ Parser.prototype.createNextDroppable = function(params) {
 			target.evt = selectedItem.eventOid;
 			target.version = selectedItem.crfVersionOid;
 			this.rule.targets.push(target);
+			// If this is an edit - changing an eventified target
+			if (params.element.parent().find(".versionify").is(":checked")) {
+				target.versionify = true;
+			}
 			//Reset UI
 			var div = params.element.parent().clone();
 			div.find(".target").val("");
