@@ -238,7 +238,8 @@ Parser.prototype.createNextDroppable = function(params) {
 	} else if (params.element.is(".dest")) {
 		if (!this.isAddedShowHideTarget(params.ui.draggable.attr("item-name"))) {
 			if (params.existingValue) {
-				this.getShowHideAction().destinations.indexOf(params.existingValue);
+				var itemExpression = params.element.attr("crf-oid") + "." + params.element.attr("group-oid") + "." + params.element.attr("item-oid");
+				var index = this.getShowHideAction().destinations.indexOf(itemExpression);
 				if (index > -1) {
 					this.getShowHideAction().destinations.splice(index, 1);
 				}
@@ -1869,7 +1870,8 @@ Parser.prototype.deleteTarget = function(target) {
 		}
 	} else {
 		if (this.getShowHideAction() && this.getShowHideAction().destinations.length > 0) {
-			var index = this.getShowHideAction().destinations.indexOf(this.constructCRFPath($(target).siblings(".dest").val()));
+			var itemExpression = $(target).siblings(".dest").attr("crf-oid") + "." + $(target).siblings(".dest").attr("group-oid") + "." + $(target).siblings(".dest").attr("item-oid");
+			var index = this.getShowHideAction().destinations.indexOf(itemExpression);
 			if (index > -1) {
 				this.getShowHideAction().destinations.splice(index, 1);
 				$(target).parent().remove();

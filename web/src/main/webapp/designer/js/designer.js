@@ -630,7 +630,6 @@ function createDroppable(params) {
 		accept: params.accept,
 		hoverClass: "ui-state-active",
 		drop: function(event, ui) {	
-
 			var existingValue = params.element.val();
  			params.element.text("");
  			params.element.removeClass("init");
@@ -652,18 +651,10 @@ function createDroppable(params) {
 					params.element.append("&gt;");
 				} else if (ui.draggable.is("td.group")) {
 					params.element.append(ui.draggable.attr("item-name"));
-					// Persist attrinutes
-					params.element.attr("item-oid", ui.draggable.attr("oid"));
-					params.element.attr("crf-oid", ui.draggable.attr("crf-oid"));
-					params.element.attr("event-oid", ui.draggable.attr("event-oid"));
-					params.element.attr("group-oid", ui.draggable.attr("group-oid"));
-					params.element.attr("study-oid", ui.draggable.attr("study-oid"));
-					params.element.attr("version-oid", ui.draggable.attr("version-oid"));
 				} else {
 					params.element.append(ui.draggable.text());
 				}
 			}
-
 			params.element.tooltip("hide");
 			// Create the next droppable
 			parser.createNextDroppable({
@@ -671,6 +662,15 @@ function createDroppable(params) {
 				element: params.element,
 				existingValue: existingValue
 			});
+			if (ui.draggable.is("td.group")) {
+				// Persist attrinutes
+				params.element.attr("item-oid", ui.draggable.attr("oid"));
+				params.element.attr("crf-oid", ui.draggable.attr("crf-oid"));
+				params.element.attr("event-oid", ui.draggable.attr("event-oid"));
+				params.element.attr("group-oid", ui.draggable.attr("group-oid"));
+				params.element.attr("study-oid", ui.draggable.attr("study-oid"));
+				params.element.attr("version-oid", ui.draggable.attr("version-oid"));
+			}
 			$("#deleteButton").show("hidden");
 			params.element.css('font-weight', 'bold');
 			if (!$(".sortable").is(".ui-sortable")) {
