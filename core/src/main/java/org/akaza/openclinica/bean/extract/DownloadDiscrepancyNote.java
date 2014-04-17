@@ -13,21 +13,6 @@
 
 package org.akaza.openclinica.bean.extract;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletOutputStream;
-
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.service.DiscrepancyNoteThread;
-import org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import org.apache.commons.lang.StringEscapeUtils;
-
 import com.lowagie.text.BadElementException;
 import com.lowagie.text.Cell;
 import com.lowagie.text.Document;
@@ -39,20 +24,31 @@ import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.Table;
 import com.lowagie.text.pdf.PdfWriter;
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.service.DiscrepancyNoteThread;
+import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.apache.commons.lang.StringEscapeUtils;
+
+import javax.servlet.ServletOutputStream;
+import java.awt.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class converts or serializes DiscrepancyNoteBeans to Strings or iText-related classes so that they can be
  * compiled into a file and downloaded to the user. This is a convenience class with a number of different methods for
  * serializing beans to Strings.
  * 
- * @see org.akaza.openclinica.control.extract.DiscrepancyNoteOutputServlet
  * @author Bruce W. Perry
  * 
  */
 public class DownloadDiscrepancyNote implements DownLoadBean {
 	public static String CSV = "text/plain";
 	public static String PDF = "application/pdf";
-	public static String COMMA = ",";
 	public static Map<Integer, String> RESOLUTION_STATUS_MAP = new HashMap<Integer, String>();
 	static {
 		RESOLUTION_STATUS_MAP.put(1, "New");
@@ -63,9 +59,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 	}
 
 	public DownloadDiscrepancyNote() {
-	}
-
-	public DownloadDiscrepancyNote(boolean firstColumnHeaderLine) {
 	}
 
 	public void downLoad(EntityBean bean, String format, OutputStream stream) {
@@ -90,12 +83,10 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if (servletStream != null) {
-				try {
-					servletStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			try {
+				servletStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 
@@ -108,7 +99,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 			return;
 		}
 		StringBuilder allContent = new StringBuilder();
-		String singleBeanContent = "";
+		String singleBeanContent;
 
 		for (EntityBean discNoteBean : listOfBeans) {
 			if (!(discNoteBean instanceof DiscrepancyNoteBean))
@@ -149,19 +140,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 
 	public int getContentLength(EntityBean bean, String format) {
 		return serializeToString(bean, false, 0).getBytes().length;
-	}
-
-	public int getListContentLength(List<DiscrepancyNoteBean> beans, String format) {
-		int totalLength = 0;
-		int count = 0;
-		for (DiscrepancyNoteBean bean : beans) {
-			++count;
-			// Only count the byte length of a CSV header row for the first DNote
-			totalLength += serializeToString(bean, (count == 1), 0).getBytes().length;
-			totalLength += "\n".getBytes().length;
-
-		}
-		return totalLength;
 	}
 
 	public int getThreadListContentLength(List<DiscrepancyNoteThread> threadBeans) {
@@ -361,38 +339,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 
 	}
 
-	public void serializeListToPDF(List<DiscrepancyNoteBean> listOfBeans, OutputStream stream, String studyIdentifier) {
-
-		ServletOutputStream servletStream = (ServletOutputStream) stream;
-
-		Document pdfDoc = new Document();
-
-		try {
-			PdfWriter.getInstance(pdfDoc, servletStream);
-			pdfDoc.open();
-			// Create header for the study identifier or name
-			if (studyIdentifier != null) {
-				HeaderFooter header = new HeaderFooter(new Phrase("Study Identifier: " + studyIdentifier + " pg."),
-						true);
-				header.setAlignment(Element.ALIGN_CENTER);
-				Paragraph para = new Paragraph("Study Identifier: " + studyIdentifier, new Font(Font.HELVETICA, 18,
-						Font.BOLD, new Color(0, 0, 0)));
-				para.setAlignment(Element.ALIGN_CENTER);
-				pdfDoc.setHeader(header);
-				pdfDoc.add(para);
-			}
-			for (DiscrepancyNoteBean discNoteBean : listOfBeans) {
-				pdfDoc.add(this.createTableFromBean(discNoteBean));
-				pdfDoc.add(new Paragraph("\n"));
-			}
-			// pdfDoc.add(new Paragraph(content));
-		} catch (DocumentException e) {
-			e.printStackTrace();
-		}
-		pdfDoc.close();
-
-	}
-
 	public void serializeThreadsToPDF(List<DiscrepancyNoteThread> listOfThreads, OutputStream stream,
 			String studyIdentifier) {
 
@@ -414,15 +360,22 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 				pdfDoc.setHeader(header);
 				pdfDoc.add(para);
 			}
+			boolean newPage = false;
 			for (DiscrepancyNoteThread discNoteThread : listOfThreads) {
-				pdfDoc.add(this.createTableThreadHeader(discNoteThread));
-				// Just the parent of the thread? discNoteThread.getLinkedNoteList()
-				for (DiscrepancyNoteBean discNoteBean : discNoteThread.getLinkedNoteList()) {
-					// DiscrepancyNoteBean discNoteBean = discNoteThread.getLinkedNoteList().getFirst();
-					if (discNoteBean.getParentDnId() > 0) {
-						pdfDoc.add(this.createTableFromBean(discNoteBean));
-						pdfDoc.add(new Paragraph("\n"));
+				if (discNoteThread != null && !discNoteThread.getLinkedNoteList().isEmpty()) {
+					if (newPage) {
+						pdfDoc.newPage();
 					}
+					pdfDoc.add(this.createTableThreadHeader(discNoteThread));
+					// Just the parent of the thread? discNoteThread.getLinkedNoteList()
+					for (DiscrepancyNoteBean discNoteBean : discNoteThread.getLinkedNoteList()) {
+						// DiscrepancyNoteBean discNoteBean = discNoteThread.getLinkedNoteList().getFirst();
+						if (discNoteBean.getParentDnId() > 0) {
+							pdfDoc.add(this.createTableFromBean(discNoteBean));
+							pdfDoc.add(new Paragraph("\n"));
+						}
+					}
+					newPage = true;
 				}
 			}
 			// pdfDoc.add(new Paragraph(content));
@@ -433,55 +386,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 
 	}
 
-	public void downLoadDiscBeans(List<DiscrepancyNoteBean> listOfBeans, String format, OutputStream stream,
-			String studyIdentifier) {
-
-		if (listOfBeans == null) {
-			return;
-		}
-		StringBuilder allContent = new StringBuilder();
-		String singleBeanContent = "";
-		int counter = 0;
-
-		if (CSV.equalsIgnoreCase(format)) {
-
-			for (DiscrepancyNoteBean discNoteBean : listOfBeans) {
-				++counter;
-
-				singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, 0) : serializeToString(
-						discNoteBean, false, 0);
-				allContent.append(singleBeanContent);
-				allContent.append("\n");
-
-			}
-		}
-
-		// This must be a ServletOutputStream for our purposes
-		ServletOutputStream servletStream = (ServletOutputStream) stream;
-
-		try {
-			if (CSV.equalsIgnoreCase(format)) {
-				servletStream.print(allContent.toString());
-			} else {
-
-				// Create PDF version
-				this.serializeListToPDF(listOfBeans, servletStream, studyIdentifier);
-
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (servletStream != null) {
-				try {
-					servletStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-	}
-
 	public void downLoadThreadedDiscBeans(List<DiscrepancyNoteThread> listOfThreadedBeans, String format,
 			OutputStream stream, String studyIdentifier) {
 
@@ -489,7 +393,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 			return;
 		}
 		StringBuilder allContent = new StringBuilder();
-		String singleBeanContent = "";
+		String singleBeanContent;
 		int counter = 0;
 		int threadCounter = 0;
 
@@ -557,7 +461,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 		csvValue = StringEscapeUtils.escapeJava(csvValue);
 
 		if (csvValue.contains(",")) {
-			return new StringBuilder("\"").append(csvValue).append("\"").toString();
+			return "\"" + csvValue + "\"";
 		} else {
 			return csvValue;
 		}
@@ -572,9 +476,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 		table.setBorderColor(new java.awt.Color(0, 0, 0));
 		table.setPadding(4);
 		table.setSpacing(4);
-		if (discNoteThread == null || discNoteThread.getLinkedNoteList().isEmpty()) {
-			return table;
-		}
 
 		// Get information for the header; the resolution status, however, has to be the latest
 		// resolution status for the DN thread
@@ -615,15 +516,10 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 			cell = createCell("Study Event Date", dnBean.getEventStart() + "");
 			table.addCell(cell);
 
-			StringBuilder tmpStrBuilder = new StringBuilder("CRF: ");
-			tmpStrBuilder.append(dnBean.getCrfName());
-			tmpStrBuilder.append("\n");
-			tmpStrBuilder.append("Status: ");
-			tmpStrBuilder.append(dnBean.getCrfStatus());
 			content.append(dnBean.getCrfName());
 
-			cell = new Cell(new Paragraph(tmpStrBuilder.toString(), new Font(Font.HELVETICA, 14, Font.BOLD, new Color(
-					0, 0, 0))));
+			cell = new Cell(new Paragraph("CRF: " + dnBean.getCrfName() + "\n" + "Status: " + dnBean.getCrfStatus(),
+					new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 0, 0))));
 
 			table.addCell(cell);
 
@@ -655,10 +551,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean {
 	}
 
 	private Cell createCell(String propertyName, String propertyValue) throws BadElementException {
-
-		StringBuilder content = new StringBuilder(propertyName + ": ");
-		content.append(propertyValue);
-		Paragraph para = new Paragraph(content.toString(), new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 0, 0)));
+		Paragraph para = new Paragraph(propertyName + ": " + propertyValue, new Font(Font.HELVETICA, 14, Font.BOLD,
+				new Color(0, 0, 0)));
 		return new Cell(para);
 	}
 
