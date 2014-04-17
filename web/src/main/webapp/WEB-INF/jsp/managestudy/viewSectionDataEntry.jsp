@@ -126,7 +126,7 @@
 									value="${toc.crf.name}" /> <c:out
 									value="${toc.crfVersion.name}" /> 
 									<c:choose>
-									<c:when test="${eventCRF.stage.initialDE}">
+									<c:when test="${eventCRF.stage.initialDE and !eventCRF.notStarted}">
 										<img src="images/icon_InitialDE.gif"
 											alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"
 											title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
@@ -171,13 +171,16 @@
 											alt="<fmt:message key="locked" bundle="${resword}"/>"
 											title="<fmt:message key="locked" bundle="${resword}"/>">
 									</c:when>
+                                    <c:when test="${eventCRF.status.signed}">
+                                        <img src="images/icon_Signed.gif" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>">
+                                    </c:when>
 									<c:when test="${eventCRF.stage.invalid}">
 										<img src="images/icon_Invalid.gif"
 											alt="<fmt:message key="invalid" bundle="${resword}"/>"
 											title="<fmt:message key="invalid" bundle="${resword}"/>">
 									</c:when>
 									<c:otherwise>
-
+                                        <img src="images/icon_NotStarted.gif" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
 									</c:otherwise>
 								</c:choose></b> &nbsp;&nbsp;
 						</span>
