@@ -459,7 +459,13 @@ public class CreateSubStudyServlet extends Controller {
 						&& !fp.getString("autoCodeDictionaryName").isEmpty()) {
 					scg.getValue().setValue(fp.getString("autoCodeDictionaryName"));
 					study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
-				}
+				} else if (scg.getParameter().getHandle().equalsIgnoreCase("subjectPersonIdRequired")
+						&& !fp.getString("subjectPersonIdRequired").isEmpty()) {
+					scg.getValue().setValue(
+							fp.getString("subjectPersonIdRequired"));
+					study.getStudyParameterConfig().setSubjectPersonIdRequired(
+							fp.getString("subjectPersonIdRequired"));
+				};
 			}
 		}
 

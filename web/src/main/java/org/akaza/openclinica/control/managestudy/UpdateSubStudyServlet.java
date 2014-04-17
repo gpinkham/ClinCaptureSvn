@@ -320,6 +320,7 @@ public class UpdateSubStudyServlet extends Controller {
 		study.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
 		study.getStudyParameterConfig().setInterviewDateRequired(fp.getString("interviewDateRequired"));
 		study.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
+		study.getStudyParameterConfig().setSubjectPersonIdRequired(fp.getString("subjectPersonIdRequired"));
 
 		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
 		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));

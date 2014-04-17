@@ -377,10 +377,32 @@
       </td>
     </tr>
    </c:when>
-   
-   </c:choose>
+	<c:when test="${config.parameter.handle=='subjectPersonIdRequired'}">
+		<tr valign="top">
+			<td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/></td>
+			<td class="table_cell">
+				<c:choose>
+					<c:when test="${config.value.value == 'copyFromSSID'}">
+						<fmt:message key="copy_from_ssid" bundle="${resword}"/>
+					</c:when>
 
-  </c:forEach>
+					<c:when test="${config.value.value == 'required'}">
+						<fmt:message key="required" bundle="${resword}"/>
+					</c:when>
+
+					<c:when test="${config.value.value == 'optional'}">
+						<fmt:message key="optional" bundle="${resword}"/>
+					</c:when>
+	
+					<c:otherwise>
+						<fmt:message key="not_used" bundle="${resword}"/>
+					</c:otherwise>
+				</c:choose>
+			</td>
+		</tr>
+	 </c:when>
+</c:choose>
+</c:forEach>
 
 </table>
 
