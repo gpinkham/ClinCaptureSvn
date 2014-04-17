@@ -14,7 +14,6 @@
  * =================================================================================================================================================================================================================================================================================================================================================================================================================================================================== */
 
 $(function() {
-	
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 	$("a[id='back']").attr("href", c + "/designer/rule.html");
 	$("a[id='exit']").attr("href", c + "/ViewRuleAssignment?read=true&restore=true");
@@ -86,9 +85,13 @@ $(function() {
 		// Redirect to design if no rule present
 		window.open("rule.html", '_self');
 	}
-
 	$("#save").click(function() {
 		saveRule(rule);
+	});
+	// Clean up on exit
+	$("#exit").click(function() {
+		cleanUp();
+		$(this).click();
 	});
 })
 
@@ -131,9 +134,7 @@ function saveRule(rule) {
 				ctx.evaluates = rule.evaluates;
 				// Persist in sessin
 				sessionStorage.setItem("context", JSON.stringify(ctx));
-				// Clean up
-				sessionStorage.removeItem("rule");
-				sessionStorage.removeItem("status");
+				cleanUp();
 				window.open(rule.submission + "/designer/rule.html", '_self');
 			} catch (e) {
 				$(".spinner").remove();
@@ -150,4 +151,9 @@ function saveRule(rule) {
 			});
 		}
 	})
+}
+
+function cleanUp() {
+	sessionStorage.removeItem("rule");
+	sessionStorage.removeItem("status");
 }
