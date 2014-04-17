@@ -197,7 +197,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			this.rule.targets.push(target);
 			//Reset UI
 			var div = params.element.parent().clone();
-			div.find(".target").text("");
+			div.find(".target").val("");
 			div.find(".target").removeClass("bordered");
 			// Re-bind Event handlers
 			createDroppable({
@@ -245,7 +245,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			}
 			this.getShowHideAction().destinations.push(path);
 			var div = params.element.parent().clone();
-			div.find("input").text("");
+			div.find("input").val("");
 			div.find("input").removeClass("bordered");
 			// create a new input 
 			if (!params.element.val()) {
@@ -1491,12 +1491,10 @@ Parser.prototype.addNewInsertActionInputs = function() {
 
 	var input = div.find(".item");
 	input.val("");
-	input.text("");
 	input.removeClass("bordered");
 
 	var inputVal = div.find(".value");
 	inputVal.val("");
-	inputVal.text("");
 	inputVal.removeClass("bordered");
 	inputVal.removeAttr("type");
 	inputVal.blur(function() {
@@ -1712,13 +1710,12 @@ Parser.prototype.setTargets = function(targets) {
 				name: targets[x].name
 			});
 			var div = targetDiv.clone();
-			div.find(".target").text("");
+			div.find(".target").val("");
 			createDroppable({
 				element: div.find(".target"),
 				accept: "div[id='items'] td"
 			});
 			div.find(".target").val(tar.name);
-			div.find(".target").text(tar.name);
 			// Item attributes
 			div.find(".target").css('font-weight', 'bold');
 			div.find(".target").attr("item-oid", tar.oid);
@@ -2096,7 +2093,6 @@ Parser.prototype.resetActions = function(target) {
 	$(".dotted-border-lg").find("input, textarea").each(function() {
 		if (!isShowHideTarget(target)) {
 			$(this).val("");
-			$(this).text("");
 			$(".space-left-neg > .input-group").not(":first").remove();
 		}
 	});

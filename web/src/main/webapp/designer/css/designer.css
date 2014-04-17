@@ -219,7 +219,6 @@ textarea {
 }
 
 td {
-  cursor: hand;
   cursor: pointer; 
 }
 
@@ -368,4 +367,10 @@ div {
 .data-scrollbar {
   overflow-y: scroll;
   overflow: auto;
+}
+td.group, td.ui-draggable {
+  text-align: left;
+}
+.center-justify {
+  text-align: center;
 }

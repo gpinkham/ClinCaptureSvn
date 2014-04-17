@@ -84,6 +84,7 @@ function createTable(params) {
 	for (var x = 0; x < params.length; x++) {
 		var th = $("<th>");
 		th.text(params[x]);
+		th.addClass('center-justify');
 		thRow.append(th);
 	}
 	thead.append(thRow);
@@ -1186,7 +1187,7 @@ function loadCRFVersionItems(params) {
 			}
 
 			var tdDataType = $("<td>");
-			tdDataType.text(item.type);
+			tdDataType.text(mapItemType(item.type));
 			tr.append(tdName);
 			tr.append(tdDescription);
 			tr.append(tdDataType);
@@ -1345,4 +1346,12 @@ function showCRFItem(ele) {
 		type: "items",
 		candidate: $(ele).attr("item-oid")
 	});
+}
+
+function mapItemType(type) {
+	if (type == 'st') {
+		return 'text';
+	} else if (type == 'int') {
+		return 'number';
+	}
 }
