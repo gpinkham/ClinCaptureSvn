@@ -119,14 +119,14 @@ function submitform(){
 
 
 <form action="CreateCRFVersion?action=confirm&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post" ENCTYPE="multipart/form-data">
-<div style="width: 400px">
+<div style="width: 450px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-<div class="textbox_center">
-<table border="0" cellpadding="0" cellspacing="0">
+<div class="textbox_center fileInputDivWrapper">
+<table border="0" cellpadding="0" cellspacing="0" class="fileInputTableWrapper">
 
 <tr>
-<td class="formlabel"><fmt:message key="ms_excel_file_to_upload" bundle="${resword}"/>:</td>
+<td class="formlabel"><div class="excelFileUploadWrapper"><fmt:message key="ms_excel_file_to_upload" bundle="${resword}"/>:</div></td>
 <td><input type="file" name="excel_file" id="excel_file_path" onchange="javascript:changeIcon()">
 <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="excel_file"/></jsp:include></td>
 </tr>

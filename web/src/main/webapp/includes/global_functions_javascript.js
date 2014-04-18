@@ -2322,17 +2322,34 @@ var bindRadioButtons = function() {
     }
 };
 
+function fixFileInputsForFireFox() {
+    $(".fileInputDivWrapper").parent().append("<span class=\"fileNameTail hidden\">...</span>");
+    $(".fileInputDivWrapper input[type=file]").each(function() {
+        $(this).change(function() {
+            $(".fileNameTail").addClass("hidden");
+            $(".fileNameTail").removeClass("visible");
+            var tableWidth = parseInt($(".fileInputTableWrapper").width());
+            var divWidth = parseInt($(".fileInputTableWrapper").parent().width());
+            if ((tableWidth - 3) > divWidth) {
+                $(".fileNameTail").removeClass("hidden");
+                $(".fileNameTail").addClass("visible");
+            }
+        });
+    });
+}
+
 /* =======================================================================
  * Disable the Randomization result field and the randomization date field
  * They should be read-only
  ========================================================================= */
 $(function() {
-	
-	var dateInput = $("#Rand_Date").find(":input");
-	var resultInput = $("#Rand_Result").find(":input");
+    var dateInput = $("#Rand_Date").find(":input");
+    var resultInput = $("#Rand_Result").find(":input");
 
-	$(dateInput).attr("readonly", "readonly");
-	$(resultInput).attr("readonly", "readonly");
+    $(dateInput).attr("readonly", "readonly");
+    $(resultInput).attr("readonly", "readonly");
+
+    fixFileInputsForFireFox();
 });
 
 /* =======================================================================================

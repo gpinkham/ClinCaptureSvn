@@ -2334,6 +2334,10 @@ a.dnShortcut:hover {
     margin-left: 0px !important;
 }
 
+.visible {
+    display: block !important;
+}
+
 .hidden {
     display: none !important;
 }
@@ -2565,4 +2569,27 @@ a.dnShortcut:hover {
 
 .scheduleLink {
     display: block;
+}
+
+.fileInputDivWrapper {
+    margin-right: 30px;
+    overflow: hidden;
+    padding: 7px 16px 12px 11px;
+}
+
+.fileInputTableWrapper {
+    padding: 10px;
+}
+
+.excelFileUploadWrapper {
+    width: 120px;
+}
+
+.fileNameTail {
+    float: right;
+    left: -15px;
+    position: relative;
+    top: -40px;
+    width: 14px;
+    z-index: 99999;
 }
