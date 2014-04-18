@@ -333,13 +333,13 @@
 				<c:set var="subjectPersonIdNotUsed" value=""/>
 
 				<c:choose>
-					<c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'required'}">\
+					<c:when test="${config.value.value == 'required'}">
 						<c:set var="subjectPersonIdRequired" value="checked"/>
 					</c:when>
-					<c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
+					<c:when test="${config.value.value == 'optional'}">
 						<c:set var="subjectPersonIdOptional" value="checked"/>
 					</c:when>
-					<c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'copyFromSSID'}">
+					<c:when test="${config.value.value == 'copyFromSSID'}">
 						<c:set var="subjectPersonIdCopy" value="checked"/>
 					</c:when>
 					<c:otherwise>
