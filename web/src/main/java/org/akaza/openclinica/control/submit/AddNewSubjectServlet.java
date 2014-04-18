@@ -21,21 +21,10 @@
 package org.akaza.openclinica.control.submit;
 
 import com.clinovo.util.ValidatorHelper;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -71,6 +60,16 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 // import javax.servlet.http.*;
 
@@ -147,6 +146,14 @@ public class AddNewSubjectServlet extends Controller {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
+
+		if (!currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
+				&& !currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR)) {
+			addPageMessage(restext.getString("no_have_correct_privilege_to_add_subject"), request);
+			throw new InsufficientPermissionException(Page.MENU_SERVLET,
+					restext.getString("no_have_correct_privilege_to_add_subject"), "1");
+		}
 
 		String DOB = "";
 		String YOB = "";
@@ -180,7 +187,6 @@ public class AddNewSubjectServlet extends Controller {
 		// study
 		int parentStudyId = currentStudy.getParentStudyId();
 		if (parentStudyId <= 0) {
-			parentStudyId = currentStudy.getId();
 			classes = sgcdao.findAllActiveByStudy(currentStudy, true);
 			dynamicClasses = getDynamicGroupClassesByStudyId(request, currentStudy.getId());
 		} else {
