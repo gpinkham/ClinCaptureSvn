@@ -109,7 +109,7 @@
 						<img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/>
 					</c:if>
 				</td>
-				<td class="table_cell" width="50">
+				<td class="table_cell" width="60">
 
 				<c:set var="versionCount" value="0"/>
 				<c:set var="firstVersionId" value="0"/>
@@ -212,26 +212,23 @@
 				</c:otherwise>
 				</c:choose>
 				<td class="table_cell" width="110">&nbsp;&nbsp;</td>
-				<td class="table_cell" width="220">
+				<td class="table_cell">
 				<table cellspacing="0" cellpadding="0" border="0">
 				<tr>
-				<c:choose>
-				 <c:when test="${!dedc.status.locked && currRow.bean.studyEvent.subjectEventStatus.name != 'locked' && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6}">
-                    <td>
-                    <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>', document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>);"
-                      onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                      onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
-                    </a>
-                    </td>
-				 </c:when>
-				 <c:otherwise>
-				 <td>
-					<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="6">
-				</td>
-				 </c:otherwise>
-				</c:choose>
-				
+					<td>
+						<c:choose>
+						 <c:when test="${!dedc.status.locked && currRow.bean.studyEvent.subjectEventStatus.name != 'locked' && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && study.status.available && !currRow.bean.studyEvent.status.deleted && userRole.role.id ne 6}">		                    
+		                    <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>', document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>);"
+		                      onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
+		                      onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
+		                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
+		                    </a>                    
+						 </c:when>
+						 <c:otherwise>						 
+							&nbsp;						
+						 </c:otherwise>
+						</c:choose>
+					</td>
 				
 		         <td>
                      <a href="#" onclick="viewCrfByVersion('${dedc.edc.id}', '${studySub.id}', $('#${dynamicCrfVersionId}').val(), '${currRow.bean.studyEvent.id}', 1, 'ViewStudySubject?id=${studySub.id}');"
@@ -269,7 +266,7 @@
     <c:set var="dec" value="${dedc}"/>
 	<tr>
 		<td class="table_cell" width="180"><c:out value="${dec.eventCRF.crf.name}"/> <c:if test="${dec.eventDefinitionCRF.requiredCRF}"><span style="color: orange">*</span></c:if> <c:if test="${(dec.eventDefinitionCRF.sourceDataVerification.code eq 1 or dec.eventDefinitionCRF.sourceDataVerification.code eq 2) and (userRole.role.id eq 1 or userRole.role.id eq 2 or userRole.role.id eq 6)}"><img src="images/sdv.png" style="border: none; margin: 0px; padding: 0px;"/></c:if></td>
-		<td class="table_cell" width="50"><c:out value="${dec.eventCRF.crfVersion.name}" /></td>
+		<td class="table_cell" width="60"><c:out value="${dec.eventCRF.crfVersion.name}" /></td>
 		<td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
 		<c:choose>
 		 <c:when test="${dec.stage.initialDE}">
@@ -320,7 +317,7 @@
 		 </c:choose>
 		</td>
 
-		<td class="table_cell" width="220">
+		<td class="table_cell">
 		 <table border="0" cellpadding="0" cellspacing="0">
 	     <tr valign="top">
 	     <td>
@@ -362,7 +359,7 @@
 		    	</c:if>
     		</c:when>
 			<c:otherwise>
-			<img name="itemForSpace" src="images/bt_EnterData.gif" border="0" style="visibility:hidden"  align="left" hspace="6">
+				&nbsp;
 			</c:otherwise>
 		</c:choose>
 		</td>

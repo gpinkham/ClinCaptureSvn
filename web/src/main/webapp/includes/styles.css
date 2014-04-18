@@ -798,10 +798,18 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     border-right-width: 0px;
     border-bottom-width: 1px;
     border-left-color: #CCCCCC;
+    border-right-color: #CCCCCC;
     border-bottom-color: #CCCCCC;
+    border-top-color: #CCCCCC;
     font-weight: bold;
     color: #666666;
     vertical-align: top;
+}
+
+.right_no_bottom{
+	border-top-width: 1px !important;
+	border-right-width: 1px !important;
+	border-bottom-width: 0px !important;
 }
 
 .table_header_row_left { padding-top: 3px;
@@ -941,6 +949,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     border-bottom-width: 1px;
     border-left-color: #CCCCCC;
     border-bottom-color: #CCCCCC;
+    border-top-color: #CCCCCC;
     font-weight: bold;
     color: #666666;
     vertical-align: top;
