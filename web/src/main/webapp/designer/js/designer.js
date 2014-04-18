@@ -1353,5 +1353,7 @@ function mapItemType(type) {
 		return 'text';
 	} else if (type == 'int') {
 		return 'number';
+	} else {
+		return type;
 	}
 }
