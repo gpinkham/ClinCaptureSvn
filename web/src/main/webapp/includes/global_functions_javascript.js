@@ -3662,7 +3662,8 @@ function FieldChecker(selector, checkType) {
 
 								switch (checkType) {
 								case "email":
-									var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+									var emailString = '(([^<>()[\\]\\\\.,;:\\s@\\"]+(\\.[^<>()[\\]\\\\.,;:\\s@\\"]+)*)|(\\".+\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))';
+									var re =  new RegExp("(" + emailString + "+)(,\s*" +emailString + "+)*", 'g');
 									if (!re.test(currentValue)) {
 										numberOfErrors++;
 										$(this).focus();
@@ -3674,7 +3675,7 @@ function FieldChecker(selector, checkType) {
 												.find(".alert").css("display",
 														"none")
 									}
-									break
+									break;
 								default:
 									numberOfErrors = 0;
 								}
