@@ -118,22 +118,7 @@
     </tr>
 </table>
 
-<c:choose>
-    <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
-        <div class="table_title_Admin">
-    </c:when>
-    <c:otherwise>
-        <c:choose>
-            <c:when test="${userRole.manageStudy}">
-                <div class="table_titla_manage">
-            </c:when>
-            <c:otherwise>
-                <div class="table_title_submit">
-            </c:otherwise>
-        </c:choose>
-
-    </c:otherwise>
-</c:choose>
+<div class="table_title_Admin">
 
 	<a href="javascript:leftnavExpand('studySubjectRecord', true); leftnavExpand('dynamicGroups'); leftnavExpand('groups');">
 		<img id="excl_studySubjectRecord" src="images/bt_Expand.gif" border="0"> <fmt:message key="study_subject_record" bundle="${resword}"/>
@@ -464,21 +449,7 @@
 </c:if>
 <!-- Group table end -->
 
-<c:choose>
-    <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
-        <div class="table_title_Admin">
-    </c:when>
-    <c:otherwise>
-        <c:choose>
-            <c:when test="${userRole.manageStudy}">
-                <div class="table_titla_manage">
-            </c:when>
-            <c:otherwise>
-                <div class="table_title_submit">
-            </c:otherwise>
-        </c:choose>
-    </c:otherwise>
-</c:choose>
+<div class="table_title_Admin">
 	<a name="events" href="javascript:leftnavExpand('subjectEvents',true);">
 		<img id="excl_subjectEvents" src="images/bt_Collapse.gif" border="0"> <fmt:message key="events" bundle="${resword}"/>
 	</a>
