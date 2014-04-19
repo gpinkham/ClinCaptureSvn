@@ -1543,14 +1543,6 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     height: 23px;
 }
 
-.tab_R_h { background-image: url(../images/tab_R_h.gif);
-    background-repeat: no-repeat;
-    background-position: top right;
-    padding-right: 23px;
-    height: 23px;
-    text-align: center;
-}
-
 .tabtext { line-height: 22px;
     font-weight: bold;
     color: #000000;
@@ -1593,14 +1585,15 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 	padding-left: 9px;
 	height: 23px;
 	}
-/* BWP: I reduced padding-right by 14 px */
-.tab_R_h { background-image: url(../images/tab_R_h.gif);
+
+.tab_R_h {
+	background-image: url(../images/tab_R_h.gif);
 	background-repeat: no-repeat;
 	background-position: top right;
-	padding-right: 9px;
+	padding-right: 15px;
 	height: 23px;
 	text-align: center;
-	}
+}
 
 .tabtext { line-height: 22px;
 	font-weight: bold;

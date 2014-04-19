@@ -7,41 +7,38 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
 
-
 <jsp:include page="include/managestudy_top_pages.jsp"/>
 
+<!-- *JSP* ${pageContext.page['class'].simpleName} -->
+
 <jsp:include page="include/sideAlert.jsp"/>
+
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open">
-    <td class="sidebar_tab">
-
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
-
-        <div class="sidebar_tab_content">
-
-            <fmt:message key="design_implement_sdv" bundle="${restext}"/>
-
-        </div>
-
-    </td>
-
+	<td class="sidebar_tab">
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+			<img src="../images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+		<b><fmt:message key="instructions" bundle="${restext}"/></b>
+		<div class="sidebar_tab_content">
+			<fmt:message key="design_implement_sdv" bundle="${restext}" />
+		</div>
+	</td>
 </tr>
+
 <tr id="sidebar_Instructions_closed" style="display: none">
-    <td class="sidebar_tab">
-
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
-
-    </td>
+	<td class="sidebar_tab">
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+			<img src="../images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+		<b><fmt:message key="instructions" bundle="${restext}"/></b>
+	</td>
 </tr>
 <jsp:include page="include/sideInfo.jsp"/>
+
 <link rel="stylesheet" href="../includes/jmesa/jmesa.css" type="text/css">
 
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js"></script>
+
 <%-- view all subjects starts here --%>
 <script type="text/javascript">
 
@@ -52,7 +49,7 @@
     function onInvokeExportAction(id) {
         var parameterString = createParameterStringForLimit(id);
     }
-</script></div>
+</script>
 
 <h1>
 	<span class="first_level_header">
@@ -63,31 +60,41 @@
 </h1>
 
 <jsp:useBean scope='session' id='sSdvRestore' class='java.lang.String' />
+
 <c:set var="restore" value="true"/>
-<c:if test="${sSdvRestore=='false'}"><c:set var="restore" value="false"/></c:if>
+<c:if test="${sSdvRestore=='false'}">
+	<c:set var="restore" value="false"/>
+</c:if>
 <c:set var="additionalParameter" value=""/>
 <c:if test="${showBackButton}">
-    <c:set var="additionalParameter" value="sbb=true&"/>
+	<c:set var="additionalParameter" value="sbb=true&"/>
 </c:if>
 
 <div id="searchFilterSDV">
-    <table border="0" cellpadding="0" cellspacing="0">
-        <tr>
-            <td valign="bottom" id="Tab1'">
-                <div id="Tab1NotSelected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
-                    <a class="tabtext" title="<fmt:message key="view_by_event_CRF" bundle="${resword}"/>" href='viewAllSubjectSDVtmp?${additionalParameter}studyId=${studyId}' onclick="javascript:HighlightTab(1);"><fmt:message key="view_by_event_CRF" bundle="${resword}"/></a></div></div></div></div>
-                <div id="Tab1Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_event_CRF" bundle="${resword}"/></span></div></div></div></div></td>
-              
-            <td valign="bottom" id="Tab2'">
-				<div id="Tab2Selected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
-                    <a class="tabtext" title="<fmt:message key="view_by_studysubjectID" bundle="${resword}"/>" href='viewSubjectAggregate?${additionalParameter}s_sdv_restore=${restore}&studyId=${studyId}' onclick="javascript:HighlightTab(2);"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></a></div></div></div></div>
-                <div id="Tab2NotSelected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></span></div></div></div></div></td>
+	<table border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="bottom" id="Tab1'">
+				<div id="Tab1Selected">
+				<div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h">
+					<span class="tabtext"><fmt:message key="view_by_event_CRF" bundle="${resword}"/></span>
+				</div></div></div>
+				</div>
+			</td>
 
-        </tr>
-    </table>
-    <script language="JavaScript">
-        HighlightTab(1);
-    </script>
+			<td valign="bottom" id="Tab2'">
+				<div id="Tab2NotSelected">
+				<div class="tab_BG"><div class="tab_L"><div class="tab_R">
+				<a class="tabtext"
+					title="<fmt:message key="view_by_studysubjectID" bundle="${resword}"/>"
+					href='viewSubjectAggregate?${additionalParameter}s_sdv_restore=${restore}&studyId=${studyId}'>
+
+					<fmt:message key="view_by_studysubjectID" bundle="${resword}" />
+				</a>
+				</div></div></div>
+				</div>
+			</td>
+		</tr>
+	</table>
 </div>
 
 <script type="text/javascript">
@@ -103,27 +110,32 @@
     	});
  	}
 </script>
+
 <div id="subjectSDV">
-    <form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp">
-        <input type="hidden" name="studyId" value="${param.studyId}">
-        <input type="hidden" name=imagePathPrefix value="../">
-        <%--This value will be set by an onclick handler associated with an SDV button --%>
-        <input type="hidden" name="crfId" value="0">
-        <%-- the destination JSP page after removal or adding SDV for an eventCRF --%>
-        <input type="hidden" name="redirection" value="viewAllSubjectSDVtmp">
-        ${sdvTableAttribute}
-        <br />
-        
-            <input type="hidden" name="sbb" value="true"/>
-            <input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
- 
-        <input type="submit" name="sdvAllFormSubmit" class="button_medium" value="<fmt:message key="sdv_all_checked" bundle="${resword}"/>" onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();"/>
+	<form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp">
+		<input type="hidden" name="studyId" value="${param.studyId}">
+		<input type="hidden" name=imagePathPrefix value="../">
 
-    </form>
+		<%--This value will be set by an onclick handler associated with an SDV button --%>
+		<input type="hidden" name="crfId" value="0">
 
+		<%-- the destination JSP page after removal or adding SDV for an eventCRF --%>
+		<input type="hidden" name="redirection" value="viewAllSubjectSDVtmp">
+
+		${sdvTableAttribute}
+		<br />
+
+		<input type="hidden" name="sbb" value="true"/>
+
+		<input type="button" name="BTN_Smart_Back" id="GoToPreviousPage"
+			value="<fmt:message key="back" bundle="${resword}"/>"
+			class="button_medium"
+			onClick="javascript: goBackSmart('${navigationURL}', '${defaultURL}');" />
+
+		<input type="submit" name="sdvAllFormSubmit" class="button_medium"
+			value="<fmt:message key="sdv_all_checked" bundle="${resword}"/>"
+			onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();" />
+	</form>
 </div>
 
 <jsp:include page="include/footer.jsp"/>
