@@ -1008,7 +1008,31 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 		} else {
 			userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, 0, subjectId);
 		}
+
+		UserAccountBean rootUserAccount = (UserAccountBean) userAccountDAO.findByPK(1);
+		if (!rootUserAccount.getStatus().isLocked() && !rootUserAccount.getStatus().isDeleted()) {
+			StudyUserRoleBean rootStudyUserRole = createRootUserRole(rootUserAccount, studyId);
+			userAccounts.add(rootStudyUserRole);
+		}
+
 		return userAccounts;
+	}
+
+	private StudyUserRoleBean createRootUserRole(UserAccountBean rootUserAccount, int studyId) {
+
+		StudyUserRoleBean rootUserRole = rootUserAccount.getSysAdminRole();
+
+		rootUserRole.setUserAccountId(rootUserAccount.getId());
+		rootUserRole.setRole(Role.SYSTEM_ADMINISTRATOR);
+		rootUserRole.setStatus(rootUserAccount.getStatus());
+		rootUserRole.setFirstName(rootUserAccount.getFirstName());
+		rootUserRole.setLastName(rootUserAccount.getLastName());
+		rootUserRole.setCreatedDate(rootUserAccount.getCreatedDate());
+		rootUserRole.setUserName(rootUserAccount.getName());
+		rootUserRole.setName(rootUserAccount.getName());
+		rootUserRole.setStudyId(studyId);
+
+		return rootUserRole;
 	}
 
 	private void manageReasonForChangeState(HttpSession session, String field) {
