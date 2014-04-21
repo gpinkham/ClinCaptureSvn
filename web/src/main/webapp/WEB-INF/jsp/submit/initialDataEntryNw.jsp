@@ -248,10 +248,22 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 </c:forEach>
 
 
-<c:if test="${! empty formMessages}">
+<c:if test="${! empty formMessages or !empty warningMessages}">
     <!-- initial position for data entry error messages; we'll
     improve the style as well -->
-    <div id="errorMessagesContainer" class="aka_err_message">
+    <div id="errorMessagesContainer" style="word-wrap: break-word !important; width:600px;"  class="aka_err_message">
+        <ul>
+            <c:forEach var="message" items="${warningMessages}">
+                <c:forEach items="${message.value}" var="value">
+                    <li style="color: #868686">
+                            <span style="text-decoration: underline"><strong>
+                                <label onclick="getFocused('<c:out value="${message.key}"/>');"><c:out
+                                        value="${value}"/></label>
+                            </strong></span>
+                    </li>
+                </c:forEach>
+            </c:forEach>
+        </ul>
         <ul>
             <c:forEach var="message" items="${formMessages}">
                 <c:choose>

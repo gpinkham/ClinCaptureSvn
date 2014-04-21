@@ -249,6 +249,8 @@ public abstract class DataEntryServlet extends Controller {
 
 	private static final String DNS_TO_TRANSFORM = "listOfDNsToTransform";
 
+	private static final String WARNINGS_LIST = "warningsIsDisplayed";
+
 	@Override
 	protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response)
 			throws InsufficientPermissionException;
@@ -1270,7 +1272,24 @@ public abstract class DataEntryServlet extends Controller {
 				}
 			}
 
-			if (!errors.isEmpty()) {
+			Boolean warningsIsDisplayed = (Boolean) request.getSession().getAttribute(WARNINGS_LIST);
+			HashMap warningMessages = new HashMap();
+			if (warningsIsDisplayed == null) {
+				HashMap<String, ArrayList<String>> siErrors = sv.validate();
+				if (siErrors != null && !siErrors.isEmpty()) {
+					Iterator iter = siErrors.keySet().iterator();
+					while (iter.hasNext()) {
+						String fieldName = iter.next().toString();
+						warningMessages.put(fieldName, siErrors.get(fieldName));
+					}
+				}
+				if (warningMessages.size() > 0) {
+					request.getSession().setAttribute(WARNINGS_LIST, true);
+					request.setAttribute("warningMessages", warningMessages);
+				}
+			}
+
+			if (!errors.isEmpty() || !warningMessages.isEmpty()) {
 				if (errors.keySet().contains(INPUT_INTERVIEWER) || errors.keySet().contains(INPUT_INTERVIEW_DATE)) {
 					request.setAttribute("expandCrfInfo", true);
 				}
@@ -1280,16 +1299,6 @@ public abstract class DataEntryServlet extends Controller {
 				String[] textFields = { INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE };
 				fp.setCurrentStringValuesAsPreset(textFields);
 				setPresetValues(fp.getPresetValues(), request);
-				logMe("!errors if  Loop begin  " + System.currentTimeMillis());
-				HashMap<String, ArrayList<String>> siErrors = sv.validate();
-
-				if (siErrors != null && !siErrors.isEmpty()) {
-					Iterator iter = siErrors.keySet().iterator();
-					while (iter.hasNext()) {
-						String fieldName = iter.next().toString();
-						errors.put(fieldName, siErrors.get(fieldName));
-					}
-				}
 
 				request.setAttribute("markComplete", fp.getString(INPUT_MARK_COMPLETE));
 				request.setAttribute(BEAN_DISPLAY, section);
@@ -1865,6 +1874,7 @@ public abstract class DataEntryServlet extends Controller {
 	}
 
 	private void clearSession(HttpServletRequest request) {
+		request.getSession().removeAttribute(WARNINGS_LIST);
 		request.getSession().removeAttribute(CreateDiscrepancyNoteServlet.SUBMITTED_DNS_MAP);
 		request.getSession().removeAttribute(CreateDiscrepancyNoteServlet.TRANSFORMED_SUBMITTED_DNS);
 		request.getSession().removeAttribute(DNS_TO_TRANSFORM);

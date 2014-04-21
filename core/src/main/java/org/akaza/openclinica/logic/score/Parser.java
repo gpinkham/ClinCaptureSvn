@@ -26,12 +26,13 @@ package org.akaza.openclinica.logic.score;
  * ArrayList and parse item variables in expression.
  * 
  */
+
+import org.akaza.openclinica.bean.submit.ItemBean;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
-
-import org.akaza.openclinica.bean.submit.ItemBean;
 
 @SuppressWarnings("rawtypes")
 public class Parser {
@@ -156,18 +157,20 @@ public class Parser {
 						} else {
 							// if no item value found, score result will be
 							// empty
-							errors.append(" " + t.getName().trim() + " " + "is empty" + "; ");
+							errors.append(" " + t.getName().trim() + ";");
 							isEmpty = true;
 						}
 					} else {
 						// if no item value found, score result will be empty
-						errors.append(" " + t.getName().trim() + " " + "is empty" + "; ");
+						errors.append(" " + t.getName().trim() + ";");
 						isEmpty = true;
 					}
 				}
 			}
 		}
-		if (isEmpty) {
+		if (isEmpty && !expression.isEmpty()) {
+
+			errors.insert(0, "The following items are blank: ");
 			return new ArrayList<ScoreToken>();
 		} else {
 			return expression;
