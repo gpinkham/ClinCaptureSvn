@@ -3659,25 +3659,33 @@ function FieldChecker(selector, checkType) {
 
 							if ($(this).parent().css("display") != "none") {
 								var currentValue = $(this).val();
+								var currentObject = $(this)
 
 								switch (checkType) {
 								case "email":
-									var emailString = '(([^<>()[\\]\\\\.,;:\\s@\\"]+(\\.[^<>()[\\]\\\\.,;:\\s@\\"]+)*)|(\\".+\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))';
-									var re =  new RegExp("(" + emailString + "+)(,\s*" +emailString + "+)*", 'g');
-									if (!re.test(currentValue)) {
-										numberOfErrors++;
-										$(this).focus();
-										$(this).parent().parent()
-												.find(".alert").css("display",
-														"block");
-									} else {
-										$(this).parent().parent()
-												.find(".alert").css("display",
-														"none")
-									}
+									var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+									var partsOfStr = currentValue.split(',');
+
+									partsOfStr.forEach(function(entry) {
+
+										var trimmedMail = entry.replace(/^\s+/, '').replace(/\s+$/, '');
+
+										if (!re.test(trimmedMail)) {
+											numberOfErrors++;
+											currentObject.focus();
+											currentObject.parent().parent().find(
+													".alert").css("display",
+													"block");
+										} else {
+											currentObject.parent().parent().find(
+													".alert").css("display",
+													"none");
+										}
+									});
 									break;
 								default:
 									numberOfErrors = 0;
+
 								}
 							}
 						});
