@@ -27,6 +27,7 @@ import java.io.Serializable;
  * 
  */
 // JN: added serializable, as this bean needs be to passed over in -non-static manner over to job.
+@SuppressWarnings("rawtypes")
 public class ExtractPropertyBean implements Comparable, Serializable {
 
 	/**
