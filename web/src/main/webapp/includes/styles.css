@@ -873,13 +873,17 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 
 .table_horizontal  tr td, .table_vertical tr td{
 	padding: 3px 6px;
-    border-style: solid;
-    border-left-width: 0px;
+	border-style: solid;
+	border-left-width: 0px;
 	border-right-width: 1px;
 	border-top-width:0px;
 	border-bottom-width:1px;
-    border-color: #E6E6E6;
+	border-color: #E6E6E6;
 	border-spacing:1px;
+}
+
+.table_horizontal, .table_vertical {
+	border-collapse: collapse;
 }
 
 .table_horizontal tr:first-child td, .table_vertical tr td:first-child{

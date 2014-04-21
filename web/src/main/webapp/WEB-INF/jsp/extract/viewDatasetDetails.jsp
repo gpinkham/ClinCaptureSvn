@@ -9,37 +9,27 @@
 
 <jsp:include page="../include/extract-header.jsp"/>
 
-
 <!-- *JSP* ${pageContext.page['class'].simpleName} -->
+
 <jsp:include page="../include/sideAlert.jsp"/>
+
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
-
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
+	<td class="sidebar_tab">
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+			<img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
-		<div class="sidebar_tab_content">
-
-
-		</div>
-
-		</td>
-
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
-
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
+		<div class="sidebar_tab_content"></div>
+	</td>
+</tr>
+<tr id="sidebar_Instructions_closed" style="display: all">
+	<td class="sidebar_tab">
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+			<img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
-		</td>
-  </tr>
-
+	</td>
+</tr>
 <jsp:include page="../include/sideInfo.jsp"/>
-
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="dataset" class="org.akaza.openclinica.bean.extract.DatasetBean"/>
@@ -53,80 +43,66 @@
 
 <div style="width:600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
 <div class="tablebox_center">
+
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-  <tr valign="top"><td class="table_header_column"><fmt:message key="name" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${dataset.name}"/>
-  </td></tr>
+	<tr valign="top">
+		<td class="table_header_column"><fmt:message key="name" bundle="${resword}"/>:</td>
+		<td class="table_cell"><c:out value="${dataset.name}"/></td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${dataset.description}"/>
-  </td></tr>
+	<tr valign="top">
+		<td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td>
+		<td class="table_cell"><c:out value="${dataset.description}"/></td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="item_status" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${dataset.datasetItemStatus.description}"/>
-  </td></tr>
+	<tr valign="top">
+		<td class="table_header_column"><fmt:message key="item_status" bundle="${resword}"/>:</td>
+		<td class="table_cell"><c:out value="${dataset.datasetItemStatus.description}"/></td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="owner" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${dataset.owner.name}"/>
-  </td></tr>
+	<tr valign="top">
+		<td class="table_header_column"><fmt:message key="owner" bundle="${resword}"/>:</td>
+		<td class="table_cell"><c:out value="${dataset.owner.name}"/></td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td><td class="table_cell">
-  <fmt:formatDate value="${dataset.createdDate}" pattern="${dteFormat}"/>
-  </td></tr>
+	<tr valign="top">
+		<td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td>
+		<td class="table_cell"><fmt:formatDate value="${dataset.createdDate}" pattern="${dteFormat}"/></td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="date_last_updated" bundle="${resword}"/>:</td>
-  <td class="table_cell"><fmt:formatDate value="${dataset.updatedDate}" pattern="${dteFormat}"/>&nbsp;</td></tr>
+	<tr valign="top">
+		<td class="table_header_column"><fmt:message key="date_last_updated" bundle="${resword}"/>:</td>
+		<td class="table_cell"><fmt:formatDate value="${dataset.updatedDate}" pattern="${dteFormat}"/>&nbsp;</td>
+	</tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${dataset.status.name}"/>
-  </td></tr>
+	<tr valign="top">
+		<td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td>
+		<td class="table_cell"><c:out value="${dataset.status.name}"/></td>
+	</tr>
 </table>
+
 </div>
 </div></div></div></div></div></div></div></div>
-
 </div>
+
 <br><br>
+
 <jsp:include page="selected-inactive.jsp"></jsp:include>
 
 <table border="0">
-<tr>
-	<td>
-		<input type="button" name="BTN_Back" id="GoToPreviousPage"
-					value="<fmt:message key="back" bundle="${resword}"/>"
-					class="button_medium"
-					onClick="javascript: window.location.href='ViewDatasets'" />
-	</td>
-    <%--c:choose>
-        <c:when test="${!(userRole.monitor || userRole.investigator)}">
-             <td>
-                <form action="EditDataset">
-                <input type="hidden" name="dsId" value="<c:out value="${dataset.id}"/>"/>
-                <input type="submit" value="<fmt:message key="edit_dataset" bundle="${resword}"/>" class="button_xlong"/><br>
-                </form>
-             </td>
-        </c:when>
-        <c:otherwise>
-            <c:if test="${dataset.owner.name == userBean.name}">
-                <td>
-                   <form action="EditDataset">
-                   <input type="hidden" name="dsId" value="<c:out value="${dataset.id}"/>"/>
-                   <input type="submit" value="<fmt:message key="edit_dataset" bundle="${resword}"/>" class="button_xlong"/><br>
-                   </form>
-                </td>
-            </c:if>
-        </c:otherwise>
-    </c:choose--%>
-  <%--td>
-   <form action="ExportDataset">
-    <input type="hidden" name="datasetId" value="<c:out value="${dataset.id}"/>"/>
-    <input type="submit" value="<fmt:message key="export_this_dataset" bundle="${resword}"/>" class="button_xlong"/><br>
-   </form>
-  </td--%>
-</tr>
+	<tr>
+		<td>
+			<input type="button" name="BTN_Back" id="GoToPreviousPage"
+						value="<fmt:message key="back" bundle="${resword}"/>"
+						class="button_medium"
+						onClick="javascript: window.location.href='ViewDatasets'" />
+		</td>
+	</tr>
 </table>
+
 <c:import url="../include/workflow.jsp">
    <c:param name="module" value="extract"/>
 </c:import>
+
 <jsp:include page="../include/footer.jsp"/>
