@@ -43,6 +43,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Properties;
 
 @Component
@@ -279,13 +280,10 @@ public class CoreResources implements ResourceLoaderAware {
 		}
 		// end
 
-		String assignRandomizationResultTo = dataInfo
-				.getProperty("assignRandomizationResultTo");
-		if (assignRandomizationResultTo == null
-				|| assignRandomizationResultTo.isEmpty()) {
+		String assignRandomizationResultTo = dataInfo.getProperty("assignRandomizationResultTo");
+		if (assignRandomizationResultTo == null || assignRandomizationResultTo.isEmpty()) {
 			assignRandomizationResultTo = "dnfroup";
-			dataInfo.setProperty("assignRandomizationResultTo",
-					assignRandomizationResultTo);
+			dataInfo.setProperty("assignRandomizationResultTo", assignRandomizationResultTo);
 		}
 
 		prepareMailProps();
@@ -547,7 +545,7 @@ public class CoreResources implements ResourceLoaderAware {
 			ExtractPropertyBean epbean = new ExtractPropertyBean();
 			epbean.setId(i);
 			// we will implement a find by id function in the front end
-
+			epbean.setOrder(Integer.parseInt(getExtractField("extract." + i + ".order")));
 			// check to make sure the file exists, if not throw an exception and system will abort to start.
 			checkForFile(getExtractFields("extract." + i + ".file"));
 			epbean.setFileName(getExtractFields("extract." + i + ".file"));
@@ -628,7 +626,7 @@ public class CoreResources implements ResourceLoaderAware {
 			ret.add(epbean);
 			i++;
 		}
-
+		Collections.sort(ret);
 		return ret;
 	}
 

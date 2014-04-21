@@ -13,12 +13,11 @@
 
 package org.akaza.openclinica.bean.extract;
 
-import java.io.Serializable;
-
+import org.akaza.openclinica.bean.service.ProcessingFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.akaza.openclinica.bean.service.ProcessingFunction;
+import java.io.Serializable;
 
 /**
  * Extract Property Bean, by Tom Hickerson 09/2010 Placeholder for items from the extract.properties file, filled in by
@@ -28,7 +27,7 @@ import org.akaza.openclinica.bean.service.ProcessingFunction;
  * 
  */
 // JN: added serializable, as this bean needs be to passed over in -non-static manner over to job.
-public class ExtractPropertyBean implements Serializable {
+public class ExtractPropertyBean implements Comparable, Serializable {
 
 	/**
      * 
@@ -47,6 +46,7 @@ public class ExtractPropertyBean implements Serializable {
 	private String[] exportFileName;
 	private String[] rolesAllowed;
 	private int id;
+	private int order;
 	private String format;
 	private ProcessingFunction postProcessing;
 	private boolean zipFormat;
@@ -278,5 +278,21 @@ public class ExtractPropertyBean implements Serializable {
 
 	public String getDatasetName() {
 		return datasetName;
+	}
+
+	public int getOrder() {
+		return order;
+	}
+
+	public void setOrder(int order) {
+		this.order = order;
+	}
+
+	public int compareTo(Object o) {
+		int result = 0;
+		if (o != null && o instanceof ExtractPropertyBean) {
+			result = new Integer(getOrder()).compareTo(((ExtractPropertyBean) o).getOrder());
+		}
+		return result;
 	}
 }

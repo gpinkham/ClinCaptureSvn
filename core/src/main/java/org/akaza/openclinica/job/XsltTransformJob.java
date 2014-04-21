@@ -37,6 +37,7 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
+import org.akaza.openclinica.util.ExcelConverter;
 import org.apache.commons.io.FileUtils;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -366,6 +367,11 @@ public class XsltTransformJob extends QuartzJobBean {
 
 					in.close();
 					endFileStream.close();
+
+					// Convert file if Excel 2013
+					if (endFile.endsWith("xlsx")) {
+						ExcelConverter.convertTabDelimitedToExcel(endFile, endFile, datasetBean.getName());
+					}
 
 					fileCntr++;
 				}
