@@ -20,16 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.clinovo.model.CodedItem;
 import com.clinovo.service.CodedItemService;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -59,6 +51,12 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+
 /**
  * @author jxu
  * 
@@ -79,7 +77,8 @@ public class RemoveStudyEventServlet extends Controller {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
 						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
 
@@ -97,7 +96,7 @@ public class RemoveStudyEventServlet extends Controller {
 
 		if (studyEventId == 0) {
 			addPageMessage(respage.getString("please_choose_a_SE_to_remove"), request);
-			request.setAttribute("id", new Integer(studySubId).toString());
+			request.setAttribute("id", Integer.toString(studySubId));
 			forwardToViewStudySubjectPage(request, response);
 		} else {
 
@@ -107,7 +106,8 @@ public class RemoveStudyEventServlet extends Controller {
 			request.setAttribute("studySub", studySub);
 
 			StudyEventDefinitionDAO seddao = getStudyEventDefinitionDAO();
-			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+			StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao
+					.findByPK(event.getStudyEventDefinitionId());
 			event.setStudyEventDefinition(sed);
 
 			StudyDAO studydao = getStudyDAO();
@@ -144,11 +144,10 @@ public class RemoveStudyEventServlet extends Controller {
 				// remove all event crfs
 				EventCRFDAO ecdao = getEventCRFDAO();
 
-				ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+				ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(event);
 
 				ItemDataDAO iddao = getItemDataDAO();
-				for (int k = 0; k < eventCRFs.size(); k++) {
-					EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
+				for (EventCRFBean eventCRF : eventCRFs) {
 					if (!eventCRF.getStatus().equals(Status.DELETED)) {
 						eventCRF.setStatus(Status.AUTO_DELETED);
 						eventCRF.setUpdater(ub);
@@ -158,9 +157,8 @@ public class RemoveStudyEventServlet extends Controller {
 
 						CodedItemService codedItemService = getCodedItemService();
 
-						ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-						for (int a = 0; a < itemDatas.size(); a++) {
-							ItemDataBean item = (ItemDataBean) itemDatas.get(a);
+						ArrayList<ItemDataBean> itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
+						for (ItemDataBean item : itemDatas) {
 							if (!item.getStatus().equals(Status.DELETED)) {
 								item.setStatus(Status.AUTO_DELETED);
 								item.setUpdater(ub);
@@ -179,14 +177,20 @@ public class RemoveStudyEventServlet extends Controller {
 					}
 				}
 
-				String emailBody = new StringBuilder("").append(respage.getString("the_event")).append(" ")
-						.append(event.getStudyEventDefinition().getName()).append(" ")
-						.append(respage.getString("has_been_removed_from_the_subject_record_for")).append(" ")
-						.append(studySub.getLabel()).append(" ").append(respage.getString("in_the_study"))
-						.append(" ").append(study.getName()).append(".").toString();
+				String emailBody = new StringBuilder("")
+						.append(respage.getString("the_event"))
+						.append(" ")
+						.append(event.getStudyEventDefinition().getName())
+						.append(" ")
+						.append(respage.getString("has_been_removed_from_the_subject_record_for"))
+						.append(" ")
+						.append(studySub.getLabel())
+						.append(" ")
+						.append(study.isSite(study.getParentStudyId()) ? respage.getString("in_the_site") : respage
+								.getString("in_the_study")).append(" ").append(study.getName()).append(".").toString();
 
 				addPageMessage(emailBody, request);
-				request.setAttribute("id", new Integer(studySubId).toString());
+				request.setAttribute("id", Integer.toString(studySubId));
 				forwardToViewStudySubjectPage(request, response);
 			}
 		}
@@ -201,7 +205,8 @@ public class RemoveStudyEventServlet extends Controller {
 		if (savedUrl != null && savedUrl.contains("id=" + id)) {
 			response.sendRedirect(savedUrl);
 		} else {
-			response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id=" + id);
+			response.sendRedirect(request.getContextPath() + Page.VIEW_STUDY_SUBJECT_SERVLET.getFileName() + "?id="
+					+ id);
 		}
 	}
 
@@ -222,7 +227,7 @@ public class RemoveStudyEventServlet extends Controller {
 		int i;
 		for (i = 0; i < eventDefinitionCRFs.size(); i++) {
 			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-			definitionsById.put(new Integer(edc.getStudyEventDefinitionId()), edc);
+			definitionsById.put(edc.getStudyEventDefinitionId(), edc);
 		}
 
 		StudyEventDAO sedao = getStudyEventDAO();
@@ -244,7 +249,8 @@ public class RemoveStudyEventServlet extends Controller {
 			int studyEventId = ecb.getStudyEventId();
 			int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
 
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(studyEventDefinitionId));
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(
+					studyEventDefinitionId));
 
 			DisplayEventCRFBean dec = new DisplayEventCRFBean();
 			dec.setFlags(ecb, getUserAccountBean(request), getCurrentRole(request), edc.isDoubleEntry());
