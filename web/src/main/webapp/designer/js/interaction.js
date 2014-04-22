@@ -424,7 +424,7 @@ $(function() {
 		parser.setShowHideActionMessage($(this).val());
 	});
 
-	$(".deleteButton").click(function() {
+	$("#deleteButton").click(function() {
 		if ($("#designSurface").find(".panel-body").children().size() > 2) {
 			bootbox.confirm("Are you sure you want to clear the entire expression?", function(result) {
 				if (result) {

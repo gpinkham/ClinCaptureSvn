@@ -695,6 +695,7 @@ Parser.prototype.render = function(rule) {
 	this.setDoubleDataEntryExecute(rule.dde);
 	this.setInitialDataEntryExecute(rule.ide);
 	this.setAdministrativeEditingExecute(rule.ae);
+	// Show the delete expression button
 	$("#deleteButton").removeClass("hidden");
 }
 

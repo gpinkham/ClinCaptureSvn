@@ -177,7 +177,7 @@ function createBreadCrumb(params) {
  *
  * ========================================================================= */
 function resetBuildControls(parentDiv) {
-	$("#deleteButton").hide();
+	$("#deleteButton").addClass('hidden');
 	parentDiv.children("div").not(".pull-right").remove();
 	parentDiv.append(createStartExpressionDroppable());
 }
@@ -671,7 +671,7 @@ function createDroppable(params) {
 				params.element.attr("study-oid", ui.draggable.attr("study-oid"));
 				params.element.attr("version-oid", ui.draggable.attr("version-oid"));
 			}
-			$("#deleteButton").show("hidden");
+			$("#deleteButton").removeClass("hidden");
 			params.element.css('font-weight', 'bold');
 			if (!$(".sortable").is(".ui-sortable")) {
 				createSortable(params.element);
