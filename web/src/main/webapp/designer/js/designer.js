@@ -384,8 +384,6 @@ function createPopover(droppable) {
 		trigger: "manual",
 		container: droppable
 	}).click(function(evt) {
-		// existing
-		showCRFItem(this);
 		$(".popover").remove();
 		evt.stopPropagation();
 		$(this).popover('show');

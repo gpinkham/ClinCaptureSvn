@@ -177,6 +177,10 @@ Parser.prototype.createNextDroppable = function(params) {
 			createPopover(RPAREN);
 			createPopover(dataPredicate);
 		} 
+		// Enable showing selected item td
+		params.element.click(function() {
+			showCRFItem(this);
+		});
 	} else if (params.element.is(".target")) {
 		if (!this.isAddedTarget(selectedItem)) {
 			if (params.existingValue) {
@@ -2062,7 +2066,7 @@ Parser.prototype.recursiveSelect = function(params) {
 	if ($("td[oid=" + params.candidate + "]").length > 0) {
 		$("td[oid=" + params.candidate + "]").parent().addClass("selected");
 	} else {
-		if ($(".pagination").length > 0) {
+		if (next.length > 0) {
 			next[0].click();
 			if ($("td[oid=" + params.candidate + "]").length == 0) {
 				if (next[0]) {
