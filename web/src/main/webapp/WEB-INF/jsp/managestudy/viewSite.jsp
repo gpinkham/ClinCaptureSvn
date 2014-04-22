@@ -94,7 +94,7 @@
 	</span>
 </h1>
 <strong><fmt:message key="download_oid_in_odm_format_by_click" bundle="${restext}"/>
- <a href="DownloadStudyMetadata?studyId=<c:out value="${siteToView.id}"/>"> <fmt:message key="here" bundle="${restext}"/></a>.</strong>
+ <a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=${siteToView.id}');"><fmt:message key="here" bundle="${restext}"/></a>.</strong>
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
 <br><br>
 
@@ -421,8 +421,8 @@
 <c:set var="defCount" value="0"/>
 <c:forEach var="definition" items="${definitions}">
 <c:set var="defCount" value="${defCount+1}"/>
-	&nbsp&nbsp&nbsp&nbsp<b><a href="javascript:leftnavExpand('sed<c:out value="${defCount}"/>');">
-        <img id="excl_sed<c:out value="${defCount}"/>" src="images/bt_Expand.gif" border="0"> <c:out value="${definition.name}"/></b></a>
+	&nbsp&nbsp&nbsp&nbsp<a href="javascript:leftnavExpand('sed${defCount}');">
+        <img id="excl_sed${defCount}" src="images/bt_Expand.gif" border="0"><b>${definition.name}</b></a>
 		<c:choose>
 		<c:when test="${idToSort>0 && idToSort == definition.id}">
 			<div id="sed<c:out value="${defCount}"/>" style="display: all">
