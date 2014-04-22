@@ -181,6 +181,7 @@ public class ViewStudyEventsServlet extends SecureController {
 			StudySubjectBean ssb = (StudySubjectBean) studySubject;
 			ArrayList<StudyEventBean> evts = sedao.findAllByStudySubject(ssb);
 			for (StudyEventBean seb : evts) {
+				seb.setStudySubjectLabel(ssb.getLabel());
 				if (!(currentRole.isStudyDirector() || currentRole.isStudyAdministrator())
 						&& seb.getSubjectEventStatus().isLocked()) {
 					seb.setEditable(false);

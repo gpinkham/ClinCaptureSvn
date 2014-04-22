@@ -74,7 +74,7 @@
 		<a href="javascript:openDocWindow('help/2_5_viewEvents_Help.html')">
 			<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
 		</a>
-		<a href="javascript:openDocWindow('ViewStudyEvents?print=yes&<c:out value="${queryUrl}"/>')"
+		<a href="javascript:openDocWindow('ViewStudyEvents?print=yes&${queryUrl}')"
 		onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"
 		onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">
 			<img name="bt_Print0" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>">
@@ -173,50 +173,18 @@
 <c:forEach var="eventView" items="${allEvents}">
       <c:choose>
         <c:when test="${userRole.manageStudy}">
-         <span class="table_title_manage">
+         <span class="table_title_Admin floatLeft">
         </c:when>
         <c:otherwise>
-          <span class="table_title_submit">
+          <span class="table_title_Admin floatLeft">
         </c:otherwise>
       </c:choose>
 
-  <fmt:message key="event_name" bundle="${resword}"/>: <c:out value="${eventView.definition.name}"/></span><br>
-	<b><fmt:message key="event_type" bundle="${resword}"/></b>:<fmt:message key="${eventView.definition.type}" bundle="${resword}"/>,
-	<c:choose>
-     <c:when test="${eventView.definition.repeating}">
-       <fmt:message key="repeating" bundle="${resword}"/>
-     </c:when>
-     <c:otherwise>
-      <fmt:message key="non_repeating" bundle="${resword}"/>
-     </c:otherwise>
-    </c:choose>,
-	<b><fmt:message key="category" bundle="${resword}"/></b>:
-	<c:choose>
-	 <c:when test="${eventView.definition.category == null || eventView.definition.category ==''}">
-	  <fmt:message key="N/A" bundle="${resword}"/>
-	 </c:when>
-	 <c:otherwise>
-	   <c:out value="${eventView.definition.category}"/>
-	 </c:otherwise>
-	</c:choose>
-	<br>
-	<b><fmt:message key="subjects_who_scheduled" bundle="${resword}"/></b>: <c:out value="${eventView.subjectScheduled}"/> (<fmt:message key="start_date_of_first_event" bundle="${resword}"/>:
-	<c:choose>
-      <c:when test="${eventView.firstScheduledStartDate== null}">
-       <fmt:message key="N/A" bundle="${resword}"/>
-      </c:when>
-     <c:otherwise>
-       <fmt:formatDate value="${eventView.firstScheduledStartDate}" pattern="${dteFormat}"/>
-     </c:otherwise>
-     </c:choose>), <b><fmt:message key="completed" bundle="${resword}"/></b>: <c:out value="${eventView.subjectCompleted}"/> (<fmt:message key="completion_date_of_last_event" bundle="${resword}"/>:
-   <c:choose>
-   <c:when test="${eventView.lastCompletionDate== null}">
-    <fmt:message key="N/A" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-    <fmt:formatDate value="${eventView.lastCompletionDate}" pattern="${dteFormat}"/>
-   </c:otherwise>
- </c:choose>), <b><fmt:message key="discontinued" bundle="${resword}"/></b>: <c:out value="${eventView.subjectDiscontinued}"/><br>
+    <b> <c:out value="${eventView.definition.name}"/></b></span><a href="InitUpdateEventDefinition?id=${eventView.definition.id}" class="floatLeft"
+    onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
+    onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img
+    name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
+    <br><br>
 	<c:set var="table" value="${eventView.studyEventTable}" scope="request" />
 	<c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showEventByDefinitionRow.jsp" /></c:import>
 <br>
