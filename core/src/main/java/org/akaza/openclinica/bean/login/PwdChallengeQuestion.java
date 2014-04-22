@@ -35,24 +35,23 @@ import java.util.List;
 // Internationalized name and description in Term.getName and
 // Term.getDescription()
 public class PwdChallengeQuestion extends Term {
-	
+
 	private static final long serialVersionUID = -3257460938361987325L;
 
 	public static final PwdChallengeQuestion MAIDEN_NAME = new PwdChallengeQuestion(1, "Mother_Maiden_Name");
 
-	public static final PwdChallengeQuestion FARORITE_ANIMAL = new PwdChallengeQuestion(2, "Favorite_Animal");
+	public static final PwdChallengeQuestion FAVORITE_ANIMAL = new PwdChallengeQuestion(2, "Favorite_Animal");
 
 	public static final PwdChallengeQuestion CITY_OF_BIRTH = new PwdChallengeQuestion(3, "City_of_Birth");
 
-	private static final PwdChallengeQuestion[] members = { MAIDEN_NAME, FARORITE_ANIMAL, CITY_OF_BIRTH };
+	public static final PwdChallengeQuestion FAVORITE_COLOR = new PwdChallengeQuestion(4, "Favorite_Color");
+
+	private static final PwdChallengeQuestion[] members = { FAVORITE_ANIMAL, CITY_OF_BIRTH, MAIDEN_NAME, FAVORITE_COLOR };
 
 	public static final List<PwdChallengeQuestion> list = Arrays.asList(members);
 
 	private PwdChallengeQuestion(int id, String name) {
 		super(id, name);
-	}
-
-	private PwdChallengeQuestion() {
 	}
 
 	public static boolean contains(int id) {
