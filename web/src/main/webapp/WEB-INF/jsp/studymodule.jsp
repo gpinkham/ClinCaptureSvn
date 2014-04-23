@@ -193,14 +193,11 @@
             <c:url var="viewStudy" value="/ViewStudy?id=${studyId}&viewFull=yes"/>
             <td>
                 <a href="${viewStudy}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-<%-- Commented by Clinovo
-                <a href="${updateStudy}"><img src="../images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>"/></a>
-END --%>
 
 <%-- Inserted by Clinovo --%>
                 <c:choose>
                     <c:when test="${currentStudy.status.id == 4}">
-                        <a href="${updateStudy}"><img src="../images/bt_Edit.gif" border="0"/></a>
+                        <a href="${updateStudy}"><img src="../images/bt_Edit.gif" border="0" title="<fmt:message key="edit" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:otherwise>
                         <a/></a>
