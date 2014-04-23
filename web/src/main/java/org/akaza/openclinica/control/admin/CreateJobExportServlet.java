@@ -14,18 +14,6 @@
 package org.akaza.openclinica.control.admin;
 
 import com.clinovo.util.ValidatorHelper;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -47,6 +35,19 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * 
  * @author thickerson
@@ -63,7 +64,6 @@ public class CreateJobExportServlet extends Controller {
 	public static final String EMAIL = "contactEmail";
 	public static final String JOB_NAME = "jobName";
 	public static final String JOB_DESC = "jobDesc";
-	public static final String USER_ID = "user_id";
 	public static final String DATASETS = "datasets";
 
 	@Override
@@ -99,7 +99,8 @@ public class CreateJobExportServlet extends Controller {
 		request.setAttribute(FORMAT_ID, fp2.getInt(FORMAT_ID));
 		request.setAttribute(PERIOD, fp2.getString(PERIOD));
 		request.setAttribute(DATASET_ID, fp2.getInt(DATASET_ID));
-		Date jobDate = (fp2.getDateTime(DATE_START_JOB));
+		// to back local time use expression fp2.getDateTime(DATE_START_JOB)
+		Date jobDate = new Date(System.currentTimeMillis() + 15 * 60 * 1000);
 		HashMap presetValues = new HashMap();
 		Calendar calendar = new GregorianCalendar();
 		calendar.setTime(jobDate);
