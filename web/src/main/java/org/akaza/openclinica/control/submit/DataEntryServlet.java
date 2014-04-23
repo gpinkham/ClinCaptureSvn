@@ -22,6 +22,7 @@ package org.akaza.openclinica.control.submit;
 
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
+import com.clinovo.service.DataEntryService;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -121,6 +122,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.quartz.impl.StdScheduler;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -2436,7 +2438,7 @@ public abstract class DataEntryServlet extends Controller {
 					|| !StringUtil.isBlank(fp.getString(igb.getOid() + "_manual" + i + ".newRow"))) {
 
 				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-						sb.getId(), nullValuesList, getServletContext());
+						sb.getId(), nullValuesList, getItemMetadataService(getServletContext()));
 
 				dibs = processInputForGroupItem(fp, dibs, i, digb, false);
 
@@ -2469,7 +2471,7 @@ public abstract class DataEntryServlet extends Controller {
 					|| !StringUtil.isBlank(fp.getString(igb.getOid() + "_" + i + ".newRow"))) {
 
 				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-						sb.getId(), nullValuesList, getServletContext());
+						sb.getId(), nullValuesList, getItemMetadataService(getServletContext()));
 
 				dibs = processInputForGroupItem(fp, dibs, i, digb, true);
 
@@ -3104,114 +3106,16 @@ public abstract class DataEntryServlet extends Controller {
 	 */
 	protected DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems,
 			HttpServletRequest request, boolean isSubmitted) throws Exception {
-		DisplaySectionBean section = new DisplaySectionBean();
 		FormProcessor fp = new FormProcessor(request);
-		HttpSession session = request.getSession();
-		StudyBean study = (StudyBean) session.getAttribute("study");
+		int eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
+		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
 		SessionManager sm = getSessionManager(request);
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 		SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
 		EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
-
-		// Find out whether there are ungrouped items in this section
-		boolean hasUngroupedItems = false;
-		int eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
-
-		if (eventDefinitionCRFId <= 0) { // TODO: this block of code repeats
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
-			EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(),
-					ecb.getCRFVersionId());
-			eventDefinitionCRFId = edcBean.getId();
-		}
-		logger.trace("eventDefinitionCRFId " + eventDefinitionCRFId);
-		// Use this class to find out whether there are ungrouped items in this
-		// section
-		FormBeanUtil formBeanUtil = new FormBeanUtil();
-		List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();
-		if (hasGroup) {
-			DisplaySectionBean newDisplayBean = new DisplaySectionBean();
-			if (includeUngroupedItems) {
-				// Null values: this method adds null values to the
-				// displayitembeans
-				newDisplayBean = formBeanUtil.createDisplaySectionBWithFormGroups(sb.getId(), ecb.getCRFVersionId(),
-						getDataSource(), eventDefinitionCRFId, ecb, getServletContext());
-			} else {
-				newDisplayBean = formBeanUtil.createDisplaySectionWithItemGroups(study, sb.getId(), ecb,
-						ecb.getStudyEventId(), sm, eventDefinitionCRFId, getServletContext());
-			}
-			itemGroups = newDisplayBean.getDisplayFormGroups();
-			logger.trace("found item group size: " + itemGroups.size() + " and to string: " + itemGroups.toString());
-			section.setDisplayFormGroups(itemGroups);
-
-		}
-
-		// Find out whether any display items are *not* grouped; see issue 1689
-		hasUngroupedItems = formBeanUtil.sectionHasUngroupedItems(getDataSource(), sb.getId(), itemGroups);
-
-		SectionDAO sdao = new SectionDAO(getDataSource());
-		sb.setHasSCDItem(hasUngroupedItems ? sdao.hasSCDItem(sb.getId()) : false);
-
-		section.setEventCRF(ecb);
-
-		if (sb.getParentId() > 0) {
-			SectionBean parent = (SectionBean) sdao.findByPK(sb.getParentId());
-			sb.setParent(parent);
-		}
-
-		section.setSection(sb);
-
-		CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
-		CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
-		section.setCrfVersion(cvb);
-
-		CRFDAO cdao = new CRFDAO(getDataSource());
-		CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
-		section.setCrf(cb);
-
-		section.setEventDefinitionCRF(edcb);
-
-		// setup DAO's here to avoid creating too many objects
-		ItemDAO idao = new ItemDAO(getDataSource());
-		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
-		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
-
-		// Use itemGroups to determine if there are any ungrouped items
-
-		// get all the parent display item beans not in group
-		ArrayList displayItems = getParentDisplayItems(hasGroup, sb, edcb, idao, ifmdao, iddao, hasUngroupedItems,
-				request);
-
-		logger.debug("just ran get parent display, has group " + hasGroup + " has ungrouped " + hasUngroupedItems);
-		// now sort them by ordinal
-		Collections.sort(displayItems);
-
-		// now get the child DisplayItemBeans
-		for (int i = 0; i < displayItems.size(); i++) {
-			DisplayItemBean dib = (DisplayItemBean) displayItems.get(i);
-			dib.setChildren(getChildrenDisplayItems(dib, edcb, request));
-
-			// TODO use the setData command here to make sure we get a value?
-			// On Submition of the Admin Editing form the loadDBValue does not required
-			//
-			if (ecb.getStage() == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE
-					|| ecb.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
-				if (shouldLoadDBValues(dib) && !isSubmitted) {
-					dib.loadDBValue();
-				}
-			} else {
-				if (shouldLoadDBValues(dib)) {
-					logger.trace("should load db values is true, set value");
-					dib.loadDBValue();
-					logger.trace("just got data loaded: " + dib.getData().getValue());
-				}
-			}
-
-			displayItems.set(i, dib);
-		}
-
-		section.setItems(displayItems);
-
-		return section;
+		
+		return getDataEntryService(getServletContext()).getDisplayBean(hasGroup, includeUngroupedItems,
+				isSubmitted, getServletPage(request), study, ecb, sb, edcb, eventDefinitionCRFId, sm);	
 	}
 
 	/**
@@ -3223,227 +3127,12 @@ public abstract class DataEntryServlet extends Controller {
 	 */
 	protected ArrayList getAllDisplayBeans(HttpServletRequest request) throws Exception {
 		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-		ArrayList sections = new ArrayList();
-		HttpSession session = request.getSession();
-		StudyBean study = (StudyBean) session.getAttribute("study");
-		SectionDAO sdao = new SectionDAO(getDataSource());
-		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
-		// ALL_SECTION_BEANS
-		ArrayList<SectionBean> allSectionBeans = (ArrayList<SectionBean>) request.getAttribute(ALL_SECTION_BEANS);
+		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
+ 		ArrayList<SectionBean> allSectionBeans = (ArrayList<SectionBean>) request.getAttribute(ALL_SECTION_BEANS);
 
-		for (int j = 0; j < allSectionBeans.size(); j++) {
-
-			SectionBean sb = allSectionBeans.get(j);
-
-			DisplaySectionBean section = new DisplaySectionBean();
-			section.setEventCRF(ecb);
-
-			if (sb.getParentId() > 0) {
-				SectionBean parent = (SectionBean) sdao.findByPK(sb.getParentId());
-				sb.setParent(parent);
-			}
-
-			section.setSection(sb);
-
-			CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
-			CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
-			section.setCrfVersion(cvb);
-
-			CRFDAO cdao = new CRFDAO(getDataSource());
-			CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
-			section.setCrf(cb);
-
-			EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
-			EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(),
-					cvb.getId());
-
-			section.setEventDefinitionCRF(edcb);
-
-			// setup DAO's here to avoid creating too many objects
-			ItemDAO idao = new ItemDAO(getDataSource());
-			ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
-			iddao = new ItemDataDAO(getDataSource());
-
-			// get all the display item beans
-			ArrayList displayItems = getParentDisplayItems(false, sb, edcb, idao, ifmdao, iddao, false, request);
-
-			logger.debug("222 just ran get parent display, has group " + " FALSE has ungrouped FALSE");
-			// now sort them by ordinal
-			Collections.sort(displayItems);
-
-			// now get the child DisplayItemBeans
-			for (int i = 0; i < displayItems.size(); i++) {
-				DisplayItemBean dib = (DisplayItemBean) displayItems.get(i);
-				dib.setChildren(getChildrenDisplayItems(dib, edcb, request));
-
-				if (shouldLoadDBValues(dib)) {
-					logger.trace("should load db values is true, set value");
-					dib.loadDBValue();
-				}
-
-				displayItems.set(i, dib);
-			}
-
-			section.setItems(displayItems);
-			sections.add(section);
-
-		}
-		return sections;
+ 		return getDataEntryService(getServletContext()).getAllDisplayBeans(allSectionBeans, ecb, study, getServletPage(request));
 	}
-
-	/**
-	 * For each single item in this section which is a parent, get a DisplayItemBean corresponding to that item. Note
-	 * that an item is a parent iff its parentId == 0.
-	 * 
-	 * @param sb
-	 *            The section whose items we are retrieving.
-	 * @param hasUngroupedItems
-	 * @param request
-	 *            TODO
-	 * 
-	 * @return An array of DisplayItemBean objects, one per parent item in the section. Note that there is no guarantee
-	 *         on the ordering of the objects.
-	 * @throws Exception
-	 */
-	private ArrayList getParentDisplayItems(boolean hasGroup, SectionBean sb, EventDefinitionCRFBean edcb,
-			ItemDAO idao, ItemFormMetadataDAO ifmdao, ItemDataDAO iddao, boolean hasUngroupedItems,
-			HttpServletRequest request) throws Exception {
-		ArrayList answer = new ArrayList();
-		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-
-		// DisplayItemBean objects are composed of an ItemBean, ItemDataBean and
-		// ItemFormDataBean.
-		// However the DAOs only provide methods to retrieve one type of bean at
-		// a
-		// time (per section)
-		// the displayItems hashmap allows us to compose these beans into
-		// DisplayItemBean objects,
-		// while hitting the database only three times
-		HashMap displayItems = new HashMap();
-
-		ArrayList itemsUngrped = new ArrayList();
-		if (hasGroup && hasUngroupedItems) {
-			itemsUngrped = idao.findAllUngroupedParentsBySectionId(sb.getId(), sb.getCRFVersionId());
-		}
-
-		ArrayList items = idao.findAllNonRepeatingParentsBySectionId(sb.getId());
-		items.addAll(itemsUngrped);
-
-		logger.debug("items size" + items.size());
-		for (int i = 0; i < items.size(); i++) {
-			DisplayItemBean dib = new DisplayItemBean();
-			dib.setEventDefinitionCRF(edcb);
-			ItemBean ib = (ItemBean) items.get(i);
-			dib.setItem(ib);
-			displayItems.put(new Integer(dib.getItem().getId()), dib);
-		}
-
-		ArrayList data = iddao.findAllBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
-		for (int i = 0; i < data.size(); i++) {
-			ItemDataBean idb = (ItemDataBean) data.get(i);
-			DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(idb.getItemId()));
-			if (dib != null) {
-				dib.setData(idb);
-				displayItems.put(new Integer(idb.getItemId()), dib);
-			}
-		}
-
-		ArrayList metadata = ifmdao.findAllBySectionId(sb.getId());
-		for (int i = 0; i < metadata.size(); i++) {
-			ItemFormMetadataBean ifmb = (ItemFormMetadataBean) metadata.get(i);
-			DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(ifmb.getItemId()));
-			if (dib != null) {
-				logMe("Entering thread before getting ItemMetadataService:::" + Thread.currentThread());
-				boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
-				if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-					showItem = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
-				}
-
-				boolean passedDDE = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
-				if (showItem) {
-					ifmb.setShowItem(true);
-				}
-				DynamicsItemFormMetadataBean dynamicsMetadataBean = getItemMetadataService()
-						.getDynamicsItemFormMetadataBean(ifmb.getItemId(), ecb, dib.getData());
-				if (dynamicsMetadataBean != null) {
-					ifmb.setShowItem(dynamicsMetadataBean.isShowItem());
-				}
-				dib.setMetadata(ifmb);
-				displayItems.put(new Integer(ifmb.getItemId()), dib);
-			}
-		}
-
-		Iterator hmIt = displayItems.keySet().iterator();
-		while (hmIt.hasNext()) {
-			Integer key = (Integer) hmIt.next();
-			DisplayItemBean dib = (DisplayItemBean) displayItems.get(key);
-			answer.add(dib);
-		}
-
-		return answer;
-	}
-
-	/**
-	 * Get the DisplayItemBean objects corresponding to the items which are children of the specified parent.
-	 * 
-	 * @param parent
-	 *            The item whose children are to be retrieved.
-	 * @param request
-	 *            TODO
-	 * @return An array of DisplayItemBean objects corresponding to the items which are children of parent, and are
-	 *         sorted by column number (ascending), then ordinal (ascending).
-	 */
-	private ArrayList getChildrenDisplayItems(DisplayItemBean parent, EventDefinitionCRFBean edcb,
-			HttpServletRequest request) {
-		ArrayList answer = new ArrayList();
-		EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
-		int parentId = parent.getItem().getId();
-		ItemDAO idao = new ItemDAO(getDataSource());
-		ArrayList childItemBeans = idao.findAllByParentIdAndCRFVersionId(parentId, ecb.getCRFVersionId());
-		ItemDataDAO iddao = new ItemDataDAO(getDataSource());
-		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
-		for (int i = 0; i < childItemBeans.size(); i++) {
-			ItemBean child = (ItemBean) childItemBeans.get(i);
-			ItemDataBean data = iddao.findByItemIdAndEventCRFId(child.getId(), ecb.getId());
-			ItemFormMetadataBean metadata = ifmdao.findByItemIdAndCRFVersionId(child.getId(), ecb.getCRFVersionId());
-
-			DisplayItemBean dib = new DisplayItemBean();
-			dib.setEventDefinitionCRF(edcb);
-			dib.setItem(child);
-			// tbh
-			if (!getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-				dib.setData(data);
-			}
-			dib.setDbData(data);
-			boolean showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, data);
-			if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-				showItem = getItemMetadataService().hasPassedDDE(metadata, ecb, data);
-			}
-
-			if (showItem) {
-				logger.debug("set show item: " + metadata.getItemId() + " data " + data.getId());
-				metadata.setShowItem(true);
-			}
-
-			dib.setMetadata(metadata);
-
-			if (shouldLoadDBValues(dib)) {
-				logger.trace("should load db values is true, set value");
-				dib.loadDBValue();
-				logger.trace("just loaded the child value: " + dib.getData().getValue());
-			}
-
-			answer.add(dib);
-		}
-
-		// this is a pretty slow and memory intensive way to sort... see if we
-		// can
-		// have the db do this instead
-		Collections.sort(answer);
-
-		return answer;
-	}
-
+	
 	/**
 	 * gets the available dynamics service
 	 */
@@ -3466,8 +3155,6 @@ public abstract class DataEntryServlet extends Controller {
 	 * @return The Page object which represents this servlet.
 	 */
 	protected abstract Page getServletPage(HttpServletRequest request);
-
-	protected abstract boolean shouldLoadDBValues(DisplayItemBean dib);
 
 	protected void setUpPanel(HttpServletRequest request, DisplaySectionBean section) {
 		StudyInfoPanel panel = getStudyInfoPanel(request);
@@ -4203,7 +3890,7 @@ public abstract class DataEntryServlet extends Controller {
 						// better way to
 						// do deep copy, like clone
 						List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(),
-								ecb, sb.getId(), edcb, idb.getOrdinal(), getServletContext());
+								ecb, sb.getId(), edcb, idb.getOrdinal(), getItemMetadataService(getServletContext()));
 
 						digb.setItems(dibs);
 						logger.trace("set with dibs list of : " + dibs.size());
@@ -4232,7 +3919,7 @@ public abstract class DataEntryServlet extends Controller {
 									dib.setData(idb);
 									logger.debug("--> set data " + idb.getId() + ": " + idb.getValue());
 
-									if (shouldLoadDBValues(dib)) {
+									if (getDataEntryService(getServletContext()).shouldLoadDBValues(dib, getServletPage(request))) {
 										logger.debug("+++should load db values is true, set value");
 										dib.loadDBValue();
 										logger.debug("+++data loaded: " + idb.getName() + ": " + idb.getOrdinal() + " "
@@ -4250,7 +3937,7 @@ public abstract class DataEntryServlet extends Controller {
 					// no data, still add a blank row for displaying
 					DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
 					List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-							sb.getId(), nullValuesList, getServletContext());
+							sb.getId(), nullValuesList, getItemMetadataService(getServletContext()));
 					digb2.setItems(dibs);
 					logger.trace("set with nullValuesList of : " + nullValuesList);
 					digb2.setEditFlag("initial");
@@ -4317,7 +4004,7 @@ public abstract class DataEntryServlet extends Controller {
 				// better way to
 				// do deep copy, like clone
 				List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-						sb.getId(), edcb, idb.getOrdinal(), getServletContext());
+						sb.getId(), edcb, idb.getOrdinal(), getItemMetadataService(getServletContext()));
 
 				digb.setItems(dibs);
 				logger.trace("set with dibs list of : " + dibs.size());
@@ -4344,7 +4031,7 @@ public abstract class DataEntryServlet extends Controller {
 							dib.setData(idb);
 							logger.debug("--> set data " + idb.getId() + ": " + idb.getValue());
 
-							if (shouldLoadDBValues(dib)) {
+							if (getDataEntryService(getServletContext()).shouldLoadDBValues(dib, getServletPage(request))) {
 								logger.debug("+++should load db values is true, set value");
 								dib.loadDBValue();
 								logger.debug("+++data loaded: " + idb.getName() + ": " + idb.getOrdinal() + " "
@@ -4361,7 +4048,7 @@ public abstract class DataEntryServlet extends Controller {
 			// no data, still add a blank row for displaying
 			DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
 			List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb,
-					sb.getId(), nullValuesList, getServletContext());
+					sb.getId(), nullValuesList, getItemMetadataService(getServletContext()));
 			digb2.setItems(dibs);
 			logger.trace("set with nullValuesList of : " + nullValuesList);
 			digb2.setEditFlag("initial");
@@ -5155,5 +4842,16 @@ public abstract class DataEntryServlet extends Controller {
 
 		return result;
 	}
-
+	
+	protected DynamicsMetadataService getItemMetadataService(ServletContext context) {
+		DynamicsMetadataService itemMetadataService = (DynamicsMetadataService) SpringServletAccess.getApplicationContext(context).getBean(
+				"dynamicsMetadataService");
+		return itemMetadataService;
+	}
+		
+	protected DataEntryService getDataEntryService(ServletContext context) {
+		DataEntryService dataEntryService = (DataEntryService) SpringServletAccess.getApplicationContext(context).getBean(
+				"dataEntryService");
+		return dataEntryService;
+	}
 }

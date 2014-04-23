@@ -249,11 +249,6 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 	}
 
 	@Override
-	protected boolean shouldLoadDBValues(DisplayItemBean dib) {
-		return true;
-	}
-
-	@Override
 	protected boolean shouldRunRules() {
 		return true;
 	}

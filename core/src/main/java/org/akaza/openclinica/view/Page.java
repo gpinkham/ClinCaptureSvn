@@ -864,5 +864,12 @@ public class Page {
 	public static Page setNewPage(String fileName, String title) {
 		return new Page(fileName, title);
 	}
-
+	
+	public static boolean isDDEServletPage(Page page) {
+		return page == null? false : Page.DOUBLE_DATA_ENTRY_SERVLET.equals(page);
+	}
+	
+	public static boolean isAdminEditServletPage(Page page) {
+		return page == null? false : Page.DOUBLE_DATA_ENTRY_SERVLET.equals(page);
+	}
 }

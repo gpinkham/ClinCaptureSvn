@@ -120,7 +120,7 @@ public class PrintCRFServlet extends DataEntryServlet {
 
 			if (itemGroupBeans.size() > 0) {
 				DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, getDataSource(),
-						getServletContext());
+						getItemMetadataService(getServletContext()));
 				handler.setCrfVersionId(crfVersionId);
 				handler.setEventCRFId(eventCRFId);
 				List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
@@ -245,11 +245,6 @@ public class PrintCRFServlet extends DataEntryServlet {
 
 		return formGroups;
 
-	}
-
-	@Override
-	protected boolean shouldLoadDBValues(DisplayItemBean dib) {
-		return true;
 	}
 
 	@Override

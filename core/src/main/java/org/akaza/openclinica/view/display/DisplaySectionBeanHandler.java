@@ -16,7 +16,6 @@ package org.akaza.openclinica.view.display;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -30,6 +29,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 
 /**
@@ -42,20 +42,20 @@ public class DisplaySectionBeanHandler {
 	private int crfVersionId;
 	private int eventCRFId;
 	private List<DisplaySectionBean> displaySectionBeans;
-	private ServletContext context;
+	private DynamicsMetadataService itemMetadataService;
 	private DataSource dataSource;
 
 	public DisplaySectionBeanHandler(boolean dataEntry) {
 		this.hasStoredData = dataEntry;
 	}
 
-	public DisplaySectionBeanHandler(boolean dataEntry, DataSource dataSource, ServletContext context) {
+	public DisplaySectionBeanHandler(boolean dataEntry, DataSource dataSource, DynamicsMetadataService itemMetadataService) {
 		this(dataEntry);
 		if (dataSource != null) {
 			this.setDataSource(dataSource);
 		}
-		if (context != null) {
-			this.context = context;
+		if (itemMetadataService != null) {
+			this.itemMetadataService = itemMetadataService;
 		}
 	}
 
@@ -125,7 +125,7 @@ public class DisplaySectionBeanHandler {
 			DisplaySectionBean displaySectionBean;
 			for (SectionBean sectionBean : allCrfSections) {
 				displaySectionBean = formBeanUtil.createDisplaySectionBWithFormGroupsForPrint(sectionBean.getId(),
-						this.crfVersionId, dataSource, eventDefBean.getId(), eventCRFBean, context);
+						this.crfVersionId, dataSource, eventDefBean.getId(), eventCRFBean, itemMetadataService);
 				displaySectionBeans.add(displaySectionBean);
 			}
 		}

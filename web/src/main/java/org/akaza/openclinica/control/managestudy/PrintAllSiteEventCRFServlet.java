@@ -170,7 +170,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
 					// ('false' in terms of this
 					// servlet; see PrintDataEntryServlet).
 					DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, getDataSource(),
-							getServletContext());
+							getItemMetadataService(getServletContext()));
 					handler.setCrfVersionId(crfVersionBean.getId());
 					// handler.setEventCRFId(eventCRFId);
 					List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
@@ -328,12 +328,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
 		return formGroups;
 
 	}
-
-	@Override
-	protected boolean shouldLoadDBValues(DisplayItemBean dib) {
-		return true;
-	}
-
+	
 	@Override
 	protected boolean shouldRunRules() {
 		return false;

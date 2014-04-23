@@ -568,14 +568,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
 	}
 
-	@Override
-	protected boolean shouldLoadDBValues(DisplayItemBean dib) {
-		return true;
-	}
-
 	/**
 	 * Current User may access a requested event CRF in the current user's studies
-	 * 
+	 *
 	 * @param request
 	 *            TODO
 	 */

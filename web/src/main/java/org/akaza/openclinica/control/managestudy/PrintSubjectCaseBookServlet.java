@@ -193,7 +193,7 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 				sedBean.setStudyEventDefinition(sed);
 
 				DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(
-						true, getDataSource(), getServletContext());
+						true, getDataSource(), getItemMetadataService(getServletContext()));
 
 				handler.setCrfVersionId(crfverBean.getId());
 				handler.setEventCRFId(ecb.getId());
@@ -357,11 +357,6 @@ public class PrintSubjectCaseBookServlet extends DataEntryServlet {
 			List<DisplayItemGroupBean> formGroups, HttpServletRequest request,
 			HttpServletResponse response) {
 		return formGroups;
-	}
-
-	@Override
-	protected boolean shouldLoadDBValues(DisplayItemBean dib) {
-		return true;
 	}
 
 	@Override

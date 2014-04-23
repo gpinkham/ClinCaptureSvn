@@ -401,42 +401,6 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.akaza.openclinica.control.submit.DataEntryServlet#loadDBValues()
-	 */
-	@Override
-	protected boolean shouldLoadDBValues(DisplayItemBean dib) {
-		// my understanding-jxu:
-		// if the status is pending, should not load the db value
-		// if the status is UNAVAILABLE,load DB value
-		// interesting bug here: some fields load, some don't
-		// remove a session value here:
-		// int keyId = ecb.getId();
-		// session.removeAttribute(COUNT_VALIDATE+keyId);
-		// logger.info("^^^removed count_validate here");
-		// wonky place to do it, but no other place at the moment, tbh
-		if (dib.getData().getStatus() == null || dib.getData().getStatus().equals(Status.UNAVAILABLE)) {
-			return true;
-		}
-		/*
-		 * if (!dib.getData().getStatus().equals(Status.UNAVAILABLE)) { logger.info("status don't match.."); return
-		 * false; //return true; }
-		 */
-
-		// how about this instead:
-		// if it's pending, return false
-		// otherwise return true?
-		if (dib.getData().getStatus().equals(Status.PENDING)) {
-			// logger.info("status was pending...");
-			return false;
-			// return true;
-		}
-
-		return true;
-	}
-
 	@Override
 	protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName,
 			RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, Boolean fireRuleValidation,

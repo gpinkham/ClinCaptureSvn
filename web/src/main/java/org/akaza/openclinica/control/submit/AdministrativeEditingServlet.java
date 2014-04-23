@@ -197,18 +197,6 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 	}
 
 	@Override
-	protected boolean shouldLoadDBValues(DisplayItemBean dib) {
-		if (dib.getData().getStatus() == null) {
-			return true;
-		}
-		if (!Status.UNAVAILABLE.equals(dib.getData().getStatus())) {
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
 	protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName,
 			HttpServletRequest request) {
 

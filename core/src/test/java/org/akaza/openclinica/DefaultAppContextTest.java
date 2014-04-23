@@ -9,6 +9,7 @@ import com.clinovo.dao.TermDAO;
 import com.clinovo.dao.WidgetDAO;
 import com.clinovo.dao.WidgetsLayoutDAO;
 import com.clinovo.service.CodedItemService;
+import com.clinovo.service.DataEntryService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
 import com.clinovo.service.StudySubjectIdService;
@@ -49,6 +50,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.hibernate.SessionFactory;
@@ -71,6 +73,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected CRFDAO crfdao;
 	protected EventCRFDAO eventCRFDAO;
 	protected StudyDAO studyDAO;
+	protected SectionDAO sectionDAO;
 	protected DatasetDAO datasetDAO;
 	protected ItemDataDAO itemDataDAO;
 	protected ItemFormMetadataDAO imfdao;
@@ -146,6 +149,8 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	@Autowired
 	protected WidgetsLayoutService widgetsLayoutService;
 	@Autowired
+	protected DataEntryService dataEntryService;
+	@Autowired
 	private SessionFactory sessionFactory;
 
 	@Before
@@ -158,6 +163,7 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 		crfdao = new CRFDAO(dataSource);
 		eventCRFDAO = new EventCRFDAO(dataSource);
 		studyDAO = new StudyDAO(dataSource);
+		sectionDAO = new SectionDAO(dataSource);
 		datasetDAO = new DatasetDAO(dataSource);
 		itemDataDAO = new ItemDataDAO(dataSource);
 		imfdao = new ItemFormMetadataDAO(dataSource);

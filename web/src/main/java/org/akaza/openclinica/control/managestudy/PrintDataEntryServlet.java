@@ -190,7 +190,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
 			// a boolean value depending on whether an event or data is involved
 			// or not
 			DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(true, getDataSource(),
-					getServletContext());
+					getItemMetadataService(getServletContext()));
 
 			handler.setCrfVersionId(crfVersionId);
 			handler.setEventCRFId(eventCRFId);
@@ -303,11 +303,6 @@ public class PrintDataEntryServlet extends DataEntryServlet {
 
 		return formGroups;
 
-	}
-
-	@Override
-	protected boolean shouldLoadDBValues(DisplayItemBean dib) {
-		return true;
 	}
 
 	@Override
