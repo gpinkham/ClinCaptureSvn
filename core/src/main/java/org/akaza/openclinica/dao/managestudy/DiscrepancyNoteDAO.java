@@ -165,6 +165,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		}
 		eb.setAge(selectInt(hm, "age"));
 		eb.setDays(selectInt(hm, "days"));
+		if (hm.get("item_data_ordinal") != null) {
+			eb.setItemDataOrdinal((Integer) hm.get("item_data_ordinal"));
+		}
 		return eb;
 	}
 
@@ -483,6 +486,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		this.setTypeExpected(15, TypeNames.STRING);
 		this.setTypeExpected(16, TypeNames.STRING);
 		this.setTypeExpected(17, TypeNames.STRING);
+		this.setTypeExpected(18, TypeNames.STRING);
+		this.setTypeExpected(19, TypeNames.INT);
 
 		Map variables = new HashMap();
 		for (int i = 1; i <= (eventCrfOnly ? 4 : 10); i++) {

@@ -60,6 +60,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
@@ -708,6 +709,8 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		request.setAttribute(USER_ACCOUNTS, userAccounts);
 		request.setAttribute(VIEW_DN_LINK, this.getPageServletFileName(request));
 
+		prepareRepeatingInfo(name, entityId, request);
+
 		if (!INTERVIEWER.equals(field) && !INTERVIEW_DATE.equals(field) && !LOCATION.equals(field)
 				&& !DATE_START.equals(field) && !DATE_END.equals(field)) {
 
@@ -731,6 +734,14 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			request.setAttribute("responseMessage", "Error in data");
 			forwardPage(Page.ADD_ONE_DISCREPANCY_NOTE_DIV, request, response);
 		}
+	}
+
+	private void prepareRepeatingInfo(String name, int entityId, HttpServletRequest request) {
+		Map<String, String> repeatingInfoMap = DiscrepancyNoteUtil.prepareRepeatingInfoMap(name, entityId,
+				getItemDataDAO(), getEventCRFDAO(), getStudyEventDAO(), getItemGroupMetadataDAO(),
+				getStudyEventDefinitionDAO());
+		request.setAttribute("itemDataOrdinal", repeatingInfoMap.get("itemDataOrdinal"));
+		request.setAttribute("studyEventOrdinal", repeatingInfoMap.get("studyEventOrdinal"));
 	}
 
 	private StudyUserRoleBean createRootUserRole(UserAccountBean rootUserAccount, int studyId) {

@@ -119,7 +119,7 @@
 <div style="float: left;">
 	<h1>
 		<span class="first_level_header">
-			<c:out value="${entityName}"/>: <fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
+			<c:out value="${entityName}"/><c:if test="${itemDataOrdinal ne null}">(#${itemDataOrdinal})</c:if>: <fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
 		</span>
 	</h1>
 </div>
@@ -138,7 +138,7 @@
                         <div class="tab_BG_h"><div class="tab_R_h" style="padding-right: 0px;"><div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
 						<b><c:choose>
                             <c:when test="${entityName != '' && entityName != null }">
-                                  "<c:out value="${entityName}"/>"
+                                  "<c:out value="${entityName}"/><c:if test="${itemDataOrdinal ne null}">(#${itemDataOrdinal})</c:if>"
                             </c:when>
                             <c:otherwise>
                                 <%-- nothing here; if entityName is blank --%>
@@ -163,7 +163,7 @@
                     <td class="table_cell_noborder">
                         <b><c:choose>
                             <c:when test="${studyEvent != null}">
-                                <c:out value="${studyEvent.name}"/>
+                                <c:out value="${studyEvent.name}"/><c:if test="${studyEventOrdinal ne null}">(x${studyEventOrdinal})</c:if>
                             </c:when>
                             <c:otherwise>N/A
                             </c:otherwise>

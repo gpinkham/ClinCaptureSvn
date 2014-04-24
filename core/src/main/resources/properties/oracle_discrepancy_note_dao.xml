@@ -13,7 +13,7 @@
     <query>
         <name>findAllSubjectDNByStudy</name>
         <sql>
-            SELECT dn.*, ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value
+            SELECT dn.*, ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value, 0 item_data_ordinal
             FROM study_subject ss,
             dn_subject_map ds,
             dn_age_days dad,
@@ -108,7 +108,7 @@
     <query>
         <name>findAllStudySubjectDNByStudy</name>
         <sql>
-            SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value
+            SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, NULL event_name, NULL item_value, 0 item_data_ordinal
             FROM study_subject ss,
             dn_study_subject_map dss,
             dn_age_days dad,
@@ -138,7 +138,7 @@
     <query>
         <name>findAllStudyEventDNByStudy</name>
         <sql>
-            SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, sed.name event_name, NULL item_value
+            SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, NULL crf_name, sed.name event_name, NULL item_value, 0 item_data_ordinal
             FROM study_subject ss,
             study_event se left join study_event_definition sed on se.study_event_definition_id =
             sed.study_event_definition_id,
@@ -178,7 +178,7 @@
         <name>findAllEventCrfDNByStudy</name>
         <sql>
             SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, c.name crf_name, sed.name event_name, NULL
-            item_value
+            item_value, 0 item_data_ordinal
             FROM study_subject ss,
             event_crf ec left join crf_version cv on ec.crf_version_id = cv.crf_version_id
             left join crf c on c.crf_id = cv.crf_id
@@ -221,7 +221,7 @@
         <name>findAllItemDataDNByStudy</name>
         <sql>
             SELECT dn.*,ss.label, dad.age, dad.days, NULL item_name, c.name crf_name, sed.name event_name, NULL
-            item_value
+            item_value, itd.ordinal item_data_ordinal
             FROM study_subject ss,
             event_crf ec left join crf_version cv on ec.crf_version_id = cv.crf_version_id
             left join crf c on c.crf_id = cv.crf_id

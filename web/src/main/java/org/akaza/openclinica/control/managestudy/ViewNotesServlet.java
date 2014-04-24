@@ -22,12 +22,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -58,6 +52,13 @@ import org.jmesa.facade.TableFacade;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -202,6 +203,7 @@ public class ViewNotesServlet extends RememberLastPage {
 		factory.setCrfVersionDao(crfVersionDao);
 		factory.setStudyEventDao(studyEventDao);
 		factory.setStudyEventDefinitionDao(studyEventDefinitionDao);
+		factory.setItemGroupMetadataDAO(getItemGroupMetadataDAO());
 		factory.setEventDefinitionCRFDao(eventDefinitionCRFDao);
 		factory.setItemDao(itemDao);
 		factory.setItemDataDao(itemDataDao);
@@ -246,9 +248,9 @@ public class ViewNotesServlet extends RememberLastPage {
 		request.setAttribute("typeKeys", customTotalMap);
 		request.setAttribute("mapKeys", ResolutionStatus.getMembers());
 		request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames(resterm));
-		
+
 		request.setAttribute("grandTotal", customTotalMap.get("Total"));
-		
+
 		forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY, request, response);
 	}
 

@@ -48,8 +48,10 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.web.table.filter.CRFFilter;
 import org.akaza.openclinica.web.table.filter.StudyEventTableRowFilter;
 import org.jmesa.core.filter.DateFilterMatcher;
@@ -107,6 +109,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 	private CRFDAO crfDao;
 	private StudyEventDAO studyEventDao;
 	private StudyEventDefinitionDAO studyEventDefinitionDao;
+	private ItemGroupMetadataDAO itemGroupMetadataDAO;
 	private EventDefinitionCRFDAO eventDefinitionCRFDao;
 	private ItemDataDAO itemDataDao;
 	private ItemDAO itemDao;
@@ -279,6 +282,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 			UserAccountBean owner = (UserAccountBean) getUserAccountDao().findByPK(discrepancyNoteBean.getOwnerId());
 
+			Map<String, String> repeatingInfoMap = DiscrepancyNoteUtil.prepareRepeatingInfoMap(
+					discrepancyNoteBean.getEntityType(), discrepancyNoteBean.getEntityId(), itemDataDao, eventCRFDao,
+					studyEventDao, itemGroupMetadataDAO, studyEventDefinitionDao);
+			String itemDataOrdinal = repeatingInfoMap.get("itemDataOrdinal");
+			String studyEventOrdinal = repeatingInfoMap.get("studyEventOrdinal");
+
 			HashMap<Object, Object> h = new HashMap<Object, Object>();
 
 			h.put("discrepancyNoteBean.id", discrepancyNoteBean.getId());
@@ -294,11 +303,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			h.put("discrepancyNoteBean", discrepancyNoteBean);
 			h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
 			h.put("discrepancyNoteBean.updatedDate", discrepancyNoteBean.getUpdatedDate());
-			h.put("eventName", discrepancyNoteBean.getEventName());
+			h.put("eventName", studyEventOrdinal != null ? (discrepancyNoteBean.getEventName() + "(x"
+					+ studyEventOrdinal + ")") : discrepancyNoteBean.getEventName());
 			h.put("eventStartDate", discrepancyNoteBean.getEventStart());
 			h.put("crfName", discrepancyNoteBean.getCrfName());
 			h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
-			h.put("entityName", discrepancyNoteBean.getEntityName());
+			h.put("entityName",
+					itemDataOrdinal != null ? (discrepancyNoteBean.getEntityName() + "(#" + itemDataOrdinal + ")")
+							: discrepancyNoteBean.getEntityName());
 			h.put("entityValue", discrepancyNoteBean.getEntityValue());
 			h.put("discrepancyNoteBean", discrepancyNoteBean);
 			h.put("discrepancyNoteBean.description", discrepancyNoteBean.getDescription());
@@ -427,9 +439,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					}
 				} else if (entityType.equalsIgnoreCase("eventCRF")) {
 					StudyEventDAO sed = getStudyEventDao();
-					StudyEventBean se = (StudyEventBean) sed.findByPK(dnb.getEntityId());
-
 					EventCRFBean ecb = (EventCRFBean) aeb;
+					StudyEventBean se = (StudyEventBean) sed.findByPK(ecb.getStudyEventId());
+					StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(
+							se.getStudyEventDefinitionId());
 					CRFVersionDAO cvdao = getCrfVersionDao();
 					CRFDAO cdao = getCrfDao();
 					CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
@@ -440,10 +453,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 					StudySubjectBean ssub = (StudySubjectBean) getStudySubjectDao().findByPK(ecb.getStudySubjectId());
 					dnb.setStudySub(ssub);
-					if (se != null) {
-						dnb.setEventStart(se.getDateStarted());
-						dnb.setEventName(se.getName());
-					}
+					dnb.setEventStart(se.getDateStarted());
+					dnb.setEventName(sedb.getName());
 					dnb.setCrfName(cb.getName());
 					String crfStatus = resword.getString(ecb.getStage().getNameRaw());
 					if (crfStatus.equals("Invalid")) {
@@ -478,7 +489,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					StudySubjectBean ssub = (StudySubjectBean) getStudySubjectDao().findByPK(se.getStudySubjectId());
 					dnb.setStudySub(ssub);
 					dnb.setEventStart(se.getDateStarted());
-					dnb.setEventName(se.getName());
+					dnb.setEventName(sedb.getName());
 					String column = dnb.getColumn().trim();
 					if (!StringUtil.isBlank(column)) {
 						if ("date_start".equals(column)) {
@@ -529,7 +540,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 					StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
 					dnb.setStudySub(ssub);
 					dnb.setEventStart(se.getDateStarted());
-					dnb.setEventName(se.getName());
+					dnb.setEventName(sedb.getName());
 					dnb.setCrfName(cb.getName());
 					String crfStatus = resword.getString(ec.getStage().getNameRaw());
 					if (crfStatus.equals("Invalid")) {
@@ -1025,6 +1036,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 	public void setStudyEventDefinitionDao(StudyEventDefinitionDAO studyEventDefinitionDao) {
 		this.studyEventDefinitionDao = studyEventDefinitionDao;
+	}
+
+	public ItemGroupMetadataDAO getItemGroupMetadataDAO() {
+		return itemGroupMetadataDAO;
+	}
+
+	public void setItemGroupMetadataDAO(ItemGroupMetadataDAO itemGroupMetadataDAO) {
+		this.itemGroupMetadataDAO = itemGroupMetadataDAO;
 	}
 
 	public ArrayList<DiscrepancyNoteBean> getAllNotes() {

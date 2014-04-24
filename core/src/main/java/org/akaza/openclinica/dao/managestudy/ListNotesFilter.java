@@ -12,15 +12,17 @@
  ******************************************************************************/
 package org.akaza.openclinica.dao.managestudy;
 
+import com.clinovo.util.RegexpUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import java.util.regex.Pattern;
 
 public class ListNotesFilter implements CriteriaCommand {
 
@@ -240,8 +242,18 @@ public class ListNotesFilter implements CriteriaCommand {
 		for (ListNotesFilter.Filter filter : this.getFilters()) {
 			String property = filter.getProperty();
 			if (additionalColumnMapping.containsKey(property)) {
-				builder.append(" and ").append(additionalColumnMapping.get(property)).append(" like '%")
-						.append(filter.getValue()).append("%' ");
+				String itemDataOrdinal = null;
+				String value = (String) filter.getValue();
+				if (property.equalsIgnoreCase("entityName") && Pattern.compile("\\(#\\d*\\)").matcher(value).find()) {
+					itemDataOrdinal = RegexpUtil.parseGroup(value, "(\\(#\\d*\\))", 1).replaceAll("\\(#|\\)", "");
+					value = RegexpUtil.parseGroup(value, "(\\w*)(\\(#\\d*\\))", 1);
+				}
+				builder.append(" and ").append(additionalColumnMapping.get(property)).append(" like '%").append(value)
+						.append("%' ");
+				if (itemDataOrdinal != null) {
+					builder.append(" and ").append("dns.item_data_ordinal").append(" = ").append(itemDataOrdinal)
+							.append(" ");
+				}
 			}
 		}
 		return builder.toString();

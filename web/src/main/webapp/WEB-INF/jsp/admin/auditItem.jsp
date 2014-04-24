@@ -34,7 +34,7 @@
 		      <td class="table_cell"><c:out value="${audit.auditEventTypeName}"/>&nbsp;</td>
 		      <td class="table_cell"><fmt:formatDate value="${audit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
 		      <td class="table_cell"><c:out value="${audit.userName}"/>&nbsp;</td>
-		      <td class="table_cell"><c:out value="${audit.entityName}"/>&nbsp;</td>
+		      <td class="table_cell"><c:out value="${audit.entityName}"/><c:if test="${itemDataOrdinal ne null}">(#${itemDataOrdinal})</c:if>&nbsp;</td>
 		      <td class="table_cell"><c:out value="${audit.oldValue}"/>&nbsp;</td>
 		      <td class="table_cell"><c:out value="${audit.newValue}"/>&nbsp;</td>
 		  </tr>

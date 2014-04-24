@@ -13,6 +13,33 @@
 
 package org.akaza.openclinica.service;
 
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.core.SessionManager;
+import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,31 +52,15 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-
 /**
  * DiscrepancyNoteUtil is a convenience class for managing discrepancy notes, such as getting all notes for a study, or
  * filtering them by subject or resolution status.
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class DiscrepancyNoteUtil {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DiscrepancyNoteUtil.class);
+
 	// TODO: initialize these static members from the database.
 	public static final Map<String, Integer> TYPES = new HashMap<String, Integer>();
 	static {
@@ -896,8 +907,6 @@ public class DiscrepancyNoteUtil {
 	/**
 	 * Generate a summary of statistics for a collection of discrepancy notes.
 	 * 
-	 * @param allDiscBeans
-	 *            A List of DiscrepancyNoteBeans.
 	 * @return A Map mapping the name of each type of note (e.g., "Annotation") to another Map containing that type's
 	 *         statistics.
 	 */
@@ -1563,10 +1572,10 @@ public class DiscrepancyNoteUtil {
 
 	public static void transformSavedRFCToFVC(DiscrepancyNoteBean dn, String detailedNote, Integer resStatusId,
 			DiscrepancyNoteDAO dndao) {
-		transformSavedDNTo(dn, "", "", DiscrepancyNoteType.REASON_FOR_CHANGE.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
-				resStatusId, dndao);
+		transformSavedDNTo(dn, "", "", DiscrepancyNoteType.REASON_FOR_CHANGE.getId(),
+				DiscrepancyNoteType.FAILEDVAL.getId(), resStatusId, dndao);
 	}
-	
+
 	public static void transformSavedAnnotationToFVC(DiscrepancyNoteBean dn, String detailedNote, Integer resStatusId,
 			DiscrepancyNoteDAO dndao) {
 		transformSavedDNTo(dn, "", "", DiscrepancyNoteType.ANNOTATION.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
@@ -1616,7 +1625,7 @@ public class DiscrepancyNoteUtil {
 		transformDNTo(dn, "", "", DiscrepancyNoteType.REASON_FOR_CHANGE.getId(), DiscrepancyNoteType.FAILEDVAL.getId(),
 				resStatusId);
 	}
-	
+
 	private static DiscrepancyNoteBean transformDNTo(DiscrepancyNoteBean dn, String description, String detailedNotes,
 			Integer oldTypeId, Integer typeId, Integer resStatusId) {
 		if (oldTypeId != dn.getDiscrepancyNoteTypeId())
@@ -1632,5 +1641,41 @@ public class DiscrepancyNoteUtil {
 			dn.setResolutionStatusId(resStatusId);
 
 		return dn;
+	}
+
+	public static Map<String, String> prepareRepeatingInfoMap(String name, int entityId, ItemDataDAO iddao,
+			EventCRFDAO ecdao, StudyEventDAO sedao, ItemGroupMetadataDAO igmdao, StudyEventDefinitionDAO seddao) {
+		Map<String, String> repeatingInfoMap = new HashMap<String, String>();
+		try {
+			if (name.equalsIgnoreCase("eventcrf")) {
+				EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(entityId);
+				StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+				StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb
+						.getStudyEventDefinitionId());
+				if (sedb.isRepeating())
+					repeatingInfoMap.put("studyEventOrdinal", "" + seb.getSampleOrdinal());
+			} else if (name.equalsIgnoreCase("studyevent")) {
+				StudyEventBean seb = (StudyEventBean) sedao.findByPK(entityId);
+				StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb
+						.getStudyEventDefinitionId());
+				if (sedb.isRepeating())
+					repeatingInfoMap.put("studyEventOrdinal", "" + seb.getSampleOrdinal());
+			} else if (name.equalsIgnoreCase("itemdata")) {
+				ItemDataBean idb = (ItemDataBean) iddao.findByPK(entityId);
+				EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
+				StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+				StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb
+						.getStudyEventDefinitionId());
+				ItemGroupMetadataBean igmb = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(idb.getItemId(),
+						ecb.getCRFVersionId());
+				if (sedb.isRepeating())
+					repeatingInfoMap.put("studyEventOrdinal", "" + seb.getSampleOrdinal());
+				if (igmb.isRepeatingGroup())
+					repeatingInfoMap.put("itemDataOrdinal", "" + idb.getOrdinal());
+			}
+		} catch (Exception ex) {
+			LOGGER.error("Error has occurred.", ex);
+		}
+		return repeatingInfoMap;
 	}
 }

@@ -41,15 +41,16 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 	private ResolutionStatus resStatus;
 
 	private String detailedNotes = "";
-	private int parentDnId = 0;
+	private int parentDnId;
 	private String entityType = "";
 	private String column = "";// not in DB
-	private int entityId = 0;
+	private int entityId;
 	private String field = "";
 	private String fieldForDN = "";
 	private ArrayList children = new ArrayList();// not in DB
-	private int studyId = 0;
-	private int eventCRFId = 0;
+	private int studyId;
+	private int eventCRFId;
+	private int itemDataOrdinal;
 
 	private UserAccountBean lastUpdator;
 	private Date lastDateUpdated;
@@ -636,5 +637,13 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
 	public void setFieldForDN(String fieldForDN) {
 		this.fieldForDN = fieldForDN;
+	}
+
+	public int getItemDataOrdinal() {
+		return itemDataOrdinal;
+	}
+
+	public void setItemDataOrdinal(int itemDataOrdinal) {
+		this.itemDataOrdinal = itemDataOrdinal;
 	}
 }
