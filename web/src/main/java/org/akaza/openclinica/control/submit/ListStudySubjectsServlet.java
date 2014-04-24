@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -59,7 +61,10 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 			return;
 		}
 
-		if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+		if (currentRole != null
+				&& (currentRole.equals(Role.SYSTEM_ADMINISTRATOR) || currentRole.equals(Role.STUDY_ADMINISTRATOR)
+				|| currentRole.equals(Role.STUDY_DIRECTOR) || currentRole.equals(Role.INVESTIGATOR)
+				|| currentRole.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.equals(Role.STUDY_MONITOR))) {
 			return;
 		}
 
