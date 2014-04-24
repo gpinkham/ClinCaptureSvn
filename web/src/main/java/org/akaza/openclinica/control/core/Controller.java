@@ -86,6 +86,7 @@ import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -945,6 +946,13 @@ public abstract class Controller extends BaseController {
 	public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail,
 			String successMessage, String failMessage, Boolean sendMessage, HttpServletRequest request)
 			throws Exception {
+		return sendEmailWithAttach(to, from, subject, body, htmlEmail, successMessage, failMessage, 
+				sendMessage, new String[0], request);
+	}
+	
+	public Boolean sendEmailWithAttach(String to, String from, String subject, String body, Boolean htmlEmail,
+			String successMessage, String failMessage, Boolean sendMessage, String[] files, HttpServletRequest request)
+			throws Exception {
 		Boolean messageSent = true;
 		try {
 			JavaMailSenderImpl mailSender = getMailSender();
@@ -955,6 +963,10 @@ public abstract class Controller extends BaseController {
 			helper.setTo(processMultipleImailAddresses(to.trim()));
 			helper.setSubject(subject);
 			helper.setText(body, true);
+			for (String filePath : files) {
+				FileSystemResource file = new FileSystemResource(filePath);
+				helper.addAttachment(file.getFilename(), file);
+			}
 
 			mailSender.send(mimeMessage);
 			if (successMessage != null && sendMessage) {

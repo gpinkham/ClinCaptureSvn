@@ -37,6 +37,8 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
 
+import com.clinovo.service.ReportCRFService;
+
 /**
  * <P>
  * <b>SqlInitServlet.java </b>, servlet designed to run on startup, gathers all the SQL queries and stores them in
@@ -75,11 +77,16 @@ public class SQLInitServlet extends HttpServlet {
 		String ruleDirectory = "rules";
 		String rootDirectory = getField("filePath");
 		String crfDirectory = "crf" + File.separator;
+		String crfReportDirectory = ReportCRFService.CRF_REPORT_DIR;
 		String crfOriginalDirectory = "original" + File.separator;
 
 		// Creating rules directory if not exist
 		if (!(new File(rootDirectory)).isDirectory() || !(new File(ruleDirectory)).isDirectory()) {
 			(new File(rootDirectory + ruleDirectory)).mkdirs();
+		}
+				
+		if (!(new File(rootDirectory)).isDirectory() || !(new File(crfReportDirectory)).isDirectory()) {
+			(new File(rootDirectory + crfReportDirectory)).mkdirs();
 		}
 
 		if (!(new File(rootDirectory)).isDirectory() || !(new File(crfDirectory)).isDirectory()

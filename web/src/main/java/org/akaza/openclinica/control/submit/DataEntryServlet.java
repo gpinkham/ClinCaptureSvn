@@ -23,6 +23,7 @@ package org.akaza.openclinica.control.submit;
 import com.clinovo.model.CodedItem;
 import com.clinovo.model.CodedItemElement;
 import com.clinovo.service.DataEntryService;
+import com.clinovo.service.ReportCRFService;
 import com.clinovo.util.ValidatorHelper;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -73,6 +74,7 @@ import org.akaza.openclinica.control.form.ScoreItemValidator;
 import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
+import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -119,6 +121,7 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.impl.StdScheduler;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
@@ -127,6 +130,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1696,7 +1700,11 @@ public abstract class DataEntryServlet extends Controller {
 							return;
 						}
 					}
-
+					
+					// send email with CRF-report
+					if (markSuccessfully && "complete".equals(edcb.getEmailStep())) sendEmailWithCRFReport(crfVersionBean, 
+							crfBean, ssb, edcb, ecb, currentStudy, locale, request);
+					
 					// now write the event crf bean to the database
 					String annotations = fp.getString(INPUT_ANNOTATIONS);
 					setEventCRFAnnotations(annotations, request);
@@ -1862,6 +1870,42 @@ public abstract class DataEntryServlet extends Controller {
 				SubjectEventStatusUtil.determineSubjectEventStates(sedb, ssb, study, new DAOWrapper(studydao, seDao,
 						ssdao, ecdao, edcdao, dndao));
 			}
+		}
+	}
+
+	private void sendEmailWithCRFReport(CRFVersionBean crfVersionBean, CRFBean crfBean, StudySubjectBean ssb,
+			EventDefinitionCRFBean edcb, EventCRFBean ecb, StudyBean currentStudy, Locale locale,
+			HttpServletRequest request) {
+		ReportCRFService reportCRFService = (ReportCRFService) SpringServletAccess.getApplicationContext(
+				getServletContext()).getBean("reportCRFService");
+		try {
+			String reportFilePath = reportCRFService.createPDFReport(ecb.getId(), currentStudy, locale, resword, request
+					.getRequestURL().toString().replaceAll(request.getServletPath(), ""), this.getServletContext()
+					.getRealPath("/"), SQLInitServlet.getField("filePath") + ReportCRFService.CRF_REPORT_DIR + File.separator, getSessionManager(request));
+			if (!StringUtil.isBlank(reportFilePath) && "complete".equals(edcb.getEmailStep())) {
+				StringBuilder body = new StringBuilder();
+				body.append(MessageFormat.format(respage.getString("crf_report_email_body"), "completed"));
+				body.append(respage.getString("email_body_simple_separator"));
+				body.append(respage.getString("email_body_simple_separator"));
+				body.append(MessageFormat.format(respage.getString("thank_you_message"), currentStudy.getName()));
+				body.append(respage.getString("email_body_separator"));
+				body.append(respage.getString("email_body_simple_separator"));
+				body.append(respage.getString("email_footer"));
+				String[] files = { reportFilePath };
+
+				boolean isEmailSent = sendEmailWithAttach(
+						edcb.getEmailTo(),
+						EmailEngine.getAdminEmail(),
+						MessageFormat.format(respage.getString("crf_report_message"), ssb.getLabel(), crfBean.getName()
+								+ " " + crfVersionBean.getName()), body.toString(), true, null, null, true, files,
+						request);
+				String message = isEmailSent ? respage.getString("crf_report_was_sent_successfully_message") : respage
+						.getString("crf_report_was_not_sent_successfully_message");
+				addPageMessage(message, request);
+			}
+		} catch (Exception e) {
+			logger.error("Error occurs while creating a CRF-report");
+			e.printStackTrace();
 		}
 	}
 

@@ -12,6 +12,7 @@ import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DataEntryService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.DiscrepancyDescriptionService;
+import com.clinovo.service.ReportCRFService;
 import com.clinovo.service.StudySubjectIdService;
 import com.clinovo.service.SystemService;
 import com.clinovo.service.TermService;
@@ -150,6 +151,8 @@ public abstract class DefaultAppContextTest extends AbstractContextSentiveTest {
 	protected WidgetsLayoutService widgetsLayoutService;
 	@Autowired
 	protected DataEntryService dataEntryService;
+	@Autowired
+	protected ReportCRFService reportCRFService;
 	@Autowired
 	private SessionFactory sessionFactory;
 

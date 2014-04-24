@@ -748,7 +748,18 @@
     <item_group_metadata item_group_metadata_id="34" item_group_id="4" header="" subheader="" layout=""
                          repeat_number="3" repeat_max="40" repeat_array="" row_start_number="0" crf_version_id="2"
                          item_id="34" ordinal="7" show_group="true" repeating_group="true"/>
-
+	<item_group_metadata item_group_metadata_id="35" item_group_id="1" header="" subheader="" layout=""
+                         repeat_number="1" repeat_max="1" repeat_array="" row_start_number="1" crf_version_id="1"
+                         item_id="16" ordinal="16" show_group="true" repeating_group="false"/>
+	<item_group_metadata item_group_metadata_id="36" item_group_id="1" header="" subheader="" layout=""
+                         repeat_number="1" repeat_max="1" repeat_array="" row_start_number="1" crf_version_id="1"
+                         item_id="17" ordinal="17" show_group="true" repeating_group="false"/>
+    <item_group_metadata item_group_metadata_id="37" item_group_id="1" header="" subheader="" layout=""
+                         repeat_number="1" repeat_max="1" repeat_array="" row_start_number="1" crf_version_id="1"
+                         item_id="18" ordinal="18" show_group="true" repeating_group="false"/>
+    <item_group_metadata item_group_metadata_id="38" item_group_id="1" header="" subheader="" layout=""
+                         repeat_number="1" repeat_max="1" repeat_array="" row_start_number="1" crf_version_id="1"
+                         item_id="19" ordinal="19" show_group="true" repeating_group="false"/>					 
     <rule_expression id="1"
                      value="SE_ED1NONRE.F_AGEN.IG_AGEN_UNGROUPED[1].I_AGEN_PERIODSTART eq &quot;07/01/2008&quot; and I_CONC_CON_MED_NAME eq &quot;Tylenol&quot;"
                      context="1" owner_id="0" date_created="2008-07-02" date_updated="2008-07-02" update_id="0"
