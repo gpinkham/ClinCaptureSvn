@@ -1830,9 +1830,11 @@ public abstract class DataEntryServlet extends Controller {
 									// Clinovo Ticket #173 start
 									StdScheduler scheduler = getScheduler(request);
 									CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
-									String message = calLogic.MaxMinDaysValidator(seb);
-									if (!"empty".equalsIgnoreCase(message)) {
-										addPageMessage(message, request);
+									if (!isAdministrativeEditing()) {
+										String message = calLogic.MaxMinDaysValidator(seb);
+										if (!"empty".equalsIgnoreCase(message)) {
+											addPageMessage(message, request);
+										}
 									}
 									// end
 									forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET, request, response);
@@ -3536,9 +3538,11 @@ public abstract class DataEntryServlet extends Controller {
 			StdScheduler scheduler = getScheduler(request);
 			CalendarLogic calLogic = new CalendarLogic(getDataSource(), scheduler);
 			calLogic.ScheduleSubjectEvents(seb);
-			String message = calLogic.MaxMinDaysValidator(seb);
-			if (!"empty".equalsIgnoreCase(message)) {
-				addPageMessage(message, request);
+			if (!isAdministrativeEditing()) {
+				String message = calLogic.MaxMinDaysValidator(seb);
+				if (!"empty".equalsIgnoreCase(message)) {
+					addPageMessage(message, request);
+				}
 			}
 		}
 		// end
