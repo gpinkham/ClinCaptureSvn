@@ -380,16 +380,23 @@ public class WidgetsLayoutController {
 
 		Calendar sdvCal = Calendar.getInstance();
 		int currentYear = sdvCal.get(Calendar.YEAR);
+		int currentMonth = sdvCal.get(Calendar.MONTH);
 
 		for (EventCRFBean ecrf : ecrfs) {
 
 			sdvCal.setTime(ecrf.getUpdatedDate());
-			int month = sdvCal.get(Calendar.MONTH);
 			int ecrfYear = sdvCal.get(Calendar.YEAR);
-			
 
-			if (sdvProgressYear == ecrfYear) {
-				countValues.set(month, countValues.get(month) + 1);
+			if (ecrfYear <= sdvProgressYear) {
+
+				int month = sdvCal.get(Calendar.MONTH);
+				int eStartMonth = (ecrfYear == sdvProgressYear) ? month : 0;
+				int eEndMonth = (sdvProgressYear != currentYear) ? 11 : currentMonth;
+
+				for(int i = eStartMonth; i <= eEndMonth; i++) {
+
+					countValues.set(i, countValues.get(i) + 1); 
+				}
 			}
 		}
 
@@ -398,8 +405,8 @@ public class WidgetsLayoutController {
 		int counter = 1;
 
 		for (int currentValue : countValues) {
-			String currentMonth = messageSource.getMessage("short.month." + counter, null, request.getLocale());
-			valuesAndSigns.put(currentMonth, currentValue);
+			String currentMonthName = messageSource.getMessage("short.month." + counter, null, request.getLocale());
+			valuesAndSigns.put(currentMonthName, currentValue);
 
 			counter++;
 		}
@@ -415,7 +422,6 @@ public class WidgetsLayoutController {
 		for (EventCRFBean avCRF : availableForSDV) {
 
 			Calendar avCal = Calendar.getInstance();
-			int currentMonth = avCal.get(Calendar.MONTH);
 
 			avCal.setTime(avCRF.getUpdatedDate());
 			int avYear = avCal.get(Calendar.YEAR);
