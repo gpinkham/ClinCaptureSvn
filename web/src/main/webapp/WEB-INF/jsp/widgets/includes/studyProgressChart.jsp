@@ -8,6 +8,6 @@
 
 <form class="hidden" id="study_progress">
 	<c:forEach items="${studyProgressMap}" var="eventStatus" varStatus="status">
-		<input id="sp_${fn:replace(eventStatus.key, ' ', '_')}_count" value="${eventStatus.value}"/>			
+		<input id="sp_${fn:replace(eventStatus.key, ' ', '_')}_count" value="${eventStatus.value}"/>
 	</c:forEach>
 </form>

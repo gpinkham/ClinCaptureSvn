@@ -53,7 +53,7 @@
 			<td id="layout1" class="droptrue ui-sortable column1" unselectable="on">
 				<span class="filler">filler</span>
 				<c:forEach var="widget" items="${dispayWidgetsLayout}">
-					<c:if test="${widget.ordinal ne 0 and widget.ordinal%2 ne 0}">
+					<c:if test="${widget.ordinal ne 0 and widget.ordinal%2 ne 0 and not widget.twoColumnWidget}">
 						<div class="widget" id="${widget.widgetId}">
 							<a onclick="javascript:removeWidget(this)" href="#"><img src="../images/remove_widget.png" class="remove" title="remove"/></a>
 							<c:catch var="e">

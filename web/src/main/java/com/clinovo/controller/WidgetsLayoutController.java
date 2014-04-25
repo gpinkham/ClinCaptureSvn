@@ -6,6 +6,7 @@ import com.clinovo.model.Widget;
 import com.clinovo.model.WidgetsLayout;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.dynamicevent.DynamicEventBean;
@@ -13,6 +14,9 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.dao.EventCRFSDVFilter;
+import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.dynamicevent.DynamicEventDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.ListEventsForSubjectFilter;
@@ -20,8 +24,10 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,9 +39,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -52,6 +60,9 @@ public class WidgetsLayoutController {
 
 	@Autowired
 	private WidgetService widgetService;
+	
+	 @Autowired
+	 private MessageSource messageSource;
 
 	@RequestMapping("/configureHomePage")
 	public ModelMap configureHomePageHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -156,10 +167,7 @@ public class WidgetsLayoutController {
 	@RequestMapping("/initNdsAssignedToMeWidget")
 	public void initNdsAssignedToMeWidget(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		response.setDateHeader("Expires", -1);
-		response.setHeader("Pragma", "no-cache");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Cache-Control", "no-store");
+		setRequestHeadersAndUpdateLocale(response, request);
 
 		int currentUser = Integer.parseInt(request.getParameter("userId"));
 		StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
@@ -197,12 +205,7 @@ public class WidgetsLayoutController {
 	public String initEventsCompletionWidget(HttpServletRequest request, HttpServletResponse response, Model model)
 			throws IOException {
 
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Pragma", "no-cache");
-		response.setDateHeader("Expires", -1);
-		response.setHeader("Cache-Control", "no-store");
-
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		setRequestHeadersAndUpdateLocale(response, request);
 
 		String page = "widgets/includes/eventsCompletionChart";
 		String action = request.getParameter("action");
@@ -293,12 +296,7 @@ public class WidgetsLayoutController {
 	public String initSubjectStatusCountWidget(HttpServletRequest request, HttpServletResponse response, Model model)
 			throws IOException {
 
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Pragma", "no-cache");
-		response.setDateHeader("Expires", -1);
-		response.setHeader("Cache-Control", "no-store");
-
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		setRequestHeadersAndUpdateLocale(response, request);
 
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(datasource);
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
@@ -320,12 +318,7 @@ public class WidgetsLayoutController {
 	public String initStudyProgressWidget(HttpServletRequest request, HttpServletResponse response, Model model)
 			throws IOException {
 
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("Pragma", "no-cache");
-		response.setDateHeader("Expires", -1);
-		response.setHeader("Cache-Control", "no-store");
-
-		ResourceBundleProvider.updateLocale(request.getLocale());
+		setRequestHeadersAndUpdateLocale(response, request);
 
 		StudyEventDAO studyEventDAO = new StudyEventDAO(datasource);
 		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
@@ -356,6 +349,100 @@ public class WidgetsLayoutController {
 		return "widgets/includes/studyProgressChart";
 	}
 
+	@RequestMapping("/initSdvProgressWidget")
+	public String initSdvProgressWidget(HttpServletRequest request, HttpServletResponse response, Model model)
+			throws IOException {
+
+		setRequestHeadersAndUpdateLocale(response, request);
+
+		int sdvProgressYear = Integer.parseInt((String) request.getParameter("sdvProgressYear"));
+		sdvProgressYear = sdvProgressYear == 0 ? Calendar.getInstance().get(Calendar.YEAR) : sdvProgressYear;
+		StudyBean sb = (StudyBean) request.getSession().getAttribute("study");
+
+		EventCRFDAO eCrfdao = new EventCRFDAO(datasource);
+
+		ArrayList<EventCRFBean> previousYear = (ArrayList<EventCRFBean>) eCrfdao.findSDVedEventCRFsByStudyAndYear(sb,
+				sdvProgressYear - 1);
+		boolean previousDataExists = previousYear.size() > 0;
+
+		ArrayList<EventCRFBean> nextYear = (ArrayList<EventCRFBean>) eCrfdao.findSDVedEventCRFsByStudyAndYear(sb,
+				sdvProgressYear + 1);
+		boolean nextDataExists = nextYear.size() > 0;
+
+		EventCRFSDVFilter sdvFilterDone = new EventCRFSDVFilter(sb.getId());
+		sdvFilterDone.addFilter("sdvStatus", "complete");
+		EventCRFSDVSort sdvSortDone = new EventCRFSDVSort();
+		boolean sdvWithOpenQueries = sb.getStudyParameterConfig().getAllowSdvWithOpenQueries().equals("yes");
+		ArrayList<EventCRFBean> ecrfs = (ArrayList<EventCRFBean>) eCrfdao.getAvailableWithFilterAndSort(
+				sb.getId(), sb.getId(), sdvFilterDone, sdvSortDone, sdvWithOpenQueries, 0, 9999);
+
+		List<Integer> countValues = new ArrayList<Integer>(Collections.nCopies(12, 0));
+
+		Calendar sdvCal = Calendar.getInstance();
+		int currentYear = sdvCal.get(Calendar.YEAR);
+
+		for (EventCRFBean ecrf : ecrfs) {
+
+			sdvCal.setTime(ecrf.getUpdatedDate());
+			int month = sdvCal.get(Calendar.MONTH);
+			int ecrfYear = sdvCal.get(Calendar.YEAR);
+			
+
+			if (sdvProgressYear == ecrfYear) {
+				countValues.set(month, countValues.get(month) + 1);
+			}
+		}
+
+		LinkedHashMap<String, Integer> valuesAndSigns = new LinkedHashMap<String, Integer>();
+
+		int counter = 1;
+
+		for (int currentValue : countValues) {
+			String currentMonth = messageSource.getMessage("short.month." + counter, null, request.getLocale());
+			valuesAndSigns.put(currentMonth, currentValue);
+
+			counter++;
+		}
+
+		EventCRFSDVFilter sdvFilter = new EventCRFSDVFilter(sb.getId());
+		sdvFilter.addFilter("sdvStatus", "not done");
+		EventCRFSDVSort sdvSort = new EventCRFSDVSort();
+		ArrayList<EventCRFBean> availableForSDV = (ArrayList<EventCRFBean>) eCrfdao.getAvailableWithFilterAndSort(
+				sb.getId(), sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries, 0, 9999);
+
+		List<Integer> countAvailableCRFs = new ArrayList<Integer>(Collections.nCopies(12, 0));
+
+		for (EventCRFBean avCRF : availableForSDV) {
+
+			Calendar avCal = Calendar.getInstance();
+			int currentMonth = avCal.get(Calendar.MONTH);
+
+			avCal.setTime(avCRF.getUpdatedDate());
+			int avYear = avCal.get(Calendar.YEAR);
+
+			if (avYear <= sdvProgressYear){
+
+				int avMonth = avCal.get(Calendar.MONTH);
+				int startMonth = (avYear == sdvProgressYear) ? avMonth : 0;
+				int endMonth = (sdvProgressYear != currentYear) ? 11 : currentMonth;
+
+				for(int i = startMonth; i <= endMonth; i++) {
+
+					countAvailableCRFs.set(i, countAvailableCRFs.get(i) + 1); 
+				}
+			}
+			
+		}
+
+		model.addAttribute("sdvAvailableECRFs", countAvailableCRFs);
+		model.addAttribute("sdvProgressYear", sdvProgressYear);
+		model.addAttribute("sdvValuesByMonth", valuesAndSigns);
+		model.addAttribute("sdvNextYearExists", nextDataExists);
+		model.addAttribute("sdvPreviousYearExists", previousDataExists);
+
+		return "widgets/includes/sdvProgressChart";
+	}
+
 	private Integer getCountOfSubjects(StudyBean sb) {
 
 		int countOfSubjects;
@@ -382,5 +469,15 @@ public class WidgetsLayoutController {
 		}
 
 		return studyEventDefinitions;
+	}
+
+	private void setRequestHeadersAndUpdateLocale(HttpServletResponse response, HttpServletRequest request) {
+
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Pragma", "no-cache");
+		response.setDateHeader("Expires", -1);
+		response.setHeader("Cache-Control", "no-store");
+
+		ResourceBundleProvider.updateLocale(request.getLocale());
 	}
 }

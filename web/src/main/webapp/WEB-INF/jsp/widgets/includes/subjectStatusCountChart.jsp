@@ -8,7 +8,7 @@
 
 <form class="hidden" id="subjects_status_count">
 	<input type="text" id="ssc_available" value="${countOfAvailableSubjects}" />
+	<input type="text" id="ssc_signed" value="${countOfSignedSubjects}" />
 	<input type="text" id="ssc_removed" value="${countOfRemovedSubjects}" />
 	<input type="text" id="ssc_locked" value="${countOfLockedSubjects}" />
-	<input type="text" id="ssc_signed" value="${countOfSignedSubjects}" />
 </form>

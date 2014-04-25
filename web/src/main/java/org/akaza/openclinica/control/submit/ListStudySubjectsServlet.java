@@ -62,9 +62,9 @@ public class ListStudySubjectsServlet extends RememberLastPage {
 		}
 
 		if (currentRole != null
-				&& (currentRole.equals(Role.SYSTEM_ADMINISTRATOR) || currentRole.equals(Role.STUDY_ADMINISTRATOR)
-				|| currentRole.equals(Role.STUDY_DIRECTOR) || currentRole.equals(Role.INVESTIGATOR)
-				|| currentRole.equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.equals(Role.STUDY_MONITOR))) {
+				&& (currentRole.getRole().equals(Role.SYSTEM_ADMINISTRATOR) || currentRole.getRole().equals(Role.STUDY_ADMINISTRATOR)
+				|| currentRole.getRole().equals(Role.STUDY_DIRECTOR) || currentRole.getRole().equals(Role.INVESTIGATOR)
+				|| currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR) || currentRole.getRole().equals(Role.STUDY_MONITOR))) {
 			return;
 		}
 

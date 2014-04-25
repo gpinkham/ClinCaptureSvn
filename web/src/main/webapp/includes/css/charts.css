@@ -135,6 +135,7 @@ form#actionForSave input {
 #toolbar_tc,#toolbar {
 	min-height: 40px;
 	padding-bottom: 5px;
+	padding-top: 5px;
 }
 
 .ui-sortable-placeholder {

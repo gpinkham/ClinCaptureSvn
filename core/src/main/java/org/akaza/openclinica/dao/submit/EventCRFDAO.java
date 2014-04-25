@@ -23,6 +23,7 @@ package org.akaza.openclinica.dao.submit;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -36,6 +37,7 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
 import javax.sql.DataSource;
+
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -453,6 +455,17 @@ public class EventCRFDAO extends AuditableEntityDAO {
 		variables.put(3, eventCRFId);
 
 		this.execute(digester.getQuery("setSDVStatus"), variables);
+	}
+	
+	public Collection findSDVedEventCRFsByStudyAndYear(StudyBean study, int year) {
+
+		HashMap variables = new HashMap();
+
+		variables.put(1, study.getId());
+		variables.put(2, study.getId());
+		variables.put(3, year);
+
+		return executeFindAllQuery("findSDVedEventCRFsByStudyAndYear", variables);
 	}
 
 	public Integer countEventCRFsByStudy(int studyId, int parentStudyId) {

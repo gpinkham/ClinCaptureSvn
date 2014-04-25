@@ -30,16 +30,18 @@ if (typeof String.prototype.trim !== 'function') {
 }
 
 function launchCustomizePage() {
+
 	setScrollHendlers(scrollTrigger);
 	resizeTcInToolbar();
 	inicializeDnD();
 	$("#toolbar, #layout1, #layout2,#layout_tc").disableSelection();
 	$(".widget .chart_wrapper a").attr("href", "#");
-	$(".widget input[type=button]").remove();
+	$(".widget input[type=button], .widget_big input[type=button]").remove();
 	updatePostOrder();
 }
 
 function inicializeDnD() {
+
 	$(".droptrue").sortable({
 		connectWith : '.droptrue',
 		opacity : 0.6,
@@ -63,20 +65,25 @@ function inicializeDnD() {
 		helper : 'clone',
 		items : '.widget_big',
 		cursorAt : {
-			left : 80
+			left : 80,
+			top : 20
 		},
 		revert : true,
 		start : function(e, ui) {
+		
 			ui.helper.animate({
-				width : 380
+				width : 380,
+				height : "auto"
 			}, 300);
+
 			highlight("tc");
 			$(this).find(".tc_content").css("display", "none");
 			$(this).find(".description").css("display", "block");
 			scrollTrigger = false;
 		},
 		receive : function(e, ui) {
-			if (ui.item.parent().attr('id') == "layout_tc") {
+
+			if ($(this).attr("id") == "layout_tc") {
 				ui.item.animate({
 					width : 778
 				}, 300);
@@ -86,17 +93,26 @@ function inicializeDnD() {
 				ui.item.css("width", "380");
 				$(this).find(".tc_content").css("display", "none");
 				$(this).find(".description").css("display", "block");
-			}
-			;
+			};
 		},
 		stop : function(e, ui) {
+
 			disableHighlight();
 			scrollTrigger = true;
+			if ($(this).attr("id") == "layout_tc") {
+				$(this).find(".tc_content").css("display", "block");
+				$(this).find(".description").css("display", "none");
+			}
 		},
 		placeholer : 'ui-placeholder-big'
 	});
 }
 
+/*
+* This function adds auto scrolling for the toolbar area in the Customize page.
+* When user set mouse over two columns widget - toolbar area will be scrolled
+* to TC widgets drop zone.
+*/
 function setScrollHendlers(scrollTrigger) {
 	$(".widget_big").mouseenter(function() {
 		if (scrollTrigger) {
@@ -139,7 +155,26 @@ function setScrollHendlers(scrollTrigger) {
 			});
 }
 
+/*
+* Change size of all Two-columns widgets in toolbar,
+* hide content and show description
+*/
+function resizeTcInToolbar() {
+
+	$("#toolbar_tc .widget_big").css("width", "380px");
+
+	$("#toolbar_tc .widget_big").each(function() {
+		$(this).find(".tc_content").css("display", "none");
+		$(this).find(".description").css("display", "block");
+	});
+}
+
+/*
+* Highlight areas where widget can be dropped.
+* This function will be activated on drag action.
+*/
 function highlight(target) {
+
 	if (target === "oc") {
 		$("#layout1, #layout2, #toolbar").each(function() {
 			$(this).animate({
@@ -159,14 +194,10 @@ function highlight(target) {
 	}
 }
 
-function resizeTcInToolbar() {
-	$("#toolbar_tc .widget_big").css("width", "380px");
-	$("#toolbar_tc .widget_big").each(function() {
-		$(this).find(".tc_content").css("display", "none");
-		$(this).find(".description").css("display", "block");
-	});
-}
-
+/*
+* Disable highlighting of areas where widget can be dropped.
+* This function will be activated when user drops widget.
+*/
 function disableHighlight() {
 	$("#layout1, #layout2, #toolbar, #toolbar_tc, #layout_tc").each(function() {
 		$(this).animate({
@@ -177,6 +208,7 @@ function disableHighlight() {
 }
 
 function updatePostOrder() {
+
 	var arr = [];
 	$(".column1 div.widget").each(function() {
 		arr.push($(this).attr('id'));
@@ -204,7 +236,9 @@ function updatePostOrder() {
 }
 
 function removeWidget(elemet) {
+
 	var itemToRemove = $(elemet).parent();
+
 	if (itemToRemove.attr("class") == "widget") {
 		$("#toolbar").prepend(itemToRemove);
 	} else {
@@ -239,6 +273,13 @@ function saveLayoutAndExit() {
 /* /Customize page */
 
 /* Initialization of widgets */
+
+
+/*
+ * Initialize NDs Assigned To Me widget.
+ */
+
+/* Initialization of widgets */
 function initNdsAssignedToMeWidget() {
 	var url = getCurentUrl();
 
@@ -267,8 +308,10 @@ function initNdsAssignedToMeWidget() {
 			var totalNds = newNds + updatedNds + closedNds
 					+ resolutionProposedDns;
 			captionLimit = countCaptionLimit(totalNds);
+			
 			var captionSelector = ".dns_assigned_to_me .captions td";
 			setCaption(captionSelector, captionLimit);
+			
 			var valuesSecelctor = ".dns_assigned_to_me .stack";
 			setStacksLenghts(valuesSecelctor, array, captionLimit);
 		},
@@ -278,6 +321,11 @@ function initNdsAssignedToMeWidget() {
 	});
 }
 
+/*
+ * Initialize Events Completion widget.
+ * 
+ * @returns eventsCompletionChart.jsp (append it to #events_completion_container)
+ */
 function initEventsCompletionWidget(action) {
 	var url = getCurentUrl();
 	var lastElement = $(".events_completion input#ec_last_element").val();
@@ -300,9 +348,10 @@ function initEventsCompletionWidget(action) {
 			action : action
 		},
 		success : function(html) {
-			$(".events_completion #events_completion_container").html(html);
-			var hasNext = $("#events_completion_form #ec_has_next").val();
-			var hasPrevious = $("#events_completion_form #ec_has_previous").val();
+
+			$("#events_completion_container").html(html);
+			var hasNext = $("#ec_has_next").val();
+			var hasPrevious = $("#ec_has_previous").val();
 
             $(".pop-up").css('display', 'none');
 
@@ -361,6 +410,11 @@ function initEventsCompletionWidget(action) {
 	});
 }
 
+/*
+ * Initialize Subject Status Count widget.
+ * 
+ * @returns subjectStatusCountChart.jsp (append it to #subject_status_count_container)
+ */
 function initSubjectStatusCount() {
 	var url = getCurentUrl();
 
@@ -370,31 +424,26 @@ function initSubjectStatusCount() {
 		data : {},
 		success : function(html) {
 
-		$(".subject_status_count #subject_status_count_container")
-				.html(html);
-					
-		var element = document.getElementById('toolbar');
-		var data = new google.visualization.DataTable();
-		var availableSubjects = parseInt($("form#subjects_status_count #ssc_available").val());
-		var signedSubjects = parseInt($("form#subjects_status_count #ssc_signed").val());
-		var removedSubjects = parseInt($("form#subjects_status_count #ssc_removed").val());
-		var lockedSubjects = parseInt($("form#subjects_status_count #ssc_locked").val());
-		var totalSubjectsCount = availableSubjects + signedSubjects + removedSubjects + lockedSubjects;
+		$("#subject_status_count_container").html(html);
+
+		var totalSubjectsCount = 0;
+
+		$("form#subjects_status_count input").each(function() {
+			totalSubjectsCount += parseInt($(this).val());
+		});
 
 		if (totalSubjectsCount != 0 ) {
-			data.addColumn('string', 'Statuses');
-			data.addColumn('number', 'Count');
-			data.addRows([ [ ' - Available', availableSubjects ],
-			               [ ' - Signed', signedSubjects ], 
-			               [ ' - Removed', removedSubjects ],
-			               [ ' - Locked', lockedSubjects ] ]);
-	
-	
-			var options = getPieOptions([ '#7fd0ff', '#32a656','#ff0000', '#868686' ]);
+
+			var data = getSubjectStatusWidgetData();
+
+			var options = new getPieOptions();
+			options.colors = [ '#7fd0ff', '#32a656','#ff0000', '#868686' ];
+			
 			var subjectStatusChart = new google.visualization.PieChart(document.getElementById('subject_status_count_chart'));
-	
 			subjectStatusChart.draw(data, options);
-	
+
+			var element = document.getElementById('toolbar');
+
 			if (!element) {
 	
 				function selectHandler() {
@@ -411,16 +460,151 @@ function initSubjectStatusCount() {
 	
 				google.visualization.events.addListener(subjectStatusChart, 'select', selectHandler);
 			}
-		} else {
-			$("#subject_status_count_container").attr("height","50px");
-		}
-	},
-	error : function(e) {
+			} else {
+				$("#subject_status_count_container").attr("height","50px");
+			}
+		},
+		error : function(e) {
 			console.log("Error:" + e);
 		}
 	});
 }
 
+
+/*
+* Get values for Subject Status Count Widget from .subjects_status_count form
+*/
+function getSubjectStatusWidgetData() {
+
+	var data = new google.visualization.DataTable();
+	var statuses = [ 'Available', 'Signed', 'Removed', 'Locked' ];
+
+	data.addColumn('string', 'Statuses');
+	data.addColumn('number', 'Count');
+
+	$("form#subjects_status_count input").each(function(index) {
+		data.addRow([ " - " + statuses[index], parseInt($(this).val()) ]);
+	});
+
+	return data;
+}
+
+/*
+ * Initialize SDV Progress widget This function will be used for three tipes of
+ * actions:
+ * 1. Init - will be run when user opens home page 
+ * 2. Next - will upload data for next year (if exists) 
+ * 3. Back - will upload data for previous year (if exists)
+ * 
+ * Depending on returned data - "Next" or "Previous" buttons will be hidden
+ * 
+ * @param action - type if action that which will be executed 
+ * @returns sdvProgressChart.jsp (append it to .sdv_progress_container)
+ */
+function initSdvProgress(action) {
+	var url = getCurentUrl();
+	var displayedYear = parseInt($(".sdv_progress #sdvProgressYear").val());
+	
+	if (action === "init") {
+		displayedYear = 0;
+	} else if (action === "next") {
+		displayedYear += 1;
+	} else if (action === "back") {
+		displayedYear -= 1;
+	}
+
+	var data = {
+		action: action,
+		sdvProgressYear: displayedYear
+	};
+	
+	$.ajax({
+		type : "POST",
+		url : url + "initSdvProgressWidget",
+		data : data,
+		success : function(html) {
+			
+			$(".sdv_progress .sdv_progress_container").html(html);
+			displayedYear = $(".sdv_progress #sdvProgressYear").val();
+
+			var data = getSdvWidgetData();
+
+			var options = new getVerticalBarOptions();
+			options.hAxis.title = displayedYear;
+
+			var sdvProgressChart = new google.visualization.ColumnChart(document.getElementById('sdv_progress_chart'));
+			sdvProgressChart.draw(data, options);
+			setSDVButtonsColor();
+
+			var element = document.getElementById('toolbar');
+			if (!element) {
+
+				function selectHandler() {
+
+					var selectedItem = sdvProgressChart
+						.getSelection()[0];
+
+					if (selectedItem) {
+
+						var sdvStep = (selectedItem.column == "3") ? "not+done" : "complete";
+						var redirectPrefix = "pages/viewAllSubjectSDVtmp?studyId=";
+						var redirectSufix = "&showMoreLink=true&sdv_tr_=true&sdv_p_=1&sdv_mr_=15";
+						var studyId = $("input[id=sdvWStudyId]").val();
+						
+						window.location.href = redirectPrefix + studyId + redirectSufix + "&sdv_f_sdvStatus=" + sdvStep;
+						}
+					}
+
+					google.visualization.events
+							.addListener(sdvProgressChart, 'select',
+							selectHandler);
+			} else {
+				$(".widget input[type=button], .widget_big input[type=button]").remove();
+			}
+		},
+		error : function(e) {
+			console.log("Error:" + e);
+		}
+	});
+}
+
+/*
+* Get values for SDV Progress Widget from sdvMonthForm
+*/
+function getSdvWidgetData() {
+
+	var data = new google.visualization.DataTable();
+
+	data.addColumn('string', 'Month');
+	data.addColumn('number', 'SDV-ed event CRFs');
+	data.addColumn({
+		type : 'number',
+		role : 'annotation'
+	});
+	data.addColumn('number', 'Available for SDV');
+	data.addColumn({
+		type : 'number',
+		role : 'annotation'
+	});
+
+	$("#sdvMonthForm input").each(
+			function() {
+				var currentValue = parseInt($(this).val());
+				var currentMonth = $(this).attr("month");
+				var available = parseInt($(this).attr("available"));
+
+				data.addRow([ currentMonth, currentValue, currentValue,
+						available, available ]);
+			});
+
+	return data;
+}
+
+/*
+ * Initialize Study Progress widget.
+ * 
+ * @returns studyProgressChart.jsp (append it to .study_progress_container)
+ */
 function initStudyProgress() {
 	var url = getCurentUrl();
 
@@ -432,73 +616,32 @@ function initStudyProgress() {
 
 			$(".study_progress #study_progress_container").html(html);
 
-			var spScheduled = parseInt($(
-					"#study_progress #sp_scheduled_count").val());
-			var spDES = parseInt($(
-					"#study_progress #sp_data_entry_started_count")
-					.val());
-			var spSDV = parseInt($(
-					"#study_progress #sp_source_data_verified_count")
-					.val());
-			var spSigned = parseInt($(
-					"#study_progress #sp_signed_count").val());
-			var spCompleted = parseInt($(
-					"#study_progress #sp_completed_count").val());
-			var spSkipped = parseInt($(
-					"#study_progress #sp_skipped_count").val());
-			var spStopped = parseInt($(
-					"#study_progress #sp_stopped_count").val());
-			var spLocked = parseInt($(
-					"#study_progress #sp_locked_count").val());
-			var totalCount = spScheduled + spDES + spSDV + spSigned
-					+ spCompleted + spSkipped + spStopped + spLocked;
-			var element = document.getElementById('toolbar');
-			var spData = new google.visualization.DataTable();
+			var totalCount = 0;
+
+			$("form[id=study_progress] input").each(function(index) {
+				totalCount += parseInt($(this).val());
+			});
+
+			var element = document.getElementById('toolbar');	
 
 			if (totalCount != 0) {
-				spData.addColumn('string', 'Statuses');
-				spData.addColumn('number', 'Count');
-				spData.addColumn('number', 'StatusId');
-				spData.addRows([ [ ' - Scheduled', spScheduled, 1 ],
-								[ ' - Data Entry Started', spDES, 3 ],
-								[ ' - SDV-ed', spSDV, 9 ],
-								[ ' - Signed', spSigned, 8 ],
-								[ ' - Completed', spCompleted, 4 ],
-								[ ' - Skipped', spSkipped, 6 ],
-								[ ' - Stopped', spStopped, 5 ],
-								[ ' - Locked', spLocked, 7 ] ]);
 
-				var options = getPieOptions([ '#12d2ff', '#ffc700',
+				var spData = getStudyProgresWidgetData();
+				var options = new getPieOptions();
+
+				options.colors = [ '#12d2ff', '#ffc700',
 						'#8ac819', '#029f32', '#9439c4', '#ff6301',
-						'#ff0000', '#868686' ]);
+						'#ff0000', '#868686' ];
+
 				var subjectStatusChart = new google.visualization.PieChart(
 						document.getElementById('study_progress_chart'));
 
 				subjectStatusChart.draw(spData, options);
 
 				if (!element) {
-					var d = new Date();
-					var months = [ "Jan", "Feb", "Mar", "Apr", "May",
-							"Jun", "Jul", "Aug", "Sep", "Oct", "Nov",
-							"Dec" ];
-					var curr_date = d.getDate();
-					var curr_month = months[parseInt(d.getMonth())];
-					var curr_year = d.getFullYear();
-					var startYear = parseInt(curr_year) - 10;
-					var endDate = (('' + curr_date).length < 2 ? '0'
-							: '')
-							+ curr_date
-							+ "-"
-							+ curr_month
-							+ "-"
-							+ curr_year;
-					var startDate = (('' + curr_date).length < 2 ? '0'
-							: '')
-							+ curr_date
-							+ "-"
-							+ curr_month
-							+ "-"
-							+ startYear;
+					var startEndDates = getEventsFilterDates();
+					var startDate = startEndDates[0];
+					var endDate = startEndDates[1];
 
 					function selectHandler() {
 						var selectedItem = subjectStatusChart
@@ -529,7 +672,42 @@ function initStudyProgress() {
 		}
 	});
 }
+
+/*
+* Get values for SDV Progress Widget from sdvMonthForm
+*/
+function getStudyProgresWidgetData() {
+	var spData = new google.visualization.DataTable();
+
+	var statusIds = [ 1, 3, 9, 8, 4, 6, 5, 7 ];
+	var statusNames = [ 'Scheduled', 'Data Entry Started', 'SDV-ed', 'Signed',
+			'Completed', 'Skipped', 'Stopped', 'Locked' ];
+
+	spData.addColumn('string', 'Statuses');
+	spData.addColumn('number', 'Count');
+	spData.addColumn('number', 'StatusId');
+
+	$("form[id=study_progress] input").each(
+			function(index) {
+				if (statusIds[index] != undefined) {
+
+					spData.addRow([ " - " + statusNames[index],
+							parseInt($(this).val()), statusIds[index] ]);
+				}
+			});
+
+	return spData;
+}
 /* /Initialization of widgets */
+
+/* Supporting functions */
+
+
+/* 
+* Calculate limit of caption for table
+* 
+* @param total - the maximum value that will be displayed in the chart
+*/
 
 /* Supporting functions */
 function countCaptionLimit(total) {
@@ -543,6 +721,12 @@ function countCaptionLimit(total) {
 	return total;
 }
 
+/*
+* Set captions for table
+*
+* @param selector - jQuery selector for line marks
+* @param maxValue - caption limit
+*/
 function setCaption(selector, maxValue) {
 	var counter = 0;
 	$(selector).each(function() {
@@ -584,43 +768,142 @@ function setStacksLenghts(selector, values, captionLimit) {
 			});
 }
 
-function getPieOptions(sliceColors) {
-	var options = {
-		width : 450,
-		height : 200,
-		legend : {
-			position : 'right',
-			alignment : 'center',
-			textStyle : {
-				color : '#4D4D4D'
-			}
-		},
-		pieSliceText : 'percents',
-		pieStartAngle : 0,
-		chartArea : {
-			left : 10,
-			top : 20,
-			right : 20,
-			width : "85%",
-			height : "85%"
-		},
-		colors : sliceColors,
-		fontSize : 11,
-		fontName : 'Tahoma',
-		tooltip : {
-			textStyle : {
-				color : '#4D4D4D',
-				fontName : 'Tahoma',
-				fontSize : 11,
-				showColorCode : false
-			}
+/*
+* On "View All Events in study" page user should enter two dates for filter
+* 
+* @returns <Array<Date, Date>>[0] - start date for filter (current date - 10 years)
+* @returns <Array<Date, Date>>[1] - end date for filter (current date)
+*/
+function getEventsFilterDates() {
+
+	var d = new Date();
+	var months = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+			"Sep", "Oct", "Nov", "Dec" ];
+
+	var curr_date = d.getDate();
+	var curr_month = months[parseInt(d.getMonth())];
+	var curr_year = d.getFullYear();
+	var startYear = parseInt(curr_year) - 10;
+	var endDate = (('' + curr_date).length < 2 ? '0' : '') + curr_date + "-"
+			+ curr_month + "-" + curr_year;
+
+	var startDate = (('' + curr_date).length < 2 ? '0' : '') + curr_date + "-"
+			+ curr_month + "-" + startYear;
+
+	return [ startDate, endDate ];
+}
+
+/*
+ * Get all required options for Pie chart
+ */
+function getPieOptions() {
+
+	this.width = 450;
+	this.height = 200;
+	this.legend = {
+		position : 'right',
+		alignment : 'center',
+		textStyle : {
+			color : '#4D4D4D'
+		}
+	};
+	this.pieSliceText = 'percents';
+	this.pieStartAngle = 0;
+	this.chartArea = {
+		left : 10,
+		top : 20,
+		right : 20,
+		width : "85%",
+		height : "85%"
+	};
+	this.colors = [ '#8ac819' ];
+	this.fontSize = 11;
+	this.fontName = 'Tahoma';
+	this.tooltip = {
+		textStyle : {
+			color : '#4D4D4D',
+			fontName : 'Tahoma',
+			fontSize : 11,
+			showColorCode : false
+		}
+	};
+}
+
+/*
+ * Get all required options for Vertical bar chart
+ */
+function getVerticalBarOptions() {
+
+	this.hAxis = {
+		title : "",
+		allowContainerBoundaryTextCufoff : false,
+		titleTextStyle : {
+			italic : false,
+			bold : true
 		}
 	};
 
-	return options;
+	this.chartArea = {
+		left : 30,
+		top : 30,
+		right : 40,
+		width : "77%",
+		height : "65%"
+	};
+	this.annotations = {
+		textStyle : {
+			fontName : 'Tahoma',
+			fontSize : 10,
+			bold : false,
+			italic : false,
+			color : '#4D4D4D',
+			auraColor : '#ffffff',
+			opacity : 1
+		}
+	};
+	this.width = 790;
+	this.height = 200;
+	this.legend = {
+		position : 'right',
+		alignment : 'center',
+		maxLines : 2,
+		textStyle : {
+			color : '#4D4D4D'
+		}
+	};
+
+	this.fontSize = 11;
+	this.fontName = 'Tahoma';
+	this.bar = {
+		groupWidth : '70%'
+	};
+
+	this.animation = {
+		duration : 1000,
+		easing : 'out'
+	};
+
+	this.colors = [ '#8ac819', '#ffc700' ];
+	this.isStacked = true;
+}
+
+
+/*
+ * This function will update color of buttons inside SDV widget depending on color theme
+ */
+function setSDVButtonsColor() {
+	
+	var color = $("form[id=sdv_progress] #currentColor").val();
+	
+	if (color === "green") {
+		$(".sdv_progress input[type=button]").attr("class", "button_medium_green");
+	} else if (color === "violet") {
+		$(".sdv_progress input[type=button]").attr("class", "button_medium_violet");
+	}
 }
 
 function getCurentUrl() {
+
 	var urlTemp = new RegExp("^.*(pages)")
 			.exec(window.location.href.toString());
 	var url = "";
@@ -633,29 +916,51 @@ function getCurentUrl() {
 	return url;
 }
 
+/*
+ * Create new cookie
+ * 
+ * @param c_name <String> name of cookie that will be created;
+ * @param value <String> value of cookie that will be created;
+ * @param exdays <String> time of cookie life in days;
+ */
 function setCookie(c_name, value, exdays) {
+
 	var exdate = new Date();
 	exdate.setDate(exdate.getDate() + exdays);
-	var c_value = escape(value)
+	var c_value = encodeURI(value)
 			+ ((exdays == null) ? "" : ("; expires=" + exdate.toUTCString()));
 	document.cookie = c_name + "=" + c_value;
 }
 
+/*
+ * Get Cookie by name
+ * 
+ * @param c_name <String> name of cookie to find;
+ * @return <String> value of cookie;
+ */
 function getCookie(c_name) {
+
 	if (document.cookie.length > 0) {
 		c_start = document.cookie.indexOf(c_name + "=");
+
 		if (c_start != -1) {
 			c_start = c_start + c_name.length + 1;
 			c_end = document.cookie.indexOf(";", c_start);
+
 			if (c_end == -1) {
 				c_end = document.cookie.length;
 			}
-			return unescape(document.cookie.substring(c_start, c_end));
+
+			return  decodeURI(document.cookie.substring(c_start, c_end));
 		}
 	}
+
 	return "";
 }
 
+/*
+ * Check if cookies are enabled in browser
+ */
 function checkCookiesDialog() {
 
 	setCookie("testCookie", "test");
@@ -668,13 +973,19 @@ function checkCookiesDialog() {
 	}
 }
 
+/*
+ * This function shows the dialog window with a warning message inside.
+ */
 function displayCookiesErrorMessage() {
+
+	// Check if dialog was already shown before
 	if ($("#confirmation").length == 0) {
-		$("body").append("<div id=\"confirmation\" style=\"display: none;\">"
-							+ "<div style=\"clear: both; text-align: justify;\">"
-							+ "Cookies are disabled in your browser, some of widgets will not be shown. Please enable cookies."
-							+ "</div>" + 
-						"</div>");
+		$("body")
+				.append(
+						"<div id=\"confirmation\" style=\"display: none;\">"
+								+ "<div style=\"clear: both; text-align: justify;\">"
+								+ "Cookies are disabled in your browser, some of widgets will not be shown. Please enable cookies."
+								+ "</div>" + "</div>");
 
 		$("#confirmation").dialog({
 			autoOpen : false,
@@ -687,14 +998,22 @@ function displayCookiesErrorMessage() {
 	}
 
 	$("#confirmation").dialog("open");
+
+	// Set color scheme of the dialog
 	var color = $('*').find('a').css('color');
+
+	// If color theme = violet
 	if (color == 'rgb(170, 98, 198)' || color == '#AA62C6'
 			|| color == '#aa62c6') {
-		$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#AA62C6');
+		$('.ui-dialog .ui-dialog-titlebar').find('span')
+				.css('color', '#AA62C6');
 	}
+
+	// If color theme = green
 	if (color == 'rgb(117, 184, 148)' || color == '#75b894'
 			|| color == '#75B894') {
-		$('.ui-dialog .ui-dialog-titlebar').find('span').css('color', '#75b894');
+		$('.ui-dialog .ui-dialog-titlebar').find('span')
+				.css('color', '#75b894');
 	}
 }
 /* /Supporting functions */
