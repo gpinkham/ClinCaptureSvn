@@ -546,7 +546,7 @@ function initSdvProgress(action) {
 
 					if (selectedItem) {
 
-						var sdvStep = (selectedItem.column == "3") ? "not+done" : "complete";
+						var sdvStep = (selectedItem.column == "3" || selectedItem.column == "4") ? "not+done" : "complete";
 						var redirectPrefix = "pages/viewAllSubjectSDVtmp?studyId=";
 						var redirectSufix = "&showMoreLink=true&sdv_tr_=true&sdv_p_=1&sdv_mr_=15";
 						var studyId = $("input[id=sdvWStudyId]").val();

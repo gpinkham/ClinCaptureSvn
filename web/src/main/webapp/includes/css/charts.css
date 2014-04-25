@@ -198,10 +198,10 @@ form#actionForSave input {
 }
 
 .widget .stack .pop-up-visible {
-    color: white;
-    position: absolute;
-    display: block;
-    text-align: center;
+	color: white;
+	position: relative;
+	display: table;
+	text-align: center;
 }
 
 .widget table.captions {
