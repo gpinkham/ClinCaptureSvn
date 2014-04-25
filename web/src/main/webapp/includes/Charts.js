@@ -543,8 +543,11 @@ function initSdvProgress(action) {
 
 					var selectedItem = sdvProgressChart
 						.getSelection()[0];
+					
+					var currentYear = new Date().getFullYear();
+					var currentMonth = new Date().getMonth();
 
-					if (selectedItem) {
+					if (selectedItem && selectedItem.row == currentMonth && currentYear == displayedYear) {
 
 						var sdvStep = (selectedItem.column == "3" || selectedItem.column == "4") ? "not+done" : "complete";
 						var redirectPrefix = "pages/viewAllSubjectSDVtmp?studyId=";
@@ -552,12 +555,12 @@ function initSdvProgress(action) {
 						var studyId = $("input[id=sdvWStudyId]").val();
 						
 						window.location.href = redirectPrefix + studyId + redirectSufix + "&sdv_f_sdvStatus=" + sdvStep;
-						}
 					}
+				}
 
-					google.visualization.events
-							.addListener(sdvProgressChart, 'select',
-							selectHandler);
+				google.visualization.events
+						.addListener(sdvProgressChart, 'select',
+						selectHandler);
 			} else {
 				$(".widget input[type=button], .widget_big input[type=button]").remove();
 			}
