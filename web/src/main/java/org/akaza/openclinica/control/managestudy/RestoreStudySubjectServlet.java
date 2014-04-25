@@ -187,7 +187,7 @@ public class RestoreStudySubjectServlet extends Controller {
                 }
 
 				String emailBody = respage.getString("the_subject") + " " + subject.getName() + " "
-						+ respage.getString("has_been_restored_to_the_study") + " " + study.getName() + ".";
+						+ (study.isSite(study.getParentStudyId()) ? respage.getString("has_been_restored_to_the_site") : respage.getString("has_been_restored_to_the_study")) + " " + study.getName() + ".";
 				addPageMessage(emailBody, request);
 				
 				forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
