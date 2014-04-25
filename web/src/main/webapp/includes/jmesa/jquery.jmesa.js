@@ -85,7 +85,7 @@
             //this.setPageToLimit(id, '1');
 
             var limit = this.getTableFacade(id).limit;
-            var filter = new classes.Filter(property, value);
+            var filter = new classes.Filter(property, $.trim(value));
             limit.addFilter(filter);
         },
         removeFilterFromLimit : function(id, property) {
@@ -299,7 +299,7 @@
             /* the filter objects */
             var filterSet = limit.getFilterSet();
             $.each(filterSet, function(index, filter) {
-                $(form).append('<input type="hidden" name="' + limit.id + '_f_' + filter.property + '" value="' + filter.value + '"/>');
+                $(form).append('<input type="hidden" name="' + limit.id + '_f_' + filter.property + '" value="' + $.trim(filter.value) + '"/>');
             });
 
             return true;
@@ -324,7 +324,7 @@
             /* the filter objects */
             var filterSet = limit.getFilterSet();
             $.each(filterSet, function(index, filter) {
-                url += '&' + limit.id + '_f_' + filter.property + '=' + encodeURIComponent(filter.value);
+                url += '&' + limit.id + '_f_' + filter.property + '=' + encodeURIComponent($.trim(filter.value));
             });
 
             /* the export */
