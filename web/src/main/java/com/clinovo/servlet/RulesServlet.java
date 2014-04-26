@@ -238,7 +238,6 @@ public class RulesServlet extends HttpServlet {
 								act.put("show", showAction.getExpressionEvaluatesTo());
 								object.put("evaluates", showAction.getExpressionEvaluatesTo());
 							} else {
-								
 								HideActionBean hideAction = (HideActionBean) ruleSetRule.getActions().get(x);
 								act.put("hide", hideAction.getExpressionEvaluatesTo());
 								JSONArray destinations = new JSONArray();
