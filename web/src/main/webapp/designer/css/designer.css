@@ -4,7 +4,7 @@
 
 .row {
   margin-left: 0;
-  margin-right: 0.8em;
+  margin-right: 1.2rem;
 }
 
 .col-md-12, .col-md-3 {
@@ -23,7 +23,7 @@ body .container {
   width: 69.5%;
   bottom: 15%;
   position: fixed;
-  margin-top: 1em;
+  margin-top: 1rem;
   overflow-y: hidden;
   padding-right: 1px;
 }
@@ -57,7 +57,7 @@ body .panel-body {
 }
 
 .dotted-border {
-  margin-top: 3em;
+  margin-top: 3rem;
   min-height: 44px;
   margin-right: 2px;
   border: 2px dotted;
@@ -69,9 +69,8 @@ body .panel-body {
 }
 
 .dotted-border-lg {
-  margin-top: 1em;
-  padding-top: 1em;
-  margin-bottom: 1px;
+  margin-top: 0.2rem;
+  padding-top: 0.5rem;
   border: 2px dotted #357EBD;
   border-radius: 5px 5px 5px 5px;
 }
@@ -80,7 +79,7 @@ body .panel-body {
   top: 90px;
   right: 12px;    
   height: 79.2%;
-  margin-top: 1em;
+  margin-top: 1rem;
   width: 30.5% !important;
   position: fixed !important;
 }
@@ -93,34 +92,34 @@ body .panel-body {
 }
 
 .trash {
-  margin-top: 3em;
-  margin-right: 1em;
-  padding-right: .3em;
+  margin-top: 3rem;
+  margin-right: 1rem;
+  padding-right: .3rem;
 }
 
 .space-right-m {
-  margin-right: 1em;
+  margin-right: 1rem;
 }
 
 .space-left-m {
-  margin-left: 1em;
+  margin-left: 1rem;
 }
 
 .space-top-sm {
-  padding-top: 2.5em;
+  padding-top: 1.2rem;
   white-space: nowrap;
 }
 
 .space-top-m {
-  margin-top: 1em;
+  margin-top: 1rem;
 }
 
 .space-bottom {
-  margin-bottom: 1em;
+  margin-bottom: 1rem;
 }
 
 .space-left-neg {
-  margin-left: -1em;
+  margin-left: -1.6rem;
 }
 
 .nowrap {
@@ -133,7 +132,7 @@ span {
 }
 
 textarea {
-  margin-top: 0.5em; 
+  margin-top: 0.5rem; 
   width: 83% !important;
 }
 
@@ -147,27 +146,27 @@ textarea {
 }
 
 .nav-cont {
-	padding-left: 8em;
-	padding-right: 8em;
+	padding-left: 8rem;
+	padding-right: 8rem;
 }
 
 .nav-justified {
-  margin-top: 0.5em !important;
-  margin-bottom: 1em !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 1rem !important;
 }
 
 .nav-justified li {
 	float: none;
   width: 201px;
-	padding-left: .5em;
-	padding-right: .5em;
+	padding-left: .5rem;
+	padding-right: .5rem;
 }
 
 .nav-justified li > a {
   width:180px;
   height: 49px;
   line-height:30px;
-  margin-bottom:0.5em !important;
+  margin-bottom:0.5rem !important;
   background-color:#428BCA !important;
 }
 
@@ -182,7 +181,7 @@ textarea {
 }
 
 .breadcrumb {
-  margin-top: 2em !important;
+  margin-top: 2rem !important;
 }
 
 .table {
@@ -195,12 +194,12 @@ textarea {
  }
 
 .form-grp {
-  margin-bottom: 4em;
+  margin-bottom: 4rem;
 }
 
 #variables {
   overflow: hidden;
-  padding-top: 4em !important;
+  padding-top: 4rem !important;
 }
 
 .group {
@@ -253,7 +252,7 @@ td {
   background-color: #fff;
 }
  
-/* Themes for different contexts */
+/* Thremes for different contexts */
 .bs-callout-danger {
   background-color: #fcf2f2;
   border-color: #dFb5b4;
@@ -319,7 +318,7 @@ body .modal-dialog {
 }
 
 .lbl {
-  margin-top: .5em;
+  margin-top: .5rem;
 }
 
 div {
@@ -338,7 +337,7 @@ div {
 }
 
 .input-group {
-  margin-bottom: .5em;
+  margin-bottom: .5rem;
 }
 
 .inner-scrollbar-wrapper {
@@ -373,4 +372,8 @@ td.group, td.ui-draggable {
 }
 .center-justify {
   text-align: center;
+}
+
+.form-group {
+  margin-bottom: 5px;
 }
