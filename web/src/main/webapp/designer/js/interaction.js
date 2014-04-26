@@ -468,7 +468,25 @@ $(function() {
 	$("#validate").click(function() {
 		parser.validate();
 	});
-
+	$('p.ui-draggable').click(function() {
+		var element = $('.dotted-border').last();
+		var params = Object.create(null);
+		params.ui = Object.create(null);
+		params.element = element;
+		params.ui.draggable = $(this);
+		if (element.is('.ui-droppable')) {
+			if (element.droppable("option", "accept").indexOf(constructAccepts(this)) > -1 || element.droppable("option", "accept").indexOf($(this).attr('id')) > -1) {
+				handleDropEvent(params);
+			}
+		} else {
+			if (element.text() == ')') {
+				if (element.prev().droppable("option", "accept").indexOf(constructAccepts(this)) > -1 || element.droppable("option", "accept").indexOf($(this).attr('id')) > -1) {
+					params.element = element.prev();
+					handleDropEvent(params);
+				}
+			}
+		}
+	});
 	createPopover($(".dotted-border"));
 	$(document).ready(function() {
 		parser.fetchStudies();

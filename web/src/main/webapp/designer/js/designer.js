@@ -627,53 +627,9 @@ function createDroppable(params) {
 	params.element.droppable({
 		accept: params.accept,
 		hoverClass: "ui-state-active",
-		drop: function(event, ui) {	
-			var existingValue = params.element.val();
- 			params.element.text("");
- 			params.element.removeClass("init");
- 			params.element.addClass("bordered");
-			if (parser.isText(ui.draggable)) {
-				handleTextDrop(params.element);
-			} else if (parser.isDate(ui.draggable)) {
-				handleDateDrop(params.element);
-			} else if (parser.isNumber(ui.draggable)) {
-				handleNumberDrop(params.element);
-			} else if (parser.isEmpty(ui.draggable)) {
-				params.element.append('""');
-			} else if (parser.isCurrentDate(ui.draggable)) {
-				params.element.append(" _CURRENT_DATE");
-			} else {
-				if (ui.draggable.text() == "<") {
-					params.element.append("&lt;");
-				} else if (ui.draggable.text() == ">") {
-					params.element.append("&gt;");
-				} else if (ui.draggable.is("td.group")) {
-					params.element.append(ui.draggable.attr("item-name"));
-				} else {
-					params.element.append(ui.draggable.text());
-				}
-			}
-			params.element.tooltip("hide");
-			// Create the next droppable
-			parser.createNextDroppable({
-				ui: ui,
-				element: params.element,
-				existingValue: existingValue
-			});
-			if (ui.draggable.is("td.group")) {
-				// Persist attrinutes
-				params.element.attr("item-oid", ui.draggable.attr("oid"));
-				params.element.attr("crf-oid", ui.draggable.attr("crf-oid"));
-				params.element.attr("event-oid", ui.draggable.attr("event-oid"));
-				params.element.attr("group-oid", ui.draggable.attr("group-oid"));
-				params.element.attr("study-oid", ui.draggable.attr("study-oid"));
-				params.element.attr("version-oid", ui.draggable.attr("version-oid"));
-			}
-			$("#deleteButton").removeClass("hidden");
-			params.element.css('font-weight', 'bold');
-			if (!$(".sortable").is(".ui-sortable")) {
-				createSortable(params.element);
-			}
+		drop: function(evt, ui) {
+			params.ui = ui;	
+			handleDropEvent(params);
 		}
 	})
 
@@ -746,6 +702,55 @@ function createSortable() {
 		}
 	});
 	$(".sortable").disableSelection();
+}
+
+function handleDropEvent(params) {
+	var existingValue = params.element.val();
+	params.element.text("");
+	params.element.removeClass("init");
+	params.element.addClass("bordered");
+	if (parser.isText(params.ui.draggable)) {
+		handleTextDrop(params.element);
+	} else if (parser.isDate(params.ui.draggable)) {
+		handleDateDrop(params.element);
+	} else if (parser.isNumber(params.ui.draggable)) {
+		handleNumberDrop(params.element);
+	} else if (parser.isEmpty(params.ui.draggable)) {
+		params.element.append('""');
+	} else if (parser.isCurrentDate(params.ui.draggable)) {
+		params.element.append(" _CURRENT_DATE");
+	} else {
+		if (params.ui.draggable.text() == "<") {
+			params.element.append("&lt;");
+		} else if (params.ui.draggable.text() == ">") {
+			params.element.append("&gt;");
+		} else if (params.ui.draggable.is("td.group")) {
+			params.element.append(params.ui.draggable.attr("item-name"));
+		} else {
+			params.element.append(params.ui.draggable.text());
+		}
+	}
+	params.element.tooltip("hide");
+	// Create the next droppable
+	parser.createNextDroppable({
+		ui: params.ui,
+		element: params.element,
+		existingValue: existingValue
+	});
+	if (params.ui.draggable.is("td.group")) {
+		// Persist attrinutes
+		params.element.attr("item-oid", params.ui.draggable.attr("oid"));
+		params.element.attr("crf-oid", params.ui.draggable.attr("crf-oid"));
+		params.element.attr("event-oid", params.ui.draggable.attr("event-oid"));
+		params.element.attr("group-oid", params.ui.draggable.attr("group-oid"));
+		params.element.attr("study-oid", params.ui.draggable.attr("study-oid"));
+		params.element.attr("version-oid", params.ui.draggable.attr("version-oid"));
+	}
+	$("#deleteButton").removeClass("hidden");
+	params.element.css('font-weight', 'bold');
+	if (!$(".sortable").is(".ui-sortable")) {
+		createSortable(params.element);
+	}
 }
 
 /* ======================================================================
@@ -1154,6 +1159,25 @@ function loadCRFVersionItems(params) {
  			} else {
  				tdName.text(item.name);
  			}
+ 			tdName.click(function(evt) {
+				var element = $('.dotted-border').last();
+				var params = Object.create(null);
+				params.ui = Object.create(null);
+				params.element = element;
+				params.ui.draggable = $(this);
+				if (element.is('.ui-droppable')) {
+					if (element.droppable("option", "accept").indexOf('td') > -1) {
+						handleDropEvent(params);
+					}
+				} else {
+					if (element.text() == ')') {
+						if (element.prev().droppable("option", "accept").indexOf('td') > -1) {
+							params.element = element.prev();
+							handleDropEvent(params);
+						}
+					}
+				}
+			});
 			tdName.text(item.name);
 			tdName.addClass("group");
 			tdName.attr("item-name", item.name);
@@ -1354,4 +1378,8 @@ function mapItemType(type) {
 	} else {
 		return type;
 	}
+}
+
+function constructAccepts(ele) {
+	return $(ele).parent().prop('tagName').toLowerCase() + "[id='" + $(ele).parents('.col-md-3').attr('id') + "'] " + $(ele).prop('tagName').toLowerCase();
 }
