@@ -1,5 +1,6 @@
 package com.clinovo.command;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ public class SystemCommand extends BaseCommand {
 	private String newLogoPath;
 
 	private MultipartFile logoFile;
+
+	private StudyBean currentStudy;
 
 	public boolean isBackMode() {
 		return backMode;
@@ -56,5 +59,20 @@ public class SystemCommand extends BaseCommand {
 
 	public void setNewLogoPath(String newLogoPath) {
 		this.newLogoPath = newLogoPath;
+	}
+
+	/**
+	 * @return the currentStudy
+	 */
+	public StudyBean getCurrentStudy() {
+		return currentStudy;
+	}
+
+	/**
+	 * @param currentStudy
+	 *            the currentStudy to set
+	 */
+	public void setCurrentStudy(StudyBean currentStudy) {
+		this.currentStudy = currentStudy;
 	}
 }

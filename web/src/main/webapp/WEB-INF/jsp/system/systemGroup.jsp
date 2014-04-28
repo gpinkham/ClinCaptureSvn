@@ -21,10 +21,11 @@
 <form:hidden path="${paramPath}.group.orderId"/>
 <form:hidden path="${paramPath}.group.parentId"/>
 <form:hidden path="${paramPath}.group.version"/>
+<form:hidden path="${paramPath}.group.isStudySpecific"/>
 <form:hidden id="state_group_id_${grp.group.id}" path="${paramPath}.opened"/>
 
 <div class="group"><img id="img_group_id_${grp.group.id}"
                         src="../images/${themeColor}${grp.opened ? "bt_Collapse" : "bt_Expand"}.gif" border="0"
-                        class="mousePointer" onclick="changeGroupState('${themeColor}', ${grp.group.id}');"/><span
+                        class="mousePointer" onclick="changeGroupState('${themeColor}', '${grp.group.id}');"/><span
     class="table_title_Admin mousePointer" onclick="changeGroupState('${themeColor}','${grp.group.id}');"><fmt:message
     key="systemProperty.${grp.group.name}.name" bundle="${resword}"/></span></div>

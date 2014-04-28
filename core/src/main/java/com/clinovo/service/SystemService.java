@@ -18,10 +18,10 @@ import com.clinovo.command.SystemCommand;
 import com.clinovo.command.SystemGroupHolder;
 import com.clinovo.model.System;
 import com.clinovo.model.SystemGroup;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 
 import java.util.List;
-
-import org.akaza.openclinica.bean.core.Role;
 
 public interface SystemService {
 
@@ -64,7 +64,7 @@ public interface SystemService {
 	 *            user role
 	 * @return List of the SystemGroupHolder
 	 */
-	List<SystemGroupHolder> getSystemPropertyGroups(Role role);
+	List<SystemGroupHolder> getSystemPropertyGroups(Role role, StudyBean study);
 
 	/**
 	 * Updates all system properties in the database.

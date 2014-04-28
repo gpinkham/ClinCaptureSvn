@@ -4,9 +4,7 @@ import com.clinovo.command.SystemCommand;
 import com.clinovo.command.SystemGroupHolder;
 import com.clinovo.model.PropertyType;
 import com.clinovo.model.PropertyValueType;
-
-import java.util.Locale;
-
+import org.akaza.openclinica.util.StringValidator;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,6 +12,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+
+import java.util.List;
+import java.util.Locale;
 
 @Component
 @SuppressWarnings("unused")
@@ -57,6 +58,8 @@ public class SystemValidator {
 				sgh.setOpened(opened);
 				validate(sgh, path, errors, locale);
 			}
+			// Validate Medical Coding
+			validateMedicalCoding(command, errors);
 		}
 	}
 
@@ -89,5 +92,60 @@ public class SystemValidator {
 				}
 			}
 		}
+	}
+
+	private void validateMedicalCoding(SystemCommand command, Errors errors) {
+
+		String defaultBioontologyURL = "";
+		String medicalCodingApiKey = "";
+		String path = "";
+		String pathForBioontologyURL = "";
+		String pathForCodingApiKey = "";
+		boolean opened = false;
+		// Set defaultBioontologyURL and medicalCodingApiKey
+		for (SystemGroupHolder sgh : command.getSystemPropertyGroups()) {
+
+			if (sgh.getGroup().getName().equals("medical_coding")) {
+				opened = sgh.isOpened();
+				path = "systemPropertyGroups['" + command.getSystemPropertyGroups().indexOf(sgh) + "']";
+				List<com.clinovo.model.System> properties = sgh.getSystemProperties();
+				for (com.clinovo.model.System property : properties) {
+
+					if (property.getName().equals("defaultBioontologyURL")) {
+						defaultBioontologyURL = property.getValue();
+						pathForBioontologyURL = path + ".systemProperties['" + properties.indexOf(property)
+								+ "'].value";
+					} else if (property.getName().equals("medicalCodingApiKey")) {
+						medicalCodingApiKey = property.getValue();
+						pathForCodingApiKey = path + ".systemProperties['" + properties.indexOf(property) + "'].value";
+					}
+				}
+				opened = !performValidation(errors, defaultBioontologyURL, medicalCodingApiKey, pathForBioontologyURL,
+						pathForCodingApiKey) || opened;
+				sgh.setOpened(opened);
+				break;
+			}
+		}
+	}
+
+	private boolean performValidation(Errors errors, String defaultBioontologyURL, String medicalCodingApiKey,
+			String pathForBioontologyURL, String pathForCodingApiKey) {
+		boolean valid = true;
+		if (!defaultBioontologyURL.trim().isEmpty()) {
+
+			if (!StringValidator.isValidURL(defaultBioontologyURL)) {
+				errors.rejectValue(pathForBioontologyURL, "please_provide_a_valid_url");
+				valid = false;
+			}
+			if (defaultBioontologyURL.endsWith("/")) {
+				errors.rejectValue(pathForBioontologyURL, "please_remove_the_final_slash");
+				valid = false;
+			}
+			if (medicalCodingApiKey.isEmpty()) {
+				errors.rejectValue(pathForCodingApiKey, "please_supply_the_biootology_api_key");
+				valid = false;
+			}
+		}
+		return valid;
 	}
 }

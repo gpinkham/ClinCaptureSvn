@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?> 
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" 
+	        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd"> 
+ 
+    <changeSet author="Frank" id="2014-04-22-TICKET1295-ADD-COLUMN-TO-SYSTEM-GROUP"> 
+        <comment>Add column is_study_specific to system_group</comment> 
+        <addColumn tableName="system_group"> 
+             <column name="is_study_specific" type="BOOLEAN" defaultValueBoolean="false" /> 
+            </addColumn> 
+        <addNotNullConstraint columnName="is_study_specific" 
+        defaultNullValue="FALSE" 
+        tableName="system_group"/> 
+    </changeSet> 
+
+    <changeSet author="Frank" id="2014-04-22-TICKET1295-INSERT-DATA"> 
+        <insert tableName="system_group"> 
+            <column name="id" value="12" /> 
+            <column name="name" value="imports" /> 
+            <column name="parent_id" value="0" /> 
+            <column name="order_id" value="3" /> 
+            <column name="version" value="1" /> 
+            <column name="is_study_specific" valueBoolean="true" /> 
+        </insert> 
+    </changeSet> 
+
+    <changeSet author="Frank" id="2014-04-22-TICKET1295-UPDATE-SYSTEM-GROUP-DATA"> 
+        <update tableName="system_group"> 
+            <column name="order_id" value="4" /> 
+            <where>name = 'email'</where> 
+        </update> 
+        <update tableName="system_group"> 
+            <column name="order_id" value="5" /> 
+            <where>name = 'security'</where> 
+        </update> 
+        <update tableName="system_group"> 
+            <column name="order_id" value="6" /> 
+            <where>name = 'facility'</where> 
+        </update> 
+        <update tableName="system_group"> 
+            <column name="order_id" value="7" /> 
+            <where>name = 'support'</where> 
+        </update> 
+        <update tableName="system_group"> 
+            <column name="order_id" value="8" /> 
+            <where>name = 'rules_studio'</where> 
+        </update> 
+        <update tableName="system_group"> 
+            <column name="order_id" value="9" /> 
+            <where>name = 'reporting'</where> 
+        </update> 
+        <update tableName="system_group"> 
+            <column name="order_id" value="10" /> 
+            <where>name = 'randomization'</where> 
+        </update> 
+        <update tableName="system_group"> 
+            <column name="order_id" value="12" /> 
+            <where>name = 'cancer_clinical_trials_suites'</where> 
+        </update> 
+        <update tableName="system_group"> 
+            <column name="is_study_specific" valueBoolean="true" /> 
+            <column name="order_id" value="11" /> 
+            <where>name = 'medical_coding'</where> 
+        </update> 
+    </changeSet> 
+
+    <changeSet author="Frank" id="2014-04-22-TICKET1295-ADD-COLUMN-TO-STUDY-PARAMETER"> 
+        <comment>Add columns to study_parameter to make it compliant with System Settings</comment> 
+        <addColumn tableName="study_parameter"> 
+             <column name="system_group_id" type="INTEGER"/> 
+        </addColumn> 
+        <addColumn tableName="study_parameter"> 
+             <column name="control_type" type="VARCHAR(255)"/> 
+        </addColumn>
+        <addColumn tableName="study_parameter"> 
+             <column name="control_values" type="VARCHAR(255)"/> 
+        </addColumn>
+        <addColumn tableName="study_parameter"> 
+             <column name="display_order" type="INTEGER"/> 
+        </addColumn> 
+        <addColumn tableName="study_parameter"> 
+             <column name="crc" type="VARCHAR(255)"/> 
+        </addColumn>
+        <addColumn tableName="study_parameter"> 
+             <column name="investigator" type="VARCHAR(255)"/> 
+        </addColumn>
+        <addColumn tableName="study_parameter"> 
+             <column name="monitor" type="VARCHAR(255)"/> 
+        </addColumn>
+        <addColumn tableName="study_parameter"> 
+             <column name="admin" type="VARCHAR(255)"/> 
+        </addColumn> 
+        <addColumn tableName="study_parameter"> 
+             <column name="root" type="VARCHAR(255)"/> 
+        </addColumn>
+        <addColumn tableName="study_parameter"> 
+             <column name="control_size" type="INTEGER"/> 
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="Frank" id="2014-04-22-TICKET1295-UPDATE-STUDY-PARAMETER-DATA"> 
+        <update tableName="study_parameter"> 
+            <column name="system_group_id" value="12" /> 
+            <column name="control_type" value="RADIO" /> 
+            <column name="control_values" value="yes,no" /> 
+            <column name="display_order" value="1" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <where>handle = 'markImportedCRFAsCompleted'</where> 
+        </update> 
+
+        <update tableName="study_parameter"> 
+            <column name="system_group_id" value="12" /> 
+            <column name="control_type" value="RADIO" /> 
+            <column name="control_values" value="yes,no" /> 
+            <column name="display_order" value="2" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <where>handle = 'autoScheduleEventDuringImport'</where> 
+        </update> 
+
+        <update tableName="study_parameter"> 
+            <column name="system_group_id" value="12" /> 
+            <column name="control_type" value="RADIO" /> 
+            <column name="control_values" value="yes,no" /> 
+            <column name="display_order" value="3" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <where>handle = 'autoCreateSubjectDuringImport'</where> 
+        </update> 
+
+        <update tableName="study_parameter"> 
+            <column name="system_group_id" value="12" /> 
+            <column name="control_type" value="RADIO" /> 
+            <column name="control_values" value="yes,no" /> 
+            <column name="display_order" value="4" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <where>handle = 'replaceExisitingDataDuringImport'</where> 
+        </update> 
+
+        <update tableName="study_parameter"> 
+            <column name="system_group_id" value="10" /> 
+            <column name="control_type" value="RADIO" /> 
+            <column name="control_values" value="yes,no" /> 
+            <column name="display_order" value="1" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <where>handle = 'allowCodingVerification'</where> 
+        </update> 
+
+        <update tableName="study_parameter"> 
+            <column name="system_group_id" value="10" /> 
+            <column name="control_type" value="TEXT" /> 
+            <column name="display_order" value="2" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <column name="control_size" value="60" /> 
+            <where>handle = 'defaultBioontologyURL'</where> 
+        </update> 
+
+        <update tableName="study_parameter"> 
+            <column name="system_group_id" value="10" /> 
+            <column name="control_type" value="TEXT" /> 
+            <column name="display_order" value="3" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <column name="control_size" value="60" /> 
+            <where>handle = 'medicalCodingApiKey'</where> 
+        </update> 
+
+        <update tableName="study_parameter"> 
+            <column name="system_group_id" value="10" /> 
+            <column name="control_type" value="TEXT" /> 
+            <column name="display_order" value="4" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />  
+            <column name="control_size" value="60" /> 
+            <where>handle = 'autoCodeDictionaryName'</where> 
+        </update> 
+
+        <update tableName="study_parameter"> 
+            <column name="system_group_id" value="10" /> 
+            <column name="control_type" value="RADIO" />  
+            <column name="control_values" value="yes,no" /> 
+            <column name="display_order" value="5" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="READ" /> 
+            <column name="root" value="READ" />
+            <where>handle = 'medicalCodingApprovalNeeded'</where> 
+        </update> 
+
+        <update tableName="study_parameter"> 
+            <column name="system_group_id" value="10" /> 
+            <column name="control_type" value="RADIO" />  
+            <column name="control_values" value="yes,no" /> 
+            <column name="display_order" value="6" /> 
+            <column name="crc" value="HIDDEN" /> 
+            <column name="investigator" value="HIDDEN" /> 
+            <column name="monitor" value="HIDDEN" /> 
+            <column name="admin" value="WRITE" /> 
+            <column name="root" value="WRITE" />
+            <where>handle = 'medicalCodingContextNeeded'</where> 
+        </update> 
+    </changeSet> 	 
+</databaseChangeLog> 

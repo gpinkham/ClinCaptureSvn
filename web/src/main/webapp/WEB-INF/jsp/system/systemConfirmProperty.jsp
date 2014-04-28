@@ -29,7 +29,7 @@
         <c:when test="${systemProperty.type eq 'TEXT' || systemProperty.type eq 'COMBOBOX' || systemProperty.type eq 'DYNAMIC_INPUT'}">
           <td>${systemProperty.value}</td>
         </c:when>
-        <c:when test="${systemProperty.type eq 'RADIO' || systemProperty.type eq 'DYNAMIC_RADIO'}">
+        <c:when test="${(systemProperty.type eq 'RADIO' || systemProperty.type eq 'DYNAMIC_RADIO') && (systemProperty.value ne null and not empty systemProperty.value)}">
           <td><fmt:message key="systemProperty.${systemProperty.name}.${systemProperty.value}.radioLabel"
                            bundle="${resword}"/></td>
         </c:when>

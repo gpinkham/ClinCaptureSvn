@@ -34,6 +34,15 @@ public class StudyParameter extends AuditableEntityBean {
 	private String defaultValue;
 	private boolean inheritable;
 	private boolean overridable;
+	private Integer systemGroupId;
+	private String controlType;
+	private String controlValues;
+	private int controlSize;
+	private String crc;
+	private String investigator;
+	private String monitor;
+	private String admin;
+	private String root;
 
 	public StudyParameter() {
 		handle = "";
@@ -134,6 +143,141 @@ public class StudyParameter extends AuditableEntityBean {
 	 */
 	public void setOverridable(boolean overridable) {
 		this.overridable = overridable;
+	}
+
+	/**
+	 * @return the systemGroupId
+	 */
+	public Integer getSystemGroupId() {
+		return systemGroupId;
+	}
+
+	/**
+	 * @param systemGroupId
+	 *            the systemGroupId to set
+	 */
+	public void setSystemGroupId(Integer systemGroupId) {
+		this.systemGroupId = systemGroupId;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public String getControlType() {
+		return controlType;
+	}
+
+	/**
+	 * @param type
+	 *            the type to set
+	 */
+	public void setControlType(String type) {
+		this.controlType = type;
+	}
+
+	/**
+	 * @return the typeValues
+	 */
+	public String getControlValues() {
+		return controlValues;
+	}
+
+	/**
+	 * @param typeValues
+	 *            the typeValues to set
+	 */
+	public void setControlValues(String typeValues) {
+		this.controlValues = typeValues;
+	}
+
+	/**
+	 * @return the controlSize
+	 */
+	public int getControlSize() {
+		return controlSize;
+	}
+
+	/**
+	 * @param controlSize
+	 *            the controlSize to set
+	 */
+	public void setControlSize(int controlSize) {
+		this.controlSize = controlSize;
+	}
+
+	/**
+	 * @return the crc
+	 */
+	public String getCrc() {
+		return crc;
+	}
+
+	/**
+	 * @param crc
+	 *            the crc to set
+	 */
+	public void setCrc(String crc) {
+		this.crc = crc;
+	}
+
+	/**
+	 * @return the investigator
+	 */
+	public String getInvestigator() {
+		return investigator;
+	}
+
+	/**
+	 * @param investigator
+	 *            the investigator to set
+	 */
+	public void setInvestigator(String investigator) {
+		this.investigator = investigator;
+	}
+
+	/**
+	 * @return the monitor
+	 */
+	public String getMonitor() {
+		return monitor;
+	}
+
+	/**
+	 * @param monitor
+	 *            the monitor to set
+	 */
+	public void setMonitor(String monitor) {
+		this.monitor = monitor;
+	}
+
+	/**
+	 * @return the admin
+	 */
+	public String getAdmin() {
+		return admin;
+	}
+
+	/**
+	 * @param admin
+	 *            the admin to set
+	 */
+	public void setAdmin(String admin) {
+		this.admin = admin;
+	}
+
+	/**
+	 * @return the root
+	 */
+	public String getRoot() {
+		return root;
+	}
+
+	/**
+	 * @param root
+	 *            the root to set
+	 */
+	public void setRoot(String root) {
+		this.root = root;
 	}
 
 }

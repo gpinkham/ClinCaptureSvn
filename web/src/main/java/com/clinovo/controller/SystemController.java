@@ -9,8 +9,10 @@ import com.clinovo.util.SessionUtil;
 import com.clinovo.validation.SystemValidator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.BaseController;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 @Controller
 @RequestMapping("/system")
@@ -45,11 +48,15 @@ public class SystemController {
 	private CoreResources coreResources;
 
 	@Autowired
+	private DataSource datasource;
+
+	@Autowired
 	private MessageSource messageSource;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String mainGet(HttpServletRequest request, Model model) throws Exception {
 		String page = "system/system";
+		StudyBean study = (StudyBean) request.getSession().getAttribute("study");
 		if (!MayProceedUtil.mayProceed(request, Role.SYSTEM_ADMINISTRATOR, Role.STUDY_ADMINISTRATOR)) {
 			page = "redirect:/MainMenu?message=system_no_permission";
 		} else {
@@ -58,7 +65,8 @@ public class SystemController {
 			if (systemCommand == null || !systemCommand.isBackMode()) {
 				systemCommand = new SystemCommand();
 				Role role = ((StudyUserRoleBean) request.getSession().getAttribute(BaseController.USER_ROLE)).getRole();
-				systemCommand.setSystemPropertyGroups(systemService.getSystemPropertyGroups(role));
+				systemCommand.setSystemPropertyGroups(systemService.getSystemPropertyGroups(role, study));
+				systemCommand.setCurrentStudy(study);
 			}
 			model.addAttribute(SYSTEM_COMMAND, systemCommand);
 
@@ -125,11 +133,18 @@ public class SystemController {
 				SessionUtil.updateSession(coreResources, request.getSession());
 				SQLInitServlet.updateParams(coreResources.getDataInfo());
 				request.getSession().setAttribute(SYSTEM_COMMAND_RESULT, "systemCommand.dataWasSuccessfullySaved");
+				refreshStudyInSession(request, systemCommand);
 			} catch (Exception ex) {
 				request.getSession().setAttribute(SYSTEM_COMMAND_ERROR, "error.systemCommand.dataWasNotSaved");
 				LOGGER.error("Error has occurred.", ex);
 			}
 		}
 		return page;
+	}
+
+	private void refreshStudyInSession(HttpServletRequest request, SystemCommand systemCommand) {
+		StudyConfigService scs = new StudyConfigService(datasource);
+		StudyBean study = scs.setParametersForStudy(systemCommand.getCurrentStudy());
+		request.getSession().setAttribute("study", study);
 	}
 }

@@ -50,4 +50,12 @@
 			from study_parameter sp, study_parameter_value spv
             where spv.study_id=? and sp.handle = spv.parameter</sql>
 	</query>
+	<query>
+		<name>findParametersBySystemGroup</name>
+		<sql>
+			SELECT * FROM study_parameter
+			WHERE system_group_id=?
+			ORDER BY display_order
+		</sql>
+	</query>
 </queries>
