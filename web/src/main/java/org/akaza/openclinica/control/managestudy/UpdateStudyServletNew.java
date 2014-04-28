@@ -269,15 +269,6 @@ public class UpdateStudyServletNew extends Controller {
 			Validator.addError(errors, "endDateTimeLabel",
 					resexception.getString("maximum_lenght_endDateTimeLabel_255"));
 		}
-		if (fp.getString("defaultBioontologyURL").trim().endsWith("/")) {
-			Validator
-					.addError(errors, "defaultBioontologyURL", resexception.getString("please_remove_the_final_slash"));
-		}
-		if (!fp.getString("defaultBioontologyURL").trim().isEmpty()
-				&& fp.getString("medicalCodingApiKey").trim().isEmpty()) {
-			Validator.addError(errors, "medicalCodingApiKey",
-					resexception.getString("please_supply_the_biootology_api_key"));
-		}
 
 		createStudyBean(fp, study);
 	}
@@ -519,33 +510,7 @@ public class UpdateStudyServletNew extends Controller {
 		study.getStudyParameterConfig().setUseEndTime(fp.getString("useEndTime"));
 		study.getStudyParameterConfig().setStartDateTimeLabel(fp.getString("startDateTimeLabel"));
 		study.getStudyParameterConfig().setEndDateTimeLabel(fp.getString("endDateTimeLabel"));
-		study.getStudyParameterConfig().setMarkImportedCRFAsCompleted(fp.getString("markImportedCRFAsCompleted"));
-		study.getStudyParameterConfig().setAutoScheduleEventDuringImport(fp.getString("autoScheduleEventDuringImport"));
-		study.getStudyParameterConfig().setAutoCreateSubjectDuringImport(fp.getString("autoCreateSubjectDuringImport"));
 		study.getStudyParameterConfig().setAllowSdvWithOpenQueries(fp.getString("allowSdvWithOpenQueries"));
-		study.getStudyParameterConfig().setReplaceExisitingDataDuringImport(
-				fp.getString("replaceExisitingDataDuringImport"));
-
-		// Medical coding
-		study.getStudyParameterConfig().setMedicalCodingApiKey(fp.getString("medicalCodingApiKey"));
-		study.getStudyParameterConfig().setDefaultBioontologyURL(fp.getString("defaultBioontologyURL"));
-		study.getStudyParameterConfig().setAutoCodeDictionaryName(fp.getString("autoCodeDictionaryName"));
-		study.getStudyParameterConfig().setAllowCodingVerification(fp.getString("allowCodingVerification"));
-		study.getStudyParameterConfig().setMedicalCodingContextNeeded(fp.getString("medicalCodingContextNeeded"));
-		study.getStudyParameterConfig().setMedicalCodingApprovalNeeded(fp.getString("medicalCodingApprovalNeeded"));
-
-		try {
-
-			// Create custom dictionary
-			if (study.getStudyParameterConfig().getAutoCodeDictionaryName() != null
-					&& !study.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
-				getDictionaryService().createDictionary(study.getStudyParameterConfig().getAutoCodeDictionaryName(),
-						study);
-			}
-		} catch (CodeException e) {
-
-			logger.info("Custom dictionary with similar name exists");
-		}
 
 		if (!errors.isEmpty()) {
 			fp.getRequest().setAttribute("formMessages", errors);
@@ -857,66 +822,9 @@ public class UpdateStudyServletNew extends Controller {
 		spv.setValue(study1.getStudyParameterConfig().getEndDateTimeLabel());
 		updateParameter(spvdao, spv);
 
-		spv.setParameter("markImportedCRFAsCompleted");
-		spv.setValue(study1.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("autoScheduleEventDuringImport");
-		spv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("autoCreateSubjectDuringImport");
-		spv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
-		updateParameter(spvdao, spv);
-
 		spv.setParameter("allowSdvWithOpenQueries");
 		spv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
 		updateParameter(spvdao, spv);
-
-		spv.setParameter("replaceExisitingDataDuringImport");
-		spv.setValue(study1.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("allowCodingVerification");
-		spv.setValue(study1.getStudyParameterConfig().getAllowCodingVerification());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("defaultBioontologyURL");
-		spv.setValue(study1.getStudyParameterConfig().getDefaultBioontologyURL());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("medicalCodingApiKey");
-		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApiKey());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("medicalCodingApiKey");
-		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApiKey());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("autoCodeDictionaryName");
-		spv.setValue(study1.getStudyParameterConfig().getAutoCodeDictionaryName());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("medicalCodingApprovalNeeded");
-		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingApprovalNeeded());
-		updateParameter(spvdao, spv);
-
-		spv.setParameter("medicalCodingContextNeeded");
-		spv.setValue(study1.getStudyParameterConfig().getMedicalCodingContextNeeded());
-		updateParameter(spvdao, spv);
-
-		try {
-
-			// Create custom dictionary
-			if (study1.getStudyParameterConfig().getAutoCodeDictionaryName() != null
-					&& !study1.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
-				getDictionaryService().createDictionary(study1.getStudyParameterConfig().getAutoCodeDictionaryName(),
-						study1);
-			}
-		} catch (CodeException e) {
-
-			logger.info("Custom dictionary with similar name exists");
-		}
 
 		StudyBean curStudy = (StudyBean) request.getSession().getAttribute("study");
 		if (curStudy != null && study1.getId() == curStudy.getId()) {
@@ -1025,49 +933,10 @@ public class UpdateStudyServletNew extends Controller {
 			childspv.setValue(study1.getStudyParameterConfig().getEndDateTimeLabel());
 			updateParameter(spvdao, childspv);
 
-			childspv.setParameter("markImportedCRFAsCompleted");
-			childspv.setValue(study1.getStudyParameterConfig().getMarkImportedCRFAsCompleted());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("autoScheduleEventDuringImport");
-			childspv.setValue(study1.getStudyParameterConfig().getAutoScheduleEventDuringImport());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("autoCreateSubjectDuringImport");
-			childspv.setValue(study1.getStudyParameterConfig().getAutoCreateSubjectDuringImport());
-			updateParameter(spvdao, childspv);
-
 			childspv.setParameter("allowSdvWithOpenQueries");
 			childspv.setValue(study1.getStudyParameterConfig().getAllowSdvWithOpenQueries());
 			updateParameter(spvdao, childspv);
 
-			childspv.setParameter("replaceExisitingDataDuringImport");
-			childspv.setValue(study1.getStudyParameterConfig().getReplaceExisitingDataDuringImport());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("allowCodingVerification");
-			childspv.setValue(study1.getStudyParameterConfig().getAllowCodingVerification());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("defaultBioontologyURL");
-			childspv.setValue(study1.getStudyParameterConfig().getDefaultBioontologyURL());
-			updateParameter(spvdao, childspv);
-
-			childspv.setParameter("autoCodeDictionaryName");
-			childspv.setValue(study1.getStudyParameterConfig().getAutoCodeDictionaryName());
-			updateParameter(spvdao, childspv);
-
-			try {
-
-				// Create custom dictionary
-				if (child.getStudyParameterConfig().getAutoCodeDictionaryName() != null
-						&& !child.getStudyParameterConfig().getAutoCodeDictionaryName().isEmpty()) {
-					getDictionaryService().createDictionary(
-							child.getStudyParameterConfig().getAutoCodeDictionaryName(), child);
-				}
-			} catch (CodeException e) {
-				logger.info("Custom dictionary with similar name exists");
-			}
 		}
 	}
 

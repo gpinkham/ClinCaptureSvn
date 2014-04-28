@@ -4016,3 +4016,12 @@ function checkFileUpload(fileUploadId, message){
     }
     return true;
 }
+
+function hideUnhideStudyParamRow(element) {
+	var rowClass = $(element).attr('data-row-class');
+	if ($(element).attr('data-cc-action') == 'show') {
+		$("tr." + rowClass).show();
+	} else {
+		$("tr." + rowClass).hide();
+	}
+}
