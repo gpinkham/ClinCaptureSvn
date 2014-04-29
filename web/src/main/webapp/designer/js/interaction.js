@@ -167,6 +167,10 @@ $(function() {
 		element: $(".linefy"),
 		title: "Specify the line number in the repeating group to which the rule will apply"
 	});
+	createToolTip({
+		element: $(".opt"),
+		title: "Specify target options"
+	});
 
 	// ======================= End of tool tip creation =======================
 	// Hide action messages parameter divs
@@ -289,6 +293,34 @@ $(function() {
 	// Handles clicks on item draggable
 	$(document).on('click', '.target, .dest, .value, .item', function() {
 		showCRFItem(this);
+	});
+	$(document).on('click', '.opt', function() {
+		var itemName = $(this).prev().find('.target').val();
+		if (itemName) {
+			// Check event duplication
+			var eventDuplex = parser.isDuplicated({
+				name: itemName,
+				type: "eventOid"
+			});
+			if (!eventDuplex) {
+				$(this).prev().find(".eventify").parent().removeClass("hidden");
+			}
+			// Check version duplication
+			var versionDuplex = parser.isDuplicated({
+				name: itemName,
+				type: "crfVersionOid"
+			});
+			if (!versionDuplex) {
+				$(this).prev().find(".versionify").parent().removeClass("hidden");
+			}
+			// Check if target is repeat item
+			if (parser.isRepeatItem(itemName)) {
+				var liner = $(this).prev().find(".linefy");
+				liner.removeClass("hidden");
+				liner.focus();
+				liner.siblings(".target").css("width", "89%");
+			}
+		}
 	});
 	// === Discrepancy action ====
 	$('input[action=discrepancy]').click(function() {

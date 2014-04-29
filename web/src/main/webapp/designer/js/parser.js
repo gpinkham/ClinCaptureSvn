@@ -214,32 +214,10 @@ Parser.prototype.createNextDroppable = function(params) {
 			});
 			// create a new input 
 			if (!params.element.val()) {
-				params.element.parent().after(div);
+				$('.opt:last').after(div);
+				div.after($('.opt:last').clone());
 			} 
 			div.find(".target").focus();
-			// Check event duplication
-			var eventDuplex = this.isDuplicated({
-				type: "eventOid",
-				name: params.ui.draggable.attr("item-name")
-			});
-			if (!eventDuplex) {
-				params.element.parent().find(".eventify").parent().removeClass("hidden");
-			} 
-			// Check version duplication
-			var versionDuplex = this.isDuplicated({
-				type: "crfVersionOid",
-				name: params.ui.draggable.attr("item-name")
-			});
-			if (!versionDuplex) {
-				params.element.parent().find(".versionify").parent().removeClass("hidden");
-			} 
-			// Check version duplication
-			if (this.isRepeatItem(params.ui.draggable.attr("item-name"))) {
-				var liner = params.element.parent().find(".linefy");
-				liner.removeClass("hidden");
-				liner.focus();
-				liner.siblings(".target").css("width", "89%");
-			} 
 		}
 		params.element.removeClass("bordered");	
 		params.element.val(params.ui.draggable.attr("item-name"));
@@ -1747,6 +1725,7 @@ Parser.prototype.setTargets = function(targets) {
 				title: "Specify the line number in the repeating group to which the rule will apply"
 			});
 			x === 0 ? targetDiv.before(div) : $(".parent-target").last().before(div);
+			div.after($('.opt:last').clone());
 			// Eventify
 			var eventDuplex = this.isDuplicated({
 				type: "eventOid",
@@ -1853,6 +1832,7 @@ Parser.prototype.deleteTarget = function(target) {
 			var index = this.rule.targets.indexOf(this.rule.targets[x]);
 			if (index > -1 && this.rule.targets[x].name === $(target).siblings("input").val()) {
 				this.rule.targets.splice(index, 1);
+				$(target).parent().next().remove();
 				$(target).parent().remove();
 				break;
 			}

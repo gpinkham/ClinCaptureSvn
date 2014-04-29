@@ -381,10 +381,19 @@ td.group, td.ui-draggable {
 .btn {
   padding: 6px 8px;
 }
-
 #groups, #compare {
   padding: 0 0 0 0 !important;
 }
 .form-group {
   margin-bottom: 5px;
+}
+.opt {
+  float: right;
+  margin-top: -3.2rem;
+}
+.parent-target {
+  width: 98% !important;
+}
+#ruleName {
+ width: 98% !important; 
 }

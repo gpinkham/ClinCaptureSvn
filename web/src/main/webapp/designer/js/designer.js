@@ -718,7 +718,7 @@ function handleDropEvent(params) {
 	} else if (parser.isEmpty(params.ui.draggable)) {
 		params.element.append('""');
 	} else if (parser.isCurrentDate(params.ui.draggable)) {
-		params.element.append(" _CURRENT_DATE");
+		params.element.append("_CURRENT_DATE");
 	} else {
 		if (params.ui.draggable.text() == "<") {
 			params.element.append("&lt;");
