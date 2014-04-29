@@ -405,7 +405,7 @@ Parser.prototype.getInsertActionDestination = function(id) {
  * Returns true if the element has id === 'text'
  * ====================================================== */
 Parser.prototype.isText = function(element) {
-	return element.attr("id") === "text";
+	return element.is('.text');
 }
 
 /* ======================================================
@@ -417,7 +417,7 @@ Parser.prototype.isText = function(element) {
  * Returns true if the element has id === 'date'
  * ====================================================== */
 Parser.prototype.isDate = function(element) {
-	return element.attr("id") === "date";
+	return element.is('.date');
 }
 
 /* ======================================================
@@ -429,7 +429,7 @@ Parser.prototype.isDate = function(element) {
  * Returns true if the element has id === 'empty'
  * ====================================================== */
 Parser.prototype.isEmpty = function(element) {
-	return element.attr("id") === "empty";
+	return element.is('.empty');
 }
 
 /* ======================================================
@@ -441,7 +441,7 @@ Parser.prototype.isEmpty = function(element) {
  * Returns true if the element has id === 'number'
  * ====================================================== */
 Parser.prototype.isNumber = function(element) {
-	return element.attr("id") === "number";
+	return element.is('.number');
 }
 
 /* =============================================================
@@ -453,31 +453,7 @@ Parser.prototype.isNumber = function(element) {
  * Returns true if the element has id === 'currentDate'
  * ====================================================== */
 Parser.prototype.isCurrentDate = function(element) {
-	return element.attr("id") === "currentDate";
-}
-
-/* ==============================================================================
- * Determines if the drop surface is of type that accepts conditional draggables
- *
- * Arguments [element]:
- * => element - the element to check on
- *
- * Returns true if the element has id === 'evalSurface'
- * ============================================================================ */
-Parser.prototype.isConditionalSurface = function(element) {
-	return element.attr("id") === "evalSurface";
-}
-
-/* ====================================================
- * Determines if the element is a CRF item
- *
- * Arguments [element]:
- * => element - the element to check on
- *
- * Returns true if the element is <td> and a draggable
- * ==================================================== */
-Parser.prototype.isCRFItem = function(element) {
-	return element.prop("tagName").toLowerCase() === "td" && element.is(".ui-draggable");
+	return element.is('.current-date');
 }
 
 Parser.prototype.getItemDuplicates = function(itemName) {

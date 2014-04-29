@@ -61,7 +61,6 @@ body .panel-body {
 }
 
 .dotted-border {
-  margin-top: 3rem;
   min-height: 44px;
   margin-right: 2px;
   border: 2px dotted;
@@ -381,7 +380,7 @@ td.group, td.ui-draggable {
 .btn {
   padding: 6px 8px;
 }
-#groups, #compare {
+.drag-container {
   padding: 0 0 0 0 !important;
 }
 .form-group {
@@ -396,4 +395,7 @@ td.group, td.ui-draggable {
 }
 #ruleName {
  width: 98% !important; 
+}
+.sortable {
+  padding: 5rem !important;
 }

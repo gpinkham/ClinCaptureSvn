@@ -314,7 +314,7 @@ function createStartExpressionDroppable() {
 	});
 	createDroppable({
 		element: div,
-		accept: "#leftParentheses, #rightParentheses, div[id='items'] td, div[id='data'] p"
+		accept: ".group, .data p, div[id='items'] td"
 	});
 	return div;
 }
@@ -327,12 +327,12 @@ function createStartExpressionDroppable() {
  * ========================================================================= */
 function createSymbolDroppable() {
 	var div = createDropSurface({
-		class: "comp",
+		class: "comp compare",
 		text: "Compare or Calculate"
 	});
 	createDroppable({
 		element: div,
-		accept: "div[id='compare'] p, div[id='calculate'] p"
+		accept: ".compare p"
 	});
 	return div;
 }
@@ -358,12 +358,12 @@ function createRPARENDiv() {
  * =========================================================================== */
 function createConditionDroppable() {
 	var div = createDropSurface({
-		class: "eval",
+		class: "eval condition",
 		text: "Condition"
 	});
 	createDroppable({
 		element: div,
-		accept: "div[id='evaluate'] p"
+		accept: ".condition p"
 	});
 	return div;
 }
@@ -1159,24 +1159,8 @@ function loadCRFVersionItems(params) {
  			} else {
  				tdName.text(item.name);
  			}
- 			tdName.click(function(evt) {
-				var element = $('.dotted-border').last();
-				var params = Object.create(null);
-				params.ui = Object.create(null);
-				params.element = element;
-				params.ui.draggable = $(this);
-				if (element.is('.ui-droppable')) {
-					if (element.droppable("option", "accept").indexOf('td') > -1) {
-						handleDropEvent(params);
-					}
-				} else {
-					if (element.text() == ')') {
-						if (element.prev().droppable("option", "accept").indexOf('td') > -1) {
-							params.element = element.prev();
-							handleDropEvent(params);
-						}
-					}
-				}
+ 			tdName.click(function() {
+				handleClickDrop(this);
 			});
 			tdName.text(item.name);
 			tdName.addClass("group");
@@ -1380,6 +1364,25 @@ function mapItemType(type) {
 	}
 }
 
-function constructAccepts(ele) {
-	return $(ele).parent().prop('tagName').toLowerCase() + "[id='" + $(ele).parents('.col-md-3').attr('id') + "'] " + $(ele).prop('tagName').toLowerCase();
+function handleClickDrop(ele) {
+	var params = Object.create(null);
+	// Parameters for drop
+	params.ui = Object.create(null);
+	params.ui.draggable = $(ele);
+	// Get a matching drop surface, if more than one, select last
+	if ($(ele).is('.group')) {
+		if ($('.dotted-border.' + 'group').last().text() == ')') {
+			params.element = $('.dotted-border.' + 'group').eq(-2);
+			handleDropEvent(params);
+		} else {
+			params.element = $('.dotted-border.' + 'group').last();
+			handleDropEvent(params);
+		}
+	} else if ($(ele).is('.compare')) {
+		params.element = $('.dotted-border.' + 'compare').last();
+		handleDropEvent(params);
+	} else if ($(ele).is('.condition')) {
+		params.element = $('.dotted-border.' + 'condition').last();
+		handleDropEvent(params);
+	}
 }

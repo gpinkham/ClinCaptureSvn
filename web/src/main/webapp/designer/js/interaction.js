@@ -41,91 +41,87 @@ $(function() {
 	});
 	createToolTip({
 		title: "Start grouping",
-		element: $("#leftParentheses")
+		element: $(".leftPAREN")
 	});
 	createToolTip({
 		title: "End grouping",
-		element: $("#rightParentheses")
+		element: $(".rightPAREN")
 	});
 	createToolTip({
 		title: "And...",
-		element: $("#and")
+		element: $(".and")
 	});
 	createToolTip({
 		title: "Or...",
-		element: $("#or")
-	});
-	createToolTip({
-		title: "Not",
-		element: $("#not")
+		element: $(".or")
 	});
 	createToolTip({
 		title: "Equal",
-		element: $("#equal")
+		element: $(".eq")
 	});
 	createToolTip({
 		title: "Not equal",
-		element: $("#notEqual")
+		element: $(".neq")
 	});
 	createToolTip({
 		title: "Less than",
-		element: $("#lessThan")
+		element: $(".lt")
 	});
 	createToolTip({
 		title: "Greater than",
-		element: $("#greaterThan")
+		element: $(".gt")
 	});
 	createToolTip({
 		title: "Less than or equal to",
-		element: $("#lessThanOrEqual")
+		element: $(".lte")
 	});
 	createToolTip({
 		title: "Greater than or equal to",
-		element: $("#greaterThanOrEqual")
+		element: $(".gte")
 	});
 	createToolTip({
-		title: "Contain",
-		element: $("#contain")
+		title: "Contains",
+		element: $(".ct")
 	});
 	createToolTip({
-		title: "Does not contain",
-		element: $("#notContain")
+		element: $(".nct"),
+		title: "Does not contain"
 	});
 	createToolTip({
 		title: "Plus",
-		element: $("#plus")
+		element: $(".plus")
 	});
 	createToolTip({
 		title: "Minus",
-		element: $("#minus")
+		element: $(".minus")
 	});
 	createToolTip({
 		title: "Divide by",
-		element: $("#divide")
+		element: $(".divide")
 	});
 	createToolTip({
 		title: "Multiplied by",
-		element: $("#multiply")
+		element: $(".mult")
 	});
 	createToolTip({
-		element: $("#number"),
+		element: $(".number"),
 		title: "Integer and float number field"
 	});
 	createToolTip({
 		title: "Null field",
-		element: $("#empty")
+		element: $(".empty")
 	});
 	createToolTip({
 		title: "Date field",
-		element: $("#date")
+		element: $(".date")
 	});
 	createToolTip({
 		title: "Text field",
-		element: $("#text")
+		element: $(".text")
 	});
 	createToolTip({
 		title: "Current system date",
-		element: $("#currentDate")
+		element: $(".current-date")
 	});
 	createToolTip({
 		title: "Select a study",
@@ -179,37 +175,32 @@ $(function() {
 
 	// ======================= Draggables =======================
 	createDraggable({
-		target: $(".dotted-border"),
-		element: $("#leftParentheses")
+		element: $(".group"),
+		target: $(".dotted-border")
 	});
 
-	createDraggable({
-		target: $("#secondGroupSurface"),
-		element: $("#rightParentheses")
-	});
-
-	$("div[id='evaluate']").find("p").each(function() {
+	$(".condition").find("p").each(function() {
 		createDraggable({
 			element: $(this),
 			target: $(".eval")
 		});
 	});
 
-	$("div[id='compare']").find("p").each(function() {
+	$(".compare").find("p").each(function() {
 		createDraggable({
 			element: $(this),
 			target: $(".comp")
 		});
 	});
 
-	$("div[id='calculate']").find("p").each(function() {
+	$(".calculate").find("p").each(function() {
 		createDraggable({
 			element: $(this),
 			target: $(".comp")
 		});
 	});
 
-	$("div[id='data']").find("p").each(function() {
+	$(".data").find("p").each(function() {
 		createDraggable({
 			element: $(this),
 			target: ".group, .value"
@@ -221,7 +212,7 @@ $(function() {
 	// ======================= Droppables =======================
 	createDroppable({
 		element: $(".dotted-border"),
-		accept: "#leftParentheses, div[id='data'] p, div[id='items'] td"
+		accept: ".leftPAREN, .data p, div[id='items'] td"
 	});
 
 	createDroppable({
@@ -241,7 +232,7 @@ $(function() {
 
 	createDroppable({
 		element: $(".value"),
-		accept: "div[id='data'] p, div[id='items'] td"
+		accept: ".data p, div[id='items'] td"
 	});
 
 	// ======================= End of creating droppables =======================
@@ -501,23 +492,7 @@ $(function() {
 		parser.validate();
 	});
 	$('p.ui-draggable').click(function() {
-		var element = $('.dotted-border').last();
-		var params = Object.create(null);
-		params.ui = Object.create(null);
-		params.element = element;
-		params.ui.draggable = $(this);
-		if (element.is('.ui-droppable')) {
-			if (element.droppable("option", "accept").indexOf(constructAccepts(this)) > -1 || element.droppable("option", "accept").indexOf($(this).attr('id')) > -1) {
-				handleDropEvent(params);
-			}
-		} else {
-			if (element.text() == ')') {
-				if (element.prev().droppable("option", "accept").indexOf(constructAccepts(this)) > -1 || element.droppable("option", "accept").indexOf($(this).attr('id')) > -1) {
-					params.element = element.prev();
-					handleDropEvent(params);
-				}
-			}
-		}
+		handleClickDrop(this);
 	});
 	createPopover($(".dotted-border"));
 	$(document).ready(function() {

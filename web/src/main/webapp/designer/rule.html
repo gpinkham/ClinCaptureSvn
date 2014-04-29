@@ -42,55 +42,55 @@
       </div>
       <div class="row">
         <div class="col-md-12 pull-left">
-          <div id="groups" class="col-md-2 z">
+          <div class="col-md-2 z drag-container parenthesis">
             <div class="panel panel-primary">
               <div class="panel-heading">
                 <h3 class="panel-title center-text">Group</h3>
               </div>
               <div class="panel-body">
-                <p id="leftParentheses" class="btn group">&#40;</p>
-                <p id="rightParentheses" class="btn group">&#41;</p>
+                <p class="btn group leftPAREN">&#40;</p>
+                <p class="btn group rightPAREN">&#41;</p>
               </div>
             </div>
           </div>
-          <div id="compare" class="col-md-4 z">
+          <div class="col-md-4 z drag-container compare">
             <div class="panel panel-primary">
               <div class="panel-heading">
                 <h3 class="panel-title center-text">Compare</h3>
               </div>
               <div class="panel-body">
-                <p id="lessThan" class="btn comp">&lt;</p>
-                <p id="greaterThan" class="btn comp">&gt;</p>
-                <p id="lessThanOrEqual" class="btn comp" >&#8804;</p>
-                <p id="greaterThanOrEqual" class="btn comp" >&#8805;</p>
-                <p id="equal" class="btn comp">&#61;</p>
-                <p id="notEqual" class="btn comp">&#8800;</p>
-                <p id="notContain" class="btn comp" >&#8713;</p>
-                <p id="contain" class="btn comp" >&isin;</p>
+                <p class="btn comp compare lt">&lt;</p>
+                <p class="btn comp compare gt">&gt;</p>
+                <p class="btn comp compare lte" >&#8804;</p>
+                <p class="btn comp compare gte" >&#8805;</p>
+                <p class="btn comp compare eq">&#61;</p>
+                <p class="btn comp compare neq">&#8800;</p>
+                <p class="btn comp compare ct" >&#8713;</p>
+                <p class="btn comp compare nct" >&isin;</p>
               </div>
             </div>
           </div>
-          <div id="calculate" class="col-md-3 z">
+          <div class="col-md-3 z compare">
             <div class="panel panel-primary">
               <div class="panel-heading">
                 <h3 class="panel-title center-text">Calculate</h3>
               </div>
               <div class="panel-body">
-                <p id="plus" class="btn comp">&#43;</p>
-                <p id="minus" class="btn comp">&#45;</p>
-                <p id="multiply" class="btn comp">&times;</p>
-                <p id="divide" class="btn comp">&divide;</p>
+                <p class="btn comp plus compare">&#43;</p>
+                <p class="btn comp minus compare">&#45;</p>
+                <p class="btn comp mult compare">&times;</p>
+                <p class="btn comp divide compare">&divide;</p>
               </div>
             </div>
           </div>
-          <div id="evaluate" class="col-md-3 z">
+          <div class="col-md-3 z condition">
             <div class="panel panel-primary">
               <div class="panel-heading">
                 <h3 class="panel-title center-text">Condition</h3>
               </div>
               <div class="panel-body">
-                <p id="and" class="btn eval">AND</p>
-                <p id="or" class="btn eval">OR</p>
+                <p class="btn eval and condition">AND</p>
+                <p class="btn eval or condition">OR</p>
               </div>
             </div>
           </div>
@@ -258,11 +258,11 @@
             <h3 class="panel-title center-text">Data</h3>
           </div>
           <div class="panel-body">
-            <p id="text" class="btn group">Text</p>
-            <p id="number" class="btn group">Number</p>
-            <p id="date" class="btn group">Date</p>
-            <p id="currentDate" class="btn group">Current date</p>
-            <p id="empty" class="btn group">Empty</p>
+            <p class="btn group text">Text</p>
+            <p class="btn group number">Number</p>
+            <p class="btn group date">Date</p>
+            <p class="btn group current-date">Current date</p>
+            <p class="btn group empty">Empty</p>
             <div id="variables" class="space-top">
               <ul class="nav nav-tabs">
                 <li id="studiesLink" class="active"><a class="pont green" href="#studies">Studies</a></li>
