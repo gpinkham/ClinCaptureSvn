@@ -93,7 +93,8 @@
                     <div ID="loginBox" align="center">
                         <!-- Login box contents -->
                         <div ID="login" align="left">
-                            <form action="<c:url value='/j_spring_security_check'/>" method="post">
+                            <form action="<c:url value='/j_spring_security_check'/>" method="post" autocomplete='off'>
+                                <input type="password" style="display:none"/>
                                 <h1><fmt:message key="login" bundle="${resword}"/></h1>
                                 <b><fmt:message key="user_name" bundle="${resword}"/></b>
                                 <div class="formfieldM_BG">
@@ -118,9 +119,6 @@
     </center>
 
     <script type="text/javascript">
-        document.getElementById('username').setAttribute( 'autocomplete', 'off' );
-        document.getElementById('j_password').setAttribute( 'autocomplete', 'off' );
-
         jQuery(document).ready(function() {
 
             jQuery('#requestPassword').click(function() {
