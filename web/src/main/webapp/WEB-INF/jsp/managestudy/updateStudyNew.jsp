@@ -1591,16 +1591,16 @@
 			<td>
 				<input type="radio" name="secondaryIdRequired" 
 					${studyToView.studyParameterConfig.secondaryIdRequired == 'yes' ? "checked" : ""}
-					value="yes" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="secondaryId">
+					value="yes" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="secondaryId">
 					<fmt:message key="required" bundle="${resword}"/>
 					
 				<input type="radio" name="secondaryIdRequired" 
 					${studyToView.studyParameterConfig.secondaryIdRequired == 'no' ? "checked" : ""}
-					value="no" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="secondaryId">
+					value="no" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="secondaryId">
 					<fmt:message key="optional" bundle="${resword}"/>
 				<input type="radio" name="secondaryIdRequired" 
 					${studyToView.studyParameterConfig.secondaryIdRequired == 'not_used' ? "checked" : ""}
-					value="not_used" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="secondaryId"">
+					value="not_used" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="secondaryId"">
 					<fmt:message key="not_used" bundle="${resword}"/>
 			</td>
 		</tr>
@@ -1632,15 +1632,15 @@
 			<td>
 				<input type="radio" name="dateOfEnrollmentForStudyRequired" 
 					${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'yes' ? "checked" : ""}
-					value="yes" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="dateOfEnrollment">
+					value="yes" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="dateOfEnrollment">
 					<fmt:message key="required" bundle="${resword}"/>
 				<input type="radio" name="dateOfEnrollmentForStudyRequired" 
 					${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'no' ? "checked" : ""}
-					value="no" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="dateOfEnrollment">
+					value="no" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="dateOfEnrollment">
 					<fmt:message key="optional" bundle="${resword}"/>
 				<input type="radio" name="dateOfEnrollmentForStudyRequired" 
 					${studyToView.studyParameterConfig.dateOfEnrollmentForStudyRequired == 'not_used' ? "checked" : ""}
-					value="not_used" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="dateOfEnrollment">
+					value="not_used" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="dateOfEnrollment">
 					<fmt:message key="not_used" bundle="${resword}"/>
 			</td>
 		</tr>
@@ -1660,11 +1660,11 @@
 			<td>
 				<input type="radio" name="genderRequired" 
 					${studyToView.studyParameterConfig.genderRequired == 'true' ? "checked" : ""}
-					value="true" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="gender">
+					value="true" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="gender">
 					<fmt:message key="yes" bundle="${resword}"/>
 				<input type="radio" name="genderRequired" 
 					${studyToView.studyParameterConfig.genderRequired == 'false' ? "checked" : ""}
-					value="false" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="gender">
+					value="false" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="gender">
 					<fmt:message key="no" bundle="${resword}"/>
 			</td>
 		</tr>
@@ -1696,16 +1696,16 @@
 			</td>
 			<td>
 				<c:set var="not_used" value="not used"/>
-				<input type="radio" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId" 
+				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId" 
 					${studyToView.studyParameterConfig.subjectPersonIdRequired == 'required' ? "checked" : ""}
 					name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId" 
+				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId" 
 					${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional' ? "checked" : ""}
 					name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId" 
+				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="personId" 
 					${studyToView.studyParameterConfig.subjectPersonIdRequired == 'copyFromSSID' ? "checked" : ""}
 					name="subjectPersonIdRequired" value="copyFromSSID"><fmt:message key="copy_from_ssid" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="personId" 
+				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="personId" 
 					${studyToView.studyParameterConfig.subjectPersonIdRequired == not_used ? "checked" : ""}
 					name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
 			</td>
@@ -1758,15 +1758,15 @@
 			<td>
 				<input class="some-class" type="radio" name="startDateTimeRequired" value="yes" 
 					${studyToView.studyParameterConfig.startDateTimeRequired == 'yes' ? "checked" : ""}
-					onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="startDate">
+					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="startDate">
 					<fmt:message key="required" bundle="${resword}"/>
 				<input type="radio" name="startDateTimeRequired" value="no" 
 					${studyToView.studyParameterConfig.startDateTimeRequired == 'no' ? "checked" : ""}
-					onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="startDate">
+					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="startDate">
 					<fmt:message key="optional" bundle="${resword}"/>
 				<input type="radio" name="startDateTimeRequired" value="not_used" 
 					${studyToView.studyParameterConfig.startDateTimeRequired == 'not_used' ? "checked" : ""}
-					onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="startDate">
+					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="startDate">
 					<fmt:message key="not_used" bundle="${resword}"/>
 			</td>
 		</tr>
@@ -1799,17 +1799,17 @@
 			<td>
 				<input type="radio" checked name="endDateTimeRequired" value="yes" 
 					${studyToView.studyParameterConfig.endDateTimeRequired == 'yes' ? "checked" : ""}
-					onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="stopDate">
+					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="stopDate">
 					<fmt:message key="required" bundle="${resword}"/>
 					
 				<input type="radio" name="endDateTimeRequired" value="no" 
 					${studyToView.studyParameterConfig.endDateTimeRequired == 'no' ? "checked" : ""}
-					onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="stopDate">
+					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="stopDate">
 					<fmt:message key="optional" bundle="${resword}"/>
 					
 				<input type="radio" name="endDateTimeRequired" value="not_used" 
 					${studyToView.studyParameterConfig.endDateTimeRequired == 'not_used' ? "checked" : ""}
-					onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="stopDate">
+					onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="stopDate">
 					<fmt:message key="not_used" bundle="${resword}"/>
 			</td>
 		</tr>
@@ -1849,11 +1849,11 @@
 				<fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/>
 			</td>
 			<td>
-				<input type="radio" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewer" 
+				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewer" 
 					${studyToView.studyParameterConfig.interviewerNameRequired == 'yes' ? "checked" : ""} 
 					name="interviewerNameRequired" value="yes"> 
 				<fmt:message key="yes" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewer" 
+				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewer" 
 					${studyToView.studyParameterConfig.interviewerNameRequired != 'yes' ? "checked" : ""}
 					name="interviewerNameRequired" value="no">
 					<fmt:message key="no" bundle="${resword}"/>
@@ -1901,11 +1901,11 @@
 				<fmt:message key="interviewer_date_required" bundle="${resword}"/>
 			</td>
 			<td>
-				<input type="radio" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewDate" 
+				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="show" data-row-class="interviewDate" 
 					${studyToView.studyParameterConfig.interviewDateRequired == 'yes' ? "checked" : ""} 
 					name="interviewDateRequired" value="yes"> 
 				<fmt:message key="yes" bundle="${resword}"/>
-				<input type="radio" onchange="javascript:changeIcon(); hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewDate" 
+				<input type="radio" onchange="javascript:changeIcon();" onclick="hideUnhideStudyParamRow(this);" data-cc-action="hide" data-row-class="interviewDate" 
 					${studyToView.studyParameterConfig.interviewDateRequired != 'yes' ? "checked" : ""}
 					name="interviewDateRequired" value="no">
 					<fmt:message key="no" bundle="${resword}"/>
