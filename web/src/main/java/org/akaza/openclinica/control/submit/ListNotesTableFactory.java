@@ -860,7 +860,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 			String value;
 
 			value = (String) super.getValue();
-			html.append(value).div().style("width: 250px;").end().divEnd();
+			html.append(value);
 			return html.toString();
 		}
 	}
