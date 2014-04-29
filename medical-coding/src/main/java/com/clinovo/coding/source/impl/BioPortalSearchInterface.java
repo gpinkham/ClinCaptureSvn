@@ -9,19 +9,20 @@ import com.clinovo.util.CompleteClassificationFieldsUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class BioPortalSearchInterface implements SearchInterface {
 
@@ -55,6 +56,7 @@ public class BioPortalSearchInterface implements SearchInterface {
 
 			if (prefLabel.indexOf("_com") < 0) {
 
+				String whodPreferredTerm = dictionary.equals(WHOD) ? prefLabel.substring(prefLabel.indexOf("@"), prefLabel.length()).indexOf("Y") > 0 ? "Yes" : prefLabel.substring(prefLabel.indexOf("@"), prefLabel.length()).indexOf("N") > 0 ? "No" : "" : "";
 				prefLabel = dictionary.equals(WHOD) ? prefLabel.substring(0, prefLabel.indexOf("@")).replaceAll("_and_", "_&_").replaceAll("_", " ") : prefLabel;
 
 				ClassificationElement classificationElement = new ClassificationElement();
@@ -65,10 +67,17 @@ public class BioPortalSearchInterface implements SearchInterface {
 				classification.setHttpPath(codeHttpPath);
 				classification.addClassificationElement(classificationElement);
 
+				if (dictionary.equals(WHOD)) {
+					ClassificationElement prefClassificationElement = new ClassificationElement();
+					prefClassificationElement.setElementName("Preferred");
+					prefClassificationElement.setCodeName(whodPreferredTerm);
+					classification.addClassificationElement(prefClassificationElement);
+				}
+
 				classifications.add(classification);
 			}
 		}
-
+		Collections.sort(classifications, new ClassificationSortByReference());
 		return classifications;
 	}
 
@@ -272,4 +281,22 @@ public class BioPortalSearchInterface implements SearchInterface {
 
 		throw new SearchException("Unknown dictionary type specified");
 	}
+
+	private class ClassificationSortByReference implements Comparator<Classification> {
+		public int compare(Classification o1, Classification o2) {
+			for (ClassificationElement classification : o1.getClassificationElement()) {
+				for (ClassificationElement classification2 : o2.getClassificationElement()) {
+					if (classification.getElementName().equals("Preferred") && classification.getElementName().equals(classification2.getElementName())) {
+						if ((classification.getCodeName().equals("No") && classification2.getCodeName().equals("Yes"))) {
+							return 1;
+						} else if (classification.getCodeName().equals("Yes") && classification2.getCodeName().equals("No")) {
+							return -1;
+						}
+					}
+				}
+			}
+			return 0;
+		}
+	}
+
 }

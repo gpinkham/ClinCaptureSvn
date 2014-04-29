@@ -43,12 +43,20 @@
                     <td width="360px" colspan="2"></td>
                     <td></td>
                 </tr>
-                <c:forEach items="${obj.classificationElement}" var="classElement">
-                    <tr>
+                <c:forEach items="${obj.classificationElement}" var="classElement" varStatus="status">
+                    <c:choose>
+                        <c:when test="${itemDictionary == 'WHOD' and status.last}">
+                            <tr style="font-weight:bold;">
+                        </c:when>
+                        <c:otherwise>
+                            <tr>
+                        </c:otherwise>
+                    </c:choose>
                         <td>
                             <c:out value="${classElement.elementName}"/>:
                         </td>
-                        <td width="360px"><c:out value="${classElement.codeName}"/></td>
+                            <td width="360px"><c:out value="${classElement.codeName}"/>
+                        </td>
                         <td colspan="2"></td>
                         <td></td>
                     </tr>

@@ -70,7 +70,7 @@ public class CodingSpringJob extends QuartzJobBean {
 					whodClassElement.setCodeName(whodClassElement.getCodeName().replaceAll(" &amp; ", " and ").replaceAll(" ", "_") + termUniqKey);
 				}
 
-				int componentElementIndex = classificationResult.getClassificationElement().size() - 3;
+				int componentElementIndex = classificationResult.getClassificationElement().size() - 4;
 				String componentField = classificationResult.getClassificationElement().get(componentElementIndex).getCodeName() + "_com";
 				classificationResult.getClassificationElement().get(componentElementIndex).setCodeName(componentField);
 			}
