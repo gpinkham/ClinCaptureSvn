@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.Controller;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.view.Page;
@@ -36,7 +37,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component
-@SuppressWarnings("unused")
 public class UpdateRuleSetRuleServlet extends Controller {
 
 	private static final long serialVersionUID = 1L;
@@ -69,6 +69,7 @@ public class UpdateRuleSetRuleServlet extends Controller {
 
 	@Override
 	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
 		UserAccountBean ub = getUserAccountBean(request);
 		String ruleSetId = request.getParameter(RULESET_ID);
 		String ruleSetRuleId = request.getParameter(RULESETRULE_ID);
@@ -76,14 +77,10 @@ public class UpdateRuleSetRuleServlet extends Controller {
 		String action = request.getParameter(ACTION);
 		if (ruleSetRuleId != null) {
 			RuleSetRuleBean ruleSetRule = getRuleSetRuleDao().findById(Integer.valueOf(ruleSetRuleId));
-			if (ruleSetRule != null && action.equals("delete")) {
-				deleteRule(ruleSetRule);
-			}
-		} else if (ruleSetId != null && action.equals("delete")) {
+			performAction(action, ruleSetRule, ub);
+		} else if (ruleSetId != null) {
 			RuleSetBean rs = getRuleSetDao().findById(Integer.valueOf(ruleSetId));
-			for (RuleSetRuleBean theRuleSetRule : rs.getRuleSetRules()) {
-				deleteRule(theRuleSetRule);
-			}
+			performAction(action, rs, ub);
 		}
 		if (source != null && source.equals("ViewRuleSet")) {
 			getServletContext().getRequestDispatcher("/ViewRuleSet?ruleSetId=" + ruleSetId).forward(request, response);
@@ -92,18 +89,80 @@ public class UpdateRuleSetRuleServlet extends Controller {
 		}
 	}
 
+	private void performAction(String action, RuleSetBean rs, UserAccountBean ub) {
+		if (rs != null) {
+			rs.setUpdaterAndDate(ub);
+			if (action.equals("remove")) {
+				for (RuleSetRuleBean theRuleSetRule : rs.getRuleSetRules()) {
+					theRuleSetRule.setUpdaterAndDate(ub);
+					removeRule(theRuleSetRule);
+				}
+			} else if (action.equals("restore")) {
+				for (RuleSetRuleBean theRuleSetRule : rs.getRuleSetRules()) {
+					theRuleSetRule.setUpdaterAndDate(ub);
+					restoreRule(theRuleSetRule);
+				}
+			} else if (action.equals("delete")) {
+				for (RuleSetRuleBean theRuleSetRule : rs.getRuleSetRules()) {
+					deleteRule(theRuleSetRule);
+				}
+			}
+		}
+	}
+
+	private void performAction(String action, RuleSetRuleBean ruleSetRule, UserAccountBean ub) {
+		if (ruleSetRule != null) {
+			ruleSetRule.setUpdaterAndDate(ub);
+			if (action.equals("remove")) {
+				removeRule(ruleSetRule);
+			} else if (action.equals("restore")) {
+				restoreRule(ruleSetRule);
+			} else if (action.equals("delete")) {
+				deleteRule(ruleSetRule);
+			}
+		}
+	}
+
 	private void deleteRule(RuleSetRuleBean ruleSetRule) {
 		RuleSetBean ruleSet = ruleSetRule.getRuleSetBean();
-		if (ruleSetRule != null) {
-			getRuleDao().getSessionFactory().getCurrentSession().clear();
-			Session session = getRuleDao().getSessionFactory().getCurrentSession();
-			Transaction transaction = session.beginTransaction();
-			session.delete(ruleSetRule);
-			if (ruleSet.getRuleSetRuleSize() <= 1) {
-				session.delete(ruleSet);
-			}
-			transaction.commit();
-			session.flush();
+		getRuleDao().getSessionFactory().getCurrentSession().clear();
+		Session session = getRuleDao().getSessionFactory().getCurrentSession();
+		Transaction transaction = session.beginTransaction();
+		session.delete(ruleSetRule);
+		if (ruleSet.getRuleSetRuleSize() <= 1) {
+			session.delete(ruleSet);
 		}
+		transaction.commit();
+		session.flush();
+	}
+
+	private void removeRule(RuleSetRuleBean ruleSetRule) {
+		RuleSetBean ruleSet = ruleSetRule.getRuleSetBean();
+		getRuleDao().getSessionFactory().getCurrentSession().clear();
+		Session session = getRuleDao().getSessionFactory().getCurrentSession();
+		Transaction transaction = session.beginTransaction();
+		ruleSetRule.setStatus(Status.DELETED);
+		session.update(ruleSetRule);
+		if (ruleSet.getRuleSetRuleSize() <= 1) {
+			ruleSet.setStatus(Status.DELETED);
+			session.update(ruleSet);
+		}
+		transaction.commit();
+		session.flush();
+	}
+
+	private void restoreRule(RuleSetRuleBean ruleSetRule) {
+		RuleSetBean ruleSet = ruleSetRule.getRuleSetBean();
+		getRuleDao().getSessionFactory().getCurrentSession().clear();
+		Session session = getRuleDao().getSessionFactory().getCurrentSession();
+		Transaction transaction = session.beginTransaction();
+		ruleSetRule.setStatus(Status.AVAILABLE);
+		session.update(ruleSetRule);
+		if (ruleSet.getRuleSetRuleSize() <= 1) {
+			ruleSet.setStatus(Status.AVAILABLE);
+			session.update(ruleSet);
+		}
+		transaction.commit();
+		session.flush();
 	}
 }

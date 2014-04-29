@@ -2628,3 +2628,7 @@ a.dnShortcut:hover {
     width: 14px;
     z-index: 99999;
 }
+
+#ruleAssignments > tbody > tr > td:last-of-type {
+    white-space: nowrap;
+}

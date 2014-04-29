@@ -260,7 +260,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			}
 		}
 		if (ruleSetRuleStatusFilterNotSelected) {
-			viewRuleAssignmentFilter.addFilter("ruleSetRuleStatus", "1");
+			// viewRuleAssignmentFilter.addFilter("ruleSetRuleStatus", "1");
 		}
 
 		viewRuleAssignmentFilter.addFilter("ignoreWrongRules", true);
@@ -769,8 +769,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 			value += buildEditRuleLink(ruleId, ruleSetRule.getId(), ruleSetRule.getRuleBean().getStudyId());
 			if (ruleSetRule.getStatus() != Status.DELETED) {
 				value += viewLinkBuilder(ruleSetId) + executeLinkBuilder(ruleSetId, ruleId)
-						+ removeLinkBuilder(ruleSetRuleId, ruleSetId) + extractXmlLinkBuilder(ruleSetRuleId)
-						+ testLinkBuilder(ruleSetRuleId);
+						+ removeLinkBuilder(ruleSetRuleId, ruleSetId) + deleteLinkBuilder(ruleSetRuleId, ruleSetId)
+						+ extractXmlLinkBuilder(ruleSetRuleId) + testLinkBuilder(ruleSetRuleId);
 			} else {
 				value += viewLinkBuilder(ruleSetId) + restoreLinkBuilder(ruleSetRuleId, ruleSetId)
 						+ extractXmlLinkBuilder(ruleSetRuleId) + testLinkBuilder(ruleSetRuleId);
@@ -824,16 +824,31 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
 	}
 
-	private String removeLinkBuilder(Integer ruleSetRuleId, Integer ruleSetId) {
+	private String deleteLinkBuilder(Integer ruleSetRuleId, Integer ruleSetId) {
 		HtmlBuilder actionLink = new HtmlBuilder();
 		actionLink.a().href(
 				"UpdateRuleSetRule?action=delete&ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
 		actionLink.append("onClick=\"return confirmDialog({ message:'"
 				+ resword.getString("are_you_sure_to_delete_this_rule") + "', height:150, width:500, aLink:this });\"");
 		actionLink.append("onMouseDown=\"javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');\"");
-		actionLink.append("onMouseUp=\"javascript:setImage('bt_Delete1','images/bt_Delete.Delete');\"").close();
-		actionLink.img().name("bt_Delete1").src("images/bt_Delete.gif").border("0").alt("Delete").title("Delete")
-				.append("hspace=\"2\"").end().aEnd();
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_Delete1','images/bt_Delete.gif');\"").close();
+		actionLink.img().name("bt_Delete1").src("images/bt_Delete.gif").border("0").alt(resword.getString("delete"))
+				.title(resword.getString("delete")).append("hspace=\"2\"").end().aEnd();
+		actionLink.append("&nbsp;&nbsp;&nbsp;");
+		return actionLink.toString();
+
+	}
+
+	private String removeLinkBuilder(Integer ruleSetRuleId, Integer ruleSetId) {
+		HtmlBuilder actionLink = new HtmlBuilder();
+		actionLink.a().href(
+				"UpdateRuleSetRule?action=remove&ruleSetRuleId=" + ruleSetRuleId + "&ruleSetId=" + ruleSetId);
+		actionLink.append("onClick=\"return confirmDialog({ message:'" + resword.getString("rule_if_you_remove_this")
+				+ "', height:150, width:500, aLink:this });\"");
+		actionLink.append("onMouseDown=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"");
+		actionLink.append("onMouseUp=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"").close();
+		actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove"))
+				.title(resword.getString("remove")).append("hspace=\"2\"").end().aEnd();
 		actionLink.append("&nbsp;&nbsp;&nbsp;");
 		return actionLink.toString();
 
