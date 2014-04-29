@@ -48,8 +48,6 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.UserAccountUtil;
-
 @SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 @Component
 public class ListUserAccountsServlet extends RememberLastPage {
@@ -87,8 +85,8 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		if (!currentUser.getName().equals(UserAccountBean.ROOT)) {
 			iterateUser = allUsers.listIterator();
 			while (iterateUser.hasNext()) {
-				if (!UserAccountUtil.doesUserHaveRoleInStydies(iterateUser.next(),
-						studyListCurrentUserHasAccessTo, sdao)) {
+				if (getUserAccountService().doesUserHaveRoleInStydies(iterateUser.next(),
+						studyListCurrentUserHasAccessTo)) {
 					iterateUser.remove();			
 				}
 			}

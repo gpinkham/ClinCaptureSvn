@@ -25,16 +25,21 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author jxu
@@ -45,42 +50,43 @@ import java.util.List;
  *         Code Templates
  */
 @SuppressWarnings({ "serial" })
-public class SetUserRoleServlet extends SecureController {
+@Component
+public class SetUserRoleServlet extends Controller {
 
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		if (ub.isSysAdmin()) {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		if (getUserAccountBean(request).isSysAdmin()) {
 			return;
 		}
 
 		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
-		throw new InsufficientPermissionException(Page.LIST_USER_ACCOUNTS_SERVLET, resexception.getString("not_admin"),
-				"1");
+						+ respage.getString("change_study_contact_sysadmin"), request);
+		throw new InsufficientPermissionException(Page.LIST_USER_ACCOUNTS_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		UserAccountDAO udao = getUserAccountDAO();
+		StudyDAO sdao = getStudyDAO();
 		FormProcessor fp = new FormProcessor(request);
 		int userId = fp.getInt("userId");
 		String pageIsChanged = request.getParameter("pageIsChanged");
-		UserAccountBean userLoggedInSystem = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+		UserAccountBean currentUser = getUserAccountBean(request);
 		List<StudyBean> finalStudyListNotHaveRole;
 		List<StudyBean> studyListRoleCanBeAssignedTo;
 		List<StudyBean> studyListWithRoleAssigned;
 		List<StudyBean> siteListByParent;
 		boolean isStudyLevelUser;
-		
+
 		if (pageIsChanged != null) {
 			request.setAttribute("pageIsChanged", pageIsChanged);
 		}
-		
+
 		if (userId == 0) {
-			addPageMessage(respage.getString("please_choose_a_user_to_set_role_for"));
-			forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_user_to_set_role_for"), request);
+			forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 		} else {
 			String action = request.getParameter("action");
 			UserAccountBean user = (UserAccountBean) udao.findByPK(userId);
@@ -92,20 +98,20 @@ public class SetUserRoleServlet extends SecureController {
 			request.setAttribute("studyId", studyId);
 
 			if ("confirm".equalsIgnoreCase(action) || changeRoles) {
-				
-				studyListRoleCanBeAssignedTo = sdao.findAllActiveStudiesWhereUserHasRole(userLoggedInSystem.getName());
+
+				studyListRoleCanBeAssignedTo = sdao.findAllActiveStudiesWhereUserHasRole(currentUser.getName());
 				studyListWithRoleAssigned = sdao.findAllActiveWhereUserHasRole(user.getName());
 				isStudyLevelUser = user.getRoles().get(0).isStudyLevelRole();
-				
+
 				if (isStudyLevelUser) {
 					studyListRoleCanBeAssignedTo.removeAll(studyListWithRoleAssigned);
 					finalStudyListNotHaveRole = studyListRoleCanBeAssignedTo;
 				} else {
 					finalStudyListNotHaveRole = new ArrayList<StudyBean>();
-					for (StudyBean sb: studyListRoleCanBeAssignedTo) {
+					for (StudyBean sb : studyListRoleCanBeAssignedTo) {
 						siteListByParent = sdao.findAllByParentAndActive(sb.getId());
 						siteListByParent.removeAll(studyListWithRoleAssigned);
-						if(!siteListByParent.isEmpty()) {
+						if (!siteListByParent.isEmpty()) {
 							finalStudyListNotHaveRole.add(sb);
 							finalStudyListNotHaveRole.addAll(siteListByParent);
 						}
@@ -121,7 +127,7 @@ public class SetUserRoleServlet extends SecureController {
 				uRole.setUserName(user.getName());
 				request.setAttribute("uRole", uRole);
 
-				forwardPage(Page.SET_USER_ROLE);
+				forwardPage(Page.SET_USER_ROLE, request, response);
 			} else {
 				// set role
 				String userName = fp.getString("name");
@@ -135,31 +141,36 @@ public class SetUserRoleServlet extends SecureController {
 				sur.setStudyId(studyId);
 				sur.setStudyName(userStudy.getName());
 				sur.setStatus(Status.AVAILABLE);
-				sur.setOwner(ub);
+				sur.setOwner(currentUser);
 				sur.setCreatedDate(new Date());
 
 				if (studyId > 0) {
 					udao.createStudyUserRole(user, sur);
-					if (ub.getId() == user.getId()) {
-						session.setAttribute("reloadUserBean", true);
+
+					if (currentUser.getId() != user.getId()) {
+						getUserAccountService().setActiveStudyId(user, studyId);
 					}
-					addPageMessage(new StringBuilder("").append(user.getFirstName()).append(" ")
-							.append(user.getLastName()).append(" (").append(resword.getString("username"))
-							.append(": ").append(user.getName()).append(") ")
-							.append(respage.getString("has_been_granted_the_role")).append(" \"")
-							.append(sur.getRole().getDescription()).append("\" ")
-							.append(respage.getString("in_the_study_site")).append(" ")
-							.append(userStudy.getName()).append(".").toString());
+
+					if (currentUser.getId() == user.getId()) {
+						request.getSession().setAttribute("reloadUserBean", true);
+					}
+					addPageMessage(new StringBuilder("").append(user.getFirstName()).append(" ").append(user.getLastName())
+									.append(" (").append(resword.getString("username")).append(": ")
+									.append(user.getName()).append(") ")
+									.append(respage.getString("has_been_granted_the_role")).append(" \"")
+									.append(sur.getRole().getDescription()).append("\" ")
+									.append(respage.getString("in_the_study_site")).append(" ")
+									.append(userStudy.getName()).append(".").toString(), request);
 				}
-		
-				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+
+				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 			}
 
 		}
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
 		return SecureController.ADMIN_SERVLET_CODE;
 	}
 }

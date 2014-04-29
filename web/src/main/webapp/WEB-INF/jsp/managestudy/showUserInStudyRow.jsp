@@ -6,8 +6,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.StudyUserRoleRow" />
-
 <tr valign="top">   
       <td class="table_cell_left"><c:out value="${currRow.bean.userName}"/></td>
       <td class="table_cell"><c:out value="${currRow.bean.firstName}"/></td>  
@@ -66,7 +64,7 @@
             </c:if>   
                                     
         	<td>
-       		 <a href="DeleteStudyUserRole?studyId=<c:out value="${currRow.bean.studyId}" />&userName=<c:out value="${currRow.bean.userName}"/>&action=3" onClick="<c:out value="${onClick}" />"
+       		 <a href="DeleteStudyUserRole?studyId=<c:out value="${currRow.bean.studyId}" />&userId=<c:out value="${currRow.bean.userAccountId}"/>&action=3" onClick="<c:out value="${onClick}" />"
                 onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
                 onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');">
                 <img name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>

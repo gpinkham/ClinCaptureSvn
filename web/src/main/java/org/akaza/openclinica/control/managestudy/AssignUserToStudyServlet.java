@@ -50,8 +50,6 @@ import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.UserAccountRow;
 import org.springframework.stereotype.Component;
 
-import com.clinovo.util.UserAccountUtil;
-
 /**
  * Processes request to assign a user to a study
  * 
@@ -169,7 +167,6 @@ public class AssignUserToStudyServlet extends Controller {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	private void addUser(HttpServletRequest request, HttpServletResponse response, ArrayList users) throws Exception {
 		UserAccountBean ub = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -181,23 +178,12 @@ public class AssignUserToStudyServlet extends Controller {
 		Set addedUsers = new HashSet();
 		for (int i = 0; i < users.size(); i++) {
 			int id = fp.getInt("id" + i);
-			String firstName = fp.getString("firstName" + i);
-			String lastName = fp.getString("lastName" + i);
-			String name = fp.getString("name" + i);
-			String email = fp.getString("email" + i);
 			int roleId = fp.getInt("activeStudyRoleId" + i);
 			String checked = fp.getString("selected" + i);
 
 			if (!StringUtil.isBlank(checked) && "yes".equalsIgnoreCase(checked.trim())) {
 				logger.info("one user selected");
-				UserAccountBean u = new UserAccountBean();
-				u.setId(id);
-				u.setLastName(lastName);
-				u.setFirstName(firstName);
-				u.setName(name);
-				u.setEmail(email);
-				u.setActiveStudyId(ub.getActiveStudyId());
-				u.setOwnerId(id);
+				UserAccountBean user = (UserAccountBean) udao.findByPK(id);
 				addedUsers.add(id);
 
 				StudyUserRoleBean sub = new StudyUserRoleBean();
@@ -205,15 +191,17 @@ public class AssignUserToStudyServlet extends Controller {
 				sub.setStudyId(currentStudy.getId());
 				sub.setStatus(Status.AVAILABLE);
 				sub.setOwner(ub);
-				if (udao.findStudyUserRole(u, sub).getName() != null
-						&& udao.findStudyUserRole(u, sub).getName().isEmpty())// create only when it doesn't exist in
+				if (udao.findStudyUserRole(user, sub).getName() != null
+						&& udao.findStudyUserRole(user, sub).getName().isEmpty()) {// create only when it doesn't exist in
 																				// database
-					udao.createStudyUserRole(u, sub);
-				else {
+					udao.createStudyUserRole(user, sub);
+					getUserAccountService().setActiveStudyId(user, currentStudy.getId());
+				
+				} else {
 					break;
 				}
 				logger.info("one user added");
-				pageMass = pageMass + sendEmail(u, currentStudy, sub);
+				pageMass = pageMass + sendEmail(user, currentStudy, sub);
 
 			} else {
 				if (tmpSelectedUsersMap != null && tmpSelectedUsersMap.containsKey(id)) {
@@ -235,20 +223,19 @@ public class AssignUserToStudyServlet extends Controller {
 					}
 				}
 				if (!alreadyAdded) {
-					UserAccountBean u = new UserAccountBean();
-					u.setId(id);
-					u.setName(udao.findByPK(id).getName());
-					u.setActiveStudyId(ub.getActiveStudyId());
-					u.setOwnerId(id);
+					UserAccountBean user = (UserAccountBean) udao.findByPK(id);
 
 					StudyUserRoleBean sub = new StudyUserRoleBean();
 					sub.setRoleName(Role.get(roleId).getName());
 					sub.setStudyId(currentStudy.getId());
 					sub.setStatus(Status.AVAILABLE);
 					sub.setOwner(ub);
-					udao.createStudyUserRole(u, sub);
+					udao.createStudyUserRole(user, sub);
+					
+					getUserAccountService().setActiveStudyId(user, currentStudy.getId());
+					
 					logger.info("one user added");
-					pageMass = pageMass + sendEmail(u, currentStudy, sub);
+					pageMass = pageMass + sendEmail(user, currentStudy, sub);
 				}
 			}
 		}
@@ -271,7 +258,7 @@ public class AssignUserToStudyServlet extends Controller {
 	 * 
 	 * @return currentStudy StudyBean
 	 */
-	private ArrayList findUsers(HttpServletRequest request) {
+	private ArrayList findUsers(HttpServletRequest request) throws Exception {
 
 		UserAccountBean currentUser = getUserAccountBean(request);
 		StudyBean currentStudy = getCurrentStudy(request);
@@ -297,8 +284,8 @@ public class AssignUserToStudyServlet extends Controller {
 		
 		iterateUser = userListbyRoles.listIterator();
 		while (iterateUser.hasNext()) {
-			if (!UserAccountUtil.doesUserHaveRoleInStydies(iterateUser.next(),
-					studyListCurrentUserHasAccessTo, sdao)) {
+			if (!getUserAccountService().doesUserHaveRoleInStydies(iterateUser.next(),
+					studyListCurrentUserHasAccessTo)) {
 				iterateUser.remove();				
 			}
 		}

@@ -3,6 +3,7 @@ package org.akaza.openclinica.control.core;
 import com.clinovo.service.CodedItemService;
 import com.clinovo.service.DictionaryService;
 import com.clinovo.service.StudySubjectIdService;
+import com.clinovo.service.UserAccountService;
 import com.clinovo.service.WidgetService;
 import com.clinovo.service.WidgetsLayoutService;
 
@@ -205,6 +206,8 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
     private WidgetsLayoutService widgetsLayoutService;
     @Autowired
     private WidgetService widgetService;
+    @Autowired
+    private UserAccountService userAccountService;
 
 	public static synchronized void removeLockedCRF(int userId) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(unavailableCRFList);
@@ -477,5 +480,9 @@ public abstract class BaseController extends HttpServlet implements HttpRequestH
 
 	public WidgetService getWidgetService() {
 		return widgetService;
-	}    
+	}   
+	
+	public UserAccountService getUserAccountService() {
+		return userAccountService;
+	}  
 }

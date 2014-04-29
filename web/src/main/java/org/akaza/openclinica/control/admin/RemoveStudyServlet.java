@@ -23,9 +23,13 @@ package org.akaza.openclinica.control.admin;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -35,6 +39,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
+import org.akaza.openclinica.control.core.Controller;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -50,6 +55,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
 /**
  * Processes the request of removing a top level study, all the data assoicated with this study will be removed
@@ -58,33 +64,39 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class RemoveStudyServlet extends SecureController {
+@Component
+public class RemoveStudyServlet extends Controller {
 	/**
      *
      */
 	@Override
-	public void mayProceed() throws InsufficientPermissionException {
-		if (ub.isSysAdmin()) {
+	public void mayProceed(HttpServletRequest request, HttpServletResponse response)
+			throws InsufficientPermissionException {
+		if (getUserAccountBean(request).isSysAdmin()) {
 			return;
 		}
 
-		addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-				+ respage.getString("change_study_contact_sysadmin"));
+		addPageMessage(
+				respage.getString("no_have_correct_privilege_current_study")
+						+ respage.getString("change_study_contact_sysadmin"), request);
 		throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
 
 	}
 
 	@Override
-	public void processRequest() throws Exception {
-		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+	public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		StudyDAO sdao = getStudyDAO();
 		FormProcessor fp = new FormProcessor(request);
 		int studyId = fp.getInt("id");
+		StudyBean currentStudy = getCurrentStudy(request);
+		UserAccountBean currentUser = getUserAccountBean(request);
+		StudyUserRoleBean currentRole = getCurrentRole(request);
 
 		// it's impossible to remove the current study
 		if ((currentStudy.getParentStudyId() > 0 && currentStudy.getParentStudyId() == studyId)
 				|| (currentStudy.getId() == studyId)) {
-			addPageMessage(resword.getString("you_are_trying_to_remove_the_current_study"));
-			forwardPage(Page.STUDY_LIST_SERVLET);
+			addPageMessage(resword.getString("you_are_trying_to_remove_the_current_study"), request);
+			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 			return;
 		}
 
@@ -93,21 +105,21 @@ public class RemoveStudyServlet extends SecureController {
 		ArrayList sites = (ArrayList) sdao.findAllByParent(studyId);
 
 		// find all user and roles in the study, include ones in sites
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountDAO udao = getUserAccountDAO();
 		ArrayList userRoles = udao.findAllByStudyId(studyId);
 
 		// find all subjects in the study, include ones in sites
-		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+		StudySubjectDAO ssdao = getStudySubjectDAO();
 		ArrayList subjects = ssdao.findAllByStudy(study);
 
 		// find all events in the study, include ones in sites
-		StudyEventDefinitionDAO sefdao = new StudyEventDefinitionDAO(sm.getDataSource());
+		StudyEventDefinitionDAO sefdao = getStudyEventDefinitionDAO();
 		ArrayList definitions = sefdao.findAllByStudy(study);
 
 		String action = request.getParameter("action");
 		if (studyId == 0) {
-			addPageMessage(respage.getString("please_choose_a_study_to_remove"));
-			forwardPage(Page.STUDY_LIST_SERVLET);
+			addPageMessage(respage.getString("please_choose_a_study_to_remove"), request);
+			forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 		} else {
 			if ("confirm".equalsIgnoreCase(action)) {
 				request.setAttribute("studyToRemove", study);
@@ -119,16 +131,15 @@ public class RemoveStudyServlet extends SecureController {
 				request.setAttribute("subjectsToRemove", subjects);
 
 				request.setAttribute("definitionsToRemove", definitions);
-				forwardPage(Page.REMOVE_STUDY);
+				forwardPage(Page.REMOVE_STUDY, request, response);
 			} else {
 				logger.info("submit to remove the study");
 				// change all statuses to unavailable
-				StudyDAO studao = new StudyDAO(sm.getDataSource());
 				study.setOldStatus(study.getStatus());
 				study.setStatus(Status.DELETED);
-				study.setUpdater(ub);
+				study.setUpdater(currentUser);
 				study.setUpdatedDate(new Date());
-				studao.update(study);
+				sdao.update(study);
 
 				// remove all sites
 				for (int i = 0; i < sites.size(); i++) {
@@ -136,7 +147,7 @@ public class RemoveStudyServlet extends SecureController {
 					if (!site.getStatus().equals(Status.DELETED)) {
 						site.setOldStatus(site.getStatus());
 						site.setStatus(Status.AUTO_DELETED);
-						site.setUpdater(ub);
+						site.setUpdater(currentUser);
 						site.setUpdatedDate(new Date());
 						sdao.update(site);
 					}
@@ -145,13 +156,7 @@ public class RemoveStudyServlet extends SecureController {
 				// remove all users and roles
 				for (int i = 0; i < userRoles.size(); i++) {
 					StudyUserRoleBean role = (StudyUserRoleBean) userRoles.get(i);
-					logger.info("remove user role" + role.getName());
-					if (!role.getStatus().equals(Status.DELETED)) {
-						role.setStatus(Status.AUTO_DELETED);
-						role.setUpdater(ub);
-						role.setUpdatedDate(new Date());
-						udao.updateStudyUserRole(role, role.getUserName());
-					}
+					getUserAccountService().autoRemoveStudyUserRole(role, currentUser);
 				}
 
 				// YW << bug fix for that current active study has been deleted
@@ -174,7 +179,7 @@ public class RemoveStudyServlet extends SecureController {
 					StudySubjectBean subject = (StudySubjectBean) subjects.get(i);
 					if (!subject.getStatus().equals(Status.DELETED)) {
 						subject.setStatus(Status.AUTO_DELETED);
-						subject.setUpdater(ub);
+						subject.setUpdater(currentUser);
 						subject.setUpdatedDate(new Date());
 						ssdao.update(subject);
 					}
@@ -183,15 +188,15 @@ public class RemoveStudyServlet extends SecureController {
 				// remove all study_group_class
 				// changed by jxu on 08-31-06, to fix the problem of no study_id
 				// in study_group table
-				StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-				SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
+				StudyGroupClassDAO sgcdao = getStudyGroupClassDAO();
+				SubjectGroupMapDAO sgmdao = getSubjectGroupMapDAO();
 
 				ArrayList groups = sgcdao.findAllByStudy(study);
 				for (int i = 0; i < groups.size(); i++) {
 					StudyGroupClassBean group = (StudyGroupClassBean) groups.get(i);
 					if (!group.getStatus().equals(Status.DELETED)) {
 						group.setStatus(Status.AUTO_DELETED);
-						group.setUpdater(ub);
+						group.setUpdater(currentUser);
 						group.setUpdatedDate(new Date());
 						sgcdao.update(group);
 						// all subject_group_map
@@ -200,7 +205,7 @@ public class RemoveStudyServlet extends SecureController {
 							SubjectGroupMapBean sgMap = (SubjectGroupMapBean) subjectGroupMaps.get(j);
 							if (!sgMap.getStatus().equals(Status.DELETED)) {
 								sgMap.setStatus(Status.AUTO_DELETED);
-								sgMap.setUpdater(ub);
+								sgMap.setUpdater(currentUser);
 								sgMap.setUpdatedDate(new Date());
 								sgmdao.update(sgMap);
 							}
@@ -213,20 +218,20 @@ public class RemoveStudyServlet extends SecureController {
 					StudyGroupClassBean gc = (StudyGroupClassBean) groupClasses.get(i);
 					if (!gc.getStatus().equals(Status.DELETED)) {
 						gc.setStatus(Status.AUTO_DELETED);
-						gc.setUpdater(ub);
+						gc.setUpdater(currentUser);
 						gc.setUpdatedDate(new Date());
 						sgcdao.update(gc);
 					}
 				}
 
 				// remove all event definitions and event
-				EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-				StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+				EventDefinitionCRFDAO edcdao = getEventDefinitionCRFDAO();
+				StudyEventDAO sedao = getStudyEventDAO();
 				for (int i = 0; i < definitions.size(); i++) {
 					StudyEventDefinitionBean definition = (StudyEventDefinitionBean) definitions.get(i);
 					if (!definition.getStatus().equals(Status.DELETED)) {
 						definition.setStatus(Status.AUTO_DELETED);
-						definition.setUpdater(ub);
+						definition.setUpdater(currentUser);
 						definition.setUpdatedDate(new Date());
 						sefdao.update(definition);
 						ArrayList edcs = (ArrayList) edcdao.findAllByDefinition(definition.getId());
@@ -234,32 +239,32 @@ public class RemoveStudyServlet extends SecureController {
 							EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcs.get(j);
 							if (!edc.getStatus().equals(Status.DELETED)) {
 								edc.setStatus(Status.AUTO_DELETED);
-								edc.setUpdater(ub);
+								edc.setUpdater(currentUser);
 								edc.setUpdatedDate(new Date());
 								edcdao.update(edc);
 							}
 						}
 
 						ArrayList events = (ArrayList) sedao.findAllByDefinition(definition.getId());
-						EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+						EventCRFDAO ecdao = getEventCRFDAO();
 
 						for (int j = 0; j < events.size(); j++) {
 							StudyEventBean event = (StudyEventBean) events.get(j);
 							if (!event.getStatus().equals(Status.DELETED)) {
 								event.setStatus(Status.AUTO_DELETED);
-								event.setUpdater(ub);
+								event.setUpdater(currentUser);
 								event.setUpdatedDate(new Date());
 								sedao.update(event);
 
 								ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
-								ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+								ItemDataDAO iddao = getItemDataDAO();
 								for (int k = 0; k < eventCRFs.size(); k++) {
 									EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
 									if (!eventCRF.getStatus().equals(Status.DELETED)) {
 										eventCRF.setOldStatus(eventCRF.getStatus());
 										eventCRF.setStatus(Status.AUTO_DELETED);
-										eventCRF.setUpdater(ub);
+										eventCRF.setUpdater(currentUser);
 										eventCRF.setUpdatedDate(new Date());
 										ecdao.update(eventCRF);
 
@@ -269,7 +274,7 @@ public class RemoveStudyServlet extends SecureController {
 											if (!item.getStatus().equals(Status.DELETED)) {
 												item.setOldStatus(item.getStatus());
 												item.setStatus(Status.AUTO_DELETED);
-												item.setUpdater(ub);
+												item.setUpdater(currentUser);
 												item.setUpdatedDate(new Date());
 												iddao.update(item);
 											}
@@ -281,20 +286,20 @@ public class RemoveStudyServlet extends SecureController {
 					}
 				}// for definitions
 
-				DatasetDAO datadao = new DatasetDAO(sm.getDataSource());
+				DatasetDAO datadao = getDatasetDAO();
 				ArrayList dataset = datadao.findAllByStudyId(study.getId());
 				for (int i = 0; i < dataset.size(); i++) {
 					DatasetBean data = (DatasetBean) dataset.get(i);
 					if (!data.getStatus().equals(Status.DELETED)) {
 						data.setStatus(Status.AUTO_DELETED);
-						data.setUpdater(ub);
+						data.setUpdater(currentUser);
 						data.setUpdatedDate(new Date());
 						datadao.update(data);
 					}
 				}
 
-				addPageMessage(resexception.getString("this_study_has_been_removed_succesfully"));
-				forwardPage(Page.STUDY_LIST_SERVLET);
+				addPageMessage(resexception.getString("this_study_has_been_removed_succesfully"), request);
+				forwardPage(Page.STUDY_LIST_SERVLET, request, response);
 
 			}
 		}
@@ -302,7 +307,7 @@ public class RemoveStudyServlet extends SecureController {
 	}
 
 	@Override
-	protected String getAdminServlet() {
+	protected String getAdminServlet(HttpServletRequest request) {
 		return SecureController.ADMIN_SERVLET_CODE;
 	}
 }

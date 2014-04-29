@@ -117,13 +117,13 @@ public class UserAccountTable extends Table {
 						+ " role for " + u.getName() + " in " + studyName + "?";
 				row += " <a href='" + EditStudyUserRoleServlet.getLink(sur, u) + "'>edit role</a>";
 				row += " <a href='"
-						+ DeleteStudyUserRoleServlet.getLink(u.getName(), sur.getStudyId(), EntityAction.DELETE)
+						+ DeleteStudyUserRoleServlet.getLink(u.getId(), sur.getStudyId(), EntityAction.DELETE)
 						+ "' onClick='return confirm(\"" + confirmQuestion + "\");'>delete role</a>";
 			} else {
 				String confirmQuestion = "Are you sure you want to restore the " + sur.getRole().getDescription()
 						+ " role for " + u.getName() + " in Study " + sur.getStudyId() + "?";
 				row += " <a href='"
-						+ DeleteStudyUserRoleServlet.getLink(u.getName(), sur.getStudyId(), EntityAction.RESTORE)
+						+ DeleteStudyUserRoleServlet.getLink(u.getId(), sur.getStudyId(), EntityAction.RESTORE)
 						+ "' onClick=\"return confirm('" + confirmQuestion + "');\">restore role</a>";
 			}
 			row += "<br/>\n";

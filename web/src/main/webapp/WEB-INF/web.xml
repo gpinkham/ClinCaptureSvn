@@ -492,9 +492,9 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UnLockUserServlet</servlet-name>
+        <servlet-name>unLockUserServlet</servlet-name>
         <display-name>UnLockUser</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.UnLockUserServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>createStudyServlet</servlet-name>
@@ -703,14 +703,14 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewSiteServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RemoveSiteServlet</servlet-name>
+        <servlet-name>removeSiteServlet</servlet-name>
         <display-name>RemoveSite</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RemoveSiteServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RestoreSiteServlet</servlet-name>
+        <servlet-name>restoreSiteServlet</servlet-name>
         <display-name>RestoreSite</display-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RestoreSiteServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RemoveEventDefinitionServlet</servlet-name>
@@ -854,14 +854,14 @@
         <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RemoveStudyServlet</servlet-name>
+        <servlet-name>removeStudyServlet</servlet-name>
         <display-name>RemoveStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.RemoveStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RestoreStudyServlet</servlet-name>
+        <servlet-name>restoreStudyServlet</servlet-name>
         <display-name>RestoreStudy</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.RestoreStudyServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>listSubjectServlet</servlet-name>
@@ -914,9 +914,9 @@
         <servlet-class>org.akaza.openclinica.control.admin.ViewSubjectServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>SetUserRoleServlet</servlet-name>
+        <servlet-name>setUserRoleServlet</servlet-name>
         <display-name>SetUserRole</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.SetUserRoleServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>viewTableOfContentServlet</servlet-name>
@@ -1543,7 +1543,7 @@
         <url-pattern>/DeleteUser</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UnLockUserServlet</servlet-name>
+        <servlet-name>unLockUserServlet</servlet-name>
         <url-pattern>/UnLockUser</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1740,11 +1740,11 @@
         <url-pattern>/ViewSite</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveSiteServlet</servlet-name>
+        <servlet-name>removeSiteServlet</servlet-name>
         <url-pattern>/RemoveSite</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestoreSiteServlet</servlet-name>
+        <servlet-name>restoreSiteServlet</servlet-name>
         <url-pattern>/RestoreSite</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1836,11 +1836,11 @@
         <url-pattern>/ReassignStudySubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveStudyServlet</servlet-name>
+        <servlet-name>removeStudyServlet</servlet-name>
         <url-pattern>/RemoveStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestoreStudyServlet</servlet-name>
+        <servlet-name>restoreStudyServlet</servlet-name>
         <url-pattern>/RestoreStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -1888,7 +1888,7 @@
         <url-pattern>/ViewSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>SetUserRoleServlet</servlet-name>
+        <servlet-name>setUserRoleServlet</servlet-name>
         <url-pattern>/SetUserRole</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

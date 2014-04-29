@@ -57,8 +57,7 @@ public class DeleteUserServlet extends Controller {
 		UserAccountBean ub = getUserAccountBean(request);
 
 		if (!ub.isSysAdmin()) {
-			addPageMessage(
-					respage.getString("no_have_correct_privilege_current_study")
+			addPageMessage(respage.getString("no_have_correct_privilege_current_study")
 							+ respage.getString("change_study_contact_sysadmin"), request);
 			throw new InsufficientPermissionException(Page.MENU_SERVLET,
 					resexception.getString("you_may_not_perform_administrative_functions"), "1");
@@ -77,9 +76,14 @@ public class DeleteUserServlet extends Controller {
 
 		UserAccountBean u = (UserAccountBean) udao.findByPK(userId);
 
+		MessageFormat messageFormat = new MessageFormat("");
+
 		String message;
 		if (!u.isActive()) {
-			message = respage.getString("the_specified_user_not_exits");
+
+			messageFormat.applyPattern(respage.getString("the_specified_user_not_exits"));
+			message = messageFormat.format(new Object[] { userId });
+
 		} else if (!EntityAction.contains(action)) {
 			message = respage.getString("the_specified_action_on_the_user_is_invalid");
 		} else if (!EntityAction.get(action).equals(EntityAction.DELETE)
@@ -94,7 +98,7 @@ public class DeleteUserServlet extends Controller {
 
 				if (udao.isQuerySuccessful()) {
 					message = respage.getString("the_user_has_been_removed_successfully");
-					
+
 					try {
 						sendRestoreEmail(request, u, null, desiredAction);
 					} catch (Exception e) {
@@ -131,7 +135,8 @@ public class DeleteUserServlet extends Controller {
 		forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET, request, response);
 	}
 
-	private void sendRestoreEmail(HttpServletRequest request, UserAccountBean u, String password, EntityAction desiredAction) throws Exception {
+	private void sendRestoreEmail(HttpServletRequest request, UserAccountBean u, String password,
+			EntityAction desiredAction) throws Exception {
 		StudyBean currentStudy = getCurrentStudy(request);
 		String body = "";
 		String subject = "";
@@ -139,7 +144,7 @@ public class DeleteUserServlet extends Controller {
 		StudyBean emailParentStudy;
 		Object arguments[] = {};
 		MessageFormat msg = new MessageFormat("");
-		
+
 		if (currentStudy.getParentStudyId() > 0) {
 			emailParentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
 		} else {
@@ -150,15 +155,16 @@ public class DeleteUserServlet extends Controller {
 			logger.info("Sending remove account notification to " + u.getName());
 			subject = restext.getString("your_clin_capture_account_has_been_removed");
 			msg.applyPattern(restext.getString("your_account_has_been_removed_email_message_html"));
-			arguments = new Object[] {u.getFirstName() + " " + u.getLastName(), u.getName(), emailParentStudy.getName()};
+			arguments = new Object[] { u.getFirstName() + " " + u.getLastName(), u.getName(),
+					emailParentStudy.getName() };
 		} else if (desiredAction.equals(EntityAction.RESTORE)) {
 			logger.info("Sending restore and password reset notification to " + u.getName());
 			subject = restext.getString("your_new_openclinica_account_has_been_restored");
 			msg.applyPattern(restext.getString("your_account_has_been_restored_and_password_reset_email_message_html"));
-			arguments = new Object[] {u.getFirstName() + " " + u.getLastName(), u.getName(), password, 
-					SQLInitServlet.getSystemURL(), emailParentStudy.getName()};
+			arguments = new Object[] { u.getFirstName() + " " + u.getLastName(), u.getName(), password,
+					SQLInitServlet.getSystemURL(), emailParentStudy.getName() };
 		}
-		
+
 		body = msg.format(arguments);
 		logger.info("Sending email...begin");
 		sendEmail(u.getEmail().trim(), subject, body, false, request);

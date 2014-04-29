@@ -60,7 +60,7 @@ import javax.sql.DataSource;
  *         <P>
  *         expand on query to get all that from a select star?
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class UserAccountDAO extends AuditableEntityDAO {
 
 	@Override
@@ -205,7 +205,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		if (!this.isQuerySuccessful()) {
 			eb.setId(0);
 			logger.warn("query failed: " + sql);
-		} 
+		}
 
 		return eb;
 	}
@@ -292,15 +292,15 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		this.execute(digester.getQuery("insert"), variables);
 		success = success && isQuerySuccessful();
 
-        ArrayList userRoles = uab.getRoles();
-        for (int i = 0; i < userRoles.size(); i++) {
-            StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
-            createStudyUserRole(uab, studyRole);
-            success = success && isQuerySuccessful();
-        }
-        if (success) {
-            uab.setId(id);
-        }
+		ArrayList userRoles = uab.getRoles();
+		for (int i = 0; i < userRoles.size(); i++) {
+			StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
+			createStudyUserRole(uab, studyRole);
+			success = success && isQuerySuccessful();
+		}
+		if (success) {
+			uab.setId(id);
+		}
 		return uab;
 	}
 
@@ -357,8 +357,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		Integer statusId = (Integer) hm.get("status_id");
 		Integer studyId = (Integer) hm.get("study_id");
 		surb.setUserName((String) hm.get("user_name"));
-        surb.setName((String) hm.get("role_name"));
-        surb.setRoleName((String) hm.get("role_name"));
+		surb.setName((String) hm.get("role_name"));
+		surb.setRoleName((String) hm.get("role_name"));
 		surb.setCreatedDate(dateCreated);
 		surb.setUpdatedDate(dateUpdated);
 		surb.setStatus(Status.get(statusId.intValue()));
@@ -674,11 +674,11 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
 	}
 
-	public void deleteUserRole(int studyId, Role role, UserAccountBean user) {
+	public void deleteUserRole(StudyUserRoleBean role) {
 		HashMap variables = new HashMap();
-		variables.put(1, user.getName());
-		variables.put(2, role.getName());
-		variables.put(3, studyId);
+		variables.put(1, role.getUserName());
+		variables.put(2, role.getRole().getName());
+		variables.put(3, role.getStudyId());
 		String sql = digester.getQuery("deleteUserRole");
 		this.execute(sql, variables);
 	}
@@ -732,7 +732,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		return answer;
 
 	}
-	
+
 	/**
 	 * Finds all roles (including roles with status Removed) in a study
 	 * 
@@ -1032,7 +1032,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 		}
 		return pwb.getDateLastUsed();
 	}
-	
+
 	public EntityBean findByUserEmail(String email) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
