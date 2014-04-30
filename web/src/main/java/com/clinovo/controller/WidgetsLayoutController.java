@@ -415,7 +415,7 @@ public class WidgetsLayoutController {
 		sdvFilter.addFilter("sdvStatus", "not done");
 		EventCRFSDVSort sdvSort = new EventCRFSDVSort();
 		ArrayList<EventCRFBean> availableForSDV = (ArrayList<EventCRFBean>) eCrfdao.getAvailableWithFilterAndSort(
-				sb.getId(), sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries, 0, 9999);
+				sb.getId(), sb.getId(), sdvFilter, sdvSort, sdvWithOpenQueries, 0, 99999);
 
 		List<Integer> countAvailableCRFs = new ArrayList<Integer>(Collections.nCopies(12, 0));
 
