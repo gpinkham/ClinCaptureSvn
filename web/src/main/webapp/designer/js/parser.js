@@ -12,10 +12,20 @@
 
  * LIMITATION OF LIABILITY. IN NO EVENT SHALL CLINOVO BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF ORACLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CLINOVO‚ÄôS ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED TWO HUNDRED DOLLARS (U.S. $200).
  * =================================================================================================================================================================================================================================================================================================================================================================================================================================================================== */
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i].trim();
+        if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+
 function Parser() {
 	this.rule = Object.create(null);
 	this.rule.targets = [];
-	this.rule.actions = [];	
+	this.rule.actions = [];
 	this.rule.copied = false;
 	this.rule.editing = false;
 }
@@ -59,7 +69,7 @@ Parser.prototype.setRuleSet = function(ruleSet) {
  * ====================================================================== */
 Parser.prototype.fetchStudies = function() {
 	// Notification
-	$("body").append(createLoader());	
+	$("body").append(createLoader());
 	var c = new RegExp('(.+?(?=/))').exec(window.location.pathname)[0];
 	$.ajax({
 		type: "POST",
@@ -74,7 +84,7 @@ Parser.prototype.fetchStudies = function() {
 			// If editing a rule
 			if (parser.getParameter("action") === "edit") {
 				parser.fetchRuleForEditing();
-			} 
+			}
 			// A back action from validation page
 			if (sessionStorage.getItem("status") && sessionStorage.getItem("status") === "load") {
 				parser.render(JSON.parse(sessionStorage.getItem("rule")));
@@ -176,7 +186,7 @@ Parser.prototype.createNextDroppable = function(params) {
 			dataPredicate.after(RPAREN);
 			createPopover(RPAREN);
 			createPopover(dataPredicate);
-		} 
+		}
 		// Enable showing selected item td
 		params.element.click(function() {
 			showCRFItem(this);
@@ -212,14 +222,14 @@ Parser.prototype.createNextDroppable = function(params) {
 				accept: "div[id='items'] td",
 				element: div.find(".target")
 			});
-			// create a new input 
+			// create a new input
 			if (!params.element.val()) {
 				$('.opt:last').after(div);
 				div.after($('.opt:last').clone());
-			} 
+			}
 			div.find(".target").focus();
 		}
-		params.element.removeClass("bordered");	
+		params.element.removeClass("bordered");
 		params.element.val(params.ui.draggable.attr("item-name"));
 	} else if (params.element.is(".dest")) {
 		if (!this.isAddedShowHideTarget(params.ui.draggable.attr("item-name"))) {
@@ -234,14 +244,14 @@ Parser.prototype.createNextDroppable = function(params) {
 			var div = params.element.parent().clone();
 			div.find("input").val("");
 			div.find("input").removeClass("bordered");
-			// create a new input 
+			// create a new input
 			if (!params.element.val()) {
 				params.element.parent().after(div);
 				createDroppable({
 					element: div.find(".dest"),
 					accept: "div[id='items'] td"
 				});
-			} 
+			}
 			params.element.val(params.ui.draggable.attr("item-name"));
 		}
 		params.element.removeClass("bordered");
@@ -311,27 +321,19 @@ Parser.prototype.createNextDroppable = function(params) {
 				} else if (this.isDate(params.ui.draggable)) {
 					params.element.attr("type", "date");
 					params.element.val($(this).text());
-					var msie = window.navigator.userAgent.indexOf('MSIE ');
-					var trident = window.navigator.userAgent.indexOf('Trident/');
-					if (typeof InstallTrigger !== 'undefined' || msie > 0 || trident > 0) {
-						params.element.data({date: new Date(params.element.val())}).datepicker('update').children("input").val(new Date(params.element.val()));
-						params.element.datepicker({orientation:'bottom left'}).on("hide", function() {
-							if ($(this).val()) {
-								params.element.val($(this).val());
-							} else {
-								params.element.val("Select Date");
-							}
-						});
-						params.element.focus();
-					} else {
-						params.element.blur(function() {
-							if ($(this).val()) {
-								params.element.text($(this).val());
-							} else {
-								params.element.text("Select Date");
-							}
-						});
-					}
+					$.fn.datepicker.defaults.format = getCookie('bootstrapDateFormat');
+					params.element.data({
+						date: new Date(params.element.val())
+					}).datepicker('update').children("input").val(new Date(params.element.val()));
+					params.element.datepicker({
+						orientation: 'bottom left'
+					}).on("hide", function() {
+						if ($(this).val()) {
+							params.element.val($(this).val());
+						} else {
+							params.element.val("Select Date");
+						}
+					});
 				} else if (this.isNumber(params.ui.draggable)) {
 					params.element.attr("type", "number");
 					params.element.blur(function() {
@@ -340,19 +342,18 @@ Parser.prototype.createNextDroppable = function(params) {
 							params.element.removeClass("invalid");
 						} else {
 							params.element.val();
-							params.element.focus();
 							params.element.select();
 							params.element.addClass("invalid");
 						}
 					});
-					params.element.focus();
 				} else if (parser.isEmpty(params.ui.draggable)) {
 					params.element.removeAttr("type");
-					params.element.val('""');				
+					params.element.val('""');
 				} else {
 					destination.value = params.element.val();
 				}
 			}
+			params.element.focus();
 		}
 		params.element.removeClass("bordered");
 	} else {
@@ -564,7 +565,13 @@ Parser.prototype.createRule = function() {
 				ele: $(".dotted-border")[index]
 			})
 		}
+		if (!isNaN(Date.parse(pred))) {
+			var date = new Date(pred);
+			pred = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+            pred = $.format.date(new Date(pred), 'yyyy-MM-dd');
+		}
 		expression.push(pred);
+
 	});
 	parser.rule.expression = expression;
 	if (parser.isValid(expression).valid) {
@@ -1563,6 +1570,7 @@ Parser.prototype.setInsertActionMessage = function(message) {
 }
 
 Parser.prototype.setExpression = function(expression) {
+    var wasDateType = false;
 	if (expression instanceof Array) {
 		this.rule.expression = expression;
 		var currDroppable = $(".dotted-border");
@@ -1570,6 +1578,7 @@ Parser.prototype.setExpression = function(expression) {
 			var itm = this.getItem(expression[e]);
 			if (e === 0) {
 				if (itm) {
+                    wasDateType = itm.type == "date";
 					var preds = expression[e].split(".");
 					if (preds.length == 4) {
 						$(".dotted-border").attr("event-oid", preds[3]);
@@ -1630,7 +1639,11 @@ Parser.prototype.setExpression = function(expression) {
 						droppable.attr("study-oid", this.extractStudy(this.getStudy()).oid);
 						droppable.text(itm.name);
 					} else {
-						droppable.text(expression[e]);
+                        var value = expression[e];
+                        if (wasDateType && !isNaN(new Date(value).valueOf())) {
+                            value = $.format.date(new Date(value), getCookie('ccDateFormat'));
+                        }
+						droppable.text(value);
 					}
 					currDroppable.after(droppable);
 					currDroppable = droppable;

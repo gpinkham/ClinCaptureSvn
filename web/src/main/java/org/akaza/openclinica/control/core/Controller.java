@@ -99,6 +99,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -131,9 +132,15 @@ import java.util.StringTokenizer;
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public abstract class Controller extends BaseController {
 
-	public static final String FORM_WITH_STATE_FLAG = "formWithStateFlag";
-	protected StudyBean originalScope = null;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
+	public static final String CC_DATE_FORMAT = "ccDateFormat";
+	public static final String DATE_FORMAT_STRING = "date_format_string";
+	public static final String FORM_WITH_STATE_FLAG = "formWithStateFlag";
+	public static final String BOOSTRAP_DATE_FORMAT = "bootstrapDateFormat";
+	public static final String BOOTSTRAP_DATAPICKER_DATE_FORMAT = "bootstrap_datapicker_date_format";
+
+	protected StudyBean originalScope = null;
 
 	protected void addPageMessage(String message, HttpServletRequest request) {
 		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
@@ -334,6 +341,9 @@ public abstract class Controller extends BaseController {
 		resword = ResourceBundleProvider.getWordsBundle(locale);
 		respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 		resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
+
+		response.addCookie(new Cookie(BOOSTRAP_DATE_FORMAT, resformat.getString(BOOTSTRAP_DATAPICKER_DATE_FORMAT)));
+		response.addCookie(new Cookie(CC_DATE_FORMAT, resformat.getString(DATE_FORMAT_STRING)));
 
 		initMaps();
 		getErrorsHolder(request);

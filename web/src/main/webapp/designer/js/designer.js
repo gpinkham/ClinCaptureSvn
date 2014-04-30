@@ -819,30 +819,16 @@ function handleNumberDrop(element) {
  *  - element - the element that has been dropped
  * ============================================================================ */
 function handleDateDrop(element) {
-
 	var newInput = $("<input>");
-	newInput.attr("type", "date");
 	newInput.addClass("input-sm");
-
-    var msie = window.navigator.userAgent.indexOf('MSIE ');
-    var trident = window.navigator.userAgent.indexOf('Trident/');
-	if (typeof InstallTrigger !== 'undefined' || msie > 0 || trident > 0) {
-		newInput.datepicker().on("hide", function() {
-			if ($(this).val()) {
-				element.text($(this).val());
-			} else {
-				element.text("Select Date");
-			}
-		});
-	} else {
-		newInput.blur(function() {
-			if ($(this).val()) {
-				element.text($(this).val());
-			} else {
-				element.text("Data");
-			}
-		});
-	}
+	$.fn.datepicker.defaults.format = getCookie('bootstrapDateFormat');
+	newInput.datepicker().on("hide", function() {
+		if ($(this).val()) {
+			element.text($(this).val());
+		} else {
+			element.text("Select Date");
+		}
+	});
 	element.append(newInput);
 	newInput.focus();
 }
