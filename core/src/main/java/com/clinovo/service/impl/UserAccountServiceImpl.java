@@ -63,6 +63,11 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 		List<StudyBean> fullStudyList = new ArrayList<StudyBean>();
 		List<StudyUserRoleBean> rolesList = user.getRoles();
+		
+		if (rolesList.isEmpty()) {	//return FALSE in case if the user has no roles assigned
+			return false; 
+		}
+		
 		boolean isStudyLevelUser = rolesList.get(0).isStudyLevelRole();
 
 		if (isStudyLevelUser) {
