@@ -634,8 +634,7 @@ function createDroppable(params) {
 	})
 
 	function isDate(val) {
-		var d = new Date(val);
-		return !isNaN(d.valueOf()) && d.__proto__ != "Invalid Date";
+		return Date.parse(val) != null;
 	}
 
 	params.element.dblclick(function() {

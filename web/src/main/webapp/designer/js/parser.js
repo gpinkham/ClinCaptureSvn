@@ -565,10 +565,9 @@ Parser.prototype.createRule = function() {
 				ele: $(".dotted-border")[index]
 			})
 		}
-		if (!isNaN(Date.parse(pred))) {
-			var date = new Date(pred);
-			pred = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-            pred = $.format.date(new Date(pred), 'yyyy-MM-dd');
+        var date = Date.parse(pred);
+		if (date != null) {
+            pred = date.toString("yyyy-MM-dd");
 		}
 		expression.push(pred);
 
@@ -1640,8 +1639,9 @@ Parser.prototype.setExpression = function(expression) {
 						droppable.text(itm.name);
 					} else {
                         var value = expression[e];
-                        if (wasDateType && !isNaN(new Date(value).valueOf())) {
-                            value = $.format.date(new Date(value), getCookie('ccDateFormat'));
+                        var date = Date.parse(value);
+                        if (wasDateType && date != null) {
+                            value = date.toString(getCookie('ccDateFormat'));
                         }
 						droppable.text(value);
 					}
