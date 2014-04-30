@@ -1259,6 +1259,12 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-bottom: 7px;
 }
 
+.formFieldLSelect {
+    width: 199px;
+    margin-top: 2px;
+    margin-left: 1px;
+}
+
 .formfieldL_BG { background-image: url(../images/formfieldL_BG.gif);
     background-repeat: no-repeat;
     width: 207px;

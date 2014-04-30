@@ -359,7 +359,7 @@ $(document).ready(function() {
 	<div class="dnBoxCol2 dnBoxText">
 		<c:if test="${isRFC}">
 			<div class="formfieldL_BG" id="select" style="display:none" >
-				<select name="description" id="selectDescription" class="formFieldL" disabled>
+				<select name="description" id="selectDescription"  class="formFieldL formfieldLSelect" disabled>
 					<c:forEach var="rfcTerm" items="${dDescriptionsMap['dnRFCDescriptions']}">
 						<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
 					</c:forEach>
@@ -389,13 +389,13 @@ $(document).ready(function() {
 		<c:choose>
 		<c:when test="${parentId > 0}">
 			<input type="hidden" name="typeId" value="${param.typeId}"/>
-			<select name="pTypeId" id="pTypeId" class="formfieldL" disabled>
+			<select name="pTypeId" id="pTypeId" class="formfieldL formFieldLSelect" disabled>
 				<option value="<c:out value="${param.typeId}"/>" selected><c:out value="${param.typeName}"/>
 			</select>
 		</c:when>
 		<c:otherwise>
 			<c:set var="typeId1" value="${discrepancyNote.discrepancyNoteTypeId}"/>
-			<select name="typeId" id="typeId" class="formfieldL"
+			<select name="typeId" id="typeId" class="formfieldL formFieldLSelect"
                     onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2',
                             '<c:out value="${whichResStatus}"/>',
                             '<fmt:message key="New" bundle="${resterm}"/>',
@@ -438,7 +438,7 @@ $(document).ready(function() {
 		<div class="dnBoxCol1 dnBoxText"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
 		<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG">
 			<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
-		    <select name="resStatusId" id="resStatusId" class="formfieldL">
+		    <select name="resStatusId" id="resStatusId" class="formfieldL formFieldLSelect">
 				<c:set var="resStatuses" value="${resolutionStatuses}"/>
 				<c:forEach var="status" items="${resStatuses}">
 					<c:choose>
@@ -476,11 +476,10 @@ $(document).ready(function() {
 				<c:set var="userAccountId1" value="0"/>
 			</c:otherwise>
 			</c:choose>
-			<select name="userAccountId" id="userAccountId" class="formfieldL" >
+			<select name="userAccountId" id="userAccountId" class="formfieldL formFieldLSelect" >
 				<option value="0">
 		  		<c:forEach var="user" items="${userAccounts}">
-		   		<c:choose>
-		     	<c:when test="${userAccountId1 == user.userAccountId}">
+		   		<c:choose>		     	<c:when test="${userAccountId1 == user.userAccountId}">
 		       		<option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.lastName}"/>, <c:out value="${user.firstName}"/> (<c:out value="${user.userName}"/>)
 		     	</c:when>
 		     	<c:otherwise>

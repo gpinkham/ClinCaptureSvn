@@ -251,7 +251,7 @@ $(document).ready(function() {
 				<c:when test="${parentId == 0}">
 					<c:if test="${isRFC}">
 						<div class="formfieldL_BG" id="select${parentId}" style="display:none" >
-							<select name="description${parentId}" id="selectDescription${parentId}" class="formFieldL" disabled>
+							<select name="description${parentId}" id="selectDescription${parentId}" class="formFieldL formFieldLSelect" disabled>
 								<c:forEach var="rfcTerm" items="${dDescriptionsMap['dnRFCDescriptions']}">
 									<option value="${rfcTerm.name}"><c:out value="${rfcTerm.name}"/>
 								</c:forEach>
@@ -268,14 +268,14 @@ $(document).ready(function() {
 				</c:when>
 				<c:otherwise>
 					<div class="formfieldL_BG">
-						<select name="description${parentId}" id="selectUpdateDescription${parentId}" class="formFieldL">
+						<select name="description${parentId}" id="selectUpdateDescription${parentId}" class="formFieldL formFieldLSelect">
 							<c:forEach var="term" items="${dDescriptionsMap['dnUpdateDescriptions']}">
 								<option value="${term.name}"><c:out value="${term.name}"/>
 							</c:forEach>
 							<option value="Other"><fmt:message key="other" bundle="${resword}"/>
 						</select>
 					
-						<select name="description${parentId}" id="selectCloseDescription${parentId}" class="formFieldL" disabled style="display:none">
+						<select name="description${parentId}" id="selectCloseDescription${parentId}" class="formFieldL formFieldLSelect" disabled style="display:none">
 							<c:forEach var="term" items="${dDescriptionsMap['dnCloseDescriptions']}">
 								<option value="${term.name}"><c:out value="${term.name}"/>
 							</c:forEach>
@@ -312,7 +312,7 @@ $(document).ready(function() {
 				<c:set var="typeIdl" value="${discrepancyNote.discrepancyNoteTypeId}"/>
 				<c:choose>
 				<c:when test="${whichResStatus == 22 || whichResStatus == 1}">
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript: setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
+					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL formFieldLSelect" onchange ="javascript: setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
 						<c:forEach var="type" items="${discrepancyTypes2}">
 							<c:choose>
 								<c:when test="${typeIdl == type.id}">
@@ -326,7 +326,7 @@ $(document).ready(function() {
 					</select>
 				</c:when>
 				<c:otherwise>
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript: setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
+					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL formFieldLSelect" onchange ="javascript: setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>', ${isRFC}, ${parentId});">
 						<c:forEach var="type" items="${discrepancyTypes}">
 							<c:choose>
 								<c:when test="${typeIdl == type.id}">
@@ -350,7 +350,7 @@ $(document).ready(function() {
 			<div class="dnBoxCol2">
 				<div class="formfieldL_BG">
 				<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
-			    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL" onchange="javascript:showAnotherDescriptions(this.options[selectedIndex].value, ${parentId});">
+			    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL formFieldLSelect" onchange="javascript:showAnotherDescriptions(this.options[selectedIndex].value, ${parentId});">
 					<c:choose>
 					<c:when test="${(parentId>0 || whichResStatus==2 && discrepancyNote.discrepancyNoteTypeId==3) || whichResStatus==1}">
 						<c:set var="resStatuses" value="${resolutionStatuses}"/>
@@ -397,7 +397,7 @@ $(document).ready(function() {
 						<c:set var="userAccountId1" value="0"/>
 					</c:otherwise>
 					</c:choose>
-					<select name="userAccountId${parentId}" id="userAccountId${parentId}" class="formfieldL" >
+					<select name="userAccountId${parentId}" id="userAccountId${parentId}" class="formfieldL formFieldLSelect" >
 						<option value="0">
 				  		<c:forEach var="user" items="${userAccounts}">
 				   		<c:choose>
