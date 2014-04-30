@@ -20,12 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -57,6 +53,11 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * @author jxu
@@ -233,6 +234,7 @@ public class RestoreStudyServlet extends Controller {
 
 						ArrayList events = (ArrayList) sedao.findAllByDefinition(definition.getId());
 						EventCRFDAO ecdao = getEventCRFDAO();
+						CodedItemService codedItemService = getCodedItemService();
 
 						for (int j = 0; j < events.size(); j++) {
 							StudyEventBean event = (StudyEventBean) events.get(j);
@@ -261,6 +263,18 @@ public class RestoreStudyServlet extends Controller {
 												item.setUpdater(currentUser);
 												item.setUpdatedDate(new Date());
 												iddao.update(item);
+											}
+
+											CodedItem codedItem = codedItemService.findCodedItem(item.getId());
+
+											if (codedItem != null) {
+												if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
+													codedItem.setStatus("NOT_CODED");
+												} else {
+													codedItem.setStatus("CODED");
+												}
+
+												codedItemService.saveCodedItem(codedItem);
 											}
 										}
 									}

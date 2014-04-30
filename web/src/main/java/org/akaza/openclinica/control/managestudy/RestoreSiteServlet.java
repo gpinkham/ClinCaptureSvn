@@ -20,6 +20,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -47,12 +49,11 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Restores a removed site and all its data, including users. roles, study groups, definitions, events and items
@@ -196,6 +197,7 @@ public class RestoreSiteServlet extends Controller {
 						ArrayList<StudyEventBean> events = (ArrayList<StudyEventBean>) sedao
 								.findAllByStudySubject(subject);
 						EventCRFDAO ecdao = getEventCRFDAO();
+						CodedItemService codedItemService = getCodedItemService();
 
 						for (StudyEventBean event : events) {
 							if (event.getStatus().equals(Status.AUTO_DELETED)) {
@@ -224,6 +226,17 @@ public class RestoreSiteServlet extends Controller {
 												item.setUpdater(currentUser);
 												item.setUpdatedDate(new Date());
 												iddao.update(item);
+											}
+											CodedItem codedItem = codedItemService.findCodedItem(item.getId());
+
+											if (codedItem != null) {
+                                                if (codedItem.getHttpPath() == null || codedItem.getHttpPath().isEmpty()) {
+													codedItem.setStatus("NOT_CODED");
+												} else {
+													codedItem.setStatus("CODED");
+												}
+
+												codedItemService.saveCodedItem(codedItem);
 											}
 										}
 									}

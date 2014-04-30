@@ -20,12 +20,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.clinovo.model.CodedItem;
+import com.clinovo.service.CodedItemService;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -56,6 +52,11 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Processes the request of removing a top level study, all the data assoicated with this study will be removed
@@ -257,8 +258,9 @@ public class RemoveStudyServlet extends Controller {
 								sedao.update(event);
 
 								ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
+								CodedItemService codedItemService = getCodedItemService();
 								ItemDataDAO iddao = getItemDataDAO();
+
 								for (int k = 0; k < eventCRFs.size(); k++) {
 									EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
 									if (!eventCRF.getStatus().equals(Status.DELETED)) {
@@ -277,6 +279,14 @@ public class RemoveStudyServlet extends Controller {
 												item.setUpdater(currentUser);
 												item.setUpdatedDate(new Date());
 												iddao.update(item);
+											}
+
+											CodedItem codedItem = codedItemService.findCodedItem(item.getId());
+
+											if (codedItem != null) {
+
+												codedItem.setStatus("REMOVED");
+												codedItemService.saveCodedItem(codedItem);
 											}
 										}
 									}
