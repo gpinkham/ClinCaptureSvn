@@ -85,7 +85,7 @@ public class ListUserAccountsServlet extends RememberLastPage {
 		if (!currentUser.getName().equals(UserAccountBean.ROOT)) {
 			iterateUser = allUsers.listIterator();
 			while (iterateUser.hasNext()) {
-				if (getUserAccountService().doesUserHaveRoleInStydies(iterateUser.next(),
+				if (!getUserAccountService().doesUserHaveRoleInStydies(iterateUser.next(),
 						studyListCurrentUserHasAccessTo)) {
 					iterateUser.remove();			
 				}
