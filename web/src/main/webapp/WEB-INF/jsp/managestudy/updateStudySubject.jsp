@@ -172,7 +172,7 @@
 																		<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 																			<c:choose>
 																				<c:when test="${hasNotes}">
-																					<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date',
+																					<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date',
 																							'spanAlert-enrollmentDate', '', event); return false;">
 																						<img id="flag_enrollmentDate" name="flag_enrollmentDate" src="${enrollmentNoteStatus.iconFilePath}"
 																								border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
@@ -180,13 +180,13 @@
 																					</a>
 																				</c:when>
 																				<c:otherwise>
-																					<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=<c:out value="${studySub.id}"/>&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date',
+																					<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?stSubjectId=${studySub.id}&id=<c:out value="${studySub.id}"/>&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date',
 																							'spanAlert-enrollmentDate', '', event); return false;">
 																						<img id="flag_enrollmentDate" name="flag_enrollmentDate" src="images/icon_noNote.gif" border="0"
 																								alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
 																								title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" />
 																						<input type="hidden"
-																								value="ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date" />
+																								value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date" />
 																					</a>
 																				</c:otherwise>
 																			</c:choose>

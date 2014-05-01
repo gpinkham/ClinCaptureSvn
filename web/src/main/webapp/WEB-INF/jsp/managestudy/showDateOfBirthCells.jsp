@@ -10,14 +10,14 @@
                <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>						
                <c:choose>
                    <c:when test="${hasDOBNote eq 'yes'}">
-                       <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
+                       <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
                            <img id="flag_dob" name="flag_dob" src="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                        </a>						                            
                    </c:when>
                    <c:otherwise>						                            
-                       <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob', '', event); return false;">
+                       <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob', '', event); return false;">
 						            <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
-                               <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth">
+                               <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth">
                        </a>
                    </c:otherwise>
                </c:choose>
@@ -32,14 +32,14 @@
                <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
                <c:choose>
                    <c:when test="${hasDOBNote eq 'yes'}">
-                       <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
+                       <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
                            <img id="flag_dob" name="flag_dob" src="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                        </a>						                            
                    </c:when>
                    <c:otherwise>						                            
-                       <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob', '', event); return false;">
+                       <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob', '', event); return false;">
                            <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
-                                 <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth">
+                                 <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth">
                        </a>
                    </c:otherwise>
                </c:choose>
@@ -55,14 +55,14 @@
                <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>						
                <c:choose>
                    <c:when test="${hasDOBNote eq 'yes'}">
-                       <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
+                       <a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob', '', event); return false;">
                            <img id="flag_dob" name="flag_dob" src="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                        </a>						                            
                    </c:when>
                    <c:otherwise>						                          
-                       <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob', '', event); return false;">
+                       <a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob', '', event); return false;">
                            <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
-                                 <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth">
+                                 <input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth">
                        </a>
                    </c:otherwise>
                </c:choose>

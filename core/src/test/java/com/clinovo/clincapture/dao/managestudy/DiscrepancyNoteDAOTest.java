@@ -425,4 +425,14 @@ public class DiscrepancyNoteDAOTest extends DefaultAppContextTest {
 		assertNotNull(discrepancyNoteDAO.countViewNotesByStatusId(studyId, statusId));
 		assertEquals(2, discrepancyNoteDAO.countViewNotesByStatusId(studyId, statusId));
 	}
+
+	@Test
+	public void testFindAllByEntityAndColumnAndStudyCorrectForSubject() {
+		int entityId = 1;
+		StudyBean currentStudy = new StudyBean();
+		currentStudy.setId(1);
+		currentStudy.setParentStudyId(0);
+		assertNotNull(discrepancyNoteDAO.findAllByEntityAndColumnAndStudy(currentStudy, "subject", entityId, ""));
+		assertEquals(1, discrepancyNoteDAO.findAllByEntityAndColumnAndStudy(currentStudy, "subject", entityId, "").size());
+	}
 }

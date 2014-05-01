@@ -276,7 +276,7 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 			}
 
 			if (!allNotesforSubject.isEmpty()) {
-				setRequestAttributesForNotes(request, discrepancyNoteDAO, allNotesforSubject);
+				setRequestAttributesForNotes(currentStudy, request, discrepancyNoteDAO, allNotesforSubject);
 			}
 
 			SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);
@@ -456,10 +456,10 @@ public class ViewStudySubjectServlet extends RememberLastPage {
 		}
 	}
 
-	private void setRequestAttributesForNotes(HttpServletRequest request, DiscrepancyNoteDAO discrepancyNoteDAO,
+	private void setRequestAttributesForNotes(StudyBean currentStudy, HttpServletRequest request, DiscrepancyNoteDAO discrepancyNoteDAO,
 			List<DiscrepancyNoteBean> discBeans) {
 		for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
-			ArrayList notes = (ArrayList) discrepancyNoteDAO.findAllByEntityAndColumn(
+			ArrayList notes = (ArrayList) discrepancyNoteDAO.findAllByEntityAndColumnAndStudy(currentStudy, 
 					discrepancyNoteBean.getEntityType(), discrepancyNoteBean.getEntityId(),
 					discrepancyNoteBean.getColumn());
 			discrepancyNoteBean.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(

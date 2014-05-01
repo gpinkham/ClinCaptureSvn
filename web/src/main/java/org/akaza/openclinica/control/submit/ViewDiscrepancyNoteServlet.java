@@ -148,37 +148,9 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		FormProcessor fp = new FormProcessor(request);
 		int itemId = fp.getInt(CreateDiscrepancyNoteServlet.ITEM_ID);
 		request.setAttribute(CreateDiscrepancyNoteServlet.ITEM_ID, itemId);
-		request.setAttribute(DIS_TYPES, DiscrepancyNoteType.list);
-		if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
-				|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
-			ArrayList<ResolutionStatus> resStatuses = new ArrayList();
-			resStatuses.add(ResolutionStatus.UPDATED);
-			request.setAttribute(RES_STATUSES, resStatuses);
-			request.setAttribute(WHICH_RES_STATUSES, "22");
-			ArrayList<ResolutionStatus> resStatuses2 = new ArrayList<ResolutionStatus>();
-			resStatuses2.add(ResolutionStatus.OPEN);
-			request.setAttribute(RES_STATUSES2, resStatuses2);
-			ArrayList types2 = DiscrepancyNoteType.toArrayList();
-			types2.remove(DiscrepancyNoteType.QUERY);
-			request.setAttribute(DIS_TYPES2, types2);
-		} else if (currentRole.getRole().equals(Role.STUDY_MONITOR)) {
-			ArrayList<ResolutionStatus> resStatuses = new ArrayList();
-			resStatuses.add(ResolutionStatus.OPEN);
-			resStatuses.add(ResolutionStatus.UPDATED);
-			resStatuses.add(ResolutionStatus.CLOSED);
-			request.setAttribute(RES_STATUSES, resStatuses);
-			request.setAttribute(WHICH_RES_STATUSES, "1");
-			ArrayList<DiscrepancyNoteType> types2 = new ArrayList<DiscrepancyNoteType>();
-			types2.add(DiscrepancyNoteType.QUERY);
-			request.setAttribute(DIS_TYPES2, types2);
-		} else {
-			request.setAttribute(RES_STATUSES, ResolutionStatus.simpleList);
-			// it's for parentDNId is null or 0 and FVC
-			request.setAttribute(WHICH_RES_STATUSES, "2");
-			ArrayList<ResolutionStatus> resStatuses2 = new ArrayList<ResolutionStatus>();
-			resStatuses2.add(ResolutionStatus.OPEN);
-			request.setAttribute(RES_STATUSES2, resStatuses2);
-		}
+
+		sendDNTypesAndResStatusesLists(currentRole, request);
+
 		// logic from CreateDiscrepancyNoteServlet
 		request.setAttribute("unlock", "0");
 		String monitor = fp.getString("study_monitor");
@@ -208,11 +180,6 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 
 		request.setAttribute("y", ypos);
 
-		String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
-		String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note")
-				+ respage.getString("change_study_contact_sysadmin");
-		String subjectIdNotFound = respage.getString("subject_id_not_found");
-
 		DiscrepancyNoteDAO dndao = getDiscrepancyNoteDAO();
 		int entityId = fp.getInt(ENTITY_ID, true);
 		String name = fp.getString(ENTITY_TYPE, true);
@@ -233,23 +200,11 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		Locale locale = request.getLocale();
 		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
 
-		int subjectId = fp.getInt(CreateDiscrepancyNoteServlet.SUBJECT_ID, true);
-		try {
-			if (subjectId == 0 && "studyEvent".equalsIgnoreCase(name)) {
-				subjectId = Integer.valueOf((String) request.getSession().getAttribute(
-						CreateDiscrepancyNoteServlet.SUBJECT_ID));
-			}
-		} catch (Exception e) {
-			addPageMessage(subjectIdNotFound, request);
-			throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
-		}
+		int stSubjectId = fp.getInt(CreateDiscrepancyNoteServlet.ST_SUBJECT_ID, true);
+		StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
+		StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(stSubjectId);
+		request.setAttribute("noteSubject", ssub);
 
-		StudySubjectBean ssub = new StudySubjectBean();
-		if (subjectId > 0) {
-			StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
-			ssub = (StudySubjectBean) ssdao.findByPK(subjectId);
-			request.setAttribute("noteSubject", ssub);
-		}
 		ItemBean item = new ItemBean();
 		if (itemId > 0) {
 			ItemDAO idao = new ItemDAO(getDataSource());
@@ -306,8 +261,6 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 				request.setAttribute("crf", crf);
 
 			} else if ("studySub".equalsIgnoreCase(name)) {
-				StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
-				ssub = (StudySubjectBean) ssdao.findByPK(entityId);
 				SubjectDAO sdao = new SubjectDAO(getDataSource());
 				SubjectBean sub = (SubjectBean) sdao.findByPK(ssub.getSubjectId());
 				request.setAttribute("noteSubject", ssub);
@@ -483,25 +436,13 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 
 		request.setAttribute(CreateDiscrepancyNoteServlet.WRITE_TO_DB, writeToDB ? "1" : "0");
 
-		List<DiscrepancyNoteBean> notes = (List<DiscrepancyNoteBean>) dndao.findAllByEntityAndColumn(name, entityId,
-				column);
+		List<DiscrepancyNoteBean> notes = (List<DiscrepancyNoteBean>) dndao.findAllByEntityAndColumnAndStudy(
+				currentStudy, name, entityId, column);
 
 		if (notes.size() > 0) {
 			manageStatuses(request, field);
-
-			StudyDAO studyDAO = new StudyDAO(getDataSource());
-			int parentStudyForNoteSub = 0;
-			StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
-
-			StudySubjectBean notessub = (StudySubjectBean) ssdao.findByPK(subjectId);
-			StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(notessub.getStudyId());
-			if (null != studyBeanSub) {
-				parentStudyForNoteSub = studyBeanSub.getParentStudyId();
-			}
-			if (notessub.getStudyId() != currentStudy.getId() && currentStudy.getId() != parentStudyForNoteSub) {
-				addPageMessage(noAccessMessage, request);
-				throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
-			}
+			CreateDiscrepancyNoteServlet.checkSubjectInCorrectStudy(name, ssub, currentStudy, getDataSource(), logger,
+					request);
 		}
 		// Update the resolution status of parent disc
 		// notes based
@@ -557,7 +498,6 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 					}
 				}
 			}
-
 		}
 
 		UserAccountDAO udao = getUserAccountDAO();
@@ -686,25 +626,8 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 		fixStatusUpdatedDate(noteTree);
 		request.setAttribute(DIS_NOTES, noteTree);
 
-		// copied from CreatediscrepancyNoteServlet generateUserAccounts
-		StudyDAO studyDAO = getStudyDAO();
-		StudyBean subjectStudy = studyDAO.findByStudySubjectId(subjectId);
-		int studyId = currentStudy.getId();
-		ArrayList<StudyUserRoleBean> userAccounts;
-		if (currentStudy.getParentStudyId() > 0) {
-			userAccounts = udao.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId(), subjectId);
-		} else if (subjectStudy.getParentStudyId() > 0) {
-			userAccounts = udao.findAllUsersByStudyOrSite(subjectStudy.getId(), subjectStudy.getParentStudyId(),
-					subjectId);
-		} else {
-			userAccounts = udao.findAllUsersByStudyOrSite(studyId, 0, subjectId);
-		}
-
-		UserAccountBean rootUserAccount = (UserAccountBean) udao.findByPK(1);
-		if (!rootUserAccount.getStatus().isLocked() && !rootUserAccount.getStatus().isDeleted()) {
-			StudyUserRoleBean rootStudyUserRole = createRootUserRole(rootUserAccount, studyId);
-			userAccounts.add(rootStudyUserRole);
-		}
+		ArrayList<StudyUserRoleBean> userAccounts = DiscrepancyNoteUtil.generateUserAccounts(
+				ssub.getId(), currentStudy, udao, new StudyDAO(getDataSource()));
 
 		request.setAttribute(USER_ACCOUNTS, userAccounts);
 		request.setAttribute(VIEW_DN_LINK, this.getPageServletFileName(request));
@@ -734,31 +657,6 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			request.setAttribute("responseMessage", "Error in data");
 			forwardPage(Page.ADD_ONE_DISCREPANCY_NOTE_DIV, request, response);
 		}
-	}
-
-	private void prepareRepeatingInfo(String name, int entityId, HttpServletRequest request) {
-		Map<String, String> repeatingInfoMap = DiscrepancyNoteUtil.prepareRepeatingInfoMap(name, entityId,
-				getItemDataDAO(), getEventCRFDAO(), getStudyEventDAO(), getItemGroupMetadataDAO(),
-				getStudyEventDefinitionDAO());
-		request.setAttribute("itemDataOrdinal", repeatingInfoMap.get("itemDataOrdinal"));
-		request.setAttribute("studyEventOrdinal", repeatingInfoMap.get("studyEventOrdinal"));
-	}
-
-	private StudyUserRoleBean createRootUserRole(UserAccountBean rootUserAccount, int studyId) {
-
-		StudyUserRoleBean rootUserRole = rootUserAccount.getSysAdminRole();
-
-		rootUserRole.setUserAccountId(rootUserAccount.getId());
-		rootUserRole.setRole(Role.SYSTEM_ADMINISTRATOR);
-		rootUserRole.setStatus(rootUserAccount.getStatus());
-		rootUserRole.setFirstName(rootUserAccount.getFirstName());
-		rootUserRole.setLastName(rootUserAccount.getLastName());
-		rootUserRole.setCreatedDate(rootUserAccount.getCreatedDate());
-		rootUserRole.setUserName(rootUserAccount.getName());
-		rootUserRole.setName(rootUserAccount.getName());
-		rootUserRole.setStudyId(studyId);
-
-		return rootUserRole;
 	}
 
 	private void setupStudyEventCRFAttributes(EventCRFBean eventCRFBean, HttpServletRequest request) {
@@ -885,5 +783,47 @@ public class ViewDiscrepancyNoteServlet extends Controller {
 			}
 			request.setAttribute(RES_STATUSES2, ResolutionStatus.simpleList);
 		}
+	}
+
+	private void sendDNTypesAndResStatusesLists(StudyUserRoleBean currentRole, HttpServletRequest request) {
+		request.setAttribute(DIS_TYPES, DiscrepancyNoteType.list);
+		if (currentRole.getRole().equals(Role.CLINICAL_RESEARCH_COORDINATOR)
+				|| currentRole.getRole().equals(Role.INVESTIGATOR)) {
+			ArrayList<ResolutionStatus> resStatuses = new ArrayList();
+			resStatuses.add(ResolutionStatus.UPDATED);
+			request.setAttribute(RES_STATUSES, resStatuses);
+			request.setAttribute(WHICH_RES_STATUSES, "22");
+			ArrayList<ResolutionStatus> resStatuses2 = new ArrayList<ResolutionStatus>();
+			resStatuses2.add(ResolutionStatus.OPEN);
+			request.setAttribute(RES_STATUSES2, resStatuses2);
+			ArrayList types2 = DiscrepancyNoteType.toArrayList();
+			types2.remove(DiscrepancyNoteType.QUERY);
+			request.setAttribute(DIS_TYPES2, types2);
+		} else if (currentRole.getRole().equals(Role.STUDY_MONITOR)) {
+			ArrayList<ResolutionStatus> resStatuses = new ArrayList();
+			resStatuses.add(ResolutionStatus.OPEN);
+			resStatuses.add(ResolutionStatus.UPDATED);
+			resStatuses.add(ResolutionStatus.CLOSED);
+			request.setAttribute(RES_STATUSES, resStatuses);
+			request.setAttribute(WHICH_RES_STATUSES, "1");
+			ArrayList<DiscrepancyNoteType> types2 = new ArrayList<DiscrepancyNoteType>();
+			types2.add(DiscrepancyNoteType.QUERY);
+			request.setAttribute(DIS_TYPES2, types2);
+		} else {
+			request.setAttribute(RES_STATUSES, ResolutionStatus.simpleList);
+			// it's for parentDNId is null or 0 and FVC
+			request.setAttribute(WHICH_RES_STATUSES, "2");
+			ArrayList<ResolutionStatus> resStatuses2 = new ArrayList<ResolutionStatus>();
+			resStatuses2.add(ResolutionStatus.OPEN);
+			request.setAttribute(RES_STATUSES2, resStatuses2);
+		}
+	}
+	
+	private void prepareRepeatingInfo(String name, int entityId, HttpServletRequest request) {
+		Map<String, String> repeatingInfoMap = DiscrepancyNoteUtil.prepareRepeatingInfoMap(name, entityId,
+				getItemDataDAO(), getEventCRFDAO(), getStudyEventDAO(), getItemGroupMetadataDAO(),
+				getStudyEventDefinitionDAO());
+		request.setAttribute("itemDataOrdinal", repeatingInfoMap.get("itemDataOrdinal"));
+		request.setAttribute("studyEventOrdinal", repeatingInfoMap.get("studyEventOrdinal"));
 	}
 }

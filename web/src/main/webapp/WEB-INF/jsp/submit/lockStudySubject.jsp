@@ -114,14 +114,14 @@
 
             <c:choose>
                 <c:when test="${hasUniqueIDNote eq 'yes'}">
-                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
                         <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                     </a>
 
                 </c:when>
                 <c:otherwise>
 
-                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
                         <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                     </a>
                 </c:otherwise>
@@ -155,14 +155,14 @@
 
                     <c:choose>
                         <c:when test="${hasDOBNote eq 'yes'}">
-                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
                                 <img id="flag_dob" name="flag_dob" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
 
                         </c:when>
                         <c:otherwise>
 
-                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
                                 <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
                         </c:otherwise>
@@ -183,14 +183,14 @@
 
                     <c:choose>
                         <c:when test="${hasDOBNote eq 'yes'}">
-                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
                                 <img id="flag_dob" name="flag_dob" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
 
                         </c:when>
                         <c:otherwise>
 
-                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
                                 <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
                         </c:otherwise>
@@ -211,14 +211,14 @@
 
                     <c:choose>
                         <c:when test="${hasDOBNote eq 'yes'}">
-                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
                                 <img id="flag_dob" name="flag_dob" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
 
                         </c:when>
                         <c:otherwise>
 
-                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
                                 <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
                         </c:otherwise>
@@ -246,12 +246,12 @@
                     <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
                     <c:choose>
                         <c:when test="${hasGenderNote eq 'yes'}">
-                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
+                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
                                 <img id="flag_gender" name="flag_gender" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
                         </c:when>
                         <c:otherwise>
-                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubjectBean.id}&id=${subject.id}&writeToDB=1&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
+                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?CreateDiscrepancyNote?stSubjectId=${studySubjectBean.id}&id=${subject.id}&writeToDB=1&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
                                 <img id="flag_gender" name="flag_gender" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
                         </c:otherwise>
@@ -293,12 +293,12 @@
                     <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
                     <c:choose>
                         <c:when test="${hasEnrollmentNote eq 'yes'}">
-                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubjectBean.id}&id=${studySubjectBean.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
+                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&stSubjectId=${studySubjectBean.id}&id=${studySubjectBean.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
                                 <img id="flag_enrollmentDate" name="flag_enrollmentDate" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
                         </c:when>
                         <c:otherwise>
-                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubjectBean.id}&id=${studySubjectBean.id}&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
+                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?CreateDiscrepancyNote?stSubjectId=${studySubjectBean.id}&id=${studySubjectBean.id}&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
                                 <img id="flag_enrollmentDate" name="flag_enrollmentDate" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                             </a>
                         </c:otherwise>

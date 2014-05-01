@@ -289,7 +289,7 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 				String close = fp.getString("close" + parentId);
 				// session.setAttribute(CLOSE_WINDOW, "true".equals(close)?"true":"");
 				if ("true".equals(close)) {
-					sendUpdatedDN(entityId, dn, dndao, request);
+					sendUpdatedDN(currentStudy, entityId, dn, dndao, request);
 					CreateDiscrepancyNoteServlet.saveNoteToSubmittedDNsMap(dn, request);
 					request.setAttribute("responseMessage", "Save Done");
 					request.setAttribute("refresh", true);
@@ -321,15 +321,15 @@ public class CreateOneDiscrepancyNoteServlet extends Controller {
 		viewNoteLink = this.appendPageFileName(viewNoteLink, "y", ypos != null && ypos.length() > 0 ? ypos : "0");
 		request.setAttribute(REFRESH_PARENT_WINDOW, true);
 		dn.setItemId(fp.getInt(ITEM_ID));
-		sendUpdatedDN(entityId, dn, dndao, request);
+		sendUpdatedDN(currentStudy, entityId, dn, dndao, request);
 
 		forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()), request, response);
 	}
 
-	private void sendUpdatedDN(int entityId, DiscrepancyNoteBean dn, DiscrepancyNoteDAO dndao,
+	private void sendUpdatedDN(StudyBean currentStudy, int entityId, DiscrepancyNoteBean dn, DiscrepancyNoteDAO dndao,
 			HttpServletRequest request) {
 		// we should send fake dn with correct resolution status to change flag color for the field
-		ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(dn.getEntityType(), dn.getEntityId(),
+		ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumnAndStudy(currentStudy, dn.getEntityType(), dn.getEntityId(),
 				dn.getColumn());
 		DiscrepancyNoteBean dnDuplicate = new DiscrepancyNoteBean(dn);
 		dnDuplicate.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, entityId, notes));

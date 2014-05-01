@@ -130,7 +130,7 @@ public class UpdateStudySubjectServlet extends Controller {
 			forwardPage(Page.LIST_STUDY_SUBJECTS, request, response);
 		} else {
 
-			ArrayList dbNotes = (ArrayList) dndao.findAllByEntityAndColumn("studySub", studySubId, "enrollment_date");
+			ArrayList dbNotes = (ArrayList) dndao.findAllByEntityAndColumnAndStudy(currentStudy, "studySub", studySubId, "enrollment_date");
 			request.setAttribute(HAS_NOTES, dbNotes != null && dbNotes.size() > 0);
 			request.setAttribute(ENROLLMENT_NOTE_STATUS, ResolutionStatus.get(DataEntryServlet
 					.getDiscrepancyNoteResolutionStatus(dndao, studySubId, dbNotes)));

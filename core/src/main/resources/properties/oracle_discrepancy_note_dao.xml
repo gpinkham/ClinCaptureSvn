@@ -697,16 +697,19 @@
         </sql>
     </query>
     <query>
-        <name>findAllBySubjectAndColumn</name>
+        <name>findAllBySubjectAndColumnAndStudy</name>
         <sql>
             SELECT dn.*,ss.label
             FROM discrepancy_note dn, dn_subject_map dsm,
-            study_subject ss, subject sub
+            study_subject ss, subject sub, study st 
             where dsm.subject_id=?
             AND dsm.column_name=?
             AND dn.discrepancy_note_id=dsm.discrepancy_note_id
+			AND (dn.study_id IN (SELECT study_id FROM study WHERE study.study_id = ? OR study.parent_study_id = ?))
             AND dsm.subject_id = sub.subject_id
             AND ss.subject_id = sub.subject_id
+			AND ss.study_id = st.study_id
+			AND (st.study_id = ? OR st.parent_study_id = ?) 
             order by dn.date_created desc
 
         </sql>

@@ -771,7 +771,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		return discNotes;
 	}
 
-	public Collection findAllByEntityAndColumn(String entityName, int entityId, String column) {
+	public Collection findAllByEntityAndColumnAndStudy(StudyBean study, String entityName, int entityId, String column) {
 		this.setTypesExpected();
 		this.setTypeExpected(12, TypeNames.STRING);// ss.label
 		ArrayList alist = new ArrayList();
@@ -779,7 +779,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 		variables.put(1, entityId);
 		variables.put(2, column);
 		if ("subject".equalsIgnoreCase(entityName)) {
-			alist = this.select(digester.getQuery("findAllBySubjectAndColumn"), variables);
+			int parentStudyId = study.getParentStudyId() == 0? study.getId() : study.getParentStudyId();
+			variables.put(3, parentStudyId);
+			variables.put(4, parentStudyId);
+			variables.put(5, parentStudyId);
+			variables.put(6, parentStudyId);
+			alist = this.select(digester.getQuery("findAllBySubjectAndColumnAndStudy"), variables);
 		} else if ("studySub".equalsIgnoreCase(entityName)) {
 			alist = this.select(digester.getQuery("findAllByStudySubjectAndColumn"), variables);
 		} else if ("eventCrf".equalsIgnoreCase(entityName)) {

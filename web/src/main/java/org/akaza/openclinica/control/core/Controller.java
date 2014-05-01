@@ -143,6 +143,10 @@ public abstract class Controller extends BaseController {
 	protected StudyBean originalScope = null;
 
 	protected void addPageMessage(String message, HttpServletRequest request) {
+		addPageMessage(message, request, logger);
+	}
+	
+	public static void addPageMessage(String message, HttpServletRequest request, Logger aLogger) {
 		ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
 
 		if (pageMessages == null) {
@@ -152,7 +156,7 @@ public abstract class Controller extends BaseController {
 		if (!pageMessages.contains(message)) {
 			pageMessages.add(message);
 		}
-		logger.debug(message);
+		aLogger.debug(message);
 		request.setAttribute(PAGE_MESSAGE, pageMessages);
 	}
 

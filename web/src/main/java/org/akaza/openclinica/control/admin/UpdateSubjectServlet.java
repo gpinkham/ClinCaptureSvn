@@ -106,19 +106,19 @@ public class UpdateSubjectServlet extends SecureController {
 			String action = fp.getString("action", true);
 
             DiscrepancyNoteBean discrepancyNoteBean = new DiscrepancyNoteBean();
-            ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn("subject", subjectId, "unique_identifier");
+            ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumnAndStudy(currentStudy, "subject", subjectId, "unique_identifier");
             discrepancyNoteBean.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, subjectId, notes));
             request.setAttribute(HAS_UNIQUE_ID_NOTE, notes.size() > 0 ? "yes" : "");
             request.setAttribute(UNIQUE_ID_NOTE, discrepancyNoteBean);
 
             discrepancyNoteBean = new DiscrepancyNoteBean();
-            notes = (ArrayList) dndao.findAllByEntityAndColumn("subject", subjectId, "gender");
+            notes = (ArrayList) dndao.findAllByEntityAndColumnAndStudy(currentStudy, "subject", subjectId, "gender");
             discrepancyNoteBean.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, subjectId, notes));
             request.setAttribute(HAS_GENDER_NOTE, notes.size() > 0 ? "yes" : "");
             request.setAttribute(GENDER_NOTE, discrepancyNoteBean);
 
             discrepancyNoteBean = new DiscrepancyNoteBean();
-            notes = (ArrayList) dndao.findAllByEntityAndColumn("subject", subjectId, "date_of_birth");
+            notes = (ArrayList) dndao.findAllByEntityAndColumnAndStudy(currentStudy, "subject", subjectId, "date_of_birth");
             discrepancyNoteBean.setResolutionStatusId(DataEntryServlet.getDiscrepancyNoteResolutionStatus(dndao, subjectId, notes));
             request.setAttribute(HAS_DOB_NOTE, notes.size() > 0 ? "yes" : "");
             request.setAttribute(DOB_NOTE, discrepancyNoteBean);

@@ -15,6 +15,9 @@ package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -27,6 +30,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -1641,6 +1645,58 @@ public class DiscrepancyNoteUtil {
 			dn.setResolutionStatusId(resStatusId);
 
 		return dn;
+	}
+	
+	public static ArrayList<StudyUserRoleBean> generateUserAccounts(int studySubjectId, StudyBean currentStudy,
+			UserAccountDAO udao, StudyDAO studyDAO) {
+		StudyBean subjectStudy = studyDAO.findByStudySubjectId(studySubjectId);
+		int studyId = currentStudy.getId();
+		ArrayList<StudyUserRoleBean> userAccounts = new ArrayList<StudyUserRoleBean>();
+		if (currentStudy.getParentStudyId() > 0) {
+			userAccounts = udao.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId(), studySubjectId);
+		} else if (subjectStudy.getParentStudyId() > 0) {
+			userAccounts = udao.findAllUsersByStudyOrSite(subjectStudy.getId(), subjectStudy.getParentStudyId(),
+					studySubjectId);
+		} else {
+			userAccounts = udao.findAllUsersByStudyOrSite(studyId, 0, studySubjectId);
+		}
+
+		UserAccountBean rootUserAccount = (UserAccountBean) udao.findByPK(1);
+		if (!rootUserAccount.getStatus().isLocked() && !rootUserAccount.getStatus().isDeleted()) {
+			StudyUserRoleBean rootStudyUserRole = createRootUserRole(rootUserAccount, studyId);
+			userAccounts.add(rootStudyUserRole);
+		}
+
+		return userAccounts;
+	}
+	
+	private static StudyUserRoleBean createRootUserRole(UserAccountBean rootUserAccount, int studyId) {
+		StudyUserRoleBean rootUserRole = rootUserAccount.getSysAdminRole();
+
+		rootUserRole.setUserAccountId(rootUserAccount.getId());
+		rootUserRole.setRole(Role.SYSTEM_ADMINISTRATOR);
+		rootUserRole.setStatus(rootUserAccount.getStatus());
+		rootUserRole.setFirstName(rootUserAccount.getFirstName());
+		rootUserRole.setLastName(rootUserAccount.getLastName());
+		rootUserRole.setCreatedDate(rootUserAccount.getCreatedDate());
+		rootUserRole.setUserName(rootUserAccount.getName());
+		rootUserRole.setName(rootUserAccount.getName());
+		rootUserRole.setStudyId(studyId);
+
+		return rootUserRole;
+	}
+	
+	public static StudySubjectBean getStudySubject(int subjectId, StudyBean currentStudy, DataSource dataSource) {
+		StudySubjectBean ssub = new StudySubjectBean();
+		if (subjectId <= 0) 
+			return ssub;
+		StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
+		StudyDAO sdao = new StudyDAO(dataSource);
+		ssub = (StudySubjectBean) ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
+		if (ssub.getId() <= 0 && currentStudy.getParentStudyId() > 0)
+			ssub = (StudySubjectBean) ssdao.findBySubjectIdAndStudy(subjectId, (StudyBean) sdao.findByPK(currentStudy.getParentStudyId()));
+		
+		return ssub;
 	}
 
 	public static Map<String, String> prepareRepeatingInfoMap(String name, int entityId, ItemDataDAO iddao,

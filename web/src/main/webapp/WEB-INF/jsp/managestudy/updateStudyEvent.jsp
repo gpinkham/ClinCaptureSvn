@@ -128,7 +128,7 @@
 							<c:choose>
 								<c:when test="${numberOfDateStartDNotes > 0}">
 									<span style="float:right">
-										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_start&column=date_start&strErrMsg','spanAlert-date_start', '', event); return false;">
+										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&stSubjectId=${studySubject.id}&name=studyEvent&field=date_start&column=date_start&strErrMsg','spanAlert-date_start', '', event); return false;">
 											<img id="flag_date_start" name="flag_start_date" 
 												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 										</a>
@@ -136,10 +136,10 @@
 								</c:when>
 								<c:otherwise>
 									<span style="float:right">
-										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_start&column=date_start&strErrMsg=','spanAlert-date_start', '', event); return false;">
+										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&stSubjectId=${studySubject.id}&name=studyEvent&field=date_start&column=date_start&strErrMsg=','spanAlert-date_start', '', event); return false;">
 											<img id="flag_date_start" name="flag_start_date" 
 												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-											<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_start&column=date_start&strErrMsg"/>
+											<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&stSubjectId=${studySubject.id}&name=studyEvent&field=date_start&column=date_start&strErrMsg"/>
 										</a>
 									</span>
 								</c:otherwise>
@@ -179,7 +179,7 @@
 							<c:choose>
 								<c:when test="${numberOfDateEndDNotes > 0}">
 									<span style="float:right">
-										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_end&column=date_end&strErrMsg','spanAlert-date_end', '', event); return false;">
+										<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&stSubjectId=${studySubject.id}&name=studyEvent&field=date_end&column=date_end&strErrMsg','spanAlert-date_end', '', event); return false;">
 											<img id="flag_date_end" name="flag_date_end" 
 												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 										</a>
@@ -187,10 +187,10 @@
 								</c:when>
 								<c:otherwise>
 									<span style="float:right">
-										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_end&column=date_end&strErrMsg=','spanAlert-date_end', '', event); return false;">
+										<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&stSubjectId=${studySubject.id}&name=studyEvent&field=date_end&column=date_end&strErrMsg=','spanAlert-date_end', '', event); return false;">
 											<img id="flag_date_end" name="flag_date_end" 
 												src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-											<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=date_end&column=date_end&strErrMsg"/>
+											<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&stSubjectId=${studySubject.id}&name=studyEvent&field=date_end&column=date_end&strErrMsg"/>
 										</a>
 									</span>
 								</c:otherwise>
@@ -221,7 +221,7 @@
 								<c:choose>
 									<c:when test="${numberOfLocationDNotes > 0}">
 										<span style="float:right">
-											<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg','spanAlert-location', '', event); return false;">
+											<a href="#" onClick="openDNWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&stSubjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg','spanAlert-location', '', event); return false;">
 												<img id="flag_location" name="flag_location" 
 													src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
 											</a>
@@ -229,10 +229,10 @@
 									</c:when>
 									<c:otherwise>
 										<span style="float:right">
-											<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-location', '', event); return false;">
+											<a href="#" onClick="openDNWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&stSubjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-location', '', event); return false;">
 												<img id="flag_location" name="flag_location" 
 													src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"/>
-												<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg"/>
+												<input type="hidden" value="ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&stSubjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg"/>
 											</a>
 										</span>
 									</c:otherwise>
