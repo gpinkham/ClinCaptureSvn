@@ -44,8 +44,8 @@
 <table border="0" cellpadding="0" cellspacing="0" width="<c:out value="${tableWidth}" default="100"/>%">
 	<tr>
 		<td>
-<div class="box_T" style="display: table;"><div class="box_L" style="display: table;"><div class="box_R" style="display: table;"><div class="box_B" style="display: table;"><div class="box_TL" style="display: table;"><div class="box_TR" style="display: table;"><div class="box_BL" style="display: table;"><div class="box_BR" style="display: table;">
-<div class="tablebox_center">
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<div class="tablebox_center" style="display: table;">
 
 	<table border="0" cellpadding="0" cellspacing="0"> 
 
