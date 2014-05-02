@@ -33,13 +33,9 @@
   </head>
   <body>
     <div class="container">
-      <div class="col-md-12">
-        <div class="col-md-8">
+      <div>
           <img src="images/rs-logo.png">
-        </div>
-        <div class="col-md-3 img col-md-offset-12">
-          <img src="images/brand2.png">
-        </div>
+          <img class="img col-md-offset-12" src="images/brand2.png">
       </div>
       <div class="row">
         <div class="col-md-12 pull-left">
@@ -178,8 +174,11 @@
           <div class="col-md-2 space-top-sm">
             <input type="radio" action="email" name="action"> Send email
           </div>
-          <div class="col-md-3 space-top-sm">
+          <div class="col-md-2 space-top-sm">
             <input type="radio" action="insert" name="action"> Insert data
+          </div>
+          <div class="col-md-3 space-top-sm">
+            <input type="radio" action="show" name="action"> Show CRF Item
           </div>
         </div>
         <div class="row">
@@ -187,10 +186,10 @@
             &nbsp;
           </div>
           <div class="col-md-2 space-top-sm">
-            <input type="radio" action="show" name="action"> Show CRF Item
+            <input type="radio" action="hide" name="action"> Hide CRF Item
           </div>
           <div class="col-md-7 space-top-sm">
-            <input type="radio" action="hide" name="action"> Hide CRF Item
+            &nbsp;
           </div>
         </div>
         <div class="row">
@@ -253,18 +252,35 @@
           </nav>
         </div>
       </div>
-      <div id="data" class="data">
-        <div class="panel panel-primary">
-          <div class="panel-heading">
-            <h3 class="panel-title center-text">Data</h3>
+      <div class="data">
+        <div class='row'>
+          <div class="col-md-6">
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title center-text">Data</h3>
+              </div>
+              <div class="panel-body">
+                <p class="btn group text">Text</p>
+                <p class="btn group number">Number</p>
+                <p class="btn group date">Date</p>
+              </div>
+            </div>
           </div>
+          <div class="col-md-6">
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title center-text">Macros</h3>
+              </div>
+              <div class="panel-body">
+                <p class="btn group current-date">Current date</p>
+                <p class="btn group empty">Empty</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-primary border-less-panel">
           <div class="panel-body">
-            <p class="btn group text">Text</p>
-            <p class="btn group number">Number</p>
-            <p class="btn group date">Date</p>
-            <p class="btn group current-date">Current date</p>
-            <p class="btn group empty">Empty</p>
-            <div id="variables" class="space-top">
+            <div class="space-top variables">
               <ul class="nav nav-tabs">
                 <li id="studiesLink" class="active"><a class="pont green" href="#studies">Studies</a></li>
                 <li id="eventsLink"><a class="pont green" href="#events">Events</a></li>

@@ -193,7 +193,6 @@ function resetBuildControls(parentDiv) {
  * Returns the created pagination
  * ========================================================================= */
 function createPagination(params) {
-
 	params.div.find(".pagination").remove();
 	if (params.itemsArr.length > 1) {
 		var ul = $("<ul>");
@@ -211,7 +210,6 @@ function createPagination(params) {
 					table: params.div.find("table"),
 					pagination: params.div.find(".pagination")
 				});
-
 			} else if (currentPageIndex > 0) {
 				currentPageIndex = currentPageIndex - 1;
 				resetTable({
@@ -221,7 +219,6 @@ function createPagination(params) {
 				});
 			}
 		});
-
 		el.append(aEL);
 		ul.prepend(el);
 
@@ -233,7 +230,6 @@ function createPagination(params) {
 
 		var rEl = $("<li>");
 		var rAEL = $("<a>");
-
 		var tt = unescape(JSON.parse('"\u00BB\u00BB"'));
 		rAEL.text(tt);
 		rAEL.click(function() {
@@ -246,7 +242,6 @@ function createPagination(params) {
 				});
 			}
 		});
-
 		rEl.append(rAEL);
 		ul.append(rEl);
 		return ul
@@ -861,7 +856,6 @@ function loadStudies(studies) {
 						row: row,
 						study: currentStudy
 					});
-
 				} else {
 					resetStudy({
 						row: row,

@@ -458,7 +458,7 @@ $(function() {
 		}
 	});
 
-	$('div[id="variables"] a').click(function(e) {
+	$('.variables a').click(function(e) {
 		currentPageIndex = 0;
 		e.preventDefault();
 		$(this).tab('show');

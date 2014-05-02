@@ -4,7 +4,7 @@
 
 .row {
   margin-left: 0;
-  margin-right: 1.2rem;
+  margin-right: 10px;
 }
 
 .col-md-12, .col-md-3 {
@@ -13,6 +13,7 @@
 }
 
 body {
+  font-size: 13px;
   overflow: hidden;
 }
 
@@ -20,7 +21,7 @@ body .container {
   top: 0;
   left: 0;
   height: 100%;
-  width: 69.5%;
+  width: 70%;
   bottom: 15%;
   position: fixed;
   margin-top: 1rem;
@@ -47,7 +48,8 @@ body .panel-body {
 
 .targettable {
   z-index: 0;
-  margin-top: -17.5px;
+  width: 99.99%;
+  margin-top: -18px;
   min-height: 167.5px;
 }
 
@@ -80,18 +82,44 @@ body .panel-body {
 
 .data {
   top: 90px;
-  right: 12px;    
-  height: 79.2%;
+  right: 12px;
+  height: 100%;
   margin-top: 1rem;
-  width: 30.5% !important;
+  width: 30% !important;
   position: fixed !important;
 }
-
-.data > .panel {
+  
+.data .panel {
+  float: left;
   width: 100%;
-  min-height: 100% !important;
+  margin-left: 1px;
+}
+
+.data .row {
+  margin-right: 1px;
+  margin-left: -2px;
+  margin-bottom: -18px;
+}
+
+.data .row .col-md-6 {
+  padding-right: 0;
+  padding-left: 2px;
+}
+ 
+.border-less-panel {
+  height: 100%;
   border-radius: 4px 4px 0px 0px;
   border-bottom: none !important;
+}
+
+@-moz-document url-prefix() {
+  .row {
+    margin-right: 1.3rem;
+  }
+  .data .panel {
+    margin-left: -2px;
+    margin-bottom: 2px;
+  }
 }
 
 .trash {
@@ -110,7 +138,6 @@ body .panel-body {
 
 .space-top-sm {
   padding-top: 1.2rem;
-  white-space: nowrap;
 }
 
 .space-top-m {
@@ -200,9 +227,8 @@ textarea {
   margin-bottom: 4rem;
 }
 
-#variables {
-  overflow: hidden;
-  padding-top: 4rem !important;
+.variables {
+  padding-top: 1rem !important;
 }
 
 .group {
@@ -289,7 +315,8 @@ td {
 
 .img {
   right: 0;
-  position: fixed !important;
+  position: fixed;
+  margin-right: 2rem;
 }
 
 body .modal-dialog {
@@ -308,8 +335,8 @@ body .modal-dialog {
 }
 
 .spinner * {
-  left: 35%;
   top: 45%;
+  left: 35%;
   display: block;    
   margin-top: -20px;
   margin-left: -45px;
@@ -344,12 +371,12 @@ div {
 }
 
 .inner-scrollbar-wrapper {
-    width: 98%;
-    overflow-y: auto;
+  width: 98%;
+  overflow-y: auto;
 }
 
 .inner-scrollbar {
-    width: 98%;
+  width: 98%;
 }
 
 .footer-container {
@@ -367,12 +394,13 @@ div {
 }
 
 .data-scrollbar {
-  overflow-y: scroll;
-  overflow: auto;
+  overflow-y: auto;
 }
+
 td.group, td.ui-draggable {
   text-align: left;
 }
+
 .center-justify {
   text-align: center;
 }
