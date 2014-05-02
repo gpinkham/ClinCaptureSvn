@@ -928,7 +928,7 @@ public class CreateDiscrepancyNoteServlet extends Controller {
 					+ (note.getEntityType().equalsIgnoreCase("itemData") ? note.getField() : DiscrepancyNoteBean
 							.getColumnToFieldMap().get(note.getColumn())));
 			arguments.add(ENTITY_COLUMN + "=" + columnValue);
-			arguments.add(SUBJECT_ID + "=" + note.getSubjectId());
+			arguments.add(ST_SUBJECT_ID + "=" + note.getSubjectId());
 			arguments.add(ITEM_ID + "=" + note.getItemId());
 			String queryString = StringUtil.join("&", arguments);
 			return "ViewDiscrepancyNote?" + queryString;
