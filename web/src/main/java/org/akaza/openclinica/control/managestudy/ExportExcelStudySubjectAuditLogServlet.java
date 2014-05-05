@@ -387,48 +387,48 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 						String getOld = studyEvent.getOldValue();
 						String oldValue;
 						if (getOld.equals("0"))
-							oldValue = "invalid";
+							oldValue = ResourceBundleProvider.getResWord("invalid_");
 						else if (getOld.equals("1"))
-							oldValue = "scheduled";
+							oldValue = ResourceBundleProvider.getResWord("scheduled_");
 						else if (getOld.equals("2"))
-							oldValue = "not_scheduled";
+							oldValue = ResourceBundleProvider.getResWord("not_scheduled");
 						else if (getOld.equals("3"))
-							oldValue = "data_entry_started";
+							oldValue = ResourceBundleProvider.getResWord("data_entry_started_");
 						else if (getOld.equals("4"))
-							oldValue = "completed";
+							oldValue = ResourceBundleProvider.getResWord("completed_");
 						else if (getOld.equals("5"))
-							oldValue = "stopped";
+							oldValue = ResourceBundleProvider.getResWord("stopped_");
 						else if (getOld.equals("6"))
-							oldValue = "skipped";
+							oldValue = ResourceBundleProvider.getResWord("skipped_");
 						else if (getOld.equals("7"))
-							oldValue = "locked";
+							oldValue = ResourceBundleProvider.getResWord("locked");
 						else if (getOld.equals("8"))
-							oldValue = "signed";
+							oldValue = ResourceBundleProvider.getResWord("signed");
 						else
 							oldValue = studyEvent.getOldValue();
 
 						String getNew = studyEvent.getNewValue();
 						String newValue;
 						if (getNew.equals("0"))
-							newValue = "invalid";
+							newValue = ResourceBundleProvider.getResWord("invalid_");
 						else if (getNew.equals("1"))
-							newValue = "scheduled";
+							newValue = ResourceBundleProvider.getResWord("scheduled_");
 						else if (getNew.equals("2"))
-							newValue = "not_scheduled";
+							newValue = ResourceBundleProvider.getResWord("not_scheduled");
 						else if (getNew.equals("3"))
-							newValue = "data_entry_started";
+							newValue = ResourceBundleProvider.getResWord("data_entry_started_");
 						else if (getNew.equals("4"))
-							newValue = "completed";
+							newValue = ResourceBundleProvider.getResWord("completed_");
 						else if (getNew.equals("5"))
-							newValue = "removed";
+							newValue = ResourceBundleProvider.getResWord("removed_");
 						else if (getNew.equals("6"))
-							newValue = "skipped";
+							newValue = ResourceBundleProvider.getResWord("skipped_");
 						else if (getNew.equals("7"))
-							newValue = "locked";
+							newValue = ResourceBundleProvider.getResWord("locked");
 						else if (getNew.equals("8"))
-							newValue = "signed";
+							newValue = ResourceBundleProvider.getResWord("signed");
 						else if (getNew.equals("9"))
-							newValue = "frozen";
+							newValue = ResourceBundleProvider.getResWord("frozen_");
 						else
 							newValue = studyEvent.getNewValue();
 
@@ -482,27 +482,27 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 									|| eventCrfAudit.getEntityName().equals("Status")) {
 								String getOld = eventCrfAudit.getOldValue();
 								if (getOld.equals("0"))
-									oldValue = "invalid";
+									oldValue = ResourceBundleProvider.getResWord("invalid_");
 								else if (getOld.equals("1"))
-									oldValue = "available";
+									oldValue = ResourceBundleProvider.getResWord("available_");
 								else if (getOld.equals("2"))
-									oldValue = "unavailable";
+									oldValue = ResourceBundleProvider.getResWord("completed");
 								else if (getOld.equals("3"))
-									oldValue = "private";
+									oldValue = ResourceBundleProvider.getResWord("private");
 								else if (getOld.equals("4"))
-									oldValue = "pending";
+									oldValue = ResourceBundleProvider.getResWord("pending");
 								else if (getOld.equals("5"))
-									oldValue = "removed";
+									oldValue = ResourceBundleProvider.getResWord("removed_");
 								else if (getOld.equals("6"))
-									oldValue = "locked";
+									oldValue = ResourceBundleProvider.getResWord("locked");
 								else if (getOld.equals("7"))
-									oldValue = "auto-removed";
+									oldValue = ResourceBundleProvider.getResWord("auto_removed");
 							} else if (eventCrfAudit.getAuditEventTypeId() == 32) {
 								String getOld = eventCrfAudit.getOldValue();
 								if (getOld.equals("0"))
-									oldValue = "FALSE";
+									oldValue = ResourceBundleProvider.getResWord("FALSE");
 								else if (getOld.equals("1"))
-									oldValue = "TRUE";
+									oldValue = ResourceBundleProvider.getResWord("TRUE");
 							} else {
 								oldValue = eventCrfAudit.getOldValue();
 							}
@@ -511,27 +511,27 @@ public class ExportExcelStudySubjectAuditLogServlet extends Controller {
 									|| eventCrfAudit.getEntityName().equals("Status")) {
 								String getNew = eventCrfAudit.getNewValue();
 								if (getNew.equals("0"))
-									newValue = "invalid";
+									newValue = ResourceBundleProvider.getResWord("invalid_");
 								else if (getNew.equals("1"))
-									newValue = "available";
+									newValue = ResourceBundleProvider.getResWord("available_");
 								else if (getNew.equals("2"))
-									newValue = "unavailable";
+									newValue = ResourceBundleProvider.getResWord("completed");
 								else if (getNew.equals("3"))
-									newValue = "private";
+									newValue = ResourceBundleProvider.getResWord("private");
 								else if (getNew.equals("4"))
-									newValue = "pending";
+									newValue = ResourceBundleProvider.getResWord("pending");
 								else if (getNew.equals("5"))
-									newValue = "removed";
+									newValue = ResourceBundleProvider.getResWord("removed_");
 								else if (getNew.equals("6"))
-									newValue = "locked";
+									newValue = ResourceBundleProvider.getResWord("locked");
 								else if (getNew.equals("7"))
-									newValue = "auto-removed";
+									newValue = ResourceBundleProvider.getResWord("auto_removed");
 							} else if (eventCrfAudit.getAuditEventTypeId() == 32) {
 								String getNew = eventCrfAudit.getNewValue();
 								if (getNew.equals("0"))
-									newValue = "FALSE";
+									newValue = ResourceBundleProvider.getResWord("FALSE");
 								else if (getNew.equals("1"))
-									newValue = "TRUE";
+									newValue = ResourceBundleProvider.getResWord("TRUE");
 							} else {
 								newValue = eventCrfAudit.getNewValue();
 							}
