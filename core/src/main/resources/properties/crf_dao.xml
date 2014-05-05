@@ -149,4 +149,17 @@
 		<name>getAllCRFNamesFromStudy</name>
 		<sql>SELECT distinct name FROM crf WHERE crf_id IN (SELECT distinct crf_id FROM event_definition_crf WHERE study_id=?)</sql>
 	</query>
+    <query>
+        <name>deleteCrfByCrfId</name>
+        <sql>DELETE FROM scd_item_metadata scd WHERE scd.scd_item_form_metadata_id IN (SELECT item_form_metadata.item_form_metadata_id FROM item_form_metadata WHERE item_form_metadata.crf_version_id in (SELECT crf_version_id FROM crf_version WHERE crf_id = ?));
+            DELETE FROM item_form_metadata WHERE item_form_metadata.crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
+            DELETE FROM item_group_metadata WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
+            DELETE FROM section WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
+            DELETE FROM versioning_map WHERE crf_version_id IN (SELECT crf_version_id FROM crf_version WHERE crf_id = ?);
+            DELETE FROM item WHERE item.item_id NOT IN (SELECT item_id FROM versioning_map);
+            DELETE FROM crf_version WHERE crf_id = ?;
+            DELETE FROM item_group WHERE crf_id = ?;
+            DELETE FROM event_definition_crf WHERE crf_id = ?;
+            DELETE FROM crf WHERE crf_id = ?;</sql>
+    </query>
 </queries>

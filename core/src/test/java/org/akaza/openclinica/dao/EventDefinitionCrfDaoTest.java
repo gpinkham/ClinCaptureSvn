@@ -1,13 +1,13 @@
 package org.akaza.openclinica.dao;
 
-import java.util.List;
-
 import org.akaza.openclinica.DefaultAppContextTest;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.junit.Test;
+
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
@@ -25,14 +25,14 @@ public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 	public void testThatFindAllReturnsCorrectNumber() {
 		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eventDefinitionCRFDAO
 				.findAll();
-		assertEquals(5, eventCRFs.size());
+		assertEquals(6, eventCRFs.size());
 	}
 
 	@Test
 	public void testThatFindAllByDefinitionReturnsEdcWithCorrectCrfId() {
 		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eventDefinitionCRFDAO
 				.findAllByDefinition(3);
-		assertEquals(2, eventCRFs.get(0).getCrfId());
+		assertEquals(3, eventCRFs.get(0).getCrfId());
 	}
 
 	@Test
@@ -46,7 +46,7 @@ public class EventDefinitionCrfDaoTest extends DefaultAppContextTest {
 	public void restThatFindAllParentsByDefinitionReturnsCorrectNumberOfEdcs() {
 		List<EventDefinitionCRFBean> eventCRFs = (List<EventDefinitionCRFBean>) eventDefinitionCRFDAO
 				.findAllParentsByDefinition(3);
-		assertEquals(1, eventCRFs.size());
+		assertEquals(2, eventCRFs.size());
 	}
 
 	@Test

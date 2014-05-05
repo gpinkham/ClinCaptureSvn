@@ -14,6 +14,6 @@ public class ItemDataTest extends DefaultAppContextTest {
 	@Test
 	public void testThatFindAllReturnsCorrectNumberOfItemDataItems() {
 
-		assertEquals(62, itemDataDAO.findAll().size());
+		assertEquals(63, itemDataDAO.findAll().size());
 	}
 }

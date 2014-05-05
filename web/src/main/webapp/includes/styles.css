@@ -1147,6 +1147,21 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-right: 10px;
 }
 
+.button_medium_red {  background-color:transparent;
+    border-width: 0px;
+    background-image: url(../images/bt_RedRemove.gif);
+    background-repeat: no-repeat;
+    background-position: bottom;
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 11px;
+    color: #FFFFFF;
+    font-weight: bold;
+    width: 80px;
+    height: 17px;
+    margin-right: 10px;
+}
+
 .button_long { background-color:transparent;
     border-width: 0px;
     background-image: url(../images/button_long_BG.gif);

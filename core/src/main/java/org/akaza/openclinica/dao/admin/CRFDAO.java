@@ -378,4 +378,19 @@ public class CRFDAO extends AuditableEntityDAO {
 		}
 		return al;
 	}
+
+	public void deleteCrfById(int crfId) {
+		String sql = digester.getQuery("deleteCrfByCrfId");
+		HashMap variables = new HashMap();
+		variables.put(1, crfId);
+		variables.put(2, crfId);
+		variables.put(3, crfId);
+		variables.put(4, crfId);
+		variables.put(5, crfId);
+		variables.put(6, crfId);
+		variables.put(7, crfId);
+		variables.put(8, crfId);
+		variables.put(9, crfId);
+		this.execute(sql, variables);
+	}
 }

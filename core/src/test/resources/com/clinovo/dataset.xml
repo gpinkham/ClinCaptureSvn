@@ -34,6 +34,8 @@
          owner_id="1" date_created="2008-07-02" oc_oid="F_AGEN" source_study_id="1"/>
     <crf crf_id="2" status_id="1" name="Concomitant Medications AG" description="Test" owner_id="1"
          date_created="2008-07-02" oc_oid="F_CONC" source_study_id="1"/>
+    <crf crf_id="3" status_id="1" name="Medical coding eCRF" description="Test" owner_id="1"
+         date_created="2014-05-05" oc_oid="F_MEDICAL" source_study_id="1"/>
 
     <crf_version crf_version_id="1" crf_id="1" name="v2.0" description="Cal&apos;s Test v1; new template"
                  revision_notes="rev agoodwin 10.16.2007" status_id="1" date_created="2008-07-02" owner_id="1"
@@ -43,6 +45,9 @@
     <crf_version crf_version_id="3" crf_id="2" name="v3.0" description="Test delete query"
                  revision_notes="agoodwin 10.16.2007" status_id="1" date_created="2008-07-02" owner_id="1"
                  oc_oid="F_CONC_V30"/>
+    <crf_version crf_version_id="4" crf_id="3" name="v1.0" description="Medical coding first version"
+                 revision_notes="demo ecrf" status_id="1" date_created="2014-05-05" owner_id="1"
+                 oc_oid="F_MEDICAL_V1"/>
 
     <subject subject_id="1" status_id="1" date_of_birth="2008-07-01" gender="m" unique_identifier="pID1"
              date_created="2008-07-02" owner_id="1" update_id="1" dob_collected="true"/>
@@ -146,6 +151,11 @@
                validator_annotations="" validate_string="" owner_id="1" date_created="2008-07-02" study_subject_id="1"
                date_updated="2008-07-02" update_id="1" electronic_signature_status="false" sdv_status="false"
                old_status_id="1" sdv_update_id="0" not_started="false"/>
+    <event_crf event_crf_id="14" study_event_id="1" crf_version_id="4" date_interviewed="2014-05-05"
+               interviewer_name="Vitaly" completion_status_id="1" status_id="1" annotations="" validator_id="0"
+               validator_annotations="" validate_string="" owner_id="1" date_created="2014-05-05" study_subject_id="1"
+               date_updated="2014-05-05" update_id="1" electronic_signature_status="false" sdv_status="false"
+               old_status_id="1" sdv_update_id="0" not_started="true"/>
 
     <event_definition_crf event_definition_crf_id="1" study_event_definition_id="1" study_id="1" crf_id="1"
                           required_crf="true" double_entry="false" require_all_text_filled="false"
@@ -167,6 +177,10 @@
                           required_crf="true" double_entry="false" require_all_text_filled="false"
                           decision_conditions="false" null_values="" default_version_id="2" status_id="1" owner_id="1"
                           date_created="2008-07-02" ordinal="2" electronic_signature="false" hide_crf="false"/>
+    <event_definition_crf event_definition_crf_id="6" study_event_definition_id="3" study_id="1" crf_id="3"
+                          required_crf="true" double_entry="false" require_all_text_filled="false"
+                          decision_conditions="false" null_values="" default_version_id="2" status_id="1" owner_id="1"
+                          date_created="2014-05-05" ordinal="1" electronic_signature="false" hide_crf="false"/>
 
     <item item_id="1" name="periodStart" description="Start of Agent Administration Period" units="" phi_status="false"
           item_data_type_id="9" item_reference_type_id="1" status_id="1" owner_id="1" date_created="2008-07-02"
@@ -261,6 +275,8 @@
           oc_oid="I_CONC_CON_MED_ROUTE"/>
     <item item_id="34" name="Con_Med_form" description="Dose form" units="" phi_status="false" item_data_type_id="5"
           item_reference_type_id="1" status_id="1" owner_id="1" date_created="2008-07-02" oc_oid="I_CONC_CON_MED_FORM"/>
+    <item item_id="35" name="Med" description="Term" units="" phi_status="false" item_data_type_id="5"
+          item_reference_type_id="1" status_id="1" owner_id="1" date_created="2014-05-05" oc_oid="MEDICAL_CODING"/>
 
     <versioning_map crf_version_id="1" item_id="1"/>
     <versioning_map crf_version_id="1" item_id="2"/>
@@ -296,6 +312,7 @@
     <versioning_map crf_version_id="2" item_id="32"/>
     <versioning_map crf_version_id="2" item_id="33"/>
     <versioning_map crf_version_id="2" item_id="34"/>
+    <versioning_map crf_version_id="4" item_id="35"/>
 
     <item_data item_data_id="1" item_id="1" event_crf_id="1" status_id="2" value="07/01/2008" date_created="2008-07-02"
                owner_id="1" ordinal="1"/>
@@ -421,6 +438,8 @@
                owner_id="1" ordinal="3"/>
     <item_data item_data_id="62" item_id="34" event_crf_id="3" status_id="1" value="" date_created="2008-07-02"
                owner_id="1" ordinal="3"/>
+    <item_data item_data_id="63" item_id="35" event_crf_id="14" status_id="1" value="" date_created="2014-05-05"
+               owner_id="1" ordinal="3"/>
 
     <section section_id="1" crf_version_id="1" status_id="1" label="AdministrationandDosage"
              title="Administration and Dosage"
@@ -436,6 +455,9 @@
              parent_id="0" date_created="2008-07-02" owner_id="1" borders="0"/>
     <section section_id="4" crf_version_id="2" status_id="1" label="Concomitant Meds" title="Concomitant Meds"
              subtitle="" instructions="" page_number_label="1" ordinal="1" parent_id="0" date_created="2008-07-02"
+             owner_id="1" borders="0"/>
+    <section section_id="5" crf_version_id="4" status_id="1" label="Medical coding sec" title="Medical coding sec"
+             subtitle="" instructions="" page_number_label="1" ordinal="1" parent_id="0" date_created="2014-05-05"
              owner_id="1" borders="0"/>
 
     <response_set response_set_id="1" response_type_id="1" label="text" options_text="text" options_values="text"
@@ -636,6 +658,11 @@
                         left_item_text="Time" right_item_text="" section_id="1" response_set_id="1" regexp=""
                         regexp_error_msg="" ordinal="4" required="false" default_value="" response_layout=""
                         show_item="true" code_ref=""/>
+    <item_form_metadata item_form_metadata_id="38" item_id="7" crf_version_id="4" header="" subheader="" parent_id="0"
+                        parent_label="" column_number="0" page_number_label="1" question_number_label="a"
+                        left_item_text="Term" right_item_text="" section_id="1" response_set_id="1" regexp=""
+                        regexp_error_msg="" ordinal="4" required="false" default_value="" response_layout=""
+                        show_item="true" code_ref=""/>
 
     <item_group item_group_id="1" name="Ungrouped" crf_id="1" status_id="1" date_created="2008-07-02" owner_id="1"
                 oc_oid="IG_AGEN_UNGROUPED"/>
@@ -645,6 +672,8 @@
                 oc_oid="IG_CONC_UNGROUPED"/>
     <item_group item_group_id="4" name="CONCOMITANT MEDICATIONS" crf_id="2" status_id="1" date_created="2008-07-02"
                 owner_id="1" oc_oid="IG_CONC_CONCOMITANTMEDICATIONS"/>
+    <item_group item_group_id="5" name="MEDICAL" crf_id="3" status_id="1" date_created="2014-05-05"
+                owner_id="1" oc_oid="IG_UNGROUPED_MEDICAL"/>
 
     <item_group_metadata item_group_metadata_id="1" item_group_id="1" header="" subheader="" layout="" repeat_number="1"
                          repeat_max="1" repeat_array="" row_start_number="1" crf_version_id="1" item_id="1" ordinal="1"
@@ -759,7 +788,11 @@
                          item_id="18" ordinal="18" show_group="true" repeating_group="false"/>
     <item_group_metadata item_group_metadata_id="38" item_group_id="1" header="" subheader="" layout=""
                          repeat_number="1" repeat_max="1" repeat_array="" row_start_number="1" crf_version_id="1"
-                         item_id="19" ordinal="19" show_group="true" repeating_group="false"/>					 
+                         item_id="19" ordinal="19" show_group="true" repeating_group="false"/>
+    <item_group_metadata item_group_metadata_id="39" item_group_id="1" header="" subheader="" layout=""
+                         repeat_number="1" repeat_max="1" repeat_array="" row_start_number="1" crf_version_id="4"
+                         item_id="19" ordinal="19" show_group="true" repeating_group="false"/>
+
     <rule_expression id="1"
                      value="SE_ED1NONRE.F_AGEN.IG_AGEN_UNGROUPED[1].I_AGEN_PERIODSTART eq &quot;07/01/2008&quot; and I_CONC_CON_MED_NAME eq &quot;Tylenol&quot;"
                      context="1" owner_id="0" date_created="2008-07-02" date_updated="2008-07-02" update_id="0"
