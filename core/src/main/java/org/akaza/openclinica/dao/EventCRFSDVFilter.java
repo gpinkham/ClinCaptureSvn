@@ -13,14 +13,14 @@
 
 package org.akaza.openclinica.dao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.apache.commons.lang.StringEscapeUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class EventCRFSDVFilter implements CriteriaCommand {
 
@@ -83,13 +83,13 @@ public class EventCRFSDVFilter implements CriteriaCommand {
 					criteria = criteria
 							+ " ec.crf_version_id in (select distinct crf_version_id from crf_version crfv, crf cr, event_definition_crf edc where crfv.crf_id = cr.crf_id AND cr.crf_id = edc.crf_id AND edc.crf_id in (select crf_id from event_definition_crf where (s.study_id  = "
 							+ studyId + " or s.study_id in (select study_id from study where s.parent_study_id = "
-							+ studyId + ")) ";
+							+ studyId + ")) )) ";
 					criteria += " AND ( ";
 					for (int i = 0; i < reqs.size(); i++) {
 						criteria += i != 0 ? " OR " : "";
-						criteria += " source_data_verification_code = " + reqs.get(i);
+						criteria += " edc.source_data_verification_code = " + reqs.get(i);
 					}
-					criteria += " ) )) ";
+					criteria += " ) ";
 				}
 			} else if (property.equals("crfStatus")) {
 				if (value.equals("Completed")) {
