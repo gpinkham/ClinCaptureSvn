@@ -2653,3 +2653,14 @@ a.dnShortcut:hover {
 #ruleAssignments > tbody > tr > td:last-of-type {
     white-space: nowrap;
 }
+
+.uploadFileBoxText {
+	font-family: Tahoma Arial, Helvetica, sans-serif;
+	padding: 2px 5px 2px 10px;
+}
+
+.uploadFileBoxText p {
+	font-size: 12px;
+	text-align: justified;
+	word-wrap: normal;
+}
