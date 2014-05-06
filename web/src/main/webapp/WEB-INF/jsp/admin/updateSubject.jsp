@@ -255,7 +255,7 @@
 					<tr>
 						<td>
 							<div class="formfieldM_BG">
-								<input type="text" name="dateOfBirth" size="15" value="<c:out value="${fields['dateOfBirth']}"/>" class="formfieldM">
+								<input type="text" name="yearOfBirth" size="15" value="<c:out value="${fields['dateOfBirth']}"/>" class="formfieldM">
 							</div>
 						</td>
 						<td class="formlabel">
@@ -278,7 +278,7 @@
 						</td> 
 					</tr>
 				</table>
-				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dateOfBirth"/></jsp:include>
+				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yearOfBirth"/></jsp:include>
 			</td>
 		</tr>
 	</c:when>
@@ -329,7 +329,9 @@
 			($("input[name=isDataChanged]").val() == 'true')) {
         	confirmBackSmart('<fmt:message key="you_have_unsaved_data3" bundle="${resword}"/>', '${navigationURL}', '${defaultURL}');
         } 
-        goBackSmart('${navigationURL}', '${defaultURL}');
+         else{
+        	 goBackSmart('${navigationURL}', '${defaultURL}');
+         }
     }
  
     saveEditUserFormState(updateSubjectFormState);
